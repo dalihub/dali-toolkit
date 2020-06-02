@@ -268,7 +268,7 @@ int UtcDaliMagnifierOnSizeSet(void)
   application.Render();
 
   Vector3 size( 200.0f, 300.0f, 0.0f );
-  view.SetSize( size );
+  view.SetProperty( Actor::Property::SIZE, size );
 
   application.SendNotification();
   application.Render();

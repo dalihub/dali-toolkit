@@ -73,7 +73,7 @@ void OnPinch( Dali::Actor actor, const Dali::PinchGesture& pinch )
 {
   // Scale your actor according to the pinch scale
   Vector3 newSize = actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) * pinch.scale;
-  actor.SetSize(newSize);
+  actor.SetProperty( Actor::Property::SIZE, newSize );
 }
 
 // Elsewhere

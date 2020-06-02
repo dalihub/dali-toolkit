@@ -137,7 +137,7 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
   Constraint constraint;
 
   ScrollView scrollView = ScrollView::New();
-  scrollView.SetSize(size);
+  scrollView.SetProperty( Actor::Property::SIZE, size);
   scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
 
@@ -176,7 +176,7 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
   Actor container = Actor::New();
   container.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   container.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
-  container.SetSize( size );
+  container.SetProperty( Actor::Property::SIZE, size );
   scrollView.Add( container );
 
   constraint = Constraint::New<Vector3>( container, Actor::Property::SIZE, EqualToConstraint() );
@@ -195,7 +195,7 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
       constraint.Apply();
       page.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
       page.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-      page.SetPosition( column * size.x, row * size.y );
+      page.SetProperty( Actor::Property::POSITION, Vector2( column * size.x, row * size.y ));
       container.Add(page);
 
       gPages.push_back(page);

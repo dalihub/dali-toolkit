@@ -58,7 +58,7 @@ int UtcDaliVisualAction(void)
 
   Toolkit::Visual::Base visualBaseHandle = Toolkit::Visual::Base( dummyVisualPtr.Get() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visualBaseHandle );
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( dummyControl );
 
   application.SendNotification();
@@ -100,7 +100,7 @@ int UtcDaliVisualActionNotImplemented(void)
   Visual::Base visual = factory.CreateVisual( propertyMap );
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( dummyControl );
 
   application.SendNotification();
@@ -136,7 +136,7 @@ int UtcDaliVisualSetProperties(void)
 
   Toolkit::Visual::Base visualBaseHandle = Toolkit::Visual::Base( colorVisualPtr.Get() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visualBaseHandle );
-  dummyControl.SetSize( 200.f, 200.f );
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( dummyControl );
 
   application.SendNotification();
@@ -341,7 +341,7 @@ int UtcDaliAnimatedVectorImageVisualSetProperties(void)
   DummyControl actor = DummyControl::New( true );
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.0f, 200.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();

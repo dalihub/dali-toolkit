@@ -78,7 +78,7 @@ void PageTurnPortraitView::OnPageTurnViewInitialize()
   mSpineEffectShader.RegisterProperty(PROPERTY_TEXTURE_WIDTH, 1.f );
 
   mControlSize = mPageSize;
-  Self().SetSize( mPageSize );
+  Self().SetProperty( Actor::Property::SIZE, mPageSize );
   mTurningPageLayer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
 }
 

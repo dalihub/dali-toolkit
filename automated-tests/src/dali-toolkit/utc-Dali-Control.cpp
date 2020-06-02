@@ -425,7 +425,7 @@ int UtcDaliControlSignalAutomaticDisconnect(void)
   DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 0u, TEST_LOCATION );
 
   const Vector3 ignoredSize( 20, 20, 0 );
-  actor.SetSize( ignoredSize );
+  actor.SetProperty( Actor::Property::SIZE, ignoredSize );
   END_TEST;
 }
 
@@ -434,7 +434,7 @@ int UtcDaliControlTestParameters(void)
   ToolkitTestApplication application;
   DummyControl test = DummyControl::New();
 
-  test.SetSize( 0.7f, 0.7f, 0.7f );
+  test.SetProperty( Actor::Property::SIZE, Vector3( 0.7f, 0.7f, 0.7f ) );
 
   Stage::GetCurrent().Add( test );
 
@@ -950,7 +950,7 @@ int UtcDaliControlResourcesReady(void)
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, smallVisual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
 
   Toolkit::Visual::ResourceStatus resourceStatus = actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL);
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
@@ -1009,7 +1009,7 @@ int UtcDaliControlResourcesReady02(void)
   gResourceReadySignalFired = false;
 
   Control control = Control::New();
-  control.SetSize( 200.f, 200.f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   control.ResourceReadySignal().Connect( &ResourceReadySignal );
 
   Property::Map propertyMap;
@@ -1120,7 +1120,7 @@ int UtcDaliControlDoAction(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( dummyControl );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -1162,7 +1162,7 @@ int UtcDaliControlDoActionWhenNotStage(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
 
   application.SendNotification();
   application.Render();

@@ -325,7 +325,7 @@ void Popup::OnInitialize()
 
   mPopupLayout.SetResizePolicy( ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH );
   mPopupLayout.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
-  mPopupLayout.SetSize( Stage::GetCurrent().GetSize().x * DEFAULT_RELATIVE_PARENT_WIDTH, 0.0f );
+  mPopupLayout.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x * DEFAULT_RELATIVE_PARENT_WIDTH, 0.0f ) );
 
   mPopupLayout.SetFitHeight( 0 ); // Set row to fit.
   mPopupLayout.SetFitHeight( 1 ); // Set row to fit.
@@ -354,7 +354,7 @@ void Popup::LayoutAnimation()
     case Toolkit::Popup::ZOOM:
     {
       // Zoom animations start fully zoomed out.
-      mPopupContainer.SetScale( Vector3::ZERO );
+      mPopupContainer.SetProperty( Actor::Property::SCALE, Vector3::ZERO );
       break;
     }
 
@@ -435,7 +435,7 @@ void Popup::StartTransitionAnimation( bool transitionIn, bool instantaneous /* f
       }
       else
       {
-        mPopupContainer.SetScale( transitionIn ? Vector3::ONE : Vector3::ZERO );
+        mPopupContainer.SetProperty( Actor::Property::SCALE, transitionIn ? Vector3::ONE : Vector3::ZERO );
       }
       break;
     }
@@ -898,7 +898,7 @@ void Popup::LayoutTail()
     mTailImage.SetProperty( Dali::Actor::Property::NAME, "tailImage" );
     mTailImage.SetProperty( Actor::Property::PARENT_ORIGIN, parentOrigin );
     mTailImage.SetProperty( Actor::Property::ANCHOR_POINT, anchorPoint );
-    mTailImage.SetPosition( position );
+    mTailImage.SetProperty( Actor::Property::POSITION, position );
 
     if( mPopupBackgroundImage )
     {
@@ -931,7 +931,7 @@ Toolkit::Control Popup::CreateBacking()
 
   // Always the full size of the stage.
   backing.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  backing.SetSize( Stage::GetCurrent().GetSize() );
+  backing.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize() );
 
   // Catch events.
   backing.SetProperty( Actor::Property::SENSITIVE, true );
@@ -1032,7 +1032,7 @@ void Popup::UpdateBackgroundPositionAndSize()
     mPopupBackgroundImage.SetProperty( Actor::Property::SIZE_MODE_FACTOR, Vector3( mBackgroundBorder.left + mBackgroundBorder.right, mBackgroundBorder.top + mBackgroundBorder.bottom, 0.0f ) );
 
     // Adjust the position of the background so the transparent areas are set appropriately
-    mPopupBackgroundImage.SetPosition( ( mBackgroundBorder.right - mBackgroundBorder.left ) * 0.5f, ( mBackgroundBorder.bottom - mBackgroundBorder.top ) * 0.5f );
+    mPopupBackgroundImage.SetProperty( Actor::Property::POSITION, Vector2( ( mBackgroundBorder.right - mBackgroundBorder.left ) * 0.5f, ( mBackgroundBorder.bottom - mBackgroundBorder.top ) * 0.5f ));
   }
 }
 
@@ -1687,7 +1687,7 @@ void Popup::LayoutContext( const Vector2& size )
   }
 
   // Set the final position.
-  mPopupContainer.SetPosition( newPosition );
+  mPopupContainer.SetProperty( Actor::Property::POSITION, newPosition );
 }
 
 void Popup::OnRelayout( const Vector2& size, RelayoutContainer& container )

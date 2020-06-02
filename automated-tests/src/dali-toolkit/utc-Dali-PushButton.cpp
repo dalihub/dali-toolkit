@@ -135,7 +135,7 @@ void SetupButtonForTestTouchEvents( ToolkitTestApplication& application, Button&
 {
   button.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  button.SetPosition( BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
+  button.SetProperty( Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
   if ( useDefaultImages )
   {
     const Vector2 TEST_IMAGE_SIZE = Vector2( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
@@ -466,8 +466,8 @@ int UtcDaliPushButtonPressed(void)
   PushButton pushButton = PushButton::New();
   pushButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   pushButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
-  pushButton.SetSize( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
+  pushButton.SetProperty( Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
+  pushButton.SetProperty( Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
   Stage::GetCurrent().Add( pushButton );
 
@@ -499,8 +499,8 @@ int UtcDaliPushButtonReleased(void)
   PushButton pushButton = PushButton::New();
   pushButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   pushButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
-  pushButton.SetSize( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
+  pushButton.SetProperty( Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
+  pushButton.SetProperty( Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
   Stage::GetCurrent().Add( pushButton );
 
@@ -582,8 +582,8 @@ int UtcDaliPushButtonSelected(void)
   PushButton pushButton = PushButton::New();
   pushButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   pushButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
-  pushButton.SetSize( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
+  pushButton.SetProperty( Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
+  pushButton.SetProperty( Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
   Stage::GetCurrent().Add( pushButton );
 
@@ -749,7 +749,7 @@ int UtcDaliPushButtonPaddingLayout(void)
 
   pushButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   pushButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( 0.0f, 0.0f );
+  pushButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   pushButton.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
   Stage::GetCurrent().Add( pushButton );
@@ -798,7 +798,7 @@ int UtcDaliPushButtonPaddingLayout(void)
 
   pushButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   pushButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( 0.0f, 0.0f );
+  pushButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   pushButton.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
   Stage::GetCurrent().Add( pushButton );
@@ -896,7 +896,7 @@ int UtcDaliPushButtonAlignmentLayout(void)
 
   pushButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   pushButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( 0.0f, 0.0f );
+  pushButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   pushButton.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
   Stage::GetCurrent().Add( pushButton );
@@ -1057,7 +1057,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
   ToolkitTestApplication application;
 
   PushButton pushButton = PushButton::New();
-  pushButton.SetSize( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
+  pushButton.SetProperty( Actor::Property::SIZE, Vector2( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS ) );
 
   Stage::GetCurrent().Add( pushButton );
 

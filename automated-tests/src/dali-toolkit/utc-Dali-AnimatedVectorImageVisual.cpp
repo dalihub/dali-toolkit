@@ -75,7 +75,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual01(void)
   DummyControl actor = DummyControl::New( true );
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.0f, 200.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -108,7 +108,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual02(void)
   DummyControl actor = DummyControl::New( true );
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.0f, 200.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -147,7 +147,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual03(void)
   DummyControl actor = DummyControl::New( true );
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.0f, 200.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -188,7 +188,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   DummyControl actor = DummyControl::New( true );
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.0f, 200.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -259,7 +259,7 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 
@@ -437,7 +437,7 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
 
     // Change Size
     Vector3 newSize( 100.0f, 100.0f, 0.0f );
-    dummyControl.SetSize( newSize );
+    dummyControl.SetProperty( Actor::Property::SIZE, newSize );
 
     application.SendNotification();
     application.Render(16);
@@ -476,7 +476,7 @@ int UtcDaliAnimatedVectorImageVisualCustomShader(void)
   Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  dummy.SetSize( 200.f, 200.f );
+  dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( dummy );
 
@@ -526,7 +526,7 @@ int UtcDaliAnimatedVectorImageVisualNaturalSize(void)
 
   DALI_TEST_EQUALS( naturalSize, Vector2( 100.0f, 100.0f ), TEST_LOCATION );    // 100x100 is the content default size.
 
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   application.SendNotification();
   application.Render();
@@ -556,7 +556,7 @@ int UtcDaliAnimatedVectorImageVisualLoopCount(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 
@@ -600,7 +600,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 
@@ -710,7 +710,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 
@@ -803,7 +803,7 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
   DevelControl::VisualEventSignal( actor ).Connect( &VisualEventSignal );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 
@@ -842,7 +842,7 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 
@@ -940,7 +940,7 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 
@@ -1046,7 +1046,7 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 
@@ -1141,7 +1141,7 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 
@@ -1218,8 +1218,8 @@ int UtcDaliAnimatedVectorImageVisualPropertyNotification(void)
 
   Vector2 controlSize( 20.f, 30.f );
   Vector3 controlScale( 2.0f, 2.0f, 1.0f );
-  actor.SetSize( controlSize );
-  actor.SetScale( controlScale );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
+  actor.SetProperty( Actor::Property::SCALE, controlScale );
 
   Stage::GetCurrent().Add( actor );
 
@@ -1241,8 +1241,8 @@ int UtcDaliAnimatedVectorImageVisualPropertyNotification(void)
   // Change scale and size
   controlSize = Vector2( 50.f, 40.f );
   controlScale= Vector3( 0.5f, 0.5f, 1.0f );
-  actor.SetSize( controlSize );
-  actor.SetScale( controlScale );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
+  actor.SetProperty( Actor::Property::SCALE, controlScale );
 
   application.SendNotification();
   application.Render();
@@ -1279,7 +1279,7 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
   dummyImpl1.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual1 );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor1.SetSize( controlSize );
+  actor1.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor1 );
 
@@ -1294,7 +1294,7 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
   DummyControlImpl& dummyImpl2 = static_cast< DummyControlImpl& >( actor2.GetImplementation() );
   dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual2 );
 
-  actor2.SetSize( controlSize );
+  actor2.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor2 );
 
@@ -1343,7 +1343,7 @@ int UtcDaliAnimatedVectorImageVisualControlVisibilityChanged(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 
@@ -1387,7 +1387,7 @@ int UtcDaliAnimatedVectorImageVisualWindowVisibilityChanged(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
+  actor.SetProperty( Actor::Property::SIZE, controlSize );
 
   Stage::GetCurrent().Add( actor );
 

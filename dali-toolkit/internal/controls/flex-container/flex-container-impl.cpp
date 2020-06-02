@@ -704,8 +704,8 @@ void FlexContainer::RelayoutChildren()
     Dali::Actor child = mChildrenNodes[i].actor.GetHandle();
     if( child )
     {
-      child.SetX( YGNodeLayoutGetLeft( mChildrenNodes[i].node ) );
-      child.SetY( YGNodeLayoutGetTop( mChildrenNodes[i].node ) );
+      child.SetProperty( Actor::Property::POSITION_X,  YGNodeLayoutGetLeft( mChildrenNodes[i].node ) );
+      child.SetProperty( Actor::Property::POSITION_Y,  YGNodeLayoutGetTop( mChildrenNodes[i].node ) );
     }
   }
 }

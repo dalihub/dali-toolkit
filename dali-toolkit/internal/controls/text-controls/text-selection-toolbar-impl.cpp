@@ -178,7 +178,7 @@ void TextSelectionToolbar::OnRelayout( const Vector2& size, RelayoutContainer& c
   if( mScrollBar )
   {
     float barWidth = std::min( mTableOfButtons.GetNaturalSize().width, size.width ) - 2.f * mScrollBarPadding.x;
-    mScrollBar.SetSize( Vector2( 0.0f, barWidth ) );
+    mScrollBar.SetProperty( Actor::Property::SIZE, Vector2( 0.0f, barWidth ) );
   }
 }
 
@@ -265,7 +265,7 @@ void TextSelectionToolbar::SetUpScrollBar( bool enable )
       mScrollBar.SetStyleName( "TextSelectionScrollBar" );
       mScrollBar.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );
       mScrollBar.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-      mScrollBar.SetPosition( mScrollBarPadding.x, -mScrollBarPadding.y );
+      mScrollBar.SetProperty( Actor::Property::POSITION, Vector2( mScrollBarPadding.x, -mScrollBarPadding.y ));
       mScrollBar.SetResizePolicy( Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH );
       mScrollBar.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) ) );
       mScrollBar.SetScrollIndicator( indicator );
@@ -312,7 +312,7 @@ void TextSelectionToolbar::ResizeDividers( Size& size )
   for( unsigned int i = 0; i < mDividerIndexes.Count(); ++i )
   {
     Actor divider = mTableOfButtons.GetChildAt( Toolkit::TableView::CellPosition( 0, mDividerIndexes[ i ] ) );
-    divider.SetSize( size );
+    divider.SetProperty( Actor::Property::SIZE, size );
   }
   RelayoutRequest();
 }
@@ -327,7 +327,7 @@ void TextSelectionToolbar::SetScrollBarPadding( const Vector2& padding )
   mScrollBarPadding = padding;
   if( mScrollBar )
   {
-    mScrollBar.SetPosition( mScrollBarPadding.x, -mScrollBarPadding.y );
+    mScrollBar.SetProperty( Actor::Property::POSITION, Vector2( mScrollBarPadding.x, -mScrollBarPadding.y ));
   }
 
   RelayoutRequest();

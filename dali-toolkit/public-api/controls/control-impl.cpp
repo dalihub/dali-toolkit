@@ -504,7 +504,7 @@ void Control::OnPinch(const PinchGesture& pinch)
     *( mImpl->mStartingPinchScale ) = Self().GetCurrentProperty< Vector3 >( Actor::Property::SCALE );
   }
 
-  Self().SetScale( *( mImpl->mStartingPinchScale ) * pinch.scale );
+  Self().SetProperty( Actor::Property::SCALE, *( mImpl->mStartingPinchScale ) * pinch.scale );
 }
 
 void Control::OnPan( const PanGesture& pan )
@@ -668,7 +668,7 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
       childOffset.x += ( mImpl->mMargin.start + padding.start );
       childOffset.y += ( mImpl->mMargin.top + padding.top );
 
-      child.SetPosition( childOffset.x, childOffset.y );
+      child.SetProperty( Actor::Property::POSITION, Vector2( childOffset.x, childOffset.y ) );
     }
     container.Add( child, newChildSize );
   }

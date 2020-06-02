@@ -1434,11 +1434,11 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   if( mStencil )
   {
-    mStencil.SetPosition( padding.start, padding.top );
+    mStencil.SetProperty( Actor::Property::POSITION, Vector2( padding.start, padding.top ));
   }
   if( mActiveLayer )
   {
-    mActiveLayer.SetPosition( padding.start, padding.top );
+    mActiveLayer.SetProperty( Actor::Property::POSITION, Vector2( padding.start, padding.top ));
   }
 
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize, layoutDirection );
@@ -1540,7 +1540,7 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
       renderableActorPositionY = scrollOffset.y + padding.top;
     }
 
-    mRenderableActor.SetPosition( renderableActorPositionX, renderableActorPositionY );
+    mRenderableActor.SetProperty( Actor::Property::POSITION, Vector2( renderableActorPositionX, renderableActorPositionY ));
 
     // Make sure the actors are parented correctly with/without clipping
     Actor self = mStencil ? mStencil : Self();
@@ -1569,13 +1569,13 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
       if ( mDecorator && mDecorator->IsHighlightVisible() )
       {
         self.Add( mBackgroundActor );
-        mBackgroundActor.SetPosition( renderableActorPositionX, renderableActorPositionY); // In text field's coords.
+        mBackgroundActor.SetProperty( Actor::Property::POSITION, Vector2( renderableActorPositionX, renderableActorPositionY) ); // In text field's coords.
         mBackgroundActor.LowerBelow( highlightActor );
       }
       else
       {
         mRenderableActor.Add( mBackgroundActor );
-        mBackgroundActor.SetPosition( 0.0f, 0.0f ); // In renderable actor's coords.
+        mBackgroundActor.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ) ); // In renderable actor's coords.
         mBackgroundActor.LowerToBottom();
       }
     }

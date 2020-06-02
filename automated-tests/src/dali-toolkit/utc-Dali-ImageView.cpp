@@ -646,7 +646,7 @@ int UtcDaliImageViewAsyncLoadingWithoutAltasing(void)
 
   // By default, Aysnc loading is used
   Stage::GetCurrent().Add( imageView );
-  imageView.SetSize(100, 100);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(100, 100) );
   imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -1887,7 +1887,7 @@ int UtcDaliImageViewPaddingProperty(void)
 
   ImageView childImage = ImageView::New();
   childImage.SetBackgroundColor( Color::BLACK );
-  childImage.SetSize( 10.f, 10.f );
+  childImage.SetProperty( Actor::Property::SIZE, Vector2( 10.f, 10.f ) );
   imageView.Add( childImage );
 
   application.SendNotification();
@@ -2171,7 +2171,7 @@ int UtcDaliImageViewFittingModeFitKeepAspectRatio(void)
   imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE , Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO );
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(600,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(600,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2218,7 +2218,7 @@ int UtcDaliImageViewFittingModesFill(void)
   imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE , Toolkit::DevelVisual::FILL );
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(600,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(600,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2264,7 +2264,7 @@ int UtcDaliImageViewFittingModesOverfitKeepAspectRatio(void)
   imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE , Toolkit::DevelVisual::OVER_FIT_KEEP_ASPECT_RATIO );
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(600,500);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(600,500) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2311,7 +2311,7 @@ int UtcDaliImageViewFittingModesCenter01(void)
   imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::CENTER);
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(700,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(700,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2357,7 +2357,7 @@ int UtcDaliImageViewFittingModesCenter02(void)
   imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::CENTER);
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(700,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(700,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2402,7 +2402,7 @@ int UtcDaliImageViewFittingModesFitHeight01(void)
   imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FIT_HEIGHT);
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(600,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(600,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2447,7 +2447,7 @@ int UtcDaliImageViewFittingModesFitHeight02(void)
   imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FIT_HEIGHT);
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(700,600);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(700,600) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2492,7 +2492,7 @@ int UtcDaliImageViewFittingModesFitWidth01(void)
   imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FIT_WIDTH);
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(600,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(600,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2537,7 +2537,7 @@ int UtcDaliImageViewFittingModesFitWidth02(void)
   imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FIT_WIDTH);
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(700,600);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(700,600) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2584,7 +2584,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode01(void)
   imageMap[ DevelVisual::Property::VISUAL_FITTING_MODE ] =  Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(800,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2620,7 +2620,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode01(void)
   imageMap2[ DevelVisual::Property::VISUAL_FITTING_MODE ] = Toolkit::DevelVisual::CENTER;
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap2 );
-  imageView.SetSize(800,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2659,7 +2659,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode01(void)
   imageMap3[ DevelVisual::Property::VISUAL_FITTING_MODE ] =  Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap3 );
-  imageView.SetSize(800,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2706,7 +2706,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode02(void)
   imageMap[ DevelVisual::Property::VISUAL_FITTING_MODE ] =  Toolkit::DevelVisual::OVER_FIT_KEEP_ASPECT_RATIO;
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(800,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2742,7 +2742,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode02(void)
   imageMap2[ DevelVisual::Property::VISUAL_FITTING_MODE ] = Toolkit::DevelVisual::CENTER;
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap2 );
-  imageView.SetSize(800,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2781,7 +2781,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode02(void)
   imageMap3[ DevelVisual::Property::VISUAL_FITTING_MODE ] =  Toolkit::DevelVisual::OVER_FIT_KEEP_ASPECT_RATIO;
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap3 );
-  imageView.SetSize(800,700);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -2825,7 +2825,7 @@ int UtcDaliImageViewFittingModesWithAnimatedVectorImageVisual(void)
   imageMap.Add( Toolkit::ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME ); // 249x169 image
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  imageView.SetSize(600,600);
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(600,600) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -3114,8 +3114,8 @@ int UtcDaliImageViewLoadRemoteSVG(void)
   imageView.SetImage("https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/SVG_logo.svg/64px-SVG_logo.svg.png");
   imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  imageView.SetSize(300, 300);
-  imageView.SetPosition( Vector3( 150.0f , 150.0f , 0.0f ) );
+  imageView.SetProperty( Actor::Property::SIZE, Vector2(300, 300) );
+  imageView.SetProperty( Actor::Property::POSITION, Vector3( 150.0f , 150.0f , 0.0f ) );
 
   Stage::GetCurrent().Add( imageView );
 
@@ -3260,7 +3260,7 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     gResourceReadySignalFired = false;
 
     ImageView imageView = ImageView::New( TEST_RESOURCE_DIR "/Kid1.svg" );
-    imageView.SetSize( 200.f, 200.f );
+    imageView.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
     DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
@@ -3285,7 +3285,7 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     gResourceReadySignalFired = false;
 
     ImageView imageView = ImageView::New( "https://bar.org/foobar.svg" );
-    imageView.SetSize( 200.f, 200.f );
+    imageView.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
     DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );

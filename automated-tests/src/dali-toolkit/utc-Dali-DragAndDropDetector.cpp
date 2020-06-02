@@ -270,7 +270,7 @@ int UtcDaliDragAndDropDetectorStartSignal(void)
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control = Control::New();
-  control.SetSize(100.0f, 100.0f);
+  control.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   control.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(control);
   detector.Attach(control);
@@ -302,14 +302,14 @@ int UtcDaliDragAndDropDetectorEnteredSignal(void)
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();
   Control control2 = Control::New();
-  control1.SetSize(100.0f,100.0f);
-  control2.SetSize(100.0f, 100.0f);
+  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f,100.0f) );
+  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetPosition(0.0f, 0.0f);
-  control2.SetPosition(0.0f, 100.0f);
+  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   Stage::GetCurrent().Add(control1);
   Stage::GetCurrent().Add(control2);
@@ -345,14 +345,14 @@ int UtcDaliDragAndDropDetectorMovedSignal(void)
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();
   Control control2 = Control::New();
-  control1.SetSize(100.0f,100.0f);
-  control2.SetSize(100.0f, 100.0f);
+  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f,100.0f) );
+  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetPosition(0.0f, 0.0f);
-  control2.SetPosition(0.0f, 100.0f);
+  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   Stage::GetCurrent().Add(control1);
   Stage::GetCurrent().Add(control2);
@@ -392,14 +392,14 @@ int UtcDaliDragAndDropDetectorExitedSignal(void)
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();
   Control control2 = Control::New();
-  control1.SetSize(100.0f,100.0f);
-  control2.SetSize(100.0f, 100.0f);
+  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f,100.0f) );
+  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetPosition(0.0f, 0.0f);
-  control2.SetPosition(0.0f, 100.0f);
+  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   control1.SetProperty( Actor::Property::LEAVE_REQUIRED,true);
   control2.SetProperty( Actor::Property::LEAVE_REQUIRED,true);
@@ -440,14 +440,14 @@ int UtcDaliDragAndDropDetectorDroppedSignal(void)
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();
   Control control2 = Control::New();
-  control1.SetSize(100.0f,100.0f);
-  control2.SetSize(100.0f, 100.0f);
+  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f,100.0f) );
+  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetPosition(0.0f, 0.0f);
-  control2.SetPosition(0.0f, 100.0f);
+  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   Stage::GetCurrent().Add(control1);
   Stage::GetCurrent().Add(control2);
@@ -488,14 +488,14 @@ int UtcDaliDragAndDropDetectorEndedSignal(void)
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();
   Control control2 = Control::New();
-  control1.SetSize(100.0f,100.0f);
-  control2.SetSize(100.0f, 100.0f);
+  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f,100.0f) );
+  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetPosition(0.0f, 0.0f);
-  control2.SetPosition(0.0f, 100.0f);
+  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   Stage::GetCurrent().Add(control1);
   Stage::GetCurrent().Add(control2);
@@ -530,14 +530,14 @@ int UtcDaliDragAndDropDetectorGetContent(void)
   Control control2 = Control::New();
   control1.SetProperty( Dali::Actor::Property::NAME,"control1");
   control2.SetProperty( Dali::Actor::Property::NAME,"control2");
-  control1.SetSize(100.0f,100.0f);
-  control2.SetSize(100.0f, 100.0f);
+  control1.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
+  control2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   control1.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control2.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   control1.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   control2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
-  control1.SetPosition(0.0f, 0.0f);
-  control2.SetPosition(0.0f, 100.0f);
+  control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
   Stage::GetCurrent().Add(control1);
   Stage::GetCurrent().Add(control2);

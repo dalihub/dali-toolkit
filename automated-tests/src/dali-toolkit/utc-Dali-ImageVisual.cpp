@@ -74,7 +74,7 @@ Actor CreateActorWithImageVisual(const Property::Map& map)
   Visual::Base visual = factory.CreateVisual( map );
   DALI_TEST_CHECK( visual );
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
   return actor;
 }
@@ -112,7 +112,7 @@ void TestVisualRender( ToolkitTestApplication& application,
     application.GetPlatform().SetClosestImageSize(  Vector2(imageDimensions.GetWidth(), imageDimensions.GetHeight()) );
   }
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -181,7 +181,7 @@ int UtcDaliImageVisualPropertyMap(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -237,7 +237,7 @@ int UtcDaliImageVisualNoPremultipliedAlpha01(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -294,7 +294,7 @@ int UtcDaliImageVisualNoPremultipliedAlpha02(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -340,7 +340,7 @@ int UtcDaliImageVisualNoPremultipliedAlpha02(void)
   DummyControlImpl& newDummyImpl = static_cast< DummyControlImpl& >( newActor.GetImplementation() );
   newDummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, newVisual );
 
-  newActor.SetSize( 200.f, 200.f );
+  newActor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( newActor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( newActor );
@@ -397,7 +397,7 @@ int UtcDaliImageVisualRemoteImageLoad(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -639,7 +639,7 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   DummyControl actor = DummyControl::New();
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
-  actor.SetSize(2000, 2000);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Stage::GetCurrent().Add( actor );
 
@@ -717,7 +717,7 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
   DummyControl actor = DummyControl::New();
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
-  actor.SetSize(2000, 2000);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Stage::GetCurrent().Add( actor );
 
@@ -775,7 +775,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  actor.SetSize(2000, 2000);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
   Stage::GetCurrent().Add(actor);
@@ -855,7 +855,7 @@ int UtcDaliImageVisualAnimateOpacity(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  actor.SetSize(2000, 2000);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
   Stage::GetCurrent().Add(actor);
@@ -967,7 +967,7 @@ int UtcDaliImageVisualAnimateOpacity02(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  actor.SetSize(2000, 2000);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
 
@@ -1054,7 +1054,7 @@ int UtcDaliImageVisualAnimatePixelArea(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  actor.SetSize(2000, 2000);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
   Stage::GetCurrent().Add(actor);
@@ -1203,7 +1203,7 @@ int UtcDaliImageVisualSetInvalidAsyncImage(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -1247,7 +1247,7 @@ int UtcDaliImageVisualSetInvalidSyncImage(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -1288,7 +1288,7 @@ int UtcDaliImageVisualSetInvalidRemoteImage(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -1339,7 +1339,7 @@ int UtcDaliImageVisualAlphaMask(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
@@ -1394,7 +1394,7 @@ int UtcDaliImageVisualSynchronousLoadAlphaMask(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
@@ -1451,7 +1451,7 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
 
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -1505,7 +1505,7 @@ int UtcDaliImageVisualAlphaMaskCrop(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
@@ -1548,7 +1548,7 @@ int UtcDaliImageVisualReleasePolicy01(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
   imageVisual.Reset();
 
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
 
   application.SendNotification();
   application.Render(0);
@@ -1598,7 +1598,7 @@ int UtcDaliImageVisualReleasePolicy02(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
   imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
 
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
 
   application.SendNotification();
   application.Render(0);
@@ -1649,7 +1649,7 @@ int UtcDaliImageVisualReleasePolicy03(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
   imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
 
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
 
   application.SendNotification();
   application.Render(0);
@@ -1704,7 +1704,7 @@ int UtcDaliImageVisualReleasePolicy04(void)
   imageVisualNever.Reset(); // reduce ref count so only the control keeps the visual alive.
   imageVisualDestroyed.Reset(); // reduce ref count so only the control keeps the visual alive.
 
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
 
   // Test initially zero renderers
   application.SendNotification();
@@ -1788,7 +1788,7 @@ int UtcDaliImageVisualReleasePolicy06(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
   imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
 
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
 
   application.SendNotification();
   application.Render(0);
@@ -1854,7 +1854,7 @@ int UtcDaliImageVisualReleasePolicy07(void)
   imageVisualDestroyed.Reset(); // reduce ref count so only the control keeps the visual alive.
   imageVisualDetached.Reset(); // reduce ref count so only the control keeps the visual alive.
 
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
 
   // Test initially zero renderers
   application.SendNotification();
@@ -1937,7 +1937,7 @@ int UtcDaliImageVisualLoadPolicy01(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
   imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
 
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
   Stage::GetCurrent().Add( actor );
   tet_infoline( "Ensure nothing triggers another load as texure already loaded" );
   const unsigned int TIME_OUT_3_SECONDS = 3;
@@ -1991,7 +1991,7 @@ int UtcDaliImageVisualLoadPolicy02(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
   imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
 
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
   Stage::GetCurrent().Add( actor );
   tet_infoline( "Allow image time to load" );
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -2031,7 +2031,7 @@ int UtcDaliImageVisualLoadPolicy03(void)
   DummyControl actor = DummyControl::New(true);
   actor.ResourceReadySignal().Connect( &ResourceReadySignal);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
 
   tet_infoline( "Create visual with IMMEDIATE load policy" );
   Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
@@ -2069,7 +2069,7 @@ int UtcDaliImageVisualLoadPolicy04(void)
   DummyControl actor = DummyControl::New(true);
   actor.ResourceReadySignal().Connect( &ResourceReadySignal);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
 
   tet_infoline( "Create visual with IMMEDIATE load policy" );
   Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
@@ -2098,7 +2098,7 @@ int UtcDaliImageVisualLoadPolicy04(void)
   tet_infoline( "Registering visual this should trigger the loading signal as is already image loaded for previous control" );
   dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual2 );
   imageVisual2.Reset(); // reduce ref count so only the control keeps the visual alive.
-  actor2.SetSize(200.f, 200.f);
+  actor2.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 0 ), true, TEST_LOCATION ); // Not expecting any further loading as texture is being reused.
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
@@ -2119,7 +2119,7 @@ int UtcDaliImageVisualLoadPolicy05(void)
   DummyControl actor = DummyControl::New(true);
   actor.ResourceReadySignal().Connect( &ResourceReadySignal);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
   Stage::GetCurrent().Add( actor );
 
   tet_infoline( "Create visual with ATTACHED load policy" );
@@ -2149,7 +2149,7 @@ int UtcDaliImageVisualLoadPolicy05(void)
   tet_infoline( "Registering visual this should trigger the loading signal as is already image loaded for previous control" );
   dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual2 );
   imageVisual2.Reset(); // reduce ref count so only the control keeps the visual alive.
-  actor2.SetSize(200.f, 200.f);
+  actor2.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 0 ), true, TEST_LOCATION ); // Not expecting any further loading as texture is being reused.
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
@@ -2239,7 +2239,7 @@ int UtcDaliImageVisualCustomShader(void)
   Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  dummy.SetSize( 200.f, 200.f );
+  dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( dummy );
 
@@ -2271,7 +2271,7 @@ int UtcDaliImageVisualCustomShader(void)
   DummyControl dummy1 = DummyControl::New( true );
   Impl::DummyControl& dummyImpl1 = static_cast< Impl::DummyControl& >( dummy1.GetImplementation() );
   dummyImpl1.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual1 );
-  dummy1.SetSize( 200, 200 );
+  dummy1.SetProperty( Actor::Property::SIZE, Vector2( 200, 200 ) );
   dummy1.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( dummy1 );
 
@@ -2331,7 +2331,7 @@ int UtcDaliImageVisualLoadReady01(void)
   int actor1Id = actor.GetId();
   actor.ResourceReadySignal().Connect( &ResourceReadySignal);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
   Stage::GetCurrent().Add(actor);
 
   tet_infoline( "Create visual with IMMEDIATE load policy" );
@@ -2366,7 +2366,7 @@ int UtcDaliImageVisualLoadReady01(void)
   tet_infoline( "Registering visual this should trigger the ready signal when the image fails to load" );
   dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual2 );
 
-  actor2.SetSize(200.f, 200.f);
+  actor2.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
   Stage::GetCurrent().Add(actor2);
 
   tet_infoline( "Wait for loading thread to finish");

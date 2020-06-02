@@ -85,7 +85,7 @@ void SpreadFilter::Enable()
   // create actor to render input with applied emboss effect
   mActorForInput = Actor::New();
   mActorForInput.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mActorForInput.SetSize(mTargetSize);
+  mActorForInput.SetProperty( Actor::Property::SIZE, mTargetSize);
   // register properties as shader uniforms
   mActorForInput.RegisterProperty( SPREAD_UNIFORM_NAME, mSpread );
   mActorForInput.RegisterProperty( TEX_SCALE_UNIFORM_NAME, Vector2( 1.0f / mTargetSize.width, 0.0f ) );
@@ -102,7 +102,7 @@ void SpreadFilter::Enable()
   // create an actor to render mImageForHorz for vertical blur pass
   mActorForHorz = Actor::New();
   mActorForHorz.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mActorForHorz.SetSize(mTargetSize);
+  mActorForHorz.SetProperty( Actor::Property::SIZE, mTargetSize);
   // register properties as shader uniforms
   mActorForHorz.RegisterProperty( SPREAD_UNIFORM_NAME, mSpread );
   mActorForHorz.RegisterProperty( TEX_SCALE_UNIFORM_NAME, Vector2( 0.0f, 1.0f / mTargetSize.height ) );
@@ -172,11 +172,11 @@ void SpreadFilter::SetSize( const Vector2& size )
   mTargetSize = size;
   if( mActorForInput )
   {
-    mActorForInput.SetSize(mTargetSize);
+    mActorForInput.SetProperty( Actor::Property::SIZE, mTargetSize);
   }
   if( mActorForHorz )
   {
-    mActorForHorz.SetSize(mTargetSize);
+    mActorForHorz.SetProperty( Actor::Property::SIZE, mTargetSize);
   }
 }
 

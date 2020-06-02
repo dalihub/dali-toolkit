@@ -385,7 +385,7 @@ int UtcDaliControlWrapperCalculateChildSizeBase(void)
 
   Actor child = Actor::New();
   child.SetResizePolicy( Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS );
-  child.SetSize(150, 150);
+  child.SetProperty( Actor::Property::SIZE, Vector2(150, 150) );
 
   application.SendNotification();
   application.Render();
@@ -775,7 +775,7 @@ int UtcDaliControlWrapperAnimateVisual(void)
     controlWrapperImpl->TestRegisterVisual( index, visual );
 
     Stage::GetCurrent().Add( controlWrapper );
-    controlWrapper.SetSize( 100, 100 );
+    controlWrapper.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
     application.SendNotification();
     application.Render(0); // Trigger animation start
 

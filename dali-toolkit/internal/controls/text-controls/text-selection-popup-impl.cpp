@@ -765,7 +765,7 @@ std::string TextSelectionPopup::GetPressedImage() const
 #ifdef DECORATOR_DEBUG
      divider.SetProperty( Dali::Actor::Property::NAME,"Text's popup divider");
 #endif
-     divider.SetSize( size );
+     divider.SetProperty( Actor::Property::SIZE, size );
      divider.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
      divider.SetBackgroundColor( mDividerColor  );
      mToolbar.AddDivider( divider );

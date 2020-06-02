@@ -600,8 +600,8 @@ int UtcDaliPopupShowHide(void)
   Actor container = Actor::New();
   PushButton button1 = PushButton::New();
   PushButton button2 = PushButton::New();
-  button1.SetSize( DEFAULT_BUTTON_SIZE.GetVectorXY() );
-  button2.SetSize( DEFAULT_BUTTON_SIZE.GetVectorXY() );
+  button1.SetProperty( Actor::Property::SIZE, DEFAULT_BUTTON_SIZE.GetVectorXY() );
+  button2.SetProperty( Actor::Property::SIZE, DEFAULT_BUTTON_SIZE.GetVectorXY() );
   container.Add( button1 );
   container.Add( button2 );
   popup.SetFooter( container );
@@ -678,7 +678,7 @@ int UtcDaliPopupOnTouchedOutsideSignal(void)
   popup.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   popup.SetProperty( Actor::Property::ANCHOR_POINT, ParentOrigin::CENTER );
   popup.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  popup.SetSize( 50.0f, 50.0f );
+  popup.SetProperty( Actor::Property::SIZE, Vector2( 50.0f, 50.0f ) );
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
   Stage::GetCurrent().Add( popup );
   popup.OutsideTouchedSignal().Connect( &OnPopupTouchedOutside );
@@ -738,7 +738,7 @@ int UtcDaliPopupPropertyAutoHide(void)
 
   Actor container = Actor::New();
   PushButton button1 = PushButton::New();
-  button1.SetSize( DEFAULT_BUTTON_SIZE.GetVectorXY() );
+  button1.SetProperty( Actor::Property::SIZE, DEFAULT_BUTTON_SIZE.GetVectorXY() );
   container.Add( button1 );
   popup.SetFooter( container );
 
@@ -957,7 +957,7 @@ int UtcDaliPopupPropertyContextualMode(void)
   Actor placement = Actor::New();
   placement.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   placement.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  placement.SetSize( 1.0f, 1.0f );
+  placement.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   placement.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   Stage::GetCurrent().Add( placement );
 
@@ -1169,14 +1169,14 @@ int UtcDaliPopupPropertyTouchTransparent(void)
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
   popup.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   popup.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  popup.SetSize( 100, 100 );
+  popup.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   popup.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
 
   // Create a button (to go underneath the popup).
   PushButton button = Toolkit::PushButton::New();
   button.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  button.SetSize( 100, 100 );
+  button.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   button.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
 
   button.ClickedSignal().Connect( &PushButtonClicked );
@@ -1240,7 +1240,7 @@ int UtcDaliPopupPropertyTail(void)
   Popup popup = Popup::New();
   popup.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   popup.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  popup.SetSize( 100, 100 );
+  popup.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   popup.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   TextLabel content = TextLabel::New( "text" );
   popup.SetContent( content );

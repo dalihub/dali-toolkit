@@ -26,7 +26,7 @@
    @code
    Stage stage = Dali::Stage::GetCurrent();
    Size size = stage.GetSize();
-   myScrollView.SetSize( size );
+   myScrollView.SetProperty( Actor::Property::SIZE, size );
    @endcode
 
    Add Actors to this ScrollView

@@ -940,7 +940,7 @@ int UtcDaliAlignmentSizeSetP(void)
   application.SendNotification();
 
   Vector2 size( 100.0f, 200.0f );
-  alignment.SetSize(size);
+  alignment.SetProperty( Actor::Property::SIZE, size);
 
   application.Render();
   application.SendNotification();
@@ -966,7 +966,7 @@ int UtcDaliAlignmentOnTouchEvent(void)
   ToolkitTestApplication application;
 
   Alignment alignment = Alignment::New();
-  alignment.SetSize(100.0f, 100.0f);
+  alignment.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   alignment.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(alignment);
 

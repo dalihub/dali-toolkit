@@ -371,7 +371,7 @@ struct AtlasRenderer::Impl
       mActor = Actor::New();
       mActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
       mActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-      mActor.SetSize( textSize );
+      mActor.SetProperty( Actor::Property::SIZE, textSize );
       mActor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR );
     }
 
@@ -742,7 +742,7 @@ struct AtlasRenderer::Impl
     // Keep all of the origins aligned
     actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
     actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-    actor.SetSize( actorSize );
+    actor.SetProperty( Actor::Property::SIZE, actorSize );
     actor.RegisterProperty("uOffset", Vector2::ZERO );
     actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR );
 

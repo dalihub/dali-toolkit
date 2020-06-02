@@ -658,7 +658,7 @@ void Tooltip::OnRelayout( Actor actor )
       tail.SetProperty( Actor::Property::VISIBLE, false );
     }
 
-    mPopup.SetPosition( position );
+    mPopup.SetProperty( Actor::Property::POSITION, position );
   }
 }
 

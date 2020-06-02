@@ -356,7 +356,7 @@ Dali::Property::Map map;
 map[ Visual::Property::TYPE ] = Dali::Toolkit::Visual::IMAGE;
 map[ Dali::Toolkit::ImageVisual::Property::URL ] = "path-to-image.svg";
 
-control.SetSize( 200.f, 200.f );
+control.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
 control.SetProperty( Control::Property::BACKGROUND, map );
 ~~~
 ___________________________________________________________________________________________________

@@ -141,7 +141,7 @@ void BlurTwoPassFilter::Enable()
   // create actor to render input with applied emboss effect
   mActorForInput = Actor::New();
   mActorForInput.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mActorForInput.SetSize( mTargetSize );
+  mActorForInput.SetProperty( Actor::Property::SIZE, mTargetSize );
   Renderer rendererForInput = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
   SetRendererTexture( rendererForInput, mInputTexture );
   mActorForInput.AddRenderer( rendererForInput );
@@ -154,7 +154,7 @@ void BlurTwoPassFilter::Enable()
   // create an actor to render mImageForHorz for vertical blur pass
   mActorForHorz = Actor::New();
   mActorForHorz.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mActorForHorz.SetSize( mTargetSize );
+  mActorForHorz.SetProperty( Actor::Property::SIZE, mTargetSize );
   Renderer rendererForHorz = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
   SetRendererTexture( rendererForHorz, textureForHorz );
   mActorForHorz.AddRenderer( rendererForHorz );
@@ -171,7 +171,7 @@ void BlurTwoPassFilter::Enable()
   textureSetForBlending.SetTexture( 1u, mInputTexture );
   mActorForBlending.AddRenderer( rendererForBlending );
   mActorForBlending.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mActorForBlending.SetSize( mTargetSize );
+  mActorForBlending.SetProperty( Actor::Property::SIZE, mTargetSize );
 
   for( int i = 0; i < kernelSize; ++i )
   {
@@ -257,15 +257,15 @@ void BlurTwoPassFilter::SetSize( const Vector2& size )
   mTargetSize = size;
   if( mActorForInput )
   {
-    mActorForInput.SetSize(mTargetSize);
+    mActorForInput.SetProperty( Actor::Property::SIZE, mTargetSize);
   }
   if( mActorForHorz )
   {
-    mActorForHorz.SetSize(mTargetSize);
+    mActorForHorz.SetProperty( Actor::Property::SIZE, mTargetSize);
   }
   if( mActorForBlending )
   {
-    mActorForBlending.SetSize(mTargetSize);
+    mActorForBlending.SetProperty( Actor::Property::SIZE, mTargetSize);
   }
 }
 

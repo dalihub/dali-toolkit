@@ -233,7 +233,7 @@ void SuperBlurView::BlurTexture( unsigned int idx, Texture texture )
                                                            GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT,
                                                            GAUSSIAN_BLUR_DOWNSAMPLE_WIDTH_SCALE, GAUSSIAN_BLUR_DOWNSAMPLE_HEIGHT_SCALE, true );
   mGaussianBlurView[idx].SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
-  mGaussianBlurView[idx].SetSize(mTargetSize);
+  mGaussianBlurView[idx].SetProperty( Actor::Property::SIZE, mTargetSize );
   Stage::GetCurrent().Add( mGaussianBlurView[idx] );
 
   mGaussianBlurView[idx].SetUserImageAndOutputRenderTarget( texture, mBlurredImage[idx] );

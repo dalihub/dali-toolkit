@@ -412,8 +412,8 @@ int UtcDaliImageAtlasImageView(void)
   imageView2.SetProperty( ImageView::Property::IMAGE, imageMap2 );
 
   // ImageView doesn't do size negotiation properly: it only listens to OnSizeSet:
-  imageView1.SetSize( 100, 100 );
-  imageView2.SetSize( 100, 100 );
+  imageView1.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
+  imageView2.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
   imageView1.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   imageView2.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 

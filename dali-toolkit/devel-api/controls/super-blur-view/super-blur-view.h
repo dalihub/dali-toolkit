@@ -41,7 +41,7 @@ class SuperBlurView;
  *
  *  // initialise\n
  *  SuperBlurView blurView = SuperBlurView::New( blurLevels );\n
- *  blurView.SetSize();  // it is important to set the display size before set the input image!!
+ *  blurView.SetProperty( Actor::Property::SIZE, size );  // it is important to set the display size before set the input image!!
  *  Stage::GetCurrent().Add(blurView);\n
  *
  *  // Set the input image

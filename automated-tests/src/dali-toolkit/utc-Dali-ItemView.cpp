@@ -539,7 +539,7 @@ int UtcDaliItemViewScrollToItem(void)
 
   view.SetProperty( Dali::Actor::Property::NAME,"view actor");
   view.AddLayout(*layout);
-  view.SetSize(vec);
+  view.SetProperty( Actor::Property::SIZE, vec );
 
   Stage::GetCurrent().Add(view);
   layout->SetOrientation(ControlOrientation::Down);
