@@ -63,7 +63,7 @@ void TextVerticalScroller::CheckStartAnimation( Actor& sourceActor, float x, flo
     {
       mScrollAnimation.Clear();
     }
-    sourceActor.SetPosition( x, y );
+    sourceActor.SetProperty( Actor::Property::POSITION, Vector2( x, y ));
     return;
   }
   float toY = y + scrollAmount;
@@ -81,7 +81,7 @@ void TextVerticalScroller::CheckStartAnimation( Actor& sourceActor, float x, flo
   mScrollTo = toY;
 
   // Set animation attribute
-  sourceActor.SetPosition( x, y );
+  sourceActor.SetProperty( Actor::Property::POSITION, Vector2( x, y ));
   mScrollAnimation.AnimateTo( Property(sourceActor, Actor::Property::POSITION_Y), mScrollTo, AlphaFunction::EASE_OUT_SINE );
   mScrollAnimation.Play();
 }

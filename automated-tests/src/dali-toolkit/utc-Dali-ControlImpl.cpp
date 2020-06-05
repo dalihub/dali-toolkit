@@ -217,7 +217,7 @@ int UtcDaliControlImplOnGestureMethods(void)
   // Check gesture actually happens
   {
     DummyControl dummy = DummyControl::New(true);
-    dummy.SetSize( Vector2(100.0f, 100.0f ) );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f ) );
 
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
@@ -375,7 +375,7 @@ int UtcDaliControlImplSizeSetP(void)
 
     DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, false, TEST_LOCATION ); // Size not set, no onSizeSet called
     Vector2 size(100.0f, 200.0f);
-    dummy.SetSize( size );
+    dummy.SetProperty( Actor::Property::SIZE, size );
 
     DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, false, TEST_LOCATION ); // Size is going to get negotiated, no onSizeSet called
 
@@ -405,7 +405,7 @@ int UtcDaliControlImplSizeSet2P(void)
     application.SendNotification();
     application.Render();
 
-    dummy.SetSize(size);
+    dummy.SetProperty( Actor::Property::SIZE, size);
 
     application.SendNotification();
     application.Render();
@@ -473,7 +473,7 @@ int UtcDaliControlImplTouchEvent(void)
     DummyControl dummy = DummyControl::New( true );
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
-    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -499,7 +499,7 @@ int UtcDaliControlImplTouchEvent(void)
   {
     DummyControl dummy = DummyControl::New();
 
-    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -529,7 +529,7 @@ int UtcDaliControlImplHoverEvent(void)
     DummyControl dummy = DummyControl::New( true );
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
-    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -555,7 +555,7 @@ int UtcDaliControlImplHoverEvent(void)
   {
     DummyControl dummy = DummyControl::New();
 
-    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -726,7 +726,7 @@ int UtcDaliControlImplWheelEvent(void)
     DummyControl dummy = DummyControl::New( true );
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
-    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -752,7 +752,7 @@ int UtcDaliControlImplWheelEvent(void)
   {
     DummyControl dummy = DummyControl::New();
 
-    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -780,7 +780,7 @@ int UtcDaliControlImplSetStyleName(void)
   {
     DummyControl dummy = DummyControl::New( true );
 
-    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 

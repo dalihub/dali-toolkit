@@ -160,7 +160,7 @@ Dali::Image checked = Dali::ResourceImage::New( CHECKBOX_CHECKED_IMAGE );
 Toolkit::CheckBoxButton checkBox = Toolkit::CheckBoxButton::New();
 checkBox.SetBackgroundImage( unchecked );
 checkBox.SetSelectedImage( checked );
-checkBox.SetSize( Vector2( 48, 48 ) );
+checkBox.SetProperty( Actor::Property::SIZE, Vector2( 48, 48 ) );
 
 root.AddChild( checkBox, Toolkit::TableView::CellPosition( 0, 0 ) );
 

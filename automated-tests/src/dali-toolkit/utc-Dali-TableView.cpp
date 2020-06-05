@@ -73,15 +73,15 @@ static void SetupTableViewAndActors(TableView& tableView, Actor& actor1, Actor& 
   DALI_TEST_CHECK( tableView );
 
   Stage::GetCurrent().Add( tableView );
-  tableView.SetSize( Dali::Vector2( 100.0f, 100.0f ) );
+  tableView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
 
   actor1 = Actor::New();
   actor2 = Actor::New();
   actor3 = Actor::New();
 
-  actor1.SetSize( CELL_SIZE );
-  actor2.SetSize( CELL_SIZE );
-  actor3.SetSize( CELL_SIZE );
+  actor1.SetProperty( Actor::Property::SIZE, CELL_SIZE );
+  actor2.SetProperty( Actor::Property::SIZE, CELL_SIZE );
+  actor3.SetProperty( Actor::Property::SIZE, CELL_SIZE );
 
   tableView.AddChild( actor1, TableView::CellPosition( 0, 0 ) );
   tableView.AddChild( actor2, TableView::CellPosition( 0, 1 ) );
@@ -606,7 +606,7 @@ int UtcDaliTableViewSetGetProperty(void)
 
   // Create a 1x1 table-view
   TableView tableView = TableView::New(1,1);
-  tableView.SetSize( Vector2( 100.0f, 100.0f ) );
+  tableView.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   DALI_TEST_CHECK( tableView );
 
   // Test "rows" property
@@ -711,7 +711,7 @@ int UtcDaliTableViewChildProperties(void)
   // Create a 10x10 table-view
   TableView tableView = TableView::New(10,10);
   Stage::GetCurrent().Add( tableView );
-  tableView.SetSize( Dali::Vector2( 100.0f, 100.0f ) );
+  tableView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
 
   DALI_TEST_CHECK( tableView );
 
@@ -741,7 +741,7 @@ int UtcDaliTableViewChildProperties(void)
 
   // Create a third child actor with the cell alignment properties
   Actor child3 = Actor::New();
-  child3.SetSize( 5.f,5.f );
+  child3.SetProperty( Actor::Property::SIZE, Vector2( 5.f, 5.f ) );
   child3.SetProperty( TableView::ChildProperty::CELL_HORIZONTAL_ALIGNMENT, "center" );
   child3.SetProperty( TableView::ChildProperty::CELL_VERTICAL_ALIGNMENT,   "bottom" );
   tableView.Add( child3 );

@@ -174,7 +174,7 @@ int UtcDaliToggleButtonToggleStatesProperty(void)
   Stage::GetCurrent().Add( toggleButton );
   toggleButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  toggleButton.SetPosition( 0.0f, 0.0f );
+  toggleButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
 
   {// Check empty array
     Property::Array toggleIcons;
@@ -255,7 +255,7 @@ int UtcDaliToggleButtonToggleTipsProperty( void )
   Stage::GetCurrent().Add( toggleButton );
   toggleButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  toggleButton.SetPosition( 0.0f, 0.0f );
+  toggleButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
 
   { // Check empty tip array
     Property::Array toggleIcons;
@@ -314,8 +314,8 @@ int UtcDaliToggleButtonStateChange(void)
   Stage::GetCurrent().Add( toggleButton );
   toggleButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  toggleButton.SetPosition( BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
-  toggleButton.SetSize( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
+  toggleButton.SetProperty( Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
+  toggleButton.SetProperty( Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
   Property::Array toggleIcons;
   toggleIcons.PushBack( TEST_IMAGE_ONE ); //Icons path

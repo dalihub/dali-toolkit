@@ -272,7 +272,7 @@ int UtcDaliToolkitScrollBarSetScrollPropertySourceP(void)
   DALI_TEST_CHECK( scrollBar.GetScrollDirection() == ScrollBar::Vertical );
 
   float scrollBarHeight = 100.0f;
-  scrollBar.SetSize(20.0f, scrollBarHeight, 0.0f);
+  scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, scrollBarHeight, 0.0f) );
   Stage::GetCurrent().Add( scrollBar );
 
   // Create a source actor that owns the scroll properties required by the scroll bar
@@ -517,7 +517,7 @@ int UtcDaliToolkitScrollBarSetScrollPositionIntervalsP(void)
 
   scrollBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   scrollBar.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  scrollBar.SetSize(20.0f, 800.0f, 0.0f);
+  scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f) );
 
   Stage::GetCurrent().Add( scrollBar );
 
@@ -701,7 +701,7 @@ int UtcDaliToolkitScrollBarSetIndicatorHeightPolicyP(void)
   DALI_TEST_CHECK( scrollBar );
 
   float scrollBarHeight = 100.0f;
-  scrollBar.SetSize(20.0f, scrollBarHeight, 0.0f);
+  scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, scrollBarHeight, 0.0f) );
   Stage::GetCurrent().Add( scrollBar );
 
   // Create a source actor that owns the scroll properties required by the scroll bar
@@ -793,7 +793,7 @@ int UtcDaliToolkitScrollBarSetIndicatorFixedHeightP(void)
   DALI_TEST_CHECK( scrollBar );
 
   float scrollBarHeight = 100.0f;
-  scrollBar.SetSize(20.0f, scrollBarHeight, 0.0f);
+  scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, scrollBarHeight, 0.0f) );
   Stage::GetCurrent().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
@@ -1675,7 +1675,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalP(void)
 
   scrollBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   scrollBar.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  scrollBar.SetSize(20.0f, 800.0f, 0.0f);
+  scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f) );
 
   // Set the indicator height to be fixed to 50.0f
   scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
@@ -1733,7 +1733,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
 
   scrollBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   scrollBar.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  scrollBar.SetSize(20.0f, 800.0f, 0.0f);
+  scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f) );
 
   // Set the indicator height to be fixed to 50.0f
   scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
@@ -1800,7 +1800,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalP(void)
 
   scrollBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   scrollBar.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  scrollBar.SetSize(20.0f, 800.0f, 0.0f);
+  scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f) );
 
   Stage::GetCurrent().Add( scrollBar );
   ConnectionTracker connectionTracker;
@@ -1916,7 +1916,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalN(void)
 
   scrollBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   scrollBar.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  scrollBar.SetSize(20.0f, 800.0f, 0.0f);
+  scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f) );
 
   Stage::GetCurrent().Add( scrollBar );
 

@@ -280,7 +280,7 @@ void Alignment::OnRelayout( const Vector2& size, RelayoutContainer& container )
       }
     }
 
-    child.SetPosition( GetPosition( mPadding, mHorizontal, mVertical , newChildSize, currentChildSize ) );
+    child.SetProperty( Actor::Property::POSITION, GetPosition( mPadding, mHorizontal, mVertical , newChildSize, currentChildSize ) );
 
     if( renegotiate )
     {

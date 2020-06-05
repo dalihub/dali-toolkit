@@ -107,18 +107,18 @@ int UtcDaliToolBarAddControl01(void)
   try
   {
     Actor control1 = CreateColorActor( Color::RED );
-    control1.SetSize( Vector2( 100.f, 100.f ) );
+    control1.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
     Actor control2 = CreateColorActor( Color::RED );
-    control2.SetSize( Vector2( 100.f, 100.f ) );
+    control2.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
     Actor control3 = CreateColorActor( Color::RED );
-    control3.SetSize( Vector2( 100.f, 100.f ) );
+    control3.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
     Actor control4 = CreateColorActor( Color::RED );
-    control4.SetSize( Vector2( 100.f, 100.f ) );
+    control4.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
     Actor control5 = CreateColorActor( Color::RED );
-    control5.SetSize( Vector2( 100.f, 100.f ) );
+    control5.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
 
     ToolBar toolbar = ToolBar::New();
-    toolbar.SetSize( Vector2( 600.f, 100.f ) );
+    toolbar.SetProperty( Actor::Property::SIZE, Vector2( 600.f, 100.f ) );
 
     application.Render();
     application.SendNotification();
@@ -132,11 +132,11 @@ int UtcDaliToolBarAddControl01(void)
     toolbar.AddControl( control5, 0.1f, Alignment::HorizontalRight, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
 
     Actor control6 = CreateColorActor( Color::RED );
-    control6.SetSize( Vector2( 100.f, 100.f ) );
+    control6.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
     Actor control7 = CreateColorActor( Color::RED );
-    control7.SetSize( Vector2( 100.f, 100.f ) );
+    control7.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
     Actor control8 = CreateColorActor( Color::RED );
-    control8.SetSize( Vector2( 100.f, 100.f ) );
+    control8.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
 
     application.Render();
     application.SendNotification();

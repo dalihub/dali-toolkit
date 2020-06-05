@@ -1583,12 +1583,12 @@ Actor Loader::AddNode( Scene3dView& scene3dView, uint32_t index )
     anchorPoint = meshInfo.pivot;
     actor.SetProperty( Actor::Property::ANCHOR_POINT, anchorPoint );
 
-    actor.SetSize( Vector3( meshInfo.size.x, meshInfo.size.y, meshInfo.size.z ) );
+    actor.SetProperty( Actor::Property::SIZE, Vector3( meshInfo.size.x, meshInfo.size.y, meshInfo.size.z ) );
     actor.AddRenderer( renderer );
 
-    actor.SetScale( scale );
+    actor.SetProperty( Actor::Property::SCALE, scale );
     actor.RotateBy( orientation );
-    actor.SetPosition( translation );
+    actor.SetProperty( Actor::Property::POSITION, translation );
 
     shader.RegisterProperty( "uLightType", ( scene3dView.GetLightType() & ~Toolkit::Scene3dView::LightType::IMAGE_BASED_LIGHT ) );
     shader.RegisterProperty( "uLightVector", scene3dView.GetLightVector() );
@@ -1649,9 +1649,9 @@ Actor Loader::AddNode( Scene3dView& scene3dView, uint32_t index )
   else
   {
     actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-    actor.SetPosition( translation );
+    actor.SetProperty( Actor::Property::POSITION, translation );
     actor.RotateBy( orientation );
-    actor.SetSize( actorSize );
+    actor.SetProperty( Actor::Property::SIZE, actorSize );
   }
 
   tempNode = node->GetChild( "camera" );

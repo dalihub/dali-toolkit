@@ -147,7 +147,7 @@ void ScrollOvershootEffectRipple::Apply()
 
   // make sure height is set, since we only create a constraint for image width
   mOvershootSize = mAttachedScrollView.GetOvershootSize();
-  mOvershootOverlay.SetSize( mOvershootSize );
+  mOvershootOverlay.SetProperty( Actor::Property::SIZE, mOvershootSize );
 
   mAttachedScrollView.AddOverlay(mOvershootOverlay);
 
@@ -244,15 +244,15 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
       if(IsVertical())
       {
         mOvershootOverlay.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( 0.0f ), Vector3::ZAXIS ) ) );
-        mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width, mOvershootSize.height), size.depth);
+        mOvershootOverlay.SetProperty( Actor::Property::SIZE, Vector3( parentSize.width, GetBounceActorHeight(parentSize.width, mOvershootSize.height), size.depth ) );
       }
       else
       {
         mOvershootOverlay.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) ) );
-        mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height, mOvershootSize.height), size.depth);
+        mOvershootOverlay.SetProperty( Actor::Property::SIZE, Vector3( parentSize.height, GetBounceActorHeight(parentSize.height, mOvershootSize.height), size.depth ) );
         relativeOffset = Vector3(0.0f, 1.0f, 0.0f);
       }
-      mOvershootOverlay.SetPosition(relativeOffset * parentSize);
+      mOvershootOverlay.SetProperty( Actor::Property::POSITION, relativeOffset * parentSize );
     }
     else
     {
@@ -263,16 +263,16 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
       if(IsVertical())
       {
         mOvershootOverlay.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( Math::PI ), Vector3::ZAXIS ) ) );
-        mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width, mOvershootSize.height), size.depth);
+        mOvershootOverlay.SetProperty( Actor::Property::SIZE, Vector3( parentSize.width, GetBounceActorHeight(parentSize.width, mOvershootSize.height), size.depth ) );
         relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
       }
       else
       {
         mOvershootOverlay.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( 0.5f * Math::PI ), Vector3::ZAXIS ) ) );
-        mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height, mOvershootSize.height), size.depth);
+        mOvershootOverlay.SetProperty( Actor::Property::SIZE, Vector3( parentSize.height, GetBounceActorHeight(parentSize.height, mOvershootSize.height), size.depth ) );
         relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
       }
-      mOvershootOverlay.SetPosition(relativeOffset * parentSize);
+      mOvershootOverlay.SetProperty( Actor::Property::POSITION, relativeOffset * parentSize );
     }
   }
 }

@@ -138,8 +138,8 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
     Vector3 actorPos = control.GetProperty<Vector3>(Dali::Actor::Property::POSITION);
 
     mShadowControl = Dali::Toolkit::Control::New();
-    mShadowControl.SetPosition(actorPos);
-    mShadowControl.SetSize(width, height);
+    mShadowControl.SetProperty( Actor::Property::POSITION, actorPos );
+    mShadowControl.SetProperty( Actor::Property::SIZE, Vector2( width, height ) );
     mShadowControl.SetBackgroundColor(Vector4(0.3f, 0.3f, 0.3f, 0.7f));
     mShadowControl.SetProperty( Actor::Property::PARENT_ORIGIN, control.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ) );
     mShadowControl.SetProperty( Actor::Property::ANCHOR_POINT,control.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ));
@@ -151,7 +151,7 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
   {
       Vector2 screenPosition = gesture.screenPosition;
       control.GetParent().ScreenToLocal(mLocalPosition.x, mLocalPosition.y, screenPosition.x, screenPosition.y);
-      mShadowControl.SetPosition(mLocalPosition.x - mDragLocalPosition.x, mLocalPosition.y - mDragLocalPosition.y);
+      mShadowControl.SetProperty( Actor::Property::POSITION, Vector2(mLocalPosition.x - mDragLocalPosition.x, mLocalPosition.y - mDragLocalPosition.y));
   }
   if(gesture.state == Gesture::Finished)
   {

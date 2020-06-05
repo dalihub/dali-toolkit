@@ -125,7 +125,7 @@ int UtcDaliBloomViewAddRemove(void)
 
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(actor);
   Stage::GetCurrent().Add(view);
 
@@ -150,7 +150,7 @@ int UtcDaliBloomActivateDeactivate(void)
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);
   view.Activate();
@@ -215,7 +215,7 @@ int UtcDaliBloomOnSizeSet(void)
   application.Render();
 
   Vector3 size( 200.0f, 300.0f, 0.0f );
-  view.SetSize( size );
+  view.SetProperty( Actor::Property::SIZE, size );
 
   application.SendNotification();
   application.Render();

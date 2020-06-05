@@ -125,8 +125,8 @@ int UtcDaliProgressBarSignals(void)
   Stage::GetCurrent().Add( progressBar );
   progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  progressBar.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
-  progressBar.SetPosition( 0.0f, 0.0f );
+  progressBar.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  progressBar.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   progressBar.ValueChangedSignal().Connect( &OnProgressBarValueChanged );
 
   progressBar.SetProperty(ProgressBar::Property::PROGRESS_VALUE, 0.2f);
@@ -155,8 +155,8 @@ int UtcDaliProgressBarSetPropertyP(void)
   ProgressBar progressBar = ProgressBar::New();
   progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  progressBar.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
-  progressBar.SetPosition( 0.0f, 0.0f );
+  progressBar.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  progressBar.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   progressBar.ValueChangedSignal().Connect( &OnProgressBarValueChanged );
   Stage::GetCurrent().Add(progressBar);
   application.SendNotification();
@@ -302,8 +302,8 @@ int UtcDaliProgressBarSetPropertyP1(void)
   ProgressBar progressBar = ProgressBar::New();
   progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  progressBar.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
-  progressBar.SetPosition( 0.0f, 0.0f );
+  progressBar.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  progressBar.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   progressBar.ValueChangedSignal().Connect( &OnProgressBarValueChanged );
 
   Stage::GetCurrent().Add(progressBar);
@@ -375,7 +375,7 @@ int UtcDaliProgressBarSetPropertyP2(void)
   ProgressBar progressBar = ProgressBar::New();
   progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  progressBar.SetPosition( 0.0f, 0.0f );
+  progressBar.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   progressBar.SetProperty(ProgressBar::Property::LABEL_VISUAL, "test");
   progressBar.SetProperty(ProgressBar::Property::INDETERMINATE, true);
   progressBar.SetProperty(ProgressBar::Property::TRACK_VISUAL, trackImage);
@@ -395,7 +395,7 @@ int UtcDaliProgressBarSetPropertyP2(void)
   progressBar.SetProperty(ProgressBar::Property::SECONDARY_PROGRESS_VALUE, 0.3f);
 
   progressBar.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  progressBar.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  progressBar.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
   Stage::GetCurrent().Add(progressBar);
   application.SendNotification();
   application.Render();

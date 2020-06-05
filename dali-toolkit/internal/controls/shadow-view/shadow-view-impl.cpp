@@ -169,7 +169,7 @@ void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
   // position, instead parent the shadow plane drawable on the shadow plane passed in.
   mShadowPlaneBg.Add( mShadowPlane );
   mShadowPlane.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mShadowPlane.SetZ( 1.0f );
+  mShadowPlane.SetProperty( Actor::Property::POSITION_Z,  1.0f );
 
   ConstrainCamera();
 
@@ -244,7 +244,7 @@ void ShadowView::OnInitialize()
   mCameraActor.SetNearClippingPlane( 1.0f );
   mCameraActor.SetType( Dali::Camera::FREE_LOOK ); // Camera orientation constrained to point at shadow plane world position
   mCameraActor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Radian(Degree(180)), Vector3::YAXIS) );
-  mCameraActor.SetPosition(DEFAULT_LIGHT_POSITION);
+  mCameraActor.SetProperty( Actor::Property::POSITION, DEFAULT_LIGHT_POSITION );
 
   // Create render targets needed for rendering from light's point of view
   mSceneFromLightRenderTarget = FrameBuffer::New( stageSize.width, stageSize.height, FrameBuffer::Attachment::NONE );

@@ -15,7 +15,7 @@ An example actor hierachy is shown below, in which one of the actors is being an
 
 When a property is animatable, it can only be modified in the rendering thread.  The value returned from the property, is the value used when the previous frame was rendered.
 
-For example \ref Dali::Actor::Property::POSITION "Dali::Actor::Property::POSITION" returns the position at which the Actor was last rendered.  Since \ref Dali::Actor::SetPosition "Dali::Actor::SetPosition" is asynchronous, a call to \ref Dali::Actor::Property::POSITION "Dali::Actor::Property::POSITION" won't immediately return the same value.
+For example \ref Dali::Actor::Property::POSITION "Dali::Actor::Property::POSITION" returns the position at which the Actor was last rendered.  Since \ref Dali::Actor::Property::POSITION "Dali::Actor::Property::POSITION" is asynchronous, a call to GetProperty( \ref Dali::Actor::Property::POSITION "Dali::Actor::Property::POSITION" ) won't immediately return the same value.
 
 @code
 // Whilst handling an event...
@@ -23,7 +23,7 @@ For example \ref Dali::Actor::Property::POSITION "Dali::Actor::Property::POSITIO
 Actor actor = Actor::New();
 Stage::GetCurrent().Add(actor); // initial position is 0,0,0
 
-actor.SetPosition(Vector3(10,10,10));
+actor.SetProperty( Actor::Property::POSITION, Vector3(10.0f, 10.0f, 10.0f) );
 
 Vector3 current;
 current = actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
@@ -48,7 +48,7 @@ The example code above would likely output:
 
 <h2 class="pg">Setting a property during an animation</h2>
 
-When a property is being animated, the Animation will override any values set e.g. with Actor::SetPosition()
+When a property is being animated, the Animation will override any values set e.g. with Actor::Property::Position.
 
 \image html multi-threaded-animation-2.png
 

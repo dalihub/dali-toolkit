@@ -61,7 +61,7 @@ class CheckBoxButton;
  *   CheckBoxButton button = CheckBoxButton::New();
  *   button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
  *   button.SetProperty( Button::Property::LABEL, "Check" );
- *   button.SetSize( 200, 40 );
+ *   button.SetProperty( Actor::Property::SIZE, Vector2( 200, 40 );
  *   button.SetBackgroundColor( Color::WHITE );
  *   Stage::GetCurrent().Add( button );
  *

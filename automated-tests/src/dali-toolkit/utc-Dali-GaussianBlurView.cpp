@@ -146,7 +146,7 @@ int UtcDaliGaussianBlurViewAddRemove(void)
 
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(actor);
   Stage::GetCurrent().Add(view);
 
@@ -171,7 +171,7 @@ int UtcDaliGaussianBlurActivateDeactivate(void)
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);
   view.Activate();
@@ -202,7 +202,7 @@ int UtcDaliGaussianBlurActivateDeactivateRepeat(void)
   DALI_TEST_CHECK( view );
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);
   view.Activate();
@@ -254,7 +254,7 @@ int UtcDaliGaussianBlurViewSetGetRenderTarget(void)
   DALI_TEST_CHECK( view );
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);
   view.Activate();
@@ -281,7 +281,7 @@ int UtcDaliGaussianBlurViewActivateOnce1(void)
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);
   view.ActivateOnce();
@@ -306,7 +306,7 @@ int UtcDaliGaussianBlurActivateOnce2(void)
   DALI_TEST_CHECK( view );
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);
   view.ActivateOnce();
@@ -335,7 +335,7 @@ int UtcDaliGaussianBlurViewFinishedSignalN(void)
   DALI_TEST_CHECK( view );
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);
   view.Activate();

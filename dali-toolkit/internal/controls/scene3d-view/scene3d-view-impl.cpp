@@ -250,7 +250,7 @@ bool Scene3dView::SetDefaultCamera( const Dali::Camera::Type type, const float n
   mDefaultCamera.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   mDefaultCamera.SetType( type );
   mDefaultCamera.SetNearClippingPlane( nearPlane );
-  mDefaultCamera.SetPosition( cameraPosition );
+  mDefaultCamera.SetProperty( Actor::Property::POSITION, cameraPosition );
   return true;
 }
 

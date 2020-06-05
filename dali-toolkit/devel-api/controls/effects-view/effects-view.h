@@ -46,7 +46,7 @@ class EffectsView;
  *
  * // set position and format
  * effectsView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
- * effectsView.SetSize( Vector2( width, height) );
+ * effectsView.SetProperty( Actor::Property::SIZE, Vector2( width, height) );
  * effectsView.SetPixelFormat( Pixel::RGBA8888 );
  *
  * // set effect type and properties

@@ -158,7 +158,7 @@ int UtcDaliKeyInputFocusManagerSetFocus01(void)
 
   DummyControl dummy = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
-  dummy.SetSize(100.0f, 100.0f);
+  dummy.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   stage.Add( dummy );
   DALI_TEST_CHECK( ! dummyImpl.keyInputFocusGained );
 
@@ -185,7 +185,7 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
 
   DummyControl dummy1 = DummyControl::New(true);
   Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
-  dummy1.SetSize(100.0f, 100.0f);
+  dummy1.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
@@ -197,7 +197,7 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
 
   DummyControl dummy2 = DummyControl::New(true);
   Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
-  dummy2.SetSize(100.0f, 100.0f);
+  dummy2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   stage.Add( dummy2 );
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
@@ -228,20 +228,20 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
   stage.KeyEventSignal().Connect( &stageCallback, &KeyEventCallback::Callback );
 
   DummyControl dummy1 = DummyControl::New(true);
-  dummy1.SetSize(100.0f, 100.0f);
+  dummy1.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   KeyEventCallback callback1( false );
   dummy1.KeyEventSignal().Connect( &callback1, &KeyEventCallback::Callback );
   stage.Add( dummy1 );
 
   DummyControl dummy2 = DummyControl::New(true);
-  dummy2.SetSize(100.0f, 100.0f);
+  dummy2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   KeyEventCallback callback2( false );
   dummy2.KeyEventSignal().Connect( &callback2, &KeyEventCallback::Callback );
   dummy1.Add( dummy2 );
 
   DummyControl dummy3 = DummyControl::New(true);
   Impl::DummyControl& dummy3Impl = static_cast<Impl::DummyControl&>(dummy3.GetImplementation());
-  dummy3.SetSize(100.0f, 100.0f);
+  dummy3.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   KeyEventCallback callback3( false );
   dummy3.KeyEventSignal().Connect( &callback3, &KeyEventCallback::Callback );
   dummy2.Add( dummy3 );
@@ -274,20 +274,20 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
   DALI_TEST_CHECK(manager);
 
   DummyControl dummy1 = DummyControl::New(true);
-  dummy1.SetSize(100.0f, 100.0f);
+  dummy1.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   KeyEventCallback callback1( false );
   dummy1.KeyEventSignal().Connect( &callback1, &KeyEventCallback::Callback );
   stage.Add( dummy1 );
 
   DummyControl dummy2 = DummyControl::New(true);
-  dummy2.SetSize(100.0f, 100.0f);
+  dummy2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   KeyEventCallback callback2( true );
   dummy2.KeyEventSignal().Connect( &callback2, &KeyEventCallback::Callback );
   dummy1.Add( dummy2 );
 
   DummyControl dummy3 = DummyControl::New(true);
   Impl::DummyControl& dummy3Impl = static_cast<Impl::DummyControl&>(dummy3.GetImplementation());
-  dummy3.SetSize(100.0f, 100.0f);
+  dummy3.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   KeyEventCallback callback3( false );
   dummy3.KeyEventSignal().Connect( &callback3, &KeyEventCallback::Callback );
   dummy2.Add( dummy3 );
@@ -319,14 +319,14 @@ int UtcDaliKeyInputFocusManagerGetCurrentFocusControl(void)
 
   DummyControl dummy1 = DummyControl::New(true);
   Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
-  dummy1.SetSize(100.0f, 100.0f);
+  dummy1.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
 
   DummyControl dummy2 = DummyControl::New(true);
   Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
-  dummy2.SetSize(100.0f, 100.0f);
+  dummy2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   stage.Add( dummy2 );
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
@@ -371,7 +371,7 @@ int UtcDaliKeyInputFocusManagerRemoveFocus(void)
 
   DummyControl dummy1 = DummyControl::New(true);
   Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
-  dummy1.SetSize(100.0f, 100.0f);
+  dummy1.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );

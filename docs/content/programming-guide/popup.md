@@ -240,7 +240,7 @@ popup.SetContent( contentActor );
 ImageView footer = ImageView::New( DEFAULT_CONTROL_AREA_IMAGE_PATH );
 footer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 footer.SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
-footer.SetSize( 0.0f, 80.0f );
+footer.SetProperty( Actor::Property::SIZE, Vector2( 0.0f, 80.0f ) );
 footer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 footer.SetParentOrigin( ParentOrigin::CENTER );
 

@@ -1122,7 +1122,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
   DALI_TEST_CHECK( field );
 
 
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1330,7 +1330,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1526,7 +1526,7 @@ int utcDaliTextFieldEvent01(void)
 
   Stage::GetCurrent().Add( field );
 
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1578,8 +1578,8 @@ int utcDaliTextFieldEvent01(void)
 
   field2.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field2.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  field2.SetSize( 100.f, 100.0f );
-  field2.SetPosition( 100.0f, 100.0f );
+  field2.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  field2.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
 
   Stage::GetCurrent().Add( field2 );
 
@@ -1622,7 +1622,7 @@ int utcDaliTextFieldEvent02(void)
 
   Stage::GetCurrent().Add( field );
 
-  field.SetSize( 300.0f, 50.0f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1775,7 +1775,7 @@ int utcDaliTextFieldEvent03(void)
 
   field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
-  field.SetSize( 30.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 30.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1836,7 +1836,7 @@ int utcDaliTextFieldEvent04(void)
 
   field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1889,7 +1889,7 @@ int utcDaliTextFieldEvent05(void)
 
   field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1940,7 +1940,7 @@ int utcDaliTextFieldEvent06(void)
 
   field.SetProperty( TextField::Property::TEXT, "Thisisalongtextforthesizeofthetextfield." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1991,7 +1991,7 @@ int utcDaliTextFieldEvent07(void)
 
   field.SetProperty( TextField::Property::TEXT, "Thisisalongtextforthesizeofthetextfield." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Property::Map propertyMap;
@@ -2034,7 +2034,7 @@ int utcDaliTextFieldEvent08(void)
 
   field.SetProperty( TextField::Property::PLACEHOLDER_TEXT, "Setting Placeholder Text" );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -2102,7 +2102,7 @@ int utcDaliTextFieldEvent09(void)
 
   field.SetProperty( TextField::Property::TEXT, "Hello" );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -2189,7 +2189,7 @@ int utcDaliTextFieldStyleWhilstSelected(void)
 
   field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -2291,7 +2291,7 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
 
   Stage::GetCurrent().Add( field );
 
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -2373,7 +2373,7 @@ int utcDaliTextFieldSomeSpecialKeys(void)
 
   field.SetProperty( TextField::Property::TEXT, longText );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -2450,7 +2450,7 @@ int utcDaliTextFieldSizeUpdate(void)
 
 
   // "ㅁ" is bigger then "ኢ"
-  field.SetSize( Vector2( fieldWidth ,10.0f ) );
+  field.SetProperty( Actor::Property::SIZE, Vector2( fieldWidth ,10.0f ) );
   field.SetResizePolicy( ResizePolicy::FIXED , Dimension::WIDTH );
   field.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY , Dimension::HEIGHT );
 
@@ -2489,7 +2489,7 @@ int utcDaliTextFieldExtremlyLargePointSize(void)
   TextField field = TextField::New();
 
   field.SetProperty( TextField::Property::TEXT, "Text" );
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
@@ -2619,7 +2619,7 @@ int UtcDaliTextFieldSetPaddingProperty(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  field.SetSize( 300.f, 50.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
@@ -2652,7 +2652,7 @@ int UtcDaliTextFieldEnableShiftSelectionProperty(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  field.SetSize( 300.0f, 50.0f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
@@ -2680,7 +2680,7 @@ int UtcDaliTextFieldEnableGrabHandleProperty(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  field.SetSize( 300.0f, 50.0f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
@@ -2708,7 +2708,7 @@ int UtcDaliTextFieldMatchSystemLanguageDirectionProperty(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  field.SetSize( 300.0f, 50.0f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
@@ -2741,7 +2741,7 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
 
   Stage::GetCurrent().Add( field );
 
-  field.SetSize( 300.0f, 50.0f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -2830,7 +2830,7 @@ int UtcDaliTextFieldSelectWholeText(void)
 
   Stage::GetCurrent().Add( textField );
 
-  textField.SetSize( 300.f, 50.f );
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -2882,7 +2882,7 @@ int UtcDaliTextFieldSelectNone(void)
 
   Stage::GetCurrent().Add( textField );
 
-  textField.SetSize( 300.f, 50.f );
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 

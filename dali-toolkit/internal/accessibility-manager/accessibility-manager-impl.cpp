@@ -611,7 +611,7 @@ Actor AccessibilityManager::GetFocusIndicatorActor()
 
     mFocusIndicatorActor = Toolkit::ImageView::New(focusBorderImagePath);
     mFocusIndicatorActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-    mFocusIndicatorActor.SetZ( 1.0f );
+    mFocusIndicatorActor.SetProperty( Actor::Property::POSITION_Z,  1.0f );
 
     // Apply size constraint to the focus indicator
     mFocusIndicatorActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );

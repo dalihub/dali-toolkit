@@ -158,7 +158,7 @@ int UtcDaliToolkitTextSelectionToolBarP(void)
   toolbar.AddOption( option );
 
   Toolkit::Control divider = Toolkit::Control::New();
-  divider.SetSize( 2.0f, 0.0f );
+  divider.SetProperty( Actor::Property::SIZE, Vector2( 2.0f, 0.0f ) );
   divider.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
   toolbar.AddDivider( divider );
 

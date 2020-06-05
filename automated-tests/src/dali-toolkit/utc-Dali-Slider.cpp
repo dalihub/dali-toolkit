@@ -131,8 +131,8 @@ int UtcDaliSliderSignals1(void)
   Stage::GetCurrent().Add( slider );
   slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  slider.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
-  slider.SetPosition( 0.0f, 0.0f );
+  slider.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  slider.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
 
   const float MIN_BOUND = 0.0f;
   const float MAX_BOUND = 1.0f;
@@ -228,8 +228,8 @@ int UtcDaliSliderSignals2(void)
   Stage::GetCurrent().Add( slider );
   slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  slider.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
-  slider.SetPosition( 0.0f, 0.0f );
+  slider.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  slider.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
 
   const float MIN_BOUND = 0.0f;
   const float MAX_BOUND = 1.0f;
@@ -291,8 +291,8 @@ int UtcDaliSetPropertyP(void)
   Slider slider = Slider::New();
   slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  slider.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
-  slider.SetPosition( 0.0f, 0.0f );
+  slider.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  slider.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
 
   Stage::GetCurrent().Add(slider);
   application.SendNotification();

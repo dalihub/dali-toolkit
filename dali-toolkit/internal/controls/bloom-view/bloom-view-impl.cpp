@@ -277,9 +277,9 @@ void BloomView::OnInitialize()
 void BloomView::OnSizeSet(const Vector3& targetSize)
 {
   mTargetSize = Vector2(targetSize);
-  mChildrenRoot.SetSize(targetSize);
-  mCompositeActor.SetSize(targetSize);
-  mTargetActor.SetSize(targetSize);
+  mChildrenRoot.SetProperty( Actor::Property::SIZE, targetSize);
+  mCompositeActor.SetProperty( Actor::Property::SIZE, targetSize);
+  mTargetActor.SetProperty( Actor::Property::SIZE, targetSize);
 
   // Children render camera must move when GaussianBlurView object is
   // resized. This is since we cannot change render target size - so we need
@@ -289,7 +289,7 @@ void BloomView::OnSizeSet(const Vector3& targetSize)
   // this is the trade off for not being able to modify render target size
   // Change camera z position based on GaussianBlurView actor height
   float cameraPosConstraintScale = 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f);
-  mRenderFullSizeCamera.SetZ( mTargetSize.height * cameraPosConstraintScale);
+  mRenderFullSizeCamera.SetProperty( Actor::Property::POSITION_Z,  mTargetSize.height * cameraPosConstraintScale);
 
   // if we have already activated the blur, need to update render target sizes now to reflect the new size of this actor
   if(mActivated)
@@ -339,7 +339,7 @@ void BloomView::AllocateResources()
     mRenderDownsampledCamera.SetAspectRatio(mDownsampledWidth / mDownsampledHeight);
     mRenderDownsampledCamera.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
 
-    mRenderDownsampledCamera.SetPosition(0.0f, 0.0f, ((mDownsampledHeight * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f)));
+    mRenderDownsampledCamera.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, ( ( mDownsampledHeight * 0.5f ) / tanf( ARBITRARY_FIELD_OF_VIEW * 0.5f ) ) ) );
 
     // Create and place a camera for the children render, corresponding to its render target size
     mRenderFullSizeCamera.SetFieldOfView(ARBITRARY_FIELD_OF_VIEW);
@@ -348,11 +348,11 @@ void BloomView::AllocateResources()
     mRenderFullSizeCamera.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
 
     float cameraPosConstraintScale = 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f);
-    mRenderFullSizeCamera.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosConstraintScale);
+    mRenderFullSizeCamera.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, mTargetSize.height * cameraPosConstraintScale ) );
 
     //////////////////////////////////////////////////////
     // Pass size change onto GaussianBlurView, so it matches
-    mGaussianBlurView.SetSize(mTargetSize);
+    mGaussianBlurView.SetProperty( Actor::Property::SIZE, mTargetSize );
     GetImpl(mGaussianBlurView).AllocateResources();
 
     mGaussianBlurView.SetProperty( Actor::Property::VISIBLE, true );
@@ -383,7 +383,7 @@ void BloomView::AllocateResources()
     Renderer bloomRenderer = CreateRenderer( BASIC_VERTEX_SOURCE, BLOOM_EXTRACT_FRAGMENT_SOURCE );
     SetRendererTexture( bloomRenderer, mRenderTargetForRenderingChildren );
     mBloomExtractActor.AddRenderer( bloomRenderer );
-    mBloomExtractActor.SetSize( mDownsampledWidth, mDownsampledHeight ); // size needs to match render target
+    mBloomExtractActor.SetProperty( Actor::Property::SIZE, Vector2( mDownsampledWidth, mDownsampledHeight ) ); // size needs to match render target
 
     // set GaussianBlurView to blur our extracted bloom
     mGaussianBlurView.SetUserImageAndOutputRenderTarget( mBloomExtractTarget.GetColorTexture(), blurExtractTarget );

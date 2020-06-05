@@ -110,7 +110,7 @@ int UtcDaliEffectsViewAddRemoveDropShadow(void)
 
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(actor);
   Stage::GetCurrent().Add(view);
 
@@ -207,7 +207,7 @@ int UtcDaliEffectsViewOnStage(void)
   ToolkitTestApplication application;
 
   EffectsView view = EffectsView::New(EffectsView::EMBOSS);
-  view.SetSize(100.f, 100.f);
+  view.SetProperty( Actor::Property::SIZE, Vector2(100.f, 100.f) );
   Stage stage = Stage::GetCurrent();
   DALI_TEST_CHECK( stage.GetRenderTaskList().GetTaskCount() == 1 );
 
@@ -224,7 +224,7 @@ int UtcDaliEffectsViewOffStage(void)
   ToolkitTestApplication application;
 
   EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
-  view.SetSize(100.f, 100.f);
+  view.SetProperty( Actor::Property::SIZE, Vector2(100.f, 100.f) );
   Stage stage = Stage::GetCurrent();
   DALI_TEST_CHECK( stage.GetRenderTaskList().GetTaskCount() == 1 );
 
@@ -457,7 +457,7 @@ int UtcDaliEffectsViewSetRefreshOnDemandP(void)
   ToolkitTestApplication application;
 
   EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
-  view.SetSize(100.f, 100.f);
+  view.SetProperty( Actor::Property::SIZE, Vector2(100.f, 100.f) );
 
   Stage stage = Stage::GetCurrent();
   stage.Add( view );
@@ -501,7 +501,7 @@ int UtcDaliEffectsViewSizeSet(void)
 
   {
     EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
-    view.SetSize( 200.0f, 200.0f, 0.0f );
+    view.SetProperty( Actor::Property::SIZE, Vector3( 200.0f, 200.0f, 0.0f ) );
     stage.Add( view );
     application.SendNotification();
     application.Render();
@@ -510,7 +510,7 @@ int UtcDaliEffectsViewSizeSet(void)
 
   {
     EffectsView view = EffectsView::New(EffectsView::EMBOSS);
-    view.SetSize( 200.0f, 200.0f, 0.0f );
+    view.SetProperty( Actor::Property::SIZE, Vector3( 200.0f, 200.0f, 0.0f ) );
     stage.Add( view );
     application.SendNotification();
     application.Render();
@@ -520,7 +520,7 @@ int UtcDaliEffectsViewSizeSet(void)
 
   {
     EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
-    view.SetSize( 200.0f, 200.0f, 0.0f );
+    view.SetProperty( Actor::Property::SIZE, Vector3( 200.0f, 200.0f, 0.0f ) );
     stage.Add( view );
     application.SendNotification();
     application.Render();

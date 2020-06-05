@@ -201,7 +201,7 @@ void Slider::OnInitialize()
   DisplayValue( mValue, false );       // Run this last to display the correct value
 
   // Size the Slider actor to a default
-  self.SetSize( DEFAULT_HIT_REGION.x, DEFAULT_HIT_REGION.y );
+  self.SetProperty( Actor::Property::SIZE, Vector2( DEFAULT_HIT_REGION.x, DEFAULT_HIT_REGION.y ) );
 
   // Connect to the touch signal
   self.TouchSignal().Connect( this, &Slider::OnTouch );
@@ -321,12 +321,12 @@ void Slider::DisplayValue( float value, bool raiseSignals )
 
   float x = mDomain.from.x + percent * ( mDomain.to.x - mDomain.from.x );
 
-  mHandle.SetX( x );
+  mHandle.SetProperty( Actor::Property::POSITION_X,  x );
 
   // Progress bar
   if( mProgress )
   {
-    mProgress.SetSize( x, GetTrackRegion().y );
+    mProgress.SetProperty( Actor::Property::SIZE, Vector2( x, GetTrackRegion().y ) );
   }
 
   // Signals
@@ -430,7 +430,7 @@ void Slider::SetTrackVisual( Property::Map map )
       mTrackRegion = size;
       if( mTrack )
       {
-        mTrack.SetSize( mTrackRegion );
+        mTrack.SetProperty( Actor::Property::SIZE, mTrackRegion );
       }
 
     ResizeProgressRegion( Vector2( 0.0f, mTrackRegion.y ) );
@@ -570,7 +570,7 @@ void Slider::ResizeProgressRegion( const Vector2& region )
 {
   if( mProgress )
   {
-    mProgress.SetSize( region );
+    mProgress.SetProperty( Actor::Property::SIZE, region );
   }
 }
 
@@ -674,7 +674,7 @@ void Slider::ResizeHandleSize( const Vector2& size )
 {
   if( mHandle )
   {
-    mHandle.SetSize( size );
+    mHandle.SetProperty( Actor::Property::SIZE, size );
   }
 }
 
@@ -708,7 +708,7 @@ Actor Slider::CreateValueDisplay()
   popup.Add( mPopupArrow );
 
   mPopup = CreatePopup();
-  mPopup.SetSize( 0.0f, VALUE_POPUP_HEIGHT );
+  mPopup.SetProperty( Actor::Property::SIZE, Vector2( 0.0f, VALUE_POPUP_HEIGHT ) );
   mPopupArrow.Add( mPopup );
 
   return popup;
@@ -789,7 +789,7 @@ void Slider::SetHitRegion( const Vector2& size )
 
   if( mHitArea )
   {
-    mHitArea.SetSize( mHitRegion );
+    mHitArea.SetProperty( Actor::Property::SIZE, mHitRegion );
   }
 }
 
@@ -963,7 +963,7 @@ void Slider::SetTrackRegion( const Vector2& region )
 
   if( mTrack )
   {
-    mTrack.SetSize( mTrackRegion );
+    mTrack.SetProperty( Actor::Property::SIZE, mTrackRegion );
   }
 
   ResizeProgressRegion( Vector2( 0.0f, mTrackRegion.y ) );

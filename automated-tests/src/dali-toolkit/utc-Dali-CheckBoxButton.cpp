@@ -196,7 +196,7 @@ int UtcDaliCheckBoxSetDisabledPropertyP(void)
   CheckBoxButton checkBox = CheckBoxButton::New();
   Stage::GetCurrent().Add( checkBox );
 
-  checkBox.SetSize( Vector2( 20.0f, 20.0f ) );
+  checkBox.SetProperty( Actor::Property::SIZE, Vector2( 20.0f, 20.0f ) );
   checkBox.SetProperty(checkBox.GetPropertyIndex("disabledUnselectedBackgroundVisual"),  "Image.jpg" );
 
   application.SendNotification();
@@ -367,7 +367,7 @@ int UtcDaliCheckBoxSetLabelDisabledP(void)
   CheckBoxButton checkBox = CheckBoxButton::New();
   Stage::GetCurrent().Add( checkBox );
 
-  checkBox.SetSize( Vector2( 20.0f, 20.0f ) );
+  checkBox.SetProperty( Actor::Property::SIZE, Vector2( 20.0f, 20.0f ) );
   checkBox.SetProperty(Button::Property::DISABLED_UNSELECTED_VISUAL, "Image.jpg" );
 
   application.SendNotification();
