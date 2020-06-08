@@ -1366,11 +1366,11 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   if( mStencil )
   {
-    mStencil.SetPosition( padding.start, padding.top );
+    mStencil.SetProperty( Actor::Property::POSITION, Vector2( padding.start, padding.top ));
   }
   if( mActiveLayer )
   {
-    mActiveLayer.SetPosition( padding.start, padding.top );
+    mActiveLayer.SetProperty( Actor::Property::POSITION, Vector2( padding.start, padding.top ));
   }
 
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize, layoutDirection );
@@ -1843,7 +1843,7 @@ void TextEditor::ApplyScrollPosition()
   }
   else if ( Equals( scrollAmount, 0.0f, Math::MACHINE_EPSILON_1 ))
   {
-    mRenderableActor.SetPosition( scrollOffset.x + mAlignmentOffset, scrollOffset.y - scrollAmount );
+    mRenderableActor.SetProperty( Actor::Property::POSITION, Vector2( scrollOffset.x + mAlignmentOffset, scrollOffset.y - scrollAmount ));
   }
   else
   {

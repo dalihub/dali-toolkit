@@ -198,7 +198,7 @@ int UtcDaliBubbleEmitterSetBubbleScale(void)
   DALI_TEST_CHECK(emitter);
   Actor root = emitter.GetRootActor();
   Stage::GetCurrent().Add( root );
-  root.SetPosition( Vector3::ZERO );
+  root.SetProperty( Actor::Property::POSITION, Vector3::ZERO );
   root.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   root.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
@@ -321,7 +321,7 @@ int UtcDaliBubbleEmitterRestore(void)
   BubbleEmitter emitter = BubbleEmitter::New( movementArea,shapeImage, 90, Vector2( 5.f, 10.f ));
   Actor root = emitter.GetRootActor();
   Stage::GetCurrent().Add( root );
-  root.SetPosition( Vector3::ZERO );
+  root.SetProperty( Actor::Property::POSITION, Vector3::ZERO );
   root.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   root.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 

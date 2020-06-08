@@ -142,7 +142,7 @@ int UtcDaliModelViewAddRemove(void)
 
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetSize(Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
   view.Add(actor);
   Stage::GetCurrent().Add(view);
 
@@ -205,7 +205,7 @@ int UtcDaliModelOnSizeSet(void)
   application.Render();
 
   Vector3 size( 200.0f, 300.0f, 0.0f );
-  view.SetSize( size );
+  view.SetProperty( Actor::Property::SIZE, size );
 
   application.SendNotification();
   application.Render();

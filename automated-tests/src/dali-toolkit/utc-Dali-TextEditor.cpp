@@ -949,7 +949,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   DALI_TEST_CHECK( editor );
 
 
-  editor.SetSize( 300.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1163,7 +1163,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   DALI_TEST_CHECK( editor );
 
 
-  editor.SetSize( 300.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1400,7 +1400,7 @@ int utcDaliTextEditorEvent01(void)
 
   Stage::GetCurrent().Add( editor );
 
-  editor.SetSize( 300.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1442,8 +1442,8 @@ int utcDaliTextEditorEvent01(void)
 
   editor2.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor2.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  editor2.SetSize( 100.f, 100.f );
-  editor2.SetPosition( 100.f, 100.f );
+  editor2.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  editor2.SetProperty( Actor::Property::POSITION, Vector2( 100.f, 100.f ));
 
   Stage::GetCurrent().Add( editor2 );
 
@@ -1485,7 +1485,7 @@ int utcDaliTextEditorEvent02(void)
 
   Stage::GetCurrent().Add( editor );
 
-  editor.SetSize( 300.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1621,7 +1621,7 @@ int utcDaliTextEditorEvent03(void)
 
   editor.SetProperty( TextEditor::Property::TEXT, "This is a long text for the size of the text-editor." );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
-  editor.SetSize( 30.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 30.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1714,7 +1714,7 @@ int utcDaliTextEditorEvent04(void)
 
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworl" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
-  editor.SetSize( 100.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1803,7 +1803,7 @@ int utcDaliTextEditorEvent05(void)
 
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworl" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
-  editor.SetSize( 50.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 50.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL, true );
@@ -1885,7 +1885,7 @@ int utcDaliTextEditorEvent06(void)
 
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
-  editor.SetSize( 100.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -1975,7 +1975,7 @@ int utcDaliTextEditorEvent07(void)
 
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
-  editor.SetSize( 100.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -2119,7 +2119,7 @@ int utcDaliTextEditorEvent08(void)
 
   editor.SetProperty( TextEditor::Property::TEXT, "DALi" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
-  editor.SetSize( 100.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -2326,7 +2326,7 @@ int utcDaliTextEditorHandles(void)
   editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT, imagePropertyMap );
   editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, imagePropertyMap );
 
-  editor.SetSize( 30.f, 500.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 30.f, 500.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
@@ -2356,7 +2356,7 @@ int utcDaliTextEditorHandles(void)
 
   // Get the handle's actor.
   Actor handle = activeLayer.GetChildAt( 1u );
-  handle.SetSize( 100.f, 100.f );
+  handle.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
 
   // Render and notify
   application.SendNotification();
@@ -2522,11 +2522,11 @@ int utcDaliTextEditorGetPropertyLinecountP(void)
 
   Stage::GetCurrent().Add( editor );
 
-  editor.SetSize( 100.0f, 100.0f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 14, TEST_LOCATION );
 
-  editor.SetSize( 50.0f, 100.0f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 50.f, 100.f ) );
   lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 28, TEST_LOCATION );
 
@@ -2545,7 +2545,7 @@ int utcDaliTextEditorScrollStateChangedSignalTest(void)
   Stage::GetCurrent().Add( editor );
 
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
-  editor.SetSize( 50.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 50.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   editor.SetProperty( TextEditor::Property::ENABLE_SCROLL_BAR, true );
@@ -2582,7 +2582,7 @@ int UtcDaliToolkitTextEditorTextWrapMode(void)
   int lineCount =0 ;
 
   TextEditor editor = TextEditor::New();
-  editor.SetSize( 150.0f, 300.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 150.0f, 300.f ) );
   editor.SetProperty( TextEditor::Property::TEXT, "Hello world Hello world" );
 
   Stage::GetCurrent().Add( editor );
@@ -2633,7 +2633,7 @@ int UtcDaliTextEditorSetPaddingProperty(void)
 
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
-  editor.SetSize( 300.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( editor );
@@ -2666,7 +2666,7 @@ int UtcDaliTextEditorEnableShiftSelectionProperty(void)
 
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
-  editor.SetSize( 300.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( editor );
@@ -2694,7 +2694,7 @@ int UtcDaliTextEditorEnableGrabHandleProperty(void)
 
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
-  editor.SetSize( 300.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( editor );
@@ -2722,7 +2722,7 @@ int UtcDaliTextEditorMatchSystemLanguageDirectionProperty(void)
 
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
-  editor.SetSize( 300.f, 50.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( editor );

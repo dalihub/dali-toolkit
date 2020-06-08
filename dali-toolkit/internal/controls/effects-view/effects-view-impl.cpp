@@ -283,7 +283,7 @@ void EffectsView::OnSizeSet(const Vector3& targetSize)
     Enable();
   }
 
-  mChildrenRoot.SetSize( targetSize );
+  mChildrenRoot.SetProperty( Actor::Property::SIZE, targetSize );
 
   Control::OnSizeSet( targetSize );
 }
@@ -462,8 +462,8 @@ void EffectsView::SetupCameras()
     mCameraForChildren.SetNearClippingPlane(1.0f);
     mCameraForChildren.SetAspectRatio(mTargetSize.width / mTargetSize.height);
     mCameraForChildren.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-    mCameraForChildren.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosScale);
-    mCameraForChildren.SetZ( mTargetSize.height * cameraPosScale );
+    mCameraForChildren.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, mTargetSize.height * cameraPosScale ) );
+    mCameraForChildren.SetProperty( Actor::Property::POSITION_Z,  mTargetSize.height * cameraPosScale );
   }
 }
 

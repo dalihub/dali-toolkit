@@ -50,7 +50,7 @@ int UtcDaliControlActionOnVisual(void)
 
   Toolkit::Visual::Base visualBaseHandle = Toolkit::Visual::Base( dummyVisualPtr.Get() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visualBaseHandle );
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
   Stage::GetCurrent().Add( dummyControl );
 
   application.SendNotification();

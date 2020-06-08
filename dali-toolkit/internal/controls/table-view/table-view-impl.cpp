@@ -855,28 +855,28 @@ void TableView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
         if( cellData.horizontalAlignment == HorizontalAlignment::LEFT )
         {
-          actor.SetX( left + mPadding.width + padding.left );
+          actor.SetProperty( Actor::Property::POSITION_X,  left + mPadding.width + padding.left );
         }
         else if( cellData.horizontalAlignment ==  HorizontalAlignment::RIGHT )
         {
-          actor.SetX( right - mPadding.width - padding.right - actor.GetRelayoutSize( Dimension::WIDTH ) );
+          actor.SetProperty( Actor::Property::POSITION_X,  right - mPadding.width - padding.right - actor.GetRelayoutSize( Dimension::WIDTH ) );
         }
         else //if( cellData.horizontalAlignment ==  HorizontalAlignment::CENTER )
         {
-          actor.SetX( (left + right + padding.left - padding.right - actor.GetRelayoutSize( Dimension::WIDTH )) * 0.5f );
+          actor.SetProperty( Actor::Property::POSITION_X,  (left + right + padding.left - padding.right - actor.GetRelayoutSize( Dimension::WIDTH )) * 0.5f );
         }
 
         if( cellData.verticalAlignment == VerticalAlignment::TOP )
         {
-          actor.SetY( top + mPadding.height + padding.top );
+          actor.SetProperty( Actor::Property::POSITION_Y,  top + mPadding.height + padding.top );
         }
         else if( cellData.verticalAlignment == VerticalAlignment::BOTTOM )
         {
-          actor.SetY( bottom - mPadding.height - padding.bottom -  actor.GetRelayoutSize( Dimension::HEIGHT ) );
+          actor.SetProperty( Actor::Property::POSITION_Y,  bottom - mPadding.height - padding.bottom -  actor.GetRelayoutSize( Dimension::HEIGHT ) );
         }
         else //if( cellData.verticalAlignment = VerticalAlignment::CENTER )
         {
-          actor.SetY( (top + bottom + padding.top - padding.bottom - actor.GetRelayoutSize( Dimension::HEIGHT )) * 0.5f );
+          actor.SetProperty( Actor::Property::POSITION_Y,  (top + bottom + padding.top - padding.bottom - actor.GetRelayoutSize( Dimension::HEIGHT )) * 0.5f );
         }
       }
     }

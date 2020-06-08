@@ -72,7 +72,7 @@ void TestVisualRender( ToolkitTestApplication& application,
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -93,7 +93,7 @@ void TestVisualAsynchronousRender( ToolkitTestApplication& application,
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
@@ -258,7 +258,7 @@ int UtcDaliVisualFactoryGetBorderVisual1(void)
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
 
@@ -306,7 +306,7 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
 
@@ -975,7 +975,7 @@ int UtcDaliVisualFactoryGetNPatchVisual7(void)
     DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-    actor.SetSize( 200.f, 200.f );
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
     Stage::GetCurrent().Add( actor );
@@ -1138,7 +1138,7 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f) );
 
@@ -1223,7 +1223,7 @@ int UtcDaliVisualFactoryGetSvgVisualAtlas(void)
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f) );
 
@@ -1262,7 +1262,7 @@ void MeshVisualLoadsCorrectlyTest( Property::Map& propertyMap, ToolkitTestApplic
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2( 200.f, 200.f ) );
 
@@ -1305,7 +1305,7 @@ void MeshVisualDoesNotLoadCorrectlyTest( Property::Map& propertyMap, ToolkitTest
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(),  Vector2( 200.f, 200.f ) );
 
@@ -1612,7 +1612,7 @@ void TestPrimitiveVisualWithProperties( Property::Map& propertyMap, ToolkitTestA
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  actor.SetSize( 200.f, 200.f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(),  Vector2( 200.f, 200.f ) );
 
@@ -2053,7 +2053,7 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.0f, 200.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -2122,7 +2122,7 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual2(void)
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
-  actor.SetSize( 200.0f, 200.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();

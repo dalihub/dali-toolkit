@@ -1030,7 +1030,7 @@ int UtcDaliToolkitTextlabelScrollingInterruptedP(void)
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
   Stage::GetCurrent().Add( label );
-  label.SetSize( 360.0f, 20.f );
+  label.SetProperty( Actor::Property::SIZE, Vector2( 360.0f, 20.f ) );
   // Turn on all the effects
   label.SetProperty( TextLabel::Property::MULTI_LINE, false );
   label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
@@ -1166,7 +1166,7 @@ int UtcDaliToolkitTextlabelEllipsis(void)
   // Turn on all the effects
   label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   label.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  label.SetSize( 360.0f, 10.f );
+  label.SetProperty( Actor::Property::SIZE, Vector2( 360.0f, 10.f ) );
 
   try
   {
@@ -1181,7 +1181,7 @@ int UtcDaliToolkitTextlabelEllipsis(void)
 
   label.SetProperty( TextLabel::Property::TEXT, "Hello world                                        " );
   label.SetProperty( DevelTextLabel::Property::IGNORE_SPACES_AFTER_TEXT, false );
-  label.SetSize( 400.0f, 10.f );
+  label.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 10.f ) );
 
   try
   {
@@ -1197,7 +1197,7 @@ int UtcDaliToolkitTextlabelEllipsis(void)
 
   label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
   label.SetProperty( DevelTextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, true );
-  label.SetSize( 400.0f, 10.f );
+  label.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 10.f ) );
 
   try
   {
@@ -1221,7 +1221,7 @@ int UtcDaliToolkitTextlabelTextWrapMode(void)
   int lineCount =0 ;
 
   TextLabel label = TextLabel::New();
-  label.SetSize( 300.0f, 300.f );
+  label.SetProperty( Actor::Property::SIZE, Vector2( 300.0f, 300.f ) );
   label.SetProperty( TextLabel::Property::TEXT, "Hello world Hello world" );
   label.SetProperty( TextLabel::Property::MULTI_LINE, true );
 
@@ -1339,7 +1339,7 @@ int UtcDaliToolkitTextlabelTextStyle01(void)
   tet_infoline(" UtcDaliToolkitTextlabelTextStyle Setting Outline after Shadow");
 
   TextLabel label = TextLabel::New();
-  label.SetSize( 300.0f, 300.f );
+  label.SetProperty( Actor::Property::SIZE, Vector2( 300.0f, 300.f ) );
   label.SetProperty( TextLabel::Property::TEXT, "Hello world Hello world" );
   label.SetProperty( TextLabel::Property::POINT_SIZE, 12 );
   Stage::GetCurrent().Add( label );
@@ -1547,7 +1547,7 @@ int UtcDaliToolkitTextlabelTextFit(void)
   tet_infoline(" UtcDaliToolkitTextlabelTextFit");
   TextLabel label = TextLabel::New();
   Vector2 size( 460.0f, 100.0f );
-  label.SetSize( size );
+  label.SetProperty( Actor::Property::SIZE, size );
   label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
 
   // check point size

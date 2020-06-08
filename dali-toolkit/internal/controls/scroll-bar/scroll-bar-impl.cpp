@@ -307,7 +307,7 @@ void ScrollBar::ApplyConstraints()
     // Set indicator height according to the indicator's height policy
     if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
     {
-      mIndicator.SetSize(Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, mIndicatorFixedHeight);
+      mIndicator.SetProperty( Actor::Property::SIZE, Vector2( Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, mIndicatorFixedHeight) );
     }
     else
     {
@@ -532,7 +532,7 @@ void ScrollBar::OnSizeSet( const Vector3& size )
 {
   if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
   {
-    mIndicator.SetSize(size.width, mIndicatorFixedHeight);
+    mIndicator.SetProperty( Actor::Property::SIZE, Vector2( size.width, mIndicatorFixedHeight ) );
   }
 
   Control::OnSizeSet( size );
@@ -568,7 +568,7 @@ void ScrollBar::SetIndicatorFixedHeight( float height )
 
   if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
   {
-    mIndicator.SetSize(Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, mIndicatorFixedHeight);
+    mIndicator.SetProperty( Actor::Property::SIZE, Vector2( Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, mIndicatorFixedHeight) );
   }
 }
 

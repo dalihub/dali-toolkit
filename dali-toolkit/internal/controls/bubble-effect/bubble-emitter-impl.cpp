@@ -211,7 +211,7 @@ void BubbleEmitter::OnInitialize()
 {
   // Create the root actor, all the meshActor should be its children
   mBubbleRoot = Actor::New();
-  mBubbleRoot.SetSize(mMovementArea);
+  mBubbleRoot.SetProperty( Actor::Property::SIZE, mMovementArea );
 
   // Prepare the frame buffer to store the color adjusted background texture
   Vector2 imageSize = Vector2( mMovementArea.width/4.f, mMovementArea.height/4.f );
@@ -258,7 +258,7 @@ void BubbleEmitter::SetBackground( Texture bgTexture, const Vector3& hsvDelta )
 
   //Create RenderTask source actor
   Actor sourceActor = Actor::New();
-  sourceActor.SetSize( mMovementArea );
+  sourceActor.SetProperty( Actor::Property::SIZE, mMovementArea );
   sourceActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   sourceActor.RegisterProperty( "uHSVDelta", hsvDelta );
   Stage::GetCurrent().Add( sourceActor );

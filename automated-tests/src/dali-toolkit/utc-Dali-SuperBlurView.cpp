@@ -192,7 +192,7 @@ int UtcDaliSuperBlurViewSetTexture(void)
   tet_infoline(" UtcDaliSuperBlurViewSetTexture ");
 
   SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
-  blurView.SetSize( 100.f, 100.f );
+  blurView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
 
   Texture inputTexture = CreateSolidColorTexture( application, Color::GREEN, 50, 50 );
   blurView.SetTexture( inputTexture );
@@ -220,7 +220,7 @@ int UtcDaliSuperBlurViewSetTexture2(void)
   tet_infoline(" UtcDaliSuperBlurViewSetTexture2 - test setting a second texture ");
 
   SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
-  blurView.SetSize( 100.f, 100.f );
+  blurView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
 
   tet_infoline("Call SetTexture and add blurview to stage");
   Texture inputTexture = CreateSolidColorTexture( application, Color::GREEN, 50, 50 );
@@ -279,7 +279,7 @@ int UtcDaliSuperBlurViewSetProperty(void)
   SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
   // create renderers for the original image and each blurred image
   Stage::GetCurrent().Add( blurView );
-  blurView.SetSize( 100.f, 100.f );
+  blurView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
 
   // Will create ResourceImage
   blurView.SetProperty(SuperBlurView::Property::IMAGE_URL, TEST_IMAGE_FILE_NAME);
@@ -303,7 +303,7 @@ int UtcDaliSuperBlurViewGetProperty(void)
   tet_infoline(" UtcDaliSuperBlurViewSetProperty ");
 
   SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
-  blurView.SetSize( 100.f, 100.f );
+  blurView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
 
   blurView.SetProperty(SuperBlurView::Property::IMAGE_URL, TEST_IMAGE_FILE_NAME);
   Wait(application);
@@ -360,7 +360,7 @@ int UtcDaliSuperBlurViewGetBlurredTexture(void)
   tet_infoline( "UtcDaliSuperBlurViewGetBlurredTexture" );
 
   SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
-  blurView.SetSize( 100.f,100.f );
+  blurView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   Texture inputTexture = CreateSolidColorTexture( application, Color::GREEN, 100, 100 );
   blurView.SetTexture( inputTexture );
 
@@ -386,7 +386,7 @@ int UtcDaliSuperBlurViewBlurSignal(void)
   tet_infoline(" UtcDaliSuperBlurViewSignal ");
 
   SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
-  blurView.SetSize( 100.f, 100.f );
+  blurView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
 
   Texture inputTexture = CreateSolidColorTexture( application, Color::GREEN, 50, 50 );
   blurView.SetTexture( inputTexture );

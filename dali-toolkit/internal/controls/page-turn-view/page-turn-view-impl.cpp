@@ -388,7 +388,7 @@ void PageTurnView::OnInitialize()
   for( int i = 0; i < NUMBER_OF_CACHED_PAGES; i++ )
   {
     mPages.push_back( Page() );
-    mPages[i].actor.SetSize( mPageSize );
+    mPages[i].actor.SetProperty( Actor::Property::SIZE, mPageSize );
     Self().Add( mPages[i].actor );
   }
 
@@ -408,7 +408,7 @@ void PageTurnView::OnInitialize()
   for( int i = 0; i < NUMBER_OF_CACHED_PAGES_EACH_SIDE; i++ )
   {
     AddPage( i );
-    mPages[i].actor.SetZ( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
+    mPages[i].actor.SetProperty( Actor::Property::POSITION_Z,  -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
   }
   mPages[0].actor.SetProperty( Actor::Property::VISIBLE,true);
 
@@ -456,14 +456,14 @@ void PageTurnView::SetupShadowView()
 
   mShadowPlaneBackground = Actor::New();
   mShadowPlaneBackground.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mShadowPlaneBackground.SetSize( mControlSize );
+  mShadowPlaneBackground.SetProperty( Actor::Property::SIZE, mControlSize );
   Self().Add( mShadowPlaneBackground );
   mShadowView.SetShadowPlaneBackground( mShadowPlaneBackground );
 
   mPointLight = Actor::New();
   mPointLight.SetProperty( Actor::Property::ANCHOR_POINT, origin );
   mPointLight.SetProperty( Actor::Property::PARENT_ORIGIN, origin );
-  mPointLight.SetPosition( 0.f, 0.f, mPageSize.width*POINT_LIGHT_HEIGHT_RATIO );
+  mPointLight.SetProperty( Actor::Property::POSITION, Vector3( 0.f, 0.f, mPageSize.width*POINT_LIGHT_HEIGHT_RATIO ));
   Self().Add( mPointLight );
   mShadowView.SetPointLight( mPointLight );
 
@@ -500,19 +500,19 @@ void PageTurnView::SetPageSize( const Vector2& viewPageSize )
 
   if( mPointLight )
   {
-    mPointLight.SetPosition( 0.f, 0.f, mPageSize.width*POINT_LIGHT_HEIGHT_RATIO );
+    mPointLight.SetProperty( Actor::Property::POSITION, Vector3( 0.f, 0.f, mPageSize.width*POINT_LIGHT_HEIGHT_RATIO ));
   }
 
   for( size_t i=0; i<mPages.size(); i++ )
   {
-    mPages[i].actor.SetSize( mPageSize );
+    mPages[i].actor.SetProperty( Actor::Property::SIZE, mPageSize );
   }
 
   OnPageTurnViewInitialize();
 
   if( mShadowPlaneBackground )
   {
-    mShadowPlaneBackground.SetSize( mControlSize );
+    mShadowPlaneBackground.SetProperty( Actor::Property::SIZE, mControlSize );
   }
 }
 
@@ -948,11 +948,11 @@ void PageTurnView::OrganizePageDepth()
   {
     if(mCurrentPageIndex+i < mTotalPageCount)
     {
-      mPages[( mCurrentPageIndex+i )%NUMBER_OF_CACHED_PAGES].actor.SetZ( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
+      mPages[( mCurrentPageIndex+i )%NUMBER_OF_CACHED_PAGES].actor.SetProperty( Actor::Property::POSITION_Z,  -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
     }
     if( mCurrentPageIndex >= i + 1 )
     {
-      mPages[( mCurrentPageIndex-i-1 )%NUMBER_OF_CACHED_PAGES].actor.SetZ( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
+      mPages[( mCurrentPageIndex-i-1 )%NUMBER_OF_CACHED_PAGES].actor.SetProperty( Actor::Property::POSITION_Z,  -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
     }
   }
 }

@@ -406,7 +406,7 @@ int UtcDaliVideoViewMethodsForCoverage2(void)
   Vector3 vector(100.0f, 100.0f, 0.0f);
 
   DALI_TEST_CHECK(vector != videoView.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
-  videoView.SetSize( vector );
+  videoView.SetProperty( Actor::Property::SIZE, vector );
 
   application.SendNotification();
   application.Render();

@@ -296,9 +296,9 @@ struct Decorator::Impl : public ConnectionTracker
                                 ( cursor.position.y > -Math::MACHINE_EPSILON_1000 ) );
       if( mPrimaryCursorVisible )
       {
-        mPrimaryCursor.SetPosition( cursor.position.x,
-                                    cursor.position.y );
-        mPrimaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
+        mPrimaryCursor.SetProperty( Actor::Property::POSITION, Vector2( cursor.position.x,
+                                    cursor.position.y ) );
+        mPrimaryCursor.SetProperty( Actor::Property::SIZE, Size( mCursorWidth, cursor.cursorHeight ) );
       }
       mPrimaryCursor.SetProperty( Actor::Property::VISIBLE, mPrimaryCursorVisible && mCursorBlinkStatus );
     }
@@ -311,9 +311,9 @@ struct Decorator::Impl : public ConnectionTracker
                                   ( cursor.position.y > -Math::MACHINE_EPSILON_1000 ) );
       if( mSecondaryCursorVisible )
       {
-        mSecondaryCursor.SetPosition( cursor.position.x,
-                                      cursor.position.y );
-        mSecondaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
+        mSecondaryCursor.SetProperty( Actor::Property::POSITION, Vector2( cursor.position.x,
+                                      cursor.position.y ) );
+        mSecondaryCursor.SetProperty( Actor::Property::SIZE, Size( mCursorWidth, cursor.cursorHeight ) );
       }
       mSecondaryCursor.SetProperty( Actor::Property::VISIBLE, mSecondaryCursorVisible && mCursorBlinkStatus );
     }
@@ -651,7 +651,7 @@ struct Decorator::Impl : public ConnectionTracker
     mCopyPastePopup.position.x = floorf( mCopyPastePopup.position.x );
     mCopyPastePopup.position.y = floorf( mCopyPastePopup.position.y );
 
-    mCopyPastePopup.actor.SetPosition( mCopyPastePopup.position );
+    mCopyPastePopup.actor.SetProperty( Actor::Property::POSITION, mCopyPastePopup.position );
     mPopupSetNewPosition = false;
   }
 
@@ -786,7 +786,7 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if( handle.markerActor )
     {
-      handle.markerActor.SetSize( 0, handle.lineHeight );
+      handle.markerActor.SetProperty( Actor::Property::SIZE, Vector2( 0, handle.lineHeight ) );
     }
   }
 
@@ -1003,8 +1003,8 @@ struct Decorator::Impl : public ConnectionTracker
 
     if( grabHandle.actor )
     {
-      grabHandle.actor.SetPosition( grabHandle.position.x + floor( 0.5f * mCursorWidth ) + ( mSmoothHandlePanEnabled ? grabHandle.grabDisplacementX : 0.f ),
-                                    yLocalPosition + ( mSmoothHandlePanEnabled ? grabHandle.grabDisplacementY : 0.f ) );
+      grabHandle.actor.SetProperty( Actor::Property::POSITION, Vector2( grabHandle.position.x + floor( 0.5f * mCursorWidth ) + ( mSmoothHandlePanEnabled ? grabHandle.grabDisplacementX : 0.f ),
+                                    yLocalPosition + ( mSmoothHandlePanEnabled ? grabHandle.grabDisplacementY : 0.f ) ) );
     }
   }
 
@@ -1096,8 +1096,8 @@ struct Decorator::Impl : public ConnectionTracker
 
     if( handle.actor )
     {
-      handle.actor.SetPosition( handle.position.x + ( mSmoothHandlePanEnabled ? handle.grabDisplacementX : 0.f ),
-                                yLocalPosition + ( mSmoothHandlePanEnabled ? handle.grabDisplacementY : 0.f ) );
+      handle.actor.SetProperty( Actor::Property::POSITION, Vector2( handle.position.x + ( mSmoothHandlePanEnabled ? handle.grabDisplacementX : 0.f ),
+                                yLocalPosition + ( mSmoothHandlePanEnabled ? handle.grabDisplacementY : 0.f ) ) );
     }
   }
 
@@ -1164,14 +1164,14 @@ struct Decorator::Impl : public ConnectionTracker
     if ( mHighlightActor )
     {
       // Sets the position of the highlight actor inside the decorator.
-      mHighlightActor.SetPosition( mHighlightPosition.x + mHighlightOutlineOffset,
-                                   mHighlightPosition.y + mHighlightOutlineOffset );
+      mHighlightActor.SetProperty( Actor::Property::POSITION, Vector2( mHighlightPosition.x + mHighlightOutlineOffset,
+                                   mHighlightPosition.y + mHighlightOutlineOffset ) );
 
       const unsigned int numberOfQuads = mHighlightQuadList.Count();
       if( 0u != numberOfQuads )
       {
         // Set the size of the highlighted text to the actor.
-        mHighlightActor.SetSize( mHighlightSize );
+        mHighlightActor.SetProperty( Actor::Property::SIZE, mHighlightSize );
 
         // Used to translate the vertices given in decorator's coords to the mHighlightActor's local coords.
         const float offsetX = mHighlightPosition.x + 0.5f * mHighlightSize.width;
@@ -1711,7 +1711,7 @@ struct Decorator::Impl : public ConnectionTracker
     const float popupHeight = mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT );
 
     // Sets the position of the popup below.
-    mCopyPastePopup.actor.SetY( floorf( CalculateVerticalPopUpPosition( 0.5f * popupHeight, true ) ) );
+    mCopyPastePopup.actor.SetProperty( Actor::Property::POSITION_Y,  floorf( CalculateVerticalPopUpPosition( 0.5f * popupHeight, true ) ) );
   }
 
   void PopUpLeavesBottomBoundary( PropertyNotification& source )
@@ -1719,7 +1719,7 @@ struct Decorator::Impl : public ConnectionTracker
     const float popupHeight = mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT );
 
     // Sets the position of the popup above.
-    mCopyPastePopup.actor.SetY( floorf( CalculateVerticalPopUpPosition( 0.5f * popupHeight, false ) ) );
+    mCopyPastePopup.actor.SetProperty( Actor::Property::POSITION_Y,  floorf( CalculateVerticalPopUpPosition( 0.5f * popupHeight, false ) ) );
   }
 
   void SetUpPopupPositionNotifications( const Vector3& popupHalfSize )

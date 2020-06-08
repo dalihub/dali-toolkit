@@ -146,8 +146,8 @@ int UtcDaliWebViewPageNavigation(void)
   WebView view = WebView::New();
   view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  view.SetPosition( 0, 0 );
-  view.SetSize( 800, 600 );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
   Stage::GetCurrent().Add( view );
   application.SendNotification();
   application.Render();
@@ -178,7 +178,7 @@ int UtcDaliWebViewPageNavigation(void)
 
   view.LoadUrl( TEST_URL2 );
   view.Suspend();
-  view.SetSize( 400, 300 );
+  view.SetProperty( Actor::Property::SIZE, Vector2( 400, 300 ) );
   application.SendNotification();
   application.Render();
   Test::EmitGlobalTimerSignal();
@@ -217,8 +217,8 @@ int UtcDaliWebViewTouchAndKeys(void)
   WebView view = WebView::New();
   view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  view.SetPosition( 0, 0 );
-  view.SetSize( 800, 600 );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
 
   Stage::GetCurrent().Add( view );
   application.SendNotification();

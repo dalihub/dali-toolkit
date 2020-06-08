@@ -259,7 +259,7 @@ int UtcDaliVisualSetGetDepthIndex(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( dummyControl );
 
 
@@ -421,7 +421,7 @@ int UtcDaliVisualSetOnOffStage(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
 
   application.SendNotification();
   application.Render(0);
@@ -457,7 +457,7 @@ int UtcDaliVisualSetOnOffStage2(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  actor.SetSize(200.f, 200.f);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
 
   application.SendNotification();
   application.Render(0);
@@ -1818,7 +1818,7 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   DummyControl actor = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, borderVisual );
-  actor.SetSize(2000, 2000);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Stage::GetCurrent().Add(actor);
 
@@ -1886,7 +1886,7 @@ int UtcDaliVisualAnimateBorderVisual02(void)
   DummyControl actor = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, borderVisual );
-  actor.SetSize(2000, 2000);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Stage::GetCurrent().Add(actor);
 
@@ -1930,7 +1930,7 @@ int UtcDaliVisualAnimateColorVisual(void)
   DummyControl actor = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, borderVisual );
-  actor.SetSize(2000, 2000);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Stage::GetCurrent().Add(actor);
 
@@ -1985,7 +1985,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     DummyControl actor = DummyControl::New(true);
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-    actor.SetSize(2000, 2000);
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
     actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
     actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
     Stage::GetCurrent().Add(actor);
@@ -2060,7 +2060,7 @@ int UtcDaliVisualAnimatedGradientVisual01(void)
     DummyControl actor = DummyControl::New(true);
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-    actor.SetSize(2000, 2000);
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
     actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
     actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
     Stage::GetCurrent().Add(actor);
@@ -2231,7 +2231,7 @@ int UtcDaliVisualAnimatedGradientVisual02(void)
       DummyControl actor = DummyControl::New( true );
       Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>( actor.GetImplementation() );
       dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-      actor.SetSize( 2000, 2000 );
+      actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
       actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
       actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
       Stage::GetCurrent().Add(actor);
@@ -2505,7 +2505,7 @@ int UtcDaliVisualAnimatedGradientVisual03(void)
       DummyControl actor = DummyControl::New( true );
       Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>( actor.GetImplementation() );
       dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-      actor.SetSize( 2000, 2000 );
+      actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
       actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
       actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
       Stage::GetCurrent().Add(actor);
@@ -2793,7 +2793,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   //Put the visual on the stage
   DummyControl actor = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-  actor.SetSize(2000, 2000);
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Stage::GetCurrent().Add(actor);
 
@@ -3103,7 +3103,7 @@ int UtcDaliNPatchVisualCustomShader(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   dummyImpl.SetLayout( DummyControl::Property::TEST_VISUAL, transformMap );
-  dummy.SetSize(2000, 2000);
+  dummy.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Stage::GetCurrent().Add(dummy);
   application.SendNotification();
@@ -3185,7 +3185,7 @@ int UtcDaliVisualRendererRemovalAndReAddition(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 0, TEST_LOCATION );
 
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   tet_infoline( "Add control with visual to stage and check renderer count is 1" );
 
   Stage::GetCurrent().Add( dummyControl );
@@ -3247,7 +3247,7 @@ int UtcDaliVisualTextVisualRender(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, textVisual );
   DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 0, TEST_LOCATION );
 
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummyControl.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   Stage::GetCurrent().Add( dummyControl );
@@ -3270,7 +3270,7 @@ int UtcDaliVisualTextVisualRender(void)
   textVisual.SetDepthIndex( 1 );
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, textVisual );
-  dummyControl.SetSize( 720.f, 640.f );
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 720.f, 640.f ) );
 
   application.SendNotification(); // force process events to ensure text visual
   // adds renderer to the dummy control in OnRelayout
@@ -3316,7 +3316,7 @@ int UtcDaliVisualTextVisualDisableEnable(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, textVisual );
   DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 0, TEST_LOCATION );
 
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummyControl.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   Stage::GetCurrent().Add( dummyControl );
@@ -3446,7 +3446,7 @@ int UtcDaliRegisterVisualOrder(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, anotherTestVisual2Replacement );
   DALI_TEST_EQUALS( anotherTestVisual2Replacement.GetDepthIndex(), 2000, TEST_LOCATION );
 
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( dummyControl );
 
   END_TEST;
@@ -3482,7 +3482,7 @@ int UtcDaliRegisterVisualOrder02(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, testVisual2 );
   DALI_TEST_CHECK( testVisual2.GetDepthIndex() >  testVisual1.GetDepthIndex() );
 
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( dummyControl );
 
   END_TEST;
@@ -3519,7 +3519,7 @@ int UtcDaliRegisterVisualWithDepthIndex(void)
   DALI_TEST_EQUALS( testVisual3.GetDepthIndex(), 300, TEST_LOCATION );
   DALI_TEST_EQUALS( DevelControl::IsVisualEnabled( dummyImpl, DummyControl::Property::TEST_VISUAL2 ), true, TEST_LOCATION );
 
-  dummyControl.SetSize(200.f, 200.f);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( dummyControl );
 
   END_TEST;
@@ -3599,7 +3599,7 @@ int UtcDaliSvgVisualCustomShader(void)
   Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  dummy.SetSize( 200.f, 200.f );
+  dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( dummy );
 
@@ -3645,7 +3645,7 @@ int UtcDaliVisualRoundedCorner(void)
     Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-    dummy.SetSize( 200.f, 200.f );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
     Stage::GetCurrent().Add( dummy );
 
@@ -3677,7 +3677,7 @@ int UtcDaliVisualRoundedCorner(void)
     Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-    dummy.SetSize( 200.f, 200.f );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
     Stage::GetCurrent().Add( dummy );
 
@@ -3722,7 +3722,7 @@ int UtcDaliVisualRoundedCorner(void)
     Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-    dummy.SetSize( 200.f, 200.f );
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
     Stage::GetCurrent().Add( dummy );
 
@@ -3758,7 +3758,7 @@ int UtcDaliColorVisualBlurRadius(void)
   Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
-  dummy.SetSize( 200.f, 200.f );
+  dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( dummy );
 

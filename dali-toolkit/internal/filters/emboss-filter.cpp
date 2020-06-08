@@ -98,7 +98,7 @@ void EmbossFilter::Enable()
   // create actor to render input with applied emboss effect
   mActorForInput1 = Actor::New();
   mActorForInput1.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mActorForInput1.SetSize(mTargetSize);
+  mActorForInput1.SetProperty( Actor::Property::SIZE, mTargetSize);
   Vector2 textureScale( 1.5f/mTargetSize.width, 1.5f/mTargetSize.height);
   mActorForInput1.RegisterProperty( TEX_SCALE_UNIFORM_NAME, textureScale );
   mActorForInput1.RegisterProperty( COEFFICIENT_UNIFORM_NAME, Vector3( 2.f, -1.f, -1.f ) );
@@ -110,7 +110,7 @@ void EmbossFilter::Enable()
 
   mActorForInput2 = Actor::New();
   mActorForInput2.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mActorForInput2.SetSize(mTargetSize);
+  mActorForInput2.SetProperty( Actor::Property::SIZE, mTargetSize);
   mActorForInput2.RegisterProperty( TEX_SCALE_UNIFORM_NAME, textureScale );
   mActorForInput2.RegisterProperty( COEFFICIENT_UNIFORM_NAME, Vector3( -1.f, -1.f, 2.f ) );
   // set EMBOSS custom shader
@@ -121,7 +121,7 @@ void EmbossFilter::Enable()
 
   mActorForComposite = Actor::New();
   mActorForComposite.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mActorForComposite.SetSize(mTargetSize);
+  mActorForComposite.SetProperty( Actor::Property::SIZE, mTargetSize);
   mActorForComposite.SetProperty( Actor::Property::COLOR, Color::BLACK );
 
   mRootActor.Add( mActorForComposite );
@@ -211,15 +211,15 @@ void EmbossFilter::SetSize( const Vector2& size )
   mTargetSize = size;
   if( mActorForInput1 )
   {
-    mActorForInput1.SetSize(mTargetSize);
+    mActorForInput1.SetProperty( Actor::Property::SIZE, mTargetSize);
   }
   if( mActorForInput2 )
   {
-    mActorForInput2.SetSize(mTargetSize);
+    mActorForInput2.SetProperty( Actor::Property::SIZE, mTargetSize);
   }
   if( mActorForComposite )
   {
-    mActorForComposite.SetSize(mTargetSize);
+    mActorForComposite.SetProperty( Actor::Property::SIZE, mTargetSize);
   }
 }
 

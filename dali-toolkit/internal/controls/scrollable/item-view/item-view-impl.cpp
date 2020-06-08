@@ -426,7 +426,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
   Actor self = Self();
 
   // The ItemView size should match the active layout size
-  self.SetSize(targetSize);
+  self.SetProperty( Actor::Property::SIZE, targetSize);
   mActiveLayoutTargetSize = targetSize;
 
   // Switch to the new layout
@@ -446,7 +446,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
 
     Vector3 size;
     mActiveLayout->GetItemSize( itemId, targetSize, size );
-    actor.SetSize( size.GetVectorXY() );
+    actor.SetProperty( Actor::Property::SIZE, size.GetVectorXY() );
   }
 
   // Refresh the new layout
@@ -972,7 +972,7 @@ void ItemView::SetupActor( Item item, const Vector3& layoutSize )
   {
     Vector3 size;
     mActiveLayout->GetItemSize( item.first, mActiveLayoutTargetSize, size );
-    item.second.SetSize( size.GetVectorXY() );
+    item.second.SetProperty( Actor::Property::SIZE, size.GetVectorXY() );
 
     mActiveLayout->ApplyConstraints( item.second, item.first, layoutSize, Self() );
   }

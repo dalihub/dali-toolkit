@@ -441,7 +441,7 @@ int UtcDaliToolkitFlexContainerMoveFocus(void)
 
   RelayoutSignalHandler relayoutSignal(flexContainer);
   flexContainer.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback );
-  flexContainer.SetSize( stageSize );
+  flexContainer.SetProperty( Actor::Property::SIZE, stageSize );
 
   // Create two actors and add them to the container
   Actor actor1 = Actor::New();

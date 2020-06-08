@@ -57,7 +57,7 @@ int UtcDaliVisualFactoryGetArcVisual01(void)
   DummyControl actor = DummyControl::New( true );
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.0f, 200.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -93,7 +93,7 @@ int UtcDaliVisualFactoryGetArcVisual02(void)
   DummyControl actor = DummyControl::New( true );
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.0f, 200.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -132,7 +132,7 @@ int UtcDaliArcVisualGetPropertyMap01(void)
   DummyControl actor = DummyControl::New( true );
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  actor.SetSize( 200.0f, 200.0f );
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();

@@ -341,19 +341,19 @@ void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
 {
   mTargetSize = Vector2(targetSize);
 
-  mChildrenRoot.SetSize(targetSize);
+  mChildrenRoot.SetProperty( Actor::Property::SIZE, targetSize);
 
   if( !mBlurUserImage )
   {
-    mCompositingActor.SetSize(targetSize);
-    mTargetActor.SetSize(targetSize);
+    mCompositingActor.SetProperty( Actor::Property::SIZE, targetSize);
+    mTargetActor.SetProperty( Actor::Property::SIZE, targetSize);
 
     // Children render camera must move when GaussianBlurView object is resized. This is since we cannot change render target size - so we need to remap the child actors' rendering
     // accordingly so they still exactly fill the render target. Note that this means the effective resolution of the child render changes as the GaussianBlurView object changes
     // size, this is the trade off for not being able to modify render target size
     // Change camera z position based on GaussianBlurView actor height
     float cameraPosConstraintScale = 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f);
-    mRenderFullSizeCamera.SetZ(mTargetSize.height * cameraPosConstraintScale);
+    mRenderFullSizeCamera.SetProperty( Actor::Property::POSITION_Z, mTargetSize.height * cameraPosConstraintScale);
   }
 
 
@@ -399,7 +399,7 @@ void GaussianBlurView::AllocateResources()
   mRenderDownsampledCamera.SetAspectRatio(mDownsampledWidth / mDownsampledHeight);
   mRenderDownsampledCamera.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
 
-  mRenderDownsampledCamera.SetPosition(0.0f, 0.0f, ((mDownsampledHeight * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f)));
+  mRenderDownsampledCamera.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, ((mDownsampledHeight * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f))));
 
   // setup for normal operation
   if(!mBlurUserImage)
@@ -412,7 +412,7 @@ void GaussianBlurView::AllocateResources()
     mRenderFullSizeCamera.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
 
     float cameraPosConstraintScale = 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f);
-    mRenderFullSizeCamera.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosConstraintScale);
+    mRenderFullSizeCamera.SetProperty( Actor::Property::POSITION, Vector3(0.0f, 0.0f, mTargetSize.height * cameraPosConstraintScale));
 
     // create offscreen buffer of new size to render our child actors to
     mRenderTargetForRenderingChildren = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
@@ -440,10 +440,10 @@ void GaussianBlurView::AllocateResources()
   mRenderTarget2.AttachColorTexture( texture );
 
   // size needs to match render target
-  mHorizBlurActor.SetSize(mDownsampledWidth, mDownsampledHeight);
+  mHorizBlurActor.SetProperty( Actor::Property::SIZE, Vector2(mDownsampledWidth, mDownsampledHeight) );
 
   // size needs to match render target
-  mVertBlurActor.SetSize(mDownsampledWidth, mDownsampledHeight);
+  mVertBlurActor.SetProperty( Actor::Property::SIZE, Vector2(mDownsampledWidth, mDownsampledHeight) );
   SetRendererTexture( mVertBlurActor.GetRendererAt(0), mRenderTarget2 );
 
   // set gaussian blur up for new sized render targets

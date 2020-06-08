@@ -71,14 +71,14 @@ class RadioButton;
  * RadioButton button1 = RadioButton::New();
  * button1.SetProperty( Button::Property::LABEL, "button1" );
  * button1.SetBackgroundColor( Color::WHITE );
- * button1.SetPosition( 0, -40 );
+ * button1.SetProperty( Actor::Property::POSITION, Vector2( 0, -40 ) );
  * radioGroup.Add( button1 );
  *
  * // Make more RadioButtons and add them to their parent
  * RadioButton button2 = RadioButton::New();
  * button2.SetProperty( Toolkit::Button::Property::LABEL, "button2" );
  * button2.SetBackgroundColor( Color::WHITE );
- * button2.SetPosition( 0, 40 );
+ * button2.SetProperty( Actor::Property::POSITION, Vector2( 0, 40 ) );
  * radioGroup.Add( button2 );
  *
  * @endcode

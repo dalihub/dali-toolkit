@@ -1315,7 +1315,7 @@ int UtcDaliAccessibilityManagerActionActivateSignalP(void)
   accAdaptor.HandleActionEnableEvent();
 
   Dali::Toolkit::PushButton button = Dali::Toolkit::PushButton::New();
-  button.SetSize(480, 800);
+  button.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
   Stage::GetCurrent().Add(button);
   manager.SetFocusOrder( button, 1 );
   manager.SetCurrentFocusActor( button );
@@ -1524,7 +1524,7 @@ int UtcDaliAccessibilityManagerActionUpSignalP(void)
   manager.ActionUpSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
 
   DummyControl dummyControl = DummyControl::New(true);
-  dummyControl.SetSize(480, 800);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
   manager.SetFocusOrder( dummyControl, 1 );
   Stage::GetCurrent().Add( dummyControl );
   manager.SetCurrentFocusActor( dummyControl );
@@ -1569,7 +1569,7 @@ int UtcDaliAccessibilityManagerActionDownSignalP(void)
   manager.ActionDownSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
 
   Dali::Toolkit::PushButton button = Dali::Toolkit::PushButton::New();
-  button.SetSize(480, 800);
+  button.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
   Stage::GetCurrent().Add(button);
   manager.SetFocusOrder( button, 1 );
   manager.SetCurrentFocusActor( button );
@@ -2097,7 +2097,7 @@ int UtcDaliAccessibilityManagerActionZoomSignalP(void)
   DALI_TEST_CHECK( manager );
 
   Dali::Toolkit::PushButton button = Dali::Toolkit::PushButton::New();
-  button.SetSize(480, 800);
+  button.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
   Stage::GetCurrent().Add(button);
   manager.SetFocusOrder( button, 1 );
   manager.SetCurrentFocusActor( button );
@@ -2316,7 +2316,7 @@ int UtcDaliAccessibilityManagerActionTouch(void)
 
   DummyControl dummyControl = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
-  dummyControl.SetSize(480, 800);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
   manager.SetFocusOrder( dummyControl, 1 );
   Stage::GetCurrent().Add( dummyControl );
   manager.SetCurrentFocusActor( dummyControl );
@@ -2342,7 +2342,7 @@ int UtcDaliAccessibilityManagerHandlePanGesture(void)
 
   Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
   DummyControl dummyControl = DummyControl::New(true);
-  dummyControl.SetSize(480, 800);
+  dummyControl.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
   Stage::GetCurrent().Add( dummyControl );
 
   AccessibilityGestureEvent panGestureEvent(AccessibilityGestureEvent::Started);

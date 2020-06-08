@@ -510,7 +510,7 @@ int UtcDaliTooltipDisplay(void)
   control.SetProperty( DevelControl::Property::TOOLTIP, "Test" );
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
 
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
   rootActor.Add( control );
@@ -545,7 +545,7 @@ int UtcDaliTooltipDisplayWithTail(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT, "Test" )
                                       .Add( Tooltip::Property::TAIL,
@@ -585,7 +585,7 @@ int UtcDaliTooltipDisplayWithContentArray(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT,
                                             Property::Array().Add( Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::IMAGE )
@@ -629,7 +629,7 @@ int UtcDaliTooltipDisplayBelow(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT, "Test" )
                                       .Add( Tooltip::Property::POSITION, Tooltip::Position::BELOW )
@@ -665,7 +665,7 @@ int UtcDaliTooltipDisplayAbove(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT, "Test" )
                                       .Add( Tooltip::Property::POSITION, Tooltip::Position::ABOVE )
@@ -701,7 +701,7 @@ int UtcDaliTooltipDisplayAtHoverPoint(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT, "Test" )
                                       .Add( Tooltip::Property::POSITION, Tooltip::Position::HOVER_POINT )
@@ -741,7 +741,7 @@ int UtcDaliTooltipExceedThreshold(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT, "Test" )
                                       .Add( Tooltip::Property::MOVEMENT_THRESHOLD, 5 )
@@ -790,7 +790,7 @@ int UtcDaliTooltipGoOutOfBounds(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   control.SetProperty( DevelControl::Property::TOOLTIP, "Test" );
 
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
@@ -836,7 +836,7 @@ int UtcDaliTooltipHideTooltipWhenOutOfBounds(void)
   control.SetProperty( DevelControl::Property::TOOLTIP, "Test" );
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
 
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
   rootActor.Add( control );
@@ -879,7 +879,7 @@ int UtcDaliTooltipHideTooltipWhenSetToDisapperOnMovement(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT, "Test" )
                                       .Add( Tooltip::Property::DISAPPEAR_ON_MOVEMENT, true )
@@ -928,7 +928,7 @@ int UtcDaliTooltipChangeContent(void)
   control.SetProperty( DevelControl::Property::TOOLTIP, "Test" );
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  control.SetSize( 100.0f, 100.0f );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
 
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
   rootActor.Add( control );
@@ -1015,7 +1015,7 @@ int UtcDaliTooltipEnsureRemainsOnStage1(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER );
-  control.SetSize( stageSize );
+  control.SetProperty( Actor::Property::SIZE, stageSize );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT, "Test" )
                                       .Add( Tooltip::Property::TAIL,
@@ -1057,7 +1057,7 @@ int UtcDaliTooltipEnsureRemainsOnStage2(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
-  control.SetSize( stageSize );
+  control.SetProperty( Actor::Property::SIZE, stageSize );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT, "Test" )
                                       .Add( Tooltip::Property::TAIL,
@@ -1100,7 +1100,7 @@ int UtcDaliTooltipEnsureRemainsOnStage3(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER );
-  control.SetSize( stageSize );
+  control.SetProperty( Actor::Property::SIZE, stageSize );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT, "Test" )
                                       .Add( Tooltip::Property::TAIL,
@@ -1109,7 +1109,7 @@ int UtcDaliTooltipEnsureRemainsOnStage3(void)
                                                            .Add( Tooltip::Tail::Property::BELOW_VISUAL, "below-visual.png" ) )
                                       .Add( Tooltip::Property::POSITION, Tooltip::Position::BELOW )
                      );
-  control.SetX( -centerPoint.x );
+  control.SetProperty( Actor::Property::POSITION_X,  -centerPoint.x );
 
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
   rootActor.Add( control );
@@ -1145,7 +1145,7 @@ int UtcDaliTooltipEnsureRemainsOnStage4(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER );
-  control.SetSize( stageSize );
+  control.SetProperty( Actor::Property::SIZE, stageSize );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT, "Test" )
                                       .Add( Tooltip::Property::TAIL,
@@ -1154,7 +1154,7 @@ int UtcDaliTooltipEnsureRemainsOnStage4(void)
                                                            .Add( Tooltip::Tail::Property::BELOW_VISUAL, "below-visual.png" ) )
                                       .Add( Tooltip::Property::POSITION, Tooltip::Position::BELOW )
                      );
-  control.SetX( centerPoint.x );
+  control.SetProperty( Actor::Property::POSITION_X,  centerPoint.x );
 
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
   rootActor.Add( control );

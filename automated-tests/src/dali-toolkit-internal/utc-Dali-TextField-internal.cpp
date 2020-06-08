@@ -36,7 +36,7 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
 
   // Create a text field
   TextField textField = TextField::New();
-  textField.SetSize( 400.f, 60.f );
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 400.f, 60.f ) );
   textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
