@@ -275,14 +275,6 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const Visua
   return nPatchVisual;
 }
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image )
-{
-  NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
-  VisualUrl visualUrl( image.GetUrl() );
-  nPatchVisual->mImageUrl = visualUrl;
-  return nPatchVisual;
-}
-
 void NPatchVisual::LoadImages()
 {
   TextureManager& textureManager = mFactoryCache.GetTextureManager();

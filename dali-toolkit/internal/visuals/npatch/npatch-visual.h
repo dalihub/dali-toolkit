@@ -22,7 +22,6 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
-#include <dali/devel-api/images/nine-patch-image.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/shader.h>
@@ -84,14 +83,6 @@ public:
    * @return A smart-pointer to the newly allocated visual.
    */
   static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl );
-
-  /**
-   * @brief Create an N-patch visual with a NinePatchImage resource.
-   *
-   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @param[in] image The NinePatchImage to use
-   */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, NinePatchImage image );
 
 public:  // from Visual
 
