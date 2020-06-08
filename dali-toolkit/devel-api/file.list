@@ -131,6 +131,7 @@ SET( devel_api_visuals_header_files
   ${devel_api_src_dir}/visuals/animated-image-visual-actions-devel.h
   ${devel_api_src_dir}/visuals/animated-vector-image-visual-actions-devel.h
   ${devel_api_src_dir}/visuals/animated-vector-image-visual-signals-devel.h
+  ${devel_api_src_dir}/visuals/arc-visual-actions-devel.h
   ${devel_api_src_dir}/visuals/arc-visual-properties-devel.h
   ${devel_api_src_dir}/visuals/color-visual-properties-devel.h
   ${devel_api_src_dir}/visuals/image-visual-properties-devel.h

@@ -16,15 +16,13 @@
 
 #include <iostream>
 #include <stdlib.h>
-//#include <chrono>
-//#include <thread>
 #include <dali-toolkit-test-suite-utils.h>
-//#include <toolkit-timer.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/arc-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/arc-visual-actions-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include "dummy-control.h"
 
@@ -196,6 +194,80 @@ int UtcDaliArcVisualGetPropertyMap01(void)
 
   actor.Unparent( );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+int UtcDaliArcVisualUpdateProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliArcVisualUpdateProperty" );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  float thickness = 20.0f;
+  float startAngle = 0.0f;
+  float sweepAngle = 90.0f;
+
+  Property::Map propertyMap;
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ARC )
+             .Add( Visual::Property::MIX_COLOR, Color::RED )
+             .Add( DevelArcVisual::Property::THICKNESS, thickness )
+             .Add( DevelArcVisual::Property::START_ANGLE, startAngle )
+             .Add( DevelArcVisual::Property::SWEEP_ANGLE, sweepAngle );
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  DummyControl actor = DummyControl::New( true );
+  DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  Property::Value* value = map.Find( DevelArcVisual::Property::THICKNESS, Property::FLOAT );
+  DALI_TEST_EQUALS( value->Get< float >(), thickness, TEST_LOCATION );
+  DALI_TEST_EQUALS( gl.CheckUniformValue< float >( "thickness", thickness ), true, TEST_LOCATION );
+
+  value = map.Find( DevelArcVisual::Property::START_ANGLE, Property::FLOAT );
+  DALI_TEST_EQUALS( value->Get< float >(), startAngle, TEST_LOCATION );
+  DALI_TEST_EQUALS( gl.CheckUniformValue< float >( "startAngle", startAngle ), true, TEST_LOCATION );
+
+  value = map.Find( DevelArcVisual::Property::SWEEP_ANGLE, Property::FLOAT );
+  DALI_TEST_EQUALS( value->Get< float >(), sweepAngle, TEST_LOCATION );
+  DALI_TEST_EQUALS( gl.CheckUniformValue< float >( "sweepAngle", sweepAngle ), true, TEST_LOCATION );
+
+  thickness = 10.0f;
+  startAngle = 90.0f;
+  sweepAngle = 180.0f;
+
+  Property::Map attributes;
+  attributes.Add( DevelArcVisual::Property::THICKNESS, thickness )
+            .Add( DevelArcVisual::Property::START_ANGLE, startAngle )
+            .Add( DevelArcVisual::Property::SWEEP_ANGLE, sweepAngle );
+
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelArcVisual::Action::UPDATE_PROPERTY, attributes );
+
+  application.SendNotification();
+  application.Render();
+
+  map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  value = map.Find( DevelArcVisual::Property::THICKNESS, Property::FLOAT );
+  DALI_TEST_EQUALS( value->Get< float >(), thickness, TEST_LOCATION );
+  DALI_TEST_EQUALS( gl.CheckUniformValue< float >( "thickness", thickness ), true, TEST_LOCATION );
+
+  value = map.Find( DevelArcVisual::Property::START_ANGLE, Property::FLOAT );
+  DALI_TEST_EQUALS( value->Get< float >(), startAngle, TEST_LOCATION );
+  DALI_TEST_EQUALS( gl.CheckUniformValue< float >( "startAngle", startAngle ), true, TEST_LOCATION );
+
+  value = map.Find( DevelArcVisual::Property::SWEEP_ANGLE, Property::FLOAT );
+  DALI_TEST_EQUALS( value->Get< float >(), sweepAngle, TEST_LOCATION );
+  DALI_TEST_EQUALS( gl.CheckUniformValue< float >( "sweepAngle", sweepAngle ), true, TEST_LOCATION );
 
   END_TEST;
 }
