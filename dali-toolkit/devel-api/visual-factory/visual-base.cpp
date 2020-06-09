@@ -96,6 +96,11 @@ void Visual::Base::CreatePropertyMap( Dali::Property::Map& map ) const
   GetImplementation( *this ).CreatePropertyMap( map );
 }
 
+Visual::Type Visual::Base::GetType() const
+{
+  return GetImplementation( *this ).GetType();
+}
+
 
 
 

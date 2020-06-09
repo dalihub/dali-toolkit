@@ -383,7 +383,7 @@ void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 
 
 TextVisual::TextVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
+: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO, Toolkit::Visual::TEXT ),
   mController( Text::Controller::New() ),
   mTypesetter( Text::Typesetter::New( mController->GetTextModel() ) ),
   mAnimatableTextColorPropertyIndex( Property::INVALID_INDEX ),

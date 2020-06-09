@@ -272,14 +272,23 @@ public:
    */
   bool IsSynchronousLoadingRequired() const;
 
+  /**
+   * @brief Get the type of this visual.
+   *
+   * @return The the type of this visual.
+   */
+  Toolkit::Visual::Type GetType() const;
+
  protected:
 
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] fittingMode The value that determines how the visual should be fit to the view
+   * @param[in] type The type of the this visual
    */
-  Base( VisualFactoryCache& factoryCache, FittingMode fittingMode );
+  Base( VisualFactoryCache& factoryCache, FittingMode fittingMode, Toolkit::Visual::Type type );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().

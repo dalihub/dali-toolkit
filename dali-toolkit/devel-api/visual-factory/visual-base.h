@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -189,6 +190,13 @@ public:
    * @param[out] map The visual property map.
    */
   void CreatePropertyMap( Dali::Property::Map& map ) const;
+
+  /**
+   * @brief Get the type of this visual.
+   *
+   * @return The the type of this visual.
+   */
+  Visual::Type GetType() const;
 
 public: // Not intended for application developers
 

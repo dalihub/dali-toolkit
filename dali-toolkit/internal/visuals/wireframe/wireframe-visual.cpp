@@ -106,7 +106,7 @@ WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache, Visua
 }
 
 WireframeVisual::WireframeVisual( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, actualVisual ? actualVisual->GetType() : Toolkit::Visual::WIREFRAME ),
   mActualVisual( actualVisual )
 {
 }

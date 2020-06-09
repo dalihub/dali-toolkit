@@ -454,7 +454,7 @@ void NPatchVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 }
 
 NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::N_PATCH ),
   mPlacementActor(),
   mLoader( factoryCache.GetNPatchLoader() ),
   mImageUrl(),
