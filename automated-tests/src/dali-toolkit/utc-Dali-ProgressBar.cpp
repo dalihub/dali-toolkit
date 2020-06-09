@@ -17,6 +17,9 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/progress-bar/progress-bar-devel.h>
+#include <dali-toolkit/devel-api/visuals/arc-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali/devel-api/actors/actor-devel.h>
 
 using namespace Dali;
@@ -82,6 +85,22 @@ int UtcDaliProgressBarNew(void)
     ProgressBar progressBar = ProgressBar::New();
   }
   DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
+  END_TEST;
+}
+
+int UtcDaliProgressBarNew2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliProgressBarNew2");
+
+  ProgressBar progressBar1 = DevelProgressBar::New( DevelProgressBar::Style::LINEAR );
+  DALI_TEST_CHECK( progressBar1 );
+
+  ProgressBar progressBar2 = DevelProgressBar::New( DevelProgressBar::Style::CIRCULAR );
+  DALI_TEST_CHECK( progressBar2 );
+
+  DALI_TEST_CHECK( progressBar1.GetStyleName() != progressBar2.GetStyleName() );
+
   END_TEST;
 }
 
@@ -407,6 +426,107 @@ int UtcDaliProgressBarSetPropertyP2(void)
   progressBar.SetProperty(ProgressBar::Property::INDETERMINATE, false);
   val = progressBar.GetProperty<bool>(ProgressBar::Property::INDETERMINATE);
   DALI_TEST_EQUALS(val, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliProgressBarSetPropertyP3(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliProgressBarSetPropertyP3" );
+
+  ProgressBar progressBar = ProgressBar::New();
+  progressBar.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  progressBar.SetProperty( Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
+  progressBar.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, Stage::GetCurrent().GetSize().y ) );
+  Stage::GetCurrent().Add( progressBar );
+  application.SendNotification();
+  application.Render();
+
+  {
+    // Set arc visual to the SECONDARY_PROGRESS_VISUAL
+    const float expected = 180.0f;
+
+    Property::Map map;
+    map["visualType"] = "ARC";
+    map["thickness"] = 4.0f;
+    map["mixColor"] = Color::BLUE;
+    map["sweepAngle"] = 60;
+    progressBar.SetProperty(ProgressBar::Property::SECONDARY_PROGRESS_VISUAL, map);
+    progressBar.SetProperty(ProgressBar::Property::SECONDARY_PROGRESS_VALUE, 0.5f); // This should change visual's sweep angle.
+
+    Property::Value value = progressBar.GetProperty( ProgressBar::Property::SECONDARY_PROGRESS_VISUAL );
+    Property::Map* resultMap = value.GetMap();
+    DALI_TEST_CHECK( resultMap );
+
+    Property::Value* sweepAngle = resultMap->Find( DevelArcVisual::Property::SWEEP_ANGLE );
+    float result = 0.0f;
+    sweepAngle->Get( result );
+    DALI_TEST_EQUALS( result, expected, TEST_LOCATION );
+  }
+
+  {
+    // Set arc visual to the PROGRESS_VISUAL
+    const float expected = 90.0f;
+
+    Property::Map map;
+    map["visualType"] = "ARC";
+    map["thickness"] = 4.0f;
+    map["mixColor"] = Color::RED;
+    map["sweepAngle"] = 60;
+    progressBar.SetProperty(ProgressBar::Property::PROGRESS_VISUAL, map);
+    progressBar.SetProperty(ProgressBar::Property::PROGRESS_VALUE, 0.25f); // This should change visual's sweep angle.
+
+    Property::Value value = progressBar.GetProperty( ProgressBar::Property::PROGRESS_VISUAL );
+    Property::Map* resultMap = value.GetMap();
+    DALI_TEST_CHECK( resultMap );
+
+    Property::Value* sweepAngle = resultMap->Find( DevelArcVisual::Property::SWEEP_ANGLE );
+    float result = 0.0f;
+    sweepAngle->Get( result );
+    DALI_TEST_EQUALS( result, expected, TEST_LOCATION );
+  }
+
+  {
+    // Set arc visual to the INDETERMINATE_VISUAL
+    const Vector4 expected = Color::GREEN;
+
+    Property::Map map;
+    map["visualType"] = "ARC";
+    map["thickness"] = 4.0f;
+    map["mixColor"] = expected;
+    progressBar.SetProperty(ProgressBar::Property::INDETERMINATE_VISUAL, map);
+
+    Property::Value value = progressBar.GetProperty( ProgressBar::Property::INDETERMINATE_VISUAL );
+    Property::Map* resultMap = value.GetMap();
+    DALI_TEST_CHECK( resultMap );
+
+    Property::Value* mixColor = resultMap->Find( Visual::Property::MIX_COLOR );
+    Vector4 result;
+    mixColor->Get( result );
+    DALI_TEST_EQUALS( result, expected, TEST_LOCATION );
+  }
+
+  {
+    // Set arc visual to the TRACK_VISUAL
+    const Vector4 expected = Color::YELLOW;
+
+    Property::Map map;
+    map["visualType"] = "ARC";
+    map["thickness"] = 0.4f;
+    map["mixColor"] = expected;
+    progressBar.SetProperty( ProgressBar::Property::TRACK_VISUAL, map );
+    progressBar.SetProperty( ProgressBar::Property::INDETERMINATE, true ); // This should not change track visual's properties.
+
+    Property::Value value = progressBar.GetProperty( ProgressBar::Property::TRACK_VISUAL );
+    Property::Map* resultMap = value.GetMap();
+    DALI_TEST_CHECK( resultMap );
+
+    Property::Value* mixColor = resultMap->Find( Visual::Property::MIX_COLOR );
+    Vector4 result;
+    mixColor->Get( result );
+    DALI_TEST_EQUALS( result, expected, TEST_LOCATION );
+  }
 
   END_TEST;
 }

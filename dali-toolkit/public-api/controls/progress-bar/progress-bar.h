@@ -158,7 +158,7 @@ public:
 public:
 
   /**
-   * @brief Creates the ProgressBar control.
+   * @brief Creates the ProgressBar control. It creates a horizontal linear shape of progress bar.
    * @SINCE_1_2.60
    * @return A handle to the ProgressBar control
    */
