@@ -152,11 +152,6 @@ IF( ENABLE_TRACE )
   ADD_DEFINITIONS("-DTRACE_ENABLED")
 ENDIF()
 
-# Platforms with highp shader support can use vector based text
-IF( "${PROFILE}" STREQUAL "UBUNTU" )
-  SET( ENABLE_VECTOR_BASED_TEXT_RENDERING 1 )
-ENDIF()
-
 # Set paths
 SET( toolkit_images_dir  ${ROOT_SRC_DIR}/dali-toolkit/styles/images-common )
 SET( toolkit_sounds_dir  ${ROOT_SRC_DIR}/dali-toolkit/sounds )
@@ -254,6 +249,11 @@ INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/public-api/file.list )
 INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/devel-api/file.list )
 INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/third-party/file.list )
 INCLUDE( ${ROOT_SRC_DIR}/doc/file.list )
+
+# Platforms with highp shader support can use vector based text
+IF( ENABLE_VECTOR_BASED_TEXT_RENDERING )
+  INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/internal/text/rendering/vector-based/file.list )
+ENDIF()
 
 SET(LIBTYPE SHARED)
 IF(DEFINED STATIC)
