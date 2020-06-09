@@ -114,7 +114,7 @@ bool GetPolicyFromValue( const Property::Value& value, Vector2& policy )
 
 } // unnamed namespace
 
-Internal::Visual::Base::Impl::Impl(FittingMode fittingMode)
+Internal::Visual::Base::Impl::Impl( FittingMode fittingMode, Toolkit::Visual::Type type )
 : mCustomShader( NULL ),
   mBlendSlotDelegate( NULL ),
   mEventObserver( NULL ),
@@ -127,7 +127,8 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode)
   mCornerRadiusIndex( Property::INVALID_INDEX ),
   mFittingMode( fittingMode ),
   mFlags( 0 ),
-  mResourceStatus( Toolkit::Visual::ResourceStatus::PREPARING )
+  mResourceStatus( Toolkit::Visual::ResourceStatus::PREPARING ),
+  mType( type )
 {
 }
 

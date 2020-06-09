@@ -156,7 +156,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
                           ImageDimensions size,
                           FittingMode::Type fittingMode,
                           Dali::SamplingMode::Type samplingMode )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::IMAGE ),
   mImage(),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
@@ -182,7 +182,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
 }
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::IMAGE ),
   mImage( image ),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),

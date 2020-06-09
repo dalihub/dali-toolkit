@@ -212,7 +212,7 @@ GradientVisualPtr GradientVisual::New( VisualFactoryCache& factoryCache, const P
 }
 
 GradientVisual::GradientVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::GRADIENT ),
   mGradientType( LINEAR ),
   mIsOpaque( true )
 {

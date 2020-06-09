@@ -168,7 +168,7 @@ void AnimatedImageVisual::InitializeGif( const VisualUrl& imageUrl )
 }
 
 AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory )
-: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
+: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO, Toolkit::Visual::ANIMATED_IMAGE ),
   mFrameDelayTimer(),
   mPlacementActor(),
   mImageVisualShaderFactory( shaderFactory ),

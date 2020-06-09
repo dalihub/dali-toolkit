@@ -46,6 +46,7 @@ const char* TEST_NPATCH_FILE_NAME =  TEST_RESOURCE_DIR "/button-up.9.png";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
+const char* TEST_VECTOR_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/insta_camera.json";
 const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
 
 
@@ -3666,6 +3667,142 @@ int UtcDaliVisualRoundedCorner(void)
     application.Render();
 
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetType(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetType" );
+
+  VisualFactory factory = VisualFactory::Get();
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::BORDER;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::BORDER );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::COLOR;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::COLOR );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::GRADIENT;
+    properties[GradientVisual::Property::START_POSITION] = Vector2( -1.f, -1.f );
+    properties[GradientVisual::Property::END_POSITION] = Vector2( 1.f, 1.f );
+    properties[GradientVisual::Property::STOP_OFFSET] = Vector2(0.f, 1.f);
+    // propertyMap.Insert( GradientVisual::Property::SPREAD_METHOD, GradientVisual::SpreadMethod::REPEAT) ;
+    Property::Array stopColors;
+    stopColors.PushBack( Color::RED );
+    stopColors.PushBack( Color::GREEN );
+    properties[GradientVisual::Property::STOP_COLOR] = stopColors;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::GRADIENT );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::IMAGE;
+    properties.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::IMAGE );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::MESH;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::MESH );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::PRIMITIVE;
+    properties[PrimitiveVisual::Property::SHAPE] = PrimitiveVisual::Shape::CUBE;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::PRIMITIVE );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::WIREFRAME;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::WIREFRAME );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::TEXT;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::TEXT );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::N_PATCH;
+    properties[ImageVisual::Property::URL] =  TEST_NPATCH_FILE_NAME;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::N_PATCH );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::SVG;
+    properties[ImageVisual::Property::URL] = TEST_SVG_FILE_NAME;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::SVG );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = Visual::ANIMATED_IMAGE;
+    properties[ImageVisual::Property::URL] = TEST_GIF_FILE_NAME;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == Visual::ANIMATED_IMAGE );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = DevelVisual::ANIMATED_GRADIENT;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == static_cast<Visual::Type>( DevelVisual::ANIMATED_GRADIENT ) );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = DevelVisual::ANIMATED_VECTOR_IMAGE;
+    properties[ImageVisual::Property::URL] = TEST_VECTOR_IMAGE_FILE_NAME;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == static_cast<Visual::Type>( DevelVisual::ANIMATED_VECTOR_IMAGE ) );
+  }
+
+  {
+    Property::Map properties;
+    properties[Visual::Property::TYPE] = DevelVisual::ARC;
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    DALI_TEST_CHECK( visual.GetType() == static_cast<Visual::Type>( DevelVisual::ARC ) );
   }
 
   END_TEST;
