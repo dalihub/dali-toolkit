@@ -1552,7 +1552,7 @@ bool Popup::OnBackingTouched( Actor actor, const TouchData& touch )
   }
 
   // Block anything behind backing becoming touched.
-  mLayer.SetTouchConsumed( true );
+  mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, true );
   return true;
 }
 
@@ -1565,7 +1565,7 @@ bool Popup::OnBackingWheelEvent( Actor actor, const WheelEvent& event )
   }
 
   // Consume wheel event in dimmed backing actor.
-  mLayer.SetTouchConsumed( true );
+  mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, true );
   return true;
 }
 
@@ -1578,7 +1578,7 @@ bool Popup::OnDialogTouched( Actor actor, const TouchData& touch )
   }
 
   // Consume event (stops backing actor receiving touch events)
-  mLayer.SetTouchConsumed( true );
+  mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, true );
   return true;
 }
 
