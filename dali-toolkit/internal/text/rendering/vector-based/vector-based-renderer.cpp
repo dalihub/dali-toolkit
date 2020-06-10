@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -191,7 +191,7 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view,
 
   mImpl->mActor = Actor::New();
   mImpl->mActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mImpl->mActor.SetProperty( Actor::Property::SIZE, Vector2( view.GetControlSize() );
+  mImpl->mActor.SetProperty( Actor::Property::SIZE, Vector2( view.GetControlSize() ) );
   mImpl->mActor.SetProperty( Actor::Property::COLOR, Color::WHITE );
 #if defined(DEBUG_ENABLED)
   mImpl->mActor.SetProperty( Dali::Actor::Property::NAME, "Text renderable actor" );

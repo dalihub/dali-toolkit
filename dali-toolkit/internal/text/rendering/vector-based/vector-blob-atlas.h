@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VECTOR_BLOB_ATLAS_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 
@@ -154,7 +154,7 @@ private:
   unsigned int mCursorX;
   unsigned int mCursorY;
 
-  BufferImage mAtlasTexture;
+  Texture mAtlasTexture;
 
   TextureSet mTextureSet;
 
