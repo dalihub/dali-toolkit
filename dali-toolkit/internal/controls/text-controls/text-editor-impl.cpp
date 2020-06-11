@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,6 +144,24 @@ DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
 
 DALI_TYPE_REGISTRATION_END()
+
+const char * const IMAGE_MAP_FILENAME_STRING = "filename";
+
+/// Retrieves a filename from a value that is a Property::Map
+std::string GetImageFileNameFromPropertyValue( const Property::Value& value )
+{
+  std::string filename;
+  const Property::Map* map = value.GetMap();
+  if( map )
+  {
+    const Property::Value* filenameValue = map->Find( IMAGE_MAP_FILENAME_STRING );
+    if( filenameValue )
+    {
+      filenameValue->Get( filename );
+    }
+  }
+  return filename;
+}
 
 } // namespace
 
@@ -351,90 +369,90 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       }
       case Toolkit::TextEditor::Property::GRAB_HANDLE_IMAGE:
       {
-        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), image.GetUrl().c_str() );
+        const std::string imageFileName = value.Get< std::string >();
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName );
 
-        if( impl.mDecorator )
+        if( impl.mDecorator && imageFileName.size() )
         {
-          impl.mDecorator->SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED, image );
+          impl.mDecorator->SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED, imageFileName );
           impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextEditor::Property::GRAB_HANDLE_PRESSED_IMAGE:
       {
-        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), image.GetUrl().c_str() );
+        const std::string imageFileName = value.Get< std::string >();
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName );
 
-        if( impl.mDecorator )
+        if( impl.mDecorator && imageFileName.size() )
         {
-          impl.mDecorator->SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_PRESSED, image );
+          impl.mDecorator->SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_PRESSED, imageFileName );
           impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextEditor::Property::SELECTION_HANDLE_IMAGE_LEFT:
       {
-        const Image image = Scripting::NewImage( value );
+        const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && image )
+        if( impl.mDecorator && filename.size() )
         {
-          impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, image );
+          impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, filename );
           impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextEditor::Property::SELECTION_HANDLE_IMAGE_RIGHT:
       {
-        const Image image = Scripting::NewImage( value );
+        const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && image )
+        if( impl.mDecorator && filename.size() )
         {
-          impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, image );
+          impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, filename );
           impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT:
       {
-        const Image image = Scripting::NewImage( value );
+        const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && image )
+        if( impl.mDecorator && filename.size() )
         {
-          impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
+          impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, filename );
           impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT:
       {
-        const Image image = Scripting::NewImage( value );
+        const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && image )
+        if( impl.mDecorator && filename.size() )
         {
-          impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
+          impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, filename );
           impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextEditor::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT:
       {
-        const Image image = Scripting::NewImage( value );
+        const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && image )
+        if( impl.mDecorator && filename.size() )
         {
-          impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, image );
+          impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, filename );
           impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextEditor::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT:
       {
-        const Image image = Scripting::NewImage( value );
+        const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && image )
+        if( impl.mDecorator && filename.size() )
         {
-          impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, image );
+          impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, filename );
           impl.RequestTextRelayout();
         }
         break;
@@ -892,11 +910,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       {
         if( impl.mDecorator )
         {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED ) );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
+          value = impl.mDecorator->GetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED );
         }
         break;
       }
@@ -904,11 +918,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       {
         if( impl.mDecorator )
         {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_PRESSED ) );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
+          value = impl.mDecorator->GetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_PRESSED );
         }
         break;
       }
@@ -1772,14 +1782,9 @@ void TextEditor::GetHandleImagePropertyValue(  Property::Value& value, Text::Han
 {
   if( mDecorator )
   {
-    ResourceImage image = ResourceImage::DownCast( mDecorator->GetHandleImage( handleType, handleImageType ) );
-
-    if ( image )
-    {
-      Property::Map map;
-      Scripting::CreatePropertyMap( image, map );
-      value = map;
-    }
+    Property::Map map;
+    map[ IMAGE_MAP_FILENAME_STRING ] = mDecorator->GetHandleImage( handleType, handleImageType );
+    value = map;
   }
 }
 
