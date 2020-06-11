@@ -356,7 +356,7 @@ void Scene3dView::OnInitialize()
   mRoot.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   Layer layer = Layer::New();
-  layer.SetBehavior( Layer::LAYER_3D );
+  layer.SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
   layer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   layer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   layer.Add( mRoot );
