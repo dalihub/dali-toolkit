@@ -320,15 +320,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
 
   if( image )
   {
-    NinePatchImage npatchImage = NinePatchImage::DownCast( image );
-    if( npatchImage )
-    {
-      visualPtr = NPatchVisual::New( GetFactoryCache(), npatchImage );
-    }
-    else
-    {
-      visualPtr = ImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), image );
-    }
+    visualPtr = ImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), image );
   }
 
   if( mDebugEnabled )

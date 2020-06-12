@@ -19,6 +19,8 @@
 #include <dali/public-api/object/base-object.h>
 #include <toolkit-application.h>
 #include <toolkit-vector-animation-renderer.h>
+#include <toolkit-event-thread-callback.h>
+#include <memory>
 
 namespace Dali
 {
@@ -39,7 +41,8 @@ public:
     mWidth( 0 ),
     mHeight( 0 ),
     mPreviousFrame( 0 ),
-    mFrameRate( 60.0f )
+    mFrameRate( 60.0f ),
+    mEventThreadCallback( new EventThreadCallback( MakeCallback( this, &VectorAnimationRenderer::OnTriggered ) ) )
   {
     mCount++;
 
@@ -83,6 +86,12 @@ public:
 
   bool Render( uint32_t frameNumber )
   {
+    if( mNeedTrigger )
+    {
+      mEventThreadCallback->Trigger();
+      mNeedTrigger = false;
+    }
+
     if( frameNumber == 1 && mPreviousFrame != frameNumber )
     {
       mPreviousFrame = frameNumber;
@@ -133,9 +142,14 @@ public:
     return mUploadCompletedSignal;
   }
 
+  void OnTriggered()
+  {
+  }
+
 public:
 
   static uint32_t mCount;
+  static bool mNeedTrigger;
 
   std::string mUrl;
   Dali::Renderer mRenderer;
@@ -144,9 +158,11 @@ public:
   uint32_t mPreviousFrame;
   float mFrameRate;
   Dali::VectorAnimationRenderer::UploadCompletedSignalType mUploadCompletedSignal;
+  std::unique_ptr< EventThreadCallback > mEventThreadCallback;
 };
 
 uint32_t VectorAnimationRenderer::mCount = 0;
+bool VectorAnimationRenderer::mNeedTrigger = true;
 
 inline VectorAnimationRenderer& GetImplementation( Dali::VectorAnimationRenderer& renderer )
 {
@@ -250,5 +266,18 @@ VectorAnimationRenderer::UploadCompletedSignalType& VectorAnimationRenderer::Upl
   return Internal::Adaptor::GetImplementation( *this ).UploadCompletedSignal();
 }
 
-} // namespace Dali;
+} // namespace Dali
+
+namespace Test
+{
+namespace VectorAnimationRenderer
+{
+
+void RequestTrigger()
+{
+  Dali::Internal::Adaptor::VectorAnimationRenderer::mNeedTrigger = true;
+}
+
+} // VectorAnimationRenderer
+} // Test
 

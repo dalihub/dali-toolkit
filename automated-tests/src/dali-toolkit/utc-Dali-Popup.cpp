@@ -25,6 +25,7 @@
 #include <dali.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -1206,6 +1207,12 @@ int UtcDaliPopupPropertyTouchTransparent(void)
   application.Render();
 
   DALI_TEST_CHECK( !gPushButtonClicked );
+
+  // Perform a wheel event
+  Dali::Integration::WheelEvent wheelEvent( Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, Vector2( 10.0f, 10.0f ), 1, 1000u );
+  application.ProcessEvent( wheelEvent );
+  application.SendNotification();
+  application.Render();
 
   // Enable touch transparency.
   popup.SetProperty( Popup::Property::TOUCH_TRANSPARENT, true );

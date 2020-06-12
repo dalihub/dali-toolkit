@@ -771,7 +771,7 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   mPlacementActor = actor;
   // Search the Actor tree to find if Layer UI behaviour set.
   Layer layer = actor.GetLayer();
-  if( layer && layer.GetBehavior() == Layer::LAYER_3D )
+  if( layer && layer.GetProperty<Layer::Behavior>( Layer::Property::BEHAVIOR ) == Layer::LAYER_3D )
   {
      // Layer 3D set, do not align pixels
      mImpl->mRenderer.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF );

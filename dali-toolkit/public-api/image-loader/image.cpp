@@ -39,7 +39,7 @@ std::string GenerateUrl( Dali::FrameBuffer frameBuffer, Pixel::Format pixelForma
   return Dali::Toolkit::TextureManager::AddTexture( texture );
 }
 
-std::string GenerateUrl( const Dali::FrameBuffer frameBuffer, const uint8_t index )
+std::string GenerateUrl( const Dali::FrameBuffer frameBuffer, uint8_t index )
 {
   Texture texture = Dali::DevelFrameBuffer::GetColorTexture( frameBuffer, index );
   return Dali::Toolkit::TextureManager::AddTexture( texture );
@@ -58,7 +58,7 @@ std::string GenerateUrl( const Dali::NativeImageSourcePtr nativeImageSource )
   return Dali::Toolkit::TextureManager::AddTexture( texture );
 }
 
-} // TextureManager
+} // Image
 
 } // Toolkit
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/text/rendering/vector-based/vector-blob-atlas.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/debug.h>
 
 namespace
@@ -76,10 +75,10 @@ VectorBlobAtlas::VectorBlobAtlas( unsigned int textureWidth,
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "Blob atlas %p size %dx%d, item width %d, height quantum %d\n", this, textureWidth, textureHeight, itemWidth, itemHeightQuantum );
 
-  mAtlasTexture = BufferImage::New( textureWidth, textureHeight, Pixel::RGBA8888 );
+  mAtlasTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, textureWidth, textureHeight );
 
   mTextureSet = TextureSet::New();
-  TextureSetImage( mTextureSet, 0, mAtlasTexture );
+  mTextureSet.SetTexture(0, mAtlasTexture);
 }
 
 bool VectorBlobAtlas::IsFull() const
@@ -200,13 +199,15 @@ void VectorBlobAtlas::TexSubImage( unsigned int offsetX,
                                    unsigned int height,
                                    VectorBlob* blob )
 {
-  PixelBuffer* pixbuf = mAtlasTexture.GetBuffer();
+  const size_t size = width * height * 4;
+  uint8_t* pixbuf = new uint8_t[size];
+
   size_t pos;
   size_t dataIndex = 0;
-  for( size_t y= offsetY; y< height + offsetY; y++ )
+  for( size_t y = 0; y < height; y++ )
   {
     pos = y * mTextureWidth * 4;
-    for( size_t x = offsetX; x < width + offsetX; x++ )
+    for( size_t x = 0; x < width; x++ )
     {
       pixbuf[pos+x*4] =  0xFF & blob[dataIndex].r;
       pixbuf[pos+x*4+1] = 0xFF & blob[dataIndex].g;
@@ -216,7 +217,8 @@ void VectorBlobAtlas::TexSubImage( unsigned int offsetX,
     }
   }
 
-  mAtlasTexture.Update();
+  PixelData pixelData = PixelData::New(pixbuf, size, width, height, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
+  mAtlasTexture.Upload(pixelData, 0u, 0u, offsetX, offsetY, width, height);
 }
 
 } // namespace Text
