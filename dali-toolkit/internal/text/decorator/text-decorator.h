@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_DECORATOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -353,23 +353,23 @@ public:
   bool IsHandleActive( HandleType handleType ) const;
 
   /**
-   * @brief Sets the image for one of the handles.
+   * @brief Sets the image file name for one of the handles.
    *
    * @param[in] handleType One of the handles.
    * @param[in] handleImageType A different image can be set for the pressed/released states.
-   * @param[in] image The image to use.
+   * @param[in] imageFileName The image filename to use.
    */
-  void SetHandleImage( HandleType handleType, HandleImageType handleImageType, Dali::Image image );
+  void SetHandleImage( HandleType handleType, HandleImageType handleImageType, const std::string& imageFileName );
 
   /**
-   * @brief Retrieves the image for one of the handles.
+   * @brief Retrieves the file name of the image for one of the handles.
    *
    * @param[in] handleType One of the handles.
    * @param[in] handleImageType A different image can be set for the pressed/released states.
    *
-   * @return The grab handle image.
+   * @return The grab handle image string.
    */
-  Dali::Image GetHandleImage( HandleType handleType, HandleImageType handleImageType ) const;
+  const std::string& GetHandleImage( HandleType handleType, HandleImageType handleImageType ) const;
 
   /**
    * @brief Sets the color of the handles
