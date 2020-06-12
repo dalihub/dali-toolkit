@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,34 +52,6 @@ void utc_dali_toolkit_image_view_cleanup(void)
 namespace
 {
 
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
-    vTexCoord = aPosition + vec2(0.5);\n
-    gl_Position = vertexPosition;\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform lowp vec4 uColor;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
-  }\n
-);
-
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
 const char* TEST_IMAGE_FILE_NAME2 =  "gallery_image_02.jpg";
 
@@ -95,62 +67,6 @@ static const char* gImage_600_RGB = TEST_RESOURCE_DIR "/test-image-600.jpg";
 const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 
 const char* TEST_VECTOR_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/insta_camera.json";
-
-void TestImage( ImageView imageView, BufferImage image )
-{
-  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-
-  Property::Map map;
-  DALI_TEST_CHECK( value.Get( map ) );
-
-  DALI_TEST_CHECK( map.Find( "width" ) );
-  DALI_TEST_CHECK( map.Find( "height" ) );
-  DALI_TEST_CHECK( map.Find( "type" ) );
-
-  int width = 0;
-  DALI_TEST_CHECK( map[ "width" ].Get( width ) );
-  DALI_TEST_EQUALS( (unsigned int)width, image.GetWidth(), TEST_LOCATION );
-
-  int height = 0;
-  DALI_TEST_CHECK( map[ "height" ].Get( height ) );
-  DALI_TEST_EQUALS( (unsigned int)height, image.GetHeight(), TEST_LOCATION );
-
-  std::string type;
-  DALI_TEST_CHECK( map[ "type" ].Get( type ) );
-  DALI_TEST_EQUALS( type, "BufferImage", TEST_LOCATION );
-}
-
-void TestImage( ImageView imageView, ResourceImage image )
-{
-  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-
-  Property::Map map;
-  DALI_TEST_CHECK( value.Get( map ) );
-
-  if( map.Find( "width" ) )
-  {
-    int width = 0;
-    DALI_TEST_CHECK( map[ "width" ].Get( width ) );
-    DALI_TEST_EQUALS( (unsigned int)width, image.GetWidth(), TEST_LOCATION );
-  }
-
-  if( map.Find( "height" ) )
-  {
-    int height = 0;
-    DALI_TEST_CHECK( map[ "height" ].Get( height ) );
-    DALI_TEST_EQUALS( (unsigned int)height, image.GetHeight(), TEST_LOCATION );
-  }
-
-  DALI_TEST_CHECK( map.Find( "type" ) );
-
-  std::string type;
-  DALI_TEST_CHECK( map[ "type" ].Get( type ) );
-  DALI_TEST_EQUALS( type, "ResourceImage", TEST_LOCATION );
-
-  std::string filename;
-  DALI_TEST_CHECK( map[ "filename" ].Get( filename ) );
-  DALI_TEST_EQUALS( filename, image.GetUrl(), TEST_LOCATION );
-}
 
 void TestUrl( ImageView imageView, const std::string url )
 {
@@ -170,19 +86,6 @@ int UtcDaliImageViewNewP(void)
   ImageView imageView = ImageView::New();
 
   DALI_TEST_CHECK( imageView );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewNewImageP(void)
-{
-  ToolkitTestApplication application;
-
-  BufferImage image = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  ImageView imageView = ImageView::New( image );
-
-  DALI_TEST_CHECK( imageView );
-  TestImage( imageView, image );
 
   END_TEST;
 }
@@ -298,83 +201,6 @@ int UtcDaliImageViewSetGetProperty01(void)
 
   imageView.SetProperty( idx, TEST_IMAGE_FILE_NAME );
   TestUrl( imageView, TEST_IMAGE_FILE_NAME );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewSetGetProperty02(void)
-{
-  ToolkitTestApplication application;
-
-  Image image = CreateBufferImage( 10, 10, Color::WHITE );
-  ImageView imageView = ImageView::New(image);
-  Vector4 fullImageRect( 0.f, 0.f, 1.f, 1.f );
-
-  Stage::GetCurrent().Add( imageView );
-
-  application.SendNotification();
-  application.Render();
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-
-  Vector4 pixelAreaUniform;
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
-  DALI_TEST_EQUALS( pixelAreaUniform, fullImageRect, TEST_LOCATION );
-
-  Property::Value value = imageView.GetProperty( ImageView::Property::PIXEL_AREA );
-  Vector4 pixelAreaValue;
-  DALI_TEST_CHECK( value.Get(pixelAreaValue) );
-  DALI_TEST_EQUALS( pixelAreaValue, fullImageRect, TEST_LOCATION );
-
-  Vector4 pixelAreaSet( 0.2f, 0.2f, 0.3f, 0.3f );
-  imageView.SetProperty( ImageView::Property::PIXEL_AREA, pixelAreaSet);
-
-  application.SendNotification();
-  application.Render();
-
-  value = imageView.GetProperty( ImageView::Property::PIXEL_AREA );
-  value.Get(pixelAreaValue);
-  DALI_TEST_EQUALS( pixelAreaValue, pixelAreaSet, TEST_LOCATION );
-
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "pixelArea", pixelAreaUniform ) );
-  DALI_TEST_EQUALS( pixelAreaUniform, pixelAreaSet, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewSetGetProperty03(void)
-{
-  ToolkitTestApplication application;
-
-  Image image = CreateBufferImage( 10, 10, Color::WHITE );
-  ImageView imageView = ImageView::New(image);
-  Stage::GetCurrent().Add( imageView );
-  application.SendNotification();
-  application.Render();
-
-  // conventional alpha blending
-  Renderer renderer = imageView.GetRendererAt( 0 );
-  Property::Value value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
-  bool enable;
-  DALI_TEST_CHECK( value.Get( enable ) );
-  DALI_TEST_CHECK( !enable );
-
-  // pre-multiplied alpha blending
-  imageView.SetProperty( Toolkit::ImageView::Property::PRE_MULTIPLIED_ALPHA, true );
-  application.SendNotification();
-  application.Render();
-
-  int srcFactorRgb    = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
-  int destFactorRgb   = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
-  int srcFactorAlpha  = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
-  int destFactorAlpha = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
-  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::ONE );
-  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
-  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
-  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
-
-  value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
-  DALI_TEST_CHECK( value.Get( enable ) );
-  DALI_TEST_CHECK( enable );
 
   END_TEST;
 }
@@ -894,9 +720,8 @@ int UtcDaliImageViewSizeWithBackgroundAndImage(void)
 
   int widthBackground = 100;
   int heightBackground = 200;
-  int width = 300;
-  int height = 400;
-  Image image = CreateBufferImage( width, height, Vector4(1.f, 1.f, 1.f, 1.f) );
+  int width = 600;
+  int height = 600;
 
   ImageView imageView = ImageView::New();
 
@@ -909,7 +734,7 @@ int UtcDaliImageViewSizeWithBackgroundAndImage(void)
                           }
                        );
 
-  imageView.SetImage( image );
+  imageView.SetImage( gImage_600_RGB ); // 1 to 1 ratio, 600x600 pixels
 
   Stage::GetCurrent().Add( imageView );
   application.SendNotification();
@@ -958,9 +783,7 @@ int UtcDaliImageViewHeightForWidthBackgroundAndImage(void)
   int widthBackground = 100;
   int heightBackground = 200;
   int width = 300;
-  int height = 400;
-
-  Image image = CreateBufferImage( width, height, Vector4(1.f, 1.f, 1.f, 1.f) );
+  int height = 300;
 
   ImageView imageView = ImageView::New();
 
@@ -971,9 +794,9 @@ int UtcDaliImageViewHeightForWidthBackgroundAndImage(void)
                            { ImageVisual::Property::DESIRED_WIDTH, widthBackground },
                            { ImageVisual::Property::DESIRED_HEIGHT, heightBackground }
                          }
-                       );
+                       ); // 1 to 2 ratio
 
-  imageView.SetImage( image );
+  imageView.SetImage( gImage_600_RGB ); // 1 to 1 ratio
 
   Stage::GetCurrent().Add( imageView );
   application.SendNotification();
@@ -981,28 +804,6 @@ int UtcDaliImageViewHeightForWidthBackgroundAndImage(void)
 
   DALI_TEST_EQUALS( imageView.GetHeightForWidth( width ), (float)height, TEST_LOCATION );
   DALI_TEST_EQUALS( imageView.GetWidthForHeight( height ), (float)width, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewSetBufferImage(void)
-{
-  ToolkitTestApplication application;
-
-  int width1 = 300;
-  int height1 = 400;
-  BufferImage image1 = CreateBufferImage( width1, height1, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  ImageView imageView = ImageView::New();
-  imageView.SetImage( image1 );
-
-  TestImage( imageView, image1 );
-
-  int width2 = 600;
-  int height2 = 500;
-  BufferImage image2 = CreateBufferImage( width2, height2, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  imageView.SetImage( image2 );
-
-  TestImage( imageView, image2 );
 
   END_TEST;
 }
@@ -1018,83 +819,6 @@ int UtcDaliImageViewSetImageUrl(void)
 
   imageView.SetImage( TEST_IMAGE_FILE_NAME2 );
   TestUrl( imageView, TEST_IMAGE_FILE_NAME2 );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewSetImageOnstageP(void)
-{
-  ToolkitTestApplication application;
-
-  ImageView imageView = ImageView::New();
-
-  Stage::GetCurrent().Add( imageView );
-  application.SendNotification();
-  application.Render();
-
-  ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
-  imageView.SetImage( image1 );
-  TestImage( imageView, image1 );
-
-  int width = 300;
-  int height = 400;
-  BufferImage image2 = CreateBufferImage( width, height, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  imageView.SetImage( image2 );
-  TestImage( imageView, image2 );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewSetImageOnstageN(void)
-{
-  ToolkitTestApplication application;
-
-  ImageView imageView = ImageView::New();
-
-  Stage::GetCurrent().Add( imageView );
-  application.SendNotification();
-  application.Render();
-
-  ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
-  imageView.SetImage( image1 );
-  TestImage( imageView, image1 );
-
-  Image image2;
-  imageView.SetImage( image2 );
-
-  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-
-  //the value should be empty
-  std::string url;
-  DALI_TEST_CHECK( !value.Get( url ) );
-
-  Property::Map map;
-  value.Get( map );
-  DALI_TEST_CHECK( map.Empty() );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewSetImageOffstageP(void)
-{
-  ToolkitTestApplication application;
-
-  ImageView imageView = ImageView::New();
-
-  Stage::GetCurrent().Add( imageView );
-  application.SendNotification();
-  application.Render();
-  Stage::GetCurrent().Remove( imageView );
-
-  ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
-  imageView.SetImage( image1 );
-  TestImage( imageView, image1 );
-
-  int width = 300;
-  int height = 400;
-  BufferImage image2 = CreateBufferImage( width, height, Vector4( 1.f, 1.f, 1.f, 1.f ) );
-  imageView.SetImage( image2 );
-  TestImage( imageView, image2 );
 
   END_TEST;
 }
@@ -1144,62 +868,6 @@ int UtcDaliImageViewCheckResourceReady(void)
   END_TEST;
 }
 
-int UtcDaliImageViewSetImageOffstageN(void)
-{
-  ToolkitTestApplication application;
-
-  ImageView imageView = ImageView::New();
-
-  Stage::GetCurrent().Add( imageView );
-  application.SendNotification();
-  application.Render();
-  Stage::GetCurrent().Remove( imageView );
-
-  ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
-  imageView.SetImage( image1 );
-  TestImage( imageView, image1 );
-
-  Image image2;
-  imageView.SetImage( image2 );
-
-  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-
-  //the value should be empty
-  std::string url;
-  DALI_TEST_CHECK( !value.Get( url ) );
-
-  Property::Map map;
-  value.Get( map );
-  DALI_TEST_CHECK( map.Empty() );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewSetImageN(void)
-{
-  ToolkitTestApplication application;
-
-  Image image1;
-  ImageView imageView = ImageView::New();
-  imageView.SetImage( image1 );
-
-  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-
-  //the value should be empty
-  std::string url;
-  DALI_TEST_CHECK( !value.Get( url ) );
-
-  Property::Map map;
-  value.Get( map );
-  DALI_TEST_CHECK( map.Empty() );
-
-  std::string resource_url;
-  Property::Value val = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-  DALI_TEST_CHECK( !val.Get( resource_url ) );
-
-  END_TEST;
-}
-
 int UtcDaliImageViewSetImageTypeChangesP(void)
 {
   ToolkitTestApplication application;
@@ -1235,34 +903,6 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
 
   DALI_TEST_CHECK( value.Get( url ) );   // Value should NOT be empty
   DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
-  DALI_TEST_CHECK( visual );             // Visual should be valid
-
-  // Set an empty Image
-  imageView.SetImage( Image() );
-
-  application.SendNotification();
-  application.Render( 16 );
-
-  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
-
-  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
-  value.Get( map );
-  DALI_TEST_CHECK( map.Empty() );        // Value should be empty
-  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
-
-  // Set an Image
-  ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
-  imageView.SetImage( image1 );
-
-  application.SendNotification();
-  application.Render( 16 );
-
-  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
-
-  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
-  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
   DALI_TEST_CHECK( visual );             // Visual should be valid
 
   // Set an empty URL
@@ -1338,339 +978,11 @@ int UtcDaliImageViewResourceUrlP(void)
   END_TEST;
 }
 
-// Scenarios 1: ImageView from regular image
-int UtcDaliImageViewSetImageBufferImage(void)
-{
-  ToolkitTestApplication application;
-
-  ImageView imageView = ImageView::New();
-  Stage::GetCurrent().Add( imageView );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  gl.EnableTextureCallTrace( true );
-
-  std::vector< GLuint > ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  int width = 300;
-  int height = 400;
-  BufferImage image = CreateBufferImage( width, height, Color::WHITE );
-
-  imageView.SetImage( image );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
-
-  std::stringstream params;
-  params << GL_TEXTURE_2D << ", " << 23;
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
-
-  END_TEST;
-}
-
-// Scenarios 2: ImageView from Native image
-int UtcDaliImageViewSetImageNativeImage(void)
-{
-  ToolkitTestApplication application;
-
-  ImageView imageView = ImageView::New();
-  Stage::GetCurrent().Add( imageView );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  gl.EnableTextureCallTrace( true );
-
-  std::vector< GLuint > ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  int width = 200;
-  int height = 500;
-  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
-  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
-
-  imageView.SetImage( nativeImage );
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
-
-  std::stringstream params;
-  params << GL_TEXTURE_EXTERNAL_OES << ", " << 23;
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
-
-  END_TEST;
-}
-
-// Scenarios 3: ImageView initially from regular image but then SetImage called with Native image
-int UtcDaliImageViewSetImageBufferImageToNativeImage(void)
-{
-  ToolkitTestApplication application;
-
-  int width = 300;
-  int height = 400;
-  BufferImage image = CreateBufferImage( width, height, Color::WHITE );
-
-  ImageView imageView = ImageView::New( image );
-  Stage::GetCurrent().Add( imageView );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  gl.EnableTextureCallTrace( true );
-
-  std::vector< GLuint > ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
-
-  std::stringstream params;
-  params << GL_TEXTURE_2D << ", " << 23;
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
-
-  width = 200;
-  height = 500;
-  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
-  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
-  imageView.SetImage( nativeImage );
-
-  ids.clear();
-  ids.push_back( 24 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
-
-  std::stringstream nextTextureParams;
-  nextTextureParams << GL_TEXTURE_EXTERNAL_OES << ", " << 24;
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", nextTextureParams.str()) );
-
-  END_TEST;
-}
-
-// Scenarios 4: ImageView initially from Native image but then SetImage called with regular image
-int UtcDaliImageViewSetImageNativeImageToBufferImage(void)
-{
-  ToolkitTestApplication application;
-
-  int width = 300;
-  int height = 400;
-  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
-  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
-
-  ImageView imageView = ImageView::New( nativeImage );
-  Stage::GetCurrent().Add( imageView );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  gl.EnableTextureCallTrace( true );
-
-  std::vector< GLuint > ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
-
-  std::stringstream params;
-  params << GL_TEXTURE_EXTERNAL_OES << ", " << 23;
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
-
-  width = 200;
-  height = 500;
-  BufferImage image = CreateBufferImage( width, height, Color::WHITE );
-  imageView.SetImage( image );
-
-  ids.clear();
-  ids.push_back( 24 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
-
-  std::stringstream nextTextureParams;
-  nextTextureParams << GL_TEXTURE_2D << ", " << 24;
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", nextTextureParams.str()) );
-
-  END_TEST;
-}
-
-// Scenarios 5: ImageView from Native image with custom shader
-int UtcDaliImageViewSetImageNativeImageWithCustomShader(void)
-{
-  ToolkitTestApplication application;
-
-  int width = 300;
-  int height = 400;
-
-  Property::Map customShader;
-  customShader.Insert( "vertexShader", VERTEX_SHADER );
-  customShader.Insert( "fragmentShader", FRAGMENT_SHADER );
-
-  Property::Array shaderHints;
-  shaderHints.PushBack( "requiresSelfDepthTest" );
-  shaderHints.PushBack( "outputIsTransparent" );
-  shaderHints.PushBack( "outputIsOpaque" );
-  shaderHints.PushBack( "modifiesGeometry" );
-
-  customShader.Insert( "hints", shaderHints );
-
-  Property::Map map;
-  map.Insert( "shader", customShader );
-
-  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
-  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
-
-  ImageView imageView = ImageView::New( nativeImage );
-  imageView.SetProperty( ImageView::Property::IMAGE, map );
-  Stage::GetCurrent().Add( imageView );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  gl.EnableTextureCallTrace( true );
-
-  std::vector< GLuint > ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
-
-  std::stringstream params;
-  params << GL_TEXTURE_EXTERNAL_OES << ", " << 23;
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
-
-  END_TEST;
-}
-
-// Scenarios 6: ImageView initially from regular image with custom shader but then SetImage called with Native
-int UtcDaliImageViewSetImageBufferImageWithCustomShaderToNativeImage(void)
-{
-  ToolkitTestApplication application;
-
-  int width = 300;
-  int height = 400;
-
-  Property::Map customShader;
-  customShader.Insert( "vertexShader", VERTEX_SHADER );
-  customShader.Insert( "fragmentShader", FRAGMENT_SHADER );
-
-  Property::Array shaderHints;
-  shaderHints.PushBack( "requiresSelfDepthTest" );
-  shaderHints.PushBack( "outputIsTransparent" );
-  shaderHints.PushBack( "outputIsOpaque" );
-  shaderHints.PushBack( "modifiesGeometry" );
-
-  customShader.Insert( "hints", shaderHints );
-
-  Property::Map map;
-  map.Insert( "shader", customShader );
-
-  BufferImage image = CreateBufferImage( width, height, Color::WHITE );
-
-  ImageView imageView = ImageView::New( image );
-  imageView.SetProperty( ImageView::Property::IMAGE, map );
-  Stage::GetCurrent().Add( imageView );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  gl.EnableTextureCallTrace( true );
-
-  std::vector< GLuint > ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
-
-  std::stringstream params;
-  params << GL_TEXTURE_2D << ", " << 23;
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
-
-  TestNativeImagePointer nativeImageInterface = TestNativeImage::New( width, height );
-  NativeImage nativeImage = NativeImage::New( *(nativeImageInterface.Get()) );
-  imageView.SetImage( nativeImage );
-
-  ids.clear();
-  ids.push_back( 24 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
-
-  std::stringstream nativeImageParams;
-  nativeImageParams << GL_TEXTURE_EXTERNAL_OES << ", " << 24;
-  DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", nativeImageParams.str()) );
-
-
-  END_TEST;
-}
-
-int UtcDaliImageViewGetImageP1(void)
-{
-  ToolkitTestApplication application;
-
-  ImageView imageView = ImageView::New();
-  DALI_TEST_CHECK( ! imageView.GetImage() );
-
-  Image image = CreateBufferImage();
-  imageView.SetImage( image );
-  DALI_TEST_CHECK( imageView.GetImage() == image );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewGetImageP2(void)
-{
-  ToolkitTestApplication application;
-
-  BufferImage image = CreateBufferImage();
-  ImageView imageView = ImageView::New( image );
-  DALI_TEST_CHECK( imageView.GetImage() == image );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewGetImageN(void)
-{
-  ToolkitTestApplication application;
-
-  ImageView imageView = ImageView::New( TEST_IMAGE_FILE_NAME );
-  DALI_TEST_CHECK( ! imageView.GetImage() );
-
-  Image image = CreateBufferImage();
-  imageView.SetImage( image );
-  DALI_TEST_CHECK( imageView.GetImage() == image );
-
-  imageView.SetImage( TEST_IMAGE_FILE_NAME );
-  DALI_TEST_CHECK( ! imageView.GetImage() );
-
-  END_TEST;
-}
-
-
 int UtcDaliImageViewReplaceImage(void)
 {
   ToolkitTestApplication application;
 
   gResourceReadySignalFired = false;
-
-  int width = 100;
-  int height = 200;
-  Image image = CreateBufferImage( width, height, Vector4(1.f, 1.f, 1.f, 1.f) );
 
   // Check ImageView with background and main image, to ensure both visuals are marked as loaded
   ImageView imageView = ImageView::New( TEST_IMAGE_1 );
