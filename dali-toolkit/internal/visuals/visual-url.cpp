@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,9 +99,11 @@ VisualUrl::Type ResolveType( const std::string& url )
     enum { SUFFIX, HASH, HASH_DOT } state = SUFFIX;
     char SVG[ 4 ] = { 'g', 'v', 's', '.' };
     char GIF[ 4 ] = { 'f', 'i', 'g', '.' };
+    char WEBP[ 5 ] = { 'p', 'b', 'e', 'w', '.' };
     char JSON[ 5 ] = { 'n', 'o', 's', 'j', '.' };
     unsigned int svgScore = 0;
     unsigned int gifScore = 0;
+    unsigned int webpScore = 0;
     unsigned int jsonScore = 0;
     int index = count;
     while( --index >= 0 )
@@ -122,6 +124,14 @@ VisualUrl::Type ResolveType( const std::string& url )
         if( ++gifScore == sizeof(GIF) )
         {
           return VisualUrl::GIF;
+        }
+      }
+      if( ( offsetFromEnd < sizeof(WEBP) )&&( currentChar == WEBP[ offsetFromEnd ] ) )
+      {
+        // early out if WEBP as can't be used in N patch for now
+        if( ++webpScore == sizeof(WEBP) )
+        {
+          return VisualUrl::WEBP;
         }
       }
       if( ( offsetFromEnd < sizeof(JSON) )&&( currentChar == JSON[ offsetFromEnd ] ) )

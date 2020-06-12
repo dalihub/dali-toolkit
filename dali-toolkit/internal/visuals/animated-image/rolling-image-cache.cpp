@@ -131,26 +131,9 @@ TextureSet RollingImageCache::FirstFrame()
   return Frame( 0u );
 }
 
-TextureSet RollingImageCache::NextFrame()
+uint32_t RollingImageCache::GetFrameInterval( uint32_t frameIndex )
 {
-  TextureSet textureSet;
-
-  ImageFrame imageFrame = mQueue.PopFront();
-  mTextureManager.Remove( mImageUrls[ imageFrame.mUrlIndex ].mTextureId, this );
-  mImageUrls[ imageFrame.mUrlIndex ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
-
-  LoadBatch();
-
-  if( IsFrontReady() == true )
-  {
-    textureSet = GetFrontTextureSet();
-  }
-  else
-  {
-    mWaitingForReadyFrame = true;
-  }
-
-  return textureSet;
+  return 0u;
 }
 
 bool RollingImageCache::IsFrontReady() const

@@ -15,7 +15,7 @@
  */
 
 // CLASS HEADER
-#include "rolling-gif-image-cache.h"
+#include "rolling-animated-image-cache.h"
 
 // EXTERNAL HEADERS
 
@@ -58,11 +58,11 @@ namespace Toolkit
 namespace Internal
 {
 
-RollingGifImageCache::RollingGifImageCache(
-  TextureManager& textureManager, GifLoading& gifLoading, uint32_t frameCount, ImageCache::FrameReadyObserver& observer,
+RollingAnimatedImageCache::RollingAnimatedImageCache(
+  TextureManager& textureManager, AnimatedImageLoading& animatedImageLoading, uint32_t frameCount, ImageCache::FrameReadyObserver& observer,
   uint16_t cacheSize, uint16_t batchSize )
 : ImageCache( textureManager, observer, batchSize ),
-  mGifLoading( gifLoading ),
+  mAnimatedImageLoading( animatedImageLoading ),
   mFrameCount( frameCount ),
   mFrameIndex( 0 ),
   mCacheSize( cacheSize ),
@@ -72,11 +72,11 @@ RollingGifImageCache::RollingGifImageCache(
   LoadBatch();
 }
 
-RollingGifImageCache::~RollingGifImageCache()
+RollingAnimatedImageCache::~RollingAnimatedImageCache()
 {
   if( mTextureManagerAlive )
   {
-    while( !mQueue.IsEmpty() )
+    while( IsFrontReady() )
     {
       ImageFrame imageFrame = mQueue.PopFront();
       Dali::Toolkit::TextureManager::RemoveTexture( mImageUrls[ imageFrame.mFrameNumber ].mUrl );
@@ -84,64 +84,51 @@ RollingGifImageCache::~RollingGifImageCache()
   }
 }
 
-TextureSet RollingGifImageCache::Frame( uint32_t frameIndex )
+TextureSet RollingAnimatedImageCache::Frame( uint32_t frameIndex )
 {
-  // If a frame of frameIndex is not loaded, clear the queue and remove all loaded textures.
-  if( mImageUrls[ frameIndex ].mTextureId == TextureManager::INVALID_TEXTURE_ID )
+  bool popExist = false;
+  while( IsFrontReady() && mQueue.Front().mFrameNumber != frameIndex )
   {
-    mFrameIndex = frameIndex;
-    while( !mQueue.IsEmpty() )
-    {
-      ImageFrame imageFrame = mQueue.PopFront();
-      Dali::Toolkit::TextureManager::RemoveTexture( mImageUrls[ imageFrame.mFrameNumber ].mUrl );
-      mImageUrls[ imageFrame.mFrameNumber ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
-    }
-    LoadBatch();
+    ImageFrame imageFrame = mQueue.PopFront();
+    Dali::Toolkit::TextureManager::RemoveTexture( mImageUrls[ imageFrame.mFrameNumber ].mUrl );
+    mImageUrls[ imageFrame.mFrameNumber ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+    popExist = true;
   }
-  // If the frame is already loaded, remove previous frames of the frame in the queue
-  // and load new frames amount of removed frames.
-  else
+  if( popExist || mImageUrls[ frameIndex ].mTextureId == TextureManager::INVALID_TEXTURE_ID )
   {
-    bool popExist = false;
-    while( !mQueue.IsEmpty() && mQueue.Front().mFrameNumber != frameIndex )
-    {
-      ImageFrame imageFrame = mQueue.PopFront();
-      Dali::Toolkit::TextureManager::RemoveTexture( mImageUrls[ imageFrame.mFrameNumber ].mUrl );
-      mImageUrls[ imageFrame.mFrameNumber ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
-      popExist = true;
-    }
-    if( popExist )
+    // If the frame of frameIndex was already loaded, load batch from the last frame of queue
+    if( IsFrontReady() )
     {
       mFrameIndex = ( mQueue.Back().mFrameNumber + 1 ) % mFrameCount;
-      LoadBatch();
     }
+    // If the queue is empty, load batch from the frame of frameIndex
+    else
+    {
+      mFrameIndex = frameIndex;
+    }
+    LoadBatch();
   }
 
   return GetFrontTextureSet();
 }
 
-TextureSet RollingGifImageCache::FirstFrame()
+TextureSet RollingAnimatedImageCache::FirstFrame()
 {
   return Frame( 0u );
 }
 
-TextureSet RollingGifImageCache::NextFrame()
+uint32_t RollingAnimatedImageCache::GetFrameInterval( uint32_t frameIndex )
 {
-  ImageFrame imageFrame = mQueue.PopFront();
-  Dali::Toolkit::TextureManager::RemoveTexture( mImageUrls[ imageFrame.mFrameNumber ].mUrl );
-  mImageUrls[ imageFrame.mFrameNumber ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
-
-  LoadBatch();
-
-  return GetFrontTextureSet();
+  Frame( frameIndex );
+  return mAnimatedImageLoading.GetFrameInterval( frameIndex );
 }
 
-bool RollingGifImageCache::IsFrontReady() const
+bool RollingAnimatedImageCache::IsFrontReady() const
 {
   return ( !mQueue.IsEmpty() );
 }
 
-void RollingGifImageCache::LoadBatch()
+void RollingAnimatedImageCache::LoadBatch()
 {
   // Try and load up to mBatchSize images, until the cache is filled.
   // Once the cache is filled, as frames progress, the old frame is
@@ -151,9 +138,8 @@ void RollingGifImageCache::LoadBatch()
 
   // Get the smallest number of frames we need to load
   int batchSize = std::min( std::size_t(mBatchSize), mCacheSize - mQueue.Count() );
-  DALI_LOG_INFO( gAnimImgLogFilter, Debug::Concise, "RollingGifImageCache::LoadBatch() mFrameIndex:%d  batchSize:%d\n", mFrameIndex, batchSize );
-
-  if( mGifLoading.LoadNextNFrames( mFrameIndex, batchSize, pixelDataList) )
+  DALI_LOG_INFO( gAnimImgLogFilter, Debug::Concise, "RollingAnimatedImageCache::LoadBatch() mFrameIndex:%d  batchSize:%d\n", mFrameIndex, batchSize );
+  if( mAnimatedImageLoading.LoadNextNFrames( mFrameIndex, batchSize, pixelDataList) )
   {
     unsigned int pixelDataListCount = pixelDataList.size();
 
@@ -203,15 +189,15 @@ void RollingGifImageCache::LoadBatch()
   LOG_CACHE;
 }
 
-TextureSet RollingGifImageCache::GetFrontTextureSet() const
+TextureSet RollingAnimatedImageCache::GetFrontTextureSet() const
 {
-  DALI_LOG_INFO( gAnimImgLogFilter, Debug::Concise, "RollingGifImageCache::GetFrontTextureSet() FrameNumber:%d\n", mQueue[ 0 ].mFrameNumber );
+  DALI_LOG_INFO( gAnimImgLogFilter, Debug::Concise, "RollingAnimatedImageCache::GetFrontTextureSet() FrameNumber:%d\n", mQueue[ 0 ].mFrameNumber );
 
   TextureManager::TextureId textureId = GetCachedTextureId( 0 );
   return mTextureManager.GetTextureSet( textureId );
 }
 
-TextureManager::TextureId RollingGifImageCache::GetCachedTextureId( int index ) const
+TextureManager::TextureId RollingAnimatedImageCache::GetCachedTextureId( int index ) const
 {
   return mImageUrls[ mQueue[ index ].mFrameNumber ].mTextureId;
 }

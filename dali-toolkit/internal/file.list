@@ -17,7 +17,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/animated-image/image-cache.cpp
    ${toolkit_src_dir}/visuals/animated-image/fixed-image-cache.cpp
    ${toolkit_src_dir}/visuals/animated-image/rolling-image-cache.cpp
-   ${toolkit_src_dir}/visuals/animated-image/rolling-gif-image-cache.cpp
+   ${toolkit_src_dir}/visuals/animated-image/rolling-animated-image-cache.cpp
    ${toolkit_src_dir}/visuals/animated-vector-image/animated-vector-image-visual.cpp
    ${toolkit_src_dir}/visuals/animated-vector-image/vector-animation-task.cpp
    ${toolkit_src_dir}/visuals/animated-vector-image/vector-animation-thread.cpp

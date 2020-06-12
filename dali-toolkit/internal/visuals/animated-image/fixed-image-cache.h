@@ -61,11 +61,9 @@ public:
   TextureSet FirstFrame() override;
 
   /**
-   * Get the next frame. If it's not ready, this will trigger the
-   * sending of FrameReady() when the image becomes ready.
-   * This will trigger the loading of the next batch.
+   * Get the interval of Nth frame.
    */
-  TextureSet NextFrame() override;
+  uint32_t GetFrameInterval( uint32_t frameIndex ) override;
 
 private:
   /**

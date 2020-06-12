@@ -293,7 +293,7 @@ int UtcDaliAnimatedImageVisualStopBehavior(void)
 }
 
 
-int UtcDaliAnimatedImageVisualGif01(void)
+int UtcDaliAnimatedImageVisualAnimatedImage01(void)
 {
   ToolkitTestApplication application;
   TestGlAbstraction& gl = application.GetGlAbstraction();
