@@ -32,6 +32,7 @@
 
 namespace Dali
 {
+class Image;
 
 namespace Toolkit
 {

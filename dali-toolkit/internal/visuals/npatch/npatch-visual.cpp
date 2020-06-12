@@ -19,8 +19,6 @@
 #include "npatch-visual.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/images/buffer-image.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>

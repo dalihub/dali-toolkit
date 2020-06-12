@@ -23,7 +23,6 @@
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-cross-effect.h>
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-fold-effect.h>
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-wave-effect.h>
-#include <dali/public-api/images/buffer-image.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 
