@@ -395,7 +395,7 @@ void PageTurnView::OnInitialize()
   // create the layer for turning pages
   mTurningPageLayer = Layer::New();
   mTurningPageLayer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
-  mTurningPageLayer.SetBehavior(Layer::LAYER_3D);
+  mTurningPageLayer.SetProperty( Layer::Property::BEHAVIOR, Layer::LAYER_3D );
   mTurningPageLayer.Raise();
 
   // Set control size and the parent origin of page layers

@@ -99,47 +99,11 @@ void ImageView::OnInitialize()
   handle.ResourceReadySignal().Connect( this, &ImageView::OnResourceReady );
 }
 
-void ImageView::SetImage( Image image )
-{
-  // Don't bother comparing if we had a visual previously, just drop old visual and create new one
-  mImage = image;
-  mUrl.clear();
-  mPropertyMap.Clear();
-
-  Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( image );
-  if( visual )
-  {
-    if( !mVisual )
-    {
-      mVisual = visual;
-    }
-
-    if( !mShaderMap.Empty() )
-    {
-      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
-      visualImpl.SetCustomShader( mShaderMap );
-    }
-
-    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual );
-  }
-  else
-  {
-    // Unregister the existing visual
-    DevelControl::UnregisterVisual( *this, Toolkit::ImageView::Property::IMAGE );
-
-    // Trigger a size negotiation request that may be needed when unregistering a visual.
-    RelayoutRequest();
-  }
-
-  // Signal that a Relayout may be needed
-}
-
 void ImageView::SetImage( const Property::Map& map )
 {
   // Comparing a property map is too expensive so just creating a new visual
   mPropertyMap = map;
   mUrl.clear();
-  mImage.Reset();
 
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
   if( visual )
@@ -175,7 +139,6 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
   // Don't bother comparing if we had a visual previously, just drop old visual and create new one
   mUrl = url;
   mImageSize = size;
-  mImage.Reset();
   mPropertyMap.Clear();
 
   // Don't set mVisual until it is ready and shown. Getters will still use current visual.
@@ -205,11 +168,6 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
   }
 
   // Signal that a Relayout may be needed
-}
-
-Image ImageView::GetImage() const
-{
-  return mImage;
 }
 
 void ImageView::EnablePreMultipliedAlpha( bool preMultipled )
@@ -504,10 +462,6 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
                 {
                   impl.SetImage( impl.mUrl, impl.mImageSize );
                 }
-                else if( impl.mImage )
-                {
-                  impl.SetImage( impl.mImage );
-                }
                 else if( !impl.mPropertyMap.Empty() )
                 {
                   impl.SetImage( impl.mPropertyMap );
@@ -548,12 +502,6 @@ Property::Value ImageView::GetProperty( BaseObject* object, Property::Index prop
         if ( !impl.mUrl.empty() )
         {
           value = impl.mUrl;
-        }
-        else if( impl.mImage )
-        {
-          Property::Map map;
-          Scripting::CreatePropertyMap( impl.mImage, map );
-          value = map;
         }
         else
         {

@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_DEVEL_API_IMAGE_MANAGER_H
-#define DALI_TOOLKIT_DEVEL_API_IMAGE_MANAGER_H
+#ifndef DALI_TOOLKIT_IMAGE_H
+#define DALI_TOOLKIT_IMAGE_H
 
 /*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
@@ -60,7 +60,7 @@ DALI_TOOLKIT_API std::string GenerateUrl( const Dali::FrameBuffer frameBuffer, P
  * @param[in] index the index of the attached color texture.
  * @return the Url string representing this frame buffer
  */
-DALI_TOOLKIT_API std::string GenerateUrl( const Dali::FrameBuffer frameBuffer, const uint8_t index );
+DALI_TOOLKIT_API std::string GenerateUrl( const Dali::FrameBuffer frameBuffer, uint8_t index );
 
 /**
  * @brief Generate a Url from Pixel data.
@@ -80,10 +80,10 @@ DALI_TOOLKIT_API std::string GenerateUrl( const Dali::PixelData pixelData );
  */
 DALI_TOOLKIT_API std::string GenerateUrl( const Dali::NativeImageSourcePtr nativeImageSource );
 
-} // ImageUtil
+} // Image
 
 } // Toolkit
 
 } // Dali
 
-#endif // DALI_TOOLKIT_DEVEL_API_IMAGE_MANAGER_H
+#endif // DALI_TOOLKIT_IMAGE_H

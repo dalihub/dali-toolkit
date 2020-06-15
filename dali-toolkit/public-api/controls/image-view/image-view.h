@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,19 +150,6 @@ public:
   static ImageView New();
 
   /**
-   * @DEPRECATED_1_2_8, use New( const std::string& ) instead.
-   *
-   * @brief Creates an initialized ImageView from an Image instance.
-   *
-   * If the handle is empty, ImageView will not display anything.
-   *
-   * @SINCE_1_0.0
-   * @param[in] image The Image instance to display
-   * @return A handle to a newly allocated ImageView
-   */
-  static ImageView New( Image image ) DALI_DEPRECATED_API;
-
-  /**
    * @brief Creates an initialized ImageView from an URL to an image resource.
    *
    * If the string is empty, ImageView will not display anything.
@@ -230,17 +217,6 @@ public:
   static ImageView DownCast( BaseHandle handle );
 
   /**
-   * @DEPRECATED_1_2_8, use SetImage( const std::string& ) instead.
-   *
-   * @brief Sets this ImageView from an Image instance.
-   *
-   * If the handle is empty, ImageView will display nothing
-   * @SINCE_1_0.0
-   * @param[in] image The Image instance to display.
-   */
-  void SetImage( Image image ) DALI_DEPRECATED_API;
-
-  /**
    * @brief Sets this ImageView from the given URL.
    *
    * If the URL is empty, ImageView will not display anything.
@@ -264,17 +240,6 @@ public:
    * @param [in] size The width and height to fit the loaded image to
    */
   void SetImage( const std::string& url, ImageDimensions size );
-
-  /**
-   * @DEPRECATED_1_1.4
-   * @brief Gets the Image instance handle used by the ImageView.
-   *
-   * A valid handle will be returned only if this instance was created with New(Image) or SetImage(Image) was called.
-   *
-   * @SINCE_1_0.0
-   * @return The Image instance currently used by the ImageView
-   */
-  Image GetImage() const DALI_DEPRECATED_API;
 
 public: // Not intended for application developers
 

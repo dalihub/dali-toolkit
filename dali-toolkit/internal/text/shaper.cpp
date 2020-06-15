@@ -117,8 +117,8 @@ void ShapeText( const Vector<Character>& text,
 
   const Length currentNumberOfGlyphs = glyphs.Count();
   const Length numberOfGlyphsReserved = static_cast<Length>( numberOfCharacters * 1.3f );
-  glyphs.Resize( currentNumberOfGlyphs + numberOfGlyphsReserved, glyphInfo );
-  glyphToCharacterMap.Resize( currentNumberOfGlyphs + numberOfGlyphsReserved );
+  glyphs.Reserve( currentNumberOfGlyphs + numberOfGlyphsReserved );
+  glyphToCharacterMap.Reserve( currentNumberOfGlyphs + numberOfGlyphsReserved );
 
   // The actual number of glyphs.
   Length totalNumberOfGlyphs = currentNumberOfGlyphs;

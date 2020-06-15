@@ -20,6 +20,8 @@
 
 namespace Test
 {
+namespace VectorAnimationRenderer
+{
 
 #define VECTOR_ANIMATION_TOTAL_FRAME_NUMBER 5
 #define VECTOR_ANIMATION_MARKER_NAME_1 "marker1"
@@ -29,6 +31,9 @@ namespace Test
 #define VECTOR_ANIMATION_MARKER_START_FRAME_2 2
 #define VECTOR_ANIMATION_MARKER_END_FRAME_2 3
 
+void RequestTrigger();
+
+} // VectorAnimationRenderer
 } // Test
 
 

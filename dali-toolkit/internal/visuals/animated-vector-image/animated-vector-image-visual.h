@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_VECTOR_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/object/property-notification.h>
-#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/adaptor-framework/window.h>
+#include <dali/devel-api/actors/actor-devel.h>
+#include <dali/integration-api/processor-interface.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -55,7 +56,7 @@ using AnimatedVectorImageVisualPtr = IntrusivePtr< AnimatedVectorImageVisual >;
  * | url                      | STRING           |
  *
  */
-class AnimatedVectorImageVisual: public Visual::Base, public ConnectionTracker
+class AnimatedVectorImageVisual: public Visual::Base, public ConnectionTracker, public Integration::Processor
 {
 public:
 
@@ -138,6 +139,13 @@ protected:
    */
   void OnDoAction( const Property::Index actionId, const Property::Value& attributes ) override;
 
+protected: // Implementation of Processor
+
+  /**
+   * @copydoc Dali::Integration::Processor::Process()
+   */
+  void Process() override;
+
 private:
 
   /**
@@ -173,6 +181,11 @@ private:
   void StopAnimation();
 
   /**
+   * @brief Trigger rasterization of the vector content.
+   */
+  void TriggerVectorRasterization();
+
+  /**
    * @brief Callback when the world scale factor changes.
    */
   void OnScaleNotification( PropertyNotification& source );
@@ -200,20 +213,17 @@ private:
 
 private:
   VisualUrl                                    mUrl;
+  VectorAnimationTask::AnimationData           mAnimationData;
   VectorAnimationTaskPtr                       mVectorAnimationTask;
   ImageVisualShaderFactory&                    mImageVisualShaderFactory;
   PropertyNotification                         mScaleNotification;
   PropertyNotification                         mSizeNotification;
   Vector2                                      mVisualSize;
   Vector2                                      mVisualScale;
-  Property::Array                              mPlayRange;
   WeakHandle< Actor >                          mPlacementActor;
-  int32_t                                      mLoopCount;
-  uint32_t                                     mResendFlag;
-  DevelAnimatedVectorImageVisual::Action::Type mActionStatus;
-  DevelImageVisual::StopBehavior::Type         mStopBehavior;
-  DevelImageVisual::LoopingMode::Type          mLoopingMode;
+  DevelImageVisual::PlayState::Type            mPlayState;
   bool                                         mRendererAdded;
+  bool                                         mRasterizationTriggered;
 };
 
 } // namespace Internal

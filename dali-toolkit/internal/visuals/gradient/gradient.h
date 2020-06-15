@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GRADIENT_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture.h>

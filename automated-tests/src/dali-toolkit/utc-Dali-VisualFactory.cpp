@@ -831,18 +831,6 @@ int UtcDaliVisualFactoryGetNPatchVisual4(void)
 
   textureTrace.Reset();
 
-  ResourceImage image = ResourceImage::New( TEST_9_PATCH_FILE_NAME );
-  Visual::Base nPatchVisual = factory.CreateVisual( image );
-
-  DummyControl actor1 = DummyControl::New(true);
-  TestVisualRender( application, actor1, nPatchVisual );
-
-  DALI_TEST_EQUALS( textureTrace.CountMethod("BindTexture"), 0, TEST_LOCATION );  // The same texture should be used with the first visual.
-
-  naturalSize = Vector2( 0.0f, 0.0f );
-  nPatchVisual.GetNaturalSize( naturalSize );
-  DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
-
   END_TEST;
 }
 

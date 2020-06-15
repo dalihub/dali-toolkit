@@ -195,6 +195,23 @@ void Adaptor::RemoveWindow( Internal::Adaptor::SceneHolder* window )
   }
 }
 
+void Adaptor::RegisterProcessor( Integration::Processor& processor )
+{
+  Integration::Core& core = mTestApplication->GetCore();
+  core.RegisterProcessor( processor );
+}
+
+void Adaptor::UnregisterProcessor( Integration::Processor& processor )
+{
+  Integration::Core& core = mTestApplication->GetCore();
+  core.UnregisterProcessor( processor );
+}
+
+void Adaptor::SetApplication( Dali::TestApplication& testApplication )
+{
+  mTestApplication = &testApplication;
+}
+
 Dali::Adaptor::AdaptorSignalType& Adaptor::ResizedSignal()
 {
   return mResizedSignal;
@@ -354,6 +371,16 @@ const LogFactoryInterface& Adaptor::GetLogFactory()
     gLogFactory = new LogFactory;
   }
   return *gLogFactory;
+}
+
+void Adaptor::RegisterProcessor( Integration::Processor& processor )
+{
+  mImpl->RegisterProcessor( processor );
+}
+
+void Adaptor::UnregisterProcessor( Integration::Processor& processor )
+{
+  mImpl->UnregisterProcessor( processor );
 }
 
 } // namespace Dali

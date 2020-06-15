@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
@@ -795,7 +796,7 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
     if( !grabHandle.actor )
     {
-      if( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] )
+      if( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED].size() )
       {
         grabHandle.actor = ImageView::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
         GetImpl( grabHandle.actor).SetDepthIndex( DepthIndex::DECORATION );
@@ -848,9 +849,9 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
-  void CreateHandleMarker( HandleImpl& handle, Image& image, HandleType handleType )
+  void CreateHandleMarker( HandleImpl& handle, const std::string& image, HandleType handleType )
   {
-    if( image )
+    if( image.size() )
     {
       handle.markerActor = ImageView::New( image );
       handle.markerActor.SetProperty( Actor::Property::COLOR, mHandleColor );
@@ -876,7 +877,7 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& primary = mHandle[ LEFT_SELECTION_HANDLE ];
     if( !primary.actor )
     {
-      if( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] )
+      if( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED].size() )
       {
         primary.actor = ImageView::New( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
@@ -920,7 +921,7 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& secondary = mHandle[ RIGHT_SELECTION_HANDLE ];
     if( !secondary.actor )
     {
-      if( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] )
+      if( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED].size() )
       {
         secondary.actor = ImageView::New( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
@@ -1121,7 +1122,7 @@ struct Decorator::Impl : public ConnectionTracker
     // Chooses between the released or pressed image. It checks whether the pressed image exists.
     if( handle.actor )
     {
-      const HandleImageType imageType = ( handle.pressed ? ( mHandleImages[type][HANDLE_IMAGE_PRESSED] ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED ) : HANDLE_IMAGE_RELEASED );
+      const HandleImageType imageType = ( handle.pressed ? ( mHandleImages[type][HANDLE_IMAGE_PRESSED].size() ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED ) : HANDLE_IMAGE_RELEASED );
 
       handle.actor.SetImage( mHandleImages[type][imageType] );
     }
@@ -1130,7 +1131,7 @@ struct Decorator::Impl : public ConnectionTracker
     {
       if( handle.markerActor )
       {
-        const HandleImageType markerImageType = ( handle.pressed ? ( mHandleImages[markerType][HANDLE_IMAGE_PRESSED] ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED ) : HANDLE_IMAGE_RELEASED );
+        const HandleImageType markerImageType = ( handle.pressed ? ( mHandleImages[markerType][HANDLE_IMAGE_PRESSED].size() ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED ) : HANDLE_IMAGE_RELEASED );
         handle.markerActor.SetImage( mHandleImages[markerType][markerImageType] );
       }
     }
@@ -1755,12 +1756,14 @@ struct Decorator::Impl : public ConnectionTracker
     mPopupBottomExceedNotification.NotifySignal().Connect( this, &Decorator::Impl::PopUpLeavesBottomBoundary );
   }
 
-  void SetHandleImage( HandleType handleType, HandleImageType handleImageType, Dali::Image image )
+  void SetHandleImage( HandleType handleType, HandleImageType handleImageType, const std::string& imageFileName )
   {
-    HandleImpl& handle = mHandle[handleType];
-    handle.size = Size( image.GetWidth(), image.GetHeight() );
+    ImageDimensions dimensions = Dali::GetOriginalImageSize( imageFileName );
 
-    mHandleImages[handleType][handleImageType] = image;
+    HandleImpl& handle = mHandle[handleType];
+    handle.size = Size( dimensions.GetWidth(), dimensions.GetHeight() );
+
+    mHandleImages[handleType][handleImageType] = imageFileName;
   }
 
   void SetScrollThreshold( float threshold )
@@ -1898,7 +1901,7 @@ struct Decorator::Impl : public ConnectionTracker
   TextSelectionPopup::Buttons mEnabledPopupButtons; /// Bit mask of currently enabled Popup buttons
   TextSelectionPopupCallbackInterface& mTextSelectionPopupCallbackInterface;
 
-  Image               mHandleImages[HANDLE_TYPE_COUNT][HANDLE_IMAGE_TYPE_COUNT];
+  std::string         mHandleImages[HANDLE_TYPE_COUNT][HANDLE_IMAGE_TYPE_COUNT];
   Vector4             mHandleColor;
 
   CursorImpl          mCursor[CURSOR_COUNT];
@@ -2109,11 +2112,11 @@ void Decorator::SetHandleActive( HandleType handleType, bool active )
     // The problem is the handle actor does not receive the touch event with the Interrupt
     // state when the power button is pressed and the application goes to background.
     mImpl->mHandle[handleType].pressed = false;
-    Image imageReleased = mImpl->mHandleImages[handleType][HANDLE_IMAGE_RELEASED];
+    const bool imageReleased = mImpl->mHandleImages[handleType][HANDLE_IMAGE_RELEASED].size();
     ImageView imageView = mImpl->mHandle[handleType].actor;
     if( imageReleased && imageView )
     {
-      imageView.SetImage( imageReleased );
+      imageView.SetImage( mImpl->mHandleImages[handleType][HANDLE_IMAGE_RELEASED] );
     }
   }
 
@@ -2124,12 +2127,12 @@ bool Decorator::IsHandleActive( HandleType handleType ) const
   return mImpl->mHandle[handleType].active ;
 }
 
-void Decorator::SetHandleImage( HandleType handleType, HandleImageType handleImageType, Dali::Image image )
+void Decorator::SetHandleImage( HandleType handleType, HandleImageType handleImageType, const std::string& imageFileName )
 {
-  mImpl->SetHandleImage( handleType, handleImageType, image );
+  mImpl->SetHandleImage( handleType, handleImageType, imageFileName );
 }
 
-Dali::Image Decorator::GetHandleImage( HandleType handleType, HandleImageType handleImageType ) const
+const std::string& Decorator::GetHandleImage( HandleType handleType, HandleImageType handleImageType ) const
 {
   return mImpl->mHandleImages[handleType][handleImageType];
 }
