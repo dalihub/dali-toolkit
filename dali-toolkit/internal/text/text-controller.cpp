@@ -835,6 +835,16 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s\n", defaultFontFamily.c_str());
   mImpl->mFontDefaults->familyDefined = !defaultFontFamily.empty();
 
+  if( mImpl->mEventData )
+  {
+    // Update the cursor position if it's in editing mode
+    if( EventData::IsEditingState( mImpl->mEventData->mState ) )
+    {
+      mImpl->mEventData->mDecoratorUpdated = true;
+      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font family is updated.
+    }
+  }
+
   // Clear the font-specific data
   ClearFontData();
 
@@ -887,6 +897,16 @@ void Controller::SetDefaultFontWeight( FontWeight weight )
 
   mImpl->mFontDefaults->mFontDescription.weight = weight;
   mImpl->mFontDefaults->weightDefined = true;
+
+  if( mImpl->mEventData )
+  {
+    // Update the cursor position if it's in editing mode
+    if( EventData::IsEditingState( mImpl->mEventData->mState ) )
+    {
+      mImpl->mEventData->mDecoratorUpdated = true;
+      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font weight is updated.
+    }
+  }
 
   // Clear the font-specific data
   ClearFontData();
@@ -959,6 +979,16 @@ void Controller::SetDefaultFontWidth( FontWidth width )
   mImpl->mFontDefaults->mFontDescription.width = width;
   mImpl->mFontDefaults->widthDefined = true;
 
+  if( mImpl->mEventData )
+  {
+    // Update the cursor position if it's in editing mode
+    if( EventData::IsEditingState( mImpl->mEventData->mState ) )
+    {
+      mImpl->mEventData->mDecoratorUpdated = true;
+      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font width is updated.
+    }
+  }
+
   // Clear the font-specific data
   ClearFontData();
 
@@ -1029,6 +1059,16 @@ void Controller::SetDefaultFontSlant( FontSlant slant )
 
   mImpl->mFontDefaults->mFontDescription.slant = slant;
   mImpl->mFontDefaults->slantDefined = true;
+
+  if( mImpl->mEventData )
+  {
+    // Update the cursor position if it's in editing mode
+    if( EventData::IsEditingState( mImpl->mEventData->mState ) )
+    {
+      mImpl->mEventData->mDecoratorUpdated = true;
+      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font slant is updated.
+    }
+  }
 
   // Clear the font-specific data
   ClearFontData();
@@ -1116,6 +1156,16 @@ void Controller::SetDefaultFontSize( float fontSize, FontSizeType type )
       mImpl->mFontDefaults->mDefaultPointSize = ( fontSize * 72.f ) / static_cast< float >( horizontalDpi );
       mImpl->mFontDefaults->sizeDefined = true;
       break;
+    }
+  }
+
+  if( mImpl->mEventData )
+  {
+    // Update the cursor position if it's in editing mode
+    if( EventData::IsEditingState( mImpl->mEventData->mState ) )
+    {
+      mImpl->mEventData->mDecoratorUpdated = true;
+      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font size is updated.
     }
   }
 
