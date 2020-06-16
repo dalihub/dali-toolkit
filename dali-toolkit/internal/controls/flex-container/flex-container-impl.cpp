@@ -515,7 +515,7 @@ void FlexContainer::OnRelayout( const Vector2& size, RelayoutContainer& containe
     if( child )
     {
       // Anchor actor to top left of the container
-      if( child.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >() )
+      if( child.GetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >() )
       {
         child.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       }
@@ -760,7 +760,7 @@ Actor FlexContainer::GetNextKeyboardFocusableActor(Actor currentFocusedActor, To
               {
                 break;
               }
-            } while ( !mChildrenNodes[nextFocusedActorIndex].actor.GetHandle().IsKeyboardFocusable() );
+            } while ( !mChildrenNodes[nextFocusedActorIndex].actor.GetHandle().GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE ) );
             break;
           }
           case Toolkit::Control::KeyboardFocus::RIGHT:
@@ -782,7 +782,7 @@ Actor FlexContainer::GetNextKeyboardFocusableActor(Actor currentFocusedActor, To
               {
                 break;
               }
-            } while ( !mChildrenNodes[nextFocusedActorIndex].actor.GetHandle().IsKeyboardFocusable() );
+            } while ( !mChildrenNodes[nextFocusedActorIndex].actor.GetHandle().GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE ) );
             break;
           }
           default:
@@ -842,7 +842,7 @@ void FlexContainer::OnInitialize()
   YGNodeStyleSetAlignContent( mRootNode.node, static_cast<YGAlign>( mAlignContent ) );
 
   // Make self as keyboard focusable and focus group
-  self.SetKeyboardFocusable( true );
+  self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
   SetAsKeyboardFocusGroup( true );
 }
 

@@ -611,7 +611,7 @@ void VideoView::SetWindowSurfaceTarget()
 {
   Actor self = Self();
 
-  if( !self.OnStage() )
+  if( !self.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     // When the control is off the stage, it does not have Window.
     return;
@@ -736,11 +736,11 @@ void VideoView::UpdateDisplayArea( Dali::PropertyNotification& source )
 
   Actor self( Self() );
 
-  bool positionUsesAnchorPoint = self.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >();
+  bool positionUsesAnchorPoint = self.GetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >();
   Vector3 actorSize = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) * self.GetCurrentProperty< Vector3 >( Actor::Property::SCALE );
   Vector3 anchorPointOffSet = actorSize * ( positionUsesAnchorPoint ? self.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ) : AnchorPoint::TOP_LEFT );
 
-  Vector2 screenPosition = self.GetProperty( DevelActor::Property::SCREEN_POSITION ).Get< Vector2 >();
+  Vector2 screenPosition = self.GetProperty( Actor::Property::SCREEN_POSITION ).Get< Vector2 >();
 
   mDisplayArea.x = screenPosition.x - anchorPointOffSet.x;
   mDisplayArea.y = screenPosition.y - anchorPointOffSet.y;

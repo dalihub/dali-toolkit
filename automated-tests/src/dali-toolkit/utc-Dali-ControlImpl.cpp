@@ -1094,7 +1094,7 @@ int UtcDaliControlImplRegisterDisabledVisual(void)
 
   DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == false );
 
-  DALI_TEST_CHECK( dummy.OnStage() == true );
+  DALI_TEST_CHECK( dummy.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) == true );
 
   dummyImpl.EnableVisual( TEST_PROPERTY, true );
 
@@ -1133,7 +1133,7 @@ int UtcDaliControlImplDisableRegisteredVisual(void)
 
   DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == true);
 
-  DALI_TEST_CHECK( dummy.OnStage() == true );
+  DALI_TEST_CHECK( dummy.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) == true );
 
   dummyImpl.EnableVisual( TEST_PROPERTY, false );
 
@@ -1173,7 +1173,7 @@ int UtcDaliControlImplEnabledVisualParentRemovedFromStage(void)
   application.Render();
 
   DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == false );
-  DALI_TEST_CHECK( dummy.OnStage() == true );
+  DALI_TEST_CHECK( dummy.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) == true );
   dummyImpl.EnableVisual( TEST_PROPERTY, true );
 
   // Render and notify
@@ -1245,7 +1245,7 @@ int UtcDaliControlImplRegisterTwoVisualsAndEnableOnlyOne(void)
   DALI_TEST_CHECK( dummy.GetRendererCount() == 2u );
   DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY1 ) == true );
   DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY1 ) == true);
-  DALI_TEST_CHECK( dummy.OnStage() == true );
+  DALI_TEST_CHECK( dummy.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) == true );
   dummyImpl.EnableVisual( TEST_PROPERTY2, false );
 
   // Render and notify

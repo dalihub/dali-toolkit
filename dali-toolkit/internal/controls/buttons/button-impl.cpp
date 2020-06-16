@@ -289,7 +289,7 @@ void Button::ChangeState( State requestedState )
   mPreviousButtonState = mButtonState; // Store previous state for visual removal (used when animations ended)
   mButtonState = requestedState; // Update current state
 
-  if ( Self().OnStage() )
+  if ( Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     OnStateChange( mButtonState ); // Notify derived buttons
     SelectRequiredVisual( VISUAL_INDEX_FOR_STATE[ mButtonState ][ BACKGROUND ] );
@@ -619,7 +619,7 @@ void Button::OnInitialize()
   mTapDetector.Attach( self );
   mTapDetector.DetectedSignal().Connect(this, &Button::OnTap);
 
-  self.SetKeyboardFocusable( true );
+  self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
 
   self.TouchSignal().Connect( this, &Button::OnTouch );
 }

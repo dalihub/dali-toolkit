@@ -292,7 +292,7 @@ std::string DumpControl( const Internal::Control& control )
   {
     oss << "\"name\":\"" << name << "\",\n";
   }
-  oss << "\"id\":\"" << control.Self().GetId() << "\",\n";
+  oss << "\"id\":\"" << control.Self().GetProperty< int >( Actor::Property::ID ) << "\",\n";
   oss << "\"registeredVisuals\":\n" << controlData.mVisuals << ",\n";
   oss << "\"removeVisuals\":\n" << controlData.mRemoveVisuals << ",\n";
   oss << "\"rendererCount\":" << control.Self().GetRendererCount() << ",\n";
@@ -311,7 +311,7 @@ std::string DumpActor( Actor actor )
   {
     oss << "\"name\":\"" << name << "\",\n";
   }
-  oss << "\"id\":\"" << actor.GetId() << "\",\n";
+  oss << "\"id\":\"" << actor.GetProperty< int >( Actor::Property::ID ) << "\",\n";
   oss << "\"rendererCount\":" << actor.GetRendererCount() << ",\n";
   oss << "\"properties\":\n{\n";
   Toolkit::Internal::DumpProperties( oss, actor ) << "}\n";

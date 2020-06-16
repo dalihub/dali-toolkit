@@ -106,7 +106,7 @@ int UtcDaliEffectsViewAddRemoveDropShadow(void)
   DALI_TEST_CHECK( view );
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
@@ -114,13 +114,13 @@ int UtcDaliEffectsViewAddRemoveDropShadow(void)
   view.Add(actor);
   Stage::GetCurrent().Add(view);
 
-  DALI_TEST_CHECK( actor.OnStage() );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
   DALI_TEST_CHECK( actor.GetParent() );
   DALI_TEST_CHECK( actor.GetParent() != view );
 
   view.Remove(actor);
 
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
   END_TEST;
 }
 
@@ -153,7 +153,7 @@ int UtcDaliEffectsViewAddRemoveEmboss(void)
 
   Actor actor = Actor::New();
   actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
 
@@ -162,7 +162,7 @@ int UtcDaliEffectsViewAddRemoveEmboss(void)
 
   stage.Add(view);
 
-  DALI_TEST_CHECK( actor.OnStage() );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   application.SendNotification();
   application.Render();
