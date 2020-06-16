@@ -23,7 +23,6 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/images/native-image.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -154,7 +153,7 @@ void WebView::LoadUrl( const std::string& url )
   if( mWebEngine )
   {
     Texture texture = Dali::Texture::New( *mWebEngine.GetNativeImageSource() );
-        const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
+    const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
     mVisual = Toolkit::VisualFactory::Get().CreateVisual(
       { { Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE } ,
         { Toolkit::ImageVisual::Property::URL, nativeImageUrl } } );
@@ -174,7 +173,6 @@ void WebView::LoadHTMLString( const std::string& htmlString )
   {
     Texture texture = Dali::Texture::New( *mWebEngine.GetNativeImageSource() );
     const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
-
     mVisual = Toolkit::VisualFactory::Get().CreateVisual(
       { { Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE } ,
         { Toolkit::ImageVisual::Property::URL, nativeImageUrl } } );
