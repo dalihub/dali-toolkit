@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VIDEO_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/property-map.h>
-#include <dali/public-api/images/native-image.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/rendering/renderer.h>
