@@ -370,7 +370,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       case Toolkit::TextEditor::Property::GRAB_HANDLE_IMAGE:
       {
         const std::string imageFileName = value.Get< std::string >();
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str() );
 
         if( impl.mDecorator && imageFileName.size() )
         {
@@ -382,7 +382,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       case Toolkit::TextEditor::Property::GRAB_HANDLE_PRESSED_IMAGE:
       {
         const std::string imageFileName = value.Get< std::string >();
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str() );
 
         if( impl.mDecorator && imageFileName.size() )
         {
