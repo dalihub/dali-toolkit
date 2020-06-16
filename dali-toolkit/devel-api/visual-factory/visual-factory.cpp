@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,11 +97,6 @@ VisualFactory::VisualFactory(Internal::VisualFactory *impl)
 Visual::Base VisualFactory::CreateVisual( const Property::Map& propertyMap )
 {
   return GetImplementation( *this ).CreateVisual( propertyMap );
-}
-
-Visual::Base VisualFactory::CreateVisual( const Image& image )
-{
-  return GetImplementation( *this ).CreateVisual( image );
 }
 
 Visual::Base VisualFactory::CreateVisual( const std::string& url, ImageDimensions size )

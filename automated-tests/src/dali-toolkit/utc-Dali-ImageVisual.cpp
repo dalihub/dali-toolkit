@@ -570,39 +570,6 @@ int UtcDaliImageVisualTextureReuse2(void)
 }
 
 
-int UtcDaliImageVisualImageHandle(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "Request image visual with an image handle" );
-
-  VisualFactory factory = VisualFactory::Get();
-  DALI_TEST_CHECK( factory );
-
-  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  Visual::Base visual = factory.CreateVisual( image );
-
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
-
-  const int width=512;
-  const int height=513;
-
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, width, height,width, height );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  TraceCallStack& textureTrace = gl.GetTextureTrace();
-  textureTrace.Enable(true);
-
-  DummyControl actor = DummyControl::New();
-  TestVisualRender( application, actor, visual, 1u,
-                    ImageDimensions(width, height),
-                    Integration::ResourcePointer(bitmap) );
-
-  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
-  END_TEST;
-}
-
 int UtcDaliImageVisualCustomWrapModePixelArea(void)
 {
   ToolkitTestApplication application;

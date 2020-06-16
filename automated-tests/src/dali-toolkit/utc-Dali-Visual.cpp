@@ -140,20 +140,6 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
   return true;
 }
 
-void PrepareResourceImage( ToolkitTestApplication& application, unsigned int imageWidth, unsigned int imageHeight, Pixel::Format pixelFormat )
-{
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetClosestImageSize(Vector2( imageWidth, imageHeight));
-
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
-  Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight );
-  unsigned int bytesPerPixel = GetBytesPerPixel(  pixelFormat );
-  unsigned int initialColor = 0xFF;
-  memset( pixbuffer, initialColor, imageHeight*imageWidth*bytesPerPixel);
-
-  Integration::ResourcePointer resourcePtr(bitmap);
-  platform.SetSynchronouslyLoadedResource( resourcePtr );
-}
 } //namespace
 
 void dali_visual_startup(void)
@@ -297,9 +283,12 @@ int UtcDaliVisualSize(void)
   DALI_TEST_EQUALS( naturalSize, Vector2::ZERO, TEST_LOCATION );
 
   // image visual
-  PrepareResourceImage( application, 100u, 200u, Pixel::RGBA8888 );
-  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
-  Visual::Base imageVisual = factory.CreateVisual( image );
+  map.Clear();
+  map[Toolkit::Visual::Property::TYPE] = Toolkit::Visual::IMAGE;
+  map[Toolkit::ImageVisual::Property::URL] = TEST_IMAGE_FILE_NAME;
+  map[Toolkit::ImageVisual::Property::DESIRED_WIDTH] = 100.0f;
+  map[Toolkit::ImageVisual::Property::DESIRED_HEIGHT] = 200.0f;
+  Visual::Base imageVisual = factory.CreateVisual( map );
   imageVisual.SetTransformAndSize(DefaultTransform(), controlSize );
 
   imageVisual.GetNaturalSize(naturalSize);
@@ -843,52 +832,6 @@ int UtcDaliVisualGetPropertyMap5(void)
   value = resultMap.Find( "synchronousLoading",   Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() == true );
-
-  // Get an image visual with an image handle, and test the default property values
-  PrepareResourceImage( application, 100u, 200u, Pixel::RGBA8888 );
-  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
-  imageVisual = factory.CreateVisual(image);
-  imageVisual.CreatePropertyMap( resultMap );
-
-  value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
-
-  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_IMAGE_FILE_NAME );
-
-  value = resultMap.Find( ImageVisual::Property::FITTING_MODE,   Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == FittingMode::DEFAULT );
-
-  value = resultMap.Find( ImageVisual::Property::SAMPLING_MODE,   Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == SamplingMode::BOX );
-
-  value = resultMap.Find( ImageVisual::Property::DESIRED_WIDTH,   Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == 100 );
-
-  value = resultMap.Find( ImageVisual::Property::DESIRED_HEIGHT,   Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == 200 );
-
-  value = resultMap.Find( ImageVisual::Property::PIXEL_AREA, Property::VECTOR4 );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<Vector4>(), Vector4( 0.f, 0.f, 1.f, 1.f ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
-
-  value = resultMap.Find( ImageVisual::Property::WRAP_MODE_U, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK(  value->Get<int>() == WrapMode::DEFAULT);
-
-  value = resultMap.Find( ImageVisual::Property::WRAP_MODE_V, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK(  value->Get<int>() == WrapMode::DEFAULT);
-
-  value = resultMap.Find( "synchronousLoading",   Property::BOOLEAN );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<bool>() == false );
 
   END_TEST;
 }
@@ -2980,20 +2923,6 @@ int UtcDaliVisualSetTransform4(void)
 int UtcDaliVisualSetTransform5(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualSetTransform: ImageVisual from Image" );
-
-  VisualFactory factory = VisualFactory::Get();
-  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME, ImageDimensions(100, 200));
-  Visual::Base visual = factory.CreateVisual(image);
-  TestTransform( application, visual );
-  TestMixColor( visual, Visual::Property::MIX_COLOR, Color::WHITE );
-
-  END_TEST;
-}
-
-int UtcDaliVisualSetTransform6(void)
-{
-  ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualSetTransform: ImageVisual for URL " );
 
   VisualFactory factory = VisualFactory::Get();
@@ -3013,7 +2942,7 @@ int UtcDaliVisualSetTransform6(void)
   END_TEST;
 }
 
-int UtcDaliVisualSetTransform7(void)
+int UtcDaliVisualSetTransform6(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualSetTransform: NPatch visual" );

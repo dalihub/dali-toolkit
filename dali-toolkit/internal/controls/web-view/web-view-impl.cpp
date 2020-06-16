@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace Dali
@@ -152,8 +153,11 @@ void WebView::LoadUrl( const std::string& url )
   mUrl = url;
   if( mWebEngine )
   {
-    Dali::Image image = Dali::NativeImage::New( *mWebEngine.GetNativeImageSource() );
-    mVisual = Toolkit::VisualFactory::Get().CreateVisual( image );
+    Texture texture = Dali::Texture::New( *mWebEngine.GetNativeImageSource() );
+        const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
+    mVisual = Toolkit::VisualFactory::Get().CreateVisual(
+      { { Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE } ,
+        { Toolkit::ImageVisual::Property::URL, nativeImageUrl } } );
 
     if( mVisual )
     {
@@ -168,8 +172,12 @@ void WebView::LoadHTMLString( const std::string& htmlString )
 {
   if( mWebEngine )
   {
-    Dali::Image image = Dali::NativeImage::New( *mWebEngine.GetNativeImageSource() );
-    mVisual = Toolkit::VisualFactory::Get().CreateVisual( image );
+    Texture texture = Dali::Texture::New( *mWebEngine.GetNativeImageSource() );
+    const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
+
+    mVisual = Toolkit::VisualFactory::Get().CreateVisual(
+      { { Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE } ,
+        { Toolkit::ImageVisual::Property::URL, nativeImageUrl } } );
 
     if( mVisual )
     {

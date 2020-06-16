@@ -158,15 +158,6 @@ public:
                              FittingMode::Type fittingMode = FittingMode::DEFAULT,
                              Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
 
-  /**
-   * @brief Create a new image visual with an Image type.
-   *
-   * @param[in] factoryCache The VisualFactoryCache object
-   * @param[in] shaderFactory The ImageVisualShaderFactory object
-   * @param[in] image The image to use
-   */
-  static ImageVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image );
-
 public:  // from Visual
 
   /**
@@ -209,15 +200,6 @@ protected:
                ImageDimensions size,
                FittingMode::Type fittingMode,
                Dali::SamplingMode::Type samplingMode );
-
-  /**
-   * @brief Constructor with an Image type.
-   *
-   * @param[in] factoryCache The VisualFactoryCache object
-   * @param[in] shaderFactory The ImageVisualShaderFactory object
-   * @param[in] image The image to use
-   */
-  ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -284,13 +266,6 @@ private:
   void AllocateMaskData();
 
   /**
-   * @brief Applies the image to the texture set used for this renderer
-   *
-   * @param[in] image The Image to apply to the texture set used for this renderer
-   */
-  void ApplyImageToSampler( const Image& image );
-
-  /**
    * @brief Load the texture, will try to atlas unless unable or param set to false.
    * @param[in, out] atlasing flag if the image has been put in a atlas (true), passing false will not atlas even if possible.
    * @param[out] atlasRect if atlasing is used this the texture area of the image in the atlas.
@@ -312,23 +287,10 @@ private:
   void InitializeRenderer();
 
   /**
-   * @brief Initializes the Dali::Renderer from an image handle
-   *
-   * @param[in] image The image handle to intialize this ImageVisual from
-   */
-  void InitializeRenderer( const Image& image );
-
-  /**
    * @brief Creates the Dali::Renderer (potentially from the renderer cache), initializing it
    * @param[in] textures to use
    */
   void CreateRenderer( TextureSet& textures );
-
-  /**
-   * @brief Creates the Dali::Renderer for NativeImage with custom sampler type and prefix, initializing it
-   * @param NativeImageRenderer
-   */
-  void CreateNativeImageRenderer( NativeImage& nativeImage );
 
   /**
    * Creates the texture set and adds the texture to it
@@ -360,7 +322,6 @@ private:
 
 private:
 
-  Image mImage;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
   VisualUrl mImageUrl;

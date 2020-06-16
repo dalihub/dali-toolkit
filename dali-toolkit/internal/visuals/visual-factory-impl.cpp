@@ -314,24 +314,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   return Toolkit::Visual::Base( visualPtr.Get() );
 }
 
-Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
-{
-  Visual::BasePtr visualPtr;
-
-  if( image )
-  {
-    visualPtr = ImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), image );
-  }
-
-  if( mDebugEnabled )
-  {
-    //Create a WireframeVisual if we have debug enabled
-    visualPtr = WireframeVisual::New( GetFactoryCache(), visualPtr );
-  }
-
-  return Toolkit::Visual::Base( visualPtr.Get() );
-}
-
 Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, ImageDimensions size )
 {
   Visual::BasePtr visualPtr;
