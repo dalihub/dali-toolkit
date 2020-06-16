@@ -434,7 +434,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::GRAB_HANDLE_IMAGE:
       {
         const std::string imageFileName = value.Get< std::string >();
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str() );
 
         if( impl.mDecorator && imageFileName.size() )
         {
@@ -446,7 +446,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE:
       {
         const std::string imageFileName = value.Get< std::string >();
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str() );
 
         if( impl.mDecorator && imageFileName.size() )
         {
