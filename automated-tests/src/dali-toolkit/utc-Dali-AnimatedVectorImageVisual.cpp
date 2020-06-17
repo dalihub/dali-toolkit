@@ -845,6 +845,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
+  tet_printf( "1. Visual is created.\n" );
+
   DummyControl actor = DummyControl::New( true );
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
@@ -866,6 +868,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   Property::Value* value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
   DALI_TEST_EQUALS( value->Get< int >(), 2, TEST_LOCATION );
 
+  tet_printf( "2. The current frame number is [%d].\n", value->Get< int >() );
+
   Property::Array array;
   array.PushBack( 0 );
   array.PushBack( 2 );
@@ -882,6 +886,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
   DALI_TEST_EQUALS( value->Get< int >(), 2, TEST_LOCATION );
+
+  tet_printf( "3. The current frame number is [%d].\n", value->Get< int >() );
 
   // Change play range
   attributes.Clear();
@@ -913,6 +919,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
   DALI_TEST_EQUALS( value->Get< int >(), 3, TEST_LOCATION );
 
+  tet_printf( "4. The current frame number is [%d].\n", value->Get< int >() );
+
   // Jump to the same position
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3 );
 
@@ -922,6 +930,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
   DALI_TEST_EQUALS( value->Get< int >(), 3, TEST_LOCATION );
+
+  tet_printf( "5. The current frame number is [%d].\n", value->Get< int >() );
 
   END_TEST;
 }
