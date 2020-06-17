@@ -22,7 +22,6 @@
 #include <cstring> // for strlen()
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>

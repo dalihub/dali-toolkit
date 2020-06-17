@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/object/handle-devel.h>
-#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
 
