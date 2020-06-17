@@ -295,7 +295,7 @@ void GaussianBlurView::OnInitialize()
   {
     mCompositingActor = Actor::New();
     mCompositingActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
-    mCompositingActor.SetProperty( DevelActor::Property::OPACITY,GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
+    mCompositingActor.SetProperty( Actor::Property::OPACITY,GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
     renderer = CreateRenderer( BASIC_VERTEX_SOURCE, BASIC_FRAGMENT_SOURCE );
     mCompositingActor.AddRenderer( renderer );
 

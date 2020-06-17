@@ -1743,7 +1743,7 @@ void TextEditor::UpdateScrollBar()
   {
     mAnimation = Animation::New( mAnimationPeriod.durationSeconds );
   }
-  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,1.0f);
   mAnimation.AnimateTo( Property( indicator, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN, mAnimationPeriod );
   mAnimation.Play();
   mAnimation.FinishedSignal().Connect( this, &TextEditor::OnScrollIndicatorAnimationFinished );

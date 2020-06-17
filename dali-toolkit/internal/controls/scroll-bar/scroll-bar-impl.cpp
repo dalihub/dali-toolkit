@@ -391,7 +391,7 @@ void ScrollBar::ShowIndicator()
   }
   else
   {
-    mIndicator.SetProperty( DevelActor::Property::OPACITY,mIndicatorShowAlpha);
+    mIndicator.SetProperty( Actor::Property::OPACITY,mIndicatorShowAlpha);
   }
 }
 
@@ -412,7 +412,7 @@ void ScrollBar::HideIndicator()
   }
   else
   {
-    mIndicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+    mIndicator.SetProperty( Actor::Property::OPACITY,0.0f);
   }
 }
 
@@ -433,7 +433,7 @@ void ScrollBar::ShowTransientIndicator()
   }
   else
   {
-    mIndicator.SetProperty( DevelActor::Property::OPACITY,mIndicatorShowAlpha);
+    mIndicator.SetProperty( Actor::Property::OPACITY,mIndicatorShowAlpha);
   }
   mAnimation.AnimateTo( Property( mIndicator, Actor::Property::COLOR_ALPHA ),
                         0.0f, AlphaFunction::EASE_IN, TimePeriod((mIndicatorShowDuration + mTransientIndicatorDuration), mIndicatorHideDuration) );

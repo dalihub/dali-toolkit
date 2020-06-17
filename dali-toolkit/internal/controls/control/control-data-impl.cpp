@@ -434,7 +434,7 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
         StopObservingVisual( currentRegisteredVisual );
 
         // If control staged and visual enabled then visuals will be swapped once ready
-        if(  self.OnStage() && enabled )
+        if(  self.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) && enabled )
         {
           // Check if visual is currently in the process of being replaced ( is in removal container )
           RegisteredVisualContainer::Iterator visualQueuedForRemoval;
@@ -524,7 +524,7 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
 
     Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
     // Put on stage if enabled and the control is already on the stage
-    if( ( enabled == VisualState::ENABLED ) && self.OnStage() )
+    if( ( enabled == VisualState::ENABLED ) && self.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
     {
       visualImpl.SetOnStage( self );
     }
@@ -588,7 +588,7 @@ void Control::Impl::EnableVisual( Property::Index index, bool enable )
 
     (*iter)->enabled = enable;
     Actor parentActor = mControlImpl.Self();
-    if ( mControlImpl.Self().OnStage() ) // If control not on Stage then Visual will be added when StageConnection is called.
+    if ( mControlImpl.Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) ) // If control not on Stage then Visual will be added when StageConnection is called.
     {
       if ( enable )
       {
@@ -664,7 +664,7 @@ void Control::Impl::ResourceReady( Visual::Base& object)
   }
 
   // A visual is ready so control may need relayouting if staged
-  if ( self.OnStage() )
+  if ( self.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     mControlImpl.RelayoutRequest();
   }

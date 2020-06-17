@@ -203,7 +203,7 @@ bool KeyboardFocusManager::SetCurrentFocusActor( Actor actor )
 bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
 {
   bool success = false;
-  if( actor && actor.IsKeyboardFocusable() && actor.OnStage() )
+  if( actor && actor.GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE ) && actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     Integration::SceneHolder currentWindow = Integration::SceneHolder::Get( actor );
 
@@ -227,7 +227,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
   }
 
   // Check whether the actor is in the stage and is keyboard focusable.
-  if( actor && actor.IsKeyboardFocusable() && actor.OnStage() )
+  if( actor && actor.GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE ) && actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     if( ( mIsFocusIndicatorShown == SHOW ) && ( mEnableFocusIndicator == ENABLE ) )
     {
@@ -301,7 +301,7 @@ Actor KeyboardFocusManager::GetCurrentFocusActor()
 {
   Actor actor = mCurrentFocusActor.GetHandle();
 
-  if( actor && ! actor.OnStage() )
+  if( actor && ! actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     // If the actor has been removed from the stage, then it should not be focused
     actor.Reset();
@@ -323,7 +323,7 @@ Actor KeyboardFocusManager::GetFocusActorFromCurrentWindow()
     }
   }
 
-  if( actor && ! actor.OnStage() )
+  if( actor && ! actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     // If the actor has been removed from the window, then the window doesn't have any focused actor
     actor.Reset();
@@ -353,7 +353,7 @@ void KeyboardFocusManager::MoveFocusBackward()
       Actor target = mFocusHistory[ mFocusHistory.size() -1 ].GetHandle();
 
       // Impl of Actor is not null
-      if( target && target.OnStage() )
+      if( target && target.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
       {
         // Delete pre focused actor in history because it will pushed again by SetCurrentFocusActor()
         mFocusHistory.pop_back();
@@ -504,7 +504,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
       }
     }
 
-    if( nextFocusableActor && nextFocusableActor.IsKeyboardFocusable() )
+    if( nextFocusableActor && nextFocusableActor.GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE ) )
     {
       // Whether the next focusable actor is a layout control
       if( IsLayoutControl( nextFocusableActor ) )
@@ -530,7 +530,7 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
   Actor nextFocusableActor = GetImplementation( control ).GetNextKeyboardFocusableActor(actor, direction, mFocusGroupLoopEnabled);
   if(nextFocusableActor)
   {
-    if(!nextFocusableActor.IsKeyboardFocusable())
+    if(!nextFocusableActor.GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE ))
     {
       // If the actor is not focusable, ask the same layout control for the next actor to focus
       return DoMoveFocusWithinLayoutControl(control, nextFocusableActor, direction);
@@ -549,7 +549,7 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
 
-      if (committedFocusActor && committedFocusActor.IsKeyboardFocusable())
+      if (committedFocusActor && committedFocusActor.GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE ))
       {
         // Whether the commited focusable actor is a layout control
         if(IsLayoutControl(committedFocusActor))

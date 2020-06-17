@@ -857,7 +857,7 @@ int UtcDaliTableViewKeyboardFocus(void)
   ToolkitTestApplication application;
 
   TableView tableView = TableView::New(4,4);
-  tableView.SetKeyboardFocusable( true );
+  tableView.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
   tableView.SetProperty( Dali::Actor::Property::NAME, "TableView");
 
   for ( int row = 0; row < 4; ++row )
@@ -868,7 +868,7 @@ int UtcDaliTableViewKeyboardFocus(void)
       std::ostringstream str;
       str << row << "-" << col;
       control.SetProperty( Dali::Actor::Property::NAME, str.str() );
-      control.SetKeyboardFocusable( true );
+      control.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
       tableView.AddChild( control, TableView::CellPosition( row, col ) );
     }
   }
@@ -938,7 +938,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
   ToolkitTestApplication application;
 
   TableView tableView = TableView::New(3, 3);
-  tableView.SetKeyboardFocusable( true );
+  tableView.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
   tableView.SetProperty( Dali::Actor::Property::NAME, "TableView");
 
   for ( int row = 0; row < 3; ++row )
@@ -962,7 +962,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
             std::ostringstream nameStr;
             nameStr << row << "-" << col << "-" << childRow << "-" << childCol;
             control.SetProperty( Dali::Actor::Property::NAME, nameStr.str() );
-            control.SetKeyboardFocusable( true );
+            control.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
             childTableView.AddChild( control, TableView::CellPosition( childRow, childCol ) );
           }
         }
@@ -972,7 +972,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
       {
         Control control = Control::New();
         control.SetProperty( Dali::Actor::Property::NAME, str.str() );
-        control.SetKeyboardFocusable( true );
+        control.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
         tableView.AddChild( control, TableView::CellPosition( row, col ) );
       }
     }
