@@ -498,7 +498,7 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
       }
       else
       {
-        Image brokenImage = mFactoryCache.GetBrokenVisualImage();
+        Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
 
         naturalSize.x = brokenImage.GetWidth();
         naturalSize.y = brokenImage.GetWidth();
@@ -806,24 +806,20 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
       mPlacementActor.Reset();
     }
 
-    if( loadingSuccess )
+    if( !loadingSuccess )
     {
-      Sampler sampler = Sampler::New();
-      sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
-      textureSet.SetSampler( 0u, sampler );
-      mImpl->mRenderer.SetTextures(textureSet);
-    }
-    else
-    {
-      Image brokenImage = mFactoryCache.GetBrokenVisualImage();
+      Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
 
       textureSet = TextureSet::New();
+      textureSet.SetTexture(0u, brokenImage);
       mImpl->mRenderer.SetTextures( textureSet );
-      TextureSetImage( textureSet, 0u, brokenImage );
-      Sampler sampler = Sampler::New();
-      sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
-      textureSet.SetSampler( 0u, sampler );
     }
+
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
+    textureSet.SetSampler( 0u, sampler );
+    mImpl->mRenderer.SetTextures(textureSet);
+
   }
 
   // Storing TextureSet needed when renderer staged.

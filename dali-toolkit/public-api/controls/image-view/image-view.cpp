@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES

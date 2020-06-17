@@ -230,3 +230,25 @@ int UtcDaliToolkitTextSelectionToolBarScrollView(void)
   END_TEST;
 }
 
+
+
+int UtcDaliToolkitTextSelectionPopupIconProperties(void)
+{
+  ToolkitTestApplication application;
+  TextSelectionPopup popup = TextSelectionPopup::New(nullptr);
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE, "POPUP_CLIPBOARD_BUTTON_ICON_IMAGE");
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE, "POPUP_CUT_BUTTON_ICON_IMAGE");
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_COPY_BUTTON_ICON_IMAGE, "POPUP_COPY_BUTTON_ICON_IMAGE");
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE, "POPUP_PASTE_BUTTON_ICON_IMAGE");
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE, "POPUP_SELECT_BUTTON_ICON_IMAGE");
+  popup.SetProperty(TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE, "POPUP_SELECT_ALL_BUTTON_ICON_IMAGE");
+
+  DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_CLIPBOARD_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_CUT_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::POPUP_COPY_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_COPY_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_PASTE_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_SELECT_BUTTON_ICON_IMAGE", TEST_LOCATION);
+  DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE).Get<std::string>(), "POPUP_SELECT_ALL_BUTTON_ICON_IMAGE", TEST_LOCATION);
+
+  END_TEST;
+}

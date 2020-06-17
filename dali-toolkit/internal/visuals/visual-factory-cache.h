@@ -32,7 +32,7 @@
 
 namespace Dali
 {
-class Image;
+class Texture;
 
 namespace Toolkit
 {
@@ -168,10 +168,10 @@ public:
   static Geometry CreateGridGeometry( Uint16Pair gridSize );
 
   /**
-   * @brief Returns an image to be used when a visual has failed to correctly render
-   * @return The broken image handle.
+   * @brief Returns a new Texture to use when a visual has failed to correctly render
+   * @return The broken image texture.
    */
-  Image GetBrokenVisualImage();
+  Texture GetBrokenVisualImage();
 
   /**
    * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
@@ -246,6 +246,7 @@ private:
   ImageAtlasManagerPtr                     mAtlasManager;
   TextureManager                           mTextureManager;
   NPatchLoader                             mNPatchLoader;
+  Texture                                  mBrokenImageTexture;
   SvgRasterizeThread*                      mSvgRasterizeThread;
   std::unique_ptr< VectorAnimationThread > mVectorAnimationThread;
   std::string                              mBrokenImageUrl;
