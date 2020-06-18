@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/public-api/controls/model3d-view/model3d-view.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 

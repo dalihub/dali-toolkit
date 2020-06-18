@@ -238,7 +238,7 @@ int UtcDaliDebugRenderingGetVisual2(void)
   map[ ImageVisual::Property::URL ] = TEST_IMAGE_FILE_NAME;
   Visual::Base imageVisual = factory.CreateVisual( map );
   DALI_TEST_CHECK( imageVisual );
-  TestDebugVisual( imageVisual, Visual::IMAGE, Vector2::ZERO);
+  TestDebugVisual( imageVisual, Visual::IMAGE, Vector2(64.0f, 64.0f /* Broken Image Size */ ));
 
   // Test that n patch visual is replaced with debug visual
   Visual::Base nPatchVisual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );

@@ -22,9 +22,7 @@
 #include <memory>
 
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES

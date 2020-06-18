@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/object/handle-devel.h>
-#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
 
@@ -619,8 +618,8 @@ void NPatchVisual::ApplyTextureAndUniforms()
     DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.GetUrl().c_str() );
     textureSet = TextureSet::New();
 
-    Image croppedImage = mFactoryCache.GetBrokenVisualImage();
-    TextureSetImage( textureSet, 0u, croppedImage );
+    Texture croppedImage = mFactoryCache.GetBrokenVisualImage();
+    textureSet.SetTexture( 0u, croppedImage );
     mImpl->mRenderer.RegisterProperty( "uFixed[0]", Vector2::ZERO );
     mImpl->mRenderer.RegisterProperty( "uFixed[1]", Vector2::ZERO );
     mImpl->mRenderer.RegisterProperty( "uFixed[2]", Vector2::ZERO );
