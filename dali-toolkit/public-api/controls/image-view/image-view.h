@@ -104,13 +104,11 @@ public:
     {
       // Event side properties
 
-      RESERVED_PROPERTY_01 = PROPERTY_START_INDEX, ///< Reserved index for a removed property.
-
       /**
        * @brief name "image", type string if it is a url, map otherwise.
        * @SINCE_1_0.0
        */
-      IMAGE,
+      IMAGE = PROPERTY_START_INDEX,
 
       /**
        * @brief name "preMultipliedAlpha", type Boolean.

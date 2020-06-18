@@ -161,39 +161,6 @@ public:
       VERTICAL_ALIGNMENT,
 
       /**
-       * @DEPRECATED_1_2.60 Use the new enum value of TEXT_COLOR instead.
-       * @brief The color of the text.
-       * @details Name "unusedPropertyTextColor", type Property::VECTOR4.
-       * @SINCE_1_0.0
-       */
-      UNUSED_PROPERTY_TEXT_COLOR,
-
-      /**
-       * @brief This property is removed because it's deprecated.
-       */
-      RESERVED_PROPERTY_01,
-
-      /**
-       * @brief This property is removed because it's deprecated.
-       */
-      RESERVED_PROPERTY_02,
-
-      /**
-       * @brief This property is removed because it's deprecated.
-       */
-      RESERVED_PROPERTY_03,
-
-      /**
-       * @brief This property is removed because it's deprecated.
-       */
-      RESERVED_PROPERTY_04,
-
-      /**
-       * @brief This property is removed because it's deprecated.
-       */
-      RESERVED_PROPERTY_05,
-
-      /**
        * @brief Whether the mark-up processing is enabled.
        * @details Name "enableMarkup", type Property::BOOLEAN.
        * @SINCE_1_0.0

@@ -107,9 +107,6 @@ public:
        */
       STYLE_NAME = PROPERTY_START_INDEX,
 
-      RESERVED_PROPERTY_01, ///< Reserved index for a removed property.
-      RESERVED_PROPERTY_02, ///< Reserved index for a removed property.
-
       /**
        * @brief Receives key events to the control.
        * @details Name "keyInputFocus", type Property::BOOLEAN.

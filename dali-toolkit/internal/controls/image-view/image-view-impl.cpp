@@ -54,7 +54,6 @@ BaseHandle Create()
 
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ImageView, Toolkit::Control, Create );
-DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "reservedProperty01", STRING, RESERVED_PROPERTY_01 )
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "image", MAP, IMAGE )
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "preMultipliedAlpha", BOOLEAN, PRE_MULTIPLIED_ALPHA )
 
