@@ -494,7 +494,7 @@ void TextSelectionPopup::SetDimensionToCustomise( const PopupCustomisations& set
   } // switch
 }
 
-Size TextSelectionPopup::GetDimensionToCustomise( const PopupCustomisations& settingToCustomise )
+Size TextSelectionPopup::GetDimensionToCustomise( const PopupCustomisations& settingToCustomise ) const
 {
   switch( settingToCustomise )
   {
@@ -567,48 +567,49 @@ void TextSelectionPopup::SetButtonImage( Toolkit::TextSelectionPopup::Buttons bu
    } // switch
 }
 
-std::string TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::Buttons button )
+const std::string& TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::Buttons button ) const
 {
-  std::string buttonImageUrl;
   switch ( button )
   {
-    case Toolkit::TextSelectionPopup::CLIPBOARD :
+    case Toolkit::TextSelectionPopup::CLIPBOARD:
     {
-      buttonImageUrl = mClipboardIconImage;
+      return mClipboardIconImage;
       break;
     }
-    case Toolkit::TextSelectionPopup::CUT :
+    case Toolkit::TextSelectionPopup::CUT:
     {
-      buttonImageUrl = mCutIconImage;
+      return mCutIconImage;
       break;
     }
-    case Toolkit::TextSelectionPopup::COPY :
+    case Toolkit::TextSelectionPopup::COPY:
     {
-      buttonImageUrl = mCopyIconImage;
+      return mCopyIconImage;
       break;
     }
-    case Toolkit::TextSelectionPopup::PASTE :
+    case Toolkit::TextSelectionPopup::PASTE:
     {
-      buttonImageUrl = mPasteIconImage;
+      return mPasteIconImage;
       break;
     }
-    case Toolkit::TextSelectionPopup::SELECT :
+    case Toolkit::TextSelectionPopup::SELECT:
     {
-      buttonImageUrl = mSelectIconImage;
+      return mSelectIconImage;
       break;
     }
-    case Toolkit::TextSelectionPopup::SELECT_ALL :
+    case Toolkit::TextSelectionPopup::SELECT_ALL:
     {
-      buttonImageUrl = mSelectAllIconImage;
+      return mSelectAllIconImage;
       break;
     }
-    default :
+    case Toolkit::TextSelectionPopup::NONE:
     {
-      DALI_ASSERT_DEBUG( "TextSelectionPopup GetPopupImage Unknown Button" );
+      break;
     }
   } // switch
 
-  return buttonImageUrl;
+  DALI_ASSERT_DEBUG( "TextSelectionPopup GetPopupImage Unknown Button" );
+  static std::string empty;
+  return empty;
 }
 
 void TextSelectionPopup::SetPressedImage( const std::string& filename )
@@ -740,7 +741,7 @@ std::string TextSelectionPopup::GetPressedImage() const
    }
  }
 
- std::size_t TextSelectionPopup::GetNumberOfEnabledOptions()
+ std::size_t TextSelectionPopup::GetNumberOfEnabledOptions() const
  {
    std::size_t numberOfOptions = 0u;
    for( std::vector<ButtonRequirement>::const_iterator it = mOrderListOfButtons.begin(), endIt = mOrderListOfButtons.end(); ( it != endIt ); ++it )
