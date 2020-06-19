@@ -19,7 +19,6 @@
 #include "image-view-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -54,7 +53,6 @@ BaseHandle Create()
 
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ImageView, Toolkit::Control, Create );
-DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "reservedProperty01", STRING, RESERVED_PROPERTY_01 )
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "image", MAP, IMAGE )
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "preMultipliedAlpha", BOOLEAN, PRE_MULTIPLIED_ALPHA )
 
@@ -99,47 +97,11 @@ void ImageView::OnInitialize()
   handle.ResourceReadySignal().Connect( this, &ImageView::OnResourceReady );
 }
 
-void ImageView::SetImage( Image image )
-{
-  // Don't bother comparing if we had a visual previously, just drop old visual and create new one
-  mImage = image;
-  mUrl.clear();
-  mPropertyMap.Clear();
-
-  Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( image );
-  if( visual )
-  {
-    if( !mVisual )
-    {
-      mVisual = visual;
-    }
-
-    if( !mShaderMap.Empty() )
-    {
-      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
-      visualImpl.SetCustomShader( mShaderMap );
-    }
-
-    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual );
-  }
-  else
-  {
-    // Unregister the existing visual
-    DevelControl::UnregisterVisual( *this, Toolkit::ImageView::Property::IMAGE );
-
-    // Trigger a size negotiation request that may be needed when unregistering a visual.
-    RelayoutRequest();
-  }
-
-  // Signal that a Relayout may be needed
-}
-
 void ImageView::SetImage( const Property::Map& map )
 {
   // Comparing a property map is too expensive so just creating a new visual
   mPropertyMap = map;
   mUrl.clear();
-  mImage.Reset();
 
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
   if( visual )
@@ -175,7 +137,6 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
   // Don't bother comparing if we had a visual previously, just drop old visual and create new one
   mUrl = url;
   mImageSize = size;
-  mImage.Reset();
   mPropertyMap.Clear();
 
   // Don't set mVisual until it is ready and shown. Getters will still use current visual.
@@ -205,11 +166,6 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
   }
 
   // Signal that a Relayout may be needed
-}
-
-Image ImageView::GetImage() const
-{
-  return mImage;
 }
 
 void ImageView::EnablePreMultipliedAlpha( bool preMultipled )
@@ -316,11 +272,12 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
     mVisual.SetTransformAndSize( transformMap, size );
 
     // mVisual is not updated util the resource is ready in the case of visual replacement.
-    // So apply the transform and size to the new visual.
+    // in this case, the Property Map must be initialized so that the previous value is not reused.
+    // after mVisual is updated, the correct value will be reset.
     Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
     if( visual && visual != mVisual )
     {
-      visual.SetTransformAndSize( transformMap, size );
+      visual.SetTransformAndSize( Property::Map(), size );
     }
   }
 }
@@ -504,10 +461,6 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
                 {
                   impl.SetImage( impl.mUrl, impl.mImageSize );
                 }
-                else if( impl.mImage )
-                {
-                  impl.SetImage( impl.mImage );
-                }
                 else if( !impl.mPropertyMap.Empty() )
                 {
                   impl.SetImage( impl.mPropertyMap );
@@ -548,12 +501,6 @@ Property::Value ImageView::GetProperty( BaseObject* object, Property::Index prop
         if ( !impl.mUrl.empty() )
         {
           value = impl.mUrl;
-        }
-        else if( impl.mImage )
-        {
-          Property::Map map;
-          Scripting::CreatePropertyMap( impl.mImage, map );
-          value = map;
         }
         else
         {

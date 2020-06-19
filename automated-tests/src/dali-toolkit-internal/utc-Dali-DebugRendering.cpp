@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,10 +233,12 @@ int UtcDaliDebugRenderingGetVisual2(void)
   TestDebugVisual( borderVisual, Visual::BORDER, Vector2::ZERO );
 
   // Test that image visual is replaced with debug visual
-  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  Visual::Base imageVisual = factory.CreateVisual( image );
+  map.Clear();
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::IMAGE;
+  map[ ImageVisual::Property::URL ] = TEST_IMAGE_FILE_NAME;
+  Visual::Base imageVisual = factory.CreateVisual( map );
   DALI_TEST_CHECK( imageVisual );
-  TestDebugVisual( imageVisual, Visual::IMAGE, Vector2::ZERO);
+  TestDebugVisual( imageVisual, Visual::IMAGE, Vector2(64.0f, 64.0f /* Broken Image Size */ ));
 
   // Test that n patch visual is replaced with debug visual
   Visual::Base nPatchVisual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );

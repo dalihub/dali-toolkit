@@ -49,8 +49,6 @@ namespace Property
       VERTICAL_ALIGNMENT = Dali::Toolkit::TextField::Property::VERTICAL_ALIGNMENT,
       TEXT_COLOR = Dali::Toolkit::TextField::Property::TEXT_COLOR,
       PLACEHOLDER_TEXT_COLOR = Dali::Toolkit::TextField::Property::PLACEHOLDER_TEXT_COLOR,
-      RESERVED_PROPERTY_01 = Dali::Toolkit::TextField::Property::RESERVED_PROPERTY_01,
-      RESERVED_PROPERTY_02 = Dali::Toolkit::TextField::Property::RESERVED_PROPERTY_02,
       PRIMARY_CURSOR_COLOR = Dali::Toolkit::TextField::Property::PRIMARY_CURSOR_COLOR,
       SECONDARY_CURSOR_COLOR = Dali::Toolkit::TextField::Property::SECONDARY_CURSOR_COLOR,
       ENABLE_CURSOR_BLINK = Dali::Toolkit::TextField::Property::ENABLE_CURSOR_BLINK,

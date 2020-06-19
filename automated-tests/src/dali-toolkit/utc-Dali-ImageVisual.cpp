@@ -59,7 +59,7 @@ std::vector<int> gReadyIds = {};
 void ResourceReadySignal( Control control )
 {
   gResourceReadySignalFired = true;
-  gReadyIds.push_back(control.GetId());
+  gReadyIds.push_back(control.GetProperty< int >( Actor::Property::ID ));
 }
 void ClearReadyIds()
 {
@@ -569,39 +569,6 @@ int UtcDaliImageVisualTextureReuse2(void)
   END_TEST;
 }
 
-
-int UtcDaliImageVisualImageHandle(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "Request image visual with an image handle" );
-
-  VisualFactory factory = VisualFactory::Get();
-  DALI_TEST_CHECK( factory );
-
-  Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
-  Visual::Base visual = factory.CreateVisual( image );
-
-  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
-  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
-
-  const int width=512;
-  const int height=513;
-
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, width, height,width, height );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  TraceCallStack& textureTrace = gl.GetTextureTrace();
-  textureTrace.Enable(true);
-
-  DummyControl actor = DummyControl::New();
-  TestVisualRender( application, actor, visual, 1u,
-                    ImageDimensions(width, height),
-                    Integration::ResourcePointer(bitmap) );
-
-  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
-  END_TEST;
-}
 
 int UtcDaliImageVisualCustomWrapModePixelArea(void)
 {
@@ -2295,7 +2262,7 @@ void ResourceReadyLoadNext( Control control )
   static int callNumber = 0;
 
   gResourceReadySignalFired = true;
-  gReadyIds.push_back(control.GetId());
+  gReadyIds.push_back(control.GetProperty< int >( Actor::Property::ID ));
 
   if( callNumber == 0 )
   {
@@ -2328,7 +2295,7 @@ int UtcDaliImageVisualLoadReady01(void)
 
   tet_infoline( "Create a control and connect to resource ready signal" );
   DummyControl actor = DummyControl::New(true);
-  int actor1Id = actor.GetId();
+  int actor1Id = actor.GetProperty< int >( Actor::Property::ID );
   actor.ResourceReadySignal().Connect( &ResourceReadySignal);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
@@ -2359,7 +2326,7 @@ int UtcDaliImageVisualLoadReady01(void)
   Visual::Base imageVisual2 = CreateVisualWithPolicy( TEST_BROKEN_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
 
   DummyControl actor2 = DummyControl::New(true);
-  int actor2Id = actor2.GetId();
+  int actor2Id = actor2.GetProperty< int >( Actor::Property::ID );
   Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(actor2.GetImplementation());
   actor2.ResourceReadySignal().Connect( &ResourceReadyLoadNext);
 

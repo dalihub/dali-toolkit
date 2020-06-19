@@ -22,7 +22,6 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/images/resource-image.h>
 
 #if defined(DEBUG_ENABLED)
   extern Debug::Filter* gLogButtonFilter;

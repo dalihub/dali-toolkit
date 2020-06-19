@@ -985,13 +985,13 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
 
       if(actor)
       {
-        DALI_SCRIPT_VERBOSE("  Is Actor id=%d\n", actor.GetId());
+        DALI_SCRIPT_VERBOSE("  Is Actor id=%d\n", actor.GetProperty< int >( Actor::Property::ID ));
       }
 
       Toolkit::Control control  = Toolkit::Control::DownCast(handle);
       if(control)
       {
-        DALI_SCRIPT_VERBOSE("  Is Control id=%d\n", actor.GetId());
+        DALI_SCRIPT_VERBOSE("  Is Control id=%d\n", actor.GetProperty< int >( Actor::Property::ID ));
       }
 #endif // DEBUG_ENABLED
 

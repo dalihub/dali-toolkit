@@ -22,9 +22,6 @@
 #include <cstring> // for strlen()
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/images/resource-image.h>
-#include <dali/public-api/images/native-image.h>
-#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -99,8 +96,6 @@ DALI_ENUM_TO_STRING_TABLE_END( RELEASE_POLICY )
 
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
-const char* DEFAULT_SAMPLER_TYPENAME = "sampler2D";
-
 const float PIXEL_ALIGN_ON = 1.0f;
 const float PIXEL_ALIGN_OFF = 0.0f;
 
@@ -146,19 +141,13 @@ ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
   return new ImageVisual( factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode );
 }
 
-ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
-{
-  return new ImageVisual( factoryCache, shaderFactory, image );
-}
-
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
                           ImageVisualShaderFactory& shaderFactory,
                           const VisualUrl& imageUrl,
                           ImageDimensions size,
                           FittingMode::Type fittingMode,
                           Dali::SamplingMode::Type samplingMode )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
-  mImage(),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::IMAGE ),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl( imageUrl ),
@@ -180,32 +169,6 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mOrientationCorrection( true )
 {
   EnablePreMultipliedAlpha( mFactoryCache.GetPreMultiplyOnLoad() );
-}
-
-ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
-  mImage( image ),
-  mPixelArea( FULL_TEXTURE_RECT ),
-  mPlacementActor(),
-  mImageUrl(),
-  mMaskingData( ),
-  mDesiredSize(),
-  mTextureId( TextureManager::INVALID_TEXTURE_ID ),
-  mTextures(),
-  mImageVisualShaderFactory( shaderFactory ),
-  mFittingMode( FittingMode::DEFAULT ),
-  mSamplingMode( SamplingMode::DEFAULT ),
-  mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT ),
-  mLoadPolicy( Toolkit::ImageVisual::LoadPolicy::ATTACHED ),
-  mReleasePolicy( Toolkit::ImageVisual::ReleasePolicy::DESTROYED ),
-  mAtlasRect( 0.0f, 0.0f, 0.0f, 0.0f ),
-  mAttemptAtlasing( false ),
-  mLoading( false ),
-  mOrientationCorrection( true )
-{
-  // PreMultiplied alpha should be disabled when the Image is used.
-  EnablePreMultipliedAlpha( false );
 }
 
 ImageVisual::~ImageVisual()
@@ -482,13 +445,7 @@ void ImageVisual::AllocateMaskData()
 
 void ImageVisual::GetNaturalSize( Vector2& naturalSize )
 {
-  if(mImage)
-  {
-    naturalSize.x = mImage.GetWidth();
-    naturalSize.y = mImage.GetHeight();
-    return;
-  }
-  else if( mDesiredSize.GetWidth()>0 && mDesiredSize.GetHeight()>0)
+  if( mDesiredSize.GetWidth()>0 && mDesiredSize.GetHeight()>0)
   {
     naturalSize.x = mDesiredSize.GetWidth();
     naturalSize.y = mDesiredSize.GetHeight();
@@ -540,7 +497,7 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
       }
       else
       {
-        Image brokenImage = mFactoryCache.GetBrokenVisualImage();
+        Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
 
         naturalSize.x = brokenImage.GetWidth();
         naturalSize.y = brokenImage.GetWidth();
@@ -602,60 +559,6 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 
   EnablePreMultipliedAlpha( IsPreMultipliedAlphaEnabled() );
-}
-
-void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
-{
-  Geometry geometry;
-  Shader shader;
-
-  std::string fragmentShader;
-  const char* fragmentPreFix = nativeImage.GetCustomFragmentPreFix();
-  const char* customSamplerTypename = nativeImage.GetCustomSamplerTypename();
-
-  if( fragmentPreFix )
-  {
-    fragmentShader = fragmentPreFix;
-    fragmentShader += "\n";
-  }
-
-  if( mImpl->mCustomShader && !mImpl->mCustomShader->mFragmentShader.empty() )
-  {
-    fragmentShader += mImpl->mCustomShader->mFragmentShader;
-  }
-  else
-  {
-    fragmentShader += mImageVisualShaderFactory.GetFragmentShaderSource();
-  }
-
-  if( customSamplerTypename )
-  {
-    fragmentShader.replace( fragmentShader.find( DEFAULT_SAMPLER_TYPENAME ), strlen( DEFAULT_SAMPLER_TYPENAME ), customSamplerTypename );
-  }
-
-  if( !mImpl->mCustomShader )
-  {
-    geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
-
-    shader  = Shader::New( mImageVisualShaderFactory.GetVertexShaderSource(), fragmentShader );
-    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-  }
-  else
-  {
-    geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
-    shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource() : mImpl->mCustomShader->mVertexShader,
-                           fragmentShader,
-                           mImpl->mCustomShader->mHints );
-    if( mImpl->mCustomShader->mVertexShader.empty() )
-    {
-      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-    }
-  }
-
-  mImpl->mRenderer = Renderer::New( geometry, shader );
-
-  //Register transform properties
-  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
 void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection,
@@ -733,34 +636,11 @@ void ImageVisual::InitializeRenderer()
   }
 }
 
-void ImageVisual::InitializeRenderer( const Image& image )
-{
-  TextureSet textures = TextureSet::New();
-
-  NativeImage nativeImage = NativeImage::DownCast( image );
-  if( nativeImage )
-  {
-    CreateNativeImageRenderer( nativeImage );
-    DALI_ASSERT_DEBUG( textures );
-    mImpl->mRenderer.SetTextures( textures );
-  }
-  else
-  {
-    // reuse existing code for regular images
-    CreateRenderer( textures ); // Textures will be retreived from Image
-  }
-  ApplyImageToSampler( image );
-}
-
 void ImageVisual::DoSetOnStage( Actor& actor )
 {
   if( mImageUrl.IsValid() )
   {
     InitializeRenderer();
-  }
-  else if( mImage )
-  {
-    InitializeRenderer( mImage );
   }
 
   if( !mImpl->mRenderer )
@@ -804,11 +684,6 @@ void ImageVisual::DoSetOffStage( Actor& actor )
     mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
   }
 
-  if( mImageUrl.IsValid() )
-  {
-    // Legacy support for deprecated Dali::Image
-    mImage.Reset();
-  }
   mLoading = false;
   mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
@@ -826,17 +701,6 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
     map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
     map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );
     map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight() );
-  }
-  else if( mImage )
-  {
-    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, static_cast<int>(mImage.GetWidth()) );
-    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, static_cast<int>(mImage.GetHeight()) );
-
-    ResourceImage resourceImage = ResourceImage::DownCast(mImage);
-    if( resourceImage )
-    {
-      map.Insert( Toolkit::ImageVisual::Property::URL, resourceImage.GetUrl() );
-    }
   }
 
   map.Insert( Toolkit::ImageVisual::Property::FITTING_MODE, mFittingMode );
@@ -869,11 +733,6 @@ void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
     map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );
     map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight() );
   }
-  else if( mImage )
-  {
-    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, static_cast<int>(mImage.GetWidth()) );
-    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, static_cast<int>(mImage.GetHeight()) );
-  }
 }
 
 void ImageVisual::OnDoAction( const Dali::Property::Index actionName, const Dali::Property::Value& attributes )
@@ -904,20 +763,6 @@ bool ImageVisual::IsResourceReady() const
 {
   return ( mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
            mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED );
-}
-
-void ImageVisual::ApplyImageToSampler( const Image& image )
-{
-  if( image )
-  {
-    TextureSet textureSet = mImpl->mRenderer.GetTextures();
-    DALI_ASSERT_DEBUG( textureSet ); // texture set should always exist by this time
-
-    TextureSetImage( textureSet, 0u, image );
-    Sampler sampler = Sampler::New();
-    sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
-    textureSet.SetSampler( 0u, sampler );
-  }
 }
 
 // From existing atlas manager
@@ -960,22 +805,20 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
       mPlacementActor.Reset();
     }
 
-    if( loadingSuccess )
+    if( !loadingSuccess )
     {
-      Sampler sampler = Sampler::New();
-      sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
-      textureSet.SetSampler( 0u, sampler );
-      mImpl->mRenderer.SetTextures(textureSet);
-    }
-    else
-    {
-      Image brokenImage = mFactoryCache.GetBrokenVisualImage();
+      Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
 
       textureSet = TextureSet::New();
+      textureSet.SetTexture(0u, brokenImage);
       mImpl->mRenderer.SetTextures( textureSet );
-
-      ApplyImageToSampler( brokenImage );
     }
+
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
+    textureSet.SetSampler( 0u, sampler );
+    mImpl->mRenderer.SetTextures(textureSet);
+
   }
 
   // Storing TextureSet needed when renderer staged.

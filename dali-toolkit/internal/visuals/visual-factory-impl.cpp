@@ -19,7 +19,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/images/image.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -309,24 +308,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   {
     //Create a WireframeVisual if we have debug enabled
     visualPtr = WireframeVisual::New(GetFactoryCache(), visualPtr, propertyMap );
-  }
-
-  return Toolkit::Visual::Base( visualPtr.Get() );
-}
-
-Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
-{
-  Visual::BasePtr visualPtr;
-
-  if( image )
-  {
-    visualPtr = ImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), image );
-  }
-
-  if( mDebugEnabled )
-  {
-    //Create a WireframeVisual if we have debug enabled
-    visualPtr = WireframeVisual::New( GetFactoryCache(), visualPtr );
   }
 
   return Toolkit::Visual::Base( visualPtr.Get() );

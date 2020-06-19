@@ -297,7 +297,7 @@ bool Control::IsKeyboardNavigationSupported()
 
 void Control::SetKeyInputFocus()
 {
-  if( Self().OnStage() )
+  if( Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     Toolkit::KeyInputFocusManager::Get().SetFocus(Toolkit::Control::DownCast(Self()));
   }
@@ -306,7 +306,7 @@ void Control::SetKeyInputFocus()
 bool Control::HasKeyInputFocus()
 {
   bool result = false;
-  if( Self().OnStage() )
+  if( Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     Toolkit::Control control = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
     if( Self() == control )
@@ -319,7 +319,7 @@ bool Control::HasKeyInputFocus()
 
 void Control::ClearKeyInputFocus()
 {
-  if( Self().OnStage() )
+  if( Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     Toolkit::KeyInputFocusManager::Get().RemoveFocus(Toolkit::Control::DownCast(Self()));
   }
@@ -596,7 +596,7 @@ void Control::OnPropertySet( Property::Index index, Property::Value propertyValu
 {
   // If the clipping mode has been set, we may need to create a renderer.
   // Only do this if we are already on-stage as the OnStageConnection will handle the off-stage clipping controls.
-  if( ( index == Actor::Property::CLIPPING_MODE ) && Self().OnStage() )
+  if( ( index == Actor::Property::CLIPPING_MODE ) && Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     // Note: This method will handle whether creation of the renderer is required.
     CreateClippingRenderer( *this );

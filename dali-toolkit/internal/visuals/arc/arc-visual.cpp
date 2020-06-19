@@ -23,6 +23,7 @@
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/arc-visual-actions-devel.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -153,12 +154,15 @@ ArcVisualPtr ArcVisual::New( VisualFactoryCache& factoryCache, const Property::M
 }
 
 ArcVisual::ArcVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, static_cast<Toolkit::Visual::Type>( Toolkit::DevelVisual::ARC ) ),
   mThickness( 0.0f ),
   mRadius( 0.0f ),
   mStartAngle( 0.0f ),
   mSweepAngle( 360.0f ),
   mRadiusIndex( Property::INVALID_INDEX ),
+  mThicknessIndex( Property::INVALID_INDEX ),
+  mStartAngleIndex( Property::INVALID_INDEX ),
+  mSweepAngleIndex( Property::INVALID_INDEX ),
   mCapType( DevelArcVisual::Cap::BUTT )
 {
 }
@@ -176,6 +180,16 @@ void ArcVisual::DoSetProperties( const Property::Map& propertyMap )
     {
       DALI_LOG_ERROR( "ArcVisual:DoSetProperties:: THICKNESS property has incorrect type: %d\n", thicknessValue->GetType() );
     }
+    else
+    {
+      if( mImpl->mRenderer )
+      {
+        mImpl->mRenderer.SetProperty( mThicknessIndex, mThickness );
+
+        // Need to calculate radius again
+        OnSetTransform();
+      }
+    }
   }
 
   Property::Value* startAngleValue = propertyMap.Find( Toolkit::DevelArcVisual::Property::START_ANGLE, START_ANGLE_NAME );
@@ -185,6 +199,13 @@ void ArcVisual::DoSetProperties( const Property::Map& propertyMap )
     {
       DALI_LOG_ERROR( "ArcVisual:DoSetProperties:: START_ANGLE property has incorrect type: %d\n", startAngleValue->GetType() );
     }
+    else
+    {
+      if( mImpl->mRenderer )
+      {
+        mImpl->mRenderer.SetProperty( mStartAngleIndex, mStartAngle );
+      }
+    }
   }
 
   Property::Value* sweepAngleValue = propertyMap.Find( Toolkit::DevelArcVisual::Property::SWEEP_ANGLE, SWEEP_ANGLE_NAME );
@@ -193,6 +214,13 @@ void ArcVisual::DoSetProperties( const Property::Map& propertyMap )
     if( !sweepAngleValue->Get( mSweepAngle ) )
     {
       DALI_LOG_ERROR( "ArcVisual:DoSetProperties:: SWEEP_ANGLE property has incorrect type: %d\n", sweepAngleValue->GetType() );
+    }
+    else
+    {
+      if( mImpl->mRenderer )
+      {
+        mImpl->mRenderer.SetProperty( mSweepAngleIndex, mSweepAngle );
+      }
     }
   }
 
@@ -241,6 +269,23 @@ void ArcVisual::OnSetTransform()
   }
 }
 
+void ArcVisual::OnDoAction( const Property::Index actionId, const Property::Value& attributes )
+{
+  // Check if action is valid for this visual type and perform action if possible
+  switch( actionId )
+  {
+    case DevelArcVisual::Action::UPDATE_PROPERTY:
+    {
+      Property::Map* map = attributes.GetMap();
+      if( map )
+      {
+        DoSetProperties( *map );
+      }
+      break;
+    }
+  }
+}
+
 void ArcVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
@@ -267,10 +312,9 @@ void ArcVisual::InitializeRenderer()
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
-  mImpl->mRenderer.RegisterProperty( THICKNESS_NAME, mThickness );
-  mImpl->mRenderer.RegisterProperty( START_ANGLE_NAME, mStartAngle );
-  mImpl->mRenderer.RegisterProperty( SWEEP_ANGLE_NAME, mSweepAngle );
-  mImpl->mRenderer.RegisterProperty( CAP_NAME, 0.0f );
+  mThicknessIndex = mImpl->mRenderer.RegisterProperty( THICKNESS_NAME, mThickness );
+  mStartAngleIndex = mImpl->mRenderer.RegisterProperty( START_ANGLE_NAME, mStartAngle );
+  mSweepAngleIndex = mImpl->mRenderer.RegisterProperty( SWEEP_ANGLE_NAME, mSweepAngle );
 
   mRadiusIndex = mImpl->mRenderer.RegisterProperty( RADIUS_NAME, mRadius );
 

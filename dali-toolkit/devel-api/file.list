@@ -22,6 +22,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/page-turn-view/page-turn-view.cpp
   ${devel_api_src_dir}/controls/popup/confirmation-popup.cpp
   ${devel_api_src_dir}/controls/popup/popup.cpp
+  ${devel_api_src_dir}/controls/progress-bar/progress-bar-devel.cpp
   ${devel_api_src_dir}/controls/scene3d-view/scene3d-view.cpp
   ${devel_api_src_dir}/controls/shadow-view/shadow-view.cpp
   ${devel_api_src_dir}/controls/super-blur-view/super-blur-view.cpp
@@ -115,6 +116,10 @@ SET( devel_api_popup_header_files
   ${devel_api_src_dir}/controls/popup/popup.h
 )
 
+SET( devel_api_progress_bar_header_files
+  ${devel_api_src_dir}/controls/progress-bar/progress-bar-devel.h
+)
+
 SET( devel_api_visual_factory_header_files
   ${devel_api_src_dir}/visual-factory/transition-data.h
   ${devel_api_src_dir}/visual-factory/visual-factory.h
@@ -126,6 +131,7 @@ SET( devel_api_visuals_header_files
   ${devel_api_src_dir}/visuals/animated-image-visual-actions-devel.h
   ${devel_api_src_dir}/visuals/animated-vector-image-visual-actions-devel.h
   ${devel_api_src_dir}/visuals/animated-vector-image-visual-signals-devel.h
+  ${devel_api_src_dir}/visuals/arc-visual-actions-devel.h
   ${devel_api_src_dir}/visuals/arc-visual-properties-devel.h
   ${devel_api_src_dir}/visuals/color-visual-properties-devel.h
   ${devel_api_src_dir}/visuals/image-visual-properties-devel.h
@@ -234,6 +240,7 @@ SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_navigation_view_header_files}
   ${devel_api_page_turn_view_header_files}
   ${devel_api_popup_header_files}
+  ${devel_api_progress_bar_header_files}
   ${devel_api_visual_factory_header_files}
   ${devel_api_visuals_header_files}
   ${devel_api_scene3d_view_header_files}

@@ -138,7 +138,7 @@ int UtcDaliModelViewAddRemove(void)
   DALI_TEST_CHECK( view );
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
@@ -146,11 +146,11 @@ int UtcDaliModelViewAddRemove(void)
   view.Add(actor);
   Stage::GetCurrent().Add(view);
 
-  DALI_TEST_CHECK( actor.OnStage() );
+  DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
   view.Remove(actor);
 
-  DALI_TEST_CHECK( !actor.OnStage() );
+  DALI_TEST_CHECK( !actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
   END_TEST;
 }
 

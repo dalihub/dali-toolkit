@@ -53,8 +53,6 @@ namespace Property
 enum
 {
   STYLE_NAME            = Control::Property::STYLE_NAME,
-  RESERVED_PROPERTY_01  = Control::Property::RESERVED_PROPERTY_01,
-  RESERVED_PROPERTY_02  = Control::Property::RESERVED_PROPERTY_02,
   KEY_INPUT_FOCUS       = Control::Property::KEY_INPUT_FOCUS,
   BACKGROUND            = Control::Property::BACKGROUND,
   MARGIN                = Control::Property::MARGIN,

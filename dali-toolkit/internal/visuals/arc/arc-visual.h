@@ -103,6 +103,11 @@ protected:
    */
   void OnSetTransform() override;
 
+  /**
+   * @copydoc Visual::Base::OnDoAction
+   */
+  void OnDoAction( const Property::Index actionId, const Property::Value& attributes ) override;
+
 private:
 
   /**
@@ -125,6 +130,9 @@ private:
   float mStartAngle;                   ///< The start angle of the arc.
   float mSweepAngle;                   ///< The sweep angle of the arc.
   Property::Index mRadiusIndex;        ///< The index of the radius property.
+  Property::Index mThicknessIndex;     ///< The index of the thickness property.
+  Property::Index mStartAngleIndex;    ///< The index of the start angle property.
+  Property::Index mSweepAngleIndex;    ///< The index of the sweep angle property.
   DevelArcVisual::Cap::Type mCapType;  ///< The cap type.
 };
 

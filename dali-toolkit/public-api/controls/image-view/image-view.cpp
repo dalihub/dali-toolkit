@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
@@ -59,15 +58,6 @@ ImageView ImageView::New()
   return Internal::ImageView::New();
 }
 
-ImageView ImageView::New( Image image )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: New() is deprecated and will be removed from next release. use New( const std::string& ) instead.\n" );
-
-  ImageView imageView = Internal::ImageView::New();
-  imageView.SetImage( image );
-  return imageView;
-}
-
 ImageView ImageView::New( const std::string& url )
 {
   ImageView imageView = Internal::ImageView::New();
@@ -87,13 +77,6 @@ ImageView ImageView::DownCast( BaseHandle handle )
   return Control::DownCast<ImageView, Internal::ImageView>( handle );
 }
 
-void ImageView::SetImage( Image image )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetImage() is deprecated and will be removed from next release. Use SetImage( const std::string& ) instead.\n" );
-
-  Dali::Toolkit::GetImpl( *this ).SetImage( image );
-}
-
 void ImageView::SetImage( const std::string& url )
 {
   Dali::Toolkit::GetImpl( *this ).SetImage( url, ImageDimensions() );
@@ -102,13 +85,6 @@ void ImageView::SetImage( const std::string& url )
 void ImageView::SetImage( const std::string& url, ImageDimensions size )
 {
   Dali::Toolkit::GetImpl( *this ).SetImage( url, size );
-}
-
-Image ImageView::GetImage() const
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetImage() is deprecated and will be removed from next release.\n" );
-
-  return Dali::Toolkit::GetImpl( *this ).GetImage();
 }
 
 ImageView::ImageView( Internal::ImageView& implementation )

@@ -113,12 +113,6 @@ DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "pointSize",          
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "multiLine",                 BOOLEAN, MULTI_LINE                 )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "horizontalAlignment",       STRING,  HORIZONTAL_ALIGNMENT       )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "verticalAlignment",         STRING,  VERTICAL_ALIGNMENT         )
-DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "unusedPropertyTextColor",   VECTOR4, UNUSED_PROPERTY_TEXT_COLOR )
-DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "reservedProperty01",        STRING,  RESERVED_PROPERTY_01       )
-DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "reservedProperty02",        STRING,  RESERVED_PROPERTY_02       )
-DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "reservedProperty03",        STRING,  RESERVED_PROPERTY_03       )
-DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "reservedProperty04",        STRING,  RESERVED_PROPERTY_04       )
-DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "reservedProperty05",        STRING,  RESERVED_PROPERTY_05       )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "enableMarkup",              BOOLEAN, ENABLE_MARKUP              )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "enableAutoScroll",          BOOLEAN, ENABLE_AUTO_SCROLL         )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "autoScrollSpeed",           INTEGER, AUTO_SCROLL_SPEED          )
@@ -268,13 +262,6 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
             impl.mController->SetVerticalAlignment( alignment );
           }
         }
-        break;
-      }
-
-      case Toolkit::TextLabel::Property::UNUSED_PROPERTY_TEXT_COLOR:
-      {
-        label.SetProperty( Toolkit::TextLabel::Property::TEXT_COLOR, value );
-        impl.mTextUpdateNeeded = true;
         break;
       }
       case Toolkit::TextLabel::Property::ENABLE_MARKUP:
@@ -660,11 +647,6 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
             value = std::string( name );
           }
         }
-        break;
-      }
-      case Toolkit::TextLabel::Property::UNUSED_PROPERTY_TEXT_COLOR:
-      {
-        value = label.GetProperty( Toolkit::TextLabel::Property::TEXT_COLOR );
         break;
       }
       case Toolkit::TextLabel::Property::ENABLE_MARKUP:

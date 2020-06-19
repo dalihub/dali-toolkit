@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/hash.h>
-#include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
@@ -217,9 +217,21 @@ Geometry VisualFactoryCache::CreateGridGeometry( Uint16Pair gridSize )
   return geometry;
 }
 
-Image VisualFactoryCache::GetBrokenVisualImage()
+Texture VisualFactoryCache::GetBrokenVisualImage()
 {
-  return ResourceImage::New( mBrokenImageUrl );
+  if(!mBrokenImageTexture && mBrokenImageUrl.size())
+  {
+    PixelData data;
+    Devel::PixelBuffer pixelBuffer = LoadImageFromFile( mBrokenImageUrl );
+    if( pixelBuffer )
+    {
+      data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
+      mBrokenImageTexture = Texture::New( Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(),
+                                      data.GetWidth(), data.GetHeight() );
+      mBrokenImageTexture.Upload( data );
+    }
+  }
+  return mBrokenImageTexture;
 }
 
 void VisualFactoryCache::SetPreMultiplyOnLoad( bool preMultiply )

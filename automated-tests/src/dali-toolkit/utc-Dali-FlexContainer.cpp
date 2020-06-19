@@ -446,8 +446,8 @@ int UtcDaliToolkitFlexContainerMoveFocus(void)
   // Create two actors and add them to the container
   Actor actor1 = Actor::New();
   Actor actor2 = Actor::New();
-  actor1.SetKeyboardFocusable(true);
-  actor2.SetKeyboardFocusable(true);
+  actor1.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
+  actor2.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
 
@@ -524,10 +524,10 @@ int UtcDaliToolkitFlexContainerRTLSupportP(void)
   // Check content direction property.
   DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::INHERIT, TEST_LOCATION );
 
-  actor0.SetProperty( Dali::DevelActor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT );
+  actor0.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT );
   DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::RTL, TEST_LOCATION );
 
-  actor0.SetProperty( Dali::DevelActor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::LEFT_TO_RIGHT );
+  actor0.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::LEFT_TO_RIGHT );
   DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::LTR, TEST_LOCATION );
 
   flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, "RTL" );
@@ -536,7 +536,7 @@ int UtcDaliToolkitFlexContainerRTLSupportP(void)
   flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, "LTR" );
   DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::LTR, TEST_LOCATION );
 
-  actor0.SetProperty( Dali::DevelActor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT );
+  actor0.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT );
   DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::LTR, TEST_LOCATION );
 
   flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, "inherit" );

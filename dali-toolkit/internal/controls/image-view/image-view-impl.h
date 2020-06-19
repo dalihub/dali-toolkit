@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,11 +58,6 @@ public:
   static Toolkit::ImageView New();
 
   /**
-   * @copydoc Dali::Toolkit::SetImage
-   */
-  void SetImage( Image image );
-
-  /**
    * @brief Sets this ImageView from an Dali::Property::Map
    *
    * If the handle is empty, ImageView will display nothing
@@ -74,11 +69,6 @@ public:
    * @copydoc Dali::Toolkit::SetImage
    */
   void SetImage( const std::string& imageUrl, ImageDimensions size );
-
-  /**
-   * @copydoc Dali::Toolkit::GetImage
-   */
-  Image GetImage() const;
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
@@ -184,7 +174,6 @@ private:
   Toolkit::Visual::Base  mVisual;
 
   std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
-  Image            mImage;        ///< the Image if the image came from a Image, null otherwise
   Property::Map    mPropertyMap;  ///< the Property::Map if the image came from a Property::Map, empty otherwise
   Property::Map    mShaderMap;    ///< the Property::Map if the custom shader is set, empty otherwise
   ImageDimensions  mImageSize;    ///< the image size

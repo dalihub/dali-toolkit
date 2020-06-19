@@ -22,7 +22,6 @@
 #include <typeinfo>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -319,7 +318,7 @@ GradientVisualPtr GradientVisual::New( VisualFactoryCache& factoryCache, const P
 }
 
 GradientVisual::GradientVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::GRADIENT ),
   mGradientType( LINEAR ),
   mIsOpaque( true )
 {

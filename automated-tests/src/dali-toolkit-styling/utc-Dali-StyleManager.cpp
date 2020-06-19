@@ -1343,7 +1343,7 @@ int UtcDaliStyleManagerConfigSectionTest(void)
 
   // For coverage
   Toolkit::TextEditor editor = Toolkit::TextEditor::New();
-  editor.SetKeyboardFocusable( true );
+  editor.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
   Stage::GetCurrent().Add( editor );
 
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( editor );

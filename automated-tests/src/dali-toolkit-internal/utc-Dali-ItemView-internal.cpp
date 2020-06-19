@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,10 +75,7 @@ public: // From ItemFactory
   virtual Actor NewItem(unsigned int itemId)
   {
     // Create a renderable actor for this item
-    Image image = ResourceImage::New( TEST_IMAGE_FILE_NAME );
-    Actor actor = CreateRenderableActor(image);
-
-    return actor;
+    return ImageView::New( TEST_IMAGE_FILE_NAME );
   }
 };
 

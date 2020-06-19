@@ -216,7 +216,7 @@ AnimatedGradientVisualPtr AnimatedGradientVisual::New( VisualFactoryCache& facto
 }
 
 AnimatedGradientVisual::AnimatedGradientVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL )
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, static_cast<Toolkit::Visual::Type>( Toolkit::DevelVisual::ANIMATED_GRADIENT ) )
 {
   SetupDefaultValue();
 }

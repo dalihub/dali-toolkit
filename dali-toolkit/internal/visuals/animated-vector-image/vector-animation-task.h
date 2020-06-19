@@ -314,7 +314,7 @@ private:
   bool                                   mUpdateFrameNumber;
   bool                                   mNeedAnimationFinishedTrigger;
   bool                                   mAnimationDataUpdated;
-
+  bool                                   mDestroyTask;
 };
 
 } // namespace Internal

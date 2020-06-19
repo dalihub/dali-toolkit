@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@
 #include <dali/devel-api/adaptor-framework/sound-player.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -165,7 +164,7 @@ void AccessibilityManager::SetAccessibilityAttribute(Actor actor, Toolkit::Acces
 {
   if(actor)
   {
-    unsigned int actorID = actor.GetId();
+    unsigned int actorID = actor.GetProperty< int >( Actor::Property::ID );
 
     ActorAdditionalInfo info = GetActorAdditionalInfo(actorID);
     info.mAccessibilityAttributes[type] = text;
@@ -181,7 +180,7 @@ std::string AccessibilityManager::GetAccessibilityAttribute(Actor actor, Toolkit
 
   if(actor)
   {
-    ActorAdditionalInfo data = GetActorAdditionalInfo(actor.GetId());
+    ActorAdditionalInfo data = GetActorAdditionalInfo(actor.GetProperty< int >( Actor::Property::ID ));
     text = data.mAccessibilityAttributes[type];
   }
 
@@ -243,11 +242,11 @@ void AccessibilityManager::SetFocusOrder(Actor actor, const unsigned int order)
       actor.SetProperty(propertyActorFocusable, true);
 
       // Now we insert the actor into the focus chain with the specified focus order
-      mFocusIDContainer.insert(FocusIDPair(order, actor.GetId()));
+      mFocusIDContainer.insert(FocusIDPair(order, actor.GetProperty< int >( Actor::Property::ID )));
     }
 
     // Update the actor's focus order in its additional data
-    SynchronizeActorAdditionalInfo(actor.GetId(), order);
+    SynchronizeActorAdditionalInfo(actor.GetProperty< int >( Actor::Property::ID ), order);
   }
 }
 
@@ -257,7 +256,7 @@ unsigned int AccessibilityManager::GetFocusOrder(Actor actor) const
 
   if(actor)
   {
-    ActorAdditionalInfo data = GetActorAdditionalInfo(actor.GetId());
+    ActorAdditionalInfo data = GetActorAdditionalInfo(actor.GetProperty< int >( Actor::Property::ID ));
     focusOrder = data.mFocusOrder;
   }
 
@@ -295,7 +294,7 @@ bool AccessibilityManager::SetCurrentFocusActor(Actor actor)
 {
   if(actor)
   {
-    return DoSetCurrentFocusActor(actor.GetId());
+    return DoSetCurrentFocusActor(actor.GetProperty< int >( Actor::Property::ID ));
   }
 
   return false;

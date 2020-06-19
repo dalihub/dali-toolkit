@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_IMPL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,11 +65,6 @@ public:
    * @copydoc Toolkit::VisualFactory::CreateVisual( const Property::Map& )
    */
   Toolkit::Visual::Base CreateVisual( const Property::Map& propertyMap );
-
-  /**
-   * @copydoc Toolkit::VisualFactory::CreateVisual( const Image& )
-   */
-  Toolkit::Visual::Base CreateVisual( const Image& image );
 
   /**
    * @copydoc Toolkit::VisualFactory::CreateVisual( const std::string&, ImageDimensions )
@@ -140,7 +135,7 @@ void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterTyp
     Toolkit::GetImplementation(visual).SetOffStage( actor );
   }
   visual = Toolkit::VisualFactory::Get().CreateVisual( param0, param1 );
-  if( visual && actor && actor.OnStage() )
+  if( visual && actor && actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     Toolkit::GetImplementation(visual).SetOnStage(actor);
   }
@@ -163,7 +158,7 @@ void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterTyp
     Toolkit::GetImplementation(visual).SetOffStage( actor );
   }
   visual =  Toolkit::VisualFactory::Get().CreateVisual( param );
-  if( visual && actor && actor.OnStage() )
+  if( visual && actor && actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     Toolkit::GetImplementation(visual).SetOnStage(actor);
   }
