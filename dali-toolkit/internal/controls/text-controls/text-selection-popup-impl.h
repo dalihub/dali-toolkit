@@ -200,7 +200,7 @@ private: // Implementation
    *
    * @param[in] setting The setting from the PopupCustomisations enum
    */
-  Size GetDimensionToCustomise( const PopupCustomisations& setting );
+  Size GetDimensionToCustomise( const PopupCustomisations& setting ) const;
 
   /**
    * @brief Sets the image for the given button of the Popup.
@@ -216,7 +216,7 @@ private: // Implementation
    * @param[in] button The button to get the image from
    * @return The image used for that button.
    */
-  std::string GetButtonImage( Toolkit::TextSelectionPopup::Buttons button );
+  const std::string& GetButtonImage( Toolkit::TextSelectionPopup::Buttons button ) const;
 
   /**
    * @brief Sets the image for the pressed state of a popup option.
@@ -236,7 +236,7 @@ private: // Implementation
 
   void AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption );
 
-  std::size_t GetNumberOfEnabledOptions();
+  std::size_t GetNumberOfEnabledOptions() const;
 
   void AddPopupOptionsToToolbar(  bool showIcons, bool showCaptions );
 
