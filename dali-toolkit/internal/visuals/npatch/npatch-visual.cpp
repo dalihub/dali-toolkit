@@ -431,6 +431,8 @@ void NPatchVisual::OnSetTransform()
 void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
+  bool sync = IsSynchronousLoadingRequired();
+  map.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, sync );
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::N_PATCH );
   map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
   map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );

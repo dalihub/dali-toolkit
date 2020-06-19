@@ -164,6 +164,33 @@ public:
   // TextureManager Main API:
 
   /**
+   * @brief Requests an frame of animated image load.
+   *
+   * The parameters are used to specify how the animated image is loaded.
+   * The observer has the LoadComplete method called when the load is ready.
+   *
+   * @param[in] animatedImageLoading  The AnimatedImageLoading that contain the animated image information
+   * @param[in] frameIndex            The frame index to load.
+   * @param[in] samplingMode          The SamplingMode to use
+   * @param[in] synchronousLoading    true if the frame should be loaded synchronously
+   * @param[out] textureId            The textureId of the frame
+   * @param[in] wrapModeU             Horizontal Wrap mode
+   * @param[in] wrapModeV             Vertical Wrap mode
+   * @param[in] textureObserver       The client object should inherit from this and provide the "UploadCompleted" virtual.
+   *                                  This is called when an image load completes (or fails).
+   *
+   * @return                          The texture set containing the frame of animated image, or empty if still loading.
+   */
+
+  TextureSet LoadAnimatedImageTexture( Dali::AnimatedImageLoading animatedImageLoading,
+                                       uint32_t frameIndex,
+                                       Dali::SamplingMode::Type samplingMode,
+                                       bool synchronousLoading,
+                                       TextureManager::TextureId& textureId,
+                                       Dali::WrapMode::Type wrapModeU, Dali::WrapMode::Type wrapModeV,
+                                       TextureUploadObserver* textureObserver );
+
+  /**
    * @brief Requests an image load of the given URL to get PixelBuffer.
    *
    * The parameters are used to specify how the image is loaded.
@@ -431,6 +458,8 @@ private:
    * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
    * @param[in] preMultiplyOnLoad     True if the image color should be multiplied by it's alpha. Set to false if
    *                                  there is no alpha
+   * @param[in] animatedImageLoading  The AnimatedImageLoading to load animated image
+   * @param[in] frameIndex            The frame index of a frame to be loaded frame
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoadInternal(
@@ -446,7 +475,9 @@ private:
     TextureUploadObserver*              observer,
     bool                                orientationCorrection,
     TextureManager::ReloadPolicy        reloadPolicy,
-    MultiplyOnLoad&                     preMultiplyOnLoad );
+    MultiplyOnLoad&                     preMultiplyOnLoad,
+    Dali::AnimatedImageLoading          animatedImageLoading,
+    uint32_t                            frameIndex );
 
   /**
    * @brief Get the current state of a texture
@@ -477,7 +508,9 @@ private:
                  UseAtlas useAtlas,
                  TextureManager::TextureHash hash,
                  bool orientationCorrection,
-                 bool preMultiplyOnLoad )
+                 bool preMultiplyOnLoad,
+                 Dali::AnimatedImageLoading animatedImageLoading,
+                 uint32_t frameIndex )
     : url( url ),
       desiredSize( desiredSize ),
       useSize( desiredSize ),
@@ -491,6 +524,8 @@ private:
       fittingMode( fittingMode ),
       samplingMode( samplingMode ),
       storageType( UPLOAD_TO_TEXTURE ),
+      animatedImageLoading( animatedImageLoading ),
+      frameIndex( frameIndex ),
       loadSynchronously( loadSynchronously ),
       useAtlas( useAtlas ),
       cropToMask( cropToMask ),
@@ -522,6 +557,8 @@ private:
     FittingMode::Type fittingMode:3; ///< The requested FittingMode
     Dali::SamplingMode::Type samplingMode:3; ///< The requested SamplingMode
     StorageType storageType:2;     ///< CPU storage / GPU upload;
+    Dali::AnimatedImageLoading animatedImageLoading; ///< AnimatedImageLoading that contains animated image information.
+    uint32_t frameIndex;           ///< frame index that be loaded, in case of animated image
     bool loadSynchronously:1;      ///< True if synchronous loading was requested
     UseAtlas useAtlas:2;           ///< USE_ATLAS if an atlas was requested.
                                    ///< This is updated to false if atlas is not used
@@ -685,18 +722,20 @@ private:
    * Only applies size, fitting mode andsampling mode if the size is specified.
    * Only applies maskTextureId if it isn't INVALID_TEXTURE_ID
    * Always applies useAtlas.
-   * @param[in] url          The URL of the image to load
-   * @param[in] size         The image size
-   * @param[in] fittingMode  The FittingMode to use
-   * @param[in] samplingMode The SamplingMode to use
-   * @param[in] useAtlas     True if atlased
-   * @param[in] maskTextureId The masking texture id (or INVALID_TEXTURE_ID)
-   * @return                 A hash of the provided data for caching.
+   * @param[in] url              The URL of the image to load
+   * @param[in] size             The image size
+   * @param[in] fittingMode      The FittingMode to use
+   * @param[in] samplingMode     The SamplingMode to use
+   * @param[in] useAtlas         True if atlased
+   * @param[in] maskTextureId    The masking texture id (or INVALID_TEXTURE_ID)
+   * @param[in] isAnimatedImage  The boolean value to know whether the request is for animated image or not
+   * @param[in] frameIndex       The frame index of a frame to be loaded frame
+   * @return                     A hash of the provided data for caching.
    */
   TextureHash GenerateHash( const std::string& url, const ImageDimensions size,
                             const FittingMode::Type fittingMode,
                             const Dali::SamplingMode::Type samplingMode, const UseAtlas useAtlas,
-                            TextureId maskTextureId );
+                            TextureId maskTextureId, StorageType storageType, bool isAnimatedImage, uint32_t frameIndex );
 
   /**
    * @brief Looks up a cached texture by its hash.
@@ -710,7 +749,9 @@ private:
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
    * @param[in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    * @param[in] storageType       Whether the pixel data is stored in the cache, returned with PixelBuffer or uploaded to the GPU
-   * @return A TextureId of a cached Texture if found. Or INVALID_TEXTURE_ID if not found.
+   * @param[in] isAnimatedImage   The boolean value to know whether the request is for animated image or not
+   * @param[in] frameIndex        The frame index of a frame to be loaded frame
+   * @return                      A TextureId of a cached Texture if found. Or INVALID_TEXTURE_ID if not found.
    */
   TextureManager::TextureId FindCachedTexture(
     const TextureManager::TextureHash hash,
@@ -721,7 +762,9 @@ private:
     const bool useAtlas,
     TextureId maskTextureId,
     MultiplyOnLoad preMultiplyOnLoad,
-    StorageType storageType );
+    StorageType storageType,
+    bool isAnimatedImage,
+    uint32_t frameIndex );
 
 private:
 
@@ -736,6 +779,16 @@ private:
      * @param[in] textureManager Reference to the texture manager
      */
     AsyncLoadingHelper(TextureManager& textureManager);
+
+    /**
+     * @brief Load a new frame of animated image
+     * @param[in] textureId             TextureId to reference the texture that will be loaded
+     * @param[in] animatedImageLoading  The AnimatedImageLoading to load animated image
+     * @param[in] frameIndex            The frame index of a frame to be loaded frame
+     */
+    void LoadAnimatedImage( TextureId textureId,
+                            Dali::AnimatedImageLoading animatedImageLoading,
+                            uint32_t frameIndex);
 
     /**
      * @brief Load a new texture.

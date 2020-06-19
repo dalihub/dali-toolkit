@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,24 @@ namespace Toolkit
 namespace Internal
 {
 
+LoadingTask::LoadingTask( uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex )
+: pixelBuffer(),
+  url(),
+  id( id ),
+  dimensions(),
+  fittingMode(),
+  samplingMode(),
+  orientationCorrection(),
+  preMultiplyOnLoad( DevelAsyncImageLoader::PreMultiplyOnLoad::OFF ),
+  isMaskTask( false ),
+  maskPixelBuffer(),
+  contentScale( 1.0f ),
+  cropToMask( false ),
+  animatedImageLoading( animatedImageLoading ),
+  frameIndex( frameIndex )
+{
+}
+
 LoadingTask::LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dimensions,
                           FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
 : pixelBuffer(),
@@ -46,7 +64,9 @@ LoadingTask::LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dim
   isMaskTask( false ),
   maskPixelBuffer(),
   contentScale( 1.0f ),
-  cropToMask( false )
+  cropToMask( false ),
+  animatedImageLoading(),
+  frameIndex( 0u )
 {
 }
 
@@ -63,13 +83,19 @@ LoadingTask::LoadingTask( uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::Pi
   isMaskTask( true ),
   maskPixelBuffer( maskPixelBuffer ),
   contentScale( contentScale ),
-  cropToMask( cropToMask )
+  cropToMask( cropToMask ),
+  animatedImageLoading(),
+  frameIndex( 0u )
 {
 }
 
 void LoadingTask::Load()
-{
-  if( url.IsLocalResource() )
+{;
+  if( animatedImageLoading )
+  {
+    pixelBuffer = animatedImageLoading.LoadFrame( frameIndex );
+  }
+  else if( url.IsLocalResource() )
   {
     pixelBuffer = Dali::LoadImageFromFile( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
   }
@@ -140,7 +166,6 @@ void ImageLoadThread::Run()
 void ImageLoadThread::AddTask( LoadingTask* task )
 {
   bool wasEmpty = false;
-
   {
     // Lock while adding task to the queue
     ConditionalWait::ScopedLock lock( mConditionalWait );

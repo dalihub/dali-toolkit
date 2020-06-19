@@ -1098,7 +1098,7 @@ int UtcDaliImageVisualTextureCancelRemoteLoad(void)
 int UtcDaliImageVisualTextureCancelAsyncLoad(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "Load image asynchronosly, cancel loading, then load again" );
+  tet_infoline( "Load image asynchronously, cancel loading, then load again" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
