@@ -87,7 +87,7 @@ bool IsEqualGlyph ( const GlyphInfoData& glyphData, const GlyphInfo& glyph )
   {
     return false;
   }
-  if( fabsf( glyphData.advance - glyph.advance ) > Math::MACHINE_EPSILON_1000 )
+  if( fabsf( glyphData.advance - floor(glyph.advance) ) > Math::MACHINE_EPSILON_1000 )
   {
     return false;
   }
@@ -247,7 +247,7 @@ bool ShapeInfoTest( const ShapeInfoData& data )
       std::cout << "            height : " << glyphInfo.height << std::endl;
       std::cout << "          xBearing : " << glyphInfo.xBearing << std::endl;
       std::cout << "          yBearing : " << glyphInfo.yBearing << std::endl;
-      std::cout << "           advance : " << glyphInfo.advance << std::endl;
+      std::cout << "           advance : " << floor(glyphInfo.advance) << std::endl;
       std::cout << "       scaleFactor : " << glyphInfo.scaleFactor << std::endl;
       std::cout << "  isItalicRequired : " << glyphInfo.isItalicRequired << std::endl;
       std::cout << "    isBoldRequired : " << glyphInfo.isBoldRequired << std::endl;

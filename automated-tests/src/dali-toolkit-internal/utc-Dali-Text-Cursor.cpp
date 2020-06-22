@@ -226,12 +226,12 @@ bool GetCursorPositionTest( const GetCursorPositionData& data )
     GetCursorPosition( parameters,
                        cursorInfo );
 
-    if( cursorInfo.primaryPosition.x != data.visualX[index] )
+    if( floor(cursorInfo.primaryPosition.x) != data.visualX[index] )
     {
       std::cout << "  test " << index << " failed. Different 'x' cursor position : " << cursorInfo.primaryPosition.x << ", expected : " << data.visualX[index] << std::endl;
       return false;
     }
-    if( cursorInfo.primaryPosition.y != data.visualY[index] )
+    if( floor(cursorInfo.primaryPosition.y) != data.visualY[index] )
     {
       std::cout << "  test " << index << " failed. Different 'y' cursor position : " << cursorInfo.primaryPosition.y << ", expected : " << data.visualY[index] << std::endl;
        return false;
@@ -388,13 +388,13 @@ int UtcDaliGetClosestCursorIndex(void)
   float visualX02[] = { -100.f, 1000.f, 60.f, 79.f, 83.f, 148.f, 99.f };
   float visualY02[] = { -100.f, 1000.f, 12.f, 12.f, 12.f, 12.f, 12.f };
   CharacterHitTest::Mode mode02[] = { CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP };
-  CharacterIndex logicalIndex02[] = { 0, 21u, 8u, 11u, 11u, 13u, 20u };
+  CharacterIndex logicalIndex02[] = { 0, 21u, 7u, 10u, 10u, 14u, 12u };
   bool isCharacterHit02[] = { false, false, true, true, true, true, true  };
 
   float visualX03[] = { 19.f, 104.f, -2.f, 127.f };
   float visualY03[] = { 12.f, 12.f, 12.f, 12.f };
   CharacterHitTest::Mode mode03[] = { CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP };
-  CharacterIndex logicalIndex03[] = { 3u, 12u, 0, 18u };
+  CharacterIndex logicalIndex03[] = { 3u, 13u, 0, 18u };
   bool isCharacterHit03[] = { true, true, false, false };
 
   //  0     5 _ 6     11  12
@@ -412,13 +412,13 @@ int UtcDaliGetClosestCursorIndex(void)
   CharacterHitTest::Mode mode04[] = { CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP,
                                       CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP,
                                       CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP };
-  CharacterIndex logicalIndex04[] = {    0,  6u,  6u, 11u, 11u,
+  CharacterIndex logicalIndex04[] = {    0,  5u,  6u, 11u, 11u,
                                        12u, 16u, 17u, 21u, 21u,
-                                       22u, 25u, 31u, 32u, 34u, 40u, 40u,
+                                       22u, 25u, 30u, 32u, 35u, 33u, 40u,
                                        41u };
-  bool isCharacterHit04[] = { false, true, true, false, false,
-                              false, true, true, false, false,
-                              false, true, true, true, true, false, false };
+  bool isCharacterHit04[] = { false, true, true, true, false,
+                              false, true, true, true, false,
+                              false, true, true, true, true, true, false };
 
   //   0           10           20            30           40      46
   //    abcשנבdefג   קכghiעיןjk   lחלךmnoצמם   pqrפרףstuד   אוvwxה
@@ -451,12 +451,12 @@ int UtcDaliGetClosestCursorIndex(void)
                                       CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP,
                                       CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP,
                                       CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP };
-  CharacterIndex logicalIndex05[] = {    0,  10u,  20u,  30u,  40u,  46u,
-                                       47u,  52u,  62u,  71u,  82u,  93u,
-                                       94u,  99u, 112u, 122u, 131u, 140u,
-                                      141u, 153u, 162u, 171u, 181u, 187u,
-                                      188u, 194u, 201u, 213u, 222u, 234u,
-                                      236u, 244u, 254u, 263u, 265u };
+  CharacterIndex logicalIndex05[] = {    0,  10u,  19u,  28u,  39u,  44u,
+                                       45u,  49u,  59u,  66u,  78u,  87u,
+                                       89u,  96u, 107u, 115u, 124u, 133u,
+                                      134u, 145u, 154u, 162u, 171u, 179u,
+                                      180u, 184u, 191u, 203u, 212u,
+                                      221u, 222u, 233u, 240u, 251u, 265u };
   bool isCharacterHit05[] = { false, true, true, true, true, false,
                               false, true, true, true, true, false,
                               false, true, true, true, true, false,
@@ -495,12 +495,12 @@ int UtcDaliGetClosestCursorIndex(void)
                                       CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP,
                                       CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP,
                                       CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP };
-  CharacterIndex logicalIndex06[] = {    0,  10u,  20u,  30u,  40u,  45u,
-                                       46u,  50u,  60u,  70u,  80u,  92u,
-                                       93u, 100u, 110u, 120u, 130u, 138u,
-                                      139u, 150u, 160u, 170u, 180u, 185u,
-                                      186u, 190u, 200u, 210u, 220u, 231u,
-                                      232u, 240u, 250u, 260u, 265u  };
+  CharacterIndex logicalIndex06[] = {    0,  10u,  19u,  28u,  39u,  44u,
+                                       45u,  48u,  57u,  65u,  78u,  87u,
+                                       89u,  96u, 107u, 114u, 124u, 133u,
+                                      134u, 144u, 154u, 162u, 171u, 178u,
+                                      179u, 185u, 192u, 203u, 212u, 221u,
+                                      222u, 232u, 240u, 251u, 265u  };
   bool isCharacterHit06[] = { false, true, true, true, true, false,
                               false, true, true, true, true, false,
                               false, true, true, true, true, false,

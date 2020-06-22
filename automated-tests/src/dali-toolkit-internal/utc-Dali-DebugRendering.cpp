@@ -187,10 +187,10 @@ int UtcDaliDebugRenderingGetVisual1(void)
 
   Vector2 naturalSize;
   textVisual.GetNaturalSize( naturalSize );
-  DALI_TEST_EQUALS( naturalSize, Vector2( 78.f, 20.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( naturalSize, Vector2( 82.f, 20.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   const float height = textVisual.GetHeightForWidth( 40.f );
-  DALI_TEST_EQUALS( height, 38.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( height, 57.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Test that NPatchVisual is replaced with debug visual
   // TEST_NPATCH_FILE_NAME: image_01.9.jpg
