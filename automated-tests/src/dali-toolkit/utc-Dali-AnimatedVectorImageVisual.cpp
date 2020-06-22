@@ -194,8 +194,12 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
   // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
   Renderer renderer = actor.GetRendererAt( 0u );
   DALI_TEST_CHECK( renderer );
 
@@ -864,6 +868,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   Property::Value* value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
   DALI_TEST_EQUALS( value->Get< int >(), 2, TEST_LOCATION );
@@ -882,6 +888,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   application.SendNotification();
   application.Render();
+
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
@@ -926,6 +934,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   application.SendNotification();
   application.Render();
+
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
