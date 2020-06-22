@@ -25,7 +25,6 @@
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/hash.h>
-#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/debug.h>
 

@@ -23,7 +23,6 @@
 #include <limits>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -370,7 +369,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       case Toolkit::TextEditor::Property::GRAB_HANDLE_IMAGE:
       {
         const std::string imageFileName = value.Get< std::string >();
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str() );
 
         if( impl.mDecorator && imageFileName.size() )
         {
@@ -382,7 +381,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       case Toolkit::TextEditor::Property::GRAB_HANDLE_PRESSED_IMAGE:
       {
         const std::string imageFileName = value.Get< std::string >();
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str() );
 
         if( impl.mDecorator && imageFileName.size() )
         {
@@ -1743,7 +1742,7 @@ void TextEditor::UpdateScrollBar()
   {
     mAnimation = Animation::New( mAnimationPeriod.durationSeconds );
   }
-  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,1.0f);
   mAnimation.AnimateTo( Property( indicator, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN, mAnimationPeriod );
   mAnimation.Play();
   mAnimation.FinishedSignal().Connect( this, &TextEditor::OnScrollIndicatorAnimationFinished );

@@ -68,7 +68,7 @@ SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShader
 }
 
 SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::SVG ),
   mImageVisualShaderFactory( shaderFactory ),
   mAtlasRect( FULL_TEXTURE_RECT ),
   mImageUrl( imageUrl ),

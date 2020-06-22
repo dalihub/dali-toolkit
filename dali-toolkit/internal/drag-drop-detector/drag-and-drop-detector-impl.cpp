@@ -51,7 +51,7 @@ void DragAndDropDetector::Attach(Dali::Toolkit::Control& control)
     }
     mControls.push_back(control);
     control.TouchSignal().Connect(this, &DragAndDropDetector::OnDrag);
-    mFirstEnter.push_back(control.GetId());
+    mFirstEnter.push_back(control.GetProperty< int >( Actor::Property::ID ));
     mPanGestureDetector.Attach(control);
     mPanGestureDetector.DetectedSignal().Connect(this, &DragAndDropDetector::OnPan);
   }
@@ -73,7 +73,7 @@ void DragAndDropDetector::Detach(Dali::Toolkit::Control& control)
     {
       match->TouchSignal().Disconnect(this, &DragAndDropDetector::OnDrag);
       mPanGestureDetector.Detach(*match);
-      mFirstEnter.erase(std::find(mFirstEnter.begin(), mFirstEnter.end(), control.GetId()));
+      mFirstEnter.erase(std::find(mFirstEnter.begin(), mFirstEnter.end(), control.GetProperty< int >( Actor::Property::ID )));
       mControls.erase(match);
     }
   }
@@ -131,7 +131,7 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
     mFirstEnter.clear();
     for( auto&& control : mControls)
     {
-      mFirstEnter.push_back(control.GetId());
+      mFirstEnter.push_back(control.GetProperty< int >( Actor::Property::ID ));
     }
     float width = control.GetProperty<float>(Dali::Actor::Property::SIZE_WIDTH);
     float height = control.GetProperty<float>(Dali::Actor::Property::SIZE_HEIGHT);
@@ -169,7 +169,7 @@ bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchData& data)
   {
     if(mDragControl != control && mPointDown)
     {
-      auto found = std::find(mFirstEnter.begin(), mFirstEnter.end(), control.GetId());
+      auto found = std::find(mFirstEnter.begin(), mFirstEnter.end(), control.GetProperty< int >( Actor::Property::ID ));
       if(mFirstEnter.end() != found)
       {
         SetPosition(data.GetScreenPosition(0));
@@ -188,7 +188,7 @@ bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchData& data)
   {
     if(mDragControl != control && mPointDown)
     {
-      mFirstEnter.push_back(control.GetId());
+      mFirstEnter.push_back(control.GetProperty< int >( Actor::Property::ID ));
       EmitExitedSignal(control);
     }
   }

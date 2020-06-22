@@ -1009,20 +1009,20 @@ int UtcDaliPopupPropertyBacking(void)
   Actor backing = popup.FindChildByName( "popupBacking" );
   DALI_TEST_CHECK( backing );
 
-  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   // Check enabled property.
   popup.SetDisplayState( Popup::SHOWN );
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.5f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.5f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   popup.SetDisplayState( Popup::HIDDEN );
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   popup.SetProperty( Popup::Property::BACKING_ENABLED, false );
   bool propertyResult;
@@ -1033,13 +1033,13 @@ int UtcDaliPopupPropertyBacking(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   popup.SetDisplayState( Popup::HIDDEN );
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   // Check color property.
   popup.SetProperty( Popup::Property::BACKING_ENABLED, true );

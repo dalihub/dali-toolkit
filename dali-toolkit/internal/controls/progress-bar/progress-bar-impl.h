@@ -18,11 +18,11 @@
  *
  */
 
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali-toolkit/public-api/controls/progress-bar/progress-bar.h>
+#include <dali-toolkit/devel-api/controls/progress-bar/progress-bar-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 
 namespace Dali
@@ -46,11 +46,11 @@ class ProgressBar : public Control
 public:
 
   /**
-   * Create a new ProgressBar.
-   *
+   * Create a new ProgressBar with predefined style.
+   * @param[in] progressBarStyle A style value that determines the shape of the progress bar.
    * @return A public handle to the newly allocated ProgressBar.
    */
-  static Dali::Toolkit::ProgressBar New();
+  static Dali::Toolkit::ProgressBar New( DevelProgressBar::Style progressBarStyle = DevelProgressBar::Style::LINEAR );
 
 public:
 
@@ -233,6 +233,16 @@ private:
   bool GetPropertyMapForVisual( Property::Index visualIndex, Property::Map& retreivedMap ) const;
 
   /**
+   * Apply progress value to visual
+   */
+  void ApplyProgressToVisual( float progress, Property::Index index, int depth );
+
+  /**
+   * Apply progress value to visual transform
+   */
+  void ApplyProgressToVisualTransform( float progress, Vector2 trackSize, Property::Index index );
+
+  /**
    * Check if we should start animating
    */
   virtual void OnStageConnection( int depth );
@@ -256,6 +266,9 @@ private:
   float mProgressValue;                                               ///< Current value of ProgressBar
   float mSecondaryProgressValue;                                      ///< Current loading value of ProgressBar
   bool mIndeterminate;                                                ///< Whether the progress state is determined or not
+  Property::Map mTrackVisualMap;                                      ///< To backup visual properties when switching determinate/indeterminate.
+  Property::Map mProgressVisualMap;                                   ///< To backup visual properties when switching determinate/indeterminate.
+  Property::Map mSecondaryProgressVisualMap;                          ///< To backup visual properties when switching determinate/indeterminate.
 };
 
 } // namespace Internal

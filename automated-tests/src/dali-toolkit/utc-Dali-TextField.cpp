@@ -1647,7 +1647,7 @@ int utcDaliTextFieldEvent02(void)
   application.Render();
 
   Actor layer = field.GetChildAt( 1u );
-  DALI_TEST_CHECK( layer.IsLayer() );
+  DALI_TEST_CHECK( layer.GetProperty< bool >( Actor::Property::IS_LAYER ) );
 
   DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
@@ -2458,7 +2458,7 @@ int utcDaliTextFieldSizeUpdate(void)
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
-  field.SetKeyboardFocusable(true);
+  field.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   KeyboardFocusManager::Get().SetCurrentFocusActor( field );
 
   application.SendNotification();

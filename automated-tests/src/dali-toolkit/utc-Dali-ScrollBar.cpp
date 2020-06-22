@@ -864,14 +864,14 @@ int UtcDaliToolkitScrollBarSetIndicatorShowDurationP(void)
   DALI_TEST_EQUALS( scrollBar.GetIndicatorShowDuration(), 0.35f, TEST_LOCATION );
 
   // Make the indicator invisible
-  indicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,0.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   // Show the indicator
   scrollBar.ShowIndicator();
@@ -884,21 +884,21 @@ int UtcDaliToolkitScrollBarSetIndicatorShowDurationP(void)
   application.Render();
 
   // Check that the indicator is now visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Set the duration to show the indicator to be 0.75 second
   scrollBar.SetIndicatorShowDuration(0.75);
   DALI_TEST_EQUALS( scrollBar.GetIndicatorShowDuration(), 0.75f, TEST_LOCATION );
 
   // Make the indicator invisible
-  indicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,0.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   // Show the indicator
   scrollBar.ShowIndicator();
@@ -911,7 +911,7 @@ int UtcDaliToolkitScrollBarSetIndicatorShowDurationP(void)
   application.Render();
 
   // Check that the indicator is not fully visible yet
-  DALI_TEST_CHECK( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) != 1.0f );
+  DALI_TEST_CHECK( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ) != 1.0f );
 
   // Wait for another 0.4 second
   Wait(application, 400);
@@ -921,7 +921,7 @@ int UtcDaliToolkitScrollBarSetIndicatorShowDurationP(void)
   application.Render();
 
   // Check that the indicator is now fully visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -946,14 +946,14 @@ int UtcDaliToolkitScrollBarSetIndicatorShowDurationN(void)
   DALI_TEST_CHECK( duration > 0.0f );
 
   // Make the indicator invisible
-  indicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,0.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   // Show the indicator
   scrollBar.ShowIndicator();
@@ -966,21 +966,21 @@ int UtcDaliToolkitScrollBarSetIndicatorShowDurationN(void)
   application.Render();
 
   // Check that the indicator is now visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Now set the duration to show the indicator to be a negative value (which should be ignored and therefore means instant)
   scrollBar.SetIndicatorShowDuration(-0.25f);
   DALI_TEST_EQUALS( scrollBar.GetIndicatorShowDuration(), -0.25f, TEST_LOCATION );
 
   // Make the indicator invisible
-  indicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,0.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   // Show the indicator
   scrollBar.ShowIndicator();
@@ -990,7 +990,7 @@ int UtcDaliToolkitScrollBarSetIndicatorShowDurationN(void)
   application.Render();
 
   // Check that the indicator becomes instantly visible in the next frame
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1036,14 +1036,14 @@ int UtcDaliToolkitScrollBarSetIndicatorHideDurationP(void)
   DALI_TEST_EQUALS( scrollBar.GetIndicatorHideDuration(), 0.15f, TEST_LOCATION );
 
   // Make the indicator visible
-  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,1.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Hide the indicator
   scrollBar.HideIndicator();
@@ -1056,21 +1056,21 @@ int UtcDaliToolkitScrollBarSetIndicatorHideDurationP(void)
   application.Render();
 
   // Check that the indicator is now invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   // Set the duration to hide the indicator to be 0.65 second
   scrollBar.SetIndicatorHideDuration(0.65f);
   DALI_TEST_EQUALS( scrollBar.GetIndicatorHideDuration(), 0.65f, TEST_LOCATION );
 
   // Make the indicator visible
-  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,1.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Hide the indicator
   scrollBar.HideIndicator();
@@ -1083,7 +1083,7 @@ int UtcDaliToolkitScrollBarSetIndicatorHideDurationP(void)
   application.Render();
 
   // Check that the indicator is not fully invisible yet
-  DALI_TEST_CHECK( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) != 0.0f );
+  DALI_TEST_CHECK( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ) != 0.0f );
 
   // Wait for another 0.5 second
   Wait(application, 500);
@@ -1093,7 +1093,7 @@ int UtcDaliToolkitScrollBarSetIndicatorHideDurationP(void)
   application.Render();
 
   // Check that the indicator is now fully invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1118,14 +1118,14 @@ int UtcDaliToolkitScrollBarSetIndicatorHideDurationN(void)
   DALI_TEST_CHECK( duration > 0.0f );
 
   // Make the indicator visible
-  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,1.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Hide the indicator
   scrollBar.HideIndicator();
@@ -1138,21 +1138,21 @@ int UtcDaliToolkitScrollBarSetIndicatorHideDurationN(void)
   application.Render();
 
   // Check that the indicator is now invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   // Now set the duration to hide the indicator to be a negative value (which should be ignored and therefore means instant)
   scrollBar.SetIndicatorHideDuration(-0.25f);
   DALI_TEST_EQUALS( scrollBar.GetIndicatorHideDuration(), -0.25f, TEST_LOCATION );
 
   // Make the indicator visible
-  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,1.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Hide the indicator
   scrollBar.HideIndicator();
@@ -1162,7 +1162,7 @@ int UtcDaliToolkitScrollBarSetIndicatorHideDurationN(void)
   application.Render();
 
   // Check that the indicator becomes instantly invisible in the next frame
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1210,14 +1210,14 @@ int UtcDaliToolkitScrollBarShowIndicatorP(void)
   DALI_TEST_CHECK( duration > 0.0f );
 
   // Make the indicator invisible
-  indicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,0.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   // Show the indicator
   scrollBar.ShowIndicator();
@@ -1230,7 +1230,7 @@ int UtcDaliToolkitScrollBarShowIndicatorP(void)
   application.Render();
 
   // Check that the indicator is now visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1249,14 +1249,14 @@ int UtcDaliToolkitScrollBarShowIndicatorN(void)
   DALI_TEST_CHECK( indicator );
 
   // Make the indicator initially visible
-  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,1.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is initially visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Get the default duration to show the indicator
   float duration = scrollBar.GetIndicatorShowDuration();
@@ -1272,7 +1272,7 @@ int UtcDaliToolkitScrollBarShowIndicatorN(void)
   application.Render();
 
   // Check that the indicator is still visible in the very next frame
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1297,14 +1297,14 @@ int UtcDaliToolkitScrollBarHideIndicatorP(void)
   DALI_TEST_CHECK( duration > 0.0f );
 
   // Make the indicator visible
-  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,1.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Hide the indicator
   scrollBar.HideIndicator();
@@ -1317,7 +1317,7 @@ int UtcDaliToolkitScrollBarHideIndicatorP(void)
   application.Render();
 
   // Check that the indicator is now invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1336,14 +1336,14 @@ int UtcDaliToolkitScrollBarHideIndicatorN(void)
   DALI_TEST_CHECK( indicator );
 
   // Make the indicator initially invisible
-  indicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,0.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is initially invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   // Get the default duration to hide the indicator
   float duration = scrollBar.GetIndicatorHideDuration();
@@ -1359,7 +1359,7 @@ int UtcDaliToolkitScrollBarHideIndicatorN(void)
   application.Render();
 
   // Check that the indicator is still invisible in the very next frame
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1384,14 +1384,14 @@ int UtcDaliToolkitScrollBarActionShowIndicator(void)
   DALI_TEST_CHECK( duration > 0.0f );
 
   // Make the indicator invisible
-  indicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,0.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   // Do the "ShowIndicator" action
   Property::Map emptyMap;
@@ -1405,7 +1405,7 @@ int UtcDaliToolkitScrollBarActionShowIndicator(void)
   application.Render();
 
   // Check that the indicator is now visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1430,14 +1430,14 @@ int UtcDaliToolkitScrollBarActionHideIndicator(void)
   DALI_TEST_CHECK( duration > 0.0f );
 
   // Make the indicator visible
-  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,1.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Do the "HideIndicator" action
   Property::Map emptyMap;
@@ -1451,7 +1451,7 @@ int UtcDaliToolkitScrollBarActionHideIndicator(void)
   application.Render();
 
   // Check that the indicator is now invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1476,14 +1476,14 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicator(void)
   DALI_TEST_CHECK( duration > 0.0f );
 
   // Make the indicator invisible
-  indicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,0.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   // Do the "ShowIndicator" action
   Property::Map emptyMap;
@@ -1497,7 +1497,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicator(void)
   application.Render();
 
   // Check that the indicator is now visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Get the default duration to hide the indicator
   float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
@@ -1515,7 +1515,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicator(void)
   application.Render();
 
   // Check that the indicator is now invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1534,7 +1534,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorImmediate(void)
   DALI_TEST_CHECK( indicator );
 
   // Make the indicator invisible
-  indicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,0.0f);
 
   // Don't use a show animation; the indicator should appear immediately
   scrollBar.SetProperty( ScrollBar::Property::INDICATOR_SHOW_DURATION, 0.0f );
@@ -1557,7 +1557,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorImmediate(void)
   application.Render();
 
   // Check that the indicator is now visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Get the default duration to hide the indicator
   float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
@@ -1575,7 +1575,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorImmediate(void)
   application.Render();
 
   // Check that the indicator is now invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1600,14 +1600,14 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorDuringHide(void)
   DALI_TEST_CHECK( duration > 0.0f );
 
   // Make the indicator visible
-  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
+  indicator.SetProperty( Actor::Property::OPACITY,1.0f);
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Check that the indicator is visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Hide the indicator
   scrollBar.HideIndicator();
@@ -1620,7 +1620,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorDuringHide(void)
   application.Render();
 
   // Check that the indicator is now partially hidden
-  DALI_TEST_CHECK( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ) < 1.0f );
+  DALI_TEST_CHECK( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ) < 1.0f );
 
   // Now interrupt the Hide with a DoAction( "ShowTransientIndicator" )
 
@@ -1642,7 +1642,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorDuringHide(void)
   application.Render();
 
   // Check that the indicator is now visible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 1.0f, TEST_LOCATION );
 
   // Get the default duration to hide the indicator
   float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
@@ -1660,7 +1660,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorDuringHide(void)
   application.Render();
 
   // Check that the indicator is now invisible
-  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( indicator.GetCurrentProperty< float >( Actor::Property::OPACITY ), 0.0f, TEST_LOCATION );
 
   END_TEST;
 }

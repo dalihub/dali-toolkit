@@ -1,6 +1,3 @@
-#ifndef MESH_BUILDER_H
-#define MESH_BUILDER_H
-
 /*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
@@ -18,18 +15,25 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/dali-core.h>
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/progress-bar/progress-bar-impl.h>
 
 namespace Dali
 {
 
-Shader CreateShader();
-TextureSet CreateTextureSet();
-TextureSet CreateTextureSet( Texture texture );
-Geometry CreateQuadGeometry();
-PropertyBuffer CreatePropertyBuffer();
+namespace Toolkit
+{
 
+namespace DevelProgressBar
+{
+
+Toolkit::ProgressBar New( Style progressBarStyle )
+{
+  return Internal::ProgressBar::New( progressBarStyle );
 }
 
-#endif // MESH_BUILDER_H
+} // namespace DevelProgressBar
+
+} // namespace Toolkit
+
+} // namespace Dali

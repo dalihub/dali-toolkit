@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/events/touch-data.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
@@ -289,7 +288,7 @@ void Button::ChangeState( State requestedState )
   mPreviousButtonState = mButtonState; // Store previous state for visual removal (used when animations ended)
   mButtonState = requestedState; // Update current state
 
-  if ( Self().OnStage() )
+  if ( Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     OnStateChange( mButtonState ); // Notify derived buttons
     SelectRequiredVisual( VISUAL_INDEX_FOR_STATE[ mButtonState ][ BACKGROUND ] );
@@ -619,7 +618,7 @@ void Button::OnInitialize()
   mTapDetector.Attach( self );
   mTapDetector.DetectedSignal().Connect(this, &Button::OnTap);
 
-  self.SetKeyboardFocusable( true );
+  self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
 
   self.TouchSignal().Connect( this, &Button::OnTouch );
 }

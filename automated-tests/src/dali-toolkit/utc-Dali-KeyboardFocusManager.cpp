@@ -296,12 +296,12 @@ int UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActor(void)
 
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
-  first.SetKeyboardFocusable(true);
+  first.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(first);
 
   // Create the second actor and add it to the stage
   Actor second = Actor::New();
-  second.SetKeyboardFocusable(true);
+  second.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(second);
 
   // Create the third actor but don't add it to the stage
@@ -333,7 +333,7 @@ int UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActor(void)
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
 
   // Make the third actor focusable
-  third.SetKeyboardFocusable(true);
+  third.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
 
   // Check that the focus is successfully moved to the third actor
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(third) == true);
@@ -367,12 +367,12 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
 
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
-  first.SetKeyboardFocusable(true);
+  first.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(first);
 
   // Create the second actor and add it to the stage
   Actor second = Actor::New();
-  second.SetKeyboardFocusable(true);
+  second.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(second);
 
   // Move the focus to the right
@@ -428,11 +428,11 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
 
   // Create the third actor
   Actor third = Actor::New();
-  third.SetKeyboardFocusable(true);
+  third.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
 
   // Create the fourth actor
   Actor fourth = Actor::New();
-  fourth.SetKeyboardFocusable(true);
+  fourth.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
 
   // Add the four children to table view
   tableView.AddChild(first, TableView::CellPosition(0, 0));
@@ -530,12 +530,12 @@ int UtcDaliKeyboardFocusManagerCustomAlgorithmMoveFocus(void)
 
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
-  first.SetKeyboardFocusable(true);
+  first.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(first);
 
   // Create the second actor and add it to the stage
   Actor second = Actor::New();
-  second.SetKeyboardFocusable(true);
+  second.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(second);
 
   // Move the focus to the right
@@ -623,8 +623,8 @@ int UtcDaliKeyboardFocusManagerFocusablePropertiesMoveFocus(void)
 
   PushButton button1 = PushButton::New();
   PushButton button2 = PushButton::New();
-  button1.SetKeyboardFocusable(true);
-  button2.SetKeyboardFocusable(true);
+  button1.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
+  button2.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(button1);
   Stage::GetCurrent().Add(button2);
 
@@ -637,16 +637,16 @@ int UtcDaliKeyboardFocusManagerFocusablePropertiesMoveFocus(void)
   focusChangedCallback.Reset();
 
   // set the navigation properties of button1
-  button1.SetProperty(Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetId()));
-  button1.SetProperty(Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetId()));
-  button1.SetProperty(Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetId()));
-  button1.SetProperty(Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetId()));
+  button1.SetProperty(Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty< int >( Actor::Property::ID )));
+  button1.SetProperty(Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty< int >( Actor::Property::ID )));
+  button1.SetProperty(Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty< int >( Actor::Property::ID )));
+  button1.SetProperty(Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::Value((int)button2.GetProperty< int >( Actor::Property::ID )));
 
   // set the navigation properties of button2
-  button2.SetProperty(Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::Value((int)button1.GetId()));
-  button2.SetProperty(Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID, Property::Value((int)button1.GetId()));
-  button2.SetProperty(Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID, Property::Value((int)button1.GetId()));
-  button2.SetProperty(Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::Value((int)button1.GetId()));
+  button2.SetProperty(Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::Value((int)button1.GetProperty< int >( Actor::Property::ID )));
+  button2.SetProperty(Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID, Property::Value((int)button1.GetProperty< int >( Actor::Property::ID )));
+  button2.SetProperty(Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID, Property::Value((int)button1.GetProperty< int >( Actor::Property::ID )));
+  button2.SetProperty(Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::Value((int)button1.GetProperty< int >( Actor::Property::ID )));
 
   // Move the focus towards left
   DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::LEFT) == true);
@@ -693,11 +693,11 @@ int UtcDaliKeyboardFocusManagerFocusablePropertiesMoveFocus(void)
   Stage::GetCurrent().Add(tableView);
 
   PushButton button = PushButton::New();
-  button.SetKeyboardFocusable(true);
+  button.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   tableView.AddChild(button, TableView::CellPosition(0, 0));
 
   // set the navigation properties of button3
-  button.SetProperty(Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::Value((int)button1.GetId()));
+  button.SetProperty(Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::Value((int)button1.GetProperty< int >( Actor::Property::ID )));
 
   // Set the focus to the button
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(button) == true);
@@ -731,12 +731,12 @@ int UtcDaliKeyboardFocusManagerClearFocus(void)
 
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
-  first.SetKeyboardFocusable(true);
+  first.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(first);
 
   // Create the second actor and add it to the stage
   Actor second = Actor::New();
-  second.SetKeyboardFocusable(true);
+  second.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(second);
 
   // Check that the focus is set on the first actor
@@ -901,12 +901,12 @@ int UtcDaliKeyboardFocusManagerSignalFocusedActorActivated(void)
 
   // Create the first button and add it to the stage
   PushButton firstPushButton = PushButton::New();
-  firstPushButton.SetKeyboardFocusable(true);
+  firstPushButton.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(firstPushButton);
 
   // Create the second button and add it to the stage
   PushButton secondPushButton = PushButton::New();
-  secondPushButton.SetKeyboardFocusable(true);
+  secondPushButton.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(secondPushButton);
 
   // Check that the focus is set on the first button
@@ -1001,22 +1001,22 @@ int UtcDaliKeyboardFocusManagerMoveFocusBackward(void)
 
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
-  first.SetKeyboardFocusable(true);
+  first.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(first);
 
   // Create the second actor and add it to the stage
   Actor second = Actor::New();
-  second.SetKeyboardFocusable(true);
+  second.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(second);
 
   // Create the third actor and add it to the stage
   Actor third = Actor::New();
-  third.SetKeyboardFocusable(true);
+  third.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(third);
 
   // Create the fourth actor and add it to the stage
   Actor fourth = Actor::New();
-  fourth.SetKeyboardFocusable(true);
+  fourth.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(fourth);
 
   // Check that the focus is set on the second actor
@@ -1058,7 +1058,7 @@ int UtcDaliKeyboardFocusManagerMoveFocusBackward(void)
   for(int i = 0 ; i < 31 ; i ++)
   {
     Actor actor = Actor::New();
-    actor.SetKeyboardFocusable(true);
+    actor.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
     Stage::GetCurrent().Add(actor);
     manager.SetCurrentFocusActor(actor);
   }
@@ -1108,19 +1108,19 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByKeyEvents(void)
 
   // Create the first actor
   Actor first = Actor::New();
-  first.SetKeyboardFocusable(true);
+  first.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
 
   // Create the second actor
   Actor second = Actor::New();
-  second.SetKeyboardFocusable(true);
+  second.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
 
   // Create the third actor
   Actor third = Actor::New();
-  third.SetKeyboardFocusable(true);
+  third.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
 
   // Create the fourth actor
   Actor fourth = Actor::New();
-  fourth.SetKeyboardFocusable(true);
+  fourth.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
 
   // Add the four children to table view
   tableView.AddChild(first, TableView::CellPosition(0, 0));
@@ -1301,12 +1301,12 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
 
   // Create the first actor and add it to the stage
   Control first = Control::New();
-  first.SetKeyboardFocusable(true);
+  first.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(first);
 
   // Create the second actor and add it to the stage
   Control second = Control::New();
-  second.SetKeyboardFocusable(true);
+  second.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   Stage::GetCurrent().Add(second);
 
   // Move the focus to the right
@@ -1365,11 +1365,11 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
 
   // Create the third actor
   Control third = Control::New();
-  third.SetKeyboardFocusable(true);
+  third.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
 
   // Create the fourth actor
   Control fourth = Control::New();
-  fourth.SetKeyboardFocusable(true);
+  fourth.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
 
   // Add the four children to table view
   tableView.AddChild(first, TableView::CellPosition(0, 0));
@@ -1494,7 +1494,7 @@ int UtcDaliKeyboardFocusManagerFocusedActorUnstaged(void)
   DALI_TEST_CHECK( ! manager.GetCurrentFocusActor() );
 
   Actor actor = Actor::New();
-  actor.SetKeyboardFocusable( true );
+  actor.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
 
   tet_infoline( "Attempt to set unstaged actor, no actor should be returned from KeyboardFocusManager" );
   manager.SetCurrentFocusActor( actor );
@@ -1522,7 +1522,7 @@ int UtcDaliKeyboardFocusManagerEnableFocusIndicator(void)
   DALI_TEST_CHECK( ! manager.GetCurrentFocusActor() );
 
   Actor actor = Actor::New();
-  actor.SetKeyboardFocusable( true );
+  actor.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
   Stage::GetCurrent().Add( actor );
   manager.SetCurrentFocusActor( actor );
 
@@ -1557,7 +1557,7 @@ int UtcDaliKeyboardFocusManagerCheckConsumedKeyEvent(void)
 
   // Create the first actor and add it to the stage
   Control control = Control::New();
-  control.SetKeyboardFocusable(true);
+  control.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   scene.Add(control);
 
   KeyEventCallback controlCallback( true );
@@ -1590,13 +1590,13 @@ int UtcDaliKeyboardFocusManagerFocusPerWindow(void)
   Window firstWindow = Window::New(PositionSize(0,0,300,500) ,"", false);
   DALI_TEST_CHECK( firstWindow );
   Control first = Control::New();
-  first.SetKeyboardFocusable(true);
+  first.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   firstWindow.Add(first);
 
   Window secondWindow = Window::New(PositionSize(0,0,400,600) ,"", false);
   DALI_TEST_CHECK( secondWindow );
   Control second = Control::New();
-  second.SetKeyboardFocusable(true);
+  second.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   secondWindow.Add( second );
 
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);

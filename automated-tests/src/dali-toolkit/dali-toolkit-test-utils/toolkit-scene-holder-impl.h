@@ -49,9 +49,9 @@ public:
 
   virtual void StartRender() {};
 
-  virtual bool PreRender( bool resizingSurface ) { return false; };
+  virtual bool PreRender( bool resizingSurface, const std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect  ) { return false; };
 
-  virtual void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface ) {};
+  virtual void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface, const std::vector<Rect<int>>& damagedRects ) {};
 
   virtual void StopRender() {};
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/images/native-image.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace Dali
@@ -136,7 +136,7 @@ Toolkit::WebView WebView::New( const std::string& locale, const std::string& tim
 
 void WebView::OnInitialize()
 {
-  Self().SetKeyboardFocusable( true );
+  Self().SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
   Self().TouchSignal().Connect( this, &WebView::OnTouchEvent );
 
   if( mWebEngine )
@@ -152,8 +152,11 @@ void WebView::LoadUrl( const std::string& url )
   mUrl = url;
   if( mWebEngine )
   {
-    Dali::Image image = Dali::NativeImage::New( *mWebEngine.GetNativeImageSource() );
-    mVisual = Toolkit::VisualFactory::Get().CreateVisual( image );
+    Texture texture = Dali::Texture::New( *mWebEngine.GetNativeImageSource() );
+    const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
+    mVisual = Toolkit::VisualFactory::Get().CreateVisual(
+      { { Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE } ,
+        { Toolkit::ImageVisual::Property::URL, nativeImageUrl } } );
 
     if( mVisual )
     {
@@ -168,8 +171,11 @@ void WebView::LoadHTMLString( const std::string& htmlString )
 {
   if( mWebEngine )
   {
-    Dali::Image image = Dali::NativeImage::New( *mWebEngine.GetNativeImageSource() );
-    mVisual = Toolkit::VisualFactory::Get().CreateVisual( image );
+    Texture texture = Dali::Texture::New( *mWebEngine.GetNativeImageSource() );
+    const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
+    mVisual = Toolkit::VisualFactory::Get().CreateVisual(
+      { { Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE } ,
+        { Toolkit::ImageVisual::Property::URL, nativeImageUrl } } );
 
     if( mVisual )
     {

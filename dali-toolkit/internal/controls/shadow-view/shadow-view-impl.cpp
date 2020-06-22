@@ -209,7 +209,7 @@ void ShadowView::SetShadowColor(Vector4 color)
 
 void ShadowView::Activate()
 {
-  DALI_ASSERT_ALWAYS( Self().OnStage() && "ShadowView should be on stage before calling Activate()\n" );
+  DALI_ASSERT_ALWAYS( Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) && "ShadowView should be on stage before calling Activate()\n" );
 
   // make sure resources are allocated and start the render tasks processing
   CreateRenderTasks();
@@ -217,7 +217,7 @@ void ShadowView::Activate()
 
 void ShadowView::Deactivate()
 {
-  DALI_ASSERT_ALWAYS( Self().OnStage() && "ShadowView should be on stage before calling Deactivate()\n" )
+  DALI_ASSERT_ALWAYS( Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) && "ShadowView should be on stage before calling Deactivate()\n" )
 
   // stop render tasks processing
   // Note: render target resources are automatically freed since we set the Image::Unused flag

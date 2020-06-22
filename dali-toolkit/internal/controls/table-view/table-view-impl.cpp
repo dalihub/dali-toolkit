@@ -829,7 +829,7 @@ void TableView::OnRelayout( const Vector2& size, RelayoutContainer& container )
       if( actor &&  position.rowIndex == row && position.columnIndex == column )
       {
         // Anchor actor to top left of the cell
-        if( actor.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >() )
+        if( actor.GetProperty( Actor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >() )
         {
           actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
         }
@@ -1117,7 +1117,7 @@ void TableView::OnInitialize()
 {
   // Make self as keyboard focusable and focus group
   Actor self = Self();
-  self.SetKeyboardFocusable(true);
+  self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   SetAsKeyboardFocusGroup(true);
 }
 

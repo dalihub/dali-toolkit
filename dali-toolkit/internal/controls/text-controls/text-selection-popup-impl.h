@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,11 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <string>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/object/property-map.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
@@ -25,10 +30,6 @@
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
-
-// EXTERNAL INCLUDES
-#include <dali/public-api/actors/layer.h>
-#include <dali/public-api/object/property-map.h>
 
 namespace Dali
 {
@@ -58,7 +59,6 @@ public:
       priority( 0u ),
       name(),
       caption(),
-      icon(),
       enabled( false )
     {}
 
@@ -66,13 +66,11 @@ public:
                        std::size_t buttonPriority,
                        const std::string& buttonName,
                        const std::string& buttonCaption,
-                       Dali::Image& buttonIcon,
                        bool buttonEnabled )
     : id( buttonId ),
       priority( buttonPriority ),
       name( buttonName ),
       caption( buttonCaption ),
-      icon( buttonIcon ),
       enabled( buttonEnabled )
     {}
 
@@ -80,7 +78,6 @@ public:
     std::size_t priority;
     std::string name;
     std::string caption;
-    Dali::Image icon;
     bool enabled;
   };
 
@@ -203,7 +200,7 @@ private: // Implementation
    *
    * @param[in] setting The setting from the PopupCustomisations enum
    */
-  Size GetDimensionToCustomise( const PopupCustomisations& setting );
+  Size GetDimensionToCustomise( const PopupCustomisations& setting ) const;
 
   /**
    * @brief Sets the image for the given button of the Popup.
@@ -211,7 +208,7 @@ private: // Implementation
    * @param[in] button  The button the image should be used for from the Buttons Enum.
    * @param[in] image The image to use.
    */
- void SetButtonImage( Toolkit::TextSelectionPopup::Buttons button, Dali::Image image );
+ void SetButtonImage( Toolkit::TextSelectionPopup::Buttons button, const std::string& image );
 
   /**
    * @brief Retrieves the image of the given button used by the popup
@@ -219,7 +216,7 @@ private: // Implementation
    * @param[in] button The button to get the image from
    * @return The image used for that button.
    */
-  Dali::Image GetButtonImage( Toolkit::TextSelectionPopup::Buttons button );
+  const std::string& GetButtonImage( Toolkit::TextSelectionPopup::Buttons button ) const;
 
   /**
    * @brief Sets the image for the pressed state of a popup option.
@@ -239,7 +236,7 @@ private: // Implementation
 
   void AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption );
 
-  std::size_t GetNumberOfEnabledOptions();
+  std::size_t GetNumberOfEnabledOptions() const;
 
   void AddPopupOptionsToToolbar(  bool showIcons, bool showCaptions );
 
@@ -273,13 +270,13 @@ private: // Data
 
   Dali::Toolkit::TableView mTableOfButtons;           // Actor which holds all the buttons, sensitivity can be set on buttons via this actor
 
-  // Images to be used by the Popup buttons
-  Image mCutIconImage;
-  Image mCopyIconImage;
-  Image mPasteIconImage;
-  Image mClipboardIconImage;
-  Image mSelectIconImage;
-  Image mSelectAllIconImage;
+  // Images paths to be used by the Popup buttons
+  std::string mCutIconImage;
+  std::string mCopyIconImage;
+  std::string mPasteIconImage;
+  std::string mClipboardIconImage;
+  std::string mSelectIconImage;
+  std::string mSelectAllIconImage;
 
   Size mPopupMaxSize;                   // Maximum size of the Popup
   Size mOptionMaxSize;                  // Maximum size of an Option button

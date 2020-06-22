@@ -67,8 +67,8 @@ DALI_ENUM_TO_STRING_TABLE_END( VISUAL_FITTING_MODE )
 
 } // namespace
 
-Visual::Base::Base( VisualFactoryCache& factoryCache, FittingMode fittingMode )
-: mImpl( new Impl(fittingMode) ),
+Visual::Base::Base( VisualFactoryCache& factoryCache, FittingMode fittingMode, Toolkit::Visual::Type type )
+: mImpl( new Impl( fittingMode, type ) ),
   mFactoryCache( factoryCache )
 {
 }
@@ -500,6 +500,11 @@ bool Visual::Base::IsResourceReady() const
 bool Visual::Base::IsSynchronousLoadingRequired() const
 {
   return ( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING );
+}
+
+Toolkit::Visual::Type Visual::Base::GetType() const
+{
+  return mImpl->mType;
 }
 
 Toolkit::Visual::ResourceStatus Visual::Base::GetResourceStatus() const

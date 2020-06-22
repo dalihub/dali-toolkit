@@ -28,6 +28,9 @@
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/devel-api/visuals/arc-visual-properties-devel.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
@@ -86,6 +89,35 @@ float DEFAULT_VALUE = 0.0f;
 float DEFAULT_LOWER_BOUND = 0.0f;
 float DEFAULT_UPPER_BOUND = 1.0f;
 float DEFAULT_FONT_SIZE = 12.0f;
+const char* CIRCULAR_PROGRESS_BAR_STYLE_NAME = "CircularProgressBar";
+
+
+void BackupVisualProperties( const Control* control, Property::Index index, Property::Map& map )
+{
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( *control, index );
+
+  if( visual )
+  {
+    map.Clear();
+    visual.CreatePropertyMap( map );
+  }
+}
+
+void RestoreVisualProperties( Control* control, Property::Index index, Property::Map& map, int depth )
+{
+  if( !map.Empty() )
+  {
+    Toolkit::Visual::Base visual = DevelControl::GetVisual( *control, index );
+
+    Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+
+    visualImpl.SetProperties( map );
+
+    DevelControl::UnregisterVisual( *control, index );
+
+    DevelControl::RegisterVisual( *control, index, visual, true, depth );
+  }
+}
 
 } // Unnamed namespace
 
@@ -93,13 +125,25 @@ float DEFAULT_FONT_SIZE = 12.0f;
 // ProgressBar
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-Dali::Toolkit::ProgressBar ProgressBar::New()
+Dali::Toolkit::ProgressBar ProgressBar::New( DevelProgressBar::Style progressBarStyle )
 {
   // Create the implementation
   ProgressBarPtr progressBar( new ProgressBar() );
 
-  // Pass ownership to CustomActor via derived handle
   Dali::Toolkit::ProgressBar handle( *progressBar );
+
+  switch( progressBarStyle )
+  {
+    case DevelProgressBar::Style::CIRCULAR:
+    {
+      progressBar->SetStyleName( CIRCULAR_PROGRESS_BAR_STYLE_NAME );
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
 
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
@@ -133,8 +177,6 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
   trackSize.width = std::max( 0.0f, size.width ); // Ensure we don't go negative
 
   Toolkit::Visual::Base trackVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::TRACK_VISUAL );
-  Toolkit::Visual::Base secondProgressVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL );
-  Toolkit::Visual::Base progressVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::PROGRESS_VISUAL );
   Toolkit::Visual::Base labelVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::LABEL_VISUAL );
   Toolkit::Visual::Base indeterminateVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL );
 
@@ -149,29 +191,9 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
     trackVisual.SetTransformAndSize( visualTransform, trackSize );
   }
 
-  if( secondProgressVisual )
-  {
-    Property::Map visualTransform;
+  ApplyProgressToVisualTransform( mSecondaryProgressValue, trackSize, Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL );
 
-    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, Vector2( mDomain.from.x + mSecondaryProgressValue * ( mDomain.to.x - mDomain.from.x ), trackSize.height  ) )
-                   .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
-                   .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
-    secondProgressVisual.SetTransformAndSize( visualTransform, trackSize );
-  }
-
-  if( progressVisual )
-  {
-    Property::Map visualTransform;
-
-    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, Vector2( mDomain.from.x + mProgressValue * ( mDomain.to.x - mDomain.from.x ), trackSize.height ) )
-                   .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
-                   .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
-    progressVisual.SetTransformAndSize( visualTransform, trackSize );
-  }
+  ApplyProgressToVisualTransform( mProgressValue, trackSize, Toolkit::ProgressBar::Property::PROGRESS_VISUAL );
 
   if( labelVisual )
   {
@@ -240,6 +262,8 @@ void ProgressBar::SetProgressValue( float value )
   {
     mProgressValue = Clamp( value, DEFAULT_LOWER_BOUND, DEFAULT_UPPER_BOUND );
 
+    ApplyProgressToVisual( mProgressValue, Toolkit::ProgressBar::Property::PROGRESS_VISUAL, ProgressDepthIndex::PROGRESS_VISUAL );
+
     Toolkit::ProgressBar self = Toolkit::ProgressBar::DownCast( Self() );
     mValueChangedSignal.Emit( self, mProgressValue, mSecondaryProgressValue );
     RelayoutRequest();
@@ -260,6 +284,8 @@ void ProgressBar::SetSecondaryProgressValue( float value )
       ( ( value <= DEFAULT_UPPER_BOUND ) || ( Equals( value, DEFAULT_UPPER_BOUND ) ) ) )
   {
     mSecondaryProgressValue = Clamp( value, DEFAULT_LOWER_BOUND, DEFAULT_UPPER_BOUND );
+
+    ApplyProgressToVisual( mSecondaryProgressValue, Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL, ProgressDepthIndex::SECONDARY_PROGRESS_VISUAL );
 
     Toolkit::ProgressBar self = Toolkit::ProgressBar::DownCast( Self() );
     mValueChangedSignal.Emit( self, mProgressValue, mSecondaryProgressValue );
@@ -292,6 +318,13 @@ void ProgressBar::SetIndeterminate( bool value )
     {
       mIndeterminateVisualAni.Stop();
     }
+
+    // Restore previous visual data after animation finished.
+    RestoreVisualProperties( this, Toolkit::ProgressBar::Property::TRACK_VISUAL, mTrackVisualMap, ProgressDepthIndex::TRACK_VISUAL );
+    RestoreVisualProperties( this, Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL, mSecondaryProgressVisualMap, ProgressDepthIndex::SECONDARY_PROGRESS_VISUAL );
+    RestoreVisualProperties( this, Toolkit::ProgressBar::Property::PROGRESS_VISUAL, mProgressVisualMap, ProgressDepthIndex::PROGRESS_VISUAL );
+
+    RelayoutRequest();
   }
 }
 
@@ -311,6 +344,11 @@ void ProgressBar::SetIndeterminateVisualTransition( Toolkit::TransitionData tran
 
 void ProgressBar::PlayIndeterminateVisualTransition()
 {
+  // Store current visual data before animation changes it.
+  BackupVisualProperties( this, Toolkit::ProgressBar::Property::TRACK_VISUAL, mTrackVisualMap );
+  BackupVisualProperties( this, Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL, mSecondaryProgressVisualMap );
+  BackupVisualProperties( this, Toolkit::ProgressBar::Property::PROGRESS_VISUAL, mProgressVisualMap );
+
   if( mIndeterminateVisualAni )
   {
     mIndeterminateVisualAni.Stop();
@@ -404,6 +442,47 @@ bool ProgressBar::GetPropertyMapForVisual( Property::Index visualIndex, Property
   return success;
 }
 
+
+void ProgressBar::ApplyProgressToVisual( float progress, Property::Index index, int depth )
+{
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, index );
+
+  if( visual && static_cast<DevelVisual::Type>( visual.GetType() ) == DevelVisual::ARC && !mIndeterminate )
+  {
+    Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+
+    Property::Map map;
+
+    map[ Toolkit::DevelArcVisual::Property::SWEEP_ANGLE ] = Property::Value( 360.0f * progress );
+
+    visualImpl.SetProperties( map );
+
+    DevelControl::UnregisterVisual( *this, index );
+    DevelControl::RegisterVisual( *this, index, visual, true, depth );
+  }
+}
+
+void ProgressBar::ApplyProgressToVisualTransform( float progress, Vector2 trackSize, Property::Index index )
+{
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, index );
+
+  if( visual )
+  {
+    Property::Map visualTransform;
+
+    if( static_cast<DevelVisual::Type>( visual.GetType() ) != DevelVisual::ARC )
+    {
+      visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, Vector2( mDomain.from.x + progress * ( mDomain.to.x - mDomain.from.x ), trackSize.height ) )
+                     .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                     .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                     .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                     .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
+    }
+
+    visual.SetTransformAndSize( visualTransform, trackSize );
+  }
+}
+
 // Static class method to support script connecting signals
 bool ProgressBar::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
@@ -444,12 +523,14 @@ void ProgressBar::SetProperty( BaseObject* object, Property::Index propertyIndex
       case Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL:
       {
         progressBarImpl.CreateVisualsForComponent( propertyIndex, value, ProgressDepthIndex::SECONDARY_PROGRESS_VISUAL );
+        progressBarImpl.ApplyProgressToVisual( progressBarImpl.mSecondaryProgressValue, propertyIndex, ProgressDepthIndex::SECONDARY_PROGRESS_VISUAL );
         break;
       }
 
       case Toolkit::ProgressBar::Property::PROGRESS_VISUAL:
       {
         progressBarImpl.CreateVisualsForComponent( propertyIndex, value, ProgressDepthIndex::PROGRESS_VISUAL );
+        progressBarImpl.ApplyProgressToVisual( progressBarImpl.mProgressValue, propertyIndex, ProgressDepthIndex::PROGRESS_VISUAL );
         break;
       }
 

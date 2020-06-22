@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,14 +99,6 @@ public:
    * @return The handle to the created visual
    */
   Visual::Base CreateVisual( const Property::Map& propertyMap  );
-
-  /**
-   * @brief Request the visual to render the image.
-   *
-   * @param[in] image The image to be rendered.
-   * @return The pointer pointing to the visual
-   */
-  Visual::Base CreateVisual( const Image& image );
 
   /**
    * @brief Request the visual to render the given resource at the url.

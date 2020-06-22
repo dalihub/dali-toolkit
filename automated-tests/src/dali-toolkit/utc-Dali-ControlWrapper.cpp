@@ -527,7 +527,7 @@ int UtcDaliControlWrapperRegisterDisabledVisual(void)
 
   DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( controlWrapper.OnStage(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( controlWrapper.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ), true, TEST_LOCATION );
 
   controlWrapperImpl->EnableVisual( TEST_PROPERTY, true );
 
@@ -570,7 +570,7 @@ int UtcDaliControlWrapperRegisterDisabledVisualWithDepthIndex(void)
 
   DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( controlWrapper.OnStage(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( controlWrapper.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ), true, TEST_LOCATION );
 
   controlWrapperImpl->EnableVisual( TEST_PROPERTY, true );
 

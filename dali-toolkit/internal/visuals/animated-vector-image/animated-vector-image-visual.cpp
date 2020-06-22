@@ -84,7 +84,7 @@ AnimatedVectorImageVisualPtr AnimatedVectorImageVisual::New( VisualFactoryCache&
 }
 
 AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL, static_cast<Toolkit::Visual::Type>( Toolkit::DevelVisual::ANIMATED_VECTOR_IMAGE ) ),
   mUrl( imageUrl ),
   mAnimationData(),
   mVectorAnimationTask( new VectorAnimationTask( factoryCache, imageUrl.GetUrl() ) ),

@@ -19,7 +19,6 @@
 #include "image-view-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -54,7 +53,6 @@ BaseHandle Create()
 
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ImageView, Toolkit::Control, Create );
-DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "reservedProperty01", STRING, RESERVED_PROPERTY_01 )
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "image", MAP, IMAGE )
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "preMultipliedAlpha", BOOLEAN, PRE_MULTIPLIED_ALPHA )
 
@@ -274,11 +272,12 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
     mVisual.SetTransformAndSize( transformMap, size );
 
     // mVisual is not updated util the resource is ready in the case of visual replacement.
-    // So apply the transform and size to the new visual.
+    // in this case, the Property Map must be initialized so that the previous value is not reused.
+    // after mVisual is updated, the correct value will be reset.
     Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
     if( visual && visual != mVisual )
     {
-      visual.SetTransformAndSize( transformMap, size );
+      visual.SetTransformAndSize( Property::Map(), size );
     }
   }
 }

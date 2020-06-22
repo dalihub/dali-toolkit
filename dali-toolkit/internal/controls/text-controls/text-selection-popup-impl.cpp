@@ -25,7 +25,6 @@
 #include <string.h>
 #include <cfloat>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-map.h>
@@ -177,38 +176,32 @@ void TextSelectionPopup::SetProperty( BaseObject* object, Property::Index index,
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        impl.SetButtonImage( Toolkit::TextSelectionPopup::CLIPBOARD, image );
+        impl.SetButtonImage( Toolkit::TextSelectionPopup::CLIPBOARD, value.Get< std::string >() );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        impl.SetButtonImage( Toolkit::TextSelectionPopup::CUT, image );
+        impl.SetButtonImage( Toolkit::TextSelectionPopup::CUT, value.Get< std::string >() );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_COPY_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        impl.SetButtonImage( Toolkit::TextSelectionPopup::COPY, image );
+        impl.SetButtonImage( Toolkit::TextSelectionPopup::COPY, value.Get< std::string >() );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        impl.SetButtonImage( Toolkit::TextSelectionPopup::PASTE, image );
+        impl.SetButtonImage( Toolkit::TextSelectionPopup::PASTE, value.Get< std::string >() );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        impl.SetButtonImage( Toolkit::TextSelectionPopup::SELECT, image );
+        impl.SetButtonImage( Toolkit::TextSelectionPopup::SELECT, value.Get< std::string >() );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        impl.SetButtonImage( Toolkit::TextSelectionPopup::SELECT_ALL, image );
+        impl.SetButtonImage( Toolkit::TextSelectionPopup::SELECT_ALL, value.Get< std::string >() );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_DIVIDER_COLOR:
@@ -285,56 +278,32 @@ Property::Value TextSelectionPopup::GetProperty( BaseObject* object, Property::I
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::DownCast( impl.GetButtonImage( Toolkit::TextSelectionPopup::CLIPBOARD ) );
-        if( image )
-        {
-          value = image.GetUrl();
-        }
+        value = impl.GetButtonImage( Toolkit::TextSelectionPopup::CLIPBOARD );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_CUT_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::DownCast( impl.GetButtonImage( Toolkit::TextSelectionPopup::CUT ) );
-        if( image )
-        {
-          value = image.GetUrl();
-        }
+        value = impl.GetButtonImage( Toolkit::TextSelectionPopup::CUT );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_COPY_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::DownCast( impl.GetButtonImage( Toolkit::TextSelectionPopup::COPY ) );
-        if( image )
-        {
-          value = image.GetUrl();
-        }
+        value = impl.GetButtonImage( Toolkit::TextSelectionPopup::COPY );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_PASTE_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::DownCast( impl.GetButtonImage( Toolkit::TextSelectionPopup::PASTE ) );
-        if( image )
-        {
-          value = image.GetUrl();
-        }
+        value = impl.GetButtonImage( Toolkit::TextSelectionPopup::PASTE );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::DownCast( impl.GetButtonImage( Toolkit::TextSelectionPopup::SELECT ) );
-        if( image )
-        {
-          value = image.GetUrl();
-        }
+        value = impl.GetButtonImage( Toolkit::TextSelectionPopup::SELECT );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_SELECT_ALL_BUTTON_ICON_IMAGE:
       {
-        ResourceImage image = ResourceImage::DownCast( impl.GetButtonImage( Toolkit::TextSelectionPopup::SELECT_ALL ) );
-        if( image )
-        {
-          value = image.GetUrl();
-        }
+        value = impl.GetButtonImage( Toolkit::TextSelectionPopup::SELECT_ALL );
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_IMAGE:
@@ -525,7 +494,7 @@ void TextSelectionPopup::SetDimensionToCustomise( const PopupCustomisations& set
   } // switch
 }
 
-Size TextSelectionPopup::GetDimensionToCustomise( const PopupCustomisations& settingToCustomise )
+Size TextSelectionPopup::GetDimensionToCustomise( const PopupCustomisations& settingToCustomise ) const
 {
   switch( settingToCustomise )
   {
@@ -557,89 +526,90 @@ Size TextSelectionPopup::GetDimensionToCustomise( const PopupCustomisations& set
   return Size::ZERO;
 }
 
-void TextSelectionPopup::SetButtonImage( Toolkit::TextSelectionPopup::Buttons button, Dali::Image image )
+void TextSelectionPopup::SetButtonImage( Toolkit::TextSelectionPopup::Buttons button, const std::string& image )
 {
    switch ( button )
    {
-   break;
-   case Toolkit::TextSelectionPopup::CLIPBOARD:
-   {
-     mClipboardIconImage  = image;
-   }
-   break;
-   case Toolkit::TextSelectionPopup::CUT :
-   {
-     mCutIconImage = image;
-   }
-   break;
-   case Toolkit::TextSelectionPopup::COPY :
-   {
-     mCopyIconImage = image;
-   }
-   break;
-   case Toolkit::TextSelectionPopup::PASTE :
-   {
-     mPasteIconImage = image;
-   }
-   break;
-   case Toolkit::TextSelectionPopup::SELECT :
-   {
-     mSelectIconImage = image;
-   }
-   break;
-   case Toolkit::TextSelectionPopup::SELECT_ALL :
-   {
-     mSelectAllIconImage = image;
-   }
-   break;
-   default :
-   {
-     DALI_ASSERT_DEBUG( "TextSelectionPopup SetPopupImage Unknown Button" );
-   }
+     case Toolkit::TextSelectionPopup::CLIPBOARD:
+     {
+       mClipboardIconImage  = image;
+       break;
+     }
+     case Toolkit::TextSelectionPopup::CUT :
+     {
+       mCutIconImage = image;
+       break;
+     }
+     case Toolkit::TextSelectionPopup::COPY :
+     {
+       mCopyIconImage = image;
+       break;
+     }
+     case Toolkit::TextSelectionPopup::PASTE :
+     {
+       mPasteIconImage = image;
+       break;
+     }
+     case Toolkit::TextSelectionPopup::SELECT :
+     {
+       mSelectIconImage = image;
+       break;
+     }
+     case Toolkit::TextSelectionPopup::SELECT_ALL :
+     {
+       mSelectAllIconImage = image;
+       break;
+     }
+     default :
+     {
+       DALI_ASSERT_DEBUG( "TextSelectionPopup SetPopupImage Unknown Button" );
+     }
    } // switch
 }
 
-Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::Buttons button )
+const std::string& TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::Buttons button ) const
 {
   switch ( button )
   {
-  case Toolkit::TextSelectionPopup::CLIPBOARD :
-  {
-    return mClipboardIconImage;
-  }
-  break;
-  case Toolkit::TextSelectionPopup::CUT :
-  {
-    return mCutIconImage;
-  }
-  break;
-  case Toolkit::TextSelectionPopup::COPY :
-  {
-    return mCopyIconImage;
-  }
-  break;
-  case Toolkit::TextSelectionPopup::PASTE :
-  {
-    return mPasteIconImage;
-  }
-  break;
-  case Toolkit::TextSelectionPopup::SELECT :
-  {
-    return mSelectIconImage;
-  }
-  break;
-  case Toolkit::TextSelectionPopup::SELECT_ALL :
-  {
-    return mSelectAllIconImage;
-  }
-  break;
-  default :
-  {
-    DALI_ASSERT_DEBUG( "TextSelectionPopup GetPopupImage Unknown Button" );
-  }
+    case Toolkit::TextSelectionPopup::CLIPBOARD:
+    {
+      return mClipboardIconImage;
+      break;
+    }
+    case Toolkit::TextSelectionPopup::CUT:
+    {
+      return mCutIconImage;
+      break;
+    }
+    case Toolkit::TextSelectionPopup::COPY:
+    {
+      return mCopyIconImage;
+      break;
+    }
+    case Toolkit::TextSelectionPopup::PASTE:
+    {
+      return mPasteIconImage;
+      break;
+    }
+    case Toolkit::TextSelectionPopup::SELECT:
+    {
+      return mSelectIconImage;
+      break;
+    }
+    case Toolkit::TextSelectionPopup::SELECT_ALL:
+    {
+      return mSelectAllIconImage;
+      break;
+    }
+    case Toolkit::TextSelectionPopup::NONE:
+    {
+      break;
+    }
   } // switch
 
-  return Dali::Image();
+  DALI_ASSERT_DEBUG( "TextSelectionPopup GetPopupImage Unknown Button" );
+  static std::string empty;
+  return empty;
 }
 
 void TextSelectionPopup::SetPressedImage( const std::string& filename )
@@ -658,12 +628,12 @@ std::string TextSelectionPopup::GetPressedImage() const
    mOrderListOfButtons.reserve( 8u );
 
    // Create button for each possible option using Option priority
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::CUT, mCutOptionPriority, OPTION_CUT, POPUP_CUT_STRING , mCutIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::CUT)  ) );
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::COPY, mCopyOptionPriority, OPTION_COPY, POPUP_COPY_STRING, mCopyIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::COPY)  ) );
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::PASTE, mPasteOptionPriority, OPTION_PASTE, POPUP_PASTE_STRING, mPasteIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::PASTE)  ) );
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::SELECT, mSelectOptionPriority, OPTION_SELECT_WORD, POPUP_SELECT_STRING, mSelectIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::SELECT)  ) );
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::SELECT_ALL, mSelectAllOptionPriority, OPTION_SELECT_ALL, POPUP_SELECT_ALL_STRING, mSelectAllIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::SELECT_ALL)  ) );
-   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::CLIPBOARD, mClipboardOptionPriority, OPTION_CLIPBOARD, POPUP_CLIPBOARD_STRING, mClipboardIconImage, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::CLIPBOARD)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::CUT, mCutOptionPriority, OPTION_CUT, POPUP_CUT_STRING , 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::CUT)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::COPY, mCopyOptionPriority, OPTION_COPY, POPUP_COPY_STRING, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::COPY)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::PASTE, mPasteOptionPriority, OPTION_PASTE, POPUP_PASTE_STRING, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::PASTE)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::SELECT, mSelectOptionPriority, OPTION_SELECT_WORD, POPUP_SELECT_STRING, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::SELECT)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::SELECT_ALL, mSelectAllOptionPriority, OPTION_SELECT_ALL, POPUP_SELECT_ALL_STRING, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::SELECT_ALL)  ) );
+   mOrderListOfButtons.push_back( ButtonRequirement( Toolkit::TextSelectionPopup::CLIPBOARD, mClipboardOptionPriority, OPTION_CLIPBOARD, POPUP_CLIPBOARD_STRING, 0 != ( mEnabledButtons & Toolkit::TextSelectionPopup::CLIPBOARD)  ) );
 
    // Sort the buttons according their priorities.
    std::sort( mOrderListOfButtons.begin(), mOrderListOfButtons.end(), TextSelectionPopup::ButtonPriorityCompare() );
@@ -771,7 +741,7 @@ std::string TextSelectionPopup::GetPressedImage() const
    }
  }
 
- std::size_t TextSelectionPopup::GetNumberOfEnabledOptions()
+ std::size_t TextSelectionPopup::GetNumberOfEnabledOptions() const
  {
    std::size_t numberOfOptions = 0u;
    for( std::vector<ButtonRequirement>::const_iterator it = mOrderListOfButtons.begin(), endIt = mOrderListOfButtons.end(); ( it != endIt ); ++it )

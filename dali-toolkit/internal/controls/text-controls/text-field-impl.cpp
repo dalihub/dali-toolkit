@@ -23,7 +23,6 @@
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -91,8 +90,6 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "horizontalAlignment",          
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "verticalAlignment",                    STRING,    VERTICAL_ALIGNMENT                   )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "textColor",                            VECTOR4,   TEXT_COLOR                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderTextColor",                 VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "reservedProperty01",                   STRING,    RESERVED_PROPERTY_01                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "reservedProperty02",                   STRING,    RESERVED_PROPERTY_02                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "primaryCursorColor",                   VECTOR4,   PRIMARY_CURSOR_COLOR                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "secondaryCursorColor",                 VECTOR4,   SECONDARY_CURSOR_COLOR               )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableCursorBlink",                    BOOLEAN,   ENABLE_CURSOR_BLINK                  )
@@ -434,7 +431,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::GRAB_HANDLE_IMAGE:
       {
         const std::string imageFileName = value.Get< std::string >();
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str() );
 
         if( impl.mDecorator && imageFileName.size() )
         {
@@ -446,7 +443,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE:
       {
         const std::string imageFileName = value.Get< std::string >();
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str() );
 
         if( impl.mDecorator && imageFileName.size() )
         {

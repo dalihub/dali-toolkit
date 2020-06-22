@@ -46,8 +46,9 @@ struct Base::Impl
   /**
    * Constructor
    * @param [in] fittingMode that the derived class prefers
+   * @param [in] type The type of the this visual
    */
-  Impl(FittingMode fittingMode);
+  Impl( FittingMode fittingMode, Toolkit::Visual::Type type );
 
   /**
    * Destructor
@@ -132,6 +133,7 @@ struct Base::Impl
   FittingMode     mFittingMode;  //< How the contents should fit the view
   int             mFlags;
   Toolkit::Visual::ResourceStatus  mResourceStatus;
+  const Toolkit::Visual::Type      mType;
 };
 
 } // namespace Visual

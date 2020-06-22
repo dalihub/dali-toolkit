@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <cstring> // for strcmp
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -391,7 +390,7 @@ void ScrollBar::ShowIndicator()
   }
   else
   {
-    mIndicator.SetProperty( DevelActor::Property::OPACITY,mIndicatorShowAlpha);
+    mIndicator.SetProperty( Actor::Property::OPACITY,mIndicatorShowAlpha);
   }
 }
 
@@ -412,7 +411,7 @@ void ScrollBar::HideIndicator()
   }
   else
   {
-    mIndicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
+    mIndicator.SetProperty( Actor::Property::OPACITY,0.0f);
   }
 }
 
@@ -433,7 +432,7 @@ void ScrollBar::ShowTransientIndicator()
   }
   else
   {
-    mIndicator.SetProperty( DevelActor::Property::OPACITY,mIndicatorShowAlpha);
+    mIndicator.SetProperty( Actor::Property::OPACITY,mIndicatorShowAlpha);
   }
   mAnimation.AnimateTo( Property( mIndicator, Actor::Property::COLOR_ALPHA ),
                         0.0f, AlphaFunction::EASE_IN, TimePeriod((mIndicatorShowDuration + mTransientIndicatorDuration), mIndicatorHideDuration) );

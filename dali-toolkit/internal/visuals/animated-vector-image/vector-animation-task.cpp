@@ -74,7 +74,8 @@ VectorAnimationTask::VectorAnimationTask( VisualFactoryCache& factoryCache, cons
   mForward( true ),
   mUpdateFrameNumber( false ),
   mNeedAnimationFinishedTrigger( true ),
-  mAnimationDataUpdated( false )
+  mAnimationDataUpdated( false ),
+  mDestroyTask( false )
 {
   Initialize();
 }
@@ -95,6 +96,8 @@ void VectorAnimationTask::Finalize()
   }
 
   mVectorRenderer.Finalize();
+
+  mDestroyTask = true;
 }
 
 void VectorAnimationTask::SetRenderer( Renderer renderer )
@@ -371,6 +374,15 @@ bool VectorAnimationTask::Rasterize()
 {
   bool stopped = false;
   uint32_t currentFrame;
+
+  {
+    ConditionalWait::ScopedLock lock( mConditionalWait );
+    if( mDestroyTask )
+    {
+      // The task will be destroyed. We don't need rasterization.
+      return false;
+    }
+  }
 
   ApplyAnimationData();
 
