@@ -1663,14 +1663,15 @@ void TextField::OnTap( const TapGesture& gesture )
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
   Extents padding;
   padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
-  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x - padding.start, gesture.localPoint.y - padding.top );
+  const Vector2& localPoint = gesture.GetLocalPoint();
+  mController->TapEvent( gesture.GetNumberOfTaps(), localPoint.x - padding.start, localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }
 
 void TextField::OnPan( const PanGesture& gesture )
 {
-  mController->PanEvent( gesture.state, gesture.displacement );
+  mController->PanEvent( gesture.GetState(), gesture.GetDisplacement() );
 }
 
 void TextField::OnLongPress( const LongPressGesture& gesture )
@@ -1681,7 +1682,8 @@ void TextField::OnLongPress( const LongPressGesture& gesture )
   }
   Extents padding;
   padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
-  mController->LongPressEvent( gesture.state, gesture.localPoint.x - padding.start, gesture.localPoint.y - padding.top );
+  const Vector2& localPoint = gesture.GetLocalPoint();
+  mController->LongPressEvent( gesture.GetState(), localPoint.x - padding.start, localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }

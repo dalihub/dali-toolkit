@@ -507,12 +507,12 @@ void Control::OnPinch(const PinchGesture& pinch)
     mImpl->mStartingPinchScale = new Vector3;
   }
 
-  if( pinch.state == Gesture::Started )
+  if( pinch.GetState() == Gesture::Started )
   {
     *( mImpl->mStartingPinchScale ) = Self().GetCurrentProperty< Vector3 >( Actor::Property::SCALE );
   }
 
-  Self().SetProperty( Actor::Property::SCALE, *( mImpl->mStartingPinchScale ) * pinch.scale );
+  Self().SetProperty( Actor::Property::SCALE, *( mImpl->mStartingPinchScale ) * pinch.GetScale() );
 }
 
 void Control::OnPan( const PanGesture& pan )

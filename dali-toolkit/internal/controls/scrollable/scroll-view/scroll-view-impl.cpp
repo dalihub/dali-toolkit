@@ -28,6 +28,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -1002,7 +1003,7 @@ void ScrollView::SetScrollSensitive(bool sensitive)
     // while the scroll view is panning, the state needs to be reset.
     if ( mPanning )
     {
-      PanGesture cancelGesture( Gesture::Cancelled );
+      PanGesture cancelGesture = DevelPanGesture::New( Gesture::Cancelled );
       OnPan( cancelGesture );
     }
 
@@ -2478,17 +2479,18 @@ void ScrollView::OnPan( const PanGesture& gesture )
   }
 
   // translate Gesture input to get useful data...
-  switch(gesture.state)
+  switch(gesture.GetState())
   {
     case Gesture::Started:
     {
       DALI_LOG_SCROLL_STATE("[0x%X] Pan Started", this);
-      mPanStartPosition = gesture.position - gesture.displacement;
+      const Vector2& position = gesture.GetPosition();
+      mPanStartPosition = position - gesture.GetDisplacement();
       UpdateLocalScrollProperties();
       GestureStarted();
       mPanning = true;
       self.SetProperty( Toolkit::ScrollView::Property::PANNING, true );
-      self.SetProperty( Toolkit::ScrollView::Property::START_PAGE_POSITION, Vector3(gesture.position.x, gesture.position.y, 0.0f) );
+      self.SetProperty( Toolkit::ScrollView::Property::START_PAGE_POSITION, Vector3(position.x, position.y, 0.0f) );
 
       UpdateMainInternalConstraint();
       Toolkit::ScrollBar scrollBar = mScrollBar.GetHandle();
@@ -2511,7 +2513,7 @@ void ScrollView::OnPan( const PanGesture& gesture )
       if ( mPanning )
       {
         DALI_LOG_SCROLL_STATE("[0x%X] Pan Continuing", this);
-        GestureContinuing(gesture.screenDisplacement);
+        GestureContinuing(gesture.GetScreenDisplacement());
       }
       else
       {
@@ -2526,10 +2528,10 @@ void ScrollView::OnPan( const PanGesture& gesture )
     {
       if ( mPanning )
       {
-        DALI_LOG_SCROLL_STATE("[0x%X] Pan %s", this, ( ( gesture.state == Gesture::Finished ) ? "Finished" : "Cancelled" ) );
+        DALI_LOG_SCROLL_STATE("[0x%X] Pan %s", this, ( ( gesture.GetState() == Gesture::Finished ) ? "Finished" : "Cancelled" ) );
 
         UpdateLocalScrollProperties();
-        mLastVelocity = gesture.velocity;
+        mLastVelocity = gesture.GetVelocity();
         mPanning = false;
         self.SetProperty( Toolkit::ScrollView::Property::PANNING, false );
 
@@ -2561,7 +2563,7 @@ void ScrollView::OnPan( const PanGesture& gesture )
 
   } // end switch(gesture.state)
 
-  OnGestureEx(gesture.state);
+  OnGestureEx(gesture.GetState());
 }
 
 void ScrollView::OnGestureEx(Gesture::State state)

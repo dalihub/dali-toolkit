@@ -248,13 +248,13 @@ void Slider::OnPan( Actor actor, const PanGesture& gesture )
   // gesture.position is in local actor coordinates
   if( mState != DISABLED )
   {
-    switch( gesture.state )
+    switch( gesture.GetState() )
     {
       case Gesture::Continuing:
       {
         if( mState == PRESSED )
         {
-          float value = MapBounds( MarkFilter ( MapPercentage( gesture.position ) ), GetLowerBound(), GetUpperBound() );
+          float value = MapBounds( MarkFilter ( MapPercentage( gesture.GetPosition() ) ), GetLowerBound(), GetUpperBound() );
           SetValue( value );
           DisplayPopup( value );
         }
@@ -266,7 +266,7 @@ void Slider::OnPan( Actor actor, const PanGesture& gesture )
         {
           if( GetSnapToMarks() )
           {
-            float value = MapBounds( SnapToMark( MapPercentage( gesture.position ) ), GetLowerBound(), GetUpperBound() );
+            float value = MapBounds( SnapToMark( MapPercentage( gesture.GetPosition() ) ), GetLowerBound(), GetUpperBound() );
             SetValue( value );
             DisplayPopup( value );
           }

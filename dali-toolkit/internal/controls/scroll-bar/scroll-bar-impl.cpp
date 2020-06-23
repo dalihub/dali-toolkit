@@ -195,7 +195,7 @@ ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
   mIndicatorHideDuration(DEFAULT_INDICATOR_HIDE_DURATION),
   mTransientIndicatorDuration(DEFAULT_INDICATOR_TRANSIENT_DURATION),
   mScrollStart(0.0f),
-  mGestureDisplacement( Vector3::ZERO ),
+  mGestureDisplacement( Vector2::ZERO ),
   mCurrentScrollPosition(0.0f),
   mIndicatorHeightPolicy(Toolkit::ScrollBar::VARIABLE),
   mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT),
@@ -459,9 +459,9 @@ void ScrollBar::OnPan( const PanGesture& gesture )
   {
     Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(scrollableHandle);
 
-    switch(gesture.state)
+    switch(gesture.GetState())
     {
-      case Gesture::Started:
+      case Dali::Gesture::Started:
       {
         if( !mPanProcessTimer )
         {
@@ -473,15 +473,14 @@ void ScrollBar::OnPan( const PanGesture& gesture )
 
         ShowIndicator();
         mScrollStart = scrollableHandle.GetCurrentProperty< float >( mPropertyScrollPosition );
-        mGestureDisplacement = Vector3::ZERO;
+        mGestureDisplacement = Vector2::ZERO;
         mIsPanning = true;
 
         break;
       }
-      case Gesture::Continuing:
+      case Dali::Gesture::Continuing:
       {
-        mGestureDisplacement.x += gesture.displacement.x;
-        mGestureDisplacement.y += gesture.displacement.y;
+        mGestureDisplacement += gesture.GetDisplacement();
 
         float minScrollPosition = scrollableHandle.GetCurrentProperty<float>( mPropertyMinScrollPosition );
         float maxScrollPosition = scrollableHandle.GetCurrentProperty<float>( mPropertyMaxScrollPosition );

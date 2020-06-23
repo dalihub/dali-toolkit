@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -612,19 +612,20 @@ void PageTurnView::RemovePage( int pageIndex )
 void PageTurnView::OnPan( const PanGesture& gesture )
 {
   // the pan gesture is attached to control itself instead of each page
-  switch( gesture.state )
+  switch( gesture.GetState() )
   {
     case Gesture::Started:
     {
       // check whether the undergoing turning page number already reaches the maximum allowed
       if( mPageUpdated && mAnimatingCount< MAXIMUM_TURNING_NUM && mSlidingCount < 1 )
       {
-        SetPanActor( gesture.position ); // determine which page actor is panned
+        const Vector2& position = gesture.GetPosition();
+        SetPanActor( position ); // determine which page actor is panned
         if( mTurningPageIndex != -1 && mPages[mTurningPageIndex % NUMBER_OF_CACHED_PAGES].actor.GetParent() != Self()) // if the page is added to turning layer,it is undergoing an animation currently
         {
           mTurningPageIndex = -1;
         }
-        PanStarted( SetPanPosition( gesture.position ) );  // pass in the pan position in the local page coordinate
+        PanStarted( SetPanPosition( position ) );  // pass in the pan position in the local page coordinate
       }
       else
       {
@@ -634,13 +635,13 @@ void PageTurnView::OnPan( const PanGesture& gesture )
     }
     case Gesture::Continuing:
     {
-      PanContinuing( SetPanPosition( gesture.position ) ); // pass in the pan position in the local page coordinate
+      PanContinuing( SetPanPosition( gesture.GetPosition() ) ); // pass in the pan position in the local page coordinate
       break;
     }
     case Gesture::Finished:
     case Gesture::Cancelled:
     {
-      PanFinished( SetPanPosition( gesture.position ), gesture.GetSpeed() );
+      PanFinished( SetPanPosition( gesture.GetPosition() ), gesture.GetSpeed() );
       break;
     }
     case Gesture::Clear:

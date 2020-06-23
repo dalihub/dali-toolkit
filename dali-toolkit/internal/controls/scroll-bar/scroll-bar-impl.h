@@ -295,7 +295,7 @@ private:
   float mTransientIndicatorDuration;                                 ///< The duration before hiding transient indicator
 
   float mScrollStart;                                                ///< Scroll Start position (start of drag)
-  Vector3 mGestureDisplacement;                                      ///< Gesture Displacement.
+  Vector2 mGestureDisplacement;                                      ///< Gesture Displacement.
 
   float mCurrentScrollPosition;                                      ///< The current scroll position updated by the pan gesture
 

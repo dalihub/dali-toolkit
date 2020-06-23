@@ -1259,7 +1259,8 @@ struct Decorator::Impl : public ConnectionTracker
 
   void DoPan( HandleImpl& handle, HandleType type, const PanGesture& gesture )
   {
-    if( Gesture::Started == gesture.state )
+    Gesture::State state = gesture.GetState();
+    if( Gesture::Started == state )
     {
       handle.grabDisplacementX = handle.grabDisplacementY = 0.f;
 
@@ -1267,15 +1268,16 @@ struct Decorator::Impl : public ConnectionTracker
       handle.globalPosition.y = handle.position.y;
     }
 
-    handle.grabDisplacementX += gesture.displacement.x;
-    handle.grabDisplacementY += ( handle.verticallyFlipped ? -gesture.displacement.y : gesture.displacement.y );
+    const Vector2& displacement = gesture.GetDisplacement();
+    handle.grabDisplacementX += displacement.x;
+    handle.grabDisplacementY += ( handle.verticallyFlipped ? -displacement.y : displacement.y );
 
     const float x = handle.globalPosition.x + handle.grabDisplacementX;
     const float y = handle.globalPosition.y + handle.grabDisplacementY + 0.5f * handle.lineHeight;
     const float yVerticallyFlippedCorrected = y - ( handle.verticallyFlippedOnTouch ? handle.lineHeight : 0.f );
 
-    if( ( Gesture::Started    == gesture.state ) ||
-        ( Gesture::Continuing == gesture.state ) )
+    if( ( Gesture::Started    == state ) ||
+        ( Gesture::Continuing == state ) )
     {
       Vector2 targetSize;
       mController.GetTargetSize( targetSize );
@@ -1317,8 +1319,8 @@ struct Decorator::Impl : public ConnectionTracker
 
       mIsHandlePanning = true;
     }
-    else if( ( Gesture::Finished  == gesture.state ) ||
-             ( Gesture::Cancelled == gesture.state ) )
+    else if( ( Gesture::Finished  == state ) ||
+             ( Gesture::Cancelled == state ) )
     {
       if( mScrollTimer &&
           ( mScrollTimer.IsRunning() || mNotifyEndOfScroll ) )

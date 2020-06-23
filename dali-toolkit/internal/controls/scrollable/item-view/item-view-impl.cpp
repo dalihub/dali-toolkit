@@ -1159,7 +1159,7 @@ void ItemView::OnPan( const PanGesture& gesture )
     return;
   }
 
-  mGestureState = gesture.state;
+  mGestureState = gesture.GetState();
 
   switch (mGestureState)
   {
@@ -1227,7 +1227,8 @@ void ItemView::OnPan( const PanGesture& gesture )
 
     case Gesture::Continuing:
     {
-      mScrollDistance = CalculateScrollDistance(gesture.displacement, *mActiveLayout);
+      const Vector2& displacement = gesture.GetDisplacement();
+      mScrollDistance = CalculateScrollDistance(displacement, *mActiveLayout);
       mScrollSpeed = Clamp((gesture.GetSpeed() * gesture.GetSpeed() * mActiveLayout->GetFlickSpeedFactor() * MILLISECONDS_PER_SECONDS), 0.0f, mActiveLayout->GetMaximumSwipeSpeed());
 
       // Refresh order depends on the direction of the scroll; negative is towards the last item.
@@ -1246,7 +1247,7 @@ void ItemView::OnPan( const PanGesture& gesture )
           ( firstItemScrollPosition <= mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), layoutSize) &&
             currentOvershoot > -1.0f ) )
       {
-        mTotalPanDisplacement += gesture.displacement;
+        mTotalPanDisplacement += displacement;
       }
 
       mScrollOvershoot = CalculateScrollOvershoot();

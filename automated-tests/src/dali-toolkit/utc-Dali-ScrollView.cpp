@@ -686,6 +686,18 @@ int UtcDaliToolkitScrollModeP1(void)
   // Confirm the final X coord has snapped to exactly one page ahead of the start page.
   DALI_TEST_EQUALS( viewPageSize.width, scrollView.GetCurrentScrollPosition().x, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
+  // Change scroll mode during pan, should not crash
+  PerformGestureSwipe( application, startPos, direction, frames - 1, time, false );
+  try
+  {
+    scrollView.SetScrollSensitive(false);
+    DALI_TEST_CHECK(true);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false);
+  }
+
   END_TEST;
 }
 

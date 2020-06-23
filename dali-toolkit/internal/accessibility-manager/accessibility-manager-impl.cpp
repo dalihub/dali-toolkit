@@ -25,6 +25,7 @@
 #include <dali/devel-api/adaptor-framework/sound-player.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
+#include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -1331,14 +1332,12 @@ bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& pan
 
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
 
-  Dali::PanGesture pan( static_cast<Dali::Gesture::State>(panEvent.state) );
-
-  pan.time = panEvent.time;
-  pan.numberOfTouches = panEvent.numberOfTouches;
-  pan.screenPosition = panEvent.currentPosition;
-  pan.screenDisplacement = mPreviousPosition - panEvent.currentPosition;
-  pan.screenVelocity.x = pan.screenDisplacement.x / panEvent.timeDelta;
-  pan.screenVelocity.y = pan.screenDisplacement.y / panEvent.timeDelta;
+  Dali::PanGesture pan = DevelPanGesture::New( static_cast<Dali::Gesture::State>(panEvent.state) );
+  DevelPanGesture::SetTime( pan, panEvent.time );
+  DevelPanGesture::SetNumberOfTouches( pan, panEvent.numberOfTouches  );
+  DevelPanGesture::SetScreenPosition( pan, panEvent.currentPosition );
+  DevelPanGesture::SetScreenDisplacement( pan, mPreviousPosition - panEvent.currentPosition );
+  DevelPanGesture::SetScreenVelocity( pan, Vector2( pan.GetScreenDisplacement().x / panEvent.timeDelta, pan.GetScreenDisplacement().y / panEvent.timeDelta ) );
 
   // Only handle the pan gesture when the current focused actor is scrollable or within a scrollable actor
   while(mCurrentGesturedActor && mCurrentGesturedActor != rootActor && !handled)
@@ -1348,14 +1347,13 @@ bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& pan
     {
       Vector2 localCurrent;
       control.ScreenToLocal( localCurrent.x, localCurrent.y, panEvent.currentPosition.x, panEvent.currentPosition.y );
-      pan.position = localCurrent;
+      DevelPanGesture::SetPosition( pan, localCurrent );
 
       Vector2 localPrevious;
       control.ScreenToLocal( localPrevious.x, localPrevious.y, mPreviousPosition.x, mPreviousPosition.y );
 
-      pan.displacement = localCurrent - localPrevious;
-      pan.velocity.x = pan.displacement.x / panEvent.timeDelta;
-      pan.velocity.y = pan.displacement.y / panEvent.timeDelta;
+      DevelPanGesture::SetDisplacement( pan, localCurrent - localPrevious );
+      DevelPanGesture::SetVelocity( pan, Vector2( pan.GetDisplacement().x / panEvent.timeDelta, pan.GetDisplacement().y / panEvent.timeDelta ));
 
       handled = GetImplementation( control ).OnAccessibilityPan(pan);
     }
