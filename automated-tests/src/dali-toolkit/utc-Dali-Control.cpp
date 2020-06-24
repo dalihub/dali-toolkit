@@ -26,6 +26,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/alignment/alignment.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 

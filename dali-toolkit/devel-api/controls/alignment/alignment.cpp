@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/public-api/controls/alignment/alignment.h>
+#include <dali-toolkit/devel-api/controls/alignment/alignment.h>
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>

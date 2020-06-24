@@ -26,6 +26,7 @@
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
