@@ -80,6 +80,15 @@ enum Type
    * @note Optional.
    */
   CORNER_RADIUS = OPACITY + 2,
+
+  /**
+   * @brief Whether the corner radius value is relative (percentage [0.0f to 1.0f] of the visual size) or absolute (in world units).
+   * @details Name "cornerRadiusPolicy", type Property::INTEGER.
+   * @see Policy::Type
+   * @note By default, it is ABSOLUTE to the visual's size.
+   *       If it it RELATIVE, the corner radius value is relative to the smaller of the visual width and visual height.
+   */
+  CORNER_RADIUS_POLICY = OPACITY + 3,
 };
 
 } // namespace Property

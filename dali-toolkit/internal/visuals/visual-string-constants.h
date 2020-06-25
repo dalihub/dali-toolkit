@@ -64,6 +64,7 @@ extern const char * const VISUAL_FITTING_MODE;
 
 // Corner radius
 extern const char * const CORNER_RADIUS;
+extern const char * const CORNER_RADIUS_POLICY;
 
 // Color visual
 extern const char * const RENDER_IF_TRANSPARENT_NAME;

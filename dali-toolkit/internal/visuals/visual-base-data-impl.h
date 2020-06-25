@@ -127,6 +127,7 @@ struct Base::Impl
   Vector4         mMixColor;
   Size            mControlSize;
   float           mCornerRadius;
+  float           mCornerRadiusPolicy;
   int             mDepthIndex;
   Property::Index mMixColorIndex;
   Property::Index mCornerRadiusIndex;
