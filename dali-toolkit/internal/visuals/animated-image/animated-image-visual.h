@@ -24,7 +24,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/adaptor-framework/timer.h>
-#include <dali/devel-api/adaptor-framework/gif-loading.h>
+#include <dali/devel-api/adaptor-framework/animated-image-loading.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -92,7 +92,7 @@ public:
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] shaderFactory The ImageVisualShaderFactory object
-   * @param[in] imageUrl The URL to gif resource to use
+   * @param[in] imageUrl The URL to animated image resource to use
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
@@ -224,10 +224,10 @@ private:
   bool DisplayNextFrame();
 
   /**
-   * Initialize the gif variables.
-   * @param[in] imageUrl The url of the animated gif
+   * Initialize the animated image variables.
+   * @param[in] imageUrl The url of the animated image
    */
-  void InitializeGif( const VisualUrl& imageUrl );
+  void InitializeAnimatedImage( const VisualUrl& imageUrl );
 
   // Undefined
   AnimatedImageVisual( const AnimatedImageVisual& animatedImageVisual );
@@ -241,11 +241,10 @@ private:
   WeakHandle<Actor> mPlacementActor;
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 
-  // Variables for GIF player
-  Dali::Vector<uint32_t> mFrameDelayContainer;
+  // Variables for Animated Image player
   Vector4 mPixelArea;
   VisualUrl mImageUrl;
-  std::unique_ptr<Dali::GifLoading> mGifLoading; // Only needed for animated gifs
+  Dali::AnimatedImageLoading mAnimatedImageLoading; // Only needed for animated image
   uint32_t mCurrentFrameIndex; // Frame index into textureRects
 
   // Variables for Multi-Image player

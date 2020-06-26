@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
+#include <dali-toolkit/devel-api/accessibility-manager/accessibility-manager.h>
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>

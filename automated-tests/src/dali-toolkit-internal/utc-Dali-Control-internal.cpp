@@ -25,6 +25,7 @@
 #include <dummy-visual.h>
 #include <../dali-toolkit/dali-toolkit-test-utils/dummy-control.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/internal/controls/control/control-debug.h>
 
 

@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/accessibility-manager/accessibility-manager.h>
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-accessibility-adaptor.h>

@@ -27,7 +27,7 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
+#include <dali-toolkit/devel-api/accessibility-manager/accessibility-manager.h>
 #include <dali/public-api/adaptor-framework/tts-player.h>
 
 namespace Dali

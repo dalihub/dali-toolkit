@@ -24,7 +24,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/alignment/alignment.h>
+#include <dali-toolkit/devel-api/controls/alignment/alignment.h>
 
 namespace Dali
 {

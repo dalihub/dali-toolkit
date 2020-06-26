@@ -3,6 +3,7 @@ SET( devel_api_src_dir ${ROOT_SRC_DIR}/dali-toolkit/devel-api )
 
 # Add local source files here
 SET( devel_api_src_files
+  ${devel_api_src_dir}/accessibility-manager/accessibility-manager.cpp
   ${devel_api_src_dir}/asset-manager/asset-manager.cpp
   ${devel_api_src_dir}/builder/base64-encoding.cpp
   ${devel_api_src_dir}/builder/builder.cpp
@@ -11,6 +12,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/control-devel.cpp
   ${devel_api_src_dir}/controls/control-wrapper.cpp
   ${devel_api_src_dir}/controls/control-wrapper-impl.cpp
+  ${devel_api_src_dir}/controls/alignment/alignment.cpp
   ${devel_api_src_dir}/controls/bloom-view/bloom-view.cpp
   ${devel_api_src_dir}/controls/bubble-effect/bubble-emitter.cpp
   ${devel_api_src_dir}/controls/buttons/toggle-button.cpp
@@ -24,8 +26,10 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/popup/popup.cpp
   ${devel_api_src_dir}/controls/progress-bar/progress-bar-devel.cpp
   ${devel_api_src_dir}/controls/scene3d-view/scene3d-view.cpp
+  ${devel_api_src_dir}/controls/scroll-bar/scroll-bar.cpp
   ${devel_api_src_dir}/controls/shadow-view/shadow-view.cpp
   ${devel_api_src_dir}/controls/super-blur-view/super-blur-view.cpp
+  ${devel_api_src_dir}/controls/table-view/table-view.cpp
   ${devel_api_src_dir}/controls/text-controls/text-editor-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-field-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-popup.cpp
@@ -47,6 +51,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/transition-effects/cube-transition-effect.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-fold-effect.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-wave-effect.cpp
+  ${devel_api_src_dir}/utility/npatch-utilities.cpp
   ${devel_api_src_dir}/visual-factory/transition-data.cpp
   ${devel_api_src_dir}/visual-factory/visual-factory.cpp
   ${devel_api_src_dir}/visual-factory/visual-base.cpp
@@ -60,11 +65,19 @@ SET( devel_api_header_files
   ${devel_api_src_dir}/toolkit-property-index-ranges.h
 )
 
+SET( devel_api_accessibility-manager_header_files
+  ${devel_api_src_dir}/accessibility-manager/accessibility-manager.h
+)
+
 SET( devel_api_controls_header_files
   ${devel_api_src_dir}/controls/control-depth-index-ranges.h
   ${devel_api_src_dir}/controls/control-devel.h
   ${devel_api_src_dir}/controls/control-wrapper.h
   ${devel_api_src_dir}/controls/control-wrapper-impl.h
+)
+
+SET( devel_api_alignment_header_files
+  ${devel_api_src_dir}/controls/alignment/alignment.h
 )
 
 SET( devel_api_bloom_view_header_files
@@ -118,6 +131,14 @@ SET( devel_api_popup_header_files
 
 SET( devel_api_progress_bar_header_files
   ${devel_api_src_dir}/controls/progress-bar/progress-bar-devel.h
+)
+
+SET( devel_api_scroll_bar_header_files
+  ${devel_api_src_dir}/controls/scroll-bar/scroll-bar.h
+)
+
+SET( devel_api_table_view_header_files
+  ${devel_api_src_dir}/controls/table-view/table-view.h
 )
 
 SET( devel_api_visual_factory_header_files
@@ -223,12 +244,18 @@ SET( devel_api_drag_and_drop_detector_header_files
   ${devel_api_src_dir}/drag-drop-detector/drag-and-drop-detector.h
 )
 
+SET( devel_api_utility_header_files
+  ${devel_api_src_dir}/utility/npatch-utilities.h
+)
+
 SET( SOURCES ${SOURCES}
   ${devel_api_src_files}
 )
 
 SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_header_files}
+  ${devel_api_accessibility-manager_header_files}
+  ${devel_api_alignment_header_files}
   ${devel_api_controls_header_files}
   ${devel_api_bloom_view_header_files}
   ${devel_api_bubble_emitter_header_files}
@@ -241,6 +268,8 @@ SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_page_turn_view_header_files}
   ${devel_api_popup_header_files}
   ${devel_api_progress_bar_header_files}
+  ${devel_api_scroll_bar_header_files}
+  ${devel_api_table_view_header_files}
   ${devel_api_visual_factory_header_files}
   ${devel_api_visuals_header_files}
   ${devel_api_scene3d_view_header_files}
@@ -259,4 +288,5 @@ SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_video_view_header_files}
   ${devel_api_web_view_header_files}
   ${devel_api_drag_and_drop_detector_header_files}
+  ${devel_api_utility_header_files}
 )

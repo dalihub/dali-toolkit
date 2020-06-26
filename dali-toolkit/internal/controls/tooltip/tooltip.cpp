@@ -27,7 +27,7 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/table-view/table-view.h>
+#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>

@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_ROLLING_GIF_IMAGE_CACHE_H
-#define DALI_TOOLKIT_INTERNAL_ROLLING_GIF_IMAGE_CACHE_H
+#ifndef DALI_TOOLKIT_INTERNAL_ROLLING_ANIMATED_IMAGE_CACHE_H
+#define DALI_TOOLKIT_INTERNAL_ROLLING_ANIMATED_IMAGE_CACHE_H
 
 /*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
@@ -18,7 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/gif-loading.h>
+#include <dali/devel-api/adaptor-framework/animated-image-loading.h>
 #include <dali/devel-api/common/circular-queue.h>
 #include <dali-toolkit/internal/visuals/animated-image/image-cache.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
@@ -31,20 +31,20 @@ namespace Internal
 {
 
 /**
- * Class to manage a rolling cache of GIF images, where the cache size
+ * Class to manage a rolling cache of Animated images, where the cache size
  * is smaller than the total number of images.
  *
  * Frames are always ready, so the observer.FrameReady callback is never triggered;
  * the FirstFrame and NextFrame APIs will always return a texture.
  */
-class RollingGifImageCache : public ImageCache
+class RollingAnimatedImageCache : public ImageCache
 {
 public:
   /**
    * Constructor.
    * @param[in] textureManager The texture manager
-   * @param[in] gifLoader The loaded gif image
-   * @param[in] frameCount The number of frames in the gif
+   * @param[in] animatedImageLoader The loaded animated image
+   * @param[in] frameCount The number of frames in the animated image
    * @param[in] observer FrameReady observer
    * @param[in] cacheSize The size of the cache
    * @param[in] batchSize The size of a batch to load
@@ -52,8 +52,8 @@ public:
    * This will start loading textures immediately, according to the
    * batch and cache sizes.
    */
-  RollingGifImageCache( TextureManager&                 textureManager,
-                        GifLoading&                     gifLoader,
+  RollingAnimatedImageCache( TextureManager&                 textureManager,
+                        AnimatedImageLoading&           animatedImageLoader,
                         uint32_t                        frameCount,
                         ImageCache::FrameReadyObserver& observer,
                         uint16_t                        cacheSize,
@@ -62,7 +62,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~RollingGifImageCache();
+  virtual ~RollingAnimatedImageCache();
 
   /**
    * Get the Nth frame. If it's not ready, this will trigger the
@@ -77,11 +77,9 @@ public:
   TextureSet FirstFrame() override;
 
   /**
-   * Get the next frame. If it's not ready, this will trigger the
-   * sending of FrameReady() when the image becomes ready.
-   * This will trigger the loading of the next batch.
+   * Get the interval of Nth frame.
    */
-  TextureSet NextFrame() override;
+  uint32_t GetFrameInterval( uint32_t frameIndex ) override;
 
 private:
   /**
@@ -114,16 +112,18 @@ private:
     unsigned int mFrameNumber = 0u;
   };
 
-  GifLoading&               mGifLoading;
-  uint32_t                  mFrameCount;
-  int                       mFrameIndex;
-  std::vector<UrlStore>     mImageUrls;
-  uint16_t                  mCacheSize;
-  CircularQueue<ImageFrame> mQueue;
+  Dali::AnimatedImageLoading& mAnimatedImageLoading;
+  uint32_t                   mFrameCount;
+  int                        mFrameIndex;
+  std::vector<UrlStore>      mImageUrls;
+  uint16_t                   mCacheSize;
+  CircularQueue<ImageFrame>  mQueue;
 };
 
 } // namespace Internal
+
 } // namespace Toolkit
+
 } // namespace Dali
 
-#endif
+#endif //DALI_TOOLKIT_INTERNAL_ROLLING_ANIMATED_IMAGE_CACHE_H
