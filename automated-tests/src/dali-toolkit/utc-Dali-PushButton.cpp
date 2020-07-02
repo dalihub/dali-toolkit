@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -686,21 +686,6 @@ int UtcDaliPushButtonSelected(void)
   END_TEST;
 }
 
-int UtcDaliPushButtonPropertySetIconAlignment(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliPushButtonPropertySetIconAlignment");
-
-  PushButton pushButton = PushButton::New();
-  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "TOP" );
-  DALI_TEST_EQUALS( pushButton.GetProperty<std::string>( Toolkit::PushButton::Property::ICON_ALIGNMENT ), "TOP", TEST_LOCATION );
-
-  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "RIGHT" );
-  DALI_TEST_EQUALS( pushButton.GetProperty<std::string>( Toolkit::PushButton::Property::ICON_ALIGNMENT ), "RIGHT", TEST_LOCATION );
-
-  END_TEST;
-}
-
 int UtcDaliPushButtonPropertySetLabelPadding(void)
 {
   ToolkitTestApplication application;
@@ -804,9 +789,9 @@ int UtcDaliPushButtonPaddingLayout(void)
   Stage::GetCurrent().Add( pushButton );
 
 
-  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "RIGHT" );
-  pushButton.SetProperty( Toolkit::PushButton::Property::UNSELECTED_ICON, TEST_IMAGE_ONE );
-  pushButton.SetProperty( Toolkit::PushButton::Property::SELECTED_ICON, TEST_IMAGE_ONE );
+  pushButton.SetProperty( Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT, "BEGIN" );
+  pushButton.SetProperty( Toolkit::Button::Property::UNSELECTED_VISUAL, TEST_IMAGE_ONE );
+  pushButton.SetProperty( Toolkit::Button::Property::SELECTED_VISUAL, TEST_IMAGE_ONE );
 
   application.SendNotification();
   application.Render();
@@ -931,9 +916,9 @@ int UtcDaliPushButtonAlignmentLayout(void)
                                                      ( TEST_IMAGE_SIZE.height + TEST_ICON_PADDING.w + TEST_ICON_PADDING.z ) );
 
   // Add Icon and set its alignment
-  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "RIGHT" );
-  pushButton.SetProperty( Toolkit::PushButton::Property::UNSELECTED_ICON, TEST_IMAGE_ONE );
-  pushButton.SetProperty( Toolkit::PushButton::Property::SELECTED_ICON, TEST_IMAGE_ONE );
+  pushButton.SetProperty( Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT, "BEGIN" );
+  pushButton.SetProperty( Toolkit::Button::Property::UNSELECTED_VISUAL, TEST_IMAGE_ONE );
+  pushButton.SetProperty( Toolkit::Button::Property::SELECTED_VISUAL, TEST_IMAGE_ONE );
   pushButton.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, TEST_ICON_PADDING );
 
   application.SendNotification();
@@ -960,7 +945,7 @@ int UtcDaliPushButtonAlignmentLayout(void)
   DALI_TEST_EQUALS( size.height, ( std::max( testImageWithPaddingSize.height, labelAndPaddingSize.height) ) , Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Now test left alignment matches right for size.
-  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "LEFT" );
+  pushButton.SetProperty( Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT, "END" );
 
   application.SendNotification();
   application.Render();
@@ -1001,8 +986,8 @@ int UtcDaliPushButtonAlignmentLayout(void)
    *
    */
 
-  tet_infoline("SetProperty on ICON_ALIGNMENT should relayout the Button");
-  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "TOP" );
+  tet_infoline("SetProperty on LABEL_RELATIVE_ALIGNMENT should relayout the Button");
+  pushButton.SetProperty( Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT, "BOTTOM" );
 
   application.SendNotification();
   application.Render();
@@ -1037,7 +1022,7 @@ int UtcDaliPushButtonAlignmentLayout(void)
    *  +---------+
    */
   tet_infoline(" Test Icon BOTTOM alignment - Width grows to largest of Icon or label (plus padding)");
-  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "BOTTOM" );
+  pushButton.SetProperty( Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT, "TOP" );
 
   application.SendNotification();
   application.Render();
@@ -1097,7 +1082,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
 
   Stage::GetCurrent().Add( pushButton );
 
-  tet_printf("With UNSELECTED_BACKGROUND_VISUAL and UNSELECTED_ICON the renderer count is(%d)\n", pushButton.GetRendererCount() );
+  tet_printf("With UNSELECTED_BACKGROUND_VISUAL and UNSELECTED_VISUAL the renderer count is(%d)\n", pushButton.GetRendererCount() );
 
   DALI_TEST_EQUALS( pushButton.GetRendererCount(), 2, TEST_LOCATION );
 

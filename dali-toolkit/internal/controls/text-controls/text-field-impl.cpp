@@ -29,9 +29,9 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
@@ -63,7 +63,7 @@ namespace // unnamed namespace
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
 #endif
 
-  const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+  const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::DevelText::DEFAULT_RENDERING_BACKEND;
 } // unnamed namespace
 
 namespace
@@ -77,7 +77,6 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextField, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "renderingBackend",                     INTEGER,   RENDERING_BACKEND                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "text",                                 STRING,    TEXT                                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderText",                      STRING,    PLACEHOLDER_TEXT                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderTextFocused",               STRING,    PLACEHOLDER_TEXT_FOCUSED             )
@@ -133,6 +132,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "matchSystemLanguageDirect
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandlePopup",          BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "textBackground",                 VECTOR4,   BACKGROUND                           )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextField, "selectedText",         STRING,    SELECTED_TEXT                        )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "renderingBackend",               INTEGER,   RENDERING_BACKEND                    )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -188,13 +188,13 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
     switch( index )
     {
-      case Toolkit::TextField::Property::RENDERING_BACKEND:
+      case Toolkit::DevelTextField::Property::RENDERING_BACKEND:
       {
         int backend = value.Get< int >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p RENDERING_BACKEND %d\n", impl.mController.Get(), backend );
 
 #ifndef ENABLE_VECTOR_BASED_TEXT_RENDERING
-        if( Text::RENDERING_VECTOR_BASED == backend )
+        if( DevelText::RENDERING_VECTOR_BASED == backend )
         {
           backend = TextAbstraction::BITMAP_GLYPH; // Fallback to bitmap-based rendering
         }
@@ -207,7 +207,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           if( impl.mController )
           {
             // When using the vector-based rendering, the size of the GLyphs are different
-            TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+            TextAbstraction::GlyphType glyphType = (DevelText::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
             impl.mController->SetGlyphType( glyphType );
           }
         }
@@ -821,7 +821,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
 
     switch( index )
     {
-      case Toolkit::TextField::Property::RENDERING_BACKEND:
+      case Toolkit::DevelTextField::Property::RENDERING_BACKEND:
       {
         value = impl.mRenderingBackend;
         break;
@@ -1307,7 +1307,7 @@ void TextField::OnInitialize()
   mController = Text::Controller::New( this, this );
 
   // When using the vector-based rendering, the size of the GLyphs are different
-  TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+  TextAbstraction::GlyphType glyphType = (DevelText::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
   mController->SetGlyphType( glyphType );
 
   mDecorator = Text::Decorator::New( *mController,

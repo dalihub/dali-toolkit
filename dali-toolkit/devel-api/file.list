@@ -211,6 +211,7 @@ SET( devel_api_text_header_files
   ${devel_api_src_dir}/text/text-enumerations-devel.h
   ${devel_api_src_dir}/text/bitmap-font.h
   ${devel_api_src_dir}/text/text-utils-devel.h
+  ${devel_api_src_dir}/text/rendering-backend.h
 )
 
 SET( devel_api_tool_bar_header_files

@@ -120,7 +120,6 @@ SET( public_api_focus_manager_header_files
 )
 
 SET( public_api_text_header_files
-  ${public_api_src_dir}/text/rendering-backend.h
   ${public_api_src_dir}/text/text-enumerations.h
 )
 

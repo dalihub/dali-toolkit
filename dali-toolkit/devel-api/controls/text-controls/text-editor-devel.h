@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_EDITOR_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ namespace Property
 {
   enum Type
   {
-      RENDERING_BACKEND = Dali::Toolkit::TextEditor::Property::RENDERING_BACKEND,
       TEXT = Dali::Toolkit::TextEditor::Property::TEXT,
       TEXT_COLOR = Dali::Toolkit::TextEditor::Property::TEXT_COLOR,
       FONT_FAMILY = Dali::Toolkit::TextEditor::Property::FONT_FAMILY,
@@ -117,7 +116,13 @@ namespace Property
        * @details Name "matchSystemLanguageDirection", type (Property::BOOLEAN), Read/Write
        * @note The default value is false
        */
-      MATCH_SYSTEM_LANGUAGE_DIRECTION
+      MATCH_SYSTEM_LANGUAGE_DIRECTION,
+
+      /**
+       * @brief The type or rendering e.g. bitmap-based.
+       * @details Name "renderingBackend", type Property::INTEGER.
+       */
+      RENDERING_BACKEND,
   };
 
 } // namespace Property

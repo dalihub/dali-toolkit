@@ -56,7 +56,6 @@
 
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
-#include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>

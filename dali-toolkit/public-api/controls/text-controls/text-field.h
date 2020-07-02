@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_FIELD_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,18 +73,11 @@ public:
     enum
     {
       /**
-       * @brief The type or rendering e.g. bitmap-based.
-       * @details Name "renderingBackend", type Property::INTEGER.
-       * @SINCE_1_0.0
-       */
-      RENDERING_BACKEND = PROPERTY_START_INDEX,
-
-      /**
        * @brief The text to display in UTF-8 format.
        * @details Name "text", type Property::STRING.
        * @SINCE_1_0.0
        */
-      TEXT,
+      TEXT = PROPERTY_START_INDEX,
 
       /**
        * @brief The text to display when the TextField is empty and inactive.

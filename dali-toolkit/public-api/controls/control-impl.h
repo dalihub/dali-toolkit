@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -449,30 +449,6 @@ public: // API for derived classes to override
    * @SINCE_1_0.0
    */
   virtual void OnInitialize();
-
-  /**
-   * @DEPRECATED_1_1.30. Override OnChildAdd instead.
-   *
-   * @brief Called whenever an Actor is added to the control.
-   *
-   * Could be overridden by derived classes.
-   *
-   * @SINCE_1_0.0
-   * @param[in] child The added actor
-   */
-  virtual void OnControlChildAdd( Actor& child ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.30. Override OnChildRemove instead.
-   *
-   * @brief Called whenever an Actor is removed from the control.
-   *
-   * Could be overridden by derived classes.
-   *
-   * @SINCE_1_0.0
-   * @param[in] child The removed actor
-   */
-  virtual void OnControlChildRemove( Actor& child ) DALI_DEPRECATED_API;
 
   // Styling
 
