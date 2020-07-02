@@ -609,13 +609,27 @@ bool ImageVisual::AttemptAtlasing()
 void ImageVisual::InitializeRenderer()
 {
   auto attemptAtlasing = AttemptAtlasing();
-  // texture set has to be created first as we need to know if atlasing succeeded or not
-  // when selecting the shader
 
-  if( mTextureId == TextureManager::INVALID_TEXTURE_ID && ! mTextures ) // Only load the texture once
+  // Load Texture if mTextures is empty.
+  // mTextures is already set, the mTexture can be used to create Renderer.
+  // There are two cases mTextures is empty.
+  // 1. mTextureId == TextureManager::INVALID_TEXTURE_ID
+  //  - Visual is on stage with LoadPolicy::ATTACHED
+  // 2. mTextureId != TextureManager::INVALID_TEXTURE_ID
+  //  - If ReleasePolicy is DESTROYED, InitializeRenderer called every on stage called.
+  //  - Then every resources those contained in Visual are Reset but mTextureId is remained when the Off stage time,
+  //  - So, mTextures needed to be get from texture manager to created resources like mImpl->mRenderer.
+  if( ! mTextures )
   {
-    LoadTexture( attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection,
-                 TextureManager::ReloadPolicy::CACHED );
+    if( mTextureId == TextureManager::INVALID_TEXTURE_ID )
+    {
+      LoadTexture( attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection,
+                   TextureManager::ReloadPolicy::CACHED );
+    }
+    else
+    {
+      mTextures = mFactoryCache.GetTextureManager().GetTextureSet( mTextureId );
+    }
   }
 
   CreateRenderer( mTextures );
