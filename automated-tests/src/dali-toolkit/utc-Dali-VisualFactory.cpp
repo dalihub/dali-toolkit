@@ -1706,7 +1706,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual4(void)
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
-  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTRUM );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTUM );
   propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );

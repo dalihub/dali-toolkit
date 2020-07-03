@@ -30,9 +30,9 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
@@ -63,7 +63,7 @@ namespace // unnamed namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
 #endif
 
-const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::DevelText::DEFAULT_RENDERING_BACKEND;
 const float DEFAULT_SCROLL_SPEED = 1200.f; ///< The default scroll speed for the text editor in pixels/second.
 } // unnamed namespace
 
@@ -83,7 +83,6 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextEditor, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "renderingBackend",                     INTEGER,   RENDERING_BACKEND                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "text",                                 STRING,    TEXT                                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "textColor",                            VECTOR4,   TEXT_COLOR                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "fontFamily",                           STRING,    FONT_FAMILY                          )
@@ -138,6 +137,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",  
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableShiftSelection",           BOOLEAN,   ENABLE_SHIFT_SELECTION               )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableGrabHandle",               BOOLEAN,   ENABLE_GRAB_HANDLE                   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "matchSystemLanguageDirection",   BOOLEAN,   MATCH_SYSTEM_LANGUAGE_DIRECTION      )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "renderingBackend",               INTEGER,   RENDERING_BACKEND                    )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -192,7 +192,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
 
     switch( index )
     {
-      case Toolkit::TextEditor::Property::RENDERING_BACKEND:
+      case Toolkit::DevelTextEditor::Property::RENDERING_BACKEND:
       {
         int backend = value.Get< int >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p RENDERING_BACKEND %d\n", impl.mController.Get(), backend );
@@ -787,7 +787,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
 
     switch( index )
     {
-      case Toolkit::TextEditor::Property::RENDERING_BACKEND:
+      case Toolkit::DevelTextEditor::Property::RENDERING_BACKEND:
       {
         value = impl.mRenderingBackend;
         break;

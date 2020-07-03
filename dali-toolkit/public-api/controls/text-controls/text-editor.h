@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_EDITOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace Toolkit
 
 namespace Internal DALI_INTERNAL
 {
-class TextEditor;
+  class TextEditor;
 }
 /**
  * @addtogroup dali_toolkit_controls_text_controls
@@ -57,7 +57,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_END_INDEX = PROPERTY_START_INDEX + 1000              ///< Reserve property indices
   };
 
   /**
@@ -73,18 +73,11 @@ public:
     enum
     {
       /**
-       * @brief The type or rendering e.g. bitmap-based.
-       * @details Name "renderingBackend", type Property::INTEGER.
-       * @SINCE_1_1.37
-       */
-      RENDERING_BACKEND = PROPERTY_START_INDEX,
-
-      /**
        * @brief The text to display in UTF-8 format.
        * @details Name "text", type Property::STRING.
        * @SINCE_1_1.37
        */
-      TEXT,
+      TEXT = PROPERTY_START_INDEX,
 
       /**
        * @brief The text color.
@@ -453,22 +446,22 @@ public:
    */
   struct InputStyle
   {
-  /**
-   * @brief Enumeration for mask used by the signal InputStyleChangedSignal().
-   * @SINCE_1_2_2
-   */
+    /**
+     * @brief Enumeration for mask used by the signal InputStyleChangedSignal().
+     * @SINCE_1_2_2
+     */
     enum Mask
     {
-      NONE         = 0x0000, ///< @SINCE_1_2_2
-      COLOR        = 0x0001, ///< @SINCE_1_2_2
-      FONT_FAMILY  = 0x0002, ///< @SINCE_1_2_2
-      POINT_SIZE   = 0x0004, ///< @SINCE_1_2_2
-      FONT_STYLE   = 0x0008, ///< @SINCE_1_2_2
+      NONE = 0x0000, ///< @SINCE_1_2_2
+      COLOR = 0x0001, ///< @SINCE_1_2_2
+      FONT_FAMILY = 0x0002, ///< @SINCE_1_2_2
+      POINT_SIZE = 0x0004, ///< @SINCE_1_2_2
+      FONT_STYLE = 0x0008, ///< @SINCE_1_2_2
       LINE_SPACING = 0x0010, ///< @SINCE_1_2_2
-      UNDERLINE    = 0x0020, ///< @SINCE_1_2_2
-      SHADOW       = 0x0040, ///< @SINCE_1_2_2
-      EMBOSS       = 0x0080, ///< @SINCE_1_2_2
-      OUTLINE      = 0x0100  ///< @SINCE_1_2_2
+      UNDERLINE = 0x0020, ///< @SINCE_1_2_2
+      SHADOW = 0x0040, ///< @SINCE_1_2_2
+      EMBOSS = 0x0080, ///< @SINCE_1_2_2
+      OUTLINE = 0x0100  ///< @SINCE_1_2_2
     };
   };
 
@@ -497,19 +490,22 @@ public:
    * @brief Text changed signal type.
    * @SINCE_1_1.37
    */
-  typedef Signal<void ( TextEditor ) > TextChangedSignalType;
+  typedef Signal< void
+  ( TextEditor ) > TextChangedSignalType;
 
   /**
    * @brief Input Style changed signal type.
    * @SINCE_1_2_2
    */
-  typedef Signal<void ( TextEditor, InputStyle::Mask ) > InputStyleChangedSignalType;
+  typedef Signal< void
+  ( TextEditor, InputStyle::Mask ) > InputStyleChangedSignalType;
 
   /**
    * @brief Scroll state changed signal type.
    * @SINCE_1_2.60
    */
-  typedef Signal< void ( TextEditor, Scroll::Type ) > ScrollStateChangedSignalType;
+  typedef Signal< void
+  ( TextEditor, Scroll::Type ) > ScrollStateChangedSignalType;
 
   /**
    * @brief Creates the TextEditor control.
@@ -517,7 +513,8 @@ public:
    * @SINCE_1_1.37
    * @return A handle to the TextEditor control
    */
-  static TextEditor New();
+  static TextEditor
+  New();
 
   /**
    * @brief Creates an empty handle.
@@ -532,7 +529,7 @@ public:
    * @SINCE_1_1.37
    * @param[in] handle The handle to copy from
    */
-  TextEditor( const TextEditor& handle );
+  TextEditor( const TextEditor &handle );
 
   /**
    * @brief Assignment operator.
@@ -541,7 +538,8 @@ public:
    * @param[in] handle The handle to copy from
    * @return A reference to this
    */
-  TextEditor& operator=( const TextEditor& handle );
+  TextEditor&
+  operator=( const TextEditor &handle );
 
   /**
    * @brief Destructor.
@@ -561,7 +559,8 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a TextEditor or an empty handle
    */
-  static TextEditor DownCast( BaseHandle handle );
+  static TextEditor
+  DownCast( BaseHandle handle );
 
   // Signals
 
@@ -576,7 +575,8 @@ public:
    * @SINCE_1_1.37
    * @return The signal to connect to
    */
-  TextChangedSignalType& TextChangedSignal();
+  TextChangedSignalType&
+  TextChangedSignal();
 
   /**
    * @brief This signal is emitted when the input style is updated as a consequence of a change in the cursor position.
@@ -590,7 +590,8 @@ public:
    * @SINCE_1_2_2
    * @return The signal to connect to
    */
-  InputStyleChangedSignalType& InputStyleChangedSignal();
+  InputStyleChangedSignalType&
+  InputStyleChangedSignal();
 
   /**
    * @brief This signal is emitted when TextEditor scrolling is started or finished.
@@ -604,7 +605,8 @@ public:
    * @SINCE_1_2.60
    * @return The signal to connect to
    */
-  ScrollStateChangedSignalType& ScrollStateChangedSignal();
+  ScrollStateChangedSignalType&
+  ScrollStateChangedSignal();
 
 public: // Not intended for application developers
 
@@ -615,7 +617,8 @@ public: // Not intended for application developers
    * @SINCE_1_1.37
    * @param[in] implementation The Control implementation
    */
-  DALI_INTERNAL TextEditor( Internal::TextEditor& implementation );
+  DALI_INTERNAL
+  TextEditor( Internal::TextEditor &implementation );
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -623,7 +626,8 @@ public: // Not intended for application developers
    * @SINCE_1_1.37
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL TextEditor( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL
+  TextEditor( Dali::Internal::CustomActor *internal );
   /// @endcond
 };
 

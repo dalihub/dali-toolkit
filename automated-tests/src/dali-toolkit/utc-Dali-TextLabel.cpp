@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
+#include <dali-toolkit/devel-api/text/rendering-backend.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -250,7 +251,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label );
 
   // Check Property Indices are correct
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == TextLabel::Property::RENDERING_BACKEND );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == DevelTextLabel::Property::RENDERING_BACKEND );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_TEXT ) == TextLabel::Property::TEXT );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_FONT_FAMILY ) == TextLabel::Property::FONT_FAMILY );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_FONT_STYLE ) == TextLabel::Property::FONT_STYLE );
@@ -287,8 +288,8 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   Stage::GetCurrent().Add( label );
 
   // Note - we can't check the defaults since the stylesheets are platform-specific
-  label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
-  DALI_TEST_EQUALS( (Text::RenderingType)label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+  label.SetProperty( DevelTextLabel::Property::RENDERING_BACKEND, DevelText::RENDERING_SHARED_ATLAS );
+  DALI_TEST_EQUALS( (DevelText::RenderingType)label.GetProperty<int>( DevelTextLabel::Property::RENDERING_BACKEND ), DevelText::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check that text can be correctly reset
   label.SetProperty( TextLabel::Property::TEXT, "Setting Text" );
@@ -677,7 +678,7 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   try
   {
     // Render some text with the shared atlas backend
-    label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
+    label.SetProperty( DevelTextLabel::Property::RENDERING_BACKEND, DevelText::RENDERING_SHARED_ATLAS );
     application.SendNotification();
     application.Render();
   }
@@ -689,7 +690,7 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   try
   {
     // Render some text with the shared atlas backend
-    label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_VECTOR_BASED );
+    label.SetProperty( DevelTextLabel::Property::RENDERING_BACKEND, DevelText::RENDERING_VECTOR_BASED );
     application.SendNotification();
     application.Render();
   }

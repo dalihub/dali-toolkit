@@ -251,7 +251,12 @@ INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/third-party/file.list )
 INCLUDE( ${ROOT_SRC_DIR}/doc/file.list )
 
 # Platforms with highp shader support can use vector based text
+IF( NOT DEFINED ENABLE_VECTOR_BASED_TEXT_RENDERING )
+  SET(ENABLE_VECTOR_BASED_TEXT_RENDERING ON)
+ENDIF()
+
 IF( ENABLE_VECTOR_BASED_TEXT_RENDERING )
+  ADD_DEFINITIONS( "-DENABLE_VECTOR_BASED_TEXT_RENDERING" )
   INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/internal/text/rendering/vector-based/file.list )
 ENDIF()
 
@@ -529,6 +534,7 @@ MESSAGE( STATUS "Style Dir:                     " ${STYLE_DIR} )
 MESSAGE( STATUS "Style:                         " ${dali_style} )
 MESSAGE( STATUS "i18n:                          " ${ENABLE_I18N} )
 MESSAGE( STATUS "Use pkg configure:             " ${ENABLE_PKG_CONFIGURE} )
+MESSAGE( STATUS "Vector Based Text Rendering:   " ${ENABLE_VECTOR_BASED_TEXT_RENDERING} )
 MESSAGE( STATUS "Enable link test:              " ${ENABLE_LINK_TEST} )
 MESSAGE( STATUS "Configure automated tests:     " ${CONFIGURE_AUTOMATED_TESTS} )
 MESSAGE( STATUS "CXXFLAGS:                      " ${CMAKE_CXX_FLAGS} )

@@ -1446,10 +1446,10 @@ int UtcDaliPopupPropertyTypeRegistryConnectSignal(void)
   END_TEST;
 }
 
-int UtcDaliPopupOnControlChildAdd(void)
+int UtcDaliPopupOnChildAdd(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( " UtcDaliPopupOnControlChildAdd" );
+  tet_infoline( " UtcDaliPopupOnChildAdd" );
 
   // Create the Popup actor
   Popup popup = Popup::New();

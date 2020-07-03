@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
+#include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -60,7 +60,7 @@ namespace Internal
 
 namespace
 {
-  const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+  const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::DevelText::DEFAULT_RENDERING_BACKEND;
 
   /**
    * @brief How the text visual should be aligned vertically inside the control.
@@ -105,7 +105,6 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextLabel, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "renderingBackend",          INTEGER, RENDERING_BACKEND          )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "text",                      STRING,  TEXT                       )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "fontFamily",                STRING,  FONT_FAMILY                )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "fontStyle",                 MAP,     FONT_STYLE                 )
@@ -136,6 +135,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "ignoreSpacesAfterText
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "matchSystemLanguageDirection", BOOLEAN, MATCH_SYSTEM_LANGUAGE_DIRECTION )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textFit",                   MAP,     TEXT_FIT                   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "minLineSize",               FLOAT,   MIN_LINE_SIZE              )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "renderingBackend",          INTEGER, RENDERING_BACKEND          )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -169,14 +169,12 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
     TextLabel& impl( GetImpl( label ) );
     switch( index )
     {
-      case Toolkit::TextLabel::Property::RENDERING_BACKEND:
+      case Toolkit::DevelTextLabel::Property::RENDERING_BACKEND:
       {
-        DALI_LOG_WARNING("[%s] Using deprecated Property TextLabel::Property::RENDERING_BACKEND which is no longer supported and will be ignored\n", __FUNCTION__);
-
         int backend = value.Get< int >();
 
 #ifndef ENABLE_VECTOR_BASED_TEXT_RENDERING
-        if( Text::RENDERING_VECTOR_BASED == backend )
+        if( DevelText::RENDERING_VECTOR_BASED == backend )
         {
           backend = TextAbstraction::BITMAP_GLYPH; // Fallback to bitmap-based rendering
         }
@@ -189,7 +187,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
           if( impl.mController )
           {
             // When using the vector-based rendering, the size of the GLyphs are different
-            TextAbstraction::GlyphType glyphType = (Text::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+            TextAbstraction::GlyphType glyphType = (DevelText::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
             impl.mController->SetGlyphType( glyphType );
           }
         }
@@ -578,10 +576,8 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
     TextLabel& impl( GetImpl( label ) );
     switch( index )
     {
-      case Toolkit::TextLabel::Property::RENDERING_BACKEND:
+      case Toolkit::DevelTextLabel::Property::RENDERING_BACKEND:
       {
-        DALI_LOG_WARNING("[%s] Using deprecated Property TextLabel::Property::RENDERING_BACKEND which is no longer supported and will be ignored\n", __FUNCTION__);
-
         value = impl.mRenderingBackend;
         break;
       }

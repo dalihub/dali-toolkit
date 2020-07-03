@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
+#include <dali-toolkit/devel-api/text/rendering-backend.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -390,7 +391,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor );
 
   // Check Property Indices are correct
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == TextEditor::Property::RENDERING_BACKEND );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == DevelTextEditor::Property::RENDERING_BACKEND );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_TEXT ) == TextEditor::Property::TEXT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_TEXT_COLOR ) == TextEditor::Property::TEXT_COLOR );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_FONT_FAMILY ) == TextEditor::Property::FONT_FAMILY );
@@ -479,8 +480,8 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Note - we can't check the defaults since the stylesheets are platform-specific
 
   // Check the render backend property.
-  editor.SetProperty( TextEditor::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
-  DALI_TEST_EQUALS( (Text::RenderingType)editor.GetProperty<int>( TextEditor::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+  editor.SetProperty( DevelTextEditor::Property::RENDERING_BACKEND, DevelText::RENDERING_SHARED_ATLAS );
+  DALI_TEST_EQUALS( (DevelText::RenderingType)editor.GetProperty<int>( DevelTextEditor::Property::RENDERING_BACKEND ), DevelText::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check text property.
   editor.SetProperty( TextEditor::Property::TEXT, "Setting Text" );
@@ -880,7 +881,7 @@ int utcDaliTextEditorAtlasRenderP(void)
   try
   {
     // Render some text with the shared atlas backend
-    editor.SetProperty( TextEditor::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
+    editor.SetProperty( DevelTextEditor::Property::RENDERING_BACKEND, DevelText::RENDERING_SHARED_ATLAS );
     application.SendNotification();
     application.Render();
   }

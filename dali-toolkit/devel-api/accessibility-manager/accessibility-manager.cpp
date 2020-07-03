@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -320,13 +320,6 @@ AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::Actio
 AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionZoomSignal()
 {
   return GetImpl(*this).ActionZoomSignal();
-}
-
-AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionReadIndicatorInformationSignal()
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: ActionReadIndicatorInformationSignal is deprecated and will be removed from next release.\n" );
-
-  return GetImpl(*this).ActionReadIndicatorInformationSignal();
 }
 
 AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionReadPauseResumeSignal()

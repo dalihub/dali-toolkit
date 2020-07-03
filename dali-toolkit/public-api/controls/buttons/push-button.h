@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PUSH_BUTTON_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,10 +111,7 @@ public:
      */
     enum
     {
-      UNSELECTED_ICON = PROPERTY_START_INDEX, ///< Property, name "unselectedIcon",  type std::string @SINCE_1_0.0 @DEPRECATED_1_2.XX Button::Property::UNSELECTED_VISUAL
-      SELECTED_ICON,                          ///< Property, name "selectedIcon",    type std::string @SINCE_1_0.0 @DEPRECATED_1_2.XX Button::Property::SELECTED_VISUAL
-      ICON_ALIGNMENT,                         ///< Property, name "iconAlignment",   type std::string @SINCE_1_0.0 @DEPRECATED_1_2.XX Use Button::Property::LABEL_RELATIVE_ALIGNMENT
-      LABEL_PADDING,                          ///< Property, name "labelPadding",    type Vector4 @SINCE_1_0.0
+      LABEL_PADDING = PROPERTY_START_INDEX,   ///< Property, name "labelPadding",    type Vector4 @SINCE_1_0.0
       ICON_PADDING,                           ///< Property, name "iconPadding",     type Vector4 @SINCE_1_0.0
     };
   };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2128,22 +2128,6 @@ int UtcDaliAccessibilityManagerActionZoomSignalN(void)
   DALI_TEST_CHECK( manager );
 
   manager.ActionZoomSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
-  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliAccessibilityManagerActionReadIndicatorInformationSignalN(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( " UtcDaliAccessibilityManagerActionReadIndicatorInformationSignalN" );
-
-  AccessibilityManagerSignalHandler callback;
-
-  AccessibilityManager manager = AccessibilityManager::Get();
-  DALI_TEST_CHECK( manager );
-
-  manager.ActionReadIndicatorInformationSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
   DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
 
   END_TEST;
