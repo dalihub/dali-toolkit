@@ -283,6 +283,8 @@ IF( WIN32 )
   FIND_PACKAGE( unofficial-angle REQUIRED )
   FIND_PACKAGE( unofficial-cairo REQUIRED )
 
+  FIND_PACKAGE( WebP REQUIRED )
+
   SET( DALIADAPTOR_LDFLAGS
        "${DALIADAPTOR_LDFLAGS}"
        dali2-adaptor::dali2-adaptor )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -820,8 +820,11 @@ void TextVisual::AddRenderer( Actor& actor, const Vector2& size, bool hasMultipl
     // Get the current offset for recalculate the offset when tiling.
     Property::Map retMap;
     mImpl->mTransform.GetPropertyMap( retMap );
-    Vector2 offSet = retMap.Find( Dali::Toolkit::Visual::Transform::Property::OFFSET )->Get< Vector2 >();
-    info.offSet = offSet;
+    Property::Value* offsetValue = retMap.Find( Dali::Toolkit::Visual::Transform::Property::OFFSET );
+    if( offsetValue )
+    {
+      offsetValue->Get( info.offSet );
+    }
 
     // Create a textureset in the default renderer.
     CreateTextureSet( info, mImpl->mRenderer, sampler, hasMultipleTextColors, containsColorGlyph, styleEnabled );
