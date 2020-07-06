@@ -70,7 +70,6 @@ VectorAnimationTask::VectorAnimationTask( VisualFactoryCache& factoryCache, cons
   mAnimationDataIndex( 0 ),
   mLoopCount( LOOP_FOREVER ),
   mCurrentLoop( 0 ),
-  mResourceReady( false ),
   mForward( true ),
   mUpdateFrameNumber( false ),
   mNeedAnimationFinishedTrigger( true ),
@@ -138,8 +137,6 @@ void VectorAnimationTask::SetSize( uint32_t width, uint32_t height )
     mWidth = width;
     mHeight = height;
 
-    mResourceReady = false;
-
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetSize: width = %d, height = %d [%p]\n", width, height, this );
   }
 }
@@ -148,6 +145,7 @@ void VectorAnimationTask::PlayAnimation()
 {
   if( mPlayState != PlayState::PLAYING )
   {
+    mNeedAnimationFinishedTrigger = true;
     mUpdateFrameNumber = false;
     mPlayState = PlayState::PLAYING;
 
@@ -266,12 +264,10 @@ void VectorAnimationTask::SetPlayRange( const Property::Array& playRange )
       if( mStartFrame > mCurrentFrame )
       {
         mCurrentFrame = mStartFrame;
-        mResourceReady = false;
       }
       else if( mEndFrame < mCurrentFrame )
       {
         mCurrentFrame = mEndFrame;
-        mResourceReady = false;
       }
 
       DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetPlayRange: [%d, %d] [%p]\n", mStartFrame, mEndFrame, this );
@@ -302,7 +298,6 @@ void VectorAnimationTask::SetCurrentFrameNumber( uint32_t frameNumber )
   {
     mCurrentFrame = frameNumber;
     mUpdateFrameNumber = false;
-    mResourceReady = false;
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetCurrentFrameNumber: frame number = %d [%p]\n", mCurrentFrame, this );
   }
@@ -394,10 +389,7 @@ bool VectorAnimationTask::Rasterize()
 
   currentFrame = mCurrentFrame;
 
-  // Reset values
-  mResourceReady = true;
   mUpdateFrameNumber = true;
-  mNeedAnimationFinishedTrigger = true;
 
   if( mPlayState == PlayState::STOPPING )
   {
@@ -462,11 +454,6 @@ bool VectorAnimationTask::Rasterize()
     {
       DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Rasterize: Rendering failed. Try again later.[%d] [%p]\n", currentFrame, this );
       mUpdateFrameNumber = false;
-
-      if( !mResourceReady )
-      {
-        mResourceReady = false;
-      }
     }
   }
 
