@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,19 @@ IntrusivePtr<AsyncImageLoader> AsyncImageLoader::New()
 {
   IntrusivePtr<AsyncImageLoader> internal = new AsyncImageLoader();
   return internal;
+}
+
+uint32_t AsyncImageLoader::LoadAnimatedImage( Dali::AnimatedImageLoading animatedImageLoading,
+                                              uint32_t frameIndex )
+{
+  if( !mIsLoadThreadStarted )
+  {
+    mLoadThread.Start();
+    mIsLoadThreadStarted = true;
+  }
+  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, animatedImageLoading, frameIndex ) );
+
+  return mLoadTaskId;
 }
 
 uint32_t AsyncImageLoader::Load( const VisualUrl& url,

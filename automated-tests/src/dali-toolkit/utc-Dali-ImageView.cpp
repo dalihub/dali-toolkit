@@ -424,6 +424,11 @@ int UtcDaliImageViewPixelArea(void)
   // loading started
   application.SendNotification();
   application.Render(16);
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( gifView.GetRendererCount() == 1u );
 
   const Vector4 fullTextureRect( 0.f, 0.f, 1.f, 1.f );
@@ -860,6 +865,11 @@ int UtcDaliImageViewCheckResourceReady(void)
 
   application.SendNotification();
   application.Render(16);
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
 
   DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
 

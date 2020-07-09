@@ -177,8 +177,8 @@ AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache, Imag
   mCurrentFrameIndex( 0 ),
   mImageUrls( NULL ),
   mImageCache( NULL ),
-  mCacheSize( 1 ),
-  mBatchSize( 1 ),
+  mCacheSize( 2 ),
+  mBatchSize( 2 ),
   mFrameDelay( 100 ),
   mLoopCount( LOOP_FOREVER ),
   mCurrentLoopIndex( 0 ),
@@ -220,6 +220,9 @@ void AnimatedImageVisual::GetNaturalSize( Vector2& naturalSize )
 void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
+
+  bool sync = IsSynchronousLoadingRequired();
+  map.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, sync );
 
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::ANIMATED_IMAGE );
 
@@ -402,7 +405,14 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
       int batchSize;
       if( value.Get( batchSize ) )
       {
-        mBatchSize = batchSize;
+        if( batchSize < 2 )
+        {
+          DALI_LOG_ERROR( "The minimum value of batch size is 2." );
+        }
+        else
+        {
+          mBatchSize = batchSize;
+        }
       }
       break;
     }
@@ -412,7 +422,14 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
       int cacheSize;
       if( value.Get( cacheSize ) )
       {
-        mCacheSize = cacheSize;
+        if( cacheSize < 2 )
+        {
+          DALI_LOG_ERROR( "The minimum value of cache size is 2." );
+        }
+        else
+        {
+          mCacheSize = cacheSize;
+        }
       }
       break;
     }
@@ -443,6 +460,21 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
       if( Scripting::GetEnumerationProperty( value, STOP_BEHAVIOR_TABLE, STOP_BEHAVIOR_TABLE_COUNT, stopBehavior ) )
       {
         mStopBehavior = DevelImageVisual::StopBehavior::Type( stopBehavior );
+      }
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING:
+    {
+      bool sync = false;
+      value.Get( sync );
+      if( sync )
+      {
+        mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+      }
+      else
+      {
+        mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
       }
       break;
     }
@@ -543,7 +575,7 @@ void AnimatedImageVisual::LoadFirstBatch()
 
   if( mAnimatedImageLoading )
   {
-    mImageCache = new RollingAnimatedImageCache( textureManager, mAnimatedImageLoading, mFrameCount, *this, cacheSize, batchSize );
+    mImageCache = new RollingAnimatedImageCache( textureManager, mAnimatedImageLoading, mFrameCount, *this, cacheSize, batchSize, IsSynchronousLoadingRequired() );
   }
   else if( mImageUrls )
   {
@@ -607,14 +639,16 @@ TextureSet AnimatedImageVisual::PrepareTextureSet()
 {
   TextureSet textureSet;
   if (mImageCache)
+  {
     textureSet = mImageCache->FirstFrame();
+  }
   if( textureSet )
   {
     SetImageSize( textureSet );
   }
   else
   {
-    DALI_LOG_INFO(gAnimImgLogFilter,Debug::Concise,"ResourceReady(ResourceStatus::FAILED)\n");
+    DALI_LOG_INFO( gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::FAILED)\n" );
     ResourceReady( Toolkit::Visual::ResourceStatus::FAILED );
   }
 
@@ -644,7 +678,7 @@ void AnimatedImageVisual::FrameReady( TextureSet textureSet )
   }
   else
   {
-    if(mImpl->mRenderer)
+    if( mImpl->mRenderer )
     {
       mImpl->mRenderer.SetTextures( textureSet );
     }

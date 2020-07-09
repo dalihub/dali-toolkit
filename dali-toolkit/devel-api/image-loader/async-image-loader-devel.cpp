@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,13 @@ namespace Toolkit
 {
 namespace DevelAsyncImageLoader
 {
+
+uint32_t LoadAnimatedImage( AsyncImageLoader asyncImageLoader,
+                            Dali::AnimatedImageLoading animatedImageLoading,
+                            uint32_t frameIndex )
+{
+  return GetImplementation( asyncImageLoader ).LoadAnimatedImage( animatedImageLoading, frameIndex );
+}
 
 uint32_t Load( AsyncImageLoader asyncImageLoader,
                const std::string& url,

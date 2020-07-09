@@ -2048,6 +2048,11 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
   application.SendNotification();
   application.Render();
 
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
   // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
   Renderer renderer = actor.GetRendererAt( 0u );
@@ -2061,12 +2066,9 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
   timer.MockEmitSignal();
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
-  textureTrace.Reset();
 
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
-  // Force the timer used by the animatedImageVisual to tick,
-  timer.MockEmitSignal();
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
@@ -2074,6 +2076,23 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
 
   // Force the timer used by the animatedImageVisual to tick,
   timer.MockEmitSignal();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
+  // Force the timer used by the animatedImageVisual to tick,
+  timer.MockEmitSignal();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
@@ -2113,6 +2132,11 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual2(void)
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
