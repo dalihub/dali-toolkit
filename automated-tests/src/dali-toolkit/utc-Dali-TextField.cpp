@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
+#include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include "toolkit-clipboard.h"
 
 using namespace Dali;
@@ -417,7 +418,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field );
 
   // Check Property Indices are correct
-  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == TextField::Property::RENDERING_BACKEND );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == DevelTextField::Property::RENDERING_BACKEND );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_TEXT ) == TextField::Property::TEXT );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == TextField::Property::PLACEHOLDER_TEXT );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_FOCUSED ) == TextField::Property::PLACEHOLDER_TEXT_FOCUSED );
@@ -506,8 +507,11 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Note - we can't check the defaults since the stylesheets are platform-specific
 
   // Check the render backend property.
-  field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
-  DALI_TEST_EQUALS( (Text::RenderingType)field.GetProperty<int>( TextField::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+  field.SetProperty( DevelTextField::Property::RENDERING_BACKEND, DevelText::RENDERING_SHARED_ATLAS );
+  DALI_TEST_EQUALS( (DevelText::RenderingType)field.GetProperty<int>( DevelTextField::Property::RENDERING_BACKEND ), DevelText::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+
+  field.SetProperty( DevelTextField::Property::RENDERING_BACKEND, DevelText::RENDERING_VECTOR_BASED );
+  DALI_TEST_EQUALS( (DevelText::RenderingType)field.GetProperty<int>( DevelTextField::Property::RENDERING_BACKEND ), DevelText::RENDERING_VECTOR_BASED, TEST_LOCATION );
 
   // Check text property.
   field.SetProperty( TextField::Property::TEXT, "Setting Text" );
@@ -960,7 +964,7 @@ int utcDaliTextFieldAtlasRenderP(void)
   try
   {
     // Render some text with the shared atlas backend
-    field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
+    field.SetProperty( DevelTextField::Property::RENDERING_BACKEND, DevelText::RENDERING_SHARED_ATLAS );
     application.SendNotification();
     application.Render();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ namespace
 // shapes
 DALI_ENUM_TO_STRING_TABLE_BEGIN( SHAPE_TYPE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, SPHERE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONICAL_FRUSTRUM ) // deprecated
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CYLINDER )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CUBE )
@@ -78,7 +77,6 @@ const float MAX_SMOOTHNESS =       1.0; ///< Maximum bevel smoothness for bevell
 //Specific shape labels.
 const char * const SPHERE_LABEL( "SPHERE" );
 const char * const CONE_LABEL( "CONE" );
-const char * const CONICAL_FRUSTRUM_LABEL( "CONICAL_FRUSTRUM" ); // deprecated
 const char * const CYLINDER_LABEL( "CYLINDER" );
 const char * const CUBE_LABEL( "CUBE" );
 const char * const OCTAHEDRON_LABEL( "OCTAHEDRON" );
@@ -501,11 +499,6 @@ void PrimitiveVisual::CreateGeometry()
     {
       //Create a conic with zero top radius.
       CreateConic( vertices, indices, 0, mScaleBottomRadius, mScaleHeight, mSlices );
-      break;
-    }
-    case Toolkit::PrimitiveVisual::Shape::CONICAL_FRUSTRUM: // deprecated
-    {
-      CreateConic( vertices, indices, mScaleTopRadius, mScaleBottomRadius, mScaleHeight, mSlices );
       break;
     }
     case Toolkit::PrimitiveVisual::Shape::CYLINDER:

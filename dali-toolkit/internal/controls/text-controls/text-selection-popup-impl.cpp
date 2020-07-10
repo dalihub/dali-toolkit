@@ -35,6 +35,7 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
@@ -701,11 +702,11 @@ std::string TextSelectionPopup::GetPressedImage() const
    if( showIcons )
    {
      option.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, Vector4( 10.0f, 10.0f, 10.0f, 10.0f ) );
-     option.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "TOP" );
+     option.SetProperty( Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT, "BOTTOM" );
 
      // TODO: This is temporarily disabled until the text-selection-popup image API is changed to strings.
-     //option.SetProperty( Toolkit::PushButton::Property::SELECTED_ICON, button.icon );
-     //option.SetProperty( Toolkit::PushButton::Property::UNSELECTED_ICON, button.icon );
+     //option.SetProperty(  Toolkit::Button::Property::SELECTED_VISUAL, button.icon );
+     //option.SetProperty(  Toolkit::Button::Property::UNSELECTED_VISUAL, button.icon );
    }
 
    // 3. Set the normal option image (blank / Transparent).

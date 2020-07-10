@@ -207,19 +207,6 @@ Toolkit::GaussianBlurView GaussianBlurView::New(const unsigned int numSamples, c
   return handle;
 }
 
-/////////////////////////////////////////////////////////////
-// for creating a subtree for all user added child actors, so that we can have them exclusive to the mRenderChildrenTask and our other actors exclusive to our other tasks
-// DEPRECATED: overloading Actor::Add()/Remove() not nice since breaks polymorphism. Need another method to pass ownership of added child actors to our internal actor root.
-void GaussianBlurView::Add(Actor child)
-{
-  mChildrenRoot.Add(child);
-}
-
-void GaussianBlurView::Remove(Actor child)
-{
-  mChildrenRoot.Remove(child);
-}
-
 void GaussianBlurView::SetUserImageAndOutputRenderTarget(Texture inputImage, FrameBuffer outputRenderTarget)
 {
   // can only do this if the GaussianBlurView object was created with this parameter set

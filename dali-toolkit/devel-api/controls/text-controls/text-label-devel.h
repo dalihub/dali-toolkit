@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LABEL_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ namespace Property
 {
   enum Type
   {
-    RENDERING_BACKEND = Dali::Toolkit::TextLabel::Property::RENDERING_BACKEND,
     TEXT = Dali::Toolkit::TextLabel::Property::TEXT,
     FONT_FAMILY = Dali::Toolkit::TextLabel::Property::FONT_FAMILY,
     FONT_STYLE = Dali::Toolkit::TextLabel::Property::FONT_STYLE,
@@ -141,6 +140,11 @@ namespace Property
      */
     MIN_LINE_SIZE,
 
+    /**
+     * @brief The type of rendering e.g. bitmap-based.
+     * @details Name "renderingBackend", type Property::INT.
+     */
+    RENDERING_BACKEND,
   };
 
 } // namespace Property

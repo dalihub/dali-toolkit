@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,19 +184,21 @@ enum
   /**
    * @brief Defines the batch size for pre-loading images in the AnimatedImageVisual
    * @details Name "batchSize", type Property::INTEGER, number of images to pre-load
-   * before starting to play. Default value: 1
+   * before starting to play. Default value: 2
    * @SINCE_1_2.60
    * @note Optional.
+   * @note Minimum supported value is 2.
    */
   BATCH_SIZE,
 
   /**
    * @brief Defines the cache size for loading images in the AnimatedImageVisual
    * @details Name "cacheSize", type Property::INTEGER, number of images to keep
-   * cached ahead during playback. Default value: 1
+   * cached ahead during playback. Default value: 2
    *
    * @SINCE_1_2.60
    * @note Optional.
+   * @note Minimum supported value is 2.
    * @note, cacheSize should be >= batchSize.
    * If it isn't, then the cache will automatically be changed to batchSize.
    * @note, because of the defaults, it is expected that the application developer

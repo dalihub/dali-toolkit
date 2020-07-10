@@ -158,6 +158,105 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   END_TEST;
 }
 
+int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedImageVisualGetPropertyMap" );
+
+  // request AnimatedImageVisual with a property map
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base animatedImageVisual = factory.CreateVisual(
+    Property::Map()
+    .Add( Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE )
+    .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME )
+    .Add( ImageVisual::Property::BATCH_SIZE, 1 )
+    .Add( ImageVisual::Property::CACHE_SIZE, 1 )
+    .Add( ImageVisual::Property::SYNCHRONOUS_LOADING, false ));
+
+  Property::Map resultMap;
+  animatedImageVisual.CreatePropertyMap( resultMap );
+
+  // check the property values from the returned map from a visual
+  Property::Value* value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::ANIMATED_IMAGE );
+
+  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
+
+  value = resultMap.Find( ImageVisual::Property::BATCH_SIZE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == 2 );
+
+  value = resultMap.Find( ImageVisual::Property::CACHE_SIZE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == 2 );
+
+  END_TEST;
+}
+
+
+int UtcDaliAnimatedImageVisualSynchronousLoading(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE );
+    propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 2);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 20);
+    propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+
+    DummyControl dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    Stage::GetCurrent().Add( dummyControl );
+
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::GetTimerCount(), 1, TEST_LOCATION );
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 2, TEST_LOCATION );
+
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::JUMP_TO, 3 );
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 3, TEST_LOCATION );
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliAnimatedImageVisualJumpToAction(void)
 {
@@ -318,6 +417,12 @@ int UtcDaliAnimatedImageVisualAnimatedImage01(void)
 
     dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
     Stage::GetCurrent().Add( dummyControl );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
     application.SendNotification();
     application.Render(20);
 
@@ -329,6 +434,11 @@ int UtcDaliAnimatedImageVisualAnimatedImage01(void)
     textureTrace.Enable(true);
 
     Test::EmitGlobalTimerSignal();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
 
     application.SendNotification();
     application.Render(20);
@@ -452,8 +562,8 @@ int UtcDaliAnimatedImageVisualMultiImage02(void)
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE );
     propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
-    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 0);
-    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 0);
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 2);
     propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 100);
 
     VisualFactory factory = VisualFactory::Get();
@@ -749,8 +859,14 @@ void TestLoopCount( ToolkitTestApplication &application, DummyControl &dummyCont
 
   textureTrace.Enable(true);
   Stage::GetCurrent().Add( dummyControl );
+
   application.SendNotification();
   application.Render(16);
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_INNER_LOCATION( location ) );
+
+  application.SendNotification();
+  application.Render();
 
   tet_infoline( "Test that a timer has been created" );
   DALI_TEST_EQUALS( Test::GetTimerCount(), 1, TEST_INNER_LOCATION( location ) );
@@ -767,10 +883,15 @@ void TestLoopCount( ToolkitTestApplication &application, DummyControl &dummyCont
       Test::EmitGlobalTimerSignal();
       application.SendNotification();
       application.Render(16);
-      DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 1, TEST_INNER_LOCATION( location ) );
+
+      DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_INNER_LOCATION( location ) );
+
+      application.SendNotification();
+      application.Render();
+      DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 2, TEST_INNER_LOCATION( location ) );
       DALI_TEST_EQUALS( Test::AreTimersRunning(), true, TEST_INNER_LOCATION( location ) );
     }
-    tet_printf( "\nTest Loop %u \n", i );
+    tet_printf( "Test Loop %u \n\n", i + 1u );
   }
 
   tet_printf( "Test that after %u loops, and we have no frame. Timer should stop \n", loopCount );
@@ -808,6 +929,12 @@ int UtcDaliAnimatedImageVisualLoopCount(void)
 
     TestLoopCount( application, dummyControl, 4, 0, TEST_LOCATION );
 
+    dummyImpl.UnregisterVisual( DummyControl::Property::TEST_VISUAL );
+    animatedImageVisual.Reset();
+
+    application.SendNotification();
+    application.Render(16);
+
     // Test with no (1) loop count. Request AnimatedImageVisual with a property map
     animatedImageVisual = factory.CreateVisual(
       Property::Map()
@@ -821,6 +948,12 @@ int UtcDaliAnimatedImageVisualLoopCount(void)
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, animatedImageVisual );
 
     TestLoopCount( application, dummyControl, 4, 1, TEST_LOCATION );
+
+    dummyImpl.UnregisterVisual( DummyControl::Property::TEST_VISUAL );
+    animatedImageVisual.Reset();
+
+    application.SendNotification();
+    application.Render(16);
 
     // Test with no (100) loop count. Request AnimatedImageVisual with a property map
     animatedImageVisual = factory.CreateVisual(
@@ -836,7 +969,6 @@ int UtcDaliAnimatedImageVisualLoopCount(void)
 
     TestLoopCount( application, dummyControl, 4, 100, TEST_LOCATION );
   }
-
   END_TEST;
 }
 
@@ -871,12 +1003,22 @@ int UtcDaliAnimatedImageVisualPlayback(void)
     application.SendNotification();
     application.Render(16);
 
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
     tet_infoline( "Test that a timer has been created" );
     DALI_TEST_EQUALS( Test::GetTimerCount(), 1, TEST_LOCATION );
 
     Test::EmitGlobalTimerSignal();
     application.SendNotification();
     application.Render(16);
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
     DALI_TEST_EQUALS( Test::AreTimersRunning(), true, TEST_LOCATION );
 
     Property::Map attributes;
@@ -892,6 +1034,11 @@ int UtcDaliAnimatedImageVisualPlayback(void)
     Test::EmitGlobalTimerSignal();
     application.SendNotification();
     application.Render(16);
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
     DALI_TEST_EQUALS( Test::AreTimersRunning(), true, TEST_LOCATION );
 
     tet_infoline( "Test Stop action. Timer should stop after Stop action" );
@@ -906,6 +1053,11 @@ int UtcDaliAnimatedImageVisualPlayback(void)
     Test::EmitGlobalTimerSignal();
     application.SendNotification();
     application.Render(16);
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
     DALI_TEST_EQUALS( Test::AreTimersRunning(), true, TEST_LOCATION );
 
     dummyControl.Unparent();

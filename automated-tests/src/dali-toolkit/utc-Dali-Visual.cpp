@@ -25,6 +25,7 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
@@ -1139,7 +1140,7 @@ int UtcDaliVisualGetPropertyMap10(void)
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::TEXT );
   propertyMap.Insert( Visual::Property::MIX_COLOR, Color::BLACK );
-  propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
+  propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::DevelText::DEFAULT_RENDERING_BACKEND ) );
   propertyMap.Insert( "enableMarkup", false );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
@@ -3155,7 +3156,7 @@ int UtcDaliVisualTextVisualRender(void)
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::TEXT );
   propertyMap.Insert( "mixColor", Color::WHITE );
-  propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
+  propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::DevelText::DEFAULT_RENDERING_BACKEND ) );
   propertyMap.Insert( "enableMarkup", false );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );
@@ -3224,7 +3225,7 @@ int UtcDaliVisualTextVisualDisableEnable(void)
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::TEXT );
   propertyMap.Insert( "mixColor", Color::WHITE );
-  propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::Text::DEFAULT_RENDERING_BACKEND ) );
+  propertyMap.Insert( "renderingBackend", static_cast<int>( Toolkit::DevelText::DEFAULT_RENDERING_BACKEND ) );
   propertyMap.Insert( "enableMarkup", false );
   propertyMap.Insert( "text", "Hello world" );
   propertyMap.Insert( "fontFamily", "TizenSans" );

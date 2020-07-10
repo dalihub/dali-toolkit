@@ -186,7 +186,7 @@ ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIndicatorShowAlpha(1.0f),
   mDirection(direction),
-  mScrollableObject(WeakHandleBase()),
+  mScrollableObject(WeakHandle<Handle>()),
   mPropertyScrollPosition(Property::INVALID_INDEX),
   mPropertyMinScrollPosition(Property::INVALID_INDEX),
   mPropertyMaxScrollPosition(Property::INVALID_INDEX),
@@ -225,7 +225,7 @@ void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index property
       && propertyMaxScrollPosition != Property::INVALID_INDEX
       && propertyScrollContentSize != Property::INVALID_INDEX )
   {
-    mScrollableObject = WeakHandleBase(handle);
+    mScrollableObject = WeakHandle<Handle>(handle);
     mPropertyScrollPosition = propertyScrollPosition;
     mPropertyMinScrollPosition = propertyMinScrollPosition;
     mPropertyMaxScrollPosition = propertyMaxScrollPosition;
@@ -294,7 +294,7 @@ Actor ScrollBar::GetScrollIndicator()
 
 void ScrollBar::ApplyConstraints()
 {
-  Handle scrollableHandle = mScrollableObject.GetBaseHandle();
+  Handle scrollableHandle = mScrollableObject.GetHandle();
 
   if( scrollableHandle )
   {
@@ -337,7 +337,7 @@ void ScrollBar::SetScrollPositionIntervals( const Dali::Vector<float>& positions
 {
   mScrollPositionIntervals = positions;
 
-  Handle scrollableHandle = mScrollableObject.GetBaseHandle();
+  Handle scrollableHandle = mScrollableObject.GetHandle();
 
   if( scrollableHandle )
   {
@@ -359,7 +359,7 @@ Dali::Vector<float> ScrollBar::GetScrollPositionIntervals() const
 void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification& source)
 {
   // Emit the signal to notify the scroll position crossing
-  Handle scrollableHandle = mScrollableObject.GetBaseHandle();
+  Handle scrollableHandle = mScrollableObject.GetHandle();
   if(scrollableHandle)
   {
     mScrollPositionIntervalReachedSignal.Emit( scrollableHandle.GetCurrentProperty< float >( mPropertyScrollPosition ) );
@@ -442,7 +442,7 @@ void ScrollBar::ShowTransientIndicator()
 bool ScrollBar::OnPanGestureProcessTick()
 {
   // Update the scroll position property.
-  Handle scrollableHandle = mScrollableObject.GetBaseHandle();
+  Handle scrollableHandle = mScrollableObject.GetHandle();
   if( scrollableHandle )
   {
     scrollableHandle.SetProperty(mPropertyScrollPosition, mCurrentScrollPosition);
@@ -453,7 +453,7 @@ bool ScrollBar::OnPanGestureProcessTick()
 
 void ScrollBar::OnPan( const PanGesture& gesture )
 {
-  Handle scrollableHandle = mScrollableObject.GetBaseHandle();
+  Handle scrollableHandle = mScrollableObject.GetHandle();
 
   if(scrollableHandle)
   {

@@ -1098,7 +1098,7 @@ int UtcDaliImageVisualTextureCancelRemoteLoad(void)
 int UtcDaliImageVisualTextureCancelAsyncLoad(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "Load image asynchronosly, cancel loading, then load again" );
+  tet_infoline( "Load image asynchronously, cancel loading, then load again" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -1857,6 +1857,87 @@ int UtcDaliImageVisualReleasePolicy07(void)
 
   tet_infoline( "Ensure a texture is not deleted as second visual used the DESTROYED release policy" );
   DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualReleasePolicy08(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualReleasePolicy08 Ensure TextureSet is same after detach/attach on stage when texture used the DESTROYED release policy" );
+
+  tet_infoline( "Create first visual with DESTROYED release policy" );
+  Visual::Base imageVisualDestroyed = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED );
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Register visuals with control and ensure it has the only handles" );
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisualDestroyed );
+  imageVisualDestroyed.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
+
+  // Test initially zero renderers
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+  textureTrace.Reset();
+
+  Stage::GetCurrent().Add( actor );
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  tet_infoline( "Ensure a texture is created" );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
+  // Ensure TextureSet is same after detach/attach on stage when texture used the DESTROYED release policy
+  // 1. Get TextureSet
+  TextureSet textureSetBefore = actor.GetRendererAt( 0u ).GetTextures();
+
+  // 2.Remove actor from stage. In this case, renderer also is deleted.
+  tet_infoline( "Remove actor from stage" );
+  Stage::GetCurrent().Remove( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Ensure a texture is not deleted as visual used the DESTROYED release policy" );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+  textureTrace.Reset();
+
+  // 3.Add actor in stage. In this case, renderer is created.
+  tet_infoline( "Add actor in stage" );
+  Stage::GetCurrent().Add( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  application.SendNotification();
+  application.Render();
+  tet_infoline( "Ensure a texture is not created again" );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION );
+  textureTrace.Reset();
+
+  // 4.Compare Texture with before and after. textureSet need to be same because release policy is the DESTROYED.
+  tet_infoline( "Ensure a textureSet is not deleted because it is used the DESTROYED release policy" );
+  TextureSet textureSetAfter = actor.GetRendererAt( 0u ).GetTextures();
+  DALI_TEST_CHECK( textureSetBefore == textureSetAfter );
+  textureSetBefore.Reset();
+  textureSetAfter.Reset();
+
+  dummyImpl.UnregisterVisual( DummyControl::Property::TEST_VISUAL );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 1, TEST_LOCATION );
 
   END_TEST;
 }

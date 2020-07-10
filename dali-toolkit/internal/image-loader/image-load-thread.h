@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_LOAD_THREAD_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,16 @@ struct LoadingTask
   /**
    * Constructor.
    * @param [in] id of the task
+   * @param [in] animatedImageLoading The AnimatedImageLoading to load animated image
+   * @param [in] frameIndex The frame index of a frame to be loaded frame
+   */
+  LoadingTask( uint32_t id,
+               Dali::AnimatedImageLoading animatedImageLoading,
+               uint32_t frameIndex );
+
+  /**
+   * Constructor.
+   * @param [in] id of the task
    * @param [in] url The URL of the image file to load.
    * @param [in] size The width and height to fit the loaded image to, 0.0 means whole image
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
@@ -60,7 +70,7 @@ struct LoadingTask
                FittingMode::Type fittingMode,
                SamplingMode::Type samplingMode,
                bool orientationCorrection,
-               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
+               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
 
   /**
    * Constructor.
@@ -72,11 +82,11 @@ struct LoadingTask
    * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    */
   LoadingTask( uint32_t id,
-              Devel::PixelBuffer pixelBuffer,
-              Devel::PixelBuffer maskPixelBuffer,
-              float contentScale,
-              bool cropToMask,
-              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
+               Devel::PixelBuffer pixelBuffer,
+               Devel::PixelBuffer maskPixelBuffer,
+               float contentScale,
+               bool cropToMask,
+               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
 
   /**
    * Load the image
@@ -117,6 +127,8 @@ public:
   Devel::PixelBuffer maskPixelBuffer; ///< pixelBuffer of mask image
   float contentScale;               ///< The factor to scale the content
   bool cropToMask;                  ///< Whether to crop the content to the mask size
+  Dali::AnimatedImageLoading animatedImageLoading;
+  uint32_t frameIndex;
 };
 
 

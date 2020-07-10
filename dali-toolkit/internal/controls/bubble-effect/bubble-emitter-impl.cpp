@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,7 +215,7 @@ void BubbleEmitter::OnInitialize()
 
   // Prepare the frame buffer to store the color adjusted background texture
   Vector2 imageSize = Vector2( mMovementArea.width/4.f, mMovementArea.height/4.f );
-  mFrameBuffer = FrameBuffer::New( imageSize.x, imageSize.y, 0 );
+  mFrameBuffer = FrameBuffer::New( imageSize.x, imageSize.y, FrameBuffer::Attachment::NONE );
   mEffectTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, imageSize.x, imageSize.y );
   mFrameBuffer.AttachColorTexture( mEffectTexture );
 
