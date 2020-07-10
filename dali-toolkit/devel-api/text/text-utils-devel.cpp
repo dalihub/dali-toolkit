@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <cstring>
+#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -91,6 +92,7 @@ const float RAD_135 = Math::PI_2 + Math::PI_4; ///< 135 degrees in radians;
 const float RAD_225 = RAD_135    + Math::PI_2; ///< 225 degrees in radians;
 const float RAD_270 = 3.f * Math::PI_2;        ///< 270 degrees in radians;
 const float RAD_315 = RAD_225    + Math::PI_2; ///< 315 degrees in radians;
+const float MAX_INT = std::numeric_limits<int>::max();
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN( LAYOUT_TYPE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( DevelText::Layout, SINGLELINE )
@@ -132,6 +134,7 @@ struct InternalDataModel
   bool isTextMirrored ;                                    // Whether the text has been mirrored.
 
   Length numberOfGlyphs;
+  Size textLayoutArea;
 };
 
 bool GetLayoutEnumeration(const Property::Value& propertyValue, DevelText::Layout::Type& layout)
@@ -495,20 +498,67 @@ void SetEmojiVector( InternalDataModel& internalDataModel )
 
 void Align( const RendererParameters& textParameters, TextAbstraction::TextRenderer::Parameters& rendererParameters,
             Vector<EmbeddedItemInfo>& embeddedItemLayout, InternalDataModel& internalDataModel,
-            Size& textLayoutArea, const Size& newLayoutSize,
-            const bool isCircularTextLayout, const bool isClockwise,
-            HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment, CircularAlignment::Type circularAlignment,
-            const unsigned int radius )
+            const Size& newLayoutSize )
 {
   Text::Layout::Engine& layoutEngine = internalDataModel.layoutEngine;
   Text::ModelPtr& textModel = internalDataModel.textModel;
   const Length numberOfCharacters = internalDataModel.numberOfCharacters;
+  Size& textLayoutArea = internalDataModel.textLayoutArea;
 
   Vector<LineRun>& lines = textModel->mVisualModel->mLines;                                                         // The laid out lines.
 
   ////////////////////////////////////////////////////////////////////////////////
   // Align the text.
   ////////////////////////////////////////////////////////////////////////////////
+
+  HorizontalAlignment::Type horizontalAlignment = Toolkit::HorizontalAlignment::CENTER;
+  HorizontalAlignment::Type horizontalCircularAlignment = Toolkit::HorizontalAlignment::CENTER;
+  VerticalAlignment::Type verticalAlignment = VerticalAlignment::CENTER;
+  CircularAlignment::Type circularAlignment = CircularAlignment::BEGIN;
+
+  Layout::Type layout = Layout::SINGLELINE;
+
+  // Sets the alignment
+  Property::Value horizontalAlignmentStr( textParameters.horizontalAlignment );
+  GetHorizontalAlignmentEnumeration( horizontalAlignmentStr, horizontalAlignment );
+  horizontalCircularAlignment = horizontalAlignment;
+
+  Property::Value verticalAlignmentStr( textParameters.verticalAlignment );
+  GetVerticalAlignmentEnumeration( verticalAlignmentStr, verticalAlignment );
+
+  Property::Value circularAlignmentStr( textParameters.circularAlignment );
+  GetCircularAlignmentEnumeration( circularAlignmentStr, circularAlignment );
+
+  Property::Value layoutStr( textParameters.layout );
+  GetLayoutEnumeration( layoutStr, layout );
+
+  // Whether the layout is circular.
+  const bool isCircularTextLayout = (Layout::CIRCULAR == layout);
+  const bool isClockwise = isCircularTextLayout && ( 0.f < textParameters.incrementAngle );
+
+  // Convert CircularAlignment to HorizontalAlignment.
+  if( isCircularTextLayout )
+  {
+    switch( circularAlignment )
+    {
+      case CircularAlignment::BEGIN:
+      {
+        horizontalCircularAlignment = Toolkit::HorizontalAlignment::BEGIN;
+        break;
+      }
+      case CircularAlignment::CENTER:
+      {
+        horizontalCircularAlignment = Toolkit::HorizontalAlignment::CENTER;
+        break;
+      }
+      case CircularAlignment::END:
+      {
+        horizontalCircularAlignment = Toolkit::HorizontalAlignment::END;
+        break;
+      }
+    }
+  }
+  textModel->mHorizontalAlignment = isCircularTextLayout ? horizontalCircularAlignment : horizontalAlignment;
 
   // Retrieve the line of text to know the direction and the width. @todo multi-line
   const LineRun& line = lines[0u];
@@ -604,14 +654,14 @@ void Align( const RendererParameters& textParameters, TextAbstraction::TextRende
       {
         const bool isNeg = textParameters.incrementAngle < 0.f;
         const float textWidth = static_cast<float>( rendererParameters.circularWidth );
-        angleOffset = ( isNeg ? -0.5f : 0.5f ) * ( textLayoutArea.width - textWidth ) / static_cast<float>( radius );
+        angleOffset = ( isNeg ? -0.5f : 0.5f ) * ( textLayoutArea.width - textWidth ) / static_cast<float>( rendererParameters.radius );
         break;
       }
       case CircularAlignment::END:
       {
         const bool isNeg = textParameters.incrementAngle < 0.f;
         const float textWidth = static_cast<float>( rendererParameters.circularWidth );
-        angleOffset = ( isNeg ? -1.f : 1.f ) * ( textLayoutArea.width - textWidth ) / static_cast<float>( radius );
+        angleOffset = ( isNeg ? -1.f : 1.f ) * ( textLayoutArea.width - textWidth ) / static_cast<float>( rendererParameters.radius );
         break;
       }
     }
@@ -700,7 +750,7 @@ void Align( const RendererParameters& textParameters, TextAbstraction::TextRende
 
       Dali::TextAbstraction::CircularTextParameters circularTextParameters;
 
-      circularTextParameters.radius = static_cast<double>( radius );
+      circularTextParameters.radius = static_cast<double>( rendererParameters.radius );
       circularTextParameters.invRadius = 1.0 / circularTextParameters.radius;
       circularTextParameters.beginAngle = static_cast<double>( -rendererParameters.beginAngle + Dali::Math::PI_2 );
       circularTextParameters.centerX = 0.5f * static_cast<double>( textParameters.textWidth );
@@ -768,14 +818,14 @@ void Align( const RendererParameters& textParameters, TextAbstraction::TextRende
 }
 
 void Ellipsis(  const RendererParameters& textParameters, TextAbstraction::TextRenderer::Parameters& rendererParameters,
-               Vector<EmbeddedItemInfo>& embeddedItemLayout, Size& textLayoutArea,  InternalDataModel& internalDataModel )
+               Vector<EmbeddedItemInfo>& embeddedItemLayout, InternalDataModel& internalDataModel )
 {
   Text::ModelPtr& textModel = internalDataModel.textModel;
   FontClient& fontClient = internalDataModel.fontClient;
 
   Vector<LineRun>& lines = textModel->mVisualModel->mLines;                              // The laid out lines.
   Vector<bool>& isEmoji = internalDataModel.isEmoji;
-
+  const Size textLayoutArea = internalDataModel.textLayoutArea;
   ////////////////////////////////////////////////////////////////////////////////
   // Ellipsis the text.
   ////////////////////////////////////////////////////////////////////////////////
@@ -942,30 +992,14 @@ Size LayoutText( const RendererParameters& textParameters, TextAbstraction::Text
   const Vector<Character>& mirroredUtf32Characters = internalDataModel.mirroredUtf32Characters;
   const Length numberOfCharacters = internalDataModel.numberOfCharacters;
 
-  // Sets the alignment
-  HorizontalAlignment::Type horizontalAlignment = Toolkit::HorizontalAlignment::CENTER;
-  HorizontalAlignment::Type horizontalCircularAlignment = Toolkit::HorizontalAlignment::CENTER;
-  VerticalAlignment::Type verticalAlignment = VerticalAlignment::CENTER;
   Layout::Type layout = Layout::SINGLELINE;
-  CircularAlignment::Type circularAlignment = CircularAlignment::BEGIN;
-
-  Property::Value horizontalAlignmentStr( textParameters.horizontalAlignment );
-  GetHorizontalAlignmentEnumeration( horizontalAlignmentStr, horizontalAlignment );
-  horizontalCircularAlignment = horizontalAlignment;
-
-  Property::Value verticalAlignmentStr( textParameters.verticalAlignment );
-  GetVerticalAlignmentEnumeration( verticalAlignmentStr, verticalAlignment );
 
   Property::Value layoutStr( textParameters.layout );
   GetLayoutEnumeration( layoutStr, layout );
 
-  Property::Value circularAlignmentStr( textParameters.circularAlignment );
-  GetCircularAlignmentEnumeration( circularAlignmentStr, circularAlignment );
-
   // Whether the layout is multi-line.
   const Text::Layout::Engine::Type horizontalLayout = ( Layout::MULTILINE == layout ) ? Text::Layout::Engine::MULTI_LINE_BOX : Text::Layout::Engine::SINGLE_LINE_BOX;
   layoutEngine.SetLayout( horizontalLayout ); // TODO: multi-line.
-
 
   // Whether the layout is circular.
   const bool isCircularTextLayout = (Layout::CIRCULAR == layout);
@@ -990,49 +1024,23 @@ Size LayoutText( const RendererParameters& textParameters, TextAbstraction::Text
   }
   const unsigned int radius = textParameters.radius - static_cast<unsigned int>( maxAscenderDescender );
 
-  // Convert CircularAlignment to HorizontalAlignment.
-  if( isCircularTextLayout )
-  {
-    switch( circularAlignment )
-    {
-      case CircularAlignment::BEGIN:
-      {
-        horizontalCircularAlignment = Toolkit::HorizontalAlignment::BEGIN;
-        break;
-      }
-      case CircularAlignment::CENTER:
-      {
-        horizontalCircularAlignment = Toolkit::HorizontalAlignment::CENTER;
-        break;
-      }
-      case CircularAlignment::END:
-      {
-        horizontalCircularAlignment = Toolkit::HorizontalAlignment::END;
-        break;
-      }
-    }
-  }
-
   // Set the layout parameters.
-  Size textLayoutArea( static_cast<float>( textParameters.textWidth ),
-                     static_cast<float>( textParameters.textHeight ) );
+  internalDataModel.textLayoutArea = Size( static_cast<float>( textParameters.textWidth ),
+                                           static_cast<float>( textParameters.textHeight ) );
 
   if( isCircularTextLayout )
   {
     // In a circular layout, the length of the text area depends on the radius.
     rendererParameters.radius = radius;
-    textLayoutArea.width = fabs( Radian( Degree( textParameters.incrementAngle ) ) * static_cast<float>( rendererParameters.radius ) );
+    internalDataModel.textLayoutArea.width = fabs( Radian( Degree( textParameters.incrementAngle ) ) * static_cast<float>( rendererParameters.radius ) );
   }
   // Resize the vector of positions to have the same size than the vector of glyphs.
   rendererParameters.positions.Resize( numberOfGlyphs );
 
-
-
-  textModel->mHorizontalAlignment = isCircularTextLayout ? horizontalCircularAlignment : horizontalAlignment;
   textModel->mLineWrapMode = LineWrap::WORD;
   textModel->mIgnoreSpacesAfterText = false;
   textModel->mMatchSystemLanguageDirection = false;
-  Text::Layout::Parameters layoutParameters( textLayoutArea,
+  Text::Layout::Parameters layoutParameters( internalDataModel.textLayoutArea,
                                              textModel );
 
 
@@ -1055,14 +1063,7 @@ Size LayoutText( const RendererParameters& textParameters, TextAbstraction::Text
                            textParameters.ellipsisEnabled,
                            isAutoScrollEnabled );
 
-  ////////////////////////////////////////////////////////////////////////////////
-  // Align the text.
-  ////////////////////////////////////////////////////////////////////////////////
-  Align( textParameters, rendererParameters, embeddedItemLayout, internalDataModel,
-         textLayoutArea, newLayoutSize, isCircularTextLayout, isClockwise,
-         horizontalAlignment, verticalAlignment, circularAlignment, radius );
-
-  return textLayoutArea;
+  return newLayoutSize;
 
 }
 
@@ -1146,14 +1147,20 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   SetEmojiVector( internalData );
 
   ////////////////////////////////////////////////////////////////////////////////
-  // Layout the text and Align the text
+  // Layout the text
   ////////////////////////////////////////////////////////////////////////////////
-  Size textLayoutArea = LayoutText( textParameters, rendererParameters, embeddedItemLayout, internalData );
+  Size newLayoutSize = LayoutText( textParameters, rendererParameters, embeddedItemLayout, internalData );
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Align the text.
+  ////////////////////////////////////////////////////////////////////////////////
+  Align( textParameters, rendererParameters, embeddedItemLayout, internalData, newLayoutSize );
+
 
   ////////////////////////////////////////////////////////////////////////////////
   // Ellipsis the text.
   ////////////////////////////////////////////////////////////////////////////////
-  Ellipsis( textParameters, rendererParameters, embeddedItemLayout, textLayoutArea, internalData );
+  Ellipsis( textParameters, rendererParameters, embeddedItemLayout, internalData );
 
   ////////////////////////////////////////////////////////////////////////////////
   // Render the text.
@@ -1470,6 +1477,92 @@ void UpdateBuffer(Devel::PixelBuffer src, Devel::PixelBuffer dst, unsigned int x
     }
   }
 }
+
+
+Dali::Property::Array RenderForLastIndex( RendererParameters& textParameters )
+{
+  Property::Array offsetValues;
+  if( textParameters.text.empty() )
+  {
+    return offsetValues;
+  }
+  FontClient fontClient = FontClient::Get();
+  MetricsPtr metrics;
+  metrics = Metrics::New( fontClient );
+
+  Text::ModelPtr textModel = Text::Model::New();
+  InternalDataModel internalData( fontClient, metrics, textModel );
+
+  TextAbstraction::TextRenderer::Parameters rendererParameters( textModel->mVisualModel->mGlyphs,
+                                                                textModel->mVisualModel->mGlyphPositions,
+                                                                textModel->mVisualModel->mColors,
+                                                                textModel->mVisualModel->mColorIndices,
+                                                                internalData.blendingMode,
+                                                                internalData.isEmoji );
+
+
+  rendererParameters.width = textParameters.textWidth;
+  rendererParameters.height = textParameters.textHeight;
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Process the markup string if the mark-up processor is enabled.
+  ////////////////////////////////////////////////////////////////////////////////
+  ShapeTextPreprocess( textParameters, rendererParameters, internalData );
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Retrieve the glyphs. Text shaping
+  ////////////////////////////////////////////////////////////////////////////////
+  Dali::Vector<Dali::Toolkit::DevelText::EmbeddedItemInfo> embeddedItemLayout;
+  ShapeText( rendererParameters, embeddedItemLayout, internalData );
+
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Retrieve the glyph's metrics.
+  ////////////////////////////////////////////////////////////////////////////////
+  metrics->GetGlyphMetrics( rendererParameters.glyphs.Begin(), internalData.numberOfGlyphs );
+
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Layout the text
+  ////////////////////////////////////////////////////////////////////////////////
+  int boundingBox = textParameters.textHeight;
+  textParameters.textHeight = MAX_INT; // layout for the entire area.
+  LayoutText( textParameters, rendererParameters, embeddedItemLayout, internalData );
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Calculation last character index
+  ////////////////////////////////////////////////////////////////////////////////
+  Vector<LineRun>& lines = internalData.textModel->mVisualModel->mLines;
+  unsigned int numberOfLines = lines.Count();
+  int numberOfCharacters = 0;
+  float penY = 0.f;
+  for( unsigned int index = 0u; index < numberOfLines; ++index  )
+  {
+    const LineRun& line = *( lines.Begin() + index );
+    numberOfCharacters += line.characterRun.numberOfCharacters;
+    penY += ( line.ascender + -line.descender );
+    if( ( penY + ( line.ascender + -line.descender ) ) > boundingBox )
+    {
+      offsetValues.PushBack( numberOfCharacters );
+      penY = 0.f;
+    }
+  }
+  if( penY > 0.f)
+  {
+    // add remain character index
+    offsetValues.PushBack( numberOfCharacters );
+  }
+
+  return offsetValues;
+}
+
+
+Dali::Property::Array GetLastCharacterIndex( RendererParameters& textParameters )
+{
+  Dali::Property::Array offsetValues = Toolkit::DevelText::RenderForLastIndex( textParameters );
+  return offsetValues;
+}
+
 
 } // namespace DevelText
 

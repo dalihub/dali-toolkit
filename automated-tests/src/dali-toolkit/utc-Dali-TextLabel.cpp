@@ -29,6 +29,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
+#include <dali-toolkit/devel-api/text/text-utils-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -1628,6 +1629,28 @@ int UtcDaliToolkitTextlabelMaxTextureSet(void)
 
   // Check if the number of renderers is greater than 1.
   DALI_TEST_CHECK( label.GetRendererCount() > 1u );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelLastCharacterIndex(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelLastCharacterIndex");
+
+  Vector2 size( 300.0f, 100.0f );
+
+  Dali::Toolkit::DevelText::RendererParameters textParameters;
+  textParameters.text = "This is a sample text to get the last index.";
+  textParameters.layout = "multiLine";
+  textParameters.fontSize = 20.f;
+  textParameters.textWidth = 300u;
+  textParameters.textHeight = 100u;
+  textParameters.ellipsisEnabled = true;
+  Dali::Property::Array indexArray = Dali::Toolkit::DevelText::GetLastCharacterIndex( textParameters );
+
+  DALI_TEST_CHECK( !indexArray.Empty() );
+  DALI_TEST_EQUALS( indexArray.GetElementAt(0).Get<int>(), 10, TEST_LOCATION );
 
   END_TEST;
 }
