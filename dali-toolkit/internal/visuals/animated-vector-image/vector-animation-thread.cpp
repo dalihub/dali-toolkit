@@ -59,6 +59,7 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging,
 VectorAnimationThread::VectorAnimationThread()
 : mAnimationTasks(),
   mCompletedTasks(),
+  mWorkingTasks(),
   mRasterizers( GetNumberOfThreads( NUMBER_OF_RASTERIZE_THREADS_ENV, DEFAULT_NUMBER_OF_RASTERIZE_THREADS ), [&]() { return RasterizeHelper( *this ); } ),
   mSleepThread( MakeCallback( this, &VectorAnimationThread::OnAwakeFromSleep ) ),
   mConditionalWait(),
@@ -75,6 +76,7 @@ VectorAnimationThread::~VectorAnimationThread()
   {
     ConditionalWait::ScopedLock lock( mConditionalWait );
     mDestroyThread = true;
+    mNeedToSleep = false;
     mConditionalWait.Notify( lock );
   }
 
@@ -108,6 +110,7 @@ void VectorAnimationThread::AddTask( VectorAnimationTaskPtr task )
       mAnimationTasks.push_back( task );
     }
 
+    mNeedToSleep = false;
     // wake up the animation thread
     mConditionalWait.Notify( lock );
   }
@@ -115,14 +118,35 @@ void VectorAnimationThread::AddTask( VectorAnimationTaskPtr task )
 
 void VectorAnimationThread::OnTaskCompleted( VectorAnimationTaskPtr task, bool keepAnimation )
 {
-  if( keepAnimation && !mDestroyThread )
+  if( !mDestroyThread )
   {
     ConditionalWait::ScopedLock lock( mConditionalWait );
+    bool needRasterize = false;
 
-    if( mCompletedTasks.end() == std::find( mCompletedTasks.begin(), mCompletedTasks.end(), task ) )
+    auto workingTask = std::find( mWorkingTasks.begin(), mWorkingTasks.end(), task );
+    if( workingTask != mWorkingTasks.end() )
     {
-      mCompletedTasks.push_back( task );
+      mWorkingTasks.erase( workingTask );
+    }
 
+    // Check pending task
+    if( mAnimationTasks.end() != std::find( mAnimationTasks.begin(), mAnimationTasks.end(), task ) )
+    {
+      needRasterize = true;
+    }
+
+    if( keepAnimation )
+    {
+      if( mCompletedTasks.end() == std::find( mCompletedTasks.begin(), mCompletedTasks.end(), task ) )
+      {
+        mCompletedTasks.push_back( task );
+        needRasterize = true;
+      }
+    }
+
+    if( needRasterize )
+    {
+      mNeedToSleep = false;
       // wake up the animation thread
       mConditionalWait.Notify( lock );
     }
@@ -156,12 +180,12 @@ void VectorAnimationThread::Rasterize()
   ConditionalWait::ScopedLock lock( mConditionalWait );
 
   // conditional wait
-  if( (mAnimationTasks.empty() && mCompletedTasks.empty() ) || mNeedToSleep )
+  if( mNeedToSleep )
   {
     mConditionalWait.Wait( lock );
   }
 
-  mNeedToSleep = false;
+  mNeedToSleep = true;
 
   // Process completed tasks
   for( auto&& task : mCompletedTasks )
@@ -192,10 +216,9 @@ void VectorAnimationThread::Rasterize()
   mCompletedTasks.clear();
 
   // pop out the next task from the queue
-  while( !mAnimationTasks.empty() && !mNeedToSleep )
+  for( auto it = mAnimationTasks.begin(); it != mAnimationTasks.end(); )
   {
-    std::vector< VectorAnimationTaskPtr >::iterator next = mAnimationTasks.begin();
-    VectorAnimationTaskPtr nextTask = *next;
+    VectorAnimationTaskPtr nextTask = *it;
 
     auto currentTime = std::chrono::system_clock::now();
     auto nextFrameTime = nextTask->GetNextFrameTime();
@@ -208,17 +231,28 @@ void VectorAnimationThread::Rasterize()
 
     if( nextFrameTime <= currentTime )
     {
-      mAnimationTasks.erase( next );
+      // If the task is not in the working list
+      if( std::find( mWorkingTasks.begin(), mWorkingTasks.end(), nextTask ) == mWorkingTasks.end() )
+      {
+        it = mAnimationTasks.erase( it );
 
-      auto rasterizerHelperIt = mRasterizers.GetNext();
-      DALI_ASSERT_ALWAYS( rasterizerHelperIt != mRasterizers.End() );
+        // Add it to the working list
+        mWorkingTasks.push_back( nextTask );
 
-      rasterizerHelperIt->Rasterize( nextTask );
+        auto rasterizerHelperIt = mRasterizers.GetNext();
+        DALI_ASSERT_ALWAYS( rasterizerHelperIt != mRasterizers.End() );
+
+        rasterizerHelperIt->Rasterize( nextTask );
+      }
+      else
+      {
+        it++;
+      }
     }
     else
     {
-      mNeedToSleep = true;
       mSleepThread.SleepUntil( nextFrameTime );
+      break;
     }
   }
 }

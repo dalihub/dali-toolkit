@@ -270,6 +270,8 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   Property::Map resultMap;
   resultMap = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
 
@@ -678,6 +680,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
 
   application.SendNotification();
   application.Render();
+
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::PLAY_RANGE );

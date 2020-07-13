@@ -183,6 +183,7 @@ private:
 
   std::vector< VectorAnimationTaskPtr >      mAnimationTasks;
   std::vector< VectorAnimationTaskPtr >      mCompletedTasks;
+  std::vector< VectorAnimationTaskPtr >      mWorkingTasks;
   RoundRobinContainerView< RasterizeHelper > mRasterizers;
   SleepThread                                mSleepThread;
   ConditionalWait                            mConditionalWait;
