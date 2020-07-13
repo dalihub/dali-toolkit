@@ -104,6 +104,36 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( DevelText::CircularAlignment, CENTER )
 DALI_ENUM_TO_STRING_WITH_SCOPE( DevelText::CircularAlignment, END )
 DALI_ENUM_TO_STRING_TABLE_END( CIRCULAR_ALIGNMENT_TYPE )
 
+struct InternalDataModel
+{
+  InternalDataModel( FontClient& fontClient,
+                     MetricsPtr metrics,
+                     Text::ModelPtr textModel )
+  : fontClient( fontClient ),
+    metrics( metrics ),
+    textModel( textModel ),
+    numberOfCharacters{ 0u },
+    isTextMirrored{ false },
+    numberOfGlyphs{ 0u }
+  {
+      layoutEngine.SetMetrics( metrics );
+  }
+
+  FontClient& fontClient;
+  MetricsPtr metrics;
+  Text::Layout::Engine layoutEngine;             ///< The layout engine.
+  Text::ModelPtr textModel;                      ///< Pointer to the text's model.
+  Vector<ColorBlendingMode> blendingMode;        ///< How embedded items and bitmap font glyphs are blended with color text.
+  Vector<bool> isEmoji;                          ///< Whether the glyph is an emoji.
+
+  Vector<Character> mirroredUtf32Characters;               // The utf32Characters Characters but mirrored if there are RTL text.
+
+  Length numberOfCharacters;                               // The number of characters (not glyphs!).
+  bool isTextMirrored ;                                    // Whether the text has been mirrored.
+
+  Length numberOfGlyphs;
+};
+
 bool GetLayoutEnumeration(const Property::Value& propertyValue, DevelText::Layout::Type& layout)
 {
   return Scripting::GetEnumerationProperty(propertyValue, LAYOUT_TYPE_TABLE, LAYOUT_TYPE_TABLE_COUNT, layout);
@@ -114,80 +144,38 @@ bool GetCircularAlignmentEnumeration(const Property::Value& propertyValue, Devel
   return Scripting::GetEnumerationProperty(propertyValue, CIRCULAR_ALIGNMENT_TYPE_TABLE, CIRCULAR_ALIGNMENT_TYPE_TABLE_COUNT, circularAlignment);
 }
 
-Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<EmbeddedItemInfo>& embeddedItemLayout )
+
+void ShapeTextPreprocess( const RendererParameters& textParameters, TextAbstraction::TextRenderer::Parameters& rendererParameters, InternalDataModel& internalDataModel )
 {
-  if( textParameters.text.empty() )
-  {
-    Dali::Devel::PixelBuffer pixelBuffer = Dali::Devel::PixelBuffer::New( textParameters.textWidth,
-                                                                          textParameters.textHeight,
-                                                                          Dali::Pixel::RGBA8888 );
-
-    const unsigned int bufferSize = textParameters.textWidth * textParameters.textHeight * Dali::Pixel::GetBytesPerPixel(Dali::Pixel::RGBA8888);
-    unsigned char* buffer = pixelBuffer.GetBuffer();
-    memset(buffer, 0, bufferSize);
-
-    return pixelBuffer;
-  }
 
   MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
-  FontClient fontClient = FontClient::Get();
-  MetricsPtr metrics;
-  Text::Layout::Engine layoutEngine;             ///< The layout engine.
-  Text::ModelPtr textModel = Text::Model::New(); ///< Pointer to the text's model.
-  Vector<ColorBlendingMode> blendingMode;        ///< How embedded items and bitmap font glyphs are blended with color text.
-  Vector<bool> isEmoji;                          ///< Whether the glyph is an emoji.
+  const uint8_t* utf8 = NULL;                              // pointer to the first character of the text (encoded in utf8)
+  Length textSize = 0u;                                    // The length of the utf8 string.
 
-  // Use this to access FontClient i.e. to get down-scaled Emoji metrics.
-  metrics = Metrics::New( fontClient );
-  layoutEngine.SetMetrics( metrics );
-
-  TextAbstraction::TextRenderer::Parameters rendererParameters( textModel->mVisualModel->mGlyphs,
-                                                                textModel->mVisualModel->mGlyphPositions,
-                                                                textModel->mVisualModel->mColors,
-                                                                textModel->mVisualModel->mColorIndices,
-                                                                blendingMode,
-                                                                isEmoji );
-
-  rendererParameters.width = textParameters.textWidth;
-  rendererParameters.height = textParameters.textHeight;
-  rendererParameters.pixelFormat = TextAbstraction::TextRenderer::Parameters::RGBA8888; // @note: At the moment all textures are generated RGBA8888
+  Length& numberOfCharacters = internalDataModel.numberOfCharacters;
+  Vector<Character>& mirroredUtf32Characters = internalDataModel.mirroredUtf32Characters;
+  Text::ModelPtr& textModel = internalDataModel.textModel;
 
   Vector<Character>& utf32Characters = textModel->mLogicalModel->mText;                                             // Characters encoded in utf32.
-  Vector<Character> mirroredUtf32Characters;                                                                        // The utf32Characters Characters but mirrored if there are RTL text.
   Vector<LineBreakInfo>& lineBreakInfo = textModel->mLogicalModel->mLineBreakInfo;                                  // The line break info.
   Vector<ScriptRun>& scripts = textModel->mLogicalModel->mScriptRuns;                                               // Charactes's script.
   Vector<FontDescriptionRun>& fontDescriptionRuns = textModel->mLogicalModel->mFontDescriptionRuns;                 // Desired font descriptions.
   Vector<FontRun>& validFonts = textModel->mLogicalModel->mFontRuns;                                                // Validated fonts.
   Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = textModel->mLogicalModel->mBidirectionalParagraphInfo; // The bidirectional info per paragraph.
-  //Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = textModel->mLogicalModel->mBidirectionalLineInfo;     // The bidirectional info per line.
   Vector<CharacterDirection>& directions = textModel->mLogicalModel->mCharacterDirections;                          // Character's directions.
   Vector<ColorRun>& colorRuns = textModel->mLogicalModel->mColorRuns;                                               // colors of the text.
-
-  Vector<CharacterIndex>& glyphsToCharacters = textModel->mVisualModel->mGlyphsToCharacters;                        // Glyphs to character map.
-  Vector<GlyphIndex>& charactersToGlyph = textModel->mVisualModel->mCharactersToGlyph;                              // Characters to glyphs map.
-  Vector<Length>& charactersPerGlyph = textModel->mVisualModel->mCharactersPerGlyph;                                // Number of characters per glyph.
-  Vector<Length>& glyphsPerCharacter = textModel->mVisualModel->mGlyphsPerCharacter;                                // The number of glyphs that are shaped.
-  Vector<LineRun>& lines = textModel->mVisualModel->mLines;                                                         // The laid out lines.
-
-  Vector<GlyphIndex> newParagraphGlyphs;                   // Glyphs for the new paragraph characters.
 
   // the default font's description.
   FontDescription defaultFontDescription;
   PointSize26Dot6 defaultPointSize = FontClient::DEFAULT_POINT_SIZE;
-
-  Length numberOfCharacters = 0u;                          // The number of characters (not glyphs!).
-  bool isTextMirrored = false;                             // Whether the text has been mirrored.
-
-  const uint8_t* utf8 = NULL;                              // pointer to the first character of the text (encoded in utf8)
-  Length textSize = 0u;                                    // The length of the utf8 string.
 
   ////////////////////////////////////////////////////////////////////////////////
   // Process the markup string if the mark-up processor is enabled.
   ////////////////////////////////////////////////////////////////////////////////
 
   MarkupProcessData markupProcessData( colorRuns,
-                                       fontDescriptionRuns,
-                                       textModel->mLogicalModel->mEmbeddedItems );
+                                      fontDescriptionRuns,
+                                      textModel->mLogicalModel->mEmbeddedItems );
 
   if (textParameters.markupEnabled)
   {
@@ -232,9 +220,9 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   ////////////////////////////////////////////////////////////////////////////////
 
   multilanguageSupport.SetScripts( utf32Characters,
-                                   0u,
-                                   numberOfCharacters,
-                                   scripts );
+                                  0u,
+                                  numberOfCharacters,
+                                  scripts );
 
   // Check if there are emojis.
   // If there are an RGBA8888 pixel format is needed.
@@ -330,13 +318,30 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
     // This paragraph has right to left text. Some characters may need to be mirrored.
     // TODO: consider if the mirrored string can be stored as well.
 
-    isTextMirrored = GetMirroredText( utf32Characters,
+    internalDataModel.isTextMirrored = GetMirroredText( utf32Characters,
                                       directions,
                                       bidirectionalInfo,
                                       0u,
                                       numberOfCharacters,
                                       mirroredUtf32Characters );
   }
+}
+
+void ShapeText( TextAbstraction::TextRenderer::Parameters& rendererParameters, Vector<EmbeddedItemInfo>& embeddedItemLayout, InternalDataModel& internalDataModel )
+{
+  Vector<GlyphIndex> newParagraphGlyphs;                   // Glyphs for the new paragraph characters.
+  const Length numberOfCharacters = internalDataModel.numberOfCharacters;
+  const bool isTextMirrored = internalDataModel.isTextMirrored;
+  Text::ModelPtr& textModel = internalDataModel.textModel;
+  const Vector<Character>& mirroredUtf32Characters = internalDataModel.mirroredUtf32Characters;
+  FontClient& fontClient = internalDataModel.fontClient;
+  const Vector<Character>& utf32Characters = textModel->mLogicalModel->mText;                                             // Characters encoded in utf32.
+  const Vector<LineBreakInfo>& lineBreakInfo = textModel->mLogicalModel->mLineBreakInfo;                                  // The line break info.
+  const Vector<ScriptRun>& scripts = textModel->mLogicalModel->mScriptRuns;                                               // Charactes's script.
+  const Vector<FontRun>& validFonts = textModel->mLogicalModel->mFontRuns;                                                // Validated fonts.
+
+  Vector<CharacterIndex>& glyphsToCharacters = textModel->mVisualModel->mGlyphsToCharacters;                        // Glyphs to character map.
+  Vector<Length>& charactersPerGlyph = textModel->mVisualModel->mCharactersPerGlyph;                                // Number of characters per glyph.
 
   ////////////////////////////////////////////////////////////////////////////////
   // Retrieve the glyphs. Text shaping
@@ -363,7 +368,7 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   textModel->mVisualModel->CreateGlyphsPerCharacterTable( 0u, 0u, numberOfCharacters );
   textModel->mVisualModel->CreateCharacterToGlyphTable( 0u, 0u, numberOfCharacters );
 
-  const Length numberOfGlyphs = rendererParameters.glyphs.Count();
+  internalDataModel.numberOfGlyphs = rendererParameters.glyphs.Count();
 
   // Once the text has been shaped and the glyphs created it's possible to replace the font id of those glyphs
   // that represent an image or an item and create the embedded item layout info.
@@ -402,12 +407,18 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
       embeddedItemLayout.PushBack( embeddedInfo );
     }
   }
+}
 
-  ////////////////////////////////////////////////////////////////////////////////
-  // Retrieve the glyph's metrics.
-  ////////////////////////////////////////////////////////////////////////////////
+void SetColorSegmentation( const RendererParameters& textParameters, InternalDataModel& internalDataModel )
+{
 
-  metrics->GetGlyphMetrics( rendererParameters.glyphs.Begin(), numberOfGlyphs );
+  Text::ModelPtr& textModel = internalDataModel.textModel;
+  Vector<ColorBlendingMode>& blendingMode = internalDataModel.blendingMode;
+
+  Vector<ColorRun>& colorRuns = textModel->mLogicalModel->mColorRuns;                                               // colors of the text.
+
+  Vector<GlyphIndex>& charactersToGlyph = textModel->mVisualModel->mCharactersToGlyph;                              // Characters to glyphs map.
+  Vector<Length>& glyphsPerCharacter = textModel->mVisualModel->mGlyphsPerCharacter;                                // The number of glyphs that are shaped.
 
   ////////////////////////////////////////////////////////////////////////////////
   // Set the color runs in glyphs.
@@ -418,7 +429,7 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
                             glyphsPerCharacter,
                             0u,
                             0u,
-                            numberOfCharacters,
+                            internalDataModel.numberOfCharacters,
                             textModel->mVisualModel->mColors,
                             textModel->mVisualModel->mColorIndices );
 
@@ -426,7 +437,7 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   textModel->mVisualModel->mColors.Insert( textModel->mVisualModel->mColors.Begin(),textParameters.textColor );
 
   // Set how the embedded items are blended with text color.
-  blendingMode.Resize( numberOfGlyphs, textParameters.isTextColorSet ? ColorBlendingMode::MULTIPLY : ColorBlendingMode::NONE );
+  blendingMode.Resize( internalDataModel.numberOfGlyphs, textParameters.isTextColorSet ? ColorBlendingMode::MULTIPLY : ColorBlendingMode::NONE );
 
   if( !textParameters.isTextColorSet )
   {
@@ -450,7 +461,15 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
     const GlyphIndex glyphIndex = textModel->mVisualModel->mCharactersToGlyph[item.characterIndex];
     blendingMode[glyphIndex] = item.colorBlendingMode;
   }
+}
 
+void SetEmojiVector( InternalDataModel& internalDataModel )
+{
+  Vector<bool>& isEmoji = internalDataModel.isEmoji;
+  Text::ModelPtr& textModel = internalDataModel.textModel;
+  const Length numberOfGlyphs = internalDataModel.numberOfGlyphs;
+
+  const Vector<ScriptRun>& scripts = textModel->mLogicalModel->mScriptRuns;                                               // Charactes's script.
   ////////////////////////////////////////////////////////////////////////////////
   // Set the isEmoji Vector
   ////////////////////////////////////////////////////////////////////////////////
@@ -471,120 +490,21 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
       }
     }
   }
-
-  ////////////////////////////////////////////////////////////////////////////////
-  // Layout the text.
-  ////////////////////////////////////////////////////////////////////////////////
-
-  // Sets the alignment
-  HorizontalAlignment::Type horizontalAlignment = Toolkit::HorizontalAlignment::CENTER;
-  HorizontalAlignment::Type horizontalCircularAlignment = Toolkit::HorizontalAlignment::CENTER;
-  VerticalAlignment::Type verticalAlignment = VerticalAlignment::CENTER;
-  Layout::Type layout = Layout::SINGLELINE;
-  CircularAlignment::Type circularAlignment = CircularAlignment::BEGIN;
-
-  Property::Value horizontalAlignmentStr( textParameters.horizontalAlignment );
-  GetHorizontalAlignmentEnumeration( horizontalAlignmentStr, horizontalAlignment );
-  horizontalCircularAlignment = horizontalAlignment;
-
-  Property::Value verticalAlignmentStr( textParameters.verticalAlignment );
-  GetVerticalAlignmentEnumeration( verticalAlignmentStr, verticalAlignment );
-
-  Property::Value layoutStr( textParameters.layout );
-  GetLayoutEnumeration( layoutStr, layout );
-
-  Property::Value circularAlignmentStr( textParameters.circularAlignment );
-  GetCircularAlignmentEnumeration( circularAlignmentStr, circularAlignment );
-
-  // Whether the layout is multi-line.
-  const Text::Layout::Engine::Type horizontalLayout = ( Layout::MULTILINE == layout ) ? Text::Layout::Engine::MULTI_LINE_BOX : Text::Layout::Engine::SINGLE_LINE_BOX;
-  layoutEngine.SetLayout( horizontalLayout ); // TODO: multi-line.
+}
 
 
-  // Whether the layout is circular.
-  const bool isCircularTextLayout = (Layout::CIRCULAR == layout);
-  const bool isClockwise = isCircularTextLayout && ( 0.f < textParameters.incrementAngle );
+void Align( const RendererParameters& textParameters, TextAbstraction::TextRenderer::Parameters& rendererParameters,
+            Vector<EmbeddedItemInfo>& embeddedItemLayout, InternalDataModel& internalDataModel,
+            Size& textLayoutArea, const Size& newLayoutSize,
+            const bool isCircularTextLayout, const bool isClockwise,
+            HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment, CircularAlignment::Type circularAlignment,
+            const unsigned int radius )
+{
+  Text::Layout::Engine& layoutEngine = internalDataModel.layoutEngine;
+  Text::ModelPtr& textModel = internalDataModel.textModel;
+  const Length numberOfCharacters = internalDataModel.numberOfCharacters;
 
-  // Calculates the max ascender or the max descender.
-  // Is used to calculate the radius of the base line of the text.
-  float maxAscenderDescender = 0.f;
-  if( isCircularTextLayout )
-  {
-    FontId currentFontId = 0u;
-    for( const auto& glyph : rendererParameters.glyphs )
-    {
-      if( currentFontId != glyph.fontId )
-      {
-        currentFontId = glyph.fontId;
-        FontMetrics metrics;
-        fontClient.GetFontMetrics(currentFontId, metrics);
-        maxAscenderDescender = std::max( maxAscenderDescender, isClockwise ? metrics.ascender : metrics.descender );
-      }
-    }
-  }
-  const unsigned int radius = textParameters.radius - static_cast<unsigned int>( maxAscenderDescender );
-
-  // Convert CircularAlignment to HorizontalAlignment.
-  if( isCircularTextLayout )
-  {
-    switch( circularAlignment )
-    {
-      case CircularAlignment::BEGIN:
-      {
-        horizontalCircularAlignment = Toolkit::HorizontalAlignment::BEGIN;
-        break;
-      }
-      case CircularAlignment::CENTER:
-      {
-        horizontalCircularAlignment = Toolkit::HorizontalAlignment::CENTER;
-        break;
-      }
-      case CircularAlignment::END:
-      {
-        horizontalCircularAlignment = Toolkit::HorizontalAlignment::END;
-        break;
-      }
-    }
-  }
-
-  // Set the layout parameters.
-  Size textLayoutArea( static_cast<float>( textParameters.textWidth ),
-                     static_cast<float>( textParameters.textHeight ) );
-
-  if( isCircularTextLayout )
-  {
-    // In a circular layout, the length of the text area depends on the radius.
-    rendererParameters.radius = radius;
-    textLayoutArea.width = fabs( Radian( Degree( textParameters.incrementAngle ) ) * static_cast<float>( rendererParameters.radius ) );
-  }
-
-  textModel->mHorizontalAlignment = isCircularTextLayout ? horizontalCircularAlignment : horizontalAlignment;
-  textModel->mLineWrapMode = LineWrap::WORD;
-  textModel->mIgnoreSpacesAfterText = false;
-  textModel->mMatchSystemLanguageDirection = false;
-  Text::Layout::Parameters layoutParameters( textLayoutArea,
-                                             textModel );
-
-  // Resize the vector of positions to have the same size than the vector of glyphs.
-  rendererParameters.positions.Resize( numberOfGlyphs );
-
-  // Whether the last character is a new paragraph character.
-  layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph( textToShape[numberOfCharacters - 1u] );
-
-  // The initial glyph and the number of glyphs to layout.
-  layoutParameters.startGlyphIndex = 0u;
-  layoutParameters.numberOfGlyphs = numberOfGlyphs;
-  layoutParameters.startLineIndex = 0u;
-  layoutParameters.estimatedNumberOfLines = 1u;
-  layoutParameters.interGlyphExtraAdvance = 0.f;
-
-  // Update the visual model.
-  Size newLayoutSize;
-  bool isAutoScrollEnabled = false;
-  layoutEngine.LayoutText( layoutParameters,
-                           newLayoutSize,
-                           textParameters.ellipsisEnabled,
-                           isAutoScrollEnabled );
+  Vector<LineRun>& lines = textModel->mVisualModel->mLines;                                                         // The laid out lines.
 
   ////////////////////////////////////////////////////////////////////////////////
   // Align the text.
@@ -730,7 +650,7 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
     }
 
     // Calculate the horizontal offset according with the given alignment.
-  float alignmentOffset = 0.f;
+    float alignmentOffset = 0.f;
     layoutEngine.Align( textLayoutArea,
                       0u,
                       numberOfCharacters,
@@ -742,10 +662,10 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
 
     // Update the position of the glyphs with the calculated offsets.
     for( auto& position : rendererParameters.positions )
-  {
-    position.x += line.alignmentOffset;
-    position.y = penY;
-  }
+    {
+      position.x += line.alignmentOffset;
+      position.y = penY;
+    }
   }
 
   // Cairo adds the bearing to the position of the glyph
@@ -844,6 +764,17 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
       embeddedItem.position.y -= embeddedItem.size.height;
     }
   }
+
+}
+
+void Ellipsis(  const RendererParameters& textParameters, TextAbstraction::TextRenderer::Parameters& rendererParameters,
+               Vector<EmbeddedItemInfo>& embeddedItemLayout, Size& textLayoutArea,  InternalDataModel& internalDataModel )
+{
+  Text::ModelPtr& textModel = internalDataModel.textModel;
+  FontClient& fontClient = internalDataModel.fontClient;
+
+  Vector<LineRun>& lines = textModel->mVisualModel->mLines;                              // The laid out lines.
+  Vector<bool>& isEmoji = internalDataModel.isEmoji;
 
   ////////////////////////////////////////////////////////////////////////////////
   // Ellipsis the text.
@@ -995,7 +926,149 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
       }
     }
   }
+}
 
+Size LayoutText( const RendererParameters& textParameters, TextAbstraction::TextRenderer::Parameters& rendererParameters,
+                 Vector<EmbeddedItemInfo>& embeddedItemLayout, InternalDataModel& internalDataModel )
+{
+  ////////////////////////////////////////////////////////////////////////////////
+  // Layout the text.
+  ////////////////////////////////////////////////////////////////////////////////
+  Text::ModelPtr& textModel = internalDataModel.textModel;
+  Text::Layout::Engine& layoutEngine = internalDataModel.layoutEngine;
+  FontClient& fontClient = internalDataModel.fontClient;
+  const Length numberOfGlyphs = internalDataModel.numberOfGlyphs;
+  const bool isTextMirrored = internalDataModel.isTextMirrored;
+  const Vector<Character>& mirroredUtf32Characters = internalDataModel.mirroredUtf32Characters;
+  const Length numberOfCharacters = internalDataModel.numberOfCharacters;
+
+  // Sets the alignment
+  HorizontalAlignment::Type horizontalAlignment = Toolkit::HorizontalAlignment::CENTER;
+  HorizontalAlignment::Type horizontalCircularAlignment = Toolkit::HorizontalAlignment::CENTER;
+  VerticalAlignment::Type verticalAlignment = VerticalAlignment::CENTER;
+  Layout::Type layout = Layout::SINGLELINE;
+  CircularAlignment::Type circularAlignment = CircularAlignment::BEGIN;
+
+  Property::Value horizontalAlignmentStr( textParameters.horizontalAlignment );
+  GetHorizontalAlignmentEnumeration( horizontalAlignmentStr, horizontalAlignment );
+  horizontalCircularAlignment = horizontalAlignment;
+
+  Property::Value verticalAlignmentStr( textParameters.verticalAlignment );
+  GetVerticalAlignmentEnumeration( verticalAlignmentStr, verticalAlignment );
+
+  Property::Value layoutStr( textParameters.layout );
+  GetLayoutEnumeration( layoutStr, layout );
+
+  Property::Value circularAlignmentStr( textParameters.circularAlignment );
+  GetCircularAlignmentEnumeration( circularAlignmentStr, circularAlignment );
+
+  // Whether the layout is multi-line.
+  const Text::Layout::Engine::Type horizontalLayout = ( Layout::MULTILINE == layout ) ? Text::Layout::Engine::MULTI_LINE_BOX : Text::Layout::Engine::SINGLE_LINE_BOX;
+  layoutEngine.SetLayout( horizontalLayout ); // TODO: multi-line.
+
+
+  // Whether the layout is circular.
+  const bool isCircularTextLayout = (Layout::CIRCULAR == layout);
+  const bool isClockwise = isCircularTextLayout && ( 0.f < textParameters.incrementAngle );
+
+  // Calculates the max ascender or the max descender.
+  // Is used to calculate the radius of the base line of the text.
+  float maxAscenderDescender = 0.f;
+  if( isCircularTextLayout )
+  {
+    FontId currentFontId = 0u;
+    for( const auto& glyph : rendererParameters.glyphs )
+    {
+      if( currentFontId != glyph.fontId )
+      {
+        currentFontId = glyph.fontId;
+        FontMetrics metrics;
+        fontClient.GetFontMetrics(currentFontId, metrics);
+        maxAscenderDescender = std::max( maxAscenderDescender, isClockwise ? metrics.ascender : metrics.descender );
+      }
+    }
+  }
+  const unsigned int radius = textParameters.radius - static_cast<unsigned int>( maxAscenderDescender );
+
+  // Convert CircularAlignment to HorizontalAlignment.
+  if( isCircularTextLayout )
+  {
+    switch( circularAlignment )
+    {
+      case CircularAlignment::BEGIN:
+      {
+        horizontalCircularAlignment = Toolkit::HorizontalAlignment::BEGIN;
+        break;
+      }
+      case CircularAlignment::CENTER:
+      {
+        horizontalCircularAlignment = Toolkit::HorizontalAlignment::CENTER;
+        break;
+      }
+      case CircularAlignment::END:
+      {
+        horizontalCircularAlignment = Toolkit::HorizontalAlignment::END;
+        break;
+      }
+    }
+  }
+
+  // Set the layout parameters.
+  Size textLayoutArea( static_cast<float>( textParameters.textWidth ),
+                     static_cast<float>( textParameters.textHeight ) );
+
+  if( isCircularTextLayout )
+  {
+    // In a circular layout, the length of the text area depends on the radius.
+    rendererParameters.radius = radius;
+    textLayoutArea.width = fabs( Radian( Degree( textParameters.incrementAngle ) ) * static_cast<float>( rendererParameters.radius ) );
+  }
+  // Resize the vector of positions to have the same size than the vector of glyphs.
+  rendererParameters.positions.Resize( numberOfGlyphs );
+
+
+
+  textModel->mHorizontalAlignment = isCircularTextLayout ? horizontalCircularAlignment : horizontalAlignment;
+  textModel->mLineWrapMode = LineWrap::WORD;
+  textModel->mIgnoreSpacesAfterText = false;
+  textModel->mMatchSystemLanguageDirection = false;
+  Text::Layout::Parameters layoutParameters( textLayoutArea,
+                                             textModel );
+
+
+  // Whether the last character is a new paragraph character.
+  const Vector<Character>& textToShape = isTextMirrored ? mirroredUtf32Characters : textModel->mLogicalModel->mText;
+  layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph( textToShape[numberOfCharacters - 1u] );
+
+  // The initial glyph and the number of glyphs to layout.
+  layoutParameters.startGlyphIndex = 0u;
+  layoutParameters.numberOfGlyphs = numberOfGlyphs;
+  layoutParameters.startLineIndex = 0u;
+  layoutParameters.estimatedNumberOfLines = 1u;
+  layoutParameters.interGlyphExtraAdvance = 0.f;
+
+  // Update the visual model.
+  Size newLayoutSize;
+  bool isAutoScrollEnabled = false;
+  layoutEngine.LayoutText( layoutParameters,
+                           newLayoutSize,
+                           textParameters.ellipsisEnabled,
+                           isAutoScrollEnabled );
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Align the text.
+  ////////////////////////////////////////////////////////////////////////////////
+  Align( textParameters, rendererParameters, embeddedItemLayout, internalDataModel,
+         textLayoutArea, newLayoutSize, isCircularTextLayout, isClockwise,
+         horizontalAlignment, verticalAlignment, circularAlignment, radius );
+
+  return textLayoutArea;
+
+}
+
+
+Devel::PixelBuffer RenderText( const RendererParameters& textParameters, TextAbstraction::TextRenderer::Parameters& rendererParameters )
+{
   ////////////////////////////////////////////////////////////////////////////////
   // Render the text.
   ////////////////////////////////////////////////////////////////////////////////
@@ -1006,6 +1079,88 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   TextAbstraction::TextRenderer renderer = TextAbstraction::TextRenderer::Get();
   return renderer.Render( rendererParameters );
 }
+
+
+Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<EmbeddedItemInfo>& embeddedItemLayout )
+{
+  if( textParameters.text.empty() )
+  {
+    Dali::Devel::PixelBuffer pixelBuffer = Dali::Devel::PixelBuffer::New( textParameters.textWidth,
+                                                                          textParameters.textHeight,
+                                                                          Dali::Pixel::RGBA8888 );
+
+    const unsigned int bufferSize = textParameters.textWidth * textParameters.textHeight * Dali::Pixel::GetBytesPerPixel(Dali::Pixel::RGBA8888);
+    unsigned char* buffer = pixelBuffer.GetBuffer();
+    memset(buffer, 0, bufferSize);
+
+    return pixelBuffer;
+  }
+
+  FontClient fontClient = FontClient::Get();
+  MetricsPtr metrics;
+  // Use this to access FontClient i.e. to get down-scaled Emoji metrics.
+  metrics = Metrics::New( fontClient );
+
+  Text::ModelPtr textModel = Text::Model::New();
+  InternalDataModel internalData( fontClient, metrics, textModel );
+
+  TextAbstraction::TextRenderer::Parameters rendererParameters( internalData.textModel->mVisualModel->mGlyphs,
+                                                                internalData.textModel->mVisualModel->mGlyphPositions,
+                                                                internalData.textModel->mVisualModel->mColors,
+                                                                internalData.textModel->mVisualModel->mColorIndices,
+                                                                internalData.blendingMode,
+                                                                internalData.isEmoji );
+
+
+  rendererParameters.width = textParameters.textWidth;
+  rendererParameters.height = textParameters.textHeight;
+  rendererParameters.pixelFormat = TextAbstraction::TextRenderer::Parameters::RGBA8888; // @note: At the moment all textures are generated RGBA8888
+
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Process the markup string if the mark-up processor is enabled.
+  ////////////////////////////////////////////////////////////////////////////////
+  ShapeTextPreprocess( textParameters, rendererParameters, internalData );
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Retrieve the glyphs. Text shaping
+  ////////////////////////////////////////////////////////////////////////////////
+  ShapeText( rendererParameters, embeddedItemLayout, internalData );
+
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Retrieve the glyph's metrics.
+  ////////////////////////////////////////////////////////////////////////////////
+
+  metrics->GetGlyphMetrics( rendererParameters.glyphs.Begin(), internalData.numberOfGlyphs );
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Set the color runs in glyphs.
+  ////////////////////////////////////////////////////////////////////////////////
+  SetColorSegmentation( textParameters, internalData );
+
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Set the isEmoji Vector
+  ////////////////////////////////////////////////////////////////////////////////
+  SetEmojiVector( internalData );
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Layout the text and Align the text
+  ////////////////////////////////////////////////////////////////////////////////
+  Size textLayoutArea = LayoutText( textParameters, rendererParameters, embeddedItemLayout, internalData );
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Ellipsis the text.
+  ////////////////////////////////////////////////////////////////////////////////
+  Ellipsis( textParameters, rendererParameters, embeddedItemLayout, textLayoutArea, internalData );
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Render the text.
+  ////////////////////////////////////////////////////////////////////////////////
+  return RenderText( textParameters, rendererParameters );
+}
+
 
 Devel::PixelBuffer CreateShadow( const ShadowParameters& shadowParameters )
 {
