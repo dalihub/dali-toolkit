@@ -51,6 +51,8 @@ typedef Signal< void (Window,bool) > FocusChangeSignalType;
 class Window : public BaseHandle
 {
 public:
+  using KeyEventSignalType = Signal< void (const KeyEvent&) >;
+  using TouchSignalType = Signal< void (const TouchData&) >;
 
   static Window New(PositionSize windowPosition, const std::string& name, bool isTransparent = false);
   static Window New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent = false);
@@ -70,6 +72,8 @@ public:
   void Raise();
   void Hide();
   FocusChangeSignalType& FocusChangeSignal();
+  KeyEventSignalType& KeyEventSignal();
+  TouchSignalType& TouchSignal();
 
 public:
   explicit Window( Internal::Adaptor::Window* window );
@@ -81,9 +85,7 @@ const Internal::Adaptor::Window& GetImplementation(const Dali::Window& window);
 namespace DevelWindow
 {
 typedef Signal< void () > EventProcessingFinishedSignalType;
-typedef Signal< void (const KeyEvent&) > KeyEventSignalType;
 typedef Signal< bool (const KeyEvent&) > KeyEventGeneratedSignalType;
-typedef Signal< void (const TouchData&) > TouchSignalType;
 typedef Signal< void (const WheelEvent&) > WheelEventSignalType;
 typedef Signal< void ( Window, bool ) > VisibilityChangedSignalType;
 
@@ -91,9 +93,7 @@ Dali::Window Get( Actor actor );
 Dali::Window DownCast(  BaseHandle handle );
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window );
-KeyEventSignalType& KeyEventSignal( Dali::Window window );
 KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Dali::Window window );
-TouchSignalType& TouchSignal( Dali::Window window );
 WheelEventSignalType& WheelEventSignal( Window window );
 VisibilityChangedSignalType& VisibilityChangedSignal( Window window );
 }
