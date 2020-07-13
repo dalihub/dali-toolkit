@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <utility> // pair
 #include <iterator>
+#include <string>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
