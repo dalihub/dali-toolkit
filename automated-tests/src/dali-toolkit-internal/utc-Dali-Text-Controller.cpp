@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -425,7 +425,7 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
                                                                                                             TextSelectionPopup::CLIPBOARD );
 
   textPopup.EnableButtons( buttonsToEnable );
-  Stage::GetCurrent().Add( textPopup );
+  application.GetScene().Add( textPopup );
   textPopup.ShowPopup();
 
   // Render and notify
@@ -663,7 +663,7 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   tet_infoline(" UtcDaliTextControllerSetGetLineSpacingProperty");
   ToolkitTestApplication application;
 
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
 
   // single line text
   const std::string textSingle("A Quick Brown Fox Jumps Over The Lazy Dog");
@@ -804,7 +804,7 @@ int UtcDaliTextControllerCheckBufferIndices(void)
   mImpl.mOperationsPending = Controller::ALL_OPERATIONS;
 
   // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
   tet_result(TET_PASS);
@@ -855,7 +855,7 @@ int UtcDaliTextControllerCheckInputColorChanged(void)
   DALI_TEST_EQUALS( Controller::COLOR, static_cast<Controller::OperationsMask>( mImpl.mOperationsPending & Controller::COLOR ), TEST_LOCATION );
 
   // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
   tet_result(TET_PASS);
@@ -904,7 +904,7 @@ int UtcDaliTextControllerCheckInputFontFamilyChanged(void)
                     TEST_LOCATION );
 
   // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
   tet_result(TET_PASS);
@@ -953,7 +953,7 @@ int UtcDaliTextControllerCheckInputFontWeightChanged(void)
                     TEST_LOCATION );
 
   // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
   tet_result(TET_PASS);
@@ -1002,7 +1002,7 @@ int UtcDaliTextControllerCheckInputFontWidthChanged(void)
                     TEST_LOCATION );
 
   // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
   tet_result(TET_PASS);
@@ -1051,7 +1051,7 @@ int UtcDaliTextControllerCheckInputFontSlantChanged(void)
                     TEST_LOCATION );
 
   // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
   tet_result(TET_PASS);
@@ -1100,7 +1100,7 @@ int UtcDaliTextControllerCheckInputFontPointSizeChanged(void)
                     TEST_LOCATION );
 
   // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
   tet_result(TET_PASS);
@@ -1127,7 +1127,7 @@ int UtcDaliTextControllerSelectEvent(void)
   controller->SelectEvent( 0.f, 0.f, SelectionType::INTERACTIVE );
 
   // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
   // Get the implementation of the text controller
@@ -1185,7 +1185,7 @@ int UtcDaliTextControllerRemoveTextChangeEventData(void)
   DALI_TEST_EQUALS( EventData::EDITING, mImpl.mEventData->mState, TEST_LOCATION );
 
   // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
   controller->Relayout( size );
 
   tet_result(TET_PASS);
@@ -1213,7 +1213,7 @@ int UtcDaliTextControllerCheckInputFontPointSizeUpdated(void)
   application.Render();
 
   // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  const Size size( application.GetScene().GetSize() );
   controller->Relayout(size);
 
   // simulate a key event.

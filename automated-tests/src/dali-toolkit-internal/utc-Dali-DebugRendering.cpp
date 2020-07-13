@@ -39,7 +39,7 @@ const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
-void TestDebugVisual( Visual::Base& visual, Visual::Type actualType, Vector2 expectedNaturalSize )
+void TestDebugVisual( Integration::Scene scene,  Visual::Base& visual, Visual::Type actualType, Vector2 expectedNaturalSize )
 {
   {
     auto& impl = GetImplementation( visual );
@@ -61,7 +61,7 @@ void TestDebugVisual( Visual::Base& visual, Visual::Type actualType, Vector2 exp
   DummyControl actor = DummyControl::New();
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
-  Stage::GetCurrent().Add( actor );
+  scene.Add( actor );
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1, TEST_LOCATION );
   if( actor.GetRendererCount() > 0 )
@@ -97,7 +97,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap1.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
   Visual::Base colorVisual = factory.CreateVisual(propertyMap1);
   DALI_TEST_CHECK( colorVisual );
-  TestDebugVisual( colorVisual, Visual::COLOR, Vector2::ZERO );
+  TestDebugVisual( application.GetScene(),  colorVisual, Visual::COLOR, Vector2::ZERO );
 
   // Test that border visual is replaced with debug visual
   Property::Map propertyMap2;
@@ -106,7 +106,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap2.Insert(BorderVisual::Property::SIZE,  2.f);
   Visual::Base borderVisual = factory.CreateVisual(propertyMap2);
   DALI_TEST_CHECK( borderVisual );
-  TestDebugVisual( borderVisual, Visual::BORDER, Vector2::ZERO );
+  TestDebugVisual( application.GetScene(),  borderVisual, Visual::BORDER, Vector2::ZERO );
 
   // Test that gradient visual is replaced with debug visual
   Property::Map propertyMap3;
@@ -126,7 +126,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap3.Insert(GradientVisual::Property::STOP_COLOR, stopColors);
   Visual::Base gradientVisual = factory.CreateVisual(propertyMap3);
   DALI_TEST_CHECK( gradientVisual );
-  TestDebugVisual( gradientVisual, Visual::GRADIENT, Vector2::ZERO );
+  TestDebugVisual( application.GetScene(),  gradientVisual, Visual::GRADIENT, Vector2::ZERO );
 
   // Test that image visual is replaced with debug visual
   Property::Map propertyMap4;
@@ -136,7 +136,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap4.Insert( ImageVisual::Property::DESIRED_HEIGHT,  100.f );
   Visual::Base imageVisual = factory.CreateVisual( propertyMap4 );
   DALI_TEST_CHECK( imageVisual );
-  TestDebugVisual( imageVisual, Visual::IMAGE, Vector2( 50.f, 100.f ) );
+  TestDebugVisual( application.GetScene(),  imageVisual, Visual::IMAGE, Vector2( 50.f, 100.f ) );
 
   // Test that SVG visual is replaced with debug visual
   // TEST_SVG_FILE:
@@ -148,7 +148,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap5.Insert( ImageVisual::Property::URL,  TEST_SVG_FILE_NAME );
   Visual::Base svgVisual = factory.CreateVisual( propertyMap5 );
   DALI_TEST_CHECK( svgVisual );
-  TestDebugVisual( svgVisual, Visual::SVG, Vector2(100.f, 100.f) );
+  TestDebugVisual( application.GetScene(),  svgVisual, Visual::SVG, Vector2(100.f, 100.f) );
 
   // Test that AnimatedImageVisual is replaced with debug visual
   // TEST_GIF_FILE: anim.gif
@@ -158,7 +158,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap6.Insert( ImageVisual::Property::URL,  TEST_GIF_FILE_NAME );
   Visual::Base animatedImageVisual = factory.CreateVisual( propertyMap6 );
   DALI_TEST_CHECK( animatedImageVisual );
-  TestDebugVisual( animatedImageVisual, Visual::ANIMATED_IMAGE, Vector2(50.f, 50.f) );
+  TestDebugVisual( application.GetScene(),  animatedImageVisual, Visual::ANIMATED_IMAGE, Vector2(50.f, 50.f) );
 
   // Test that text visual is replaced with debug visual
 
@@ -199,7 +199,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap8.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   Visual::Base nPatchVisual = factory.CreateVisual( propertyMap8 );
   DALI_TEST_CHECK( nPatchVisual );
-  TestDebugVisual( nPatchVisual, Visual::N_PATCH, Vector2::ZERO );
+  TestDebugVisual( application.GetScene(),  nPatchVisual, Visual::N_PATCH, Vector2::ZERO );
 
   EnvironmentVariable::SetTestingEnvironmentVariable(false);
   END_TEST;
@@ -221,7 +221,7 @@ int UtcDaliDebugRenderingGetVisual2(void)
 
   Visual::Base colorVisual = factory.CreateVisual( map);
   DALI_TEST_CHECK( colorVisual );
-  TestDebugVisual( colorVisual, Visual::COLOR, Vector2::ZERO );
+  TestDebugVisual( application.GetScene(),  colorVisual, Visual::COLOR, Vector2::ZERO );
 
   // Test that border visual is replaced with debug visual
   map.Clear();
@@ -230,7 +230,7 @@ int UtcDaliDebugRenderingGetVisual2(void)
   map[ BorderVisual::Property::SIZE   ] = 2.f;
   Visual::Base borderVisual = factory.CreateVisual( map );
   DALI_TEST_CHECK( borderVisual );
-  TestDebugVisual( borderVisual, Visual::BORDER, Vector2::ZERO );
+  TestDebugVisual( application.GetScene(),  borderVisual, Visual::BORDER, Vector2::ZERO );
 
   // Test that image visual is replaced with debug visual
   map.Clear();
@@ -238,12 +238,12 @@ int UtcDaliDebugRenderingGetVisual2(void)
   map[ ImageVisual::Property::URL ] = TEST_IMAGE_FILE_NAME;
   Visual::Base imageVisual = factory.CreateVisual( map );
   DALI_TEST_CHECK( imageVisual );
-  TestDebugVisual( imageVisual, Visual::IMAGE, Vector2(64.0f, 64.0f /* Broken Image Size */ ));
+  TestDebugVisual( application.GetScene(),  imageVisual, Visual::IMAGE, Vector2(64.0f, 64.0f /* Broken Image Size */ ));
 
   // Test that n patch visual is replaced with debug visual
   Visual::Base nPatchVisual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( nPatchVisual );
-  TestDebugVisual( nPatchVisual, Visual::N_PATCH, Vector2::ZERO );
+  TestDebugVisual( application.GetScene(),  nPatchVisual, Visual::N_PATCH, Vector2::ZERO );
 
   EnvironmentVariable::SetTestingEnvironmentVariable(false);
   END_TEST;
@@ -336,7 +336,7 @@ int UtcDaliDebugRenderingRenderText(void)
   try
   {
     Toolkit::TextLabel label = TextLabel::New( "Hello" );
-    Stage::GetCurrent().Add( label );
+    application.GetScene().Add( label );
     DALI_TEST_CHECK( true );
   } catch( ... )
   {

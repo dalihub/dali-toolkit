@@ -205,7 +205,7 @@ int UtcDaliToolkitTextSelectionToolBarScrollView(void)
 
   TextSelectionToolbar toolbar = TextSelectionToolbar::New();
   DALI_TEST_CHECK( toolbar );
-  Stage::GetCurrent().Add( toolbar );
+  application.GetScene().Add( toolbar );
 
   Property::Map map;
   map["overshootEffectColor"] = Color::RED;

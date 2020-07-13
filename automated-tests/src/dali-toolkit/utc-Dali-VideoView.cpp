@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,7 +152,7 @@ int UtcDaliVideoViewProperty1b(void)
 
   Toolkit::VideoView view = Toolkit::VideoView::New();
   DALI_TEST_CHECK( view );
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   std::string file;
   Property::Map map;
@@ -358,7 +358,7 @@ int UtcDaliVideoViewCustomShaderForCoverage(void)
   bool isUnderlay = videoView.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
   DALI_TEST_CHECK( !isUnderlay );
 
-  Stage::GetCurrent().Add( videoView );
+  application.GetScene().Add( videoView );
   videoView.SetProperty( VideoView::Property::VIDEO, "testvideo" );
 
   Property::Map customShader;
@@ -387,7 +387,7 @@ int UtcDaliVideoViewMethodsForCoverage2(void)
 
   windowSurfaceTarget.Insert( RENDERING_TYPE, "windowSurfaceTarget" );
 
-  Stage::GetCurrent().Add( videoView );
+  application.GetScene().Add( videoView );
 
   application.SendNotification();
   application.Render();
@@ -426,7 +426,7 @@ int UtcDaliVideoViewPropertyUnderlay(void)
   VideoView view = VideoView::New();
   DALI_TEST_CHECK( view );
 
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
   view.Play();
 
   application.SendNotification();
@@ -474,7 +474,7 @@ int UtcDaliVideoViewPropertyPlayPosition(void)
   VideoView view = VideoView::New();
   DALI_TEST_CHECK( view );
 
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
   view.Play();
 
   application.SendNotification();
@@ -501,7 +501,7 @@ int UtcDaliVideoViewNew2(void)
   VideoView view = VideoView::New( true );
   DALI_TEST_CHECK( view );
 
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
   view.Play();
 
   application.SendNotification();
@@ -510,7 +510,7 @@ int UtcDaliVideoViewNew2(void)
   VideoView view2 = VideoView::New( "", false );
   DALI_TEST_CHECK( view2 );
 
-  Stage::GetCurrent().Add( view2 );
+  application.GetScene().Add( view2 );
   view2.Play();
 
   application.SendNotification();
@@ -527,7 +527,7 @@ int UtcDaliVideoViewPropertyDisplayMode(void)
   VideoView view = VideoView::New();
   DALI_TEST_CHECK( view );
 
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
   view.Play();
 
   application.SendNotification();
@@ -555,7 +555,7 @@ int UtcDaliVideoViewCustomShader(void)
   bool isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
   DALI_TEST_CHECK( !isUnderlay );
 
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
   view.SetProperty( VideoView::Property::VIDEO, "testvideo" );
 
   /* insert custom shader */
@@ -573,7 +573,7 @@ int UtcDaliVideoViewCustomShader(void)
   view.SetProperty( VideoView::Property::VIDEO, map );
 
   /* do render for check custom shader */
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
   view.Play();
 
   application.SendNotification();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,16 +197,16 @@ int UtcDaliSuperBlurViewSetTexture(void)
   Texture inputTexture = CreateSolidColorTexture( application, Color::GREEN, 50, 50 );
   blurView.SetTexture( inputTexture );
   // start multiple guassian blur call, each guassian blur creates two render tasks
-  DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
+  DALI_TEST_CHECK( application.GetScene().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
 
   {
     // create renderers for the original image and each blurred image
-    Stage::GetCurrent().Add( blurView );
+    application.GetScene().Add( blurView );
     Wait(application);
     DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );
 
     Wait(application);
-    Stage::GetCurrent().Remove( blurView );
+    application.GetScene().Remove( blurView );
   }
 
   END_TEST;
@@ -215,7 +215,7 @@ int UtcDaliSuperBlurViewSetTexture(void)
 int UtcDaliSuperBlurViewSetTexture2(void)
 {
   ToolkitTestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   tet_infoline(" UtcDaliSuperBlurViewSetTexture2 - test setting a second texture ");
 
@@ -227,7 +227,7 @@ int UtcDaliSuperBlurViewSetTexture2(void)
   blurView.SetTexture( inputTexture );
 
   // start multiple guassian blur call, each guassian blur creates two render tasks
-  DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
+  DALI_TEST_CHECK( application.GetScene().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
   {
     // create renderers for the original image and each blurred image
     stage.Add( blurView );
@@ -238,7 +238,7 @@ int UtcDaliSuperBlurViewSetTexture2(void)
     Wait(application, 1000);
 
     tet_infoline("Remove from stage");
-    Stage::GetCurrent().Remove( blurView );
+    application.GetScene().Remove( blurView );
   }
 
   tet_infoline("Test that there are no render tasks remaining");
@@ -248,11 +248,11 @@ int UtcDaliSuperBlurViewSetTexture2(void)
   Texture inputTexture2 = CreateSolidColorTexture( application, Color::CYAN, 50, 50 );
   blurView.SetTexture( inputTexture2 );
   // start multiple guassian blur call, each guassian blur creates two render tasks
-  DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
+  DALI_TEST_CHECK( application.GetScene().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
 
   {
     // create renderers for the original image and each blurred image
-    Stage::GetCurrent().Add( blurView );
+    application.GetScene().Add( blurView );
     Wait(application);
     DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );
 
@@ -260,7 +260,7 @@ int UtcDaliSuperBlurViewSetTexture2(void)
     Wait(application, 1000);
 
     tet_infoline("Remove from stage");
-    Stage::GetCurrent().Remove( blurView );
+    application.GetScene().Remove( blurView );
   }
 
   tet_infoline("Test that there are no render tasks remaining");
@@ -278,7 +278,7 @@ int UtcDaliSuperBlurViewSetProperty(void)
 
   SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
   // create renderers for the original image and each blurred image
-  Stage::GetCurrent().Add( blurView );
+  application.GetScene().Add( blurView );
   blurView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
 
   // Will create ResourceImage
@@ -287,7 +287,7 @@ int UtcDaliSuperBlurViewSetProperty(void)
 
   // start multiple guassian blur call, each guassian blur creates two render tasks
 
-  unsigned int count = Stage::GetCurrent().GetRenderTaskList().GetTaskCount();
+  unsigned int count = application.GetScene().GetRenderTaskList().GetTaskCount();
   DALI_TEST_CHECK( count == 1+BLUR_LEVELS*2 );
 
   Wait(application);
@@ -309,7 +309,7 @@ int UtcDaliSuperBlurViewGetProperty(void)
   Wait(application);
 
   // create renderers for the original image and each blurred image
-  Stage::GetCurrent().Add( blurView );
+  application.GetScene().Add( blurView );
 
   std::string imageUrl = blurView.GetProperty<std::string>( SuperBlurView::Property::IMAGE_URL );
   DALI_TEST_EQUALS( imageUrl, TEST_IMAGE_FILE_NAME, TEST_LOCATION );
@@ -391,13 +391,13 @@ int UtcDaliSuperBlurViewBlurSignal(void)
   Texture inputTexture = CreateSolidColorTexture( application, Color::GREEN, 50, 50 );
   blurView.SetTexture( inputTexture );
   // start multiple guassian blur call, each guassian blur creates two render tasks
-  DALI_TEST_CHECK( Stage::GetCurrent().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
+  DALI_TEST_CHECK( application.GetScene().GetRenderTaskList().GetTaskCount() == 1+BLUR_LEVELS*2);
 
   SignalHandler signalHandler;
   blurView.BlurFinishedSignal().Connect(&signalHandler, &SignalHandler::Callback);
 
   // create renderers for the original image and each blurred image
-  Stage::GetCurrent().Add( blurView );
+  application.GetScene().Add( blurView );
   Wait(application, 1000);
 
   DALI_TEST_EQUALS(blurView.GetRendererCount(), BLUR_LEVELS+1, TEST_LOCATION );

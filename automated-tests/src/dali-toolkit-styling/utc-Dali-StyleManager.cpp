@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -230,8 +230,8 @@ int UtcDaliStyleManagerApplyTheme(void)
   // Add 2 buttons to test how many times the signal is sent
   Test::TestButton testButton = Test::TestButton::New();
   Test::TestButton testButton2 = Test::TestButton::New();
-  Stage::GetCurrent().Add( testButton );
-  Stage::GetCurrent().Add( testButton2 );
+  application.GetScene().Add( testButton );
+  application.GetScene().Add( testButton2 );
   StyleChangedSignalChecker styleChangedSignalHandler;
   StyleChangedSignalChecker styleChangedSignalHandler2;
   StyleManager styleManager = StyleManager::Get();
@@ -350,7 +350,7 @@ int UtcDaliStyleManagerApplyDefaultTheme(void)
   ToolkitTestApplication application;
 
   Test::TestButton testButton = Test::TestButton::New();
-  Stage::GetCurrent().Add( testButton );
+  application.GetScene().Add( testButton );
   StyleChangedSignalChecker styleChangedSignalHandler;
   StyleManager styleManager = StyleManager::Get();
 
@@ -491,8 +491,8 @@ int UtcDaliStyleManagerApplyStyle(void)
   // Add 2 buttons
   Test::TestButton testButton = Test::TestButton::New();
   Test::TestButton testButton2 = Test::TestButton::New();
-  Stage::GetCurrent().Add( testButton );
-  Stage::GetCurrent().Add( testButton2 );
+  application.GetScene().Add( testButton );
+  application.GetScene().Add( testButton2 );
   StyleChangedSignalChecker styleChangedSignalHandler;
   StyleManager styleManager = StyleManager::Get();
 
@@ -559,8 +559,8 @@ int UtcDaliStyleManagerIncludeStyleP(void)
   // Add 2 buttons
   Test::TestButton testButton = Test::TestButton::New();
   Test::TestButton testButton2 = Test::TestButton::New();
-  Stage::GetCurrent().Add( testButton );
-  Stage::GetCurrent().Add( testButton2 );
+  application.GetScene().Add( testButton );
+  application.GetScene().Add( testButton2 );
   StyleChangedSignalChecker styleChangedSignalHandler;
   StyleManager styleManager = StyleManager::Get();
 
@@ -611,8 +611,8 @@ int UtcDaliStyleManagerIncludeStyleN(void)
   // Add 2 buttons
   Test::TestButton testButton = Test::TestButton::New();
   Test::TestButton testButton2 = Test::TestButton::New();
-  Stage::GetCurrent().Add( testButton );
-  Stage::GetCurrent().Add( testButton2 );
+  application.GetScene().Add( testButton );
+  application.GetScene().Add( testButton2 );
   StyleChangedSignalChecker styleChangedSignalHandler;
   StyleManager styleManager = StyleManager::Get();
 
@@ -646,13 +646,13 @@ int UtcDaliStyleManagerStyleChangedSignalFontFamily(void)
 
   std::string labelStr("Label");
   Toolkit::TextLabel label = Toolkit::TextLabel::New(labelStr);
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   Toolkit::TextField field = Toolkit::TextField::New();
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   Toolkit::TextEditor editor = Toolkit::TextEditor::New();
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   StyleChangedSignalChecker styleChangedSignalHandler;
   Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
@@ -727,10 +727,10 @@ int UtcDaliStyleManagerStyleChangedSignalFontSize(void)
 
   std::string labelStr("Label");
   Toolkit::TextLabel label = Toolkit::TextLabel::New(labelStr);
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   Toolkit::TextLabel label2 = Toolkit::TextLabel::New(labelStr);
-  Stage::GetCurrent().Add( label2 );
+  application.GetScene().Add( label2 );
 
   StyleChangedSignalChecker styleChangedSignalHandler;
   StyleMonitor styleMonitor = StyleMonitor::Get();
@@ -810,10 +810,10 @@ int UtcDaliStyleManagerStyleChangedSignalFontSizeTextField(void)
   std::string fieldStr("Field");
   Toolkit::TextField field = Toolkit::TextField::New();
   field.SetProperty( Toolkit::TextField::Property::TEXT, fieldStr );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   Toolkit::TextField field2 = Toolkit::TextField::New();
-  Stage::GetCurrent().Add( field2 );
+  application.GetScene().Add( field2 );
   field2.SetProperty( Toolkit::TextField::Property::TEXT, fieldStr );
 
   StyleChangedSignalChecker styleChangedSignalHandler;
@@ -893,10 +893,10 @@ int UtcDaliStyleManagerStyleChangedSignalFontSizeTextEditor(void)
   std::string editorStr("Editor");
   Toolkit::TextEditor editor = Toolkit::TextEditor::New();
   editor.SetProperty( Toolkit::TextEditor::Property::TEXT, editorStr );
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   Toolkit::TextEditor editor2 = Toolkit::TextEditor::New();
-  Stage::GetCurrent().Add( editor2 );
+  application.GetScene().Add( editor2 );
   editor2.SetProperty( Toolkit::TextEditor::Property::TEXT, editorStr );
 
   StyleChangedSignalChecker styleChangedSignalHandler;
@@ -953,7 +953,7 @@ int UtcDaliStyleManagerSetState01(void)
 
   DummyControl actor = DummyControl::New(true);
   actor.SetStyleName("BasicControl");
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   Integration::ResourcePointer ninePatch = CustomizeNinePatch( application, 30, 30 );
@@ -1029,7 +1029,7 @@ int UtcDaliStyleManagerSetState02(void)
 
   DummyControl actor = DummyControl::New(true);
   actor.SetStyleName("BasicControl");
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   Integration::ResourcePointer ninePatch = CustomizeNinePatch( application, 30, 30 );
@@ -1109,7 +1109,7 @@ int UtcDaliStyleManagerSetState03N(void)
 
   DummyControl actor = DummyControl::New(true);
   actor.SetStyleName("NoStyles");
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   Property::Map propertyMap;
@@ -1158,7 +1158,7 @@ int UtcDaliStyleManagerSetState04N(void)
 
   DummyControl actor = DummyControl::New(true);
   actor.SetStyleName("NoStateStyle");
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   Property::Map propertyMap;
@@ -1208,7 +1208,7 @@ int UtcDaliStyleManagerSetSubState01(void)
   actor.SetProperty(DevelControl::Property::STATE, "NORMAL");
   actor.SetProperty(DevelControl::Property::SUB_STATE, "SELECTED");
   actor.SetStyleName("ComplexControl");
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Integration::ResourcePointer ninePatch = CustomizeNinePatch( application, 30, 30 );
 
@@ -1252,7 +1252,7 @@ int UtcDaliStyleManagerSetSubState02(void)
   tet_infoline( "Setting state to NORMAL/SELECTED before re-styling\n");
 
   actor.SetStyleName("ComplexControl");
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   Integration::ResourcePointer ninePatch = CustomizeNinePatch( application, 30, 30 );
 
@@ -1344,7 +1344,7 @@ int UtcDaliStyleManagerConfigSectionTest(void)
   // For coverage
   Toolkit::TextEditor editor = Toolkit::TextEditor::New();
   editor.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( editor );
 

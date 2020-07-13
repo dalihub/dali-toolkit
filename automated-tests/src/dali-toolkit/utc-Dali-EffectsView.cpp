@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ int UtcDaliEffectsViewNew(void)
   view = EffectsView::New( EffectsView::DROP_SHADOW );
   DALI_TEST_CHECK( view );
 
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
 
   view.Reset();
   view = EffectsView::New( EffectsView::EMBOSS );
@@ -110,9 +110,9 @@ int UtcDaliEffectsViewAddRemoveDropShadow(void)
 
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, application.GetScene().GetSize());
   view.Add(actor);
-  Stage::GetCurrent().Add(view);
+  application.GetScene().Add(view);
 
   DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
   DALI_TEST_CHECK( actor.GetParent() );
@@ -133,7 +133,7 @@ int UtcDaliEffectsViewAddRemoveEmboss(void)
   tet_infoline("Checking number of render tasks = 1");
   application.SendNotification();
   application.Render();
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   DALI_TEST_EQUALS( stage.GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION );
 
   tet_infoline("Create effects view");
@@ -208,7 +208,7 @@ int UtcDaliEffectsViewOnStage(void)
 
   EffectsView view = EffectsView::New(EffectsView::EMBOSS);
   view.SetProperty( Actor::Property::SIZE, Vector2(100.f, 100.f) );
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   DALI_TEST_CHECK( stage.GetRenderTaskList().GetTaskCount() == 1 );
 
   stage.Add( view );
@@ -225,7 +225,7 @@ int UtcDaliEffectsViewOffStage(void)
 
   EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
   view.SetProperty( Actor::Property::SIZE, Vector2(100.f, 100.f) );
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   DALI_TEST_CHECK( stage.GetRenderTaskList().GetTaskCount() == 1 );
 
   stage.Add( view );
@@ -336,7 +336,7 @@ int UtcDaliEffectsViewOffsetProperty(void)
   ToolkitTestApplication application;
 
   EffectsView view = EffectsView::New( EffectsView::EMBOSS );
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
 
   Property::Value value = view.GetProperty( EffectsView::Property::EFFECT_OFFSET );
   Vector3 offsetValue;
@@ -371,7 +371,7 @@ int UtcDaliEffectsViewColorProperty(void)
   ToolkitTestApplication application;
 
   EffectsView view = EffectsView::New( EffectsView::DROP_SHADOW );
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
 
   Property::Value value = view.GetProperty( EffectsView::Property::EFFECT_COLOR );
   Vector4 colorValue;
@@ -459,7 +459,7 @@ int UtcDaliEffectsViewSetRefreshOnDemandP(void)
   EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);
   view.SetProperty( Actor::Property::SIZE, Vector2(100.f, 100.f) );
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   stage.Add( view );
   application.SendNotification();
   application.Render();
@@ -497,7 +497,7 @@ int UtcDaliEffectsViewSetRefreshOnDemandN(void)
 int UtcDaliEffectsViewSizeSet(void)
 {
   ToolkitTestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   {
     EffectsView view = EffectsView::New(EffectsView::DROP_SHADOW);

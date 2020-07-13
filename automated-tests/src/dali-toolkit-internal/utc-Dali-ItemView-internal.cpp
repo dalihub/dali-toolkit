@@ -102,8 +102,8 @@ int UtcDaliItemLayoutCheckPropertiesSetBeforeActivateLayout(void)
 
   Dali::Toolkit::Internal::GridLayout* gridLayout = dynamic_cast<Dali::Toolkit::Internal::GridLayout*>(view.GetLayout(0).Get());
 
-  Dali::Stage stage = Dali::Stage::GetCurrent();
-  Vector3 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector3 stageSize(scene.GetSize());
 
   //Check if the number of columns is equals to 6 which is set before.
   DALI_TEST_EQUALS(gridLayout->GetNumberOfColumns(), 6, TEST_LOCATION );

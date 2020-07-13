@@ -64,7 +64,7 @@ int UtcDaliNavigationViewNew(void)
   navigationView = NavigationView::New();
   DALI_TEST_CHECK( navigationView );
 
-  Stage::GetCurrent().Add( navigationView );
+  application.GetScene().Add( navigationView );
 
   application.SendNotification();
   application.Render();
@@ -115,7 +115,7 @@ int UtcDaliNavigationViewPush(void)
 {
   ToolkitTestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   // 1 Create and Add Navigation View to stage, actor count should be zero
   NavigationView naviView = NavigationView::New();
@@ -137,7 +137,7 @@ int UtcDaliNavigationViewPop(void)
 {
   ToolkitTestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   // 1 Create Navigation View
   NavigationView naviView = NavigationView::New();
@@ -172,7 +172,7 @@ int UtcDaliNavigationViewPushAndPop(void)
 {
   ToolkitTestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   // 1 Create Navigation View
   NavigationView naviView = NavigationView::New();
@@ -214,7 +214,7 @@ int UtcDaliNavigationViewPreventLastPop(void)
 {
   ToolkitTestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   // 1 Create Navigation View
   NavigationView naviView = NavigationView::New();

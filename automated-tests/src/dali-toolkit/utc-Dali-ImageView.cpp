@@ -221,7 +221,7 @@ int UtcDaliImageViewPreMultipliedAlphaPng(void)
   ImageView imageView1 = ImageView::New();
   imageView1.SetProperty( ImageView::Property::IMAGE, imageMap );
 
-  Stage::GetCurrent().Add( imageView1 );
+  application.GetScene().Add( imageView1 );
 
   Property::Value value = imageView1.GetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA );
   bool enable;
@@ -294,7 +294,7 @@ int UtcDaliImageViewPreMultipliedAlphaPng(void)
   ImageView imageView2 = ImageView::New();
   imageView2.SetProperty( ImageView::Property::IMAGE, imageMap );
 
-  Stage::GetCurrent().Add( imageView2 );
+  application.GetScene().Add( imageView2 );
 
   application.SendNotification();
   application.Render();
@@ -334,7 +334,7 @@ int UtcDaliImageViewPreMultipliedAlphaJpg(void)
   ImageView imageView1 = ImageView::New();
   imageView1.SetProperty( ImageView::Property::IMAGE, imageMap );
 
-  Stage::GetCurrent().Add( imageView1 );
+  application.GetScene().Add( imageView1 );
 
   Property::Value value = imageView1.GetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA );
   bool enable;
@@ -375,7 +375,7 @@ int UtcDaliImageViewPreMultipliedAlphaJpg(void)
   // Disable pre-multiplied alpha blending
   imageView2.SetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA, false );
 
-  Stage::GetCurrent().Add( imageView2 );
+  application.GetScene().Add( imageView2 );
 
   application.SendNotification();
   application.Render();
@@ -418,7 +418,7 @@ int UtcDaliImageViewPixelArea(void)
                                       .Add( ImageVisual::Property::PIXEL_AREA, pixelAreaVisual ) );
 
   // Add to stage
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   stage.Add( gifView );
 
   // loading started
@@ -476,7 +476,7 @@ int UtcDaliImageViewAsyncLoadingWithoutAltasing(void)
   ImageView imageView = ImageView::New( gImage_600_RGB );
 
   // By default, Aysnc loading is used
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(100, 100) );
   imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
@@ -517,7 +517,7 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   // By default, Aysnc loading is used
   // loading is not started if the actor is offStage
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
   application.SendNotification();
   application.Render(16);
   application.Render(16);
@@ -564,7 +564,7 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing02(void)
   ImageView imageView = ImageView::New();
   imageView.SetProperty( ImageView::Property::IMAGE, asyncLoadingMap );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
   application.SendNotification();
   application.Render(16);
   application.Render(16);
@@ -619,7 +619,7 @@ int UtcDaliImageViewSyncLoading(void)
     syncLoadingMap[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
     application.SendNotification();
     application.Render(16);
 
@@ -655,7 +655,7 @@ int UtcDaliImageViewSyncLoading02(void)
     syncLoadingMap[ "atlasing" ] = true;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
     application.SendNotification();
     application.Render(16);
 
@@ -685,7 +685,7 @@ int UtcDaliImageViewAddedTexture(void)
   propertyMap[ImageVisual::Property::URL] = url;
   imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
   application.SendNotification();
   application.Render();
 
@@ -709,7 +709,7 @@ int UtcDaliImageViewSizeWithBackground(void)
                          }
                        );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
   application.SendNotification();
   application.Render();
 
@@ -741,7 +741,7 @@ int UtcDaliImageViewSizeWithBackgroundAndImage(void)
 
   imageView.SetImage( gImage_600_RGB ); // 1 to 1 ratio, 600x600 pixels
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
   application.SendNotification();
   application.Render();
 
@@ -769,7 +769,7 @@ int UtcDaliImageViewHeightForWidthBackground(void)
                          }
                        );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
   application.SendNotification();
   application.Render();
 
@@ -803,7 +803,7 @@ int UtcDaliImageViewHeightForWidthBackgroundAndImage(void)
 
   imageView.SetImage( gImage_600_RGB ); // 1 to 1 ratio
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
   application.SendNotification();
   application.Render();
 
@@ -858,7 +858,7 @@ int UtcDaliImageViewCheckResourceReady(void)
 
   imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // loading started, this waits for the loader thread
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -885,7 +885,7 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
   ImageView imageView = ImageView::New();
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( imageView );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   std::string url;
   Property::Map map;
@@ -1001,7 +1001,7 @@ int UtcDaliImageViewReplaceImage(void)
 
   imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   application.SendNotification();
   application.Render(16);
@@ -1051,7 +1051,7 @@ int UtcDaliImageViewReplaceImageAndGetNaturalSize(void)
 
   dummyControl.Add( imageView );
   dummyImpl.SetRelayoutCallback( &OnRelayoutOverride );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   application.SendNotification();
   application.Render();
@@ -1179,7 +1179,7 @@ int UtcDaliImageViewResourceReadySignalWithReusedImage02(void)
   tet_infoline("Connect to ResourceReady signal for second ImageView, it should still fire as resource is ready");
   imageViewWithExistingImage.ResourceReadySignal().Connect( &ResourceReadySignal);
 
-  Stage::GetCurrent().Add( imageViewWithExistingImage );
+  application.GetScene().Add( imageViewWithExistingImage );
 
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
@@ -1200,7 +1200,7 @@ int UtcDaliImageViewPaddingProperty(void)
   imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   application.SendNotification();
   application.Render();
@@ -1250,7 +1250,7 @@ int UtcDaliImageViewPaddingProperty02(void)
   imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   application.SendNotification();
   application.Render();
@@ -1291,7 +1291,7 @@ int UtcDaliImageViewPaddingProperty03(void)
   imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   application.SendNotification();
   application.Render();
@@ -1339,7 +1339,7 @@ int UtcDaliImageViewPaddingProperty04(void)
   imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   application.SendNotification();
   application.Render();
@@ -1391,7 +1391,7 @@ int UtcDaliImageViewTransformTest01(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
   imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   application.SendNotification();
   application.Render();
@@ -1425,7 +1425,7 @@ int UtcDaliImageViewUsingAtlasAndGetNaturalSize(void)
   imageMap[ Toolkit::ImageVisual::Property::URL ] = gImage_34_RGBA;
   imageMap[ Toolkit::ImageVisual::Property::ATLASING ] = true;
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1453,7 +1453,7 @@ int UtcDaliImageViewFillMode(void)
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1495,7 +1495,7 @@ int UtcDaliImageViewFittingModeFitKeepAspectRatio(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(600,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1542,7 +1542,7 @@ int UtcDaliImageViewFittingModesFill(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(600,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1588,7 +1588,7 @@ int UtcDaliImageViewFittingModesOverfitKeepAspectRatio(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(600,500) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1635,7 +1635,7 @@ int UtcDaliImageViewFittingModesCenter01(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(700,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1681,7 +1681,7 @@ int UtcDaliImageViewFittingModesCenter02(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(700,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1726,7 +1726,7 @@ int UtcDaliImageViewFittingModesFitHeight01(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(600,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1771,7 +1771,7 @@ int UtcDaliImageViewFittingModesFitHeight02(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(700,600) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1816,7 +1816,7 @@ int UtcDaliImageViewFittingModesFitWidth01(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(600,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1861,7 +1861,7 @@ int UtcDaliImageViewFittingModesFitWidth02(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(700,600) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1908,7 +1908,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode01(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -1944,7 +1944,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode01(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap2 );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
@@ -1983,7 +1983,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode01(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap3 );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -2030,7 +2030,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode02(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -2066,7 +2066,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode02(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap2 );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
@@ -2105,7 +2105,7 @@ int UtcDaliImageViewFittingModesChangeFittingMode02(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap3 );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(800,700) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -2149,7 +2149,7 @@ int UtcDaliImageViewFittingModesWithAnimatedVectorImageVisual(void)
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(600,600) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   // Trigger a potential relayout
   application.SendNotification();
@@ -2200,7 +2200,7 @@ int UtcDaliImageViewCustomShader(void)
     ImageView imageView = ImageView::New();
     imageView.SetProperty( ImageView::Property::IMAGE, properties );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
 
     application.SendNotification();
     application.Render();
@@ -2234,7 +2234,7 @@ int UtcDaliImageViewCustomShader(void)
     ImageView imageView = ImageView::New( TEST_IMAGE_FILE_NAME );
     imageView.SetProperty( ImageView::Property::IMAGE, properties );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
 
     application.SendNotification();
     application.Render();
@@ -2269,7 +2269,7 @@ int UtcDaliImageViewCustomShader(void)
     imageView.SetProperty( ImageView::Property::IMAGE, properties );
     imageView.SetProperty( ImageView::Property::IMAGE, TEST_IMAGE_FILE_NAME );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
 
     application.SendNotification();
     application.Render();
@@ -2307,7 +2307,7 @@ int UtcDaliImageViewCustomShader(void)
     imageView.SetProperty( ImageView::Property::IMAGE, properties1 );
     imageView.SetProperty( ImageView::Property::IMAGE, properties );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
 
     application.SendNotification();
     application.Render();
@@ -2345,7 +2345,7 @@ int UtcDaliImageViewCustomShader(void)
     imageView.SetProperty( ImageView::Property::IMAGE, properties );
     imageView.SetProperty( ImageView::Property::IMAGE, properties1 );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
 
     application.SendNotification();
     application.Render();
@@ -2439,7 +2439,7 @@ int UtcDaliImageViewLoadRemoteSVG(void)
   imageView.SetProperty( Actor::Property::SIZE, Vector2(300, 300) );
   imageView.SetProperty( Actor::Property::POSITION, Vector3( 150.0f , 150.0f , 0.0f ) );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   DALI_TEST_CHECK( imageView );
 
@@ -2478,7 +2478,7 @@ int UtcDaliImageViewSyncSVGLoading(void)
     syncLoadingMap.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING,  true);
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
     DALI_TEST_CHECK( imageView );
 
     application.SendNotification();
@@ -2513,7 +2513,7 @@ int UtcDaliImageViewAsyncSVGLoading(void)
     syncLoadingMap.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING,  false);
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
     DALI_TEST_CHECK( imageView );
 
     application.SendNotification();
@@ -2552,7 +2552,7 @@ int UtcDaliImageViewSVGLoadingSyncSetInvalidValue(void)
     syncLoadingMap.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, std::to_string(5) );
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
     DALI_TEST_CHECK( imageView );
 
     application.SendNotification();
@@ -2587,7 +2587,7 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
     DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
 
     application.SendNotification();
 
@@ -2612,7 +2612,7 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 
     DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
 
-    Stage::GetCurrent().Add( imageView );
+    application.GetScene().Add( imageView );
 
     application.SendNotification();
 
@@ -2660,7 +2660,7 @@ int UtcDaliImageViewSetImageOnResourceReadySignal(void)
   ImageView imageView = ImageView::New( gImage_34_RGBA );
   imageView.ResourceReadySignal().Connect( &OnResourceReadySignal );
 
-  Stage::GetCurrent().Add( imageView );
+  application.GetScene().Add( imageView );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 

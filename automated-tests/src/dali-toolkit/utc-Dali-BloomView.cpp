@@ -125,9 +125,9 @@ int UtcDaliBloomViewAddRemove(void)
 
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, application.GetScene().GetSize());
   view.Add(actor);
-  Stage::GetCurrent().Add(view);
+  application.GetScene().Add(view);
 
   DALI_TEST_CHECK( actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) );
 
@@ -146,21 +146,21 @@ int UtcDaliBloomActivateDeactivate(void)
   Toolkit::BloomView view = Toolkit::BloomView::New();
   DALI_TEST_CHECK( view );
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
   view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  view.SetProperty( Actor::Property::SIZE, Stage::GetCurrent().GetSize());
+  view.SetProperty( Actor::Property::SIZE, application.GetScene().GetSize());
   view.Add(Actor::New());
-  Stage::GetCurrent().Add(view);
+  application.GetScene().Add(view);
   view.Activate();
 
-  RenderTaskList taskList2 = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList2 = application.GetScene().GetRenderTaskList();
   DALI_TEST_CHECK( 1u != taskList2.GetTaskCount() );
 
   view.Deactivate();
 
-  RenderTaskList taskList3 = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList3 = application.GetScene().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList3.GetTaskCount() );
   END_TEST;
 }
@@ -209,7 +209,7 @@ int UtcDaliBloomOnSizeSet(void)
 
   BloomView view = Toolkit::BloomView::New();
 
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
 
   application.SendNotification();
   application.Render();

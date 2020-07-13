@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +132,7 @@ static void OnScrollComplete( const Vector2& position )
   gOnScrollCompleteCalled = true;
 }
 
-ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
+ScrollView SetupTestScrollView(Integration::Scene scene, int rows, int columns, Vector2 size)
 {
   Constraint constraint;
 
@@ -149,7 +149,7 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
   scrollView.ScrollStartedSignal().Connect( &OnScrollStart );
   scrollView.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
   scrollView.ScrollCompletedSignal().Connect( &OnScrollComplete );
-  Stage::GetCurrent().Add( scrollView );
+  scene.Add( scrollView );
   RulerPtr rulerX = CreateRuler(size.width);
   RulerPtr rulerY = CreateRuler(size.height);
   if(columns > 1)
@@ -171,7 +171,7 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
 
   scrollView.SetRulerX( rulerX );
   scrollView.SetRulerY( rulerY );
-  Stage::GetCurrent().Add( scrollView );
+  scene.Add( scrollView );
 
   Actor container = Actor::New();
   container.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
@@ -238,9 +238,9 @@ int UtcDaliScrollViewPagePathEffectTest(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliScrollViewPagePathEffectTest");
 
-  Vector2 size = Stage::GetCurrent().GetSize();
+  Vector2 size = application.GetScene().GetSize();
 
-  ScrollView scrollView = SetupTestScrollView(1, 3, size);
+  ScrollView scrollView = SetupTestScrollView(application.GetScene(), 1, 3, size);
   Actor testPage = gPages[2];
   Wait(application, 500);
 

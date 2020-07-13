@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -220,7 +220,7 @@ int UtcDaliControlImplOnGestureMethods(void)
     dummy.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f ) );
 
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     // Render and notify a couple of times
     application.SendNotification();
@@ -255,7 +255,7 @@ int UtcDaliControlImplOnGestureMethods(void)
 
     DALI_TEST_CHECK( dummyImpl.longPressCalled == true );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
 
   END_TEST;
@@ -267,7 +267,7 @@ int UtcDaliControlImplChildAddAndRemove(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     application.Render();
@@ -291,13 +291,13 @@ int UtcDaliControlImplChildAddAndRemove(void)
     application.Render();
     application.SendNotification();
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
 
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     application.Render();
     application.SendNotification();
@@ -316,7 +316,7 @@ int UtcDaliControlImplChildAddAndRemove(void)
     application.Render();
     application.SendNotification();
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
   END_TEST;
 }
@@ -330,13 +330,13 @@ int UtcDaliControlImplStageConnection(void)
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     DALI_TEST_EQUALS( dummyImpl.stageConnectionCalled, false, TEST_LOCATION );
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
     application.Render();
     application.SendNotification();
     DALI_TEST_EQUALS( dummyImpl.stageConnectionCalled, true, TEST_LOCATION );
 
     DALI_TEST_EQUALS( dummyImpl.stageDisconnectionCalled, false, TEST_LOCATION );
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
     application.Render();
     application.SendNotification();
     DALI_TEST_EQUALS( dummyImpl.stageDisconnectionCalled, true, TEST_LOCATION );
@@ -344,19 +344,19 @@ int UtcDaliControlImplStageConnection(void)
 
   // Ensure full code coverage
   {
-    unsigned int stageChildren = Stage::GetCurrent().GetLayer(0).GetChildCount();
+    unsigned int stageChildren = application.GetScene().GetLayer(0).GetChildCount();
     DummyControl dummy = DummyControl::New();
 
-    DALI_TEST_EQUALS( Stage::GetCurrent().GetLayer(0).GetChildCount(), stageChildren, TEST_LOCATION );
-    Stage::GetCurrent().Add(dummy);
+    DALI_TEST_EQUALS( application.GetScene().GetLayer(0).GetChildCount(), stageChildren, TEST_LOCATION );
+    application.GetScene().Add(dummy);
     application.Render();
     application.SendNotification();
-    DALI_TEST_EQUALS( Stage::GetCurrent().GetLayer(0).GetChildCount(), stageChildren + 1, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetScene().GetLayer(0).GetChildCount(), stageChildren + 1, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
     application.Render();
     application.SendNotification();
-    DALI_TEST_EQUALS( Stage::GetCurrent().GetLayer(0).GetChildCount(), stageChildren, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetScene().GetLayer(0).GetChildCount(), stageChildren, TEST_LOCATION );
   }
   END_TEST;
 }
@@ -369,7 +369,7 @@ int UtcDaliControlImplSizeSetP(void)
     DummyControl dummy = DummyControl::New( true );
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
     application.Render();
     application.SendNotification();
 
@@ -385,7 +385,7 @@ int UtcDaliControlImplSizeSetP(void)
     DALI_TEST_EQUALS( size, dummy.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).GetVectorXY(), TEST_LOCATION );
     DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, true, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
 
   END_TEST;
@@ -397,7 +397,7 @@ int UtcDaliControlImplSizeSet2P(void)
 
   {
     DummyControl dummy = DummyControl::New();
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     Vector2 size(100.0f, 200.0f);
     DALI_TEST_CHECK( size != dummy.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).GetVectorXY() );
@@ -412,7 +412,7 @@ int UtcDaliControlImplSizeSet2P(void)
 
     DALI_TEST_EQUALS(size, dummy.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).GetVectorXY(), TEST_LOCATION);
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
   END_TEST;
 }
@@ -426,7 +426,7 @@ int UtcDaliControlImplSizeAnimation(void)
     DummyControl dummy = DummyControl::New( true );
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     DALI_TEST_EQUALS( dummyImpl.sizeAnimationCalled, false, TEST_LOCATION );
     Animation animation = Animation::New(1.0f);
@@ -440,14 +440,14 @@ int UtcDaliControlImplSizeAnimation(void)
 
     DALI_TEST_EQUALS( dummyImpl.sizeAnimationCalled, true, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
 
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
 
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     Animation animation = Animation::New(1.0f);
     animation.AnimateTo( Property( dummy, Actor::Property::SIZE ), Vector3( 100.0f, 150.0f, 200.0f ) );
@@ -458,7 +458,7 @@ int UtcDaliControlImplSizeAnimation(void)
     application.Render();
     application.SendNotification();
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
   END_TEST;
 }
@@ -475,7 +475,7 @@ int UtcDaliControlImplTouchEvent(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     application.Render();
     application.SendNotification();
@@ -492,7 +492,7 @@ int UtcDaliControlImplTouchEvent(void)
     application.ProcessEvent(touchEvent);
     DALI_TEST_EQUALS( dummyImpl.touchEventCalled, true, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
 
   // Ensure full code coverage
@@ -501,7 +501,7 @@ int UtcDaliControlImplTouchEvent(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     application.Render();
     application.SendNotification();
@@ -516,7 +516,7 @@ int UtcDaliControlImplTouchEvent(void)
     touchEvent.AddPoint(point);
     application.ProcessEvent(touchEvent);
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
   END_TEST;
 }
@@ -531,7 +531,7 @@ int UtcDaliControlImplHoverEvent(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     application.Render();
     application.SendNotification();
@@ -548,7 +548,7 @@ int UtcDaliControlImplHoverEvent(void)
     application.ProcessEvent( event );
     DALI_TEST_EQUALS( dummyImpl.hoverEventCalled, true, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
 
   // Ensure full code coverage
@@ -557,7 +557,7 @@ int UtcDaliControlImplHoverEvent(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     application.Render();
     application.SendNotification();
@@ -572,7 +572,7 @@ int UtcDaliControlImplHoverEvent(void)
     event.AddPoint(point);
     application.ProcessEvent( event );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
   END_TEST;
 }
@@ -588,7 +588,7 @@ int UtcDaliControlImplKeyEvent(void)
     DummyControl dummy = DummyControl::New( true );
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
     dummy.SetKeyInputFocus();
 
     application.Render();
@@ -601,14 +601,14 @@ int UtcDaliControlImplKeyEvent(void)
     application.ProcessEvent(keyEvent);
     DALI_TEST_EQUALS( dummyImpl.keyEventCalled, true, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
 
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
 
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
     dummy.SetKeyInputFocus();
 
     application.Render();
@@ -619,7 +619,7 @@ int UtcDaliControlImplKeyEvent(void)
     Integration::KeyEvent keyEvent;
     application.ProcessEvent(keyEvent);
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
   END_TEST;
 }
@@ -632,7 +632,7 @@ int UtcDaliControlImplKeyInputFocusGained(void)
     DummyControl dummy = DummyControl::New( true );
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     DALI_TEST_EQUALS( dummyImpl.keyInputFocusGained, false, TEST_LOCATION );
 
@@ -640,16 +640,16 @@ int UtcDaliControlImplKeyInputFocusGained(void)
 
     DALI_TEST_EQUALS( dummyImpl.keyInputFocusGained, true, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
 
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
 
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
     dummy.SetKeyInputFocus();
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
   END_TEST;
 }
@@ -662,7 +662,7 @@ int UtcDaliControlImplKeyInputFocusLost(void)
     DummyControl dummy = DummyControl::New( true );
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     DALI_TEST_EQUALS( dummyImpl.keyInputFocusLost, false, TEST_LOCATION );
 
@@ -671,14 +671,14 @@ int UtcDaliControlImplKeyInputFocusLost(void)
 
     DALI_TEST_EQUALS( dummyImpl.keyInputFocusLost, true, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
 
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
 
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
     dummy.SetKeyInputFocus();
     dummy.ClearKeyInputFocus();
 
@@ -687,7 +687,7 @@ int UtcDaliControlImplKeyInputFocusLost(void)
     dummyImpl.IsKeyboardNavigationSupported();
     dummyImpl.IsKeyboardFocusGroup();
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
   END_TEST;
 }
@@ -728,7 +728,7 @@ int UtcDaliControlImplWheelEvent(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     dummy.WheelEventSignal().Connect(&WheelEventCallback);
 
@@ -745,7 +745,7 @@ int UtcDaliControlImplWheelEvent(void)
     application.ProcessEvent( event );
     DALI_TEST_EQUALS( dummyImpl.wheelEventCalled, true, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
 
   // Ensure full code coverage
@@ -754,7 +754,7 @@ int UtcDaliControlImplWheelEvent(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     dummy.WheelEventSignal().Connect(&WheelEventCallback);
 
@@ -768,7 +768,7 @@ int UtcDaliControlImplWheelEvent(void)
     Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
     application.ProcessEvent( event );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
   END_TEST;
 }
@@ -782,13 +782,13 @@ int UtcDaliControlImplSetStyleName(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
     dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    Stage::GetCurrent().Add(dummy);
+    application.GetScene().Add(dummy);
 
     dummy.SetStyleName("TestStyle");
 
     DALI_TEST_CHECK( dummy.GetStyleName() == "TestStyle" );
 
-    Stage::GetCurrent().Remove(dummy);
+    application.GetScene().Remove(dummy);
   }
   END_TEST;
 }
@@ -1040,7 +1040,7 @@ int UtcDaliControlImplRegisterUnregisterVisual(void)
   dummyImpl.RegisterVisual( index, visual );
 
   tet_infoline( "Add control with visual to stage and check renderer count is 1" );
-  Stage::GetCurrent().Add( dummy );
+  application.GetScene().Add( dummy );
   application.SendNotification();
   application.Render();
 
@@ -1051,7 +1051,7 @@ int UtcDaliControlImplRegisterUnregisterVisual(void)
   dummyImpl.UnregisterVisual( index );
 
   tet_infoline( "Remove control with visual from stage and check renderer count is 0" );
-  Stage::GetCurrent().Remove( dummy );
+  application.GetScene().Remove( dummy );
   application.SendNotification();
   application.Render();
 
@@ -1086,7 +1086,7 @@ int UtcDaliControlImplRegisterDisabledVisual(void)
   DALI_TEST_CHECK( dummyImpl.GetVisual( TEST_PROPERTY ) == visual );
   DALI_TEST_CHECK( dummyImpl.IsVisualEnabled( TEST_PROPERTY ) == false );
 
-  Stage::GetCurrent().Add(dummy);
+  application.GetScene().Add(dummy);
 
   // Render and notify
   application.SendNotification();
@@ -1125,7 +1125,7 @@ int UtcDaliControlImplDisableRegisteredVisual(void)
   // Register index with a color visual
   dummyImpl.RegisterVisual( TEST_PROPERTY, visual );
 
-  Stage::GetCurrent().Add(dummy);
+  application.GetScene().Add(dummy);
 
   // Render and notify
   application.SendNotification();
@@ -1167,7 +1167,7 @@ int UtcDaliControlImplEnabledVisualParentRemovedFromStage(void)
   // Register index with a color visual
   dummyImpl.RegisterVisual( TEST_PROPERTY, visual, false );
 
-  Stage::GetCurrent().Add(dummy);
+  application.GetScene().Add(dummy);
   // Render and notify
   application.SendNotification();
   application.Render();
@@ -1182,13 +1182,13 @@ int UtcDaliControlImplEnabledVisualParentRemovedFromStage(void)
   DALI_TEST_CHECK( dummy.GetRendererCount() == 1u );
 
   // Remove control from stage, visual should be removed from stage too
-  Stage::GetCurrent().Remove(dummy);
+  application.GetScene().Remove(dummy);
   // Render and notify
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK( dummy.GetRendererCount() == 0u );
 
-  Stage::GetCurrent().Add(dummy);
+  application.GetScene().Add(dummy);
   // Render and notify
   application.SendNotification();
   application.Render();
@@ -1237,7 +1237,7 @@ int UtcDaliControlImplRegisterTwoVisualsAndEnableOnlyOne(void)
   // Register second index with a color visual
   dummyImpl.RegisterVisual( TEST_PROPERTY2, visual2 );
 
-  Stage::GetCurrent().Add(dummy);
+  application.GetScene().Add(dummy);
   // Render and notify
   application.SendNotification();
   application.Render();
@@ -1254,13 +1254,13 @@ int UtcDaliControlImplRegisterTwoVisualsAndEnableOnlyOne(void)
   DALI_TEST_CHECK( dummy.GetRendererCount() == 1u );
 
   // Remove control from stage, visual should be removed from stage too
-  Stage::GetCurrent().Remove(dummy);
+  application.GetScene().Remove(dummy);
   // Render and notify
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK( dummy.GetRendererCount() == 0u );
 
-  Stage::GetCurrent().Add(dummy);
+  application.GetScene().Add(dummy);
   // Render and notify
   application.SendNotification();
   application.Render();
@@ -1293,7 +1293,7 @@ int UtcDaliControlImplAutoClippingWithVisuals(void)
 
   control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
 
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   application.SendNotification();
   application.Render();
@@ -1323,7 +1323,7 @@ int UtcDaliControlImplAutoClippingWithVisualsAlreadyOnStage(void)
 
   DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
 
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   application.SendNotification();
   application.Render();

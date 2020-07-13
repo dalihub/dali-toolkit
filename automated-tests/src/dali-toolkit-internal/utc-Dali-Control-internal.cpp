@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ int UtcDaliControlActionOnVisual(void)
   Toolkit::Visual::Base visualBaseHandle = Toolkit::Visual::Base( dummyVisualPtr.Get() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visualBaseHandle );
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   application.SendNotification();
   application.Render();
@@ -80,13 +80,13 @@ int UtcDaliControlDebugHierarchy(void)
   tableView.AddChild( ImageView::New( TEST_RESOURCE_DIR "/gallery-small-1.jpg" ), TableView::CellPosition( 1, 1 ) );
   tableView.AddChild( TextLabel::New("Stuff"), TableView::CellPosition( 1, 2 ) );
 
-  Stage::GetCurrent().Add( tableView );
+  application.GetScene().Add( tableView );
 
   Property::Value v(Matrix3::IDENTITY);
   tableView.RegisterProperty( "SomeMatrix3", v);
 
   std::ostringstream oss;
-  Dali::Toolkit::Internal::DumpControlHierarchy( oss, Stage::GetCurrent().GetRootLayer() );
+  Dali::Toolkit::Internal::DumpControlHierarchy( oss, application.GetScene().GetRootLayer() );
   DALI_TEST_CHECK( oss.str().length() != 0 );
   tet_printf("Control hierarchy: \n%s\n", oss.str().c_str() );
 

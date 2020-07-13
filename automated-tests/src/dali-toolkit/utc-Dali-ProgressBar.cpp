@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,10 +141,10 @@ int UtcDaliProgressBarSignals(void)
 
   // Create the ProgressBar actor
   ProgressBar progressBar = ProgressBar::New();
-  Stage::GetCurrent().Add( progressBar );
+  application.GetScene().Add( progressBar );
   progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  progressBar.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  progressBar.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, 20.0f ) );
   progressBar.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   progressBar.ValueChangedSignal().Connect( &OnProgressBarValueChanged );
 
@@ -174,10 +174,10 @@ int UtcDaliProgressBarSetPropertyP(void)
   ProgressBar progressBar = ProgressBar::New();
   progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  progressBar.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  progressBar.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, 20.0f ) );
   progressBar.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   progressBar.ValueChangedSignal().Connect( &OnProgressBarValueChanged );
-  Stage::GetCurrent().Add(progressBar);
+  application.GetScene().Add(progressBar);
   application.SendNotification();
   application.Render();
 
@@ -321,11 +321,11 @@ int UtcDaliProgressBarSetPropertyP1(void)
   ProgressBar progressBar = ProgressBar::New();
   progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  progressBar.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  progressBar.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, 20.0f ) );
   progressBar.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   progressBar.ValueChangedSignal().Connect( &OnProgressBarValueChanged );
 
-  Stage::GetCurrent().Add(progressBar);
+  application.GetScene().Add(progressBar);
   application.SendNotification();
   application.Render();
 
@@ -414,8 +414,8 @@ int UtcDaliProgressBarSetPropertyP2(void)
   progressBar.SetProperty(ProgressBar::Property::SECONDARY_PROGRESS_VALUE, 0.3f);
 
   progressBar.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  progressBar.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
-  Stage::GetCurrent().Add(progressBar);
+  progressBar.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, 20.0f ) );
+  application.GetScene().Add(progressBar);
   application.SendNotification();
   application.Render();
 
@@ -438,8 +438,8 @@ int UtcDaliProgressBarSetPropertyP3(void)
   ProgressBar progressBar = ProgressBar::New();
   progressBar.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   progressBar.SetProperty( Actor::Property::ANCHOR_POINT, ParentOrigin::TOP_LEFT);
-  progressBar.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, Stage::GetCurrent().GetSize().y ) );
-  Stage::GetCurrent().Add( progressBar );
+  progressBar.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, application.GetScene().GetSize().y ) );
+  application.GetScene().Add( progressBar );
   application.SendNotification();
   application.Render();
 

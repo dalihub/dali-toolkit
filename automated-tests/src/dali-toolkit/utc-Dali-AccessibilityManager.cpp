@@ -283,9 +283,9 @@ int UtcDaliAccessibilityManagerGetActorByFocusOrder(void)
   DALI_TEST_CHECK(manager.GetActorByFocusOrder(3) == Actor());
 
   // Add the actors to the stage
-  Stage::GetCurrent().Add(first);
-  Stage::GetCurrent().Add(second);
-  Stage::GetCurrent().Add(third);
+  application.GetScene().Add(first);
+  application.GetScene().Add(second);
+  application.GetScene().Add(third);
 
   // Check that we get an empty handle because focus order 0 means undefined.
   DALI_TEST_CHECK(manager.GetActorByFocusOrder(0) == Actor());
@@ -328,12 +328,12 @@ int UtcDaliAccessibilityManagerSetAndGetCurrentFocusActor(void)
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
   manager.SetFocusOrder(first, 1);
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   // Create the second actor and add it to the stage
   Actor second = Actor::New();
   manager.SetFocusOrder(second, 2);
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   // Create the third actor but don't add it to the stage
   Actor third = Actor::New();
@@ -357,7 +357,7 @@ int UtcDaliAccessibilityManagerSetAndGetCurrentFocusActor(void)
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(third) == false);
 
   // Add the third actor to the stage
-  Stage::GetCurrent().Add(third);
+  application.GetScene().Add(third);
 
   // make the third actor invisible
   third.SetProperty( Actor::Property::VISIBLE,false);
@@ -426,7 +426,7 @@ int UtcDaliAccessibilityManagerGetCurrentFocusGroup(void)
   Actor secondChild = Actor::New();
   parent.Add(firstChild);
   parent.Add(secondChild);
-  Stage::GetCurrent().Add(parent);
+  application.GetScene().Add(parent);
 
   // Create three actors and add them as the children of the first child actor
   Actor firstGrandChild = Actor::New();
@@ -492,13 +492,13 @@ int UtcDaliAccessibilityManagerGetCurrentFocusOrder(void)
   accAdaptor.HandleActionEnableEvent();
 
   Actor first = Actor::New();
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   Actor second = Actor::New();
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   Actor third = Actor::New();
-  Stage::GetCurrent().Add(third);
+  application.GetScene().Add(third);
 
   // Set the focus order and description for the first actor
   manager.SetFocusOrder(first, 1);
@@ -554,13 +554,13 @@ int UtcDaliAccessibilityManagerMoveFocusForward(void)
   accAdaptor.HandleActionNextEvent(true);
 
   Actor first = Actor::New();
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   Actor second = Actor::New();
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   Actor third = Actor::New();
-  Stage::GetCurrent().Add(third);
+  application.GetScene().Add(third);
 
   // Set the focus order and description for the first actor
   manager.SetFocusOrder(first, 1);
@@ -671,13 +671,13 @@ int UtcDaliAccessibilityManagerMoveFocusBackward(void)
   accAdaptor.HandleActionEnableEvent();
 
   Actor first = Actor::New();
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   Actor second = Actor::New();
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   Actor third = Actor::New();
-  Stage::GetCurrent().Add(third);
+  application.GetScene().Add(third);
 
   // Set the focus order and description for the first actor
   manager.SetFocusOrder(first, 1);
@@ -790,12 +790,12 @@ int UtcDaliAccessibilityManagerClearFocus(void)
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
   manager.SetFocusOrder(first, 1);
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   // Create the second actor and add it to the stage
   Actor second = Actor::New();
   manager.SetFocusOrder(second, 2);
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   // Check that no actor is being focused yet.
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
@@ -828,12 +828,12 @@ int UtcDaliAccessibilityManagerReset(void)
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
   manager.SetFocusOrder(first, 1);
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   // Create the second actor and add it to the stage
   Actor second = Actor::New();
   manager.SetFocusOrder(second, 2);
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   // Check that no actor is being focused yet.
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
@@ -875,7 +875,7 @@ int UtcDaliAccessibilityManagerFocusGroup(void)
   Actor secondChild = Actor::New();
   parent.Add(firstChild);
   parent.Add(secondChild);
-  Stage::GetCurrent().Add(parent);
+  application.GetScene().Add(parent);
 
   // Create three actors and add them as the children of the first child actor
   Actor firstGrandChild = Actor::New();
@@ -992,7 +992,7 @@ int UtcDaliAccessibilityManagerSetAndGetFocusIndicatorWithFocusedActor(void)
   DALI_TEST_CHECK(defaultFocusIndicatorActor);
 
   Actor focusedActor = Actor::New();
-  Stage::GetCurrent().Add( focusedActor );
+  application.GetScene().Add( focusedActor );
 
   application.SendNotification();
   application.Render();
@@ -1036,12 +1036,12 @@ int UtcDaliAccessibilityManagerSignalFocusChanged(void)
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
   manager.SetFocusOrder(first, 1);
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   // Create the second actor and add it to the stage
   Actor second = Actor::New();
   manager.SetFocusOrder(second, 2);
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   // Check that no actor is being focused yet.
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
@@ -1087,12 +1087,12 @@ int UtcDaliAccessibilityManagerSignalFocusOvershot(void)
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
   manager.SetFocusOrder(first, 1);
-  Stage::GetCurrent().Add(first);
+  application.GetScene().Add(first);
 
   // Create the second actor and add it to the stage
   Actor second = Actor::New();
   manager.SetFocusOrder(second, 2);
-  Stage::GetCurrent().Add(second);
+  application.GetScene().Add(second);
 
   // Check that the wrap mode is disabled
   DALI_TEST_CHECK(manager.GetWrapMode() == false);
@@ -1317,7 +1317,7 @@ int UtcDaliAccessibilityManagerActionActivateSignalP(void)
 
   Dali::Toolkit::PushButton button = Dali::Toolkit::PushButton::New();
   button.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
-  Stage::GetCurrent().Add(button);
+  application.GetScene().Add(button);
   manager.SetFocusOrder( button, 1 );
   manager.SetCurrentFocusActor( button );
 
@@ -1527,7 +1527,7 @@ int UtcDaliAccessibilityManagerActionUpSignalP(void)
   DummyControl dummyControl = DummyControl::New(true);
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
   manager.SetFocusOrder( dummyControl, 1 );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
   manager.SetCurrentFocusActor( dummyControl );
 
   accessibilityAdaptor.HandleActionUpEvent();
@@ -1571,7 +1571,7 @@ int UtcDaliAccessibilityManagerActionDownSignalP(void)
 
   Dali::Toolkit::PushButton button = Dali::Toolkit::PushButton::New();
   button.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
-  Stage::GetCurrent().Add(button);
+  application.GetScene().Add(button);
   manager.SetFocusOrder( button, 1 );
   manager.SetCurrentFocusActor( button );
 
@@ -2099,7 +2099,7 @@ int UtcDaliAccessibilityManagerActionZoomSignalP(void)
 
   Dali::Toolkit::PushButton button = Dali::Toolkit::PushButton::New();
   button.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
-  Stage::GetCurrent().Add(button);
+  application.GetScene().Add(button);
   manager.SetFocusOrder( button, 1 );
   manager.SetCurrentFocusActor( button );
 
@@ -2303,7 +2303,7 @@ int UtcDaliAccessibilityManagerActionTouch(void)
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
   manager.SetFocusOrder( dummyControl, 1 );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
   manager.SetCurrentFocusActor( dummyControl );
 
   TouchPoint point( 0, TouchPoint::Started, 100.0f, 200.0f );
@@ -2328,7 +2328,7 @@ int UtcDaliAccessibilityManagerHandlePanGesture(void)
   Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
   DummyControl dummyControl = DummyControl::New(true);
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   AccessibilityGestureEvent panGestureEvent(AccessibilityGestureEvent::Started);
   panGestureEvent.previousPosition = Vector2(0.f, 0.f);

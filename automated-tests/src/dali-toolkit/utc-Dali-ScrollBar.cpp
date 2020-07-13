@@ -277,11 +277,11 @@ int UtcDaliToolkitScrollBarSetScrollPropertySourceP(void)
 
   float scrollBarHeight = 100.0f;
   scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, scrollBarHeight, 0.0f) );
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   // Create a source actor that owns the scroll properties required by the scroll bar
   Actor sourceActor = Actor::New();
-  Stage::GetCurrent().Add( sourceActor );
+  application.GetScene().Add( sourceActor );
 
   // Register the scroll properties
   Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
@@ -359,7 +359,7 @@ int UtcDaliToolkitScrollBarSetScrollPropertySourceP(void)
 
   // Create another source actor
   Actor newSourceActor = Actor::New();
-  Stage::GetCurrent().Add( newSourceActor );
+  application.GetScene().Add( newSourceActor );
 
   // Register the scroll properties
   Property::Index newPropertyScrollPosition = newSourceActor.RegisterProperty( "sourcePosition",  0.0f );
@@ -523,7 +523,7 @@ int UtcDaliToolkitScrollBarSetScrollPositionIntervalsP(void)
   scrollBar.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f) );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   // Connect to the ScrollPositionIntervalReached signal
   scrollBar.ScrollPositionIntervalReachedSignal().Connect( &OnScrollPositionIntervalReached );
@@ -534,7 +534,7 @@ int UtcDaliToolkitScrollBarSetScrollPositionIntervalsP(void)
 
   // Create a source actor that owns the scroll properties required by the scroll bar
   Actor sourceActor = Actor::New();
-  Stage::GetCurrent().Add( sourceActor );
+  application.GetScene().Add( sourceActor );
 
   // Register the scroll properties
   Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
@@ -706,11 +706,11 @@ int UtcDaliToolkitScrollBarSetIndicatorHeightPolicyP(void)
 
   float scrollBarHeight = 100.0f;
   scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, scrollBarHeight, 0.0f) );
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   // Create a source actor that owns the scroll properties required by the scroll bar
   Actor sourceActor = Actor::New();
-  Stage::GetCurrent().Add( sourceActor );
+  application.GetScene().Add( sourceActor );
 
   // Register the scroll properties
   Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
@@ -798,7 +798,7 @@ int UtcDaliToolkitScrollBarSetIndicatorFixedHeightP(void)
 
   float scrollBarHeight = 100.0f;
   scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, scrollBarHeight, 0.0f) );
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -858,7 +858,7 @@ int UtcDaliToolkitScrollBarSetIndicatorShowDurationP(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -938,7 +938,7 @@ int UtcDaliToolkitScrollBarSetIndicatorShowDurationN(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1030,7 +1030,7 @@ int UtcDaliToolkitScrollBarSetIndicatorHideDurationP(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1110,7 +1110,7 @@ int UtcDaliToolkitScrollBarSetIndicatorHideDurationN(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1202,7 +1202,7 @@ int UtcDaliToolkitScrollBarShowIndicatorP(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1247,7 +1247,7 @@ int UtcDaliToolkitScrollBarShowIndicatorN(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1289,7 +1289,7 @@ int UtcDaliToolkitScrollBarHideIndicatorP(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1334,7 +1334,7 @@ int UtcDaliToolkitScrollBarHideIndicatorN(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1376,7 +1376,7 @@ int UtcDaliToolkitScrollBarActionShowIndicator(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1422,7 +1422,7 @@ int UtcDaliToolkitScrollBarActionHideIndicator(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1468,7 +1468,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicator(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1532,7 +1532,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorImmediate(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1592,7 +1592,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorDuringHide(void)
   ScrollBar scrollBar = ScrollBar::New();
   DALI_TEST_CHECK( scrollBar );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   Actor indicator = scrollBar.GetScrollIndicator();
   DALI_TEST_CHECK( indicator );
@@ -1685,7 +1685,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalP(void)
   scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
   scrollBar.SetIndicatorFixedHeight(50.0f);
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   // Connect the pan finished signal
   ConnectionTracker connectionTracker;
@@ -1699,7 +1699,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalP(void)
 
   // Create a source actor that owns the scroll properties required by the scroll bar
   Actor sourceActor = Actor::New();
-  Stage::GetCurrent().Add( sourceActor );
+  application.GetScene().Add( sourceActor );
 
   // Register the scroll properties
   Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
@@ -1743,7 +1743,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
   scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
   scrollBar.SetIndicatorFixedHeight(50.0f);
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   // Connect the pan finished signal
   ConnectionTracker connectionTracker;
@@ -1761,7 +1761,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
 
   // Create a source actor that owns the scroll properties required by the scroll bar
   Actor sourceActor = Actor::New();
-  Stage::GetCurrent().Add( sourceActor );
+  application.GetScene().Add( sourceActor );
 
   // Register the scroll properties
   Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
@@ -1806,7 +1806,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalP(void)
   scrollBar.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f) );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
   ConnectionTracker connectionTracker;
 
   // Connect to the ScrollPositionIntervalReached signal
@@ -1820,7 +1820,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalP(void)
 
   // Create a source actor that owns the scroll properties required by the scroll bar
   Actor sourceActor = Actor::New();
-  Stage::GetCurrent().Add( sourceActor );
+  application.GetScene().Add( sourceActor );
 
   // Register the scroll properties
   Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );
@@ -1922,7 +1922,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalN(void)
   scrollBar.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f) );
 
-  Stage::GetCurrent().Add( scrollBar );
+  application.GetScene().Add( scrollBar );
 
   // Connect to the ScrollPositionIntervalReached signal
   scrollBar.ScrollPositionIntervalReachedSignal().Connect( &OnScrollPositionIntervalReached );
@@ -1933,7 +1933,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalN(void)
 
   // Create a source actor that owns the scroll properties required by the scroll bar
   Actor sourceActor = Actor::New();
-  Stage::GetCurrent().Add( sourceActor );
+  application.GetScene().Add( sourceActor );
 
   // Register the scroll properties
   Property::Index propertyScrollPosition = sourceActor.RegisterProperty( "sourcePosition",  0.0f );

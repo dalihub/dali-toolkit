@@ -469,7 +469,7 @@ int UtcDaliPushButtonPressed(void)
   pushButton.SetProperty( Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
   pushButton.SetProperty( Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
-  Stage::GetCurrent().Add( pushButton );
+  application.GetScene().Add( pushButton );
 
   application.SendNotification();
   application.Render();
@@ -502,7 +502,7 @@ int UtcDaliPushButtonReleased(void)
   pushButton.SetProperty( Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
   pushButton.SetProperty( Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
-  Stage::GetCurrent().Add( pushButton );
+  application.GetScene().Add( pushButton );
 
   application.SendNotification();
   application.Render();
@@ -585,7 +585,7 @@ int UtcDaliPushButtonSelected(void)
   pushButton.SetProperty( Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
   pushButton.SetProperty( Actor::Property::SIZE, BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 
-  Stage::GetCurrent().Add( pushButton );
+  application.GetScene().Add( pushButton );
 
   application.SendNotification();
   application.Render();
@@ -737,7 +737,7 @@ int UtcDaliPushButtonPaddingLayout(void)
   pushButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   pushButton.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
-  Stage::GetCurrent().Add( pushButton );
+  application.GetScene().Add( pushButton );
 
   application.SendNotification();
   application.Render();
@@ -786,7 +786,7 @@ int UtcDaliPushButtonPaddingLayout(void)
   pushButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   pushButton.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
-  Stage::GetCurrent().Add( pushButton );
+  application.GetScene().Add( pushButton );
 
 
   pushButton.SetProperty( Toolkit::DevelButton::Property::LABEL_RELATIVE_ALIGNMENT, "BEGIN" );
@@ -884,7 +884,7 @@ int UtcDaliPushButtonAlignmentLayout(void)
   pushButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
   pushButton.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
-  Stage::GetCurrent().Add( pushButton );
+  application.GetScene().Add( pushButton );
 
   // Add a label and get size of control
   pushButton.SetProperty( Toolkit::Button::Property::LABEL, "Label" );
@@ -1044,7 +1044,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
   PushButton pushButton = PushButton::New();
   pushButton.SetProperty( Actor::Property::SIZE, Vector2( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS ) );
 
-  Stage::GetCurrent().Add( pushButton );
+  application.GetScene().Add( pushButton );
 
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
@@ -1064,7 +1064,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
 
   tet_printf("Remove button from stage\n" );
 
-  Stage::GetCurrent().Remove( pushButton );
+  application.GetScene().Remove( pushButton );
 
   rendererCount = pushButton.GetRendererCount();
   tet_printf("After removing pushbutton from stage the renderer count is(%d)\n ", rendererCount );
@@ -1080,7 +1080,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
 
   tet_printf("Added UNSELECTED_VISUAL and add button back to Stage\n");
 
-  Stage::GetCurrent().Add( pushButton );
+  application.GetScene().Add( pushButton );
 
   tet_printf("With UNSELECTED_BACKGROUND_VISUAL and UNSELECTED_VISUAL the renderer count is(%d)\n", pushButton.GetRendererCount() );
 
@@ -1101,7 +1101,7 @@ int UtcDaliPushButtonSetSelectedVisualN(void)
   pushButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   pushButton.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
-  Stage::GetCurrent().Add( pushButton );
+  application.GetScene().Add( pushButton );
   application.SendNotification();
   application.Render(0);
 
@@ -1109,7 +1109,7 @@ int UtcDaliPushButtonSetSelectedVisualN(void)
   tet_printf("RendererCount prior to adding visual(%d)\n",preRendererCount);
   DALI_TEST_EQUALS( preRendererCount, 0, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( pushButton );
+  application.GetScene().Remove( pushButton );
   application.SendNotification();
   application.Render(0);
 
@@ -1121,7 +1121,7 @@ int UtcDaliPushButtonSetSelectedVisualN(void)
   colorMap.Insert(BorderVisual::Property::SIZE,  5.f);
   pushButton.SetProperty( Toolkit::Button::Property::UNSELECTED_VISUAL, colorMap );
 
-  Stage::GetCurrent().Add( pushButton );
+  application.GetScene().Add( pushButton );
   application.SendNotification();
   application.Render(0);
 
@@ -1142,7 +1142,7 @@ int UtcDaliPushButtonToggleSignalP(void)
 
   SetupButtonForTestTouchEvents( application, button, true );
 
-  Stage::GetCurrent().Add( button );
+  application.GetScene().Add( button );
 
   application.SendNotification();
   application.Render();

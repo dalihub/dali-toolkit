@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -272,7 +272,7 @@ int UtcDaliDragAndDropDetectorStartSignal(void)
   Control control = Control::New();
   control.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
   control.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(control);
+  application.GetScene().Add(control);
   detector.Attach(control);
 
   application.SendNotification();
@@ -311,8 +311,8 @@ int UtcDaliDragAndDropDetectorEnteredSignal(void)
   control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
-  Stage::GetCurrent().Add(control1);
-  Stage::GetCurrent().Add(control2);
+  application.GetScene().Add(control1);
+  application.GetScene().Add(control2);
 
   detector.Attach(control1);
   detector.Attach(control2);
@@ -354,8 +354,8 @@ int UtcDaliDragAndDropDetectorMovedSignal(void)
   control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
-  Stage::GetCurrent().Add(control1);
-  Stage::GetCurrent().Add(control2);
+  application.GetScene().Add(control1);
+  application.GetScene().Add(control2);
 
   detector.Attach(control1);
   detector.Attach(control2);
@@ -404,8 +404,8 @@ int UtcDaliDragAndDropDetectorExitedSignal(void)
   control1.SetProperty( Actor::Property::LEAVE_REQUIRED,true);
   control2.SetProperty( Actor::Property::LEAVE_REQUIRED,true);
 
-  Stage::GetCurrent().Add(control1);
-  Stage::GetCurrent().Add(control2);
+  application.GetScene().Add(control1);
+  application.GetScene().Add(control2);
 
   detector.Attach(control1);
   detector.Attach(control2);
@@ -449,8 +449,8 @@ int UtcDaliDragAndDropDetectorDroppedSignal(void)
   control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
-  Stage::GetCurrent().Add(control1);
-  Stage::GetCurrent().Add(control2);
+  application.GetScene().Add(control1);
+  application.GetScene().Add(control2);
 
   detector.Attach(control1);
   detector.Attach(control2);
@@ -497,8 +497,8 @@ int UtcDaliDragAndDropDetectorEndedSignal(void)
   control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
-  Stage::GetCurrent().Add(control1);
-  Stage::GetCurrent().Add(control2);
+  application.GetScene().Add(control1);
+  application.GetScene().Add(control2);
 
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
@@ -539,8 +539,8 @@ int UtcDaliDragAndDropDetectorGetContent(void)
   control1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   control2.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
 
-  Stage::GetCurrent().Add(control1);
-  Stage::GetCurrent().Add(control2);
+  application.GetScene().Add(control1);
+  application.GetScene().Add(control2);
 
   detector.Attach(control1);
   detector.Attach(control2);

@@ -272,11 +272,11 @@ int UtcDaliItemLayoutSetAndGetOrientation(void)
   layout->SetItemSize(itemSize);
 
   Vector3 itemSize1;
-  layout->GetItemSize(0u, Vector3(Stage::GetCurrent().GetSize()), itemSize1);
+  layout->GetItemSize(0u, Vector3(application.GetScene().GetSize()), itemSize1);
 
   DALI_TEST_CHECK(itemSize == itemSize1);
 
-  float position = layout->GetClosestOnScreenLayoutPosition(0, 0.0f, Vector3(Stage::GetCurrent().GetSize()));
+  float position = layout->GetClosestOnScreenLayoutPosition(0, 0.0f, Vector3(application.GetScene().GetSize()));
 
   DALI_TEST_EQUALS(position, 0.0f, TEST_LOCATION);
 
@@ -587,11 +587,11 @@ int UtcDaliItemLayoutSetAndGetLayoutProperties(void)
       DALI_TEST_EQUALS(swipSpeed, 30.0f, TEST_LOCATION );
     }
   }
-  Dali::Stage stage = Dali::Stage::GetCurrent();
-  Vector3 stageSize(stage.GetSize());
-  view.ActivateLayout(0, stageSize, 0.5f);
-  view.ActivateLayout(1, stageSize, 0.5f);
-  view.ActivateLayout(2, stageSize, 0.5f);
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector3 sceneSize(scene.GetSize());
+  view.ActivateLayout(0, sceneSize, 0.5f);
+  view.ActivateLayout(1, sceneSize, 0.5f);
+  view.ActivateLayout(2, sceneSize, 0.5f);
   END_TEST;
 
 }

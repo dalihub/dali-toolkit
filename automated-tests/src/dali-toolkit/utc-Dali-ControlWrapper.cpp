@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -319,7 +319,7 @@ int UtcDaliControlWrapperRelayoutRequest(void)
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
   ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
-  Stage::GetCurrent().Add( controlWrapper );
+  application.GetScene().Add( controlWrapper );
 
   application.SendNotification();
   application.Render();
@@ -519,7 +519,7 @@ int UtcDaliControlWrapperRegisterDisabledVisual(void)
   DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( TEST_PROPERTY ), visual, TEST_LOCATION );
   DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( controlWrapper );
+  application.GetScene().Add( controlWrapper );
 
   // Render and notify
   application.SendNotification();
@@ -562,7 +562,7 @@ int UtcDaliControlWrapperRegisterDisabledVisualWithDepthIndex(void)
   DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( visual.GetDepthIndex(), 10, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( controlWrapper );
+  application.GetScene().Add( controlWrapper );
 
   // Render and notify
   application.SendNotification();
@@ -635,7 +635,7 @@ int UtcDaliControlWrapperTransitionDataMap1N(void)
   controlWrapper.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   controlWrapper.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   controlWrapper.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(controlWrapper);
+  application.GetScene().Add(controlWrapper);
 
   Animation anim = controlWrapperImpl->CreateTransition( transition );
   DALI_TEST_CHECK( ! anim );
@@ -697,7 +697,7 @@ int UtcDaliControlWrapperTestControlProperties(void)
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
   ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
-  Stage::GetCurrent().Add( controlWrapper );
+  application.GetScene().Add( controlWrapper );
 
   // "background" property
   Property::Map rendererMap;
@@ -774,7 +774,7 @@ int UtcDaliControlWrapperAnimateVisual(void)
     // Register to self
     controlWrapperImpl->TestRegisterVisual( index, visual );
 
-    Stage::GetCurrent().Add( controlWrapper );
+    application.GetScene().Add( controlWrapper );
     controlWrapper.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
     application.SendNotification();
     application.Render(0); // Trigger animation start
@@ -812,7 +812,7 @@ int UtcDaliControlWrapperAnimateVisual(void)
     DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), false, TEST_LOCATION ); // Control not destroyed yet
     DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( index ), visual, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( controlWrapper );
+    application.GetScene().Remove( controlWrapper );
   }
 
   DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), true, TEST_LOCATION ); // Should be destroyed

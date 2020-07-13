@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ int UtcDaliVisualAction(void)
   Toolkit::Visual::Base visualBaseHandle = Toolkit::Visual::Base( dummyVisualPtr.Get() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visualBaseHandle );
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   application.SendNotification();
   application.Render();
@@ -100,7 +100,7 @@ int UtcDaliVisualActionNotImplemented(void)
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   application.SendNotification();
   application.Render();
@@ -136,7 +136,7 @@ int UtcDaliVisualSetProperties(void)
   Toolkit::Visual::Base visualBaseHandle = Toolkit::Visual::Base( colorVisualPtr.Get() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visualBaseHandle );
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   application.SendNotification();
   application.Render();
@@ -202,7 +202,7 @@ int UtcDaliAnimatedVectorImageVisualSetProperties(void)
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
