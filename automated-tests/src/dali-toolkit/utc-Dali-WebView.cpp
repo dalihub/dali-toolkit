@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ int UtcDaliWebViewPageNavigation(void)
   view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
   view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK( view );
@@ -220,7 +220,7 @@ int UtcDaliWebViewTouchAndKeys(void)
   view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
   view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
 
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
   application.SendNotification();
   application.Render();
 

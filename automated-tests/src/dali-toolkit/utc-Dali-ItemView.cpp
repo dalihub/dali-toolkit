@@ -289,7 +289,7 @@ int UtcDaliItemViewActivateLayoutAndGetActiveLayout(void)
   DALI_TEST_CHECK(view.GetActiveLayout() == NULL);
 
   // Activate the depth layout
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(1, stageSize, 0.5f);
 
   // Check the current active layout is the depth layout
@@ -326,7 +326,7 @@ int UtcDaliItemViewDeactivateCurrentLayout(void)
   DALI_TEST_CHECK(view.GetActiveLayout() == NULL);
 
   // Activate the grid layout
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
   // Check the current active layout is the grid layout
@@ -354,7 +354,7 @@ int UtcDaliItemViewGetItemAndGetItemId(void)
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
   // Get the item given the item ID
@@ -379,7 +379,7 @@ int UtcDaliItemViewRemoveItem(void)
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
   // Get the item given the item ID 2 and 3
@@ -434,7 +434,7 @@ int UtcDaliItemViewGetCurrentLayoutPosition(void)
   view.AddLayout(*depthLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.0f);
 
   // Check the current layout position for the 10th items is 9.0f
@@ -538,7 +538,7 @@ int UtcDaliItemViewScrollToItem(void)
   view.AddLayout(*layout);
   view.SetProperty( Actor::Property::SIZE, vec );
 
-  Stage::GetCurrent().Add(view);
+  application.GetScene().Add(view);
   layout->SetOrientation(ControlOrientation::Down);
   view.ActivateLayout(0, vec, 0.0f);
 
@@ -595,7 +595,7 @@ int UtcDaliItemViewScrollToItem(void)
     tet_result(TET_FAIL);
   }
 
-  Stage::GetCurrent().Remove(view);
+  application.GetScene().Remove(view);
   END_TEST;
 }
 
@@ -629,7 +629,7 @@ int UtcDaliItemViewInsertItemP(void)
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.0f);
 
   // Get the specified item where new item to be inserted before that
@@ -686,7 +686,7 @@ int UtcDaliItemViewInsertItemsP(void)
   view.AddLayout(*depthLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
   unsigned int itemCount = view.GetChildCount();
@@ -757,7 +757,7 @@ int UtcDaliItemViewReplaceItemP(void)
   view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
   Actor newActor = Actor::New();
@@ -783,7 +783,7 @@ int UtcDaliItemViewReplaceItemsP(void)
   view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
   ItemContainer replaceList;
@@ -821,7 +821,7 @@ int UtcDaliItemViewGetItemsRangeP(void)
   view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
   ItemRange itemRange(0, 0);
@@ -846,7 +846,7 @@ int UtcDaliItemViewSetItemsAnchorPointP(void)
   view.AddLayout(*spiralLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
   Vector3 anchorPoint(10.0f, 10.0f, 0.0f);
@@ -871,7 +871,7 @@ int UtcDaliItemViewSetItemsParentOriginP(void)
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.5f);
 
   Vector3 parentOrigin(10.0f, 10.0f, 0.0f);
@@ -903,7 +903,7 @@ int UtcDaliItemViewLayoutActivatedSignalP(void)
   ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
 
   // Connect the layout activated signal
   view.LayoutActivatedSignal().Connect( &OnLayoutActivated );
@@ -915,7 +915,7 @@ int UtcDaliItemViewLayoutActivatedSignalP(void)
   application.Render();
 
   // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  Vector3 stageSize(application.GetScene().GetSize());
   view.ActivateLayout(0, stageSize, 0.1f);
 
   // Wait for 0.1 second
@@ -1089,7 +1089,7 @@ int UtcDaliItemViewSetGetProperty(void)
 int UtcDaliItemViewOvershootVertical(void)
 {
   ToolkitTestApplication application;
-  Dali::Stage stage = Dali::Stage::GetCurrent();
+  Dali::Integration::Scene stage = application.GetScene();
 
   // Create the ItemView actor
   TestItemFactory factory;
@@ -1155,7 +1155,7 @@ int UtcDaliItemViewOvershootVertical(void)
 int UtcDaliItemViewOvershootHorizontal(void)
 {
   ToolkitTestApplication application;
-  Dali::Stage stage = Dali::Stage::GetCurrent();
+  Dali::Integration::Scene stage = application.GetScene();
 
   // Create the ItemView actor
   TestItemFactory factory;
@@ -1217,7 +1217,7 @@ int UtcDaliItemViewOvershootHorizontal(void)
 int UtcDaliItemEnableDisableRefresh(void)
 {
   ToolkitTestApplication application;
-  Dali::Stage stage = Dali::Stage::GetCurrent();
+  Dali::Integration::Scene stage = application.GetScene();
 
   // Create the ItemView actor
   TestItemFactory factory;

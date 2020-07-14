@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,7 +189,7 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
   DALI_TEST_CHECK( !gSignalReceivedCancel );
 
   // Provoke the signal.
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
 
   // Check the signal has occurred.
   DALI_TEST_CHECK( gSignalReceivedOK );
@@ -208,7 +208,7 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
   DALI_TEST_CHECK( !gSignalReceivedCancel );
 
   // Provoke the signal.
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
 
   // Check the cancel signal has occurred.
   DALI_TEST_CHECK( gSignalReceivedOK );
@@ -250,7 +250,7 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationN(void)
    DALI_TEST_CHECK( !gSignalReceivedOK );
 
    // Provoke the signal.
-   Stage::GetCurrent().Add( popup );
+   application.GetScene().Add( popup );
 
    // Check the signal has still not occurred, as our button was incorrectly named.
    DALI_TEST_CHECK( !gSignalReceivedOK );
@@ -272,7 +272,7 @@ int UtcDaliConfirmationPopupTypeRegistryCreation(void)
   Toolkit::Popup popup = Toolkit::Popup::DownCast( baseHandle );
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
 
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
   popup.SetDisplayState( Toolkit::Popup::SHOWN );
 
   application.SendNotification();

@@ -45,7 +45,7 @@ int UtcDaliMagnifierNew(void)
   magnifier = Magnifier::New();
   DALI_TEST_CHECK( magnifier );
 
-  Stage::GetCurrent().Add( magnifier );
+  application.GetScene().Add( magnifier );
 
   application.SendNotification();
   application.Render();
@@ -115,7 +115,7 @@ int UtcDaliMagnifierSetSourceActorP(void)
 {
   ToolkitTestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Magnifier view = Magnifier::New();
   stage.Add( view );
@@ -163,7 +163,7 @@ int UtcDaliMagnifierFrameVisibility(void)
 {
   ToolkitTestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Magnifier view = Magnifier::New();
   stage.Add( view );
@@ -196,7 +196,7 @@ int UtcDaliMagnifierMagnificationFactor(void)
 {
   ToolkitTestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Magnifier view = Magnifier::New();
   stage.Add( view );
@@ -231,7 +231,7 @@ int UtcDaliMagnifierSourcePosition(void)
 {
   ToolkitTestApplication application;
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   Magnifier view = Magnifier::New();
   stage.Add( view );
@@ -262,7 +262,7 @@ int UtcDaliMagnifierOnSizeSet(void)
 
   Magnifier view = Magnifier::New();
 
-  Stage::GetCurrent().Add( view );
+  application.GetScene().Add( view );
 
   application.SendNotification();
   application.Render();

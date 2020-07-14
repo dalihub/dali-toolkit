@@ -20,6 +20,7 @@
 #include <sstream>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -67,12 +68,12 @@ struct Constraint100
 };
 
 // Convenience function to quickly set up a 10x10 table with each cell being 10x10 pixels in size by default.
-static void SetupTableViewAndActors(TableView& tableView, Actor& actor1, Actor& actor2, Actor& actor3)
+static void SetupTableViewAndActors(Integration::Scene scene, TableView& tableView, Actor& actor1, Actor& actor2, Actor& actor3)
 {
   tableView = TableView::New( 10, 10 ); // 10 by 10 grid.
   DALI_TEST_CHECK( tableView );
 
-  Stage::GetCurrent().Add( tableView );
+  scene.Add( tableView );
   tableView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
 
   actor1 = Actor::New();
@@ -133,7 +134,7 @@ int UtcDaliTableViewMetricsPadding(void)
   Actor actor2;
   Actor actor3;
 
-  SetupTableViewAndActors(tableView, actor1, actor2, actor3);
+  SetupTableViewAndActors(application.GetScene(), tableView, actor1, actor2, actor3);
 
   // 1. check that padding works. no padding:
   tableView.SetCellPadding(Size(0.0f, 0.0f));
@@ -167,7 +168,7 @@ int UtcDaliTableViewMetricsFit(void)
   Actor actor2;
   Actor actor3;
 
-  SetupTableViewAndActors(tableView, actor1, actor2, actor3);
+  SetupTableViewAndActors(application.GetScene(), tableView, actor1, actor2, actor3);
   application.SendNotification();
   application.Render();
 
@@ -220,7 +221,7 @@ int UtcDaliTableViewMetricsFixed(void)
   Actor actor2;
   Actor actor3;
 
-  SetupTableViewAndActors(tableView, actor1, actor2, actor3);
+  SetupTableViewAndActors(application.GetScene(), tableView, actor1, actor2, actor3);
   application.SendNotification();
   application.Render();
 
@@ -256,7 +257,7 @@ int UtcDaliTableViewMetricsRelative(void)
   Actor actor2;
   Actor actor3;
 
-  SetupTableViewAndActors(tableView, actor1, actor2, actor3);
+  SetupTableViewAndActors(application.GetScene(), tableView, actor1, actor2, actor3);
   application.SendNotification();
   application.Render();
 
@@ -710,7 +711,7 @@ int UtcDaliTableViewChildProperties(void)
 
   // Create a 10x10 table-view
   TableView tableView = TableView::New(10,10);
-  Stage::GetCurrent().Add( tableView );
+  application.GetScene().Add( tableView );
   tableView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
 
   DALI_TEST_CHECK( tableView );
@@ -873,7 +874,7 @@ int UtcDaliTableViewKeyboardFocus(void)
     }
   }
 
-  Stage::GetCurrent().Add( tableView );
+  application.GetScene().Add( tableView );
 
   application.SendNotification();
   application.Render();
@@ -978,7 +979,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
     }
   }
 
-  Stage::GetCurrent().Add( tableView );
+  application.GetScene().Add( tableView );
 
   application.SendNotification();
   application.Render();

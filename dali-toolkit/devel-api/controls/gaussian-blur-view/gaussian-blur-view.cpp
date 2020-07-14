@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,16 +79,6 @@ GaussianBlurView::GaussianBlurView( Dali::Internal::CustomActor* internal )
 GaussianBlurView GaussianBlurView::DownCast( BaseHandle handle )
 {
   return Control::DownCast<GaussianBlurView, Internal::GaussianBlurView>(handle);
-}
-
-void GaussianBlurView::Add(Actor child)
-{
-  GetImpl(*this).Add(child);
-}
-
-void GaussianBlurView::Remove(Actor child)
-{
-  GetImpl(*this).Remove(child);
 }
 
 void GaussianBlurView::Activate()

@@ -58,8 +58,14 @@ TextureSet FixedImageCache::Frame( uint32_t frameIndex )
 {
   while( frameIndex > mFront )
   {
-    NextFrame();
+    ++mFront;
+    if( mFront >= mImageUrls.size() )
+    {
+      mFront = 0;
+    }
+    LoadBatch();
   }
+
   mFront = frameIndex;
 
   TextureSet textureSet;
@@ -87,23 +93,9 @@ TextureSet FixedImageCache::FirstFrame()
   return textureSet;
 }
 
-TextureSet FixedImageCache::NextFrame()
+uint32_t FixedImageCache::GetFrameInterval( uint32_t frameIndex )
 {
-  TextureSet textureSet;
-  ++mFront;
-  mFront %= mImageUrls.size();
-
-  if( IsFrontReady() == true )
-  {
-    textureSet = GetFrontTextureSet();
-  }
-  else
-  {
-    mWaitingForReadyFrame = true;
-  }
-  LoadBatch();
-
-  return textureSet;
+  return 0u;
 }
 
 bool FixedImageCache::IsFrontReady() const

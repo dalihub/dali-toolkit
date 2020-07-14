@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -354,7 +354,7 @@ int UtcDaliPageTurnViewSetGetProperty(void)
   PageTurnView landscapeView = PageTurnLandscapeView::New( factory, VIEW_PAGE_SIZE );
   DALI_TEST_CHECK( landscapeView );
 
-  Stage::GetCurrent().Add( landscapeView );
+  application.GetScene().Add( landscapeView );
 
   // Test "viewPageSize" property
   DALI_TEST_CHECK( landscapeView.GetPropertyIndex("viewPageSize") == PageTurnView::Property::VIEW_PAGE_SIZE  );
@@ -402,10 +402,10 @@ int UtcDaliPageTurnPortraitViewSignals(void)
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
 
   TestPageFactory factory;
-  Vector2 size = Stage::GetCurrent().GetSize();
+  Vector2 size = application.GetScene().GetSize();
   PageTurnView portraitView = PageTurnPortraitView::New( factory, size );
   portraitView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  Stage::GetCurrent().Add( portraitView );
+  application.GetScene().Add( portraitView );
 
   // Render and notify
   application.SendNotification();
@@ -540,10 +540,10 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
    */
 
   TestPageFactory factory;
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 stageSize = application.GetScene().GetSize();
   PageTurnView landscapeView = PageTurnLandscapeView::New( factory, Vector2(stageSize.x*0.5f, stageSize.x*0.8f) );
   landscapeView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  Stage::GetCurrent().Add( landscapeView );
+  application.GetScene().Add( landscapeView );
 
   // Render and notify
   application.SendNotification();
@@ -666,12 +666,12 @@ int UtcDaliPageTurnEmptyTextureHandle(void)
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
 
   TestPageFactory factory( false /* returns empty handles */ );
-  Vector2 size = Stage::GetCurrent().GetSize();
+  Vector2 size = application.GetScene().GetSize();
   try
   {
     PageTurnView portraitView = PageTurnPortraitView::New( factory, size );
     portraitView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-    Stage::GetCurrent().Add( portraitView );
+    application.GetScene().Add( portraitView );
 
     tet_result(TET_FAIL);
   }

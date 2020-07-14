@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_MANAGER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
+#include <dali-toolkit/devel-api/accessibility-manager/accessibility-manager.h>
 #include <dali/public-api/adaptor-framework/tts-player.h>
 
 namespace Dali
@@ -407,14 +407,6 @@ public:  // Signals
   }
 
   /**
-   * @copydoc Dali::Toolkit::AccessibilityManager::ActionReadIndicatorInformationSignal
-   */
-  AccessibilityActionSignalType& ActionReadIndicatorInformationSignal()
-  {
-    return mActionReadIndicatorInformationSignal;
-  }
-
-  /**
    * @copydoc Dali::Toolkit::AccessibilityManager::ActionReadPauseResumeSignal
    */
   AccessibilityActionSignalType& ActionReadPauseResumeSignal()
@@ -717,7 +709,6 @@ private:
   AccessibilityActionSignalType       mActionReadFromTopSignal;
   AccessibilityActionSignalType       mActionReadFromNextSignal;
   AccessibilityActionSignalType       mActionZoomSignal;
-  AccessibilityActionSignalType       mActionReadIndicatorInformationSignal;
   AccessibilityActionSignalType       mActionReadPauseResumeSignal;
   AccessibilityActionSignalType       mActionStartStopSignal;
   AccessibilityActionScrollSignalType mActionScrollSignal;

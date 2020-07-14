@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,7 +237,7 @@ int UtcDaliTransitionDataMap1P(void)
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
 
@@ -305,7 +305,7 @@ int UtcDaliTransitionDataMap2P(void)
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
 
@@ -373,7 +373,7 @@ int UtcDaliTransitionDataMap2Pb(void)
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
 
@@ -444,7 +444,7 @@ int UtcDaliTransitionDataMap3P(void)
   DummyControl actor = DummyControl::New();
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   Animation anim = dummyImpl.CreateTransition( transition );
@@ -511,7 +511,7 @@ int UtcDaliTransitionDataMap4P(void)
   DummyControl actor = DummyControl::New();
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
 
@@ -573,7 +573,7 @@ int UtcDaliTransitionDataMap5P(void)
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
 
@@ -645,7 +645,7 @@ int UtcDaliTransitionDataMap6P(void)
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
 
@@ -718,7 +718,7 @@ int UtcDaliTransitionDataMap1N(void)
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   Animation anim = dummyImpl.CreateTransition( transition );
@@ -794,7 +794,7 @@ int UtcDaliTransitionDataMapN4(void)
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   Property::Map visualMap;
@@ -846,7 +846,7 @@ int UtcDaliTransitionDataMapN5(void)
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   Property::Map visualMap;
@@ -897,7 +897,7 @@ int UtcDaliTransitionDataMapN6(void)
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   Property::Map visualMap;
@@ -969,7 +969,7 @@ int UtcDaliTransitionDataArrayP(void)
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
   actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion(Radian(0), Vector3::ZAXIS), TEST_LOCATION);
 
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());

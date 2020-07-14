@@ -220,13 +220,13 @@ void AddVertex( Vector< Vector2 >& vertices, unsigned int x, unsigned int y )
   vertices.PushBack( Vector2( x, y ) );
 }
 
-void RegisterStretchProperties( Renderer& renderer, const char * uniformName, const NPatchLoader::StretchRanges& stretchPixels, uint16_t imageExtent)
+void RegisterStretchProperties( Renderer& renderer, const char * uniformName, const NPatchUtility::StretchRanges& stretchPixels, uint16_t imageExtent)
 {
   uint16_t prevEnd = 0;
   uint16_t prevFix = 0;
   uint16_t prevStretch = 0;
   unsigned int i = 1;
-  for( NPatchLoader::StretchRanges::ConstIterator it = stretchPixels.Begin(); it != stretchPixels.End(); ++it, ++i )
+  for( NPatchUtility::StretchRanges::ConstIterator it = stretchPixels.Begin(); it != stretchPixels.End(); ++it, ++i )
   {
     uint16_t start = it->GetX();
     uint16_t end = it->GetY();
@@ -431,6 +431,8 @@ void NPatchVisual::OnSetTransform()
 void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
+  bool sync = IsSynchronousLoadingRequired();
+  map.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, sync );
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::N_PATCH );
   map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
   map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
@@ -507,8 +509,8 @@ Shader NPatchVisual::CreateShader()
   const NPatchLoader::Data* data;
   // 0 is either no data (load failed?) or no stretch regions on image
   // for both cases we use the default shader
-  NPatchLoader::StretchRanges::SizeType xStretchCount = 0;
-  NPatchLoader::StretchRanges::SizeType yStretchCount = 0;
+  NPatchUtility::StretchRanges::SizeType xStretchCount = 0;
+  NPatchUtility::StretchRanges::SizeType yStretchCount = 0;
 
   auto fragmentShader = mAuxiliaryPixelBuffer ? FRAGMENT_MASK_SHADER
                                               : FRAGMENT_SHADER;

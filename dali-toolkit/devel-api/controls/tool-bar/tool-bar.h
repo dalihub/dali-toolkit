@@ -22,7 +22,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/alignment/alignment.h>
+#include <dali-toolkit/devel-api/controls/alignment/alignment.h>
 
 namespace Dali
 {

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_BAR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
+#include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 
 namespace Dali
 {
@@ -283,7 +283,7 @@ private:
 
   Toolkit::ScrollBar::Direction mDirection;                          ///< The direction of scroll bar (vertical or horizontal)
 
-  WeakHandleBase mScrollableObject;                                  ///< Object to be scrolled
+  WeakHandle<Handle> mScrollableObject;                              ///< Object to be scrolled
 
   Property::Index mPropertyScrollPosition;                           ///< Index of scroll position property owned by the object to be scrolled
   Property::Index mPropertyMinScrollPosition;                        ///< Index of minimum scroll position property owned by the object to be scrolled

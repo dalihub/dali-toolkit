@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ACCESSIBILITY_MANAGER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -761,20 +761,6 @@ public:
    * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionZoomSignal();
-
-  /**
-   * @DEPRECATED_1_4.9
-   * @brief This is emitted when accessibility action is received to read the information
-   * in the indicator (by two fingers triple tap).
-   *
-   * A callback of the following type may be connected:
-   * @code
-   *   bool YourCallback( AccessibilityManager& manager );
-   * @endcode
-   * @SINCE_1_0.0
-   * @return The signal to connect to
-   */
-  AccessibilityActionSignalType& ActionReadIndicatorInformationSignal();
 
   /**
    * @brief This is emitted when accessibility action is received to pause/resume the

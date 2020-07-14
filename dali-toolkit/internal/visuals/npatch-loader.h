@@ -20,12 +20,12 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <dali/public-api/rendering/texture-set.h>
-#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 
-// INTERNAL HEADERS
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
+#include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 
 namespace Dali
 {
@@ -35,13 +35,6 @@ namespace Toolkit
 
 namespace Internal
 {
-
-namespace NPatchBuffer
-{
-
-void GetRedOffsetAndMask( Dali::Pixel::Format pixelFormat, int& byteOffset, int& bitMask );
-
-} // namespace NPatchBuffer
 
 /**
  * The manager for loading Npatch textures.
@@ -55,8 +48,6 @@ void GetRedOffsetAndMask( Dali::Pixel::Format pixelFormat, int& byteOffset, int&
 class NPatchLoader
 {
 public:
-
-  typedef Dali::Vector< Uint16Pair > StretchRanges;
 
   enum
   {
@@ -77,8 +68,8 @@ public:
 
     std::string url;                              ///< Url of the N-Patch
     TextureSet textureSet;                        ///< Texture containing the cropped image
-    StretchRanges stretchPixelsX;                 ///< X stretch pixels
-    StretchRanges stretchPixelsY;                 ///< Y stretch pixels
+    NPatchUtility::StretchRanges stretchPixelsX;  ///< X stretch pixels
+    NPatchUtility::StretchRanges stretchPixelsY;  ///< Y stretch pixels
     std::size_t hash;                             ///< Hash code for the Url
     uint32_t croppedWidth;                        ///< Width of the cropped middle part of N-patch
     uint32_t croppedHeight;                       ///< Height of the cropped middle part of N-patch

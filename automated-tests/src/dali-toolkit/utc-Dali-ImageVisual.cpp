@@ -115,7 +115,7 @@ void TestVisualRender( ToolkitTestApplication& application,
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification(); // Send messages to update
   application.Render();           // process update and render
@@ -184,7 +184,7 @@ int UtcDaliImageVisualPropertyMap(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
   application.Render();
 
@@ -203,7 +203,7 @@ int UtcDaliImageVisualPropertyMap(void)
   DALI_TEST_EQUALS( preMultipliedAlpha2, true, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
@@ -240,7 +240,7 @@ int UtcDaliImageVisualNoPremultipliedAlpha01(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
   application.Render();
 
@@ -261,7 +261,7 @@ int UtcDaliImageVisualNoPremultipliedAlpha01(void)
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
@@ -297,7 +297,7 @@ int UtcDaliImageVisualNoPremultipliedAlpha02(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
   application.Render();
 
@@ -343,7 +343,7 @@ int UtcDaliImageVisualNoPremultipliedAlpha02(void)
   newActor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( newActor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( newActor );
+  application.GetScene().Add( newActor );
 
   application.SendNotification();
   application.Render();
@@ -367,7 +367,7 @@ int UtcDaliImageVisualNoPremultipliedAlpha02(void)
   DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
   DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
@@ -400,7 +400,7 @@ int UtcDaliImageVisualRemoteImageLoad(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -411,7 +411,7 @@ int UtcDaliImageVisualRemoteImageLoad(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
@@ -434,7 +434,7 @@ int UtcDaliImageVisualTextureReuse1(void)
   drawTrace.Enable(true);
 
   Actor actor = CreateActorWithImageVisual( propertyMap );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
 
   // Wait for image to load
@@ -451,7 +451,7 @@ int UtcDaliImageVisualTextureReuse1(void)
   drawTrace.Reset();
 
   Actor actor2 = CreateActorWithImageVisual( propertyMap );
-  Stage::GetCurrent().Add(actor2);
+  application.GetScene().Add(actor2);
 
   application.SendNotification(); // Send messages to update
   application.Render();           // process update and render
@@ -468,7 +468,7 @@ int UtcDaliImageVisualTextureReuse1(void)
 
   tet_infoline("Test that removing 1 actor doesn't delete the texture\n");
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   application.SendNotification();
   application.Render();
 
@@ -477,7 +477,7 @@ int UtcDaliImageVisualTextureReuse1(void)
 
   tet_infoline("Test that removing last actor does delete the texture\n");
 
-  Stage::GetCurrent().Remove( actor2 ); // Detaches remaining ImageVisual
+  application.GetScene().Remove( actor2 ); // Detaches remaining ImageVisual
   application.SendNotification();
   application.Render();
 
@@ -504,7 +504,7 @@ int UtcDaliImageVisualTextureReuse2(void)
   drawTrace.Enable(true);
 
   Actor actor = CreateActorWithImageVisual( propertyMap );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
 
   // Wait for image to load
@@ -524,7 +524,7 @@ int UtcDaliImageVisualTextureReuse2(void)
   propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, 100 );
   propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, 100 );
   Actor actor2 = CreateActorWithImageVisual( propertyMap );
-  Stage::GetCurrent().Add(actor2);
+  application.GetScene().Add(actor2);
 
   application.SendNotification();
 
@@ -550,7 +550,7 @@ int UtcDaliImageVisualTextureReuse2(void)
 
   tet_infoline("Test that removing 1 actor deletes it's texture\n");
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   application.SendNotification();
   application.Render();
 
@@ -559,7 +559,7 @@ int UtcDaliImageVisualTextureReuse2(void)
 
   tet_infoline("Test that removing last actor deletes it's texture\n");
 
-  Stage::GetCurrent().Remove( actor2 );
+  application.GetScene().Remove( actor2 );
   application.SendNotification();
   application.Render();
 
@@ -608,7 +608,7 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // loading started
   application.SendNotification();
@@ -686,7 +686,7 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // loading started
   application.SendNotification();
@@ -745,7 +745,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -825,7 +825,7 @@ int UtcDaliImageVisualAnimateOpacity(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -963,7 +963,7 @@ int UtcDaliImageVisualAnimateOpacity02(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New( array );
   Animation animation = dummyImpl.CreateTransition( transition );
 
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
   application.SendNotification();
   application.Render(0);     // Ensure animation starts
 
@@ -1024,7 +1024,7 @@ int UtcDaliImageVisualAnimatePixelArea(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2(2000, 2000) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -1081,10 +1081,10 @@ int UtcDaliImageVisualTextureCancelRemoteLoad(void)
   drawTrace.Enable(true);
 
   Actor actor = CreateActorWithImageVisual( propertyMap );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   application.SendNotification();
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
@@ -1098,7 +1098,7 @@ int UtcDaliImageVisualTextureCancelRemoteLoad(void)
 int UtcDaliImageVisualTextureCancelAsyncLoad(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "Load image asynchronosly, cancel loading, then load again" );
+  tet_infoline( "Load image asynchronously, cancel loading, then load again" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -1120,12 +1120,12 @@ int UtcDaliImageVisualTextureCancelAsyncLoad(void)
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( Control::Property::BACKGROUND, visual );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Cancel loading
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Create another visual with the same image
   visual = factory.CreateVisual( propertyMap );
@@ -1173,7 +1173,7 @@ int UtcDaliImageVisualSetInvalidAsyncImage(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -1184,7 +1184,7 @@ int UtcDaliImageVisualSetInvalidAsyncImage(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
@@ -1217,7 +1217,7 @@ int UtcDaliImageVisualSetInvalidSyncImage(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -1225,7 +1225,7 @@ int UtcDaliImageVisualSetInvalidSyncImage(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
@@ -1258,7 +1258,7 @@ int UtcDaliImageVisualSetInvalidRemoteImage(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -1269,7 +1269,7 @@ int UtcDaliImageVisualSetInvalidRemoteImage(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
@@ -1310,7 +1310,7 @@ int UtcDaliImageVisualAlphaMask(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
   application.Render();
 
@@ -1365,7 +1365,7 @@ int UtcDaliImageVisualSynchronousLoadAlphaMask(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Do not wait for any EventThreadTrigger in synchronous alpha mask.
 
@@ -1421,7 +1421,7 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
   application.Render();
 
@@ -1476,7 +1476,7 @@ int UtcDaliImageVisualAlphaMaskCrop(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
   application.Render();
 
@@ -1522,7 +1522,7 @@ int UtcDaliImageVisualReleasePolicy01(void)
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Wait for image to load
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -1572,7 +1572,7 @@ int UtcDaliImageVisualReleasePolicy02(void)
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Wait for image to load
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -1623,7 +1623,7 @@ int UtcDaliImageVisualReleasePolicy03(void)
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Wait for image to load
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -1679,7 +1679,7 @@ int UtcDaliImageVisualReleasePolicy04(void)
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Wait for image to load
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -1762,7 +1762,7 @@ int UtcDaliImageVisualReleasePolicy06(void)
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Wait for image to load
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -1829,7 +1829,7 @@ int UtcDaliImageVisualReleasePolicy07(void)
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   // Wait for image to load
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
@@ -1857,6 +1857,87 @@ int UtcDaliImageVisualReleasePolicy07(void)
 
   tet_infoline( "Ensure a texture is not deleted as second visual used the DESTROYED release policy" );
   DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualReleasePolicy08(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualReleasePolicy08 Ensure TextureSet is same after detach/attach on stage when texture used the DESTROYED release policy" );
+
+  tet_infoline( "Create first visual with DESTROYED release policy" );
+  Visual::Base imageVisualDestroyed = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED );
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Register visuals with control and ensure it has the only handles" );
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisualDestroyed );
+  imageVisualDestroyed.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
+
+  // Test initially zero renderers
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+  textureTrace.Reset();
+
+  application.GetScene().Add( actor );
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  tet_infoline( "Ensure a texture is created" );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
+  // Ensure TextureSet is same after detach/attach on stage when texture used the DESTROYED release policy
+  // 1. Get TextureSet
+  TextureSet textureSetBefore = actor.GetRendererAt( 0u ).GetTextures();
+
+  // 2.Remove actor from stage. In this case, renderer also is deleted.
+  tet_infoline( "Remove actor from stage" );
+  application.GetScene().Remove( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Ensure a texture is not deleted as visual used the DESTROYED release policy" );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+  textureTrace.Reset();
+
+  // 3.Add actor in stage. In this case, renderer is created.
+  tet_infoline( "Add actor in stage" );
+  application.GetScene().Add( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  application.SendNotification();
+  application.Render();
+  tet_infoline( "Ensure a texture is not created again" );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("GenTextures"), 0, TEST_LOCATION );
+  textureTrace.Reset();
+
+  // 4.Compare Texture with before and after. textureSet need to be same because release policy is the DESTROYED.
+  tet_infoline( "Ensure a textureSet is not deleted because it is used the DESTROYED release policy" );
+  TextureSet textureSetAfter = actor.GetRendererAt( 0u ).GetTextures();
+  DALI_TEST_CHECK( textureSetBefore == textureSetAfter );
+  textureSetBefore.Reset();
+  textureSetAfter.Reset();
+
+  dummyImpl.UnregisterVisual( DummyControl::Property::TEST_VISUAL );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 1, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1905,7 +1986,7 @@ int UtcDaliImageVisualLoadPolicy01(void)
   imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
 
   actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   tet_infoline( "Ensure nothing triggers another load as texure already loaded" );
   const unsigned int TIME_OUT_3_SECONDS = 3;
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1, TIME_OUT_3_SECONDS ), false, TEST_LOCATION );
@@ -1959,7 +2040,7 @@ int UtcDaliImageVisualLoadPolicy02(void)
   imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
 
   actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   tet_infoline( "Allow image time to load" );
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
@@ -2087,7 +2168,7 @@ int UtcDaliImageVisualLoadPolicy05(void)
   actor.ResourceReadySignal().Connect( &ResourceReadySignal);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   tet_infoline( "Create visual with ATTACHED load policy" );
   Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::ATTACHED );
@@ -2140,7 +2221,7 @@ int UtcDaliImageVisualOrientationCorrection(void)
   tet_infoline( "Create control for visual, need to loaded it" );
   DummyControl actor = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
   // Wait for image to load
@@ -2208,7 +2289,7 @@ int UtcDaliImageVisualCustomShader(void)
 
   dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  Stage::GetCurrent().Add( dummy );
+  application.GetScene().Add( dummy );
 
   application.SendNotification();
   application.Render();
@@ -2240,7 +2321,7 @@ int UtcDaliImageVisualCustomShader(void)
   dummyImpl1.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual1 );
   dummy1.SetProperty( Actor::Property::SIZE, Vector2( 200, 200 ) );
   dummy1.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  Stage::GetCurrent().Add( dummy1 );
+  application.GetScene().Add( dummy1 );
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableEnableDisableCallTrace( true );
@@ -2299,7 +2380,7 @@ int UtcDaliImageVisualLoadReady01(void)
   actor.ResourceReadySignal().Connect( &ResourceReadySignal);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   actor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   tet_infoline( "Create visual with IMMEDIATE load policy" );
   Visual::Base imageVisual1 = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
@@ -2334,7 +2415,7 @@ int UtcDaliImageVisualLoadReady01(void)
   dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual2 );
 
   actor2.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
-  Stage::GetCurrent().Add(actor2);
+  application.GetScene().Add(actor2);
 
   tet_infoline( "Wait for loading thread to finish");
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );

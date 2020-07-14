@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
+#include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include "toolkit-clipboard.h"
 
 using namespace Dali;
@@ -417,7 +418,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field );
 
   // Check Property Indices are correct
-  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == TextField::Property::RENDERING_BACKEND );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == DevelTextField::Property::RENDERING_BACKEND );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_TEXT ) == TextField::Property::TEXT );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == TextField::Property::PLACEHOLDER_TEXT );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_FOCUSED ) == TextField::Property::PLACEHOLDER_TEXT_FOCUSED );
@@ -501,13 +502,16 @@ int UtcDaliTextFieldSetPropertyP(void)
   tet_infoline(" UtcDaliToolkitTextFieldSetPropertyP");
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   // Note - we can't check the defaults since the stylesheets are platform-specific
 
   // Check the render backend property.
-  field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
-  DALI_TEST_EQUALS( (Text::RenderingType)field.GetProperty<int>( TextField::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+  field.SetProperty( DevelTextField::Property::RENDERING_BACKEND, DevelText::RENDERING_SHARED_ATLAS );
+  DALI_TEST_EQUALS( (DevelText::RenderingType)field.GetProperty<int>( DevelTextField::Property::RENDERING_BACKEND ), DevelText::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+
+  field.SetProperty( DevelTextField::Property::RENDERING_BACKEND, DevelText::RENDERING_VECTOR_BASED );
+  DALI_TEST_EQUALS( (DevelText::RenderingType)field.GetProperty<int>( DevelTextField::Property::RENDERING_BACKEND ), DevelText::RENDERING_VECTOR_BASED, TEST_LOCATION );
 
   // Check text property.
   field.SetProperty( TextField::Property::TEXT, "Setting Text" );
@@ -955,12 +959,12 @@ int utcDaliTextFieldAtlasRenderP(void)
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   try
   {
     // Render some text with the shared atlas backend
-    field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
+    field.SetProperty( DevelTextField::Property::RENDERING_BACKEND, DevelText::RENDERING_SHARED_ATLAS );
     application.SendNotification();
     application.Render();
   }
@@ -979,7 +983,7 @@ int utcDaliTextFieldTextChangedP(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   // connect to the text changed signal.
   ConnectionTracker* testTracker = new ConnectionTracker();
@@ -1011,7 +1015,7 @@ int utcDaliTextFieldTextChangedN(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   // connect to the text changed signal.
   ConnectionTracker* testTracker = new ConnectionTracker();
@@ -1035,7 +1039,7 @@ int utcDaliTextFieldMaxCharactersReachedP(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   const int maxNumberOfCharacters = 1;
   field.SetProperty( TextField::Property::MAX_LENGTH, maxNumberOfCharacters );
@@ -1067,7 +1071,7 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   const int maxNumberOfCharacters = 3;
   field.SetProperty( TextField::Property::MAX_LENGTH, maxNumberOfCharacters );
@@ -1135,7 +1139,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
   bool inputStyleChangedSignal = false;
   field.ConnectSignal( testTracker, "inputStyleChanged",   CallbackFunctor(&inputStyleChangedSignal) );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   // Render and notify
   application.SendNotification();
@@ -1343,7 +1347,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
   bool inputStyleChangedSignal = false;
   field.ConnectSignal( testTracker, "inputStyleChanged",   CallbackFunctor(&inputStyleChangedSignal) );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   // Render and notify
   application.SendNotification();
@@ -1524,7 +1528,7 @@ int utcDaliTextFieldEvent01(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
@@ -1581,7 +1585,7 @@ int utcDaliTextFieldEvent01(void)
   field2.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   field2.SetProperty( Actor::Property::POSITION, Vector2( 100.0f, 100.0f ));
 
-  Stage::GetCurrent().Add( field2 );
+  application.GetScene().Add( field2 );
 
   // Render and notify
   application.SendNotification();
@@ -1620,7 +1624,7 @@ int utcDaliTextFieldEvent02(void)
   DALI_TEST_CHECK( field );
   LoadMarkerImages(application, field);
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
@@ -1771,7 +1775,7 @@ int utcDaliTextFieldEvent03(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
@@ -1828,7 +1832,7 @@ int utcDaliTextFieldEvent04(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
   LoadMarkerImages(application, field);
   // Render and notify
   application.SendNotification();
@@ -1881,7 +1885,7 @@ int utcDaliTextFieldEvent05(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
   LoadMarkerImages(application, field);
   // Render and notify
   application.SendNotification();
@@ -1932,7 +1936,7 @@ int utcDaliTextFieldEvent06(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
   LoadMarkerImages(application, field);
   // Render and notify
   application.SendNotification();
@@ -1983,7 +1987,7 @@ int utcDaliTextFieldEvent07(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
   LoadMarkerImages(application, field);
   // Render and notify
   application.SendNotification();
@@ -2026,7 +2030,7 @@ int utcDaliTextFieldEvent08(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
   LoadMarkerImages(application, field);
   // Render and notify
   application.SendNotification();
@@ -2063,7 +2067,7 @@ int utcDaliTextFieldEvent08(void)
 
   Wait(application, 500);
 
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
   Layer layer = stage.GetRootLayer();
   Actor actor = layer.FindChildByName("optionPaste");
 
@@ -2094,7 +2098,7 @@ int utcDaliTextFieldEvent09(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
   LoadMarkerImages(application, field);
   // Render and notify
   application.SendNotification();
@@ -2181,7 +2185,7 @@ int utcDaliTextFieldStyleWhilstSelected(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
   LoadMarkerImages(application, field);
   // Render and notify
   application.SendNotification();
@@ -2289,7 +2293,7 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
@@ -2363,7 +2367,7 @@ int utcDaliTextFieldSomeSpecialKeys(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
   LoadMarkerImages(application, field);
   // Render and notify
   application.SendNotification();
@@ -2442,7 +2446,7 @@ int utcDaliTextFieldSizeUpdate(void)
   // Checks some special keys when the text is selected.
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   float previousHeight = 0.0f;
   float currentHeight = 0.0f;
@@ -2492,7 +2496,7 @@ int utcDaliTextFieldExtremlyLargePointSize(void)
   field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   try
   {
@@ -2513,7 +2517,7 @@ int UtcDaliTextFieldDefaultFontStylePropertyCoverage(void)
   tet_infoline("UtcDaliTextFieldFontStylePorpertyCoverage");
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   Property::Map fontStyleMapGet;
 
@@ -2539,7 +2543,7 @@ int UtcDaliTextFieldSettingPlaceholder(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   // Check the placeholder property with pixel size
   Property::Map placeholderPixelSizeMapSet;
@@ -2622,7 +2626,7 @@ int UtcDaliTextFieldSetPaddingProperty(void)
   field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   application.SendNotification();
   application.Render();
@@ -2655,7 +2659,7 @@ int UtcDaliTextFieldEnableShiftSelectionProperty(void)
   field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   application.SendNotification();
   application.Render();
@@ -2683,7 +2687,7 @@ int UtcDaliTextFieldEnableGrabHandleProperty(void)
   field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   application.SendNotification();
   application.Render();
@@ -2711,7 +2715,7 @@ int UtcDaliTextFieldMatchSystemLanguageDirectionProperty(void)
   field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   application.SendNotification();
   application.Render();
@@ -2739,7 +2743,7 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-  Stage::GetCurrent().Add( field );
+  application.GetScene().Add( field );
 
   field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
@@ -2828,7 +2832,7 @@ int UtcDaliTextFieldSelectWholeText(void)
 
   TextField textField = TextField::New();
 
-  Stage::GetCurrent().Add( textField );
+  application.GetScene().Add( textField );
 
   textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
@@ -2880,7 +2884,7 @@ int UtcDaliTextFieldSelectNone(void)
 
   TextField textField = TextField::New();
 
-  Stage::GetCurrent().Add( textField );
+  application.GetScene().Add( textField );
 
   textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );

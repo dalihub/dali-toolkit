@@ -1,8 +1,8 @@
-#ifndef DALI_TOOLKIT_RENDERING_BACKEND_H
-#define DALI_TOOLKIT_RENDERING_BACKEND_H
+#ifndef DALI_TOOLKIT_RENDERING_BACKEND_DEVEL_H
+#define DALI_TOOLKIT_RENDERING_BACKEND_DEVEL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,22 +28,21 @@ namespace Toolkit
  * @{
  */
 
-namespace Text
+namespace DevelText
 {
 
 /**
  * @brief Enumeration for the type of text renderer required.
- * @SINCE_1_0.0
  */
 enum RenderingType
 {
-  RENDERING_SHARED_ATLAS, ///< A bitmap-based solution where renderers can share a texture atlas @SINCE_1_0.0
+  RENDERING_SHARED_ATLAS, ///< A bitmap-based solution where renderers can share a texture atlas
   RENDERING_VECTOR_BASED  ///< A solution where glyphs are stored as vectors (scalable). Requires highp shader support. @SINCE_1_1.31
 };
 
 const unsigned int DEFAULT_RENDERING_BACKEND = RENDERING_SHARED_ATLAS;
 
-} // namespace Text
+} // namespace DevelText
 
 /**
  * @}
@@ -52,4 +51,4 @@ const unsigned int DEFAULT_RENDERING_BACKEND = RENDERING_SHARED_ATLAS;
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_RENDERING_BACKEND_H
+#endif // DALI_TOOLKIT_RENDERING_BACKEND_DEVEL_H

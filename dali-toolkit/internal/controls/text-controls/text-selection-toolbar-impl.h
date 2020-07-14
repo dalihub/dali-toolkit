@@ -21,8 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
-#include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
-#include <dali-toolkit/public-api/controls/table-view/table-view.h>
+#include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
+#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
 
 // EXTERNAL INCLUDES

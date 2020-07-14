@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,7 +149,7 @@ int UtcDaliToolkitFlexContainerSetPropertyP(void)
   DALI_TEST_CHECK( flexContainer );
 
   // Add flex container to the stage
-  Stage::GetCurrent().Add( flexContainer );
+  application.GetScene().Add( flexContainer );
 
   // Create two actors and add them to the container
   Actor actor1 = Actor::New();
@@ -196,7 +196,7 @@ int UtcDaliToolkitFlexContainerSetPropertyEnumP(void)
   DALI_TEST_CHECK( flexContainer );
 
   // Add flex container to the stage
-  Stage::GetCurrent().Add( flexContainer );
+  application.GetScene().Add( flexContainer );
 
   // Create two actors and add them to the container
   Actor actor1 = Actor::New();
@@ -242,7 +242,7 @@ int UtcDaliToolkitFlexContainerSetChildPropertyP(void)
   DALI_TEST_CHECK( flexContainer );
 
   // Add flex container to the stage
-  Stage::GetCurrent().Add( flexContainer );
+  application.GetScene().Add( flexContainer );
 
   // Create an actor and add it to the container
   Actor actor = Actor::New();
@@ -310,7 +310,7 @@ int UtcDaliToolkitFlexContainerRemoveChildP(void)
   DALI_TEST_CHECK( flexContainer );
 
   // Add flex container to the stage
-  Stage::GetCurrent().Add( flexContainer );
+  application.GetScene().Add( flexContainer );
 
   RelayoutSignalHandler relayoutSignal(flexContainer);
   flexContainer.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback );
@@ -436,8 +436,8 @@ int UtcDaliToolkitFlexContainerMoveFocus(void)
   flexContainer.SetProperty( FlexContainer::Property::FLEX_DIRECTION, FlexContainer::ROW );
 
   // Add flex container to the stage
-  Stage::GetCurrent().Add( flexContainer );
-  Size stageSize = Stage::GetCurrent().GetSize();
+  application.GetScene().Add( flexContainer );
+  Size stageSize = application.GetScene().GetSize();
 
   RelayoutSignalHandler relayoutSignal(flexContainer);
   flexContainer.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback );
@@ -505,7 +505,7 @@ int UtcDaliToolkitFlexContainerRTLSupportP(void)
 
   Actor actor0 = Actor::New();
 
-  Stage::GetCurrent().Add( actor0 );
+  application.GetScene().Add( actor0 );
   actor0.Add( flexContainer );
 
   // Create two actors and add them to the container

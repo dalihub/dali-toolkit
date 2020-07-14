@@ -24,6 +24,7 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include "dummy-control.h"
 
 #include <dali/integration-api/debug.h>
@@ -33,7 +34,7 @@ using namespace Dali::Toolkit;
 
 namespace
 {
-typedef Toolkit::Internal::NPatchLoader::StretchRanges StretchRanges;
+typedef Toolkit::NPatchUtility::StretchRanges StretchRanges;
 
 const char* TEST_9_PATCH_FILE_NAME =  TEST_RESOURCE_DIR  "/demo-tile-texture-focused.9.png";
 const char* TEST_NPATCH_FILE_NAME =  TEST_RESOURCE_DIR  "/heartsframe.9.png";
@@ -75,7 +76,7 @@ void TestVisualRender( ToolkitTestApplication& application,
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -96,7 +97,7 @@ void TestVisualAsynchronousRender( ToolkitTestApplication& application,
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -231,7 +232,7 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
   DALI_TEST_EQUALS( actualValue, Vector3(testColor), TEST_LOCATION );
   DALI_TEST_EQUALS( actualColor.a, testColor.a, TEST_LOCATION );
 
-  Stage::GetCurrent().Remove(actor);
+  application.GetScene().Remove(actor);
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
@@ -259,7 +260,7 @@ int UtcDaliVisualFactoryGetBorderVisual1(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
@@ -307,7 +308,7 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
@@ -339,7 +340,7 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
   visual = factory.CreateVisual( map );
 
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   blendMode = actor.GetRendererAt(0u).GetProperty<int>( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( static_cast<BlendMode::Type>(blendMode), BlendMode::ON, TEST_LOCATION );
@@ -458,7 +459,7 @@ int UtcDaliVisualFactoryDefaultOffsetsGradientVisual(void)
   DummyControl actor = DummyControl::New(true);
   TestVisualRender( application, actor, visual );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
@@ -770,7 +771,7 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( actor );
+    application.GetScene().Remove( actor );
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
     Vector2 naturalSize( 0.0f, 0.0f );
@@ -796,7 +797,7 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
     visual.GetNaturalSize( naturalSize );
     DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( actor );
+    application.GetScene().Remove( actor );
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   }
 
@@ -896,7 +897,7 @@ int UtcDaliVisualFactoryGetNPatchVisual6(void)
     visual.GetNaturalSize( naturalSize );
     DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( actor );
+    application.GetScene().Remove( actor );
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   }
 
@@ -924,7 +925,7 @@ int UtcDaliVisualFactoryGetNPatchVisual6(void)
     visual.GetNaturalSize( naturalSize );
     DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
 
-    Stage::GetCurrent().Remove( actor );
+    application.GetScene().Remove( actor );
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   }
 
@@ -966,7 +967,7 @@ int UtcDaliVisualFactoryGetNPatchVisual7(void)
     actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
 
-    Stage::GetCurrent().Add( actor );
+    application.GetScene().Add( actor );
     actor.Unparent();
 
     application.SendNotification();
@@ -1016,7 +1017,7 @@ int UtcDaliNPatchVisualAuxiliaryImage(void)
   dummyImpl.SetLayout( DummyControl::Property::TEST_VISUAL, transformMap );
   dummy.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  Stage::GetCurrent().Add(dummy);
+  application.GetScene().Add(dummy);
 
   application.SendNotification();
   application.Render();
@@ -1127,7 +1128,7 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f) );
 
   application.SendNotification();
@@ -1167,7 +1168,7 @@ int UtcDaliVisualFactoryGetSvgVisualLarge(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS ); // Only rasterizes when it knows control size.
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -1212,7 +1213,7 @@ int UtcDaliVisualFactoryGetSvgVisualAtlas(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f) );
 
   application.SendNotification();
@@ -1251,7 +1252,7 @@ void MeshVisualLoadsCorrectlyTest( Property::Map& propertyMap, ToolkitTestApplic
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2( 200.f, 200.f ) );
 
   //Ensure set on stage.
@@ -1294,7 +1295,7 @@ void MeshVisualDoesNotLoadCorrectlyTest( Property::Map& propertyMap, ToolkitTest
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(),  Vector2( 200.f, 200.f ) );
 
   //Ensure set on stage.
@@ -1601,7 +1602,7 @@ void TestPrimitiveVisualWithProperties( Property::Map& propertyMap, ToolkitTestA
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(),  Vector2( 200.f, 200.f ) );
 
   //Ensure set on stage.
@@ -1705,7 +1706,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual4(void)
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
-  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTRUM );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTUM );
   propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
@@ -2042,7 +2043,12 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -2060,12 +2066,9 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
   timer.MockEmitSignal();
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
-  textureTrace.Reset();
 
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
-  // Force the timer used by the animatedImageVisual to tick,
-  timer.MockEmitSignal();
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
@@ -2073,6 +2076,23 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
 
   // Force the timer used by the animatedImageVisual to tick,
   timer.MockEmitSignal();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
+  // Force the timer used by the animatedImageVisual to tick,
+  timer.MockEmitSignal();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
@@ -2111,7 +2131,12 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual2(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();

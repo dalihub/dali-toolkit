@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,7 +136,7 @@ int UtcDaliBuilderQuitSignal(void)
   );
   Builder builder = Builder::New();
   builder.LoadFromString( json );
-  builder.AddActors ( Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors ( application.GetScene().GetRootLayer() );
 
   // Connect to builder's quit signal
   bool functorCalled( false );
@@ -297,7 +297,7 @@ int UtcDaliBuilderAnimationP(void)
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
-  builder.AddActors( Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors( application.GetScene().GetRootLayer() );
 
   Animation anim = builder.CreateAnimation("animate");
 
@@ -427,7 +427,7 @@ int UtcDaliBuilderAnimationN(void)
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
-  builder.AddActors( Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors( application.GetScene().GetRootLayer() );
 
   Animation anim = builder.CreateAnimation("animate");
 
@@ -448,11 +448,11 @@ int UtcDaliBuilderAnimationN(void)
   DALI_TEST_CHECK(anim);
 
   // alternative actor to use for FindChildByName
-  anim = builder.CreateAnimation("animate2", Dali::Stage::GetCurrent().GetRootLayer());
+  anim = builder.CreateAnimation("animate2", application.GetScene().GetRootLayer());
   DALI_TEST_CHECK(anim);
 
   // alternative actor to use for FindChildByName
-  anim = builder.CreateAnimation("animate2", map, Dali::Stage::GetCurrent().GetRootLayer());
+  anim = builder.CreateAnimation("animate2", map, application.GetScene().GetRootLayer());
   DALI_TEST_CHECK(anim);
 
 
@@ -511,10 +511,10 @@ int UtcDaliBuilderConstantsP(void)
 
   DALI_TEST_CHECK( value.GetType() != Property::NONE );
 
-  builder.AddActors ( Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors ( application.GetScene().GetRootLayer() );
   DALI_TEST_CHECK( builder );
 
-  Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("image");
+  Actor actor = application.GetScene().GetRootLayer().FindChildByName("image");
   DALI_TEST_CHECK( actor );
 
   END_TEST;
@@ -682,13 +682,13 @@ int UtcDaliBuilderRenderTasksP(void)
   Builder builder = Builder::New();
   builder.LoadFromString( json );
 
-  unsigned int count = Stage::GetCurrent().GetRenderTaskList().GetTaskCount();
+  unsigned int count = application.GetScene().GetRenderTaskList().GetTaskCount();
 
   // coverage
   builder.CreateRenderTask( "task0" );
 
   DALI_TEST_CHECK( count <
-                   Stage::GetCurrent().GetRenderTaskList().GetTaskCount() );
+                   application.GetScene().GetRenderTaskList().GetTaskCount() );
 
   END_TEST;
 }
@@ -723,7 +723,7 @@ int UtcDaliBuilderChildActionP(void)
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
-  builder.AddActors ( Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors ( application.GetScene().GetRootLayer() );
 
   // Render and notify
   application.SendNotification();
@@ -741,7 +741,7 @@ int UtcDaliBuilderChildActionP(void)
   application.SendNotification();
   application.Render();
 
-  Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("subActor");
+  Actor actor = application.GetScene().GetRootLayer().FindChildByName("subActor");
   DALI_TEST_CHECK( actor );
 
   DALI_TEST_CHECK( !actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) );
@@ -780,7 +780,7 @@ int UtcDaliBuilderSetPropertyActionP(void)
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
-  builder.AddActors ( Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors ( application.GetScene().GetRootLayer() );
 
   // Render and notify
   application.SendNotification();
@@ -798,7 +798,7 @@ int UtcDaliBuilderSetPropertyActionP(void)
   application.SendNotification();
   application.Render();
 
-  Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("subActor");
+  Actor actor = application.GetScene().GetRootLayer().FindChildByName("subActor");
   DALI_TEST_CHECK( actor );
 
   DALI_TEST_CHECK( !actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) );
@@ -834,7 +834,7 @@ int UtcDaliBuilderGenericActionP(void)
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
-  builder.AddActors ( Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors ( application.GetScene().GetRootLayer() );
 
   // Render and notify
   application.SendNotification();
@@ -852,7 +852,7 @@ int UtcDaliBuilderGenericActionP(void)
   application.SendNotification();
   application.Render();
 
-  Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("actor");
+  Actor actor = application.GetScene().GetRootLayer().FindChildByName("actor");
   DALI_TEST_CHECK( actor );
 
   DALI_TEST_CHECK( !actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) );
@@ -919,7 +919,7 @@ int UtcDaliBuilderPropertyNotificationP(void)
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
-  builder.AddActors ( Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors ( application.GetScene().GetRootLayer() );
 
   // Render and notify
   application.SendNotification();
@@ -941,7 +941,7 @@ int UtcDaliBuilderPropertyNotificationP(void)
   application.SendNotification();
   application.Render();
 
-  Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("actor");
+  Actor actor = application.GetScene().GetRootLayer().FindChildByName("actor");
   DALI_TEST_CHECK( actor );
 
   DALI_TEST_CHECK( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) );
@@ -972,7 +972,7 @@ int UtcDaliBuilderPropertyNotificationN(void)
   {
     Builder builder = Builder::New();
     builder.LoadFromString( json );
-    builder.AddActors ( Stage::GetCurrent().GetRootLayer() );
+    builder.AddActors ( application.GetScene().GetRootLayer() );
     DALI_TEST_CHECK( false );
   }
   catch(...)
@@ -1103,13 +1103,13 @@ int UtcDaliBuilderCustomShaderP(void)
   Builder builder = Builder::New();
   builder.LoadFromString( json );
 
-  builder.AddActors ( "stage", Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors ( "stage", application.GetScene().GetRootLayer() );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("Image1");
+  Actor actor = application.GetScene().GetRootLayer().FindChildByName("Image1");
 
   // coverage
   DALI_TEST_CHECK( actor );
@@ -1190,13 +1190,13 @@ int UtcDaliBuilderAddActorsP(void)
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
-  builder.AddActors ( "arbitarysection", Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors ( "arbitarysection", application.GetScene().GetRootLayer() );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("subActor");
+  Actor actor = application.GetScene().GetRootLayer().FindChildByName("subActor");
   DALI_TEST_CHECK( actor );
 
   DALI_TEST_CHECK( !actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) );
@@ -1396,7 +1396,7 @@ int UtcDaliBuilderPathConstraintsP(void)
   // For coverage
 
   Actor actor = Actor::New();
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   builder.AddActors( actor );
 
   // Render and notify
@@ -1502,7 +1502,7 @@ int UtcDaliBuilderMapping01(void)
   builder.LoadFromString( json );
 
   Test::TestButton testButton = Test::TestButton::New();
-  Stage::GetCurrent().Add( testButton );
+  application.GetScene().Add( testButton );
 
   // Render and notify
   application.SendNotification();
@@ -1574,7 +1574,7 @@ int UtcDaliBuilderMappingCycleCheck(void)
   builder.LoadFromString( json );
 
   Test::TestButton testButton = Test::TestButton::New();
-  Stage::GetCurrent().Add( testButton );
+  application.GetScene().Add( testButton );
 
   // Render and notify
   application.SendNotification();
@@ -1621,7 +1621,7 @@ int UtcDaliBuilderTypeCasts(void)
   );
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
@@ -1658,7 +1658,7 @@ int UtcDaliBuilderBuilderControl(void)
   );
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
@@ -1687,7 +1687,7 @@ int UtcDaliBuilderCustomControl(void)
   );
 
   Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
+  application.GetScene().Add( rootActor );
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
@@ -1739,7 +1739,7 @@ int UtcDaliBuilderActionsWithParams(void)
 
   Builder builder = Builder::New();
   builder.LoadFromString( json );
-  builder.AddActors( Stage::GetCurrent().GetRootLayer() );
+  builder.AddActors( application.GetScene().GetRootLayer() );
 
   DALI_TEST_CHECK( true ); // For Coverage
 

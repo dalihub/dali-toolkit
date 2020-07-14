@@ -20,7 +20,6 @@
 
 #include <dali/dali.h>
 
-#include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
@@ -31,7 +30,6 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/controls/model3d-view/model3d-view.h>
 #include <dali-toolkit/public-api/controls/progress-bar/progress-bar.h>
-#include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout-property.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
@@ -44,7 +42,6 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/public-api/controls/slider/slider.h>
-#include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/public-api/controls/text-controls/hidden-input-properties.h>
 #include <dali-toolkit/public-api/controls/text-controls/placeholder-properties.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
@@ -55,13 +52,10 @@
 #include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 
-#include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
-
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
 #include <dali-toolkit/public-api/styling/style-manager.h>
 
-#include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>

@@ -164,6 +164,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
                 break;
               }
               case VisualUrl::GIF:
+              case VisualUrl::WEBP:
               {
                 visualPtr = AnimatedImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap );
                 break;
@@ -334,6 +335,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
         break;
       }
       case VisualUrl::GIF:
+      case VisualUrl::WEBP:
       {
         visualPtr = AnimatedImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl );
         break;

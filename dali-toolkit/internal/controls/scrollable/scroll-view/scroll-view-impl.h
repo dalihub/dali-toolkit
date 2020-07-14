@@ -26,7 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
+#include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-base-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>

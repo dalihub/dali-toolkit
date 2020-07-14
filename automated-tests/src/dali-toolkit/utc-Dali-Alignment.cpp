@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali-toolkit/devel-api/controls/alignment/alignment.h>
 #include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;
@@ -238,7 +239,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -249,7 +250,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -258,7 +259,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -269,7 +270,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -278,7 +279,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -289,7 +290,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -298,7 +299,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -309,7 +310,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -318,7 +319,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -329,7 +330,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -338,7 +339,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -349,7 +350,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -358,7 +359,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -369,7 +370,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -378,7 +379,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -389,7 +390,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -398,7 +399,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -409,7 +410,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -472,10 +473,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     Alignment alignment = Alignment::New();
     DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -485,10 +486,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     Alignment alignment = Alignment::New(Alignment::HorizontalLeft);
     DALI_TEST_EQUALS(Alignment::HorizontalLeft | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -498,10 +499,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     Alignment alignment = Alignment::New(Alignment::HorizontalRight);
     DALI_TEST_EQUALS(Alignment::HorizontalRight | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -511,10 +512,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     Alignment alignment = Alignment::New(Alignment::HorizontalLeft, Alignment::VerticalTop);
     DALI_TEST_EQUALS(Alignment::HorizontalLeft | Alignment::VerticalTop, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -524,10 +525,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     Alignment alignment = Alignment::New(Alignment::HorizontalCenter, Alignment::VerticalTop);
     DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalTop, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -537,10 +538,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     Alignment alignment = Alignment::New(Alignment::HorizontalRight, Alignment::VerticalTop);
     DALI_TEST_EQUALS(Alignment::HorizontalRight | Alignment::VerticalTop, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -550,10 +551,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     Alignment alignment = Alignment::New(Alignment::HorizontalLeft, Alignment::VerticalBottom);
     DALI_TEST_EQUALS(Alignment::HorizontalLeft | Alignment::VerticalBottom, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -563,10 +564,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     Alignment alignment = Alignment::New(Alignment::HorizontalCenter, Alignment::VerticalBottom);
     DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalBottom, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -576,10 +577,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     Alignment alignment = Alignment::New(Alignment::HorizontalRight, Alignment::VerticalBottom);
     DALI_TEST_EQUALS(Alignment::HorizontalRight | Alignment::VerticalBottom, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -594,7 +595,7 @@ int UtcDaliAlignmentSetScaling(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -618,7 +619,7 @@ int UtcDaliAlignmentSetScaling(void)
     application.Render();
     application.SendNotification();
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -627,7 +628,7 @@ int UtcDaliAlignmentSetScaling(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -651,7 +652,7 @@ int UtcDaliAlignmentSetScaling(void)
     application.Render();
     application.SendNotification();
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -660,7 +661,7 @@ int UtcDaliAlignmentSetScaling(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -684,7 +685,7 @@ int UtcDaliAlignmentSetScaling(void)
     application.Render();
     application.SendNotification();
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -693,7 +694,7 @@ int UtcDaliAlignmentSetScaling(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -717,7 +718,7 @@ int UtcDaliAlignmentSetScaling(void)
     application.Render();
     application.SendNotification();
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -726,7 +727,7 @@ int UtcDaliAlignmentSetScaling(void)
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
-    Stage::GetCurrent().Add(alignment);
+    application.GetScene().Add(alignment);
     application.Render();
     application.SendNotification();
 
@@ -750,7 +751,7 @@ int UtcDaliAlignmentSetScaling(void)
     application.Render();
     application.SendNotification();
 
-    Stage::GetCurrent().Remove(alignment);
+    application.GetScene().Remove(alignment);
     application.Render();
     application.SendNotification();
   }
@@ -905,7 +906,7 @@ int UtcDaliAlignmentChildAddAndRemove(void)
   ToolkitTestApplication application;
 
   Alignment alignment = Alignment::New();
-  Stage::GetCurrent().Add(alignment);
+  application.GetScene().Add(alignment);
 
   application.Render();
   application.SendNotification();
@@ -925,7 +926,7 @@ int UtcDaliAlignmentChildAddAndRemove(void)
   application.Render();
   application.SendNotification();
 
-  Stage::GetCurrent().Remove(alignment);
+  application.GetScene().Remove(alignment);
   END_TEST;
 }
 
@@ -934,7 +935,7 @@ int UtcDaliAlignmentSizeSetP(void)
   ToolkitTestApplication application;
 
   Alignment alignment = Alignment::New();
-  Stage::GetCurrent().Add(alignment);
+  application.GetScene().Add(alignment);
 
   application.Render();
   application.SendNotification();
@@ -949,7 +950,7 @@ int UtcDaliAlignmentSizeSetP(void)
 
   DALI_TEST_EQUALS(size, alignment.GetTargetSize().GetVectorXY(), TEST_LOCATION);
 
-  Stage::GetCurrent().Remove(alignment);
+  application.GetScene().Remove(alignment);
   END_TEST;
 }
 
@@ -968,7 +969,7 @@ int UtcDaliAlignmentOnTouchEvent(void)
   Alignment alignment = Alignment::New();
   alignment.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
   alignment.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-  Stage::GetCurrent().Add(alignment);
+  application.GetScene().Add(alignment);
 
   alignment.TouchSignal().Connect(&TouchCallback);
 
@@ -994,7 +995,7 @@ int UtcDaliAlignmentOnKeyEvent(void)
   ToolkitTestApplication application;
 
   Alignment alignment = Alignment::New();
-  Stage::GetCurrent().Add(alignment);
+  application.GetScene().Add(alignment);
 
   alignment.SetKeyInputFocus();
 
@@ -1015,7 +1016,7 @@ int UtcDaliAlignmentOnSizeAnimation(void)
   ToolkitTestApplication application;
 
   Alignment alignment = Alignment::New();
-  Stage::GetCurrent().Add(alignment);
+  application.GetScene().Add(alignment);
 
   Animation animation = Animation::New(100.0f);
   animation.AnimateTo( Property( alignment, Actor::Property::SIZE ), Vector3( 100.0f, 150.0f, 200.0f ) );

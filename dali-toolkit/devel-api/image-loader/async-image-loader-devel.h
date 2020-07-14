@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_IMAGE_LOADER_ASYNC_IMAGE_LOADER_DEVEL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,12 @@
  * limitations under the License.
  */
 
+// EXTERNAL HEADER
 #include <dali/public-api/signals/dali-signal.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/devel-api/adaptor-framework/animated-image-loading.h>
+
+// INTERNAL HEADER
 #include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 
 namespace Dali
@@ -38,6 +42,19 @@ enum class PreMultiplyOnLoad
   OFF = 0, ///< Don't modify the image
   ON           ///< Multiply alpha into color channels on load
 };
+
+/**
+ * @brief Starts an animated image loading task.
+ * @REMARK_INTERNET
+ * @REMARK_STORAGE
+ * @param[in] asyncImageLoader The ayncImageLoader
+ * @param[in] animatedImageLoading The AnimatedImageLoading to load animated image
+ * @param[in] frameIndex The frame index of a frame to be loaded frame
+ * @return The loading task id
+ */
+DALI_TOOLKIT_API uint32_t LoadAnimatedImage( AsyncImageLoader asyncImageLoader,
+                                             Dali::AnimatedImageLoading animatedImageLoading,
+                                             uint32_t frameIndex );
 
 /**
  * @brief Starts an image loading task.

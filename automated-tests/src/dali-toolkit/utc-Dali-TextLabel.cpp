@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
+#include <dali-toolkit/devel-api/text/rendering-backend.h>
+#include <dali-toolkit/devel-api/text/text-utils-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -250,7 +252,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label );
 
   // Check Property Indices are correct
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == TextLabel::Property::RENDERING_BACKEND );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == DevelTextLabel::Property::RENDERING_BACKEND );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_TEXT ) == TextLabel::Property::TEXT );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_FONT_FAMILY ) == TextLabel::Property::FONT_FAMILY );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_FONT_STYLE ) == TextLabel::Property::FONT_STYLE );
@@ -284,11 +286,11 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   TextLabel label = TextLabel::New();
   DALI_TEST_CHECK( label );
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   // Note - we can't check the defaults since the stylesheets are platform-specific
-  label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
-  DALI_TEST_EQUALS( (Text::RenderingType)label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+  label.SetProperty( DevelTextLabel::Property::RENDERING_BACKEND, DevelText::RENDERING_SHARED_ATLAS );
+  DALI_TEST_EQUALS( (DevelText::RenderingType)label.GetProperty<int>( DevelTextLabel::Property::RENDERING_BACKEND ), DevelText::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check that text can be correctly reset
   label.SetProperty( TextLabel::Property::TEXT, "Setting Text" );
@@ -658,7 +660,7 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   // Turn on all the effects
   label.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
@@ -677,7 +679,7 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   try
   {
     // Render some text with the shared atlas backend
-    label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
+    label.SetProperty( DevelTextLabel::Property::RENDERING_BACKEND, DevelText::RENDERING_SHARED_ATLAS );
     application.SendNotification();
     application.Render();
   }
@@ -689,7 +691,7 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   try
   {
     // Render some text with the shared atlas backend
-    label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_VECTOR_BASED );
+    label.SetProperty( DevelTextLabel::Property::RENDERING_BACKEND, DevelText::RENDERING_VECTOR_BASED );
     application.SendNotification();
     application.Render();
   }
@@ -707,7 +709,7 @@ int UtcDaliToolkitTextLabelLanguagesP(void)
   TextLabel label = TextLabel::New();
   DALI_TEST_CHECK( label );
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   const std::string scripts( " привет мир, γειά σου Κόσμε, Hello world, مرحبا بالعالم, שלום עולם, "
                              "բարեւ աշխարհը, მსოფლიოში, 안녕하세요, 你好世界, ひらがな, カタカナ, "
@@ -732,7 +734,7 @@ int UtcDaliToolkitTextLabelEmojisP(void)
   TextLabel label = TextLabel::New();
   DALI_TEST_CHECK( label );
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
@@ -775,7 +777,7 @@ int UtcDaliToolkitTextlabelScrollingP(void)
   DALI_TEST_CHECK( labelFinished );
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  Stage::GetCurrent().Add( labelImmediate );
+  application.GetScene().Add( labelImmediate );
   // Turn on all the effects
   labelImmediate.SetProperty( TextLabel::Property::MULTI_LINE, false );
   labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
@@ -783,7 +785,7 @@ int UtcDaliToolkitTextlabelScrollingP(void)
   labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
   labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
 
-  Stage::GetCurrent().Add( labelFinished );
+  application.GetScene().Add( labelFinished );
   // Turn on all the effects
   labelFinished.SetProperty( TextLabel::Property::MULTI_LINE, false );
   labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
@@ -831,7 +833,7 @@ int UtcDaliToolkitTextlabelScrollingCenterAlignP(void)
   DALI_TEST_CHECK( labelLong );
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  Stage::GetCurrent().Add( labelShort );
+  application.GetScene().Add( labelShort );
   // Turn on all the effects
   labelShort.SetProperty( TextLabel::Property::MULTI_LINE, false );
   labelShort.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
@@ -840,7 +842,7 @@ int UtcDaliToolkitTextlabelScrollingCenterAlignP(void)
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
 
-  Stage::GetCurrent().Add( labelLong );
+  application.GetScene().Add( labelLong );
   // Turn on all the effects
   labelLong.SetProperty( TextLabel::Property::MULTI_LINE, false );
   labelLong.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
@@ -881,7 +883,7 @@ int UtcDaliToolkitTextlabelScrollingCenterAlignRTLP(void)
   DALI_TEST_CHECK( labelLong );
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  Stage::GetCurrent().Add( labelShort );
+  application.GetScene().Add( labelShort );
   // Turn on all the effects
   labelShort.SetProperty( TextLabel::Property::MULTI_LINE, false );
   labelShort.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
@@ -890,7 +892,7 @@ int UtcDaliToolkitTextlabelScrollingCenterAlignRTLP(void)
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
 
-  Stage::GetCurrent().Add( labelLong );
+  application.GetScene().Add( labelLong );
   // Turn on all the effects
   labelLong.SetProperty( TextLabel::Property::MULTI_LINE, false );
   labelLong.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
@@ -931,7 +933,7 @@ int UtcDaliToolkitTextlabelScrollingEndAlignP(void)
   DALI_TEST_CHECK( labelLong );
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  Stage::GetCurrent().Add( labelShort );
+  application.GetScene().Add( labelShort );
   // Turn on all the effects
   labelShort.SetProperty( TextLabel::Property::MULTI_LINE, false );
   labelShort.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "END" );
@@ -940,7 +942,7 @@ int UtcDaliToolkitTextlabelScrollingEndAlignP(void)
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
 
-  Stage::GetCurrent().Add( labelLong );
+  application.GetScene().Add( labelLong );
   // Turn on all the effects
   labelLong.SetProperty( TextLabel::Property::MULTI_LINE, false );
   labelLong.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "END" );
@@ -981,7 +983,7 @@ int UtcDaliToolkitTextlabelScrollingEndAlignRTLP(void)
   DALI_TEST_CHECK( labelLong );
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  Stage::GetCurrent().Add( labelShort );
+  application.GetScene().Add( labelShort );
   // Turn on all the effects
   labelShort.SetProperty( TextLabel::Property::MULTI_LINE, false );
   labelShort.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "END" );
@@ -990,7 +992,7 @@ int UtcDaliToolkitTextlabelScrollingEndAlignRTLP(void)
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
 
-  Stage::GetCurrent().Add( labelLong );
+  application.GetScene().Add( labelLong );
   // Turn on all the effects
   labelLong.SetProperty( TextLabel::Property::MULTI_LINE, false );
   labelLong.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "END" );
@@ -1029,7 +1031,7 @@ int UtcDaliToolkitTextlabelScrollingInterruptedP(void)
   DALI_TEST_CHECK( label );
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
   label.SetProperty( Actor::Property::SIZE, Vector2( 360.0f, 20.f ) );
   // Turn on all the effects
   label.SetProperty( TextLabel::Property::MULTI_LINE, false );
@@ -1082,7 +1084,7 @@ int UtcDaliToolkitTextlabelScrollingN(void)
   TextLabel label = TextLabel::New("Some text to scroll");
   DALI_TEST_CHECK( label );
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1113,7 +1115,7 @@ int UtcDaliToolkitTextlabelScrollingWithEllipsis(void)
   TextLabel label = TextLabel::New("Some text to scroll");
   DALI_TEST_CHECK( label );
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1161,7 +1163,7 @@ int UtcDaliToolkitTextlabelEllipsis(void)
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   // Turn on all the effects
   label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
@@ -1228,7 +1230,7 @@ int UtcDaliToolkitTextlabelTextWrapMode(void)
 
 
   //label.SetProperty( TextLabel::Property::POINT_SIZE, 18 );
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   label.SetProperty( TextLabel::Property::LINE_WRAP_MODE, "WORD" );
   DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::WORD ), TEST_LOCATION );
@@ -1301,7 +1303,7 @@ int UtcDaliToolkitTextLabelColorComponents(void)
   label.SetProperty( TextLabel::Property::TEXT, "Hello world Hello world" );
   label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::BLUE );
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
   drawTrace.Enable( true );
@@ -1341,7 +1343,7 @@ int UtcDaliToolkitTextlabelTextStyle01(void)
   label.SetProperty( Actor::Property::SIZE, Vector2( 300.0f, 300.f ) );
   label.SetProperty( TextLabel::Property::TEXT, "Hello world Hello world" );
   label.SetProperty( TextLabel::Property::POINT_SIZE, 12 );
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   Property::Map outlineMapSet;
   Property::Map outlineMapGet;
@@ -1410,7 +1412,7 @@ int UtcDaliToolkitTextlabelMultiline(void)
   label.SetProperty( TextLabel::Property::TEXT, "Hello world Hello world Hello world Hello world Hello world Hello world" );
   label.SetProperty( TextLabel::Property::POINT_SIZE, 20 );
   label.SetProperty( TextLabel::Property::MULTI_LINE, false );
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   application.SendNotification();
   application.Render();
@@ -1440,7 +1442,7 @@ int UtcDaliToolkitTextlabelTextDirection(void)
 
   label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
   label.SetProperty( TextLabel::Property::POINT_SIZE, 20 );
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   // Test LTR text
   DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::TEXT_DIRECTION ), static_cast< int >( Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
@@ -1471,7 +1473,7 @@ int UtcDaliToolkitTextlabelVerticalLineAlignment(void)
   label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
   label.SetProperty( TextLabel::Property::POINT_SIZE, 15 );
   label.SetProperty( TextLabel::Property::LINE_SPACING, 12 );
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
   DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT ), static_cast< int >( Toolkit::DevelText::VerticalLineAlignment::TOP ), TEST_LOCATION );
 
   label.SetProperty( DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT, DevelText::VerticalLineAlignment::MIDDLE  );
@@ -1519,7 +1521,7 @@ int UtcDaliToolkitTextLabelBitmapFont(void)
   // The text has been laid out with the bitmap font if the natural size is the sum of all the width (322) and 34 height.
   DALI_TEST_EQUALS( label.GetNaturalSize(), Vector3(322.f, 34.f, 0.f), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   application.SendNotification();
   application.Render();
@@ -1560,12 +1562,12 @@ int UtcDaliToolkitTextlabelTextFit(void)
   label.SetProperty( Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet );
   label.SetProperty( TextLabel::Property::POINT_SIZE, 120.f);
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   application.SendNotification();
   application.Render();
 
-  const Vector3 EXPECTED_NATURAL_SIZE( 460.0f, 98.0f, 0.0f );
+  const Vector3 EXPECTED_NATURAL_SIZE( 452.0f, 94.0f, 0.0f );
   DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION );
 
   // check pixel size
@@ -1616,7 +1618,7 @@ int UtcDaliToolkitTextlabelMaxTextureSet(void)
   label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
   label.SetProperty( Toolkit::TextLabel::Property::TEXT_COLOR, Color::BLUE );
 
-  Stage::GetCurrent().Add( label );
+  application.GetScene().Add( label );
 
   application.SendNotification();
   application.Render();
@@ -1627,6 +1629,28 @@ int UtcDaliToolkitTextlabelMaxTextureSet(void)
 
   // Check if the number of renderers is greater than 1.
   DALI_TEST_CHECK( label.GetRendererCount() > 1u );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelLastCharacterIndex(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelLastCharacterIndex");
+
+  Vector2 size( 300.0f, 100.0f );
+
+  Dali::Toolkit::DevelText::RendererParameters textParameters;
+  textParameters.text = "This is a sample text to get the last index.";
+  textParameters.layout = "multiLine";
+  textParameters.fontSize = 20.f;
+  textParameters.textWidth = 300u;
+  textParameters.textHeight = 100u;
+  textParameters.ellipsisEnabled = true;
+  Dali::Property::Array indexArray = Dali::Toolkit::DevelText::GetLastCharacterIndex( textParameters );
+
+  DALI_TEST_CHECK( !indexArray.Empty() );
+  DALI_TEST_EQUALS( indexArray.GetElementAt(0).Get<int>(), 10, TEST_LOCATION );
 
   END_TEST;
 }

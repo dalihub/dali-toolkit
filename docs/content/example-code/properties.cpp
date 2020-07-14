@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,8 +56,8 @@ public:
   // C++ EXAMPLE
   void Create( Application& application )
   {
-    // Get the stage handle
-    Stage stage = Stage::GetCurrent();
+    // Get the window handle
+    Window window = application.GetWindow();
 
     mImageView = ImageView::New();
 
@@ -72,8 +72,8 @@ public:
     imageMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 100;
     mImageView.SetProperty( ImageView::Property::IMAGE, imageMap );
 
-    // Add the image view to the stage
-    stage.Add( mImageView );
+    // Add the image view to the window
+    window.Add( mImageView );
 
     // Register a custom float property on mImageView and use it to store the number of times we are tapped
     mTagPropertyIndex = mImageView.RegisterProperty( TAG_PROPERTY_NAME, 0, Property::READ_WRITE /* Event-side only, i.e. not animatable */ );
@@ -87,7 +87,7 @@ public:
     mTagText.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
     mTagText.SetProperty( TextLabel::Property::TEXT_COLOR, Color::WHITE );
     mTagText.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
-    stage.Add( mTagText );
+    window.Add( mTagText );
   }
 
   /**

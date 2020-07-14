@@ -55,23 +55,10 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PushButton, Toolkit::Button, Create )
 
-DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "unselectedIcon",  STRING, UNSELECTED_ICON )
-DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "selectedIcon",  STRING, SELECTED_ICON )
-DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "iconAlignment",  STRING, ICON_ALIGNMENT )
 DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "labelPadding",  STRING, LABEL_PADDING )
 DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "iconPadding",  STRING, ICON_PADDING )
 
 DALI_TYPE_REGISTRATION_END()
-
-/*
- * Table to define Text-to-enum conversions for IconAlignment.
- */
-const Dali::Scripting::StringEnum IconAlignmentTable[] = {
-  { "LEFT",   Toolkit::Internal::PushButton::LEFT },
-  { "RIGHT",  Toolkit::Internal::PushButton::RIGHT },
-  { "TOP",    Toolkit::Internal::PushButton::TOP },
-  { "BOTTOM", Toolkit::Internal::PushButton::BOTTOM },
-}; const unsigned int IconAlignmentTableCount = sizeof( IconAlignmentTable ) / sizeof( IconAlignmentTable[0] );
 
 } // unnamed namespace
 
@@ -161,25 +148,6 @@ void PushButton::SetProperty( BaseObject* object, Property::Index propertyIndex,
 
     switch ( propertyIndex )
     {
-      case Toolkit::PushButton::Property::UNSELECTED_ICON:
-      {
-        pushButtonImpl.CreateVisualsForComponent( Toolkit::Button::Property::UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
-        break;
-      }
-      case Toolkit::PushButton::Property::SELECTED_ICON:
-      {
-        pushButtonImpl.CreateVisualsForComponent( Toolkit::Button::Property::SELECTED_VISUAL, value, DepthIndex::CONTENT );
-        break;
-      }
-      case Toolkit::PushButton::Property::ICON_ALIGNMENT:
-      {
-        IconAlignment iconAlignment;
-        if( Scripting::GetEnumeration< IconAlignment >( value.Get< std::string >().c_str(), IconAlignmentTable, IconAlignmentTableCount, iconAlignment ) )
-        {
-          pushButtonImpl.SetIconAlignment( iconAlignment );
-        }
-        break;
-      }
       case Toolkit::PushButton::Property::LABEL_PADDING:
       {
         Vector4 padding ( value.Get< Vector4 >() );
@@ -208,21 +176,6 @@ Property::Value PushButton::GetProperty( BaseObject* object, Property::Index pro
 
     switch ( propertyIndex )
     {
-      case Toolkit::PushButton::Property::UNSELECTED_ICON:
-      {
-        //value = pushButtonImpl.GetIcon( UNSELECTED_DECORATION );
-        break;
-      }
-      case Toolkit::PushButton::Property::SELECTED_ICON:
-      {
-        //value = pushButtonImpl.GetIcon( UNSELECTED_DECORATION );
-        break;
-      }
-      case Toolkit::PushButton::Property::ICON_ALIGNMENT:
-      {
-        value = Scripting::GetLinearEnumerationName< IconAlignment >( pushButtonImpl.GetIconAlignment(), IconAlignmentTable, IconAlignmentTableCount );
-        break;
-      }
       case Toolkit::PushButton::Property::LABEL_PADDING:
       {
         Padding padding = pushButtonImpl.Button::GetLabelPadding();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -362,7 +362,7 @@ int UtcDaliButtonAutoRepeatingP(void)
   button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   button.SetProperty( Actor::Property::POSITION, Vector2( 240, 400 ));
   button.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
-  Stage::GetCurrent().Add( button );
+  application.GetScene().Add( button );
 
   application.SendNotification();
   application.Render();
@@ -593,7 +593,7 @@ int UtcDaliButtonPressedSignalP(void)
   button.SetProperty( Actor::Property::POSITION, Vector2( 240, 400 ));
   button.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
 
-  Stage::GetCurrent().Add( button );
+  application.GetScene().Add( button );
 
   application.SendNotification();
   application.Render();
@@ -700,7 +700,7 @@ int UtcDaliButtonClickedSignalP(void)
   button.SetProperty( Actor::Property::POSITION, Vector2( 240, 400 ));
   button.SetProperty( Actor::Property::SIZE, Vector2( 100, 100 ) );
 
-  Stage::GetCurrent().Add( button );
+  application.GetScene().Add( button );
 
   application.SendNotification();
   application.Render();
@@ -791,7 +791,7 @@ int UtcDaliButtonStateChangedSignalP(void)
 
   button.SetProperty( Button::Property::TOGGLABLE, true);
 
-  Stage::GetCurrent().Add( button );
+  application.GetScene().Add( button );
 
   application.SendNotification();
   application.Render();
@@ -851,7 +851,7 @@ int UtcDaliButtonEventConsumption(void)
   parentButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   parentButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   parentButton.SetProperty( Actor::Property::SIZE, Vector2( 20, 20 ) );
-  Stage::GetCurrent().Add( parentButton );
+  application.GetScene().Add( parentButton );
 
   Button childButton = PushButton::New();
   childButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
@@ -905,7 +905,7 @@ int UtcDaliButtonRelease(void)
   parentButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   parentButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   parentButton.SetProperty( Actor::Property::SIZE, Vector2( 20, 20 ) );
-  Stage::GetCurrent().Add( parentButton );
+  application.GetScene().Add( parentButton );
   parentButton.ReleasedSignal().Connect( &ButtonCallback );
 
   // Reset signal flags
@@ -950,7 +950,7 @@ int UtcDaliButtonMultiTouch(void)
   button.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   button.SetProperty( Actor::Property::SIZE, Vector2( 20, 20 ) );
-  Stage::GetCurrent().Add( button );
+  application.GetScene().Add( button );
   button.ReleasedSignal().Connect( &ButtonCallback );
 
   // Reset signal flags

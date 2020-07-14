@@ -32,6 +32,7 @@ INCLUDE_DIRECTORIES(
 SET( devel_api_src_dir dali-toolkit/devel-api )
 
 SET ( SOURCES ${SOURCES}
+  ${devel_api_src_dir}/accessibility-manager/accessibility-manager.cpp
   ${devel_api_src_dir}/builder/builder.cpp
   ${devel_api_src_dir}/builder/json-parser.cpp
   ${devel_api_src_dir}/builder/tree-node.cpp
@@ -266,7 +267,6 @@ SET( SOURCES ${SOURCES}
   ${public_api_src_dir}/image-loader/async-image-loader.cpp
   ${public_api_src_dir}/image-loader/sync-image-loader.cpp
   ${public_api_src_dir}/styling/style-manager.cpp
-  ${public_api_src_dir}/accessibility-manager/accessibility-manager.cpp
   ${public_api_src_dir}/focus-manager/keyboard-focus-manager.cpp
   ${public_api_src_dir}/dali-toolkit-version.cpp
   ${public_api_src_dir}/enums.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual01(void)
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -109,7 +109,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual02(void)
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -148,7 +148,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual03(void)
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -189,13 +189,17 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 200.0f ) );
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
 
+  // Trigger count is 1 - render a frame
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
   // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
   Renderer renderer = actor.GetRendererAt( 0u );
   DALI_TEST_CHECK( renderer );
 
@@ -261,10 +265,12 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
+
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
   Property::Map resultMap;
   resultMap = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
@@ -343,7 +349,7 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
     tet_infoline( "Test Play action" );
     DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
 
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
     application.SendNotification();
     application.Render( 16 );
 
@@ -412,7 +418,7 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
     DALI_TEST_CHECK( value->Get< int >() == DevelImageVisual::PlayState::STOPPED );
 
     tet_infoline( "On stage again" );
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
 
     application.SendNotification();
     application.Render(16);
@@ -474,7 +480,7 @@ int UtcDaliAnimatedVectorImageVisualCustomShader(void)
 
   dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  Stage::GetCurrent().Add( dummy );
+  application.GetScene().Add( dummy );
 
   application.SendNotification();
   application.Render();
@@ -513,7 +519,7 @@ int UtcDaliAnimatedVectorImageVisualNaturalSize(void)
   Vector2 controlSize( 20.f, 30.f );
   Vector2 naturalSize;
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -554,7 +560,7 @@ int UtcDaliAnimatedVectorImageVisualLoopCount(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Property::Map attributes;
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
@@ -598,7 +604,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Property::Map attributes;
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
@@ -675,6 +681,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
 
@@ -714,7 +722,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Property::Map attributes;
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
@@ -813,7 +821,7 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Property::Map attributes;
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
@@ -854,7 +862,7 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -863,6 +871,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   application.SendNotification();
   application.Render();
+
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
   Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   Property::Value* value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
@@ -882,6 +892,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   application.SendNotification();
   application.Render();
+
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
@@ -927,6 +939,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
   DALI_TEST_EQUALS( value->Get< int >(), 3, TEST_LOCATION );
@@ -962,7 +976,7 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -1074,7 +1088,7 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Property::Map attributes;
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
@@ -1169,7 +1183,7 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   Property::Map attributes;
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
@@ -1247,7 +1261,7 @@ int UtcDaliAnimatedVectorImageVisualPropertyNotification(void)
   actor.SetProperty( Actor::Property::SIZE, controlSize );
   actor.SetProperty( Actor::Property::SCALE, controlScale );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -1307,7 +1321,7 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
   Vector2 controlSize( 20.f, 30.f );
   actor1.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor1 );
+  application.GetScene().Add( actor1 );
 
   propertyMap.Clear();
   propertyMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE )
@@ -1322,7 +1336,7 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
 
   actor2.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor2 );
+  application.GetScene().Add( actor2 );
 
   DevelControl::DoAction( actor2, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, Property::Map() );
 
@@ -1371,7 +1385,7 @@ int UtcDaliAnimatedVectorImageVisualControlVisibilityChanged(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();
@@ -1418,7 +1432,7 @@ int UtcDaliAnimatedVectorImageVisualWindowVisibilityChanged(void)
   Vector2 controlSize( 20.f, 30.f );
   actor.SetProperty( Actor::Property::SIZE, controlSize );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render();

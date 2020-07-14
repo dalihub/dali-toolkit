@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -473,14 +473,6 @@ void Control::OnInitialize()
 {
 }
 
-void Control::OnControlChildAdd( Actor& child )
-{
-}
-
-void Control::OnControlChildRemove( Actor& child )
-{
-}
-
 void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   // By default the control is only interested in theme (not font) changes
@@ -582,14 +574,10 @@ void Control::OnKeyInputFocusLost()
 
 void Control::OnChildAdd(Actor& child)
 {
-  // Notify derived classes.
-  OnControlChildAdd( child );
 }
 
 void Control::OnChildRemove(Actor& child)
 {
-  // Notify derived classes.
-  OnControlChildRemove( child );
 }
 
 void Control::OnPropertySet( Property::Index index, Property::Value propertyValue )

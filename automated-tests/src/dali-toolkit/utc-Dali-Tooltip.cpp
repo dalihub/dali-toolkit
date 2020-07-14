@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -512,7 +512,7 @@ int UtcDaliTooltipDisplay(void)
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -520,7 +520,7 @@ int UtcDaliTooltipDisplay(void)
 
   int rootChildCount = rootActor.GetChildCount();
 
-  Vector2 centerPoint = Stage::GetCurrent().GetSize() * 0.5f;
+  Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
@@ -554,7 +554,7 @@ int UtcDaliTooltipDisplayWithTail(void)
                                                            .Add( Tooltip::Tail::Property::BELOW_VISUAL, "below-visual.png" ))
                      );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -562,7 +562,7 @@ int UtcDaliTooltipDisplayWithTail(void)
 
   int rootChildCount = rootActor.GetChildCount();
 
-  Vector2 centerPoint = Stage::GetCurrent().GetSize() * 0.5f;
+  Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
@@ -598,7 +598,7 @@ int UtcDaliTooltipDisplayWithContentArray(void)
                                                            .Add( Tooltip::Tail::Property::BELOW_VISUAL, "below-visual.png" ))
                      );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -606,7 +606,7 @@ int UtcDaliTooltipDisplayWithContentArray(void)
 
   int rootChildCount = rootActor.GetChildCount();
 
-  Vector2 centerPoint = Stage::GetCurrent().GetSize() * 0.5f;
+  Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
@@ -635,13 +635,13 @@ int UtcDaliTooltipDisplayBelow(void)
                                       .Add( Tooltip::Property::POSITION, Tooltip::Position::BELOW )
                      );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
   application.Render();
 
-  Vector2 centerPoint = Stage::GetCurrent().GetSize() * 0.5f;
+  Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
@@ -671,13 +671,13 @@ int UtcDaliTooltipDisplayAbove(void)
                                       .Add( Tooltip::Property::POSITION, Tooltip::Position::ABOVE )
                      );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
   application.Render();
 
-  Vector2 centerPoint = Stage::GetCurrent().GetSize() * 0.5f;
+  Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
@@ -707,13 +707,13 @@ int UtcDaliTooltipDisplayAtHoverPoint(void)
                                       .Add( Tooltip::Property::POSITION, Tooltip::Position::HOVER_POINT )
                      );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
   application.Render();
 
-  const Vector2 stageSize = Stage::GetCurrent().GetSize();
+  const Vector2 stageSize = application.GetScene().GetSize();
   Vector2 hoverPoint = stageSize * 0.5f;
   hoverPoint.x -= 10.0f;
   hoverPoint.y -= 10.0f;
@@ -747,7 +747,7 @@ int UtcDaliTooltipExceedThreshold(void)
                                       .Add( Tooltip::Property::MOVEMENT_THRESHOLD, 5 )
                      );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -756,7 +756,7 @@ int UtcDaliTooltipExceedThreshold(void)
   int rootChildCount = rootActor.GetChildCount();
 
   tet_infoline( "Start hover" );
-  Vector2 hoverPoint = Stage::GetCurrent().GetSize() * 0.5f;
+  Vector2 hoverPoint = application.GetScene().GetSize() * 0.5f;
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, hoverPoint ) );
 
   application.SendNotification();
@@ -793,7 +793,7 @@ int UtcDaliTooltipGoOutOfBounds(void)
   control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   control.SetProperty( DevelControl::Property::TOOLTIP, "Test" );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -802,7 +802,7 @@ int UtcDaliTooltipGoOutOfBounds(void)
   int rootChildCount = rootActor.GetChildCount();
 
   tet_infoline( "Start hover" );
-  Vector2 hoverPoint = Stage::GetCurrent().GetSize() * 0.5f;
+  Vector2 hoverPoint = application.GetScene().GetSize() * 0.5f;
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, hoverPoint ) );
 
   application.SendNotification();
@@ -838,7 +838,7 @@ int UtcDaliTooltipHideTooltipWhenOutOfBounds(void)
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -846,7 +846,7 @@ int UtcDaliTooltipHideTooltipWhenOutOfBounds(void)
 
   int rootChildCount = rootActor.GetChildCount();
 
-  Vector2 hoverPoint = Stage::GetCurrent().GetSize() * 0.5f;
+  Vector2 hoverPoint = application.GetScene().GetSize() * 0.5f;
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, hoverPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
@@ -886,7 +886,7 @@ int UtcDaliTooltipHideTooltipWhenSetToDisapperOnMovement(void)
                                       .Add( Tooltip::Property::MOVEMENT_THRESHOLD, 5 )
                      );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -894,7 +894,7 @@ int UtcDaliTooltipHideTooltipWhenSetToDisapperOnMovement(void)
 
   int rootChildCount = rootActor.GetChildCount();
 
-  Vector2 hoverPoint = Stage::GetCurrent().GetSize() * 0.5f;
+  Vector2 hoverPoint = application.GetScene().GetSize() * 0.5f;
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, hoverPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
@@ -930,7 +930,7 @@ int UtcDaliTooltipChangeContent(void)
   control.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   control.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -938,7 +938,7 @@ int UtcDaliTooltipChangeContent(void)
 
   int rootChildCount = rootActor.GetChildCount();
 
-  Vector2 centerPoint = Stage::GetCurrent().GetSize() * 0.5f;
+  Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   tet_infoline( "Change content while timer is running and ensure it matches the new value" );
@@ -1009,7 +1009,7 @@ int UtcDaliTooltipEnsureRemainsOnStage1(void)
 {
   ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
 
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 stageSize = application.GetScene().GetSize();
 
   tet_infoline( "Create a control and place it at the bottom of the screen, setting the tooltip to appear below" );
   Control control = Control::New();
@@ -1025,7 +1025,7 @@ int UtcDaliTooltipEnsureRemainsOnStage1(void)
                                       .Add( Tooltip::Property::POSITION, Tooltip::Position::BELOW )
                      );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -1051,7 +1051,7 @@ int UtcDaliTooltipEnsureRemainsOnStage2(void)
 {
   ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
 
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 stageSize = application.GetScene().GetSize();
 
   tet_infoline( "Create a control and place it at the top of the screen, setting the tooltip to appear above" );
   Control control = Control::New();
@@ -1067,7 +1067,7 @@ int UtcDaliTooltipEnsureRemainsOnStage2(void)
                                       .Add( Tooltip::Property::POSITION, Tooltip::Position::ABOVE )
                      );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -1093,7 +1093,7 @@ int UtcDaliTooltipEnsureRemainsOnStage3(void)
 {
   ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
 
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 stageSize = application.GetScene().GetSize();
   Vector2 centerPoint = stageSize * 0.5f;
 
   tet_infoline( "Create a control and adjust it's position so that the tooltip will attempt to appear to the left of the screen" );
@@ -1111,7 +1111,7 @@ int UtcDaliTooltipEnsureRemainsOnStage3(void)
                      );
   control.SetProperty( Actor::Property::POSITION_X,  -centerPoint.x );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();
@@ -1138,7 +1138,7 @@ int UtcDaliTooltipEnsureRemainsOnStage4(void)
 {
   ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
 
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Vector2 stageSize = application.GetScene().GetSize();
   Vector2 centerPoint = stageSize * 0.5f;
 
   tet_infoline( "Create a control and adjust it's position so that the tooltip will attempt to appear to the right of the screen" );
@@ -1156,7 +1156,7 @@ int UtcDaliTooltipEnsureRemainsOnStage4(void)
                      );
   control.SetProperty( Actor::Property::POSITION_X,  centerPoint.x );
 
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor = application.GetScene().GetRootLayer();
   rootActor.Add( control );
 
   application.SendNotification();

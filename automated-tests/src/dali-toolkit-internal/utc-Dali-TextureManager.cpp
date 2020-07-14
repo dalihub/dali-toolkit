@@ -25,6 +25,7 @@
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
 using namespace Dali::Toolkit::Internal;
 
@@ -201,6 +202,73 @@ int UtcTextureManagerCachingForDifferentLoadingType(void)
   DALI_TEST_EQUALS( observer2.mLoaded, true, TEST_LOCATION );
   DALI_TEST_EQUALS( observer2.mObserverCalled, true, TEST_LOCATION );
   DALI_TEST_EQUALS( observer2.mCompleteType, TestObserver::CompleteType::LOAD_COMPLETE, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcTextureManagerUseInvalidMask(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcTextureManagerUseInvalidMask" );
+
+  TextureManager textureManager; // Create new texture manager
+
+  TestObserver observer;
+  std::string filename( TEST_IMAGE_FILE_NAME );
+  std::string maskname("");
+  TextureManager::MaskingDataPointer maskInfo = nullptr;
+  maskInfo.reset(new TextureManager::MaskingData());
+  maskInfo->mAlphaMaskUrl = maskname;
+  maskInfo->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
+  maskInfo->mCropToMask = true;
+  maskInfo->mContentScaleFactor = 1.0f;
+
+  auto textureId( TextureManager::INVALID_TEXTURE_ID );
+  Vector4 atlasRect( 0.f, 0.f, 1.f, 1.f );
+  Dali::ImageDimensions atlasRectSize( 0,0 );
+  bool synchronousLoading(false);
+  bool atlasingStatus(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  ImageAtlasManagerPtr atlasManager = nullptr;
+  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+
+  textureManager.LoadTexture(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    synchronousLoading,
+    textureId,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    WrapMode::DEFAULT,
+    WrapMode::DEFAULT,
+    &observer,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply
+  );
+
+  DALI_TEST_EQUALS( observer.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer.mObserverCalled, false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( observer.mLoaded, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer.mObserverCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION );
 
   END_TEST;
 }

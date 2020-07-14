@@ -188,35 +188,6 @@ public:
                               bool blurUserImage = false);
 
   /**
-   * @DEPRECATED_1_1.28 Use Actor::Add(Actor) instead
-   * @brief Adds a child Actor to this Actor.
-   * @SINCE_1_0.0
-   * @param [in] child The child.
-   * @pre This Actor (the parent) has been initialized.
-   * @pre The child actor has been initialized.
-   * @pre The child actor is not the same as the parent actor.
-   * @pre The actor is not the Root actor
-   * @post The child will be referenced by its parent. This means that the child will be kept alive,
-   * even if the handle passed into this method is reset or destroyed.
-   * @note If the child already has a parent, it will be removed from old parent
-   * and reparented to this actor. This may change childs position, color, shader effect,
-   * scale etc as it now inherits them from this actor.
-   */
-  void Add(Actor child);
-
-  /**
-   * @DEPRECATED_1_1.28 Use Actor::Remove(Actor) instead
-   * @brief Removes a child Actor from this Actor.
-   *
-   * If the actor was not a child of this actor, this is a no-op.
-   * @SINCE_1_0.0
-   * @param [in] child The child.
-   * @pre This Actor (the parent) has been initialized.
-   * @pre The child actor is not the same as the parent actor.
-   */
-  void Remove(Actor child);
-
-  /**
    * @brief Start rendering the GaussianBlurView. Must be called after you Add() it to the stage.
    * @SINCE_1_0.0
    */

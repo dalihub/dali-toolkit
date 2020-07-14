@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_FIELD_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ namespace Property
 {
   enum
   {
-      RENDERING_BACKEND = Dali::Toolkit::TextField::Property::RENDERING_BACKEND,
       TEXT = Dali::Toolkit::TextField::Property::TEXT,
       PLACEHOLDER_TEXT = Dali::Toolkit::TextField::Property::PLACEHOLDER_TEXT,
       PLACEHOLDER_TEXT_FOCUSED = Dali::Toolkit::TextField::Property::PLACEHOLDER_TEXT_FOCUSED,
@@ -128,7 +127,13 @@ namespace Property
        * @details Name "selectedText", type Property::STRING.
        * @note This property is read-only.
        */
-      SELECTED_TEXT = ELLIPSIS + 6
+      SELECTED_TEXT = ELLIPSIS + 6,
+
+      /**
+       * @brief The type or rendering e.g. bitmap-based.
+       * @details Name "renderingBackend", type Property::INTEGER.
+       */
+      RENDERING_BACKEND = ELLIPSIS + 7,
 
   };
 } // namespace Property
