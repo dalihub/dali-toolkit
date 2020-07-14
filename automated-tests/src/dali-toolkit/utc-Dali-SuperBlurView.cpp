@@ -136,7 +136,7 @@ int UtcDaliSuperBlurViewNew(void)
   DALI_TEST_CHECK( blurView );
 
   //Additional check to ensure object is created by checking if it's registered
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   gObjectCreatedCallBackCalled = false;

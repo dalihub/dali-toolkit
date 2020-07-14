@@ -946,7 +946,7 @@ int UtcDaliControlImplRegisterVisualToSelf(void)
 {
   ToolkitTestApplication application;
 
-  Test::ObjectDestructionTracker objectDestructionTracker;
+  Test::ObjectDestructionTracker objectDestructionTracker( application.GetCore().GetObjectRegistry() );
 
   {
     DummyControl dummy = DummyControl::New();
