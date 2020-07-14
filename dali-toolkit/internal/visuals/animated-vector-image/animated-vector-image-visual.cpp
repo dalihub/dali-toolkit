@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/visuals/animated-vector-image/animated-vector-image-visual.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/stage.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>

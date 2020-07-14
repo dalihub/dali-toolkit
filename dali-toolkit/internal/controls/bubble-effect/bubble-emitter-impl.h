@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUBBLE_EMITTER_IMPL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/common/stage.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/geometry.h>
