@@ -24,7 +24,6 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include "dummy-control.h"
 
 #include <dali/integration-api/debug.h>
@@ -34,7 +33,7 @@ using namespace Dali::Toolkit;
 
 namespace
 {
-typedef Toolkit::NPatchUtility::StretchRanges StretchRanges;
+typedef Toolkit::Internal::NPatchLoader::StretchRanges StretchRanges;
 
 const char* TEST_9_PATCH_FILE_NAME =  TEST_RESOURCE_DIR  "/demo-tile-texture-focused.9.png";
 const char* TEST_NPATCH_FILE_NAME =  TEST_RESOURCE_DIR  "/heartsframe.9.png";

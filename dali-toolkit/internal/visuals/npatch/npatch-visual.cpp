@@ -220,13 +220,13 @@ void AddVertex( Vector< Vector2 >& vertices, unsigned int x, unsigned int y )
   vertices.PushBack( Vector2( x, y ) );
 }
 
-void RegisterStretchProperties( Renderer& renderer, const char * uniformName, const NPatchUtility::StretchRanges& stretchPixels, uint16_t imageExtent)
+void RegisterStretchProperties( Renderer& renderer, const char * uniformName, const NPatchLoader::StretchRanges& stretchPixels, uint16_t imageExtent)
 {
   uint16_t prevEnd = 0;
   uint16_t prevFix = 0;
   uint16_t prevStretch = 0;
   unsigned int i = 1;
-  for( NPatchUtility::StretchRanges::ConstIterator it = stretchPixels.Begin(); it != stretchPixels.End(); ++it, ++i )
+  for( NPatchLoader::StretchRanges::ConstIterator it = stretchPixels.Begin(); it != stretchPixels.End(); ++it, ++i )
   {
     uint16_t start = it->GetX();
     uint16_t end = it->GetY();
@@ -507,8 +507,8 @@ Shader NPatchVisual::CreateShader()
   const NPatchLoader::Data* data;
   // 0 is either no data (load failed?) or no stretch regions on image
   // for both cases we use the default shader
-  NPatchUtility::StretchRanges::SizeType xStretchCount = 0;
-  NPatchUtility::StretchRanges::SizeType yStretchCount = 0;
+  NPatchLoader::StretchRanges::SizeType xStretchCount = 0;
+  NPatchLoader::StretchRanges::SizeType yStretchCount = 0;
 
   auto fragmentShader = mAuxiliaryPixelBuffer ? FRAGMENT_MASK_SHADER
                                               : FRAGMENT_SHADER;
