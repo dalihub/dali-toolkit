@@ -101,7 +101,7 @@ Node::~Node()
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Destructor() <<\n");
 }
 
-void Node::AddChild( Actor child, Extents margin, MeasureCallback measureFunction, int index )
+Node* Node::AddChild( Actor child, Extents margin, MeasureCallback measureFunction, int index )
 {
   if( child )
   {
@@ -130,8 +130,12 @@ void Node::AddChild( Actor child, Extents margin, MeasureCallback measureFunctio
 
     YGNodeInsertChild( mImpl->mYogaNode, childNode->mImpl->mYogaNode, index );
 
+    Node* result = childNode.get();
     mImpl->mChildNodes.emplace_back( std::move(childNode) );
+
+    return result;;
   }
+  return nullptr;
 }
 
 void Node::RemoveChild( Actor child )
@@ -248,6 +252,78 @@ void Node::SetFlexItemsAlignment(Dali::Toolkit::Flex::Alignment flexAlignment )
 Dali::Toolkit::Flex::Alignment Node::GetFlexItemsAlignment() const
 {
   return static_cast<Dali::Toolkit::Flex::Alignment>( YGNodeStyleGetAlignItems( mImpl->mYogaNode ));
+}
+
+void Node::SetFlexAlignmentSelf( Dali::Toolkit::Flex::Alignment flexAlignmentSelf )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Set flex alignment self [%d] on mYogaNode[%p]\n", flexAlignmentSelf, mImpl->mYogaNode )
+
+  YGNodeStyleSetAlignSelf( mImpl->mYogaNode, static_cast<YGAlign>(flexAlignmentSelf) );
+}
+
+Dali::Toolkit::Flex::Alignment Node::GetFlexAlignmentSelf() const
+{
+  return static_cast<Dali::Toolkit::Flex::Alignment>(YGNodeStyleGetAlignSelf( mImpl->mYogaNode ));
+}
+
+void Node::SetFlexPositionType( Dali::Toolkit::Flex::PositionType flexPositionType )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Set flex position type [%d] on mYogaNode[%p]\n", flexPositionType, mImpl->mYogaNode )
+
+  YGNodeStyleSetPositionType( mImpl->mYogaNode, static_cast<YGPositionType>(flexPositionType) );
+}
+
+Dali::Toolkit::Flex::PositionType Node::GetFlexPositionType() const
+{
+  return static_cast<Dali::Toolkit::Flex::PositionType>(YGNodeStyleGetPositionType( mImpl->mYogaNode ));
+}
+
+void Node::SetFlexAspectRatio( float flexAspectRatio )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Set flex aspect ratio [%d] on mYogaNode[%p]\n", flexAspectRatio, mImpl->mYogaNode )
+
+  YGNodeStyleSetAspectRatio( mImpl->mYogaNode, static_cast<float>(flexAspectRatio) );
+}
+
+float Node::GetFlexAspectRatio() const
+{
+  return static_cast<float>(YGNodeStyleGetAspectRatio( mImpl->mYogaNode ));
+}
+
+void Node::SetFlexBasis( float flexBasis )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Set flex basis [%d] on mYogaNode[%p]\n", flexBasis, mImpl->mYogaNode )
+
+  YGNodeStyleSetFlexBasis( mImpl->mYogaNode, static_cast<float>(flexBasis) );
+}
+
+float Node::GetFlexBasis() const
+{
+  return static_cast<float>(YGNodeStyleGetFlexBasis( mImpl->mYogaNode ).value);
+}
+
+void Node::SetFlexShrink( float flexShrink )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Set flex shrink [%d] on mYogaNode[%p]\n", flexShrink, mImpl->mYogaNode )
+
+  YGNodeStyleSetFlexShrink( mImpl->mYogaNode, static_cast<float>(flexShrink) );
+}
+
+float Node::GetFlexShrink() const
+{
+  return static_cast<float>(YGNodeStyleGetFlexShrink( mImpl->mYogaNode ));
+}
+
+void Node::SetFlexGrow( float flexGrow )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Set flex grow [%d] on mYogaNode[%p]\n", flexGrow, mImpl->mYogaNode )
+
+  YGNodeStyleSetFlexGrow( mImpl->mYogaNode, static_cast<float>(flexGrow) );
+}
+
+float Node::GetFlexGrow() const
+{
+  return static_cast<float>(YGNodeStyleGetFlexGrow( mImpl->mYogaNode ));
 }
 
 float Node::GetFlexWidth() const
