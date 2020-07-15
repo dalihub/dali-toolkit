@@ -104,8 +104,8 @@ int UtcDaliAlignmentConstructorRegister(void)
 {
   ToolkitTestApplication application;
 
-  //Te ensure the object is registered after creation
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  //To ensure the object is registered after creation
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   gObjectCreatedCallBackCalled = false;
