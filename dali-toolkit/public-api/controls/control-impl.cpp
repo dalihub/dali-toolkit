@@ -473,6 +473,14 @@ void Control::OnInitialize()
 {
 }
 
+void Control::OnControlChildAdd( Actor& child )
+{
+}
+
+void Control::OnControlChildRemove( Actor& child )
+{
+}
+
 void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   // By default the control is only interested in theme (not font) changes
