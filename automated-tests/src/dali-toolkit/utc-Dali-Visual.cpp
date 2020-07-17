@@ -501,6 +501,7 @@ int UtcDaliVisualGetPropertyMap1(void)
   propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
   propertyMap.Insert(Visual::Property::MIX_COLOR,  Color::BLUE);
   propertyMap.Insert( DevelVisual::Property::CORNER_RADIUS, 10.0f );
+  propertyMap.Insert( DevelVisual::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::RELATIVE );
   propertyMap.Insert( DevelColorVisual::Property::BLUR_RADIUS, 20.0f );
   Visual::Base colorVisual = factory.CreateVisual( propertyMap );
 
@@ -518,6 +519,10 @@ int UtcDaliVisualGetPropertyMap1(void)
   Property::Value* cornerRadiusValue = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
   DALI_TEST_CHECK( cornerRadiusValue );
   DALI_TEST_CHECK( cornerRadiusValue->Get< float >() == 10.0f );
+
+  Property::Value* cornerRadiusPolicyValue = resultMap.Find( DevelVisual::Property::CORNER_RADIUS_POLICY, Property::INTEGER );
+  DALI_TEST_CHECK( cornerRadiusPolicyValue );
+  DALI_TEST_CHECK( cornerRadiusPolicyValue->Get< int >() == Toolkit::Visual::Transform::Policy::RELATIVE );
 
   Property::Value* blurRadiusValue = resultMap.Find( DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT );
   DALI_TEST_CHECK( blurRadiusValue );
@@ -3591,7 +3596,7 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
   }
 
-  // color visual
+  // color visual 1
   {
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
@@ -3600,6 +3605,7 @@ int UtcDaliVisualRoundedCorner(void)
     properties[Visual::Property::TYPE] = Visual::COLOR;
     properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
     properties["cornerRadius"] = cornerRadius;
+    properties["cornerRadiusPolicy"] = Toolkit::Visual::Transform::Policy::ABSOLUTE;
 
     Visual::Base visual = factory.CreateVisual( properties );
 
@@ -3619,6 +3625,72 @@ int UtcDaliVisualRoundedCorner(void)
     application.Render();
 
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+  }
+
+  // color visual 2
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float cornerRadius = 0.5f;
+
+    properties[Visual::Property::TYPE] = Visual::COLOR;
+    properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+    properties[DevelVisual::Property::CORNER_RADIUS_POLICY] = Toolkit::Visual::Transform::Policy::RELATIVE;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    Stage::GetCurrent().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE ), true, TEST_LOCATION );
+  }
+
+  // color visual 3 - invalid value
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float cornerRadius = 30.0f;
+
+    properties[Visual::Property::TYPE] = Visual::COLOR;
+    properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+    properties[DevelVisual::Property::CORNER_RADIUS_POLICY] = -1; // Set an invalid value
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    Stage::GetCurrent().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    // Default corner radius policy is absolute.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
   }
 
   // gradient visual
