@@ -99,6 +99,11 @@ protected:
    */
   void OnSetTransform() override;
 
+  /**
+   * @copydoc Visual::Base::OnDoAction
+   */
+  void OnDoAction( const Property::Index actionId, const Property::Value& attributes ) override;
+
 private:
   /**
    * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.

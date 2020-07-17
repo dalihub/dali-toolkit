@@ -40,6 +40,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/color-visual-actions-devel.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -71,17 +72,14 @@ void ChangeBackgroundColorVisual( Control& controlImpl, bool renderIfTransparent
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
 
   Toolkit::Visual::Base backgroundVisual = controlDataImpl.GetVisual( Toolkit::Control::Property::BACKGROUND );
-  if( backgroundVisual )
+  if( backgroundVisual && backgroundVisual.GetType() == Toolkit::Visual::COLOR )
   {
     Property::Map map;
     backgroundVisual.CreatePropertyMap( map );
-    Property::Value* typeValue = map.Find( Toolkit::Visual::Property::TYPE );
-    if( typeValue && typeValue->Get< int >() == Toolkit::Visual::COLOR )
-    {
-      // Only change it if it's a color visual
-      map[ Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT ] = renderIfTransparent;
-      controlImpl.SetBackground( map );
-    }
+
+    // Only change it if it's a color visual
+    map[ Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT ] = renderIfTransparent;
+    controlImpl.SetBackground( map );
   }
 }
 
@@ -170,16 +168,39 @@ const std::string& Control::GetStyleName() const
 void Control::SetBackgroundColor( const Vector4& color )
 {
   mImpl->mBackgroundColor = color;
+
   Property::Map map;
   map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
 
+  bool renderIfTransparent = false;
   int clippingMode = ClippingMode::DISABLED;
   if( ( Self().GetProperty( Actor::Property::CLIPPING_MODE ).Get( clippingMode ) ) &&
       ( clippingMode == ClippingMode::CLIP_CHILDREN ) )
   {
     // If clipping-mode is set to CLIP_CHILDREN, then force visual to add the render even if transparent
     map[ Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT ] = true;
+    renderIfTransparent = true;
+  }
+
+  Toolkit::Visual::Base visual = mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
+  if( visual && visual.GetType() == Toolkit::Visual::COLOR )
+  {
+    Property::Map visualMap;
+    visual.CreatePropertyMap( visualMap );
+
+    Property::Value* renderValue = visualMap.Find( Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT );
+    Property::Value* colorValue = visualMap.Find( Toolkit::ColorVisual::Property::MIX_COLOR );
+    if( renderValue && colorValue )
+    {
+      if( ( renderValue->Get< bool >() == true || colorValue->Get< Vector4 >().a > 0.0f )
+          && ( renderIfTransparent || color.a > 0.0f ) )
+      {
+        // Update background color only
+        mImpl->DoAction( Toolkit::Control::Property::BACKGROUND, DevelColorVisual::Action::UPDATE_PROPERTY, map );
+        return;
+      }
+    }
   }
 
   SetBackground( map );
