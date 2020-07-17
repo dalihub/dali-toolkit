@@ -3648,7 +3648,7 @@ int UtcDaliVisualRoundedCorner(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-    Stage::GetCurrent().Add( dummy );
+    application.GetScene().Add( dummy );
 
     application.SendNotification();
     application.Render();
@@ -3680,7 +3680,7 @@ int UtcDaliVisualRoundedCorner(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-    Stage::GetCurrent().Add( dummy );
+    application.GetScene().Add( dummy );
 
     application.SendNotification();
     application.Render();
