@@ -475,7 +475,7 @@ int UtcDaliTextEditorSetPropertyP(void)
   tet_infoline(" UtcDaliToolkitTextEditorSetPropertyP");
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   // Note - we can't check the defaults since the stylesheets are platform-specific
 
@@ -876,7 +876,7 @@ int utcDaliTextEditorAtlasRenderP(void)
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   try
   {
@@ -900,7 +900,7 @@ int utcDaliTextEditorTextChangedP(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   // connect to the text changed signal.
   ConnectionTracker* testTracker = new ConnectionTracker();
@@ -963,7 +963,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   bool inputStyleChangedSignal = false;
   editor.ConnectSignal( testTracker, "inputStyleChanged",   CallbackFunctor(&inputStyleChangedSignal) );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   // Render and notify
   application.SendNotification();
@@ -1177,7 +1177,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   bool inputStyleChangedSignal = false;
   editor.ConnectSignal( testTracker, "inputStyleChanged",   CallbackFunctor(&inputStyleChangedSignal) );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   // Render and notify
   application.SendNotification();
@@ -1399,7 +1399,7 @@ int utcDaliTextEditorEvent01(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
@@ -1446,7 +1446,7 @@ int utcDaliTextEditorEvent01(void)
   editor2.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   editor2.SetProperty( Actor::Property::POSITION, Vector2( 100.f, 100.f ));
 
-  Stage::GetCurrent().Add( editor2 );
+  application.GetScene().Add( editor2 );
 
   // Render and notify
   application.SendNotification();
@@ -1484,7 +1484,7 @@ int utcDaliTextEditorEvent02(void)
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
@@ -1618,7 +1618,7 @@ int utcDaliTextEditorEvent03(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::TEXT, "This is a long text for the size of the text-editor." );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
@@ -1711,7 +1711,7 @@ int utcDaliTextEditorEvent04(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworl" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
@@ -1800,7 +1800,7 @@ int utcDaliTextEditorEvent05(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworl" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
@@ -1882,7 +1882,7 @@ int utcDaliTextEditorEvent06(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
@@ -1972,7 +1972,7 @@ int utcDaliTextEditorEvent07(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
@@ -2116,7 +2116,7 @@ int utcDaliTextEditorEvent08(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::TEXT, "DALi" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
@@ -2310,7 +2310,7 @@ int utcDaliTextEditorHandles(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::TEXT, "This is a long text for the size of the text-editor." );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
@@ -2429,7 +2429,7 @@ int utcDaliTextEditorUnderPropertyStringP(void)
 
   std::string underlineSettings1( "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}" );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::UNDERLINE, underlineSettings1 );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::UNDERLINE ), underlineSettings1, TEST_LOCATION );
@@ -2473,7 +2473,7 @@ int utcDaliTextEditorShadowPropertyStringP(void)
 
   std::string shadowSettings( "{\"color\":\"green\",\"offset\":\"2 2\",\"blurRadius\":\"0\"}" );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\",\"blurRadius\":\"0\"}" );
 
@@ -2495,7 +2495,7 @@ int utcDaliTextEditorFontStylePropertyStringP(void)
 
   std::string fontStyleSettings( "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
 
@@ -2521,7 +2521,7 @@ int utcDaliTextEditorGetPropertyLinecountP(void)
   editor.SetProperty( TextEditor::Property::TEXT,
                        "TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST ");
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
   lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
@@ -2543,7 +2543,7 @@ int utcDaliTextEditorScrollStateChangedSignalTest(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   editor.SetProperty( Actor::Property::SIZE, Vector2( 50.f, 50.f ) );
@@ -2586,7 +2586,7 @@ int UtcDaliToolkitTextEditorTextWrapMode(void)
   editor.SetProperty( Actor::Property::SIZE, Vector2( 150.0f, 300.f ) );
   editor.SetProperty( TextEditor::Property::TEXT, "Hello world Hello world" );
 
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   editor.SetProperty( TextEditor::Property::LINE_WRAP_MODE, "WORD" );
   DALI_TEST_EQUALS( editor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::WORD ), TEST_LOCATION );
@@ -2637,7 +2637,7 @@ int UtcDaliTextEditorSetPaddingProperty(void)
   editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   application.SendNotification();
   application.Render();
@@ -2670,7 +2670,7 @@ int UtcDaliTextEditorEnableShiftSelectionProperty(void)
   editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   application.SendNotification();
   application.Render();
@@ -2698,7 +2698,7 @@ int UtcDaliTextEditorEnableGrabHandleProperty(void)
   editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   application.SendNotification();
   application.Render();
@@ -2726,7 +2726,7 @@ int UtcDaliTextEditorMatchSystemLanguageDirectionProperty(void)
   editor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( editor );
+  application.GetScene().Add( editor );
 
   application.SendNotification();
   application.Render();

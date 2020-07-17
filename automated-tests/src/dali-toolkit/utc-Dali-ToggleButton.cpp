@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,7 +128,7 @@ int UtcDaliToggleButtonNewP(void)
   DALI_TEST_CHECK( toggleButton2 == toggleButton );
 
   //Additional check to ensure object is created by checking if it's registered
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   gObjectCreatedCallBackCalled = false;
@@ -171,7 +171,7 @@ int UtcDaliToggleButtonToggleStatesProperty(void)
 
   // Create the ToggleButton actor
   ToggleButton toggleButton = ToggleButton::New();
-  Stage::GetCurrent().Add( toggleButton );
+  application.GetScene().Add( toggleButton );
   toggleButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
@@ -252,7 +252,7 @@ int UtcDaliToggleButtonToggleTipsProperty( void )
 
   // Create the ToggleButton actor
   ToggleButton toggleButton = ToggleButton::New();
-  Stage::GetCurrent().Add( toggleButton );
+  application.GetScene().Add( toggleButton );
   toggleButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
@@ -311,7 +311,7 @@ int UtcDaliToggleButtonStateChange(void)
 
   // Create the ToggleButton actor
   ToggleButton toggleButton = ToggleButton::New();
-  Stage::GetCurrent().Add( toggleButton );
+  application.GetScene().Add( toggleButton );
   toggleButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   toggleButton.SetProperty( Actor::Property::POSITION, BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );

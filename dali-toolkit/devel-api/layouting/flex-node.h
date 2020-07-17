@@ -84,6 +84,14 @@ enum class Alignment
     STRETCH                ///< Stretch to fit the container
 };
 
+/**
+ * @brief Enumeration for the position type of the flex item how it is positioned within its parent.
+ */
+enum class PositionType
+{
+    RELATIVE,              ///< Flex items laid out relatively
+    ABSOLUTE               ///< Flex items laid out absolutely
+};
 
 /**
  * Struct used for MeasureCallback
@@ -133,8 +141,9 @@ public:
    * @param[in] margin of child Actor.
    * @param[in] measureFunction for the child.
    * @param[in] index to insert at.
+   * @return child node pointer
    */
-  void AddChild( Actor child, Extents margin, MeasureCallback measureFunction, int index );
+  Node* AddChild( Actor child, Extents margin, MeasureCallback measureFunction, int index );
 
   /**
    * @brief Remove child from the FlexLayout at the given index.
@@ -239,6 +248,78 @@ public:
    * @return The flex items alignment.
    */
   Alignment GetFlexItemsAlignment() const;
+
+  /**
+   * @brief Set the alignment self of the layout items.
+   * @param[in] flexAlignmentSelf The alignment self of the items.
+   */
+  void SetFlexAlignmentSelf( Alignment flexAlignmentSelf );
+
+  /**
+   * @brief Get the alignment self of the layout items.
+   * @return The flex items alignment self.
+   */
+  Alignment GetFlexAlignmentSelf() const;
+
+  /**
+   * @brief Set the position type of the layout items.
+   * @param[in] flexPositionType The position type of the items.
+   */
+  void SetFlexPositionType( PositionType flexPositionType );
+
+  /**
+   * @brief Get the position type of the layout items.
+   * @return The flex position type.
+   */
+  PositionType GetFlexPositionType() const;
+
+  /**
+   * @brief Set the aspect ratio of the layout items.
+   * @param[in] flexAspectRatio The aspect ratio of the items.
+   */
+  void SetFlexAspectRatio( float flexAspectRatio );
+
+  /**
+   * @brief Get the aspect ratio of the layout items.
+   * @return The flex aspect ratio.
+   */
+  float GetFlexAspectRatio() const;
+
+  /**
+   * @brief Set the basis of the layout items.
+   * @param[in] flexBasis The basis of the items.
+   */
+  void SetFlexBasis( float flexBasis );
+
+  /**
+   * @brief Get the basis of the layout items.
+   * @return The flex basis.
+   */
+  float GetFlexBasis() const;
+
+  /**
+   * @brief Set the shrink of the layout items.
+   * @param[in] flexShrink The shrink of the items.
+   */
+  void SetFlexShrink( float flexShrink );
+
+  /**
+   * @brief Get the shrink of the layout items.
+   * @return The flex shrink.
+   */
+  float GetFlexShrink() const;
+
+  /**
+   * @brief Set the grow of the layout items.
+   * @param[in] flexGrow The grow of the items.
+   */
+  void SetFlexGrow( float flexGrow );
+
+  /**
+   * @brief Get the grow of the layout items.
+   * @return The flex grow.
+   */
+  float GetFlexGrow() const;
 
   /**
    * @brief Set the margin.

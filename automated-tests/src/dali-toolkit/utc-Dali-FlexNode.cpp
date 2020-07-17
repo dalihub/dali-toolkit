@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,38 +175,44 @@ int UtcDaliToolkitFlexNodeAddChildrenColumnJustify(void)
   // Position elements in a Column
   flexNode->SetFlexDirection(Flex::FlexDirection::COLUMN);
 
-  tet_infoline("Justify to the Start, align to start");
+  tet_infoline("Justify to the Start, align to start, third item should be displayed at the top and the end");
   flexNode->SetFlexJustification(Flex::Justification::FLEX_START);
   flexNode->SetFlexItemsAlignment( Flex::Alignment::FLEX_START );
 
-  // Create two actors and add them to the parent flex node
+  // Create three actors and add them to the parent flex node
   Actor actor1 = Actor::New();
   Actor actor2 = Actor::New();
+  Actor actor3 = Actor::New();
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
+  DALI_TEST_CHECK( actor3 );
 
   DALI_TEST_EQUALS( (int)flexNode->GetFlexJustification(), (int)Flex::Justification::FLEX_START, TEST_LOCATION );
   DALI_TEST_EQUALS( (int)flexNode->GetFlexItemsAlignment(), (int)Flex::Alignment::FLEX_START, TEST_LOCATION );
 
   flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
   flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
+  Flex::Node* actor3node = flexNode->AddChild(actor3, Extents(0,0,0,0), &MeasureChild, 2);
+  actor3node->SetFlexAlignmentSelf( Flex::Alignment::FLEX_END );
 
   flexNode->CalculateLayout(480, 800, false);
 
   Vector4 root = flexNode->GetNodeFrame(-1); // -1 is the root
   Vector4 actor1Frame = flexNode->GetNodeFrame(0); // 0 is first child
   Vector4 actor2Frame = flexNode->GetNodeFrame(1); // 1 is second child
+  Vector4 actor3Frame = flexNode->GetNodeFrame(2); // 2 is third child
 
   tet_printf("Root frame(left:%f,top:%f,right:%f,bottom:%f)\n", root.x, root.y, root.z, root.w);
 
   tet_printf("Actor 1 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor1Frame.x, actor1Frame.y, actor1Frame.z, actor1Frame.w);
   tet_printf("Actor 2 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor2Frame.x, actor2Frame.y, actor2Frame.z, actor2Frame.w);
+  tet_printf("Actor 3 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor3Frame.x, actor3Frame.y, actor3Frame.z, actor3Frame.w);
 
   /*
     ---------
     |1      |
     |2      |
-    |       |
+    |      3|
     |       |
     |       |
     ---------
@@ -214,8 +220,9 @@ int UtcDaliToolkitFlexNodeAddChildrenColumnJustify(void)
 
   DALI_TEST_EQUALS( actor1Frame, Vector4( 0.0f, 0.0f, ITEM_SIZE.width, ITEM_SIZE.height ), TEST_LOCATION );
   DALI_TEST_EQUALS( actor2Frame, Vector4( 0.0f, ITEM_SIZE.height, ITEM_SIZE.width, ITEM_SIZE.height *2 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3Frame, Vector4( root.z - ITEM_SIZE.width, ITEM_SIZE.height *2, root.z, ITEM_SIZE.height *3 ), TEST_LOCATION );
 
-  tet_infoline(" Justify to the End, items should now be displayed at the bottom");
+  tet_infoline(" Justify to the End, items should now be displayed at the bottom, third item should now be displayed at the end");
   flexNode->SetFlexJustification( Flex::Justification::FLEX_END );
   flexNode->SetFlexItemsAlignment( Flex::Alignment::FLEX_START );
 
@@ -225,24 +232,27 @@ int UtcDaliToolkitFlexNodeAddChildrenColumnJustify(void)
   root = flexNode->GetNodeFrame(-1); // -1 is the root
   actor1Frame = flexNode->GetNodeFrame(0); // 0 is first child
   actor2Frame = flexNode->GetNodeFrame(1); // 1 is second child
+  actor3Frame = flexNode->GetNodeFrame(2); // 2 is third child
 
   tet_printf("Root frame(left:%f,top:%f,right:%f,bottom:%f)\n", root.x, root.y, root.z, root.w);
 
   tet_printf("Actor 1 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor1Frame.x, actor1Frame.y, actor1Frame.z, actor1Frame.w);
   tet_printf("Actor 2 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor2Frame.x, actor2Frame.y, actor2Frame.z, actor2Frame.w);
+  tet_printf("Actor 3 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor3Frame.x, actor3Frame.y, actor3Frame.z, actor3Frame.w);
 
   /*
     ---------
     |       |
     |       |
-    |       |
     |1      |
     |2      |
+    |      3|
     ---------
   */
 
-  DALI_TEST_EQUALS( actor1Frame, Vector4( 0.0f, root.w - (ITEM_SIZE.height*2), ITEM_SIZE.width,  root.w - ITEM_SIZE.height ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2Frame, Vector4( 0.0f, root.w - ITEM_SIZE.height, ITEM_SIZE.width, root.w ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1Frame, Vector4( 0.0f, root.w - (ITEM_SIZE.height*3), ITEM_SIZE.width,  root.w - (ITEM_SIZE.height*2) ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2Frame, Vector4( 0.0f, root.w - (ITEM_SIZE.height*2), ITEM_SIZE.width, root.w - ITEM_SIZE.height ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3Frame, Vector4( root.z - ITEM_SIZE.width, root.w - ITEM_SIZE.height, root.z, root.w ), TEST_LOCATION );
 
   tet_infoline(" Align to End, items should now be displayed at the bottom and the end");
   flexNode->SetFlexJustification( Flex::Justification::FLEX_END );
@@ -253,22 +263,25 @@ int UtcDaliToolkitFlexNodeAddChildrenColumnJustify(void)
   root = flexNode->GetNodeFrame(-1); // -1 is the root
   actor1Frame = flexNode->GetNodeFrame(0); // 0 is first child
   actor2Frame = flexNode->GetNodeFrame(1); // 1 is second child
+  actor3Frame = flexNode->GetNodeFrame(2); // 2 is third child
 
   tet_printf("Actor 1 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor1Frame.x, actor1Frame.y, actor1Frame.z, actor1Frame.w);
   tet_printf("Actor 2 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor2Frame.x, actor2Frame.y, actor2Frame.z, actor2Frame.w);
+  tet_printf("Actor 3 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor3Frame.x, actor3Frame.y, actor3Frame.z, actor3Frame.w);
 
   /*
     ---------
     |       |
     |       |
-    |       |
     |      1|
     |      2|
+    |      3|
     ---------
   */
 
-  DALI_TEST_EQUALS( actor1Frame, Vector4( root.z - ITEM_SIZE.width, root.w - (ITEM_SIZE.height*2), root.z,  root.w - ITEM_SIZE.height ), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2Frame, Vector4( root.z - ITEM_SIZE.width, root.w - ITEM_SIZE.height, root.z, root.w ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1Frame, Vector4( root.z - ITEM_SIZE.width, root.w - (ITEM_SIZE.height*3), root.z,  root.w - (ITEM_SIZE.height*2) ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2Frame, Vector4( root.z - ITEM_SIZE.width, root.w - (ITEM_SIZE.height*2), root.z,  root.w - ITEM_SIZE.height ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3Frame, Vector4( root.z - ITEM_SIZE.width, root.w - ITEM_SIZE.height, root.z, root.w ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -555,6 +568,243 @@ int UtcDaliToolkitFlexNodeCallbackTestP(void)
 
   DALI_TEST_EQUALS( actor1Frame, Vector4( 0.0f, 0.0f, ITEM_SIZE_CALLBACK_TEST.width, ITEM_SIZE_CALLBACK_TEST.height ), TEST_LOCATION );
   DALI_TEST_EQUALS( actor2Frame, Vector4( 0.0f, ITEM_SIZE_CALLBACK_TEST.height, ITEM_SIZE.width, ITEM_SIZE_CALLBACK_TEST.height + ITEM_SIZE.height ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitFlexNodeFlexPositionType(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitFlexNodeFlexPositionType");
+  Flex::Node* flexNode = new Flex::Node();
+  DALI_TEST_CHECK( flexNode );
+
+  tet_infoline(" FlexPositionType is RELATIVE by default");
+
+  // Create two actors and add them to the parent flex node
+  Actor actor1 = Actor::New();
+  Actor actor2 = Actor::New();
+  DALI_TEST_CHECK( actor1 );
+  DALI_TEST_CHECK( actor2 );
+
+  flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  Flex::Node* actor2node = flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
+
+  DALI_TEST_EQUALS( (int)actor2node->GetFlexPositionType(), (int)Flex::PositionType::RELATIVE, TEST_LOCATION );
+
+  flexNode->CalculateLayout(480, 800, false);
+
+  Vector4 root = flexNode->GetNodeFrame(-1); // -1 is the root
+  Vector4 actor1Frame = flexNode->GetNodeFrame(0); // 0 is first child
+  Vector4 actor2Frame = flexNode->GetNodeFrame(1); // 1 is second child
+
+  tet_printf("Root frame(left:%f,top:%f,right:%f,bottom:%f)\n", root.x, root.y, root.z, root.w);
+
+  tet_printf("Actor 1 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor1Frame.x, actor1Frame.y, actor1Frame.z, actor1Frame.w);
+  tet_printf("Actor 2 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor2Frame.x, actor2Frame.y, actor2Frame.z, actor2Frame.w);
+
+  /*
+    ---------
+    |1      |
+    |2      |
+    |       |
+    |       |
+    |       |
+    ---------
+  */
+
+  DALI_TEST_EQUALS( actor1Frame, Vector4( 0.0f, 0.0f, ITEM_SIZE.width, ITEM_SIZE.height ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2Frame, Vector4( 0.0f, ITEM_SIZE.height, ITEM_SIZE.width, ITEM_SIZE.height *2 ), TEST_LOCATION );
+
+  tet_infoline(" ABSOLUTE FlexPositionType, second item should now be ignore any properties");
+  actor2node->SetFlexPositionType( Flex::PositionType::ABSOLUTE );
+
+  // Recalulate layout
+  flexNode->CalculateLayout(480, 800, false);
+
+  root = flexNode->GetNodeFrame(-1); // -1 is the root
+  actor1Frame = flexNode->GetNodeFrame(0); // 0 is first child
+  actor2Frame = flexNode->GetNodeFrame(1); // 1 is second child
+
+  tet_printf("Root frame(left:%f,top:%f,right:%f,bottom:%f)\n", root.x, root.y, root.z, root.w);
+
+  tet_printf("Actor 1 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor1Frame.x, actor1Frame.y, actor1Frame.z, actor1Frame.w);
+  tet_printf("Actor 2 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor2Frame.x, actor2Frame.y, actor2Frame.z, actor2Frame.w);
+
+  /*
+    ---------
+    |1(2)   |
+    |       |
+    |       |
+    |       |
+    |       |
+    ---------
+  */
+
+  DALI_TEST_EQUALS( actor1Frame, Vector4( 0.0f, 0.0f, ITEM_SIZE.width, ITEM_SIZE.height ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2Frame, Vector4( 0.0f, 0.0f, ITEM_SIZE.width, ITEM_SIZE.height ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitFlexNodeFlexAspectRatio(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitFlexNodeFlexAspectRatio");
+  Flex::Node* flexNode = new Flex::Node();
+  DALI_TEST_CHECK( flexNode );
+
+  // Create a actor and add them to the parent flex node
+  Actor actor1 = Actor::New();
+  DALI_TEST_CHECK( actor1 );
+
+  tet_infoline(" 1.0 FlexAspectRatio");
+  Flex::Node* actor1node = flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  actor1node->SetFlexAspectRatio(1.0);
+
+  DALI_TEST_EQUALS( actor1node->GetFlexAspectRatio(), 1.0f, TEST_LOCATION );
+
+  flexNode->CalculateLayout(480, 800, false);
+
+  Vector4 root = flexNode->GetNodeFrame(-1); // -1 is the root
+  Vector4 actor1Frame = flexNode->GetNodeFrame(0); // 0 is first child
+
+  tet_printf("Root frame(left:%f,top:%f,right:%f,bottom:%f)\n", root.x, root.y, root.z, root.w);
+
+  tet_printf("Actor 1 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor1Frame.x, actor1Frame.y, actor1Frame.z, actor1Frame.w);
+
+  /*
+    ---------
+    |---    |
+    ||1|    |
+    |---    |
+    |       |
+    |       |
+    ---------
+  */
+
+  DALI_TEST_EQUALS( actor1Frame, Vector4( 0.0f, 0.0f, ITEM_SIZE.width, ITEM_SIZE.height ), TEST_LOCATION );
+
+  tet_infoline(" 2.0 FlexAspectRatio");
+  actor1node->SetFlexAspectRatio(2.0);
+
+  DALI_TEST_EQUALS( actor1node->GetFlexAspectRatio(), 2.0f, TEST_LOCATION );
+
+  // Recalulate layout
+  flexNode->CalculateLayout(480, 800, false);
+
+  root = flexNode->GetNodeFrame(-1); // -1 is the root
+  actor1Frame = flexNode->GetNodeFrame(0); // 0 is first child
+
+  tet_printf("Root frame(left:%f,top:%f,right:%f,bottom:%f)\n", root.x, root.y, root.z, root.w);
+
+  tet_printf("Actor 1 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor1Frame.x, actor1Frame.y, actor1Frame.z, actor1Frame.w);
+
+  /*
+    ---------
+    |------ |
+    || 1  | |
+    |------ |
+    |       |
+    |       |
+    ---------
+  */
+
+  DALI_TEST_EQUALS( actor1Frame, Vector4( 0.0f, 0.0f, ITEM_SIZE.width*2, ITEM_SIZE.height ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitFlexNodeFlexBasisShrinkGrow(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitFlexNodeFlexBasisShrinkGrow");
+  Flex::Node* flexNode = new Flex::Node();
+  DALI_TEST_CHECK( flexNode );
+
+  // Position elements as a Row
+  flexNode->SetFlexDirection(Flex::FlexDirection::ROW);
+
+  // Create three actors and add them to the parent flex node
+  Actor actor1 = Actor::New();
+  Actor actor2 = Actor::New();
+  Actor actor3 = Actor::New();
+  DALI_TEST_CHECK( actor1 );
+  DALI_TEST_CHECK( actor2 );
+  DALI_TEST_CHECK( actor3 );
+
+  Flex::Node* actor1node = flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  Flex::Node* actor2node = flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
+  Flex::Node* actor3node = flexNode->AddChild(actor3, Extents(0,0,0,0), &MeasureChild, 2);
+
+  float basis = 5;
+
+  actor1node->SetFlexGrow(0.0);
+  actor2node->SetFlexGrow(0.0);
+  actor3node->SetFlexGrow(0.0);
+  actor1node->SetFlexShrink(1.0);
+  actor2node->SetFlexShrink(1.0);
+  actor3node->SetFlexShrink(1.0);
+  actor1node->SetFlexBasis(basis);
+  actor2node->SetFlexBasis(basis);
+  actor3node->SetFlexBasis(basis);
+
+  DALI_TEST_EQUALS( actor1node->GetFlexGrow(), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1node->GetFlexShrink(), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1node->GetFlexBasis(), basis, TEST_LOCATION );
+
+  flexNode->CalculateLayout(600, 200, false);
+
+  Vector4 root = flexNode->GetNodeFrame(-1); // -1 is the root
+  Vector4 actor1Frame = flexNode->GetNodeFrame(0); // 0 is first child
+  Vector4 actor2Frame = flexNode->GetNodeFrame(1); // 1 is second child
+  Vector4 actor3Frame = flexNode->GetNodeFrame(2); // 2 is third child
+
+  tet_printf("Root frame(left:%f,top:%f,right:%f,bottom:%f)\n", root.x, root.y, root.z, root.w);
+
+  tet_printf("Actor 1 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor1Frame.x, actor1Frame.y, actor1Frame.z, actor1Frame.w);
+  tet_printf("Actor 2 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor2Frame.x, actor2Frame.y, actor2Frame.z, actor2Frame.w);
+  tet_printf("Actor 3 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor3Frame.x, actor3Frame.y, actor3Frame.z, actor3Frame.w);
+
+  /*
+    -------------------
+    ||1||2||3|        |
+    |                 |
+    -------------------
+  */
+
+  DALI_TEST_EQUALS( actor1Frame, Vector4( 0.0f, 0.0f, basis, ITEM_SIZE.height ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2Frame, Vector4( basis, 0.0f, basis*2, ITEM_SIZE.height ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3Frame, Vector4( basis*2, 0.0f, basis*3, ITEM_SIZE.height ), TEST_LOCATION );
+
+
+  actor2node->SetFlexGrow(1.0);
+  actor3node->SetFlexGrow(1.0);
+
+  // Recalulate layout
+  flexNode->CalculateLayout(605, 200, false);
+
+  root = flexNode->GetNodeFrame(-1); // -1 is the root
+  actor1Frame = flexNode->GetNodeFrame(0); // 0 is first child
+  actor2Frame = flexNode->GetNodeFrame(1); // 1 is second child
+  actor3Frame = flexNode->GetNodeFrame(2); // 2 is third child
+
+  tet_printf("Root frame(left:%f,top:%f,right:%f,bottom:%f)\n", root.x, root.y, root.z, root.w);
+
+  tet_printf("Actor 1 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor1Frame.x, actor1Frame.y, actor1Frame.z, actor1Frame.w);
+  tet_printf("Actor 2 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor2Frame.x, actor2Frame.y, actor2Frame.z, actor2Frame.w);
+  tet_printf("Actor 3 frame(left:%f,top:%f,right:%f,bottom:%f)\n", actor3Frame.x, actor3Frame.y, actor3Frame.z, actor3Frame.w);
+
+  /*
+    -------------------
+    ||1||  2  ||  3  ||
+    |                 |
+    -------------------
+  */
+
+  DALI_TEST_EQUALS( actor1Frame, Vector4( 0.0f, 0.0f, basis, ITEM_SIZE.height ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2Frame, Vector4( basis, 0.0f, basis + (root.z-basis)/2, ITEM_SIZE.height ), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3Frame, Vector4( basis + (root.z-basis)/2, 0.0f, root.z, ITEM_SIZE.height ), TEST_LOCATION );
 
   END_TEST;
 }

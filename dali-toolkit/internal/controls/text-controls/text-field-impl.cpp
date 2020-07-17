@@ -22,7 +22,7 @@
 #include <cstring>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
-#include <dali/public-api/common/stage.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/object/type-registry-helper.h>

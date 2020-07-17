@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ int UtcDaliRadioButtonNewP(void)
   DALI_TEST_CHECK( radioButton2 == radioButton );
 
   //Additional check to ensure object is created by checking if it's registered
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   gObjectCreatedCallBackCalled = false;
@@ -185,7 +185,7 @@ int UtcDaliRadioButtonSelectedProperty(void)
 
   // Create the RadioButton actor
   RadioButton radioButton = RadioButton::New();
-  Stage::GetCurrent().Add( radioButton );
+  application.GetScene().Add( radioButton );
   radioButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   radioButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   radioButton.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
@@ -217,7 +217,7 @@ int UtcDaliRadioButtonSelectedProperty(void)
   radioButton3.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 40.0f ));
 
   Actor radioGroup = Actor::New();
-  Stage::GetCurrent().Add( radioGroup );
+  application.GetScene().Add( radioGroup );
   radioGroup.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   radioGroup.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   radioGroup.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));

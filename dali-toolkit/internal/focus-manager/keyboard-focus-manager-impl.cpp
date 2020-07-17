@@ -25,7 +25,6 @@
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>

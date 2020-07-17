@@ -248,7 +248,7 @@ int UtcDaliVisualSetGetDepthIndex(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
 
   int depthIndex = dummyControl.GetRendererAt(0u).GetProperty<int>( Renderer::Property::DEPTH_INDEX );
@@ -418,13 +418,13 @@ int UtcDaliVisualSetOnOffStage(void)
   application.Render(0);
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render(0);
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
 
   application.SendNotification();
   application.Render(0);
@@ -455,7 +455,7 @@ int UtcDaliVisualSetOnOffStage2(void)
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   // First on/off
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render(0);
@@ -465,14 +465,14 @@ int UtcDaliVisualSetOnOffStage2(void)
   auto textures = renderer.GetTextures();
   DALI_TEST_CHECK( textures.GetTextureCount() != 0u );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
 
   application.SendNotification();
   application.Render(0);
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   // Second on/off
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
 
   application.SendNotification();
   application.Render(0);
@@ -482,7 +482,7 @@ int UtcDaliVisualSetOnOffStage2(void)
   textures = renderer.GetTextures();
   DALI_TEST_CHECK( textures.GetTextureCount() != 0u );
 
-  Stage::GetCurrent().Remove( actor );
+  application.GetScene().Remove( actor );
 
   application.SendNotification();
   application.Render(0);
@@ -618,7 +618,7 @@ int UtcDaliVisualGetPropertyMap2N(void)
   DummyControl dummyControl = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, borderVisual );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 1, TEST_LOCATION );
 
@@ -1765,7 +1765,7 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, borderVisual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -1833,7 +1833,7 @@ int UtcDaliVisualAnimateBorderVisual02(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, borderVisual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -1877,7 +1877,7 @@ int UtcDaliVisualAnimateColorVisual(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, borderVisual );
   actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -1933,7 +1933,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
     actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
     actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
-    Stage::GetCurrent().Add(actor);
+    application.GetScene().Add(actor);
 
     DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
@@ -2008,7 +2008,7 @@ int UtcDaliVisualAnimatedGradientVisual01(void)
     actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
     actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
     actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
-    Stage::GetCurrent().Add(actor);
+    application.GetScene().Add(actor);
 
     application.SendNotification();
     application.Render(0);
@@ -2179,7 +2179,7 @@ int UtcDaliVisualAnimatedGradientVisual02(void)
       actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
       actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
       actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
-      Stage::GetCurrent().Add(actor);
+      application.GetScene().Add(actor);
 
       application.SendNotification();
       application.Render( 0 );
@@ -2453,7 +2453,7 @@ int UtcDaliVisualAnimatedGradientVisual03(void)
       actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
       actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
       actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
-      Stage::GetCurrent().Add(actor);
+      application.GetScene().Add(actor);
 
       application.SendNotification();
       application.Render( 0 );
@@ -2740,7 +2740,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
   actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   dummyImpl.SetLayout( DummyControl::Property::TEST_VISUAL, transform );
@@ -3036,7 +3036,7 @@ int UtcDaliNPatchVisualCustomShader(void)
   dummyImpl.SetLayout( DummyControl::Property::TEST_VISUAL, transformMap );
   dummy.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  Stage::GetCurrent().Add(dummy);
+  application.GetScene().Add(dummy);
   application.SendNotification();
 
   Renderer renderer = dummy.GetRendererAt( 0 );
@@ -3081,7 +3081,7 @@ int UtcDaliGradientVisualBlendMode(void)
 
   DummyControl control = DummyControl::New(true);
   control.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>( control.GetImplementation() );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL,  opaqueGradientVisual );
@@ -3119,7 +3119,7 @@ int UtcDaliVisualRendererRemovalAndReAddition(void)
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   tet_infoline( "Add control with visual to stage and check renderer count is 1" );
 
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   application.SendNotification();
   application.Render();
@@ -3127,7 +3127,7 @@ int UtcDaliVisualRendererRemovalAndReAddition(void)
   DALI_TEST_EQUALS( dummyControl.GetRendererCount(), 1, TEST_LOCATION );
 
   tet_infoline( "Remove control with visual from stage and check renderer count is 0" );
-  Stage::GetCurrent().Remove( dummyControl );
+  application.GetScene().Remove( dummyControl );
   application.SendNotification();
   application.Render();
 
@@ -3135,7 +3135,7 @@ int UtcDaliVisualRendererRemovalAndReAddition(void)
 
   tet_infoline( "Re-add control with visual to stage and check renderer count is still 1" );
 
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   application.SendNotification();
   application.Render();
@@ -3181,7 +3181,7 @@ int UtcDaliVisualTextVisualRender(void)
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummyControl.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
   application.SendNotification();
   application.Render();
 
@@ -3250,7 +3250,7 @@ int UtcDaliVisualTextVisualDisableEnable(void)
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummyControl.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
   application.SendNotification();
   application.Render();
 
@@ -3378,7 +3378,7 @@ int UtcDaliRegisterVisualOrder(void)
   DALI_TEST_EQUALS( anotherTestVisual2Replacement.GetDepthIndex(), 2000, TEST_LOCATION );
 
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   END_TEST;
 }
@@ -3414,7 +3414,7 @@ int UtcDaliRegisterVisualOrder02(void)
   DALI_TEST_CHECK( testVisual2.GetDepthIndex() >  testVisual1.GetDepthIndex() );
 
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   END_TEST;
 }
@@ -3451,7 +3451,7 @@ int UtcDaliRegisterVisualWithDepthIndex(void)
   DALI_TEST_EQUALS( DevelControl::IsVisualEnabled( dummyImpl, DummyControl::Property::TEST_VISUAL2 ), true, TEST_LOCATION );
 
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   END_TEST;
 }
@@ -3532,7 +3532,7 @@ int UtcDaliSvgVisualCustomShader(void)
 
   dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  Stage::GetCurrent().Add( dummy );
+  application.GetScene().Add( dummy );
 
   application.SendNotification();
   application.Render();
@@ -3578,7 +3578,7 @@ int UtcDaliVisualRoundedCorner(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-    Stage::GetCurrent().Add( dummy );
+    application.GetScene().Add( dummy );
 
     application.SendNotification();
     application.Render();
@@ -3610,7 +3610,7 @@ int UtcDaliVisualRoundedCorner(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-    Stage::GetCurrent().Add( dummy );
+    application.GetScene().Add( dummy );
 
     application.SendNotification();
     application.Render();
@@ -3655,7 +3655,7 @@ int UtcDaliVisualRoundedCorner(void)
 
     dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-    Stage::GetCurrent().Add( dummy );
+    application.GetScene().Add( dummy );
 
     application.SendNotification();
     application.Render();
@@ -3691,7 +3691,7 @@ int UtcDaliColorVisualBlurRadius(void)
 
   dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
   dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  Stage::GetCurrent().Add( dummy );
+  application.GetScene().Add( dummy );
 
   application.SendNotification();
   application.Render();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ int UtcDaliBubbleEmitterNew(void)
   DALI_TEST_CHECK( emitter );
 
   // Additional check to ensure object is created by checking if it's registered
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
   gObjectCreatedCallBackCalled = false;
   registry.ObjectCreatedSignal().Connect( &TestCallback );
@@ -169,7 +169,7 @@ int UtcDaliBubbleEmitterSetBackground(void)
   Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 200, Vector2( 5.f, 10.f ));
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   unsigned int taskCount = taskList.GetTaskCount();
 
   Texture bgImage = CreateSolidColorTexture( application, Color::RED, 50, 50 );
@@ -197,7 +197,7 @@ int UtcDaliBubbleEmitterSetBubbleScale(void)
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 150, Vector2( 5.f, 10.f ));
   DALI_TEST_CHECK(emitter);
   Actor root = emitter.GetRootActor();
-  Stage::GetCurrent().Add( root );
+  application.GetScene().Add( root );
   root.SetProperty( Actor::Property::POSITION, Vector3::ZERO );
   root.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   root.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
@@ -274,7 +274,7 @@ int UtcDaliBubbleEmitterEmitBubble(void)
 
   Actor root = emitter.GetRootActor();
   Renderer bubbleRenderer = root.GetRendererAt( 0 );
-  Stage::GetCurrent().Add( root );
+  application.GetScene().Add( root );
   DALI_TEST_CHECK( bubbleRenderer );
 
   Property::Index propertyIndex0 = bubbleRenderer.GetPropertyIndex( "uPercentage[0]" );
@@ -320,7 +320,7 @@ int UtcDaliBubbleEmitterRestore(void)
   Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( movementArea,shapeImage, 90, Vector2( 5.f, 10.f ));
   Actor root = emitter.GetRootActor();
-  Stage::GetCurrent().Add( root );
+  application.GetScene().Add( root );
   root.SetProperty( Actor::Property::POSITION, Vector3::ZERO );
   root.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   root.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -418,9 +418,9 @@ int UtcDaliImageAtlasImageView(void)
   imageView2.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   application.GetPlatform().SetClosestImageSize(  Vector2(34, 34) );
-  Stage::GetCurrent().Add( imageView1 );
+  application.GetScene().Add( imageView1 );
   application.GetPlatform().SetClosestImageSize(  Vector2(50, 50) );
-  Stage::GetCurrent().Add( imageView2 );
+  application.GetScene().Add( imageView2 );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
 
@@ -449,7 +449,7 @@ int UtcDaliImageAtlasImageView(void)
 
   // remove the imageView2 from stage, the second image will also be removed from atlas
   // then the space on the atlas will be used by the third image added.
-  Stage::GetCurrent().Remove( imageView2 );
+  application.GetScene().Remove( imageView2 );
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
 
@@ -463,7 +463,7 @@ int UtcDaliImageAtlasImageView(void)
   imageView3.SetProperty( ImageView::Property::IMAGE, imageMap3 );
 
   application.GetPlatform().SetClosestImageSize(  Vector2(100, 100) );
-  Stage::GetCurrent().Add( imageView3 );
+  application.GetScene().Add( imageView3 );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ int UtcDaliSliderNew(void)
   DALI_TEST_CHECK( slider2 == slider );
 
   //Additional check to ensure object is created by checking if it's registered
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   gObjectCreatedCallBackCalled = false;
@@ -128,10 +128,10 @@ int UtcDaliSliderSignals1(void)
 
   // Create the Popup actor
   Slider slider = Slider::New();
-  Stage::GetCurrent().Add( slider );
+  application.GetScene().Add( slider );
   slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  slider.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  slider.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, 20.0f ) );
   slider.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
 
   const float MIN_BOUND = 0.0f;
@@ -225,10 +225,10 @@ int UtcDaliSliderSignals2(void)
 
   // Create the Popup actor
   Slider slider = Slider::New();
-  Stage::GetCurrent().Add( slider );
+  application.GetScene().Add( slider );
   slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  slider.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  slider.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, 20.0f ) );
   slider.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
 
   const float MIN_BOUND = 0.0f;
@@ -291,10 +291,10 @@ int UtcDaliSetPropertyP(void)
   Slider slider = Slider::New();
   slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
   slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
-  slider.SetProperty( Actor::Property::SIZE, Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  slider.SetProperty( Actor::Property::SIZE, Vector2( application.GetScene().GetSize().x, 20.0f ) );
   slider.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
 
-  Stage::GetCurrent().Add(slider);
+  application.GetScene().Add(slider);
   application.SendNotification();
   application.Render();
 

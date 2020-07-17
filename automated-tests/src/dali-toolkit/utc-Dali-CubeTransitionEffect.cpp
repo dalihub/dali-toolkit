@@ -135,7 +135,7 @@ int UtcDaliCubeTransitionWaveEffectNew(void)
   waveEffect.Reset();
 
   //Additional check to ensure object is created by checking if it's registered
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   gObjectCreatedCallBackCalled = false;
@@ -165,7 +165,7 @@ int UtcDaliCubeTransitionCrossEffectNew(void)
   crossEffect.Reset();
 
   //Additional check to ensure object is created by checking if it's registered
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   gObjectCreatedCallBackCalled = false;
@@ -195,7 +195,7 @@ int UtcDaliCubeTransitionFoldEffectNew(void)
   foldEffect.Reset();
 
   //Additional check to ensure object is created by checking if it is registered
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   gObjectCreatedCallBackCalled = false;
@@ -261,7 +261,7 @@ int UtcDaliCubeTransitionEffectGetRoot(void)
 
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
-  Stage::GetCurrent().Add( waveEffect );
+  application.GetScene().Add( waveEffect );
   waveEffect.SetCurrentTexture( texture );
   waveEffect.SetTargetTexture( texture );
 
@@ -293,7 +293,7 @@ int UtcDaliCubeTransitionEffectIsTransitioning(void)
 
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
-  Stage::GetCurrent().Add( waveEffect );
+  application.GetScene().Add( waveEffect );
 
   waveEffect.SetTransitionDuration( TRANSITION_DURATION );
   waveEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
@@ -310,7 +310,7 @@ int UtcDaliCubeTransitionEffectIsTransitioning(void)
 
   CubeTransitionEffect crossEffect = CubeTransitionCrossEffect::New( NUM_ROWS, NUM_COLUMNS );
   crossEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
-  Stage::GetCurrent().Add( crossEffect );
+  application.GetScene().Add( crossEffect );
 
   crossEffect.SetTransitionDuration( TRANSITION_DURATION );
   crossEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
@@ -327,7 +327,7 @@ int UtcDaliCubeTransitionEffectIsTransitioning(void)
 
   CubeTransitionEffect foldEffect = CubeTransitionFoldEffect::New( NUM_ROWS, NUM_COLUMNS );
   foldEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
-  Stage::GetCurrent().Add( foldEffect );
+  application.GetScene().Add( foldEffect );
 
   foldEffect.SetTransitionDuration( TRANSITION_DURATION );
   DALI_TEST_CHECK( !foldEffect.IsTransitioning() );
@@ -357,7 +357,7 @@ int UtcDaliCubeTransitionEffectSetCurrentTexture(void)
   waveEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
   waveEffect.SetCurrentTexture( texture );
 
-  Stage::GetCurrent().Add( waveEffect );
+  application.GetScene().Add( waveEffect );
 
   application.SendNotification();
   application.Render();
@@ -393,12 +393,12 @@ int UtcDaliCubeTransitionEffectSetTargetTexture(void)
   Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, 40, 40 );
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS );
   waveEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
-  Stage::GetCurrent().Add( waveEffect );
+  application.GetScene().Add( waveEffect );
 
   waveEffect.SetCurrentTexture( texture );
   waveEffect.SetTargetTexture( texture );
 
-  Stage::GetCurrent().Add( waveEffect );
+  application.GetScene().Add( waveEffect );
 
   application.SendNotification();
   application.Render();
@@ -441,7 +441,7 @@ int UtcDaliCubeTransitionWaveEffectStartTransition(void)
   waveEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
   waveEffect.SetCurrentTexture( texture );
 
-  Stage::GetCurrent().Add( waveEffect );
+  application.GetScene().Add( waveEffect );
 
   application.SendNotification();
   application.Render();
@@ -499,7 +499,7 @@ int UtcDaliCubeTransitionCrossEffectStartTransition(void)
   crossEffect.SetCurrentTexture( texture );
   crossEffect.SetTargetTexture( texture );
 
-  Stage::GetCurrent().Add( crossEffect );
+  application.GetScene().Add( crossEffect );
 
   application.SendNotification();
   application.Render();
@@ -557,7 +557,7 @@ int UtcDaliCubeTransitionFoldEffectStartTransition(void)
   foldEffect.SetCurrentTexture( texture );
   foldEffect.SetTargetTexture( texture );
 
-  Stage::GetCurrent().Add( foldEffect );
+  application.GetScene().Add( foldEffect );
 
   application.SendNotification();
   application.Render();
@@ -615,18 +615,18 @@ int UtcDaliCubeTransitionEffectSignalTransitionCompleted(void)
   waveEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
   waveEffect.SetTransitionDuration( TRANSITION_DURATION );
   waveEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
-  Stage::GetCurrent().Add( waveEffect );
+  application.GetScene().Add( waveEffect );
 
   CubeTransitionEffect crossEffect = CubeTransitionCrossEffect::New( NUM_ROWS, NUM_COLUMNS );
   crossEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
   crossEffect.SetTransitionDuration( TRANSITION_DURATION );
   crossEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
-  Stage::GetCurrent().Add( crossEffect );
+  application.GetScene().Add( crossEffect );
 
   CubeTransitionEffect foldEffect = CubeTransitionCrossEffect::New( NUM_ROWS, NUM_COLUMNS );
   foldEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
   foldEffect.SetTransitionDuration( TRANSITION_DURATION );
-  Stage::GetCurrent().Add( foldEffect );
+  application.GetScene().Add( foldEffect );
 
   bool signalVerified = false;
   CubeTransitionEffect currentEffect;
@@ -704,18 +704,18 @@ int UtcDaliCubeTransitionEffectPauseResumeTransition(void)
   waveEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
   waveEffect.SetTransitionDuration( TRANSITION_DURATION );
   waveEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
-  Stage::GetCurrent().Add( waveEffect );
+  application.GetScene().Add( waveEffect );
 
   CubeTransitionEffect crossEffect = CubeTransitionCrossEffect::New( NUM_ROWS, NUM_COLUMNS );
   crossEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
   crossEffect.SetTransitionDuration( TRANSITION_DURATION );
   crossEffect.SetCubeDisplacement( CUBE_DISPLACEMENT );
-  Stage::GetCurrent().Add( crossEffect );
+  application.GetScene().Add( crossEffect );
 
   CubeTransitionEffect foldEffect = CubeTransitionFoldEffect::New( NUM_ROWS, NUM_COLUMNS );
   foldEffect.SetProperty( Actor::Property::SIZE, Vector2( VIEW_AREA_SIZE ) );
   foldEffect.SetTransitionDuration( TRANSITION_DURATION );
-  Stage::GetCurrent().Add( foldEffect );
+  application.GetScene().Add( foldEffect );
 
   bool signalVerified = false;
   CubeTransitionEffect currentEffect;
@@ -814,7 +814,7 @@ int UtcDaliCubeTransitionWaveEffectStopTransition(void)
   waveEffect.SetCurrentTexture( firstTexture );
   waveEffect.SetTargetTexture( secondTexture );
 
-  Stage::GetCurrent().Add( waveEffect );
+  application.GetScene().Add( waveEffect );
 
   application.SendNotification();
   application.Render();
@@ -880,7 +880,7 @@ int UtcDaliCubeTransitionCrossEffectStopTransition(void)
   crossEffect.SetCurrentTexture( firstTexture );
   crossEffect.SetTargetTexture( secondTexture );
 
-  Stage::GetCurrent().Add( crossEffect );
+  application.GetScene().Add( crossEffect );
 
   application.SendNotification();
   application.Render();
@@ -950,7 +950,7 @@ int UtcDaliCubeTransitionFoldEffectStopTransition(void)
   foldEffect.SetCurrentTexture( firstTexture );
   foldEffect.SetTargetTexture( secondTexture );
 
-  Stage::GetCurrent().Add( foldEffect );
+  application.GetScene().Add( foldEffect );
 
   application.SendNotification();
   application.Render();

@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/object/property-array.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
@@ -191,6 +192,14 @@ DALI_TOOLKIT_API Devel::PixelBuffer ConvertToRgba8888( Devel::PixelBuffer pixelB
 * @param[in] blend Whether to blend the source pixel buffer with the destination pixel buffer as background.
 */
 DALI_TOOLKIT_API void UpdateBuffer( Devel::PixelBuffer src, Devel::PixelBuffer dst, unsigned int x, unsigned int y, bool blend);
+
+/**
+ * @brief Splits the text in pages of the size given in @p textParameters
+ *
+ * @note The returned indices are indices to utf32 characters. The input text is encoded in utf8.
+ * @return An array with the indices of the last character of each page
+ */
+DALI_TOOLKIT_API Dali::Property::Array GetLastCharacterIndex( RendererParameters& textParameters );
 
 } // namespace DevelText
 

@@ -29,7 +29,7 @@
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/stage.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali

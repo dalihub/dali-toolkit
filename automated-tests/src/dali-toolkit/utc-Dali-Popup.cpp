@@ -225,7 +225,7 @@ int UtcDaliPopupNewP( void )
   DALI_TEST_CHECK( popup2 == popup );
 
   // Additional check to ensure object is created by checking if it's registered.
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   gObjectCreatedCallBackCalled = false;
@@ -357,7 +357,7 @@ int UtcDaliPopupSetContentP(void)
 
   // Create the Popup actor
   Popup popup = Popup::New();
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
   popup.SetProperty( Toolkit::Popup::Property::ANIMATION_DURATION, 0.0f );
 
   // Put in show state so it's layer is connected to popup (for ancestor check).
@@ -402,7 +402,7 @@ int UtcDaliPopupSetFooterP(void)
 
   // Create the Popup actor
   Popup popup = Popup::New();
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
   popup.SetProperty( Toolkit::Popup::Property::ANIMATION_DURATION, 0.0f );
   // Put in show state so it's layer is connected to popup (for ancestor check).
   popup.SetDisplayState( Popup::SHOWN );
@@ -446,7 +446,7 @@ int UtcDaliPopupSetControlFooterMultiple(void)
 
   // Create the Popup actor
   Popup popup = Popup::New();
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
   popup.SetProperty( Toolkit::Popup::Property::ANIMATION_DURATION, 0.0f );
   // Put in show state so it's layer is connected to popup (for ancestor check).
   popup.SetDisplayState( Popup::SHOWN );
@@ -641,7 +641,7 @@ int UtcDaliPopupPropertyTailVisibility(void)
 
   // Create the Popup actor
   Popup popup = Popup::New();
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
 
   popup.SetProperty( Popup::Property::TAIL_VISIBILITY, false );
   popup.SetDisplayState( Popup::SHOWN );
@@ -681,7 +681,7 @@ int UtcDaliPopupOnTouchedOutsideSignal(void)
   popup.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   popup.SetProperty( Actor::Property::SIZE, Vector2( 50.0f, 50.0f ) );
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
   popup.OutsideTouchedSignal().Connect( &OnPopupTouchedOutside );
   popup.SetDisplayState( Popup::SHOWN );
 
@@ -753,7 +753,7 @@ int UtcDaliPopupPropertyAutoHide(void)
   DALI_TEST_CHECK( popup.GetProperty( Popup::Property::AUTO_HIDE_DELAY ).Get( getAutoHideDelay ) );
   DALI_TEST_EQUALS( getAutoHideDelay, 200, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
 
   DALI_TEST_EQUALS( gPopupState, Popup::HIDDEN, TEST_LOCATION );
 
@@ -793,7 +793,7 @@ int UtcDaliPopupPropertyAnimationMode(void)
   Popup popup = Popup::New();
   ConnectStateSignals( popup );
   popup.SetTitle( TextLabel::New( "Title" ) );
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
 
   std::string animationModes[] = { "NONE", "ZOOM", "FADE", "CUSTOM" };
 
@@ -960,7 +960,7 @@ int UtcDaliPopupPropertyContextualMode(void)
   placement.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   placement.SetProperty( Actor::Property::SIZE, Vector2( 1.0f, 1.0f ) );
   placement.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  Stage::GetCurrent().Add( placement );
+  application.GetScene().Add( placement );
 
   placement.Add( popup );
 
@@ -1004,7 +1004,7 @@ int UtcDaliPopupPropertyBacking(void)
   // Create the Popup actor
   Popup popup = Popup::New();
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
 
   Actor backing = popup.FindChildByName( "popupBacking" );
   DALI_TEST_CHECK( backing );
@@ -1063,7 +1063,7 @@ int UtcDaliPopupPropertyBackgroundImage(void)
 
   // Create the Popup actor
   Popup popup = Popup::New();
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
 
   // Check setting an image
   popup.SetProperty( Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE, "invalid-image.png" );
@@ -1126,7 +1126,7 @@ int UtcDaliPopupPropertyCustomAnimation(void)
   DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::EXIT_ANIMATION ).Get( resultMap ) );
   DALI_TEST_EQUALS( resultMap.Count(), 0u, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
   popup.SetDisplayState( Popup::SHOWN );
 
   for( int i = 0; i < RENDER_ANIMATION_TEST_DURATION_FRAMES; i++ )
@@ -1182,7 +1182,7 @@ int UtcDaliPopupPropertyTouchTransparent(void)
 
   button.ClickedSignal().Connect( &PushButtonClicked );
 
-  Stage::GetCurrent().Add( button );
+  application.GetScene().Add( button );
 
   button.Add( popup );
 
@@ -1281,7 +1281,7 @@ int UtcDaliPopupPropertyTail(void)
   DALI_TEST_CHECK( popup.GetProperty( Popup::Property::TAIL_POSITION ).Get( vectorResult ) );
   DALI_TEST_EQUALS( vectorResult, tailPosition, TEST_LOCATION );
 
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
 
   popup.SetDisplayState( Popup::SHOWN );
   application.SendNotification();
@@ -1363,7 +1363,7 @@ int UtcDaliPopupTypeToast(void)
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 1.0f );
 
   popup.SetTitle( Toolkit::TextLabel::New( "This is a Toast Popup.\nIt will auto-hide itself" ) );
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
   popup.SetDisplayState( Toolkit::Popup::SHOWN );
 
   for( int i = 0; i < RENDER_ANIMATION_TEST_DURATION_FRAMES; i++ )
@@ -1412,7 +1412,7 @@ int UtcDaliPopupTypeRegistryCreation(void)
   ConnectStateSignals( popup );
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
 
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
   popup.SetDisplayState( Toolkit::Popup::SHOWN );
 
   application.SendNotification();
@@ -1472,7 +1472,7 @@ int UtcDaliPopupOnKeyEvent(void)
   // Create the Popup actor
   Popup popup = Popup::New();
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
-  Stage::GetCurrent().Add( popup );
+  application.GetScene().Add( popup );
 
   popup.SetDisplayState( Popup::SHOWN );
   application.SendNotification();

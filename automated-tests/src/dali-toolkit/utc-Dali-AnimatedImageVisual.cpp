@@ -219,7 +219,7 @@ int UtcDaliAnimatedImageVisualSynchronousLoading(void)
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
     dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
 
     TraceCallStack& textureTrace = gl.GetTextureTrace();
     textureTrace.Enable(true);
@@ -282,7 +282,7 @@ int UtcDaliAnimatedImageVisualJumpToAction(void)
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
     dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
     application.SendNotification();
     application.Render(20);
 
@@ -352,7 +352,7 @@ int UtcDaliAnimatedImageVisualStopBehavior(void)
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
     dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
     application.SendNotification();
     application.Render(20);
 
@@ -416,7 +416,7 @@ int UtcDaliAnimatedImageVisualAnimatedImage01(void)
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
     dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
 
     application.SendNotification();
     application.Render();
@@ -483,7 +483,7 @@ int UtcDaliAnimatedImageVisualMultiImage01(void)
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
     dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
     application.SendNotification();
     application.Render(16);
 
@@ -553,7 +553,7 @@ int UtcDaliAnimatedImageVisualMultiImage02(void)
   ToolkitTestApplication application;
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
-  tet_infoline( "Test that the animated visual still works with zero sized cache" );
+  tet_infoline( "Test that the animated visual has different batch and cache size." );
 
   {
     Property::Array urls;
@@ -562,59 +562,130 @@ int UtcDaliAnimatedImageVisualMultiImage02(void)
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE );
     propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
-    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 2);
-    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 2);
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 0);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 0);
     propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 100);
 
     VisualFactory factory = VisualFactory::Get();
     Visual::Base visual = factory.CreateVisual( propertyMap ); // TexMgr::Request load tId:0
 
-    // Expect that each image is loaded each tick
+    // Check the batch size and cache size need to have minimum 2.
+    Property::Map resultMap;
+    visual.CreatePropertyMap( resultMap );
+    Property::Value* value = resultMap.Find( ImageVisual::Property::BATCH_SIZE, "batchSize" );
+    DALI_TEST_CHECK( value );
+    DALI_TEST_EQUALS( value->Get<int>(), 2, TEST_LOCATION );
+    value = resultMap.Find( ImageVisual::Property::CACHE_SIZE, "cacheSize" );
+    DALI_TEST_CHECK( value );
+    DALI_TEST_EQUALS( value->Get<int>(), 2, TEST_LOCATION );
+    visual.Reset();
 
+    // Batch size is 2 and cache size is 3
+    propertyMap.Clear();
+    propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE );
+    propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 3);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 100);
+
+    visual = factory.CreateVisual( propertyMap ); // TexMgr::Request load tId:0
+
+    // Expect that each image is loaded each tick
     DummyControl dummyControl = DummyControl::New(true);
-    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
-    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+    Impl::DummyControl& dummyImpl1 = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl1.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+    visual.Reset();
 
     dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
     application.SendNotification();
     application.Render(16);
 
-    tet_infoline( "Ready the visual after the visual is on stage" );
-    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+    tet_infoline( "Ready the visual after the visual is on window" );
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
     application.SendNotification();
-    application.Render(16);//glGenTextures 1
-    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 1, TEST_LOCATION );
+    application.Render(16);//glGenTextures 1 and 2
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 2, TEST_LOCATION );
 
     tet_infoline( "Test that each tick, a new image is requested" );
     Test::EmitGlobalTimerSignal(); // TexMgr::Remove tId:0
     application.SendNotification();
     application.Render(16);
-    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1, 10 ), true, TEST_LOCATION );
-    application.SendNotification();
-    application.Render(16);//glGenTextures 2
-    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 1, TEST_LOCATION );
-
-    tet_infoline( "Test that each tick, a new image is requested" );
-    Test::EmitGlobalTimerSignal(); // Internal::~TextureSet()
-    application.SendNotification();
-    application.Render(16);//glDeleteTextures 2
-    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1, 10 ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
     application.SendNotification();
     application.Render(16);//glGenTextures 3
-    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 1, TEST_LOCATION );
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 3, TEST_LOCATION );
 
     tet_infoline( "Test that each tick, a new image is requested" );
-    Test::EmitGlobalTimerSignal();
+    Test::EmitGlobalTimerSignal(); // TexMgr::Remove tId:1
     application.SendNotification();
-    application.Render(16);//glDeleteTextures 3
-    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1, 10 ), true, TEST_LOCATION );
+    application.Render(16);
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
     application.SendNotification();
-    application.Render(16);//Gen4
-    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 1, TEST_LOCATION );
+    application.Render(16);//glGenTextures 4
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 3, TEST_LOCATION );
+
+    dummyImpl1.UnregisterVisual( DummyControl::Property::TEST_VISUAL );
+    dummyControl.Unparent();
+
+
+    // Batch size is 9 and cache size is 4
+    propertyMap.Clear();
+    propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE );
+    propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 3);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 7);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 100);
+
+    visual = factory.CreateVisual( propertyMap ); // TexMgr::Request load tId:0
+
+    // Expect that each image is loaded each tick
+    dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+    visual.Reset();
+
+    dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    application.GetScene().Add( dummyControl );
+    application.SendNotification();
+    application.Render(16);
+
+    tet_infoline( "Ready the visual after the visual is on window" );
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
+    application.SendNotification();
+    application.Render(16);//glGenTextures 1, 2, and 3
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 3, TEST_LOCATION );
+
+    tet_infoline( "Test that each tick, a new image is requested" );
+    Test::EmitGlobalTimerSignal(); // TexMgr::Remove tId:0
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
+    application.SendNotification();
+    application.Render(16);//glGenTextures 4, 5, and 6
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 5, TEST_LOCATION );
+
+    tet_infoline( "Test that each tick, a new image is requested" );
+    Test::EmitGlobalTimerSignal(); // TexMgr::Remove tId:1
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
+    application.SendNotification();
+    application.Render(16);//glGenTextures 7, 1, and 2
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 7, TEST_LOCATION );
+
+    tet_infoline( "Test that each tick, a new image is requested" );
+    Test::EmitGlobalTimerSignal(); // TexMgr::Remove tId:2
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+    application.SendNotification();
+    application.Render(16);//glGenTextures 3
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 7, TEST_LOCATION );
+
     dummyControl.Unparent();
   }
-  tet_infoline("Test that removing the visual from stage deletes all textures");
+  tet_infoline("Test that removing the visual from window deletes all textures");
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 0, TEST_LOCATION );
@@ -655,7 +726,7 @@ int UtcDaliAnimatedImageVisualMultiImage03(void)
     Impl::DummyControl& dummyImpl1 = static_cast<Impl::DummyControl&>(dummyControl1.GetImplementation());
     dummyImpl1.RegisterVisual( DummyControl::Property::TEST_VISUAL, animatedImageVisual1 );
     dummyControl1.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    Stage::GetCurrent().Add( dummyControl1 );
+    application.GetScene().Add( dummyControl1 );
 
     application.SendNotification();
     application.Render(16);
@@ -671,7 +742,7 @@ int UtcDaliAnimatedImageVisualMultiImage03(void)
     Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(dummyControl2.GetImplementation());
     dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, animatedImageVisual2 );
     dummyControl2.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    Stage::GetCurrent().Add( dummyControl2 );
+    application.GetScene().Add( dummyControl2 );
     application.SendNotification();
     application.Render(16);
 
@@ -732,7 +803,7 @@ int UtcDaliAnimatedImageVisualMultiImage04(void)
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
     dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
     application.SendNotification();
     application.Render(16);
 
@@ -818,7 +889,7 @@ int UtcDaliAnimatedImageVisualMultiImage05(void)
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
     dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
     application.SendNotification();
     application.Render(16);
 
@@ -858,7 +929,7 @@ void TestLoopCount( ToolkitTestApplication &application, DummyControl &dummyCont
   TraceCallStack& textureTrace = gl.GetTextureTrace();
 
   textureTrace.Enable(true);
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   application.SendNotification();
   application.Render(16);
@@ -999,7 +1070,7 @@ int UtcDaliAnimatedImageVisualPlayback(void)
     dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
     textureTrace.Enable(true);
-    Stage::GetCurrent().Add( dummyControl );
+    application.GetScene().Add( dummyControl );
     application.SendNotification();
     application.Render(16);
 

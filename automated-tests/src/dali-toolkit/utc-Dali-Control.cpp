@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,7 @@ int UtcDaliControlRegister(void)
   ToolkitTestApplication application;
 
   // Ensure the object is registered after creation
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
   gObjectCreatedCallBackCalled = false;
@@ -230,7 +230,7 @@ int UtcDaliControlNavigationProperties(void)
   ToolkitTestApplication application;
 
   Control control = Control::New();
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   DALI_TEST_EQUALS( -1, control.GetProperty( DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
   DALI_TEST_EQUALS( -1, control.GetProperty( DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
@@ -261,7 +261,7 @@ int UtcDaliControlNavigationProperties(void)
 int UtcDaliControlKeyInputFocus(void)
 {
   ToolkitTestApplication application;
-  Stage stage = Stage::GetCurrent();
+  Integration::Scene stage = application.GetScene();
 
   DummyControl control;
 
@@ -383,14 +383,14 @@ int UtcDaliControlSignalConnectDisconnect(void)
     DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, false, TEST_LOCATION );
 
-    Stage::GetCurrent().Add( actor );
+    application.GetScene().Add( actor );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, true, TEST_LOCATION );
 
     dummyImpl->mCustomSlot1Called = false;
     actor.OnStageSignal().Disconnect( dummyImpl, &DummyControlImpl::CustomSlot1 );
     DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 0u, TEST_LOCATION );
-    Stage::GetCurrent().Remove( actor );
-    Stage::GetCurrent().Add( actor );
+    application.GetScene().Remove( actor );
+    application.GetScene().Add( actor );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, false, TEST_LOCATION );
   }
   END_TEST;
@@ -417,9 +417,9 @@ int UtcDaliControlSignalAutomaticDisconnect(void)
     DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, false, TEST_LOCATION );
 
-    Stage::GetCurrent().Add( actor );
+    application.GetScene().Add( actor );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, true, TEST_LOCATION );
-    Stage::GetCurrent().Remove( actor );
+    application.GetScene().Remove( actor );
   }
   // dummyControl automatically disconnects
 
@@ -437,7 +437,7 @@ int UtcDaliControlTestParameters(void)
 
   test.SetProperty( Actor::Property::SIZE, Vector3( 0.7f, 0.7f, 0.7f ) );
 
-  Stage::GetCurrent().Add( test );
+  application.GetScene().Add( test );
 
   application.SendNotification();
   application.Render();
@@ -488,7 +488,7 @@ int UtcDaliControlBackgroundColorRendererCount(void)
 
   ToolkitTestApplication application;
   Control control = Control::New();
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   tet_infoline( "Set transparent, no renderers should be created" );
   control.SetBackgroundColor( Color::TRANSPARENT );
@@ -673,7 +673,7 @@ int UtcDaliControlKeyProperties(void)
   ToolkitTestApplication application;
 
   Control control = Control::New();
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   DALI_TEST_EQUALS( control.HasKeyInputFocus(), control.GetProperty( Control::Property::KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
 
@@ -720,7 +720,7 @@ int UtcDaliControlImplKeyInputFocusGainedSignal(void)
   ToolkitTestApplication application;
 
   Control control = Control::New();
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   gKeyInputFocusCallBackCalled = false;
   control.KeyInputFocusGainedSignal().Connect(&TestKeyInputFocusCallback);
@@ -742,7 +742,7 @@ int UtcDaliControlImplKeyInputFocusLostSignal(void)
   ToolkitTestApplication application;
 
   Control control = Control::New();
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   gKeyInputFocusCallBackCalled = false;
   control.KeyInputFocusLostSignal().Connect(&TestKeyInputFocusCallback);
@@ -784,7 +784,7 @@ int UtcDaliControlAutoClipping(void)
 
   control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
 
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   application.SendNotification();
   application.Render();
@@ -807,7 +807,7 @@ int UtcDaliControlAutoClippingN(void)
 
   control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
 
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   application.SendNotification();
   application.Render();
@@ -834,7 +834,7 @@ int UtcDaliControlAutoClippingWhenAlreadyOnStage(void)
 
   DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
 
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   application.SendNotification();
   application.Render();
@@ -862,7 +862,7 @@ int UtcDaliControlAutoClippingWhenAlreadyOnStageN(void)
 
   DALI_TEST_EQUALS( 0, control.GetRendererCount(), TEST_LOCATION );
 
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   application.SendNotification();
   application.Render();
@@ -903,7 +903,7 @@ int UtcDaliControlSetTransformSize(void)
 
   tet_infoline( "Test to ensure that the control background transform does not get overwritten when adding to the stage" );
 
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   application.SendNotification();
   application.Render();
@@ -958,7 +958,7 @@ int UtcDaliControlResourcesReady(void)
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::PREPARING), TEST_LOCATION );
 
-  Stage::GetCurrent().Add( actor );
+  application.GetScene().Add( actor );
   application.SendNotification();
   application.Render();
 
@@ -1017,7 +1017,7 @@ int UtcDaliControlResourcesReady02(void)
   propertyMap.Insert( ImageVisual::Property::URL, "invalid.jpg" );
   control.SetProperty( Control::Property::BACKGROUND, propertyMap );
 
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   application.SendNotification();
   application.Render();
@@ -1043,7 +1043,7 @@ int UtcDaliControlMarginProperty(void)
 
   control.SetProperty( Control::Property::MARGIN, Extents( 20, 10, 0, 0 ) );
 
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   application.SendNotification();
   application.Render();
@@ -1074,7 +1074,7 @@ int UtcDaliControlPaddingProperty(void)
 
   control.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
 
-  Stage::GetCurrent().Add( control );
+  application.GetScene().Add( control );
 
   application.SendNotification();
   application.Render();
@@ -1122,7 +1122,7 @@ int UtcDaliControlDoAction(void)
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
@@ -1184,7 +1184,7 @@ int UtcDaliControlDoActionWhenNotStage(void)
 
   tet_infoline( "Adding control to stage will in turn add the visual to the stage" );
 
-  Stage::GetCurrent().Add( dummyControl );
+  application.GetScene().Add( dummyControl );
   application.SendNotification();
   application.Render();
   tet_infoline( "No change in textures could occurs as already loaded and cached texture will be used" );

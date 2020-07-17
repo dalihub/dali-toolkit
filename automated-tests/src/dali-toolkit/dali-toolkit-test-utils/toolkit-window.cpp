@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
 
 #define DALI_WINDOW_H
@@ -164,6 +163,16 @@ FocusChangeSignalType& Window::FocusChangeSignal()
   return GetImplementation( *this ).mFocusChangeSignal;
 }
 
+Window::KeyEventSignalType& Window::KeyEventSignal()
+{
+  return GetImplementation( *this ).KeyEventSignal();
+}
+
+Window::TouchSignalType& Window::TouchSignal()
+{
+  return GetImplementation( *this ).TouchSignal();
+}
+
 namespace DevelWindow
 {
 
@@ -194,19 +203,9 @@ EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window 
   return GetImplementation( window ).GetScene().EventProcessingFinishedSignal();
 }
 
-KeyEventSignalType& KeyEventSignal( Window window )
-{
-  return GetImplementation( window ).KeyEventSignal();
-}
-
 KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Window window )
 {
   return GetImplementation( window ).KeyEventGeneratedSignal();
-}
-
-TouchSignalType& TouchSignal( Window window )
-{
-  return GetImplementation( window ).TouchSignal();
 }
 
 WheelEventSignalType& WheelEventSignal( Window window )

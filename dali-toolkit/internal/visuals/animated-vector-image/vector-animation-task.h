@@ -309,7 +309,6 @@ private:
   uint32_t                               mAnimationDataIndex;
   int32_t                                mLoopCount;
   int32_t                                mCurrentLoop;
-  bool                                   mResourceReady;
   bool                                   mForward;
   bool                                   mUpdateFrameNumber;
   bool                                   mNeedAnimationFinishedTrigger;

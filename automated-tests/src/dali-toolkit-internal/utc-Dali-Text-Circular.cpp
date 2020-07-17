@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -638,9 +638,9 @@ int UtcDaliTextCircularBlend(void)
   tet_infoline(" UtcDaliTextCircularN");
 
   ToolkitTestApplication application;
-  Stage stage = Stage::GetCurrent();
-  stage.SetBackgroundColor( Color::WHITE );
-  stage.SetBackgroundColor( Vector4( 0.04f, 0.345f, 0.392f, 1.0f ) );
+  auto scene = application.GetScene();
+  scene.SetBackgroundColor( Color::WHITE );
+  scene.SetBackgroundColor( Vector4( 0.04f, 0.345f, 0.392f, 1.0f ) );
 
 
   const std::string image1 = "<item 'width'=26 'height'=26 'url'='" + TEST_IMAGE_FILE_NAME1 + "'/>";
