@@ -62,12 +62,12 @@ bool NativeImageSource::IsColorDepthSupported( ColorDepth colorDepth )
   return false;
 }
 
-bool NativeImageSource::GlExtensionCreate()
+bool NativeImageSource::CreateResource()
 {
   return false;
 }
 
-void NativeImageSource::GlExtensionDestroy()
+void NativeImageSource::DestroyResource()
 {
 }
 
@@ -91,6 +91,31 @@ unsigned int NativeImageSource::GetHeight() const
 }
 
 bool NativeImageSource::RequiresBlending() const
+{
+  return false;
+}
+
+int NativeImageSource::GetTextureTarget() const
+{
+  return 0;
+}
+
+const char* NativeImageSource::GetCustomFragmentPrefix() const
+{
+  return "";
+}
+
+const char* NativeImageSource::GetCustomSamplerTypename() const
+{
+  return "";
+}
+
+Any NativeImageSource::GetNativeImageHandle() const
+{
+  return nullptr;
+}
+
+bool NativeImageSource::SourceChanged() const
 {
   return false;
 }
