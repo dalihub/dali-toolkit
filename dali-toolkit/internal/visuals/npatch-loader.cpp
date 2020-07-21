@@ -18,7 +18,10 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 
-// EXTERNAL INCLUDES
+// INTERNAL HEADERS
+#include <dali-toolkit/internal/visuals/rendering-addon.h>
+
+// EXTERNAL HEADERS
 #include <dali/devel-api/common/hash.h>
 #include <dali/integration-api/debug.h>
 
@@ -52,6 +55,9 @@ void SetLoadedNPatchData( NPatchLoader::Data* data, Devel::PixelBuffer& pixelBuf
   data->croppedWidth = pixelBuffer.GetWidth();
   data->croppedHeight = pixelBuffer.GetHeight();
 
+  // Create opacity map
+  data->renderingMap = RenderingAddOn::Get().IsValid() ? RenderingAddOn::Get().BuildNPatch(pixelBuffer, data ) : nullptr;
+
   PixelData pixels = Devel::PixelBuffer::Convert( pixelBuffer ); // takes ownership of buffer
 
   Texture texture = Texture::New( TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight() );
@@ -64,6 +70,15 @@ void SetLoadedNPatchData( NPatchLoader::Data* data, Devel::PixelBuffer& pixelBuf
 }
 
 } // namespace NPatchBuffer
+
+NPatchLoader::Data::~Data()
+{
+  // If there is an opacity map, it has to be destroyed using addon call
+  if( renderingMap )
+  {
+    RenderingAddOn::Get().DestroyNPatch( renderingMap );
+  }
+}
 
 NPatchLoader::NPatchLoader()
 {

@@ -1,3 +1,4 @@
+# prebuild test addons
 IF( DEFINED MODULE )
     MESSAGE(STATUS "Building: ${CMAKE_CURRENT_SOURCE_DIR}/${MODULE}")
     ADD_SUBDIRECTORY(${MODULE})
