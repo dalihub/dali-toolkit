@@ -670,7 +670,7 @@ struct Engine::Impl
       const GlyphInfo& glyph = *( glyphsBuffer + i );
       Vector2& position = *( glyphPositionsBuffer + i );
 
-      position.x = std::roundf( penX + glyph.xBearing );
+      position.x = penX + glyph.xBearing;
       position.y = -glyph.yBearing;
 
       penX += ( glyph.advance + interGlyphExtraAdvance );
@@ -732,7 +732,7 @@ struct Engine::Impl
         const GlyphInfo& glyph = *( glyphsBuffer + glyphIndex );
         Vector2& position = *( glyphPositionsBuffer + glyphIndex - layoutParameters.startGlyphIndex );
 
-        position.x = std::round( penX + glyph.xBearing );
+        position.x = penX + glyph.xBearing;
         position.y = -glyph.yBearing;
 
        penX += ( glyph.advance + layoutParameters.interGlyphExtraAdvance );

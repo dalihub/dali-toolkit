@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/common/stage.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>

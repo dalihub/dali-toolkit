@@ -425,7 +425,7 @@ int UtcDaliControlWrapperRegisterVisualToSelf(void)
 {
   ToolkitTestApplication application;
 
-  Test::ObjectDestructionTracker objectDestructionTracker;
+  Test::ObjectDestructionTracker objectDestructionTracker( application.GetCore().GetObjectRegistry() );
 
   {
     Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
@@ -461,7 +461,7 @@ int UtcDaliControlWrapperRegisterVisualWithDepthIndexToSelf(void)
 {
   ToolkitTestApplication application;
 
-  Test::ObjectDestructionTracker objectDestructionTracker;
+  Test::ObjectDestructionTracker objectDestructionTracker( application.GetCore().GetObjectRegistry() );
 
   {
     Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
@@ -749,7 +749,7 @@ int UtcDaliControlWrapperAnimateVisual(void)
   tet_infoline("Test that the control wrapper's visuals can be animated by name when registered");
 
   ToolkitTestApplication application;
-  Test::ObjectDestructionTracker objectDestructionTracker;
+  Test::ObjectDestructionTracker objectDestructionTracker( application.GetCore().GetObjectRegistry() );
 
   {
     Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );

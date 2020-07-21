@@ -134,6 +134,7 @@ private:
   Dali::Toolkit::AtlasManager mAtlasManager;          ///> Atlas Manager created by GlyphManager
   std::vector< FontGlyphRecord > mFontGlyphRecords;
   Toolkit::AtlasGlyphManager::Metrics mMetrics;       ///> Metrics to pass back on GlyphManager status
+  Sampler mSampler;
 };
 
 } // namespace Internal

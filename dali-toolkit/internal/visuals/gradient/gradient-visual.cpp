@@ -158,6 +158,7 @@ DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   varying mediump vec2 vPosition;\n
   varying mediump vec2 vRectSize;\n
+  varying mediump float vCornerRadius;\n
   \n
   //Visual size and offset
   uniform mediump vec2 offset;\n
@@ -166,12 +167,16 @@ DALI_COMPOSE_SHADER(
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
   uniform mediump float cornerRadius;\n
+  uniform mediump float cornerRadiusPolicy;\n
 
   vec4 ComputeVertexPosition()\n
   {\n
     vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    vRectSize = visualSize * 0.5 - cornerRadius;\n
+    mediump float minSize = min( visualSize.x, visualSize.y );\n
+    vCornerRadius = mix( cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);\n
+    vCornerRadius = min( vCornerRadius, minSize * 0.5 );\n
+    vRectSize = visualSize * 0.5 - vCornerRadius;\n
     vPosition = aPosition * visualSize;\n
     return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
   }\n
@@ -194,6 +199,7 @@ DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   varying mediump vec2 vPosition;\n
   varying mediump vec2 vRectSize;\n
+  varying mediump float vCornerRadius;\n
   \n
   //Visual size and offset
   uniform mediump vec2 offset;\n
@@ -202,12 +208,16 @@ DALI_COMPOSE_SHADER(
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
   uniform mediump float cornerRadius;\n
+  uniform mediump float cornerRadiusPolicy;\n
 
   vec4 ComputeVertexPosition()\n
   {\n
     vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    vRectSize = visualSize * 0.5 - cornerRadius;\n
+    mediump float minSize = min( visualSize.x, visualSize.y );\n
+    vCornerRadius = mix( cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);\n
+    vCornerRadius = min( vCornerRadius, minSize * 0.5 );\n
+    vRectSize = visualSize * 0.5 - vCornerRadius;\n
     vPosition = aPosition * visualSize;\n
     return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
   }\n
@@ -256,14 +266,14 @@ DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n // sampler1D?
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform mediump float cornerRadius;\n
   varying mediump vec2 vTexCoord;\n
   varying mediump vec2 vPosition;\n
   varying mediump vec2 vRectSize;\n
+  varying mediump float vCornerRadius;\n
   \n
   void main()\n
   {\n
-    mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - cornerRadius;\n
+    mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
     gl_FragColor = texture2D( sTexture, vec2( vTexCoord.y, 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
     gl_FragColor *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
   }\n
@@ -274,14 +284,14 @@ DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n // sampler1D?
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform mediump float cornerRadius;\n
   varying mediump vec2 vTexCoord;\n
   varying mediump vec2 vPosition;\n
   varying mediump vec2 vRectSize;\n
+  varying mediump float vCornerRadius;\n
   \n
   void main()\n
   {\n
-    mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - cornerRadius;\n
+    mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
     gl_FragColor = texture2D( sTexture, vec2( length(vTexCoord), 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
     gl_FragColor *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
   }\n

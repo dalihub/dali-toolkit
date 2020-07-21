@@ -22,7 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/timer.h>
-#include <dali/public-api/common/stage.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/object/property-notification.h>

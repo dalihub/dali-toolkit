@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
 
 #define DALI_WINDOW_H
