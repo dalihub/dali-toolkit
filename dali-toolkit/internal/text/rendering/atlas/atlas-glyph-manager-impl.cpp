@@ -41,6 +41,8 @@ namespace Internal
 AtlasGlyphManager::AtlasGlyphManager()
 {
   mAtlasManager = Dali::Toolkit::AtlasManager::New();
+  mSampler = Sampler::New();
+  mSampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
 }
 
 void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
@@ -58,6 +60,7 @@ void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
     Dali::Texture atlas = mAtlasManager.GetAtlasContainer( slot.mAtlasId );
     TextureSet textureSet = TextureSet::New();
     textureSet.SetTexture( 0u, atlas );
+    textureSet.SetSampler( 0u, mSampler);
     mAtlasManager.SetTextures( slot.mAtlasId, textureSet );
   }
 

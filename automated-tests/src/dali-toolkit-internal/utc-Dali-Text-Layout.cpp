@@ -199,7 +199,7 @@ bool LayoutTextTest( const LayoutTextData& data )
   {
     const Vector2& position = *( glyphPositions.Begin() + index );
 
-    if( fabsf( position.x - *( data.positions + 2u * index ) ) > Math::MACHINE_EPSILON_1000 )
+    if( fabsf( std::round( position.x ) - *( data.positions + 2u * index ) ) > Math::MACHINE_EPSILON_1000 )
     {
       std::cout << "  Different position for glyph " << index << " x : " << position.x << ", expected : " << *( data.positions + 2u * index ) << std::endl;
       return false;
