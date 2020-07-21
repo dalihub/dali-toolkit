@@ -52,7 +52,6 @@ SET ( SOURCES ${SOURCES}
   ${devel_api_src_dir}/controls/popup/popup.cpp
   ${devel_api_src_dir}/controls/shadow-view/shadow-view.cpp
   ${devel_api_src_dir}/controls/super-blur-view/super-blur-view.cpp
-  ${devel_api_src_dir}/controls/text-controls/autofill-container.cpp
   ${devel_api_src_dir}/controls/text-controls/text-editor-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-field-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-popup.cpp
@@ -163,7 +162,6 @@ SET( SOURCES ${SOURCES}
    ${internal_src_dir}/controls/slider/slider-impl.cpp
    ${internal_src_dir}/controls/super-blur-view/super-blur-view-impl.cpp
    ${internal_src_dir}/controls/table-view/table-view-impl.cpp
-   ${internal_src_dir}/controls/text-controls/autofill-container-impl.cpp
    ${internal_src_dir}/controls/text-controls/text-editor-impl.cpp
    ${internal_src_dir}/controls/text-controls/text-field-impl.cpp
    ${internal_src_dir}/controls/text-controls/text-label-impl.cpp
