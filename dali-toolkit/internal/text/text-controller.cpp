@@ -3728,6 +3728,7 @@ bool Controller::RemoveText( int cursorOffset,
       if( ( currentText.Count() - numberOfCharacters == 0 ) && ( cursorIndex == 0 ) )
       {
         mImpl->ClearPreEditFlag();
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = 0;
       }
 
       // Updates the text style runs by removing characters. Runs with no characters are removed.
