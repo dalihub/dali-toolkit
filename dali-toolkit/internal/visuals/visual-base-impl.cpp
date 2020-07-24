@@ -129,6 +129,10 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
       {
         matchKey = Property::Key( Toolkit::DevelVisual::Property::CORNER_RADIUS );
       }
+      else if( matchKey == CORNER_RADIUS_POLICY )
+      {
+        matchKey = Property::Key( Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY );
+      }
     }
 
     switch( matchKey.indexKey )
@@ -202,6 +206,28 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
         if( value.Get( radius ) )
         {
           mImpl->mCornerRadius = radius;
+        }
+        break;
+      }
+      case Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY:
+      {
+        int policy;
+        if( value.Get( policy ) )
+        {
+          switch( policy )
+          {
+            case Toolkit::Visual::Transform::Policy::RELATIVE:
+            case Toolkit::Visual::Transform::Policy::ABSOLUTE:
+            {
+              mImpl->mCornerRadiusPolicy = policy;
+              break;
+            }
+            default:
+            {
+              DALI_LOG_ERROR( "Unsupported policy: %d\n", policy );
+              break;
+            }
+          }
         }
         break;
       }
@@ -299,6 +325,7 @@ void Visual::Base::SetOnStage( Actor& actor )
       if( IsRoundedCornerRequired() )
       {
         mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty( CORNER_RADIUS, mImpl->mCornerRadius );
+        mImpl->mRenderer.RegisterProperty( CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy );
 
         mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
       }
@@ -348,6 +375,7 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE, fittingModeString );
 
   map.Insert( Toolkit::DevelVisual::Property::CORNER_RADIUS, mImpl->mCornerRadius );
+  map.Insert( Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, static_cast< int >( mImpl->mCornerRadiusPolicy ) );
 }
 
 void Visual::Base::CreateInstancePropertyMap( Property::Map& map ) const

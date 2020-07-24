@@ -123,6 +123,7 @@ Internal::Visual::Base::Impl::Impl( FittingMode fittingMode, Toolkit::Visual::Ty
   mMixColor( Color::WHITE ),
   mControlSize( Vector2::ZERO ),
   mCornerRadius( 0.0f ),
+  mCornerRadiusPolicy( 1.0f ),
   mDepthIndex( 0.0f ),
   mMixColorIndex( Property::INVALID_INDEX ),
   mCornerRadiusIndex( Property::INVALID_INDEX ),

@@ -80,6 +80,7 @@ const char * const VISUAL_FITTING_MODE( "visualFittingMode" );
 
 // Corner radius
 const char * const CORNER_RADIUS( "cornerRadius" );
+const char * const CORNER_RADIUS_POLICY( "cornerRadiusPolicy" );
 
 // Color visual
 const char * const RENDER_IF_TRANSPARENT_NAME( "renderIfTransparent" );

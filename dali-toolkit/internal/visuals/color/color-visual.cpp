@@ -26,6 +26,7 @@
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/color-visual-actions-devel.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -86,6 +87,7 @@ const char* VERTEX_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   uniform mediump vec3 uSize;\n
   varying mediump vec2 vPosition;\n
   varying mediump vec2 vRectSize;\n
+  varying mediump float vCornerRadius;\n
   \n
   //Visual size and offset
   uniform mediump vec2 offset;\n
@@ -95,12 +97,16 @@ const char* VERTEX_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
   uniform mediump float cornerRadius;\n
+  uniform mediump float cornerRadiusPolicy;\n
   \n
   vec4 ComputeVertexPosition()\n
   {\n
     vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    vRectSize = visualSize / 2.0 - cornerRadius;\n
+    mediump float minSize = min( visualSize.x, visualSize.y );\n
+    vCornerRadius = mix( cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);\n
+    vCornerRadius = min( vCornerRadius, minSize * 0.5 );\n
+    vRectSize = visualSize / 2.0 - vCornerRadius;\n
     vPosition = aPosition* visualSize;\n
     return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
   }\n
@@ -115,13 +121,13 @@ const char* VERTEX_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
 const char* FRAGMENT_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   varying mediump vec2 vPosition;\n
   varying mediump vec2 vRectSize;\n
+  varying mediump float vCornerRadius;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform mediump float cornerRadius;\n
   \n
   void main()\n
   {\n
-      mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - cornerRadius;\n
+      mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
       gl_FragColor = uColor * vec4( mixColor, 1.0 );\n
       gl_FragColor.a *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
   }\n
@@ -274,6 +280,23 @@ void ColorVisual::OnSetTransform()
   if( mImpl->mRenderer )
   {
     mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
+}
+
+void ColorVisual::OnDoAction( const Property::Index actionId, const Property::Value& attributes )
+{
+  // Check if action is valid for this visual type and perform action if possible
+  switch( actionId )
+  {
+    case DevelColorVisual::Action::UPDATE_PROPERTY:
+    {
+      Property::Map* map = attributes.GetMap();
+      if( map )
+      {
+        DoSetProperties( *map );
+      }
+      break;
+    }
   }
 }
 
