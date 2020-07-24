@@ -63,18 +63,22 @@ public:
       croppedWidth( 0 ),
       croppedHeight( 0 ),
       border( 0, 0, 0, 0 ),
-      loadCompleted( false )
+      loadCompleted( false ),
+      renderingMap{ nullptr }
     {}
 
-    std::string url;                              ///< Url of the N-Patch
-    TextureSet textureSet;                        ///< Texture containing the cropped image
-    NPatchUtility::StretchRanges stretchPixelsX;  ///< X stretch pixels
-    NPatchUtility::StretchRanges stretchPixelsY;  ///< Y stretch pixels
-    std::size_t hash;                             ///< Hash code for the Url
-    uint32_t croppedWidth;                        ///< Width of the cropped middle part of N-patch
-    uint32_t croppedHeight;                       ///< Height of the cropped middle part of N-patch
-    Rect< int > border;                           ///< The size of the border
-    bool loadCompleted;                           ///< True if the data loading is completed
+    ~Data();
+
+    std::string url;                               ///< Url of the N-Patch
+    TextureSet textureSet;                         ///< Texture containing the cropped image
+    NPatchUtility::StretchRanges stretchPixelsX;   ///< X stretch pixels
+    NPatchUtility::StretchRanges stretchPixelsY;   ///< Y stretch pixels
+    std::size_t hash;                              ///< Hash code for the Url
+    uint32_t croppedWidth;                         ///< Width of the cropped middle part of N-patch
+    uint32_t croppedHeight;                        ///< Height of the cropped middle part of N-patch
+    Rect< int > border;                            ///< The size of the border
+    bool loadCompleted;                            ///< True if the data loading is completed
+    void* renderingMap;                            ///< NPatch rendering data
   };
 
 public:

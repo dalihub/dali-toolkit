@@ -7,6 +7,7 @@ SET(CAPI_LIB "dali-toolkit-internal")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
+ utc-Dali-AddOns.cpp
  utc-Dali-BidirectionalSupport.cpp
  utc-Dali-ColorConversion.cpp
  utc-Dali-Control-internal.cpp
@@ -73,8 +74,8 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-native-image.cpp
    dali-toolkit-test-utils/toolkit-text-utils.cpp
    dali-toolkit-test-utils/dummy-visual.cpp
+   dali-toolkit-test-utils/test-addon-manager.cpp
 )
-
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali2-core
@@ -82,10 +83,11 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali2-toolkit
 )
 
-ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED )
+ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED -fPIC )
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
+ADD_DEFINITIONS(-DDALI_ADDONS_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\")
 
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
     SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")
@@ -101,9 +103,42 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
-    -lpthread --coverage
+    -lpthread --coverage -ldl
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}
     DESTINATION ${BIN_DIR}/${EXEC_NAME}
 )
+
+# build addons
+MESSAGE( STATUS "BINDIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
+FILE( GLOB FILES ${CMAKE_CURRENT_SOURCE_DIR}/addons/*.cmake )
+
+FOREACH( INFILE IN ITEMS ${FILES} )
+
+    INCLUDE( ${INFILE} )
+    MESSAGE( STATUS "Building ${INFILE}" )
+
+    ADD_LIBRARY( ${ADDON_NAME} SHARED ${ADDON_SOURCES} )
+
+    TARGET_INCLUDE_DIRECTORIES( ${ADDON_NAME} PUBLIC
+            ../../../
+            ${${CAPI_LIB}_INCLUDE_DIRS}
+            ../dali-toolkit/dali-toolkit-test-utils
+            dali-toolkit-test-utils)
+
+    TARGET_LINK_LIBRARIES(${ADDON_NAME}
+            ${CMAKE_CXX_LINK_FLAGS}
+            ${${CAPI_LIB}_LIBRARIES}
+            -lpthread -ldl --coverage
+            )
+
+    INSTALL( TARGETS ${ADDON_NAME} DESTINATION ${BIN_DIR} )
+
+    SET( ADDON_LIST "lib${ADDON_NAME}.so
+${ADDON_LIST}")
+ENDFOREACH()
+
+# store AddOns list
+FILE( WRITE ${CMAKE_CURRENT_BINARY_DIR}/addons.txt "${ADDON_LIST}" )

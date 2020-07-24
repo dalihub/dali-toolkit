@@ -40,6 +40,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 
 namespace Dali
 {
@@ -515,7 +516,15 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
 
   if( !mImpl->mCustomShader )
   {
-    geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
+    TextureManager& textureManager = mFactoryCache.GetTextureManager();
+
+    uint32_t opaqueElementsCount {0u};
+    uint32_t transparentElementsCount {0u};
+    geometry = textureManager.GetRenderGeometry(mTextureId, opaqueElementsCount, transparentElementsCount);
+    if(!opaqueElementsCount && !transparentElementsCount)
+    {
+      geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
+    }
 
     shader = mImageVisualShaderFactory.GetShader( mFactoryCache,
                              mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
@@ -850,6 +859,37 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
   {
     resourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
   }
+
+  // use geometry if needed
+  if( loadingSuccess )
+  {
+    uint32_t opaqueElements{0u};
+    uint32_t transparentElements{0u};
+    auto geometry = mFactoryCache.GetTextureManager().GetRenderGeometry(mTextureId, opaqueElements, transparentElements);
+    if (mImpl->mRenderer && geometry)
+    {
+      mImpl->mRenderer.SetGeometry(geometry);
+      Dali::DevelRenderer::DrawCommand drawCommand{};
+      drawCommand.drawType = DevelRenderer::DrawType::INDEXED;
+
+      if (opaqueElements)
+      {
+        drawCommand.firstIndex = 0;
+        drawCommand.elementCount = opaqueElements;
+        drawCommand.queue = 0;
+        DevelRenderer::AddDrawCommand(mImpl->mRenderer, drawCommand);
+      }
+
+      if (transparentElements)
+      {
+        drawCommand.firstIndex = opaqueElements;
+        drawCommand.elementCount = transparentElements;
+        drawCommand.queue = 1;
+        DevelRenderer::AddDrawCommand(mImpl->mRenderer, drawCommand);
+      }
+    }
+  }
+
   // Signal to observers ( control ) that resources are ready. Must be all resources.
   ResourceReady( resourceStatus );
   mLoading = false;

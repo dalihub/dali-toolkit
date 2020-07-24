@@ -27,6 +27,7 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/rendering/geometry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
@@ -426,6 +427,15 @@ public:
    */
   void SetBrokenImageUrl(const std::string& brokenImageUrl);
 
+  /**
+   * @brief Returns the geometry associated with texture.
+   * @param[in] textureId Id of the texture
+   * @param[out] frontElements number of front elements
+   * @param[out] backElements number of back elements
+   * @return Returns valid geometry object
+   */
+  Geometry GetRenderGeometry(TextureId textureId, uint32_t& frontElements, uint32_t& backElements );
+
 private:
 
   /**
@@ -688,6 +698,14 @@ private:
    * store the data to.
    */
   void UploadTexture( Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo );
+
+  /**
+   * Creates tiled geometry of for the texture which separates fully-opaque
+   * tiles from ones which use transparency.
+   * @param pixelBuffer
+   * @param textureInfo
+   */
+  bool CreateTiledGeometry( const Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo );
 
   /**
    * Mark the texture as complete, and inform observers
