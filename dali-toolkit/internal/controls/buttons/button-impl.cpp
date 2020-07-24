@@ -619,6 +619,7 @@ void Button::OnInitialize()
   mTapDetector.DetectedSignal().Connect(this, &Button::OnTap);
 
   self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
+  self.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
 
   self.TouchedSignal().Connect( this, &Button::OnTouch );
 }

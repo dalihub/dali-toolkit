@@ -170,6 +170,8 @@ void ProgressBar::OnInitialize()
     return std::unique_ptr< Dali::Accessibility::Accessible >(
         new AccessibleImpl( actor, Dali::Accessibility::Role::PROGRESS_BAR ) );
   } );
+  //Enable highightability
+  Self().SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
 }
 
 void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container )

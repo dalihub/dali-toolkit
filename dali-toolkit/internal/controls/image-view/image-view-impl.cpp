@@ -101,6 +101,10 @@ void ImageView::OnInitialize()
     return std::unique_ptr< Dali::Accessibility::Accessible >(
       new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::IMAGE ) );
   } );
+
+  //Enable highightability
+  Self().SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
+
 }
 
 void ImageView::SetImage( const Property::Map& map )

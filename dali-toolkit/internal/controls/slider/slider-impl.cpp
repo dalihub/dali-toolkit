@@ -203,6 +203,9 @@ void Slider::OnInitialize()
   // Size the Slider actor to a default
   self.SetProperty( Actor::Property::SIZE, Vector2( DEFAULT_HIT_REGION.x, DEFAULT_HIT_REGION.y ) );
 
+  // Set the Slider to be highlightable in Screen Reader mode
+  self.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
+
   // Connect to the touch signal
   self.TouchedSignal().Connect( this, &Slider::OnTouch );
 

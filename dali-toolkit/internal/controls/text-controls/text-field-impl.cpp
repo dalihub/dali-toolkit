@@ -1235,6 +1235,9 @@ void TextField::OnInitialize()
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
   self.OnSceneSignal().Connect( this, &TextField::OnSceneConnect );
 
+  //Enable highightability
+  self.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
+
   DevelControl::SetInputMethodContext( *this, mInputMethodContext );
 
   if( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy )

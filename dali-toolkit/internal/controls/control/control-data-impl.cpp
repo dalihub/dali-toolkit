@@ -1984,7 +1984,7 @@ Dali::Accessibility::States Control::Impl::AccessibleImpl::CalculateStates()
   s[Dali::Accessibility::State::FOCUSABLE] = self.GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE );
   s[Dali::Accessibility::State::FOCUSED] = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
   if(self.GetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE ).GetType() == Property::NONE )
-    s[Dali::Accessibility::State::HIGHLIGHTABLE] = true;
+    s[Dali::Accessibility::State::HIGHLIGHTABLE] = false;
   else
     s[Dali::Accessibility::State::HIGHLIGHTABLE] = self.GetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE ).Get< bool >();
   s[Dali::Accessibility::State::HIGHLIGHTED] = GetCurrentlyHighlightedActor() == self;

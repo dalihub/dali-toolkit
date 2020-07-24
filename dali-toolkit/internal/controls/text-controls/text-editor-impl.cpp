@@ -1215,6 +1215,9 @@ void TextEditor::OnInitialize()
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
   self.OnSceneSignal().Connect( this, &TextEditor::OnSceneConnect );
 
+  //Enable highightability
+  self.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
+
   DevelControl::SetInputMethodContext( *this, mInputMethodContext );
 
   // Creates an extra control to be used as stencil buffer.

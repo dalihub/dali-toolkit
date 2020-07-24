@@ -392,6 +392,9 @@ void TextSelectionPopup::OnInitialize()
     return std::unique_ptr< Dali::Accessibility::Accessible >(
       new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
   } );
+  
+  //Enable highightability
+  self.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
 }
 
 void TextSelectionPopup::HideAnimationFinished( Animation& animation )

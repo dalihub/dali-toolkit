@@ -721,6 +721,9 @@ void TextLabel::OnInitialize()
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 
+  // Enable highlightability
+  self.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
+
   // Enable the text ellipsis.
   mController->SetTextElideEnabled( true );   // If false then text larger than control will overflow
 
