@@ -91,6 +91,8 @@ typedef Signal< void ( Window, bool ) > VisibilityChangedSignalType;
 
 Dali::Window Get( Actor actor );
 Dali::Window DownCast(  BaseHandle handle );
+void AddFrameRenderedCallback( Window window, std::unique_ptr< CallbackBase > callback, int32_t frameId );
+void AddFramePresentedCallback( Window window, std::unique_ptr< CallbackBase > callback, int32_t frameId );
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window );
 KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Dali::Window window );

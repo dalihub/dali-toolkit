@@ -23,6 +23,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraint.h>
@@ -130,26 +131,27 @@ const char* FRAGMENT_SHADER_TEXTURE = DALI_COMPOSE_SHADER(
 
 } // anonymous namepsace
 
-VideoView::VideoView()
+VideoView::VideoView( Dali::VideoSyncMode syncMode )
 : Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
   mCurrentVideoPlayPosition( 0 ),
+  mFrameID( 0 ),
   mIsPlay( false ),
-  mIsUnderlay( true )
+  mIsUnderlay( true ),
+  mSyncMode( syncMode )
 {
-  mVideoPlayer = Dali::VideoPlayer::New();
 }
 
 VideoView::~VideoView()
 {
 }
 
-Toolkit::VideoView VideoView::New()
+Toolkit::VideoView VideoView::New( VideoSyncMode syncMode )
 {
-  VideoView* impl = new VideoView();
+  VideoView* impl = new VideoView( syncMode );
   Toolkit::VideoView handle = Toolkit::VideoView( *impl );
 
+  impl->mVideoPlayer = Dali::VideoPlayer::New( impl->Self(), syncMode );
   impl->Initialize();
-
   return handle;
 }
 
@@ -565,6 +567,16 @@ void VideoView::OnStageDisconnection()
   Control::OnStageDisconnection();
 }
 
+void VideoView::OnSizeSet( const Vector3& targetSize )
+{
+  if( mIsUnderlay && mSyncMode == Dali::VideoSyncMode::ENABLED )
+  {
+    SetFrameRenderCallback();
+    mVideoPlayer.StartSynchronization();
+  }
+  Control::OnSizeSet( targetSize );
+}
+
 Vector3 VideoView::GetNaturalSize()
 {
   Vector3 size;
@@ -728,7 +740,9 @@ void VideoView::SetNativeImageTarget()
 
 void VideoView::UpdateDisplayArea( Dali::PropertyNotification& source )
 {
-  if( !mIsUnderlay )
+  // If mSyncMode is enabled, Video player's size and poistion is updated in Video player's constraint.
+  // Because video view and player should be work syncronization.
+  if( !mIsUnderlay || mSyncMode == Dali::VideoSyncMode::ENABLED )
   {
     return;
   }
@@ -812,6 +826,22 @@ Any VideoView::GetMediaPlayer()
   return mVideoPlayer.GetMediaPlayer();
 }
 
+void VideoView::OnAnimationFinished( Animation& animation )
+{
+  // send desync
+  SetFrameRenderCallback();
+}
+
+void VideoView::PlayAnimation( Dali::Animation animation )
+{
+  if( mIsUnderlay && mSyncMode == Dali::VideoSyncMode::ENABLED )
+  {
+    mVideoPlayer.StartSynchronization();
+    animation.FinishedSignal().Connect( this, &VideoView::OnAnimationFinished );
+  }
+  animation.Play();
+}
+
 Dali::Shader VideoView::CreateShader()
 {
   std::string fragmentShader = "#extension GL_OES_EGL_image_external:require\n";
@@ -879,6 +909,23 @@ void VideoView::ApplyBackupProperties()
 
     SetPropertyInternal( property.first.indexKey, property.second );
   }
+}
+
+void VideoView::FrameRenderCallback( int frameID )
+{
+  // send desync
+  if( frameID == mFrameID )
+  {
+    mVideoPlayer.FinishSynchronization();
+    mFrameID = 0;
+  }
+}
+
+void VideoView::SetFrameRenderCallback()
+{
+  mFrameID++;
+  DevelWindow::AddFrameRenderedCallback( DevelWindow::Get( Self() ),
+                                         std::unique_ptr< CallbackBase >( MakeCallback( this, &VideoView::FrameRenderCallback ) ), mFrameID );
 }
 
 } // namespace Internal

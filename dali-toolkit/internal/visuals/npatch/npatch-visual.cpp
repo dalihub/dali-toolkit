@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
 
@@ -33,6 +34,7 @@
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/visuals/rendering-addon.h>
 
 namespace Dali
 {
@@ -403,6 +405,11 @@ void NPatchVisual::DoSetOnStage( Actor& actor )
     mPlacementActor = actor;
     if( data->loadCompleted )
     {
+      if( RenderingAddOn::Get().IsValid() )
+      {
+        RenderingAddOn::Get().SubmitRenderTask( mImpl->mRenderer, data->renderingMap );
+      }
+
       ApplyTextureAndUniforms();
       actor.AddRenderer( mImpl->mRenderer );
       mPlacementActor.Reset();
@@ -486,13 +493,30 @@ Geometry NPatchVisual::CreateGeometry()
       }
       else
       {
-        geometry = GetNinePatchGeometry( VisualFactoryCache::NINE_PATCH_GEOMETRY );
+        if( data->renderingMap )
+        {
+          uint32_t elementCount[2];
+          geometry = RenderingAddOn::Get().CreateGeometryGrid(data->renderingMap, Uint16Pair(3, 3), elementCount );
+        }
+        else
+        {
+          geometry = GetNinePatchGeometry( VisualFactoryCache::NINE_PATCH_GEOMETRY );
+        }
       }
     }
     else if( data->stretchPixelsX.Size() > 0 || data->stretchPixelsY.Size() > 0)
     {
       Uint16Pair gridSize( 2 * data->stretchPixelsX.Size() + 1,  2 * data->stretchPixelsY.Size() + 1 );
-      geometry = !mBorderOnly ? CreateGridGeometry( gridSize ) : CreateBorderGeometry( gridSize );
+      if( !data->renderingMap )
+      {
+        geometry = !mBorderOnly ? CreateGridGeometry( gridSize ) : CreateBorderGeometry( gridSize );
+      }
+      else
+      {
+        uint32_t elementCount[2];
+        geometry = !mBorderOnly ?
+                   RenderingAddOn::Get().CreateGeometryGrid(data->renderingMap, gridSize, elementCount ) : CreateBorderGeometry(gridSize );
+      }
     }
   }
   else

@@ -21,6 +21,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali-toolkit/devel-api/controls/video-view/video-view-devel.h>
+#include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -31,6 +32,7 @@ const char* const TEST_FILE( "test.mp4" );
 const char* const VOLUME_LEFT( "volumeLeft" );
 const char* const VOLUME_RIGHT( "volumeRight" );
 const char* const RENDERING_TYPE( "renderingTarget" );
+const char* const DUMMY_STRING( "dummy string" );
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
@@ -106,7 +108,8 @@ int UtcDaliVideoViewNew(void)
   Toolkit::VideoView view = Toolkit::VideoView::New();
   DALI_TEST_CHECK( view );
 
-  Toolkit::VideoView view2 = Toolkit::VideoView::New( "" );
+  const std::string url( DUMMY_STRING );
+  Toolkit::VideoView view2 = Toolkit::VideoView::New( url );
   DALI_TEST_CHECK( view2 );
   END_TEST;
 }
@@ -546,7 +549,7 @@ int UtcDaliVideoViewCustomShader(void)
   ToolkitTestApplication application;
   tet_infoline( "VideoView with custom shader" );
 
-  VideoView view = VideoView::New();
+  VideoView view = VideoView::New( false );
   DALI_TEST_CHECK( view );
 
   ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
@@ -594,6 +597,152 @@ int UtcDaliVideoViewCustomShader(void)
 
   Property::Value* vertex = shaderMap->Find( "vertex" ); // vertex key name from shader-impl.cpp
   DALI_TEST_EQUALS( VERTEX_SHADER, vertex->Get<std::string>(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+// Functor to test whether a Finish signal is emitted
+struct AnimationFinishCheck
+{
+  AnimationFinishCheck(bool& signalReceived)
+  : mSignalReceived(signalReceived)
+  {
+  }
+
+  void operator()(Animation& animation)
+  {
+    mSignalReceived = true;
+  }
+
+  void Reset()
+  {
+    mSignalReceived = false;
+  }
+
+  void CheckSignalReceived()
+  {
+    if (!mSignalReceived)
+    {
+      tet_printf("Expected Finish signal was not received\n");
+      tet_result(TET_FAIL);
+    }
+    else
+    {
+      tet_result(TET_PASS);
+    }
+  }
+
+  void CheckSignalNotReceived()
+  {
+    if (mSignalReceived)
+    {
+      tet_printf("Unexpected Finish signal was received\n");
+      tet_result(TET_FAIL);
+    }
+    else
+    {
+      tet_result(TET_PASS);
+    }
+  }
+
+  bool& mSignalReceived; // owned by individual tests
+};
+
+int UtcDaliVideoViewSyncAniamtionForCoverage(void)
+{
+  ToolkitTestApplication application;
+
+  VideoView videoView = DevelVideoView::New( Dali::VideoSyncMode::ENABLED );
+  DALI_TEST_CHECK( videoView );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+
+  // Start the animation
+  Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+  animation.AnimateTo(Property(videoView, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+  DevelVideoView::PlayAnimation( videoView, animation );
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*1000.0f) - 1u/*just less than the animation duration*/);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(2u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( targetPosition, videoView.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), TEST_LOCATION );
+
+  // Restart the animation, with a different duration
+  finishCheck.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewASyncAniamtionForCoverage(void)
+{
+  ToolkitTestApplication application;
+
+  VideoView videoView = DevelVideoView::New( Dali::VideoSyncMode::DISABLED );
+  DALI_TEST_CHECK( videoView );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+
+  // Start the animation
+  Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+  animation.AnimateTo(Property(videoView, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+  DevelVideoView::PlayAnimation( videoView, animation );
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*1000.0f) - 1u/*just less than the animation duration*/);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(2u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( targetPosition, videoView.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), TEST_LOCATION );
+
+  // Restart the animation, with a different duration
+  finishCheck.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewResizeWithSynchronization(void)
+{
+  ToolkitTestApplication application;
+  VideoView videoView = DevelVideoView::New( Dali::VideoSyncMode::ENABLED );
+  DALI_TEST_CHECK( videoView );
+
+  application.GetScene().Add( videoView );
+
+  Vector3 vector(50.0f, 200.0f, 0.0f);
+  videoView.SetProperty( Actor::Property::SIZE, vector );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(vector == videoView.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   END_TEST;
 }

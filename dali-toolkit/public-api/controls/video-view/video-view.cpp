@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/property-map.h>
+#include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/video-view/video-view-impl.h>
@@ -55,26 +56,26 @@ VideoView::~VideoView()
 
 VideoView VideoView::New()
 {
-  return Internal::VideoView::New();
+  return Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
 }
 
 VideoView VideoView::New( const std::string& url )
 {
-  VideoView videoView = Internal::VideoView::New();
+  VideoView videoView = Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
   Dali::Toolkit::GetImpl( videoView ).SetUrl( url );
   return videoView;
 }
 
 VideoView VideoView::New( bool swCodec )
 {
-  VideoView videoView = Internal::VideoView::New();
+  VideoView videoView = Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
   Dali::Toolkit::GetImpl( videoView ).SetSWCodec( swCodec );
   return videoView;
 }
 
 VideoView VideoView::New( const std::string& url, bool swCodec )
 {
-  VideoView videoView = Internal::VideoView::New();
+  VideoView videoView = Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
   Dali::Toolkit::GetImpl( videoView ).SetUrl( url );
   Dali::Toolkit::GetImpl( videoView ).SetSWCodec( swCodec );
   return videoView;

@@ -16,6 +16,7 @@
  */
 
 #include <dali/devel-api/adaptor-framework/video-player.h>
+#include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-object.h>
 #include <toolkit-application.h>
@@ -98,6 +99,15 @@ public:
     return NULL;
   }
 
+  void StartSynchronization()
+  {
+
+  }
+
+  void FinishSynchronization()
+  {
+
+  }
 
 public:
 
@@ -151,6 +161,13 @@ VideoPlayer::~VideoPlayer()
 }
 
 VideoPlayer VideoPlayer::New()
+{
+  Internal::Adaptor::VideoPlayer* player = new Internal::Adaptor::VideoPlayer();
+
+  return VideoPlayer( player );
+}
+
+VideoPlayer VideoPlayer::New( Dali::Actor actor, Dali::VideoSyncMode syncMode )
 {
   Internal::Adaptor::VideoPlayer* player = new Internal::Adaptor::VideoPlayer();
 
@@ -296,6 +313,16 @@ Dali::VideoPlayerPlugin::DisplayMode::Type VideoPlayer::GetDisplayMode() const
 Any VideoPlayer::GetMediaPlayer()
 {
   return Internal::Adaptor::GetImplementation( *this ).GetMediaPlayer();
+}
+
+void VideoPlayer::StartSynchronization()
+{
+  Internal::Adaptor::GetImplementation( *this ).StartSynchronization();
+}
+
+void VideoPlayer::FinishSynchronization()
+{
+  Internal::Adaptor::GetImplementation( *this ).FinishSynchronization();
 }
 
 } // namespace Dali;

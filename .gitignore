@@ -39,6 +39,8 @@ libdali2-toolkit.so*
 /docs/generated/*
 /build/tizen/doc
 /build/tizen/.cov
+build/tizen/CMakeDoxyfile.in
+build/tizen/CMakeDoxygenDefaults.cmake
 /build/desktop
 /packaging/home*
 .vscode/

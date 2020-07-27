@@ -512,6 +512,18 @@ int UtcDaliControlBackgroundColorRendererCount(void)
   DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( GetControlBackgroundColor( control ), semiTransparent, TEST_LOCATION );
 
+  Renderer renderer = control.GetRendererAt( 0 );
+  DALI_TEST_CHECK( renderer );
+
+  tet_infoline( "Set semi transparent alpha with positive RGB values, renderer should not be changed" );
+  const Vector4 newColor( 1.0f, 1.0f, 0.5f, 0.5f );
+  control.SetBackgroundColor( newColor );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), newColor, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer, control.GetRendererAt( 0 ), TEST_LOCATION );
+
   tet_infoline( "Set transparent, ensure no renderers are created" );
   control.SetBackgroundColor( Color::TRANSPARENT );
   application.SendNotification();
