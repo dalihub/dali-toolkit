@@ -1337,3 +1337,28 @@ int UtcDaliControlImplAutoClippingWithVisualsAlreadyOnStage(void)
 
   END_TEST;
 }
+
+int UtcDaliControlImplOnPinch(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
+  control.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(control);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::Control& impl = Toolkit::Internal::GetImplementation(control);
+  impl.EnableGestureDetection(Gesture::Pinch);
+
+  // Scale becomes 0.6666666
+  TestStartPinch( application,  Vector2( 5.0f, 20.0f ), Vector2( 35.0f, 20.0f ),
+                                Vector2( 10.0f, 20.0f ), Vector2( 30.0f, 20.0f ), 100 );
+
+  DALI_TEST_EQUALS(0.666f, control.GetProperty( Actor::Property::SCALE_X).Get<float>(), 0.01f, TEST_LOCATION);
+
+  END_TEST;
+
+}
