@@ -95,6 +95,7 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-tts-player.cpp
   dali-toolkit-test-utils/toolkit-native-image-source.cpp
   dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp
+  dali-toolkit-test-utils/toolkit-vector-image-renderer.cpp
   dali-toolkit-test-utils/toolkit-video-player.cpp
   dali-toolkit-test-utils/toolkit-web-engine.cpp
   dali-toolkit-test-utils/toolkit-window.cpp

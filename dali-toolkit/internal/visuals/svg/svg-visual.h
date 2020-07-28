@@ -26,7 +26,9 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
+#ifdef NO_THORVG
 struct NSVGimage;
+#endif /* NO_THORVG */
 
 namespace Dali
 {
@@ -142,6 +144,7 @@ protected:
 
 public:
 
+#ifdef NO_THORVG
   /**
    * @bried Apply the rasterized image to the visual.
    *
@@ -149,14 +152,31 @@ public:
    * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
    */
   void ApplyRasterizedImage( NSVGimage* parsedSvg, PixelData rasterizedPixelData );
+#else /* NO_THORVG */
+  /**
+   * @bried Apply the rasterized image to the visual.
+   *
+   * @param[in] vectorImage The data of vector image.
+   * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
+   * @param[in] bool Whether the resource is loaded
+   */
+  void ApplyRasterizedImage( VectorImageRenderer vectorImage, PixelData rasterizedPixelData, bool isLoaded );
+#endif /* NO_THORVG */
 
 private:
+#ifdef NO_THORVG
   /**
     * @brief Parses the SVG Image from the set URL.
     *
     * @param[in] imageUrl The URL of the image to parse the SVG from.
     */
    void ParseFromUrl( const VisualUrl& imageUrl );
+#else /* NO_THORVG */
+  /**
+    * @brief Load the SVG Image from the set URL.
+    */
+   void Load();
+#endif /* NO_THORVG */
 
   /**
    * @bried Rasterize the svg with the given size, and add it to the visual.
@@ -182,7 +202,15 @@ private:
   ImageVisualShaderFactory& mImageVisualShaderFactory;
   Vector4                   mAtlasRect;
   VisualUrl                 mImageUrl;
+#ifdef NO_THORVG
   NSVGimage*                mParsedImage;
+#else /* NO_THORVG */
+  VectorImageRenderer       mVectorRenderer;
+  uint32_t                  mDefaultWidth;
+  uint32_t                  mDefaultHeight;
+  bool                      mLoaded;
+  bool                      mLocalResource;
+#endif /* NO_THORVG */
   WeakHandle<Actor>         mPlacementActor;
   Vector2                   mVisualSize;
   bool                      mAttemptAtlasing;  ///< If true will attempt atlasing, otherwise create unique texture

@@ -29,8 +29,13 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
+#ifdef NO_THORVG
 struct NSVGimage;
 struct NSVGrasterizer;
+#else /* NO_THORVG */
+#include <string.h>
+#include <dali/devel-api/adaptor-framework/vector-image-renderer.h>
+#endif /* NO_THORVG */
 
 namespace Dali
 {
@@ -58,6 +63,7 @@ typedef IntrusivePtr< RasterizingTask > RasterizingTaskPtr;
 class RasterizingTask : public RefObject
 {
 public:
+#ifdef NO_THORVG
   /**
    * Constructor
    *
@@ -70,6 +76,17 @@ public:
    * @param[in] height The rasterization height.
    */
   RasterizingTask( SvgVisual* svgRenderer, NSVGimage* parsedSvg, const VisualUrl& url, float dpi, unsigned int width, unsigned int height );
+#else /* NO_THORVG */
+  /**
+   * Constructor
+   * @param[in] svgRenderer The renderer which the rasterized image to be applied.
+   * @param[in] url The URL to svg resource to use.
+   * @param[in] width The rasterization width.
+   * @param[in] height The rasterization height.
+   * @param[in] loaded The svg resource is loaded or not.
+   */
+  RasterizingTask( SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height, bool loaded );
+#endif /* NO_THORVG */
 
   /**
    * Destructor.
@@ -92,11 +109,31 @@ public:
    */
   PixelData GetPixelData() const;
 
+#ifdef NO_THORVG
   /**
    * Get the parsed data.
    * @return parsed image data.
    */
   NSVGimage* GetParsedImage() const;
+  /**
+   * Get default size of svg
+   *
+   * @param[out] width The default width of svg
+   * @param[out] height The default height of svg
+   */
+  void GetDefaultSize( uint32_t& width, uint32_t& height ) const;
+#else /* NO_THORVG */
+  /**
+   * Get the VectorRenderer.
+   * @return VectorRenderer.
+   */
+  VectorImageRenderer GetVectorRenderer() const;
+  /**
+   * Whether the resource is loaded.
+   * @return True if the resource is loaded.
+   */
+  bool IsLoaded() const;
+#endif /* NO_THORVG */
 
   /**
    * Load svg file
@@ -112,13 +149,21 @@ private:
 
 private:
   SvgVisualPtr    mSvgVisual;
+#ifdef NO_THORVG
   NSVGimage*      mParsedSvg;
+#else /* NO_THORVG */
+  VectorImageRenderer mVectorRenderer;
+#endif /* NO_THORVG */
   VisualUrl       mUrl;
   PixelData       mPixelData;
   float           mDpi;
   unsigned int    mWidth;
   unsigned int    mHeight;
+#ifdef NO_THORVG
   NSVGrasterizer* mRasterizer;
+#else /* NO_THORVG */
+  bool            mLoaded;
+#endif /* NO_THORVG */
 };
 
 /**
@@ -163,14 +208,25 @@ public:
    */
   void RemoveTask( SvgVisual* visual );
 
+#ifdef NO_THORVG
   /**
    * Delete the parsed SVG image, called by main thread.
    *
-   * The parsed svg should be delelted in worker thread, as the main thread does not know whether a rasterization of this svg is ongoing.
+   * The parsed svg should be deleted in worker thread, as the main thread does not know whether a rasterization of this svg is ongoing.
    *
    * @param[in] parsedImage The image to be deleted
    */
   void DeleteImage( NSVGimage* parsedSvg );
+#else /* NO_THORVG */
+  /**
+   * Delete the parsed SVG image, called by main thread.
+   *
+   * The parsed svg should be deleted in worker thread, as the main thread does not know whether a rasterization of this svg is ongoing.
+   *
+   * @param[in] VectorImage The image to be deleted
+   */
+  void DeleteImage( VectorImageRenderer vectorImage );
+#endif /* NO_THORVG */
 
 private:
 
@@ -214,7 +270,11 @@ private:
 
   std::vector<RasterizingTaskPtr>  mRasterizeTasks;     //The queue of the tasks waiting to rasterize the SVG image
   std::vector <RasterizingTaskPtr> mCompletedTasks;     //The queue of the tasks with the SVG rasterization completed
+#ifdef NO_THORVG
   Vector<NSVGimage*>               mDeleteSvg;          //The images that the event thread requested to delete
+#else /* NO_THORVG */
+  Vector <VectorImageRenderer*>      mDeleteSvg;          //The images that the event thread requested to delete
+#endif /* NO_THORVG */
 
   ConditionalWait            mConditionalWait;
   Dali::Mutex                mMutex;
