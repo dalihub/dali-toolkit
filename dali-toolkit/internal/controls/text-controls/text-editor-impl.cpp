@@ -1820,7 +1820,7 @@ void TextEditor::OnStageConnection( int depth )
 
 bool TextEditor::OnTouched( Actor actor, const TouchData& touch )
 {
-  return true;
+  return false;
 }
 
 void TextEditor::OnIdleSignal()
