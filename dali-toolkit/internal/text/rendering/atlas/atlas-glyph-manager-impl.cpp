@@ -42,7 +42,7 @@ AtlasGlyphManager::AtlasGlyphManager()
 {
   mAtlasManager = Dali::Toolkit::AtlasManager::New();
   mSampler = Sampler::New();
-  mSampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+  mSampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
 }
 
 void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
