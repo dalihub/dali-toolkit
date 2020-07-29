@@ -194,6 +194,14 @@ public:
   ImageView( const ImageView& imageView );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  ImageView( ImageView&& rhs );
+
+  /**
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
@@ -201,6 +209,15 @@ public:
    * @return The updated ImageView
    */
   ImageView& operator=( const ImageView& imageView );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  ImageView& operator=( ImageView&& rhs );
 
   /**
    * @brief Downcasts a handle to ImageView handle.

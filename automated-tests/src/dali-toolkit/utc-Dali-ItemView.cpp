@@ -166,6 +166,75 @@ int UtcDaliItemViewNew(void)
   END_TEST;
 }
 
+int UtcDaliItemViewCopyConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  TestItemFactory factory;
+  ItemView itemView = ItemView::New( factory );
+  DALI_TEST_CHECK( itemView );
+
+  ItemView copy( itemView );
+  DALI_TEST_CHECK( copy );
+
+  END_TEST;
+}
+
+int UtcDaliItemViewCopyAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  TestItemFactory factory;
+  ItemView itemView = ItemView::New( factory );
+  DALI_TEST_CHECK( itemView );
+
+  ItemView copy;
+  copy = itemView;
+  DALI_TEST_CHECK( copy );
+  DALI_TEST_EQUALS( itemView, copy, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliItemViewMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  TestItemFactory factory;
+  ItemView itemView = ItemView::New( factory );
+  DALI_TEST_EQUALS( 1, itemView.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  itemView.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == itemView.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  ItemView moved = std::move( itemView );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !itemView );
+
+  END_TEST;
+}
+
+int UtcDaliItemViewMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  TestItemFactory factory;
+  ItemView itemView = ItemView::New( factory );
+  DALI_TEST_EQUALS( 1, itemView.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  itemView.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == itemView.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  ItemView moved;
+  moved = std::move( itemView );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !itemView );
+
+  END_TEST;
+}
+
 int UtcDaliItemViewDownCast(void)
 {
   ToolkitTestApplication application;

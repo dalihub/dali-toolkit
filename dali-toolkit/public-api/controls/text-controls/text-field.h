@@ -539,6 +539,14 @@ public:
   TextField( const TextField& handle );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  TextField( TextField&& rhs );
+
+  /**
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
@@ -546,6 +554,15 @@ public:
    * @return A reference to this
    */
   TextField& operator=( const TextField& handle );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  TextField& operator=( TextField&& rhs );
 
   /**
    * @brief Destructor.

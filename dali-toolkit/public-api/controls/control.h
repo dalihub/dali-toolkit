@@ -200,6 +200,14 @@ public: // Creation & Destruction
   Control(const Control& uiControl);
 
   /**
+   * @brief Move constructor.
+   *
+   * @SINCE_1_9.23
+   * @param[in] rhs Handle to move
+   */
+  Control( Control&& rhs );
+
+  /**
    * @brief Dali::Control is intended as a base class.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
@@ -210,7 +218,7 @@ public: // Creation & Destruction
 public: // operators
 
   /**
-   * @brief Assignment operator.
+   * @brief Copy assignment operator.
    *
    * Changes this handle to point to another real object.
    * @SINCE_1_0.0
@@ -218,6 +226,15 @@ public: // operators
    * @return Reference to this
    */
   Control& operator=( const Control& handle );
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_1_9.23
+   * @param[in] rhs Object to assign this to
+   * @return Reference to this
+   */
+  Control& operator=( Control&& rhs );
 
 public:
 

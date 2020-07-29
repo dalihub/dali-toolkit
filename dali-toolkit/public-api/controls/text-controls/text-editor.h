@@ -532,14 +532,30 @@ public:
   TextEditor( const TextEditor &handle );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  TextEditor( TextEditor&& rhs );
+
+  /**
    * @brief Assignment operator.
    *
    * @SINCE_1_1.37
    * @param[in] handle The handle to copy from
    * @return A reference to this
    */
-  TextEditor&
-  operator=( const TextEditor &handle );
+  TextEditor& operator=( const TextEditor &handle );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  TextEditor& operator=( TextEditor&& rhs );
 
   /**
    * @brief Destructor.

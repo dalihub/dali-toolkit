@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ITEM_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,12 +215,29 @@ public:
   ItemView( const ItemView& itemView );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  ItemView( ItemView&& rhs );
+
+  /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
    * @param[in] itemView Handle to an object
    * @return A reference to this
    */
   ItemView& operator=( const ItemView& itemView );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  ItemView& operator=( ItemView&& rhs );
 
   /**
    * @brief Destructor.

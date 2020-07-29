@@ -126,6 +126,24 @@ int UtcDaliImageViewCopyConstructorP(void)
   END_TEST;
 }
 
+int UtcDaliImageViewMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  DALI_TEST_EQUALS( 1, imageView.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  imageView.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == imageView.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  ImageView moved = std::move( imageView );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !imageView );
+
+  END_TEST;
+}
+
 int UtcDaliImageViewAssignmentOperatorP(void)
 {
   ToolkitTestApplication application;
@@ -135,6 +153,25 @@ int UtcDaliImageViewAssignmentOperatorP(void)
   ImageView copy( imageView );
   DALI_TEST_CHECK( copy );
   DALI_TEST_EQUALS( imageView, copy, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  DALI_TEST_EQUALS( 1, imageView.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  imageView.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == imageView.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  ImageView moved;
+  moved = std::move( imageView );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !imageView );
 
   END_TEST;
 }

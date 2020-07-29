@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,19 +36,13 @@ TextField::TextField()
 {
 }
 
-TextField::TextField( const TextField& handle )
-: Control( handle )
-{
-}
+TextField::TextField( const TextField& handle ) = default;
 
-TextField& TextField::operator=( const TextField& handle )
-{
-  if( &handle != this )
-  {
-    Control::operator=( handle );
-  }
-  return *this;
-}
+TextField::TextField( TextField&& rhs ) = default;
+
+TextField& TextField::operator=( const TextField& handle ) = default;
+
+TextField& TextField::operator=( TextField&& rhs ) = default;
 
 TextField::~TextField()
 {

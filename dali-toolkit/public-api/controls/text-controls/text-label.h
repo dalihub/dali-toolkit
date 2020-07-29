@@ -399,6 +399,14 @@ public:
   TextLabel( const TextLabel& handle );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  TextLabel( TextLabel&& rhs );
+
+  /**
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
@@ -406,6 +414,15 @@ public:
    * @return A reference to this
    */
   TextLabel& operator=( const TextLabel& handle );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  TextLabel& operator=( TextLabel&& rhs );
 
   /**
    * @brief Destructor.

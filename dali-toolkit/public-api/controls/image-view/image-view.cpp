@@ -35,19 +35,13 @@ ImageView::ImageView()
 {
 }
 
-ImageView::ImageView( const ImageView& imageView )
-: Control( imageView )
-{
-}
+ImageView::ImageView( const ImageView& imageView ) = default;
 
-ImageView& ImageView::operator=( const ImageView& imageView )
-{
-  if( &imageView != this )
-  {
-    Control::operator=( imageView );
-  }
-  return *this;
-}
+ImageView::ImageView( ImageView&& rhs ) = default;
+
+ImageView& ImageView::operator=( const ImageView& imageView ) = default;
+
+ImageView& ImageView::operator=( ImageView&& rhs ) = default;
 
 ImageView::~ImageView()
 {

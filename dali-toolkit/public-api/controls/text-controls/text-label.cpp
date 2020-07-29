@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,19 +44,13 @@ TextLabel::TextLabel()
 {
 }
 
-TextLabel::TextLabel( const TextLabel& handle )
-: Control( handle )
-{
-}
+TextLabel::TextLabel( const TextLabel& handle ) = default;
 
-TextLabel& TextLabel::operator=( const TextLabel& handle )
-{
-  if( &handle != this )
-  {
-    Control::operator=( handle );
-  }
-  return *this;
-}
+TextLabel::TextLabel( TextLabel&& rhs ) = default;
+
+TextLabel& TextLabel::operator=( const TextLabel& handle ) = default;
+
+TextLabel& TextLabel::operator=( TextLabel&& rhs ) = default;
 
 TextLabel::~TextLabel()
 {

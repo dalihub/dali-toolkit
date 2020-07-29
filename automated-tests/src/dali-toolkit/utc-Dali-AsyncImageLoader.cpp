@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,6 +123,22 @@ int UtcDaliAsyncImageLoaderCopyConstructor(void)
   END_TEST;
 }
 
+int UtcDaliAsyncImageLoaderMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  AsyncImageLoader loader = AsyncImageLoader::New( );
+  DALI_TEST_CHECK( loader );
+  DALI_TEST_EQUALS( 1, loader.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  AsyncImageLoader moved = std::move( loader );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !loader );
+
+  END_TEST;
+}
+
 int UtcDaliAsyncImageLoaderAssignmentOperator(void)
 {
   ToolkitTestApplication application;
@@ -136,6 +152,23 @@ int UtcDaliAsyncImageLoaderAssignmentOperator(void)
   loader2 = loader;
   DALI_TEST_CHECK( loader2 );
   DALI_TEST_CHECK( loader == loader2 ); // the two handles are pointing to the same object.
+
+  END_TEST;
+}
+
+int UtcDaliAsyncImageLoaderMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  AsyncImageLoader loader = AsyncImageLoader::New( );
+  DALI_TEST_CHECK( loader );
+  DALI_TEST_EQUALS( 1, loader.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+
+  AsyncImageLoader moved;
+  moved = std::move( loader );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( !loader );
 
   END_TEST;
 }

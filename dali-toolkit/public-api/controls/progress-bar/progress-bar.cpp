@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,19 +31,13 @@ ProgressBar::ProgressBar()
 {
 }
 
-ProgressBar::ProgressBar( const ProgressBar& handle )
-: Control( handle )
-{
-}
+ProgressBar::ProgressBar( const ProgressBar& handle ) = default;
 
-ProgressBar& ProgressBar::operator=( const ProgressBar& handle )
-{
-  if( &handle != this )
-  {
-    Control::operator=( handle );
-  }
-  return *this;
-}
+ProgressBar::ProgressBar( ProgressBar&& rhs ) = default;
+
+ProgressBar& ProgressBar::operator=( const ProgressBar& handle ) = default;
+
+ProgressBar& ProgressBar::operator=( ProgressBar&& rhs ) = default;
 
 ProgressBar::ProgressBar(Internal::ProgressBar& implementation)
 : Control(implementation)

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SCROLL_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -737,6 +737,14 @@ public:
   ScrollView( const ScrollView& handle );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  ScrollView( ScrollView&& rhs );
+
+  /**
    * @brief Assignment operator.
    *
    * Changes this handle to point to another real object.
@@ -745,6 +753,15 @@ public:
    * @return A reference to this
    */
   ScrollView& operator=( const ScrollView& handle );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  ScrollView& operator=( ScrollView&& rhs );
 
   /**
    * @brief Destructor.
