@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VIDEO_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -255,6 +255,14 @@ public:
   VideoView( const VideoView& videoView );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  VideoView( VideoView&& rhs );
+
+  /**
    * @brief Assignment operator.
    *
    * @SINCE_1_1.38
@@ -262,6 +270,15 @@ public:
    * @return The updated VideoView
    */
   VideoView& operator=( const VideoView& videoView );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  VideoView& operator=( VideoView&& rhs );
 
   /**
    * @brief Downcasts a handle to VideoView handle.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,19 +36,13 @@ TextEditor::TextEditor()
 {
 }
 
-TextEditor::TextEditor( const TextEditor& handle )
-: Control( handle )
-{
-}
+TextEditor::TextEditor( const TextEditor& handle ) = default;
 
-TextEditor& TextEditor::operator=( const TextEditor& handle )
-{
-  if( &handle != this )
-  {
-    Control::operator=( handle );
-  }
-  return *this;
-}
+TextEditor::TextEditor( TextEditor&& rhs ) = default;
+
+TextEditor& TextEditor::operator=( const TextEditor& handle ) = default;
+
+TextEditor& TextEditor::operator=( TextEditor&& rhs ) = default;
 
 TextEditor::~TextEditor()
 {

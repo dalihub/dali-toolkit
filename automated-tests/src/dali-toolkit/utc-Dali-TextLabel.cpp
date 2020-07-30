@@ -230,6 +230,23 @@ int UtcDaliToolkitTextLabelCopyConstructorP(void)
   END_TEST;
 }
 
+int UtcDaliTextLabelMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  TextLabel textLabel = TextLabel::New();
+  textLabel.SetProperty( TextLabel::Property::TEXT, "Test" );
+  DALI_TEST_CHECK( textLabel.GetProperty<std::string>( TextLabel::Property::TEXT ) == "Test" );
+
+  TextLabel moved = std::move( textLabel );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( moved.GetProperty<std::string>( TextLabel::Property::TEXT ) == "Test" );
+  DALI_TEST_CHECK( !textLabel );
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextLabelAssignmentOperatorP(void)
 {
   ToolkitTestApplication application;
@@ -240,6 +257,24 @@ int UtcDaliToolkitTextLabelAssignmentOperatorP(void)
   TextLabel copy = textLabel;
   DALI_TEST_CHECK( copy );
   DALI_TEST_CHECK( copy.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ) == textLabel.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ) );
+  END_TEST;
+}
+
+int UtcDaliTextLabelMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  TextLabel textLabel = TextLabel::New();
+  textLabel.SetProperty( TextLabel::Property::TEXT, "Test" );
+  DALI_TEST_CHECK( textLabel.GetProperty<std::string>( TextLabel::Property::TEXT ) == "Test" );
+
+  TextLabel moved;
+  moved = std::move( textLabel );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( moved.GetProperty<std::string>( TextLabel::Property::TEXT ) == "Test" );
+  DALI_TEST_CHECK( !textLabel );
+
   END_TEST;
 }
 

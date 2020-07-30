@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -298,19 +298,13 @@ ScrollView::ScrollView( Dali::Internal::CustomActor* internal )
   VerifyCustomActorPointer<Internal::ScrollView>(internal);
 }
 
-ScrollView::ScrollView( const ScrollView& handle )
-: Scrollable( handle )
-{
-}
+ScrollView::ScrollView( const ScrollView& handle ) = default;
 
-ScrollView& ScrollView::operator=( const ScrollView& handle )
-{
-  if( &handle != this )
-  {
-    Control::operator=( handle );
-  }
-  return *this;
-}
+ScrollView::ScrollView( ScrollView&& rhs ) = default;
+
+ScrollView& ScrollView::operator=( const ScrollView& handle ) = default;
+
+ScrollView& ScrollView::operator=( ScrollView&& rhs ) = default;
 
 ScrollView ScrollView::New()
 {

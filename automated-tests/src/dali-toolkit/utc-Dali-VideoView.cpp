@@ -274,6 +274,43 @@ int UtcDaliVideoViewCopyAndAssignment(void)
   END_TEST;
 }
 
+int UtcDaliVideoViewMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  VideoView view = Toolkit::VideoView::New();
+  DALI_TEST_EQUALS( 1, view.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  view.SetProperty( VideoView::Property::LOOPING, true );
+  DALI_TEST_CHECK( view.GetProperty<bool>( VideoView::Property::LOOPING ) );
+
+  VideoView moved = std::move( view );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( moved.GetProperty<bool>( VideoView::Property::LOOPING ) );
+  DALI_TEST_CHECK( !view );
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  VideoView view = Toolkit::VideoView::New();
+  DALI_TEST_EQUALS( 1, view.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  view.SetProperty( VideoView::Property::LOOPING, true );
+  DALI_TEST_CHECK( view.GetProperty<bool>( VideoView::Property::LOOPING ) );
+
+  VideoView moved;
+  moved = std::move( view );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( moved.GetProperty<bool>( VideoView::Property::LOOPING ) );
+  DALI_TEST_CHECK( !view );
+
+  END_TEST;
+}
+
 int UtcDaliVideoViewTypeRegistry(void)
 {
   ToolkitTestApplication application;

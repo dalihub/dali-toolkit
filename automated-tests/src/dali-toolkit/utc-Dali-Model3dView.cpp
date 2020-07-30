@@ -174,6 +174,43 @@ int UtcDaliModelCopyAndAssignment(void)
   END_TEST;
 }
 
+int UtcDaliModelMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  Model3dView view = Toolkit::Model3dView::New();
+  DALI_TEST_EQUALS( 1, view.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  view.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == view.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  Model3dView moved = std::move( view );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !view );
+
+  END_TEST;
+}
+
+int UtcDaliModelMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  Model3dView view = Toolkit::Model3dView::New();
+  DALI_TEST_EQUALS( 1, view.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  view.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == view.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  Model3dView moved;
+  moved = std::move( view );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !view );
+
+  END_TEST;
+}
+
 int UtcDaliModelTypeRegistry(void)
 {
   ToolkitTestApplication application;

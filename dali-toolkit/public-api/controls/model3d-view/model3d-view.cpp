@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,19 +33,13 @@ namespace Toolkit
 Model3dView::Model3dView()
 {}
 
-Model3dView::Model3dView( const Model3dView& model3dView )
-: Control( model3dView )
-{
-}
+Model3dView::Model3dView( const Model3dView& model3dView ) = default;
 
-Model3dView& Model3dView::operator=( const Model3dView& model3dView )
-{
-  if( &model3dView != this )
-  {
-    Control::operator=( model3dView );
-  }
-  return *this;
-}
+Model3dView::Model3dView( Model3dView&& rhs ) = default;
+
+Model3dView& Model3dView::operator=( const Model3dView& model3dView ) = default;
+
+Model3dView& Model3dView::operator=( Model3dView&& rhs ) = default;
 
 Model3dView::~Model3dView()
 {

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_FLEX_CONTAINER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -241,12 +241,29 @@ public:
   FlexContainer( const FlexContainer& handle );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  FlexContainer( FlexContainer&& rhs );
+
+  /**
    * @brief Assignment operator. Changes this handle to point to another real object.
    * @SINCE_1_1.35
    * @param[in] handle Handle to an object
    * @return A reference to this
    */
   FlexContainer& operator=( const FlexContainer& handle );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  FlexContainer& operator=( FlexContainer&& rhs );
 
   /**
    * @brief Destructor.

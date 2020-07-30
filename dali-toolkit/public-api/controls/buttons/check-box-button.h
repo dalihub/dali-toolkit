@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CHECK_BOX_BUTTON_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,12 +97,29 @@ public:
   CheckBoxButton( const CheckBoxButton& checkBox );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  CheckBoxButton( CheckBoxButton&& rhs );
+
+  /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
    * @param[in] checkBox Handle to an object
    * @return A reference to this
    */
   CheckBoxButton& operator=( const CheckBoxButton& checkBox );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  CheckBoxButton& operator=( CheckBoxButton&& rhs );
 
   /**
    * @brief Destructor.
