@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_BUTTON_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -236,12 +236,29 @@ public:
   Button( const Button& button );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  Button( Button&& rhs );
+
+  /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
    * @param[in] button Handle to an object
    * @return A reference to this
    */
   Button& operator=( const Button& button );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  Button& operator=( Button&& rhs );
 
   /**
    * @brief Downcasts a handle to Button handle.

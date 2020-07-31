@@ -36,19 +36,13 @@ namespace Toolkit
 Button::Button()
 {}
 
-Button::Button( const Button& button )
-: Control( button )
-{
-}
+Button::Button( const Button& button ) = default;
 
-Button& Button::operator=( const Button& button )
-{
-  if( &button != this )
-  {
-    Control::operator=( button );
-  }
-  return *this;
-}
+Button::Button( Button&& rhs ) = default;
+
+Button& Button::operator=( const Button& button ) = default;
+
+Button& Button::operator=( Button&& rhs ) = default;
 
 Button::~Button()
 {

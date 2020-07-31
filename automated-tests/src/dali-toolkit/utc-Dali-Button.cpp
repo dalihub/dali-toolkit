@@ -163,6 +163,25 @@ int UtcDaliButtonCopyConstructorP(void)
   END_TEST;
 }
 
+int UtcDaliButtonMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+  DALI_TEST_EQUALS( 1, button.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), false , TEST_LOCATION );
+  button.SetProperty( Button::Property::TOGGLABLE, true );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), true , TEST_LOCATION );
+
+  Button moved = std::move( button );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( moved.GetProperty<bool>( Button::Property::TOGGLABLE ), true , TEST_LOCATION );
+  DALI_TEST_CHECK( !button );
+
+  END_TEST;
+}
+
 int UtcDaliButtonAssignmentOperatorP(void)
 {
   TestApplication application;
@@ -173,6 +192,26 @@ int UtcDaliButtonAssignmentOperatorP(void)
   DALI_TEST_CHECK( copy );
 
   DALI_TEST_CHECK( button == copy );
+  END_TEST;
+}
+
+int UtcDaliButtonMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+  DALI_TEST_EQUALS( 1, button.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), false , TEST_LOCATION );
+  button.SetProperty( Button::Property::TOGGLABLE, true );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), true , TEST_LOCATION );
+
+  Button moved;
+  moved = std::move( button );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( moved.GetProperty<bool>( Button::Property::TOGGLABLE ), true , TEST_LOCATION );
+  DALI_TEST_CHECK( !button );
+
   END_TEST;
 }
 

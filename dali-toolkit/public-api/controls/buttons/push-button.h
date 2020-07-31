@@ -134,12 +134,29 @@ public:
   PushButton( const PushButton& pushButton );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  PushButton( PushButton&& rhs );
+
+  /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
    * @param[in] pushButton Handle to an object
    * @return A reference to this
    */
   PushButton& operator=( const PushButton& pushButton );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  PushButton& operator=( PushButton&& rhs );
 
   /**
    * @brief Destructor.

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_RADIO_BUTTON_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2029 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,12 +103,29 @@ class DALI_TOOLKIT_API RadioButton: public Button
   RadioButton( const RadioButton& radioButton );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  RadioButton( RadioButton&& rhs );
+
+  /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
    * @param[in] radioButton Handle to an object
    * @return A reference to this
    */
   RadioButton& operator=( const RadioButton& radioButton );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  RadioButton& operator=( RadioButton&& rhs );
 
   /**
    * @brief Destructor.

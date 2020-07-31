@@ -198,6 +198,16 @@ Window DownCast( BaseHandle handle )
   return Dali::Window( windowImpl );
 }
 
+void AddFrameRenderedCallback( Window window, std::unique_ptr< CallbackBase > callback, int32_t frameId )
+{
+  CallbackBase::Execute( *callback, frameId );
+}
+
+void AddFramePresentedCallback( Window window, std::unique_ptr< CallbackBase > callback, int32_t frameId )
+{
+  CallbackBase::Execute( *callback, frameId );
+}
+
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window )
 {
   return GetImplementation( window ).GetScene().EventProcessingFinishedSignal();

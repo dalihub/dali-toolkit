@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,19 +40,13 @@ ItemView::ItemView( Dali::Internal::CustomActor* internal )
   VerifyCustomActorPointer<Internal::ItemView>(internal);
 }
 
-ItemView::ItemView( const ItemView& itemView )
-: Scrollable(itemView)
-{
-}
+ItemView::ItemView( const ItemView& itemView ) = default;
 
-ItemView& ItemView::operator=( const ItemView& itemView )
-{
-  if( &itemView != this )
-  {
-    Control::operator=( itemView );
-  }
-  return *this;
-}
+ItemView::ItemView( ItemView&& rhs ) = default;
+
+ItemView& ItemView::operator=( const ItemView& itemView ) = default;
+
+ItemView& ItemView::operator=( ItemView&& rhs ) = default;
 
 ItemView ItemView::New(ItemFactory& factory)
 {

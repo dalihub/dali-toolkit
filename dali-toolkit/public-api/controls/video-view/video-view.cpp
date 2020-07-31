@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/property-map.h>
+#include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/video-view/video-view-impl.h>
@@ -34,20 +35,13 @@ VideoView::VideoView()
 {
 }
 
-VideoView::VideoView( const VideoView& videoView )
-: Control( videoView )
-{
-}
+VideoView::VideoView( const VideoView& videoView ) = default;
 
-VideoView& VideoView::operator=( const VideoView& videoView )
-{
-  if( &videoView != this )
-  {
-    Control::operator=( videoView );
-  }
+VideoView::VideoView( VideoView&& rhs ) = default;
 
-  return *this;
-}
+VideoView& VideoView::operator=( const VideoView& videoView ) = default;
+
+VideoView& VideoView::operator=( VideoView&& rhs ) = default;
 
 VideoView::~VideoView()
 {
@@ -55,26 +49,26 @@ VideoView::~VideoView()
 
 VideoView VideoView::New()
 {
-  return Internal::VideoView::New();
+  return Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
 }
 
 VideoView VideoView::New( const std::string& url )
 {
-  VideoView videoView = Internal::VideoView::New();
+  VideoView videoView = Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
   Dali::Toolkit::GetImpl( videoView ).SetUrl( url );
   return videoView;
 }
 
 VideoView VideoView::New( bool swCodec )
 {
-  VideoView videoView = Internal::VideoView::New();
+  VideoView videoView = Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
   Dali::Toolkit::GetImpl( videoView ).SetSWCodec( swCodec );
   return videoView;
 }
 
 VideoView VideoView::New( const std::string& url, bool swCodec )
 {
-  VideoView videoView = Internal::VideoView::New();
+  VideoView videoView = Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
   Dali::Toolkit::GetImpl( videoView ).SetUrl( url );
   Dali::Toolkit::GetImpl( videoView ).SetSWCodec( swCodec );
   return videoView;

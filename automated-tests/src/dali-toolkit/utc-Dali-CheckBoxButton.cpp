@@ -90,6 +90,25 @@ int UtcDaliCheckBoxButtonCopyConstructorP(void)
   END_TEST;
 }
 
+int UtcDaliCheckBoxButtonMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  CheckBoxButton button = CheckBoxButton::New();
+  DALI_TEST_EQUALS( 1, button.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), true , TEST_LOCATION );
+  button.SetProperty( Button::Property::TOGGLABLE, false );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), false , TEST_LOCATION );
+
+  CheckBoxButton moved = std::move( button );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( moved.GetProperty<bool>( Button::Property::TOGGLABLE ), false , TEST_LOCATION );
+  DALI_TEST_CHECK( !button );
+
+  END_TEST;
+}
+
 int UtcDaliCheckBoxButtonAssignmentOperatorP(void)
 {
   ToolkitTestApplication application;
@@ -100,6 +119,26 @@ int UtcDaliCheckBoxButtonAssignmentOperatorP(void)
   DALI_TEST_CHECK( copy );
 
   DALI_TEST_CHECK( checkBox == copy );
+  END_TEST;
+}
+
+int UtcDaliCheckBoxButtonMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  CheckBoxButton button = CheckBoxButton::New();
+  DALI_TEST_EQUALS( 1, button.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), true , TEST_LOCATION );
+  button.SetProperty( Button::Property::TOGGLABLE, false );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), false , TEST_LOCATION );
+
+  CheckBoxButton moved;
+  moved = std::move( button );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( moved.GetProperty<bool>( Button::Property::TOGGLABLE ), false , TEST_LOCATION );
+  DALI_TEST_CHECK( !button );
+
   END_TEST;
 }
 

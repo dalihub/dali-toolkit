@@ -289,6 +289,24 @@ int UtcDaliToolkitScrollViewCopyConstructorP(void)
   END_TEST;
 }
 
+int UtcDaliScrollViewMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  ScrollView scrollView = ScrollView::New();
+  DALI_TEST_EQUALS( 1, scrollView.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_POSITION, Vector2(10.0f, 10.0f) );
+  DALI_TEST_EQUALS( scrollView.GetProperty<Vector2>( ScrollView::Property::SCROLL_POSITION ), Vector2(10.0f, 10.0f), TEST_LOCATION );
+
+  ScrollView moved = std::move( scrollView );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( moved.GetProperty<Vector2>( ScrollView::Property::SCROLL_POSITION ), Vector2(10.0f, 10.0f), TEST_LOCATION );
+  DALI_TEST_CHECK( !scrollView );
+
+  END_TEST;
+}
+
 int UtcDaliToolkitScrollViewAssignmentOperatorP(void)
 {
   ToolkitTestApplication application;
@@ -296,9 +314,29 @@ int UtcDaliToolkitScrollViewAssignmentOperatorP(void)
   ScrollView scrollView = ScrollView::New();
   scrollView.SetProperty( ScrollView::Property::SCROLL_POSITION, Vector2(10.0f, 10.0f) );
 
-  ScrollView copy = scrollView;
+  ScrollView copy;
+  copy = scrollView;
   DALI_TEST_CHECK( copy );
   DALI_TEST_CHECK( copy.GetProperty<Vector2>( ScrollView::Property::SCROLL_POSITION ) == scrollView.GetProperty<Vector2>( ScrollView::Property::SCROLL_POSITION ) );
+  END_TEST;
+}
+
+int UtcDaliScrollViewMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  ScrollView scrollView = ScrollView::New();
+  DALI_TEST_EQUALS( 1, scrollView.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  scrollView.SetProperty( ScrollView::Property::SCROLL_POSITION, Vector2(10.0f, 10.0f) );
+  DALI_TEST_EQUALS( scrollView.GetProperty<Vector2>( ScrollView::Property::SCROLL_POSITION ), Vector2(10.0f, 10.0f), TEST_LOCATION );
+
+  ScrollView moved;
+  moved = std::move( scrollView );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( moved.GetProperty<Vector2>( ScrollView::Property::SCROLL_POSITION ), Vector2(10.0f, 10.0f), TEST_LOCATION );
+  DALI_TEST_CHECK( !scrollView );
+
   END_TEST;
 }
 

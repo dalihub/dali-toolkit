@@ -27,6 +27,7 @@
 #include <dali/public-api/rendering/texture.h>
 #include <dali/devel-api/adaptor-framework/video-player.h>
 #include <dali/integration-api/adaptor-framework/trigger-event-factory.h>
+#include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -47,16 +48,16 @@ class VideoView: public Control
 {
 protected:
 
-  VideoView();
+  VideoView( Dali::VideoSyncMode syncMode );
 
   virtual ~VideoView();
 
 public:
 
   /**
-   * @copydoc Toolkit::VideoView::New()
+   * @copydoc Toolkit::DevelVideoView::New()
    */
-  static Toolkit::VideoView New();
+  static Toolkit::VideoView New( VideoSyncMode syncMode );
 
   /**
    * @brief Sets a video url to play.
@@ -255,6 +256,17 @@ public:
    */
   Any GetMediaPlayer();
 
+  /**
+   * @brief Play the resize or move animation with synchronization between UI(transparent hole) and video player
+   *
+   * The resize and move animation's play() function is called.
+   * If the animation is played, UI and video player will work synchronization.
+   *
+   * @param[in] videoView The current VideoView
+   * @param[in] animation The animation for video view's resize or move.
+   */
+  void PlayAnimation( Dali::Animation animation );
+
 private: // From Control
 
   /**
@@ -271,6 +283,11 @@ private: // From Control
    * @copydoc Toolkit::Control::OnStageDisconnection()
    */
   virtual void OnStageDisconnection();
+
+  /**
+   * @copydoc Toolkit::Control::OnSizeSet()
+   */
+  virtual void OnSizeSet( const Vector3& targetSize );
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize
@@ -330,6 +347,32 @@ private:
    */
   void ApplyBackupProperties();
 
+  /*
+   * @brief FrameRender's callback function
+   *
+   * This function means the resize/move animation is finished,
+   * so Ui and video player's synchronization can be finished.
+   *
+   */
+  void FrameRenderCallback( int frameID );
+
+  /*
+   * @brief Set frameRender Callback function
+   *
+   * This function is added for listenr the resize/move animation is finished,
+   *
+   */
+  void SetFrameRenderCallback();
+
+
+  /*
+   * @brief resize/move animation finished callback function
+   *
+   * This function is called the resize/move animation is finished,
+   *
+   */
+  void OnAnimationFinished( Dali::Animation& animation );
+
 private:
 
   Dali::VideoPlayer mVideoPlayer;
@@ -348,8 +391,12 @@ private:
   Dali::Property::Map mPropertyBackup;
 
   int mCurrentVideoPlayPosition;
+  int mFrameID;
+
   bool mIsPlay;
   bool mIsUnderlay;
+
+  Dali::VideoSyncMode mSyncMode;
 };
 
 } // namespace Internal

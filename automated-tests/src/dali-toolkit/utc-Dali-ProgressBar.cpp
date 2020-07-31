@@ -115,6 +115,71 @@ int UtcDaliProgressBarDestructor(void)
   END_TEST;
 }
 
+int UtcDaliProgressBarCopyConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  ProgressBar progressBar = ProgressBar::New();
+  DALI_TEST_CHECK( progressBar );
+
+  ProgressBar copy( progressBar );
+  DALI_TEST_CHECK( copy );
+
+  END_TEST;
+}
+
+int UtcDaliProgressBarCopyAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  ProgressBar progressBar = ProgressBar::New();
+  DALI_TEST_CHECK( progressBar );
+
+  ProgressBar copy;
+  copy = progressBar;
+  DALI_TEST_CHECK( copy );
+  DALI_TEST_EQUALS( progressBar, copy, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliProgressBarMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  ProgressBar progressBar = ProgressBar::New();
+  DALI_TEST_EQUALS( 1, progressBar.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  progressBar.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == progressBar.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  ProgressBar moved = std::move( progressBar );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !progressBar );
+
+  END_TEST;
+}
+
+int UtcDaliProgressBarMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  ProgressBar progressBar = ProgressBar::New();
+  DALI_TEST_EQUALS( 1, progressBar.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  progressBar.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == progressBar.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  ProgressBar moved;
+  moved = std::move( progressBar );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !progressBar );
+
+  END_TEST;
+}
+
 int UtcDaliProgressBarDownCast(void)
 {
   ToolkitTestApplication application;

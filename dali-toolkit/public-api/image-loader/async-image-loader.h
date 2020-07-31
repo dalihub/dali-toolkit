@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ASYNC_IMAGE_LOADER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,6 +128,14 @@ public:
   AsyncImageLoader( const AsyncImageLoader& handle );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  AsyncImageLoader( AsyncImageLoader&& rhs );
+
+  /**
    * @brief This assignment operator is required for (smart) pointer semantics.
    * @SINCE_1_2_14
    *
@@ -135,6 +143,14 @@ public:
    * @return A reference to this
    */
   AsyncImageLoader& operator=( const AsyncImageLoader& handle );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  AsyncImageLoader& operator=( AsyncImageLoader&& rhs );
 
   /**
    * @brief Creates a new loader to load the image asynchronously in a worker thread.

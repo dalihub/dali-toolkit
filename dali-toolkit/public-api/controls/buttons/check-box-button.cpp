@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,19 +34,13 @@ CheckBoxButton::CheckBoxButton()
 {
 }
 
-CheckBoxButton::CheckBoxButton( const CheckBoxButton& checkBox )
-: Button( checkBox )
-{
-}
+CheckBoxButton::CheckBoxButton( const CheckBoxButton& checkBox ) = default;
 
-CheckBoxButton& CheckBoxButton::operator=( const CheckBoxButton& checkBox )
-{
-  if( &checkBox != this )
-  {
-    Button::operator=( checkBox );
-  }
-  return *this;
-}
+CheckBoxButton::CheckBoxButton( CheckBoxButton&& rhs ) = default;
+
+CheckBoxButton& CheckBoxButton::operator=( const CheckBoxButton& checkBox ) = default;
+
+CheckBoxButton& CheckBoxButton::operator=( CheckBoxButton&& rhs ) = default;
 
 CheckBoxButton::~CheckBoxButton()
 {

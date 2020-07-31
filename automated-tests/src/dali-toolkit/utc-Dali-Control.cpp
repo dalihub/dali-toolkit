@@ -181,6 +181,43 @@ int UtcDaliControlCopyAndAssignment(void)
   END_TEST;
 }
 
+int UtcDaliControlMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  DALI_TEST_EQUALS( 1, control.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  control.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == control.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  Control moved = std::move( control );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !control );
+
+  END_TEST;
+}
+
+int UtcDaliControlMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  DALI_TEST_EQUALS( 1, control.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  control.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == control.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  Control moved;
+  moved = std::move( control );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !control );
+
+  END_TEST;
+}
+
 int UtcDaliControlDownCast(void)
 {
   ToolkitTestApplication application;

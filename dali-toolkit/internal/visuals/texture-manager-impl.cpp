@@ -27,11 +27,13 @@
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/rendering/geometry.h>
 
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/image-loader/image-atlas-impl.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/rendering-addon.h>
 
 namespace
 {
@@ -133,6 +135,8 @@ TextureManager::TextureManager()
   mCurrentTextureId( 0 ),
   mQueueLoadFlag(false)
 {
+  // Initialize the AddOn
+  RenderingAddOn::Get();
 }
 
 TextureManager::~TextureManager()
@@ -1048,6 +1052,12 @@ void TextureManager::UploadTexture( Devel::PixelBuffer& pixelBuffer, TextureInfo
     // Check if this pixelBuffer is premultiplied
     textureInfo.preMultiplied = pixelBuffer.IsAlphaPreMultiplied();
 
+    auto& renderingAddOn = RenderingAddOn::Get();
+    if( renderingAddOn.IsValid() )
+    {
+      renderingAddOn.CreateGeometry( textureInfo.textureId, pixelBuffer );
+    }
+
     Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(),
                                     pixelBuffer.GetWidth(), pixelBuffer.GetHeight() );
 
@@ -1371,6 +1381,13 @@ void TextureManager::AsyncLoadingHelper::AsyncLoadComplete(uint32_t           id
 void TextureManager::SetBrokenImageUrl(const std::string& brokenImageUrl)
 {
   mBrokenImageUrl = brokenImageUrl;
+}
+
+Geometry TextureManager::GetRenderGeometry(TextureId textureId, uint32_t& frontElements, uint32_t& backElements )
+{
+  return RenderingAddOn::Get().IsValid() ?
+         RenderingAddOn::Get().GetGeometry( textureId, frontElements, backElements) :
+         Geometry();
 }
 
 } // namespace Internal
