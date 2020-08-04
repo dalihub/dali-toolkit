@@ -163,7 +163,7 @@ SizeTuple Node::MeasureNode( float width, int widthMode, float height, int heigh
   if( mImpl->mMeasureCallback && mImpl->mActor.GetHandle() )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MeasureNode MeasureCallback executing on %s\n", mImpl->mActor.GetHandle().GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() );
-    nodeSize = mImpl->mMeasureCallback( mImpl->mActor.GetHandle(), width, widthMode, height, heightMode );
+    mImpl->mMeasureCallback( mImpl->mActor.GetHandle(), width, widthMode, height, heightMode, &nodeSize );
   }
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MeasureNode nodeSize width:%f height:%f\n", nodeSize.width, nodeSize.height );
   return nodeSize;
