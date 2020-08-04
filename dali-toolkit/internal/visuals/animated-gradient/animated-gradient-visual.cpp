@@ -554,7 +554,7 @@ void AnimatedGradientVisual::OnSetTransform()
   }
 }
 
-void AnimatedGradientVisual::DoSetOnStage( Actor& actor )
+void AnimatedGradientVisual::DoSetOnScene( Actor& actor )
 {
   InitializeRenderer();
   actor.AddRenderer( mImpl->mRenderer );
@@ -564,7 +564,7 @@ void AnimatedGradientVisual::DoSetOnStage( Actor& actor )
   ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
-void AnimatedGradientVisual::DoSetOffStage( Actor& actor )
+void AnimatedGradientVisual::DoSetOffScene( Actor& actor )
 {
   DALI_ASSERT_DEBUG( (bool)mImpl->mRenderer && "There should always be a renderer whilst on stage");
 

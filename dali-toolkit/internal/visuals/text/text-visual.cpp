@@ -421,7 +421,7 @@ void TextVisual::DoSetProperties( const Property::Map& propertyMap )
   engine.SetCursorWidth( 0u ); // Do not layout space for the cursor.
 }
 
-void TextVisual::DoSetOnStage( Actor& actor )
+void TextVisual::DoSetOnScene( Actor& actor )
 {
   mControl = actor;
 
@@ -476,7 +476,7 @@ void TextVisual::RemoveRenderer( Actor& actor )
   mRendererList.clear();
 }
 
-void TextVisual::DoSetOffStage( Actor& actor )
+void TextVisual::DoSetOffScene( Actor& actor )
 {
   RemoveRenderer( actor );
 

@@ -131,7 +131,7 @@ enum
  * @param[in] index The Property index of the visual, used to reference visual
  * @param[in] visual The visual to register
  *
- * @note Derived class should not call visual.SetOnStage(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
+ * @note Derived class should not call visual.SetOnScene(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
  *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
  * @note If the depth-index is not set on the visual, then it is set to be above the currently registered visuals.
  * @note If replacing a visual, then the depth-index of the visual being replaced is used for the visual.
@@ -146,7 +146,7 @@ DALI_TOOLKIT_API void RegisterVisual( Internal::Control& control, Dali::Property
  * @param[in] visual The visual to register
  * @param[in] depthIndex The visual's depth-index is set to this
  *
- * @note Derived class should not call visual.SetOnStage(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
+ * @note Derived class should not call visual.SetOnScene(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
  *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
  *
  * @see Visual::Base::GetDepthIndex()

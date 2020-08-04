@@ -130,9 +130,9 @@ protected:
   void OnSetTransform() override;
 
   /**
-   * @copydoc Visual::Base::DoSetOnStage
+   * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnStage( Actor& actor ) override;
+  void DoSetOnScene( Actor& actor ) override;
 
 private:
 

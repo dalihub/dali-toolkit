@@ -132,12 +132,12 @@ void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterTyp
 {
   if( actor )
   {
-    Toolkit::GetImplementation(visual).SetOffStage( actor );
+    Toolkit::GetImplementation(visual).SetOffScene( actor );
   }
   visual = Toolkit::VisualFactory::Get().CreateVisual( param0, param1 );
   if( visual && actor && actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
-    Toolkit::GetImplementation(visual).SetOnStage(actor);
+    Toolkit::GetImplementation(visual).SetOnScene(actor);
   }
 }
 
@@ -155,12 +155,12 @@ void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterTyp
 {
   if( actor && visual )
   {
-    Toolkit::GetImplementation(visual).SetOffStage( actor );
+    Toolkit::GetImplementation(visual).SetOffScene( actor );
   }
   visual =  Toolkit::VisualFactory::Get().CreateVisual( param );
   if( visual && actor && actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
-    Toolkit::GetImplementation(visual).SetOnStage(actor);
+    Toolkit::GetImplementation(visual).SetOnScene(actor);
   }
 }
 

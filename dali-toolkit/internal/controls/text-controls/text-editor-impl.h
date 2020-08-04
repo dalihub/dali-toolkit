@@ -158,9 +158,9 @@ private: // From Control
   virtual void OnLongPress( const LongPressGesture& gesture );
 
   /**
-   * @copydoc Control::OnStageConnection()
+   * @copydoc Control::OnSceneConnection()
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
   /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
@@ -279,8 +279,8 @@ private: // Implementation
    */
   void RenderText( Text::Controller::UpdateTextType updateTextType );
 
-  // Connection needed to re-render text, when a text editor returns to the stage.
-  void OnStageConnect( Dali::Actor actor );
+  // Connection needed to re-render text, when a text editor returns to the scene.
+  void OnSceneConnect( Dali::Actor actor );
 
 private: // Data
   // Signals

@@ -471,14 +471,14 @@ void PageTurnView::SetupShadowView()
   mShadowView.Activate();
 }
 
-void PageTurnView::OnStageConnection( int depth )
+void PageTurnView::OnSceneConnection( int depth )
 {
   SetupShadowView();
 
-  Control::OnStageConnection( depth );
+  Control::OnSceneConnection( depth );
 }
 
-void PageTurnView::OnStageDisconnection()
+void PageTurnView::OnSceneDisconnection()
 {
   if(mShadowView)
   {
@@ -491,7 +491,7 @@ void PageTurnView::OnStageDisconnection()
   // make sure the status of the control is updated correctly when the pan gesture is interrupted
   StopTurning();
 
-  Control::OnStageDisconnection();
+  Control::OnSceneDisconnection();
 }
 
 void PageTurnView::SetPageSize( const Vector2& viewPageSize )

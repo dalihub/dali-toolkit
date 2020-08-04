@@ -1565,12 +1565,12 @@ bool Popup::OnDialogTouched( Actor actor, const TouchData& touch )
   return false;
 }
 
-void Popup::OnStageConnection( int depth )
+void Popup::OnSceneConnection( int depth )
 {
   mLayoutDirty = true;
   RelayoutRequest();
 
-  Control::OnStageConnection( depth );
+  Control::OnSceneConnection( depth );
 }
 
 void Popup::OnChildAdd( Actor& child )

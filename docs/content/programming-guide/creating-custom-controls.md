@@ -387,29 +387,29 @@ Avoid adding or removing the child again within these methods.
  
 ___________________________________________________________________________________________________
 
-### Stage Connection {#creating-controls-stage}
+### Scene Connection {#creating-controls-scene}
 
-Methods are provided that can be overridden if notification is required when our control is connected to or disconnected from the stage.
+Methods are provided that can be overridden if notification is required when our control is connected to or disconnected from the scene.
 An up call to the Control class is necessary if these methods are overridden.
  
 ~~~{.cpp}
 // C++
-void Internal::MyUIControl::OnStageConnection( int depth )
+void Internal::MyUIControl::OnSceneConnection( int depth )
 {
-  // Do any other operations required upon stage connection
+  // Do any other operations required upon scene connection
 
   // Up call to Control at the end
-  Control::OnStageConnection( depth );
+  Control::OnSceneConnection( depth );
 }
 ~~~
 ~~~{.cpp}
 // C++
-void Internal::MyUIControl::OnStageDisconnection()
+void Internal::MyUIControl::OnSceneDisconnection()
 {
-  // Do any other operations required upon stage disconnection
+  // Do any other operations required upon scene disconnection
 
   // Up call to Control at the end
-  Control::OnStageDisconnection();
+  Control::OnSceneDisconnection();
 }
 ~~~
  

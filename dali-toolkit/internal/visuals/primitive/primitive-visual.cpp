@@ -399,7 +399,7 @@ void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize )
   naturalSize.y = mObjectDimensions.y;
 }
 
-void PrimitiveVisual::DoSetOnStage( Actor& actor )
+void PrimitiveVisual::DoSetOnScene( Actor& actor )
 {
   InitializeRenderer();
 

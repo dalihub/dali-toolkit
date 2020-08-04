@@ -128,14 +128,14 @@ private: // From Control
   virtual void OnSizeSet( const Vector3& targetSize );
 
   /**
-   * @copydoc Toolkit::Internal::Control::OnStageConnection
+   * @copydoc Toolkit::Internal::Control::OnSceneConnection
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
   /**
-   * @copydoc Toolkit::Internal::Control::OnStageDisconnection
+   * @copydoc Toolkit::Internal::Control::OnSceneDisconnection
    */
-  virtual void OnStageDisconnection();
+  virtual void OnSceneDisconnection();
 
   /**
    * @copydoc Toolkit::Internal::Control::OnChildAdd

@@ -1282,7 +1282,7 @@ void TextEditor::OnInitialize()
   // Fill-parent area by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
-  self.OnStageSignal().Connect( this, &TextEditor::OnStageConnect );
+  self.OnSceneSignal().Connect( this, &TextEditor::OnSceneConnect );
 
   DevelControl::SetInputMethodContext( *this, mInputMethodContext );
 
@@ -1759,7 +1759,7 @@ void TextEditor::OnScrollIndicatorAnimationFinished( Animation& animation )
   }
 }
 
-void TextEditor::OnStageConnect( Dali::Actor actor )
+void TextEditor::OnSceneConnect( Dali::Actor actor )
 {
   if ( mHasBeenStaged )
   {
@@ -1807,15 +1807,15 @@ void TextEditor::KeyboardStatusChanged(bool keyboardShown)
   }
 }
 
-void TextEditor::OnStageConnection( int depth )
+void TextEditor::OnSceneConnection( int depth )
 {
   // Sets the depth to the visuals inside the text's decorator.
   mDecorator->SetTextDepth( depth );
 
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 
-  // Call the Control::OnStageConnection() to set the depth of the background.
-  Control::OnStageConnection( depth );
+  // Call the Control::OnSceneConnection() to set the depth of the background.
+  Control::OnSceneConnection( depth );
 }
 
 bool TextEditor::OnTouched( Actor actor, const TouchData& touch )

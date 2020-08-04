@@ -110,10 +110,10 @@ private:
   bool OnKeyEvent(const KeyEvent& event);
 
   /**
-   * Signal handler called when a focused Control is removed from Stage.
-   * @param[in]  control  The control removed from stage.
+   * Signal handler called when a focused Control is removed from Scene.
+   * @param[in]  control  The control removed from the scene.
    */
-  void OnFocusControlStageDisconnection( Dali::Actor control );
+  void OnFocusControlSceneDisconnection( Dali::Actor control );
 
   /**
     *  Recursively deliver events to the control and its parents, until the event is consumed or the stage is reached.
