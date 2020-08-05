@@ -1,4 +1,4 @@
-# DALi Introduction ajskdfajksd fhksja
+# DALi Introduction
 
 ### Introduction
  + [What is DALi?](@ref dali-introduction)
