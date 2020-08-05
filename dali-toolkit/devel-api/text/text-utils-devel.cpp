@@ -147,7 +147,6 @@ bool GetCircularAlignmentEnumeration(const Property::Value& propertyValue, Devel
   return Scripting::GetEnumerationProperty(propertyValue, CIRCULAR_ALIGNMENT_TYPE_TABLE, CIRCULAR_ALIGNMENT_TYPE_TABLE_COUNT, circularAlignment);
 }
 
-
 void ShapeTextPreprocess( const RendererParameters& textParameters, TextAbstraction::TextRenderer::Parameters& rendererParameters, InternalDataModel& internalDataModel )
 {
 
@@ -1001,6 +1000,9 @@ Size LayoutText( const RendererParameters& textParameters, TextAbstraction::Text
   const Text::Layout::Engine::Type horizontalLayout = ( Layout::MULTILINE == layout ) ? Text::Layout::Engine::MULTI_LINE_BOX : Text::Layout::Engine::SINGLE_LINE_BOX;
   layoutEngine.SetLayout( horizontalLayout ); // TODO: multi-line.
 
+  // Set minimun line size
+  layoutEngine.SetDefaultLineSize( textParameters.minLineSize );
+
   // Whether the layout is circular.
   const bool isCircularTextLayout = (Layout::CIRCULAR == layout);
   const bool isClockwise = isCircularTextLayout && ( 0.f < textParameters.incrementAngle );
@@ -1536,12 +1538,16 @@ Dali::Property::Array RenderForLastIndex( RendererParameters& textParameters )
   unsigned int numberOfLines = lines.Count();
   int numberOfCharacters = 0;
   float penY = 0.f;
+  float lineSize = internalData.layoutEngine.GetDefaultLineSize();
+  float lineOffset = 0.f;
   for( unsigned int index = 0u; index < numberOfLines; ++index  )
   {
     const LineRun& line = *( lines.Begin() + index );
     numberOfCharacters += line.characterRun.numberOfCharacters;
-    penY += ( line.ascender + -line.descender );
-    if( ( penY + ( line.ascender + -line.descender ) ) > boundingBox )
+
+    lineOffset = lineSize > 0.f ? lineSize : ( line.ascender + -line.descender );
+    penY += lineOffset;
+    if( ( penY + lineOffset ) > boundingBox )
     {
       offsetValues.PushBack( numberOfCharacters );
       penY = 0.f;

@@ -57,7 +57,8 @@ struct DALI_TOOLKIT_API RendererParameters
     incrementAngle{ 0.f },
     ellipsisEnabled{ true },
     markupEnabled{ false },
-    isTextColorSet{ false }
+    isTextColorSet{ false },
+    minLineSize{ 0.f }
   {}
 
   std::string text;                ///< The text to be rendered encoded in utf8.
@@ -86,6 +87,8 @@ struct DALI_TOOLKIT_API RendererParameters
   bool ellipsisEnabled:1;          ///< Whether the ellipsis layout option is enabled.
   bool markupEnabled:1;            ///< Whether the mark-up processor is enabled.
   bool isTextColorSet:1;           ///< Whether a default color has been set.
+
+  float minLineSize;               ///< The line's minimum size (in points).
 };
 
 /**
