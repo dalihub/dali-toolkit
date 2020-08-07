@@ -659,10 +659,10 @@ Property::Value ProgressBar::GetProperty( BaseObject* object, Property::Index pr
   return value;
 }
 
-void ProgressBar::OnStageConnection( int depth )
+void ProgressBar::OnSceneConnection( int depth )
 {
   // Chain up first (ensures visuals are ready to draw)
-  Control::OnStageConnection( depth );
+  Control::OnSceneConnection( depth );
 
   if( mIndeterminate )
   {

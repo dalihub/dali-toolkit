@@ -78,9 +78,9 @@ public:
 private: // override functions from Control
 
   /**
-   * @copydoc Control::OnStageConnection( int depth  )
+   * @copydoc Control::OnSceneConnection( int depth  )
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
   /**
    * @copydoc Control::OnRelayout()

@@ -82,7 +82,7 @@ void KeyInputFocusManager::SetFocus( Toolkit::Control control )
     return;
   }
 
-  control.OffStageSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlStageDisconnection );
+  control.OffSceneSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection );
 
   Dali::Toolkit::Control previousFocusControl = GetCurrentFocusControl();
   if( previousFocusControl )
@@ -108,7 +108,7 @@ void KeyInputFocusManager::RemoveFocus( Toolkit::Control control )
 {
   if( control == mCurrentFocusControl )
   {
-    control.OffStageSignal().Disconnect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlStageDisconnection );
+    control.OffSceneSignal().Disconnect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection );
 
     // Notify the control that it has lost key input focus
     GetImplementation( control ).OnKeyInputFocusLost();
@@ -164,7 +164,7 @@ bool KeyInputFocusManager::EmitKeyEventSignal( Toolkit::Control control, const K
   return consumed;
 }
 
-void KeyInputFocusManager::OnFocusControlStageDisconnection( Dali::Actor actor )
+void KeyInputFocusManager::OnFocusControlSceneDisconnection( Dali::Actor actor )
 {
   RemoveFocus( Dali::Toolkit::Control::DownCast( actor ) );
 }

@@ -104,9 +104,9 @@ private:
   virtual void OnInitialize();
 
   /**
-   * @copydoc CustomActorImpl::OnStageConnection()
+   * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
 private:
 

@@ -424,7 +424,7 @@ Property::Value Model3dView::GetProperty( BaseObject* object, Property::Index in
 /////////////////////////////////////////////////////////////
 
 
-void Model3dView::OnStageConnection( int depth )
+void Model3dView::OnSceneConnection( int depth )
 {
   CustomActor self = Self();
   self.AddRenderer( mRenderer );
@@ -446,7 +446,7 @@ void Model3dView::OnStageConnection( int depth )
     constraint.Apply();
   }
 
-  Control::OnStageConnection( depth );
+  Control::OnSceneConnection( depth );
 }
 
 ///////////////////////////////////////////////////////////

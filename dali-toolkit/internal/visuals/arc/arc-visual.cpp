@@ -233,7 +233,7 @@ void ArcVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 }
 
-void ArcVisual::DoSetOnStage( Actor& actor )
+void ArcVisual::DoSetOnScene( Actor& actor )
 {
   InitializeRenderer();
 

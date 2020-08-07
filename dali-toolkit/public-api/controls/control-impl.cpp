@@ -554,9 +554,9 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
   }
 }
 
-void Control::OnStageConnection( int depth )
+void Control::OnSceneConnection( int depth )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageConnection number of registered visuals(%d)\n",  mImpl->mVisuals.Size() );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnSceneConnection number of registered visuals(%d)\n",  mImpl->mVisuals.Size() );
 
   Actor self( Self() );
 
@@ -565,22 +565,22 @@ void Control::OnStageConnection( int depth )
     // Check whether the visual is empty and enabled
     if( (*iter)->visual && (*iter)->enabled )
     {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageConnection Setting visual(%d) on stage\n", (*iter)->index );
-      Toolkit::GetImplementation((*iter)->visual).SetOnStage( self );
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnSceneConnection Setting visual(%d) on scene\n", (*iter)->index );
+      Toolkit::GetImplementation((*iter)->visual).SetOnScene( self );
     }
   }
 
   // The clipping renderer is only created if required.
   CreateClippingRenderer( *this );
 
-  // Request to be laid out when the control is connected to the Stage.
+  // Request to be laid out when the control is connected to the Scene.
   // Signal that a Relayout may be needed
 }
 
 
-void Control::OnStageDisconnection()
+void Control::OnSceneDisconnection()
 {
-  mImpl->OnStageDisconnection();
+  mImpl->OnSceneDisconnection();
 }
 
 void Control::OnKeyInputFocusGained()
@@ -604,7 +604,7 @@ void Control::OnChildRemove(Actor& child)
 void Control::OnPropertySet( Property::Index index, Property::Value propertyValue )
 {
   // If the clipping mode has been set, we may need to create a renderer.
-  // Only do this if we are already on-stage as the OnStageConnection will handle the off-stage clipping controls.
+  // Only do this if we are already on-stage as the OnSceneConnection will handle the off-stage clipping controls.
   if( ( index == Actor::Property::CLIPPING_MODE ) && Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
   {
     // Note: This method will handle whether creation of the renderer is required.

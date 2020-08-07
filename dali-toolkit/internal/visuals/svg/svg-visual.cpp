@@ -142,7 +142,7 @@ void SvgVisual::DoSetProperty( Property::Index index, const Property::Value& val
   }
 }
 
-void SvgVisual::DoSetOnStage( Actor& actor )
+void SvgVisual::DoSetOnScene( Actor& actor )
 {
   Shader shader;
   if( !mImpl->mCustomShader )
@@ -175,7 +175,7 @@ void SvgVisual::DoSetOnStage( Actor& actor )
   ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
-void SvgVisual::DoSetOffStage( Actor& actor )
+void SvgVisual::DoSetOffScene( Actor& actor )
 {
   mFactoryCache.GetSVGRasterizationThread()->RemoveTask( this );
 
@@ -262,7 +262,7 @@ void SvgVisual::ApplyRasterizedImage( NSVGimage* parsedSvg, PixelData rasterized
     mParsedImage = parsedSvg;
   }
 
-  if( mParsedImage && IsOnStage() )
+  if( mParsedImage && IsOnScene() )
   {
     TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
     if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED )
@@ -336,7 +336,7 @@ void SvgVisual::OnSetTransform()
 {
   Vector2 visualSize = mImpl->mTransform.GetVisualSize( mImpl->mControlSize );
 
-  if( IsOnStage() )
+  if( IsOnScene() )
   {
     if( visualSize != mVisualSize )
     {

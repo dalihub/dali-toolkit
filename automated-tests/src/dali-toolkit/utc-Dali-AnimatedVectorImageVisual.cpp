@@ -86,7 +86,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual01(void)
   Renderer renderer = actor.GetRendererAt( 0u );
   DALI_TEST_CHECK( renderer );
 
-  // Test SetOffStage().
+  // Test SetOffScene().
   actor.Unparent();
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 

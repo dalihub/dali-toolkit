@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_CONTROL_DEPTH_INDEX_RANGES_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/compile-time-assert.h>
 #include <dali/devel-api/actors/layer-devel.h>
 
 namespace Dali
@@ -48,11 +47,11 @@ enum Ranges
   FOREGROUND_EFFECT =  2 * DevelLayer::SIBLING_ORDER_MULTIPLIER/100
 };
 
-DALI_COMPILE_TIME_ASSERT( (unsigned int)DevelLayer::ACTOR_DEPTH_MULTIPLIER > (unsigned int)DevelLayer::SIBLING_ORDER_MULTIPLIER );
-DALI_COMPILE_TIME_ASSERT( BACKGROUND_EFFECT < BACKGROUND );
-DALI_COMPILE_TIME_ASSERT( BACKGROUND < CONTENT );
-DALI_COMPILE_TIME_ASSERT( CONTENT < DECORATION );
-DALI_COMPILE_TIME_ASSERT( DECORATION < FOREGROUND_EFFECT );
+static_assert( (unsigned int)DevelLayer::ACTOR_DEPTH_MULTIPLIER > (unsigned int)DevelLayer::SIBLING_ORDER_MULTIPLIER );
+static_assert( BACKGROUND_EFFECT < BACKGROUND );
+static_assert( BACKGROUND < CONTENT );
+static_assert( CONTENT < DECORATION );
+static_assert( DECORATION < FOREGROUND_EFFECT );
 
 } // namespace DepthIndex
 

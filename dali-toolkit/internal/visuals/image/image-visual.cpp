@@ -659,7 +659,7 @@ void ImageVisual::InitializeRenderer()
   }
 }
 
-void ImageVisual::DoSetOnStage( Actor& actor )
+void ImageVisual::DoSetOnScene( Actor& actor )
 {
   if( mImageUrl.IsValid() )
   {
@@ -695,9 +695,9 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   }
 }
 
-void ImageVisual::DoSetOffStage( Actor& actor )
+void ImageVisual::DoSetOffScene( Actor& actor )
 {
-  // Visual::Base::SetOffStage only calls DoSetOffStage if mRenderer exists (is on onstage)
+  // Visual::Base::SetOffScene only calls DoSetOffScene if mRenderer exists (is on onstage)
 
   // Image release is dependent on the ReleasePolicy, renderer is destroyed.
   actor.RemoveRenderer( mImpl->mRenderer);

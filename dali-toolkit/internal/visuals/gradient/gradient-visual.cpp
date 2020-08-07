@@ -374,7 +374,7 @@ void GradientVisual::OnSetTransform()
   }
 }
 
-void GradientVisual::DoSetOnStage( Actor& actor )
+void GradientVisual::DoSetOnScene( Actor& actor )
 {
   InitializeRenderer();
 

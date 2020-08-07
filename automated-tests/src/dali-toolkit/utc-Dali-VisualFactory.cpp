@@ -2098,7 +2098,7 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
   textureTrace.Reset();
 
-  // Test SetOffStage().
+  // Test SetOffScene().
   actor.Unparent();
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 

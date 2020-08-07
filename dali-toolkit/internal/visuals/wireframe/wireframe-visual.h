@@ -119,9 +119,9 @@ protected: // from Visual::Base
   void DoSetProperties( const Property::Map& propertyMap ) override;
 
   /**
-   * @copydoc Visual::Base::DoSetOnStage
+   * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnStage( Actor& actor ) override;
+  void DoSetOnScene( Actor& actor ) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform

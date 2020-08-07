@@ -276,19 +276,19 @@ TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &Do
 DALI_TYPE_REGISTRATION_END()
 
 /**
- * @brief Iterate through given container and setOffStage any visual found
+ * @brief Iterate through given container and setOffScene any visual found
  *
  * @param[in] container Container of visuals
  * @param[in] parent Parent actor to remove visuals from
  */
-void SetVisualsOffStage( const RegisteredVisualContainer& container, Actor parent )
+void SetVisualsOffScene( const RegisteredVisualContainer& container, Actor parent )
 {
   for( auto iter = container.Begin(), end = container.End() ; iter!= end; iter++)
   {
     if( (*iter)->visual )
     {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::SetOffStage Setting visual(%d) off stage\n", (*iter)->index );
-      Toolkit::GetImplementation((*iter)->visual).SetOffStage( parent );
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::SetOffScene Setting visual(%d) off stage\n", (*iter)->index );
+      Toolkit::GetImplementation((*iter)->visual).SetOffScene( parent );
     }
   }
 }
@@ -440,7 +440,7 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
           {
             // Visual with same index is already in removal container so current visual pending
             // Only the the last requested visual will be displayed so remove current visual which is staged but not ready.
-            Toolkit::GetImplementation( currentRegisteredVisual ).SetOffStage( self );
+            Toolkit::GetImplementation( currentRegisteredVisual ).SetOffScene( self );
             mVisuals.Erase( registeredVisualsiter );
           }
           else
@@ -524,7 +524,7 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
     // Put on stage if enabled and the control is already on the stage
     if( ( enabled == VisualState::ENABLED ) && self.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
     {
-      visualImpl.SetOnStage( self );
+      visualImpl.SetOnScene( self );
     }
     else if( visualImpl.IsResourceReady() ) // When not being staged, check if visual already 'ResourceReady' before it was Registered. ( Resource may have been loaded already )
     {
@@ -545,7 +545,7 @@ void Control::Impl::UnregisterVisual( Property::Index index )
     StopObservingVisual( (*iter)->visual );
 
     Actor self( mControlImpl.Self() );
-    Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+    Toolkit::GetImplementation((*iter)->visual).SetOffScene( self );
     (*iter)->visual.Reset();
     mVisuals.Erase( iter );
   }
@@ -553,7 +553,7 @@ void Control::Impl::UnregisterVisual( Property::Index index )
   if( FindVisual( index, mRemoveVisuals, iter ) )
   {
     Actor self( mControlImpl.Self() );
-    Toolkit::GetImplementation( (*iter)->visual ).SetOffStage( self );
+    Toolkit::GetImplementation( (*iter)->visual ).SetOffScene( self );
     (*iter)->pending = false;
     (*iter)->visual.Reset();
     mRemoveVisuals.Erase( iter );
@@ -586,17 +586,17 @@ void Control::Impl::EnableVisual( Property::Index index, bool enable )
 
     (*iter)->enabled = enable;
     Actor parentActor = mControlImpl.Self();
-    if ( mControlImpl.Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) ) // If control not on Stage then Visual will be added when StageConnection is called.
+    if ( mControlImpl.Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) ) // If control not on Scene then Visual will be added when SceneConnection is called.
     {
       if ( enable )
       {
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting %s(%d) on stage \n", (*iter)->visual.GetName().c_str(), index );
-        Toolkit::GetImplementation((*iter)->visual).SetOnStage( parentActor );
+        Toolkit::GetImplementation((*iter)->visual).SetOnScene( parentActor );
       }
       else
       {
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting %s(%d) off stage \n", (*iter)->visual.GetName().c_str(), index );
-        Toolkit::GetImplementation((*iter)->visual).SetOffStage( parentActor );  // No need to call if control not staged.
+        Toolkit::GetImplementation((*iter)->visual).SetOffScene( parentActor );  // No need to call if control not staged.
       }
     }
   }
@@ -654,7 +654,7 @@ void Control::Impl::ResourceReady( Visual::Base& object)
       if( FindVisual( (*registeredIter)->index, mRemoveVisuals, visualToRemoveIter ) )
       {
         (*registeredIter)->pending = false;
-        Toolkit::GetImplementation( (*visualToRemoveIter)->visual ).SetOffStage( self );
+        Toolkit::GetImplementation( (*visualToRemoveIter)->visual ).SetOffScene( self );
         mRemoveVisuals.Erase( visualToRemoveIter );
       }
       break;
@@ -1140,7 +1140,7 @@ void Control::Impl::RemoveVisual( RegisteredVisualContainer& visuals, const std:
     Toolkit::Visual::Base visual = (*visualIter)->visual;
     if( visual && visual.GetName() == visualName )
     {
-      Toolkit::GetImplementation(visual).SetOffStage( self );
+      Toolkit::GetImplementation(visual).SetOffScene( self );
       (*visualIter)->visual.Reset();
       visuals.Erase( visualIter );
       break;
@@ -1354,22 +1354,22 @@ void Control::Impl::SetSubState( const std::string& subStateName, bool withTrans
   }
 }
 
-void Control::Impl::OnStageDisconnection()
+void Control::Impl::OnSceneDisconnection()
 {
   Actor self = mControlImpl.Self();
 
   // Any visuals set for replacement but not yet ready should still be registered.
-  // Reason: If a request was made to register a new visual but the control removed from stage before visual was ready
+  // Reason: If a request was made to register a new visual but the control removed from scene before visual was ready
   // then when this control appears back on stage it should use that new visual.
 
-  // Iterate through all registered visuals and set off stage
-  SetVisualsOffStage( mVisuals, self );
+  // Iterate through all registered visuals and set off scene
+  SetVisualsOffScene( mVisuals, self );
 
-  // Visuals pending replacement can now be taken out of the removal list and set off stage
-  // Iterate through all replacement visuals and add to a move queue then set off stage
+  // Visuals pending replacement can now be taken out of the removal list and set off scene
+  // Iterate through all replacement visuals and add to a move queue then set off scene
   for( auto removalIter = mRemoveVisuals.Begin(), end = mRemoveVisuals.End(); removalIter != end; removalIter++ )
   {
-    Toolkit::GetImplementation((*removalIter)->visual).SetOffStage( self );
+    Toolkit::GetImplementation((*removalIter)->visual).SetOffScene( self );
   }
 
   for( auto replacedIter = mVisuals.Begin(), end = mVisuals.End(); replacedIter != end; replacedIter++ )

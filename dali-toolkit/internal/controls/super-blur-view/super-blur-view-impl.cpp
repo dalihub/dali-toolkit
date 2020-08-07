@@ -294,15 +294,15 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
   Control::OnSizeSet( targetSize );
 }
 
-void SuperBlurView::OnStageConnection( int depth )
+void SuperBlurView::OnSceneConnection( int depth )
 {
   if( mTargetSize == Vector2::ZERO )
   {
     return;
   }
 
-  // Exception to the rule, chaining up first ensures visuals have SetOnStage called to create their renderers
-  Control::OnStageConnection( depth );
+  // Exception to the rule, chaining up first ensures visuals have SetOnScene called to create their renderers
+  Control::OnSceneConnection( depth );
 
   Actor self = Self();
 
@@ -334,7 +334,7 @@ void SuperBlurView::OnStageConnection( int depth )
   }
 }
 
-void SuperBlurView::OnStageDisconnection()
+void SuperBlurView::OnSceneDisconnection()
 {
   for(unsigned int i=0; i<mBlurLevels+1;i++)
   {
@@ -342,7 +342,7 @@ void SuperBlurView::OnStageDisconnection()
     mRenderers[i].Reset();
   }
 
-  Control::OnStageDisconnection();
+  Control::OnSceneDisconnection();
 }
 
 Vector3 SuperBlurView::GetNaturalSize()

@@ -329,15 +329,15 @@ protected: // From Control
   virtual bool OnKeyboardEnter();
 
   /**
-   * @copydoc Toolkit::Control::OnStageDisconnection()
-   * @note If overridden by deriving button classes, then an up-call to Button::OnStageDisconnection MUST be made at the end.
+   * @copydoc Toolkit::Control::OnSceneDisconnection()
+   * @note If overridden by deriving button classes, then an up-call to Button::OnSceneDisconnection MUST be made at the end.
    */
-  virtual void OnStageDisconnection();
+  virtual void OnSceneDisconnection();
 
   /**
-   * @copydoc Toolkit::Control::OnStageConnnection()
+   * @copydoc Toolkit::Control::OnSceneConnection()
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize

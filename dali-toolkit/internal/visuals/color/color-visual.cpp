@@ -245,7 +245,7 @@ void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 }
 
-void ColorVisual::DoSetOnStage( Actor& actor )
+void ColorVisual::DoSetOnScene( Actor& actor )
 {
   InitializeRenderer();
 

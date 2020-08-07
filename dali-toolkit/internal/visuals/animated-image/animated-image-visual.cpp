@@ -82,7 +82,7 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
  *   |     new cache
  *   |       cache->LoadBatch()
  *   |
- *   | DoSetOnStage()
+ *   | DoSetOnScene()
  *   |   PrepareTextureSet()
  *   |     cache->FirstFrame()
  *   |   CreateRenderer()    (Doesn't become ready until first frame loads)
@@ -272,7 +272,7 @@ void AnimatedImageVisual::OnDoAction( const Dali::Property::Index actionId, cons
     }
     case DevelAnimatedImageVisual::Action::PLAY:
     {
-      if( mFrameDelayTimer && IsOnStage() && mActionStatus != DevelAnimatedImageVisual::Action::PLAY )
+      if( mFrameDelayTimer && IsOnScene() && mActionStatus != DevelAnimatedImageVisual::Action::PLAY )
       {
         mFrameDelayTimer.Start();
       }
@@ -284,7 +284,7 @@ void AnimatedImageVisual::OnDoAction( const Dali::Property::Index actionId, cons
       // STOP reset functionality will actually be done in a future change
       // Stop will be executed on next timer tick
       mActionStatus = DevelAnimatedImageVisual::Action::STOP;
-      if( IsOnStage() )
+      if( IsOnScene() )
       {
         DisplayNextFrame();
       }
@@ -303,7 +303,7 @@ void AnimatedImageVisual::OnDoAction( const Dali::Property::Index actionId, cons
         {
           mIsJumpTo = true;
           mCurrentFrameIndex = frameNumber;
-          if( IsOnStage() )
+          if( IsOnScene() )
           {
             DisplayNextFrame();
           }
@@ -481,7 +481,7 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
   }
 }
 
-void AnimatedImageVisual::DoSetOnStage( Actor& actor )
+void AnimatedImageVisual::DoSetOnScene( Actor& actor )
 {
   mPlacementActor = actor;
   TextureSet textureSet = PrepareTextureSet();
@@ -497,7 +497,7 @@ void AnimatedImageVisual::DoSetOnStage( Actor& actor )
   }
 }
 
-void AnimatedImageVisual::DoSetOffStage( Actor& actor )
+void AnimatedImageVisual::DoSetOffScene( Actor& actor )
 {
   DALI_ASSERT_DEBUG( (bool)mImpl->mRenderer && "There should always be a renderer whilst on stage");
 

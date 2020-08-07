@@ -130,14 +130,14 @@ public: //Signal
 
 protected:
   /**
-   * @copydoc CustomActorImpl::OnStageConnection()
+   * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
   /**
-   * @copydoc CustomActorImpl::OnStageDisconnection()
+   * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
-  virtual void OnStageDisconnection();
+  virtual void OnSceneDisconnection();
 
 protected:
 

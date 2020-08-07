@@ -552,7 +552,7 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   imageView.SetProperty( Toolkit::Control::Property::PADDING, Extents( 10u, 10u, 10u, 10u ) );
 
   // By default, Aysnc loading is used
-  // loading is not started if the actor is offStage
+  // loading is not started if the actor is offScene
 
   application.GetScene().Add( imageView );
   application.SendNotification();

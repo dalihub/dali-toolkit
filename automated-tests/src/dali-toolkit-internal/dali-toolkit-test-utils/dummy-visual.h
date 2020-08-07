@@ -79,7 +79,7 @@ protected:
   virtual void DoCreateInstancePropertyMap( Property::Map& map ) const override;
   virtual void DoSetProperties( const Property::Map& propertyMap ) override;
   virtual void OnSetTransform() override;
-  virtual void DoSetOnStage( Actor& actor ) override;
+  virtual void DoSetOnScene( Actor& actor ) override;
   virtual void OnDoAction( const Property::Index actionName, const Property::Value& attributes ) override;
 
 private:

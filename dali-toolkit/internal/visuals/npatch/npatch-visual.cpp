@@ -389,7 +389,7 @@ void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 }
 
-void NPatchVisual::DoSetOnStage( Actor& actor )
+void NPatchVisual::DoSetOnScene( Actor& actor )
 {
   // load when first go on stage
   LoadImages();
@@ -420,7 +420,7 @@ void NPatchVisual::DoSetOnStage( Actor& actor )
   }
 }
 
-void NPatchVisual::DoSetOffStage( Actor& actor )
+void NPatchVisual::DoSetOffScene( Actor& actor )
 {
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
