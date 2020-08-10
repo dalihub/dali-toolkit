@@ -275,14 +275,14 @@ private: // From Control
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Control::OnStageConnect()
+   * @copydoc Toolkit::Control::OnSceneConnection()
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
   /**
-   * @copydoc Toolkit::Control::OnStageDisconnection()
+   * @copydoc Toolkit::Control::OnSceneDisconnection()
    */
-  virtual void OnStageDisconnection();
+  virtual void OnSceneDisconnection();
 
   /**
    * @copydoc Toolkit::Control::OnSizeSet()

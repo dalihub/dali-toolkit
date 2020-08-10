@@ -41,19 +41,13 @@ PushButton::PushButton( Internal::PushButton& implementation )
 {
 }
 
-PushButton::PushButton( const PushButton& pushButton )
-: Button( pushButton )
-{
-}
+PushButton::PushButton( const PushButton& pushButton ) = default;
 
-PushButton& PushButton::operator=( const PushButton& pushButton )
-{
-  if( &pushButton != this )
-  {
-    Button::operator=( pushButton );
-  }
-  return *this;
-}
+PushButton::PushButton( PushButton&& rhs ) = default;
+
+PushButton& PushButton::operator=( const PushButton& pushButton ) = default;
+
+PushButton& PushButton::operator=( PushButton&& rhs ) = default;
 
 PushButton::PushButton( Dali::Internal::CustomActor* internal )
 : Button( internal )

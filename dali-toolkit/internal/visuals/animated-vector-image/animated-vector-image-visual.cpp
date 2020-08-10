@@ -248,7 +248,7 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
   }
 }
 
-void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
+void AnimatedVectorImageVisual::DoSetOnScene( Actor& actor )
 {
   Shader shader;
 
@@ -297,10 +297,10 @@ void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
     DevelWindow::VisibilityChangedSignal( window ).Connect( this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged );
   }
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOnStage [%p]\n", this );
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOnScene [%p]\n", this );
 }
 
-void AnimatedVectorImageVisual::DoSetOffStage( Actor& actor )
+void AnimatedVectorImageVisual::DoSetOffScene( Actor& actor )
 {
   StopAnimation();
   SendAnimationData();
@@ -331,14 +331,14 @@ void AnimatedVectorImageVisual::DoSetOffStage( Actor& actor )
   mVisualSize = Vector2::ZERO;
   mVisualScale = Vector2::ONE;
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOffStage [%p]\n", this );
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOffScene [%p]\n", this );
 }
 
 void AnimatedVectorImageVisual::OnSetTransform()
 {
   Vector2 visualSize = mImpl->mTransform.GetVisualSize( mImpl->mControlSize );
 
-  if( IsOnStage() && visualSize != mVisualSize )
+  if( IsOnScene() && visualSize != mVisualSize )
   {
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnSetTransform: width = %f, height = %f [%p]\n", visualSize.width, visualSize.height, this );
 
@@ -363,7 +363,7 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
   {
     case DevelAnimatedVectorImageVisual::Action::PLAY:
     {
-      if( IsOnStage() && mVisualSize != Vector2::ZERO )
+      if( IsOnScene() && mVisualSize != Vector2::ZERO )
       {
         if( mAnimationData.playState != DevelImageVisual::PlayState::PLAYING )
         {

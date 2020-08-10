@@ -387,6 +387,23 @@ int UtcDaliToolkitTextFieldCopyConstructorP(void)
   END_TEST;
 }
 
+int UtcDaliTextFieldMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  TextField textField = TextField::New();
+  textField.SetProperty( TextEditor::Property::TEXT, "Test" );
+  DALI_TEST_CHECK( textField.GetProperty<std::string>( TextField::Property::TEXT ) == "Test" );
+
+  TextField moved = std::move( textField );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( moved.GetProperty<std::string>( TextField::Property::TEXT ) == "Test" );
+  DALI_TEST_CHECK( !textField );
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextFieldAssignmentOperatorP(void)
 {
   ToolkitTestApplication application;
@@ -397,6 +414,24 @@ int UtcDaliToolkitTextFieldAssignmentOperatorP(void)
   TextField copy = textField;
   DALI_TEST_CHECK( copy );
   DALI_TEST_CHECK( copy.GetProperty<std::string>( TextField::Property::TEXT ) == textField.GetProperty<std::string>( TextField::Property::TEXT ) );
+  END_TEST;
+}
+
+int UtcDaliTextFieldMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  TextField textField = TextField::New();
+  textField.SetProperty( TextEditor::Property::TEXT, "Test" );
+  DALI_TEST_CHECK( textField.GetProperty<std::string>( TextField::Property::TEXT ) == "Test" );
+
+  TextField moved;
+  moved = std::move( textField );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( moved.GetProperty<std::string>( TextField::Property::TEXT ) == "Test" );
+  DALI_TEST_CHECK( !textField );
+
   END_TEST;
 }
 

@@ -244,7 +244,7 @@ void CubeTransitionEffect::Initialize()
   OnInitialize();
 }
 
-void CubeTransitionEffect::OnStageConnection( int depth )
+void CubeTransitionEffect::OnSceneConnection( int depth )
 {
   Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
   Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
@@ -261,10 +261,10 @@ void CubeTransitionEffect::OnStageConnection( int depth )
   mCurrentRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, depth );
   Self().AddRenderer( mCurrentRenderer );
 
-  Control::OnStageConnection( depth );
+  Control::OnSceneConnection( depth );
 }
 
-void CubeTransitionEffect::OnStageDisconnection()
+void CubeTransitionEffect::OnSceneDisconnection()
 {
   if( mCurrentRenderer )
   {
@@ -286,7 +286,7 @@ void CubeTransitionEffect::OnStageDisconnection()
     mTargetRenderer.Reset();
   }
 
-  Control::OnStageDisconnection();
+  Control::OnSceneDisconnection();
 }
 
 void CubeTransitionEffect::SetTransitionDuration( float duration )

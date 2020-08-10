@@ -294,114 +294,114 @@ protected: // For derived classes to call
    */
   void EmitKeyInputFocusSignal( bool focusGained );
 
-protected: // From CustomActorImpl, not to be used by application developers
+protected: // From CustomActorImpl
 
   /**
-   * @copydoc CustomActorImpl::OnStageConnection()
-   * @note If overridden, then an up-call to Control::OnStageConnection MUST be made at the end.
+   * @copydoc CustomActorImpl::OnSceneConnection()
+   * @note If overridden, then an up-call to Control::OnSceneConnection MUST be made at the end.
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth ) override;
 
   /**
-   * @copydoc CustomActorImpl::OnStageDisconnection()
-   * @note If overridden, then an up-call to Control::OnStageDisconnection MUST be made at the end.
+   * @copydoc CustomActorImpl::OnSceneDisconnection()
+   * @note If overridden, then an up-call to Control::OnSceneDisconnection MUST be made at the end.
    */
-  virtual void OnStageDisconnection();
+  virtual void OnSceneDisconnection() override;
 
   /**
    * @copydoc CustomActorImpl::OnChildAdd()
    * @note If overridden, then an up-call to Control::OnChildAdd MUST be made at the end.
    */
-  virtual void OnChildAdd( Actor& child );
+  virtual void OnChildAdd( Actor& child ) override;
 
   /**
    * @copydoc CustomActorImpl::OnChildRemove()
    * @note If overridden, then an up-call to Control::OnChildRemove MUST be made at the end.
    */
-  virtual void OnChildRemove( Actor& child );
+  virtual void OnChildRemove( Actor& child ) override;
 
   /**
    * @copydoc CustomActorImpl::OnPropertySet()
    * @note If overridden, then an up-call to Control::OnChildRemove MUST be made at the end.
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet()
    * @note If overridden, then an up-call to Control::OnSizeSet MUST be made at the end.
    */
-  virtual void OnSizeSet( const Vector3& targetSize );
+  virtual void OnSizeSet( const Vector3& targetSize ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeAnimation()
    * @note If overridden, then an up-call to Control::OnSizeAnimation MUST be made at the end.
    */
-  virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize );
+  virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize ) override;
 
   /**
    * @copydoc CustomActorImpl::OnTouchEvent()
    */
-  virtual bool OnTouchEvent( const TouchEvent& event );
+  virtual bool OnTouchEvent( const TouchEvent& event ) override;
 
   /**
    * @copydoc CustomActorImpl::OnHoverEvent()
    */
-  virtual bool OnHoverEvent( const HoverEvent& event );
+  virtual bool OnHoverEvent( const HoverEvent& event ) override;
 
   /**
    * @copydoc CustomActorImpl::OnKeyEvent()
    */
-  virtual bool OnKeyEvent( const KeyEvent& event );
+  virtual bool OnKeyEvent( const KeyEvent& event ) override;
 
   /**
    * @copydoc CustomActorImpl::OnWheelEvent()
    */
-  virtual bool OnWheelEvent( const WheelEvent& event );
+  virtual bool OnWheelEvent( const WheelEvent& event ) override;
 
   /**
    * @copydoc CustomActorImpl::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSetResizePolicy()
    */
-  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) override;
 
   /**
    * @copydoc CustomActorImpl::GetNaturalSize()
    */
-  virtual Vector3 GetNaturalSize();
+  virtual Vector3 GetNaturalSize() override;
 
   /**
    * @copydoc CustomActorImpl::CalculateChildSize()
    */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension );
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) override;
 
   /**
    * @copydoc CustomActorImpl::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width );
+  virtual float GetHeightForWidth( float width ) override;
 
   /**
    * @copydoc CustomActorImpl::GetWidthForHeight()
    */
-  virtual float GetWidthForHeight( float height );
+  virtual float GetWidthForHeight( float height ) override;
 
   /**
    * @copydoc CustomActorImpl::RelayoutDependentOnChildren()
    */
-  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) override;
 
   /**
    * @copydoc CustomActorImpl::OnCalculateRelayoutSize()
    */
-  virtual void OnCalculateRelayoutSize( Dimension::Type dimension );
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension ) override;
 
   /**
    * @copydoc CustomActorImpl::OnLayoutNegotiated()
    */
-  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension );
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) override;
 
 protected: // Helpers for deriving classes
 

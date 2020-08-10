@@ -125,14 +125,14 @@ private: // from Control
   virtual void OnSizeSet(const Vector3& targetSize);
 
   /**
-   * @copydoc CustomActorImpl::OnStageConnection()
+   * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
   /**
-   * @copydoc CustomActorImpl::OnStageDisconnection()
+   * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
-  virtual void OnStageDisconnection();
+  virtual void OnSceneDisconnection();
 
   /**
    * @copydoc CustomActorImpl::GetNaturalSize()

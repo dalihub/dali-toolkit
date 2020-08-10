@@ -1232,3 +1232,62 @@ int UtcDaliTextControllerCheckInputFontPointSizeUpdated(void)
 
   END_TEST;
 }
+
+int UtcDaliTextControllerDeleteSurroundings(void)
+{
+  tet_infoline(" UtcDaliTextControllerDeleteSurroundings");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextField( controller );
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  DALI_TEST_EQUALS( EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION );
+
+  InputMethodContext inputMethodContext = InputMethodContext::New();
+  // Add some pre-edit text, such as Korean
+  InputMethodContext::EventData imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "ㅂㅂㅂ", 0, 3 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+
+  // Perform a relayout
+  const Size size( application.GetScene().GetSize() );
+
+  application.SendNotification();
+  application.Render();
+
+  controller->Relayout( size );
+
+  // Simulate a key event to delete one text
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::KeyEvent::Down ) );
+
+  // Send DELETE_SURROUNDING event (Delete All text)
+  imfEvent = InputMethodContext::EventData( InputMethodContext::DELETE_SURROUNDING, "", -2, 2 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+
+  application.SendNotification();
+  application.Render();
+
+  controller->Relayout( size );
+
+  // simulate a key event to add text
+  controller->KeyEvent( GenerateKey( "ㅇ", "ㅇ", 238, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "ㅇ", "ㅇ", 238, 0, 0, Dali::KeyEvent::Down ) );
+
+  DALI_TEST_EQUALS( EventData::EDITING, mImpl.mEventData->mState, TEST_LOCATION );
+
+  // Force to update the model.
+  controller->GetNaturalSize();
+
+  application.SendNotification();
+  application.Render();
+
+  controller->Relayout( size );
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}

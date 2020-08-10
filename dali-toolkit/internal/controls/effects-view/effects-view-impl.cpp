@@ -288,7 +288,7 @@ void EffectsView::OnSizeSet(const Vector3& targetSize)
   Control::OnSizeSet( targetSize );
 }
 
-void EffectsView::OnStageConnection( int depth )
+void EffectsView::OnSceneConnection( int depth )
 {
   Actor self( Self() );
 
@@ -303,10 +303,10 @@ void EffectsView::OnStageConnection( int depth )
 
   Enable();
 
-  Control::OnStageConnection( depth );
+  Control::OnSceneConnection( depth );
 }
 
-void EffectsView::OnStageDisconnection()
+void EffectsView::OnSceneDisconnection()
 {
   Actor self( Self() );
 
@@ -325,7 +325,7 @@ void EffectsView::OnStageDisconnection()
   self.RemoveRenderer( mRendererPostFilter );
   mRendererPostFilter.Reset();
 
-  Control::OnStageDisconnection();
+  Control::OnSceneDisconnection();
 }
 
 void EffectsView::OnChildAdd( Actor& child )

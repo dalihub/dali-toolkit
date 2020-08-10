@@ -27,6 +27,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
@@ -78,6 +79,11 @@ public:
    * @copydoc Dali::Toollkit::TextEditor::GetInputMethodContext()
    */
   InputMethodContext GetInputMethodContext();
+
+  /**
+   * @copydoc Dali::Toollkit::TextEditor::MaxLengthReachedSignal()
+   */
+  DevelTextEditor::MaxLengthReachedSignalType&  MaxLengthReachedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -158,9 +164,9 @@ private: // From Control
   virtual void OnLongPress( const LongPressGesture& gesture );
 
   /**
-   * @copydoc Control::OnStageConnection()
+   * @copydoc Control::OnSceneConnection()
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
   /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
@@ -279,14 +285,15 @@ private: // Implementation
    */
   void RenderText( Text::Controller::UpdateTextType updateTextType );
 
-  // Connection needed to re-render text, when a text editor returns to the stage.
-  void OnStageConnect( Dali::Actor actor );
+  // Connection needed to re-render text, when a text editor returns to the scene.
+  void OnSceneConnect( Dali::Actor actor );
 
 private: // Data
   // Signals
   Toolkit::TextEditor::TextChangedSignalType mTextChangedSignal;
   Toolkit::TextEditor::InputStyleChangedSignalType mInputStyleChangedSignal;
   Toolkit::TextEditor::ScrollStateChangedSignalType mScrollStateChangedSignal;
+  Toolkit::DevelTextEditor::MaxLengthReachedSignalType mMaxLengthReachedSignal;
 
   InputMethodContext mInputMethodContext;
   Text::ControllerPtr mController;

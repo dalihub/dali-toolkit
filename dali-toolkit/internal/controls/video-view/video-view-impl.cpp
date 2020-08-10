@@ -552,9 +552,9 @@ void VideoView::SetDepthIndex( int depthIndex )
   }
 }
 
-void VideoView::OnStageConnection( int depth )
+void VideoView::OnSceneConnection( int depth )
 {
-  Control::OnStageConnection( depth );
+  Control::OnSceneConnection( depth );
 
   if( mIsUnderlay )
   {
@@ -562,9 +562,9 @@ void VideoView::OnStageConnection( int depth )
   }
 }
 
-void VideoView::OnStageDisconnection()
+void VideoView::OnSceneDisconnection()
 {
-  Control::OnStageDisconnection();
+  Control::OnSceneDisconnection();
 }
 
 void VideoView::OnSizeSet( const Vector3& targetSize )

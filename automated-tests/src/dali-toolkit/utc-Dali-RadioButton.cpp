@@ -86,6 +86,25 @@ int UtcDaliRadioButtonCopyConstructorP(void)
   END_TEST;
 }
 
+int UtcDaliRadioButtonMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  RadioButton button = RadioButton::New();
+  DALI_TEST_EQUALS( 1, button.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), true , TEST_LOCATION );
+  button.SetProperty( Button::Property::TOGGLABLE, false );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), false , TEST_LOCATION );
+
+  RadioButton moved = std::move( button );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( moved.GetProperty<bool>( Button::Property::TOGGLABLE ), false , TEST_LOCATION );
+  DALI_TEST_CHECK( !button );
+
+  END_TEST;
+}
+
 int UtcDaliRadioButtonAssignmentOperatorP(void)
 {
   TestApplication application;
@@ -96,6 +115,26 @@ int UtcDaliRadioButtonAssignmentOperatorP(void)
   DALI_TEST_CHECK( copy );
 
   DALI_TEST_CHECK( button == copy );
+  END_TEST;
+}
+
+int UtcDaliRadioButtonMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  RadioButton button = RadioButton::New();
+  DALI_TEST_EQUALS( 1, button.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), true , TEST_LOCATION );
+  button.SetProperty( Button::Property::TOGGLABLE, false );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::TOGGLABLE ), false , TEST_LOCATION );
+
+  RadioButton moved;
+  moved = std::move( button );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_EQUALS( moved.GetProperty<bool>( Button::Property::TOGGLABLE ), false , TEST_LOCATION );
+  DALI_TEST_CHECK( !button );
+
   END_TEST;
 }
 

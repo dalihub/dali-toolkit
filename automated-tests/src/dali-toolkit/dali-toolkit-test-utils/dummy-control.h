@@ -166,8 +166,8 @@ private: // From Internal::Control
 
 private: // From CustomActorImpl
 
-  virtual void OnStageConnection( int depth );
-  virtual void OnStageDisconnection();
+  virtual void OnSceneConnection( int depth );
+  virtual void OnSceneDisconnection();
   virtual void OnChildAdd(Actor& child);
   virtual void OnChildRemove(Actor& child);
   virtual void OnSizeSet(const Vector3& targetSize);

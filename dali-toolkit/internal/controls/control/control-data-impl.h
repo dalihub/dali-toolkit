@@ -290,9 +290,9 @@ public:
   bool IsResourceReady() const;
 
   /**
-   * @copydoc CustomActorImpl::OnStageDisconnection()
+   * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
-  void OnStageDisconnection();
+  void OnSceneDisconnection();
 
   /**
    * @brief Sets the margin.

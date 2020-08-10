@@ -181,6 +181,43 @@ int UtcDaliControlCopyAndAssignment(void)
   END_TEST;
 }
 
+int UtcDaliControlMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  DALI_TEST_EQUALS( 1, control.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  control.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == control.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  Control moved = std::move( control );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !control );
+
+  END_TEST;
+}
+
+int UtcDaliControlMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  DALI_TEST_EQUALS( 1, control.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  control.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == control.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  Control moved;
+  moved = std::move( control );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !control );
+
+  END_TEST;
+}
+
 int UtcDaliControlDownCast(void)
 {
   ToolkitTestApplication application;
@@ -369,7 +406,7 @@ int UtcDaliControlSignalConnectDisconnect(void)
     DummyControl dummy = DummyControlImpl::New();
 
     Actor actor = Actor::New();
-    DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 0u, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.OnSceneSignal().GetConnectionCount(), 0u, TEST_LOCATION );
     Toolkit::Internal::Control& control = Toolkit::Internal::GetImplementation( dummy );
     DummyControlImpl* dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
 
@@ -379,16 +416,16 @@ int UtcDaliControlSignalConnectDisconnect(void)
       END_TEST;
     }
 
-    actor.OnStageSignal().Connect( dummyImpl, &DummyControlImpl::CustomSlot1 );
-    DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 1u, TEST_LOCATION );
+    actor.OnSceneSignal().Connect( dummyImpl, &DummyControlImpl::CustomSlot1 );
+    DALI_TEST_EQUALS( actor.OnSceneSignal().GetConnectionCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, false, TEST_LOCATION );
 
     application.GetScene().Add( actor );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, true, TEST_LOCATION );
 
     dummyImpl->mCustomSlot1Called = false;
-    actor.OnStageSignal().Disconnect( dummyImpl, &DummyControlImpl::CustomSlot1 );
-    DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 0u, TEST_LOCATION );
+    actor.OnSceneSignal().Disconnect( dummyImpl, &DummyControlImpl::CustomSlot1 );
+    DALI_TEST_EQUALS( actor.OnSceneSignal().GetConnectionCount(), 0u, TEST_LOCATION );
     application.GetScene().Remove( actor );
     application.GetScene().Add( actor );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, false, TEST_LOCATION );
@@ -413,8 +450,8 @@ int UtcDaliControlSignalAutomaticDisconnect(void)
       END_TEST;
     }
 
-    actor.OnStageSignal().Connect( dummyImpl, &DummyControlImpl::CustomSlot1 );
-    DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 1u, TEST_LOCATION );
+    actor.OnSceneSignal().Connect( dummyImpl, &DummyControlImpl::CustomSlot1 );
+    DALI_TEST_EQUALS( actor.OnSceneSignal().GetConnectionCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, false, TEST_LOCATION );
 
     application.GetScene().Add( actor );
@@ -423,7 +460,7 @@ int UtcDaliControlSignalAutomaticDisconnect(void)
   }
   // dummyControl automatically disconnects
 
-  DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.OnSceneSignal().GetConnectionCount(), 0u, TEST_LOCATION );
 
   const Vector3 ignoredSize( 20, 20, 0 );
   actor.SetProperty( Actor::Property::SIZE, ignoredSize );

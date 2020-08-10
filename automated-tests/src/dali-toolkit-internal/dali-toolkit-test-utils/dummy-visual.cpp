@@ -63,7 +63,7 @@ void DummyVisual::OnSetTransform()
   // Implement if required
 }
 
-void DummyVisual::DoSetOnStage( Actor& actor )
+void DummyVisual::DoSetOnScene( Actor& actor )
 {
   // Implement if required
 }

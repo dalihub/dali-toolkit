@@ -61,6 +61,8 @@ public:
   ~Window();
   Window(const Window& handle);
   Window& operator=(const Window& rhs);
+  Window( Window&& rhs );
+  Window& operator=( Window&& rhs );
 
   Integration::Scene GetScene();
   Dali::RenderSurfaceInterface& GetRenderSurface();

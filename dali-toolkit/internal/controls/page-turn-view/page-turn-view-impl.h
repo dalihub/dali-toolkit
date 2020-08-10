@@ -258,14 +258,14 @@ private: // from Control
   virtual void OnInitialize();
 
   /**
-   * @copydoc CustomActorImpl::OnStageConnection()
+   * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
   /**
-   * @copydoc CustomActorImpl::OnStageDisconnection()
+   * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
-  virtual void OnStageDisconnection();
+  virtual void OnSceneDisconnection();
 
 private: // implemented differently by PageTurnLandscapeView and PageTurnPortraitView
 

@@ -630,11 +630,7 @@ bool Button::OnAccessibilityActivated()
 
 bool Button::OnTouch( Actor actor, const TouchData& touch )
 {
-
-  // Only events are processed when the button is not disabled
-  auto result( false );
-
-  if( !IsDisabled() )
+  if( !IsDisabled() && (actor == touch.GetHitActor(0)) )
   {
     if ( 1 == touch.GetPointCount() )
     {
@@ -675,9 +671,8 @@ bool Button::OnTouch( Actor actor, const TouchData& touch )
       // Sets the button state to the default
       mButtonPressedState = UNPRESSED;
     }
-    result = true;
   }
-  return result;
+  return false;
 }
 
 bool Button::OnKeyboardEnter()
@@ -689,7 +684,7 @@ bool Button::OnKeyboardEnter()
   return ret;
 }
 
-void Button::OnStageDisconnection()
+void Button::OnSceneDisconnection()
 {
   if( DEPRESSED == mButtonPressedState )
   {
@@ -706,18 +701,18 @@ void Button::OnStageDisconnection()
 
   mButtonPressedState = UNPRESSED;
 
-  Control::OnStageDisconnection(); // Visuals will be set off stage
+  Control::OnSceneDisconnection(); // Visuals will be set off stage
 }
 
-void Button::OnStageConnection( int depth )
+void Button::OnSceneConnection( int depth )
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::OnStageConnection ptr(%p) \n", this );
+  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::OnSceneConnection ptr(%p) \n", this );
   OnButtonVisualRemoval( VISUAL_INDEX_FOR_STATE[ mPreviousButtonState ][ BACKGROUND ] );
   OnButtonVisualRemoval( VISUAL_INDEX_FOR_STATE[ mPreviousButtonState ][ FOREGROUND ] );
   SelectRequiredVisual( Toolkit::Button::Property::LABEL );
   SelectRequiredVisual( VISUAL_INDEX_FOR_STATE[ mButtonState ][ BACKGROUND ] );
   SelectRequiredVisual( VISUAL_INDEX_FOR_STATE[ mButtonState ][ FOREGROUND ] );
-  Control::OnStageConnection( depth ); // Enabled visuals will be put on stage
+  Control::OnSceneConnection( depth ); // Enabled visuals will be put on stage
   RelayoutRequest();
 }
 

@@ -397,10 +397,10 @@ int UtcDaliVisualSize(void)
   END_TEST;
 }
 
-int UtcDaliVisualSetOnOffStage(void)
+int UtcDaliVisualSetOnOffScene(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualSetOnOffStage" );
+  tet_infoline( "UtcDaliVisualSetOnOffScene" );
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
@@ -433,10 +433,10 @@ int UtcDaliVisualSetOnOffStage(void)
   END_TEST;
 }
 
-int UtcDaliVisualSetOnOffStage2(void)
+int UtcDaliVisualSetOnOffScene2(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualSetOnOffStage2" );
+  tet_infoline( "UtcDaliVisualSetOnOffScene2" );
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;

@@ -109,6 +109,24 @@ int UtcDaliToolkitFlexContainerCopyConstructorP(void)
   END_TEST;
 }
 
+int UtcDaliFlexContainerMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  FlexContainer flexContainer = FlexContainer::New();
+  DALI_TEST_EQUALS( 1, flexContainer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  flexContainer.SetProperty( FlexContainer::Property::FLEX_DIRECTION, FlexContainer::ROW_REVERSE );
+  DALI_TEST_CHECK( flexContainer.GetProperty<int>( FlexContainer::Property::FLEX_DIRECTION ) == FlexContainer::ROW_REVERSE );
+
+  FlexContainer moved = std::move( flexContainer );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( moved.GetProperty<int>( FlexContainer::Property::FLEX_DIRECTION ) == FlexContainer::ROW_REVERSE );
+  DALI_TEST_CHECK( !flexContainer );
+
+  END_TEST;
+}
+
 int UtcDaliToolkitFlexContainerAssignmentOperatorP(void)
 {
   ToolkitTestApplication application;
@@ -119,6 +137,25 @@ int UtcDaliToolkitFlexContainerAssignmentOperatorP(void)
   FlexContainer copy = flexContainer;
   DALI_TEST_CHECK( copy );
   DALI_TEST_CHECK( copy.GetProperty<int>( FlexContainer::Property::FLEX_DIRECTION ) == flexContainer.GetProperty<int>( FlexContainer::Property::FLEX_DIRECTION ) );
+  END_TEST;
+}
+
+int UtcDaliFlexContainerMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  FlexContainer flexContainer = FlexContainer::New();
+  DALI_TEST_EQUALS( 1, flexContainer.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  flexContainer.SetProperty( FlexContainer::Property::FLEX_DIRECTION, FlexContainer::ROW_REVERSE );
+  DALI_TEST_CHECK( flexContainer.GetProperty<int>( FlexContainer::Property::FLEX_DIRECTION ) == FlexContainer::ROW_REVERSE );
+
+  FlexContainer moved;
+  moved = std::move( flexContainer );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( moved.GetProperty<int>( FlexContainer::Property::FLEX_DIRECTION ) == FlexContainer::ROW_REVERSE );
+  DALI_TEST_CHECK( !flexContainer );
+
   END_TEST;
 }
 

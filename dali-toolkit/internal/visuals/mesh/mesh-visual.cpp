@@ -489,7 +489,7 @@ void MeshVisual::OnSetTransform()
   }
 }
 
-void MeshVisual::DoSetOnStage( Actor& actor )
+void MeshVisual::DoSetOnScene( Actor& actor )
 {
   InitializeRenderer();
 

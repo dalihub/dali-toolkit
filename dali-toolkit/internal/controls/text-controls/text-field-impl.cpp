@@ -1359,7 +1359,7 @@ void TextField::OnInitialize()
   // Fill-parent area by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
-  self.OnStageSignal().Connect( this, &TextField::OnStageConnect );
+  self.OnSceneSignal().Connect( this, &TextField::OnSceneConnect );
 
   DevelControl::SetInputMethodContext( *this, mInputMethodContext );
 
@@ -1785,7 +1785,7 @@ void TextField::AddDecoration( Actor& actor, bool needsClipping )
   }
 }
 
-void TextField::OnStageConnect( Dali::Actor actor )
+void TextField::OnSceneConnect( Dali::Actor actor )
 {
   if ( mHasBeenStaged )
   {
@@ -1855,20 +1855,20 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
   }
 }
 
-void TextField::OnStageConnection( int depth )
+void TextField::OnSceneConnection( int depth )
 {
   // Sets the depth to the visuals inside the text's decorator.
   mDecorator->SetTextDepth( depth );
 
   // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 
-  // Call the Control::OnStageConnection() to set the depth of the background.
-  Control::OnStageConnection( depth );
+  // Call the Control::OnSceneConnection() to set the depth of the background.
+  Control::OnSceneConnection( depth );
 }
 
 bool TextField::OnTouched( Actor actor, const TouchData& touch )
 {
-  return true;
+  return false;
 }
 
 void TextField::OnIdleSignal()

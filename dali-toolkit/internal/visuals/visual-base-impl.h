@@ -130,15 +130,15 @@ public:
   int GetDepthIndex() const;
 
   /**
-   * @copydoc Toolkit::Visual::Base::SetOnStage
+   * @copydoc Toolkit::Visual::Base::SetOnScene
    * @pre Impl->mGeometry must be created before this method is called
    */
-  void SetOnStage( Actor& actor );
+  void SetOnScene( Actor& actor );
 
   /**
-   * @copydoc Toolkit::Visual::Base::SetOffStage
+   * @copydoc Toolkit::Visual::Base::SetOffScene
    */
-  void SetOffStage( Actor& actor );
+  void SetOffScene( Actor& actor );
 
   /**
    * @copydoc Toolkit::Visual::Base::CreatePropertyMap
@@ -327,20 +327,20 @@ protected:
   virtual void OnSetTransform() = 0;
 
   /**
-   * @brief Called by SetOnStage() allowing sub classes to respond to the SetOnStage event
+   * @brief Called by SetOnScene() allowing sub classes to respond to the SetOnScene event
    *
    * @note The derived class is required to create the renderer, and add it to the actor when all the resources are in place.
    *
    * @param[in] actor The actor applying this visual.
    */
-  virtual void DoSetOnStage( Actor& actor ) = 0;
+  virtual void DoSetOnScene( Actor& actor ) = 0;
 
   /**
-   * @brief Called by SetOffStage() allowing sub classes to respond to the SetOffStage event
+   * @brief Called by SetOffScene() allowing sub classes to respond to the SetOffScene event
    *
    * @param[in] actor The actor applying this visual.
    */
-  virtual void DoSetOffStage( Actor& actor );
+  virtual void DoSetOffScene( Actor& actor );
 
   /**
    * @brief Called by DoAction() allowing sub classes to do the given action.
@@ -353,11 +353,11 @@ protected:
 protected:
 
   /**
-   * @brief Gets the on stage state for this Visual
+   * @brief Gets the on scene state for this Visual
    *
-   * @return Returns true if this Visual is on stage, false if it is off the stage
+   * @return Returns true if this Visual is on the scene, false if it is off the scene
    */
-  bool IsOnStage() const;
+  bool IsOnScene() const;
 
   /**
    * @brief Query whether the corners of the visual requires to be rounded.

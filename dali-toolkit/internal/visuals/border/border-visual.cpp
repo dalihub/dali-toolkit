@@ -197,7 +197,7 @@ void BorderVisual::DoSetProperty( Dali::Property::Index index,
   }
 }
 
-void BorderVisual::DoSetOnStage( Actor& actor )
+void BorderVisual::DoSetOnScene( Actor& actor )
 {
   InitializeRenderer();
 

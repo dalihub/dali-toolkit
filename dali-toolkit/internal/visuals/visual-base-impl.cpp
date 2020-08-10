@@ -310,13 +310,13 @@ int Visual::Base::GetDepthIndex() const
   return mImpl->mDepthIndex;
 }
 
-void Visual::Base::SetOnStage( Actor& actor )
+void Visual::Base::SetOnScene( Actor& actor )
 {
-  if( !IsOnStage() )
+  if( !IsOnScene() )
   {
     // To display the actor correctly, renderer should not be added to actor until all required resources are ready.
     // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
-    DoSetOnStage( actor );
+    DoSetOnScene( actor );
 
     if( mImpl->mRenderer )
     {
@@ -332,19 +332,19 @@ void Visual::Base::SetOnStage( Actor& actor )
 
       mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
       mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-      mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
+      mImpl->mFlags |= Impl::IS_ON_SCENE; // Only sets the flag if renderer exists
     }
   }
 }
 
-void Visual::Base::SetOffStage( Actor& actor )
+void Visual::Base::SetOffScene( Actor& actor )
 {
-  if( IsOnStage() )
+  if( IsOnScene() )
   {
-    DoSetOffStage( actor );
+    DoSetOffScene( actor );
     mImpl->mMixColorIndex = Property::INVALID_INDEX;
     mImpl->mCornerRadiusIndex = Property::INVALID_INDEX;
-    mImpl->mFlags &= ~Impl::IS_ON_STAGE;
+    mImpl->mFlags &= ~Impl::IS_ON_SCENE;
   }
 }
 
@@ -415,15 +415,15 @@ bool Visual::Base::IsPreMultipliedAlphaEnabled() const
   return mImpl->mFlags & Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
-void Visual::Base::DoSetOffStage( Actor& actor )
+void Visual::Base::DoSetOffScene( Actor& actor )
 {
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
 }
 
-bool Visual::Base::IsOnStage() const
+bool Visual::Base::IsOnScene() const
 {
-  return mImpl->mFlags & Impl::IS_ON_STAGE;
+  return mImpl->mFlags & Impl::IS_ON_SCENE;
 }
 
 bool Visual::Base::IsRoundedCornerRequired() const

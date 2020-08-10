@@ -704,7 +704,7 @@ void ScrollView::OnInitialize()
   SetInternalConstraints();
 }
 
-void ScrollView::OnStageConnection( int depth )
+void ScrollView::OnSceneConnection( int depth )
 {
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
@@ -720,16 +720,16 @@ void ScrollView::OnStageConnection( int depth )
     EnableScrollOvershoot(true);
   }
 
-  ScrollBase::OnStageConnection( depth );
+  ScrollBase::OnSceneConnection( depth );
 }
 
-void ScrollView::OnStageDisconnection()
+void ScrollView::OnSceneDisconnection()
 {
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
   StopAnimation();
 
-  ScrollBase::OnStageDisconnection();
+  ScrollBase::OnSceneDisconnection();
 }
 
 ScrollView::~ScrollView()
@@ -2125,7 +2125,7 @@ bool ScrollView::OnTouch( Actor actor, const TouchData& touch )
     mScrollInterrupted = false;
   }
 
-  return true;
+  return false;
 }
 
 bool ScrollView::OnWheelEvent(const WheelEvent& event)

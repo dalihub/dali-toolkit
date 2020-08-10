@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,19 +39,13 @@ RadioButton::RadioButton( Internal::RadioButton& implementation )
 {
 }
 
-RadioButton::RadioButton( const RadioButton& radioButton )
-  : Button( radioButton )
-{
-}
+RadioButton::RadioButton( const RadioButton& radioButton ) = default;
 
-RadioButton& RadioButton::operator=( const RadioButton& radioButton )
-{
-  if( &radioButton != this )
-  {
-    Button::operator=( radioButton );
-  }
-  return *this;
-}
+RadioButton::RadioButton( RadioButton&& rhs ) = default;
+
+RadioButton& RadioButton::operator=( const RadioButton& radioButton ) = default;
+
+RadioButton& RadioButton::operator=( RadioButton&& rhs ) = default;
 
 RadioButton::RadioButton( Dali::Internal::CustomActor* internal )
   : Button( internal )

@@ -77,6 +77,71 @@ int UtcDaliSliderNew(void)
   END_TEST;
 }
 
+int UtcDaliSliderCopyConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  Slider slider = Slider::New();
+  DALI_TEST_CHECK( slider );
+
+  Slider copy( slider );
+  DALI_TEST_CHECK( copy );
+
+  END_TEST;
+}
+
+int UtcDaliSliderCopyAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  Slider slider = Slider::New();
+  DALI_TEST_CHECK( slider );
+
+  Slider copy;
+  copy = slider;
+  DALI_TEST_CHECK( copy );
+  DALI_TEST_EQUALS( slider, copy, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliSliderMoveConstructor(void)
+{
+  ToolkitTestApplication application;
+
+  Slider slider = Slider::New();
+  DALI_TEST_EQUALS( 1, slider.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  slider.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == slider.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  Slider moved = std::move( slider );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !slider );
+
+  END_TEST;
+}
+
+int UtcDaliSliderMoveAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  Slider slider = Slider::New();
+  DALI_TEST_EQUALS( 1, slider.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  slider.SetProperty( Actor::Property::SENSITIVE, false );
+  DALI_TEST_CHECK( false == slider.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+
+  Slider moved;
+  moved = std::move( slider );
+  DALI_TEST_CHECK( moved );
+  DALI_TEST_EQUALS( 1, moved.GetBaseObject().ReferenceCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( false == moved.GetProperty< bool >( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( !slider );
+
+  END_TEST;
+}
+
 int UtcDaliSliderDestructor(void)
 {
   ToolkitTestApplication application;

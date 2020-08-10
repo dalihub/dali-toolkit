@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_MODEL3D_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,12 +142,29 @@ public:
   Model3dView( const Model3dView& model3dView );
 
   /**
+   * @brief Move constructor
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   */
+  Model3dView( Model3dView&& rhs );
+
+  /**
    * @brief Assignment operator.
    * @SINCE_1_1.4
    * @param[in] model3dView Handle to an object
    * @return reference to this
    */
   Model3dView& operator=( const Model3dView& model3dView );
+
+  /**
+   * @brief Move assignment
+   * @SINCE_1_9.23
+   *
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this
+   */
+  Model3dView& operator=( Model3dView&& rhs );
 
   /**
    * @brief Downcasts an Object handle to Model3dView.

@@ -33,6 +33,11 @@ InputMethodContext GetInputMethodContext( TextEditor textEditor )
   return GetImpl( textEditor ).GetInputMethodContext();
 }
 
+MaxLengthReachedSignalType& MaxLengthReachedSignal( TextEditor textEditor )
+{
+  return GetImpl( textEditor ).MaxLengthReachedSignal();
+}
+
 } // namespace DevelTextEditor
 
 } // namespace Toolkit

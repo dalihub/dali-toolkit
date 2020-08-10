@@ -245,7 +245,7 @@ private:
   /**
    * Check if we should start animating
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
 private:
 

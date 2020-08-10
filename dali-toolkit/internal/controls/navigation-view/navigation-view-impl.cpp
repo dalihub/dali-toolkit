@@ -71,11 +71,11 @@ Toolkit::NavigationView NavigationView::New()
   return navigationView;
 }
 
-void NavigationView::OnStageConnection( int depth )
+void NavigationView::OnSceneConnection( int depth )
 {
   Self().SetProperty( Actor::Property::SENSITIVE,true);
 
-  Control::OnStageConnection( depth );
+  Control::OnSceneConnection( depth );
 }
 
 void NavigationView::Push( Actor& actor )

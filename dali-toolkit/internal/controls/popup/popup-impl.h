@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_POPUP_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -437,7 +437,7 @@ private:
   /**
    * Called when the popup is directly or indirectly parented to the stage.
    */
-  virtual void OnStageConnection( int depth );
+  virtual void OnSceneConnection( int depth );
 
   /**
    * From Control; called after a child has been added to the owning actor.
@@ -498,6 +498,12 @@ private:
    * @param[in/out] focusableActors The vector to add focusable actors to
    */
   void AddFocusableChildrenRecursive( Actor parent, std::vector< Actor >& focusableActors );
+
+  /**
+   * Sets up the touch signals connections as required.
+   * @note This must be called after all the members have been created.
+   */
+  void SetupTouch();
 
 private:
 

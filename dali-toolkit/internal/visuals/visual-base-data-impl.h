@@ -57,7 +57,7 @@ struct Base::Impl
 
   enum Flags
   {
-    IS_ON_STAGE = 1,
+    IS_ON_SCENE = 1,
     IS_ATLASING_APPLIED = 1<<1,
     IS_PREMULTIPLIED_ALPHA = 1 << 2,
     IS_SYNCHRONOUS_RESOURCE_LOADING = 1 << 3

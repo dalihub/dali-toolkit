@@ -123,6 +123,12 @@ namespace Property
        * @details Name "renderingBackend", type Property::INTEGER.
        */
       RENDERING_BACKEND,
+
+      /**
+       * @brief The maximum number of characters that can be inserted.
+       * @details Name "maxLength", type Property::INTEGER.
+       */
+      MAX_LENGTH,
   };
 
 } // namespace Property
@@ -134,6 +140,23 @@ namespace Property
  * @return InputMethodContext instance.
  */
 DALI_TOOLKIT_API InputMethodContext GetInputMethodContext( TextEditor textEditor );
+
+/**
+ * @brief Max Characters Exceed signal type.
+  */
+using MaxLengthReachedSignalType = Signal< void ( TextEditor ) >;
+
+/**
+ * @brief This signal is emitted when inserted text exceeds the maximum character limit.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( TextEditor textEditor );
+ * @endcode
+ * @param[in] textEditor The instance of TextEditor.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API MaxLengthReachedSignalType& MaxLengthReachedSignal( TextEditor textEditor );
 
 } // namespace DevelTextEditor
 

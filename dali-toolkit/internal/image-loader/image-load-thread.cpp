@@ -140,6 +140,18 @@ ImageLoadThread::~ImageLoadThread()
   Join();
 
   delete mTrigger;
+
+  for( auto&& iter : mLoadQueue )
+  {
+    delete iter;
+  }
+  mLoadQueue.Clear();
+
+  for( auto&& iter : mCompleteQueue )
+  {
+    delete iter;
+  }
+  mCompleteQueue.Clear();
 }
 
 void ImageLoadThread::Run()

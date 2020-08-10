@@ -110,14 +110,14 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
   virtual void OnInitialize( const char* name ) {}
 
   // From Toolkit::Internal::ControlWrapper
-  virtual void OnStageConnection( int depth )
+  virtual void OnSceneConnection( int depth )
   {
     mDepth = depth;
-    Control::OnStageConnection(depth);
+    Control::OnSceneConnection(depth);
   }
-  virtual void OnStageDisconnection()
+  virtual void OnSceneDisconnection()
   {
-    Control::OnStageDisconnection();
+    Control::OnSceneDisconnection();
   }
   virtual void OnChildAdd( Actor& child )
   {

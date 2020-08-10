@@ -168,7 +168,7 @@ void WireframeVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 }
 
-void WireframeVisual::DoSetOnStage( Actor& actor )
+void WireframeVisual::DoSetOnScene( Actor& actor )
 {
   InitializeRenderer();
 

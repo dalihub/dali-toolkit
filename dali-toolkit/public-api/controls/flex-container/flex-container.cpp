@@ -36,19 +36,13 @@ FlexContainer::FlexContainer()
 {
 }
 
-FlexContainer::FlexContainer( const FlexContainer& handle )
-: Control( handle )
-{
-}
+FlexContainer::FlexContainer( const FlexContainer& handle ) = default;
 
-FlexContainer& FlexContainer::operator=( const FlexContainer& handle )
-{
-  if( &handle != this )
-  {
-    Control::operator=( handle );
-  }
-  return *this;
-}
+FlexContainer::FlexContainer( FlexContainer&& rhs ) = default;
+
+FlexContainer& FlexContainer::operator=( const FlexContainer& handle ) = default;
+
+FlexContainer& FlexContainer::operator=( FlexContainer&& rhs ) = default;
 
 FlexContainer::~FlexContainer()
 {

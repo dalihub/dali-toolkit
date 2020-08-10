@@ -549,7 +549,8 @@ struct AtlasRenderer::Impl
         }
 
         // Move the origin (0,0) of the mesh to the center of the actor
-        const Vector2 position = *( positionsBuffer + i ) - halfTextSize - lineOffsetPosition;
+        const Vector2& temp = *( positionsBuffer + i );
+        const Vector2 position = Vector2( roundf( temp.x ), temp.y ) - halfTextSize - lineOffsetPosition; // roundf() avoids pixel alignment issues.
 
         if ( 0u != slot.mImageId ) // invalid slot id, glyph has failed to be added to atlas
         {
