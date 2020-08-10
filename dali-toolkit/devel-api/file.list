@@ -30,6 +30,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/shadow-view/shadow-view.cpp
   ${devel_api_src_dir}/controls/super-blur-view/super-blur-view.cpp
   ${devel_api_src_dir}/controls/table-view/table-view.cpp
+  ${devel_api_src_dir}/controls/text-controls/autofill-container.cpp
   ${devel_api_src_dir}/controls/text-controls/text-editor-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-field-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-popup.cpp
@@ -200,6 +201,7 @@ SET( devel_api_super_blur_view_header_files
 )
 
 SET( devel_api_text_controls_header_files
+  ${devel_api_src_dir}/controls/text-controls/autofill-container.h
   ${devel_api_src_dir}/controls/text-controls/text-editor-devel.h
   ${devel_api_src_dir}/controls/text-controls/text-field-devel.h
   ${devel_api_src_dir}/controls/text-controls/text-label-devel.h
