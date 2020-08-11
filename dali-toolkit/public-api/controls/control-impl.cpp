@@ -386,7 +386,7 @@ bool Control::OnAccessibilityPan(PanGesture gesture)
   return false; // Accessibility pan gesture is not handled by default
 }
 
-bool Control::OnAccessibilityTouch(const TouchEvent& touchEvent)
+bool Control::OnAccessibilityTouch(const TouchData& touchData)
 {
   return false; // Accessibility touch event is not handled by default
 }
@@ -625,11 +625,6 @@ void Control::OnSizeSet(const Vector3& targetSize)
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
   // @todo size negotiate background to new size, animate as well?
-}
-
-bool Control::OnTouchEvent(const TouchEvent& event)
-{
-  return false; // Do not consume
 }
 
 bool Control::OnHoverEvent(const HoverEvent& event)
