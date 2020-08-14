@@ -71,7 +71,7 @@ public:
    * @SINCE_1_0.0
    */
   typedef Signal< bool ( AccessibilityManager& ) > AccessibilityActionSignalType; ///< Generic signal type @SINCE_1_0.0
-  typedef Signal< bool ( AccessibilityManager&, const Dali::TouchData& )> AccessibilityActionScrollSignalType; ///< Scroll signal type @SINCE_1_0.0
+  typedef Signal< bool ( AccessibilityManager&, const Dali::TouchEvent& )> AccessibilityActionScrollSignalType; ///< Scroll signal type @SINCE_1_0.0
 
   /**
    * @brief Enumeration for accessibility that needs four information which will be read by screen-reader.
@@ -794,7 +794,7 @@ public:
    *
    * A callback of the following type may be connected:
    * @code
-   *   bool YourCallback( AccessibilityManager& manager, const TouchData& event );
+   *   bool YourCallback( AccessibilityManager& manager, const TouchEvent& event );
    * @endcode
    * @SINCE_1_0.0
    * @return The signal to connect to
