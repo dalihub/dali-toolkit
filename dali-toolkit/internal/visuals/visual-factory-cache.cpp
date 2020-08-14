@@ -25,6 +25,7 @@
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 
 namespace Dali
 {
@@ -37,7 +38,7 @@ namespace Internal
 
 VisualFactoryCache::VisualFactoryCache( bool preMultiplyOnLoad )
 : mSvgRasterizeThread( NULL ),
-  mVectorAnimationThread(),
+  mVectorAnimationManager(),
   mBrokenImageUrl(""),
   mPreMultiplyOnLoad( preMultiplyOnLoad )
 {
@@ -130,14 +131,13 @@ SvgRasterizeThread* VisualFactoryCache::GetSVGRasterizationThread()
   return mSvgRasterizeThread;
 }
 
-VectorAnimationThread& VisualFactoryCache::GetVectorAnimationThread()
+VectorAnimationManager& VisualFactoryCache::GetVectorAnimationManager()
 {
-  if( !mVectorAnimationThread )
+  if( !mVectorAnimationManager )
   {
-    mVectorAnimationThread = std::unique_ptr< VectorAnimationThread >( new VectorAnimationThread() );
-    mVectorAnimationThread->Start();
+    mVectorAnimationManager = std::unique_ptr< VectorAnimationManager >( new VectorAnimationManager() );
   }
-  return *mVectorAnimationThread;
+  return *mVectorAnimationManager;
 }
 
 void VisualFactoryCache::ApplyRasterizedSVGToSampler()
