@@ -101,6 +101,7 @@ const char* const PROPERTY_NAME_PLACEHOLDER                          = "placehol
 const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableShiftSelection";
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGrabHandle";
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
+const char* const PROPERTY_NAME_MAX_LENGTH                           = "maxLength";
 
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
@@ -127,6 +128,7 @@ const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 
 static bool gTextChangedCallBackCalled;
 static bool gInputStyleChangedCallbackCalled;
+static bool gMaxCharactersCallBackCalled;
 static Dali::Toolkit::TextEditor::InputStyle::Mask gInputStyleMask;
 
 struct CallbackFunctor
@@ -156,6 +158,13 @@ static void TestInputStyleChangedCallback( TextEditor control, TextEditor::Input
 
   gInputStyleChangedCallbackCalled = true;
   gInputStyleMask = mask;
+}
+
+static void TestMaxLengthReachedCallback( TextEditor control )
+{
+  tet_infoline(" TestMaxLengthReachedCallback");
+
+  gMaxCharactersCallBackCalled = true;
 }
 
 // Generate a KeyEvent to send to Core.
@@ -481,6 +490,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextEditor::Property::ENABLE_SHIFT_SELECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MAX_LENGTH ) == DevelTextEditor::Property::MAX_LENGTH );
 
   END_TEST;
 }
@@ -2786,6 +2796,39 @@ int UtcDaliTextEditorGetInputMethodContext(void)
 
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( DevelTextEditor::GetInputMethodContext( editor ) );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorMaxCharactersReached(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("utcDaliTextEditorMaxCharactersReached");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  const int maxNumberOfCharacters = 1;
+  editor.SetProperty( DevelTextEditor::Property::MAX_LENGTH, maxNumberOfCharacters );
+  DALI_TEST_EQUALS( editor.GetProperty<int>( DevelTextEditor::Property::MAX_LENGTH ), maxNumberOfCharacters, TEST_LOCATION );
+
+  editor.SetKeyInputFocus();
+
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextEditor::MaxLengthReachedSignal( editor ).Connect(&TestMaxLengthReachedCallback);
+  bool maxLengthReachedSignal = false;
+  editor.ConnectSignal( testTracker, "maxLengthReached", CallbackFunctor(&maxLengthReachedSignal) );
+
+  gMaxCharactersCallBackCalled = false;
+
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  DALI_TEST_CHECK( gMaxCharactersCallBackCalled );
+  DALI_TEST_CHECK( maxLengthReachedSignal );
 
   END_TEST;
 }

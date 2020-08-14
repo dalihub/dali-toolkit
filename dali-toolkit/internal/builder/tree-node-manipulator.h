@@ -198,14 +198,14 @@ private:
 /*
  * Collect nodes
  */
-struct CollectNodes : public std::unary_function<TreeNode*, void>
+struct CollectNodes
 {
   CollectNodes() {};
 
   /*
    * Call operator to add nodes to the list
    */
-  result_type operator()(argument_type& n)
+  void operator()(TreeNode*& n)
   {
     DALI_ASSERT_DEBUG(n && "Operation on NULL JSON node");
     nodes.push_back(n);

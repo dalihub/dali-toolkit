@@ -35,7 +35,6 @@
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -138,9 +137,11 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableShiftSelection",  
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableGrabHandle",               BOOLEAN,   ENABLE_GRAB_HANDLE                   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "matchSystemLanguageDirection",   BOOLEAN,   MATCH_SYSTEM_LANGUAGE_DIRECTION      )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "renderingBackend",               INTEGER,   RENDERING_BACKEND                    )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "maxLength",                      INTEGER,   MAX_LENGTH                           )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
+DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -771,6 +772,17 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::MAX_LENGTH:
+      {
+        if( impl.mController )
+        {
+          const int max = value.Get< int >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p MAX_LENGTH %d\n", impl.mController.Get(), max );
+
+          impl.mController->SetMaximumNumberOfCharacters( max );
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -1171,6 +1183,14 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::MAX_LENGTH:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetMaximumNumberOfCharacters();
+        }
+        break;
+      }
     } //switch
   }
 
@@ -1180,6 +1200,11 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
 InputMethodContext TextEditor::GetInputMethodContext()
 {
   return mInputMethodContext;
+}
+
+DevelTextEditor::MaxLengthReachedSignalType& TextEditor::MaxLengthReachedSignal()
+{
+  return mMaxLengthReachedSignal;
 }
 
 bool TextEditor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -1196,6 +1221,14 @@ bool TextEditor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_INPUT_STYLE_CHANGED ) )
   {
     editor.InputStyleChangedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_MAX_LENGTH_REACHED ) )
+  {
+    if( editor )
+    {
+      Internal::TextEditor& editorImpl( GetImpl( editor ) );
+      editorImpl.MaxLengthReachedSignal().Connect( tracker, functor );
+    }
   }
   else
   {
@@ -1588,7 +1621,8 @@ void TextEditor::TextChanged()
 
 void TextEditor::MaxLengthReached()
 {
-  // Nothing to do as TextEditor doesn't emit a max length reached signal.
+  Dali::Toolkit::TextEditor handle( GetOwner() );
+  mMaxLengthReachedSignal.Emit( handle );
 }
 
 void TextEditor::InputStyleChanged( Text::InputStyle::Mask inputStyleMask )

@@ -141,10 +141,6 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
     mTargetSize = targetSize;
     Control::OnSizeAnimation( animation, targetSize );
   }
-  virtual bool OnTouchEvent( const TouchEvent& event )
-  {
-    return true;
-  }
   virtual bool OnHoverEvent( const HoverEvent& event )
   {
     return true;
