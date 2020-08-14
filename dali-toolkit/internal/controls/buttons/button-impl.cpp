@@ -630,7 +630,11 @@ bool Button::OnAccessibilityActivated()
 
 bool Button::OnTouch( Actor actor, const TouchData& touch )
 {
-  if( !IsDisabled() && (actor == touch.GetHitActor(0)) )
+
+  // Only events are processed when the button is not disabled
+  auto result( false );
+
+  if( !IsDisabled() )
   {
     if ( 1 == touch.GetPointCount() )
     {
@@ -671,8 +675,9 @@ bool Button::OnTouch( Actor actor, const TouchData& touch )
       // Sets the button state to the default
       mButtonPressedState = UNPRESSED;
     }
+    result = true;
   }
-  return false;
+  return result;
 }
 
 bool Button::OnKeyboardEnter()

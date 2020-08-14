@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -209,7 +209,7 @@ bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchData& data)
     }
     mPointDown = false;
   }
-  return false;
+  return true;
 }
 
 const std::string& DragAndDropDetector::GetContent() const

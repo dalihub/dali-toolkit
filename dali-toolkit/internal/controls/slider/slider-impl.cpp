@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -240,7 +240,7 @@ bool Slider::OnTouch(Actor actor, const TouchData& touch)
     }
   }
 
-  return false;
+  return true;
 }
 
 void Slider::OnPan( Actor actor, const PanGesture& gesture )

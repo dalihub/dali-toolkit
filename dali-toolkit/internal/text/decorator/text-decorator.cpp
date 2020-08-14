@@ -1386,7 +1386,8 @@ struct Decorator::Impl : public ConnectionTracker
       SetHandleImage( GRAB_HANDLE );
     }
 
-    return false;
+    // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
+    return true;
   }
 
   bool OnHandleOneTouched( Actor actor, const TouchData& touch )
@@ -1416,7 +1417,8 @@ struct Decorator::Impl : public ConnectionTracker
       SetHandleImage( LEFT_SELECTION_HANDLE );
     }
 
-    return false;
+    // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
+    return true;
   }
 
   bool OnHandleTwoTouched( Actor actor, const TouchData& touch )
@@ -1446,7 +1448,8 @@ struct Decorator::Impl : public ConnectionTracker
       SetHandleImage( RIGHT_SELECTION_HANDLE );
     }
 
-    return false;
+    // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
+    return true;
   }
 
   void HandleResetPosition( PropertyNotification& source )

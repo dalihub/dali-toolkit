@@ -330,14 +330,14 @@ void Popup::OnInitialize()
   mPopupLayout.SetFitHeight( 0 ); // Set row to fit.
   mPopupLayout.SetFitHeight( 1 ); // Set row to fit.
 
+  mPopupLayout.TouchSignal().Connect( this, &Popup::OnDialogTouched );
+
   mPopupContainer.Add( mPopupLayout );
 
   // Any content after this point which is added to Self() will be re-parented to mContent.
   mAlterAddedChild = true;
 
   SetAsKeyboardFocusGroup( true );
-
-  SetupTouch();
 }
 
 Popup::~Popup()
@@ -592,6 +592,9 @@ void Popup::SetPopupBackgroundImage( Actor image )
   mPopupBackgroundImage.SetProperty( Dali::Actor::Property::NAME, "popupBackgroundImage" );
   mPopupBackgroundImage.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   mPopupBackgroundImage.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+
+  // OnDialogTouched only consumes the event. It prevents the touch event to be caught by the backing.
+  mPopupBackgroundImage.TouchSignal().Connect( this, &Popup::OnDialogTouched );
 
   // Set the popup border to be slightly larger than the layout contents.
   UpdateBackgroundPositionAndSize();
@@ -935,6 +938,7 @@ Toolkit::Control Popup::CreateBacking()
 
   // Default to being transparent.
   backing.SetProperty( Actor::Property::COLOR_ALPHA, 0.0f );
+  backing.TouchSignal().Connect( this, &Popup::OnBackingTouched );
   backing.WheelEventSignal().Connect( this, &Popup::OnBackingWheelEvent );
   return backing;
 }
@@ -1115,11 +1119,7 @@ const std::string& Popup::GetTailRightImage() const
 
 void Popup::SetTouchTransparent( bool enabled )
 {
-  if( mTouchTransparent != enabled )
-  {
-    mTouchTransparent = enabled;
-    SetupTouch();
-  }
+  mTouchTransparent = enabled;
 }
 
 const bool Popup::IsTouchTransparent() const
@@ -1534,18 +1534,26 @@ bool Popup::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
 
 bool Popup::OnBackingTouched( Actor actor, const TouchData& touch )
 {
-  // Allow events to pass through if the backing isn't the hit-actor
-  if( (touch.GetHitActor(0) == actor) &&
-      (touch.GetPointCount() > 0) &&
-      (touch.GetState( 0 ) == PointState::DOWN))
+  // Allow events to pass through if touch transparency is enabled.
+  if( mTouchTransparent )
   {
-    // Guard against destruction during signal emission.
-    Toolkit::Popup handle( GetOwner() );
-
-    mTouchedOutsideSignal.Emit();
+    return false;
   }
 
-  return false;
+  if( touch.GetPointCount() > 0 )
+  {
+    if( touch.GetState( 0 ) == PointState::DOWN )
+    {
+      // Guard against destruction during signal emission.
+      Toolkit::Popup handle( GetOwner() );
+
+      mTouchedOutsideSignal.Emit();
+    }
+  }
+
+  // Block anything behind backing becoming touched.
+  mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, true );
+  return true;
 }
 
 bool Popup::OnBackingWheelEvent( Actor actor, const WheelEvent& event )
@@ -1556,13 +1564,22 @@ bool Popup::OnBackingWheelEvent( Actor actor, const WheelEvent& event )
     return false;
   }
 
+  // Consume wheel event in dimmed backing actor.
+  mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, true );
   return true;
 }
 
 bool Popup::OnDialogTouched( Actor actor, const TouchData& touch )
 {
-  // Only connecting this so the backing does not become the default hit-actor and inadvertently closes the popup
-  return false;
+  // Allow events to pass through if touch transparency is enabled.
+  if( mTouchTransparent )
+  {
+    return false;
+  }
+
+  // Consume event (stops backing actor receiving touch events)
+  mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, true );
+  return true;
 }
 
 void Popup::OnSceneConnection( int depth )
@@ -1958,25 +1975,6 @@ Actor Popup::GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::
   return nextFocusableActor;
 }
 
-void Popup::SetupTouch()
-{
-  if( ! mTouchTransparent )
-  {
-    // Connect all the signals and set us up to consume all touch events
-    mBacking.TouchSignal().Connect( this, &Popup::OnBackingTouched );
-    mPopupBackgroundImage.TouchSignal().Connect( this, &Popup::OnDialogTouched );
-    mPopupLayout.TouchSignal().Connect( this, &Popup::OnDialogTouched );
-    mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, true );
-  }
-  else
-  {
-    // We are touch transparent so disconnect all signals and ensure our layer does not consumed all touch events
-    mBacking.TouchSignal().Disconnect( this, &Popup::OnBackingTouched );
-    mPopupBackgroundImage.TouchSignal().Disconnect( this, &Popup::OnDialogTouched );
-    mPopupLayout.TouchSignal().Disconnect( this, &Popup::OnDialogTouched );
-    mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, false );
-  }
-}
 
 } // namespace Internal
 
