@@ -1302,21 +1302,6 @@ bool AccessibilityManager::AccessibilityActionStartStop()
   return mIsAccessibilityTtsEnabled;
 }
 
-bool AccessibilityManager::AccessibilityActionTouch(const TouchEvent& touch)
-{
-  bool handled = false;
-
-  // TODO: Need to convert the touchevent for the focused actor?
-
-  Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(GetCurrentFocusActor());
-  if(control)
-  {
-    handled = GetImplementation( control ).OnAccessibilityTouch(touch);
-  }
-
-  return handled;
-}
-
 bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& panEvent)
 {
   bool handled = false;

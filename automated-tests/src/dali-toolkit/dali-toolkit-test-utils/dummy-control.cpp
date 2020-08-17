@@ -218,7 +218,6 @@ Impl::DummyControl::DummyControl()
 : DummyControlImpl(),
   initializeCalled(false),
   activatedCalled(false),
-  onAccTouchedCalled(false),
   onAccValueChangeCalled(false),
   themeChangeCalled(false),
   fontChangeCalled(false),
@@ -248,7 +247,6 @@ Impl::DummyControl::~DummyControl()
 
 void Impl::DummyControl::OnInitialize() { initializeCalled = true; }
 bool Impl::DummyControl::OnAccessibilityActivated() { activatedCalled = true; return true; }
-bool Impl::DummyControl::OnAccessibilityTouch(const TouchEvent& touch) { onAccTouchedCalled = true; return true; }
 bool Impl::DummyControl::OnAccessibilityValueChange( bool isIncrease )
 {
   onAccValueChangeCalled = true; return true;
