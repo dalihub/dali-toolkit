@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -232,7 +232,6 @@ Impl::DummyControl::DummyControl()
   childRemoveCalled(false),
   sizeSetCalled(false),
   sizeAnimationCalled(false),
-  touchEventCalled(false),
   hoverEventCalled(false),
   wheelEventCalled(false),
   keyEventCalled(false),
@@ -249,7 +248,7 @@ Impl::DummyControl::~DummyControl()
 
 void Impl::DummyControl::OnInitialize() { initializeCalled = true; }
 bool Impl::DummyControl::OnAccessibilityActivated() { activatedCalled = true; return true; }
-bool Impl::DummyControl::OnAccessibilityTouch(const TouchEvent& touchEvent) { onAccTouchedCalled = true; return true; }
+bool Impl::DummyControl::OnAccessibilityTouch(const TouchEvent& touch) { onAccTouchedCalled = true; return true; }
 bool Impl::DummyControl::OnAccessibilityValueChange( bool isIncrease )
 {
   onAccValueChangeCalled = true; return true;
@@ -270,7 +269,6 @@ void Impl::DummyControl::OnChildAdd(Actor& child) { childAddCalled = true; }
 void Impl::DummyControl::OnChildRemove(Actor& child) { childRemoveCalled = true; }
 void Impl::DummyControl::OnSizeSet(const Vector3& targetSize) { Control::OnSizeSet( targetSize ); sizeSetCalled = true; }
 void Impl::DummyControl::OnSizeAnimation(Animation& animation, const Vector3& targetSize) { Control::OnSizeAnimation( animation, targetSize ); sizeAnimationCalled = true; }
-bool Impl::DummyControl::OnTouchEvent(const TouchEvent& event) { touchEventCalled = true; return false; }
 bool Impl::DummyControl::OnHoverEvent(const HoverEvent& event) { hoverEventCalled = true; return false; }
 bool Impl::DummyControl::OnWheelEvent(const WheelEvent& event) { wheelEventCalled = true; return false; }
 bool Impl::DummyControl::OnKeyEvent(const KeyEvent& event) { keyEventCalled = true; return false;}

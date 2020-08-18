@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SLIDER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -331,7 +331,7 @@ private:
    * @param[in] touch The touch info
    * @return If touch is handled or not
    */
-  bool OnTouch( Actor actor, const TouchData& touch );
+  bool OnTouch( Actor actor, const TouchEvent& touch );
 
   /**
    * Pan gesture event

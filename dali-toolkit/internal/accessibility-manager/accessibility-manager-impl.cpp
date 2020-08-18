@@ -963,12 +963,12 @@ bool AccessibilityManager::ClearAccessibilityFocus()
   }
 }
 
-bool AccessibilityManager::AccessibilityActionScroll( Dali::TouchEvent& touchEvent )
+bool AccessibilityManager::AccessibilityActionScroll( Dali::TouchEvent& touch )
 {
   Dali::Toolkit::AccessibilityManager handle( this );
   if( !mActionScrollSignal.Empty() )
   {
-    mActionScrollSignal.Emit( handle, touchEvent );
+    mActionScrollSignal.Emit( handle, touch );
   }
 
   return true;
@@ -1302,7 +1302,7 @@ bool AccessibilityManager::AccessibilityActionStartStop()
   return mIsAccessibilityTtsEnabled;
 }
 
-bool AccessibilityManager::AccessibilityActionTouch(const TouchEvent& touchEvent)
+bool AccessibilityManager::AccessibilityActionTouch(const TouchEvent& touch)
 {
   bool handled = false;
 
@@ -1311,7 +1311,7 @@ bool AccessibilityManager::AccessibilityActionTouch(const TouchEvent& touchEvent
   Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(GetCurrentFocusActor());
   if(control)
   {
-    handled = GetImplementation( control ).OnAccessibilityTouch(touchEvent);
+    handled = GetImplementation( control ).OnAccessibilityTouch(touch);
   }
 
   return handled;

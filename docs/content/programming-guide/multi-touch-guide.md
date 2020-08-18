@@ -113,7 +113,7 @@ Hit Priority of above Actor tree (all overlays): 1 - Lowest. 6 - Highest.
     IF ( TOUCH-SIGNAL-NOT-EMPTY )
     {
       // Only do the emission if touch signal of actor has connections.
-        CONSUMED = TOUCH-SIGNAL( TOUCH-DATA )
+        CONSUMED = TOUCH-SIGNAL( TOUCH-EVENT )
     }
 
     IF ( NOT-CONSUMED )

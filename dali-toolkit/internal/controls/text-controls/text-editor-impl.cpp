@@ -1852,7 +1852,7 @@ void TextEditor::OnSceneConnection( int depth )
   Control::OnSceneConnection( depth );
 }
 
-bool TextEditor::OnTouched( Actor actor, const TouchData& touch )
+bool TextEditor::OnTouched( Actor actor, const TouchEvent& touch )
 {
   return false;
 }

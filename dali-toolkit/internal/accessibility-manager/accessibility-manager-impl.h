@@ -506,10 +506,10 @@ private:
 
   /**
    * Perform the accessibility action associated with a scroll event.
-   * @param touchEvent The touch point (and time) of the event.
+   * @param touch The touch point (and time) of the event.
    * @return whether the focus is cleared or not.
    */
-  virtual bool AccessibilityActionScroll( Dali::TouchEvent& touchEvent );
+  virtual bool AccessibilityActionScroll( Dali::TouchEvent& touch );
 
   /**
    * Perform the accessibility action to move focus to the previous focusable actor (by one finger flick up).
@@ -659,10 +659,10 @@ private:
 
   /**
    * Perform the accessibility action to mouse move (by one finger tap & hold and move).
-   * @param touchEvent touch event structure
+   * @param touch touch point and time of the event
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionTouch(const TouchEvent& touchEvent);
+  virtual bool AccessibilityActionTouch(const TouchEvent& touch);
 
   /**
    * This function is connected to the TtsPlayer StateChangeSignal.

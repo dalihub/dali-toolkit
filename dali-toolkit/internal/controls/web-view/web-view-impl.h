@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_WEB_VIEW_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace Toolkit
 {
 
 class KeyEvent;
-class TouchData;
+class TouchEvent;
 class WebView;
 
 namespace Internal
@@ -206,7 +206,7 @@ private: // From Control
    * @param[in] touch The Touch Data.
    * @return Whether to consume event or not.
    */
-  bool OnTouchEvent( Actor actor, const Dali::TouchData& touch );
+  bool OnTouchEvent( Actor actor, const Dali::TouchEvent& touch );
 
   /**
    * @copydoc Toolkit::Control::OnKeyEvent()

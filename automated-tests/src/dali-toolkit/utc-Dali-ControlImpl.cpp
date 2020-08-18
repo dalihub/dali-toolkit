@@ -465,62 +465,6 @@ int UtcDaliControlImplSizeAnimation(void)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int UtcDaliControlImplTouchEvent(void)
-{
-  ToolkitTestApplication application;
-
-  {
-    DummyControl dummy = DummyControl::New( true );
-    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
-
-    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(dummy);
-
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-
-    DALI_TEST_EQUALS( dummyImpl.touchEventCalled, false, TEST_LOCATION );
-    Integration::TouchEvent touchEvent(1);
-    Integration::Point point;
-    point.SetDeviceId( 1 );
-    point.SetState( PointState::DOWN );
-    point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
-    touchEvent.AddPoint(point);
-    application.ProcessEvent(touchEvent);
-    DALI_TEST_EQUALS( dummyImpl.touchEventCalled, true, TEST_LOCATION );
-
-    application.GetScene().Remove(dummy);
-  }
-
-  // Ensure full code coverage
-  {
-    DummyControl dummy = DummyControl::New();
-
-    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(dummy);
-
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-
-    Integration::TouchEvent touchEvent(1);
-    Integration::Point point;
-    point.SetDeviceId( 1 );
-    point.SetState( PointState::DOWN );
-    point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
-    touchEvent.AddPoint(point);
-    application.ProcessEvent(touchEvent);
-
-    application.GetScene().Remove(dummy);
-  }
-  END_TEST;
-}
-
 int UtcDaliControlImplHoverEvent(void)
 {
   ToolkitTestApplication application;

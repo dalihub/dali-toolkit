@@ -123,6 +123,8 @@ const int KEY_SHIFT_MODIFIER = 257;
 const int KEY_CONTROL_MODIFIER = 258;
 
 const char* HANDLE_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insertpoint-icon.png";
+const char* HANDLE_LEFT_SELECTION_FILE_NAME = TEST_RESOURCE_DIR "/selection_handle_drop_left.png";
+const char* HANDLE_RIGHT_SELECTION_FILE_NAME = TEST_RESOURCE_DIR "/selection_handle_drop_right.png";
 
 const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 
@@ -2362,15 +2364,10 @@ int utcDaliTextEditorHandles(void)
   editor.SetProperty( TextEditor::Property::GRAB_HANDLE_IMAGE, HANDLE_IMAGE_FILE_NAME );
   editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL, true );
 
-  Property::Map imagePropertyMap;
-  imagePropertyMap["type"] = "BufferImage";
-  imagePropertyMap["width"] = 40;
-  imagePropertyMap["height"] = 40;
-
-  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_IMAGE_LEFT, imagePropertyMap );
-  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_IMAGE_RIGHT, imagePropertyMap );
-  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT, imagePropertyMap );
-  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, imagePropertyMap );
+  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_IMAGE_LEFT, Property::Map{ {"filename", HANDLE_LEFT_SELECTION_FILE_NAME } } );
+  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_IMAGE_RIGHT, Property::Map{ {"filename", HANDLE_LEFT_SELECTION_FILE_NAME } } );
+  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT, Property::Map{ {"filename", HANDLE_RIGHT_SELECTION_FILE_NAME } } );
+  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, Property::Map{ {"filename", HANDLE_RIGHT_SELECTION_FILE_NAME } } );
 
   editor.SetProperty( Actor::Property::SIZE, Vector2( 30.f, 500.f ) );
   editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );

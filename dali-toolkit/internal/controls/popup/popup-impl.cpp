@@ -28,7 +28,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
-#include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/actors/actor-devel.h>
@@ -1532,7 +1532,7 @@ bool Popup::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   return connected;
 }
 
-bool Popup::OnBackingTouched( Actor actor, const TouchData& touch )
+bool Popup::OnBackingTouched( Actor actor, const TouchEvent& touch )
 {
   // Allow events to pass through if the backing isn't the hit-actor
   if( (touch.GetHitActor(0) == actor) &&
@@ -1559,7 +1559,7 @@ bool Popup::OnBackingWheelEvent( Actor actor, const WheelEvent& event )
   return true;
 }
 
-bool Popup::OnDialogTouched( Actor actor, const TouchData& touch )
+bool Popup::OnDialogTouched( Actor actor, const TouchEvent& touch )
 {
   // Only connecting this so the backing does not become the default hit-actor and inadvertently closes the popup
   return false;

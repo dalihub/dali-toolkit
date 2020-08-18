@@ -339,11 +339,6 @@ protected: // From CustomActorImpl
   virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize ) override;
 
   /**
-   * @copydoc CustomActorImpl::OnTouchEvent()
-   */
-  virtual bool OnTouchEvent( const TouchEvent& event ) override;
-
-  /**
    * @copydoc CustomActorImpl::OnHoverEvent()
    */
   virtual bool OnHoverEvent( const HoverEvent& event ) override;
@@ -487,10 +482,10 @@ public: // API for derived classes to override
    * touch event.
    *
    * @SINCE_1_0.0
-   * @param[in] touchEvent The touch event
+   * @param[in] touch The touch event
    * @return true if the touch event has been consumed by this control
    */
-  virtual bool OnAccessibilityTouch( const TouchEvent& touchEvent );
+  virtual bool OnAccessibilityTouch( const TouchEvent& touch );
 
   /**
    * @brief This method should be overridden by deriving classes when they wish to respond
