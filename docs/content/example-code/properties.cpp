@@ -113,7 +113,7 @@ public:
     valueText << touchedCount;
     mTagText.SetProperty( TextLabel::Property::TEXT, valueText.str() );
 
-    return true; // Consumed
+    return true; // Consumed meaning any gestures will be cancelled
   }
   // C++ EXAMPLE END
 
