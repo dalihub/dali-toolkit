@@ -271,11 +271,6 @@ Popup::Popup()
   mTailDownImage = imageDirPath + DEFAULT_TAIL_DOWN_IMAGE_FILE_NAME;
   mTailLeftImage = imageDirPath + DEFAULT_TAIL_LEFT_IMAGE_FILE_NAME;
   mTailRightImage = imageDirPath + DEFAULT_TAIL_RIGHT_IMAGE_FILE_NAME;
-
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
-  } );
 }
 
 void Popup::OnInitialize()
@@ -343,6 +338,11 @@ void Popup::OnInitialize()
   SetAsKeyboardFocusGroup( true );
 
   SetupTouch();
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
+  } );
 }
 
 Popup::~Popup()

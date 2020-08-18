@@ -284,11 +284,6 @@ Model3dView::Model3dView()
   mCameraFOV = Math::PI_OVER_180 * 45.f;
 
   mControlSize = Vector2(100.,100.);
-
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::IMAGE ) );
-  } );
 }
 
 Model3dView::~Model3dView()
@@ -467,6 +462,10 @@ void Model3dView::OnInitialize()
   Shader shader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
   mRenderer = Renderer::New( mesh, shader );
 
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::IMAGE ) );
+  } );
 }
 
 void Model3dView::LoadGeometry()

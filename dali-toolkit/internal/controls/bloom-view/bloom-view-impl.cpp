@@ -158,10 +158,6 @@ BloomView::BloomView()
   mImageSaturationPropertyIndex(Property::INVALID_INDEX),
   mActivated( false )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::ANIMATION ) );
-  } );
 }
 
 BloomView::BloomView( const unsigned int blurNumSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
@@ -277,6 +273,11 @@ void BloomView::OnInitialize()
 
   // bind properties for / set shader constants to defaults
   SetupProperties();
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::ANIMATION ) );
+  } );
 }
 
 void BloomView::OnSizeSet(const Vector3& targetSize)

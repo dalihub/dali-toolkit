@@ -138,11 +138,6 @@ SuperBlurView::SuperBlurView( unsigned int blurLevels )
   mGaussianBlurView.assign( blurLevels, Toolkit::GaussianBlurView() );
   mBlurredImage.assign( blurLevels, FrameBuffer() );
   mRenderers.assign( blurLevels+1, Dali::Renderer() );
-
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
-  } );
 }
 
 SuperBlurView::~SuperBlurView()
@@ -169,6 +164,11 @@ void SuperBlurView::OnInitialize()
   Actor self( Self() );
 
   mBlurStrengthPropertyIndex = self.RegisterProperty( "blurStrength", 0.f );
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 void SuperBlurView::SetTexture( Texture texture )

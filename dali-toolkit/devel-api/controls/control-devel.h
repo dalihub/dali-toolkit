@@ -524,7 +524,7 @@ DALI_TOOLKIT_API void NotifyAccessibilityStateChange( Dali::Actor control, Dali:
  *
  * Thank to this method hierarchy of accessibility objects can be based on internal hierarchy of Actors.
  * It prevents from necessity of keeping two trees synchronized.
- * The method should be called inside constructors of all classes inheriting from Control.
+ * The method should be called inside OnInitialize method of all classes inheriting from Control.
  *
  * Possible usage can be as follows:
  * @code

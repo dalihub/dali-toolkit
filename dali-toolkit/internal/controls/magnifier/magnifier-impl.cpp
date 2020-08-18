@@ -148,11 +148,6 @@ Magnifier::Magnifier()
   mActorSize(Vector3::ZERO),
   mMagnificationFactor(1.0f)
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
-  } );
-
 }
 
 void Magnifier::SetSourceActor(Actor actor)
@@ -225,6 +220,11 @@ void Magnifier::Initialize()
   constraint.AddSource( Source( self, Actor::Property::SIZE ) );
   constraint.AddSource( Source( self, Actor::Property::WORLD_SCALE ) );
   constraint.Apply();
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 Magnifier::~Magnifier()

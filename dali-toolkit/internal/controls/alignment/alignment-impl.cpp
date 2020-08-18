@@ -190,6 +190,14 @@ const Toolkit::Alignment::Padding& Alignment::GetPadding() const
   return mPadding;
 }
 
+void Alignment::OnInitialize()
+{
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
+}
+
 void Alignment::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   // lay out the actors
@@ -299,10 +307,6 @@ Alignment::Alignment( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::T
   mScaling( Toolkit::Alignment::SCALE_NONE ),
   mPadding( 0.f, 0.f, 0.f, 0.f )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
-  } );
 }
 
 Alignment::~Alignment()

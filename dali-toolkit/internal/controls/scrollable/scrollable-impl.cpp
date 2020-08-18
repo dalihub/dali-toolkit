@@ -90,14 +90,18 @@ Scrollable::Scrollable( ControlBehaviour behaviourFlags )
   mScrollCompletedSignal(),
   mOvershootEnabled(true)
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::SCROLL_PANE ) );
-  } );
 }
 
 Scrollable::~Scrollable()
 {
+}
+
+void Scrollable::OnInitialize()
+{
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::SCROLL_PANE ) );
+  } );
 }
 
 bool Scrollable::IsOvershootEnabled() const

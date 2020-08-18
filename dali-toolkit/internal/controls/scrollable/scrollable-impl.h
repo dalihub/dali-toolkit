@@ -118,6 +118,13 @@ public:
    */
   virtual void SetOvershootSize( const Vector2& size ) = 0;
 
+protected: // From Control
+
+  /**
+   * @copydoc Control::OnInitialize
+   */
+  virtual void OnInitialize() override;
+
 private:
 
   /**

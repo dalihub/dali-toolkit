@@ -731,6 +731,11 @@ void TextLabel::OnInitialize()
 
   Layout::Engine& engine = mController->GetLayoutEngine();
   engine.SetCursorWidth( 0u ); // Do not layout space for the cursor.
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::LABEL ) );
+  } );
 }
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
@@ -969,10 +974,6 @@ TextLabel::TextLabel()
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mTextUpdateNeeded( false )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::LABEL ) );
-  } );
 }
 
 TextLabel::~TextLabel()

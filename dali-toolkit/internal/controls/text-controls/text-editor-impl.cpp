@@ -1232,6 +1232,11 @@ void TextEditor::OnInitialize()
   mStencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   self.Add( mStencil );
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::ENTRY ) );
+  } );
 }
 
 void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
@@ -1872,10 +1877,6 @@ TextEditor::TextEditor()
   mScrollBarEnabled( false ),
   mScrollStarted( false )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::ENTRY ) );
-  } );
 }
 
 TextEditor::~TextEditor()

@@ -83,6 +83,11 @@ public:
 private: // From Control
 
   /**
+   * @copydoc Control::OnInitialize()
+   */
+  virtual void OnInitialize() override;
+
+  /**
    * @copydoc Control::OnRelayout()
    */
   void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;

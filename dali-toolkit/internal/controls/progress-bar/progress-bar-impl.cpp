@@ -158,10 +158,6 @@ ProgressBar::ProgressBar()
   mSecondaryProgressValue( DEFAULT_VALUE ),
   mIndeterminate( false )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::PROGRESS_BAR ) );
-  } );
 }
 
 ProgressBar::~ProgressBar()
@@ -170,6 +166,10 @@ ProgressBar::~ProgressBar()
 
 void ProgressBar::OnInitialize()
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::PROGRESS_BAR ) );
+  } );
 }
 
 void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container )

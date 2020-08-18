@@ -66,10 +66,6 @@ Dali::Toolkit::RadioButton RadioButton::New()
 RadioButton::RadioButton()
 {
   SetTogglableButton(true);
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::RADIO_BUTTON ) );
-  } );
 }
 
 RadioButton::~RadioButton()
@@ -79,6 +75,11 @@ RadioButton::~RadioButton()
 void RadioButton::OnInitialize()
 {
   Button::OnInitialize();
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::RADIO_BUTTON ) );
+  } );
 }
 
 bool RadioButton::OnToggleReleased()

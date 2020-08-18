@@ -362,6 +362,8 @@ ItemView::ItemView(ItemFactory& factory)
 
 void ItemView::OnInitialize()
 {
+  Scrollable::OnInitialize();
+
   Actor self = Self();
 
   Vector2 stageSize = Stage::GetCurrent().GetSize();

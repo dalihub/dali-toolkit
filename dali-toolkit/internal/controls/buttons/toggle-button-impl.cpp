@@ -96,10 +96,6 @@ ToggleButton::ToggleButton()
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::Constructor\n" );
   SetTogglableButton( false );
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::TOGGLE_BUTTON ) );
-  } );
 }
 
 ToggleButton::~ToggleButton()
@@ -114,6 +110,11 @@ void ToggleButton::OnInitialize()
   // Toggle button requires the Leave event.
   Actor self = Self();
   self.SetProperty( Actor::Property::LEAVE_REQUIRED, true );
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::TOGGLE_BUTTON ) );
+  } );
 }
 
 void ToggleButton::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )

@@ -132,10 +132,6 @@ ShadowView::ShadowView( float downsampleWidthScale, float downsampleHeightScale 
   mDownsampleWidthScale(downsampleWidthScale),
   mDownsampleHeightScale(downsampleHeightScale)
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
-  } );
 }
 
 ShadowView::~ShadowView()
@@ -294,6 +290,11 @@ void ShadowView::OnInitialize()
   Constraint blurStrengthConstraint = Constraint::New<float>( mBlurFilter.GetHandleForAnimateBlurStrength(), mBlurFilter.GetBlurStrengthPropertyIndex(), EqualToConstraint() );
   blurStrengthConstraint.AddSource( Source( self, mBlurStrengthPropertyIndex) );
   blurStrengthConstraint.Apply();
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 void ShadowView::OnChildAdd( Actor& child )

@@ -825,10 +825,6 @@ FlexContainer::FlexContainer()
   mAlignContent( Toolkit::FlexContainer::ALIGN_FLEX_START )
 {
   SetKeyboardNavigationSupport( true );
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
-  } );
 }
 
 void FlexContainer::OnInitialize()
@@ -851,6 +847,11 @@ void FlexContainer::OnInitialize()
   // Make self as keyboard focusable and focus group
   self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
   SetAsKeyboardFocusGroup( true );
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 } // namespace Internal

@@ -167,6 +167,11 @@ Property::Value TextSelectionToolbar::GetProperty( BaseObject* object, Property:
 void TextSelectionToolbar::OnInitialize()
 {
   SetUp();
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::TOOL_BAR ));
+  } );
 }
 
 void TextSelectionToolbar::OnRelayout( const Vector2& size, RelayoutContainer& container )
@@ -385,12 +390,6 @@ TextSelectionToolbar::TextSelectionToolbar()
   mDividerIndexes(),
   mFirstScrollEnd( false )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor )
-    {
-      return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::TOOL_BAR, true ) );
-    }
-  );
 }
 
 TextSelectionToolbar::~TextSelectionToolbar()

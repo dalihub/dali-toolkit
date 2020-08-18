@@ -1241,6 +1241,11 @@ void TextField::OnInitialize()
   {
     EnableClipping();
   }
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::ENTRY ) );
+  } );
 }
 
 void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
@@ -1812,10 +1817,6 @@ TextField::TextField()
   mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ),
   mHasBeenStaged( false )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::ENTRY ) );
-  } );
 }
 
 TextField::~TextField()

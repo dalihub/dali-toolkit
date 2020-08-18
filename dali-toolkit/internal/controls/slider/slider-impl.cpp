@@ -159,10 +159,6 @@ Slider::Slider()
   mShowValue( false ),
   mSnapToMarks( false )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::SLIDER ) );
-  } );
 }
 
 Slider::~Slider()
@@ -209,6 +205,11 @@ void Slider::OnInitialize()
 
   // Connect to the touch signal
   self.TouchedSignal().Connect( this, &Slider::OnTouch );
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::SLIDER ) );
+  } );
 }
 
 void Slider::OnRelayout( const Vector2& size, RelayoutContainer& container )

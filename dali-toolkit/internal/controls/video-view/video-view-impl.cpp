@@ -140,12 +140,6 @@ VideoView::VideoView( Dali::VideoSyncMode syncMode )
   mIsUnderlay( true ),
   mSyncMode( syncMode )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor )
-    {
-      return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::VIDEO, true ) );
-    }
-  );
 }
 
 VideoView::~VideoView()
@@ -165,6 +159,11 @@ Toolkit::VideoView VideoView::New( VideoSyncMode syncMode )
 void VideoView::OnInitialize()
 {
   mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::VIDEO ));
+  } );
 }
 
 void VideoView::SetUrl( const std::string& url )

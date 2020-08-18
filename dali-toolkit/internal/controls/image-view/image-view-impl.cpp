@@ -70,10 +70,6 @@ ImageView::ImageView()
   mImageVisualPaddingSetByTransform( false ),
   mImageViewPixelAreaSetByFittingMode( false )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::IMAGE ) );
-  } );
 }
 
 ImageView::~ImageView()
@@ -100,6 +96,11 @@ void ImageView::OnInitialize()
   // ImageView can relayout in the OnImageReady, alternative to a signal would be to have a upcall from the Control to ImageView
   Dali::Toolkit::Control handle( GetOwner() );
   handle.ResourceReadySignal().Connect( this, &ImageView::OnResourceReady );
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::IMAGE ) );
+  } );
 }
 
 void ImageView::SetImage( const Property::Map& map )

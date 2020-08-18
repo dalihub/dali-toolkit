@@ -387,6 +387,11 @@ void TextSelectionPopup::OnInitialize()
   Actor self = Self();
   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
   self.SetProperty( Actor::Property::COLOR_ALPHA, 0.0f );
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
+  } );
 }
 
 void TextSelectionPopup::HideAnimationFinished( Animation& animation )
@@ -857,10 +862,6 @@ TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* cal
   mPopupShowing( false ),
   mButtonsChanged( false )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
-  } );
 }
 
 TextSelectionPopup::~TextSelectionPopup()

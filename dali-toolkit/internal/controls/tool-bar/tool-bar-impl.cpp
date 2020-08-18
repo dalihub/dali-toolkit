@@ -289,10 +289,6 @@ ToolBar::ToolBar()
   mInitializing( false ),
   mControls()
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::TOOL_BAR, true ) );
-  } );
 }
 
 ToolBar::~ToolBar()
@@ -318,6 +314,11 @@ void ToolBar::OnInitialize()
   mLayout.AddChild( rightSpace, Toolkit::TableView::CellPosition( 0, 1 ) );
   mLayout.SetRelativeWidth( 0, mLeftRelativeSpace );
   mLayout.SetRelativeWidth( 1, mRightRelativeSpace );
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::TOOL_BAR ));
+  } );
 }
 
 void ToolBar::OnChildAdd(Actor& child)

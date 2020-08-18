@@ -1114,10 +1114,6 @@ TableView::TableView( unsigned int initialRows, unsigned int initialColumns )
 {
   SetKeyboardNavigationSupport( true );
   ResizeContainers( initialRows, initialColumns );
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::TABLE ) );
-  } );
 }
 
 void TableView::OnInitialize()
@@ -1126,6 +1122,11 @@ void TableView::OnInitialize()
   Actor self = Self();
   self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
   SetAsKeyboardFocusGroup(true);
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::TABLE ) );
+  } );
 }
 
 void TableView::ResizeContainers( unsigned int rows, unsigned int columns )

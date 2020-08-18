@@ -143,10 +143,6 @@ GaussianBlurView::GaussianBlurView()
   mActivated( false )
 {
   SetBlurBellCurveWidth(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_BELL_CURVE_WIDTH);
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
-  } );
 }
 
 GaussianBlurView::GaussianBlurView( const unsigned int numSamples,
@@ -325,6 +321,11 @@ void GaussianBlurView::OnInitialize()
   mInternalRoot.Add( mHorizBlurActor );
   mInternalRoot.Add( mVertBlurActor );
   mInternalRoot.Add( mRenderDownsampledCamera );
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 

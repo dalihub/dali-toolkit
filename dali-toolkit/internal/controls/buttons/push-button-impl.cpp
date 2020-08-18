@@ -86,10 +86,6 @@ PushButton::PushButton()
 : Button(),
   mIconAlignment( RIGHT )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::PUSH_BUTTON ) );
-  } );
 }
 
 PushButton::~PushButton()
@@ -103,6 +99,11 @@ void PushButton::OnInitialize()
   // Push button requires the Leave event.
   Actor self = Self();
   self.SetProperty( Actor::Property::LEAVE_REQUIRED, true );
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::PUSH_BUTTON ) );
+  } );
 }
 
 void PushButton::SetIconAlignment( const PushButton::IconAlignment iconAlignment )

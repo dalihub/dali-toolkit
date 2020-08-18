@@ -148,10 +148,6 @@ EffectsView::EffectsView()
   mEnabled( false ),
   mRefreshOnDemand( EFFECTS_VIEW_REFRESH_ON_DEMAND )
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
-  } );
 }
 
 EffectsView::~EffectsView()
@@ -272,6 +268,11 @@ void EffectsView::OnInitialize()
   CustomActor self = Self();
   mChildrenRoot.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   self.Add( mChildrenRoot );
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 void EffectsView::OnSizeSet(const Vector3& targetSize)

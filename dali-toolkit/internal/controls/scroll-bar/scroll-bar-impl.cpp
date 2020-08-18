@@ -205,10 +205,6 @@ ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
   mIsPanning(false),
   mIndicatorFirstShow(true)
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::SCROLL_BAR ) );
-  } );
 }
 
 ScrollBar::~ScrollBar()
@@ -219,6 +215,11 @@ void ScrollBar::OnInitialize()
 {
   CreateDefaultIndicatorActor();
   Self().SetProperty( Actor::Property::DRAW_MODE,DrawMode::OVERLAY_2D);
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::SCROLL_BAR ) );
+  } );
 }
 
 void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize )
