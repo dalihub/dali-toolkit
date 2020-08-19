@@ -526,7 +526,7 @@ void WebEngine::SetSize( int width, int height )
 {
 }
 
-bool WebEngine::SendTouchEvent( const TouchEvent& touch )
+bool WebEngine::SendTouchEvent( const TouchData& touch )
 {
   return true;
 }

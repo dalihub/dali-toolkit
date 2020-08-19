@@ -955,7 +955,7 @@ int UtcDaliAlignmentSizeSetP(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static bool TouchCallback(Actor actor, const TouchEvent& event)
+static bool TouchCallback(Actor actor, const TouchData& event)
 {
   return false;
 }

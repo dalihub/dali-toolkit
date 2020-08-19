@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -608,7 +608,7 @@ private:
    * @param[in] touch The touch information.
    * @return True if the event should be consumed.
    */
-  bool OnTouch( Actor actor, const TouchEvent& touch );
+  bool OnTouch( Actor actor, const TouchData& touch );
 
   /**
    * Start a timer which calls OnTouchDownTimeout()

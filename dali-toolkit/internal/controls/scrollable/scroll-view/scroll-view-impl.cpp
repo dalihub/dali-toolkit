@@ -23,7 +23,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/public-api/events/wheel-event.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/property-map.h>
@@ -2059,7 +2059,7 @@ bool ScrollView::OnTouchDownTimeout()
   return false;
 }
 
-bool ScrollView::OnTouch( Actor actor, const TouchEvent& touch )
+bool ScrollView::OnTouch( Actor actor, const TouchData& touch )
 {
   if(!mSensitive)
   {

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,7 +243,7 @@ private: // Implementation
    * @param[in] actor TextEditor touched
    * @param[in] touch Touch information
    */
-  bool OnTouched( Actor actor, const TouchEvent& touch );
+  bool OnTouched( Actor actor, const TouchData& touch );
 
   /**
    * @brief Callbacks called on idle.

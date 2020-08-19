@@ -404,7 +404,7 @@ private:
    * @param[in] touch The Touch Data.
    * @return Whether to consume event or not.
    */
-  bool OnBackingTouched(Actor actor, const TouchEvent& touch);
+  bool OnBackingTouched(Actor actor, const TouchData& touch);
 
   /**
    * Signal occurs when a mouse wheel event occurs on the dimmed backing.
@@ -420,7 +420,7 @@ private:
    * @param[in] touch The Touch Data.
    * @return Whether to consume event or not.
    */
-  bool OnDialogTouched( Actor actor, const TouchEvent& touch );
+  bool OnDialogTouched( Actor actor, const TouchData& touch );
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

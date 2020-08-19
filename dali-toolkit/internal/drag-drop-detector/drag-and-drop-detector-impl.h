@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_DRAG_AND_DROP_DETECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,7 +194,7 @@ public: // Signals
   }
 
 public:
-  bool OnDrag(Dali::Actor actor, const Dali::TouchEvent& data);
+  bool OnDrag(Dali::Actor actor, const Dali::TouchData& data);
   void OnPan(Dali::Actor actor, const PanGesture& gesture);
 
 private:

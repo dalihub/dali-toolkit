@@ -22,7 +22,7 @@
 #include <cstring> // for strcmp
 #include <sstream>
 #include <limits>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 
@@ -215,7 +215,7 @@ void Slider::OnRelayout( const Vector2& size, RelayoutContainer& container )
   Control::OnRelayout( size, container );
 }
 
-bool Slider::OnTouch(Actor actor, const TouchEvent& touch)
+bool Slider::OnTouch(Actor actor, const TouchData& touch)
 {
   if( mState != DISABLED )
   {

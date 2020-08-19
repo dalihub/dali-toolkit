@@ -13,7 +13,7 @@ actor.SetParentOrigin( Dali::ParentOrigin::CENTER );
 actor.SetProperty( Dali::Actor::Property::ANCHOR_POINT, Dali::AnchorPoint::CENTER );
 Dali::Stage::GetCurrent().Add( actor );
 ...
-bool OnPressed( Dali::Actor, const TouchEvent& touch )
+bool OnPressed( Dali::Actor, const TouchData& touch )
 {
   Dali::Animation anim = Dali::Animation::New( 1.5f );
   anim.AnimateTo( Property( actor, Actor::Property::POSITION ), Vector3( 200, -100, 0 ), AlphaFunctions::Bounce );

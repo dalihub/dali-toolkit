@@ -27,7 +27,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/public-api/events/wheel-event.h>
-#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/property-helper-devel.h>
@@ -1114,7 +1114,7 @@ float ItemView::ClampFirstItemPosition( float targetPosition, const Vector3& tar
   return clamppedPosition;
 }
 
-bool ItemView::OnTouch( Actor actor, const TouchEvent& touch )
+bool ItemView::OnTouch( Actor actor, const TouchData& touch )
 {
   // Ignore events with multiple-touch points
   if (touch.GetPointCount() != 1)

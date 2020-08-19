@@ -95,7 +95,7 @@ public:
    * param[in] touch The touch-event
    * return Set to true if the signal was consumed correctly
    */
-  bool OnTouched( Actor actor, const TouchEvent& touch )
+  bool OnTouched( Actor actor, const TouchData& touch )
   {
     int touchedCount = 0;
 

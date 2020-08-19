@@ -770,7 +770,7 @@ int UtcDaliControlImplOnAccessibilityTouchP(void)
   ToolkitTestApplication application;
   Control dummy = Control::New();
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
-  TouchEvent touch;
+  TouchData touch;
   DALI_TEST_EQUALS( false, controlImpl.OnAccessibilityTouch( touch ), TEST_LOCATION );
 
   END_TEST;

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_KEYBOARD_FOCUS_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -287,7 +287,7 @@ private:
    * (i.e. the down & up touch events only).
    * @param[in] touch The touch information
    */
-  void OnTouch( const TouchEvent& touch );
+  void OnTouch( const TouchData& touch );
 
   /**
    * Called when the window focus is changed.

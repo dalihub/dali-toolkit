@@ -482,10 +482,10 @@ public: // API for derived classes to override
    * touch event.
    *
    * @SINCE_1_0.0
-   * @param[in] touch The touch event
+   * @param[in] touchData The touch event
    * @return true if the touch event has been consumed by this control
    */
-  virtual bool OnAccessibilityTouch( const TouchEvent& touch );
+  virtual bool OnAccessibilityTouch( const TouchData& touchData );
 
   /**
    * @brief This method should be overridden by deriving classes when they wish to respond

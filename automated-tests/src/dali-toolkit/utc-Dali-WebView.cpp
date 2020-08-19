@@ -75,7 +75,7 @@ static void OnEvaluateJavaScript( const std::string& result )
   gEvaluateJavaScriptCallbackCalled++;
 }
 
-static bool OnTouched( Actor actor, const Dali::TouchEvent& touch )
+static bool OnTouched( Actor actor, const Dali::TouchData& touch )
 {
   gTouched = true;
   return true;
