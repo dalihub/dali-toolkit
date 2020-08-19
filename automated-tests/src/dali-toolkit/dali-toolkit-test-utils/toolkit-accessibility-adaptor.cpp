@@ -20,7 +20,6 @@
 #include <dali/devel-api/adaptor-framework/accessibility-action-handler.h>
 #include <dali/devel-api/adaptor-framework/accessibility-gesture-handler.h>
 #include <dali/devel-api/adaptor-framework/accessibility-gesture-event.h>
-#include <dali/integration-api/events/touch-data-integ.h>
 
 namespace Dali
 {
@@ -241,8 +240,9 @@ bool AccessibilityAdaptor::HandleActionScrollEvent(const TouchPoint& point, unsi
 {
   if( mActionHandler )
   {
-    Dali::TouchData touchData = Integration::NewTouchData(timeStamp, point);
-    return mActionHandler->AccessibilityActionScroll( touchData );
+    Dali::TouchEvent touchEvent;
+    touchEvent.points.push_back( point );
+    return mActionHandler->AccessibilityActionScroll( touchEvent );
   }
   return false;
 }
@@ -251,8 +251,9 @@ bool AccessibilityAdaptor::HandleActionTouchEvent(const TouchPoint& point, unsig
 {
   if( mActionHandler )
   {
-    Dali::TouchData touchData = Integration::NewTouchData(timeStamp, point);
-    return mActionHandler->AccessibilityActionTouch( touchData );
+    Dali::TouchEvent touchEvent;
+    touchEvent.points.push_back( point );
+    return mActionHandler->AccessibilityActionTouch( touchEvent );
   }
   return false;
 }

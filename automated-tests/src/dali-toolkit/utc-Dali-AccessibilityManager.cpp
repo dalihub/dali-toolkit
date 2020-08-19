@@ -2218,11 +2218,10 @@ public:
   {
   }
 
-  bool Callback( AccessibilityManager& accessibilityManager, const Dali::TouchData& touchEvent )
+  bool Callback( AccessibilityManager& accessibilityManager, const Dali::TouchEvent& touchEvent )
   {
     mCalls++;
-    Dali::TouchData handle(touchEvent); // Ensure it's ref-counted
-    mTouchData = handle;
+    mTouchEvent = touchEvent;
     tet_infoline( "Signal called" );
     return true;
   }
@@ -2232,14 +2231,14 @@ public:
     return mCalls;
   }
 
-  const Dali::TouchData& GetTouchData() const
+  const Dali::TouchEvent& GetTouchEvent() const
   {
-    return mTouchData;
+    return mTouchEvent;
   }
 
 private:
   unsigned int mCalls;         ///< Keeps track of how many times the signal has been called.
-  Dali::TouchData mTouchData ; ///< Stores the last touch event received.
+  Dali::TouchEvent mTouchEvent; ///< Stores the last touch event received.
 };
 
 int UtcDaliAccessibilityManagerActionScrollSignalP(void)
@@ -2261,13 +2260,14 @@ int UtcDaliAccessibilityManagerActionScrollSignalP(void)
 
   DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
 
-  const TouchData& signalTouchData = callback.GetTouchData();
-  DALI_TEST_EQUALS( signalTouchData.GetPointCount(), 1u, TEST_LOCATION );
+  const TouchEvent& signalTouchEvent = callback.GetTouchEvent();
+  DALI_TEST_EQUALS( signalTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
 
+  const TouchPoint& signalTouchPoint = signalTouchEvent.GetPoint( 0u );
 
-  DALI_TEST_EQUALS( signalTouchData.GetState(0), PointState::STARTED, TEST_LOCATION );
-  DALI_TEST_EQUALS( signalTouchData.GetScreenPosition(0).x, 100.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( signalTouchData.GetScreenPosition(0).y, 200.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( signalTouchPoint.state, TouchPoint::Started, TEST_LOCATION );
+  DALI_TEST_EQUALS( signalTouchPoint.screen.x, 100.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( signalTouchPoint.screen.y, 200.0f, TEST_LOCATION );
 
   END_TEST;
 }
