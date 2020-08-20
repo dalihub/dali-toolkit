@@ -658,13 +658,6 @@ private:
   virtual bool AccessibilityActionStartStop();
 
   /**
-   * Perform the accessibility action to mouse move (by one finger tap & hold and move).
-   * @param touch touch point and time of the event
-   * @return whether the accessibility action is performed or not.
-   */
-  virtual bool AccessibilityActionTouch(const TouchEvent& touch);
-
-  /**
    * This function is connected to the TtsPlayer StateChangeSignal.
    * It is called when the TTS players state changes.
    * @param previousState The previous state of the TTS player (for comparison)

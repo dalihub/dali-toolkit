@@ -74,7 +74,6 @@ public:
   bool HandleActionDownEvent();
   bool HandleActionClearFocusEvent();
   bool HandleActionScrollEvent(const TouchPoint& point, unsigned long timeStamp);
-  bool HandleActionTouchEvent(const TouchPoint& point, unsigned long timeStamp);
   bool HandleActionBackEvent();
   bool HandleActionEnableEvent();
   bool HandleActionDisableEvent();
@@ -243,16 +242,6 @@ bool AccessibilityAdaptor::HandleActionScrollEvent(const TouchPoint& point, unsi
   {
     Dali::TouchEvent touch = Integration::NewTouchEvent(timeStamp, point);
     return mActionHandler->AccessibilityActionScroll( touch );
-  }
-  return false;
-}
-
-bool AccessibilityAdaptor::HandleActionTouchEvent(const TouchPoint& point, unsigned long timeStamp)
-{
-  if( mActionHandler )
-  {
-    Dali::TouchEvent touch = Integration::NewTouchEvent(timeStamp, point);
-    return mActionHandler->AccessibilityActionTouch( touch );
   }
   return false;
 }
@@ -502,11 +491,6 @@ bool AccessibilityAdaptor::HandleActionClearFocusEvent()
 bool AccessibilityAdaptor::HandleActionScrollEvent(const TouchPoint& point, unsigned long timeStamp)
 {
   return Internal::Adaptor::GetImplementation(*this).HandleActionScrollEvent(point, timeStamp);
-}
-
-bool AccessibilityAdaptor::HandleActionTouchEvent(const TouchPoint& point, unsigned long timeStamp)
-{
-  return Internal::Adaptor::GetImplementation(*this).HandleActionTouchEvent(point, timeStamp);
 }
 
 bool AccessibilityAdaptor::HandleActionBackEvent()

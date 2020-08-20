@@ -154,7 +154,6 @@ private: // From Internal::Control
 
   virtual void OnInitialize();
   virtual bool OnAccessibilityActivated();
-  virtual bool OnAccessibilityTouch( const TouchEvent& touch );
   virtual bool OnAccessibilityValueChange( bool isIncrease );
 
   virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
@@ -186,7 +185,6 @@ public:
 
   bool initializeCalled;
   bool activatedCalled;
-  bool onAccTouchedCalled;
   bool onAccValueChangeCalled;
   bool themeChangeCalled;
   bool fontChangeCalled;

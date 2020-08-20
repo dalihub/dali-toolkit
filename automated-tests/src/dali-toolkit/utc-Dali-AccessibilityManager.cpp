@@ -2289,32 +2289,6 @@ int UtcDaliAccessibilityManagerActionScrollSignalN(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityManagerActionTouch(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( " UtcDaliAccessibilityManagerActionTouch" );
-
-  AccessibilityManager manager = AccessibilityManager::Get();
-  DALI_TEST_CHECK( manager );
-
-  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
-
-  DummyControl dummyControl = DummyControl::New(true);
-  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
-  dummyControl.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
-  manager.SetFocusOrder( dummyControl, 1 );
-  application.GetScene().Add( dummyControl );
-  manager.SetCurrentFocusActor( dummyControl );
-
-  TouchPoint point( 0, TouchPoint::Started, 100.0f, 200.0f );
-  accessibilityAdaptor.HandleActionTouchEvent( point, 0u );
-
-  DALI_TEST_CHECK( dummyImpl.onAccTouchedCalled );
-
-  END_TEST;
-}
-
-
 int UtcDaliAccessibilityManagerHandlePanGesture(void)
 {
   // Pan gesture sent from adaptor to manager via AccessibilityGestureHandler
