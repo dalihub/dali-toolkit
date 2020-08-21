@@ -23,7 +23,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/public-api/events/wheel-event.h>
-#include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/property-map.h>
@@ -2059,7 +2059,7 @@ bool ScrollView::OnTouchDownTimeout()
   return false;
 }
 
-bool ScrollView::OnTouch( Actor actor, const TouchData& touch )
+bool ScrollView::OnTouch( Actor actor, const TouchEvent& touch )
 {
   if(!mSensitive)
   {
@@ -2144,14 +2144,14 @@ bool ScrollView::OnWheelEvent(const WheelEvent& event)
     if(mRulerX->GetType() == Ruler::Free)
     {
       // Free panning mode
-      targetScrollPosition.x += event.z * mWheelScrollDistanceStep.x;
+      targetScrollPosition.x += event.GetDelta() * mWheelScrollDistanceStep.x;
       ClampPosition(targetScrollPosition);
       ScrollTo(-targetScrollPosition);
     }
     else if(!mScrolling)
     {
       // Snap mode, only respond to the event when the previous snap animation is finished.
-      ScrollTo(GetCurrentPage() - event.z);
+      ScrollTo(GetCurrentPage() - event.GetDelta());
     }
   }
   else
@@ -2160,14 +2160,14 @@ bool ScrollView::OnWheelEvent(const WheelEvent& event)
     if(mRulerY->GetType() == Ruler::Free)
     {
       // Free panning mode
-      targetScrollPosition.y += event.z * mWheelScrollDistanceStep.y;
+      targetScrollPosition.y += event.GetDelta() * mWheelScrollDistanceStep.y;
       ClampPosition(targetScrollPosition);
       ScrollTo(-targetScrollPosition);
     }
     else if(!mScrolling)
     {
       // Snap mode, only respond to the event when the previous snap animation is finished.
-      ScrollTo(GetCurrentPage() - event.z * mRulerX->GetTotalPages());
+      ScrollTo(GetCurrentPage() - event.GetDelta() * mRulerX->GetTotalPages());
     }
   }
 

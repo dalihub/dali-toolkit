@@ -27,7 +27,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/public-api/events/wheel-event.h>
-#include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/property-helper-devel.h>
@@ -1029,7 +1029,7 @@ bool ItemView::OnWheelEvent(const WheelEvent& event)
   {
     Actor self = Self();
     const Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
-    float layoutPositionDelta = GetCurrentLayoutPosition(0) - (event.z * mWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
+    float layoutPositionDelta = GetCurrentLayoutPosition(0) - (event.GetDelta() * mWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
     float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
 
     self.SetProperty(Toolkit::ItemView::Property::LAYOUT_POSITION, firstItemScrollPosition );
@@ -1114,7 +1114,7 @@ float ItemView::ClampFirstItemPosition( float targetPosition, const Vector3& tar
   return clamppedPosition;
 }
 
-bool ItemView::OnTouch( Actor actor, const TouchData& touch )
+bool ItemView::OnTouch( Actor actor, const TouchEvent& touch )
 {
   // Ignore events with multiple-touch points
   if (touch.GetPointCount() != 1)

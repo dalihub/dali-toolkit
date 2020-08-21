@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/internal/visuals/animated-image/image-cache.h>
 #include <dali-toolkit/devel-api/visuals/animated-image-visual-actions-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 
 namespace Dali
 {

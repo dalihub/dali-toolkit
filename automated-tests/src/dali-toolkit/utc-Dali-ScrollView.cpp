@@ -20,6 +20,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -113,6 +114,7 @@ static bool gOnScrollStartCalled;                       ///< Whether the OnScrol
 static bool gOnScrollUpdateCalled;                      ///< Whether the OnScrollUpdate signal was invoked.
 static bool gOnScrollCompleteCalled;                    ///< Whether the OnScrollComplete signal was invoked.
 static bool gOnSnapStartCalled;                         ///< Whether the OnSnapStart signal was invoked.
+static bool gOnWheelEventCalled;                        ///< Whether the WheelEventSignal signal was invoked.
 static SnapType gLastSnapType;                          ///< Snaping information from SnapEvent.
 static Vector3 gConstraintResult;                       ///< Result from constraint.
 
@@ -155,6 +157,19 @@ static void OnSnapStart( const ScrollView::SnapEvent& event )
 {
   gOnSnapStartCalled = true;
   gLastSnapType = event.type;
+}
+
+/**
+ * Invoked after a wheel-event is received
+ *
+ * @param[in] actor The owing actor
+ * @param[in] event The wheel event
+ * @return True if the event should be consumed
+ */
+static bool OnWheelEvent( Actor actor, const Dali::WheelEvent& wheelEvent )
+{
+  gOnWheelEventCalled = true;
+  return false;
 }
 
 /**
@@ -2990,6 +3005,84 @@ int UtcDaliScrollViewSetGetProperty(void)
   scrollView.SetProperty( ScrollView::Property::START_PAGE_POSITION, Vector3(50.0f, 100.0f, 20.0f) );
   Wait(application);
   DALI_TEST_EQUALS( scrollView.GetProperty(ScrollView::Property::START_PAGE_POSITION).Get<Vector3>(), Vector3(50.0f, 100.0f, 20.0f), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewWheelEvent(void)
+{
+  ToolkitTestApplication application;
+
+  // Set up a scrollView.
+  ScrollView scrollView = ScrollView::New();
+
+  // Do not rely on stage size for UTC tests.
+  Vector2 viewPageSize( 720.0f, 1280.0f );
+  scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  scrollView.SetProperty( Actor::Property::SIZE, viewPageSize );
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  scrollView.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, 0.0f ));
+
+  // Position rulers.
+  // We set the X ruler to fixed to give us pages to snap to.
+  Dali::Toolkit::FixedRuler* rulerX = new Dali::Toolkit::FixedRuler( viewPageSize.width );
+  // Note: The 3x page width is arbitary, but we need enough to show that we are
+  // capping page movement by the page limiter, and not the domain.
+  rulerX->SetDomain( Dali::Toolkit::RulerDomain( 0.0f, viewPageSize.width * 3.0f, false ) );
+  Dali::Toolkit::RulerPtr rulerY = new Dali::Toolkit::DefaultRuler();
+  rulerY->Disable();
+  scrollView.SetRulerX( rulerX );
+  scrollView.SetRulerY( rulerY );
+
+  scrollView.SetWrapMode( false );
+
+  application.GetScene().Add( scrollView );
+
+  //Connect to wheel event signal
+  scrollView.WheelEventSignal().Connect( &OnWheelEvent );
+
+  DALI_TEST_CHECK( !gOnWheelEventCalled );
+
+  // Render and notify
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+
+  // Perform a wheel event
+  Dali::Integration::WheelEvent wheelEvent( Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, Vector2( 10.0f, 10.0f ), 1, 1000u );
+  application.ProcessEvent( wheelEvent );
+  DALI_TEST_CHECK( gOnWheelEventCalled );
+
+  // Set X ruler to free
+  Dali::Toolkit::DefaultRuler* defaultRuler = new Dali::Toolkit::DefaultRuler();
+  scrollView.SetRulerX( defaultRuler );
+
+  // Perform a wheel event
+  gOnWheelEventCalled = false;
+  application.ProcessEvent( wheelEvent );
+  DALI_TEST_CHECK( gOnWheelEventCalled );
+
+  // Enable Y ruler
+  rulerY->Enable();
+
+  // Perform a wheel event
+  gOnWheelEventCalled = false;
+  application.ProcessEvent( wheelEvent );
+  DALI_TEST_CHECK( gOnWheelEventCalled );
+
+  // Wait until it finishes scrolling
+  Wait(application, RENDER_DELAY_SCROLL);
+
+  // Set Y ruler to fixed
+  Dali::Toolkit::FixedRuler* fixedRulerY = new Dali::Toolkit::FixedRuler( viewPageSize.height );
+  scrollView.SetRulerY( fixedRulerY );
+
+  // Perform a wheel event
+  gOnWheelEventCalled = false;
+  application.ProcessEvent( wheelEvent );
+  DALI_TEST_CHECK( gOnWheelEventCalled );
 
   END_TEST;
 }

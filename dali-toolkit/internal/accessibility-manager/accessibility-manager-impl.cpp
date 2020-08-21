@@ -963,12 +963,12 @@ bool AccessibilityManager::ClearAccessibilityFocus()
   }
 }
 
-bool AccessibilityManager::AccessibilityActionScroll( Dali::TouchData& touchData )
+bool AccessibilityManager::AccessibilityActionScroll( Dali::TouchEvent& touch )
 {
   Dali::Toolkit::AccessibilityManager handle( this );
   if( !mActionScrollSignal.Empty() )
   {
-    mActionScrollSignal.Emit( handle, touchData );
+    mActionScrollSignal.Emit( handle, touch );
   }
 
   return true;
@@ -1300,21 +1300,6 @@ bool AccessibilityManager::AccessibilityActionStartStop()
   // TODO: Start/stop the current action
 
   return mIsAccessibilityTtsEnabled;
-}
-
-bool AccessibilityManager::AccessibilityActionTouch(const TouchData& touchData)
-{
-  bool handled = false;
-
-  // TODO: Need to convert the touchevent for the focused actor?
-
-  Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(GetCurrentFocusActor());
-  if(control)
-  {
-    handled = GetImplementation( control ).OnAccessibilityTouch(touchData);
-  }
-
-  return handled;
 }
 
 bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& panEvent)

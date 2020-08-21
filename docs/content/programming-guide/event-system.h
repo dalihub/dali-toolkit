@@ -8,14 +8,14 @@ An application can be notified when a user interacts with the touch screen on th
 This signal will be emitted by DALi whenever the touch occurs within the connected actor's bounds.
 
 Each point on the screen that is currently being touched or where touch has stopped is represented by a point.
-Dali::TouchData stores information about the state of each point (down, up, motion etc.) and the co-ordinates of the touch.
+Dali::TouchEvent stores information about the state of each point (down, up, motion etc.) and the co-ordinates of the touch.
 
 When a multi-touch event occurs, each point represents the points that are currently being touched or the points where touch has stopped.
 
 The following example shows how a connection to a touch event signal can be established:
 
 @code
-bool OnTouch( Dali::Actor actor, const Dali::TouchData& touch )
+bool OnTouch( Dali::Actor actor, const Dali::TouchEvent& touch )
 {
   bool handled = false;
 

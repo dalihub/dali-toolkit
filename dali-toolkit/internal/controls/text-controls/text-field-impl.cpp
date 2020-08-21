@@ -1866,7 +1866,7 @@ void TextField::OnSceneConnection( int depth )
   Control::OnSceneConnection( depth );
 }
 
-bool TextField::OnTouched( Actor actor, const TouchData& touch )
+bool TextField::OnTouched( Actor actor, const TouchEvent& touch )
 {
   return false;
 }

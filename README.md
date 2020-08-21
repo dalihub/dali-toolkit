@@ -24,6 +24,7 @@
  - Ubuntu 16.04 or later
  - Environment created using dali_env script in dali-core repository
  - GCC version 9
+ - Cmake version 3.8.2 or later
 
 DALi requires a compiler supporting C++17 features.
 

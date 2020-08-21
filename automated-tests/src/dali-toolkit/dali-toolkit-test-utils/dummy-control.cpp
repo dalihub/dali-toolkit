@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -218,7 +218,6 @@ Impl::DummyControl::DummyControl()
 : DummyControlImpl(),
   initializeCalled(false),
   activatedCalled(false),
-  onAccTouchedCalled(false),
   onAccValueChangeCalled(false),
   themeChangeCalled(false),
   fontChangeCalled(false),
@@ -248,7 +247,6 @@ Impl::DummyControl::~DummyControl()
 
 void Impl::DummyControl::OnInitialize() { initializeCalled = true; }
 bool Impl::DummyControl::OnAccessibilityActivated() { activatedCalled = true; return true; }
-bool Impl::DummyControl::OnAccessibilityTouch(const TouchData& touchData) { onAccTouchedCalled = true; return true; }
 bool Impl::DummyControl::OnAccessibilityValueChange( bool isIncrease )
 {
   onAccValueChangeCalled = true; return true;

@@ -23,7 +23,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/devel-api/common/stage.h>
-#include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/rendering/geometry.h>
@@ -1363,7 +1363,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
-  bool OnGrabHandleTouched( Actor actor, const TouchData& touch )
+  bool OnGrabHandleTouched( Actor actor, const TouchEvent& touch )
   {
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
 
@@ -1389,7 +1389,7 @@ struct Decorator::Impl : public ConnectionTracker
     return false;
   }
 
-  bool OnHandleOneTouched( Actor actor, const TouchData& touch )
+  bool OnHandleOneTouched( Actor actor, const TouchEvent& touch )
   {
     HandleImpl& primarySelectionHandle = mHandle[LEFT_SELECTION_HANDLE];
 
@@ -1419,7 +1419,7 @@ struct Decorator::Impl : public ConnectionTracker
     return false;
   }
 
-  bool OnHandleTwoTouched( Actor actor, const TouchData& touch )
+  bool OnHandleTwoTouched( Actor actor, const TouchEvent& touch )
   {
     HandleImpl& secondarySelectionHandle = mHandle[RIGHT_SELECTION_HANDLE];
 

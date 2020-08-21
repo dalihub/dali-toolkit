@@ -1360,6 +1360,13 @@ struct Engine::Impl
 
         // Updates the vertical pen's position.
         penY += -layout.descender + layout.lineSpacing + mDefaultLineSpacing;
+        // If there is a defaultLineSize, updates the pen's position.
+        if( mDefaultLineSize > 0.f )
+        {
+          float lineSpacing = mDefaultLineSize - ( layout.ascender + -layout.descender );
+          lineSpacing = lineSpacing < 0.f ? 0.f : lineSpacing;
+          penY += lineSpacing;
+        }
 
         // Increase the glyph index.
         index = nextIndex;

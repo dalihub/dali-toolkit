@@ -32,8 +32,8 @@ class Actor;
 class Layer;
 class RenderSurfaceInterface;
 struct KeyEvent;
-class TouchData;
-struct WheelEvent;
+class TouchEvent;
+class WheelEvent;
 
 typedef Dali::Rect<int> PositionSize;
 
@@ -52,7 +52,7 @@ class Window : public BaseHandle
 {
 public:
   using KeyEventSignalType = Signal< void (const KeyEvent&) >;
-  using TouchSignalType = Signal< void (const TouchData&) >;
+  using TouchSignalType = Signal< void (const TouchEvent&) >;
 
   static Window New(PositionSize windowPosition, const std::string& name, bool isTransparent = false);
   static Window New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent = false);

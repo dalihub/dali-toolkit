@@ -31,6 +31,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 namespace Dali
 {
@@ -518,7 +519,7 @@ Property::Value WebView::GetProperty( BaseObject* object, Property::Index proper
   return value;
 }
 
-bool WebView::OnTouchEvent( Actor actor, const Dali::TouchData& touch )
+bool WebView::OnTouchEvent( Actor actor, const Dali::TouchEvent& touch )
 {
   bool result = false;
 

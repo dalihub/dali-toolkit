@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <dali/devel-api/adaptor-framework/accessibility-action-handler.h>
 #include <dali/devel-api/adaptor-framework/accessibility-gesture-handler.h>
 #include <dali/devel-api/adaptor-framework/accessibility-gesture-event.h>
-#include <dali/integration-api/events/touch-data-integ.h>
+#include <dali/integration-api/events/touch-integ.h>
 
 namespace Dali
 {
@@ -74,7 +74,6 @@ public:
   bool HandleActionDownEvent();
   bool HandleActionClearFocusEvent();
   bool HandleActionScrollEvent(const TouchPoint& point, unsigned long timeStamp);
-  bool HandleActionTouchEvent(const TouchPoint& point, unsigned long timeStamp);
   bool HandleActionBackEvent();
   bool HandleActionEnableEvent();
   bool HandleActionDisableEvent();
@@ -241,18 +240,8 @@ bool AccessibilityAdaptor::HandleActionScrollEvent(const TouchPoint& point, unsi
 {
   if( mActionHandler )
   {
-    Dali::TouchData touchData = Integration::NewTouchData(timeStamp, point);
-    return mActionHandler->AccessibilityActionScroll( touchData );
-  }
-  return false;
-}
-
-bool AccessibilityAdaptor::HandleActionTouchEvent(const TouchPoint& point, unsigned long timeStamp)
-{
-  if( mActionHandler )
-  {
-    Dali::TouchData touchData = Integration::NewTouchData(timeStamp, point);
-    return mActionHandler->AccessibilityActionTouch( touchData );
+    Dali::TouchEvent touch = Integration::NewTouchEvent(timeStamp, point);
+    return mActionHandler->AccessibilityActionScroll( touch );
   }
   return false;
 }
@@ -502,11 +491,6 @@ bool AccessibilityAdaptor::HandleActionClearFocusEvent()
 bool AccessibilityAdaptor::HandleActionScrollEvent(const TouchPoint& point, unsigned long timeStamp)
 {
   return Internal::Adaptor::GetImplementation(*this).HandleActionScrollEvent(point, timeStamp);
-}
-
-bool AccessibilityAdaptor::HandleActionTouchEvent(const TouchPoint& point, unsigned long timeStamp)
-{
-  return Internal::Adaptor::GetImplementation(*this).HandleActionTouchEvent(point, timeStamp);
 }
 
 bool AccessibilityAdaptor::HandleActionBackEvent()
