@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -33,7 +34,6 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
-#include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 
 namespace Dali
 {
@@ -93,8 +93,8 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
   mVisualScale( Vector2::ONE ),
   mPlacementActor(),
   mPlayState( DevelImageVisual::PlayState::STOPPED ),
-  mEventCallback( nullptr ),
-  mRendererAdded( false )
+  mRendererAdded( false ),
+  mRasterizationTriggered( false )
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -105,9 +105,9 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
 
 AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
 {
-  if( mEventCallback )
+  if( mRasterizationTriggered && Adaptor::IsAvailable() )
   {
-    mFactoryCache.GetVectorAnimationManager().UnregisterEventCallback( mEventCallback );
+    Adaptor::Get().UnregisterProcessor( *this );
   }
 
   // Finalize animation task and disconnect the signal in the main thread
@@ -418,6 +418,15 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
   TriggerVectorRasterization();
 }
 
+void AnimatedVectorImageVisual::Process()
+{
+  SendAnimationData();
+
+  mRasterizationTriggered = false;
+
+  Adaptor::Get().UnregisterProcessor( *this );
+}
+
 void AnimatedVectorImageVisual::OnUploadCompleted()
 {
   // If weak handle is holding a placement actor, it is the time to add the renderer to actor.
@@ -500,11 +509,12 @@ void AnimatedVectorImageVisual::StopAnimation()
 
 void AnimatedVectorImageVisual::TriggerVectorRasterization()
 {
-  if( !mEventCallback )
+  if( !mRasterizationTriggered )
   {
-    mEventCallback = MakeCallback( this, &AnimatedVectorImageVisual::OnProcessEvents );
-    mFactoryCache.GetVectorAnimationManager().RegisterEventCallback( mEventCallback );
     Stage::GetCurrent().KeepRendering( 0.0f );  // Trigger event processing
+
+    Adaptor::Get().RegisterProcessor( *this );
+    mRasterizationTriggered = true;
   }
 }
 
@@ -564,13 +574,6 @@ void AnimatedVectorImageVisual::OnWindowVisibilityChanged( Window window, bool v
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnWindowVisibilityChanged: invisibile. Pause animation [%p]\n", this );
   }
-}
-
-void AnimatedVectorImageVisual::OnProcessEvents()
-{
-  SendAnimationData();
-
-  mEventCallback = nullptr;  // The callback will be deleted in the VectorAnimationManager
 }
 
 } // namespace Internal

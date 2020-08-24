@@ -31,7 +31,6 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
-#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 namespace Dali
 {

@@ -19,7 +19,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/animated-image/rolling-image-cache.cpp
    ${toolkit_src_dir}/visuals/animated-image/rolling-animated-image-cache.cpp
    ${toolkit_src_dir}/visuals/animated-vector-image/animated-vector-image-visual.cpp
-   ${toolkit_src_dir}/visuals/animated-vector-image/vector-animation-manager.cpp
    ${toolkit_src_dir}/visuals/animated-vector-image/vector-animation-task.cpp
    ${toolkit_src_dir}/visuals/animated-vector-image/vector-animation-thread.cpp
    ${toolkit_src_dir}/visuals/animated-vector-image/vector-rasterize-thread.cpp

@@ -24,6 +24,7 @@
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/adaptor-framework/window.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/integration-api/processor-interface.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -55,7 +56,7 @@ using AnimatedVectorImageVisualPtr = IntrusivePtr< AnimatedVectorImageVisual >;
  * | url                      | STRING           |
  *
  */
-class AnimatedVectorImageVisual: public Visual::Base, public ConnectionTracker
+class AnimatedVectorImageVisual: public Visual::Base, public ConnectionTracker, public Integration::Processor
 {
 public:
 
@@ -138,6 +139,13 @@ protected:
    */
   void OnDoAction( const Property::Index actionId, const Property::Value& attributes ) override;
 
+protected: // Implementation of Processor
+
+  /**
+   * @copydoc Dali::Integration::Processor::Process()
+   */
+  void Process() override;
+
 private:
 
   /**
@@ -197,11 +205,6 @@ private:
    */
   void OnWindowVisibilityChanged( Window window, bool visible );
 
-  /**
-   * @brief Callback when the event is processed.
-   */
-  void OnProcessEvents();
-
   // Undefined
   AnimatedVectorImageVisual( const AnimatedVectorImageVisual& visual ) = delete;
 
@@ -219,8 +222,8 @@ private:
   Vector2                                      mVisualScale;
   WeakHandle< Actor >                          mPlacementActor;
   DevelImageVisual::PlayState::Type            mPlayState;
-  CallbackBase*                                mEventCallback;    // Not owned
   bool                                         mRendererAdded;
+  bool                                         mRasterizationTriggered;
 };
 
 } // namespace Internal
