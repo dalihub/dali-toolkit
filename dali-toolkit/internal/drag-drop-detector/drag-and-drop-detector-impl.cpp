@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/drag-drop-detector/drag-and-drop-detector-impl.h>
 
 #include <dali/public-api/events/point-state.h>
-#include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
 
 namespace Dali
 {
@@ -160,7 +160,7 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
   }
 }
 
-bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchData& data)
+bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchEvent& data)
 {
   Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
   PointState::Type type = data.GetState(0);

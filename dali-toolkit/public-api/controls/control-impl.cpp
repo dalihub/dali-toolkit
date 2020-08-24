@@ -386,7 +386,7 @@ bool Control::OnAccessibilityPan(PanGesture gesture)
   return false; // Accessibility pan gesture is not handled by default
 }
 
-bool Control::OnAccessibilityTouch(const TouchData& touchData)
+bool Control::OnAccessibilityTouch(const TouchEvent& touch)
 {
   return false; // Accessibility touch event is not handled by default
 }

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_DUMMY_CONTROL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,7 +154,7 @@ private: // From Internal::Control
 
   virtual void OnInitialize();
   virtual bool OnAccessibilityActivated();
-  virtual bool OnAccessibilityTouch( const TouchData& touchData );
+  virtual bool OnAccessibilityTouch( const TouchEvent& touch );
   virtual bool OnAccessibilityValueChange( bool isIncrease );
 
   virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );

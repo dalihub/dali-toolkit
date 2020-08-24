@@ -519,7 +519,7 @@ Property::Value WebView::GetProperty( BaseObject* object, Property::Index proper
   return value;
 }
 
-bool WebView::OnTouchEvent( Actor actor, const Dali::TouchData& touch )
+bool WebView::OnTouchEvent( Actor actor, const Dali::TouchEvent& touch )
 {
   bool result = false;
 

@@ -22,7 +22,7 @@
 #include <cstring> // for strcmp
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/events/touch-data.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
@@ -628,7 +628,7 @@ bool Button::OnAccessibilityActivated()
   return OnKeyboardEnter();
 }
 
-bool Button::OnTouch( Actor actor, const TouchData& touch )
+bool Button::OnTouch( Actor actor, const TouchEvent& touch )
 {
 
   // Only events are processed when the button is not disabled
