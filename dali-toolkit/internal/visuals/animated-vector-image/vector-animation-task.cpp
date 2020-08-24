@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-thread.h>
+#include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 
 namespace Dali
 {
@@ -52,7 +53,7 @@ VectorAnimationTask::VectorAnimationTask( VisualFactoryCache& factoryCache, cons
 : mUrl( url ),
   mVectorRenderer(),
   mAnimationData(),
-  mVectorAnimationThread( factoryCache.GetVectorAnimationThread() ),
+  mVectorAnimationThread( factoryCache.GetVectorAnimationManager().GetVectorAnimationThread() ),
   mConditionalWait(),
   mAnimationFinishedTrigger(),
   mPlayState( PlayState::STOPPED ),

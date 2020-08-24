@@ -26,10 +26,11 @@
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
-#include <dali/devel-api/adaptor-framework/file-loader.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -209,6 +210,7 @@ void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
     map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
     map.Insert( Toolkit::ImageVisual::Property::ATLASING, mAttemptAtlasing );
   }
+  map.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired() );
 }
 
 void SvgVisual::DoCreateInstancePropertyMap( Property::Map& map ) const

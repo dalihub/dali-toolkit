@@ -765,16 +765,6 @@ int UtcDaliControlImplOnAccessibilityPanP(void)
   END_TEST;
 }
 
-int UtcDaliControlImplOnAccessibilityTouchP(void)
-{
-  ToolkitTestApplication application;
-  Control dummy = Control::New();
-  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
-  TouchEvent touch;
-  DALI_TEST_EQUALS( false, controlImpl.OnAccessibilityTouch( touch ), TEST_LOCATION );
-
-  END_TEST;
-}
 
 int UtcDaliControlImplOnAccessibilityActivatedP(void)
 {

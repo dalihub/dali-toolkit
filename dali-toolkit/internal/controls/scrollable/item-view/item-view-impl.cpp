@@ -1029,7 +1029,7 @@ bool ItemView::OnWheelEvent(const WheelEvent& event)
   {
     Actor self = Self();
     const Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
-    float layoutPositionDelta = GetCurrentLayoutPosition(0) - (event.z * mWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
+    float layoutPositionDelta = GetCurrentLayoutPosition(0) - (event.GetDelta() * mWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
     float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
 
     self.SetProperty(Toolkit::ItemView::Property::LAYOUT_POSITION, firstItemScrollPosition );
