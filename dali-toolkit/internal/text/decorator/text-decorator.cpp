@@ -1229,7 +1229,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         if( ! mQuadVertices )
         {
-          mQuadVertices = PropertyBuffer::New( mQuadVertexFormat );
+          mQuadVertices = VertexBuffer::New( mQuadVertexFormat );
         }
 
         mQuadVertices.SetData( &vertices[ 0 ], vertices.Size() );
@@ -1903,7 +1903,7 @@ struct Decorator::Impl : public ConnectionTracker
   CursorImpl          mCursor[CURSOR_COUNT];
   HandleImpl          mHandle[HANDLE_TYPE_COUNT];
 
-  PropertyBuffer      mQuadVertices;
+  VertexBuffer        mQuadVertices;
   Geometry            mQuadGeometry;
   QuadContainer       mHighlightQuadList;         ///< Sub-selections that combine to create the complete selection highlight.
 

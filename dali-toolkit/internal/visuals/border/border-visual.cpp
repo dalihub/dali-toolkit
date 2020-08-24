@@ -323,7 +323,7 @@ Geometry BorderVisual::CreateBorderGeometry()
   Property::Map borderVertexFormat;
   borderVertexFormat[POSITION_ATTRIBUTE_NAME] = Property::VECTOR2;
   borderVertexFormat[DRIFT_ATTRIBUTE_NAME] = Property::VECTOR2;
-  PropertyBuffer borderVertices = PropertyBuffer::New( borderVertexFormat );
+  VertexBuffer borderVertices = VertexBuffer::New( borderVertexFormat );
   borderVertices.SetData( borderVertexData, 16 );
 
   // Create indices
