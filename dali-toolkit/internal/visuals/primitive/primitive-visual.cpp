@@ -22,7 +22,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 
@@ -458,7 +457,7 @@ void PrimitiveVisual::InitializeRenderer()
   // Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 
-  mImpl->mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::PrimitiveVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor) );
+  mImpl->mMixColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::PrimitiveVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor) );
 }
 
 void PrimitiveVisual::UpdateShaderUniforms()

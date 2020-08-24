@@ -20,7 +20,6 @@
 
 // EXTERNAL HEADER
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
-#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
@@ -441,8 +440,7 @@ void Visual::Base::RegisterMixColor()
   // (Color and Primitive visuals will register their own and save to this index)
   if( mImpl->mMixColorIndex == Property::INVALID_INDEX )
   {
-    mImpl->mMixColorIndex = DevelHandle::RegisterProperty(
-      mImpl->mRenderer,
+    mImpl->mMixColorIndex = mImpl->mRenderer.RegisterProperty(
       Toolkit::Visual::Property::MIX_COLOR,
       MIX_COLOR,
       Vector3(mImpl->mMixColor) );
@@ -556,13 +554,13 @@ Renderer Visual::Base::GetRenderer()
 
 Property::Index Visual::Base::GetPropertyIndex( Property::Key key )
 {
-  Property::Index index = DevelHandle::GetPropertyIndex( mImpl->mRenderer, key );
+  Property::Index index = mImpl->mRenderer.GetPropertyIndex( key );
 
   if( index == Property::INVALID_INDEX )
   {
     // Is it a shader property?
     Shader shader = mImpl->mRenderer.GetShader();
-    index = DevelHandle::GetPropertyIndex( shader, key );
+    index = shader.GetPropertyIndex( key );
     if( index != Property::INVALID_INDEX )
     {
       // Yes - we should register it in the Renderer so it can be set / animated
@@ -580,7 +578,7 @@ Property::Index Visual::Base::GetPropertyIndex( Property::Key key )
         // Leave keyIndex as INVALID_KEY - it can still be registered against the string key.
       }
       Property::Value value = shader.GetProperty( index );
-      index = DevelHandle::RegisterProperty( mImpl->mRenderer, keyIndex, keyName, value );
+      index = mImpl->mRenderer.RegisterProperty( keyIndex, keyName, value );
     }
   }
   return index;

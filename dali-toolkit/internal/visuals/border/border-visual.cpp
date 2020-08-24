@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/devel-api/object/handle-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
@@ -201,12 +200,12 @@ void BorderVisual::DoSetOnScene( Actor& actor )
 {
   InitializeRenderer();
 
-  mBorderColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor );
+  mBorderColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor );
   if( mBorderColor.a < 1.f || mAntiAliasing)
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
-  mBorderSizeIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::BorderVisual::Property::SIZE, SIZE_NAME, mBorderSize );
+  mBorderSizeIndex = mImpl->mRenderer.RegisterProperty( Toolkit::BorderVisual::Property::SIZE, SIZE_NAME, mBorderSize );
 
   actor.AddRenderer( mImpl->mRenderer );
 

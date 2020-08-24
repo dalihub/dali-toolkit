@@ -759,7 +759,7 @@ void Control::Impl::AddTransitions( Dali::Animation& animation,
       Actor child = mControlImpl.Self().FindChildByName( animator->objectName );
       if( child )
       {
-        Property::Index propertyIndex = DevelHandle::GetPropertyIndex( child, animator->propertyKey );
+        Property::Index propertyIndex = child.GetPropertyIndex( animator->propertyKey );
         if( propertyIndex != Property::INVALID_INDEX )
         {
           if( animator->animate == false )

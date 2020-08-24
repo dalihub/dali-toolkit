@@ -1775,8 +1775,8 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index borderColorIndex = DevelHandle::GetPropertyIndex( renderer, BorderVisual::Property::COLOR );
-  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, Visual::Property::MIX_COLOR );
+  Property::Index borderColorIndex = renderer.GetPropertyIndex( BorderVisual::Property::COLOR );
+  Property::Index mixColorIndex = renderer.GetPropertyIndex( Visual::Property::MIX_COLOR );
 
   Animation animation = dummyImpl.CreateTransition( transition );
 
@@ -1843,7 +1843,7 @@ int UtcDaliVisualAnimateBorderVisual02(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = DevelHandle::GetPropertyIndex( renderer, BorderVisual::Property::SIZE );
+  Property::Index index = renderer.GetPropertyIndex( BorderVisual::Property::SIZE );
 
   Animation animation = Animation::New(4.0f);
   animation.AnimateTo( Property(renderer, index), 9.0f );
@@ -1887,7 +1887,7 @@ int UtcDaliVisualAnimateColorVisual(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index mixColorIndex = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
 
   Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
@@ -1943,7 +1943,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
     Renderer renderer = actor.GetRendererAt(0);
-    Property::Index index = DevelHandle::GetPropertyIndex( renderer, PrimitiveVisual::Property::MIX_COLOR );
+    Property::Index index = renderer.GetPropertyIndex( PrimitiveVisual::Property::MIX_COLOR );
 
     tet_infoline("Test that the renderer has the Primitive mix color");
     DALI_TEST_CHECK( index != Property::INVALID_INDEX );
