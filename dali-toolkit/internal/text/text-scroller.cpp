@@ -338,7 +338,7 @@ void TextScroller::StartScrolling( Actor scrollingTextActor, float scrollAmount,
   Shader shader = mRenderer.GetShader();
   mScrollAnimation = Animation::New( scrollDuration );
   mScrollAnimation.AnimateTo( Property( shader, mScrollDeltaIndex ), scrollAmount, TimePeriod( mLoopDelay, scrollDuration ) );
-  mScrollAnimation.SetEndAction( Animation::Discard );
+  mScrollAnimation.SetEndAction( Animation::DISCARD );
   mScrollAnimation.SetLoopCount( loopCount );
   mScrollAnimation.FinishedSignal().Connect( this, &TextScroller::AutoScrollAnimationFinished );
   mScrollAnimation.Play();

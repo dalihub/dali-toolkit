@@ -1776,10 +1776,10 @@ bool Loader::LoadAnimation( Scene3dView& scene3dView )
       }
 
       Animation animation = Animation::New( duration );
-      Animation::Interpolation interpolation = Animation::Interpolation::Linear;
+      Animation::Interpolation interpolation = Animation::Interpolation::LINEAR;
       if( animationInfo.samplerArray[currentChannel.sampler].interpolation == "CUBICSPLINE" )
       {
-        interpolation = Animation::Interpolation::Cubic;
+        interpolation = Animation::Interpolation::CUBIC;
       }
       if( animationInfo.samplerArray[currentChannel.sampler].interpolation == "STEP" )
       {
