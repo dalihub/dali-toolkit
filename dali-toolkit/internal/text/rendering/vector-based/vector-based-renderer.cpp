@@ -275,7 +275,7 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view,
 
     if( 0 != vertices.Count() )
     {
-      PropertyBuffer quadVertices = PropertyBuffer::New( mImpl->mQuadVertexFormat );
+      VertexBuffer quadVertices = VertexBuffer::New( mImpl->mQuadVertexFormat );
 
       quadVertices.SetData( &vertices[ 0 ], vertices.Size() );
 
@@ -307,4 +307,3 @@ VectorBasedRenderer::~VectorBasedRenderer()
 {
   delete mImpl;
 }
-

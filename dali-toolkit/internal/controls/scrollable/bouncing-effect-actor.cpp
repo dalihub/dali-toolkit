@@ -22,7 +22,6 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/rendering/geometry.h>
-#include <dali/public-api/rendering/property-buffer.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -114,7 +113,7 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   Property::Map vertexFormat;
   vertexFormat["aPosition1"] = Property::VECTOR3;
   vertexFormat["aPosition2"] = Property::VECTOR3;
-  PropertyBuffer vertices = PropertyBuffer::New( vertexFormat );
+  VertexBuffer vertices = VertexBuffer::New( vertexFormat );
   vertices.SetData( vertexData, 20u );
 
   unsigned short indexData[30] = { 0,3,1,0,2,3,4,7,5,4,6,7,8,11,9,8,10,11,12,15,13,12,14,15,16,19,17,16,18,19};

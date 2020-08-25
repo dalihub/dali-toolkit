@@ -640,7 +640,7 @@ Geometry ObjLoader::CreateGeometry( int objectProperties, bool useSoftNormals )
   Property::Map vertexFormat;
   vertexFormat["aPosition"] = Property::VECTOR3;
   vertexFormat["aNormal"] = Property::VECTOR3;
-  PropertyBuffer surfaceVertices = PropertyBuffer::New( vertexFormat );
+  VertexBuffer surfaceVertices = VertexBuffer::New( vertexFormat );
   surfaceVertices.SetData( &vertices[0], vertices.Size() );
   surface.AddVertexBuffer( surfaceVertices );
 
@@ -649,7 +649,7 @@ Geometry ObjLoader::CreateGeometry( int objectProperties, bool useSoftNormals )
   {
     Property::Map textureFormat;
     textureFormat["aTexCoord"] = Property::VECTOR2;
-    PropertyBuffer extraVertices = PropertyBuffer::New( textureFormat );
+    VertexBuffer extraVertices = VertexBuffer::New( textureFormat );
     extraVertices.SetData( &textures[0], textures.Size() );
 
     surface.AddVertexBuffer( extraVertices );
@@ -661,7 +661,7 @@ Geometry ObjLoader::CreateGeometry( int objectProperties, bool useSoftNormals )
     Property::Map vertexExtFormat;
     vertexExtFormat["aTangent"] = Property::VECTOR3;
     vertexExtFormat["aBiNormal"] = Property::VECTOR3;
-    PropertyBuffer extraVertices = PropertyBuffer::New( vertexExtFormat );
+    VertexBuffer extraVertices = VertexBuffer::New( vertexExtFormat );
     extraVertices.SetData( &verticesExt[0], verticesExt.Size() );
 
     surface.AddVertexBuffer( extraVertices );
