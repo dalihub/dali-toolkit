@@ -69,9 +69,7 @@ struct SignalData
   {
     functorCalled = false;
 
-    receivedKeyEvent.keyModifier = 0;
-    receivedKeyEvent.keyPressedName.clear();
-    receivedKeyEvent.keyPressed.clear();
+    receivedKeyEvent.Reset();
 
   }
 
