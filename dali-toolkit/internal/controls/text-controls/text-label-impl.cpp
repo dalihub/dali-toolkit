@@ -927,7 +927,7 @@ float TextLabel::GetHeightForWidth( float width )
   return mController->GetHeightForWidth( width ) + padding.top + padding.bottom;
 }
 
-void TextLabel::OnPropertySet( Property::Index index, Property::Value propertyValue )
+void TextLabel::OnPropertySet( Property::Index index, const Property::Value& propertyValue )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextLabel::OnPropertySet index[%d]\n", index );
 

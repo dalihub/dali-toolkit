@@ -596,7 +596,7 @@ void Control::OnChildRemove(Actor& child)
 {
 }
 
-void Control::OnPropertySet( Property::Index index, Property::Value propertyValue )
+void Control::OnPropertySet( Property::Index index, const Property::Value& propertyValue )
 {
   // If the clipping mode has been set, we may need to create a renderer.
   // Only do this if we are already on-stage as the OnSceneConnection will handle the off-stage clipping controls.
