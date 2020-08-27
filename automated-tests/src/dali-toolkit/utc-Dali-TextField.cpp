@@ -1036,7 +1036,7 @@ int utcDaliTextFieldTextChangedP(void)
   field.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
-  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   END_TEST;
@@ -1089,8 +1089,8 @@ int utcDaliTextFieldMaxCharactersReachedP(void)
 
   gMaxCharactersCallBackCalled = false;
 
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   DALI_TEST_CHECK( gMaxCharactersCallBackCalled );
   DALI_TEST_CHECK( maxLengthReachedSignal );
@@ -1121,13 +1121,13 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
 
   gMaxCharactersCallBackCalled = false;
 
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
   DALI_TEST_CHECK( !maxLengthReachedSignal );
 
-  application.ProcessEvent( GenerateKey( "Return", "", "\r", KEY_RETURN_CODE, 0, 0, Integration::KeyEvent::Down, "\r", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "Return", "", "\r", KEY_RETURN_CODE, 0, 0, Integration::KeyEvent::DOWN, "\r", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
   DALI_TEST_CHECK( !maxLengthReachedSignal );
@@ -1430,7 +1430,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
   gInputStyleMask = TextField::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1455,7 +1455,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
   gInputStyleMask = TextField::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1471,7 +1471,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
   gInputStyleMask = TextField::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1581,7 +1581,7 @@ int utcDaliTextFieldEvent01(void)
   application.Render();
 
   // Add a key event but as the text field has not the focus it should do nothing.
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1597,14 +1597,14 @@ int utcDaliTextFieldEvent01(void)
   application.Render();
 
   // Pressing delete key should be fine even if there is no text in TextField.
-  application.ProcessEvent( GenerateKey( "Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::Down, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Now the text field has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1634,8 +1634,8 @@ int utcDaliTextFieldEvent01(void)
   application.Render();
 
   // The second text field has the focus. It should handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1692,8 +1692,8 @@ int utcDaliTextFieldEvent02(void)
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   // Now the text field has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1716,7 +1716,7 @@ int utcDaliTextFieldEvent02(void)
 
   // Move the cursor and check the position changes.
   Vector3 position1 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1725,7 +1725,7 @@ int utcDaliTextFieldEvent02(void)
   Vector3 position2 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
   DALI_TEST_CHECK( position2.x < position1.x );
 
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1736,8 +1736,8 @@ int utcDaliTextFieldEvent02(void)
 
 
   // Move the cursor to the first position.
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1771,8 +1771,8 @@ int utcDaliTextFieldEvent02(void)
   DALI_TEST_CHECK( position6.x > position5.x );
 
   // Remove all the text.
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   field.SetProperty( TextField::Property::TEXT, "" );
 
   // Render and notify
@@ -2156,14 +2156,14 @@ int utcDaliTextFieldEvent09(void)
   Property::Map map;
   map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::HIDE_NONE;
   field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
-  application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
   map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::HIDE_ALL;
   map[ HiddenInput::Property::SUBSTITUTE_CHARACTER ] = 0x23;
   field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
-  application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
@@ -2172,7 +2172,7 @@ int utcDaliTextFieldEvent09(void)
   field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
   for( unsigned int index = 0u; index < 5u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
     application.SendNotification();
     application.Render();
   }
@@ -2182,7 +2182,7 @@ int utcDaliTextFieldEvent09(void)
   field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
   for( unsigned int index = 0u; index < 5u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
     application.SendNotification();
     application.Render();
   }
@@ -2190,16 +2190,16 @@ int utcDaliTextFieldEvent09(void)
   map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::SHOW_LAST_CHARACTER;
   map[ HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION ] = 0;
   field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
-  application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
   map[ HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION ] = 100;
   field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
-  application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "d", 0, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
@@ -2308,7 +2308,7 @@ int utcDaliTextFieldStyleWhilstSelected(void)
   DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
   // Press Escape to increase coverage
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
@@ -2342,8 +2342,8 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
   application.Render();
 
   // Add a key event but as the text field has not the focus it should do nothing.
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Up, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2359,10 +2359,10 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
   application.Render();
 
   // Now the text field has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Up, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Up, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::UP, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2371,8 +2371,8 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string("ad"), TEST_LOCATION );
 
   // Generate a Esc key event. The text field should lose the focus.
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2381,8 +2381,8 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
   DALI_TEST_EQUALS( false, field.HasKeyInputFocus(), TEST_LOCATION );
 
   // No more text should be introduced
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Up, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2444,24 +2444,24 @@ int utcDaliTextFieldSomeSpecialKeys(void)
   application.Render();
 
   // Generate a Esc key event. The text field should lose the focus.
-  application.ProcessEvent( GenerateKey( "XF86PowerOff", "", "XF86PowerOff", DALI_KEY_POWER, 0, 0, Integration::KeyEvent::Down, "XF86PowerOff", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "XF86PowerOff", "", "XF86PowerOff", DALI_KEY_POWER, 0, 0, Integration::KeyEvent::Up, "XF86PowerOff", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "XF86PowerOff", "", "XF86PowerOff", DALI_KEY_POWER, 0, 0, Integration::KeyEvent::DOWN, "XF86PowerOff", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "XF86PowerOff", "", "XF86PowerOff", DALI_KEY_POWER, 0, 0, Integration::KeyEvent::UP, "XF86PowerOff", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Generate a Esc key event. The text field should lose the focus.
-  application.ProcessEvent( GenerateKey( "XF86Menu", "", "XF86Menu", DALI_KEY_MENU, 0, 0, Integration::KeyEvent::Down, "XF86Menu", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "XF86Menu", "", "XF86Menu", DALI_KEY_MENU, 0, 0, Integration::KeyEvent::Up, "XF86Menu", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "XF86Menu", "", "XF86Menu", DALI_KEY_MENU, 0, 0, Integration::KeyEvent::DOWN, "XF86Menu", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "XF86Menu", "", "XF86Menu", DALI_KEY_MENU, 0, 0, Integration::KeyEvent::UP, "XF86Menu", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Generate a Esc key event. The text field should lose the focus.
-  application.ProcessEvent( GenerateKey( "XF86Home", "", "XF86Home", DALI_KEY_HOME, 0, 0, Integration::KeyEvent::Down, "XF86Home", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "XF86Home", "", "XF86Home", DALI_KEY_HOME, 0, 0, Integration::KeyEvent::Up, "XF86Home", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "XF86Home", "", "XF86Home", DALI_KEY_HOME, 0, 0, Integration::KeyEvent::DOWN, "XF86Home", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "XF86Home", "", "XF86Home", DALI_KEY_HOME, 0, 0, Integration::KeyEvent::UP, "XF86Home", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2507,8 +2507,8 @@ int utcDaliTextFieldSizeUpdate(void)
   DALI_TEST_EQUALS( previousHeight, field.GetProperty<float>( Actor::Property::SIZE_HEIGHT ) , TEST_LOCATION );
 
   // Add  another script characters ( glyph height is defferent )
-  application.ProcessEvent( GenerateKey( "ㅁ", "", "ㅁ", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "ㅁ", "", "ㅁ", KEY_A_CODE, 0, 0, Integration::KeyEvent::Up, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "ㅁ", "", "ㅁ", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "ㅁ", "", "ㅁ", KEY_A_CODE, 0, 0, Integration::KeyEvent::UP, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   application.SendNotification();
   application.Render();
@@ -2837,8 +2837,8 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
   application.Render();
 
   // Generate a Esc key event. The text field should lose the focus.
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();

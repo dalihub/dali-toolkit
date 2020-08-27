@@ -1795,7 +1795,7 @@ bool Popup::OnKeyEvent( const KeyEvent& event )
 
   bool consumed = false;
 
-  if( event.GetState() == KeyEvent::Down )
+  if( event.GetState() == KeyEvent::DOWN )
   {
     if (event.GetKeyCode() == Dali::DALI_KEY_ESCAPE || event.GetKeyCode() == Dali::DALI_KEY_BACK)
     {
