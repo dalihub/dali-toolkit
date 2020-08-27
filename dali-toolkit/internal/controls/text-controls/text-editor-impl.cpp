@@ -22,6 +22,7 @@
 #include <cstring>
 #include <limits>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
@@ -1400,7 +1401,15 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
   Vector2 contentSize( size.x - ( padding.start + padding.end ), size.y - ( padding.top + padding.bottom ) );
 
   // Support Right-To-Left of padding
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  Dali::LayoutDirection::Type layoutDirection;
+  if( mController->IsMatchSystemLanguageDirection() )
+  {
+    layoutDirection = static_cast<Dali::LayoutDirection::Type>( DevelWindow::Get( self ).GetRootLayer().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  }
+  else
+  {
+    layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  }
   if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
   {
     std::swap( padding.start, padding.end );
