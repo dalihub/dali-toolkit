@@ -81,7 +81,7 @@ namespace
     bool returnValue;
     };
 
-  Integration::TouchEvent GenerateSingleTouch(TouchPoint::State state, const Vector2& screenPosition)
+  Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition)
   {
     Integration::TouchEvent touchEvent;
     Integration::Point point;
@@ -327,7 +327,7 @@ int UtcDaliDragAndDropDetectorEnteredSignal(void)
   TestGenerateMiniPan(application);
 
   Vector2 screenCoordinates(10.0f, 110.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, screenCoordinates));
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(control2, data.control, TEST_LOCATION);
@@ -370,11 +370,11 @@ int UtcDaliDragAndDropDetectorMovedSignal(void)
   TestGenerateMiniPan(application);
 
   Vector2 screenCoordinates(10.0f, 110.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, screenCoordinates));
 
   screenCoordinates.x = 10.0f;
   screenCoordinates.y = 120.0f;
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, screenCoordinates));
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(10.0f, 120.0f), data.detector.GetCurrentScreenPosition(), TEST_LOCATION);
@@ -420,11 +420,11 @@ int UtcDaliDragAndDropDetectorExitedSignal(void)
   TestGenerateMiniPan(application);
 
   Vector2 screenCoordinates(10.0f, 110.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, screenCoordinates));
 
   screenCoordinates.x = 20.0f;
   screenCoordinates.y = 20.0f;
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, screenCoordinates));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(control2, data.control, TEST_LOCATION);
 
@@ -465,11 +465,11 @@ int UtcDaliDragAndDropDetectorDroppedSignal(void)
   TestGenerateMiniPan(application);
 
   Vector2 screenCoordinates(10.0f, 110.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, screenCoordinates));
 
   screenCoordinates.x = 10.0f;
   screenCoordinates.y = 112.0f;
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Up, screenCoordinates));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, screenCoordinates));
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(control2, data.control, TEST_LOCATION);
@@ -512,7 +512,7 @@ int UtcDaliDragAndDropDetectorEndedSignal(void)
 
   TestGenerateMiniPan(application);
 
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Down, Vector2(10.0f, 10.0f)));
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(control1, data.control, TEST_LOCATION);
@@ -555,11 +555,11 @@ int UtcDaliDragAndDropDetectorGetContent(void)
   TestGenerateMiniPan(application);
 
   Vector2 screenCoordinates(10.0f, 110.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, screenCoordinates));
 
   screenCoordinates.x = 10.0f;
   screenCoordinates.y = 112.0f;
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Up, screenCoordinates));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, screenCoordinates));
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(control2, data.control, TEST_LOCATION);
