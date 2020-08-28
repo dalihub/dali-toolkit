@@ -121,110 +121,110 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOffStage(void)
 {
   ToolkitTestApplication application;
 
-  // Default, HorizontalCenter, VerticalCenter - Ensure they do not change!
+  // Default, HORIZONTAL_CENTER, VERTICAL_CENTER - Ensure they do not change!
   {
     Alignment alignment = Alignment::New();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalCenter | Alignment::VerticalCenter));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER));
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
   }
 
-  // HorizontalLeft, VerticalCenter
+  // HORIZONTAL_LEFT, VERTICAL_CENTER
   {
     Alignment alignment = Alignment::New();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::HorizontalLeft);
+    Alignment::Type type(Alignment::HORIZONTAL_LEFT);
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
   }
 
-  // HorizontalRight, VerticalCenter
+  // HORIZONTAL_RIGHT, VERTICAL_CENTER
   {
     Alignment alignment = Alignment::New();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::HorizontalRight);
+    Alignment::Type type(Alignment::HORIZONTAL_RIGHT);
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
   }
 
-  // HorizontalLeft, VerticalTop
+  // HORIZONTAL_LEFT, VERTICAL_TOP
   {
     Alignment alignment = Alignment::New();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalLeft | Alignment::VerticalTop));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_LEFT | Alignment::VERTICAL_TOP));
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
   }
 
-  // HorizontalCenter, VerticalTop
+  // HORIZONTAL_CENTER, VERTICAL_TOP
   {
     Alignment alignment = Alignment::New();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::VerticalTop);
+    Alignment::Type type(Alignment::VERTICAL_TOP);
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
   }
 
-  // HorizontalRight, VerticalTop
+  // HORIZONTAL_RIGHT, VERTICAL_TOP
   {
     Alignment alignment = Alignment::New();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalRight | Alignment::VerticalTop));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_RIGHT | Alignment::VERTICAL_TOP));
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
   }
 
-  // HorizontalLeft, VerticalBottom
+  // HORIZONTAL_LEFT, VERTICAL_BOTTOM
   {
     Alignment alignment = Alignment::New();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalLeft | Alignment::VerticalBottom));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_LEFT | Alignment::VERTICAL_BOTTOM));
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
   }
 
-  // HorizontalCenter, VerticalBottom
+  // HORIZONTAL_CENTER, VERTICAL_BOTTOM
   {
     Alignment alignment = Alignment::New();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::VerticalBottom);
+    Alignment::Type type(Alignment::VERTICAL_BOTTOM);
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
   }
 
-  // HorizontalRight, VerticalBottom
+  // HORIZONTAL_RIGHT, VERTICAL_BOTTOM
   {
     Alignment alignment = Alignment::New();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalRight | Alignment::VerticalBottom));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_RIGHT | Alignment::VERTICAL_BOTTOM));
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
   }
@@ -235,7 +235,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
 {
   ToolkitTestApplication application;
 
-  // Default, HorizontalCenter, VerticalCenter - Ensure they do not change!
+  // Default, HORIZONTAL_CENTER, VERTICAL_CENTER - Ensure they do not change!
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -244,9 +244,9 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalCenter | Alignment::VerticalCenter));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER));
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
@@ -255,7 +255,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
   }
 
-  // HorizontalLeft, VerticalCenter
+  // HORIZONTAL_LEFT, VERTICAL_CENTER
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -264,9 +264,9 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::HorizontalLeft);
+    Alignment::Type type(Alignment::HORIZONTAL_LEFT);
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
@@ -275,7 +275,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
   }
 
-  // HorizontalRight, VerticalCenter
+  // HORIZONTAL_RIGHT, VERTICAL_CENTER
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -284,9 +284,9 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::HorizontalRight);
+    Alignment::Type type(Alignment::HORIZONTAL_RIGHT);
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
@@ -295,7 +295,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
   }
 
-  // HorizontalLeft, VerticalTop
+  // HORIZONTAL_LEFT, VERTICAL_TOP
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -304,9 +304,9 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalLeft | Alignment::VerticalTop));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_LEFT | Alignment::VERTICAL_TOP));
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
@@ -315,7 +315,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
   }
 
-  // HorizontalCenter, VerticalTop
+  // HORIZONTAL_CENTER, VERTICAL_TOP
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -324,9 +324,9 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::VerticalTop);
+    Alignment::Type type(Alignment::VERTICAL_TOP);
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
@@ -335,7 +335,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
   }
 
-  // HorizontalRight, VerticalTop
+  // HORIZONTAL_RIGHT, VERTICAL_TOP
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -344,9 +344,9 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalRight | Alignment::VerticalTop));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_RIGHT | Alignment::VERTICAL_TOP));
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
@@ -355,7 +355,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
   }
 
-  // HorizontalLeft, VerticalBottom
+  // HORIZONTAL_LEFT, VERTICAL_BOTTOM
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -364,9 +364,9 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalLeft | Alignment::VerticalBottom));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_LEFT | Alignment::VERTICAL_BOTTOM));
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
@@ -375,7 +375,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
   }
 
-  // HorizontalCenter, VerticalBottom
+  // HORIZONTAL_CENTER, VERTICAL_BOTTOM
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -384,9 +384,9 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::VerticalBottom);
+    Alignment::Type type(Alignment::VERTICAL_BOTTOM);
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
@@ -395,7 +395,7 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
   }
 
-  // HorizontalRight, VerticalBottom
+  // HORIZONTAL_RIGHT, VERTICAL_BOTTOM
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -404,9 +404,9 @@ int UtcDaliAlignmentSetAlignmentTypePositiveOnStage(void)
     application.SendNotification();
 
     // Check default values
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
 
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalRight | Alignment::VerticalBottom));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_RIGHT | Alignment::VERTICAL_BOTTOM));
     alignment.SetAlignmentType(type);
     DALI_TEST_CHECK(alignment.GetAlignmentType() & type);
 
@@ -421,45 +421,45 @@ int UtcDaliAlignmentSetAlignmentTypeNegative(void)
 {
   ToolkitTestApplication application;
 
-  // Setting HorizontalLeft, HorizontalCenter
+  // Setting HORIZONTAL_LEFT, HORIZONTAL_CENTER
   {
     Alignment alignment = Alignment::New();
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalLeft | Alignment::HorizontalCenter));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_LEFT | Alignment::HORIZONTAL_CENTER));
     alignment.SetAlignmentType(type);
     // center will prevail in conflict
-    DALI_TEST_CHECK( Alignment::HorizontalCenter & alignment.GetAlignmentType() );
-    DALI_TEST_CHECK( !(Alignment::HorizontalLeft & alignment.GetAlignmentType()) );
+    DALI_TEST_CHECK( Alignment::HORIZONTAL_CENTER & alignment.GetAlignmentType() );
+    DALI_TEST_CHECK( !(Alignment::HORIZONTAL_LEFT & alignment.GetAlignmentType()) );
   }
 
-  // Setting HorizontalCenter, HorizontalRight
+  // Setting HORIZONTAL_CENTER, HORIZONTAL_RIGHT
   {
     Alignment alignment = Alignment::New();
-    Alignment::Type type(Alignment::Type(Alignment::HorizontalCenter | Alignment::HorizontalRight));
+    Alignment::Type type(Alignment::Type(Alignment::HORIZONTAL_CENTER | Alignment::HORIZONTAL_RIGHT));
 
     alignment.SetAlignmentType(type);
     // center will prevail in conflict
-    DALI_TEST_CHECK( Alignment::HorizontalCenter & alignment.GetAlignmentType() );
-    DALI_TEST_CHECK( !(Alignment::HorizontalRight & alignment.GetAlignmentType()) );
+    DALI_TEST_CHECK( Alignment::HORIZONTAL_CENTER & alignment.GetAlignmentType() );
+    DALI_TEST_CHECK( !(Alignment::HORIZONTAL_RIGHT & alignment.GetAlignmentType()) );
   }
 
-  // Setting VerticalTop, VerticalCenter
+  // Setting VERTICAL_TOP, VERTICAL_CENTER
   {
     Alignment alignment = Alignment::New();
-    Alignment::Type type(Alignment::Type(Alignment::VerticalTop | Alignment::VerticalCenter));
+    Alignment::Type type(Alignment::Type(Alignment::VERTICAL_TOP | Alignment::VERTICAL_CENTER));
     alignment.SetAlignmentType(type);
     // center will prevail in conflict
-    DALI_TEST_CHECK( Alignment::VerticalCenter & alignment.GetAlignmentType() );
-    DALI_TEST_CHECK( !(Alignment::VerticalTop & alignment.GetAlignmentType()) );
+    DALI_TEST_CHECK( Alignment::VERTICAL_CENTER & alignment.GetAlignmentType() );
+    DALI_TEST_CHECK( !(Alignment::VERTICAL_TOP & alignment.GetAlignmentType()) );
   }
 
-  // Setting VerticalCenter, VerticalBottom
+  // Setting VERTICAL_CENTER, VERTICAL_BOTTOM
   {
     Alignment alignment = Alignment::New();
-    Alignment::Type type(Alignment::Type(Alignment::VerticalTop | Alignment::VerticalBottom));
+    Alignment::Type type(Alignment::Type(Alignment::VERTICAL_TOP | Alignment::VERTICAL_BOTTOM));
     alignment.SetAlignmentType(type);
     // top will prevail in conflict
-    DALI_TEST_CHECK( Alignment::VerticalTop & alignment.GetAlignmentType() );
-    DALI_TEST_CHECK( !(Alignment::VerticalBottom & alignment.GetAlignmentType()) );
+    DALI_TEST_CHECK( Alignment::VERTICAL_TOP & alignment.GetAlignmentType() );
+    DALI_TEST_CHECK( !(Alignment::VERTICAL_BOTTOM & alignment.GetAlignmentType()) );
   }
   END_TEST;
 }
@@ -468,10 +468,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
 {
   ToolkitTestApplication application;
 
-  // Default, HorizonalCenter, VerticalCenter
+  // Default, HorizonalCenter, VERTICAL_CENTER
   {
     Alignment alignment = Alignment::New();
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
     application.GetScene().Add(alignment);
     application.Render();
@@ -481,10 +481,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     application.SendNotification();
   }
 
-  // HorizontalLeft, VerticalCenter
+  // HORIZONTAL_LEFT, VERTICAL_CENTER
   {
-    Alignment alignment = Alignment::New(Alignment::HorizontalLeft);
-    DALI_TEST_EQUALS(Alignment::HorizontalLeft | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    Alignment alignment = Alignment::New(Alignment::HORIZONTAL_LEFT);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_LEFT | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
     application.GetScene().Add(alignment);
     application.Render();
@@ -494,10 +494,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     application.SendNotification();
   }
 
-  // HorizontalRight, VerticalCenter
+  // HORIZONTAL_RIGHT, VERTICAL_CENTER
   {
-    Alignment alignment = Alignment::New(Alignment::HorizontalRight);
-    DALI_TEST_EQUALS(Alignment::HorizontalRight | Alignment::VerticalCenter, alignment.GetAlignmentType(), TEST_LOCATION);
+    Alignment alignment = Alignment::New(Alignment::HORIZONTAL_RIGHT);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_RIGHT | Alignment::VERTICAL_CENTER, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
     application.GetScene().Add(alignment);
     application.Render();
@@ -507,10 +507,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     application.SendNotification();
   }
 
-  // HorizontalLeft, VerticalTop
+  // HORIZONTAL_LEFT, VERTICAL_TOP
   {
-    Alignment alignment = Alignment::New(Alignment::HorizontalLeft, Alignment::VerticalTop);
-    DALI_TEST_EQUALS(Alignment::HorizontalLeft | Alignment::VerticalTop, alignment.GetAlignmentType(), TEST_LOCATION);
+    Alignment alignment = Alignment::New(Alignment::HORIZONTAL_LEFT, Alignment::VERTICAL_TOP);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_LEFT | Alignment::VERTICAL_TOP, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
     application.GetScene().Add(alignment);
     application.Render();
@@ -520,10 +520,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     application.SendNotification();
   }
 
-  // HorizontalCenter, VerticalTop
+  // HORIZONTAL_CENTER, VERTICAL_TOP
   {
-    Alignment alignment = Alignment::New(Alignment::HorizontalCenter, Alignment::VerticalTop);
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalTop, alignment.GetAlignmentType(), TEST_LOCATION);
+    Alignment alignment = Alignment::New(Alignment::HORIZONTAL_CENTER, Alignment::VERTICAL_TOP);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_TOP, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
     application.GetScene().Add(alignment);
     application.Render();
@@ -533,10 +533,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     application.SendNotification();
   }
 
-  // HorizontalRight, VerticalTop
+  // HORIZONTAL_RIGHT, VERTICAL_TOP
   {
-    Alignment alignment = Alignment::New(Alignment::HorizontalRight, Alignment::VerticalTop);
-    DALI_TEST_EQUALS(Alignment::HorizontalRight | Alignment::VerticalTop, alignment.GetAlignmentType(), TEST_LOCATION);
+    Alignment alignment = Alignment::New(Alignment::HORIZONTAL_RIGHT, Alignment::VERTICAL_TOP);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_RIGHT | Alignment::VERTICAL_TOP, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
     application.GetScene().Add(alignment);
     application.Render();
@@ -546,10 +546,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     application.SendNotification();
   }
 
-  // HorizontalLeft, VerticalBottom
+  // HORIZONTAL_LEFT, VERTICAL_BOTTOM
   {
-    Alignment alignment = Alignment::New(Alignment::HorizontalLeft, Alignment::VerticalBottom);
-    DALI_TEST_EQUALS(Alignment::HorizontalLeft | Alignment::VerticalBottom, alignment.GetAlignmentType(), TEST_LOCATION);
+    Alignment alignment = Alignment::New(Alignment::HORIZONTAL_LEFT, Alignment::VERTICAL_BOTTOM);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_LEFT | Alignment::VERTICAL_BOTTOM, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
     application.GetScene().Add(alignment);
     application.Render();
@@ -559,10 +559,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     application.SendNotification();
   }
 
-  // HorizontalCenter, VerticalBottom
+  // HORIZONTAL_CENTER, VERTICAL_BOTTOM
   {
-    Alignment alignment = Alignment::New(Alignment::HorizontalCenter, Alignment::VerticalBottom);
-    DALI_TEST_EQUALS(Alignment::HorizontalCenter | Alignment::VerticalBottom, alignment.GetAlignmentType(), TEST_LOCATION);
+    Alignment alignment = Alignment::New(Alignment::HORIZONTAL_CENTER, Alignment::VERTICAL_BOTTOM);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_CENTER | Alignment::VERTICAL_BOTTOM, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
     application.GetScene().Add(alignment);
     application.Render();
@@ -572,10 +572,10 @@ int UtcDaliAlignmentGetAlignmentType(void)
     application.SendNotification();
   }
 
-  // HorizontalRight, VerticalBottom
+  // HORIZONTAL_RIGHT, VERTICAL_BOTTOM
   {
-    Alignment alignment = Alignment::New(Alignment::HorizontalRight, Alignment::VerticalBottom);
-    DALI_TEST_EQUALS(Alignment::HorizontalRight | Alignment::VerticalBottom, alignment.GetAlignmentType(), TEST_LOCATION);
+    Alignment alignment = Alignment::New(Alignment::HORIZONTAL_RIGHT, Alignment::VERTICAL_BOTTOM);
+    DALI_TEST_EQUALS(Alignment::HORIZONTAL_RIGHT | Alignment::VERTICAL_BOTTOM, alignment.GetAlignmentType(), TEST_LOCATION);
     alignment.Add(Actor::New());
     application.GetScene().Add(alignment);
     application.Render();
@@ -591,7 +591,7 @@ int UtcDaliAlignmentSetScaling(void)
 {
   ToolkitTestApplication application;
 
-  // ScaleToFill
+  // SCALE_TO_FILL
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -599,23 +599,23 @@ int UtcDaliAlignmentSetScaling(void)
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS(Alignment::ScaleNone, alignment.GetScaling(), TEST_LOCATION);
-    alignment.SetScaling(Alignment::ScaleToFill);
-    DALI_TEST_EQUALS(Alignment::ScaleToFill, alignment.GetScaling(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::SCALE_NONE, alignment.GetScaling(), TEST_LOCATION);
+    alignment.SetScaling(Alignment::SCALE_TO_FILL);
+    DALI_TEST_EQUALS(Alignment::SCALE_TO_FILL, alignment.GetScaling(), TEST_LOCATION);
     application.Render();
     application.SendNotification();
 
     // For complete line coverage
-    alignment.SetAlignmentType(Alignment::HorizontalLeft);
+    alignment.SetAlignmentType(Alignment::HORIZONTAL_LEFT);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::HorizontalRight);
+    alignment.SetAlignmentType(Alignment::HORIZONTAL_RIGHT);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::VerticalTop);
+    alignment.SetAlignmentType(Alignment::VERTICAL_TOP);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::VerticalBottom);
+    alignment.SetAlignmentType(Alignment::VERTICAL_BOTTOM);
     application.Render();
     application.SendNotification();
 
@@ -624,7 +624,7 @@ int UtcDaliAlignmentSetScaling(void)
     application.SendNotification();
   }
 
-  // ScaleToFitKeepAspect
+  // SCALE_TO_FIT_KEEP_ASPECT
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -632,23 +632,23 @@ int UtcDaliAlignmentSetScaling(void)
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS(Alignment::ScaleNone, alignment.GetScaling(), TEST_LOCATION);
-    alignment.SetScaling(Alignment::ScaleToFitKeepAspect);
-    DALI_TEST_EQUALS(Alignment::ScaleToFitKeepAspect, alignment.GetScaling(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::SCALE_NONE, alignment.GetScaling(), TEST_LOCATION);
+    alignment.SetScaling(Alignment::SCALE_TO_FIT_KEEP_ASPECT);
+    DALI_TEST_EQUALS(Alignment::SCALE_TO_FIT_KEEP_ASPECT, alignment.GetScaling(), TEST_LOCATION);
     application.Render();
     application.SendNotification();
 
     // For complete line coverage
-    alignment.SetAlignmentType(Alignment::HorizontalLeft);
+    alignment.SetAlignmentType(Alignment::HORIZONTAL_LEFT);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::HorizontalRight);
+    alignment.SetAlignmentType(Alignment::HORIZONTAL_RIGHT);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::VerticalTop);
+    alignment.SetAlignmentType(Alignment::VERTICAL_TOP);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::VerticalBottom);
+    alignment.SetAlignmentType(Alignment::VERTICAL_BOTTOM);
     application.Render();
     application.SendNotification();
 
@@ -657,7 +657,7 @@ int UtcDaliAlignmentSetScaling(void)
     application.SendNotification();
   }
 
-  // ScaleToFillKeepAspect
+  // SCALE_TO_FILL_KEEP_ASPECT
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -665,23 +665,23 @@ int UtcDaliAlignmentSetScaling(void)
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS(Alignment::ScaleNone, alignment.GetScaling(), TEST_LOCATION);
-    alignment.SetScaling(Alignment::ScaleToFillKeepAspect);
-    DALI_TEST_EQUALS(Alignment::ScaleToFillKeepAspect, alignment.GetScaling(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::SCALE_NONE, alignment.GetScaling(), TEST_LOCATION);
+    alignment.SetScaling(Alignment::SCALE_TO_FILL_KEEP_ASPECT);
+    DALI_TEST_EQUALS(Alignment::SCALE_TO_FILL_KEEP_ASPECT, alignment.GetScaling(), TEST_LOCATION);
     application.Render();
     application.SendNotification();
 
     // For complete line coverage
-    alignment.SetAlignmentType(Alignment::HorizontalLeft);
+    alignment.SetAlignmentType(Alignment::HORIZONTAL_LEFT);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::HorizontalRight);
+    alignment.SetAlignmentType(Alignment::HORIZONTAL_RIGHT);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::VerticalTop);
+    alignment.SetAlignmentType(Alignment::VERTICAL_TOP);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::VerticalBottom);
+    alignment.SetAlignmentType(Alignment::VERTICAL_BOTTOM);
     application.Render();
     application.SendNotification();
 
@@ -690,7 +690,7 @@ int UtcDaliAlignmentSetScaling(void)
     application.SendNotification();
   }
 
-  // ShrinkToFit
+  // SHRINK_TO_FIT
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -698,23 +698,23 @@ int UtcDaliAlignmentSetScaling(void)
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS(Alignment::ScaleNone, alignment.GetScaling(), TEST_LOCATION);
-    alignment.SetScaling(Alignment::ShrinkToFit);
-    DALI_TEST_EQUALS(Alignment::ShrinkToFit, alignment.GetScaling(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::SCALE_NONE, alignment.GetScaling(), TEST_LOCATION);
+    alignment.SetScaling(Alignment::SHRINK_TO_FIT);
+    DALI_TEST_EQUALS(Alignment::SHRINK_TO_FIT, alignment.GetScaling(), TEST_LOCATION);
     application.Render();
     application.SendNotification();
 
     // For complete line coverage
-    alignment.SetAlignmentType(Alignment::HorizontalLeft);
+    alignment.SetAlignmentType(Alignment::HORIZONTAL_LEFT);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::HorizontalRight);
+    alignment.SetAlignmentType(Alignment::HORIZONTAL_RIGHT);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::VerticalTop);
+    alignment.SetAlignmentType(Alignment::VERTICAL_TOP);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::VerticalBottom);
+    alignment.SetAlignmentType(Alignment::VERTICAL_BOTTOM);
     application.Render();
     application.SendNotification();
 
@@ -723,7 +723,7 @@ int UtcDaliAlignmentSetScaling(void)
     application.SendNotification();
   }
 
-  // ShrinkToFitKeepAspect
+  // SHRINK_TO_FIT_KEEP_ASPECT
   {
     Alignment alignment = Alignment::New();
     alignment.Add(Actor::New());
@@ -731,23 +731,23 @@ int UtcDaliAlignmentSetScaling(void)
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS(Alignment::ScaleNone, alignment.GetScaling(), TEST_LOCATION);
-    alignment.SetScaling(Alignment::ShrinkToFitKeepAspect);
-    DALI_TEST_EQUALS(Alignment::ShrinkToFitKeepAspect, alignment.GetScaling(), TEST_LOCATION);
+    DALI_TEST_EQUALS(Alignment::SCALE_NONE, alignment.GetScaling(), TEST_LOCATION);
+    alignment.SetScaling(Alignment::SHRINK_TO_FIT_KEEP_ASPECT);
+    DALI_TEST_EQUALS(Alignment::SHRINK_TO_FIT_KEEP_ASPECT, alignment.GetScaling(), TEST_LOCATION);
     application.Render();
     application.SendNotification();
 
     // For complete line coverage
-    alignment.SetAlignmentType(Alignment::HorizontalLeft);
+    alignment.SetAlignmentType(Alignment::HORIZONTAL_LEFT);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::HorizontalRight);
+    alignment.SetAlignmentType(Alignment::HORIZONTAL_RIGHT);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::VerticalTop);
+    alignment.SetAlignmentType(Alignment::VERTICAL_TOP);
     application.Render();
     application.SendNotification();
-    alignment.SetAlignmentType(Alignment::VerticalBottom);
+    alignment.SetAlignmentType(Alignment::VERTICAL_BOTTOM);
     application.Render();
     application.SendNotification();
 
@@ -762,49 +762,49 @@ int UtcDaliAlignmentGetScaling(void)
 {
   ToolkitTestApplication application;
 
-  // ScaleToFill
+  // SCALE_TO_FILL
   {
     Alignment alignment = Alignment::New();
-    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::ScaleNone);
+    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::SCALE_NONE);
 
-    alignment.SetScaling(Alignment::ScaleToFill);
-    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::ScaleToFill);
+    alignment.SetScaling(Alignment::SCALE_TO_FILL);
+    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::SCALE_TO_FILL);
   }
 
-  // ScaleToFitKeepAspect
+  // SCALE_TO_FIT_KEEP_ASPECT
   {
     Alignment alignment = Alignment::New();
-    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::ScaleNone);
+    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::SCALE_NONE);
 
-    alignment.SetScaling(Alignment::ScaleToFitKeepAspect);
-    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::ScaleToFitKeepAspect);
+    alignment.SetScaling(Alignment::SCALE_TO_FIT_KEEP_ASPECT);
+    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::SCALE_TO_FIT_KEEP_ASPECT);
   }
 
-  // ScaleToFillKeepAspect
+  // SCALE_TO_FILL_KEEP_ASPECT
   {
     Alignment alignment = Alignment::New();
-    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::ScaleNone);
+    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::SCALE_NONE);
 
-    alignment.SetScaling(Alignment::ScaleToFillKeepAspect);
-    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::ScaleToFillKeepAspect);
+    alignment.SetScaling(Alignment::SCALE_TO_FILL_KEEP_ASPECT);
+    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::SCALE_TO_FILL_KEEP_ASPECT);
   }
 
-  // ShrinkToFit
+  // SHRINK_TO_FIT
   {
     Alignment alignment = Alignment::New();
-    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::ScaleNone);
+    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::SCALE_NONE);
 
-    alignment.SetScaling(Alignment::ShrinkToFit);
-    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::ShrinkToFit);
+    alignment.SetScaling(Alignment::SHRINK_TO_FIT);
+    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::SHRINK_TO_FIT);
   }
 
-  // ShrinkToFitKeepAspect
+  // SHRINK_TO_FIT_KEEP_ASPECT
   {
     Alignment alignment = Alignment::New();
-    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::ScaleNone);
+    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::SCALE_NONE);
 
-    alignment.SetScaling(Alignment::ShrinkToFitKeepAspect);
-    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::ShrinkToFitKeepAspect);
+    alignment.SetScaling(Alignment::SHRINK_TO_FIT_KEEP_ASPECT);
+    DALI_TEST_CHECK(alignment.GetScaling() == Alignment::SHRINK_TO_FIT_KEEP_ASPECT);
   }
 
   END_TEST;

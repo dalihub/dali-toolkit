@@ -177,8 +177,8 @@ DALI_ACTION_REGISTRATION(   Toolkit, ScrollBar, "ShowTransientIndicator",       
 
 DALI_TYPE_REGISTRATION_END()
 
-const char* SCROLL_DIRECTION_NAME[] = {"Vertical", "Horizontal"};
-const char* INDICATOR_HEIGHT_POLICY_NAME[] = {"Variable", "Fixed"};
+const char* SCROLL_DIRECTION_NAME[] = {"VERTICAL", "HORIZONTAL"};
+const char* INDICATOR_HEIGHT_POLICY_NAME[] = {"VARIABLE", "FIXED"};
 
 }
 
@@ -197,7 +197,7 @@ ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
   mScrollStart(0.0f),
   mGestureDisplacement( Vector3::ZERO ),
   mCurrentScrollPosition(0.0f),
-  mIndicatorHeightPolicy(Toolkit::ScrollBar::Variable),
+  mIndicatorHeightPolicy(Toolkit::ScrollBar::VARIABLE),
   mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT),
   mIndicatorMinimumHeight(DEFAULT_INDICATOR_MINIMUM_HEIGHT),
   mIndicatorStartPadding(DEFAULT_INDICATOR_START_PADDING),
@@ -304,7 +304,7 @@ void ScrollBar::ApplyConstraints()
     }
 
     // Set indicator height according to the indicator's height policy
-    if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
+    if(mIndicatorHeightPolicy == Toolkit::ScrollBar::FIXED)
     {
       mIndicator.SetProperty( Actor::Property::SIZE, Vector2( Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, mIndicatorFixedHeight) );
     }
@@ -529,7 +529,7 @@ void ScrollBar::OnPan( const PanGesture& gesture )
 
 void ScrollBar::OnSizeSet( const Vector3& size )
 {
-  if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
+  if(mIndicatorHeightPolicy == Toolkit::ScrollBar::FIXED)
   {
     mIndicator.SetProperty( Actor::Property::SIZE, Vector2( size.width, mIndicatorFixedHeight ) );
   }
@@ -565,7 +565,7 @@ void ScrollBar::SetIndicatorFixedHeight( float height )
 {
   mIndicatorFixedHeight = height;
 
-  if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
+  if(mIndicatorHeightPolicy == Toolkit::ScrollBar::FIXED)
   {
     mIndicator.SetProperty( Actor::Property::SIZE, Vector2( Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, mIndicatorFixedHeight) );
   }
@@ -599,13 +599,13 @@ float ScrollBar::GetIndicatorHideDuration() const
 void ScrollBar::OnScrollDirectionPropertySet( Property::Value propertyValue )
 {
   std::string directionName( propertyValue.Get<std::string>() );
-  if(directionName == "Vertical")
+  if(directionName == "VERTICAL")
   {
-    SetScrollDirection(Toolkit::ScrollBar::Vertical);
+    SetScrollDirection(Toolkit::ScrollBar::VERTICAL);
   }
-  else if(directionName == "Horizontal")
+  else if(directionName == "HORIZONTAL")
   {
-    SetScrollDirection(Toolkit::ScrollBar::Horizontal);
+    SetScrollDirection(Toolkit::ScrollBar::HORIZONTAL);
   }
   else
   {
@@ -616,13 +616,13 @@ void ScrollBar::OnScrollDirectionPropertySet( Property::Value propertyValue )
 void ScrollBar::OnIndicatorHeightPolicyPropertySet( Property::Value propertyValue )
 {
   std::string policyName( propertyValue.Get<std::string>() );
-  if(policyName == "Variable")
+  if(policyName == "VARIABLE")
   {
-    SetIndicatorHeightPolicy(Toolkit::ScrollBar::Variable);
+    SetIndicatorHeightPolicy(Toolkit::ScrollBar::VARIABLE);
   }
-  else if(policyName == "Fixed")
+  else if(policyName == "FIXED")
   {
-    SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
+    SetIndicatorHeightPolicy(Toolkit::ScrollBar::FIXED);
   }
   else
   {

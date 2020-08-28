@@ -1306,7 +1306,7 @@ bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& pan
 {
   bool handled = false;
 
-  if( panEvent.state == AccessibilityGestureEvent::Started )
+  if( panEvent.state == AccessibilityGestureEvent::STARTED )
   {
     // Find the focusable actor at the event position
     Dali::HitTestAlgorithm::Results results;
@@ -1323,7 +1323,7 @@ bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& pan
 
   // Gesture::Finished (Up) events are delivered with previous (Motion) event position
   // Use the real previous position; otherwise we may incorrectly get a ZERO velocity
-  if ( AccessibilityGestureEvent::Finished != panEvent.state )
+  if ( AccessibilityGestureEvent::FINISHED != panEvent.state )
   {
     // Store the previous position for next Gesture::Finished iteration.
     mPreviousPosition = panEvent.previousPosition;

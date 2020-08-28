@@ -1728,8 +1728,8 @@ void TextEditor::UpdateScrollBar()
   CustomActor self = Self();
   if( !mScrollBar )
   {
-    mScrollBar = Toolkit::ScrollBar::New( Toolkit::ScrollBar::Vertical );
-    mScrollBar.SetIndicatorHeightPolicy( Toolkit::ScrollBar::Variable );
+    mScrollBar = Toolkit::ScrollBar::New( Toolkit::ScrollBar::VERTICAL );
+    mScrollBar.SetIndicatorHeightPolicy( Toolkit::ScrollBar::VARIABLE );
     mScrollBar.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT );
     mScrollBar.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT );
     mScrollBar.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );

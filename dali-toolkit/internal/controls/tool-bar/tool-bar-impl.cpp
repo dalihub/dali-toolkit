@@ -47,7 +47,7 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ToolBar, Toolkit::Control, Create )
 DALI_TYPE_REGISTRATION_END()
 
 const float DEFAULT_RELATIVE_SIZE( 0.1f );
-const Toolkit::Alignment::Type DEFAULT_ALIGNMENT( Toolkit::Alignment::HorizontalLeft );
+const Toolkit::Alignment::Type DEFAULT_ALIGNMENT( Toolkit::Alignment::HORIZONTAL_LEFT );
 } // namespace
 
 Toolkit::ToolBar ToolBar::New()
@@ -71,7 +71,7 @@ void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment:
   unsigned int index = 0;
   switch( alignment )
   {
-    case Toolkit::Alignment::HorizontalLeft:
+    case Toolkit::Alignment::HORIZONTAL_LEFT:
     {
       index = mLeftOffset;
       ++mLeftOffset;
@@ -79,14 +79,14 @@ void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment:
       ++mRightBase;
       break;
     }
-    case Toolkit::Alignment::HorizontalCenter:
+    case Toolkit::Alignment::HORIZONTAL_CENTER:
     {
       index = mCenterBase + mCenterOffset;
       ++mCenterOffset;
       ++mRightBase;
       break;
     }
-    case Toolkit::Alignment::HorizontalRight:
+    case Toolkit::Alignment::HORIZONTAL_RIGHT:
     {
       index = mRightBase - mRightOffset;
       ++mRightBase;
@@ -122,7 +122,7 @@ void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment:
   // Update spaces between left, center and right groups of controls.
   switch( alignment )
   {
-    case Toolkit::Alignment::HorizontalLeft:
+    case Toolkit::Alignment::HORIZONTAL_LEFT:
     {
       mLeftRelativeSpace -= relativeSize;
       if ( mLeftRelativeSpace < 0.f )
@@ -131,7 +131,7 @@ void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment:
       }
       break;
     }
-    case Toolkit::Alignment::HorizontalCenter:
+    case Toolkit::Alignment::HORIZONTAL_CENTER:
     {
       mLeftRelativeSpace -= 0.5f * relativeSize;
       if ( mLeftRelativeSpace < 0.f )
@@ -145,7 +145,7 @@ void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment:
       }
       break;
     }
-    case Toolkit::Alignment::HorizontalRight:
+    case Toolkit::Alignment::HORIZONTAL_RIGHT:
     {
       mRightRelativeSpace -= relativeSize;
       if ( mRightRelativeSpace < 0.f )
@@ -179,18 +179,18 @@ void ToolBar::RemoveControl( Actor control )
     // Update spaces between left, center and right groups of controls.
     if( 1.0 > mAccumulatedRelativeSpace )
     {
-      Toolkit::Alignment::Type alignment = Toolkit::Alignment::HorizontalLeft;
+      Toolkit::Alignment::Type alignment = Toolkit::Alignment::HORIZONTAL_LEFT;
       if( position.columnIndex < mLeftOffset )
       {
-        alignment = Toolkit::Alignment::HorizontalLeft;
+        alignment = Toolkit::Alignment::HORIZONTAL_LEFT;
       }
       else if( ( position.columnIndex > mLeftOffset ) && ( position.columnIndex < mCenterBase + mCenterOffset ) )
       {
-        alignment = Toolkit::Alignment::HorizontalCenter;
+        alignment = Toolkit::Alignment::HORIZONTAL_CENTER;
       }
       else if( position.columnIndex > mCenterBase + mCenterOffset )
       {
-        alignment = Toolkit::Alignment::HorizontalRight;
+        alignment = Toolkit::Alignment::HORIZONTAL_RIGHT;
       }
       else
       {
@@ -201,7 +201,7 @@ void ToolBar::RemoveControl( Actor control )
 
       switch( alignment )
       {
-        case Toolkit::Alignment::HorizontalLeft:
+        case Toolkit::Alignment::HORIZONTAL_LEFT:
         {
           mLeftRelativeSpace += relativeSize;
           if ( mLeftRelativeSpace < 0.f )
@@ -210,7 +210,7 @@ void ToolBar::RemoveControl( Actor control )
           }
           break;
         }
-        case Toolkit::Alignment::HorizontalCenter:
+        case Toolkit::Alignment::HORIZONTAL_CENTER:
         {
           mLeftRelativeSpace += 0.5f * relativeSize;
           if ( mLeftRelativeSpace < 0.f )
@@ -224,7 +224,7 @@ void ToolBar::RemoveControl( Actor control )
           }
           break;
         }
-        case Toolkit::Alignment::HorizontalRight:
+        case Toolkit::Alignment::HORIZONTAL_RIGHT:
         {
           mRightRelativeSpace += relativeSize;
           if ( mRightRelativeSpace < 0.f )

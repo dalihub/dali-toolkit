@@ -197,7 +197,7 @@ void ScrollOvershootEffectRipple::UpdatePropertyNotifications()
       increaseStep = MAX_OVERSHOOT_NOTIFY_AMOUNT;
     }
     mOvershootIncreaseNotification = self.AddPropertyNotification( mOvershootProperty, OutsideCondition(-increaseStep, increaseStep) );
-    mOvershootIncreaseNotification.SetNotifyMode(PropertyNotification::NotifyOnTrue);
+    mOvershootIncreaseNotification.SetNotifyMode(PropertyNotification::NOTIFY_ON_TRUE);
     mOvershootIncreaseNotification.NotifySignal().Connect(this, &ScrollOvershootEffectRipple::OnOvershootNotification);
   }
 
@@ -215,7 +215,7 @@ void ScrollOvershootEffectRipple::UpdatePropertyNotifications()
       reduceStep = MIN_OVERSHOOT_NOTIFY_AMOUNT;
     }
     mOvershootDecreaseNotification = self.AddPropertyNotification( mOvershootProperty, InsideCondition(-reduceStep, reduceStep) );
-    mOvershootDecreaseNotification.SetNotifyMode(PropertyNotification::NotifyOnTrue);
+    mOvershootDecreaseNotification.SetNotifyMode(PropertyNotification::NOTIFY_ON_TRUE);
     mOvershootDecreaseNotification.NotifySignal().Connect(this, &ScrollOvershootEffectRipple::OnOvershootNotification);
   }
 }

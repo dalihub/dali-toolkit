@@ -100,7 +100,7 @@ const std::string INTERNAL_MAX_POSITION_PROPERTY_NAME( "internalMaxPosition" );
  */
 float VectorInDomain(float a, float b, float start, float end, Dali::Toolkit::DirectionBias bias)
 {
-  if(bias == Dali::Toolkit::DirectionBiasNone)
+  if(bias == Dali::Toolkit::DIRECTION_BIAS_NONE)
   {
     return ShortestDistanceInDomain( a, b, start, end );
   }
@@ -111,7 +111,7 @@ float VectorInDomain(float a, float b, float start, float end, Dali::Toolkit::Di
   if(vect > 0)
   {
     // +ve vector
-    if(bias == Dali::Toolkit::DirectionBiasRight) // going right, take the vector.
+    if(bias == Dali::Toolkit::DIRECTION_BIAS_RIGHT) // going right, take the vector.
     {
       return vect;
     }
@@ -124,7 +124,7 @@ float VectorInDomain(float a, float b, float start, float end, Dali::Toolkit::Di
   else
   {
     // -ve vector
-    if(bias == Dali::Toolkit::DirectionBiasLeft) // going left, take the vector.
+    if(bias == Dali::Toolkit::DIRECTION_BIAS_LEFT) // going left, take the vector.
     {
       return vect;
     }
@@ -343,8 +343,8 @@ struct InternalPrePositionConstraint
     mDomainMax = Vector2( -rulerDomainX.max, -rulerDomainY.max );
     mClampX = rulerDomainX.enabled;
     mClampY = rulerDomainY.enabled;
-    mFixedRulerX = rulerX->GetType() == Ruler::Fixed;
-    mFixedRulerY = rulerY->GetType() == Ruler::Fixed;
+    mFixedRulerX = rulerX->GetType() == Ruler::FIXED;
+    mFixedRulerY = rulerY->GetType() == Ruler::FIXED;
   }
 
   void operator()( Vector2& scrollPostPosition, const PropertyInputContainer& inputs )
@@ -1238,7 +1238,7 @@ void ScrollView::TransformTo(const Vector2& position, float duration, AlphaFunct
                              true,
                              horizontalBias,
                              verticalBias,
-                             Snap);
+                             SNAP);
 
   if(!animating)
   {
@@ -1267,12 +1267,12 @@ void ScrollView::ScrollTo(const Vector2& position)
 
 void ScrollView::ScrollTo(const Vector2& position, float duration)
 {
-  ScrollTo(position, duration, DirectionBiasNone, DirectionBiasNone);
+  ScrollTo(position, duration, DIRECTION_BIAS_NONE, DIRECTION_BIAS_NONE);
 }
 
 void ScrollView::ScrollTo(const Vector2& position, float duration, AlphaFunction alpha)
 {
-  ScrollTo(position, duration, alpha, DirectionBiasNone, DirectionBiasNone);
+  ScrollTo(position, duration, alpha, DIRECTION_BIAS_NONE, DIRECTION_BIAS_NONE);
 }
 
 void ScrollView::ScrollTo(const Vector2& position, float duration,
@@ -1559,7 +1559,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
   Vector2 clampDelta(Vector2::ZERO);
   ClampPosition(positionSnap);
 
-  if( (mRulerX->GetType() == Ruler::Free || mRulerY->GetType() == Ruler::Free)
+  if( (mRulerX->GetType() == Ruler::FREE || mRulerY->GetType() == Ruler::FREE)
       && isFreeFlick && !mActorAutoSnapEnabled)
   {
     // Calculate target position based on velocity of flick.
@@ -1582,12 +1582,12 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
     float t = speed / a;
 
-    if(mRulerX->IsEnabled() && mRulerX->GetType() == Ruler::Free)
+    if(mRulerX->IsEnabled() && mRulerX->GetType() == Ruler::FREE)
     {
       positionSnap.x += t*u.x*0.5f;
     }
 
-    if(mRulerY->IsEnabled() && mRulerY->GetType() == Ruler::Free)
+    if(mRulerY->IsEnabled() && mRulerY->GetType() == Ruler::FREE)
     {
       positionSnap.y += t*u.y*0.5f;
     }
@@ -1607,7 +1607,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
     // If Axis is Free and has velocity, then calculate time taken
     // to reach target based on velocity in axis.
-    if(mRulerX->IsEnabled() && mRulerX->GetType() == Ruler::Free)
+    if(mRulerX->IsEnabled() && mRulerX->GetType() == Ruler::FREE)
     {
       float deltaX = fabsf(startPosition.x - positionSnap.x);
 
@@ -1621,7 +1621,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
       }
     }
 
-    if(mRulerY->IsEnabled() && mRulerY->GetType() == Ruler::Free)
+    if(mRulerY->IsEnabled() && mRulerY->GetType() == Ruler::FREE)
     {
       float deltaY = fabsf(startPosition.y - positionSnap.y);
 
@@ -1644,8 +1644,8 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
   bool animating = AnimateTo(positionSnap, positionDuration,
                              alphaFunction, false,
-                             DirectionBiasNone, DirectionBiasNone,
-                             isFlick || isFreeFlick ? Flick : Snap);
+                             DIRECTION_BIAS_NONE, DIRECTION_BIAS_NONE,
+                             isFlick || isFreeFlick ? FLICK : SNAP);
 
   return animating;
 }
@@ -1971,7 +1971,7 @@ void ScrollView::OnChildAdd(Actor& child)
     scrollBar.SetProperty( Dali::Actor::Property::NAME,"ScrollBar");
 
     mInternalActor.Add( scrollBar );
-    if( scrollBar.GetScrollDirection() == Toolkit::ScrollBar::Horizontal )
+    if( scrollBar.GetScrollDirection() == Toolkit::ScrollBar::HORIZONTAL )
     {
       scrollBar.SetScrollPropertySource( Self(),
                                          Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_X,
@@ -2141,7 +2141,7 @@ bool ScrollView::OnWheelEvent(const WheelEvent& event)
   if(mRulerX->IsEnabled() && !mRulerY->IsEnabled())
   {
     // If only the ruler in the X axis is enabled, scroll in the X axis.
-    if(mRulerX->GetType() == Ruler::Free)
+    if(mRulerX->GetType() == Ruler::FREE)
     {
       // Free panning mode
       targetScrollPosition.x += event.GetDelta() * mWheelScrollDistanceStep.x;
@@ -2157,7 +2157,7 @@ bool ScrollView::OnWheelEvent(const WheelEvent& event)
   else
   {
     // If the ruler in the Y axis is enabled, scroll in the Y axis.
-    if(mRulerY->GetType() == Ruler::Free)
+    if(mRulerY->GetType() == Ruler::FREE)
     {
       // Free panning mode
       targetScrollPosition.y += event.GetDelta() * mWheelScrollDistanceStep.y;
@@ -2864,7 +2864,7 @@ void ScrollView::SetInternalConstraints()
   // MoveActor (scrolling)
   constraint = Constraint::New<Vector3>( self, Actor::Property::POSITION, MoveActorConstraint );
   constraint.AddSource( Source( self, Toolkit::ScrollView::Property::SCROLL_POSITION ) );
-  constraint.SetRemoveAction(Constraint::Discard);
+  constraint.SetRemoveAction(Constraint::DISCARD);
   ApplyConstraintToBoundActors(constraint);
 
   // WrapActor (wrap functionality)
@@ -2875,7 +2875,7 @@ void ScrollView::SetInternalConstraints()
   constraint.AddSource( Source( self, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
   constraint.AddSource( Source( self, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
   constraint.AddSource( Source( self, Toolkit::ScrollView::Property::WRAP ) );
-  constraint.SetRemoveAction(Constraint::Discard);
+  constraint.SetRemoveAction(Constraint::DISCARD);
   ApplyConstraintToBoundActors(constraint);
 }
 

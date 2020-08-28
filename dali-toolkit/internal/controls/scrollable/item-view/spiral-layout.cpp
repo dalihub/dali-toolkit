@@ -480,7 +480,7 @@ void SpiralLayout::ApplyConstraints( Actor& actor, const int itemId, const Vecto
     // Color constraint
     constraint = Constraint::New< Vector4 >( actor, Actor::Property::COLOR, SpiralColorConstraint( itemId, mImpl->mItemSpacingRadians ) );
     constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
-    constraint.SetRemoveAction(Dali::Constraint::Discard);
+    constraint.SetRemoveAction(Dali::Constraint::DISCARD);
     constraint.Apply();
 
     // Visibility constraint
@@ -495,7 +495,7 @@ void SpiralLayout::ApplyConstraints( Actor& actor, const int itemId, const Vecto
     }
     constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
     constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-    constraint.SetRemoveAction(Dali::Constraint::Discard);
+    constraint.SetRemoveAction(Dali::Constraint::DISCARD);
     constraint.Apply();
   }
 }

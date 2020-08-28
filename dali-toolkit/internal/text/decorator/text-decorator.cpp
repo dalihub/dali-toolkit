@@ -1517,7 +1517,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                     LessThanCondition( mBoundingBox.y + topHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1534,7 +1534,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                        GreaterThanCondition( mBoundingBox.w - bottomHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1554,7 +1554,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                     LessThanCondition( mBoundingBox.y + topHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1572,7 +1572,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                        GreaterThanCondition( mBoundingBox.w - bottomHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1590,7 +1590,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                     LessThanCondition( mBoundingBox.y + topHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1604,7 +1604,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                        GreaterThanCondition( mBoundingBox.w - bottomHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1636,7 +1636,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                     LessThanCondition( mBoundingBox.x + leftWidth ) );
 
       // Notifies the change from false to true and from true to false.
-      mHandleHorizontalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+      mHandleHorizontalLessThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
       // Connects the signals with the callbacks.
       mHandleHorizontalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1649,7 +1649,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                        GreaterThanCondition( mBoundingBox.z - rightWidth ) );
 
       // Notifies the change from false to true and from true to false.
-      mHandleHorizontalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+      mHandleHorizontalGreaterThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
       // Connects the signals with the callbacks.
       mHandleHorizontalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1745,8 +1745,8 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                     GreaterThanCondition( mBoundingBox.w - popupHalfSize.height ) );
 
     // Notifies the change from false to true and from true to false.
-    mPopupTopExceedNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
-    mPopupBottomExceedNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+    mPopupTopExceedNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
+    mPopupBottomExceedNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
     mPopupTopExceedNotification.NotifySignal().Connect( this, &Decorator::Impl::PopUpLeavesTopBoundary );
     mPopupBottomExceedNotification.NotifySignal().Connect( this, &Decorator::Impl::PopUpLeavesBottomBoundary );

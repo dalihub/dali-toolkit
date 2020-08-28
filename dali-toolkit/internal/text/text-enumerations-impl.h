@@ -59,7 +59,7 @@ bool GetLineWrapModeEnumeration( const Property::Value& propertyValue, Toolkit::
 
 /**
  * @brief Get the alignment string from the provided alignment string.
- * @param[in] alignment the Text::Horizontal enum source
+ * @param[in] alignment the Text::HORIZONTAL enum source
  * @return the string equivalent
  */
 const char* GetHorizontalAlignmentString( const Toolkit::Text::HorizontalAlignment::Type& alignment );

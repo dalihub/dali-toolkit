@@ -59,17 +59,17 @@ inline Vector3 GetPosition( const Toolkit::Alignment::Padding& padding, Toolkit:
 
   switch( horizontalAlignment )
   {
-    case Dali::Toolkit::Alignment::HorizontalLeft:
+    case Dali::Toolkit::Alignment::HORIZONTAL_LEFT:
     {
       position.x += padding.left;
       break;
     }
-    case Dali::Toolkit::Alignment::HorizontalRight:
+    case Dali::Toolkit::Alignment::HORIZONTAL_RIGHT:
     {
       position.x -= padding.right;
       break;
     }
-    case Dali::Toolkit::Alignment::HorizontalCenter: // FALLTHROUGH
+    case Dali::Toolkit::Alignment::HORIZONTAL_CENTER: // FALLTHROUGH
     default: // use center as default
     {
       if( currentSize.width + padding.left + padding.right >= parentSize.width )
@@ -82,17 +82,17 @@ inline Vector3 GetPosition( const Toolkit::Alignment::Padding& padding, Toolkit:
 
   switch( verticalAlignment )
   {
-    case Dali::Toolkit::Alignment::VerticalTop:
+    case Dali::Toolkit::Alignment::VERTICAL_TOP:
     {
       position.y += padding.top;
       break;
     }
-    case Dali::Toolkit::Alignment::VerticalBottom:
+    case Dali::Toolkit::Alignment::VERTICAL_BOTTOM:
     {
       position.y -= padding.bottom;
       break;
     }
-    case Dali::Toolkit::Alignment::VerticalCenter: // FALLTHROUGH
+    case Dali::Toolkit::Alignment::VERTICAL_CENTER: // FALLTHROUGH
     default: // use center as default
     {
       if( currentSize.height + padding.top + padding.bottom >= parentSize.height )
@@ -126,31 +126,31 @@ Toolkit::Alignment Alignment::New( Toolkit::Alignment::Type horizontal, Toolkit:
 void Alignment::SetAlignmentType( Toolkit::Alignment::Type type )
 {
   // Horizontal Alignment
-  if( type & Toolkit::Alignment::HorizontalRight )
+  if( type & Toolkit::Alignment::HORIZONTAL_RIGHT )
   {
-    mHorizontal = Toolkit::Alignment::HorizontalRight;
+    mHorizontal = Toolkit::Alignment::HORIZONTAL_RIGHT;
   }
-  if( type & Toolkit::Alignment::HorizontalLeft )
+  if( type & Toolkit::Alignment::HORIZONTAL_LEFT )
   {
-    mHorizontal = Toolkit::Alignment::HorizontalLeft;
+    mHorizontal = Toolkit::Alignment::HORIZONTAL_LEFT;
   }
-  if( type & Toolkit::Alignment::HorizontalCenter )
+  if( type & Toolkit::Alignment::HORIZONTAL_CENTER )
   {
-    mHorizontal = Toolkit::Alignment::HorizontalCenter;
+    mHorizontal = Toolkit::Alignment::HORIZONTAL_CENTER;
   }
 
   // Vertical Alignment
-  if( type & Toolkit::Alignment::VerticalBottom )
+  if( type & Toolkit::Alignment::VERTICAL_BOTTOM )
   {
-    mVertical = Toolkit::Alignment::VerticalBottom;
+    mVertical = Toolkit::Alignment::VERTICAL_BOTTOM;
   }
-  if( type & Toolkit::Alignment::VerticalTop )
+  if( type & Toolkit::Alignment::VERTICAL_TOP )
   {
-    mVertical = Toolkit::Alignment::VerticalTop;
+    mVertical = Toolkit::Alignment::VERTICAL_TOP;
   }
-  if( type & Toolkit::Alignment::VerticalCenter )
+  if( type & Toolkit::Alignment::VERTICAL_CENTER )
   {
-    mVertical = Toolkit::Alignment::VerticalCenter;
+    mVertical = Toolkit::Alignment::VERTICAL_CENTER;
   }
 
   RelayoutRequest();
@@ -192,21 +192,21 @@ void Alignment::OnRelayout( const Vector2& size, RelayoutContainer& container )
   // lay out the actors
   Vector3 anchorPointAndParentOrigin  = Vector3::ZERO;
   anchorPointAndParentOrigin.z = 0.5f;
-  // anchorPoint.x is initialized to 0.0, which is HorizontalLeft
-  if( Toolkit::Alignment::HorizontalCenter == mHorizontal )
+  // anchorPoint.x is initialized to 0.0, which is HORIZONTAL_LEFT
+  if( Toolkit::Alignment::HORIZONTAL_CENTER == mHorizontal )
   {
     anchorPointAndParentOrigin.x = 0.5f;
   }
-  else if( Toolkit::Alignment::HorizontalRight == mHorizontal )
+  else if( Toolkit::Alignment::HORIZONTAL_RIGHT == mHorizontal )
   {
     anchorPointAndParentOrigin.x = 1.0f;
   }
-  // anchorPoint.y is initialized to 0.0, which is VerticalTop
-  if( Toolkit::Alignment::VerticalCenter == mVertical )
+  // anchorPoint.y is initialized to 0.0, which is VERTICAL_TOP
+  if( Toolkit::Alignment::VERTICAL_CENTER == mVertical )
   {
     anchorPointAndParentOrigin.y = 0.5f;
   }
-  else if( Toolkit::Alignment::VerticalBottom == mVertical )
+  else if( Toolkit::Alignment::VERTICAL_BOTTOM == mVertical )
   {
     anchorPointAndParentOrigin.y = 1.0f;
   }
@@ -236,33 +236,33 @@ void Alignment::OnRelayout( const Vector2& size, RelayoutContainer& container )
       // no point trying to squeeze actors into too small size
       switch( mScaling )
       {
-        case Toolkit::Alignment::ScaleNone:
+        case Toolkit::Alignment::SCALE_NONE:
         {
           // Nothing to do
           renegotiate = false;
           break;
         }
-        case Toolkit::Alignment::ScaleToFill:
+        case Toolkit::Alignment::SCALE_TO_FILL:
         {
           // Nothing to do, newChildSize is already full size minus padding
           break;
         }
-        case Toolkit::Alignment::ScaleToFitKeepAspect:
+        case Toolkit::Alignment::SCALE_TO_FIT_KEEP_ASPECT:
         {
           newChildSize = currentChildSize * std::min( ( newChildSize.width / currentChildSize.width ), ( newChildSize.height / currentChildSize.height ) );
           break;
         }
-        case Toolkit::Alignment::ScaleToFillKeepAspect:
+        case Toolkit::Alignment::SCALE_TO_FILL_KEEP_ASPECT:
         {
           newChildSize = currentChildSize * std::max( ( newChildSize.width / currentChildSize.width ), ( newChildSize.height / currentChildSize.height ) );
           break;
         }
-        case Toolkit::Alignment::ShrinkToFit:
+        case Toolkit::Alignment::SHRINK_TO_FIT:
         {
           newChildSize = Vector2( std::min( newChildSize.width, currentChildSize.width ), std::min( newChildSize.height, currentChildSize.height ) );
           break;
         }
-        case Toolkit::Alignment::ShrinkToFitKeepAspect:
+        case Toolkit::Alignment::SHRINK_TO_FIT_KEEP_ASPECT:
         {
           // check source size vs target size to see if we need to shrink
           float widthScale = ( newChildSize.width < currentChildSize.width ) ? (newChildSize.width / currentChildSize.width) : 1.f;
@@ -293,7 +293,7 @@ Alignment::Alignment( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::T
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mHorizontal( horizontal ),
   mVertical( vertical ),
-  mScaling( Toolkit::Alignment::ScaleNone ),
+  mScaling( Toolkit::Alignment::SCALE_NONE ),
   mPadding( 0.f, 0.f, 0.f, 0.f )
 {
 }

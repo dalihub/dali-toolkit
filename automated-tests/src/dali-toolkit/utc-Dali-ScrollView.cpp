@@ -478,7 +478,7 @@ int UtcDaliToolkitScrollViewScrollToPositionWithDirectionBiasP(void)
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
 
-  scrollView.ScrollTo( target2, 0.25f, Dali::Toolkit::DirectionBiasLeft, Dali::Toolkit::DirectionBiasLeft );
+  scrollView.ScrollTo( target2, 0.25f, Dali::Toolkit::DIRECTION_BIAS_LEFT, Dali::Toolkit::DIRECTION_BIAS_LEFT );
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
 
@@ -486,7 +486,7 @@ int UtcDaliToolkitScrollViewScrollToPositionWithDirectionBiasP(void)
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
 
-  scrollView.ScrollTo( target2, 0.25f, Dali::Toolkit::DirectionBiasRight, Dali::Toolkit::DirectionBiasRight );
+  scrollView.ScrollTo( target2, 0.25f, Dali::Toolkit::DIRECTION_BIAS_RIGHT, Dali::Toolkit::DIRECTION_BIAS_RIGHT );
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
 
@@ -547,7 +547,7 @@ int UtcDaliToolkitScrollViewScrollToPositionWithAlphaFunctionAndDirectionBiasP(v
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
 
-  scrollView.ScrollTo( target2, 0.25f, AlphaFunction::LINEAR, Dali::Toolkit::DirectionBiasLeft, Dali::Toolkit::DirectionBiasLeft );
+  scrollView.ScrollTo( target2, 0.25f, AlphaFunction::LINEAR, Dali::Toolkit::DIRECTION_BIAS_LEFT, Dali::Toolkit::DIRECTION_BIAS_LEFT );
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
 
@@ -555,7 +555,7 @@ int UtcDaliToolkitScrollViewScrollToPositionWithAlphaFunctionAndDirectionBiasP(v
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
 
-  scrollView.ScrollTo( target2, 0.25f, AlphaFunction::LINEAR, Dali::Toolkit::DirectionBiasRight, Dali::Toolkit::DirectionBiasRight );
+  scrollView.ScrollTo( target2, 0.25f, AlphaFunction::LINEAR, Dali::Toolkit::DIRECTION_BIAS_RIGHT, Dali::Toolkit::DIRECTION_BIAS_RIGHT );
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
 
@@ -563,7 +563,7 @@ int UtcDaliToolkitScrollViewScrollToPositionWithAlphaFunctionAndDirectionBiasP(v
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
 
-  scrollView.ScrollTo( target2, 0.25f, TestAlphaFunction, Dali::Toolkit::DirectionBiasRight, Dali::Toolkit::DirectionBiasRight );
+  scrollView.ScrollTo( target2, 0.25f, TestAlphaFunction, Dali::Toolkit::DIRECTION_BIAS_RIGHT, Dali::Toolkit::DIRECTION_BIAS_RIGHT );
   Wait(application, 125);
   // Check that the scroll animation should finish within just half of the specified duration with the above alpha function
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
@@ -881,7 +881,7 @@ int UtcDaliToolkitScrollViewScrollToPageWithDirectionBiasP(void)
 
   scrollView.SetWrapMode(true);
 
-  scrollView.ScrollTo( 0, 0.25, Dali::Toolkit::DirectionBiasLeft );
+  scrollView.ScrollTo( 0, 0.25, Dali::Toolkit::DIRECTION_BIAS_LEFT );
 
   Wait(application, RENDER_FRAME_INTERVAL); // Wait for one frame
   // Check that the scroll position remains the same
@@ -892,7 +892,7 @@ int UtcDaliToolkitScrollViewScrollToPageWithDirectionBiasP(void)
   DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 0, TEST_LOCATION );
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(0.0f, 0.0f), TEST_LOCATION );
 
-  scrollView.ScrollTo( 0, 0.25, Dali::Toolkit::DirectionBiasRight );
+  scrollView.ScrollTo( 0, 0.25, Dali::Toolkit::DIRECTION_BIAS_RIGHT );
 
   Wait(application, RENDER_FRAME_INTERVAL); // Wait for one frame
   // Check that it scrolls towards the right
@@ -1410,7 +1410,7 @@ int UtcDaliToolkitScrollViewConstraints(void)
 
   Constraint constraint = Constraint::New<Vector3>( scrollView, Actor::Property::POSITION, TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
   constraint.AddSource( Source(scrollView, ScrollView::Property::SCROLL_POSITION) );
-  constraint.SetRemoveAction(Constraint::Discard);
+  constraint.SetRemoveAction(Constraint::DISCARD);
   scrollView.ApplyConstraintToChildren(constraint);
   Wait(application);
 
@@ -1457,7 +1457,7 @@ int UtcDaliToolkitScrollViewBind(void)
   // apply this constraint to scrollview
   Constraint constraint = Constraint::New<Vector3>( scrollView, Actor::Property::POSITION, TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
   constraint.AddSource( Source(scrollView, ScrollView::Property::SCROLL_POSITION) );
-  constraint.SetRemoveAction(Constraint::Discard);
+  constraint.SetRemoveAction(Constraint::DISCARD);
   scrollView.ApplyConstraintToChildren(constraint);
 
   Wait(application);
@@ -1647,13 +1647,13 @@ int UtcDaliToolkitScrollViewSnapStartedSignalP(void)
   PerformGestureSwipe(application, CLAMP_TOUCH_START, Vector2(0.5f, 0.0f), 60, time, true);
 
   DALI_TEST_CHECK( gOnSnapStartCalled );
-  DALI_TEST_CHECK( gLastSnapType == Toolkit::Snap );
+  DALI_TEST_CHECK( gLastSnapType == Toolkit::SNAP );
 
   // Second try a swipe.
   PerformGestureSwipe(application, CLAMP_TOUCH_START, Vector2(20.0f, 0.0f), 60, time, true);
 
   DALI_TEST_CHECK( gOnSnapStartCalled );
-  DALI_TEST_CHECK( gLastSnapType == Toolkit::Flick );
+  DALI_TEST_CHECK( gLastSnapType == Toolkit::FLICK );
   END_TEST;
 }
 
@@ -2313,15 +2313,15 @@ int UtcDaliToolkitScrollViewRulerDomainClampWithStateP(void)
   ClampState clamped;
   float value = domainX.Clamp(50.0f, 100.0f, 1.0f, clamped);
   DALI_TEST_EQUALS( value, 50.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, Dali::Toolkit::NotClamped, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, Dali::Toolkit::NOT_CLAMPED, TEST_LOCATION);
 
   value = domainX.Clamp(-100.0f, 200.0f, 1.0f, clamped);
   DALI_TEST_EQUALS( value, 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, Dali::Toolkit::ClampedToMin, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, Dali::Toolkit::CLAMPED_TO_MIN, TEST_LOCATION);
 
   value = domainX.Clamp(300.0f, 20.0f, 1.0f, clamped);
   DALI_TEST_EQUALS( value, 180.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, Dali::Toolkit::ClampedToMax, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, Dali::Toolkit::CLAMPED_TO_MAX, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2380,11 +2380,11 @@ int UtcDaliToolkitScrollViewRulerGetTypeP(void)
 
   RulerPtr defaultRuler = new DefaultRuler();
   DALI_TEST_CHECK( defaultRuler );
-  DALI_TEST_EQUALS( defaultRuler->GetType(), Dali::Toolkit::Ruler::Free, TEST_LOCATION);
+  DALI_TEST_EQUALS( defaultRuler->GetType(), Dali::Toolkit::Ruler::FREE, TEST_LOCATION);
 
   RulerPtr fixedRuler = new FixedRuler( 100.0f );
   DALI_TEST_CHECK( fixedRuler );
-  DALI_TEST_EQUALS( fixedRuler->GetType(), Dali::Toolkit::Ruler::Fixed, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetType(), Dali::Toolkit::Ruler::FIXED, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2481,17 +2481,17 @@ int UtcDaliToolkitScrollViewRulerSnapAndClamp(void)
   // clamp state testing.
   ClampState clamped;
   DALI_TEST_EQUALS( ruler->SnapAndClamp(50.0f, 0.5f, 0.0f, 1.0f, clamped), 50.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
+  DALI_TEST_EQUALS( clamped, NOT_CLAMPED, TEST_LOCATION );
   DALI_TEST_EQUALS( ruler->SnapAndClamp(30.0f, 0.5f, 0.0f, 1.0f, clamped), 50.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
+  DALI_TEST_EQUALS( clamped, NOT_CLAMPED, TEST_LOCATION );
   DALI_TEST_EQUALS( ruler->SnapAndClamp(10.0f, 0.5f, 0.0f, 1.0f, clamped), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
+  DALI_TEST_EQUALS( clamped, NOT_CLAMPED, TEST_LOCATION );
   DALI_TEST_EQUALS( ruler->SnapAndClamp(-40.0f, 0.5f, 0.0f, 1.0f, clamped), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, ClampedToMin, TEST_LOCATION );
+  DALI_TEST_EQUALS( clamped, CLAMPED_TO_MIN, TEST_LOCATION );
   DALI_TEST_EQUALS( ruler->SnapAndClamp(390.0f, 0.5f, 0.0f, 1.0f, clamped), 400.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
+  DALI_TEST_EQUALS( clamped, NOT_CLAMPED, TEST_LOCATION );
   DALI_TEST_EQUALS( ruler->SnapAndClamp(430.0f, 0.5f, 0.0f, 1.0f, clamped), 400.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, ClampedToMax, TEST_LOCATION );
+  DALI_TEST_EQUALS( clamped, CLAMPED_TO_MAX, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2719,7 +2719,7 @@ int UtcDaliToolkitScrollViewConstraintsMove(void)
 
   Constraint constraint = Constraint::New<Vector3>( scrollView, Actor::Property::POSITION, MoveActorConstraint );
   constraint.AddSource( Source(scrollView, ScrollView::Property::SCROLL_POSITION) );
-  constraint.SetRemoveAction(Constraint::Discard);
+  constraint.SetRemoveAction(Constraint::DISCARD);
   scrollView.ApplyConstraintToChildren(constraint);
 
   scrollView.ScrollTo( target, 0.0f );
@@ -2769,7 +2769,7 @@ int UtcDaliToolkitScrollViewConstraintsWrap(void)
   constraint.AddSource( Source( scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
   constraint.AddSource( Source( scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
   constraint.AddSource( Source( scrollView, Toolkit::ScrollView::Property::WRAP ) );
-  constraint.SetRemoveAction(Constraint::Discard);
+  constraint.SetRemoveAction(Constraint::DISCARD);
   scrollView.ApplyConstraintToChildren(constraint);
 
   scrollView.ScrollTo( target, 0.0f );

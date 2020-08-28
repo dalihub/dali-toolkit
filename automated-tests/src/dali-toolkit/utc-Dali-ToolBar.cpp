@@ -126,10 +126,10 @@ int UtcDaliToolBarAddControl01(void)
     application.SendNotification();
 
     toolbar.Add( control1 );
-    toolbar.AddControl( control2, 0.1f, Alignment::HorizontalLeft, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
-    toolbar.AddControl( control3, 0.1f, Alignment::HorizontalCenter, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
-    toolbar.AddControl( control4, 0.1f, Alignment::HorizontalCenter, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
-    toolbar.AddControl( control5, 0.1f, Alignment::HorizontalRight, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
+    toolbar.AddControl( control2, 0.1f, Alignment::HORIZONTAL_LEFT, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
+    toolbar.AddControl( control3, 0.1f, Alignment::HORIZONTAL_CENTER, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
+    toolbar.AddControl( control4, 0.1f, Alignment::HORIZONTAL_CENTER, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
+    toolbar.AddControl( control5, 0.1f, Alignment::HORIZONTAL_RIGHT, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
 
     Actor control6 = CreateColorActor( Color::RED );
     control6.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
@@ -143,9 +143,9 @@ int UtcDaliToolBarAddControl01(void)
     application.Render();
     application.SendNotification();
 
-    toolbar.AddControl( control6, 0.4f, Alignment::HorizontalLeft, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
-    toolbar.AddControl( control7, 0.2f, Alignment::HorizontalCenter, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
-    toolbar.AddControl( control8, 0.2f, Alignment::HorizontalRight, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
+    toolbar.AddControl( control6, 0.4f, Alignment::HORIZONTAL_LEFT, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
+    toolbar.AddControl( control7, 0.2f, Alignment::HORIZONTAL_CENTER, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
+    toolbar.AddControl( control8, 0.2f, Alignment::HORIZONTAL_RIGHT, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
   }
   catch( ... )
   {
@@ -198,7 +198,7 @@ int UtcDaliToolBarRemoveControl01(void)
     Actor control = CreateColorActor( Color::RED );
 
     ToolBar toolbar = ToolBar::New();
-    toolbar.AddControl( control, 0.1f, Alignment::HorizontalLeft );
+    toolbar.AddControl( control, 0.1f, Alignment::HORIZONTAL_LEFT );
 
     toolbar.RemoveControl( control );
   }
@@ -223,8 +223,8 @@ int UtcDaliToolBarRemoveControl02(void)
 
     ToolBar toolbar01 = ToolBar::New();
     ToolBar toolbar02 = ToolBar::New();
-    toolbar01.AddControl( control01, 0.1f, Alignment::HorizontalLeft );
-    toolbar02.AddControl( control02, 0.1f, Alignment::HorizontalLeft );
+    toolbar01.AddControl( control01, 0.1f, Alignment::HORIZONTAL_LEFT );
+    toolbar02.AddControl( control02, 0.1f, Alignment::HORIZONTAL_LEFT );
 
     toolbar02.RemoveControl( control01 );
   }
@@ -243,7 +243,7 @@ int UtcDaliToolBarRemoveControl02(void)
     Actor control = CreateColorActor( Color::RED );
 
     ToolBar toolbar = ToolBar::New();
-    toolbar.AddControl( control, 0.1f, Alignment::HorizontalLeft );
+    toolbar.AddControl( control, 0.1f, Alignment::HORIZONTAL_LEFT );
 
     toolbar.RemoveControl( control );
     toolbar.RemoveControl( control );

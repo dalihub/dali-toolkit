@@ -44,7 +44,7 @@ class Alignment;
  * @note The use of scaling property will override all constraints applied to actors.
  *
  * All actors added to an alignment are going to be set with the same anchor point and parent origin. And if the scaling property is set to a value
- * different than ScaleNone, constraints as well.
+ * different than SCALE_NONE, constraints as well.
  */
 class DALI_TOOLKIT_API Alignment : public Control
 {
@@ -55,12 +55,12 @@ public:
    */
   enum Type
   {
-    HorizontalLeft   = 1, ///< Horizontal left alignment @SINCE_1_0.0
-    HorizontalCenter = 2, ///< Horizontal center alignment @SINCE_1_0.0
-    HorizontalRight  = 4, ///< Horizontal right alignment @SINCE_1_0.0
-    VerticalTop      = 8, ///< Vertical top alignment @SINCE_1_0.0
-    VerticalCenter   = 16, ///< Vertical center alignment @SINCE_1_0.0
-    VerticalBottom   = 32 ///< Vertical bottom alignment @SINCE_1_0.0
+    HORIZONTAL_LEFT   = 1, ///< HORIZONTAL left alignment @SINCE_1_9.28
+    HORIZONTAL_CENTER = 2, ///< HORIZONTAL center alignment @SINCE_1_9.28
+    HORIZONTAL_RIGHT  = 4, ///< HORIZONTAL right alignment @SINCE_1_9.28
+    VERTICAL_TOP      = 8, ///< VERTICAL top alignment @SINCE_1_9.28
+    VERTICAL_CENTER   = 16, ///< VERTICAL center alignment @SINCE_1_9.28
+    VERTICAL_BOTTOM   = 32 ///< VERTICAL bottom alignment @SINCE_1_9.28
   };
 
   /**
@@ -69,12 +69,12 @@ public:
    */
   enum Scaling
   {
-    ScaleNone,             ///< The original size is kept. @SINCE_1_0.0
-    ScaleToFill,           ///< Scale added actors to fill alignment's boundary. Aspect ratio is not maintained. @SINCE_1_0.0
-    ScaleToFitKeepAspect,  ///< Scale added actors to fit within the alignment's boundary. Aspect ratio is maintained. @SINCE_1_0.0
-    ScaleToFillKeepAspect, ///< Scale added actors to fill the alignment's boundary. Aspect ratio is maintained, and the actor may exceed the alignment's boundary. @SINCE_1_0.0
-    ShrinkToFit,           ///< If added actors are larger than the alignment's boundary it will be shrunk down to fit. Aspect ratio is not maintained @SINCE_1_0.0
-    ShrinkToFitKeepAspect, ///< If added actors are larger than the alignment's boundary it will be shrunk down to fit. Aspect ratio is maintained @SINCE_1_0.0
+    SCALE_NONE,             ///< The original size is kept. @SINCE_1_9.28
+    SCALE_TO_FILL,           ///< Scale added actors to fill alignment's boundary. Aspect ratio is not maintained. @SINCE_1_9.28
+    SCALE_TO_FIT_KEEP_ASPECT,  ///< Scale added actors to fit within the alignment's boundary. Aspect ratio is maintained. @SINCE_1_9.28
+    SCALE_TO_FILL_KEEP_ASPECT, ///< Scale added actors to fill the alignment's boundary. Aspect ratio is maintained, and the actor may exceed the alignment's boundary. @SINCE_1_9.28
+    SHRINK_TO_FIT,           ///< If added actors are larger than the alignment's boundary it will be shrunk down to fit. Aspect ratio is not maintained @SINCE_1_9.28
+    SHRINK_TO_FIT_KEEP_ASPECT, ///< If added actors are larger than the alignment's boundary it will be shrunk down to fit. Aspect ratio is maintained @SINCE_1_9.28
   };
 
   /**
@@ -130,11 +130,11 @@ public:
    * @brief Creates an alignment control.
    *
    * @SINCE_1_0.0
-   * @param[in] horizontal Specifies how to align actors horizontally. Could be HorizontalLeft, HorizontalCenter or HorizontalRight. By default, HorizontalCenter
-   * @param[in] vertical Specifies how to align actors vertically. Could be VerticalTop, VerticalCenter or VerticalBottom. By default, VerticalCenter
+   * @param[in] horizontal Specifies how to align actors horizontally. Could be HORIZONTAL_LEFT, HORIZONTAL_CENTER or HORIZONTAL_RIGHT. By default, HORIZONTAL_CENTER
+   * @param[in] vertical Specifies how to align actors vertically. Could be VERTICAL_TOP, VERTICAL_CENTER or VERTICAL_BOTTOM. By default, VERTICAL_CENTER
    * @return A handle to the Alignment control
    */
-  static Alignment New( Type horizontal = HorizontalCenter, Type vertical = VerticalCenter );
+  static Alignment New( Type horizontal = HORIZONTAL_CENTER, Type vertical = VERTICAL_CENTER );
 
   /**
    * @brief Copy constructor. Creates another handle that points to the same real object.
@@ -165,7 +165,7 @@ public:
   static Alignment DownCast( BaseHandle handle );
 
   /**
-   * @brief Sets the new alignment. By default, ( HorizontalCenter | VerticalCenter ).
+   * @brief Sets the new alignment. By default, ( HORIZONTAL_CENTER | VERTICAL_CENTER ).
    *
    * @SINCE_1_0.0
    * @param[in] type The new alignment option

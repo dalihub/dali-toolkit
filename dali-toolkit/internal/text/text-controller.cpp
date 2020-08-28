@@ -4150,7 +4150,7 @@ void Controller::ProcessModifyEvents()
     mImpl->mEventData->mRightSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
   }
 
-  // Discard temporary text
+  // DISCARD temporary text
   events.Clear();
 }
 

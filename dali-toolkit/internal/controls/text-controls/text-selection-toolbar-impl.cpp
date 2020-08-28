@@ -259,7 +259,7 @@ void TextSelectionToolbar::SetUpScrollBar( bool enable )
       indicator.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       indicator.SetStyleName( "TextSelectionScrollIndicator" );
 
-      mScrollBar = Toolkit::ScrollBar::New( Toolkit::ScrollBar::Horizontal );
+      mScrollBar = Toolkit::ScrollBar::New( Toolkit::ScrollBar::HORIZONTAL );
       mScrollBar.SetProperty( Dali::Actor::Property::NAME, "Text popup scroll bar" );
       mScrollBar.SetStyleName( "TextSelectionScrollBar" );
       mScrollBar.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );

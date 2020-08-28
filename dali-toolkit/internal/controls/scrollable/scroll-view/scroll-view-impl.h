@@ -369,13 +369,13 @@ public:
    * @copydoc ScrollTo(const Vector2&)
    */
   void TransformTo(const Vector2& position,
-                   DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
+                   DirectionBias horizontalBias = DIRECTION_BIAS_NONE, DirectionBias verticalBias = DIRECTION_BIAS_NONE);
 
   /**
    * @copydoc ScrollTo(const Vector2&, float, AlhpaFunction, DirectionBias, DirectionBias)
    */
   void TransformTo(const Vector2& position, float duration, AlphaFunction alpha,
-                   DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
+                   DirectionBias horizontalBias = DIRECTION_BIAS_NONE, DirectionBias verticalBias = DIRECTION_BIAS_NONE);
 
   /**
    * @copydoc Toolkit::ScrollView::ScrollTo(const Vector2 &position)
@@ -412,7 +412,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::ScrollTo(unsigned int page, float duration, DirectionBias bias)
    */
-  void ScrollTo(unsigned int page, float duration, DirectionBias bias = DirectionBiasNone);
+  void ScrollTo(unsigned int page, float duration, DirectionBias bias = DIRECTION_BIAS_NONE);
 
   /**
    * @copydoc Toolkit::ScrollView::ScrollTo(Actor& actor)
@@ -482,8 +482,8 @@ public:
    */
   bool AnimateTo(const Vector2& position, const Vector2& positionDuration,
                              AlphaFunction alpha, bool findShortcuts = true,
-                             DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone,
-                             SnapType snapType = Snap);
+                             DirectionBias horizontalBias = DIRECTION_BIAS_NONE, DirectionBias verticalBias = DIRECTION_BIAS_NONE,
+                             SnapType snapType = SNAP);
 
   /**
    * @copydoc Toolkit::Scrollable::AddOverlay()
