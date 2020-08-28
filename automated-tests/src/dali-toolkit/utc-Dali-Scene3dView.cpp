@@ -42,7 +42,8 @@ namespace
  * Donated by Norbert Nopper for glTF testing.
  * Take from https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/AnimatedCube
  */
-const char* TEST_GLTF_FILE_NAME = TEST_RESOURCE_DIR "/AnimatedCube.gltf";
+const char* TEST_GLTF_FILE_NAME[] = {TEST_RESOURCE_DIR "/AnimatedCube.gltf",
+                                     TEST_RESOURCE_DIR "/InterpolationTest.gltf"};
 /**
  * For the diffuse and specular cube map texture.
  * These textures are based off version of Wave engine sample
@@ -87,7 +88,7 @@ int UtcDaliScene3dViewCopyConstructorP(void)
   TestApplication application;
 
   // Initialize an object, ref count == 1
-  Scene3dView scene3dView = Scene3dView::New( TEST_GLTF_FILE_NAME );
+  Scene3dView scene3dView = Scene3dView::New( TEST_GLTF_FILE_NAME[0] );
 
   Scene3dView copy( scene3dView );
   DALI_TEST_CHECK( copy );
@@ -99,7 +100,7 @@ int UtcDaliScene3dViewCopyConstructor2P(void)
   TestApplication application;
 
   // Initialize an object, ref count == 1
-  Toolkit::Scene3dView scene3dView = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME, TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE, Vector4::ONE );
+  Toolkit::Scene3dView scene3dView = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME[0], TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE, Vector4::ONE );
 
   Scene3dView copy( scene3dView );
   DALI_TEST_CHECK( copy );
@@ -110,7 +111,7 @@ int UtcDaliScene3dViewAssignmentOperatorP(void)
 {
   TestApplication application;
 
-  Scene3dView scene3dView = Scene3dView::New( TEST_GLTF_FILE_NAME );
+  Scene3dView scene3dView = Scene3dView::New( TEST_GLTF_FILE_NAME[0] );
 
   Scene3dView copy( scene3dView );
   DALI_TEST_CHECK( copy );
@@ -128,7 +129,7 @@ int UtcDaliScene3dViewNewP(void)
   Scene3dView scene3dView;
   DALI_TEST_CHECK( !scene3dView );
 
-  scene3dView = Scene3dView::New( TEST_GLTF_FILE_NAME );
+  scene3dView = Scene3dView::New( TEST_GLTF_FILE_NAME[0] );
   DALI_TEST_CHECK( scene3dView );
 
   END_TEST;
@@ -150,7 +151,7 @@ int UtcDaliScene3dViewDownCast(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliScene3dViewDownCast");
 
-  Toolkit::Scene3dView view = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME );
+  Toolkit::Scene3dView view = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME[0] );
   BaseHandle handle(view);
 
   Toolkit::Scene3dView scene3dView = Toolkit::Scene3dView::DownCast( handle );
@@ -165,7 +166,7 @@ int UtcDaliScene3dViewSetLight(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliScene3dViewSetLight");
 
-  Toolkit::Scene3dView view = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME );
+  Toolkit::Scene3dView view = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME[0] );
 
   bool lightSet = view.SetLight( Scene3dView::LightType::DIRECTIONAL_LIGHT, Vector3( 1.0, 1.0, -1.0 ), Vector3( 0.3, 0.3, 0.3 ) );
   DALI_TEST_CHECK( lightSet );
@@ -180,7 +181,7 @@ int UtcDaliScene3dViewGetCamera(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliScene3dViewGetCamera");
 
-  Toolkit::Scene3dView view = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME );
+  Toolkit::Scene3dView view = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME[0] );
 
   CameraActor camera = view.GetDefaultCamera();
   DALI_TEST_CHECK( camera );
@@ -202,10 +203,13 @@ int UtcDaliScene3dViewAnimations(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliScene3dViewAnimations");
 
-  Toolkit::Scene3dView view = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME );
+  for( auto filename : TEST_GLTF_FILE_NAME )
+  {
+    Toolkit::Scene3dView view = Toolkit::Scene3dView::New( filename );
 
-  bool playAnimation = view.PlayAnimations();
-  DALI_TEST_CHECK( playAnimation );
+    bool playAnimation = view.PlayAnimations();
+    DALI_TEST_CHECK( playAnimation );
+  }
 
   END_TEST;
 }
@@ -215,7 +219,7 @@ int UtcDaliScene3dViewAnimations2(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliScene3dViewAnimations2");
 
-  Toolkit::Scene3dView view = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME );
+  Toolkit::Scene3dView view = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME[0] );
 
   bool animated = true;
   unsigned int animationCount = view.GetAnimationCount();

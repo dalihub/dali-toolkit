@@ -23,6 +23,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <toolkit-text-utils.h>
+#include <dali/devel-api/events/key-event-devel.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
@@ -58,12 +59,7 @@ Dali::KeyEvent GenerateKey( const std::string& keyName,
                             unsigned long timeStamp,
                             const Dali::KeyEvent::State& keyState )
 {
-  return Dali::KeyEvent( keyName,
-                         keyString,
-                         keyCode,
-                         keyModifier,
-                         timeStamp,
-                         keyState );
+  return DevelKeyEvent::New( keyName, "", keyString, keyCode, keyModifier, timeStamp, keyState, "", "", Device::Class::NONE, Device::Subclass::NONE );
 }
 
 } // namespace
@@ -844,7 +840,7 @@ int UtcDaliTextControllerCheckInputColorChanged(void)
   mImpl.mOperationsPending = Controller::NO_OPERATION;
 
   // simulate a key event.
-  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::DOWN ) );
 
   // change the input color
   const Vector4 newInputColor( 1.0f, 0.0f, 0.0f, 1.0f );
@@ -893,7 +889,7 @@ int UtcDaliTextControllerCheckInputFontFamilyChanged(void)
   mImpl.mOperationsPending = Controller::NO_OPERATION;
 
   // simulate a key event.
-  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::DOWN ) );
 
   // change the input font family
   controller->SetInputFontFamily("SamsungOneUI_300");
@@ -942,7 +938,7 @@ int UtcDaliTextControllerCheckInputFontWeightChanged(void)
   mImpl.mOperationsPending = Controller::NO_OPERATION;
 
   // simulate a key event.
-  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::DOWN ) );
 
   // change the input font weight
   controller->SetInputFontWeight( TextAbstraction::FontWeight::BOLD );
@@ -991,7 +987,7 @@ int UtcDaliTextControllerCheckInputFontWidthChanged(void)
   mImpl.mOperationsPending = Controller::NO_OPERATION;
 
   // simulate a key event.
-  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::DOWN ) );
 
   // change the input font width
   controller->SetInputFontWidth( TextAbstraction::FontWidth::EXPANDED );
@@ -1040,7 +1036,7 @@ int UtcDaliTextControllerCheckInputFontSlantChanged(void)
   mImpl.mOperationsPending = Controller::NO_OPERATION;
 
   // simulate a key event.
-  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::DOWN ) );
 
   // change the input font slant
   controller->SetInputFontSlant( TextAbstraction::FontSlant::ROMAN );
@@ -1089,7 +1085,7 @@ int UtcDaliTextControllerCheckInputFontPointSizeChanged(void)
   mImpl.mOperationsPending = Controller::NO_OPERATION;
 
   // simulate a key event.
-  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::DOWN ) );
 
   // change the input font point size
   controller->SetInputFontPointSize( 1.2f );
@@ -1180,7 +1176,7 @@ int UtcDaliTextControllerRemoveTextChangeEventData(void)
   controller->GetNaturalSize();
 
   // Simulate a key event to delete text
-  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::KeyEvent::DOWN ) );
 
   DALI_TEST_EQUALS( EventData::EDITING, mImpl.mEventData->mState, TEST_LOCATION );
 
@@ -1217,7 +1213,7 @@ int UtcDaliTextControllerCheckInputFontPointSizeUpdated(void)
   controller->Relayout(size);
 
   // simulate a key event.
-  controller->KeyEvent( GenerateKey( "a", "a", 38, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "a", "a", 38, 0, 0, Dali::KeyEvent::DOWN ) );
 
   // change the input font point size
   controller->SetInputFontPointSize( 20.f );
@@ -1262,7 +1258,7 @@ int UtcDaliTextControllerDeleteSurroundings(void)
   controller->Relayout( size );
 
   // Simulate a key event to delete one text
-  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::KeyEvent::DOWN ) );
 
   // Send DELETE_SURROUNDING event (Delete All text)
   imfEvent = InputMethodContext::EventData( InputMethodContext::DELETE_SURROUNDING, "", -2, 2 );
@@ -1274,8 +1270,8 @@ int UtcDaliTextControllerDeleteSurroundings(void)
   controller->Relayout( size );
 
   // simulate a key event to add text
-  controller->KeyEvent( GenerateKey( "ㅇ", "ㅇ", 238, 0, 0, Dali::KeyEvent::Down ) );
-  controller->KeyEvent( GenerateKey( "ㅇ", "ㅇ", 238, 0, 0, Dali::KeyEvent::Down ) );
+  controller->KeyEvent( GenerateKey( "ㅇ", "ㅇ", 238, 0, 0, Dali::KeyEvent::DOWN ) );
+  controller->KeyEvent( GenerateKey( "ㅇ", "ㅇ", 238, 0, 0, Dali::KeyEvent::DOWN ) );
 
   DALI_TEST_EQUALS( EventData::EDITING, mImpl.mEventData->mState, TEST_LOCATION );
 

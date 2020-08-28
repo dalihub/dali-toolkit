@@ -277,6 +277,21 @@ int UtcDaliBuilderAnimationP(void)
         "          \"duration\": 3"
         "        }"
         "      }]"
+        "    },"
+        "    \"pathAnimation2\": {"
+        "      \"duration\": 3.0,"
+        "      \"endAction\": \"BAKE_FINAL\","
+        "      \"disconnectAction\": \"DISCARD\","
+        "      \"properties\": [{"
+        "        \"actor\": \"greeting\","
+        "        \"path\":\"path0\","
+        "        \"forward\":[1,0,0],"
+        "        \"alphaFunction\": \"EASE_IN_OUT\","
+        "        \"timePeriod\": {"
+        "          \"delay\": 0,"
+        "          \"duration\": 3"
+        "        }"
+        "      }]"
         "    }"
         "  },"
         "  \"stage\": [{"
@@ -310,6 +325,10 @@ int UtcDaliBuilderAnimationP(void)
   DALI_TEST_CHECK( anim );
 
   anim = builder.CreateAnimation("pathAnimation");
+
+  DALI_TEST_CHECK( anim );
+
+  anim = builder.CreateAnimation("pathAnimation2");
 
   DALI_TEST_CHECK( anim );
 

@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali.h>
-#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
@@ -254,7 +253,7 @@ int UtcDaliTransitionDataMap1P(void)
   DALI_TEST_CHECK( anim );
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index mixColorIndex = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
   application.SendNotification();
   application.Render(0);
 
@@ -322,7 +321,7 @@ int UtcDaliTransitionDataMap2P(void)
   DALI_TEST_CHECK( anim );
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index mixColorIndex = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
   application.SendNotification();
   application.Render(0);
 
@@ -394,7 +393,7 @@ int UtcDaliTransitionDataMap2Pb(void)
   DALI_TEST_CHECK( anim );
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, PrimitiveVisual::Property::MIX_COLOR );
+  Property::Index mixColorIndex = renderer.GetPropertyIndex( PrimitiveVisual::Property::MIX_COLOR );
   application.SendNotification();
   application.Render(0);
 
@@ -590,7 +589,7 @@ int UtcDaliTransitionDataMap5P(void)
   DALI_TEST_CHECK( anim );
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index mixColorIndex = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
   application.SendNotification();
   application.Render(0);
 
@@ -662,7 +661,7 @@ int UtcDaliTransitionDataMap6P(void)
   DALI_TEST_CHECK( anim );
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index mixColorIndex = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
   application.SendNotification();
   application.Render(0);
 
@@ -814,7 +813,7 @@ int UtcDaliTransitionDataMapN4(void)
   application.SendNotification();
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index mixColorIdx = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index mixColorIdx = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
 
   tet_printf( "Test that the property has been set to target value\n");
   DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(mixColorIdx), Vector3(Color::RED), 0.001, TEST_LOCATION);
@@ -866,7 +865,7 @@ int UtcDaliTransitionDataMapN5(void)
   application.SendNotification();
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index mixColorIdx = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index mixColorIdx = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
 
   tet_printf( "Test that the property has been set to target value\n");
   DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(mixColorIdx), Vector3(Color::RED), 0.001, TEST_LOCATION);
@@ -917,7 +916,7 @@ int UtcDaliTransitionDataMapN6(void)
   application.SendNotification();
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index mixColorIdx = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index mixColorIdx = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
 
   tet_printf( "Test that the property has been set to target value\n");
   DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(mixColorIdx), Vector3(Color::RED), 0.001, TEST_LOCATION);

@@ -176,15 +176,15 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
   {
     if("BAKE" == *endAction)
     {
-      animation.SetEndAction( Animation::Bake );
+      animation.SetEndAction( Animation::BAKE );
     }
     else if("DISCARD" == *endAction)
     {
-      animation.SetEndAction( Animation::Discard );
+      animation.SetEndAction( Animation::DISCARD );
     }
     else if("BAKE_FINAL" == *endAction)
     {
-      animation.SetEndAction( Animation::BakeFinal );
+      animation.SetEndAction( Animation::BAKE_FINAL );
     }
   }
 
@@ -192,15 +192,15 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
   {
     if("BAKE" == *endAction)
     {
-      animation.SetDisconnectAction( Animation::Bake );
+      animation.SetDisconnectAction( Animation::BAKE );
     }
     else if("DISCARD" == *endAction)
     {
-      animation.SetDisconnectAction( Animation::Discard );
+      animation.SetDisconnectAction( Animation::DISCARD );
     }
     else if("BAKE_FINAL" == *endAction)
     {
-      animation.SetDisconnectAction( Animation::BakeFinal );
+      animation.SetDisconnectAction( Animation::BAKE_FINAL );
     }
   }
 

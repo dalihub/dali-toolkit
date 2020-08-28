@@ -69,9 +69,7 @@ struct SignalData
   {
     functorCalled = false;
 
-    receivedKeyEvent.keyModifier = 0;
-    receivedKeyEvent.keyPressedName.clear();
-    receivedKeyEvent.keyPressed.clear();
+    receivedKeyEvent.Reset();
 
   }
 
@@ -251,7 +249,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
   manager.SetFocus( dummy3 );
   DALI_TEST_CHECK( dummy3Impl.keyInputFocusGained );
 
-  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Up, "", "", Device::Class::TOUCH, Device::Subclass::NONE );
+  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE );
   application.ProcessEvent(event);
 
   DALI_TEST_CHECK( callback1.mIsCalled );
@@ -297,7 +295,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
   manager.SetFocus( dummy3 );
   DALI_TEST_CHECK( dummy3Impl.keyInputFocusGained );
 
-  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Up, "", "", Device::Class::TOUCH, Device::Subclass::NONE );
+  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE );
   application.ProcessEvent(event);
 
   DALI_TEST_CHECK( !callback1.mIsCalled );
