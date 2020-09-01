@@ -385,30 +385,30 @@ void Tooltip::SetTail( const Property::Value& value )
 
 bool Tooltip::OnHovered( Actor /* actor */, const HoverEvent& hover )
 {
-  const PointState::Type state = hover.GetState( 0 );
+  const TouchPoint::State state = hover.points[0].state;
   switch( state )
   {
-    case PointState::STARTED:
-    case PointState::MOTION:
+    case TouchPoint::Started:
+    case TouchPoint::Motion:
     {
       if( ! mPopup )
       {
         if( ! mTooltipTimer )
         {
-          mHoverPoint = hover.GetScreenPosition( 0 );
+          mHoverPoint = hover.points[ 0 ].screen;
           mTooltipTimer = Timer::New( mWaitTime );
           mTooltipTimer.TickSignal().Connect( this, &Tooltip::OnTimeout );
           mTooltipTimer.Start();
         }
         else
         {
-          Vector2 movement = mHoverPoint - hover.GetScreenPosition( 0 );
+          Vector2 movement = mHoverPoint - hover.points[ 0 ].screen;
           if( std::abs( movement.Length() ) > mMovementThreshold )
           {
             mTooltipTimer.Stop();
             mTooltipTimer.Reset();
 
-            mHoverPoint = hover.GetScreenPosition( 0 );
+            mHoverPoint = hover.points[ 0 ].screen;
             mTooltipTimer = Timer::New( mWaitTime );
             mTooltipTimer.TickSignal().Connect( this, &Tooltip::OnTimeout );
             mTooltipTimer.Start();
@@ -419,7 +419,7 @@ bool Tooltip::OnHovered( Actor /* actor */, const HoverEvent& hover )
       {
         // Popup is showing, and we're set to disappear on excessive movement so make sure we're still within the threshold.
 
-        Vector2 movement = mHoverPoint - hover.GetScreenPosition( 0 );
+        Vector2 movement = mHoverPoint - hover.points[ 0 ].screen;
         if( std::abs( movement.Length() ) > mMovementThreshold )
         {
           // Exceeding the threshold, hide the popup.
@@ -438,9 +438,9 @@ bool Tooltip::OnHovered( Actor /* actor */, const HoverEvent& hover )
       }
       break;
     }
-    case PointState::FINISHED:
-    case PointState::LEAVE:
-    case PointState::INTERRUPTED:
+    case TouchPoint::Finished:
+    case TouchPoint::Leave:
+    case TouchPoint::Interrupted:
     {
       if( mTooltipTimer )
       {
@@ -455,7 +455,8 @@ bool Tooltip::OnHovered( Actor /* actor */, const HoverEvent& hover )
       break;
     }
 
-    case PointState::STATIONARY:
+    case TouchPoint::Stationary:
+    case TouchPoint::Last:
     {
       break;
     }
