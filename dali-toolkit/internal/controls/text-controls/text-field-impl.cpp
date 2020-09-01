@@ -1896,7 +1896,7 @@ void TextField::OnSceneConnection( int depth )
 
 bool TextField::OnTouched( Actor actor, const TouchEvent& touch )
 {
-  return false;
+  return true;
 }
 
 void TextField::OnIdleSignal()
