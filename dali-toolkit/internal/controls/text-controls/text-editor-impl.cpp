@@ -1601,12 +1601,12 @@ void TextEditor::OnLongPress( const LongPressGesture& gesture )
 
 bool TextEditor::OnKeyEvent( const KeyEvent& event )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnKeyEvent %p keyCode %d\n", mController.Get(), event.GetKeyCode() );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnKeyEvent %p keyCode %d\n", mController.Get(), event.keyCode );
 
-  if( Dali::DALI_KEY_ESCAPE == event.GetKeyCode() && mController->ShouldClearFocusOnEscape() )
+  if( Dali::DALI_KEY_ESCAPE == event.keyCode && mController->ShouldClearFocusOnEscape() )
   {
     // Make sure ClearKeyInputFocus when only key is up
-    if( event.GetState() == KeyEvent::Up )
+    if( event.state == KeyEvent::Up )
     {
       ClearKeyInputFocus();
     }

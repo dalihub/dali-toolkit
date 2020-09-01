@@ -23,7 +23,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <toolkit-text-utils.h>
-#include <dali/devel-api/events/key-event-devel.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
@@ -59,7 +58,12 @@ Dali::KeyEvent GenerateKey( const std::string& keyName,
                             unsigned long timeStamp,
                             const Dali::KeyEvent::State& keyState )
 {
-  return DevelKeyEvent::New( keyName, "", keyString, keyCode, keyModifier, timeStamp, keyState, "", "", Device::Class::NONE, Device::Subclass::NONE );
+  return Dali::KeyEvent( keyName,
+                         keyString,
+                         keyCode,
+                         keyModifier,
+                         timeStamp,
+                         keyState );
 }
 
 } // namespace

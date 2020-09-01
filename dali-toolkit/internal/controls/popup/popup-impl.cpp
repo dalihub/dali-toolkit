@@ -1812,9 +1812,9 @@ bool Popup::OnKeyEvent( const KeyEvent& event )
 
   bool consumed = false;
 
-  if( event.GetState() == KeyEvent::Down )
+  if( event.state == KeyEvent::Down )
   {
-    if (event.GetKeyCode() == Dali::DALI_KEY_ESCAPE || event.GetKeyCode() == Dali::DALI_KEY_BACK)
+    if (event.keyCode == Dali::DALI_KEY_ESCAPE || event.keyCode == Dali::DALI_KEY_BACK)
     {
       SetDisplayState( Toolkit::Popup::HIDDEN );
       consumed = true;

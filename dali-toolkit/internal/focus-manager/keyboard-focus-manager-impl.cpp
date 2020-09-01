@@ -751,7 +751,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
   Toolkit::AccessibilityManager accessibilityManager = Toolkit::AccessibilityManager::Get();
 
-  std::string keyName = event.GetKeyName();
+  std::string keyName = event.keyPressedName;
 
   if( mIsFocusIndicatorShown == UNKNOWN )
   {
@@ -760,7 +760,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
   bool isFocusStartableKey = false;
 
-  if(event.GetState() == KeyEvent::Down)
+  if(event.state == KeyEvent::Down)
   {
     if (keyName == "Left")
     {
@@ -913,7 +913,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     {
     }
   }
-  else if(event.GetState() == KeyEvent::Up)
+  else if(event.state == KeyEvent::Up)
   {
     if (keyName == "Return")
     {

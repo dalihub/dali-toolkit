@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2830,11 +2830,11 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
   bool relayoutNeeded = false;
 
   if( ( NULL != mImpl->mEventData ) &&
-      ( keyEvent.GetState() == KeyEvent::Down ) )
+      ( keyEvent.state == KeyEvent::Down ) )
   {
-    int keyCode = keyEvent.GetKeyCode();
-    const std::string& keyString = keyEvent.GetKeyString();
-    const std::string keyName = keyEvent.GetKeyName();
+    int keyCode = keyEvent.keyCode;
+    const std::string& keyString = keyEvent.keyPressed;
+    const std::string keyName = keyEvent.keyPressedName;
 
     const bool isNullKey = ( 0 == keyCode ) && ( keyString.empty() );
 
