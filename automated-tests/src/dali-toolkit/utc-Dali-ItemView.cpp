@@ -24,7 +24,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/events/wheel-event-integ.h>
+
 
 using namespace Dali;
 using namespace Toolkit;
@@ -50,7 +50,6 @@ const int RENDER_FRAME_INTERVAL = 16;                     ///< Duration of each 
 static bool gObjectCreatedCallBackCalled;
 static bool gOnLayoutActivatedCalled;                     ///< Whether the LayoutActivated signal was invoked.
 static bool gOnScrollUpdateCalled;
-static bool gOnWheelEventCalled;                          ///< Whether the WheelEventSignal signal was invoked.
 
 static void TestCallback(BaseHandle handle)
 {
@@ -65,12 +64,6 @@ static void OnLayoutActivated()
 static void OnScrollUpdate( const Vector2& position )
 {
   gOnScrollUpdateCalled = true;
-}
-
-static bool OnWheelEvent( Actor actor, const Dali::WheelEvent& wheelEvent )
-{
-  gOnWheelEventCalled = true;
-  return false;
 }
 
 Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vector2& screenPosition, uint32_t time )
@@ -1327,43 +1320,6 @@ int UtcDaliItemEnableDisableRefresh(void)
   application.Render(1000);
 
   DALI_TEST_EQUALS( gOnScrollUpdateCalled, false, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliItemViewWheelEvent(void)
-{
-  ToolkitTestApplication application;
-  Dali::Integration::Scene stage = application.GetScene();
-
-  // Create the ItemView actor
-  TestItemFactory factory;
-  ItemView view = ItemView::New( factory );
-
-  // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  view.AddLayout( *gridLayout );
-  stage.Add( view );
-
-  // Activate the grid layout so that the items will be created and added to ItemView
-  Vector3 stageSize( stage.GetSize() );
-  view.ActivateLayout (0, stageSize, 0.5f );
-
-  //Connect to wheel event signal
-  view.WheelEventSignal().Connect( &OnWheelEvent );
-
-  DALI_TEST_CHECK( !gOnWheelEventCalled );
-
-  // Render and notify
-  application.Render();
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-
-  // Perform a wheel event
-  Dali::Integration::WheelEvent wheelEvent( Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, Vector2( 10.0f, 10.0f ), 1, 1000u );
-  application.ProcessEvent( wheelEvent );
-  DALI_TEST_CHECK( gOnWheelEventCalled );
 
   END_TEST;
 }
