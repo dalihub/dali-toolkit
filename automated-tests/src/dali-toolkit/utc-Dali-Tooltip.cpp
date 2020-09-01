@@ -50,7 +50,7 @@ void utc_dali_toolkit_tooltip_cleanup(void)
 namespace
 {
 
-Integration::HoverEvent GenerateSingleHover( PointState::Type state, const Vector2& screenPosition )
+Integration::HoverEvent GenerateSingleHover( TouchPoint::State state, const Vector2& screenPosition )
 {
   Integration::HoverEvent hoverEvent;
   Integration::Point point;
@@ -521,7 +521,7 @@ int UtcDaliTooltipDisplay(void)
   int rootChildCount = rootActor.GetChildCount();
 
   Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -533,7 +533,7 @@ int UtcDaliTooltipDisplay(void)
   ++rootChildCount;
   DALI_TEST_EQUALS( rootActor.GetChildCount(), rootChildCount, TEST_LOCATION );
 
-  application.ProcessEvent( GenerateSingleHover( PointState::STATIONARY, centerPoint ) ); // Emit for code coverage, will have no effect
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Stationary, centerPoint ) ); // Emit for code coverage, will have no effect
 
   END_TEST;
 }
@@ -563,7 +563,7 @@ int UtcDaliTooltipDisplayWithTail(void)
   int rootChildCount = rootActor.GetChildCount();
 
   Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -607,7 +607,7 @@ int UtcDaliTooltipDisplayWithContentArray(void)
   int rootChildCount = rootActor.GetChildCount();
 
   Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -642,7 +642,7 @@ int UtcDaliTooltipDisplayBelow(void)
   application.Render();
 
   Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -678,7 +678,7 @@ int UtcDaliTooltipDisplayAbove(void)
   application.Render();
 
   Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -717,7 +717,7 @@ int UtcDaliTooltipDisplayAtHoverPoint(void)
   Vector2 hoverPoint = stageSize * 0.5f;
   hoverPoint.x -= 10.0f;
   hoverPoint.y -= 10.0f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, hoverPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, hoverPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -757,14 +757,14 @@ int UtcDaliTooltipExceedThreshold(void)
 
   tet_infoline( "Start hover" );
   Vector2 hoverPoint = application.GetScene().GetSize() * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, hoverPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, hoverPoint ) );
 
   application.SendNotification();
   application.Render();
 
   tet_infoline( "Emit a value which exceeds threshold, timer should start again" );
   hoverPoint.x += 10.0f;
-  application.ProcessEvent( GenerateSingleHover( PointState::MOTION, hoverPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Motion, hoverPoint ) );
 
   application.SendNotification();
   application.Render();
@@ -803,14 +803,14 @@ int UtcDaliTooltipGoOutOfBounds(void)
 
   tet_infoline( "Start hover" );
   Vector2 hoverPoint = application.GetScene().GetSize() * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, hoverPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, hoverPoint ) );
 
   application.SendNotification();
   application.Render();
 
   tet_infoline( "Emit a value which goes out of bounds" );
   hoverPoint.x += 100.0f;
-  application.ProcessEvent( GenerateSingleHover( PointState::MOTION, hoverPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Motion, hoverPoint ) );
 
   application.SendNotification();
   application.Render();
@@ -847,7 +847,7 @@ int UtcDaliTooltipHideTooltipWhenOutOfBounds(void)
   int rootChildCount = rootActor.GetChildCount();
 
   Vector2 hoverPoint = application.GetScene().GetSize() * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, hoverPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, hoverPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -860,7 +860,7 @@ int UtcDaliTooltipHideTooltipWhenOutOfBounds(void)
   DALI_TEST_EQUALS( rootActor.GetChildCount(), rootChildCount, TEST_LOCATION );
 
   hoverPoint.x += 100.0f;
-  application.ProcessEvent( GenerateSingleHover( PointState::MOTION, hoverPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Motion, hoverPoint ) );
 
   application.SendNotification();
   application.Render();
@@ -895,7 +895,7 @@ int UtcDaliTooltipHideTooltipWhenSetToDisapperOnMovement(void)
   int rootChildCount = rootActor.GetChildCount();
 
   Vector2 hoverPoint = application.GetScene().GetSize() * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, hoverPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, hoverPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -908,7 +908,7 @@ int UtcDaliTooltipHideTooltipWhenSetToDisapperOnMovement(void)
   DALI_TEST_EQUALS( rootActor.GetChildCount(), rootChildCount, TEST_LOCATION );
 
   hoverPoint.x += 10.0f; // Stay within bounds but exceed threshold
-  application.ProcessEvent( GenerateSingleHover( PointState::MOTION, hoverPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Motion, hoverPoint ) );
 
   application.SendNotification();
   application.Render();
@@ -939,7 +939,7 @@ int UtcDaliTooltipChangeContent(void)
   int rootChildCount = rootActor.GetChildCount();
 
   Vector2 centerPoint = application.GetScene().GetSize() * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   tet_infoline( "Change content while timer is running and ensure it matches the new value" );
   control.SetProperty( DevelControl::Property::TOOLTIP, "Second Value" );
@@ -967,7 +967,7 @@ int UtcDaliTooltipChangeContent(void)
   DALI_TEST_EQUALS( rootActor.GetChildCount(), rootChildCount, TEST_LOCATION );
 
   tet_infoline( "More movement at same point, and emit signal, we should get the tooltip" );
-  application.ProcessEvent( GenerateSingleHover( PointState::MOTION, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Motion, centerPoint ) );
   timer.MockEmitSignal();
 
   application.SendNotification();
@@ -1032,7 +1032,7 @@ int UtcDaliTooltipEnsureRemainsOnStage1(void)
   application.Render();
 
   Vector2 centerPoint = stageSize * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -1074,7 +1074,7 @@ int UtcDaliTooltipEnsureRemainsOnStage2(void)
   application.Render();
 
   Vector2 centerPoint = stageSize * 0.5f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -1119,7 +1119,7 @@ int UtcDaliTooltipEnsureRemainsOnStage3(void)
 
   Vector2 hoverPoint( centerPoint );
   hoverPoint.x = 1.0f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();
@@ -1164,7 +1164,7 @@ int UtcDaliTooltipEnsureRemainsOnStage4(void)
 
   Vector2 hoverPoint( centerPoint );
   hoverPoint.x = 1.0f;
-  application.ProcessEvent( GenerateSingleHover( PointState::STARTED, centerPoint ) );
+  application.ProcessEvent( GenerateSingleHover( TouchPoint::Started, centerPoint ) );
 
   Dali::Timer timer = Timer::New( 1u );
   timer.MockEmitSignal();

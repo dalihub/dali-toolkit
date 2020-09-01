@@ -2096,7 +2096,7 @@ bool ScrollView::OnTouch( Actor actor, const TouchEvent& touch )
   else if( ( pointState == PointState::UP ) ||
            ( ( pointState == PointState::INTERRUPTED ) && ( touch.GetHitActor( 0 )== Self() ) ) )
   {
-    DALI_LOG_SCROLL_STATE("[0x%X] %s", this, ( ( pointState == PointState::UP ) ? "Up" : "Interrupted" ) );
+    DALI_LOG_SCROLL_STATE("[0x%X] %s", this, ( ( pointState == TouchPoint::Up ) ? "Up" : "Interrupted" ) );
 
     StopTouchDownTimer();
 

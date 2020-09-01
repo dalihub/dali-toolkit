@@ -2256,7 +2256,7 @@ int UtcDaliAccessibilityManagerActionScrollSignalP(void)
 
   Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
 
-  TouchPoint point( 0, PointState::STARTED, 100.0f, 200.0f );
+  TouchPoint point( 0, TouchPoint::Started, 100.0f, 200.0f );
   accessibilityAdaptor.HandleActionScrollEvent( point, 0u );
 
   DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
