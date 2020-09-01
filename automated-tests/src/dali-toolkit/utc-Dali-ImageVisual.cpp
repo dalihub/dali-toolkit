@@ -20,7 +20,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
 #include <toolkit-event-thread-callback.h>
-#include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -750,7 +749,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = DevelHandle::GetPropertyIndex( renderer, Visual::Property::MIX_COLOR );
+  Property::Index index = renderer.GetPropertyIndex( Visual::Property::MIX_COLOR );
   Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
 
@@ -1029,7 +1028,7 @@ int UtcDaliImageVisualAnimatePixelArea(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = DevelHandle::GetPropertyIndex( renderer, Visual::Property::MIX_COLOR );
+  Property::Index index = renderer.GetPropertyIndex( Visual::Property::MIX_COLOR );
 
   tet_infoline("Test that the renderer has the mixColor property");
   DALI_TEST_CHECK( index != Property::INVALID_INDEX );

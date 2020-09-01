@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/devel-api/object/handle-devel.h>
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
@@ -338,7 +337,7 @@ void ColorVisual::InitializeRenderer()
   // ColorVisual has it's own index key for mix color - use this instead
   // of using the new base index to avoid changing existing applications
   // String keys will get to this property.
-  mImpl->mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor) );
+  mImpl->mMixColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor) );
 
   mImpl->mRenderer.RegisterProperty( BLUR_RADIUS_NAME, mBlurRadius );
 

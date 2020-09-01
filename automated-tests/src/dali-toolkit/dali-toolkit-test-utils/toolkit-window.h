@@ -31,7 +31,7 @@ namespace Dali
 class Actor;
 class Layer;
 class RenderSurfaceInterface;
-struct KeyEvent;
+class KeyEvent;
 class TouchEvent;
 class WheelEvent;
 

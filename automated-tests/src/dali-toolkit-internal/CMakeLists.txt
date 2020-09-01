@@ -103,7 +103,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
-    -lpthread --coverage -ldl
+    -lpthread --coverage -ldl -rdynamic
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

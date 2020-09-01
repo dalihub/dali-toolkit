@@ -19,7 +19,6 @@
 #include "npatch-visual.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
@@ -181,15 +180,15 @@ Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsi
 {
   Property::Map vertexFormat;
   vertexFormat[ "aPosition" ] = Property::VECTOR2;
-  PropertyBuffer vertexPropertyBuffer = PropertyBuffer::New( vertexFormat );
+  VertexBuffer vertexBuffer = VertexBuffer::New( vertexFormat );
   if( vertices.Size() > 0 )
   {
-    vertexPropertyBuffer.SetData( &vertices[ 0 ], vertices.Size() );
+    vertexBuffer.SetData( &vertices[ 0 ], vertices.Size() );
   }
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer( vertexPropertyBuffer );
+  geometry.AddVertexBuffer( vertexBuffer );
   if( indices.Size() > 0 )
   {
     geometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
@@ -671,8 +670,8 @@ void NPatchVisual::ApplyTextureAndUniforms()
                                  auxiliaryPixelData.GetHeight() );
     texture.Upload( auxiliaryPixelData );
     textureSet.SetTexture( 1, texture );
-    DevelHandle::RegisterProperty( mImpl->mRenderer, DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA,
-                                   AUXILIARY_IMAGE_ALPHA_NAME, mAuxiliaryImageAlpha );
+    mImpl->mRenderer.RegisterProperty( DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA,
+                                       AUXILIARY_IMAGE_ALPHA_NAME, mAuxiliaryImageAlpha );
   }
   mImpl->mRenderer.SetTextures( textureSet );
 
