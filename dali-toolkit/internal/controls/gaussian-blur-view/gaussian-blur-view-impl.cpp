@@ -27,6 +27,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/property-buffer.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/render-tasks/render-task-list.h>

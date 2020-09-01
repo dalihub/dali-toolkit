@@ -216,7 +216,7 @@ Geometry WireframeVisual::CreateQuadWireframeGeometry()
 
   Property::Map quadVertexFormat;
   quadVertexFormat[POSITION_ATTRIBUTE_NAME] = Property::VECTOR2;
-  VertexBuffer quadVertices = VertexBuffer::New( quadVertexFormat );
+  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat );
   quadVertices.SetData( quadVertexData, 4 );
 
   // Create indices

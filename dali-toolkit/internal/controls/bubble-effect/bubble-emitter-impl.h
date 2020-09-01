@@ -24,10 +24,10 @@
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/property-buffer.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/shader.h>
-#include <dali/public-api/rendering/vertex-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>

@@ -180,15 +180,15 @@ Geometry GenerateGeometry( const Vector< Vector2 >& vertices, const Vector< unsi
 {
   Property::Map vertexFormat;
   vertexFormat[ "aPosition" ] = Property::VECTOR2;
-  VertexBuffer vertexBuffer = VertexBuffer::New( vertexFormat );
+  PropertyBuffer vertexPropertyBuffer = PropertyBuffer::New( vertexFormat );
   if( vertices.Size() > 0 )
   {
-    vertexBuffer.SetData( &vertices[ 0 ], vertices.Size() );
+    vertexPropertyBuffer.SetData( &vertices[ 0 ], vertices.Size() );
   }
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer( vertexBuffer );
+  geometry.AddVertexBuffer( vertexPropertyBuffer );
   if( indices.Size() > 0 )
   {
     geometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );

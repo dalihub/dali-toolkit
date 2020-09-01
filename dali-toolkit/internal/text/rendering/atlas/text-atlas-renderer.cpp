@@ -679,7 +679,7 @@ struct AtlasRenderer::Impl
   Actor CreateMeshActor( Actor textControl, Property::Index animatablePropertyIndex, const Vector4& defaultColor, const MeshRecord& meshRecord,
                          const Vector2& actorSize, Style style )
   {
-    VertexBuffer quadVertices = VertexBuffer::New( mQuadVertexFormat );
+    PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat );
     quadVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &meshRecord.mMesh.mVertices[ 0 ] ), meshRecord.mMesh.mVertices.Size() );
 
     Geometry quadGeometry = Geometry::New();

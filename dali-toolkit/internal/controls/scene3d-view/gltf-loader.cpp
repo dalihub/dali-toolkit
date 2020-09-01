@@ -372,14 +372,14 @@ void SetMeshInfoAndCanonize( MeshInfo& meshInfo, Dali::Vector<Dali::Vector3> &ve
 }
 
 template <typename T>
-VertexBuffer CreateVertexBuffer( Vector<T> bufferData, std::string map, int32_t type )
+PropertyBuffer CreatePropertyBuffer( Vector<T> bufferData, std::string map, int32_t type )
 {
   Property::Map positionMap;
   positionMap[map] = type;
 
-  VertexBuffer vertexBuffer = VertexBuffer::New( positionMap );
-  vertexBuffer.SetData( bufferData.Begin(), bufferData.Count() );
-  return vertexBuffer;
+  PropertyBuffer propertyBuffer = PropertyBuffer::New( positionMap );
+  propertyBuffer.SetData( bufferData.Begin(), bufferData.Count() );
+  return propertyBuffer;
 }
 
 void SetVertexBufferData( MeshInfo& meshInfo, std::string path, std::vector<AccessorInfo>& accessorArray, std::vector<BufferViewInfo>& bufferViewArray, std::vector<BufferInfo>& bufferArray, int32_t accessorIdx, std::string map, int32_t type )
@@ -390,8 +390,8 @@ void SetVertexBufferData( MeshInfo& meshInfo, std::string path, std::vector<Acce
     LoadDataFromAccessor( accessorIdx, bufferData, path, accessorArray, bufferViewArray, bufferArray );
     SetMeshInfoAndCanonize( meshInfo, bufferData );
 
-    VertexBuffer vertexBuffer = CreateVertexBuffer<Vector3>( bufferData, map, type );
-    meshInfo.geometry.AddVertexBuffer( vertexBuffer );
+    PropertyBuffer propertyBuffer = CreatePropertyBuffer<Vector3>( bufferData, map, type );
+    meshInfo.geometry.AddVertexBuffer( propertyBuffer );
   }
 }
 
@@ -403,8 +403,8 @@ void SetAttributeBufferData( MeshInfo& meshInfo, std::string path, std::vector<A
     Dali::Vector<T> bufferData;
     LoadDataFromAccessor( accessorIdx, bufferData, path, accessorArray, bufferViewArray, bufferArray );
 
-    VertexBuffer vertexBuffer = CreateVertexBuffer<T>( bufferData, map, type );
-    meshInfo.geometry.AddVertexBuffer( vertexBuffer );
+    PropertyBuffer propertyBuffer = CreatePropertyBuffer<T>( bufferData, map, type );
+    meshInfo.geometry.AddVertexBuffer( propertyBuffer );
   }
 }
 
@@ -1152,8 +1152,8 @@ bool SetGeometry( MeshInfo& meshInfo, std::string path, std::vector<BufferInfo>&
         bufferData[i].z = inputBufferData[i].z;
         bufferData[i].w = 1.0;
       }
-      VertexBuffer vertexBuffer = CreateVertexBuffer<Vector4>( bufferData, "aVertexColor", Property::VECTOR4 );
-      meshInfo.geometry.AddVertexBuffer( vertexBuffer );
+      PropertyBuffer propertyBuffer = CreatePropertyBuffer<Vector4>( bufferData, "aVertexColor", Property::VECTOR4 );
+      meshInfo.geometry.AddVertexBuffer( propertyBuffer );
     }
     else if( accessorArray[accessorIdx].type == "VEC4" )
     {

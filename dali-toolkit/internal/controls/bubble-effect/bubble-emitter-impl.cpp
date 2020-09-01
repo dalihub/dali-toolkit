@@ -126,8 +126,8 @@ Dali::Geometry CreateTexturedQuad()
                                 { Dali::Vector2( -0.5f,  0.5f ), Dali::Vector2( 0.0f, 1.0f ) },
                                 { Dali::Vector2(  0.5f,  0.5f ), Dali::Vector2( 1.0f, 1.0f ) }};
 
-  // Create a vertex buffer for vertex positions and texture coordinates
-  Dali::VertexBuffer vertexBuffer = Dali::VertexBuffer::New( Dali::Property::Map()
+  //Create a vertex buffer for vertex positions and texture coordinates
+  Dali::PropertyBuffer vertexBuffer = Dali::PropertyBuffer::New( Dali::Property::Map()
                                               .Add( "aPosition", Dali::Property::VECTOR2 )
                                               .Add( "aTexCoord", Dali::Property::VECTOR2 ) );
   vertexBuffer.SetData( data, 4u );
@@ -388,7 +388,7 @@ Geometry BubbleEmitter::CreateGeometry( unsigned int numOfPatch )
   vertexFormat["aIndex"] = Property::FLOAT;
   vertexFormat["aPosition"] = Property::VECTOR2;
   vertexFormat["aTexCoord"] = Property::VECTOR2;
-  VertexBuffer vertices = VertexBuffer::New( vertexFormat );
+  PropertyBuffer vertices = PropertyBuffer::New( vertexFormat );
   vertices.SetData( &vertexData[0], numVertex );
 
   Geometry geometry = Geometry::New();

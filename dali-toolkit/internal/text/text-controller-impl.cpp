@@ -3385,7 +3385,7 @@ Actor Controller::Impl::CreateBackgroundActor()
       quadVertexFormat[ "aPosition" ] = Property::VECTOR2;
       quadVertexFormat[ "aColor" ] = Property::VECTOR4;
 
-      VertexBuffer quadVertices = VertexBuffer::New( quadVertexFormat );
+      PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat );
       quadVertices.SetData( &mesh.mVertices[ 0 ], mesh.mVertices.Size() );
 
       Geometry quadGeometry = Geometry::New();

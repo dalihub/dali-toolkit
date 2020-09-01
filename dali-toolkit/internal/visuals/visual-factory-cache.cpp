@@ -89,7 +89,7 @@ Geometry VisualFactoryCache::CreateQuadGeometry()
 
   Property::Map quadVertexFormat;
   quadVertexFormat["aPosition"] = Property::VECTOR2;
-  VertexBuffer quadVertices = VertexBuffer::New( quadVertexFormat );
+  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat );
   quadVertices.SetData( quadVertexData, 4 );
 
   // Create the geometry object
@@ -193,20 +193,20 @@ Geometry VisualFactoryCache::CreateGridGeometry( Uint16Pair gridSize )
 
   Property::Map vertexFormat;
   vertexFormat[ "aPosition" ] = Property::VECTOR2;
-  VertexBuffer vertexBuffer = VertexBuffer::New( vertexFormat );
+  PropertyBuffer vertexPropertyBuffer = PropertyBuffer::New( vertexFormat );
   if( vertices.Size() > 0 )
   {
-    vertexBuffer.SetData( &vertices[ 0 ], vertices.Size() );
+    vertexPropertyBuffer.SetData( &vertices[ 0 ], vertices.Size() );
   }
 
   Property::Map indexFormat;
   indexFormat[ "indices" ] = Property::INTEGER;
-  VertexBuffer indexVertexBuffer = VertexBuffer::New( indexFormat );
+  PropertyBuffer indexPropertyBuffer = PropertyBuffer::New( indexFormat );
 
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer( vertexBuffer );
+  geometry.AddVertexBuffer( vertexPropertyBuffer );
   if( indices.Size() > 0 )
   {
     geometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
