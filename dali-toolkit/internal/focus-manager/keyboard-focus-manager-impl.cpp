@@ -760,7 +760,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
   bool isFocusStartableKey = false;
 
-  if(event.GetState() == KeyEvent::DOWN)
+  if(event.GetState() == KeyEvent::Down)
   {
     if (keyName == "Left")
     {
@@ -913,7 +913,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     {
     }
   }
-  else if(event.GetState() == KeyEvent::UP)
+  else if(event.GetState() == KeyEvent::Up)
   {
     if (keyName == "Return")
     {

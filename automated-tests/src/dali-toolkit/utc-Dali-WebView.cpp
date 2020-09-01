@@ -245,7 +245,7 @@ int UtcDaliWebViewTouchAndKeys(void)
 
   // Key event
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( view );
-  application.ProcessEvent( Integration::KeyEvent( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( Integration::KeyEvent( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
 
   DALI_TEST_CHECK( gTouched );

@@ -1482,7 +1482,7 @@ int UtcDaliPopupOnKeyEvent(void)
 
   popup.SetKeyInputFocus();
 
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", "", Device::Class::TOUCH, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", "", Device::Class::TOUCH, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 

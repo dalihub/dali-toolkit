@@ -2830,7 +2830,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
   bool relayoutNeeded = false;
 
   if( ( NULL != mImpl->mEventData ) &&
-      ( keyEvent.GetState() == KeyEvent::DOWN ) )
+      ( keyEvent.GetState() == KeyEvent::Down ) )
   {
     int keyCode = keyEvent.GetKeyCode();
     const std::string& keyString = keyEvent.GetKeyString();
