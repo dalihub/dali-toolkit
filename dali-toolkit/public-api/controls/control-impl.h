@@ -610,12 +610,12 @@ public: // API for derived classes to override
   /**
    * @copydoc ConnectionTrackerInterface::SignalConnected
    */
-  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback );
+  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
 
   /**
    * @copydoc ConnectionTrackerInterface::SignalDisconnected
    */
-  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback );
+  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
 
   /**
    * @brief Retrieves the extension for this control.
@@ -631,9 +631,12 @@ public: // API for derived classes to override
 private:
 
   /// @cond internal
-  // Undefined
-  DALI_INTERNAL Control( const Control& );
-  DALI_INTERNAL Control& operator=( const Control& );
+
+  // Not copyable or movable
+  DALI_INTERNAL Control( const Control& ) = delete; ///< Deleted copy constructor.
+  DALI_INTERNAL Control( Control&& ) = delete; ///< Deleted move constructor.
+  DALI_INTERNAL Control& operator=( const Control& ) = delete; ///< Deleted copy assignment operator.
+  DALI_INTERNAL Control& operator=( Control&& ) = delete; ///< Deleted move assignment operator.
 
 public:
   class DALI_INTERNAL Impl; // Class declaration is public so we can internally add devel API's to the Controls Impl
