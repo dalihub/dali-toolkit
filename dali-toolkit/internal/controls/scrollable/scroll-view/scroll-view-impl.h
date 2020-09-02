@@ -724,7 +724,7 @@ private:
    *
    * @param[in] gesture The gesture event.
    */
-  void OnGestureEx(Gesture::State state);
+  void OnGestureEx(GestureState state);
 
   /**
    * Performs snapping while taking into account Velocity of gesture

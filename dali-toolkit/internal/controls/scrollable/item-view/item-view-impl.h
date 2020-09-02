@@ -634,7 +634,7 @@ private:
   float mScrollSpeed;
   float mScrollOvershoot;
 
-  Dali::Gesture::State mGestureState    : 4;
+  GestureState mGestureState            : 8;
   bool mAnimatingOvershootOn            : 1;        ///< Whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
   bool mAnimateOvershootOff             : 1;        ///< Whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
   bool mAnchoringEnabled                : 1;

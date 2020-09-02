@@ -690,7 +690,7 @@ void ScrollView::OnInitialize()
   mGestureStackDepth = 0;
 
   self.TouchedSignal().Connect( this, &ScrollView::OnTouch );
-  EnableGestureDetection( Gesture::Type( Gesture::Pan ) );
+  EnableGestureDetection( GestureType::Value( GestureType::PAN ) );
 
   // By default we'll allow the user to freely drag the scroll view,
   // while disabling the other rulers.
@@ -1003,7 +1003,7 @@ void ScrollView::SetScrollSensitive(bool sensitive)
     // while the scroll view is panning, the state needs to be reset.
     if ( mPanning )
     {
-      PanGesture cancelGesture = DevelPanGesture::New( Gesture::Cancelled );
+      PanGesture cancelGesture = DevelPanGesture::New( GestureState::CANCELLED );
       OnPan( cancelGesture );
     }
 
@@ -2448,7 +2448,7 @@ void ScrollView::GestureContinuing(const Vector2& panDelta)
   mPanDelta.y+= panDelta.y;
 
   // Save the velocity, there is a bug in PanGesture
-  // Whereby the Gesture::Finished's velocity is either:
+  // Whereby the GestureState::FINISHED's velocity is either:
   // NaN (due to time delta of zero between the last two events)
   // or 0 (due to position being the same between the last two events)
 
@@ -2461,7 +2461,7 @@ void ScrollView::GestureContinuing(const Vector2& panDelta)
 }
 
 // TODO: Upgrade to use a more powerful gesture detector (one that supports multiple touches on pan - so works as pan and flick gesture)
-// BUG: Gesture::Finished doesn't always return velocity on release (due to
+// BUG: GestureState::FINISHED doesn't always return velocity on release (due to
 // timeDelta between last two events being 0 sometimes, or posiiton being the same)
 void ScrollView::OnPan( const PanGesture& gesture )
 {
@@ -2481,7 +2481,7 @@ void ScrollView::OnPan( const PanGesture& gesture )
   // translate Gesture input to get useful data...
   switch(gesture.GetState())
   {
-    case Gesture::Started:
+    case GestureState::STARTED:
     {
       DALI_LOG_SCROLL_STATE("[0x%X] Pan Started", this);
       const Vector2& position = gesture.GetPosition();
@@ -2508,7 +2508,7 @@ void ScrollView::OnPan( const PanGesture& gesture )
       break;
     }
 
-    case Gesture::Continuing:
+    case GestureState::CONTINUING:
     {
       if ( mPanning )
       {
@@ -2523,12 +2523,12 @@ void ScrollView::OnPan( const PanGesture& gesture )
       break;
     }
 
-    case Gesture::Finished:
-    case Gesture::Cancelled:
+    case GestureState::FINISHED:
+    case GestureState::CANCELLED:
     {
       if ( mPanning )
       {
-        DALI_LOG_SCROLL_STATE("[0x%X] Pan %s", this, ( ( gesture.GetState() == Gesture::Finished ) ? "Finished" : "Cancelled" ) );
+        DALI_LOG_SCROLL_STATE("[0x%X] Pan %s", this, ( ( gesture.GetState() == GestureState::FINISHED ) ? "Finished" : "Cancelled" ) );
 
         UpdateLocalScrollProperties();
         mLastVelocity = gesture.GetVelocity();
@@ -2554,8 +2554,8 @@ void ScrollView::OnPan( const PanGesture& gesture )
       break;
     }
 
-    case Gesture::Possible:
-    case Gesture::Clear:
+    case GestureState::POSSIBLE:
+    case GestureState::CLEAR:
     {
       // Nothing to do, not needed.
       break;
@@ -2566,11 +2566,11 @@ void ScrollView::OnPan( const PanGesture& gesture )
   OnGestureEx(gesture.GetState());
 }
 
-void ScrollView::OnGestureEx(Gesture::State state)
+void ScrollView::OnGestureEx(GestureState state)
 {
   // call necessary signals for application developer
 
-  if(state == Gesture::Started)
+  if(state == GestureState::STARTED)
   {
     Vector2 currentScrollPosition = GetCurrentScrollPosition();
     Self().SetProperty(Toolkit::ScrollView::Property::SCROLLING, true);
@@ -2578,8 +2578,8 @@ void ScrollView::OnGestureEx(Gesture::State state)
     DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignal 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
     mScrollStartedSignal.Emit( currentScrollPosition );
   }
-  else if( (state == Gesture::Finished) ||
-           (state == Gesture::Cancelled) ) // Finished/default
+  else if( (state == GestureState::FINISHED) ||
+           (state == GestureState::CANCELLED) ) // Finished/default
   {
     // when all the gestures have finished, we finish the transform.
     // so if a user decides to pan (1 gesture), and then pan+zoom (2 gestures)

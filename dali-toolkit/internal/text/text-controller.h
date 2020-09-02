@@ -1470,7 +1470,7 @@ public: // Text-input Event Queuing.
    * @param[in] state The state of the gesture.
    * @param[in] displacement This distance panned since the last pan gesture.
    */
-  void PanEvent( Gesture::State state, const Vector2& displacement );
+  void PanEvent( GestureState state, const Vector2& displacement );
 
   /**
    * @brief Called by editable UI controls when a long press gesture occurs.
@@ -1479,7 +1479,7 @@ public: // Text-input Event Queuing.
    * @param[in] x The x position relative to the top-left of the parent control.
    * @param[in] y The y position relative to the top-left of the parent control.
    */
-  void LongPressEvent( Gesture::State state, float x, float y );
+  void LongPressEvent( GestureState state, float x, float y );
 
   /**
    * @brief Creates a selection event.

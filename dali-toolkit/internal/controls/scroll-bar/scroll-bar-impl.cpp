@@ -265,7 +265,7 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
     mIndicatorFirstShow = true;
     Self().Add( mIndicator );
 
-    EnableGestureDetection( Gesture::Type( Gesture::Pan ) );
+    EnableGestureDetection( GestureType::Value( GestureType::PAN ) );
 
     PanGestureDetector detector( GetPanGestureDetector() );
     detector.DetachAll();
@@ -461,7 +461,7 @@ void ScrollBar::OnPan( const PanGesture& gesture )
 
     switch(gesture.GetState())
     {
-      case Dali::Gesture::Started:
+      case Dali::GestureState::STARTED:
       {
         if( !mPanProcessTimer )
         {
@@ -478,7 +478,7 @@ void ScrollBar::OnPan( const PanGesture& gesture )
 
         break;
       }
-      case Dali::Gesture::Continuing:
+      case Dali::GestureState::CONTINUING:
       {
         mGestureDisplacement += gesture.GetDisplacement();
 

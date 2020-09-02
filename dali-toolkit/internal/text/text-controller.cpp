@@ -3091,14 +3091,14 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
   mImpl->ResetInputMethodContext();
 }
 
-void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
+void Controller::PanEvent( GestureState state, const Vector2& displacement )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
 
   if( NULL != mImpl->mEventData )
   {
     Event event( Event::PAN_EVENT );
-    event.p1.mInt = state;
+    event.p1.mInt = static_cast<int>( state );
     event.p2.mFloat = displacement.x;
     event.p3.mFloat = displacement.y;
     mImpl->mEventData->mEventQueue.push_back( event );
@@ -3107,11 +3107,11 @@ void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
   }
 }
 
-void Controller::LongPressEvent( Gesture::State state, float x, float y  )
+void Controller::LongPressEvent( GestureState state, float x, float y  )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected LongPressEvent" );
 
-  if( ( state == Gesture::Started ) &&
+  if( ( state == GestureState::STARTED ) &&
       ( NULL != mImpl->mEventData ) )
   {
     // The 1st long-press on inactive text-field is treated as tap
@@ -3130,7 +3130,7 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
     else if( !mImpl->IsShowingRealText() )
     {
       Event event( Event::LONG_PRESS_EVENT );
-      event.p1.mInt = state;
+      event.p1.mInt = static_cast<int>( state );
       event.p2.mFloat = x;
       event.p3.mFloat = y;
       mImpl->mEventData->mEventQueue.push_back( event );
@@ -3142,7 +3142,7 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
       mImpl->ResetInputMethodContext();
 
       Event event( Event::LONG_PRESS_EVENT );
-      event.p1.mInt = state;
+      event.p1.mInt = static_cast<int>( state );
       event.p2.mFloat = x;
       event.p3.mFloat = y;
       mImpl->mEventData->mEventQueue.push_back( event );

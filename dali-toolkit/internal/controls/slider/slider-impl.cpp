@@ -250,7 +250,7 @@ void Slider::OnPan( Actor actor, const PanGesture& gesture )
   {
     switch( gesture.GetState() )
     {
-      case Gesture::Continuing:
+      case GestureState::CONTINUING:
       {
         if( mState == PRESSED )
         {
@@ -260,7 +260,7 @@ void Slider::OnPan( Actor actor, const PanGesture& gesture )
         }
         break;
       }
-      case Gesture::Finished:
+      case GestureState::FINISHED:
       {
         if( mState == PRESSED  )
         {

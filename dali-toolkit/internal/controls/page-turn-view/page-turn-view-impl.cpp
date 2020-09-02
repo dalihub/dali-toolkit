@@ -413,7 +413,7 @@ void PageTurnView::OnInitialize()
   mPages[0].actor.SetProperty( Actor::Property::VISIBLE,true);
 
   // enable the pan gesture which is attached to the control
-  EnableGestureDetection(Gesture::Type(Gesture::Pan));
+  EnableGestureDetection(GestureType::Value(GestureType::PAN));
 }
 
 Shader PageTurnView::CreateShader( const Property::Map& shaderMap )
@@ -614,7 +614,7 @@ void PageTurnView::OnPan( const PanGesture& gesture )
   // the pan gesture is attached to control itself instead of each page
   switch( gesture.GetState() )
   {
-    case Gesture::Started:
+    case GestureState::STARTED:
     {
       // check whether the undergoing turning page number already reaches the maximum allowed
       if( mPageUpdated && mAnimatingCount< MAXIMUM_TURNING_NUM && mSlidingCount < 1 )
@@ -633,19 +633,19 @@ void PageTurnView::OnPan( const PanGesture& gesture )
       }
       break;
     }
-    case Gesture::Continuing:
+    case GestureState::CONTINUING:
     {
       PanContinuing( SetPanPosition( gesture.GetPosition() ) ); // pass in the pan position in the local page coordinate
       break;
     }
-    case Gesture::Finished:
-    case Gesture::Cancelled:
+    case GestureState::FINISHED:
+    case GestureState::CANCELLED:
     {
       PanFinished( SetPanPosition( gesture.GetPosition() ), gesture.GetSpeed() );
       break;
     }
-    case Gesture::Clear:
-    case Gesture::Possible:
+    case GestureState::CLEAR:
+    case GestureState::POSSIBLE:
     default:
     {
       break;

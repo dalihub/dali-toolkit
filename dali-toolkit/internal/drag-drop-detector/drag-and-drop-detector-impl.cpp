@@ -123,9 +123,9 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
 {
   Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
 
-  Gesture::State state = gesture.GetState();
+  GestureState state = gesture.GetState();
 
-  if(state == Gesture::Started)
+  if(state == GestureState::STARTED)
   {
     mDragLocalPosition = gesture.GetPosition();
     mPointDown = true;
@@ -149,13 +149,13 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
     SetPosition(gesture.GetScreenPosition());
     EmitStartedSignal(control);
   }
-  if(state == Gesture::Continuing)
+  if(state == GestureState::CONTINUING)
   {
       Vector2 screenPosition = gesture.GetScreenPosition();
       control.GetParent().ScreenToLocal(mLocalPosition.x, mLocalPosition.y, screenPosition.x, screenPosition.y);
       mShadowControl.SetProperty( Actor::Property::POSITION, Vector2(mLocalPosition.x - mDragLocalPosition.x, mLocalPosition.y - mDragLocalPosition.y));
   }
-  if(state == Gesture::Finished)
+  if(state == GestureState::FINISHED)
   {
     mDragControl.GetParent().Remove(mShadowControl);
     EmitEndedSignal(control);

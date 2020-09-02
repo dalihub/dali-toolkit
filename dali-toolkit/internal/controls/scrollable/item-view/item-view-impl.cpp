@@ -347,7 +347,7 @@ ItemView::ItemView(ItemFactory& factory)
   mScrollDistance(0.0f),
   mScrollSpeed(0.0f),
   mScrollOvershoot(0.0f),
-  mGestureState(Gesture::Clear),
+  mGestureState(GestureState::CLEAR),
   mAnimatingOvershootOn(false),
   mAnimateOvershootOff(false),
   mAnchoringEnabled(false),
@@ -368,7 +368,7 @@ void ItemView::OnInitialize()
   mWheelScrollDistanceStep = stageSize.y * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
 
   self.TouchedSignal().Connect( this, &ItemView::OnTouch );
-  EnableGestureDetection(Gesture::Type(Gesture::Pan));
+  EnableGestureDetection(GestureType::Value(GestureType::PAN));
 
   mWheelEventFinishedTimer = Timer::New( WHEEL_EVENT_FINISHED_TIME_OUT );
   mWheelEventFinishedTimer.TickSignal().Connect( this, &ItemView::OnWheelEventFinished );
@@ -1125,7 +1125,7 @@ bool ItemView::OnTouch( Actor actor, const TouchEvent& touch )
   if ( touch.GetState( 0 ) == PointState::DOWN )
   {
     // Cancel ongoing scrolling etc.
-    mGestureState = Gesture::Clear;
+    mGestureState = GestureState::CLEAR;
 
     mScrollDistance = 0.0f;
     mScrollSpeed = 0.0f;
@@ -1155,7 +1155,7 @@ void ItemView::OnPan( const PanGesture& gesture )
   // Short-circuit if there is no active layout
   if (!mActiveLayout)
   {
-    mGestureState = Gesture::Clear;
+    mGestureState = GestureState::CLEAR;
     return;
   }
 
@@ -1163,7 +1163,7 @@ void ItemView::OnPan( const PanGesture& gesture )
 
   switch (mGestureState)
   {
-    case Gesture::Finished:
+    case GestureState::FINISHED:
     {
       // Swipe Detection
       if (fabsf(mScrollDistance) > mMinimumSwipeDistance &&
@@ -1218,14 +1218,14 @@ void ItemView::OnPan( const PanGesture& gesture )
     }
     break;
 
-    case Gesture::Started: // Fall through
+    case GestureState::STARTED: // Fall through
     {
       mTotalPanDisplacement = Vector2::ZERO;
       mScrollStartedSignal.Emit(GetCurrentScrollPosition());
       mRefreshEnabled = true;
     }
 
-    case Gesture::Continuing:
+    case GestureState::CONTINUING:
     {
       const Vector2& displacement = gesture.GetDisplacement();
       mScrollDistance = CalculateScrollDistance(displacement, *mActiveLayout);
@@ -1278,7 +1278,7 @@ void ItemView::OnPan( const PanGesture& gesture )
     }
     break;
 
-    case Gesture::Cancelled:
+    case GestureState::CANCELLED:
     {
       mScrollAnimation = DoAnchoring();
     }

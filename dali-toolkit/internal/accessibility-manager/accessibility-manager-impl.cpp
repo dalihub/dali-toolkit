@@ -1322,17 +1322,17 @@ bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& pan
     }
   }
 
-  // Gesture::Finished (Up) events are delivered with previous (Motion) event position
+  // GestureState::FINISHED (Up) events are delivered with previous (Motion) event position
   // Use the real previous position; otherwise we may incorrectly get a ZERO velocity
   if ( AccessibilityGestureEvent::FINISHED != panEvent.state )
   {
-    // Store the previous position for next Gesture::Finished iteration.
+    // Store the previous position for next GestureState::FINISHED iteration.
     mPreviousPosition = panEvent.previousPosition;
   }
 
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
 
-  Dali::PanGesture pan = DevelPanGesture::New( static_cast<Dali::Gesture::State>(panEvent.state) );
+  Dali::PanGesture pan = DevelPanGesture::New( static_cast<Dali::GestureState>(panEvent.state) );
   DevelPanGesture::SetTime( pan, panEvent.time );
   DevelPanGesture::SetNumberOfTouches( pan, panEvent.numberOfTouches  );
   DevelPanGesture::SetScreenPosition( pan, panEvent.currentPosition );

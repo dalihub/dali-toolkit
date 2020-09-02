@@ -1292,7 +1292,7 @@ void TextEditor::OnInitialize()
   mController->SetLayoutDirection( layoutDirection );
 
   // Forward input events to controller
-  EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
+  EnableGestureDetection( static_cast<GestureType::Value>( GestureType::TAP | GestureType::PAN | GestureType::LONG_PRESS ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
   self.TouchedSignal().Connect( this, &TextEditor::OnTouched );

@@ -90,8 +90,8 @@ public:
   static DummyControl New();
 
 public:
-  inline void EnableGestureDetection(Gesture::Type type) { Internal::Control::EnableGestureDetection(type); }
-  inline void DisableGestureDetection(Gesture::Type type) { Internal::Control::DisableGestureDetection(type); }
+  inline void EnableGestureDetection(GestureType::Value type) { Internal::Control::EnableGestureDetection(type); }
+  inline void DisableGestureDetection(GestureType::Value type) { Internal::Control::DisableGestureDetection(type); }
   inline PinchGestureDetector GetPinchGestureDetector() const { return Internal::Control::GetPinchGestureDetector(); }
   inline PanGestureDetector GetPanGestureDetector() const { return Internal::Control::GetPanGestureDetector(); }
   inline TapGestureDetector GetTapGestureDetector() const { return Internal::Control::GetTapGestureDetector(); }

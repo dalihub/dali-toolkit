@@ -117,12 +117,12 @@ public:
    *
    * Gesture detection can be enabled one at a time or in bitwise format as shown:
    * @code
-   * EnableGestureDetection(Gesture::Type(Gesture::Pinch | Gesture::Tap | Gesture::Pan));
+   * EnableGestureDetection(GestureType::Value(GestureType::PINCH | GestureType::TAP | GestureType::PAN));
    * @endcode
    * @SINCE_1_0.0
    * @param[in] type The gesture type(s) to enable
    */
-  void EnableGestureDetection( Gesture::Type type );
+  void EnableGestureDetection( GestureType::Value type );
 
   /**
    * @brief Allows deriving classes to disable any of the gesture detectors.
@@ -132,7 +132,7 @@ public:
    * @param[in] type The gesture type(s) to disable
    * @see EnableGetureDetection
    */
-  void DisableGestureDetection( Gesture::Type type );
+  void DisableGestureDetection( GestureType::Value type );
 
   /**
    * @brief If deriving classes wish to fine tune pinch gesture

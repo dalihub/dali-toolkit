@@ -228,30 +228,30 @@ void Control::ClearBackground()
    RelayoutRequest();
 }
 
-void Control::EnableGestureDetection(Gesture::Type type)
+void Control::EnableGestureDetection(GestureType::Value type)
 {
-  if ( (type & Gesture::Pinch) && !mImpl->mPinchGestureDetector )
+  if ( (type & GestureType::PINCH) && !mImpl->mPinchGestureDetector )
   {
     mImpl->mPinchGestureDetector = PinchGestureDetector::New();
     mImpl->mPinchGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PinchDetected);
     mImpl->mPinchGestureDetector.Attach(Self());
   }
 
-  if ( (type & Gesture::Pan) && !mImpl->mPanGestureDetector )
+  if ( (type & GestureType::PAN) && !mImpl->mPanGestureDetector )
   {
     mImpl->mPanGestureDetector = PanGestureDetector::New();
     mImpl->mPanGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PanDetected);
     mImpl->mPanGestureDetector.Attach(Self());
   }
 
-  if ( (type & Gesture::Tap) && !mImpl->mTapGestureDetector )
+  if ( (type & GestureType::TAP) && !mImpl->mTapGestureDetector )
   {
     mImpl->mTapGestureDetector = TapGestureDetector::New();
     mImpl->mTapGestureDetector.DetectedSignal().Connect(mImpl, &Impl::TapDetected);
     mImpl->mTapGestureDetector.Attach(Self());
   }
 
-  if ( (type & Gesture::LongPress) && !mImpl->mLongPressGestureDetector )
+  if ( (type & GestureType::LONG_PRESS) && !mImpl->mLongPressGestureDetector )
   {
     mImpl->mLongPressGestureDetector = LongPressGestureDetector::New();
     mImpl->mLongPressGestureDetector.DetectedSignal().Connect(mImpl, &Impl::LongPressDetected);
@@ -259,27 +259,27 @@ void Control::EnableGestureDetection(Gesture::Type type)
   }
 }
 
-void Control::DisableGestureDetection(Gesture::Type type)
+void Control::DisableGestureDetection(GestureType::Value type)
 {
-  if ( (type & Gesture::Pinch) && mImpl->mPinchGestureDetector )
+  if ( (type & GestureType::PINCH) && mImpl->mPinchGestureDetector )
   {
     mImpl->mPinchGestureDetector.Detach(Self());
     mImpl->mPinchGestureDetector.Reset();
   }
 
-  if ( (type & Gesture::Pan) && mImpl->mPanGestureDetector )
+  if ( (type & GestureType::PAN) && mImpl->mPanGestureDetector )
   {
     mImpl->mPanGestureDetector.Detach(Self());
     mImpl->mPanGestureDetector.Reset();
   }
 
-  if ( (type & Gesture::Tap) && mImpl->mTapGestureDetector )
+  if ( (type & GestureType::TAP) && mImpl->mTapGestureDetector )
   {
     mImpl->mTapGestureDetector.Detach(Self());
     mImpl->mTapGestureDetector.Reset();
   }
 
-  if ( (type & Gesture::LongPress) && mImpl->mLongPressGestureDetector)
+  if ( (type & GestureType::LONG_PRESS) && mImpl->mLongPressGestureDetector)
   {
     mImpl->mLongPressGestureDetector.Detach(Self());
     mImpl->mLongPressGestureDetector.Reset();
@@ -507,7 +507,7 @@ void Control::OnPinch(const PinchGesture& pinch)
     mImpl->mStartingPinchScale = new Vector3;
   }
 
-  if( pinch.GetState() == Gesture::Started )
+  if( pinch.GetState() == GestureState::STARTED )
   {
     *( mImpl->mStartingPinchScale ) = Self().GetCurrentProperty< Vector3 >( Actor::Property::SCALE );
   }
