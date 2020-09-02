@@ -536,7 +536,7 @@ void PrimitiveVisual::CreateGeometry()
   Property::Map vertexFormat;
   vertexFormat[POSITION] = Property::VECTOR3;
   vertexFormat[NORMAL] = Property::VECTOR3;
-  PropertyBuffer surfaceVertices = PropertyBuffer::New( vertexFormat );
+  VertexBuffer surfaceVertices = VertexBuffer::New( vertexFormat );
   surfaceVertices.SetData( &vertices[0], vertices.Size() );
 
   mGeometry.AddVertexBuffer( surfaceVertices );

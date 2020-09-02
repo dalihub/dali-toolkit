@@ -99,15 +99,15 @@ Geometry CreateGridGeometry( Uint16Pair gridSize )
 
   Property::Map vertexFormat;
   vertexFormat[ "aPosition" ] = Property::VECTOR2;
-  PropertyBuffer vertexPropertyBuffer = PropertyBuffer::New( vertexFormat );
+  VertexBuffer vertexBuffer = VertexBuffer::New( vertexFormat );
   if( vertices.Size() > 0 )
   {
-    vertexPropertyBuffer.SetData( &vertices[ 0 ], vertices.Size() );
+    vertexBuffer.SetData( &vertices[ 0 ], vertices.Size() );
   }
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer( vertexPropertyBuffer );
+  geometry.AddVertexBuffer( vertexBuffer );
   if( indices.Size() > 0 )
   {
     geometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
@@ -138,7 +138,7 @@ Dali::Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc )
 
   Dali::Property::Map positionVertexFormat;
   positionVertexFormat["aPosition"] = Dali::Property::VECTOR2;
-  Dali::PropertyBuffer positionVertices = Dali::PropertyBuffer::New( positionVertexFormat );
+  Dali::VertexBuffer positionVertices = Dali::VertexBuffer::New( positionVertexFormat );
   positionVertices.SetData( positionArray, numberOfVertices );
   texturedQuadGeometry.AddVertexBuffer( positionVertices );
 
