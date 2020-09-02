@@ -1,5 +1,5 @@
-#ifndef DALI_CMAKE_RENDERING_ADDON_H
-#define DALI_CMAKE_RENDERING_ADDON_H
+#ifndef DALI_RENDERING_ADDON_H
+#define DALI_RENDERING_ADDON_H
 
 /*
 * Copyright (c) 2020 Samsung Electronics Co., Ltd.
