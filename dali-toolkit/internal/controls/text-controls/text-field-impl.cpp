@@ -1342,7 +1342,7 @@ void TextField::OnInitialize()
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
-  self.TouchSignal().Connect( this, &TextField::OnTouched );
+  self.TouchedSignal().Connect( this, &TextField::OnTouched );
 
   // Set BoundingBox to stage size if not already set.
   Rect<int> boundingBox;

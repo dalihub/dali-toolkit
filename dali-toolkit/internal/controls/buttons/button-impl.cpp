@@ -620,7 +620,7 @@ void Button::OnInitialize()
 
   self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
 
-  self.TouchSignal().Connect( this, &Button::OnTouch );
+  self.TouchedSignal().Connect( this, &Button::OnTouch );
 }
 
 bool Button::OnAccessibilityActivated()

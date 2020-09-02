@@ -138,7 +138,7 @@ Toolkit::WebView WebView::New( const std::string& locale, const std::string& tim
 void WebView::OnInitialize()
 {
   Self().SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
-  Self().TouchSignal().Connect( this, &WebView::OnTouchEvent );
+  Self().TouchedSignal().Connect( this, &WebView::OnTouchEvent );
 
   if( mWebEngine )
   {

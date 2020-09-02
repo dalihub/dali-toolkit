@@ -689,7 +689,7 @@ void ScrollView::OnInitialize()
 
   mGestureStackDepth = 0;
 
-  self.TouchSignal().Connect( this, &ScrollView::OnTouch );
+  self.TouchedSignal().Connect( this, &ScrollView::OnTouch );
   EnableGestureDetection( Gesture::Type( Gesture::Pan ) );
 
   // By default we'll allow the user to freely drag the scroll view,

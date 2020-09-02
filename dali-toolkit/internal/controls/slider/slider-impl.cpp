@@ -204,7 +204,7 @@ void Slider::OnInitialize()
   self.SetProperty( Actor::Property::SIZE, Vector2( DEFAULT_HIT_REGION.x, DEFAULT_HIT_REGION.y ) );
 
   // Connect to the touch signal
-  self.TouchSignal().Connect( this, &Slider::OnTouch );
+  self.TouchedSignal().Connect( this, &Slider::OnTouch );
 }
 
 void Slider::OnRelayout( const Vector2& size, RelayoutContainer& container )
@@ -381,7 +381,7 @@ Actor Slider::CreateHitRegion()
   Actor hitRegion = Actor::New();
   hitRegion.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   hitRegion.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  hitRegion.TouchSignal().Connect( this, &Slider::OnTouch );
+  hitRegion.TouchedSignal().Connect( this, &Slider::OnTouch );
 
   return hitRegion;
 }
