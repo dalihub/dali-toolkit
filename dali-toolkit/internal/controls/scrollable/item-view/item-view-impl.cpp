@@ -367,7 +367,7 @@ void ItemView::OnInitialize()
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   mWheelScrollDistanceStep = stageSize.y * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
 
-  self.TouchSignal().Connect( this, &ItemView::OnTouch );
+  self.TouchedSignal().Connect( this, &ItemView::OnTouch );
   EnableGestureDetection(Gesture::Type(Gesture::Pan));
 
   mWheelEventFinishedTimer = Timer::New( WHEEL_EVENT_FINISHED_TIME_OUT );

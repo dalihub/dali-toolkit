@@ -165,9 +165,9 @@ Window::KeyEventSignalType& Window::KeyEventSignal()
   return GetImplementation( *this ).KeyEventSignal();
 }
 
-Window::TouchSignalType& Window::TouchSignal()
+Window::TouchEventSignalType& Window::TouchedSignal()
 {
-  return GetImplementation( *this ).TouchSignal();
+  return GetImplementation( *this ).TouchedSignal();
 }
 
 namespace DevelWindow

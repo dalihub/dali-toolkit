@@ -225,7 +225,7 @@ int UtcDaliWebViewTouchAndKeys(void)
   application.Render();
 
   view.GetNaturalSize();
-  view.TouchSignal().Connect( &OnTouched );
+  view.TouchedSignal().Connect( &OnTouched );
 
   // Touch event
   Dali::Integration::TouchEvent event;

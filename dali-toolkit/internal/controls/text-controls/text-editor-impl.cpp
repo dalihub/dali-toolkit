@@ -1295,7 +1295,7 @@ void TextEditor::OnInitialize()
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
-  self.TouchSignal().Connect( this, &TextEditor::OnTouched );
+  self.TouchedSignal().Connect( this, &TextEditor::OnTouched );
 
   // Set BoundingBox to stage size if not already set.
   Rect<int> boundingBox;

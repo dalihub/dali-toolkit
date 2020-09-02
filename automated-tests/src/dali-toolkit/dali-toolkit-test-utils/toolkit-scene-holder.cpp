@@ -105,9 +105,9 @@ Dali::Integration::SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEve
   return mScene.KeyEventGeneratedSignal();
 }
 
-Dali::Integration::SceneHolder::TouchSignalType& SceneHolder::TouchSignal()
+Dali::Integration::SceneHolder::TouchEventSignalType& SceneHolder::TouchedSignal()
 {
-  return mScene.TouchSignal();
+  return mScene.TouchedSignal();
 }
 
 Dali::Integration::SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
@@ -225,9 +225,9 @@ SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEventGeneratedSignal()
   return GetImplementation( *this ).KeyEventGeneratedSignal();
 }
 
-SceneHolder::TouchSignalType& SceneHolder::TouchSignal()
+SceneHolder::TouchEventSignalType& SceneHolder::TouchedSignal()
 {
-  return GetImplementation( *this ).TouchSignal();
+  return GetImplementation( *this ).TouchedSignal();
 }
 
 SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()

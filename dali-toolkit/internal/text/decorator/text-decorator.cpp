@@ -827,7 +827,7 @@ struct Decorator::Impl : public ConnectionTracker
         grabHandle.actor.Add( grabHandle.grabArea );
         grabHandle.actor.SetProperty( Actor::Property::COLOR, mHandleColor );
 
-        grabHandle.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
+        grabHandle.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
 
         // The grab handle's actor is attached to the tap and long press detectors in order to consume these events.
         // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
@@ -895,7 +895,7 @@ struct Decorator::Impl : public ConnectionTracker
         primary.grabArea.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
         primary.grabArea.SetProperty( Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
-        primary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
+        primary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
 
         // The handle's actor is attached to the tap and long press detectors in order to consume these events.
         // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
@@ -939,7 +939,7 @@ struct Decorator::Impl : public ConnectionTracker
         secondary.grabArea.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
         secondary.grabArea.SetProperty( Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
-        secondary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
+        secondary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
 
         // The handle's actor is attached to the tap and long press detectors in order to consume these events.
         // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.

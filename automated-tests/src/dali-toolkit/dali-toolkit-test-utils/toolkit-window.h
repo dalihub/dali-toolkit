@@ -52,7 +52,7 @@ class Window : public BaseHandle
 {
 public:
   using KeyEventSignalType = Signal< void (const KeyEvent&) >;
-  using TouchSignalType = Signal< void (const TouchEvent&) >;
+  using TouchEventSignalType = Signal< void (const TouchEvent&) >;
 
   static Window New(PositionSize windowPosition, const std::string& name, bool isTransparent = false);
   static Window New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent = false);
@@ -75,7 +75,7 @@ public:
   void Hide();
   FocusChangeSignalType& FocusChangeSignal();
   KeyEventSignalType& KeyEventSignal();
-  TouchSignalType& TouchSignal();
+  TouchEventSignalType& TouchedSignal();
 
 public:
   explicit Window( Internal::Adaptor::Window* window );

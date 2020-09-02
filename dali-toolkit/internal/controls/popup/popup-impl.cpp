@@ -1963,17 +1963,17 @@ void Popup::SetupTouch()
   if( ! mTouchTransparent )
   {
     // Connect all the signals and set us up to consume all touch events
-    mBacking.TouchSignal().Connect( this, &Popup::OnBackingTouched );
-    mPopupBackgroundImage.TouchSignal().Connect( this, &Popup::OnDialogTouched );
-    mPopupLayout.TouchSignal().Connect( this, &Popup::OnDialogTouched );
+    mBacking.TouchedSignal().Connect( this, &Popup::OnBackingTouched );
+    mPopupBackgroundImage.TouchedSignal().Connect( this, &Popup::OnDialogTouched );
+    mPopupLayout.TouchedSignal().Connect( this, &Popup::OnDialogTouched );
     mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, true );
   }
   else
   {
     // We are touch transparent so disconnect all signals and ensure our layer does not consumed all touch events
-    mBacking.TouchSignal().Disconnect( this, &Popup::OnBackingTouched );
-    mPopupBackgroundImage.TouchSignal().Disconnect( this, &Popup::OnDialogTouched );
-    mPopupLayout.TouchSignal().Disconnect( this, &Popup::OnDialogTouched );
+    mBacking.TouchedSignal().Disconnect( this, &Popup::OnBackingTouched );
+    mPopupBackgroundImage.TouchedSignal().Disconnect( this, &Popup::OnDialogTouched );
+    mPopupLayout.TouchedSignal().Disconnect( this, &Popup::OnDialogTouched );
     mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, false );
   }
 }
