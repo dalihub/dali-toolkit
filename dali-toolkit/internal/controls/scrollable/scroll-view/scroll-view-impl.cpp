@@ -629,7 +629,7 @@ Dali::Toolkit::ScrollView ScrollView::New()
 }
 
 ScrollView::ScrollView()
-: ScrollBase( ControlBehaviour( REQUIRES_WHEEL_EVENTS | DISABLE_STYLE_CHANGE_SIGNALS ) ),   // Enable size negotiation
+: ScrollBase( ControlBehaviour( DISABLE_STYLE_CHANGE_SIGNALS ) ),   // Enable size negotiation
   mTouchDownTime(0u),
   mGestureStackDepth(0),
   mScrollStateFlags(0),
@@ -703,6 +703,9 @@ void ScrollView::OnInitialize()
 
   UpdatePropertyDomain();
   SetInternalConstraints();
+
+  // Connect wheel event
+  self.WheelEventSignal().Connect( this, &ScrollView::OnWheelEvent );
 }
 
 void ScrollView::OnSceneConnection( int depth )
@@ -2129,7 +2132,7 @@ bool ScrollView::OnTouch( Actor actor, const TouchEvent& touch )
   return false;
 }
 
-bool ScrollView::OnWheelEvent(const WheelEvent& event)
+bool ScrollView::OnWheelEvent( Actor actor, const WheelEvent& event)
 {
   if(!mSensitive)
   {

@@ -566,11 +566,12 @@ private: // private overridden functions from CustomActorImpl and Controls
   virtual void OnChildRemove(Actor& child);
 
   /**
-   * From CustomActorImpl; called after a wheelEvent is received by the owning actor.
+   * Called after a wheelEvent is received by the owning actor.
+   * @param[in] actor Actor associated with the event.
    * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnWheelEvent(const WheelEvent& event);
+  bool OnWheelEvent(Actor actor, const WheelEvent& event);
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

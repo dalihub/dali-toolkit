@@ -333,7 +333,7 @@ Dali::Toolkit::ItemView ItemView::New(ItemFactory& factory)
 }
 
 ItemView::ItemView(ItemFactory& factory)
-: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS | REQUIRES_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
+: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
   mItemFactory(factory),
   mItemsParentOrigin(ParentOrigin::CENTER),
   mItemsAnchorPoint(AnchorPoint::CENTER),
@@ -374,6 +374,9 @@ void ItemView::OnInitialize()
   mWheelEventFinishedTimer.TickSignal().Connect( this, &ItemView::OnWheelEventFinished );
 
   SetRefreshInterval(DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS);
+
+  // Connect wheel event
+  self.WheelEventSignal().Connect( this, &ItemView::OnWheelEvent );
 }
 
 ItemView::~ItemView()
@@ -1022,7 +1025,7 @@ void ItemView::OnChildAdd(Actor& child)
   Scrollable::OnChildAdd( child );
 }
 
-bool ItemView::OnWheelEvent(const WheelEvent& event)
+bool ItemView::OnWheelEvent(Actor actor, const WheelEvent& event)
 {
   // Respond the wheel event to scroll
   if (mActiveLayout)

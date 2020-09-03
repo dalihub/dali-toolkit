@@ -622,17 +622,7 @@ void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
   // @todo size negotiate background to new size, animate as well?
 }
 
-bool Control::OnHoverEvent(const HoverEvent& event)
-{
-  return false; // Do not consume
-}
-
 bool Control::OnKeyEvent(const KeyEvent& event)
-{
-  return false; // Do not consume
-}
-
-bool Control::OnWheelEvent(const WheelEvent& event)
 {
   return false; // Do not consume
 }
