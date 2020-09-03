@@ -465,65 +465,6 @@ int UtcDaliControlImplSizeAnimation(void)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int UtcDaliControlImplHoverEvent(void)
-{
-  ToolkitTestApplication application;
-
-  {
-    DummyControl dummy = DummyControl::New( true );
-    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
-
-    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(dummy);
-
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-
-    DALI_TEST_EQUALS( dummyImpl.hoverEventCalled, false, TEST_LOCATION );
-    Integration::HoverEvent event(1);
-    Integration::Point point;
-    point.SetDeviceId( 1 );
-    point.SetState( PointState::MOTION );
-    point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
-    event.AddPoint(point);
-    application.ProcessEvent( event );
-    DALI_TEST_EQUALS( dummyImpl.hoverEventCalled, true, TEST_LOCATION );
-
-    application.GetScene().Remove(dummy);
-  }
-
-  // Ensure full code coverage
-  {
-    DummyControl dummy = DummyControl::New();
-
-    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(dummy);
-
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-
-    Integration::HoverEvent event(1);
-    Integration::Point point;
-    point.SetDeviceId( 1 );
-    point.SetState( PointState::MOTION );
-    point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
-    event.AddPoint(point);
-    application.ProcessEvent( event );
-
-    application.GetScene().Remove(dummy);
-  }
-  END_TEST;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 int UtcDaliControlImplKeyEvent(void)
 {
   ToolkitTestApplication application;
@@ -654,68 +595,6 @@ int UtcDaliControlImplTypeRegistry(void)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-namespace
-{
-static bool WheelEventCallback(Actor actor, const WheelEvent& event)
-{
-  return false;
-}
-}
-
-int UtcDaliControlImplWheelEvent(void)
-{
-  ToolkitTestApplication application;
-
-  {
-    DummyControl dummy = DummyControl::New( true );
-    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
-
-    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(dummy);
-
-    dummy.WheelEventSignal().Connect(&WheelEventCallback);
-
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-
-    DALI_TEST_EQUALS( dummyImpl.wheelEventCalled, false, TEST_LOCATION );
-
-    // simulate a wheel event
-    Vector2 screenCoordinates( 10.0f, 10.0f );
-    Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
-    application.ProcessEvent( event );
-    DALI_TEST_EQUALS( dummyImpl.wheelEventCalled, true, TEST_LOCATION );
-
-    application.GetScene().Remove(dummy);
-  }
-
-  // Ensure full code coverage
-  {
-    DummyControl dummy = DummyControl::New();
-
-    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(dummy);
-
-    dummy.WheelEventSignal().Connect(&WheelEventCallback);
-
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-
-    // simulate a wheel event
-    Vector2 screenCoordinates( 20.0f, 20.0f );
-    Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
-    application.ProcessEvent( event );
-
-    application.GetScene().Remove(dummy);
-  }
-  END_TEST;
-}
 
 int UtcDaliControlImplSetStyleName(void)
 {

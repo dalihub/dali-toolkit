@@ -162,6 +162,7 @@ private: // From Internal::Control
   virtual void OnTap(const TapGesture& tap);
   virtual void OnLongPress(const LongPressGesture& longPress);
   virtual Vector3 GetNaturalSize();
+  virtual bool OnKeyEvent(const KeyEvent& event);
 
 private: // From CustomActorImpl
 
@@ -171,9 +172,6 @@ private: // From CustomActorImpl
   virtual void OnChildRemove(Actor& child);
   virtual void OnSizeSet(const Vector3& targetSize);
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
-  virtual bool OnHoverEvent(const HoverEvent& event);
-  virtual bool OnWheelEvent(const WheelEvent& event);
-  virtual bool OnKeyEvent(const KeyEvent& event);
   virtual void OnKeyInputFocusGained();
   virtual void OnKeyInputFocusLost();
   virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );

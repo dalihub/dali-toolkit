@@ -339,21 +339,6 @@ protected: // From CustomActorImpl
   virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize ) override;
 
   /**
-   * @copydoc CustomActorImpl::OnHoverEvent()
-   */
-  virtual bool OnHoverEvent( const HoverEvent& event ) override;
-
-  /**
-   * @copydoc CustomActorImpl::OnKeyEvent()
-   */
-  virtual bool OnKeyEvent( const KeyEvent& event ) override;
-
-  /**
-   * @copydoc CustomActorImpl::OnWheelEvent()
-   */
-  virtual bool OnWheelEvent( const WheelEvent& event ) override;
-
-  /**
    * @copydoc CustomActorImpl::OnRelayout()
    */
   virtual void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
@@ -545,6 +530,15 @@ public: // API for derived classes to override
    * @return true if this control supported this action
    */
   virtual bool OnKeyboardEnter();
+
+  /**
+   * @brief Called after a key-event is received by the actor that has had its focus set.
+   *
+   * @SINCE_1_0.0
+   * @param[in] event The Key Event
+   * @return True if the event should be consumed
+   */
+  virtual bool OnKeyEvent( const KeyEvent& event );
 
   // Gestures
 
