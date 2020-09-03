@@ -1907,12 +1907,15 @@ std::string Control::Impl::AccessibleImpl::GetName()
   if (controlImpl.mAccessibilityNameSet)
     return controlImpl.mAccessibilityName;
 
-  return GetNameRaw();
+  if (auto raw = GetNameRaw(); !raw.empty())
+    return raw;
+
+  return self.GetProperty< std::string >( Actor::Property::NAME );
 }
 
 std::string Control::Impl::AccessibleImpl::GetNameRaw()
 {
-  return self.GetProperty< std::string >( Actor::Property::NAME );
+  return {};
 }
 
 std::string Control::Impl::AccessibleImpl::GetDescription()
