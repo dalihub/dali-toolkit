@@ -461,8 +461,7 @@ void Control::Initialize()
   // Call deriving classes so initialised before styling is applied to them.
   OnInitialize();
 
-  if( (mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS) ||
-      !(mImpl->mFlags & DISABLE_STYLE_CHANGE_SIGNALS) )
+  if( !(mImpl->mFlags & DISABLE_STYLE_CHANGE_SIGNALS) )
   {
     Toolkit::StyleManager styleManager = StyleManager::Get();
 

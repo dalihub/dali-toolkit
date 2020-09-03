@@ -57,7 +57,7 @@ Test::TestButton TestButton::New()
 }
 
 TestButton::TestButton()
-: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) )
+: Control( ControlBehaviour() )
 {
 }
 
