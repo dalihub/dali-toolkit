@@ -272,37 +272,37 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Toolkit::Control::OnSceneConnection()
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc Toolkit::Control::OnSceneDisconnection()
    */
-  virtual void OnSceneDisconnection();
+  void OnSceneDisconnection() override;
 
   /**
    * @copydoc Toolkit::Control::OnSizeSet()
    */
-  virtual void OnSizeSet( const Vector3& targetSize );
+  void OnSizeSet( const Vector3& targetSize ) override;
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
-  virtual Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize() override;
 
   /**
    * @copydoc Toolkit::Control::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width );
+  float GetHeightForWidth( float width ) override;
 
   /**
    * @copydoc Toolkit::Control::GetWidthForHeight()
    */
-  virtual float GetWidthForHeight( float height );
+  float GetWidthForHeight( float height ) override;
 
 private:
 

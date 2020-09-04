@@ -66,7 +66,7 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * Adds a control using some default values (the control uses 10% of the tool bar space and is placed on the left group).
@@ -74,7 +74,7 @@ private: // From Control
    *
    * @see Control::OnChildAdd()
    */
-  virtual void OnChildAdd(Actor& child);
+  void OnChildAdd(Actor& child) override;
 
 private:
   /**

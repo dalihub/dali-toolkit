@@ -52,12 +52,12 @@ protected:
   /**
    * @copydoc Toolkit::Internal::CubeTransitionEffect::OnInitialize
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Toolkit::Internal::CubeTransitionEffect::OnStartTransition
    */
-  virtual void OnStartTransition( Vector2 panPosition, Vector2 panDisplacement );
+  void OnStartTransition( Vector2 panPosition, Vector2 panDisplacement ) override;
 
 private:
 

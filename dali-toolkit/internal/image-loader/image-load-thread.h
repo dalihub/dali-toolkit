@@ -199,7 +199,7 @@ protected:
    * The entry function of the worker thread.
    * It fetches loading task from the loadQueue, loads the image and adds to the completeQueue.
    */
-  virtual void Run();
+  void Run() override;
 
 private:
 

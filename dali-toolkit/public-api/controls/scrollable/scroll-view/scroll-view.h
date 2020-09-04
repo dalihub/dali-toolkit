@@ -384,22 +384,22 @@ public:
   /**
    * @copydoc Toolkit::Ruler::Snap
    */
-  virtual float Snap(float x, float bias) const;
+  float Snap(float x, float bias) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetPositionFromPage
    */
-  virtual float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const;
+  float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetPageFromPosition
    */
-  virtual unsigned int GetPageFromPosition(float position, bool wrap) const;
+  unsigned int GetPageFromPosition(float position, bool wrap) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetTotalPages
    */
-  virtual unsigned int GetTotalPages() const;
+  unsigned int GetTotalPages() const override;
 };
 
 /**
@@ -420,22 +420,22 @@ public:
   /**
    * @copydoc Toolkit::Ruler::Snap
    */
-  virtual float Snap(float x, float bias) const;
+  float Snap(float x, float bias) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetPositionFromPage
    */
-  virtual float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const;
+  float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetPageFromPosition
    */
-  virtual unsigned int GetPageFromPosition(float position, bool wrap) const;
+  unsigned int GetPageFromPosition(float position, bool wrap) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetTotalPages
    */
-  virtual unsigned int GetTotalPages() const;
+  unsigned int GetTotalPages() const override;
 
 private:
   float mSpacing; ///< The spacing between each interval

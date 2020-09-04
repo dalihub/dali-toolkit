@@ -132,12 +132,12 @@ protected:
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
-  virtual void OnSceneDisconnection();
+  void OnSceneDisconnection() override;
 
 protected:
 
@@ -192,7 +192,7 @@ private:
    */
   virtual void OnStopTransition() {}
 
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   void ResetToInitialState();
 

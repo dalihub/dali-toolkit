@@ -120,32 +120,32 @@ private: // From Control
   /**
    * @copydoc Toolkit::Internal::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& targetSize )
    */
-  virtual void OnSizeSet( const Vector3& targetSize );
+  void OnSizeSet( const Vector3& targetSize ) override;
 
   /**
    * @copydoc Toolkit::Internal::Control::OnSceneConnection
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc Toolkit::Internal::Control::OnSceneDisconnection
    */
-  virtual void OnSceneDisconnection();
+  void OnSceneDisconnection() override;
 
   /**
    * @copydoc Toolkit::Internal::Control::OnChildAdd
    */
-  virtual void OnChildAdd( Actor& child );
+  void OnChildAdd( Actor& child ) override;
 
   /**
    * @copydoc Toolkit::Internal::Control::OnChildRemove
    */
-  virtual void OnChildRemove( Actor& child );
+  void OnChildRemove( Actor& child ) override;
 
 private:
 

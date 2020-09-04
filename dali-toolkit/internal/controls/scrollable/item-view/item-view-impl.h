@@ -409,7 +409,7 @@ private: // From CustomActorImpl
    * From CustomActorImpl; called after a child has been added to the owning actor.
    * @param[in] child The child which has been added.
    */
-  virtual void OnChildAdd(Actor& child);
+  void OnChildAdd(Actor& child) override;
 
   /**
    * Called after a wheel-event is received by the owning actor.
@@ -424,22 +424,22 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Toolkit::Control::OnAccessibilityPan()
    */
-  virtual bool OnAccessibilityPan(PanGesture gesture);
+  bool OnAccessibilityPan(PanGesture gesture) override;
 
   /**
    * @copydoc Toolkit::Control::GetNextKeyboardFocusableActor()
    */
-  virtual Actor GetNextKeyboardFocusableActor(Actor actor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled);
+  Actor GetNextKeyboardFocusableActor(Actor actor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled) override;
 
   /**
    * @copydoc Toolkit::Control::OnKeyboardFocusChangeCommitted()
    */
-  virtual void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor);
+  void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor) override;
 
 protected:
 
@@ -562,7 +562,7 @@ private:
   /**
    * @copydoc Toolkit::Internal::Scrollable::EnableScrollOvershoot
    */
-  virtual void EnableScrollOvershoot( bool enable );
+  void EnableScrollOvershoot( bool enable ) override;
 
   /**
    * Helper to calculate the scroll overshoot according to the pan gesture displacement.

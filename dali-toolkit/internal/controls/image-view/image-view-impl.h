@@ -120,22 +120,22 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
-  virtual Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize() override;
 
   /**
    * @copydoc Toolkit::Control::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width );
+  float GetHeightForWidth( float width ) override;
 
   /**
    * @copydoc Toolkit::Control::GetWidthForHeight()
    */
-  virtual float GetWidthForHeight( float height );
+  float GetWidthForHeight( float height ) override;
 
   /**
    * @copydoc Toolkit::Control::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
 private:
 

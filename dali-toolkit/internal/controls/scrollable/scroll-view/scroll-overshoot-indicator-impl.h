@@ -185,17 +185,17 @@ public:
   /**
    * @copydoc ScrollOvershootEffect::Apply
    */
-  virtual void Apply();
+  void Apply() override;
 
   /**
    * @copydoc ScrollOvershootEffect::Remove
    */
-  virtual void Remove( Scrollable& scrollable );
+  void Remove( Scrollable& scrollable ) override;
 
   /**
    * @copydoc ScrollOvershootEffect::Reset
    */
-  virtual void Reset();
+  void Reset() override;
 
   /**
    * @copydoc ScrollOvershootEffect::UpdatePropertyNotifications

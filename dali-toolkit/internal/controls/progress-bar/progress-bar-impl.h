@@ -171,12 +171,12 @@ protected:
   /**
    * @copydoc CustomActorImpl::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   /**
    * @copydoc CustomActorImpl::GetNaturalSize()
    */
-  virtual Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize() override;
 
 private:
 
@@ -202,7 +202,7 @@ private:
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * Get the range of the valid values the ProgressBar handle can move between
@@ -245,7 +245,7 @@ private:
   /**
    * Check if we should start animating
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
 private:
 

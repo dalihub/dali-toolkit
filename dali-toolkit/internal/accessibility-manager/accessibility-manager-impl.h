@@ -490,54 +490,54 @@ private:
    * @param[in]  panEvent  The pan event to be handled.
    * @return whether the gesture is handled successfully or not.
    */
-  virtual bool HandlePanGesture(const AccessibilityGestureEvent& panEvent);
+  bool HandlePanGesture(const AccessibilityGestureEvent& panEvent) override;
 
   /**
    * Change the accessibility status when Accessibility feature(screen-reader) turned on or off.
    * @return whether the status is changed or not.
    */
-  virtual bool ChangeAccessibilityStatus();
+  bool ChangeAccessibilityStatus() override;
 
   /**
    * Clear the accessibility focus from the current focused actor.
    * @return whether the focus is cleared or not.
    */
-  virtual bool ClearAccessibilityFocus();
+  bool ClearAccessibilityFocus() override;
 
   /**
    * Perform the accessibility action associated with a scroll event.
    * @param touch The touch point (and time) of the event.
    * @return whether the focus is cleared or not.
    */
-  virtual bool AccessibilityActionScroll( Dali::TouchEvent& touch );
+  bool AccessibilityActionScroll( Dali::TouchEvent& touch ) override;
 
   /**
    * Perform the accessibility action to move focus to the previous focusable actor (by one finger flick up).
    * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionPrevious(bool allowEndFeedback);
+  bool AccessibilityActionPrevious(bool allowEndFeedback) override;
 
   /**
    * Perform the accessibility action to move focus to the next focusable actor (by one finger flick down).
    * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionNext(bool allowEndFeedback);
+  bool AccessibilityActionNext(bool allowEndFeedback) override;
 
   /**
    * Perform the accessibility action to move focus to the previous focusable actor (by one finger flick left).
    * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionReadPrevious(bool allowEndFeedback);
+  bool AccessibilityActionReadPrevious(bool allowEndFeedback) override;
 
   /**
    * Perform the accessibility action to move focus to the next focusable actor (by one finger flick right).
    * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionReadNext(bool allowEndFeedback);
+  bool AccessibilityActionReadNext(bool allowEndFeedback) override;
 
   /**
    * Perform the accessibility action to focus and read the actor (by one finger tap or move).
@@ -545,117 +545,117 @@ private:
    *                       false if the action just read when the focus object is changed (i.e. over action)
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionRead(bool allowReadAgain);
+  bool AccessibilityActionRead(bool allowReadAgain) override;
 
   /**
    * Perform the accessibility action to activate the current focused actor (by one finger double tap).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionActivate();
+  bool AccessibilityActionActivate() override;
 
   /**
    * Perform the accessibility action to change the value when the current focused actor is a slider
    * (by double finger down and move up and right).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionUp();
+  bool AccessibilityActionUp() override;
 
   /**
    * Perform the accessibility action to change the value when the current focused actor is a slider
    * (by double finger down and move down and left).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionDown();
+  bool AccessibilityActionDown() override;
 
   /**
    * Perform the accessibility action to navigate back (by two fingers circle draw).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionBack();
+  bool AccessibilityActionBack() override;
 
   /**
    * Perform the accessibility action to scroll up the list and focus on the first item on the list
    * after the scrolling and read the item (by two finger swipe up).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionScrollUp();
+  bool AccessibilityActionScrollUp() override;
 
   /**
    * Perform the accessibility action to scroll down the list and focus on the first item on the list
    * after the scrolling and read the item (by two finger swipe down).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionScrollDown();
+  bool AccessibilityActionScrollDown() override;
 
   /**
    * Perform the accessibility action to scroll left to the previous page (by two finger swipe left).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionPageLeft();
+  bool AccessibilityActionPageLeft() override;
 
   /**
    * Perform the accessibility action to scroll right to the next page (by two finger swipe right).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionPageRight();
+  bool AccessibilityActionPageRight() override;
 
   /**
    * Perform the accessibility action to scroll up to the previous page (by one finger swipe left and right).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionPageUp();
+  bool AccessibilityActionPageUp() override;
 
   /**
    * Perform the accessibility action to scroll down to the next page (by one finger swipe right and left).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionPageDown();
+  bool AccessibilityActionPageDown() override;
 
   /**
    * Perform the accessibility action to move the focus to the first item on the screen
    * (by one finger swipe up and down).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionMoveToFirst();
+  bool AccessibilityActionMoveToFirst() override;
 
   /**
    * Perform the accessibility action to move the focus to the last item on the screen
    * (by one finger swipe down and up).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionMoveToLast();
+  bool AccessibilityActionMoveToLast() override;
 
   /**
    * Perform the accessibility action to move the focus to the first item on the top
    * and read from the top item continuously (by three fingers single tap).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionReadFromTop();
+  bool AccessibilityActionReadFromTop() override;
 
   /**
    * Perform the accessibility action to move the focus to and read from the next item
    * continuously (by three fingers double tap).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionReadFromNext();
+  bool AccessibilityActionReadFromNext() override;
 
   /**
    * Perform the accessibility action to move the focus to do the zooming (by one finger triple tap).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionZoom();
+  bool AccessibilityActionZoom() override;
 
   /**
    * Perform the accessibility action to pause/resume the current read out (by two fingers single tap).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionReadPauseResume();
+  bool AccessibilityActionReadPauseResume() override;
 
   /**
    * Perform the accessibility action to start/stop the current action (by two fingers double tap).
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionStartStop();
+  bool AccessibilityActionStartStop() override;
 
   /**
    * This function is connected to the TtsPlayer StateChangeSignal.

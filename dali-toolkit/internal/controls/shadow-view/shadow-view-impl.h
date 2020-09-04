@@ -114,17 +114,17 @@ public:
 
 private:
 
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Control::OnChildAdd()
    */
-  virtual void OnChildAdd( Actor& child );
+  void OnChildAdd( Actor& child ) override;
 
   /**
    * @copydoc Control::OnChildRemove()
    */
-  virtual void OnChildRemove( Actor& child );
+  void OnChildRemove( Actor& child ) override;
 
   /**
    * Constrain the camera actor to the position of the point light, pointing

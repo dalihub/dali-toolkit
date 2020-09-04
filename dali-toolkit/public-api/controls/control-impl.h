@@ -300,25 +300,25 @@ protected: // From CustomActorImpl
    * @copydoc CustomActorImpl::OnSceneConnection()
    * @note If overridden, then an up-call to Control::OnSceneConnection MUST be made at the end.
    */
-  virtual void OnSceneConnection( int depth ) override;
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneDisconnection()
    * @note If overridden, then an up-call to Control::OnSceneDisconnection MUST be made at the end.
    */
-  virtual void OnSceneDisconnection() override;
+  void OnSceneDisconnection() override;
 
   /**
    * @copydoc CustomActorImpl::OnChildAdd()
    * @note If overridden, then an up-call to Control::OnChildAdd MUST be made at the end.
    */
-  virtual void OnChildAdd( Actor& child ) override;
+  void OnChildAdd( Actor& child ) override;
 
   /**
    * @copydoc CustomActorImpl::OnChildRemove()
    * @note If overridden, then an up-call to Control::OnChildRemove MUST be made at the end.
    */
-  virtual void OnChildRemove( Actor& child ) override;
+  void OnChildRemove( Actor& child ) override;
 
   /**
    * @copydoc CustomActorImpl::OnPropertySet()
@@ -330,58 +330,58 @@ protected: // From CustomActorImpl
    * @copydoc CustomActorImpl::OnSizeSet()
    * @note If overridden, then an up-call to Control::OnSizeSet MUST be made at the end.
    */
-  virtual void OnSizeSet( const Vector3& targetSize ) override;
+  void OnSizeSet( const Vector3& targetSize ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeAnimation()
    * @note If overridden, then an up-call to Control::OnSizeAnimation MUST be made at the end.
    */
-  virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize ) override;
+  void OnSizeAnimation( Animation& animation, const Vector3& targetSize ) override;
 
   /**
    * @copydoc CustomActorImpl::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSetResizePolicy()
    */
-  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) override;
+  void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) override;
 
   /**
    * @copydoc CustomActorImpl::GetNaturalSize()
    */
-  virtual Vector3 GetNaturalSize() override;
+  Vector3 GetNaturalSize() override;
 
   /**
    * @copydoc CustomActorImpl::CalculateChildSize()
    */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) override;
+  float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) override;
 
   /**
    * @copydoc CustomActorImpl::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width ) override;
+  float GetHeightForWidth( float width ) override;
 
   /**
    * @copydoc CustomActorImpl::GetWidthForHeight()
    */
-  virtual float GetWidthForHeight( float height ) override;
+  float GetWidthForHeight( float height ) override;
 
   /**
    * @copydoc CustomActorImpl::RelayoutDependentOnChildren()
    */
-  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) override;
+  bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) override;
 
   /**
    * @copydoc CustomActorImpl::OnCalculateRelayoutSize()
    */
-  virtual void OnCalculateRelayoutSize( Dimension::Type dimension ) override;
+  void OnCalculateRelayoutSize( Dimension::Type dimension ) override;
 
   /**
    * @copydoc CustomActorImpl::OnLayoutNegotiated()
    */
-  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) override;
+  void OnLayoutNegotiated( float size, Dimension::Type dimension ) override;
 
 protected: // Helpers for deriving classes
 
@@ -604,12 +604,12 @@ public: // API for derived classes to override
   /**
    * @copydoc ConnectionTrackerInterface::SignalConnected
    */
-  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
+  void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
 
   /**
    * @copydoc ConnectionTrackerInterface::SignalDisconnected
    */
-  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
+  void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
 
   /**
    * @brief Retrieves the extension for this control.

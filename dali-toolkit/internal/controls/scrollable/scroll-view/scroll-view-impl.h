@@ -546,24 +546,24 @@ private: // private overridden functions from CustomActorImpl and Controls
   /**
    * @copydoc Dali::CustomActorImpl::OnSizeAnimation(Animation&, const Vector3&)
    */
-  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
+  void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet(const Vector3&)
    */
-  virtual void OnSizeSet( const Vector3& size );
+  void OnSizeSet( const Vector3& size ) override;
 
   /**
    * From CustomActorImpl; called after a child has been added to the owning actor.
    * @param[in] child The child which has been added.
    */
-  virtual void OnChildAdd(Actor& child);
+  void OnChildAdd(Actor& child) override;
 
   /**
    * From CustomActorImpl; called shortly before a child is removed from the owning actor.
    * @param[in] child The child being removed.
    */
-  virtual void OnChildRemove(Actor& child);
+  void OnChildRemove(Actor& child) override;
 
   /**
    * Called after a wheelEvent is received by the owning actor.
@@ -576,27 +576,27 @@ private: // private overridden functions from CustomActorImpl and Controls
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
-  virtual void OnSceneDisconnection();
+  void OnSceneDisconnection() override;
 
   /**
    * @copydoc Toolkit::Control::OnAccessibilityPan()
    */
-  virtual bool OnAccessibilityPan(PanGesture gesture);
+  bool OnAccessibilityPan(PanGesture gesture) override;
 
   /**
    * @copydoc Toolkit::Scrollable::EnableScrollOvershoot()
    */
-  virtual void EnableScrollOvershoot(bool enable);
+  void EnableScrollOvershoot(bool enable) override;
 
 private:
 
@@ -820,7 +820,7 @@ private:
    *
    * @param[in] child The actor to be unbound.
    */
-  virtual void FindAndUnbindActor(Actor child);
+  void FindAndUnbindActor(Actor child) override;
 
   /**
    * Gets position property.

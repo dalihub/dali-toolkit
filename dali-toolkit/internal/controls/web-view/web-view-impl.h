@@ -188,17 +188,17 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
-  virtual Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize() override;
 
   /**
    * @copydoc Toolkit::Control::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   /**
    * Signal occurs when the Web View has been touched.
@@ -211,7 +211,7 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::OnKeyEvent()
    */
-  virtual bool OnKeyEvent( const Dali::KeyEvent& event );
+  bool OnKeyEvent( const Dali::KeyEvent& event ) override;
 
 private:
 

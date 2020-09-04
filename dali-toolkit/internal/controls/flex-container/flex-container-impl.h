@@ -170,37 +170,37 @@ private: // From Control
   /**
    * @copydoc Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Control::OnChildAdd(Actor& child)
    */
-  virtual void OnChildAdd( Actor& child );
+  void OnChildAdd( Actor& child ) override;
 
   /**
    * @copydoc Control::OnChildRemove(Actor& child)
    */
-  virtual void OnChildRemove( Actor& child );
+  void OnChildRemove( Actor& child ) override;
 
   /**
    * @copydoc Control::OnRelayout
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   /**
    * @copydoc Control::RelayoutDependentOnChildren()
    */
-  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
+  bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) override;
 
   /**
    * @copydoc Control::GetNextKeyboardFocusableActor
    */
-  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled );
+  Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
-  virtual void OnSizeSet( const Vector3& size );
+  void OnSizeSet( const Vector3& size ) override;
 
   /**
   * @copydoc OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type )

@@ -53,16 +53,16 @@ public:
 
 public: // From ImageFilter
   /// @copydoc Dali::Toolkit::Internal::ImageFilter::Enable
-  virtual void Enable();
+  void Enable() override;
 
   /// @copydoc Dali::Toolkit::Internal::ImageFilter::Disable
-  virtual void Disable();
+  void Disable() override;
 
   /// @copydoc Dali::Toolkit::Internal::ImageFilter::Refresh
-  virtual void Refresh();
+  void Refresh() override;
 
   /// @copydoc Dali::Toolkit::Internal::ImageFilter::SetSize
-  virtual void SetSize( const Vector2& size );
+  void SetSize( const Vector2& size ) override;
 
 private:
   /**

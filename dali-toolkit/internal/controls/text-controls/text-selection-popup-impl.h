@@ -139,7 +139,7 @@ private: // From Control
   /**
    * @copydoc Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
 private: // Implementation
 
