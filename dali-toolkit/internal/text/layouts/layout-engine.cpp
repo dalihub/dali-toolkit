@@ -1254,7 +1254,7 @@ struct Engine::Impl
         return false;
       }
 
-      // Set the line position. Discard if ellipsis is enabled and the position exceeds the boundaries
+      // Set the line position. DISCARD if ellipsis is enabled and the position exceeds the boundaries
       // of the box.
       penY += layout.ascender;
 

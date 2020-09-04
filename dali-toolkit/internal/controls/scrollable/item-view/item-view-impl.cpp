@@ -333,7 +333,7 @@ Dali::Toolkit::ItemView ItemView::New(ItemFactory& factory)
 }
 
 ItemView::ItemView(ItemFactory& factory)
-: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS | REQUIRES_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
+: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | DISABLE_STYLE_CHANGE_SIGNALS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
   mItemFactory(factory),
   mItemsParentOrigin(ParentOrigin::CENTER),
   mItemsAnchorPoint(AnchorPoint::CENTER),
@@ -347,7 +347,7 @@ ItemView::ItemView(ItemFactory& factory)
   mScrollDistance(0.0f),
   mScrollSpeed(0.0f),
   mScrollOvershoot(0.0f),
-  mGestureState(Gesture::Clear),
+  mGestureState(GestureState::CLEAR),
   mAnimatingOvershootOn(false),
   mAnimateOvershootOff(false),
   mAnchoringEnabled(false),
@@ -367,13 +367,16 @@ void ItemView::OnInitialize()
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   mWheelScrollDistanceStep = stageSize.y * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
 
-  self.TouchSignal().Connect( this, &ItemView::OnTouch );
-  EnableGestureDetection(Gesture::Type(Gesture::Pan));
+  self.TouchedSignal().Connect( this, &ItemView::OnTouch );
+  EnableGestureDetection(GestureType::Value(GestureType::PAN));
 
   mWheelEventFinishedTimer = Timer::New( WHEEL_EVENT_FINISHED_TIME_OUT );
   mWheelEventFinishedTimer.TickSignal().Connect( this, &ItemView::OnWheelEventFinished );
 
   SetRefreshInterval(DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS);
+
+  // Connect wheel event
+  self.WheelEventSignal().Connect( this, &ItemView::OnWheelEvent );
 }
 
 ItemView::~ItemView()
@@ -1022,7 +1025,7 @@ void ItemView::OnChildAdd(Actor& child)
   Scrollable::OnChildAdd( child );
 }
 
-bool ItemView::OnWheelEvent(const WheelEvent& event)
+bool ItemView::OnWheelEvent(Actor actor, const WheelEvent& event)
 {
   // Respond the wheel event to scroll
   if (mActiveLayout)
@@ -1125,7 +1128,7 @@ bool ItemView::OnTouch( Actor actor, const TouchEvent& touch )
   if ( touch.GetState( 0 ) == PointState::DOWN )
   {
     // Cancel ongoing scrolling etc.
-    mGestureState = Gesture::Clear;
+    mGestureState = GestureState::CLEAR;
 
     mScrollDistance = 0.0f;
     mScrollSpeed = 0.0f;
@@ -1155,15 +1158,15 @@ void ItemView::OnPan( const PanGesture& gesture )
   // Short-circuit if there is no active layout
   if (!mActiveLayout)
   {
-    mGestureState = Gesture::Clear;
+    mGestureState = GestureState::CLEAR;
     return;
   }
 
-  mGestureState = gesture.state;
+  mGestureState = gesture.GetState();
 
   switch (mGestureState)
   {
-    case Gesture::Finished:
+    case GestureState::FINISHED:
     {
       // Swipe Detection
       if (fabsf(mScrollDistance) > mMinimumSwipeDistance &&
@@ -1218,16 +1221,17 @@ void ItemView::OnPan( const PanGesture& gesture )
     }
     break;
 
-    case Gesture::Started: // Fall through
+    case GestureState::STARTED: // Fall through
     {
       mTotalPanDisplacement = Vector2::ZERO;
       mScrollStartedSignal.Emit(GetCurrentScrollPosition());
       mRefreshEnabled = true;
     }
 
-    case Gesture::Continuing:
+    case GestureState::CONTINUING:
     {
-      mScrollDistance = CalculateScrollDistance(gesture.displacement, *mActiveLayout);
+      const Vector2& displacement = gesture.GetDisplacement();
+      mScrollDistance = CalculateScrollDistance(displacement, *mActiveLayout);
       mScrollSpeed = Clamp((gesture.GetSpeed() * gesture.GetSpeed() * mActiveLayout->GetFlickSpeedFactor() * MILLISECONDS_PER_SECONDS), 0.0f, mActiveLayout->GetMaximumSwipeSpeed());
 
       // Refresh order depends on the direction of the scroll; negative is towards the last item.
@@ -1246,7 +1250,7 @@ void ItemView::OnPan( const PanGesture& gesture )
           ( firstItemScrollPosition <= mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), layoutSize) &&
             currentOvershoot > -1.0f ) )
       {
-        mTotalPanDisplacement += gesture.displacement;
+        mTotalPanDisplacement += displacement;
       }
 
       mScrollOvershoot = CalculateScrollOvershoot();
@@ -1277,7 +1281,7 @@ void ItemView::OnPan( const PanGesture& gesture )
     }
     break;
 
-    case Gesture::Cancelled:
+    case GestureState::CANCELLED:
     {
       mScrollAnimation = DoAnchoring();
     }

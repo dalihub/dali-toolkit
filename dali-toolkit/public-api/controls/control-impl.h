@@ -117,12 +117,12 @@ public:
    *
    * Gesture detection can be enabled one at a time or in bitwise format as shown:
    * @code
-   * EnableGestureDetection(Gesture::Type(Gesture::Pinch | Gesture::Tap | Gesture::Pan));
+   * EnableGestureDetection(GestureType::Value(GestureType::PINCH | GestureType::TAP | GestureType::PAN));
    * @endcode
    * @SINCE_1_0.0
    * @param[in] type The gesture type(s) to enable
    */
-  void EnableGestureDetection( Gesture::Type type );
+  void EnableGestureDetection( GestureType::Value type );
 
   /**
    * @brief Allows deriving classes to disable any of the gesture detectors.
@@ -132,7 +132,7 @@ public:
    * @param[in] type The gesture type(s) to disable
    * @see EnableGetureDetection
    */
-  void DisableGestureDetection( Gesture::Type type );
+  void DisableGestureDetection( GestureType::Value type );
 
   /**
    * @brief If deriving classes wish to fine tune pinch gesture
@@ -324,7 +324,7 @@ protected: // From CustomActorImpl
    * @copydoc CustomActorImpl::OnPropertySet()
    * @note If overridden, then an up-call to Control::OnChildRemove MUST be made at the end.
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) override;
+  void OnPropertySet( Property::Index index, const Property::Value& propertyValue ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet()
@@ -337,21 +337,6 @@ protected: // From CustomActorImpl
    * @note If overridden, then an up-call to Control::OnSizeAnimation MUST be made at the end.
    */
   virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize ) override;
-
-  /**
-   * @copydoc CustomActorImpl::OnHoverEvent()
-   */
-  virtual bool OnHoverEvent( const HoverEvent& event ) override;
-
-  /**
-   * @copydoc CustomActorImpl::OnKeyEvent()
-   */
-  virtual bool OnKeyEvent( const KeyEvent& event ) override;
-
-  /**
-   * @copydoc CustomActorImpl::OnWheelEvent()
-   */
-  virtual bool OnWheelEvent( const WheelEvent& event ) override;
 
   /**
    * @copydoc CustomActorImpl::OnRelayout()
@@ -409,10 +394,10 @@ protected: // Helpers for deriving classes
   enum ControlBehaviour
   {
     CONTROL_BEHAVIOUR_DEFAULT            = 0, ///< Default behaviour: Size negotiation is enabled & listens to Style Change signal, but doesn't receive event callbacks. @SINCE_1_2_10
-    REQUIRES_STYLE_CHANGE_SIGNALS        = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 0 ),     ///< True if needs to monitor style change signals such as theme/font change @SINCE_1_0.0 @DEPRECATED_1_2_10
-    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 1 ),     ///< True if needs to support keyboard navigation @SINCE_1_0.0
 
-    DISABLE_STYLE_CHANGE_SIGNALS         = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 2 ),     ///< True if control should not monitor style change signals @SINCE_1_2_10
+    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 0 ),     ///< True if needs to support keyboard navigation @SINCE_1_0.0
+
+    DISABLE_STYLE_CHANGE_SIGNALS         = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 1 ),     ///< True if control should not monitor style change signals @SINCE_1_2_10
 
     LAST_CONTROL_BEHAVIOUR_FLAG
   };
@@ -546,6 +531,15 @@ public: // API for derived classes to override
    */
   virtual bool OnKeyboardEnter();
 
+  /**
+   * @brief Called after a key-event is received by the actor that has had its focus set.
+   *
+   * @SINCE_1_0.0
+   * @param[in] event The Key Event
+   * @return True if the event should be consumed
+   */
+  virtual bool OnKeyEvent( const KeyEvent& event );
+
   // Gestures
 
   /**
@@ -610,12 +604,12 @@ public: // API for derived classes to override
   /**
    * @copydoc ConnectionTrackerInterface::SignalConnected
    */
-  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback );
+  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
 
   /**
    * @copydoc ConnectionTrackerInterface::SignalDisconnected
    */
-  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback );
+  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
 
   /**
    * @brief Retrieves the extension for this control.
@@ -631,9 +625,12 @@ public: // API for derived classes to override
 private:
 
   /// @cond internal
-  // Undefined
-  DALI_INTERNAL Control( const Control& );
-  DALI_INTERNAL Control& operator=( const Control& );
+
+  // Not copyable or movable
+  DALI_INTERNAL Control( const Control& ) = delete; ///< Deleted copy constructor.
+  DALI_INTERNAL Control( Control&& ) = delete; ///< Deleted move constructor.
+  DALI_INTERNAL Control& operator=( const Control& ) = delete; ///< Deleted copy assignment operator.
+  DALI_INTERNAL Control& operator=( Control&& ) = delete; ///< Deleted move assignment operator.
 
 public:
   class DALI_INTERNAL Impl; // Class declaration is public so we can internally add devel API's to the Controls Impl

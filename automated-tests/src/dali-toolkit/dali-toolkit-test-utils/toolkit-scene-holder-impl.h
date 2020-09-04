@@ -106,7 +106,7 @@ public:
 
   Dali::Integration::SceneHolder::KeyEventGeneratedSignalType& KeyEventGeneratedSignal();
 
-  Dali::Integration::SceneHolder::TouchSignalType& TouchSignal();
+  Dali::Integration::SceneHolder::TouchEventSignalType& TouchedSignal();
 
   Dali::Integration::SceneHolder::WheelEventSignalType& WheelEventSignal();
 

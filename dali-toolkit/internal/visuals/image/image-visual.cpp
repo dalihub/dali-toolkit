@@ -518,10 +518,10 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   {
     TextureManager& textureManager = mFactoryCache.GetTextureManager();
 
-    uint32_t opaqueElementsCount {0u};
-    uint32_t transparentElementsCount {0u};
-    geometry = textureManager.GetRenderGeometry(mTextureId, opaqueElementsCount, transparentElementsCount);
-    if(!opaqueElementsCount && !transparentElementsCount)
+    uint32_t firstElementCount {0u};
+    uint32_t secondElementCount {0u};
+    geometry = textureManager.GetRenderGeometry(mTextureId, firstElementCount, secondElementCount);
+    if(!firstElementCount && !secondElementCount)
     {
       geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
     }
@@ -863,28 +863,28 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
   // use geometry if needed
   if( loadingSuccess )
   {
-    uint32_t opaqueElements{0u};
-    uint32_t transparentElements{0u};
-    auto geometry = mFactoryCache.GetTextureManager().GetRenderGeometry(mTextureId, opaqueElements, transparentElements);
+    uint32_t firstElementCount{0u};
+    uint32_t secondElementCount{0u};
+    auto geometry = mFactoryCache.GetTextureManager().GetRenderGeometry(mTextureId, firstElementCount, secondElementCount);
     if (mImpl->mRenderer && geometry)
     {
       mImpl->mRenderer.SetGeometry(geometry);
       Dali::DevelRenderer::DrawCommand drawCommand{};
       drawCommand.drawType = DevelRenderer::DrawType::INDEXED;
 
-      if (opaqueElements)
+      if (firstElementCount)
       {
         drawCommand.firstIndex = 0;
-        drawCommand.elementCount = opaqueElements;
-        drawCommand.queue = 0;
+        drawCommand.elementCount = firstElementCount;
+        drawCommand.queue = DevelRenderer::RENDER_QUEUE_OPAQUE;
         DevelRenderer::AddDrawCommand(mImpl->mRenderer, drawCommand);
       }
 
-      if (transparentElements)
+      if (secondElementCount)
       {
-        drawCommand.firstIndex = opaqueElements;
-        drawCommand.elementCount = transparentElements;
-        drawCommand.queue = 1;
+        drawCommand.firstIndex = firstElementCount;
+        drawCommand.elementCount = secondElementCount;
+        drawCommand.queue = DevelRenderer::RENDER_QUEUE_TRANSPARENT;
         DevelRenderer::AddDrawCommand(mImpl->mRenderer, drawCommand);
       }
     }

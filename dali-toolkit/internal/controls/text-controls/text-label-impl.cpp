@@ -23,6 +23,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -926,7 +927,7 @@ float TextLabel::GetHeightForWidth( float width )
   return mController->GetHeightForWidth( width ) + padding.top + padding.bottom;
 }
 
-void TextLabel::OnPropertySet( Property::Index index, Property::Value propertyValue )
+void TextLabel::OnPropertySet( Property::Index index, const Property::Value& propertyValue )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextLabel::OnPropertySet index[%d]\n", index );
 
@@ -966,8 +967,15 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 
   // Support Right-To-Left
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
-
+  Dali::LayoutDirection::Type layoutDirection;
+  if( mController->IsMatchSystemLanguageDirection() )
+  {
+    layoutDirection = static_cast<Dali::LayoutDirection::Type>( DevelWindow::Get( Self() ).GetRootLayer().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  }
+  else
+  {
+    layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  }
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize, layoutDirection );
 
   if( ( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) )

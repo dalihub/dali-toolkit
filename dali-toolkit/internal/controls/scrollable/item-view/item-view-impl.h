@@ -412,11 +412,12 @@ private: // From CustomActorImpl
   virtual void OnChildAdd(Actor& child);
 
   /**
-   * From CustomActorImpl; called after a wheel-event is received by the owning actor.
+   * Called after a wheel-event is received by the owning actor.
+   * @param[in] actor Actor associated with the wheel event.
    * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnWheelEvent(const WheelEvent& event);
+  bool OnWheelEvent(Actor actor, const WheelEvent& event);
 
 private: // From Control
 
@@ -634,7 +635,7 @@ private:
   float mScrollSpeed;
   float mScrollOvershoot;
 
-  Dali::Gesture::State mGestureState    : 4;
+  GestureState mGestureState            : 8;
   bool mAnimatingOvershootOn            : 1;        ///< Whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
   bool mAnimateOvershootOff             : 1;        ///< Whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
   bool mAnchoringEnabled                : 1;

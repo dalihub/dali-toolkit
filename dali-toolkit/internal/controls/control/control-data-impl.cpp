@@ -229,22 +229,22 @@ static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
     }
     else if( 0 == strcmp( signalName.c_str(), SIGNAL_TAPPED ) )
     {
-      controlImpl.EnableGestureDetection( Gesture::Tap );
+      controlImpl.EnableGestureDetection( GestureType::TAP );
       controlImpl.GetTapGestureDetector().DetectedSignal().Connect( tracker, functor );
     }
     else if( 0 == strcmp( signalName.c_str(), SIGNAL_PANNED ) )
     {
-      controlImpl.EnableGestureDetection( Gesture::Pan );
+      controlImpl.EnableGestureDetection( GestureType::PAN );
       controlImpl.GetPanGestureDetector().DetectedSignal().Connect( tracker, functor );
     }
     else if( 0 == strcmp( signalName.c_str(), SIGNAL_PINCHED ) )
     {
-      controlImpl.EnableGestureDetection( Gesture::Pinch );
+      controlImpl.EnableGestureDetection( GestureType::PINCH );
       controlImpl.GetPinchGestureDetector().DetectedSignal().Connect( tracker, functor );
     }
     else if( 0 == strcmp( signalName.c_str(), SIGNAL_LONG_PRESSED ) )
     {
-      controlImpl.EnableGestureDetection( Gesture::LongPress );
+      controlImpl.EnableGestureDetection( GestureType::LONG_PRESS );
       controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
     }
   }

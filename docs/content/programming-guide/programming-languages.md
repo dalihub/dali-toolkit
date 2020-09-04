@@ -21,7 +21,7 @@ bool OnPressed( Dali::Actor, const TouchEvent& touch )
   return true; // consume the touch event
 }
 ...
-actor.TouchSignal().Connect( &OnPressed );
+actor.TouchedSignal().Connect( &OnPressed );
 ~~~
 
 ## JSON {#json-support}
@@ -53,7 +53,7 @@ actor.TouchSignal().Connect( &OnPressed );
       "parentOrigin": "CENTER",
       "signals" :
       [
-        { "name" : "touch", "action": "play", "animation": "move" }
+        { "name" : "touched", "action": "play", "animation": "move" }
       ]
     }
   ]

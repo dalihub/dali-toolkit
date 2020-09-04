@@ -50,7 +50,7 @@ void DragAndDropDetector::Attach(Dali::Toolkit::Control& control)
       }
     }
     mControls.push_back(control);
-    control.TouchSignal().Connect(this, &DragAndDropDetector::OnDrag);
+    control.TouchedSignal().Connect(this, &DragAndDropDetector::OnDrag);
     mFirstEnter.push_back(control.GetProperty< int >( Actor::Property::ID ));
     mPanGestureDetector.Attach(control);
     mPanGestureDetector.DetectedSignal().Connect(this, &DragAndDropDetector::OnPan);
@@ -71,7 +71,7 @@ void DragAndDropDetector::Detach(Dali::Toolkit::Control& control)
 
     if(match != mControls.end())
     {
-      match->TouchSignal().Disconnect(this, &DragAndDropDetector::OnDrag);
+      match->TouchedSignal().Disconnect(this, &DragAndDropDetector::OnDrag);
       mPanGestureDetector.Detach(*match);
       mFirstEnter.erase(std::find(mFirstEnter.begin(), mFirstEnter.end(), control.GetProperty< int >( Actor::Property::ID )));
       mControls.erase(match);
@@ -86,7 +86,7 @@ void DragAndDropDetector::DetachAll()
     auto iter = mControls.begin();
     for(;iter != mControls.end();)
     {
-      iter->TouchSignal().Disconnect(this, &DragAndDropDetector::OnDrag);
+      iter->TouchedSignal().Disconnect(this, &DragAndDropDetector::OnDrag);
       mPanGestureDetector.Detach(*iter);
       iter = mControls.erase(iter);
     }
@@ -123,9 +123,11 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
 {
   Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
 
-  if(gesture.state == Gesture::Started)
+  GestureState state = gesture.GetState();
+
+  if(state == GestureState::STARTED)
   {
-    mDragLocalPosition = gesture.position;
+    mDragLocalPosition = gesture.GetPosition();
     mPointDown = true;
     mDragControl = control;
     mFirstEnter.clear();
@@ -144,16 +146,16 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
     mShadowControl.SetProperty( Actor::Property::PARENT_ORIGIN, control.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ) );
     mShadowControl.SetProperty( Actor::Property::ANCHOR_POINT,control.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ));
     control.GetParent().Add(mShadowControl);
-    SetPosition(gesture.screenPosition);
+    SetPosition(gesture.GetScreenPosition());
     EmitStartedSignal(control);
   }
-  if(gesture.state == Gesture::Continuing)
+  if(state == GestureState::CONTINUING)
   {
-      Vector2 screenPosition = gesture.screenPosition;
+      Vector2 screenPosition = gesture.GetScreenPosition();
       control.GetParent().ScreenToLocal(mLocalPosition.x, mLocalPosition.y, screenPosition.x, screenPosition.y);
       mShadowControl.SetProperty( Actor::Property::POSITION, Vector2(mLocalPosition.x - mDragLocalPosition.x, mLocalPosition.y - mDragLocalPosition.y));
   }
-  if(gesture.state == Gesture::Finished)
+  if(state == GestureState::FINISHED)
   {
     mDragControl.GetParent().Remove(mShadowControl);
     EmitEndedSignal(control);

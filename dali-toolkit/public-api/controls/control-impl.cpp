@@ -228,30 +228,30 @@ void Control::ClearBackground()
    RelayoutRequest();
 }
 
-void Control::EnableGestureDetection(Gesture::Type type)
+void Control::EnableGestureDetection(GestureType::Value type)
 {
-  if ( (type & Gesture::Pinch) && !mImpl->mPinchGestureDetector )
+  if ( (type & GestureType::PINCH) && !mImpl->mPinchGestureDetector )
   {
     mImpl->mPinchGestureDetector = PinchGestureDetector::New();
     mImpl->mPinchGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PinchDetected);
     mImpl->mPinchGestureDetector.Attach(Self());
   }
 
-  if ( (type & Gesture::Pan) && !mImpl->mPanGestureDetector )
+  if ( (type & GestureType::PAN) && !mImpl->mPanGestureDetector )
   {
     mImpl->mPanGestureDetector = PanGestureDetector::New();
     mImpl->mPanGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PanDetected);
     mImpl->mPanGestureDetector.Attach(Self());
   }
 
-  if ( (type & Gesture::Tap) && !mImpl->mTapGestureDetector )
+  if ( (type & GestureType::TAP) && !mImpl->mTapGestureDetector )
   {
     mImpl->mTapGestureDetector = TapGestureDetector::New();
     mImpl->mTapGestureDetector.DetectedSignal().Connect(mImpl, &Impl::TapDetected);
     mImpl->mTapGestureDetector.Attach(Self());
   }
 
-  if ( (type & Gesture::LongPress) && !mImpl->mLongPressGestureDetector )
+  if ( (type & GestureType::LONG_PRESS) && !mImpl->mLongPressGestureDetector )
   {
     mImpl->mLongPressGestureDetector = LongPressGestureDetector::New();
     mImpl->mLongPressGestureDetector.DetectedSignal().Connect(mImpl, &Impl::LongPressDetected);
@@ -259,27 +259,27 @@ void Control::EnableGestureDetection(Gesture::Type type)
   }
 }
 
-void Control::DisableGestureDetection(Gesture::Type type)
+void Control::DisableGestureDetection(GestureType::Value type)
 {
-  if ( (type & Gesture::Pinch) && mImpl->mPinchGestureDetector )
+  if ( (type & GestureType::PINCH) && mImpl->mPinchGestureDetector )
   {
     mImpl->mPinchGestureDetector.Detach(Self());
     mImpl->mPinchGestureDetector.Reset();
   }
 
-  if ( (type & Gesture::Pan) && mImpl->mPanGestureDetector )
+  if ( (type & GestureType::PAN) && mImpl->mPanGestureDetector )
   {
     mImpl->mPanGestureDetector.Detach(Self());
     mImpl->mPanGestureDetector.Reset();
   }
 
-  if ( (type & Gesture::Tap) && mImpl->mTapGestureDetector )
+  if ( (type & GestureType::TAP) && mImpl->mTapGestureDetector )
   {
     mImpl->mTapGestureDetector.Detach(Self());
     mImpl->mTapGestureDetector.Reset();
   }
 
-  if ( (type & Gesture::LongPress) && mImpl->mLongPressGestureDetector)
+  if ( (type & GestureType::LONG_PRESS) && mImpl->mLongPressGestureDetector)
   {
     mImpl->mLongPressGestureDetector.Detach(Self());
     mImpl->mLongPressGestureDetector.Reset();
@@ -461,8 +461,7 @@ void Control::Initialize()
   // Call deriving classes so initialised before styling is applied to them.
   OnInitialize();
 
-  if( (mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS) ||
-      !(mImpl->mFlags & DISABLE_STYLE_CHANGE_SIGNALS) )
+  if( !(mImpl->mFlags & DISABLE_STYLE_CHANGE_SIGNALS) )
   {
     Toolkit::StyleManager styleManager = StyleManager::Get();
 
@@ -507,12 +506,12 @@ void Control::OnPinch(const PinchGesture& pinch)
     mImpl->mStartingPinchScale = new Vector3;
   }
 
-  if( pinch.state == Gesture::Started )
+  if( pinch.GetState() == GestureState::STARTED )
   {
     *( mImpl->mStartingPinchScale ) = Self().GetCurrentProperty< Vector3 >( Actor::Property::SCALE );
   }
 
-  Self().SetProperty( Actor::Property::SCALE, *( mImpl->mStartingPinchScale ) * pinch.scale );
+  Self().SetProperty( Actor::Property::SCALE, *( mImpl->mStartingPinchScale ) * pinch.GetScale() );
 }
 
 void Control::OnPan( const PanGesture& pan )
@@ -596,7 +595,7 @@ void Control::OnChildRemove(Actor& child)
 {
 }
 
-void Control::OnPropertySet( Property::Index index, Property::Value propertyValue )
+void Control::OnPropertySet( Property::Index index, const Property::Value& propertyValue )
 {
   // If the clipping mode has been set, we may need to create a renderer.
   // Only do this if we are already on-stage as the OnSceneConnection will handle the off-stage clipping controls.
@@ -622,17 +621,7 @@ void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
   // @todo size negotiate background to new size, animate as well?
 }
 
-bool Control::OnHoverEvent(const HoverEvent& event)
-{
-  return false; // Do not consume
-}
-
 bool Control::OnKeyEvent(const KeyEvent& event)
-{
-  return false; // Do not consume
-}
-
-bool Control::OnWheelEvent(const WheelEvent& event)
 {
   return false; // Do not consume
 }

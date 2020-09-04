@@ -55,7 +55,7 @@ float RulerDomain::Clamp(float x, float length, float scale, ClampState &clamped
 {
   if(!enabled)
   {
-    clamped = NotClamped;
+    clamped = NOT_CLAMPED;
     return x;
   }
 
@@ -63,16 +63,16 @@ float RulerDomain::Clamp(float x, float length, float scale, ClampState &clamped
   const float maxExtent = max * scale - length;
   if(x < minExtent)
   {
-    clamped = ClampedToMin;
+    clamped = CLAMPED_TO_MIN;
     return minExtent;
   }
   else if(x > maxExtent)
   {
-    clamped = ClampedToMax;
+    clamped = CLAMPED_TO_MAX;
     return maxExtent;
   }
 
-  clamped = NotClamped;
+  clamped = NOT_CLAMPED;
   return x;
 }
 
@@ -86,7 +86,7 @@ float RulerDomain::GetSize() const
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 Ruler::Ruler()
-: mType(Free),
+: mType(FREE),
   mEnabled(true),
   mDomain(RulerDomain(0.0f,1.0f,false))
 {
@@ -157,7 +157,7 @@ float Ruler::SnapAndClamp(float x, float bias, float length, float scale, ClampS
 
 DefaultRuler::DefaultRuler()
 {
-  mType = Free;
+  mType = FREE;
 }
 
 float DefaultRuler::Snap(float x, float bias) const
@@ -193,7 +193,7 @@ FixedRuler::FixedRuler(float spacing)
     DALI_LOG_ERROR( "Page spacing too small (%f).\n", double(spacing) );
     mSpacing = spacing >= 0.0f ? Math::MACHINE_EPSILON_1 : -Math::MACHINE_EPSILON_1;
   }
-  mType = Fixed;
+  mType = FIXED;
 }
 
 float FixedRuler::Snap(float x, float bias) const

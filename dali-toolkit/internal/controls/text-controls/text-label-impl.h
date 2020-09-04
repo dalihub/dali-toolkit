@@ -103,7 +103,7 @@ private: // From Control
   /**
    * @copydoc Control::OnPropertySet()
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) override ;
+  void OnPropertySet( Property::Index index, const Property::Value& propertyValue ) override ;
 
   // From ControlInterface
 

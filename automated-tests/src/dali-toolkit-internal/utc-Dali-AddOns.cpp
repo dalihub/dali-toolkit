@@ -30,7 +30,7 @@ namespace
 
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/application-icon-20.png";
 const char* TEST_IMAGE_FILE_NAME_9 =  TEST_RESOURCE_DIR "/heartsframe.9.png";
-
+const char* TEST_IMAGE_FILE_NAME2_9 =  TEST_RESOURCE_DIR "/button-up.9.png";
 int CountFunctionCalls( const std::vector<std::string>& callstack, const std::string& function )
 {
   int counter = 0;
@@ -72,13 +72,20 @@ int UtcRenderingAddOnTestP(void)
   imageView2.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView2.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
+  // Load npatch image view
+  auto imageView3 = Dali::Toolkit::ImageView::New( TEST_IMAGE_FILE_NAME2_9 );
+  imageView3.SetProperty( Actor::Property::SIZE, Vector2( 400.f, 60.f ) );
+  imageView3.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  imageView3.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
   application.GetScene().Add( imageView );
   application.GetScene().Add( imageView2 );
+  application.GetScene().Add( imageView3 );
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( ::Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( ::Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -87,8 +94,8 @@ int UtcRenderingAddOnTestP(void)
 
   DALI_TEST_EQUALS( CountFunctionCalls( callstack, "GetGeometry" ), 2, TEST_LOCATION);
   DALI_TEST_EQUALS( CountFunctionCalls( callstack, "CreateGeometry" ), 1, TEST_LOCATION);
-  DALI_TEST_EQUALS( CountFunctionCalls( callstack, "CreateGeometryGrid" ), 1, TEST_LOCATION);
-  DALI_TEST_EQUALS( CountFunctionCalls( callstack, "BuildNPatch" ), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS( CountFunctionCalls( callstack, "CreateGeometryGrid" ), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS( CountFunctionCalls( callstack, "BuildNPatch" ), 2, TEST_LOCATION);
 
   delete addOnManager;
 

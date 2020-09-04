@@ -22,6 +22,7 @@
 #include <cstring>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/actors/actor-devel.h>
@@ -1338,10 +1339,10 @@ void TextField::OnInitialize()
   mController->SetLayoutDirection( layoutDirection );
 
   // Forward input events to controller
-  EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
+  EnableGestureDetection( static_cast<GestureType::Value>( GestureType::TAP | GestureType::PAN | GestureType::LONG_PRESS ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
-  self.TouchSignal().Connect( this, &TextField::OnTouched );
+  self.TouchedSignal().Connect( this, &TextField::OnTouched );
 
   // Set BoundingBox to stage size if not already set.
   Rect<int> boundingBox;
@@ -1433,7 +1434,15 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
   Vector2 contentSize( size.x - ( padding.start + padding.end ), size.y - ( padding.top + padding.bottom ) );
 
   // Support Right-To-Left of padding
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  Dali::LayoutDirection::Type layoutDirection;
+  if( mController->IsMatchSystemLanguageDirection() )
+  {
+    layoutDirection = static_cast<Dali::LayoutDirection::Type>( DevelWindow::Get( self ).GetRootLayer().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  }
+  else
+  {
+    layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  }
   if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
   {
     std::swap( padding.start, padding.end );
@@ -1654,14 +1663,15 @@ void TextField::OnTap( const TapGesture& gesture )
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
   Extents padding;
   padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
-  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x - padding.start, gesture.localPoint.y - padding.top );
+  const Vector2& localPoint = gesture.GetLocalPoint();
+  mController->TapEvent( gesture.GetNumberOfTaps(), localPoint.x - padding.start, localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }
 
 void TextField::OnPan( const PanGesture& gesture )
 {
-  mController->PanEvent( gesture.state, gesture.displacement );
+  mController->PanEvent( gesture.GetState(), gesture.GetDisplacement() );
 }
 
 void TextField::OnLongPress( const LongPressGesture& gesture )
@@ -1672,7 +1682,8 @@ void TextField::OnLongPress( const LongPressGesture& gesture )
   }
   Extents padding;
   padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
-  mController->LongPressEvent( gesture.state, gesture.localPoint.x - padding.start, gesture.localPoint.y - padding.top );
+  const Vector2& localPoint = gesture.GetLocalPoint();
+  mController->LongPressEvent( gesture.GetState(), localPoint.x - padding.start, localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }

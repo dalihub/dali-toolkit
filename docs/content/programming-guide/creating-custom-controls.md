@@ -187,7 +187,7 @@ ________________________________________________________________________________
 
 ### Touch, Hover & Wheel Events {#creating-controls-events}
 
-+ A **touch** is when any touch occurs within the bounds of the custom actor. Connect to Dali::Actor::TouchSignal().
++ A **touch event** is when any touch occurs within the bounds of the custom actor. Connect to Dali::Actor::TouchedSignal().
 + A **hover event** is when a pointer moves within the bounds of a custom actor (e.g. mouse pointer or hover pointer).
 + A **wheel event** is when the mouse wheel (or similar) is moved while hovering over an actor (via a mouse pointer or hover pointer).
  

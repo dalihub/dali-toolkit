@@ -711,7 +711,7 @@ private:
   FocusIDPair mCurrentFocusActor;           ///< The focus order and actor ID of current focused actor
   Actor mCurrentGesturedActor;              ///< The actor that will handle the gesture
   Actor mFocusIndicatorActor;               ///< The focus indicator actor shared by all the focusable actors for highlight
-  Vector2 mPreviousPosition;                ///< The previous pan position; useful for calculating velocity for Gesture::Finished events
+  Vector2 mPreviousPosition;                ///< The previous pan position; useful for calculating velocity for GestureState::FINISHED events
   unsigned int mRecursiveFocusMoveCounter;  ///< The counter to count the number of recursive focus movement attempted before the focus movement is successful.
   std::string mFocusSoundFilePath;          ///< The path of the focus sound file
   std::string mFocusChainEndSoundFilePath;  ///< The path of the focus chain end sound file

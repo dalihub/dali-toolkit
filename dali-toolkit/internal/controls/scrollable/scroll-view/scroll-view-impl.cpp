@@ -28,6 +28,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -100,7 +101,7 @@ const std::string INTERNAL_MAX_POSITION_PROPERTY_NAME( "internalMaxPosition" );
  */
 float VectorInDomain(float a, float b, float start, float end, Dali::Toolkit::DirectionBias bias)
 {
-  if(bias == Dali::Toolkit::DirectionBiasNone)
+  if(bias == Dali::Toolkit::DIRECTION_BIAS_NONE)
   {
     return ShortestDistanceInDomain( a, b, start, end );
   }
@@ -111,7 +112,7 @@ float VectorInDomain(float a, float b, float start, float end, Dali::Toolkit::Di
   if(vect > 0)
   {
     // +ve vector
-    if(bias == Dali::Toolkit::DirectionBiasRight) // going right, take the vector.
+    if(bias == Dali::Toolkit::DIRECTION_BIAS_RIGHT) // going right, take the vector.
     {
       return vect;
     }
@@ -124,7 +125,7 @@ float VectorInDomain(float a, float b, float start, float end, Dali::Toolkit::Di
   else
   {
     // -ve vector
-    if(bias == Dali::Toolkit::DirectionBiasLeft) // going left, take the vector.
+    if(bias == Dali::Toolkit::DIRECTION_BIAS_LEFT) // going left, take the vector.
     {
       return vect;
     }
@@ -343,8 +344,8 @@ struct InternalPrePositionConstraint
     mDomainMax = Vector2( -rulerDomainX.max, -rulerDomainY.max );
     mClampX = rulerDomainX.enabled;
     mClampY = rulerDomainY.enabled;
-    mFixedRulerX = rulerX->GetType() == Ruler::Fixed;
-    mFixedRulerY = rulerY->GetType() == Ruler::Fixed;
+    mFixedRulerX = rulerX->GetType() == Ruler::FIXED;
+    mFixedRulerY = rulerY->GetType() == Ruler::FIXED;
   }
 
   void operator()( Vector2& scrollPostPosition, const PropertyInputContainer& inputs )
@@ -628,7 +629,7 @@ Dali::Toolkit::ScrollView ScrollView::New()
 }
 
 ScrollView::ScrollView()
-: ScrollBase( ControlBehaviour( REQUIRES_WHEEL_EVENTS | DISABLE_STYLE_CHANGE_SIGNALS ) ),   // Enable size negotiation
+: ScrollBase( ControlBehaviour( DISABLE_STYLE_CHANGE_SIGNALS ) ),   // Enable size negotiation
   mTouchDownTime(0u),
   mGestureStackDepth(0),
   mScrollStateFlags(0),
@@ -688,8 +689,8 @@ void ScrollView::OnInitialize()
 
   mGestureStackDepth = 0;
 
-  self.TouchSignal().Connect( this, &ScrollView::OnTouch );
-  EnableGestureDetection( Gesture::Type( Gesture::Pan ) );
+  self.TouchedSignal().Connect( this, &ScrollView::OnTouch );
+  EnableGestureDetection( GestureType::Value( GestureType::PAN ) );
 
   // By default we'll allow the user to freely drag the scroll view,
   // while disabling the other rulers.
@@ -702,6 +703,9 @@ void ScrollView::OnInitialize()
 
   UpdatePropertyDomain();
   SetInternalConstraints();
+
+  // Connect wheel event
+  self.WheelEventSignal().Connect( this, &ScrollView::OnWheelEvent );
 }
 
 void ScrollView::OnSceneConnection( int depth )
@@ -1002,7 +1006,7 @@ void ScrollView::SetScrollSensitive(bool sensitive)
     // while the scroll view is panning, the state needs to be reset.
     if ( mPanning )
     {
-      PanGesture cancelGesture( Gesture::Cancelled );
+      PanGesture cancelGesture = DevelPanGesture::New( GestureState::CANCELLED );
       OnPan( cancelGesture );
     }
 
@@ -1238,7 +1242,7 @@ void ScrollView::TransformTo(const Vector2& position, float duration, AlphaFunct
                              true,
                              horizontalBias,
                              verticalBias,
-                             Snap);
+                             SNAP);
 
   if(!animating)
   {
@@ -1267,12 +1271,12 @@ void ScrollView::ScrollTo(const Vector2& position)
 
 void ScrollView::ScrollTo(const Vector2& position, float duration)
 {
-  ScrollTo(position, duration, DirectionBiasNone, DirectionBiasNone);
+  ScrollTo(position, duration, DIRECTION_BIAS_NONE, DIRECTION_BIAS_NONE);
 }
 
 void ScrollView::ScrollTo(const Vector2& position, float duration, AlphaFunction alpha)
 {
-  ScrollTo(position, duration, alpha, DirectionBiasNone, DirectionBiasNone);
+  ScrollTo(position, duration, alpha, DIRECTION_BIAS_NONE, DIRECTION_BIAS_NONE);
 }
 
 void ScrollView::ScrollTo(const Vector2& position, float duration,
@@ -1559,7 +1563,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
   Vector2 clampDelta(Vector2::ZERO);
   ClampPosition(positionSnap);
 
-  if( (mRulerX->GetType() == Ruler::Free || mRulerY->GetType() == Ruler::Free)
+  if( (mRulerX->GetType() == Ruler::FREE || mRulerY->GetType() == Ruler::FREE)
       && isFreeFlick && !mActorAutoSnapEnabled)
   {
     // Calculate target position based on velocity of flick.
@@ -1582,12 +1586,12 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
     float t = speed / a;
 
-    if(mRulerX->IsEnabled() && mRulerX->GetType() == Ruler::Free)
+    if(mRulerX->IsEnabled() && mRulerX->GetType() == Ruler::FREE)
     {
       positionSnap.x += t*u.x*0.5f;
     }
 
-    if(mRulerY->IsEnabled() && mRulerY->GetType() == Ruler::Free)
+    if(mRulerY->IsEnabled() && mRulerY->GetType() == Ruler::FREE)
     {
       positionSnap.y += t*u.y*0.5f;
     }
@@ -1607,7 +1611,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
     // If Axis is Free and has velocity, then calculate time taken
     // to reach target based on velocity in axis.
-    if(mRulerX->IsEnabled() && mRulerX->GetType() == Ruler::Free)
+    if(mRulerX->IsEnabled() && mRulerX->GetType() == Ruler::FREE)
     {
       float deltaX = fabsf(startPosition.x - positionSnap.x);
 
@@ -1621,7 +1625,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
       }
     }
 
-    if(mRulerY->IsEnabled() && mRulerY->GetType() == Ruler::Free)
+    if(mRulerY->IsEnabled() && mRulerY->GetType() == Ruler::FREE)
     {
       float deltaY = fabsf(startPosition.y - positionSnap.y);
 
@@ -1644,8 +1648,8 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
   bool animating = AnimateTo(positionSnap, positionDuration,
                              alphaFunction, false,
-                             DirectionBiasNone, DirectionBiasNone,
-                             isFlick || isFreeFlick ? Flick : Snap);
+                             DIRECTION_BIAS_NONE, DIRECTION_BIAS_NONE,
+                             isFlick || isFreeFlick ? FLICK : SNAP);
 
   return animating;
 }
@@ -1971,7 +1975,7 @@ void ScrollView::OnChildAdd(Actor& child)
     scrollBar.SetProperty( Dali::Actor::Property::NAME,"ScrollBar");
 
     mInternalActor.Add( scrollBar );
-    if( scrollBar.GetScrollDirection() == Toolkit::ScrollBar::Horizontal )
+    if( scrollBar.GetScrollDirection() == Toolkit::ScrollBar::HORIZONTAL )
     {
       scrollBar.SetScrollPropertySource( Self(),
                                          Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_X,
@@ -2096,7 +2100,7 @@ bool ScrollView::OnTouch( Actor actor, const TouchEvent& touch )
   else if( ( pointState == PointState::UP ) ||
            ( ( pointState == PointState::INTERRUPTED ) && ( touch.GetHitActor( 0 )== Self() ) ) )
   {
-    DALI_LOG_SCROLL_STATE("[0x%X] %s", this, ( ( pointState == TouchPoint::Up ) ? "Up" : "Interrupted" ) );
+    DALI_LOG_SCROLL_STATE("[0x%X] %s", this, ( ( pointState == PointState::UP ) ? "Up" : "Interrupted" ) );
 
     StopTouchDownTimer();
 
@@ -2128,7 +2132,7 @@ bool ScrollView::OnTouch( Actor actor, const TouchEvent& touch )
   return false;
 }
 
-bool ScrollView::OnWheelEvent(const WheelEvent& event)
+bool ScrollView::OnWheelEvent( Actor actor, const WheelEvent& event)
 {
   if(!mSensitive)
   {
@@ -2141,7 +2145,7 @@ bool ScrollView::OnWheelEvent(const WheelEvent& event)
   if(mRulerX->IsEnabled() && !mRulerY->IsEnabled())
   {
     // If only the ruler in the X axis is enabled, scroll in the X axis.
-    if(mRulerX->GetType() == Ruler::Free)
+    if(mRulerX->GetType() == Ruler::FREE)
     {
       // Free panning mode
       targetScrollPosition.x += event.GetDelta() * mWheelScrollDistanceStep.x;
@@ -2157,7 +2161,7 @@ bool ScrollView::OnWheelEvent(const WheelEvent& event)
   else
   {
     // If the ruler in the Y axis is enabled, scroll in the Y axis.
-    if(mRulerY->GetType() == Ruler::Free)
+    if(mRulerY->GetType() == Ruler::FREE)
     {
       // Free panning mode
       targetScrollPosition.y += event.GetDelta() * mWheelScrollDistanceStep.y;
@@ -2447,7 +2451,7 @@ void ScrollView::GestureContinuing(const Vector2& panDelta)
   mPanDelta.y+= panDelta.y;
 
   // Save the velocity, there is a bug in PanGesture
-  // Whereby the Gesture::Finished's velocity is either:
+  // Whereby the GestureState::FINISHED's velocity is either:
   // NaN (due to time delta of zero between the last two events)
   // or 0 (due to position being the same between the last two events)
 
@@ -2460,7 +2464,7 @@ void ScrollView::GestureContinuing(const Vector2& panDelta)
 }
 
 // TODO: Upgrade to use a more powerful gesture detector (one that supports multiple touches on pan - so works as pan and flick gesture)
-// BUG: Gesture::Finished doesn't always return velocity on release (due to
+// BUG: GestureState::FINISHED doesn't always return velocity on release (due to
 // timeDelta between last two events being 0 sometimes, or posiiton being the same)
 void ScrollView::OnPan( const PanGesture& gesture )
 {
@@ -2478,17 +2482,18 @@ void ScrollView::OnPan( const PanGesture& gesture )
   }
 
   // translate Gesture input to get useful data...
-  switch(gesture.state)
+  switch(gesture.GetState())
   {
-    case Gesture::Started:
+    case GestureState::STARTED:
     {
       DALI_LOG_SCROLL_STATE("[0x%X] Pan Started", this);
-      mPanStartPosition = gesture.position - gesture.displacement;
+      const Vector2& position = gesture.GetPosition();
+      mPanStartPosition = position - gesture.GetDisplacement();
       UpdateLocalScrollProperties();
       GestureStarted();
       mPanning = true;
       self.SetProperty( Toolkit::ScrollView::Property::PANNING, true );
-      self.SetProperty( Toolkit::ScrollView::Property::START_PAGE_POSITION, Vector3(gesture.position.x, gesture.position.y, 0.0f) );
+      self.SetProperty( Toolkit::ScrollView::Property::START_PAGE_POSITION, Vector3(position.x, position.y, 0.0f) );
 
       UpdateMainInternalConstraint();
       Toolkit::ScrollBar scrollBar = mScrollBar.GetHandle();
@@ -2506,12 +2511,12 @@ void ScrollView::OnPan( const PanGesture& gesture )
       break;
     }
 
-    case Gesture::Continuing:
+    case GestureState::CONTINUING:
     {
       if ( mPanning )
       {
         DALI_LOG_SCROLL_STATE("[0x%X] Pan Continuing", this);
-        GestureContinuing(gesture.screenDisplacement);
+        GestureContinuing(gesture.GetScreenDisplacement());
       }
       else
       {
@@ -2521,15 +2526,15 @@ void ScrollView::OnPan( const PanGesture& gesture )
       break;
     }
 
-    case Gesture::Finished:
-    case Gesture::Cancelled:
+    case GestureState::FINISHED:
+    case GestureState::CANCELLED:
     {
       if ( mPanning )
       {
-        DALI_LOG_SCROLL_STATE("[0x%X] Pan %s", this, ( ( gesture.state == Gesture::Finished ) ? "Finished" : "Cancelled" ) );
+        DALI_LOG_SCROLL_STATE("[0x%X] Pan %s", this, ( ( gesture.GetState() == GestureState::FINISHED ) ? "Finished" : "Cancelled" ) );
 
         UpdateLocalScrollProperties();
-        mLastVelocity = gesture.velocity;
+        mLastVelocity = gesture.GetVelocity();
         mPanning = false;
         self.SetProperty( Toolkit::ScrollView::Property::PANNING, false );
 
@@ -2552,8 +2557,8 @@ void ScrollView::OnPan( const PanGesture& gesture )
       break;
     }
 
-    case Gesture::Possible:
-    case Gesture::Clear:
+    case GestureState::POSSIBLE:
+    case GestureState::CLEAR:
     {
       // Nothing to do, not needed.
       break;
@@ -2561,14 +2566,14 @@ void ScrollView::OnPan( const PanGesture& gesture )
 
   } // end switch(gesture.state)
 
-  OnGestureEx(gesture.state);
+  OnGestureEx(gesture.GetState());
 }
 
-void ScrollView::OnGestureEx(Gesture::State state)
+void ScrollView::OnGestureEx(GestureState state)
 {
   // call necessary signals for application developer
 
-  if(state == Gesture::Started)
+  if(state == GestureState::STARTED)
   {
     Vector2 currentScrollPosition = GetCurrentScrollPosition();
     Self().SetProperty(Toolkit::ScrollView::Property::SCROLLING, true);
@@ -2576,8 +2581,8 @@ void ScrollView::OnGestureEx(Gesture::State state)
     DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignal 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
     mScrollStartedSignal.Emit( currentScrollPosition );
   }
-  else if( (state == Gesture::Finished) ||
-           (state == Gesture::Cancelled) ) // Finished/default
+  else if( (state == GestureState::FINISHED) ||
+           (state == GestureState::CANCELLED) ) // Finished/default
   {
     // when all the gestures have finished, we finish the transform.
     // so if a user decides to pan (1 gesture), and then pan+zoom (2 gestures)
@@ -2864,7 +2869,7 @@ void ScrollView::SetInternalConstraints()
   // MoveActor (scrolling)
   constraint = Constraint::New<Vector3>( self, Actor::Property::POSITION, MoveActorConstraint );
   constraint.AddSource( Source( self, Toolkit::ScrollView::Property::SCROLL_POSITION ) );
-  constraint.SetRemoveAction(Constraint::Discard);
+  constraint.SetRemoveAction(Constraint::DISCARD);
   ApplyConstraintToBoundActors(constraint);
 
   // WrapActor (wrap functionality)
@@ -2875,7 +2880,7 @@ void ScrollView::SetInternalConstraints()
   constraint.AddSource( Source( self, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
   constraint.AddSource( Source( self, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
   constraint.AddSource( Source( self, Toolkit::ScrollView::Property::WRAP ) );
-  constraint.SetRemoveAction(Constraint::Discard);
+  constraint.SetRemoveAction(Constraint::DISCARD);
   ApplyConstraintToBoundActors(constraint);
 }
 

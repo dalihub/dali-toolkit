@@ -1601,17 +1601,16 @@ void Controller::Impl::OnPanEvent( const Event& event )
     return;
   }
 
-  const int state = event.p1.mInt;
-
+  const GestureState state = static_cast<GestureState>( event.p1.mInt );
   switch( state )
   {
-    case Gesture::Started:
+    case GestureState::STARTED:
     {
       // Will remove the cursor, handles or text's popup, ...
       ChangeState( EventData::TEXT_PANNING );
       break;
     }
-    case Gesture::Continuing:
+    case GestureState::CONTINUING:
     {
       const Vector2& layoutSize = mModel->mVisualModel->GetLayoutSize();
       const Vector2 currentScroll = mModel->mScrollPosition;
@@ -1635,8 +1634,8 @@ void Controller::Impl::OnPanEvent( const Event& event )
       mEventData->mDecorator->UpdatePositions( mModel->mScrollPosition - currentScroll );
       break;
     }
-    case Gesture::Finished:
-    case Gesture::Cancelled: // FALLTHROUGH
+    case GestureState::FINISHED:
+    case GestureState::CANCELLED: // FALLTHROUGH
     {
       // Will go back to the previous state to show the cursor, handles, the text's popup, ...
       ChangeState( mEventData->mPreviousState );
