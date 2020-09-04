@@ -88,14 +88,14 @@ const char* VERTEX_SHADER[] =
 DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
+  uniform highp   vec3 uSize;\n
   uniform mediump mat3 uAlignmentMatrix;\n
   varying mediump vec2 vTexCoord;\n
   \n
 
   //Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
+  uniform highp   vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
@@ -120,14 +120,14 @@ DALI_COMPOSE_SHADER(
 DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
+  uniform highp   vec3 uSize;\n
   uniform mediump mat3 uAlignmentMatrix;\n
   varying mediump vec2 vTexCoord;\n
   \n
 
   //Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
+  uniform highp   vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
@@ -153,7 +153,7 @@ DALI_COMPOSE_SHADER(
 DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
+  uniform highp   vec3 uSize;\n
   uniform mediump mat3 uAlignmentMatrix;\n
   varying mediump vec2 vTexCoord;\n
   varying mediump vec2 vPosition;\n
@@ -162,7 +162,7 @@ DALI_COMPOSE_SHADER(
   \n
   //Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
+  uniform highp   vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
@@ -194,7 +194,7 @@ DALI_COMPOSE_SHADER(
 DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
+  uniform highp   vec3 uSize;\n
   uniform mediump mat3 uAlignmentMatrix;\n
   varying mediump vec2 vTexCoord;\n
   varying mediump vec2 vPosition;\n
@@ -203,7 +203,7 @@ DALI_COMPOSE_SHADER(
   \n
   //Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
+  uniform highp   vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
