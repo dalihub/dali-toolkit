@@ -33,43 +33,43 @@ public:
 
   TestRenderSurface( PositionSize positionSize ) {};
 
-  virtual PositionSize GetPositionSize() const { PositionSize size; return size; };
+  PositionSize GetPositionSize() const override { PositionSize size; return size; };
 
   virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical ) { dpiHorizontal = dpiVertical = 96; }
 
-  virtual void InitializeGraphics() {};
+  void InitializeGraphics() override {};
 
-  virtual void CreateSurface() {};
+  void CreateSurface() override {};
 
-  virtual void DestroySurface() {};
+  void DestroySurface() override {};
 
-  virtual bool ReplaceGraphicsSurface() { return false; };
+  bool ReplaceGraphicsSurface() override { return false; };
 
-  virtual void MoveResize( Dali::PositionSize positionSize ) {};
+  void MoveResize( Dali::PositionSize positionSize ) override {};
 
-  virtual void StartRender() {};
+  void StartRender() override {};
 
-  virtual bool PreRender( bool resizingSurface, const std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect  ) { return false; };
+  bool PreRender( bool resizingSurface, const std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect  ) override { return false; };
 
-  virtual void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface, const std::vector<Rect<int>>& damagedRects ) {};
+  void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface, const std::vector<Rect<int>>& damagedRects ) override {};
 
-  virtual void StopRender() {};
+  void StopRender() override {};
 
-  virtual void ReleaseLock() {};
+  void ReleaseLock() override {};
 
-  virtual void SetThreadSynchronization( ThreadSynchronizationInterface& threadSynchronization ) {};
+  void SetThreadSynchronization( ThreadSynchronizationInterface& threadSynchronization ) override {};
 
-  virtual RenderSurfaceInterface::Type GetSurfaceType() { return RenderSurfaceInterface::WINDOW_RENDER_SURFACE; };
+  RenderSurfaceInterface::Type GetSurfaceType() override { return RenderSurfaceInterface::WINDOW_RENDER_SURFACE; };
 
-  virtual void MakeContextCurrent() {};
+  void MakeContextCurrent() override {};
 
-  virtual Integration::DepthBufferAvailable GetDepthBufferRequired() { return Integration::DepthBufferAvailable::FALSE; };
+  Integration::DepthBufferAvailable GetDepthBufferRequired() override { return Integration::DepthBufferAvailable::FALSE; };
 
-  virtual Integration::StencilBufferAvailable GetStencilBufferRequired() { return Integration::StencilBufferAvailable::FALSE; };
+  Integration::StencilBufferAvailable GetStencilBufferRequired() override { return Integration::StencilBufferAvailable::FALSE; };
 
-  virtual void SetBackgroundColor( Vector4 color ) {};
+  void SetBackgroundColor( Vector4 color ) {};
 
-  virtual Vector4 GetBackgroundColor() { return Color::WHITE; };
+  Vector4 GetBackgroundColor() { return Color::WHITE; };
 };
 
 namespace Internal

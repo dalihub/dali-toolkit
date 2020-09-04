@@ -75,12 +75,12 @@ protected:
 
   DummyVisual( VisualFactoryCache& factoryCache );
 
-  virtual void DoCreatePropertyMap( Property::Map& map ) const override;
-  virtual void DoCreateInstancePropertyMap( Property::Map& map ) const override;
-  virtual void DoSetProperties( const Property::Map& propertyMap ) override;
-  virtual void OnSetTransform() override;
-  virtual void DoSetOnScene( Actor& actor ) override;
-  virtual void OnDoAction( const Property::Index actionName, const Property::Value& attributes ) override;
+  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void OnSetTransform() override;
+  void DoSetOnScene( Actor& actor ) override;
+  void OnDoAction( const Property::Index actionName, const Property::Value& attributes ) override;
 
 private:
   unsigned int mActionCounter;
