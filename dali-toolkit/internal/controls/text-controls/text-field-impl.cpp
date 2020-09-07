@@ -1693,7 +1693,7 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
   if( Dali::DALI_KEY_ESCAPE == event.GetKeyCode() && mController->ShouldClearFocusOnEscape() )
   {
     // Make sure ClearKeyInputFocus when only key is up
-    if( event.GetState() == KeyEvent::Up )
+    if( event.GetState() == KeyEvent::UP )
     {
       ClearKeyInputFocus();
     }
