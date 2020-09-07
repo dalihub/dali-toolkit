@@ -2129,7 +2129,7 @@ bool ScrollView::OnTouch( Actor actor, const TouchEvent& touch )
     mScrollInterrupted = false;
   }
 
-  return false;
+  return true;
 }
 
 bool ScrollView::OnWheelEvent( Actor actor, const WheelEvent& event)
