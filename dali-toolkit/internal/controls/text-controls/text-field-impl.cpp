@@ -1688,19 +1688,19 @@ void TextField::OnLongPress( const LongPressGesture& gesture )
 
 bool TextField::OnKeyEvent( const KeyEvent& event )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnKeyEvent %p keyCode %d\n", mController.Get(), event.keyCode );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnKeyEvent %p keyCode %d\n", mController.Get(), event.GetKeyCode() );
 
-  if( Dali::DALI_KEY_ESCAPE == event.keyCode && mController->ShouldClearFocusOnEscape() )
+  if( Dali::DALI_KEY_ESCAPE == event.GetKeyCode() && mController->ShouldClearFocusOnEscape() )
   {
     // Make sure ClearKeyInputFocus when only key is up
-    if( event.state == KeyEvent::Up )
+    if( event.GetState() == KeyEvent::Up )
     {
       ClearKeyInputFocus();
     }
 
     return true;
   }
-  else if( Dali::DevelKey::DALI_KEY_RETURN == event.keyCode )
+  else if( Dali::DevelKey::DALI_KEY_RETURN == event.GetKeyCode() )
   {
     // Do nothing when enter is comming.
     return false;
