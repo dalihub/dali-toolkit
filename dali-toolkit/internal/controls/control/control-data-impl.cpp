@@ -311,6 +311,7 @@ const PropertyRegistration Control::Impl::PROPERTY_13( typeRegistration, "upFocu
 const PropertyRegistration Control::Impl::PROPERTY_14( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_15( typeRegistration, "shadow",                Toolkit::DevelControl::Property::SHADOW,                  Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
+
 Control::Impl::Impl( Control& controlImpl )
 : mControlImpl( controlImpl ),
   mState( Toolkit::DevelControl::NORMAL ),
@@ -335,12 +336,9 @@ Control::Impl::Impl( Control& controlImpl )
   mLongPressGestureDetector(),
   mTooltip( NULL ),
   mInputMethodContext(),
-  mAutofillItem(),
-  mAutofillContainer(),
   mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIsKeyboardNavigationSupported( false ),
-  mIsKeyboardFocusGroup( false ),
-  mIsAutofillEnabled( false )
+  mIsKeyboardFocusGroup( false )
 {
 }
 
@@ -1448,36 +1446,6 @@ void Control::Impl::ClearShadow()
 
    // Trigger a size negotiation request that may be needed when unregistering a visual.
    mControlImpl.RelayoutRequest();
-}
-
-void Control::Impl::SetAutofillEnabled( bool autofillEnabled )
-{
-  mIsAutofillEnabled = autofillEnabled;
-}
-
-bool Control::Impl::IsAutofillEnabled()
-{
-  return mIsAutofillEnabled;
-}
-
-void Control::Impl::SetAutofillItemHandle( Dali::AutofillItem item )
-{
-  mAutofillItem = item;
-}
-
-Dali::AutofillItem Control::Impl::GetAutofillItemHandle()
-{
-  return mAutofillItem;
-}
-
-void Control::Impl::SetAutofillContainer( Toolkit::AutofillContainer container )
-{
-  mAutofillContainer = container;
-}
-
-Toolkit::AutofillContainer Control::Impl::GetAutofillContainer()
-{
-  return mAutofillContainer;
 }
 
 } // namespace Internal
