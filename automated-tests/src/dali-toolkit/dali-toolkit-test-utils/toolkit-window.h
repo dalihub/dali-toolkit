@@ -33,7 +33,7 @@ class Layer;
 class RenderSurfaceInterface;
 struct KeyEvent;
 class TouchEvent;
-struct WheelEvent;
+class WheelEvent;
 
 typedef Dali::Rect<int> PositionSize;
 
