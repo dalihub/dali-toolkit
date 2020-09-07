@@ -127,7 +127,7 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
   {
     Control::OnChildRemove(child);
   }
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue )
+  virtual void OnPropertySet( Property::Index index, const Property::Value& propertyValue )
   {
     Control::OnPropertySet(index, propertyValue);
   }

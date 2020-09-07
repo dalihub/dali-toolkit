@@ -2176,7 +2176,7 @@ int UtcDaliImageViewFittingModesWithAnimatedVectorImageVisual(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline( "Create an ImageVisual using ScaleToFill and animated vector image ( image: [600,600], view:[600,600] )" );
+  tet_infoline( "Create an ImageVisual using SCALE_TO_FILL and animated vector image ( image: [600,600], view:[600,600] )" );
 
   ImageView imageView = ImageView::New();
   Property::Map imageMap;

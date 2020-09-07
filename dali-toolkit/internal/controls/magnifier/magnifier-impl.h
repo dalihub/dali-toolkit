@@ -137,7 +137,7 @@ private:
 
 private:
 
-  virtual void OnSizeSet(const Vector3& targetSize);
+  void OnSizeSet(const Vector3& targetSize) override;
 
 private:
 

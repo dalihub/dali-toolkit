@@ -1470,7 +1470,7 @@ public: // Text-input Event Queuing.
    * @param[in] state The state of the gesture.
    * @param[in] displacement This distance panned since the last pan gesture.
    */
-  void PanEvent( Gesture::State state, const Vector2& displacement );
+  void PanEvent( GestureState state, const Vector2& displacement );
 
   /**
    * @brief Called by editable UI controls when a long press gesture occurs.
@@ -1479,7 +1479,7 @@ public: // Text-input Event Queuing.
    * @param[in] x The x position relative to the top-left of the parent control.
    * @param[in] y The y position relative to the top-left of the parent control.
    */
-  void LongPressEvent( Gesture::State state, float x, float y );
+  void LongPressEvent( GestureState state, float x, float y );
 
   /**
    * @brief Creates a selection event.
@@ -1532,31 +1532,31 @@ protected: // Inherit from Text::Decorator::ControllerInterface.
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::GetTargetSize()
    */
-  virtual void GetTargetSize( Vector2& targetSize );
+  void GetTargetSize( Vector2& targetSize ) override;
 
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::AddDecoration()
    */
-  virtual void AddDecoration( Actor& actor, bool needsClipping );
+  void AddDecoration( Actor& actor, bool needsClipping ) override;
 
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::DecorationEvent()
    */
-  virtual void DecorationEvent( HandleType handle, HandleState state, float x, float y );
+  void DecorationEvent( HandleType handle, HandleState state, float x, float y ) override;
 
 protected: // Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
 
   /**
    * @copydoc Dali::Toolkit::TextSelectionPopup::TextPopupButtonCallbackInterface::TextPopupButtonTouched()
    */
-  virtual void TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button );
+  void TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button ) override;
 
 protected: // Inherit from HiddenText.
 
   /**
    * @brief Invoked from HiddenText when showing time of the last character was expired
    */
-  virtual void DisplayTimeExpired();
+  void DisplayTimeExpired() override;
 
 private: // Update.
 

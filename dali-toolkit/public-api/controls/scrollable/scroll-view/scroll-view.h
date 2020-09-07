@@ -45,9 +45,9 @@ class ScrollView;
  */
 enum ClampState
 {
-  NotClamped,   ///< The quantity isn't clamped @SINCE_1_0.0
-  ClampedToMin, ///< The quantity is clamped to the min value @SINCE_1_0.0
-  ClampedToMax  ///< The quantity is clamped to the max value @SINCE_1_0.0
+  NOT_CLAMPED,   ///< The quantity isn't clamped @SINCE_1_9.28
+  CLAMPED_TO_MIN, ///< The quantity is clamped to the min value @SINCE_1_9.28
+  CLAMPED_TO_MAX  ///< The quantity is clamped to the max value @SINCE_1_9.28
 };
 
 /**
@@ -66,8 +66,8 @@ struct ClampState2D
  */
 enum SnapType
 {
-  Snap,  ///< Snap @SINCE_1_0.0
-  Flick  ///< Flick @SINCE_1_0.0
+  SNAP,  ///< SNAP @SINCE_1_9.28
+  FLICK  ///< FLICK @SINCE_1_9.28
 };
 
 /**
@@ -76,9 +76,9 @@ enum SnapType
  */
 enum DirectionBias
 {
-  DirectionBiasLeft  = -1,  ///< Bias scroll snap to Left @SINCE_1_0.0
-  DirectionBiasNone  =  0,  ///< Don't bias scroll snap @SINCE_1_0.0
-  DirectionBiasRight =  1   ///< Bias scroll snap to Right @SINCE_1_0.0
+  DIRECTION_BIAS_LEFT  = -1,  ///< Bias scroll snap to Left @SINCE_1_9.28
+  DIRECTION_BIAS_NONE  =  0,  ///< Don't bias scroll snap @SINCE_1_9.28
+  DIRECTION_BIAS_RIGHT =  1   ///< Bias scroll snap to Right @SINCE_1_9.28
 };
 
 /**
@@ -162,8 +162,8 @@ public:
    * @SINCE_1_0.0
    */
   enum RulerType {
-    Fixed,  ///< A fixed ruler @SINCE_1_0.0
-    Free    ///< A free ruler @SINCE_1_0.0
+    FIXED,  ///< A fixed ruler @SINCE_1_9.28
+    FREE    ///< A free ruler @SINCE_1_9.28
   };
 
 public:
@@ -360,7 +360,7 @@ protected:
 
 protected:
 
-  RulerType mType;               ///< Type of Ruler (Fixed or Free).
+  RulerType mType;               ///< Type of Ruler (FIXED or FREE).
   bool mEnabled;                 ///< If the ruler is enabled.
   RulerDomain mDomain;           ///< The domain of the ruler.
 
@@ -384,22 +384,22 @@ public:
   /**
    * @copydoc Toolkit::Ruler::Snap
    */
-  virtual float Snap(float x, float bias) const;
+  float Snap(float x, float bias) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetPositionFromPage
    */
-  virtual float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const;
+  float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetPageFromPosition
    */
-  virtual unsigned int GetPageFromPosition(float position, bool wrap) const;
+  unsigned int GetPageFromPosition(float position, bool wrap) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetTotalPages
    */
-  virtual unsigned int GetTotalPages() const;
+  unsigned int GetTotalPages() const override;
 };
 
 /**
@@ -420,22 +420,22 @@ public:
   /**
    * @copydoc Toolkit::Ruler::Snap
    */
-  virtual float Snap(float x, float bias) const;
+  float Snap(float x, float bias) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetPositionFromPage
    */
-  virtual float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const;
+  float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetPageFromPosition
    */
-  virtual unsigned int GetPageFromPosition(float position, bool wrap) const;
+  unsigned int GetPageFromPosition(float position, bool wrap) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetTotalPages
    */
-  virtual unsigned int GetTotalPages() const;
+  unsigned int GetTotalPages() const override;
 
 private:
   float mSpacing; ///< The spacing between each interval

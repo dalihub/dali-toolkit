@@ -58,17 +58,17 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetControlSize()
    */
-  virtual const Vector2& GetControlSize() const;
+  const Vector2& GetControlSize() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetLayoutSize()
    */
-  virtual const Vector2& GetLayoutSize() const;
+  const Vector2& GetLayoutSize() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetNumberOfGlyphs()
    */
-  virtual Length GetNumberOfGlyphs() const;
+  Length GetNumberOfGlyphs() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetGlyphs()
@@ -82,57 +82,57 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetColors()
    */
-  virtual const Vector4* const GetColors() const;
+  const Vector4* const GetColors() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetColorIndices()
    */
-  virtual const ColorIndex* const GetColorIndices() const;
+  const ColorIndex* const GetColorIndices() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetBackgroundColors()
    */
-  virtual const Vector4* const GetBackgroundColors() const;
+  const Vector4* const GetBackgroundColors() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetBackgroundColorIndices()
    */
-  virtual const ColorIndex* const GetBackgroundColorIndices() const;
+  const ColorIndex* const GetBackgroundColorIndices() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetTextColor()
    */
-  virtual const Vector4& GetTextColor() const;
+  const Vector4& GetTextColor() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetShadowOffset()
    */
-  virtual const Vector2& GetShadowOffset() const;
+  const Vector2& GetShadowOffset() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetShadowColor()
    */
-  virtual const Vector4& GetShadowColor() const;
+  const Vector4& GetShadowColor() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineColor()
    */
-  virtual const Vector4& GetUnderlineColor() const;
+  const Vector4& GetUnderlineColor() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::IsUnderlineEnabled()
    */
-  virtual bool IsUnderlineEnabled() const;
+  bool IsUnderlineEnabled() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineHeight()
    */
-  virtual float GetUnderlineHeight() const;
+  float GetUnderlineHeight() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetNumberOfUnderlineRuns()
    */
-  virtual Length GetNumberOfUnderlineRuns() const;
+  Length GetNumberOfUnderlineRuns() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineRuns()
@@ -144,12 +144,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetOutlineColor()
    */
-  virtual const Vector4& GetOutlineColor() const;
+  const Vector4& GetOutlineColor() const override;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetOutlineWidth()
    */
-  virtual uint16_t GetOutlineWidth() const;
+  uint16_t GetOutlineWidth() const override;
 
 private:
 

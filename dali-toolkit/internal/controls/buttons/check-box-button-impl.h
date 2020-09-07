@@ -68,7 +68,7 @@ private: // From Button
   /**
    * @copydoc Toolkit::Internal::Button::OnInitialize
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
 private:
 

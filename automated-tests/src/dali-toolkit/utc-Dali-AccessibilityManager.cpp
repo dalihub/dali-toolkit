@@ -2304,7 +2304,7 @@ int UtcDaliAccessibilityManagerHandlePanGesture(void)
   dummyControl.SetProperty( Actor::Property::SIZE, Vector2(480, 800) );
   application.GetScene().Add( dummyControl );
 
-  AccessibilityGestureEvent panGestureEvent(AccessibilityGestureEvent::Started);
+  AccessibilityGestureEvent panGestureEvent(AccessibilityGestureEvent::STARTED);
   panGestureEvent.previousPosition = Vector2(0.f, 0.f);
   panGestureEvent.currentPosition = Vector2(100.f, 0.f);
   panGestureEvent.timeDelta = 16;
@@ -2312,12 +2312,12 @@ int UtcDaliAccessibilityManagerHandlePanGesture(void)
 
   Test::AccessibilityAdaptor::SendPanGesture( accessibilityAdaptor, panGestureEvent );
 
-  panGestureEvent.state = AccessibilityGestureEvent::Continuing;
+  panGestureEvent.state = AccessibilityGestureEvent::CONTINUING;
   panGestureEvent.previousPosition = Vector2(100.f, 0.f);
   panGestureEvent.currentPosition = Vector2(200.f, 0.f);
   Test::AccessibilityAdaptor::SendPanGesture( accessibilityAdaptor, panGestureEvent );
 
-  panGestureEvent.state = AccessibilityGestureEvent::Finished;
+  panGestureEvent.state = AccessibilityGestureEvent::FINISHED;
   panGestureEvent.previousPosition = Vector2(200.f, 0.f);
   panGestureEvent.currentPosition = Vector2(300.f, 0.f);
   Test::AccessibilityAdaptor::SendPanGesture( accessibilityAdaptor, panGestureEvent );

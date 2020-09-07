@@ -212,17 +212,17 @@ private: // from Control
   /**
    * @copydoc Toolkit::Control::OnInitialize
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Toolkit::Control::OnPan
    */
-  virtual void OnPan( const PanGesture& gesture );
+  void OnPan( const PanGesture& gesture ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
-  virtual void OnSizeSet( const Vector3& size );
+  void OnSizeSet( const Vector3& size ) override;
 
 private:
 
@@ -295,7 +295,7 @@ private:
   float mTransientIndicatorDuration;                                 ///< The duration before hiding transient indicator
 
   float mScrollStart;                                                ///< Scroll Start position (start of drag)
-  Vector3 mGestureDisplacement;                                      ///< Gesture Displacement.
+  Vector2 mGestureDisplacement;                                      ///< Gesture Displacement.
 
   float mCurrentScrollPosition;                                      ///< The current scroll position updated by the pan gesture
 

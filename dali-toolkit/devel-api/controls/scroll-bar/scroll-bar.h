@@ -80,7 +80,7 @@ public:
       /**
        * @brief The scrolling direction of the indicator.
        * @details Name "scrollDirection", type Property::STRING.
-       *          Possible values are "Vertical" and "Horizontal".
+       *          Possible values are "VERTICAL" and "HORIZONTAL".
        * @SINCE_1_0.0
        * @see SetScrollDirection()
        */
@@ -89,7 +89,7 @@ public:
       /**
        * @brief The indicator height policy.
        * @details Name "indicatorHeightPolicy", type Property::STRING.
-       *          Possible values are "Variable" and "Fixed".
+       *          Possible values are "VARIABLE" and "FIXED".
        * @SINCE_1_0.0
        * @see SetIndicatorHeightPolicy()
        */
@@ -137,7 +137,7 @@ public:
       /**
        * @brief The padding at the start of the indicator.
        * @details Name "indicatorStartPadding", type Property::FLOAT.
-       *          For example, the padding at the top if scrollDirection is Vertical.
+       *          For example, the padding at the top if scrollDirection is VERTICAL.
        * @SINCE_1_1.36
        */
       INDICATOR_START_PADDING,
@@ -145,7 +145,7 @@ public:
       /**
        * @brief The padding at the end of the indicator.
        * @details Name "indicatorEndPadding", type Property::FLOAT.
-       *          For example, the padding at the bottom if scrollDirection is Vertical.
+       *          For example, the padding at the bottom if scrollDirection is VERTICAL.
        * @SINCE_1_1.36
        */
       INDICATOR_END_PADDING,
@@ -172,8 +172,8 @@ public:
    */
   enum Direction
   {
-    Vertical = 0,   ///< Scroll in the vertical direction @SINCE_1_0.0
-    Horizontal      ///< Scroll in the horizontal direction @SINCE_1_0.0
+    VERTICAL = 0,   ///< Scroll in the vertical direction @SINCE_1_9.28
+    HORIZONTAL      ///< Scroll in the horizontal direction @SINCE_1_9.28
   };
 
   /**
@@ -182,8 +182,8 @@ public:
    */
   enum IndicatorHeightPolicy
   {
-    Variable = 0,  ///< Variable height changed dynamically according to the length of scroll content @SINCE_1_0.0
-    Fixed          ///< Fixed height regardless of the length of scroll content @SINCE_1_0.0
+    VARIABLE = 0,  ///< VARIABLE height changed dynamically according to the length of scroll content @SINCE_1_9.28
+    FIXED          ///< FIXED height regardless of the length of scroll content @SINCE_1_9.28
   };
 
   /**
@@ -222,7 +222,7 @@ public:
    * @param[in] direction The direction of scroll bar (either vertically or horizontally)
    * @return A pointer to the created ScrollBar
    */
-  static ScrollBar New(Direction direction = Vertical);
+  static ScrollBar New(Direction direction = VERTICAL);
 
   /**
    * @brief Downcasts a handle to ScrollBar handle.

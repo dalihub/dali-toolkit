@@ -189,20 +189,20 @@ int UtcDaliToolkitScrollBarNewP(void)
   DALI_TEST_CHECK( scrollBar );
   END_TEST;
 
-  ScrollBar vertical = ScrollBar::New(ScrollBar::Vertical);
+  ScrollBar vertical = ScrollBar::New(ScrollBar::VERTICAL);
   DALI_TEST_CHECK( vertical );
-  DALI_TEST_CHECK( vertical.GetScrollDirection() == ScrollBar::Vertical );
+  DALI_TEST_CHECK( vertical.GetScrollDirection() == ScrollBar::VERTICAL );
 
   Property::Value value = vertical.GetProperty(ScrollBar::Property::SCROLL_DIRECTION);
   std::string scrollDirection = value.Get<std::string>();
-  DALI_TEST_EQUALS( scrollDirection, "Vertical", TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollDirection, "VERTICAL", TEST_LOCATION );
 
-  ScrollBar horizontal = ScrollBar::New(ScrollBar::Horizontal);
+  ScrollBar horizontal = ScrollBar::New(ScrollBar::HORIZONTAL);
   DALI_TEST_CHECK( horizontal );
-  DALI_TEST_CHECK( horizontal.GetScrollDirection() == ScrollBar::Horizontal );
+  DALI_TEST_CHECK( horizontal.GetScrollDirection() == ScrollBar::HORIZONTAL );
   value = vertical.GetProperty(ScrollBar::Property::SCROLL_DIRECTION);
   scrollDirection = value.Get<std::string>();
-  DALI_TEST_EQUALS( scrollDirection, "Horizontal", TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollDirection, "HORIZONTAL", TEST_LOCATION );
 
   END_TEST;
 }
@@ -223,17 +223,17 @@ int UtcDaliToolkitScrollBarCreateP(void)
   ScrollBar scrollBar = ScrollBar::DownCast( handle );
   DALI_TEST_CHECK( scrollBar );
 
-  scrollBar.SetProperty(ScrollBar::Property::SCROLL_DIRECTION, "Vertical");
-  scrollBar.SetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY, "Fixed");
+  scrollBar.SetProperty(ScrollBar::Property::SCROLL_DIRECTION, "VERTICAL");
+  scrollBar.SetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY, "FIXED");
 
-  DALI_TEST_EQUALS( scrollBar.GetScrollDirection(), Toolkit::ScrollBar::Vertical, TEST_LOCATION );
-  DALI_TEST_EQUALS( scrollBar.GetIndicatorHeightPolicy(), Toolkit::ScrollBar::Fixed, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollBar.GetScrollDirection(), Toolkit::ScrollBar::VERTICAL, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollBar.GetIndicatorHeightPolicy(), Toolkit::ScrollBar::FIXED, TEST_LOCATION );
 
-  scrollBar.SetProperty(ScrollBar::Property::SCROLL_DIRECTION, "Horizontal");
-  scrollBar.SetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY, "Variable");
+  scrollBar.SetProperty(ScrollBar::Property::SCROLL_DIRECTION, "HORIZONTAL");
+  scrollBar.SetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY, "VARIABLE");
 
-  DALI_TEST_EQUALS( scrollBar.GetScrollDirection(), Toolkit::ScrollBar::Horizontal, TEST_LOCATION );
-  DALI_TEST_EQUALS( scrollBar.GetIndicatorHeightPolicy(), Toolkit::ScrollBar::Variable, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollBar.GetScrollDirection(), Toolkit::ScrollBar::HORIZONTAL, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollBar.GetIndicatorHeightPolicy(), Toolkit::ScrollBar::VARIABLE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -271,9 +271,9 @@ int UtcDaliToolkitScrollBarSetScrollPropertySourceP(void)
   ToolkitTestApplication application;
 
   // Create a vertical scroll bar
-  ScrollBar scrollBar = ScrollBar::New(ScrollBar::Vertical);
+  ScrollBar scrollBar = ScrollBar::New(ScrollBar::VERTICAL);
   DALI_TEST_CHECK( scrollBar );
-  DALI_TEST_CHECK( scrollBar.GetScrollDirection() == ScrollBar::Vertical );
+  DALI_TEST_CHECK( scrollBar.GetScrollDirection() == ScrollBar::VERTICAL );
 
   float scrollBarHeight = 100.0f;
   scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, scrollBarHeight, 0.0f) );
@@ -516,7 +516,7 @@ int UtcDaliToolkitScrollBarSetScrollPositionIntervalsP(void)
   ToolkitTestApplication application;
 
   // Create a vertical scroll bar
-  ScrollBar scrollBar = ScrollBar::New(ScrollBar::Vertical);
+  ScrollBar scrollBar = ScrollBar::New(ScrollBar::VERTICAL);
   DALI_TEST_CHECK( scrollBar );
 
   scrollBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
@@ -636,7 +636,7 @@ int UtcDaliToolkitScrollBarGetScrollPositionIntervalsP(void)
   ToolkitTestApplication application;
 
   // Create a vertical scroll bar
-  ScrollBar scrollBar = ScrollBar::New(ScrollBar::Vertical);
+  ScrollBar scrollBar = ScrollBar::New(ScrollBar::VERTICAL);
   DALI_TEST_CHECK( scrollBar );
 
   // Set the values to get notified when the scroll positions of the source actor goes above or below these values
@@ -685,13 +685,13 @@ int UtcDaliToolkitScrollBarGetScrollDirectionP(void)
   ToolkitTestApplication application;
 
   // Create a vertical scroll bar
-  ScrollBar scrollBar = ScrollBar::New(ScrollBar::Vertical);
+  ScrollBar scrollBar = ScrollBar::New(ScrollBar::VERTICAL);
   DALI_TEST_CHECK( scrollBar );
-  DALI_TEST_CHECK( scrollBar.GetScrollDirection() == ScrollBar::Vertical );
+  DALI_TEST_CHECK( scrollBar.GetScrollDirection() == ScrollBar::VERTICAL );
 
   // Change the direction of scroll bar to horizontal
-  scrollBar.SetScrollDirection(ScrollBar::Horizontal);
-  DALI_TEST_CHECK( scrollBar.GetScrollDirection() == ScrollBar::Horizontal );
+  scrollBar.SetScrollDirection(ScrollBar::HORIZONTAL);
+  DALI_TEST_CHECK( scrollBar.GetScrollDirection() == ScrollBar::HORIZONTAL );
 
   END_TEST;
 }
@@ -739,11 +739,11 @@ int UtcDaliToolkitScrollBarSetIndicatorHeightPolicyP(void)
   DALI_TEST_EQUALS( indicatorHeight, scrollBarHeight * scrollBarHeight / 500.0f, TEST_LOCATION );
 
   // Set the indicator height to be fixed to 50.0f
-  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
+  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::FIXED);
   scrollBar.SetIndicatorFixedHeight(50.0f);
 
   Property::Value value = scrollBar.GetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY);
-  DALI_TEST_EQUALS(value.Get<std::string>(), "Fixed", TEST_LOCATION );
+  DALI_TEST_EQUALS(value.Get<std::string>(), "FIXED", TEST_LOCATION );
 
   // Render and notify
   application.SendNotification();
@@ -754,9 +754,9 @@ int UtcDaliToolkitScrollBarSetIndicatorHeightPolicyP(void)
   DALI_TEST_EQUALS( indicatorHeight, 50.0f, TEST_LOCATION );
 
   // Set the indicator height to be variable
-  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Variable);
+  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::VARIABLE);
   value = scrollBar.GetProperty(ScrollBar::Property::INDICATOR_HEIGHT_POLICY);
-  DALI_TEST_EQUALS(value.Get<std::string>(), "Variable", TEST_LOCATION );
+  DALI_TEST_EQUALS(value.Get<std::string>(), "VARIABLE", TEST_LOCATION );
 
   // Render and notify
   application.SendNotification();
@@ -778,12 +778,12 @@ int UtcDaliToolkitScrollBarGetIndicatorHeightPolicyP(void)
   DALI_TEST_CHECK( scrollBar );
 
   // Set the indicator height to be fixed
-  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
-  DALI_TEST_EQUALS( scrollBar.GetIndicatorHeightPolicy(), Toolkit::ScrollBar::Fixed, TEST_LOCATION );
+  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::FIXED);
+  DALI_TEST_EQUALS( scrollBar.GetIndicatorHeightPolicy(), Toolkit::ScrollBar::FIXED, TEST_LOCATION );
 
   // Set the indicator height to be variable
-  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Variable);
-  DALI_TEST_EQUALS( scrollBar.GetIndicatorHeightPolicy(), Toolkit::ScrollBar::Variable, TEST_LOCATION );
+  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::VARIABLE);
+  DALI_TEST_EQUALS( scrollBar.GetIndicatorHeightPolicy(), Toolkit::ScrollBar::VARIABLE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -804,7 +804,7 @@ int UtcDaliToolkitScrollBarSetIndicatorFixedHeightP(void)
   DALI_TEST_CHECK( indicator );
 
   // Set the indicator height to be fixed to 50.0f
-  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
+  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::FIXED);
   scrollBar.SetIndicatorFixedHeight(50.0f);
 
   // Render and notify
@@ -1674,7 +1674,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalP(void)
   ToolkitTestApplication application;
 
   // Create a vertical scroll bar
-  ScrollBar scrollBar = ScrollBar::New(ScrollBar::Vertical);
+  ScrollBar scrollBar = ScrollBar::New(ScrollBar::VERTICAL);
   DALI_TEST_CHECK( scrollBar );
 
   scrollBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
@@ -1682,7 +1682,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalP(void)
   scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f) );
 
   // Set the indicator height to be fixed to 50.0f
-  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
+  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::FIXED);
   scrollBar.SetIndicatorFixedHeight(50.0f);
 
   application.GetScene().Add( scrollBar );
@@ -1732,7 +1732,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
   ToolkitTestApplication application;
 
   // Create a vertical scroll bar
-  ScrollBar scrollBar = ScrollBar::New(ScrollBar::Vertical);
+  ScrollBar scrollBar = ScrollBar::New(ScrollBar::VERTICAL);
   DALI_TEST_CHECK( scrollBar );
 
   scrollBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
@@ -1740,7 +1740,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
   scrollBar.SetProperty( Actor::Property::SIZE, Vector3(20.0f, 800.0f, 0.0f) );
 
   // Set the indicator height to be fixed to 50.0f
-  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
+  scrollBar.SetIndicatorHeightPolicy(Toolkit::ScrollBar::FIXED);
   scrollBar.SetIndicatorFixedHeight(50.0f);
 
   application.GetScene().Add( scrollBar );
@@ -1799,7 +1799,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalP(void)
   ToolkitTestApplication application;
 
   // Create a vertical scroll bar
-  ScrollBar scrollBar = ScrollBar::New(ScrollBar::Vertical);
+  ScrollBar scrollBar = ScrollBar::New(ScrollBar::VERTICAL);
   DALI_TEST_CHECK( scrollBar );
 
   scrollBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
@@ -1915,7 +1915,7 @@ int UtcDaliToolkitScrollBarScrollPositionIntervalReachedSignalN(void)
   ToolkitTestApplication application;
 
   // Create a vertical scroll bar
-  ScrollBar scrollBar = ScrollBar::New(ScrollBar::Vertical);
+  ScrollBar scrollBar = ScrollBar::New(ScrollBar::VERTICAL);
   DALI_TEST_CHECK( scrollBar );
 
   scrollBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);

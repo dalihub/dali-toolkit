@@ -80,7 +80,7 @@ private: // override functions from Control
   /**
    * @copydoc Control::OnSceneConnection( int depth  )
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc Control::OnRelayout()

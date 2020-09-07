@@ -106,7 +106,7 @@ bool ReadFloat( const TreeNode* node, float& num )
   }
   else if( node->GetType() == TreeNode::INTEGER )
   {
-    int32_t tempNum;
+    int32_t tempNum = 0;
     ReadInt( node, tempNum );
     num = static_cast<float>( tempNum );
     returnValue = true;

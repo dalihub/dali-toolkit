@@ -425,7 +425,7 @@ private:
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * Called whenever the popup layout is re-set up.
@@ -437,43 +437,43 @@ private:
   /**
    * Called when the popup is directly or indirectly parented to the stage.
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * From Control; called after a child has been added to the owning actor.
    * @param[in] child The child which has been added.
    */
-  virtual void OnChildAdd( Actor& child );
+  void OnChildAdd( Actor& child ) override;
 
   /**
    * @copydoc Control::OnRelayOut()
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   /**
    * @copydoc Control::OnSetResizePolicy()
    */
-  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
+  void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) override;
 
   /**
    * @copydoc Control::GetNaturalSize()
    */
-  virtual Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize() override;
 
   /**
    * @copydoc Control::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width );
+  float GetHeightForWidth( float width ) override;
 
   /**
    * @copydoc Control::GetWidthForHeight()
    */
-  virtual float GetWidthForHeight( float height );
+  float GetWidthForHeight( float height ) override;
 
   /**
    * @copydoc Control::OnKeyEvent()
    */
-  virtual bool OnKeyEvent( const KeyEvent& event );
+  bool OnKeyEvent( const KeyEvent& event ) override;
 
   /**
    * @copydoc Control::GetNextKeyboardFocusableActor()

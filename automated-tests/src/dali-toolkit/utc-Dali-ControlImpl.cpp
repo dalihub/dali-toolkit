@@ -72,19 +72,19 @@ int UtcDaliControlImplEnableGestureDetector(void)
     DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
 
     DALI_TEST_CHECK( !dummyImpl.GetPinchGestureDetector() );
-    dummyImpl.EnableGestureDetection(Gesture::Pinch);
+    dummyImpl.EnableGestureDetection(GestureType::PINCH);
     DALI_TEST_CHECK( dummyImpl.GetPinchGestureDetector() );
 
     DALI_TEST_CHECK( !dummyImpl.GetPanGestureDetector() );
-    dummyImpl.EnableGestureDetection(Gesture::Pan);
+    dummyImpl.EnableGestureDetection(GestureType::PAN);
     DALI_TEST_CHECK( dummyImpl.GetPanGestureDetector() );
 
     DALI_TEST_CHECK( !dummyImpl.GetTapGestureDetector() );
-    dummyImpl.EnableGestureDetection(Gesture::Tap);
+    dummyImpl.EnableGestureDetection(GestureType::TAP);
     DALI_TEST_CHECK( dummyImpl.GetTapGestureDetector() );
 
     DALI_TEST_CHECK( !dummyImpl.GetLongPressGestureDetector() );
-    dummyImpl.EnableGestureDetection(Gesture::LongPress);
+    dummyImpl.EnableGestureDetection(GestureType::LONG_PRESS);
     DALI_TEST_CHECK( dummyImpl.GetLongPressGestureDetector() );
   }
 
@@ -98,7 +98,7 @@ int UtcDaliControlImplEnableGestureDetector(void)
     DALI_TEST_CHECK( !dummyImpl.GetTapGestureDetector() );
     DALI_TEST_CHECK( !dummyImpl.GetLongPressGestureDetector() );
 
-    dummyImpl.EnableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
+    dummyImpl.EnableGestureDetection( GestureType::Value(GestureType::PINCH | GestureType::PAN | GestureType::TAP | GestureType::LONG_PRESS) );
 
     DALI_TEST_CHECK( dummyImpl.GetPinchGestureDetector() );
     DALI_TEST_CHECK( dummyImpl.GetPanGestureDetector() );
@@ -107,7 +107,7 @@ int UtcDaliControlImplEnableGestureDetector(void)
 
     // Enable when already enabled
 
-    dummyImpl.EnableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
+    dummyImpl.EnableGestureDetection( GestureType::Value(GestureType::PINCH | GestureType::PAN | GestureType::TAP | GestureType::LONG_PRESS) );
 
     DALI_TEST_CHECK( dummyImpl.GetPinchGestureDetector() );
     DALI_TEST_CHECK( dummyImpl.GetPanGestureDetector() );
@@ -126,22 +126,22 @@ int UtcDaliControlImplDisableGestureDetector(void)
     DummyControl dummy = DummyControl::New();
     DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
 
-    dummyImpl.EnableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
+    dummyImpl.EnableGestureDetection( GestureType::Value(GestureType::PINCH | GestureType::PAN | GestureType::TAP | GestureType::LONG_PRESS) );
 
     DALI_TEST_CHECK( dummyImpl.GetPinchGestureDetector() );
-    dummyImpl.DisableGestureDetection(Gesture::Pinch);
+    dummyImpl.DisableGestureDetection(GestureType::PINCH);
     DALI_TEST_CHECK( !dummyImpl.GetPinchGestureDetector() );
 
     DALI_TEST_CHECK( dummyImpl.GetPanGestureDetector() );
-    dummyImpl.DisableGestureDetection(Gesture::Pan);
+    dummyImpl.DisableGestureDetection(GestureType::PAN);
     DALI_TEST_CHECK( !dummyImpl.GetPanGestureDetector() );
 
     DALI_TEST_CHECK( dummyImpl.GetTapGestureDetector() );
-    dummyImpl.DisableGestureDetection(Gesture::Tap);
+    dummyImpl.DisableGestureDetection(GestureType::TAP);
     DALI_TEST_CHECK( !dummyImpl.GetTapGestureDetector() );
 
     DALI_TEST_CHECK( dummyImpl.GetLongPressGestureDetector() );
-    dummyImpl.DisableGestureDetection(Gesture::LongPress);
+    dummyImpl.DisableGestureDetection(GestureType::LONG_PRESS);
     DALI_TEST_CHECK( !dummyImpl.GetLongPressGestureDetector() );
   }
 
@@ -150,14 +150,14 @@ int UtcDaliControlImplDisableGestureDetector(void)
     DummyControl dummy = DummyControl::New();
     DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
 
-    dummyImpl.EnableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
+    dummyImpl.EnableGestureDetection( GestureType::Value(GestureType::PINCH | GestureType::PAN | GestureType::TAP | GestureType::LONG_PRESS) );
 
     DALI_TEST_CHECK( dummyImpl.GetPinchGestureDetector() );
     DALI_TEST_CHECK( dummyImpl.GetPanGestureDetector() );
     DALI_TEST_CHECK( dummyImpl.GetTapGestureDetector() );
     DALI_TEST_CHECK( dummyImpl.GetLongPressGestureDetector() );
 
-    dummyImpl.DisableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
+    dummyImpl.DisableGestureDetection( GestureType::Value(GestureType::PINCH | GestureType::PAN | GestureType::TAP | GestureType::LONG_PRESS) );
 
     DALI_TEST_CHECK( !dummyImpl.GetPinchGestureDetector() );
     DALI_TEST_CHECK( !dummyImpl.GetPanGestureDetector() );
@@ -175,7 +175,7 @@ int UtcDaliControlImplDisableGestureDetector(void)
     DALI_TEST_CHECK( !dummyImpl.GetTapGestureDetector() );
     DALI_TEST_CHECK( !dummyImpl.GetLongPressGestureDetector() );
 
-    dummyImpl.DisableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
+    dummyImpl.DisableGestureDetection( GestureType::Value(GestureType::PINCH | GestureType::PAN | GestureType::TAP | GestureType::LONG_PRESS) );
 
     DALI_TEST_CHECK( !dummyImpl.GetPinchGestureDetector() );
     DALI_TEST_CHECK( !dummyImpl.GetPanGestureDetector() );
@@ -188,7 +188,7 @@ int UtcDaliControlImplDisableGestureDetector(void)
     DummyControl dummy = DummyControl::New();
     DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(dummy.GetImplementation());
 
-    dummyImpl.EnableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
+    dummyImpl.EnableGestureDetection( GestureType::Value(GestureType::PINCH | GestureType::PAN | GestureType::TAP | GestureType::LONG_PRESS) );
 
     PinchGestureDetector pinch = dummyImpl.GetPinchGestureDetector();
     PanGestureDetector pan   = dummyImpl.GetPanGestureDetector();
@@ -200,7 +200,7 @@ int UtcDaliControlImplDisableGestureDetector(void)
     DALI_TEST_EQUALS( 0 == tap.GetAttachedActorCount(), false, TEST_LOCATION );
     DALI_TEST_EQUALS( 0 == longPress.GetAttachedActorCount(), false, TEST_LOCATION );
 
-    dummyImpl.DisableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
+    dummyImpl.DisableGestureDetection( GestureType::Value(GestureType::PINCH | GestureType::PAN | GestureType::TAP | GestureType::LONG_PRESS) );
 
     DALI_TEST_EQUALS( 0 == pinch.GetAttachedActorCount(), true, TEST_LOCATION );
     DALI_TEST_EQUALS( 0 == pan.GetAttachedActorCount(), true, TEST_LOCATION );
@@ -229,7 +229,7 @@ int UtcDaliControlImplOnGestureMethods(void)
     application.Render();
 
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
-    dummyImpl.EnableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
+    dummyImpl.EnableGestureDetection( GestureType::Value(GestureType::PINCH | GestureType::PAN | GestureType::TAP | GestureType::LONG_PRESS) );
 
     DALI_TEST_CHECK( dummyImpl.pinchCalled == false );
 
@@ -465,65 +465,6 @@ int UtcDaliControlImplSizeAnimation(void)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-int UtcDaliControlImplHoverEvent(void)
-{
-  ToolkitTestApplication application;
-
-  {
-    DummyControl dummy = DummyControl::New( true );
-    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
-
-    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(dummy);
-
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-
-    DALI_TEST_EQUALS( dummyImpl.hoverEventCalled, false, TEST_LOCATION );
-    Integration::HoverEvent event(1);
-    Integration::Point point;
-    point.SetDeviceId( 1 );
-    point.SetState( PointState::MOTION );
-    point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
-    event.AddPoint(point);
-    application.ProcessEvent( event );
-    DALI_TEST_EQUALS( dummyImpl.hoverEventCalled, true, TEST_LOCATION );
-
-    application.GetScene().Remove(dummy);
-  }
-
-  // Ensure full code coverage
-  {
-    DummyControl dummy = DummyControl::New();
-
-    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(dummy);
-
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-
-    Integration::HoverEvent event(1);
-    Integration::Point point;
-    point.SetDeviceId( 1 );
-    point.SetState( PointState::MOTION );
-    point.SetScreenPosition( Vector2( 20.0f, 20.0f ) );
-    event.AddPoint(point);
-    application.ProcessEvent( event );
-
-    application.GetScene().Remove(dummy);
-  }
-  END_TEST;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 int UtcDaliControlImplKeyEvent(void)
 {
   ToolkitTestApplication application;
@@ -654,68 +595,6 @@ int UtcDaliControlImplTypeRegistry(void)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-namespace
-{
-static bool WheelEventCallback(Actor actor, const WheelEvent& event)
-{
-  return false;
-}
-}
-
-int UtcDaliControlImplWheelEvent(void)
-{
-  ToolkitTestApplication application;
-
-  {
-    DummyControl dummy = DummyControl::New( true );
-    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
-
-    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(dummy);
-
-    dummy.WheelEventSignal().Connect(&WheelEventCallback);
-
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-
-    DALI_TEST_EQUALS( dummyImpl.wheelEventCalled, false, TEST_LOCATION );
-
-    // simulate a wheel event
-    Vector2 screenCoordinates( 10.0f, 10.0f );
-    Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
-    application.ProcessEvent( event );
-    DALI_TEST_EQUALS( dummyImpl.wheelEventCalled, true, TEST_LOCATION );
-
-    application.GetScene().Remove(dummy);
-  }
-
-  // Ensure full code coverage
-  {
-    DummyControl dummy = DummyControl::New();
-
-    dummy.SetProperty( Actor::Property::SIZE, Vector2( 100.0f, 100.0f ) );
-    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-    application.GetScene().Add(dummy);
-
-    dummy.WheelEventSignal().Connect(&WheelEventCallback);
-
-    application.Render();
-    application.SendNotification();
-    application.Render();
-    application.SendNotification();
-
-    // simulate a wheel event
-    Vector2 screenCoordinates( 20.0f, 20.0f );
-    Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
-    application.ProcessEvent( event );
-
-    application.GetScene().Remove(dummy);
-  }
-  END_TEST;
-}
 
 int UtcDaliControlImplSetStyleName(void)
 {
@@ -1285,7 +1164,7 @@ int UtcDaliControlImplOnPinch(void)
   application.Render();
 
   Toolkit::Internal::Control& impl = Toolkit::Internal::GetImplementation(control);
-  impl.EnableGestureDetection(Gesture::Pinch);
+  impl.EnableGestureDetection(GestureType::PINCH);
 
   // Scale becomes 0.6666666
   TestStartPinch( application,  Vector2( 5.0f, 20.0f ), Vector2( 35.0f, 20.0f ),

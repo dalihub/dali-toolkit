@@ -144,74 +144,74 @@ public:
   /**
    * @copydoc ItemLayout::GetScrollSpeedFactor()
    */
-  virtual float GetScrollSpeedFactor() const;
+  float GetScrollSpeedFactor() const override;
 
   /**
    * @copydoc ItemLayout::GetMaximumSwipeSpeed()
    */
-  virtual float GetMaximumSwipeSpeed() const;
+  float GetMaximumSwipeSpeed() const override;
 
   /**
    * @copydoc ItemLayout::GetItemFlickAnimationDuration()
    */
-  virtual float GetItemFlickAnimationDuration() const;
+  float GetItemFlickAnimationDuration() const override;
 
   /**
    * @copydoc ItemLayout::GetClosestOnScreenLayoutPosition()
    */
-  virtual float GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize);
+  float GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) override;
 
   /**
    * @copydoc ItemLayout::GetNextFocusItemID()
    */
-  virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled);
+  int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled) override;
 
 private:
 
   /**
    * @copydoc ItemLayout::GetMinimumLayoutPosition()
    */
-  virtual float GetMinimumLayoutPosition(unsigned int numberOfItems, Vector3 layoutSize) const;
+  float GetMinimumLayoutPosition(unsigned int numberOfItems, Vector3 layoutSize) const override;
 
   /**
    * @copydoc ItemLayout::GetClosestAnchorPosition()
    */
-  virtual float GetClosestAnchorPosition(float layoutPosition) const;
+  float GetClosestAnchorPosition(float layoutPosition) const override;
 
   /**
    * @copydoc ItemLayout::GetItemScrollToPosition()
    */
-  virtual float GetItemScrollToPosition(unsigned int itemId) const;
+  float GetItemScrollToPosition(unsigned int itemId) const override;
 
   /**
    * @copydoc ItemLayout::GetItemsWithinArea()
    */
-  virtual ItemRange GetItemsWithinArea(float firstItemPosition, Vector3 layoutSize) const;
+  ItemRange GetItemsWithinArea(float firstItemPosition, Vector3 layoutSize) const override;
 
   /**
    * @copydoc ItemLayout::GetReserveItemCount()
    */
-  virtual unsigned int GetReserveItemCount(Vector3 layoutSize) const;
+  unsigned int GetReserveItemCount(Vector3 layoutSize) const override;
 
   /**
    * @copydoc ItemLayout::GetDefaultItemSize()
    */
-  virtual void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const;
+  void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const override;
 
   /**
    * @copydoc ItemLayout::GetScrollDirection()
    */
-  virtual Degree GetScrollDirection() const;
+  Degree GetScrollDirection() const override;
 
   /**
    * @copydoc ItemLayout::ApplyConstraints()
    */
-  virtual void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor );
+  void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor ) override;
 
   /**
    * @copydoc ItemLayout::GetItemPosition()
    */
-  virtual Vector3 GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const;
+  Vector3 GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const override;
 
 protected:
 

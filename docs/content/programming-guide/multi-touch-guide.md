@@ -6,7 +6,7 @@ Multi-Touch Events
 
 Touch events are received via signals.
 
-For C++ API see Dali::Actor::TouchSignal() and Dali::Actor::HoveredSignal() for more details.
+For C++ API see Dali::Actor::TouchedSignal() and Dali::Actor::HoveredSignal() for more details.
 
 ### Hit Testing Rules Summary:
 

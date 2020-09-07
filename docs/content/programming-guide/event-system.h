@@ -42,7 +42,7 @@ bool OnTouch( Dali::Actor actor, const Dali::TouchEvent& touch )
 
 // Elsewhere
 Dali::Actor actor = Actor::New();
-actor.TouchSignal().Connect( &OnTouch );
+actor.TouchedSignal().Connect( &OnTouch );
 @endcode
 
 The primary touch point is the first point that the user touches.
@@ -51,7 +51,7 @@ The touch signal is first emitted to the actor which is hit by the primary touch
 If this hit actor does not handle (consume) the event, then the event is offered to the hit actor's parent.
 Again, if the parent does not handle this event, it is then offered to its parent and so on until the stage is reached or the event is consumed.
 
-If the TouchSignal of both a parent and child are connected to, then the touch event is first offered to the child's listener.
+If the TouchedSignal of both a parent and child are connected to, then the touch event is first offered to the child's listener.
 If it is consumed by the child's listener, then the parent will not be informed.
 
 <h2 class="pg">Gestures</h2>

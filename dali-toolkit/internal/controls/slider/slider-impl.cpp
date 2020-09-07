@@ -204,7 +204,7 @@ void Slider::OnInitialize()
   self.SetProperty( Actor::Property::SIZE, Vector2( DEFAULT_HIT_REGION.x, DEFAULT_HIT_REGION.y ) );
 
   // Connect to the touch signal
-  self.TouchSignal().Connect( this, &Slider::OnTouch );
+  self.TouchedSignal().Connect( this, &Slider::OnTouch );
 }
 
 void Slider::OnRelayout( const Vector2& size, RelayoutContainer& container )
@@ -248,25 +248,25 @@ void Slider::OnPan( Actor actor, const PanGesture& gesture )
   // gesture.position is in local actor coordinates
   if( mState != DISABLED )
   {
-    switch( gesture.state )
+    switch( gesture.GetState() )
     {
-      case Gesture::Continuing:
+      case GestureState::CONTINUING:
       {
         if( mState == PRESSED )
         {
-          float value = MapBounds( MarkFilter ( MapPercentage( gesture.position ) ), GetLowerBound(), GetUpperBound() );
+          float value = MapBounds( MarkFilter ( MapPercentage( gesture.GetPosition() ) ), GetLowerBound(), GetUpperBound() );
           SetValue( value );
           DisplayPopup( value );
         }
         break;
       }
-      case Gesture::Finished:
+      case GestureState::FINISHED:
       {
         if( mState == PRESSED  )
         {
           if( GetSnapToMarks() )
           {
-            float value = MapBounds( SnapToMark( MapPercentage( gesture.position ) ), GetLowerBound(), GetUpperBound() );
+            float value = MapBounds( SnapToMark( MapPercentage( gesture.GetPosition() ) ), GetLowerBound(), GetUpperBound() );
             SetValue( value );
             DisplayPopup( value );
           }
@@ -381,7 +381,7 @@ Actor Slider::CreateHitRegion()
   Actor hitRegion = Actor::New();
   hitRegion.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   hitRegion.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  hitRegion.TouchSignal().Connect( this, &Slider::OnTouch );
+  hitRegion.TouchedSignal().Connect( this, &Slider::OnTouch );
 
   return hitRegion;
 }

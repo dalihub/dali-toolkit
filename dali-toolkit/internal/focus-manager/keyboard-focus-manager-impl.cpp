@@ -146,7 +146,7 @@ void KeyboardFocusManager::OnAdaptorInit()
     for( auto iter = sceneHolders.begin(); iter != sceneHolders.end(); ++iter )
     {
       ( *iter ).KeyEventSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent );
-      ( *iter ).TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
+      ( *iter ).TouchedSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
       Dali::Window window = DevelWindow::DownCast( *iter );
       if( window )
       {
@@ -162,7 +162,7 @@ void KeyboardFocusManager::OnAdaptorInit()
 void KeyboardFocusManager::OnSceneHolderCreated( Dali::Integration::SceneHolder& sceneHolder )
 {
   sceneHolder.KeyEventSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent );
-  sceneHolder.TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
+  sceneHolder.TouchedSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
   Dali::Window window = DevelWindow::DownCast( sceneHolder );
   if( window )
   {

@@ -1745,6 +1745,13 @@ int utcDaliTextEditorEvent03(void)
   application.SendNotification();
   application.Render();
 
+  // Pan Press
+  TestGenerateMiniPan(application);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 
@@ -2415,6 +2422,15 @@ int utcDaliTextEditorHandles(void)
   // Render and notify
   application.SendNotification();
   application.Render();
+
+  // Pan the grab handle
+  uint32_t time = 100;
+  TestStartPan( application, Vector2(10.0f, 50.0f), Vector2(10.0f, 50.0f), time );
+  TestMovePan( application, Vector2(10.0f, 30.0f), time );
+  TestEndPan( application, Vector2(10.0f, 50.0f), time);
+  application.SendNotification();
+  application.Render();
+
 
   // Release the grab handle.
   event = Dali::Integration::TouchEvent();

@@ -63,27 +63,27 @@ protected: // From PageTurnView
   /**
    * @copydoc PageTurnView::OnPageTurnViewInitialize
    */
-  virtual void OnPageTurnViewInitialize();
+  void OnPageTurnViewInitialize() override;
 
   /**
    * @copydoc PageTurnView::SetPanPosition
    */
-  virtual Vector2 SetPanPosition( const Vector2& gesturePosition );
+  Vector2 SetPanPosition( const Vector2& gesturePosition ) override;
 
   /**
    * @copydoc PageTurnView::SetPanActor
    */
-  virtual void SetPanActor( const Vector2& panPosition );
+  void SetPanActor( const Vector2& panPosition ) override;
 
   /**
    * @copydoc PageTurnView::OnPossibleOutwardsFlick
    */
-  virtual void OnPossibleOutwardsFlick( const Vector2& panPosition, float gestureSpeed );
+  void OnPossibleOutwardsFlick( const Vector2& panPosition, float gestureSpeed ) override;
 
   /**
    * @copydoc PageTurnView::OnTurnedOver
    */
-  virtual void OnTurnedOver( Actor actor, bool isLeftSide );
+  void OnTurnedOver( Actor actor, bool isLeftSide ) override;
 
 private:
 

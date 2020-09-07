@@ -496,6 +496,10 @@ Geometry NPatchVisual::CreateGeometry()
         {
           uint32_t elementCount[2];
           geometry = RenderingAddOn::Get().CreateGeometryGrid(data->renderingMap, Uint16Pair(3, 3), elementCount );
+          if( mImpl->mRenderer )
+          {
+            RenderingAddOn::Get().SubmitRenderTask(mImpl->mRenderer, data->renderingMap);
+          }
         }
         else
         {
@@ -515,6 +519,10 @@ Geometry NPatchVisual::CreateGeometry()
         uint32_t elementCount[2];
         geometry = !mBorderOnly ?
                    RenderingAddOn::Get().CreateGeometryGrid(data->renderingMap, gridSize, elementCount ) : CreateBorderGeometry(gridSize );
+        if( mImpl->mRenderer )
+        {
+          RenderingAddOn::Get().SubmitRenderTask(mImpl->mRenderer, data->renderingMap);
+        }
       }
     }
   }

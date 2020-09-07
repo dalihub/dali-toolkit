@@ -61,157 +61,157 @@ public:
   /**
    * @copydoc ModelInterface::GetControlSize()
    */
-  virtual const Size& GetControlSize() const;
+  const Size& GetControlSize() const override;
 
   /**
    * @copydoc ModelInterface::GetLayoutSize()
    */
-  virtual const Size& GetLayoutSize() const;
+  const Size& GetLayoutSize() const override;
 
   /**
    * @copydoc ModelInterface::GetScrollPosition()
    */
-  virtual const Vector2& GetScrollPosition() const;
+  const Vector2& GetScrollPosition() const override;
 
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  virtual Text::HorizontalAlignment::Type GetHorizontalAlignment() const;
+  Text::HorizontalAlignment::Type GetHorizontalAlignment() const override;
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  virtual Text::VerticalAlignment::Type GetVerticalAlignment() const;
+  Text::VerticalAlignment::Type GetVerticalAlignment() const override;
 
   /**
  * @copydoc ModelInterface::GetVerticalLineAlignment()
  */
-  virtual DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const;
+  DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const override;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
    */
-  virtual bool IsTextElideEnabled() const;
+  bool IsTextElideEnabled() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfLines()
    */
-  virtual Length GetNumberOfLines() const;
+  Length GetNumberOfLines() const override;
 
   /**
    * @copydoc ModelInterface::GetLines()
    */
-  virtual const LineRun* const GetLines() const;
+  const LineRun* const GetLines() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfScripts()
    */
-  virtual Length GetNumberOfScripts() const;
+  Length GetNumberOfScripts() const override;
 
   /**
    * @copydoc ModelInterface::GetScriptRuns()
    */
-  virtual const ScriptRun* const GetScriptRuns() const;
+  const ScriptRun* const GetScriptRuns() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfGlyphs()
    */
-  virtual Length GetNumberOfGlyphs() const;
+  Length GetNumberOfGlyphs() const override;
 
   /**
    * @copydoc ModelInterface::GetGlyphs()
    */
-  virtual const GlyphInfo* const GetGlyphs() const;
+  const GlyphInfo* const GetGlyphs() const override;
 
   /**
    * @copydoc ModelInterface::GetLayout()
    */
-  virtual const Vector2* const GetLayout() const;
+  const Vector2* const GetLayout() const override;
 
   /**
    * @copydoc ModelInterface::GetColors()
    */
-  virtual const Vector4* const GetColors() const;
+  const Vector4* const GetColors() const override;
 
   /**
    * @copydoc ModelInterface::GetColorIndices()
    */
-  virtual const ColorIndex* const GetColorIndices() const;
+  const ColorIndex* const GetColorIndices() const override;
 
   /**
    * @copydoc ModelInterface::GetBackgroundColors()
    */
-  virtual const Vector4* const GetBackgroundColors() const;
+  const Vector4* const GetBackgroundColors() const override;
 
   /**
    * @copydoc ModelInterface::GetBackgroundColorIndices()
    */
-  virtual const ColorIndex* const GetBackgroundColorIndices() const;
+  const ColorIndex* const GetBackgroundColorIndices() const override;
 
   /**
    * @copydoc ModelInterface::GetDefaultColor()
    */
-  virtual const Vector4& GetDefaultColor() const;
+  const Vector4& GetDefaultColor() const override;
 
   /**
    * @copydoc ModelInterface::GetShadowOffset()
    */
-  virtual const Vector2& GetShadowOffset() const;
+  const Vector2& GetShadowOffset() const override;
 
   /**
    * @copydoc ModelInterface::GetShadowColor()
    */
-  virtual const Vector4& GetShadowColor() const;
+  const Vector4& GetShadowColor() const override;
 
   /**
    * @copydoc ModelInterface::GetShadowBlurRadius()
    */
-  virtual const float& GetShadowBlurRadius() const;
+  const float& GetShadowBlurRadius() const override;
 
   /**
    * @copydoc ModelInterface::GetUnderlineColor()
    */
-  virtual const Vector4& GetUnderlineColor() const;
+  const Vector4& GetUnderlineColor() const override;
 
   /**
    * @copydoc ModelInterface::IsUnderlineEnabled()
    */
-  virtual bool IsUnderlineEnabled() const;
+  bool IsUnderlineEnabled() const override;
 
   /**
    * @copydoc ModelInterface::GetUnderlineHeight()
    */
-  virtual float GetUnderlineHeight() const;
+  float GetUnderlineHeight() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfUnderlineRuns()
    */
-  virtual Length GetNumberOfUnderlineRuns() const;
+  Length GetNumberOfUnderlineRuns() const override;
 
   /**
    * @copydoc ModelInterface::GetUnderlineRuns()
    */
-  virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const;
+  void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const override;
 
   /**
    * @copydoc ModelInterface::GetOutlineColor()
    */
-  virtual const Vector4& GetOutlineColor() const;
+  const Vector4& GetOutlineColor() const override;
 
   /**
    * @copydoc ModelInterface::GetOutlineWidth()
    */
-  virtual uint16_t GetOutlineWidth() const;
+  uint16_t GetOutlineWidth() const override;
 
   /**
    * @copydoc ModelInterface::GetBackgroundColor()
    */
-  virtual const Vector4& GetBackgroundColor() const;
+  const Vector4& GetBackgroundColor() const override;
 
   /**
    * @copydoc ModelInterface::IsBackgroundEnabled()
    */
-  virtual bool IsBackgroundEnabled() const;
+  bool IsBackgroundEnabled() const override;
 
 /**
    * @brief Does the text elide.

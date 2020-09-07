@@ -316,43 +316,43 @@ protected: // From Control
    * @copydoc Toolkit::Control::OnInitialize()
    * @note If overridden by deriving button classes, then an up-call to Button::OnInitialize MUST be made at the start.
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Toolkit::Control::OnAccessibilityActivated()
    */
-  virtual bool OnAccessibilityActivated();
+  bool OnAccessibilityActivated() override;
 
   /**
    * @copydoc Toolkit::Control::OnKeyboardEnter()
    */
-  virtual bool OnKeyboardEnter();
+  bool OnKeyboardEnter() override;
 
   /**
    * @copydoc Toolkit::Control::OnSceneDisconnection()
    * @note If overridden by deriving button classes, then an up-call to Button::OnSceneDisconnection MUST be made at the end.
    */
-  virtual void OnSceneDisconnection();
+  void OnSceneDisconnection() override;
 
   /**
    * @copydoc Toolkit::Control::OnSceneConnection()
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
-  virtual Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize() override;
 
   /**
    * @copydoc Toolkit::Control::OnSetResizePolicy
    */
-  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
+  void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) override;
 
   /**
    * @copydoc Toolkit::Control::OnRelayout
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
 private:
 

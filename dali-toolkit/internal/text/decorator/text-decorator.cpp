@@ -827,7 +827,7 @@ struct Decorator::Impl : public ConnectionTracker
         grabHandle.actor.Add( grabHandle.grabArea );
         grabHandle.actor.SetProperty( Actor::Property::COLOR, mHandleColor );
 
-        grabHandle.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
+        grabHandle.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
 
         // The grab handle's actor is attached to the tap and long press detectors in order to consume these events.
         // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
@@ -895,7 +895,7 @@ struct Decorator::Impl : public ConnectionTracker
         primary.grabArea.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
         primary.grabArea.SetProperty( Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
-        primary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
+        primary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
 
         // The handle's actor is attached to the tap and long press detectors in order to consume these events.
         // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
@@ -939,7 +939,7 @@ struct Decorator::Impl : public ConnectionTracker
         secondary.grabArea.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
         secondary.grabArea.SetProperty( Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
-        secondary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
+        secondary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
 
         // The handle's actor is attached to the tap and long press detectors in order to consume these events.
         // Note that no callbacks are connected to any signal emitted by the tap and long press detectors.
@@ -1259,7 +1259,8 @@ struct Decorator::Impl : public ConnectionTracker
 
   void DoPan( HandleImpl& handle, HandleType type, const PanGesture& gesture )
   {
-    if( Gesture::Started == gesture.state )
+    GestureState state = gesture.GetState();
+    if( GestureState::STARTED == state )
     {
       handle.grabDisplacementX = handle.grabDisplacementY = 0.f;
 
@@ -1267,15 +1268,16 @@ struct Decorator::Impl : public ConnectionTracker
       handle.globalPosition.y = handle.position.y;
     }
 
-    handle.grabDisplacementX += gesture.displacement.x;
-    handle.grabDisplacementY += ( handle.verticallyFlipped ? -gesture.displacement.y : gesture.displacement.y );
+    const Vector2& displacement = gesture.GetDisplacement();
+    handle.grabDisplacementX += displacement.x;
+    handle.grabDisplacementY += ( handle.verticallyFlipped ? -displacement.y : displacement.y );
 
     const float x = handle.globalPosition.x + handle.grabDisplacementX;
     const float y = handle.globalPosition.y + handle.grabDisplacementY + 0.5f * handle.lineHeight;
     const float yVerticallyFlippedCorrected = y - ( handle.verticallyFlippedOnTouch ? handle.lineHeight : 0.f );
 
-    if( ( Gesture::Started    == gesture.state ) ||
-        ( Gesture::Continuing == gesture.state ) )
+    if( ( GestureState::STARTED    == state ) ||
+        ( GestureState::CONTINUING == state ) )
     {
       Vector2 targetSize;
       mController.GetTargetSize( targetSize );
@@ -1317,8 +1319,8 @@ struct Decorator::Impl : public ConnectionTracker
 
       mIsHandlePanning = true;
     }
-    else if( ( Gesture::Finished  == gesture.state ) ||
-             ( Gesture::Cancelled == gesture.state ) )
+    else if( ( GestureState::FINISHED  == state ) ||
+             ( GestureState::CANCELLED == state ) )
     {
       if( mScrollTimer &&
           ( mScrollTimer.IsRunning() || mNotifyEndOfScroll ) )
@@ -1517,7 +1519,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                     LessThanCondition( mBoundingBox.y + topHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1534,7 +1536,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                        GreaterThanCondition( mBoundingBox.w - bottomHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1554,7 +1556,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                     LessThanCondition( mBoundingBox.y + topHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1572,7 +1574,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                        GreaterThanCondition( mBoundingBox.w - bottomHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1590,7 +1592,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                     LessThanCondition( mBoundingBox.y + topHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalLessThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1604,7 +1606,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                        GreaterThanCondition( mBoundingBox.w - bottomHeight ) );
 
         // Notifies the change from false to true and from true to false.
-        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+        mHandleVerticalGreaterThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
         // Connects the signals with the callbacks.
         mHandleVerticalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1636,7 +1638,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                     LessThanCondition( mBoundingBox.x + leftWidth ) );
 
       // Notifies the change from false to true and from true to false.
-      mHandleHorizontalLessThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+      mHandleHorizontalLessThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
       // Connects the signals with the callbacks.
       mHandleHorizontalLessThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1649,7 +1651,7 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                        GreaterThanCondition( mBoundingBox.z - rightWidth ) );
 
       // Notifies the change from false to true and from true to false.
-      mHandleHorizontalGreaterThanNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+      mHandleHorizontalGreaterThanNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
       // Connects the signals with the callbacks.
       mHandleHorizontalGreaterThanNotification.NotifySignal().Connect( this, &Decorator::Impl::HandleResetPosition );
@@ -1745,8 +1747,8 @@ struct Decorator::Impl : public ConnectionTracker
                                                                                     GreaterThanCondition( mBoundingBox.w - popupHalfSize.height ) );
 
     // Notifies the change from false to true and from true to false.
-    mPopupTopExceedNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
-    mPopupBottomExceedNotification.SetNotifyMode( PropertyNotification::NotifyOnChanged );
+    mPopupTopExceedNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
+    mPopupBottomExceedNotification.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
 
     mPopupTopExceedNotification.NotifySignal().Connect( this, &Decorator::Impl::PopUpLeavesTopBoundary );
     mPopupBottomExceedNotification.NotifySignal().Connect( this, &Decorator::Impl::PopUpLeavesBottomBoundary );

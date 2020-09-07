@@ -76,7 +76,7 @@ public:
   /**
    * @copydoc Control::OnRelayout
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   /**
    * @brief Called to load both geometry (.obj) and material (.mtl) files
@@ -101,12 +101,12 @@ private:
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
 private:
 

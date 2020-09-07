@@ -369,13 +369,13 @@ public:
    * @copydoc ScrollTo(const Vector2&)
    */
   void TransformTo(const Vector2& position,
-                   DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
+                   DirectionBias horizontalBias = DIRECTION_BIAS_NONE, DirectionBias verticalBias = DIRECTION_BIAS_NONE);
 
   /**
    * @copydoc ScrollTo(const Vector2&, float, AlhpaFunction, DirectionBias, DirectionBias)
    */
   void TransformTo(const Vector2& position, float duration, AlphaFunction alpha,
-                   DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
+                   DirectionBias horizontalBias = DIRECTION_BIAS_NONE, DirectionBias verticalBias = DIRECTION_BIAS_NONE);
 
   /**
    * @copydoc Toolkit::ScrollView::ScrollTo(const Vector2 &position)
@@ -412,7 +412,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::ScrollTo(unsigned int page, float duration, DirectionBias bias)
    */
-  void ScrollTo(unsigned int page, float duration, DirectionBias bias = DirectionBiasNone);
+  void ScrollTo(unsigned int page, float duration, DirectionBias bias = DIRECTION_BIAS_NONE);
 
   /**
    * @copydoc Toolkit::ScrollView::ScrollTo(Actor& actor)
@@ -482,8 +482,8 @@ public:
    */
   bool AnimateTo(const Vector2& position, const Vector2& positionDuration,
                              AlphaFunction alpha, bool findShortcuts = true,
-                             DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone,
-                             SnapType snapType = Snap);
+                             DirectionBias horizontalBias = DIRECTION_BIAS_NONE, DirectionBias verticalBias = DIRECTION_BIAS_NONE,
+                             SnapType snapType = SNAP);
 
   /**
    * @copydoc Toolkit::Scrollable::AddOverlay()
@@ -546,56 +546,57 @@ private: // private overridden functions from CustomActorImpl and Controls
   /**
    * @copydoc Dali::CustomActorImpl::OnSizeAnimation(Animation&, const Vector3&)
    */
-  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
+  void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet(const Vector3&)
    */
-  virtual void OnSizeSet( const Vector3& size );
+  void OnSizeSet( const Vector3& size ) override;
 
   /**
    * From CustomActorImpl; called after a child has been added to the owning actor.
    * @param[in] child The child which has been added.
    */
-  virtual void OnChildAdd(Actor& child);
+  void OnChildAdd(Actor& child) override;
 
   /**
    * From CustomActorImpl; called shortly before a child is removed from the owning actor.
    * @param[in] child The child being removed.
    */
-  virtual void OnChildRemove(Actor& child);
+  void OnChildRemove(Actor& child) override;
 
   /**
-   * From CustomActorImpl; called after a wheelEvent is received by the owning actor.
+   * Called after a wheelEvent is received by the owning actor.
+   * @param[in] actor Actor associated with the event.
    * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnWheelEvent(const WheelEvent& event);
+  bool OnWheelEvent(Actor actor, const WheelEvent& event);
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
-  virtual void OnSceneDisconnection();
+  void OnSceneDisconnection() override;
 
   /**
    * @copydoc Toolkit::Control::OnAccessibilityPan()
    */
-  virtual bool OnAccessibilityPan(PanGesture gesture);
+  bool OnAccessibilityPan(PanGesture gesture) override;
 
   /**
    * @copydoc Toolkit::Scrollable::EnableScrollOvershoot()
    */
-  virtual void EnableScrollOvershoot(bool enable);
+  void EnableScrollOvershoot(bool enable) override;
 
 private:
 
@@ -724,7 +725,7 @@ private:
    *
    * @param[in] gesture The gesture event.
    */
-  void OnGestureEx(Gesture::State state);
+  void OnGestureEx(GestureState state);
 
   /**
    * Performs snapping while taking into account Velocity of gesture
@@ -819,7 +820,7 @@ private:
    *
    * @param[in] child The actor to be unbound.
    */
-  virtual void FindAndUnbindActor(Actor child);
+  void FindAndUnbindActor(Actor child) override;
 
   /**
    * Gets position property.

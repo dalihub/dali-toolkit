@@ -93,18 +93,18 @@ public:
 
 private:
 
-  virtual void OnInitialize();
-  virtual void OnSizeSet(const Vector3& targetSize);
+  void OnInitialize() override;
+  void OnSizeSet(const Vector3& targetSize) override;
 
   /**
    * @copydoc Control::OnChildAdd()
    */
-  virtual void OnChildAdd( Actor& child );
+  void OnChildAdd( Actor& child ) override;
 
   /**
    * @copydoc Control::OnChildRemove()
    */
-  virtual void OnChildRemove( Actor& child );
+  void OnChildRemove( Actor& child ) override;
 
   void SetBlurBellCurveWidth(float blurBellCurveWidth);
   float CalcGaussianWeight(float x);

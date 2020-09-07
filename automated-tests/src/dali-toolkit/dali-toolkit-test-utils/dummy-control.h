@@ -90,8 +90,8 @@ public:
   static DummyControl New();
 
 public:
-  inline void EnableGestureDetection(Gesture::Type type) { Internal::Control::EnableGestureDetection(type); }
-  inline void DisableGestureDetection(Gesture::Type type) { Internal::Control::DisableGestureDetection(type); }
+  inline void EnableGestureDetection(GestureType::Value type) { Internal::Control::EnableGestureDetection(type); }
+  inline void DisableGestureDetection(GestureType::Value type) { Internal::Control::DisableGestureDetection(type); }
   inline PinchGestureDetector GetPinchGestureDetector() const { return Internal::Control::GetPinchGestureDetector(); }
   inline PanGestureDetector GetPanGestureDetector() const { return Internal::Control::GetPanGestureDetector(); }
   inline TapGestureDetector GetTapGestureDetector() const { return Internal::Control::GetTapGestureDetector(); }
@@ -162,6 +162,7 @@ private: // From Internal::Control
   virtual void OnTap(const TapGesture& tap);
   virtual void OnLongPress(const LongPressGesture& longPress);
   virtual Vector3 GetNaturalSize();
+  virtual bool OnKeyEvent(const KeyEvent& event);
 
 private: // From CustomActorImpl
 
@@ -171,9 +172,6 @@ private: // From CustomActorImpl
   virtual void OnChildRemove(Actor& child);
   virtual void OnSizeSet(const Vector3& targetSize);
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
-  virtual bool OnHoverEvent(const HoverEvent& event);
-  virtual bool OnWheelEvent(const WheelEvent& event);
-  virtual bool OnKeyEvent(const KeyEvent& event);
   virtual void OnKeyInputFocusGained();
   virtual void OnKeyInputFocusLost();
   virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
