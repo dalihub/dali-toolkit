@@ -53,6 +53,11 @@ IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
   FIND_PACKAGE( dali2-adaptor REQUIRED)
 ENDIF()
 
+IF ( APPLE )
+  FIND_PACKAGE( dali2-core REQUIRED)
+  FIND_PACKAGE( dali2-adaptor REQUIRED)
+ENDIF()
+
 SET( VCPKG_INCLUDE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
 
 # Define non-boolean options to CMake
@@ -208,16 +213,24 @@ IF( WIN32 )
   ADD_COMPILE_OPTIONS( /vmg )                           # Avoids a 'reinterpret_cast' compile error while compiling signals and callbacks.
   ADD_COMPILE_OPTIONS( /wd4251 )                        # Ignores warning C4251: "'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'"
 ELSE()
+  INCLUDE(CheckCXXCompilerFlag)
+
   # Set up compiler flags and warnings
   ADD_COMPILE_OPTIONS( -Wno-ignored-qualifiers )
 
   # TODO: Clang is a lot more strict with warnings, we should address
   # those issues at some point.
-  IF( NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+  # Matches "Clang" or "AppleClang"
+  IF( NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" )
     ADD_COMPILE_OPTIONS( -Werror )
   ENDIF()
 
-  ADD_COMPILE_OPTIONS( -Wall -Wno-unused-parameter -Wno-float-equal -Wno-class-memaccess )
+  ADD_COMPILE_OPTIONS( -Wall -Wno-unused-parameter -Wno-float-equal )
+  ADD_COMPILE_OPTIONS( -Wall -Wno-unused-parameter -Wno-float-equal )
+  CHECK_CXX_COMPILER_FLAG(-Wno-class-memaccess HAVE_NO_CLASS_MEMACCESS)
+  IF (HAVE_NO_CLASS_MEMACCESS)
+    ADD_COMPILE_OPTIONS( -Wno-class-memaccess )
+  ENDIF()
 
   IF( ENABLE_COVERAGE OR "$ENV{CXXFLAGS}" MATCHES --coverage )
     ADD_COMPILE_OPTIONS( --coverage )
@@ -270,12 +283,11 @@ IF(DEFINED STATIC)
   SET(LIBTYPE STATIC)
 ENDIF()
 
-IF( WIN32 )
+IF( WIN32 OR APPLE )
   SET( DALICORE_LDFLAGS
         "${DALICORE_LDFLAGS}"
         dali2-core::dali2-core )
 
-  FIND_PACKAGE( pthreads REQUIRED )
   FIND_PACKAGE( curl REQUIRED )
   FIND_LIBRARY( GETOPT_LIBRARY NAMES getopt )
   FIND_LIBRARY( EXIF_LIBRARY NAMES libexif )
@@ -285,13 +297,16 @@ IF( WIN32 )
   FIND_PACKAGE( jpeg REQUIRED )
   FIND_LIBRARY( TURBO_JPEG_LIBRARY NAMES turbojpeg )
 
-  FIND_PACKAGE( unofficial-fontconfig REQUIRED )
   FIND_PACKAGE( freetype REQUIRED )
   FIND_PACKAGE( harfbuzz REQUIRED )
   FIND_LIBRARY( FRIBIDI_LIBRARY NAMES fribidi )
 
   FIND_PACKAGE( unofficial-angle REQUIRED )
-  FIND_PACKAGE( unofficial-cairo REQUIRED )
+
+  IF ( WIN32 )
+    FIND_PACKAGE( unofficial-fontconfig REQUIRED )
+    FIND_PACKAGE( unofficial-cairo REQUIRED )
+  ENDIF()
 
   FIND_PACKAGE( WebP REQUIRED )
 
@@ -300,6 +315,9 @@ IF( WIN32 )
        dali2-adaptor::dali2-adaptor )
 ENDIF()
 
+IF ( WIN32 )
+  FIND_PACKAGE( pthreads REQUIRED )
+ENDIF()
 
 ADD_LIBRARY( ${name} ${LIBTYPE} ${SOURCES} )
 TARGET_LINK_LIBRARIES( ${name}
@@ -348,7 +366,7 @@ IF( INSTALL_CMAKE_MODULES )
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake DESTINATION share/${name})
 
   # Install the pdb file.
-  IF( ENABLE_DEBUG )
+  IF( ENABLE_DEBUG AND WIN32 )
     install( FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/${name}.pdb DESTINATION ${BIN_DIR} )
   ENDIF()
 ELSE()
@@ -399,7 +417,7 @@ INSTALL_HEADERS_WITH_DIRECTORY(PACKAGE_DOXY_HEADERS ${PACKAGE_DOXY_SRC_DIR} "dal
 INSTALL( FILES ${ROOT_SRC_DIR}/dali-toolkit/dali-toolkit.h DESTINATION ${INCLUDE_DIR}/dali-toolkit )
 
 # package doxygen file (contains doxygen grouping information)
-INSTALL( FILES ${package_doxy_files} DESTINATION ${DEV_INCLUDE_PATH}/dali-toolkit/doc )
+INSTALL( FILES ${package_doxy_files} DESTINATION ${INCLUDE_DIR}/dali-toolkit/doc )
 
 # On some platforms we want to install the data files to different location compare to
 # the data location used runtime. For example, on Android we want the toolkit library to load
