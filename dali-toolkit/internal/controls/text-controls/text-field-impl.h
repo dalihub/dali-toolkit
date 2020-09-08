@@ -144,6 +144,11 @@ private: // From Control
   void OnKeyInputFocusLost() override;
 
   /**
+   * @copydoc Control::OnAccessibilityActivated()
+   */
+  bool OnAccessibilityActivated() override;
+
+  /**
    * @copydoc Control::OnTap()
    */
   void OnTap( const TapGesture& tap ) override;

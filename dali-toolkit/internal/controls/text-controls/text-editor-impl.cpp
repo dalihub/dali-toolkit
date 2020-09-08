@@ -1471,6 +1471,12 @@ void TextEditor::OnKeyInputFocusLost()
   EmitKeyInputFocusSignal( false ); // Calls back into the Control hence done last.
 }
 
+bool TextEditor::OnAccessibilityActivated()
+{
+  SetKeyInputFocus();
+  return true;
+}
+
 void TextEditor::OnTap( const TapGesture& gesture )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnTap %p\n", mController.Get() );

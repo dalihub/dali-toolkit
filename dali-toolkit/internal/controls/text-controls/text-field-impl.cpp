@@ -1536,6 +1536,12 @@ void TextField::OnKeyInputFocusLost()
   EmitKeyInputFocusSignal( false ); // Calls back into the Control hence done last.
 }
 
+bool TextField::OnAccessibilityActivated()
+{
+  SetKeyInputFocus();
+  return true;
+}
+
 void TextField::OnTap( const TapGesture& gesture )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnTap %p\n", mController.Get() );
