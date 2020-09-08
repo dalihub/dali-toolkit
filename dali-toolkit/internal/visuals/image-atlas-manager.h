@@ -120,7 +120,7 @@ protected:
   /**
    * Destructor
    */
-  virtual ~ImageAtlasManager();
+  ~ImageAtlasManager() override;
 
   /**
    * Undefined copy constructor.

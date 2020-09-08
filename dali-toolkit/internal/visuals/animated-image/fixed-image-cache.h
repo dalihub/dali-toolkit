@@ -46,7 +46,7 @@ public:
                    ImageCache::FrameReadyObserver& observer,
                    unsigned int                    batchSize );
 
-  virtual ~FixedImageCache();
+  ~FixedImageCache() override;
 
   /**
    * Get the Nth frame. If it's not ready, this will trigger the

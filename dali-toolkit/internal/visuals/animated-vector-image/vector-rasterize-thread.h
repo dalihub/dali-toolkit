@@ -51,7 +51,7 @@ public:
   /**
    * @brief Destructor.
    */
-  virtual ~VectorRasterizeThread();
+  ~VectorRasterizeThread() override;
 
   /**
    * The callback is called from the rasterize thread after the rasterization is completed.

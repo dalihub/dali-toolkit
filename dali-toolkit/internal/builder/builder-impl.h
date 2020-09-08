@@ -230,7 +230,7 @@ public:
 
 protected:
 
-  virtual ~Builder();
+  ~Builder() override;
 
 private:
   typedef std::vector<const char*> KeyStack;
