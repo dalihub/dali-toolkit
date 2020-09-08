@@ -66,7 +66,7 @@ void TextSelectionPopup::EnableButtons( Toolkit::TextSelectionPopup::Buttons but
   GetImpl(*this).EnableButtons( buttonsToEnable );
 }
 
-void TextSelectionPopup::RaiseAbove( Layer target )
+void TextSelectionPopup::RaiseAbove( Actor target )
 {
   GetImpl(*this).RaiseAbove( target );
 }
