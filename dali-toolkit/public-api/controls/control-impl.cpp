@@ -240,6 +240,7 @@ void Control::EnableGestureDetection(GestureType::Value type)
   if((type & GestureType::PAN) && !mImpl->mPanGestureDetector)
   {
     mImpl->mPanGestureDetector = PanGestureDetector::New();
+    mImpl->mPanGestureDetector.SetMaximumTouchesRequired(2);
     mImpl->mPanGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PanDetected);
     mImpl->mPanGestureDetector.Attach(Self());
   }
