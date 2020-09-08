@@ -344,7 +344,7 @@ void TextSelectionPopup::EnableButtons( Toolkit::TextSelectionPopup::Buttons but
   mButtonsChanged = true;
 }
 
-void TextSelectionPopup::RaiseAbove( Layer target )
+void TextSelectionPopup::RaiseAbove( Actor target )
 {
   if( mToolbar )
   {

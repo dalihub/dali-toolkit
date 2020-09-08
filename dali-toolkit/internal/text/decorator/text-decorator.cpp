@@ -767,7 +767,7 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if( !mActiveLayer )
     {
-      mActiveLayer = Layer::New();
+      mActiveLayer = Actor::New();
 #ifdef DECORATOR_DEBUG
       mActiveLayer.SetProperty( Actor::Property::NAME, "ActiveLayerActor" );
 #endif
@@ -1881,7 +1881,7 @@ struct Decorator::Impl : public ConnectionTracker
   Timer               mCursorBlinkTimer;          ///< Timer to signal cursor to blink
   Timer               mScrollTimer;               ///< Timer used to scroll the text when the grab handle is moved close to the edges.
 
-  Layer                mActiveLayer;                             ///< Layer for active handles and alike that ensures they are above all else.
+  Actor                mActiveLayer;                             ///< Actor for active handles and alike that ensures they are above all else.
   PropertyNotification mHandleVerticalLessThanNotification;      ///< Notifies when the 'y' coord of the active layer is less than a given value.
   PropertyNotification mHandleVerticalGreaterThanNotification;   ///< Notifies when the 'y' coord of the active layer is grater than a given value.
   PropertyNotification mHandleHorizontalLessThanNotification;    ///< Notifies when the 'x' coord of the active layer is less than a given value.
