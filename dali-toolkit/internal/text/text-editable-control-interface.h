@@ -69,6 +69,20 @@ public:
    * @param[in] needsClipping Whether the actor needs clipping.
    */
   virtual void AddDecoration( Actor& actor, bool needsClipping ) = 0;
+
+  /**
+   * @brief Editable status (on/off).
+   *
+   * @return true if it can be edit, else false.
+   */
+  virtual bool IsEditable() const = 0;
+
+  /**
+   * @brief Change the editable status (on/off) .
+   *
+   * @param[in] editable The editable status.
+   */
+  virtual void SetEditable( bool editable ) = 0;
 };
 
 } // namespace Text

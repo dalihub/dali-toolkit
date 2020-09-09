@@ -142,6 +142,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "renderingBackend",      
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "maxLength",                      INTEGER,   MAX_LENGTH                           )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "selectedTextStart",              INTEGER,   SELECTED_TEXT_START                  )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "selectedTextEnd",                INTEGER,   SELECTED_TEXT_END                    )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableEditing",                  BOOLEAN,   ENABLE_EDITING                       )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -718,6 +719,13 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::ENABLE_EDITING:
+      {
+        const bool editable = value.Get< bool >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_EDITING %d\n", impl.mController.Get(), editable );
+        impl.SetEditable( editable );
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -1044,6 +1052,11 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         value = static_cast<int>(range.second);
         break;
       }
+      case Toolkit::DevelTextEditor::Property::ENABLE_EDITING:
+      {
+        value = impl.IsEditable();
+        break;
+      }
     } //switch
   }
 
@@ -1367,7 +1380,7 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
 void TextEditor::OnKeyInputFocusGained()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnKeyInputFocusGained %p\n", mController.Get() );
-  if ( mInputMethodContext )
+  if ( mInputMethodContext  && IsEditable() )
   {
     mInputMethodContext.StatusChangedSignal().Connect( this, &TextEditor::KeyboardStatusChanged );
 
@@ -1421,7 +1434,7 @@ void TextEditor::OnKeyInputFocusLost()
 void TextEditor::OnTap( const TapGesture& gesture )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnTap %p\n", mController.Get() );
-  if ( mInputMethodContext )
+  if ( mInputMethodContext && IsEditable() )
   {
     mInputMethodContext.Activate();
   }
@@ -1441,7 +1454,7 @@ void TextEditor::OnPan( const PanGesture& gesture )
 
 void TextEditor::OnLongPress( const LongPressGesture& gesture )
 {
-  if ( mInputMethodContext )
+  if ( mInputMethodContext && IsEditable() )
   {
     mInputMethodContext.Activate();
   }
@@ -1773,6 +1786,20 @@ void TextEditor::ApplyScrollPosition()
       mTextVerticalScroller->SetDuration( mScrollAnimationDuration );
     }
     mTextVerticalScroller->CheckStartAnimation( mRenderableActor, scrollOffset.x + mAlignmentOffset, scrollOffset.y - scrollAmount, scrollAmount );
+  }
+}
+
+bool TextEditor::IsEditable() const
+{
+  return mController->IsEditable();
+}
+
+void TextEditor::SetEditable( bool editable )
+{
+  mController->SetEditable(editable);
+  if ( mInputMethodContext && !editable )
+  {
+    mInputMethodContext.Deactivate();
   }
 }
 
