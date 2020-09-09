@@ -74,7 +74,7 @@ public:
 
 protected:
   TestButton();
-  virtual ~TestButton();
+  ~TestButton() override;
 
 public:
   Test::TestAnimationData mPressTransitionData;

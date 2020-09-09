@@ -122,7 +122,7 @@ protected:
 
   DummyControlImpl();
 
-  virtual ~DummyControlImpl();
+  ~DummyControlImpl() override;
 };
 
 namespace Impl
@@ -148,7 +148,7 @@ private:
 
   DummyControl();
 
-  virtual ~DummyControl();
+  ~DummyControl() override;
 
 private: // From Internal::Control
 
