@@ -96,11 +96,16 @@ Scrollable::~Scrollable()
 {
 }
 
+bool Scrollable::AccessibleImpl::IsScrollable()
+{
+  return true;
+}
+
 void Scrollable::OnInitialize()
 {
   DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
     return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::SCROLL_PANE ) );
+      new AccessibleImpl( actor, Dali::Accessibility::Role::SCROLL_PANE ) );
   } );
 }
 
