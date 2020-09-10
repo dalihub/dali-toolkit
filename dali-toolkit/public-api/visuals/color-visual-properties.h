@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_COLOR_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_visuals
  * @{
@@ -38,14 +36,12 @@ namespace Toolkit
  */
 namespace ColorVisual
 {
-
 /**
  * @brief ColorVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the instance of properties belonging to the ColorVisual.
  * @SINCE_1_1.45

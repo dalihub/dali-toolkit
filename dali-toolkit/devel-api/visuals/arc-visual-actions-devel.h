@@ -20,13 +20,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelArcVisual
 {
-
 /**
  * @brief Actions that the arc visual can perform.  These actions are called through the Visual::Base::DoAction API.
  */
@@ -44,7 +41,7 @@ enum Type
   UPDATE_PROPERTY = 0
 };
 
-} // namespace Actions
+} // namespace Action
 
 } // namespace DevelArcVisual
 

@@ -23,20 +23,15 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
-
 namespace DevelColorVisual
 {
-
 /**
  * @brief Additional ColorVisual Properties.
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the instance of additional properties belonging to the ColorVisual.
  */
@@ -65,7 +60,7 @@ enum
 
 } // namespace Property
 
-} // namespace ColorVisual
+} // namespace DevelColorVisual
 
 /**
  * @}

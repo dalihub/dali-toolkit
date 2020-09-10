@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_MAGNIFIER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class Magnifier;
@@ -44,17 +42,16 @@ class Magnifier;
 class DALI_TOOLKIT_API Magnifier : public Control
 {
 public:
-
   /**
    * @brief The start and end property ranges for this control.
    */
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,             ///< Reserve property indices
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000, ///< Reserve property indices
 
     ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,
-    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000              ///< Reserve animatable property indices
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices
   };
 
   /**
@@ -65,8 +62,8 @@ public:
     enum
     {
       // Event side properties
-      FRAME_VISIBILITY = PROPERTY_START_INDEX,           ///< name "frameVisibility",       Whether a frame is visible or not,         type boolean
-      MAGNIFICATION_FACTOR,                              ///< name "magnificationFactor",   Larger value means greater magnification,  type float
+      FRAME_VISIBILITY = PROPERTY_START_INDEX, ///< name "frameVisibility",       Whether a frame is visible or not,         type boolean
+      MAGNIFICATION_FACTOR,                    ///< name "magnificationFactor",   Larger value means greater magnification,  type float
 
       // Animatable properties
       SOURCE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< name "sourcePosition",  The position of the source,  type Vector3
@@ -74,7 +71,6 @@ public:
   };
 
 public:
-
   /**
    * Creates an empty Magnifier handle
    */
@@ -84,12 +80,12 @@ public:
    * Copy constructor. Creates another handle that points to the same real object
    * @param handle to copy from
    */
-  Magnifier( const Magnifier& handle );
+  Magnifier(const Magnifier& handle);
 
   /**
    * Assignment operator. Changes this handle to point to another real object
    */
-  Magnifier& operator=( const Magnifier& handle );
+  Magnifier& operator=(const Magnifier& handle);
 
   /**
    * @brief Destructor
@@ -110,10 +106,9 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a Magnifier or an uninitialized handle
    */
-  static Magnifier DownCast( BaseHandle handle );
+  static Magnifier DownCast(BaseHandle handle);
 
 public:
-
   /**
    * Set the actors to be rendered in magnifier.
    * @param[in] actor This actor and its children will be rendered.
@@ -121,7 +116,6 @@ public:
   void SetSourceActor(Actor actor);
 
 public: // Not intended for application developers
-
   /**
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.

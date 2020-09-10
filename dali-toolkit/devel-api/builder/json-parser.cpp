@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,18 @@
 
 // EXTERNAL INCLUDES
 #include <memory.h>
+#include <algorithm>
+#include <cstring>
 #include <functional>
 #include <iostream>
-#include <cstring>
-#include <algorithm>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/json-parser-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 JsonParser JsonParser::New()
 {
   Internal::JsonParser* internal = new Internal::JsonParser();
@@ -54,9 +52,9 @@ JsonParser::~JsonParser()
 {
 }
 
-JsonParser JsonParser::DownCast( BaseHandle handle )
+JsonParser JsonParser::DownCast(BaseHandle handle)
 {
-  return JsonParser( dynamic_cast<Internal::JsonParser*>(handle.GetObjectPtr()) );
+  return JsonParser(dynamic_cast<Internal::JsonParser*>(handle.GetObjectPtr()));
 }
 
 bool JsonParser::Parse(const std::string& source)
@@ -105,11 +103,10 @@ void JsonParser::Write(std::ostream& output, int indent) const
 }
 
 JsonParser::JsonParser(Internal::JsonParser* internal)
-  : BaseHandle(internal)
+: BaseHandle(internal)
 {
 }
 
-} // namespace toolkit
+} // namespace Toolkit
 
 } // namespace Dali
-

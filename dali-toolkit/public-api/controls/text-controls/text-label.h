@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class TextLabel;
@@ -65,7 +63,6 @@ class TextLabel;
 class DALI_TOOLKIT_API TextLabel : public Control
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
@@ -73,10 +70,10 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
 
-    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX, ///< @SINCE_1_2.60
-    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices @SINCE_1_2.60
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,       ///< @SINCE_1_2.60
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices @SINCE_1_2.60
   };
 
   /**
@@ -362,8 +359,8 @@ public:
      */
     enum Type
     {
-      FINISH_LOOP = 0,  ///< Stop animation after current loop finishes. @SINCE_1_2.60
-      IMMEDIATE         ///< Stop animation immediately and reset position. @SINCE_1_2.60
+      FINISH_LOOP = 0, ///< Stop animation after current loop finishes. @SINCE_1_2.60
+      IMMEDIATE        ///< Stop animation immediately and reset position. @SINCE_1_2.60
     };
   };
 
@@ -382,7 +379,7 @@ public:
    * @param[in] text The text to display
    * @return A handle to the TextLabel control
    */
-  static TextLabel New( const std::string& text );
+  static TextLabel New(const std::string& text);
 
   /**
    * @brief Creates an empty handle.
@@ -396,7 +393,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] handle The handle to copy from
    */
-  TextLabel( const TextLabel& handle );
+  TextLabel(const TextLabel& handle);
 
   /**
    * @brief Move constructor
@@ -404,7 +401,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  TextLabel( TextLabel&& rhs );
+  TextLabel(TextLabel&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -413,7 +410,7 @@ public:
    * @param[in] handle The handle to copy from
    * @return A reference to this
    */
-  TextLabel& operator=( const TextLabel& handle );
+  TextLabel& operator=(const TextLabel& handle);
 
   /**
    * @brief Move assignment
@@ -422,7 +419,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  TextLabel& operator=( TextLabel&& rhs );
+  TextLabel& operator=(TextLabel&& rhs);
 
   /**
    * @brief Destructor.
@@ -442,10 +439,9 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a TextLabel or an empty handle
    */
-  static TextLabel DownCast( BaseHandle handle );
+  static TextLabel DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -453,7 +449,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] implementation The Control implementation
    */
-  DALI_INTERNAL TextLabel( Internal::TextLabel& implementation );
+  DALI_INTERNAL TextLabel(Internal::TextLabel& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -461,7 +457,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL TextLabel( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL TextLabel(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

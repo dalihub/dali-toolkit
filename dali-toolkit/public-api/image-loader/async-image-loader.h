@@ -18,10 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -32,7 +32,6 @@ class PixelData;
 
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class AsyncImageLoader;
@@ -98,11 +97,9 @@ class AsyncImageLoader;
 class DALI_TOOLKIT_API AsyncImageLoader : public BaseHandle
 {
 public:
-
-  typedef Signal< void( uint32_t, PixelData ) > ImageLoadedSignalType; ///< Image loaded signal type @SINCE_1_2_14
+  typedef Signal<void(uint32_t, PixelData)> ImageLoadedSignalType; ///< Image loaded signal type @SINCE_1_2_14
 
 public:
-
   /**
    * @brief Constructor which creates an empty AsyncImageLoader handle.
    * @SINCE_1_2_14
@@ -125,7 +122,7 @@ public:
    *
    * @param[in] handle A reference to the copied handle
    */
-  AsyncImageLoader( const AsyncImageLoader& handle );
+  AsyncImageLoader(const AsyncImageLoader& handle);
 
   /**
    * @brief Move constructor
@@ -133,7 +130,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  AsyncImageLoader( AsyncImageLoader&& rhs );
+  AsyncImageLoader(AsyncImageLoader&& rhs);
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -142,7 +139,7 @@ public:
    * @param[in] handle  A reference to the copied handle
    * @return A reference to this
    */
-  AsyncImageLoader& operator=( const AsyncImageLoader& handle );
+  AsyncImageLoader& operator=(const AsyncImageLoader& handle);
 
   /**
    * @brief Move assignment
@@ -150,7 +147,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  AsyncImageLoader& operator=( AsyncImageLoader&& rhs );
+  AsyncImageLoader& operator=(AsyncImageLoader&& rhs);
 
   /**
    * @brief Creates a new loader to load the image asynchronously in a worker thread.
@@ -170,7 +167,7 @@ public:
    * @param[in] handle A handle to an object
    * @return A handle to a AsyncImageLoader object or an uninitialized handle
    */
-  static AsyncImageLoader DownCast( BaseHandle handle );
+  static AsyncImageLoader DownCast(BaseHandle handle);
 
   /**
    * @brief Starts an image loading task.
@@ -185,7 +182,7 @@ public:
    * @param[in] url The URL of the image file to load
    * @return The loading task id
    */
-  uint32_t Load( const std::string& url );
+  uint32_t Load(const std::string& url);
 
   /**
    * @brief Starts an image loading task.
@@ -201,7 +198,7 @@ public:
    * @param[in] dimensions The width and height to fit the loaded image to
    * @return The loading task id
    */
-  uint32_t Load( const std::string& url, ImageDimensions dimensions );
+  uint32_t Load(const std::string& url, ImageDimensions dimensions);
 
   /**
    * @brief Starts an image loading task.
@@ -215,11 +212,11 @@ public:
    * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
    * @return The loading task id
    */
-  uint32_t Load( const std::string& url,
-                 ImageDimensions dimensions,
-                 FittingMode::Type fittingMode,
-                 SamplingMode::Type samplingMode,
-                 bool orientationCorrection );
+  uint32_t Load(const std::string& url,
+                ImageDimensions    dimensions,
+                FittingMode::Type  fittingMode,
+                SamplingMode::Type samplingMode,
+                bool               orientationCorrection);
 
   /**
    * @brief Cancels an image loading task if it is still queueing in the work thread.
@@ -228,7 +225,7 @@ public:
    * @param[in] loadingTaskId The task id returned when invoking the load call.
    * @return If true, the loading task is removed from the queue, otherwise the loading is already implemented and unable to cancel anymore
    */
-  bool Cancel( uint32_t loadingTaskId );
+  bool Cancel(uint32_t loadingTaskId);
 
   /**
    * @brief Cancels all the loading tasks in the queue.
@@ -249,7 +246,6 @@ public:
   ImageLoadedSignalType& ImageLoadedSignal();
 
 public: // Not intended for developer use
-
   /// @cond internal
   /**
    * @brief Allows the creation of a AsyncImageLoader handle from an internal pointer.
@@ -258,9 +254,8 @@ public: // Not intended for developer use
    * @SINCE_1_2_14
    * @param[in] impl A pointer to the object
    */
-  explicit DALI_INTERNAL AsyncImageLoader( Internal::AsyncImageLoader* impl );
+  explicit DALI_INTERNAL AsyncImageLoader(Internal::AsyncImageLoader* impl);
   /// @endcond
-
 };
 
 /**

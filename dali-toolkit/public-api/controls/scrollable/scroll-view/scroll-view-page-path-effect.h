@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SCROLL_VIEW_PAGE_PATH_EFFECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,11 @@
 
 namespace Dali
 {
-
 class Actor;
 class Path;
 
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class ScrollViewPagePathEffect;
@@ -67,9 +65,7 @@ class ScrollViewPagePathEffect;
  */
 class DALI_TOOLKIT_API ScrollViewPagePathEffect : public ScrollViewEffect
 {
-
 public:
-
   /**
    * @brief Creates an initialized ScrollViewPagePathEffect.
    * @SINCE_1_0.0
@@ -98,7 +94,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a ScrollViewPagePathEffect or an uninitialized handle
    */
-  static ScrollViewPagePathEffect DownCast( BaseHandle handle );
+  static ScrollViewPagePathEffect DownCast(BaseHandle handle);
 
   /**
    * @brief Manually apply effect to a page in the scroll-view.
@@ -106,19 +102,17 @@ public:
    * @param[in] page The page to be affected by this effect
    * @param[in] pageOrder The order of the page in the scroll view
    */
-  void ApplyToPage( Actor page, unsigned int pageOrder );
+  void ApplyToPage(Actor page, unsigned int pageOrder);
 
 protected:
-
   /// @cond internal
   /**
    * @brief This constructor is used by Dali New() methods.
    * @SINCE_1_0.0
    * @param[in] impl A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL ScrollViewPagePathEffect( Internal::ScrollViewPagePathEffect *impl );
+  explicit DALI_INTERNAL ScrollViewPagePathEffect(Internal::ScrollViewPagePathEffect* impl);
   /// @endcond
-
 };
 
 /**

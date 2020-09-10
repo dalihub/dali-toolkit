@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelProgressBar
 {
-
 /**
  * @brief Enumeration for the style of progress bar.
  */
@@ -51,7 +48,7 @@ enum class Style
  * @param[in] progressBarStyle A style value that determines the visual properties for ProgressBar.
  * @return A handle to the ProgressBar control.
  */
-DALI_TOOLKIT_API Toolkit::ProgressBar New( Style progressBarStyle );
+DALI_TOOLKIT_API Toolkit::ProgressBar New(Style progressBarStyle);
 
 } // namespace DevelProgressBar
 

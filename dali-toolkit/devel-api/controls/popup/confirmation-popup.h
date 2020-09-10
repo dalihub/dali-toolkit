@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONFIRMATION_POPUP_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 // Forward declarations
 namespace Internal DALI_INTERNAL
 {
@@ -51,14 +49,13 @@ class ConfirmationPopup;
 class DALI_TOOLKIT_API ConfirmationPopup : public Popup
 {
 public:
-
   /**
    * @brief The start and end property ranges for this control.
    */
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1 + DEFAULT_PROPERTY_MAX_COUNT_PER_DERIVATION + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000 ///< Reserve property indices
   };
 
   /**
@@ -78,8 +75,8 @@ public:
    */
   enum ControlIndex
   {
-    CONTROL_OK = 0,    ///< Index of control 1
-    CONTROL_CANCEL,    ///< Index of control 2
+    CONTROL_OK = 0, ///< Index of control 1
+    CONTROL_CANCEL, ///< Index of control 2
   };
 
   /**
@@ -92,12 +89,12 @@ public:
   /**
    * @brief Copy constructor.
    */
-  ConfirmationPopup( const ConfirmationPopup& confirmationPopup );
+  ConfirmationPopup(const ConfirmationPopup& confirmationPopup);
 
   /**
    * @brief Assignment operator.
    */
-  ConfirmationPopup& operator=( const ConfirmationPopup& confirmationPopup );
+  ConfirmationPopup& operator=(const ConfirmationPopup& confirmationPopup);
 
   /**
    * @brief Destructor.
@@ -122,23 +119,22 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a ConfirmationPopup or an uninitialized handle
    */
-  static ConfirmationPopup DownCast( BaseHandle handle );
+  static ConfirmationPopup DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL ConfirmationPopup( Internal::ConfirmationPopup& implementation );
+  DALI_INTERNAL ConfirmationPopup(Internal::ConfirmationPopup& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  DALI_INTERNAL ConfirmationPopup( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL ConfirmationPopup(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

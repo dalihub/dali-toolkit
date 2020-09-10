@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,12 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
-EffectsView EffectsView::New( EffectType type )
+EffectsView EffectsView::New(EffectType type)
 {
   EffectsView effectsView = Internal::EffectsView::New();
-  GetImpl(effectsView).SetType( type );
+  GetImpl(effectsView).SetType(type);
   return effectsView;
 }
 
@@ -38,21 +36,21 @@ EffectsView::EffectsView()
 {
 }
 
-EffectsView::EffectsView( const EffectsView& handle )
-: Control( handle )
+EffectsView::EffectsView(const EffectsView& handle)
+: Control(handle)
 {
 }
 
-EffectsView& EffectsView::operator=( const EffectsView& rhs )
+EffectsView& EffectsView::operator=(const EffectsView& rhs)
 {
-  if( &rhs != this )
+  if(&rhs != this)
   {
     Control::operator=(rhs);
   }
   return *this;
 }
 
-EffectsView EffectsView::DownCast( BaseHandle handle )
+EffectsView EffectsView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<EffectsView, Internal::EffectsView>(handle);
 }
@@ -71,17 +69,17 @@ void EffectsView::Refresh()
   GetImpl(*this).Refresh();
 }
 
-void EffectsView::SetRefreshOnDemand( bool onDemand )
+void EffectsView::SetRefreshOnDemand(bool onDemand)
 {
-  GetImpl(*this).SetRefreshOnDemand( onDemand );
+  GetImpl(*this).SetRefreshOnDemand(onDemand);
 }
 
-void EffectsView::SetPixelFormat( Pixel::Format pixelFormat )
+void EffectsView::SetPixelFormat(Pixel::Format pixelFormat)
 {
-  GetImpl(*this).SetPixelFormat( pixelFormat );
+  GetImpl(*this).SetPixelFormat(pixelFormat);
 }
 
-void EffectsView::SetBackgroundColor( const Vector4& color )
+void EffectsView::SetBackgroundColor(const Vector4& color)
 {
   GetImpl(*this).SetBackgroundColor(color);
 }
@@ -91,18 +89,16 @@ Vector4 EffectsView::GetBackgroundColor() const
   return GetImpl(*this).GetBackgroundColor();
 }
 
-
-EffectsView::EffectsView( Internal::EffectsView& implementation )
-: Control( implementation )
+EffectsView::EffectsView(Internal::EffectsView& implementation)
+: Control(implementation)
 {
 }
 
-EffectsView::EffectsView( Dali::Internal::CustomActor* internal )
-: Control( internal )
+EffectsView::EffectsView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::EffectsView>(internal);
 }
-
 
 } //namespace Toolkit
 

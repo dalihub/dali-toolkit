@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ATLAS_UPLOAD_OBSERVER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,10 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/signals/callback.h>
 
-
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
 class ImageAtlas;
@@ -42,7 +39,6 @@ class ImageAtlas;
 class DALI_TOOLKIT_API AtlasUploadObserver
 {
 public:
-
   /**
    * @brief Constructor.
    */
@@ -59,23 +55,20 @@ public:
   virtual void UploadCompleted() = 0;
 
 public: // not intended for developer, called by ImageAtlas internally to get notified when this observer dies
-
   /**
    * @brief Register an ImageAtlas which be notified when the observer is destructing.
    * @param[in] imageAtlas The ImageAtlas object to get notification about the destruction of the observer.
    */
-  void Register( Internal::ImageAtlas& imageAtlas );
+  void Register(Internal::ImageAtlas& imageAtlas);
 
   /**
    * @brief Unregister an ImageAtlas which be notified when the observer is destructing.
    * @param[in] imageAtlas The ImageAtlas object to get notification about the destruction of the observer.
    */
-  void Unregister( Internal::ImageAtlas& imageAtlas );
+  void Unregister(Internal::ImageAtlas& imageAtlas);
 
 private:
-
   Vector<Internal::ImageAtlas*> mAtlasList; ///< The list of the registered ImageAtlas object
-
 };
 
 } // namespace Toolkit

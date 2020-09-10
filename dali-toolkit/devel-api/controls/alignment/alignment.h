@@ -2,7 +2,7 @@
 #define DALI_ALIGNMENT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class Alignment;
@@ -55,12 +53,12 @@ public:
    */
   enum Type
   {
-    HORIZONTAL_LEFT   = 1, ///< HORIZONTAL left alignment @SINCE_1_9.28
-    HORIZONTAL_CENTER = 2, ///< HORIZONTAL center alignment @SINCE_1_9.28
-    HORIZONTAL_RIGHT  = 4, ///< HORIZONTAL right alignment @SINCE_1_9.28
-    VERTICAL_TOP      = 8, ///< VERTICAL top alignment @SINCE_1_9.28
+    HORIZONTAL_LEFT   = 1,  ///< HORIZONTAL left alignment @SINCE_1_9.28
+    HORIZONTAL_CENTER = 2,  ///< HORIZONTAL center alignment @SINCE_1_9.28
+    HORIZONTAL_RIGHT  = 4,  ///< HORIZONTAL right alignment @SINCE_1_9.28
+    VERTICAL_TOP      = 8,  ///< VERTICAL top alignment @SINCE_1_9.28
     VERTICAL_CENTER   = 16, ///< VERTICAL center alignment @SINCE_1_9.28
-    VERTICAL_BOTTOM   = 32 ///< VERTICAL bottom alignment @SINCE_1_9.28
+    VERTICAL_BOTTOM   = 32  ///< VERTICAL bottom alignment @SINCE_1_9.28
   };
 
   /**
@@ -69,11 +67,11 @@ public:
    */
   enum Scaling
   {
-    SCALE_NONE,             ///< The original size is kept. @SINCE_1_9.28
-    SCALE_TO_FILL,           ///< Scale added actors to fill alignment's boundary. Aspect ratio is not maintained. @SINCE_1_9.28
+    SCALE_NONE,                ///< The original size is kept. @SINCE_1_9.28
+    SCALE_TO_FILL,             ///< Scale added actors to fill alignment's boundary. Aspect ratio is not maintained. @SINCE_1_9.28
     SCALE_TO_FIT_KEEP_ASPECT,  ///< Scale added actors to fit within the alignment's boundary. Aspect ratio is maintained. @SINCE_1_9.28
     SCALE_TO_FILL_KEEP_ASPECT, ///< Scale added actors to fill the alignment's boundary. Aspect ratio is maintained, and the actor may exceed the alignment's boundary. @SINCE_1_9.28
-    SHRINK_TO_FIT,           ///< If added actors are larger than the alignment's boundary it will be shrunk down to fit. Aspect ratio is not maintained @SINCE_1_9.28
+    SHRINK_TO_FIT,             ///< If added actors are larger than the alignment's boundary it will be shrunk down to fit. Aspect ratio is not maintained @SINCE_1_9.28
     SHRINK_TO_FIT_KEEP_ASPECT, ///< If added actors are larger than the alignment's boundary it will be shrunk down to fit. Aspect ratio is maintained @SINCE_1_9.28
   };
 
@@ -88,10 +86,10 @@ public:
      * @SINCE_1_0.0
      */
     Padding()
-    : left( 0.f ),
-      right( 0.f ),
-      top( 0.f ),
-      bottom( 0.f )
+    : left(0.f),
+      right(0.f),
+      top(0.f),
+      bottom(0.f)
     {
     }
 
@@ -104,17 +102,17 @@ public:
      * @param[in] t Top padding
      * @param[in] b Bottom padding
      */
-    Padding( float l, float r, float t, float b )
-    : left( l ),
-      right( r ),
-      top( t ),
-      bottom( b )
+    Padding(float l, float r, float t, float b)
+    : left(l),
+      right(r),
+      top(t),
+      bottom(b)
     {
     }
 
-    float left;  ///< The left padding
-    float right; ///< The right padding
-    float top;   ///< The top padding
+    float left;   ///< The left padding
+    float right;  ///< The right padding
+    float top;    ///< The top padding
     float bottom; ///< The bottom padding
   };
 
@@ -134,7 +132,7 @@ public:
    * @param[in] vertical Specifies how to align actors vertically. Could be VERTICAL_TOP, VERTICAL_CENTER or VERTICAL_BOTTOM. By default, VERTICAL_CENTER
    * @return A handle to the Alignment control
    */
-  static Alignment New( Type horizontal = HORIZONTAL_CENTER, Type vertical = VERTICAL_CENTER );
+  static Alignment New(Type horizontal = HORIZONTAL_CENTER, Type vertical = VERTICAL_CENTER);
 
   /**
    * @brief Copy constructor. Creates another handle that points to the same real object.
@@ -162,7 +160,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A handle to a Alignment or an uninitialized handle
    */
-  static Alignment DownCast( BaseHandle handle );
+  static Alignment DownCast(BaseHandle handle);
 
   /**
    * @brief Sets the new alignment. By default, ( HORIZONTAL_CENTER | VERTICAL_CENTER ).
@@ -171,7 +169,7 @@ public:
    * @param[in] type The new alignment option
    * @note There should only be one horizontal and one vertical policy.
    */
-  void SetAlignmentType( Type type );
+  void SetAlignmentType(Type type);
 
   /**
    * @brief Gets the current alignment combined into a single value.
@@ -197,7 +195,7 @@ public:
    * @param[in] scaling The scaling property
    * @see Scaling.
    */
-  void SetScaling( Scaling scaling );
+  void SetScaling(Scaling scaling);
 
   /**
    * @brief Retrieves the scaling property.
@@ -214,7 +212,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] padding The left, right, top, bottom padding values
    */
-  void SetPadding( const Padding& padding );
+  void SetPadding(const Padding& padding);
 
   /**
    * @brief Gets the padding values.
@@ -235,7 +233,6 @@ public:
   Alignment& operator=(const Alignment& alignment);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -243,7 +240,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] implementation The Control implementation
    */
-  DALI_INTERNAL Alignment( Internal::Alignment& implementation );
+  DALI_INTERNAL Alignment(Internal::Alignment& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -251,7 +248,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL Alignment( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Alignment(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

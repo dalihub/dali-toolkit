@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,35 +23,33 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ScrollBar::ScrollBar()
 {
 }
 
 ScrollBar::ScrollBar(Internal::ScrollBar& implementation)
-: Control( implementation )
+: Control(implementation)
 {
 }
 
-ScrollBar::ScrollBar( Dali::Internal::CustomActor* internal )
-: Control( internal )
+ScrollBar::ScrollBar(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::ScrollBar>(internal);
 }
 
-ScrollBar::ScrollBar( const ScrollBar& handle )
-: Control( handle )
+ScrollBar::ScrollBar(const ScrollBar& handle)
+: Control(handle)
 {
 }
 
-ScrollBar& ScrollBar::operator=( const ScrollBar& scrollBar )
+ScrollBar& ScrollBar::operator=(const ScrollBar& scrollBar)
 {
-  if( &scrollBar != this )
+  if(&scrollBar != this)
   {
-    Control::operator=( scrollBar );
+    Control::operator=(scrollBar);
   }
   return *this;
 }
@@ -61,7 +59,7 @@ ScrollBar ScrollBar::New(ScrollBar::Direction direction)
   return Internal::ScrollBar::New(direction);
 }
 
-ScrollBar ScrollBar::DownCast( BaseHandle handle )
+ScrollBar ScrollBar::DownCast(BaseHandle handle)
 {
   return Control::DownCast<ScrollBar, Internal::ScrollBar>(handle);
 }
@@ -70,12 +68,12 @@ ScrollBar::~ScrollBar()
 {
 }
 
-void ScrollBar::SetScrollPropertySource( Handle handle, Dali::Property::Index propertyScrollPosition, Dali::Property::Index propertyMinScrollPosition, Dali::Property::Index propertyMaxScrollPosition, Dali::Property::Index propertyScrollContentSize )
+void ScrollBar::SetScrollPropertySource(Handle handle, Dali::Property::Index propertyScrollPosition, Dali::Property::Index propertyMinScrollPosition, Dali::Property::Index propertyMaxScrollPosition, Dali::Property::Index propertyScrollContentSize)
 {
   GetImpl(*this).SetScrollPropertySource(handle, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
 }
 
-void ScrollBar::SetScrollIndicator( Actor indicator )
+void ScrollBar::SetScrollIndicator(Actor indicator)
 {
   GetImpl(*this).SetScrollIndicator(indicator);
 }
@@ -85,7 +83,7 @@ Actor ScrollBar::GetScrollIndicator()
   return GetImpl(*this).GetScrollIndicator();
 }
 
-void ScrollBar::SetScrollPositionIntervals( const Dali::Vector<float>& positions )
+void ScrollBar::SetScrollPositionIntervals(const Dali::Vector<float>& positions)
 {
   GetImpl(*this).SetScrollPositionIntervals(positions);
 }
@@ -95,7 +93,7 @@ Dali::Vector<float> ScrollBar::GetScrollPositionIntervals() const
   return GetImpl(*this).GetScrollPositionIntervals();
 }
 
-void ScrollBar::SetScrollDirection( ScrollBar::Direction direction )
+void ScrollBar::SetScrollDirection(ScrollBar::Direction direction)
 {
   GetImpl(*this).SetScrollDirection(direction);
 }
@@ -105,7 +103,7 @@ ScrollBar::Direction ScrollBar::GetScrollDirection() const
   return GetImpl(*this).GetScrollDirection();
 }
 
-void ScrollBar::SetIndicatorHeightPolicy( ScrollBar::IndicatorHeightPolicy policy )
+void ScrollBar::SetIndicatorHeightPolicy(ScrollBar::IndicatorHeightPolicy policy)
 {
   GetImpl(*this).SetIndicatorHeightPolicy(policy);
 }
@@ -115,7 +113,7 @@ ScrollBar::IndicatorHeightPolicy ScrollBar::GetIndicatorHeightPolicy() const
   return GetImpl(*this).GetIndicatorHeightPolicy();
 }
 
-void ScrollBar::SetIndicatorFixedHeight( float height )
+void ScrollBar::SetIndicatorFixedHeight(float height)
 {
   GetImpl(*this).SetIndicatorFixedHeight(height);
 }
@@ -125,7 +123,7 @@ float ScrollBar::GetIndicatorFixedHeight() const
   return GetImpl(*this).GetIndicatorFixedHeight();
 }
 
-void ScrollBar::SetIndicatorShowDuration( float durationSeconds )
+void ScrollBar::SetIndicatorShowDuration(float durationSeconds)
 {
   GetImpl(*this).SetIndicatorShowDuration(durationSeconds);
 }
@@ -135,7 +133,7 @@ float ScrollBar::GetIndicatorShowDuration() const
   return GetImpl(*this).GetIndicatorShowDuration();
 }
 
-void ScrollBar::SetIndicatorHideDuration( float durationSeconds )
+void ScrollBar::SetIndicatorHideDuration(float durationSeconds)
 {
   GetImpl(*this).SetIndicatorHideDuration(durationSeconds);
 }

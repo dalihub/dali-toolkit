@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 StyleManager::StyleManager()
 {
 }
@@ -43,9 +41,9 @@ StyleManager StyleManager::Get()
   return Internal::StyleManager::Get();
 }
 
-void StyleManager::ApplyTheme( const std::string& themeFile )
+void StyleManager::ApplyTheme(const std::string& themeFile)
 {
-  GetImpl(*this).ApplyTheme( themeFile );
+  GetImpl(*this).ApplyTheme(themeFile);
 }
 
 void StyleManager::ApplyDefaultTheme()
@@ -53,28 +51,28 @@ void StyleManager::ApplyDefaultTheme()
   GetImpl(*this).ApplyDefaultTheme();
 }
 
-void StyleManager::SetStyleConstant( const std::string& key, const Property::Value& value )
+void StyleManager::SetStyleConstant(const std::string& key, const Property::Value& value)
 {
-  GetImpl(*this).SetStyleConstant( key, value );
+  GetImpl(*this).SetStyleConstant(key, value);
 }
 
-bool StyleManager::GetStyleConstant( const std::string& key, Property::Value& valueOut )
+bool StyleManager::GetStyleConstant(const std::string& key, Property::Value& valueOut)
 {
-  return GetImpl(*this).GetStyleConstant( key, valueOut );
+  return GetImpl(*this).GetStyleConstant(key, valueOut);
 }
 
-void StyleManager::ApplyStyle( Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName )
+void StyleManager::ApplyStyle(Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName)
 {
-  GetImpl(*this).ApplyStyle( control, jsonFileName, styleName );
+  GetImpl(*this).ApplyStyle(control, jsonFileName, styleName);
 }
 
 StyleManager::StyleChangedSignalType& StyleManager::StyleChangedSignal()
 {
-  return GetImpl( *this ).StyleChangedSignal();
+  return GetImpl(*this).StyleChangedSignal();
 }
 
-StyleManager::StyleManager( Internal::StyleManager *impl )
-  : BaseHandle( impl )
+StyleManager::StyleManager(Internal::StyleManager* impl)
+: BaseHandle(impl)
 {
 }
 

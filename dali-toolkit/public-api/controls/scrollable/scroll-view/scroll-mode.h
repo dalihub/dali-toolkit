@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SCROLL_VIEW_SCROLL_MODE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_controls_scroll_view
  * @{
@@ -34,7 +32,6 @@ namespace Toolkit
  */
 namespace ScrollMode
 {
-
 /**
  * @brief Properties to use in a Property::MAP when setting a ScrollView's scroll mode.
  * @SINCE_1_2.60
@@ -92,7 +89,7 @@ enum Type
   Y_AXIS_SCROLL_BOUNDARY
 };
 
-} // ScrollMode
+} // namespace ScrollMode
 
 /**
  * @}

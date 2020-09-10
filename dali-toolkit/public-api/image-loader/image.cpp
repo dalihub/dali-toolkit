@@ -25,41 +25,38 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Image
 {
-
-std::string GenerateUrl( Dali::FrameBuffer frameBuffer, Pixel::Format pixelFormat, uint32_t width, uint32_t height )
+std::string GenerateUrl(Dali::FrameBuffer frameBuffer, Pixel::Format pixelFormat, uint32_t width, uint32_t height)
 {
-  Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, pixelFormat, width, height );
-  frameBuffer.AttachColorTexture( texture, 0u, 0u );
-  return Dali::Toolkit::TextureManager::AddTexture( texture );
+  Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelFormat, width, height);
+  frameBuffer.AttachColorTexture(texture, 0u, 0u);
+  return Dali::Toolkit::TextureManager::AddTexture(texture);
 }
 
-std::string GenerateUrl( const Dali::FrameBuffer frameBuffer, uint8_t index )
+std::string GenerateUrl(const Dali::FrameBuffer frameBuffer, uint8_t index)
 {
-  Texture texture = Dali::DevelFrameBuffer::GetColorTexture( frameBuffer, index );
-  return Dali::Toolkit::TextureManager::AddTexture( texture );
+  Texture texture = Dali::DevelFrameBuffer::GetColorTexture(frameBuffer, index);
+  return Dali::Toolkit::TextureManager::AddTexture(texture);
 }
 
-std::string GenerateUrl( const Dali::PixelData pixelData )
+std::string GenerateUrl(const Dali::PixelData pixelData)
 {
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
-  texture.Upload( pixelData );
-  return Dali::Toolkit::TextureManager::AddTexture( texture );
+  Texture texture = Texture::New(TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
+  texture.Upload(pixelData);
+  return Dali::Toolkit::TextureManager::AddTexture(texture);
 }
 
-std::string GenerateUrl( const Dali::NativeImageSourcePtr nativeImageSource )
+std::string GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource)
 {
-  Texture texture = Dali::Texture::New( *nativeImageSource );
-  return Dali::Toolkit::TextureManager::AddTexture( texture );
+  Texture texture = Dali::Texture::New(*nativeImageSource);
+  return Dali::Toolkit::TextureManager::AddTexture(texture);
 }
 
-} // Image
+} // namespace Image
 
-} // Toolkit
+} // namespace Toolkit
 
-} // Dali
+} // namespace Dali

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_ACTIONS_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelImageVisual
 {
-
 /**
  * @brief Actions that the image visual can perform.  These actions are called through the Visual::Base::DoAction API.
  */
@@ -37,10 +34,10 @@ namespace Action
  */
 enum Type
 {
-  RELOAD = 0  ///< Force reloading of the image, all visuals using this image will get the latest one.
+  RELOAD = 0 ///< Force reloading of the image, all visuals using this image will get the latest one.
 };
 
-} // namespace Actions
+} // namespace Action
 
 } // namespace DevelImageVisual
 

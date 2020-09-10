@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class ProgressBar;
@@ -50,7 +48,6 @@ class ProgressBar;
 class DALI_TOOLKIT_API ProgressBar : public Control
 {
 public:
-
   // Properties
 
   /**
@@ -60,7 +57,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< Start Index. @SINCE_1_2.60
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices. @SINCE_1_2.60
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000              ///< Reserve property indices. @SINCE_1_2.60
   };
 
   /**
@@ -156,7 +153,6 @@ public:
   };
 
 public:
-
   /**
    * @brief Creates the ProgressBar control. It creates a horizontal linear shape of progress bar.
    * @SINCE_1_2.60
@@ -177,7 +173,7 @@ public:
    * @SINCE_1_2.60
    * @param[in] handle Handle to an object
    */
-  ProgressBar( const ProgressBar& handle );
+  ProgressBar(const ProgressBar& handle);
 
   /**
    * @brief Move constructor
@@ -185,7 +181,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  ProgressBar( ProgressBar&& rhs );
+  ProgressBar(ProgressBar&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -195,7 +191,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A reference to this
    */
-  ProgressBar& operator=( const ProgressBar& handle );
+  ProgressBar& operator=(const ProgressBar& handle);
 
   /**
    * @brief Move assignment
@@ -204,7 +200,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  ProgressBar& operator=( ProgressBar&& rhs );
+  ProgressBar& operator=(ProgressBar&& rhs);
 
   /**
    * @brief Destructor.
@@ -223,15 +219,14 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a ProgressBar or an uninitialized handle
    */
-  static ProgressBar DownCast( BaseHandle handle );
+  static ProgressBar DownCast(BaseHandle handle);
 
-public:  // Signals
-
+public: // Signals
   /**
    * @brief Value changed signal type.
    * @SINCE_1_2.60
    */
-  typedef Signal< void ( ProgressBar, float, float ) > ValueChangedSignalType;
+  typedef Signal<void(ProgressBar, float, float)> ValueChangedSignalType;
 
   /**
    * @brief Signal emitted when the ProgressBar value changes.
@@ -246,7 +241,6 @@ public:  // Signals
   ValueChangedSignalType& ValueChangedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -258,7 +252,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL ProgressBar( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ProgressBar(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

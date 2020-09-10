@@ -23,17 +23,14 @@
 
 namespace
 {
-
 #define TOKEN_STRING(x) #x
 
 } // unnamed namespace
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 const std::string AssetManager::GetDaliImagePath()
 {
   /**
@@ -84,6 +81,6 @@ const std::string AssetManager::GetDaliDataReadOnlyPath()
   return (nullptr == DALI_DATA_READ_ONLY_DIR) ? EnvironmentVariable::GetEnvironmentVariable(TOKEN_STRING(DALI_DATA_READ_ONLY_DIR)) : DALI_DATA_READ_ONLY_DIR;
 }
 
-} // Toolkit
+} // namespace Toolkit
 
-} // Dali
+} // namespace Dali

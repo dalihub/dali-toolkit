@@ -15,16 +15,14 @@
  *
  */
 
-#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
-#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
+#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ItemView::ItemView()
 {
 }
@@ -34,26 +32,26 @@ ItemView::ItemView(Internal::ItemView& implementation)
 {
 }
 
-ItemView::ItemView( Dali::Internal::CustomActor* internal )
+ItemView::ItemView(Dali::Internal::CustomActor* internal)
 : Scrollable(internal)
 {
   VerifyCustomActorPointer<Internal::ItemView>(internal);
 }
 
-ItemView::ItemView( const ItemView& itemView ) = default;
+ItemView::ItemView(const ItemView& itemView) = default;
 
-ItemView::ItemView( ItemView&& rhs ) = default;
+ItemView::ItemView(ItemView&& rhs) = default;
 
-ItemView& ItemView::operator=( const ItemView& itemView ) = default;
+ItemView& ItemView::operator=(const ItemView& itemView) = default;
 
-ItemView& ItemView::operator=( ItemView&& rhs ) = default;
+ItemView& ItemView::operator=(ItemView&& rhs) = default;
 
 ItemView ItemView::New(ItemFactory& factory)
 {
   return Internal::ItemView::New(factory);
 }
 
-ItemView ItemView::DownCast( BaseHandle handle )
+ItemView ItemView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<ItemView, Internal::ItemView>(handle);
 }
@@ -184,37 +182,37 @@ unsigned int ItemView::GetItemId(Actor actor) const
 
 void ItemView::InsertItem(Item newItem, float durationSeconds)
 {
-  GetImpl(*this).InsertItem( newItem, durationSeconds );
+  GetImpl(*this).InsertItem(newItem, durationSeconds);
 }
 
 void ItemView::InsertItems(const ItemContainer& newItems, float durationSeconds)
 {
-  GetImpl(*this).InsertItems( newItems, durationSeconds );
+  GetImpl(*this).InsertItems(newItems, durationSeconds);
 }
 
 void ItemView::RemoveItem(unsigned int itemId, float durationSeconds)
 {
-  GetImpl(*this).RemoveItem( itemId, durationSeconds );
+  GetImpl(*this).RemoveItem(itemId, durationSeconds);
 }
 
 void ItemView::RemoveItems(const ItemIdContainer& itemIds, float durationSeconds)
 {
-  GetImpl(*this).RemoveItems( itemIds, durationSeconds );
+  GetImpl(*this).RemoveItems(itemIds, durationSeconds);
 }
 
 void ItemView::ReplaceItem(Item replacementItem, float durationSeconds)
 {
-  GetImpl(*this).ReplaceItem( replacementItem, durationSeconds );
+  GetImpl(*this).ReplaceItem(replacementItem, durationSeconds);
 }
 
 void ItemView::ReplaceItems(const ItemContainer& replacementItems, float durationSeconds)
 {
-  GetImpl(*this).ReplaceItems( replacementItems, durationSeconds );
+  GetImpl(*this).ReplaceItems(replacementItems, durationSeconds);
 }
 
-void ItemView::SetItemsParentOrigin( const Vector3& parentOrigin )
+void ItemView::SetItemsParentOrigin(const Vector3& parentOrigin)
 {
-  GetImpl(*this).SetItemsParentOrigin( parentOrigin );
+  GetImpl(*this).SetItemsParentOrigin(parentOrigin);
 }
 
 Vector3 ItemView::GetItemsParentOrigin() const
@@ -222,7 +220,7 @@ Vector3 ItemView::GetItemsParentOrigin() const
   return GetImpl(*this).GetItemsParentOrigin();
 }
 
-void ItemView::SetItemsAnchorPoint( const Vector3& anchorPoint )
+void ItemView::SetItemsAnchorPoint(const Vector3& anchorPoint)
 {
   GetImpl(*this).SetItemsAnchorPoint(anchorPoint);
 }

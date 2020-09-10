@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_MESH_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_visuals
  * @{
@@ -38,14 +36,12 @@ namespace Toolkit
  */
 namespace MeshVisual
 {
-
 /**
  * @brief MeshVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the instance of properties belonging to the MeshVisual.
  * @SINCE_1_1.45
@@ -121,15 +117,14 @@ enum
  */
 namespace ShadingMode
 {
-
 /**
  * @brief The shading mode used by MeshVisual.
  * @SINCE_1_1.45
  */
 enum Value
 {
-  TEXTURELESS_WITH_DIFFUSE_LIGHTING, ///< *Simplest*. One color that is lit by ambient and diffuse lighting. @SINCE_1_1.45
-  TEXTURED_WITH_SPECULAR_LIGHTING, ///< Uses only the visual image textures provided with specular lighting in addition to ambient and diffuse lighting. @SINCE_1_1.45
+  TEXTURELESS_WITH_DIFFUSE_LIGHTING,       ///< *Simplest*. One color that is lit by ambient and diffuse lighting. @SINCE_1_1.45
+  TEXTURED_WITH_SPECULAR_LIGHTING,         ///< Uses only the visual image textures provided with specular lighting in addition to ambient and diffuse lighting. @SINCE_1_1.45
   TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING ///< Uses all textures provided including a gloss, normal and texture map along with specular, ambient and diffuse lighting. @SINCE_1_1.45
 };
 

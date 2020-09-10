@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,21 +26,19 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 Alignment::Alignment()
 {
 }
 
-Alignment Alignment::New( Type horizontal, Type vertical )
+Alignment Alignment::New(Type horizontal, Type vertical)
 {
-  return Internal::Alignment::New( horizontal, vertical );
+  return Internal::Alignment::New(horizontal, vertical);
 }
 
 Alignment::Alignment(const Alignment& alignment)
-: Control( alignment )
+: Control(alignment)
 {
 }
 
@@ -48,57 +46,57 @@ Alignment::~Alignment()
 {
 }
 
-Alignment Alignment::DownCast( BaseHandle handle )
+Alignment Alignment::DownCast(BaseHandle handle)
 {
   return Control::DownCast<Alignment, Internal::Alignment>(handle);
 }
 
-void Alignment::SetAlignmentType( Type type )
+void Alignment::SetAlignmentType(Type type)
 {
-  GetImpl( *this ).SetAlignmentType( type );
+  GetImpl(*this).SetAlignmentType(type);
 }
 
 Alignment::Type Alignment::GetAlignmentType() const
 {
-  return GetImpl( *this ).GetAlignmentType();
+  return GetImpl(*this).GetAlignmentType();
 }
 
-void Alignment::SetScaling( Scaling scaling )
+void Alignment::SetScaling(Scaling scaling)
 {
-  GetImpl( *this ).SetScaling( scaling );
+  GetImpl(*this).SetScaling(scaling);
 }
 
 Alignment::Scaling Alignment::GetScaling() const
 {
-  return GetImpl( *this ).GetScaling();
+  return GetImpl(*this).GetScaling();
 }
 
-void Alignment::SetPadding( const Alignment::Padding& padding )
+void Alignment::SetPadding(const Alignment::Padding& padding)
 {
-  GetImpl( *this ).SetPadding( padding );
+  GetImpl(*this).SetPadding(padding);
 }
 
 const Alignment::Padding& Alignment::GetPadding() const
 {
-  return GetImpl( *this ).GetPadding();
+  return GetImpl(*this).GetPadding();
 }
 
-Alignment::Alignment( Internal::Alignment& implementation )
-: Control( implementation )
+Alignment::Alignment(Internal::Alignment& implementation)
+: Control(implementation)
 {
 }
 
 Alignment& Alignment::operator=(const Alignment& alignment)
 {
-  if( &alignment != this )
+  if(&alignment != this)
   {
-    Control::operator=( alignment );
+    Control::operator=(alignment);
   }
   return *this;
 }
 
-Alignment::Alignment( Dali::Internal::CustomActor* internal )
-: Control( internal )
+Alignment::Alignment(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::Alignment>(internal);
 }

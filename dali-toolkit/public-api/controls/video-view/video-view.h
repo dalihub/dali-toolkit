@@ -23,14 +23,12 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-  class VideoView;
-} // namespace Internal
+class VideoView;
+} // namespace DALI_INTERNAL
 
 /**
  * @addtogroup dali_toolkit_controls_video_view
@@ -59,22 +57,20 @@ namespace Internal DALI_INTERNAL
  * @SINCE_1_1.38
  *
  */
-class DALI_TOOLKIT_API VideoView: public Control
+class DALI_TOOLKIT_API VideoView : public Control
 {
 public:
-
   // Signal
-  typedef Signal< void (VideoView&) > VideoViewSignalType; ///< Video playback finished signal type @ SINCE_1_1.38
+  typedef Signal<void(VideoView&)> VideoViewSignalType; ///< Video playback finished signal type @ SINCE_1_1.38
 
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,  ///< @SINCE_1_0.0
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
   };
 
   /**
@@ -97,25 +93,25 @@ public:
        */
       VIDEO = PROPERTY_START_INDEX,
 
-     /**
+      /**
        * @brief name "looping", looping status, true or false.
        * @SINCE_1_1.38
        */
       LOOPING,
 
-     /**
+      /**
        * @brief name "muted", mute status, true or false.
        * @SINCE_1_1.38
        */
       MUTED,
 
-     /**
+      /**
        * @brief name "volume", left and right volume scalar as float type, Property::Map with two values ( "left" and "right" ).
        * @SINCE_1_1.38
        */
       VOLUME,
 
-     /**
+      /**
        * @brief name "underlay", Video rendering by underlay, true or false
        * This shows video composited underneath the window by the system. This means it may ignore rotation of the video-view
        * If false, video-view shows decoded frame images sequentially.
@@ -125,7 +121,7 @@ public:
        */
       UNDERLAY,
 
-     /**
+      /**
        * @brief The play position (millisecond) of the video.
        * @details Name "playPosition", type Property::INTEGER
        * @SINCE_1_3_9
@@ -186,7 +182,6 @@ public:
   };
 
 public:
-
   /**
    * @brief Creates an initialized VideoView.
    * @SINCE_1_1.38
@@ -205,7 +200,7 @@ public:
    * @param[in] url The url of the video resource to display
    * @return A handle to a newly allocated Dali VideoView
    */
-  static VideoView New( const std::string& url );
+  static VideoView New(const std::string& url);
 
   /**
    * @brief Creates an initialized VideoView.
@@ -215,7 +210,7 @@ public:
    *
    * @note If platform or target does not support sw codec, video-view shows an error message and video by default codec type
    */
-  static VideoView New( bool swCodec );
+  static VideoView New(bool swCodec);
 
   /**
    * @brief Creates an initialized VideoView.
@@ -230,7 +225,7 @@ public:
    *
    * @note If platform or target does not support sw codec, video-view shows an error message and video by default codec type
    */
-  static VideoView New( const std::string& url, bool swCodec );
+  static VideoView New(const std::string& url, bool swCodec);
 
   /**
    * @brief Creates an uninitialized VideoView.
@@ -252,7 +247,7 @@ public:
    * @SINCE_1_1.38
    * @param[in] videoView VideoView to copy. The copied VideoView will point at the same implementation
    */
-  VideoView( const VideoView& videoView );
+  VideoView(const VideoView& videoView);
 
   /**
    * @brief Move constructor
@@ -260,7 +255,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  VideoView( VideoView&& rhs );
+  VideoView(VideoView&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -269,7 +264,7 @@ public:
    * @param[in] videoView The VideoView to assign from
    * @return The updated VideoView
    */
-  VideoView& operator=( const VideoView& videoView );
+  VideoView& operator=(const VideoView& videoView);
 
   /**
    * @brief Move assignment
@@ -278,7 +273,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  VideoView& operator=( VideoView&& rhs );
+  VideoView& operator=(VideoView&& rhs);
 
   /**
    * @brief Downcasts a handle to VideoView handle.
@@ -290,7 +285,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a VideoView or an uninitialized handle
    */
-  static VideoView DownCast( BaseHandle handle );
+  static VideoView DownCast(BaseHandle handle);
 
   /**
    * @brief Starts the video playback.
@@ -316,7 +311,7 @@ public:
    * @SINCE_1_1.38
    * @param[in] millisecond The position for forward playback
    */
-  void Forward( int millisecond );
+  void Forward(int millisecond);
 
   /**
    * @brief Seeks backward by the specified number of milliseconds.
@@ -324,7 +319,7 @@ public:
    * @SINCE_1_1.38
    * @param[in] millisecond The position for backward playback
    */
-  void Backward( int millisecond );
+  void Backward(int millisecond);
 
   /**
    * @brief Connects to this signal to be notified when a video playback is finished.
@@ -335,7 +330,6 @@ public:
   VideoViewSignalType& FinishedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -343,7 +337,7 @@ public: // Not intended for application developers
    * @SINCE_1_1.38
    * @param[in] implementation The VideoView implementation
    */
-  DALI_INTERNAL VideoView( Internal::VideoView& implementation );
+  DALI_INTERNAL VideoView(Internal::VideoView& implementation);
 
   /**
    * @brief Allows the creation of this VideoView from an Internal::CustomActor pointer.
@@ -351,9 +345,8 @@ public: // Not intended for application developers
    * @SINCE_1_1.38
    * @param[in] internal A pointer to the internal CustomActor
    */
-  DALI_INTERNAL VideoView( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL VideoView(Dali::Internal::CustomActor* internal);
   /// @endcond
-
 };
 
 /**

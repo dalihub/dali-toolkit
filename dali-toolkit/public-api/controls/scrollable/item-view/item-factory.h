@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ITEM_FACTORY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
 /**
@@ -43,14 +42,13 @@ namespace Toolkit
 class ItemFactory
 {
 public:
-
   class Extension; ///< Forward declare future extension interface
 
   /**
    * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
-  DALI_TOOLKIT_API virtual ~ItemFactory() {};
+  DALI_TOOLKIT_API virtual ~ItemFactory(){};
 
   /**
    * @brief Queries the number of items available from the factory.
@@ -77,7 +75,7 @@ public:
    * @param[in] itemId The ID of the released item
    * @param[in] actor The actor that represents the released item
    */
-  virtual void ItemReleased(unsigned int itemId, Actor actor) {};
+  virtual void ItemReleased(unsigned int itemId, Actor actor){};
 
   /**
    * @brief Retrieves the extension for this control.

@@ -25,22 +25,20 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 CheckBoxButton::CheckBoxButton()
 : Button()
 {
 }
 
-CheckBoxButton::CheckBoxButton( const CheckBoxButton& checkBox ) = default;
+CheckBoxButton::CheckBoxButton(const CheckBoxButton& checkBox) = default;
 
-CheckBoxButton::CheckBoxButton( CheckBoxButton&& rhs ) = default;
+CheckBoxButton::CheckBoxButton(CheckBoxButton&& rhs) = default;
 
-CheckBoxButton& CheckBoxButton::operator=( const CheckBoxButton& checkBox ) = default;
+CheckBoxButton& CheckBoxButton::operator=(const CheckBoxButton& checkBox) = default;
 
-CheckBoxButton& CheckBoxButton::operator=( CheckBoxButton&& rhs ) = default;
+CheckBoxButton& CheckBoxButton::operator=(CheckBoxButton&& rhs) = default;
 
 CheckBoxButton::~CheckBoxButton()
 {
@@ -51,18 +49,18 @@ CheckBoxButton CheckBoxButton::New()
   return Internal::CheckBoxButton::New();
 }
 
-CheckBoxButton CheckBoxButton::DownCast( BaseHandle handle )
+CheckBoxButton CheckBoxButton::DownCast(BaseHandle handle)
 {
   return Control::DownCast<CheckBoxButton, Internal::CheckBoxButton>(handle);
 }
 
-CheckBoxButton::CheckBoxButton( Internal::CheckBoxButton& implementation )
-: Button( implementation )
+CheckBoxButton::CheckBoxButton(Internal::CheckBoxButton& implementation)
+: Button(implementation)
 {
 }
 
-CheckBoxButton::CheckBoxButton( Dali::Internal::CustomActor* internal )
-: Button( internal )
+CheckBoxButton::CheckBoxButton(Dali::Internal::CustomActor* internal)
+: Button(internal)
 {
   VerifyCustomActorPointer<Internal::CheckBoxButton>(internal);
 }

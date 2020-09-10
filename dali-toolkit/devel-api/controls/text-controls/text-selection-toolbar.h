@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SELECTION_TOOLBAR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class TextSelectionToolbar;
@@ -45,14 +43,13 @@ class TextSelectionToolbar;
 class DALI_TOOLKIT_API TextSelectionToolbar : public Control
 {
 public:
-
   /**
    * @brief The start and end property ranges for this control.
    */
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000 ///< Reserve property indices
   };
 
   /**
@@ -62,11 +59,11 @@ public:
   {
     enum
     {
-      MAX_SIZE =  PROPERTY_START_INDEX, ///< name "maxSize",                 The maximum size the Popup can be,              type VECTOR2
-      ENABLE_OVERSHOOT,                 ///< name "enableOvershoot",         Whether the overshoot image is enabled,         type BOOLEAN
-      ENABLE_SCROLL_BAR,                ///< name "enableScrollBar",         Whether the scroll-bar is enabled,              type BOOLEAN
-      SCROLL_BAR_PADDING,               ///< name "scrollBarPadding",        The padding used to position the scroll bar,    type VECTOR2
-      SCROLL_VIEW,                      ///< name "scrollView",              Properties to set on scroll view                type Property::Map
+      MAX_SIZE = PROPERTY_START_INDEX, ///< name "maxSize",                 The maximum size the Popup can be,              type VECTOR2
+      ENABLE_OVERSHOOT,                ///< name "enableOvershoot",         Whether the overshoot image is enabled,         type BOOLEAN
+      ENABLE_SCROLL_BAR,               ///< name "enableScrollBar",         Whether the scroll-bar is enabled,              type BOOLEAN
+      SCROLL_BAR_PADDING,              ///< name "scrollBarPadding",        The padding used to position the scroll bar,    type VECTOR2
+      SCROLL_VIEW,                     ///< name "scrollView",              Properties to set on scroll view                type Property::Map
     };
   };
 
@@ -86,7 +83,7 @@ public:
    *
    * @param[in] handle The handle to copy from.
    */
-  TextSelectionToolbar( const TextSelectionToolbar& handle );
+  TextSelectionToolbar(const TextSelectionToolbar& handle);
 
   /**
    * @brief Assignment operator.
@@ -94,7 +91,7 @@ public:
    * @param[in] handle The handle to copy from.
    * @return A reference to this.
    */
-  TextSelectionToolbar& operator=( const TextSelectionToolbar& handle );
+  TextSelectionToolbar& operator=(const TextSelectionToolbar& handle);
 
   /**
    * @brief Destructor
@@ -103,36 +100,35 @@ public:
    */
   ~TextSelectionToolbar();
 
-
   /**
    * @brief Add a option to the the Tool bar
    * @param[in] option Option actor to add
    */
-  void AddOption( Actor& option );
+  void AddOption(Actor& option);
 
   /**
    * @brief Add a divider to the the Tool bar
    * @param[in] divider Actor to be used as divider
    */
-  void AddDivider( Actor& divider );
+  void AddDivider(Actor& divider);
 
   /**
    *  @brief ResizeDividers
    *  @param[in] size New size of dividers, provide 0 for height to automatically set height
    */
-  void ResizeDividers( Size& size );
+  void ResizeDividers(Size& size);
 
   /**
    * @brief Raises the layer above the given @e target layer.
    *
    * @param[in] target The layer to get above of.
    */
-  void RaiseAbove( Layer target );
+  void RaiseAbove(Layer target);
 
   /**
    * @copydoc Toolkit::ScrollView::ScrollTo(const Vector2&)
    */
-  void ScrollTo( const Vector2& position );
+  void ScrollTo(const Vector2& position);
 
   /**
    * @brief Downcast a handle to TextSelectionToolbar.
@@ -143,23 +139,22 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a TextSelectionToolbar or an empty handle
    */
-  static TextSelectionToolbar DownCast( BaseHandle handle );
+  static TextSelectionToolbar DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @param[in] implementation The Control implementation.
    */
-  DALI_INTERNAL TextSelectionToolbar( Internal::TextSelectionToolbar& implementation );
+  DALI_INTERNAL TextSelectionToolbar(Internal::TextSelectionToolbar& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL TextSelectionToolbar( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL TextSelectionToolbar(Dali::Internal::CustomActor* internal);
 
 }; // Class TextSelectionToolbar
 

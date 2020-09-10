@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,24 +23,22 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
-CubeTransitionCrossEffect::CubeTransitionCrossEffect( Internal::CubeTransitionCrossEffect& implementation )
-: CubeTransitionEffect( implementation )
+CubeTransitionCrossEffect::CubeTransitionCrossEffect(Internal::CubeTransitionCrossEffect& implementation)
+: CubeTransitionEffect(implementation)
 {
 }
 
-CubeTransitionCrossEffect::CubeTransitionCrossEffect( Dali::Internal::CustomActor* internal )
-: CubeTransitionEffect( internal )
+CubeTransitionCrossEffect::CubeTransitionCrossEffect(Dali::Internal::CustomActor* internal)
+: CubeTransitionEffect(internal)
 {
-  VerifyCustomActorPointer< Internal::CubeTransitionCrossEffect >( internal );
+  VerifyCustomActorPointer<Internal::CubeTransitionCrossEffect>(internal);
 }
 
-CubeTransitionCrossEffect CubeTransitionCrossEffect::New( unsigned int numRows, unsigned int numColumns )
+CubeTransitionCrossEffect CubeTransitionCrossEffect::New(unsigned int numRows, unsigned int numColumns)
 {
-  return Internal::CubeTransitionCrossEffect::New( numRows, numColumns );
+  return Internal::CubeTransitionCrossEffect::New(numRows, numColumns);
 }
 
 } // namespace Toolkit

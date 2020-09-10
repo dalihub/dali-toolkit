@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,24 +23,22 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
-CubeTransitionWaveEffect::CubeTransitionWaveEffect( Internal::CubeTransitionWaveEffect& implementation )
-: CubeTransitionEffect( implementation )
+CubeTransitionWaveEffect::CubeTransitionWaveEffect(Internal::CubeTransitionWaveEffect& implementation)
+: CubeTransitionEffect(implementation)
 {
 }
 
-CubeTransitionWaveEffect::CubeTransitionWaveEffect( Dali::Internal::CustomActor* internal )
-: CubeTransitionEffect( internal )
+CubeTransitionWaveEffect::CubeTransitionWaveEffect(Dali::Internal::CustomActor* internal)
+: CubeTransitionEffect(internal)
 {
-  VerifyCustomActorPointer< Internal::CubeTransitionWaveEffect >( internal );
+  VerifyCustomActorPointer<Internal::CubeTransitionWaveEffect>(internal);
 }
 
-CubeTransitionWaveEffect CubeTransitionWaveEffect::New(unsigned int numRows, unsigned int numColumns )
+CubeTransitionWaveEffect CubeTransitionWaveEffect::New(unsigned int numRows, unsigned int numColumns)
 {
-  return Internal::CubeTransitionWaveEffect::New( numRows, numColumns );
+  return Internal::CubeTransitionWaveEffect::New(numRows, numColumns);
 }
 
 } // namespace Toolkit

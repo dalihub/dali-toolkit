@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,10 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-emitter-impl.h>
 
-
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 BubbleEmitter::BubbleEmitter()
 {
 }
@@ -36,42 +33,42 @@ BubbleEmitter::~BubbleEmitter()
 {
 }
 
-BubbleEmitter::BubbleEmitter( Internal::BubbleEmitter& implementation )
-: Control( implementation )
+BubbleEmitter::BubbleEmitter(Internal::BubbleEmitter& implementation)
+: Control(implementation)
 {
 }
 
 BubbleEmitter::BubbleEmitter(Dali::Internal::CustomActor* internal)
-: Control( internal )
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::BubbleEmitter>( internal );
+  VerifyCustomActorPointer<Internal::BubbleEmitter>(internal);
 }
 
-BubbleEmitter BubbleEmitter::New( const Vector2& winSize,
-                                  Dali::Texture shapeTexture,
-                                  unsigned int maximumNumberOfBubble,
-                                  const Vector2& bubbleSizeRange )
+BubbleEmitter BubbleEmitter::New(const Vector2& winSize,
+                                 Dali::Texture  shapeTexture,
+                                 unsigned int   maximumNumberOfBubble,
+                                 const Vector2& bubbleSizeRange)
 {
-  return Internal::BubbleEmitter::New( winSize, shapeTexture, maximumNumberOfBubble, bubbleSizeRange );
+  return Internal::BubbleEmitter::New(winSize, shapeTexture, maximumNumberOfBubble, bubbleSizeRange);
 }
 
-BubbleEmitter::BubbleEmitter( const BubbleEmitter& handle )
-: Control( handle )
+BubbleEmitter::BubbleEmitter(const BubbleEmitter& handle)
+: Control(handle)
 {
 }
 
-BubbleEmitter& BubbleEmitter::operator=( const BubbleEmitter& rhs )
+BubbleEmitter& BubbleEmitter::operator=(const BubbleEmitter& rhs)
 {
-  if( &rhs != this )
+  if(&rhs != this)
   {
     Control::operator=(rhs);
   }
   return *this;
 }
 
-BubbleEmitter BubbleEmitter::DownCast( BaseHandle handle )
+BubbleEmitter BubbleEmitter::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<BubbleEmitter, Internal::BubbleEmitter>( handle );
+  return Control::DownCast<BubbleEmitter, Internal::BubbleEmitter>(handle);
 }
 
 Actor BubbleEmitter::GetRootActor()
@@ -79,29 +76,29 @@ Actor BubbleEmitter::GetRootActor()
   return GetImpl(*this).GetRootActor();
 }
 
-void BubbleEmitter::SetBackground( Dali::Texture bgTexture, const Vector3& hsvDelta )
+void BubbleEmitter::SetBackground(Dali::Texture bgTexture, const Vector3& hsvDelta)
 {
-  GetImpl(*this).SetBackground( bgTexture, hsvDelta );
+  GetImpl(*this).SetBackground(bgTexture, hsvDelta);
 }
 
-void BubbleEmitter::SetBubbleShape( Dali::Texture shapeTexture )
+void BubbleEmitter::SetBubbleShape(Dali::Texture shapeTexture)
 {
-  GetImpl(*this).SetBubbleShape( shapeTexture );
+  GetImpl(*this).SetBubbleShape(shapeTexture);
 }
 
-void BubbleEmitter::SetBubbleScale( float scale )
+void BubbleEmitter::SetBubbleScale(float scale)
 {
-  GetImpl(*this).SetBubbleScale( scale );
+  GetImpl(*this).SetBubbleScale(scale);
 }
 
-void BubbleEmitter::SetBubbleDensity( unsigned int density )
+void BubbleEmitter::SetBubbleDensity(unsigned int density)
 {
-  GetImpl(*this).SetBubbleDensity( density );
+  GetImpl(*this).SetBubbleDensity(density);
 }
 
-void BubbleEmitter::EmitBubble( Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement )
+void BubbleEmitter::EmitBubble(Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement)
 {
-  GetImpl(*this).EmitBubble( animation, emitPosition, direction, displacement );
+  GetImpl(*this).EmitBubble(animation, emitPosition, direction, displacement);
 }
 
 void BubbleEmitter::Restore()

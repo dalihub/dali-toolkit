@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,27 +23,25 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 SuperBlurView::SuperBlurView()
 {
 }
 
-SuperBlurView SuperBlurView::New( unsigned int blurLevels )
+SuperBlurView SuperBlurView::New(unsigned int blurLevels)
 {
-  return Internal::SuperBlurView::New( blurLevels );
+  return Internal::SuperBlurView::New(blurLevels);
 }
 
-SuperBlurView::SuperBlurView( const SuperBlurView& handle )
-: Control( handle )
+SuperBlurView::SuperBlurView(const SuperBlurView& handle)
+: Control(handle)
 {
 }
 
-SuperBlurView& SuperBlurView::operator=( const SuperBlurView& rhs )
+SuperBlurView& SuperBlurView::operator=(const SuperBlurView& rhs)
 {
-  if( &rhs != this )
+  if(&rhs != this)
   {
     Control::operator=(rhs);
   }
@@ -54,25 +52,25 @@ SuperBlurView::~SuperBlurView()
 {
 }
 
-SuperBlurView SuperBlurView::DownCast( BaseHandle handle )
+SuperBlurView SuperBlurView::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<SuperBlurView, Internal::SuperBlurView>( handle );
+  return Control::DownCast<SuperBlurView, Internal::SuperBlurView>(handle);
 }
 
 SuperBlurView::SuperBlurView(Internal::SuperBlurView& implementation)
-: Control( implementation )
+: Control(implementation)
 {
 }
 
 SuperBlurView::SuperBlurView(Dali::Internal::CustomActor* internal)
-: Control( internal )
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::SuperBlurView>( internal );
+  VerifyCustomActorPointer<Internal::SuperBlurView>(internal);
 }
 
-void SuperBlurView::SetTexture( Texture texture )
+void SuperBlurView::SetTexture(Texture texture)
 {
-  GetImpl(*this).SetTexture( texture );
+  GetImpl(*this).SetTexture(texture);
 }
 
 Property::Index SuperBlurView::GetBlurStrengthPropertyIndex() const
@@ -80,9 +78,9 @@ Property::Index SuperBlurView::GetBlurStrengthPropertyIndex() const
   return GetImpl(*this).GetBlurStrengthPropertyIndex();
 }
 
-void SuperBlurView::SetBlurStrength( float blurStrength )
+void SuperBlurView::SetBlurStrength(float blurStrength)
 {
-  GetImpl(*this).SetBlurStrength( blurStrength );
+  GetImpl(*this).SetBlurStrength(blurStrength);
 }
 
 float SuperBlurView::GetCurrentBlurStrength() const
@@ -95,9 +93,9 @@ SuperBlurView::SuperBlurViewSignal& SuperBlurView::BlurFinishedSignal()
   return GetImpl(*this).BlurFinishedSignal();
 }
 
-Texture SuperBlurView::GetBlurredTexture( unsigned int level )
+Texture SuperBlurView::GetBlurredTexture(unsigned int level)
 {
-  return GetImpl(*this).GetBlurredTexture( level );
+  return GetImpl(*this).GetBlurredTexture(level);
 }
 } // namespace Toolkit
 

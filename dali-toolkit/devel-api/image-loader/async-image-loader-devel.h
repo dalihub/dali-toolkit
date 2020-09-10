@@ -18,9 +18,9 @@
  */
 
 // EXTERNAL HEADER
-#include <dali/public-api/signals/dali-signal.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/adaptor-framework/animated-image-loading.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/image-loader/async-image-loader.h>
@@ -31,8 +31,7 @@ namespace Toolkit
 {
 namespace DevelAsyncImageLoader
 {
-
-typedef Signal< void ( uint32_t, Devel::PixelBuffer ) > PixelBufferLoadedSignalType;
+typedef Signal<void(uint32_t, Devel::PixelBuffer)> PixelBufferLoadedSignalType;
 
 /**
  * @brief Whether to multiply alpha into color channels on load
@@ -40,7 +39,7 @@ typedef Signal< void ( uint32_t, Devel::PixelBuffer ) > PixelBufferLoadedSignalT
 enum class PreMultiplyOnLoad
 {
   OFF = 0, ///< Don't modify the image
-  ON           ///< Multiply alpha into color channels on load
+  ON       ///< Multiply alpha into color channels on load
 };
 
 /**
@@ -52,9 +51,9 @@ enum class PreMultiplyOnLoad
  * @param[in] frameIndex The frame index of a frame to be loaded frame
  * @return The loading task id
  */
-DALI_TOOLKIT_API uint32_t LoadAnimatedImage( AsyncImageLoader asyncImageLoader,
-                                             Dali::AnimatedImageLoading animatedImageLoading,
-                                             uint32_t frameIndex );
+DALI_TOOLKIT_API uint32_t LoadAnimatedImage(AsyncImageLoader           asyncImageLoader,
+                                            Dali::AnimatedImageLoading animatedImageLoading,
+                                            uint32_t                   frameIndex);
 
 /**
  * @brief Starts an image loading task.
@@ -69,13 +68,13 @@ DALI_TOOLKIT_API uint32_t LoadAnimatedImage( AsyncImageLoader asyncImageLoader,
  * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
  * @return The loading task id
  */
-DALI_TOOLKIT_API uint32_t Load( AsyncImageLoader asyncImageLoader,
-                                const std::string& url,
-                                ImageDimensions dimensions,
-                                FittingMode::Type fittingMode,
-                                SamplingMode::Type samplingMode,
-                                bool orientationCorrection,
-                                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
+DALI_TOOLKIT_API uint32_t Load(AsyncImageLoader                         asyncImageLoader,
+                               const std::string&                       url,
+                               ImageDimensions                          dimensions,
+                               FittingMode::Type                        fittingMode,
+                               SamplingMode::Type                       samplingMode,
+                               bool                                     orientationCorrection,
+                               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
 /**
  * @brief Starts an mask applying task.
@@ -89,21 +88,21 @@ DALI_TOOLKIT_API uint32_t Load( AsyncImageLoader asyncImageLoader,
  * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha.
  * @return The masking task id
  */
-DALI_TOOLKIT_API uint32_t ApplyMask( AsyncImageLoader asyncImageLoader,
-                                     Devel::PixelBuffer pixelBuffer,
-                                     Devel::PixelBuffer maskPixelBuffer,
-                                     float contentScale,
-                                     bool cropToMask,
-                                     DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
+DALI_TOOLKIT_API uint32_t ApplyMask(AsyncImageLoader                         asyncImageLoader,
+                                    Devel::PixelBuffer                       pixelBuffer,
+                                    Devel::PixelBuffer                       maskPixelBuffer,
+                                    float                                    contentScale,
+                                    bool                                     cropToMask,
+                                    DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
 /**
  * Connect to this signal if you want to load a PixelBuffer instead of a PixelData.
  * @note Connecting to this signal prevents the emission of the ImageLoadedSignal.
  */
-DALI_TOOLKIT_API PixelBufferLoadedSignalType&  PixelBufferLoadedSignal( AsyncImageLoader asyncImageLoader );
+DALI_TOOLKIT_API PixelBufferLoadedSignalType& PixelBufferLoadedSignal(AsyncImageLoader asyncImageLoader);
 
-}
-} // Toolkit
-} // Dali
+} // namespace DevelAsyncImageLoader
+} // namespace Toolkit
+} // namespace Dali
 
 #endif

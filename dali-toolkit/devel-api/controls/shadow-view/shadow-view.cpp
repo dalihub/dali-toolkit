@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,15 @@
 
 namespace
 {
-
-const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE = 1.0f;
+const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE  = 1.0f;
 const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE = 1.0f;
 
 } // namespace
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ShadowView::ShadowView()
 {
 }
@@ -44,13 +41,13 @@ ShadowView::~ShadowView()
 }
 
 ShadowView::ShadowView(const ShadowView& handle)
-  : Control( handle )
+: Control(handle)
 {
 }
 
 ShadowView& ShadowView::operator=(const ShadowView& rhs)
 {
-  if( &rhs != this )
+  if(&rhs != this)
   {
     Control::operator=(rhs);
   }
@@ -68,18 +65,18 @@ ShadowView ShadowView::New(float downsampleWidthScale, float downsampleHeightSca
   return Internal::ShadowView::New(downsampleWidthScale, downsampleHeightScale);
 }
 
-ShadowView::ShadowView( Internal::ShadowView& implementation )
-: Control( implementation )
+ShadowView::ShadowView(Internal::ShadowView& implementation)
+: Control(implementation)
 {
 }
 
-ShadowView::ShadowView( Dali::Internal::CustomActor* internal )
-: Control( internal )
+ShadowView::ShadowView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::ShadowView>(internal);
 }
 
-ShadowView ShadowView::DownCast( BaseHandle handle )
+ShadowView ShadowView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<ShadowView, Internal::ShadowView>(handle);
 }

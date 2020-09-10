@@ -23,38 +23,34 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelImageVisual
 {
-
 namespace Property
 {
-
 enum Type
 {
-  URL                 = Dali::Toolkit::ImageVisual::Property::URL,
-  FITTING_MODE        = Dali::Toolkit::ImageVisual::Property::FITTING_MODE,
-  SAMPLING_MODE       = Dali::Toolkit::ImageVisual::Property::SAMPLING_MODE,
-  DESIRED_WIDTH       = Dali::Toolkit::ImageVisual::Property::DESIRED_WIDTH,
-  DESIRED_HEIGHT      = Dali::Toolkit::ImageVisual::Property::DESIRED_HEIGHT,
-  SYNCHRONOUS_LOADING = Dali::Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING,
-  BORDER_ONLY         = Dali::Toolkit::ImageVisual::Property::BORDER_ONLY,
-  PIXEL_AREA          = Dali::Toolkit::ImageVisual::Property::PIXEL_AREA,
-  WRAP_MODE_U         = Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U,
-  WRAP_MODE_V         = Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V,
-  BORDER              = Dali::Toolkit::ImageVisual::Property::BORDER,
-  ATLASING            = Dali::Toolkit::ImageVisual::Property::ATLASING,
-  ALPHA_MASK_URL      = Dali::Toolkit::ImageVisual::Property::ALPHA_MASK_URL,
-  BATCH_SIZE          = Dali::Toolkit::ImageVisual::Property::BATCH_SIZE,
-  CACHE_SIZE          = Dali::Toolkit::ImageVisual::Property::CACHE_SIZE,
-  FRAME_DELAY         = Dali::Toolkit::ImageVisual::Property::FRAME_DELAY,
-  MASK_CONTENT_SCALE  = Dali::Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE,
-  CROP_TO_MASK        = Dali::Toolkit::ImageVisual::Property::CROP_TO_MASK,
-  LOAD_POLICY         = Dali::Toolkit::ImageVisual::Property::LOAD_POLICY,
-  RELEASE_POLICY      = Dali::Toolkit::ImageVisual::Property::RELEASE_POLICY,
+  URL                    = Dali::Toolkit::ImageVisual::Property::URL,
+  FITTING_MODE           = Dali::Toolkit::ImageVisual::Property::FITTING_MODE,
+  SAMPLING_MODE          = Dali::Toolkit::ImageVisual::Property::SAMPLING_MODE,
+  DESIRED_WIDTH          = Dali::Toolkit::ImageVisual::Property::DESIRED_WIDTH,
+  DESIRED_HEIGHT         = Dali::Toolkit::ImageVisual::Property::DESIRED_HEIGHT,
+  SYNCHRONOUS_LOADING    = Dali::Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING,
+  BORDER_ONLY            = Dali::Toolkit::ImageVisual::Property::BORDER_ONLY,
+  PIXEL_AREA             = Dali::Toolkit::ImageVisual::Property::PIXEL_AREA,
+  WRAP_MODE_U            = Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U,
+  WRAP_MODE_V            = Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V,
+  BORDER                 = Dali::Toolkit::ImageVisual::Property::BORDER,
+  ATLASING               = Dali::Toolkit::ImageVisual::Property::ATLASING,
+  ALPHA_MASK_URL         = Dali::Toolkit::ImageVisual::Property::ALPHA_MASK_URL,
+  BATCH_SIZE             = Dali::Toolkit::ImageVisual::Property::BATCH_SIZE,
+  CACHE_SIZE             = Dali::Toolkit::ImageVisual::Property::CACHE_SIZE,
+  FRAME_DELAY            = Dali::Toolkit::ImageVisual::Property::FRAME_DELAY,
+  MASK_CONTENT_SCALE     = Dali::Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE,
+  CROP_TO_MASK           = Dali::Toolkit::ImageVisual::Property::CROP_TO_MASK,
+  LOAD_POLICY            = Dali::Toolkit::ImageVisual::Property::LOAD_POLICY,
+  RELEASE_POLICY         = Dali::Toolkit::ImageVisual::Property::RELEASE_POLICY,
   ORIENTATION_CORRECTION = Dali::Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION,
 
   /**
@@ -152,12 +148,11 @@ enum Type
  */
 namespace PlayState
 {
-
 enum Type
 {
-  STOPPED,   ///< Animation has stopped
-  PLAYING,   ///< The animation is playing
-  PAUSED     ///< The animation is paused
+  STOPPED, ///< Animation has stopped
+  PLAYING, ///< The animation is playing
+  PAUSED   ///< The animation is paused
 };
 
 } // namespace PlayState
@@ -167,26 +162,24 @@ enum Type
  */
 namespace StopBehavior
 {
-
 enum Type
 {
-  CURRENT_FRAME,  ///< When the animation is stopped, the current frame is shown.
-  FIRST_FRAME,    ///< When the animation is stopped, the first frame is shown.
-  LAST_FRAME      ///< When the animation is stopped, the last frame is shown.
+  CURRENT_FRAME, ///< When the animation is stopped, the current frame is shown.
+  FIRST_FRAME,   ///< When the animation is stopped, the first frame is shown.
+  LAST_FRAME     ///< When the animation is stopped, the last frame is shown.
 };
 
-} // namespace StopBehavoir
+} // namespace StopBehavior
 
 /**
  * @brief Enumeration for what looping mode is in.
  */
 namespace LoopingMode
 {
-
 enum Type
 {
-  RESTART,      ///< When the animation arrives at the end in looping mode, the animation restarts from the beginning.
-  AUTO_REVERSE  ///< When the animation arrives at the end in looping mode, the animation reverses direction and runs backwards again.
+  RESTART,     ///< When the animation arrives at the end in looping mode, the animation restarts from the beginning.
+  AUTO_REVERSE ///< When the animation arrives at the end in looping mode, the animation reverses direction and runs backwards again.
 };
 
 } // namespace LoopingMode

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SCROLL_VIEW_EFFECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 
 namespace Dali
 {
-
 struct Vector2;
 struct Vector3;
 struct Vector4;
@@ -34,12 +33,11 @@ class PropertyInput;
 
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class ScrollViewEffect;
 class ScrollViewWobbleEffect;
-}
+} // namespace DALI_INTERNAL
 /**
  * @addtogroup dali_toolkit_controls_scroll_view
  * @{
@@ -60,9 +58,7 @@ class ScrollViewEffect;
  */
 class DALI_TOOLKIT_API ScrollViewEffect : public Dali::BaseHandle
 {
-
 public:
-
   /**
    * @brief Creates an uninitialized ScrollViewEffect; this can only be initialized with derived classes.
    *
@@ -72,7 +68,6 @@ public:
   ScrollViewEffect();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief This constructor is used by Dali New() methods.
@@ -80,9 +75,8 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] impl A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL ScrollViewEffect(Internal::ScrollViewEffect *impl);
+  explicit DALI_INTERNAL ScrollViewEffect(Internal::ScrollViewEffect* impl);
   /// @endcond
-
 };
 
 /**

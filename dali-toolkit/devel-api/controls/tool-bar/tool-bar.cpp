@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,31 +23,29 @@
 
 // INTERNAL INCLUDES
 
-#include <dali/integration-api/debug.h>
 #include <dali-toolkit/internal/controls/tool-bar/tool-bar-impl.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
-const Toolkit::Alignment::Padding ToolBar::DEFAULT_PADDING( 0.f, 0.f, 0.f, 0.f );
+const Toolkit::Alignment::Padding ToolBar::DEFAULT_PADDING(0.f, 0.f, 0.f, 0.f);
 
 ToolBar::ToolBar()
 {
 }
 
-ToolBar::ToolBar( const ToolBar& handle )
-: Control( handle )
+ToolBar::ToolBar(const ToolBar& handle)
+: Control(handle)
 {
 }
 
-ToolBar& ToolBar::operator=( const ToolBar& handle )
+ToolBar& ToolBar::operator=(const ToolBar& handle)
 {
-  if( &handle != this )
+  if(&handle != this)
   {
-    Control::operator=( handle );
+    Control::operator=(handle);
   }
   return *this;
 }
@@ -61,28 +59,28 @@ ToolBar ToolBar::New()
   return Internal::ToolBar::New();
 }
 
-ToolBar ToolBar::DownCast( BaseHandle handle )
+ToolBar ToolBar::DownCast(BaseHandle handle)
 {
   return Control::DownCast<ToolBar, Internal::ToolBar>(handle);
 }
 
-void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding )
+void ToolBar::AddControl(Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding)
 {
-  GetImpl( *this ).AddControl( control, relativeSize, alignment, padding );
+  GetImpl(*this).AddControl(control, relativeSize, alignment, padding);
 }
 
-void ToolBar::RemoveControl( Actor control )
+void ToolBar::RemoveControl(Actor control)
 {
-  GetImpl( *this ).RemoveControl( control );
+  GetImpl(*this).RemoveControl(control);
 }
 
-ToolBar::ToolBar( Internal::ToolBar& implementation )
-: Control( implementation )
+ToolBar::ToolBar(Internal::ToolBar& implementation)
+: Control(implementation)
 {
 }
 
-ToolBar::ToolBar( Dali::Internal::CustomActor* internal )
-: Control( internal )
+ToolBar::ToolBar(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::ToolBar>(internal);
 }

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_ALIGN_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,10 @@
  *
  */
 
-
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_controls
  * @{
@@ -36,7 +33,6 @@ namespace Toolkit
  */
 namespace Align
 {
-
 /**
  * @brief Describes anchor point and parent origin of visuals
  * @SINCE_1_2.60
@@ -53,7 +49,7 @@ enum Type
   BOTTOM_CENTER, ///< @SINCE_1_2.60
   BOTTOM_END     ///< @SINCE_1_2.60
 };
-}
+} // namespace Align
 
 /**
  * @}

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TOOLTIP_PROPERTIES_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,15 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Tooltip
 {
-
 /**
  * @brief The properties used for a Tooltip.
  */
 namespace Property
 {
-
 enum
 {
   /**
@@ -134,10 +130,8 @@ enum
 
 namespace Background
 {
-
 namespace Property
 {
-
 enum
 {
   /**
@@ -166,13 +160,11 @@ enum
  */
 namespace Tail
 {
-
 /**
  * @brief The properties of the tail used by the tooltip.
  */
 namespace Property
 {
-
 enum
 {
   /**
@@ -202,14 +194,13 @@ enum
 
 namespace Position
 {
-
 /**
  * @brief The position of the tooltip in relation to the control.
  */
 enum Type
 {
-  ABOVE, ///< The tooltip will appear above the control.
-  BELOW, ///< The tooltip will appear below the control.
+  ABOVE,      ///< The tooltip will appear above the control.
+  BELOW,      ///< The tooltip will appear below the control.
   HOVER_POINT ///< The tooltip will appear near the hover point.
 };
 

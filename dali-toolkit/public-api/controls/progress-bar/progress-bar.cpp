@@ -23,29 +23,27 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ProgressBar::ProgressBar()
 {
 }
 
-ProgressBar::ProgressBar( const ProgressBar& handle ) = default;
+ProgressBar::ProgressBar(const ProgressBar& handle) = default;
 
-ProgressBar::ProgressBar( ProgressBar&& rhs ) = default;
+ProgressBar::ProgressBar(ProgressBar&& rhs) = default;
 
-ProgressBar& ProgressBar::operator=( const ProgressBar& handle ) = default;
+ProgressBar& ProgressBar::operator=(const ProgressBar& handle) = default;
 
-ProgressBar& ProgressBar::operator=( ProgressBar&& rhs ) = default;
+ProgressBar& ProgressBar::operator=(ProgressBar&& rhs) = default;
 
 ProgressBar::ProgressBar(Internal::ProgressBar& implementation)
 : Control(implementation)
 {
 }
 
-ProgressBar::ProgressBar( Dali::Internal::CustomActor* internal )
-: Control( internal )
+ProgressBar::ProgressBar(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::ProgressBar>(internal);
 }
@@ -61,10 +59,10 @@ ProgressBar::~ProgressBar()
 
 ProgressBar::ValueChangedSignalType& ProgressBar::ValueChangedSignal()
 {
-  return GetImpl( *this ).ValueChangedSignal();
+  return GetImpl(*this).ValueChangedSignal();
 }
 
-ProgressBar ProgressBar::DownCast( BaseHandle handle )
+ProgressBar ProgressBar::DownCast(BaseHandle handle)
 {
   return Control::DownCast<ProgressBar, Internal::ProgressBar>(handle);
 }

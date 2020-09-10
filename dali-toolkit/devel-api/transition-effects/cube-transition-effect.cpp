@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 CubeTransitionEffect::CubeTransitionEffect()
 {
 }
@@ -35,25 +33,25 @@ CubeTransitionEffect::~CubeTransitionEffect()
 {
 }
 
-CubeTransitionEffect::CubeTransitionEffect( Internal::CubeTransitionEffect& implementation )
-: Control( implementation )
+CubeTransitionEffect::CubeTransitionEffect(Internal::CubeTransitionEffect& implementation)
+: Control(implementation)
 {
 }
 
-CubeTransitionEffect::CubeTransitionEffect( Dali::Internal::CustomActor* internal )
-: Control( internal )
+CubeTransitionEffect::CubeTransitionEffect(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::CubeTransitionEffect>(internal);
 }
 
-CubeTransitionEffect CubeTransitionEffect::DownCast( BaseHandle handle )
+CubeTransitionEffect CubeTransitionEffect::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<CubeTransitionEffect, Internal::CubeTransitionEffect>( handle );
+  return Control::DownCast<CubeTransitionEffect, Internal::CubeTransitionEffect>(handle);
 }
 
-void CubeTransitionEffect::SetTransitionDuration( float duration )
+void CubeTransitionEffect::SetTransitionDuration(float duration)
 {
-  GetImpl(*this).SetTransitionDuration( duration );
+  GetImpl(*this).SetTransitionDuration(duration);
 }
 
 float CubeTransitionEffect::GetTransitionDuration() const
@@ -61,9 +59,9 @@ float CubeTransitionEffect::GetTransitionDuration() const
   return GetImpl(*this).GetTransitionDuration();
 }
 
-void CubeTransitionEffect::SetCubeDisplacement( float displacement )
+void CubeTransitionEffect::SetCubeDisplacement(float displacement)
 {
-  GetImpl(*this).SetCubeDisplacement( displacement );
+  GetImpl(*this).SetCubeDisplacement(displacement);
 }
 
 float CubeTransitionEffect::GetCubeDisplacement() const
@@ -76,24 +74,24 @@ bool CubeTransitionEffect::IsTransitioning()
   return GetImpl(*this).IsTransitioning();
 }
 
-void CubeTransitionEffect::SetCurrentTexture( Texture texture )
+void CubeTransitionEffect::SetCurrentTexture(Texture texture)
 {
-  GetImpl(*this).SetCurrentTexture( texture );
+  GetImpl(*this).SetCurrentTexture(texture);
 }
 
-void CubeTransitionEffect::SetTargetTexture( Texture texture )
+void CubeTransitionEffect::SetTargetTexture(Texture texture)
 {
-  GetImpl(*this).SetTargetTexture( texture );
+  GetImpl(*this).SetTargetTexture(texture);
 }
 
-void CubeTransitionEffect::StartTransition( bool toNextImage )
+void CubeTransitionEffect::StartTransition(bool toNextImage)
 {
-  GetImpl(*this).StartTransition( toNextImage );
+  GetImpl(*this).StartTransition(toNextImage);
 }
 
-void CubeTransitionEffect::StartTransition( Vector2 panPosition, Vector2 panDisplacement )
+void CubeTransitionEffect::StartTransition(Vector2 panPosition, Vector2 panDisplacement)
 {
-  GetImpl(*this).StartTransition( panPosition, panDisplacement );
+  GetImpl(*this).StartTransition(panPosition, panDisplacement);
 }
 
 void CubeTransitionEffect::PauseTransition()
@@ -113,7 +111,7 @@ void CubeTransitionEffect::StopTransition()
 
 CubeTransitionEffect::TransitionCompletedSignalType& CubeTransitionEffect::TransitionCompletedSignal()
 {
-  return GetImpl( *this ).TransitionCompletedSignal();
+  return GetImpl(*this).TransitionCompletedSignal();
 }
 
 } // namespace Toolkit

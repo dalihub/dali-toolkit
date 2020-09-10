@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,36 +22,33 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace TextureManager
 {
-
-std::string AddTexture( Texture& texture )
+std::string AddTexture(Texture& texture)
 {
   TextureSet set = TextureSet::New();
-  set.SetTexture( 0u, texture );
-  return AddTexture( set );
+  set.SetTexture(0u, texture);
+  return AddTexture(set);
 }
 
-std::string AddTexture( TextureSet& textureSet )
+std::string AddTexture(TextureSet& textureSet)
 {
-  auto visualFactory = Toolkit::VisualFactory::Get();
-  auto& textureMgr = GetImplementation( visualFactory ).GetTextureManager();
-  return textureMgr.AddExternalTexture( textureSet );
+  auto  visualFactory = Toolkit::VisualFactory::Get();
+  auto& textureMgr    = GetImplementation(visualFactory).GetTextureManager();
+  return textureMgr.AddExternalTexture(textureSet);
 }
 
-TextureSet RemoveTexture( const std::string& textureUrl )
+TextureSet RemoveTexture(const std::string& textureUrl)
 {
-  auto visualFactory = Toolkit::VisualFactory::Get();
-  auto& textureMgr = GetImplementation( visualFactory ).GetTextureManager();
-  return textureMgr.RemoveExternalTexture( textureUrl );
+  auto  visualFactory = Toolkit::VisualFactory::Get();
+  auto& textureMgr    = GetImplementation(visualFactory).GetTextureManager();
+  return textureMgr.RemoveExternalTexture(textureUrl);
 }
 
-} // TextureManager
+} // namespace TextureManager
 
-} // Toolkit
+} // namespace Toolkit
 
-} // Dali
+} // namespace Dali

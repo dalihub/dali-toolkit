@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SUPER_BLUR_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class SuperBlurView;
@@ -55,14 +53,13 @@ class SuperBlurView;
 class DALI_TOOLKIT_API SuperBlurView : public Control
 {
 public:
-
   /**
    * @brief The start and end property ranges for this control.
    */
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000 ///< Reserve property indices
   };
 
   /**
@@ -79,7 +76,7 @@ public:
   /**
    * @brief Signal type for notifications.
    */
-  typedef Signal< void (SuperBlurView source) > SuperBlurViewSignal;
+  typedef Signal<void(SuperBlurView source)> SuperBlurViewSignal;
 
   /**
    * @brief Creates an empty SuperBlurView handle.
@@ -92,7 +89,7 @@ public:
    * @param[in] blurLevels The final blur strength level. It decides how many filtering passes are used to create the group of blurred textures.
    * @return A handle to a newly allocated Dali resource
    */
-  static SuperBlurView New( unsigned int blurLevels );
+  static SuperBlurView New(unsigned int blurLevels);
 
   /**
    * @brief Copy constructor.
@@ -100,7 +97,7 @@ public:
    * Creates another handle that points to the same real object.
    * @param[in] handle the handle to copy from
    */
-  SuperBlurView( const SuperBlurView& handle );
+  SuperBlurView(const SuperBlurView& handle);
 
   /**
    * @brief Assignment operator.
@@ -109,7 +106,7 @@ public:
    * @param[in] rhs the handle to copy from
    * @return a reference to this
    */
-  SuperBlurView& operator=( const SuperBlurView& rhs );
+  SuperBlurView& operator=(const SuperBlurView& rhs);
 
   /**
    * @brief Destructor
@@ -126,14 +123,14 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a SuperBlurView or an uninitialized handle
    */
-  static SuperBlurView DownCast( BaseHandle handle );
+  static SuperBlurView DownCast(BaseHandle handle);
 
   /**
    * @brief Sets a custom texture to be blurred.
    *
    * @param[in] texture The texture that the user wishes to blur
    */
-  void SetTexture( Texture texture );
+  void SetTexture(Texture texture);
 
   /**
    * @brief Get the index of the property that can be used to fade the blur in / out.
@@ -149,7 +146,7 @@ public:
    *
    * @param[in] blurStrength The blur strength used to display the texture.
    */
-  void SetBlurStrength( float blurStrength );
+  void SetBlurStrength(float blurStrength);
 
   /**
    * @brief Get the current blur strength.
@@ -172,10 +169,9 @@ public:
    * @param[in] level Indicate which blurred texture to get, must be a value between 1 and  blurLevels
    * @return The level-th blurred texture
    */
-  Texture GetBlurredTexture( unsigned int level );
+  Texture GetBlurredTexture(unsigned int level);
 
 public: // Not intended for application developers
-
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TRANSITION_DATA_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/animation/alpha-function.h>
+#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 
@@ -29,10 +29,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
 class TransitionData;
@@ -94,7 +92,7 @@ public:
    * @param[in] transition The transition data to store (a single animator)
    * @return A handle to an initialized data.
    */
-  static TransitionData New( const Property::Map& transition );
+  static TransitionData New(const Property::Map& transition);
 
   /**
    * @brief Creates a TransitionData object
@@ -103,7 +101,7 @@ public:
    * @param[in] transition The transition data to store (an array of maps of animators)
    * @return A handle to an initialized data.
    */
-  static TransitionData New( const Property::Array& transition );
+  static TransitionData New(const Property::Array& transition);
 
   /**
    * @brief Downcast to a TransitionData handle
@@ -113,7 +111,7 @@ public:
    * @param[in] handle Handle to an object
    * @return TransitionData handle or an uninitialized handle.
    */
-  static TransitionData DownCast( BaseHandle handle );
+  static TransitionData DownCast(BaseHandle handle);
 
   /**
    * @brief Copy constructor
@@ -121,7 +119,7 @@ public:
    * @SINCE_1_2.12
    * @param[in] handle Handle to an object
    */
-  TransitionData( const TransitionData& handle );
+  TransitionData(const TransitionData& handle);
 
   /**
    * @brief Assignment Operator
@@ -130,7 +128,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A reference to this object.
    */
-  TransitionData& operator=( const TransitionData& handle );
+  TransitionData& operator=(const TransitionData& handle);
 
   /**
    * @brief returns the count of the individual property transitions
@@ -146,11 +144,10 @@ public:
    * @param[in] index The index of the animator ( Must be less than Count() )
    * @return A property map representing the animator
    */
-  Property::Map GetAnimatorAt( size_t index );
+  Property::Map GetAnimatorAt(size_t index);
 
 public: // Not intended for application developers
-
-  explicit DALI_INTERNAL TransitionData( Internal::TransitionData *impl );
+  explicit DALI_INTERNAL TransitionData(Internal::TransitionData* impl);
 };
 
 } // namespace Toolkit

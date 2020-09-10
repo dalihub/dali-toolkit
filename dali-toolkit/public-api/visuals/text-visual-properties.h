@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
 /**
@@ -37,14 +36,12 @@ namespace Toolkit
  */
 namespace TextVisual
 {
-
 /**
  * @brief TextVisual Property.
  * @SINCE_1_2.60
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the instance of properties belonging to the TextVisual.
  * @SINCE_1_2.60

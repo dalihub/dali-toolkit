@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,29 +21,26 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelTextField
 {
-
-InputMethodContext GetInputMethodContext( TextField textField )
+InputMethodContext GetInputMethodContext(TextField textField)
 {
-  return GetImpl( textField ).GetInputMethodContext();
+  return GetImpl(textField).GetInputMethodContext();
 }
 
-void SelectWholeText( TextField textField )
+void SelectWholeText(TextField textField)
 {
-  GetImpl( textField ).SelectWholeText();
+  GetImpl(textField).SelectWholeText();
 }
 
-void SelectNone( TextField textField )
+void SelectNone(TextField textField)
 {
-  GetImpl( textField ).SelectNone();
+  GetImpl(textField).SelectNone();
 }
 
-} // namespace DevelText
+} // namespace DevelTextField
 
 } // namespace Toolkit
 

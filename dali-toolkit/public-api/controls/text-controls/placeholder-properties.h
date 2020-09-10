@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PLACEHOLDER_PROPERTIES_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_controls_text_controls
  * @{
@@ -31,7 +29,6 @@ namespace Toolkit
 
 namespace Text
 {
-
 /**
  * @brief Placeholder text used by Text controls to show text before any text inputed.
  * @SINCE_1_2.62
@@ -39,7 +36,6 @@ namespace Text
  */
 namespace PlaceHolder
 {
-
 /**
  * @brief Placeholder text Properties used by Text controls to show placeholder
  * @SINCE_1_2.62
@@ -47,7 +43,6 @@ namespace PlaceHolder
  */
 namespace Property
 {
-
 /**
  * @brief The configurable settings for the Placeholder text.
  * @SINCE_1_2.62
@@ -134,7 +129,6 @@ enum Setting
 } // namespace Property
 
 } // namespace PlaceHolder
-
 
 } // namespace Text
 

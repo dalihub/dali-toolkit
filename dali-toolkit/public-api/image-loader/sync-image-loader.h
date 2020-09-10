@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SYNC_IMAGE_LOADER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,17 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/pixel-data.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_image_loader
  * @{
@@ -38,7 +36,6 @@ namespace Toolkit
 
 namespace SyncImageLoader
 {
-
 /**
  * @brief The methods in the SyncImageLoader namespace are used to load pixel data from a URL synchronously.
  *
@@ -69,7 +66,7 @@ namespace SyncImageLoader
  * @param[in] url The URL of the image file to load
  * @return A PixelData object containing the image, or an invalid object on failure
  */
-DALI_TOOLKIT_API PixelData Load( const std::string& url );
+DALI_TOOLKIT_API PixelData Load(const std::string& url);
 
 /**
  * @brief Loads an image synchronously by specifying the target dimensions.
@@ -85,7 +82,7 @@ DALI_TOOLKIT_API PixelData Load( const std::string& url );
  * @param[in] dimensions The width and height to fit the loaded image to
  * @return A PixelData object containing the image, or an invalid object on failure
  */
-DALI_TOOLKIT_API PixelData Load( const std::string& url, ImageDimensions dimensions );
+DALI_TOOLKIT_API PixelData Load(const std::string& url, ImageDimensions dimensions);
 
 /**
  * @brief Loads an image synchronously by specifying the target dimensions and options.
@@ -99,11 +96,11 @@ DALI_TOOLKIT_API PixelData Load( const std::string& url, ImageDimensions dimensi
  * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
  * @return A PixelData object containing the image, or an invalid object on failure
  */
-DALI_TOOLKIT_API PixelData Load( const std::string& url,
-                ImageDimensions dimensions,
-                FittingMode::Type fittingMode,
-                SamplingMode::Type samplingMode,
-                bool orientationCorrection );
+DALI_TOOLKIT_API PixelData Load(const std::string& url,
+                                ImageDimensions    dimensions,
+                                FittingMode::Type  fittingMode,
+                                SamplingMode::Type samplingMode,
+                                bool               orientationCorrection);
 
 } // namespace SyncImageLoader
 

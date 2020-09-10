@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PAGE_FACTORY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @brief PageFactory is an abstract interface for providing textures to PageTurnView
  * Each page is identified by a unique ID, and has a linear order from 0 to GetNumberOfPages()-1
@@ -39,7 +37,6 @@ namespace Toolkit
 class DALI_TOOLKIT_API PageFactory
 {
 public:
-
   class Extension; ///< Forward declare future extension interface
 
   /**
@@ -65,7 +62,7 @@ public:
    * @param[in] pageId The ID of the page to create.
    * @return An actor, or an uninitialized pointer if the ID is out of range.
    */
-  virtual Texture NewPage( unsigned int pageId ) = 0;
+  virtual Texture NewPage(unsigned int pageId) = 0;
 
   /**
    * @brief Retrieve the extension for this factory

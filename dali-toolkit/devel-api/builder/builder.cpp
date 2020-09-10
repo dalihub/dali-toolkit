@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 Builder::Builder()
 {
 }
@@ -44,24 +42,24 @@ Builder Builder::New(void)
   return Builder(new Internal::Builder());
 }
 
-Builder::Builder(Internal::Builder *impl)
-  : BaseHandle(impl)
+Builder::Builder(Internal::Builder* impl)
+: BaseHandle(impl)
 {
 }
 
-void Builder::LoadFromString( const std::string &data, UIFormat rep )
+void Builder::LoadFromString(const std::string& data, UIFormat rep)
 {
-  GetImpl(*this).LoadFromString( data );
+  GetImpl(*this).LoadFromString(data);
 }
 
-void Builder::AddConstants( const Property::Map& map )
+void Builder::AddConstants(const Property::Map& map)
 {
-  GetImpl(*this).AddConstants( map );
+  GetImpl(*this).AddConstants(map);
 }
 
-void Builder::AddConstant( const std::string& key, const Property::Value& value )
+void Builder::AddConstant(const std::string& key, const Property::Value& value)
 {
-  GetImpl(*this).AddConstant( key, value );
+  GetImpl(*this).AddConstant(key, value);
 }
 
 const Property::Map& Builder::GetConfigurations() const
@@ -74,92 +72,91 @@ const Property::Map& Builder::GetConstants() const
   return GetImpl(*this).GetConstants();
 }
 
-const Property::Value& Builder::GetConstant( const std::string& key ) const
+const Property::Value& Builder::GetConstant(const std::string& key) const
 {
-  return GetImpl(*this).GetConstant( key );
+  return GetImpl(*this).GetConstant(key);
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName )
+Animation Builder::CreateAnimation(const std::string& animationName)
 {
-  return GetImpl(*this).CreateAnimation( animationName );
+  return GetImpl(*this).CreateAnimation(animationName);
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName, const Property::Map& map )
+Animation Builder::CreateAnimation(const std::string& animationName, const Property::Map& map)
 {
-  return GetImpl(*this).CreateAnimation( animationName, map );
+  return GetImpl(*this).CreateAnimation(animationName, map);
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName, Dali::Actor sourceActor )
+Animation Builder::CreateAnimation(const std::string& animationName, Dali::Actor sourceActor)
 {
-  return GetImpl(*this).CreateAnimation( animationName, sourceActor );
+  return GetImpl(*this).CreateAnimation(animationName, sourceActor);
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName, const Property::Map& map, Dali::Actor sourceActor )
+Animation Builder::CreateAnimation(const std::string& animationName, const Property::Map& map, Dali::Actor sourceActor)
 {
-  return GetImpl(*this).CreateAnimation( animationName, map, sourceActor );
+  return GetImpl(*this).CreateAnimation(animationName, map, sourceActor);
 }
 
-BaseHandle Builder::Create( const std::string& templateName )
+BaseHandle Builder::Create(const std::string& templateName)
 {
-  return GetImpl(*this).Create( templateName );
+  return GetImpl(*this).Create(templateName);
 }
 
-BaseHandle Builder::Create( const std::string& templateName, const Property::Map& map )
+BaseHandle Builder::Create(const std::string& templateName, const Property::Map& map)
 {
-  return GetImpl(*this).Create( templateName, map );
+  return GetImpl(*this).Create(templateName, map);
 }
 
-BaseHandle Builder::CreateFromJson( const std::string& json )
+BaseHandle Builder::CreateFromJson(const std::string& json)
 {
-  return GetImpl(*this).CreateFromJson( json );
+  return GetImpl(*this).CreateFromJson(json);
 }
 
-bool Builder::ApplyStyle( const std::string& styleName, Handle& handle )
+bool Builder::ApplyStyle(const std::string& styleName, Handle& handle)
 {
-  return GetImpl(*this).ApplyStyle( styleName, handle );
+  return GetImpl(*this).ApplyStyle(styleName, handle);
 }
 
-bool Builder::ApplyFromJson( Handle& handle, const std::string& json )
+bool Builder::ApplyFromJson(Handle& handle, const std::string& json)
 {
-  return GetImpl(*this).ApplyFromJson( handle, json );
+  return GetImpl(*this).ApplyFromJson(handle, json);
 }
 
-void Builder::AddActors( Actor toActor )
+void Builder::AddActors(Actor toActor)
 {
-  GetImpl(*this).AddActors( toActor );
+  GetImpl(*this).AddActors(toActor);
 }
 
-void Builder::AddActors( const std::string &sectionName, Actor toActor )
+void Builder::AddActors(const std::string& sectionName, Actor toActor)
 {
-  GetImpl(*this).AddActors( sectionName, toActor );
+  GetImpl(*this).AddActors(sectionName, toActor);
 }
 
-void Builder::CreateRenderTask( const std::string &name )
+void Builder::CreateRenderTask(const std::string& name)
 {
-  GetImpl(*this).CreateRenderTask( name );
+  GetImpl(*this).CreateRenderTask(name);
 }
 
-Path Builder::GetPath( const std::string &name )
+Path Builder::GetPath(const std::string& name)
 {
-  return GetImpl(*this).GetPath( name );
+  return GetImpl(*this).GetPath(name);
 }
 
-PathConstrainer Builder::GetPathConstrainer( const std::string& pathConstrainerName )
+PathConstrainer Builder::GetPathConstrainer(const std::string& pathConstrainerName)
 {
-  return GetImpl(*this).GetPathConstrainer( pathConstrainerName );
+  return GetImpl(*this).GetPathConstrainer(pathConstrainerName);
 }
 
-LinearConstrainer Builder::GetLinearConstrainer( const std::string& linearConstrainerName )
+LinearConstrainer Builder::GetLinearConstrainer(const std::string& linearConstrainerName)
 {
-  return GetImpl(*this).GetLinearConstrainer( linearConstrainerName );
+  return GetImpl(*this).GetLinearConstrainer(linearConstrainerName);
 }
 
 Builder::BuilderSignalType& Builder::QuitSignal()
 {
-  return GetImpl( *this ).QuitSignal();
+  return GetImpl(*this).QuitSignal();
 }
 
 } // namespace Toolkit
 
 } // namespace Dali
-

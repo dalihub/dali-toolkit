@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ITEM_LAYOUT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,14 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/enums.h>
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/enums.h>
 
 #undef min
 #undef max
 
 namespace Dali
 {
-
 namespace Toolkit
 {
 /**
@@ -84,10 +83,10 @@ struct ItemRange
    */
   ItemRange& operator=(const ItemRange& range)
   {
-    if( this != &range )
+    if(this != &range)
     {
       begin = range.begin;
-      end = range.end;
+      end   = range.end;
     }
     return *this;
   }
@@ -117,8 +116,8 @@ struct ItemRange
     ItemRange intersection(0u, 0u);
 
     // If the ranges intersect
-    if ( (begin < second.end && end > second.begin) ||
-         (second.begin < end && second.end > begin) )
+    if((begin < second.end && end > second.begin) ||
+       (second.begin < end && second.end > begin))
     {
       intersection.begin = std::max(begin, second.begin);
       intersection.end   = std::min(end, second.end);
@@ -144,7 +143,6 @@ struct ItemRange
 class DALI_TOOLKIT_API ItemLayout : public RefObject
 {
 public:
-
   class Extension; ///< Forward declare future extension interface
 
   /**
@@ -195,7 +193,7 @@ public:
    * @note layout-position is not provided as a parameter, since applying size constraints is not recommended.
    * Animating to target-sizes is preferable, since this allows controls to perform layouting without constraints.
    */
-  void GetItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const;
+  void GetItemSize(unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize) const;
 
   /**
    * @brief Overrides the default size for the layout.
@@ -203,7 +201,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] itemSize The size of each item.
    */
-  void SetItemSize( const Vector3& itemSize );
+  void SetItemSize(const Vector3& itemSize);
 
   /**
    * @brief Query the minimum valid layout position; this is a negative value.
@@ -286,7 +284,7 @@ public:
    * @note layout-position is not provided as a parameter, since applying size constraints is not recommended.
    * Animating to target-sizes is preferable, since this allows controls to perform layouting without constraints.
    */
-  virtual void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const = 0;
+  virtual void GetDefaultItemSize(unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize) const = 0;
 
   /**
    * @brief Query the scroll direction of the layout.
@@ -368,7 +366,7 @@ public:
    * @param[in] layoutSize The current size of the item view instance.
    * @param[in] itemViewActor The item view instance which requests the application of constraints.
    */
-  virtual void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor ) = 0;
+  virtual void ApplyConstraints(Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor) = 0;
 
   /**
    * @brief Gets the position of a given item
@@ -393,7 +391,6 @@ public:
   }
 
 protected:
-
   /**
    * @brief Create a new ItemLayout; Only derived versions are instantiatable.
    * @SINCE_1_0.0
@@ -401,21 +398,19 @@ protected:
   ItemLayout();
 
 private:
-
   /**
    * @brief Don't allow copy constructor
    * @SINCE_1_0.0
    */
-  ItemLayout( const ItemLayout& handle );
+  ItemLayout(const ItemLayout& handle);
 
   /**
    * @brief Don't allow copy operator
    * @SINCE_1_0.0
    */
-  ItemLayout& operator=( const ItemLayout& handle );
+  ItemLayout& operator=(const ItemLayout& handle);
 
 protected:
-
   struct Impl;
   Impl* mImpl;
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@ using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 TextSelectionToolbar TextSelectionToolbar::New()
 {
   return Internal::TextSelectionToolbar::New();
@@ -38,16 +36,16 @@ TextSelectionToolbar::TextSelectionToolbar()
 {
 }
 
-TextSelectionToolbar::TextSelectionToolbar( const TextSelectionToolbar& handle )
-: Control( handle )
+TextSelectionToolbar::TextSelectionToolbar(const TextSelectionToolbar& handle)
+: Control(handle)
 {
 }
 
-TextSelectionToolbar& TextSelectionToolbar::operator=( const TextSelectionToolbar& handle )
+TextSelectionToolbar& TextSelectionToolbar::operator=(const TextSelectionToolbar& handle)
 {
-  if( &handle != this )
+  if(&handle != this)
   {
-    Control::operator=( handle );
+    Control::operator=(handle);
   }
   return *this;
 }
@@ -56,47 +54,46 @@ TextSelectionToolbar::~TextSelectionToolbar()
 {
 }
 
-void TextSelectionToolbar::AddOption( Actor& option )
+void TextSelectionToolbar::AddOption(Actor& option)
 {
   GetImpl(*this).AddOption(option);
 }
 
-void TextSelectionToolbar::AddDivider( Actor& divider )
+void TextSelectionToolbar::AddDivider(Actor& divider)
 {
-  GetImpl(*this).AddDivider( divider );
+  GetImpl(*this).AddDivider(divider);
 }
 
-void TextSelectionToolbar::ResizeDividers( Size& size )
+void TextSelectionToolbar::ResizeDividers(Size& size)
 {
-  GetImpl(*this).ResizeDividers( size );
+  GetImpl(*this).ResizeDividers(size);
 }
 
-void TextSelectionToolbar::RaiseAbove( Layer target )
+void TextSelectionToolbar::RaiseAbove(Layer target)
 {
-  GetImpl(*this).RaiseAbove( target );
+  GetImpl(*this).RaiseAbove(target);
 }
 
-void TextSelectionToolbar::ScrollTo( const Vector2& position )
+void TextSelectionToolbar::ScrollTo(const Vector2& position)
 {
-  GetImpl(*this).ScrollTo( position );
+  GetImpl(*this).ScrollTo(position);
 }
 
-TextSelectionToolbar TextSelectionToolbar::DownCast( BaseHandle handle )
+TextSelectionToolbar TextSelectionToolbar::DownCast(BaseHandle handle)
 {
   return Control::DownCast<TextSelectionToolbar, Internal::TextSelectionToolbar>(handle);
 }
 
-TextSelectionToolbar::TextSelectionToolbar( Internal::TextSelectionToolbar& implementation )
+TextSelectionToolbar::TextSelectionToolbar(Internal::TextSelectionToolbar& implementation)
 : Control(implementation)
 {
 }
 
-TextSelectionToolbar::TextSelectionToolbar( Dali::Internal::CustomActor* internal )
-: Control( internal )
+TextSelectionToolbar::TextSelectionToolbar(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::TextSelectionToolbar>( internal );
+  VerifyCustomActorPointer<Internal::TextSelectionToolbar>(internal);
 }
-
 
 } // namespace Toolkit
 

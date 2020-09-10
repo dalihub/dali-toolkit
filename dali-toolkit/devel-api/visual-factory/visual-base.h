@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_VISUAL_BASE_H
 #define DALI_TOOLKIT_VISUAL_BASE_H
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/object/base-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -27,21 +27,18 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 namespace Visual
 {
 class Base;
 }
-}
+} // namespace DALI_INTERNAL
 
 namespace Visual
 {
-
 /**
  * @brief A Visual provides a renderer for drawing a control component. A control may have multiple visuals.
  *
@@ -84,7 +81,6 @@ namespace Visual
 class DALI_TOOLKIT_API Base : public BaseHandle
 {
 public:
-
   /**
    * @brief Create an empty Visual Handle
    */
@@ -102,7 +98,7 @@ public:
    *
    * @param[in] handle A reference to the copied handle.
    */
-  Base( const Base& handle );
+  Base(const Base& handle);
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -110,7 +106,7 @@ public:
    * @param [in] handle  A reference to the copied handle.
    * @return A reference to this.
    */
-  Base& operator=( const Base& handle );
+  Base& operator=(const Base& handle);
 
   /**
    * @brief Set the name of the visual
@@ -118,7 +114,7 @@ public:
    * Used by the styling system to animate properties
    * @param[in] name The name to give the visual
    */
-  void SetName( const std::string& name );
+  void SetName(const std::string& name);
 
   /**
    * @brief Get the name of the visual
@@ -134,7 +130,7 @@ public:
    * @param[in] transform A property map describing the transform
    * @param[in] controlSize The size of the parent control for visuals that need to scale internally.
    */
-  void SetTransformAndSize( const Dali::Property::Map& transform, Size controlSize );
+  void SetTransformAndSize(const Dali::Property::Map& transform, Size controlSize);
 
   /**
    * @brief Returns the height for a given width.
@@ -143,7 +139,7 @@ public:
    *
    * @return The height based on the width.
    */
-  float GetHeightForWidth( float width );
+  float GetHeightForWidth(float width);
 
   /**
    * @brief Returns the width for a given height.
@@ -152,7 +148,7 @@ public:
    *
    * @return The width based on the height.
    */
-  float GetWidthForHeight( float height );
+  float GetWidthForHeight(float height);
 
   /**
    * @brief Return the natural size of the visual.
@@ -165,7 +161,7 @@ public:
    *
    * @param[out] naturalSize The visual's natural size
    */
-  void GetNaturalSize( Vector2& naturalSize );
+  void GetNaturalSize(Vector2& naturalSize);
 
   /**
    * @brief Set the depth index of this visual.
@@ -175,7 +171,7 @@ public:
    *
    * @param[in] index The depth index of this visual.
    */
-  void SetDepthIndex( int index );
+  void SetDepthIndex(int index);
 
   /**
    * @brief Get the depth index of this visual
@@ -189,7 +185,7 @@ public:
    *
    * @param[out] map The visual property map.
    */
-  void CreatePropertyMap( Dali::Property::Map& map ) const;
+  void CreatePropertyMap(Dali::Property::Map& map) const;
 
   /**
    * @brief Get the type of this visual.
@@ -199,9 +195,7 @@ public:
   Visual::Type GetType() const;
 
 public: // Not intended for application developers
-
-  explicit DALI_INTERNAL Base(Internal::Visual::Base *impl);
-
+  explicit DALI_INTERNAL Base(Internal::Visual::Base* impl);
 };
 
 } // namespace Visual

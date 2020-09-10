@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SELECTION_POPUP_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class TextSelectionPopupCallbackInterface;
 
 namespace Internal DALI_INTERNAL
@@ -47,16 +45,15 @@ class TextSelectionPopup;
 class DALI_TOOLKIT_API TextSelectionPopup : public Control
 {
 public:
-
   enum Buttons
   {
-    CUT = 1u << 0,
-    COPY = 1u << 1,
-    PASTE = 1u << 2,
-    SELECT = 1u << 3,
+    CUT        = 1u << 0,
+    COPY       = 1u << 1,
+    PASTE      = 1u << 2,
+    SELECT     = 1u << 3,
     SELECT_ALL = 1u << 4,
-    CLIPBOARD = 1u << 5,
-    NONE = 1u << 6,
+    CLIPBOARD  = 1u << 5,
+    NONE       = 1u << 6,
   };
 
   /**
@@ -65,7 +62,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000 ///< Reserve property indices
   };
 
   /**
@@ -79,7 +76,7 @@ public:
        * @brief The maximum size the Popup can be.
        * @details Name "popupMaxSize", type Vector2.
        */
-      POPUP_MAX_SIZE =  PROPERTY_START_INDEX,
+      POPUP_MAX_SIZE = PROPERTY_START_INDEX,
 
       /**
        * @brief The minimum size the Popup can be.
@@ -191,7 +188,7 @@ public:
    * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    * @return A handle to the TextSelectionPopup control.
    */
-  static TextSelectionPopup New( TextSelectionPopupCallbackInterface* callbackInterface );
+  static TextSelectionPopup New(TextSelectionPopupCallbackInterface* callbackInterface);
 
   /**
    * @brief Creates an empty handle.
@@ -203,7 +200,7 @@ public:
    *
    * @param[in] handle The handle to copy from.
    */
-  TextSelectionPopup( const TextSelectionPopup& handle );
+  TextSelectionPopup(const TextSelectionPopup& handle);
 
   /**
    * @brief Assignment operator.
@@ -211,7 +208,7 @@ public:
    * @param[in] handle The handle to copy from.
    * @return A reference to this.
    */
-  TextSelectionPopup& operator=( const TextSelectionPopup& handle );
+  TextSelectionPopup& operator=(const TextSelectionPopup& handle);
 
   /**
    * @brief Destructor
@@ -229,20 +226,20 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a TextSelectionPopup or an empty handle
    */
-  static TextSelectionPopup DownCast( BaseHandle handle );
+  static TextSelectionPopup DownCast(BaseHandle handle);
 
   /**
    * @brief Specify which buttons to show in Popup
    * @param[in] buttonsToEnable Buttons to enable
    */
-  void EnableButtons( Toolkit::TextSelectionPopup::Buttons buttonsToEnable );
+  void EnableButtons(Toolkit::TextSelectionPopup::Buttons buttonsToEnable);
 
   /**
    * @brief Raises the toolbar's layer above the given @e target layer.
    *
    * @param[in] target The layer to get above of.
    */
-  void RaiseAbove( Layer target );
+  void RaiseAbove(Layer target);
 
   /**
    * @brief Show the Popup if not being shown
@@ -255,20 +252,19 @@ public:
   void HidePopup();
 
 public: // Not intended for application developers
-
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @param[in] implementation The Control implementation.
    */
-  DALI_INTERNAL TextSelectionPopup( Internal::TextSelectionPopup& implementation );
+  DALI_INTERNAL TextSelectionPopup(Internal::TextSelectionPopup& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL TextSelectionPopup( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL TextSelectionPopup(Dali::Internal::CustomActor* internal);
 
 }; // Class TextSelectionPopup
 

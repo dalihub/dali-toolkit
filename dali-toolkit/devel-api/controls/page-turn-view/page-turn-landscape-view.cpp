@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,36 +23,34 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 PageTurnLandscapeView::PageTurnLandscapeView()
 : PageTurnView()
 {
 }
 
-PageTurnLandscapeView::PageTurnLandscapeView( const PageTurnLandscapeView& pageTurnLandscapeView )
-: PageTurnView( pageTurnLandscapeView )
+PageTurnLandscapeView::PageTurnLandscapeView(const PageTurnLandscapeView& pageTurnLandscapeView)
+: PageTurnView(pageTurnLandscapeView)
 {
 }
 
-PageTurnLandscapeView::PageTurnLandscapeView( Internal::PageTurnLandscapeView& implementation )
-: PageTurnView( implementation )
+PageTurnLandscapeView::PageTurnLandscapeView(Internal::PageTurnLandscapeView& implementation)
+: PageTurnView(implementation)
 {
 }
 
-PageTurnLandscapeView::PageTurnLandscapeView( Dali::Internal::CustomActor* internal )
-: PageTurnView( internal )
+PageTurnLandscapeView::PageTurnLandscapeView(Dali::Internal::CustomActor* internal)
+: PageTurnView(internal)
 {
-  VerifyCustomActorPointer<Internal::PageTurnLandscapeView>( internal );
+  VerifyCustomActorPointer<Internal::PageTurnLandscapeView>(internal);
 }
 
-PageTurnLandscapeView& PageTurnLandscapeView::operator=( const PageTurnLandscapeView& pageTurnLandscapeView )
+PageTurnLandscapeView& PageTurnLandscapeView::operator=(const PageTurnLandscapeView& pageTurnLandscapeView)
 {
-  if( &pageTurnLandscapeView != this)
+  if(&pageTurnLandscapeView != this)
   {
-    PageTurnView::operator=( pageTurnLandscapeView );
+    PageTurnView::operator=(pageTurnLandscapeView);
   }
   return *this;
 }
@@ -61,14 +59,14 @@ PageTurnLandscapeView::~PageTurnLandscapeView()
 {
 }
 
-PageTurnLandscapeView PageTurnLandscapeView::New( PageFactory& pageFactory, const Vector2& viewPageSize )
+PageTurnLandscapeView PageTurnLandscapeView::New(PageFactory& pageFactory, const Vector2& viewPageSize)
 {
   return Internal::PageTurnLandscapeView::New(pageFactory, viewPageSize);
 }
 
-PageTurnLandscapeView PageTurnLandscapeView::DownCast( BaseHandle handle )
+PageTurnLandscapeView PageTurnLandscapeView::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<PageTurnLandscapeView, Internal::PageTurnLandscapeView>( handle );
+  return Control::DownCast<PageTurnLandscapeView, Internal::PageTurnLandscapeView>(handle);
 }
 
 } // namespace Toolkit

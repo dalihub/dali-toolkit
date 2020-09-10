@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TOGGLE_BUTTON_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 // Forward declarations
 
 namespace Internal DALI_INTERNAL
@@ -34,7 +32,7 @@ namespace Internal DALI_INTERNAL
 // Forward declarations
 
 class ToggleButton;
-}
+} // namespace DALI_INTERNAL
 /**
  * @addtogroup dali_toolkit_controls_buttons
  * @{
@@ -106,8 +104,8 @@ public:
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Button::PROPERTY_END_INDEX + 1,    ///< Toggle button start index
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000        ///< Reserving 1000 property indices
+    PROPERTY_START_INDEX = Button::PROPERTY_END_INDEX + 1, ///< Toggle button start index
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000     ///< Reserving 1000 property indices
   };
 
   /**
@@ -148,7 +146,6 @@ public:
   };
 
 public:
-
   /**
    * @brief Create an uninitialized ToggleButton; this can be initialized with ToggleButton::New().
    *
@@ -160,14 +157,14 @@ public:
    * @brief Copy constructor.
    * @param[in] toggleButton Handle to an object
    */
-  ToggleButton( const ToggleButton& toggleButton );
+  ToggleButton(const ToggleButton& toggleButton);
 
   /**
    * @brief Assignment operator.
    * @param[in] toggleButton Handle to an object
    * @return A reference to this
    */
-  ToggleButton& operator=( const ToggleButton& toggleButton );
+  ToggleButton& operator=(const ToggleButton& toggleButton);
 
   /**
    * @brief Destructor
@@ -192,24 +189,23 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a ToggleButton or an uninitialized handle
    */
-  static ToggleButton DownCast( BaseHandle handle );
+  static ToggleButton DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL ToggleButton( Internal::ToggleButton& implementation );
+  DALI_INTERNAL ToggleButton(Internal::ToggleButton& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  DALI_INTERNAL ToggleButton( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL ToggleButton(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 
