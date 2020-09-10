@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/public-api/events/wheel-event.h>
@@ -706,6 +707,11 @@ void ScrollView::OnInitialize()
 
   // Connect wheel event
   self.WheelEventSignal().Connect( this, &ScrollView::OnWheelEvent );
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::SCROLL_PANE ) );
+  } );
 }
 
 void ScrollView::OnSceneConnection( int depth )
@@ -1826,6 +1832,12 @@ void ScrollView::RemoveScrollingDirection( Radian direction )
 Toolkit::ScrollView::SnapStartedSignalType& ScrollView::SnapStartedSignal()
 {
   return mSnapStartedSignal;
+}
+
+void ScrollView::AccessibleImpl::EnsureChildVisible(Actor child)
+{
+  auto scrollView = Dali::Toolkit::ScrollView::DownCast(self);
+  scrollView.ScrollTo(child);
 }
 
 void ScrollView::FindAndUnbindActor(Actor child)

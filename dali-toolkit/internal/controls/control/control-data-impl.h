@@ -586,6 +586,8 @@ public:
     std::vector<Dali::Accessibility::Relation> GetRelationSet() override;
 
     virtual Dali::Accessibility::States CalculateStates();
+    virtual void EnsureChildVisible(Actor child);
+    virtual void EnsureSelfVisible();
   };
 
   std::function< std::unique_ptr< Dali::Accessibility::Accessible >( Actor ) > accessibilityConstructor;

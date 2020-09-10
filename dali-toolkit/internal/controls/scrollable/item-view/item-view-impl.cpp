@@ -22,7 +22,7 @@
 #include <cstring> // for strcmp
 #include <algorithm>
 #include <dali/public-api/actors/layer.h>
-
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/common/stage.h>
@@ -379,6 +379,11 @@ void ItemView::OnInitialize()
 
   // Connect wheel event
   self.WheelEventSignal().Connect( this, &ItemView::OnWheelEvent );
+
+  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor)
+  {
+    return std::unique_ptr<Dali::Accessibility::Accessible>(new AccessibleImpl(actor, Dali::Accessibility::Role::SCROLL_PANE));
+  });
 }
 
 ItemView::~ItemView()
@@ -1353,6 +1358,13 @@ void ItemView::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
     float scrollTo = mActiveLayout->GetClosestOnScreenLayoutPosition(nextItemID, layoutPosition, layoutSize);
     ScrollTo(Vector2(0.0f, scrollTo), DEFAULT_KEYBOARD_FOCUS_SCROLL_DURATION);
   }
+}
+
+void ItemView::AccessibleImpl::EnsureChildVisible(Actor child)
+{
+  EnsureSelfVisible();
+  auto itemView = Dali::Toolkit::ItemView::DownCast(self);
+  Toolkit::GetImpl(itemView).OnKeyboardFocusChangeCommitted(child);
 }
 
 Animation ItemView::DoAnchoring()

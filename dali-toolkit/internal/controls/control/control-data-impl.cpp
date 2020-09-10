@@ -2108,6 +2108,7 @@ bool Control::Impl::AccessibleImpl::GrabHighlight()
   highlight.SetProperty( Actor::Property::POSITION_Z, 1.0f );
   highlight.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
 
+  EnsureSelfVisible();
   self.Add( highlight );
   SetCurrentlyHighlightedActor( self );
   EmitHighlighted( true );
@@ -2209,6 +2210,19 @@ std::vector<Dali::Accessibility::Relation> Control::Impl::AccessibleImpl::GetRel
   }
 
   return ret;
+}
+
+void Control::Impl::AccessibleImpl::EnsureChildVisible(Actor child)
+{
+}
+
+void Control::Impl::AccessibleImpl::EnsureSelfVisible()
+{
+  auto parent = dynamic_cast<Control::Impl::AccessibleImpl*>(GetParent());
+  if (parent)
+  {
+    parent->EnsureChildVisible(self);
+  }
 }
 
 void Control::Impl::PositionOrSizeChangedCallback( PropertyNotification &p )
