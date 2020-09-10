@@ -164,6 +164,13 @@ private:
   std::vector<std::string> mToggleTooltips;               ///< Toggle tooltips.
   unsigned int             mCurrentToggleIndex;       ///< The index of state.
 protected:
+  struct AccessibleImpl : public Button::AccessibleImpl
+  {
+    using Button::AccessibleImpl::AccessibleImpl;
+
+    Dali::Accessibility::States CalculateStates() override;
+    std::string GetDescriptionRaw() override;
+  };
   void OnStateChange( State newState ) override;
 };
 
