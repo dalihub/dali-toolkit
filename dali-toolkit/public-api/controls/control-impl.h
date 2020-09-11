@@ -34,7 +34,6 @@ namespace Dali
 {
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_controls
  * @{
@@ -44,7 +43,6 @@ class StyleManager;
 
 namespace Internal
 {
-
 /**
  * @brief This is the internal base class for all controls.
  *
@@ -56,7 +54,6 @@ namespace Internal
 class DALI_TOOLKIT_API Control : public CustomActorImpl, public ConnectionTrackerInterface
 {
 public:
-
   class Extension; ///< Forward declare future extension interface
 
   // Creation & Destruction
@@ -83,7 +80,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Control::SetStyleName
    */
-  void SetStyleName( const std::string& styleName );
+  void SetStyleName(const std::string& styleName);
 
   /**
    * @copydoc Dali::Toolkit::Control::GetStyleName
@@ -95,7 +92,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Control::SetBackgroundColor
    */
-  void SetBackgroundColor( const Vector4& color );
+  void SetBackgroundColor(const Vector4& color);
 
   /**
    * @brief Sets the background with a property map.
@@ -122,7 +119,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] type The gesture type(s) to enable
    */
-  void EnableGestureDetection( GestureType::Value type );
+  void EnableGestureDetection(GestureType::Value type);
 
   /**
    * @brief Allows deriving classes to disable any of the gesture detectors.
@@ -132,7 +129,7 @@ public:
    * @param[in] type The gesture type(s) to disable
    * @see EnableGetureDetection
    */
-  void DisableGestureDetection( GestureType::Value type );
+  void DisableGestureDetection(GestureType::Value type);
 
   /**
    * @brief If deriving classes wish to fine tune pinch gesture
@@ -193,7 +190,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] isSupported Whether this control supports two dimensional keyboard navigation
    */
-  void SetKeyboardNavigationSupport( bool isSupported );
+  void SetKeyboardNavigationSupport(bool isSupported);
 
   /**
    * @brief Gets whether this control supports two dimensional keyboard navigation.
@@ -230,7 +227,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] isFocusGroup Whether this control is set as a focus group for keyboard navigation
    */
-  void SetAsKeyboardFocusGroup( bool isFocusGroup );
+  void SetAsKeyboardFocusGroup(bool isFocusGroup);
 
   /**
    * @brief Gets whether this control is a focus group for keyboard navigation.
@@ -279,11 +276,10 @@ public:
    * @param[in] event The key event
    * @return True if the event was consumed
    */
-  DALI_INTERNAL bool EmitKeyEventSignal( const KeyEvent& event );
+  DALI_INTERNAL bool EmitKeyEventSignal(const KeyEvent& event);
   /// @endcond
 
 protected: // For derived classes to call
-
   /**
    * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal.
    *
@@ -292,99 +288,97 @@ protected: // For derived classes to call
    * @SINCE_1_0.0
    * @param[in] focusGained True if gained, False if lost
    */
-  void EmitKeyInputFocusSignal( bool focusGained );
+  void EmitKeyInputFocusSignal(bool focusGained);
 
 protected: // From CustomActorImpl
-
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    * @note If overridden, then an up-call to Control::OnSceneConnection MUST be made at the end.
    */
-  virtual void OnSceneConnection( int depth ) override;
+  void OnSceneConnection(int depth) override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneDisconnection()
    * @note If overridden, then an up-call to Control::OnSceneDisconnection MUST be made at the end.
    */
-  virtual void OnSceneDisconnection() override;
+  void OnSceneDisconnection() override;
 
   /**
    * @copydoc CustomActorImpl::OnChildAdd()
    * @note If overridden, then an up-call to Control::OnChildAdd MUST be made at the end.
    */
-  virtual void OnChildAdd( Actor& child ) override;
+  void OnChildAdd(Actor& child) override;
 
   /**
    * @copydoc CustomActorImpl::OnChildRemove()
    * @note If overridden, then an up-call to Control::OnChildRemove MUST be made at the end.
    */
-  virtual void OnChildRemove( Actor& child ) override;
+  void OnChildRemove(Actor& child) override;
 
   /**
    * @copydoc CustomActorImpl::OnPropertySet()
    * @note If overridden, then an up-call to Control::OnChildRemove MUST be made at the end.
    */
-  void OnPropertySet( Property::Index index, const Property::Value& propertyValue ) override;
+  void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet()
    * @note If overridden, then an up-call to Control::OnSizeSet MUST be made at the end.
    */
-  virtual void OnSizeSet( const Vector3& targetSize ) override;
+  void OnSizeSet(const Vector3& targetSize) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeAnimation()
    * @note If overridden, then an up-call to Control::OnSizeAnimation MUST be made at the end.
    */
-  virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize ) override;
+  void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override;
 
   /**
    * @copydoc CustomActorImpl::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
    * @copydoc CustomActorImpl::OnSetResizePolicy()
    */
-  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) override;
+  void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) override;
 
   /**
    * @copydoc CustomActorImpl::GetNaturalSize()
    */
-  virtual Vector3 GetNaturalSize() override;
+  Vector3 GetNaturalSize() override;
 
   /**
    * @copydoc CustomActorImpl::CalculateChildSize()
    */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) override;
+  float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) override;
 
   /**
    * @copydoc CustomActorImpl::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width ) override;
+  float GetHeightForWidth(float width) override;
 
   /**
    * @copydoc CustomActorImpl::GetWidthForHeight()
    */
-  virtual float GetWidthForHeight( float height ) override;
+  float GetWidthForHeight(float height) override;
 
   /**
    * @copydoc CustomActorImpl::RelayoutDependentOnChildren()
    */
-  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) override;
+  bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override;
 
   /**
    * @copydoc CustomActorImpl::OnCalculateRelayoutSize()
    */
-  virtual void OnCalculateRelayoutSize( Dimension::Type dimension ) override;
+  void OnCalculateRelayoutSize(Dimension::Type dimension) override;
 
   /**
    * @copydoc CustomActorImpl::OnLayoutNegotiated()
    */
-  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) override;
+  void OnLayoutNegotiated(float size, Dimension::Type dimension) override;
 
 protected: // Helpers for deriving classes
-
   // Construction
 
   /**
@@ -393,16 +387,16 @@ protected: // Helpers for deriving classes
    */
   enum ControlBehaviour
   {
-    CONTROL_BEHAVIOUR_DEFAULT            = 0, ///< Default behaviour: Size negotiation is enabled & listens to Style Change signal, but doesn't receive event callbacks. @SINCE_1_2_10
+    CONTROL_BEHAVIOUR_DEFAULT = 0, ///< Default behaviour: Size negotiation is enabled & listens to Style Change signal, but doesn't receive event callbacks. @SINCE_1_2_10
 
-    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 0 ),     ///< True if needs to support keyboard navigation @SINCE_1_0.0
+    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 0), ///< True if needs to support keyboard navigation @SINCE_1_0.0
 
-    DISABLE_STYLE_CHANGE_SIGNALS         = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 1 ),     ///< True if control should not monitor style change signals @SINCE_1_2_10
+    DISABLE_STYLE_CHANGE_SIGNALS = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 1), ///< True if control should not monitor style change signals @SINCE_1_2_10
 
     LAST_CONTROL_BEHAVIOUR_FLAG
   };
 
-  static const int CONTROL_BEHAVIOUR_FLAG_COUNT = Log< LAST_CONTROL_BEHAVIOUR_FLAG - 1 >::value + 1;      ///< Total count of flags
+  static const int CONTROL_BEHAVIOUR_FLAG_COUNT = Log<LAST_CONTROL_BEHAVIOUR_FLAG - 1>::value + 1; ///< Total count of flags
 
   /**
    * @brief Control constructor.
@@ -410,7 +404,7 @@ protected: // Helpers for deriving classes
    * @SINCE_1_0.0
    * @param[in] behaviourFlags Behavioural flags from ControlBehaviour enum
    */
-  Control( ControlBehaviour behaviourFlags );
+  Control(ControlBehaviour behaviourFlags);
 
   /**
    * @brief Second phase initialization.
@@ -419,7 +413,6 @@ protected: // Helpers for deriving classes
   void Initialize();
 
 public: // API for derived classes to override
-
   // Lifecycle
 
   /**
@@ -439,7 +432,7 @@ public: // API for derived classes to override
    * @param[in] styleManager The StyleManager object
    * @param[in] change Information denoting what has changed
    */
-  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
+  virtual void OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change);
 
   // Accessibility
 
@@ -460,7 +453,7 @@ public: // API for derived classes to override
    * @param[in] gesture The pan gesture
    * @return true if the pan gesture has been consumed by this control
    */
-  virtual bool OnAccessibilityPan( PanGesture gesture );
+  virtual bool OnAccessibilityPan(PanGesture gesture);
 
   /**
    * @brief This method should be overridden by deriving classes when they wish to respond
@@ -470,7 +463,7 @@ public: // API for derived classes to override
    * @param[in] isIncrease Whether the value should be increased or decreased
    * @return true if the value changed action has been consumed by this control
    */
-  virtual bool OnAccessibilityValueChange( bool isIncrease );
+  virtual bool OnAccessibilityValueChange(bool isIncrease);
 
   /**
    * @brief This method should be overridden by deriving classes when they wish to respond
@@ -509,7 +502,7 @@ public: // API for derived classes to override
    * @param[in] loopEnabled Whether the focus movement should be looped within the control
    * @return The next keyboard focusable actor in this control or an empty handle if no actor can be focused
    */
-  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled );
+  virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled);
 
   /**
    * @brief Informs this control that its chosen focusable actor will be focused.
@@ -520,7 +513,7 @@ public: // API for derived classes to override
    * @SINCE_1_0.0
    * @param[in] commitedFocusableActor The commited focusable actor
    */
-  virtual void OnKeyboardFocusChangeCommitted( Actor commitedFocusableActor );
+  virtual void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor);
 
   /**
    * @brief This method is called when the control has enter pressed on it.
@@ -538,7 +531,7 @@ public: // API for derived classes to override
    * @param[in] event The Key Event
    * @return True if the event should be consumed
    */
-  virtual bool OnKeyEvent( const KeyEvent& event );
+  virtual bool OnKeyEvent(const KeyEvent& event);
 
   // Gestures
 
@@ -555,7 +548,7 @@ public: // API for derived classes to override
    * @note Pinch detection should be enabled via EnableGestureDetection().
    * @see EnableGestureDetection
    */
-  virtual void OnPinch( const PinchGesture& pinch );
+  virtual void OnPinch(const PinchGesture& pinch);
 
   /**
    * @brief Called whenever a pan gesture is detected on this control.
@@ -569,7 +562,7 @@ public: // API for derived classes to override
    * @note Pan detection should be enabled via EnableGestureDetection().
    * @see EnableGestureDetection
    */
-  virtual void OnPan( const PanGesture& pan );
+  virtual void OnPan(const PanGesture& pan);
 
   /**
    * @brief Called whenever a tap gesture is detected on this control.
@@ -583,7 +576,7 @@ public: // API for derived classes to override
    * @note Tap detection should be enabled via EnableGestureDetection().
    * @see EnableGestureDetection
    */
-  virtual void OnTap( const TapGesture& tap );
+  virtual void OnTap(const TapGesture& tap);
 
   /**
    * @brief Called whenever a long press gesture is detected on this control.
@@ -597,19 +590,19 @@ public: // API for derived classes to override
    * @note Long press detection should be enabled via EnableGestureDetection().
    * @see EnableGestureDetection
    */
-  virtual void OnLongPress( const LongPressGesture& longPress );
+  virtual void OnLongPress(const LongPressGesture& longPress);
 
   // From ConnectionTrackerInterface
 
   /**
    * @copydoc ConnectionTrackerInterface::SignalConnected
    */
-  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
+  void SignalConnected(SlotObserver* slotObserver, CallbackBase* callback) override;
 
   /**
    * @copydoc ConnectionTrackerInterface::SignalDisconnected
    */
-  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback ) override;
+  void SignalDisconnected(SlotObserver* slotObserver, CallbackBase* callback) override;
 
   /**
    * @brief Retrieves the extension for this control.
@@ -623,14 +616,13 @@ public: // API for derived classes to override
   }
 
 private:
-
   /// @cond internal
 
   // Not copyable or movable
-  DALI_INTERNAL Control( const Control& ) = delete; ///< Deleted copy constructor.
-  DALI_INTERNAL Control( Control&& ) = delete; ///< Deleted move constructor.
-  DALI_INTERNAL Control& operator=( const Control& ) = delete; ///< Deleted copy assignment operator.
-  DALI_INTERNAL Control& operator=( Control&& ) = delete; ///< Deleted move assignment operator.
+  DALI_INTERNAL Control(const Control&) = delete;            ///< Deleted copy constructor.
+  DALI_INTERNAL Control(Control&&)      = delete;            ///< Deleted move constructor.
+  DALI_INTERNAL Control& operator=(const Control&) = delete; ///< Deleted copy assignment operator.
+  DALI_INTERNAL Control& operator=(Control&&) = delete;      ///< Deleted move assignment operator.
 
 public:
   class DALI_INTERNAL Impl; // Class declaration is public so we can internally add devel API's to the Controls Impl
@@ -638,7 +630,6 @@ public:
 private:
   Impl* mImpl;
   /// @endcond
-
 };
 
 /**
@@ -649,7 +640,7 @@ private:
  * @return Implementation
  * @pre handle is initialized and points to a control
  */
-DALI_TOOLKIT_API Internal::Control& GetImplementation( Dali::Toolkit::Control& handle );
+DALI_TOOLKIT_API Internal::Control& GetImplementation(Dali::Toolkit::Control& handle);
 
 /**
  * @brief Gets implementation from the handle.
@@ -659,7 +650,7 @@ DALI_TOOLKIT_API Internal::Control& GetImplementation( Dali::Toolkit::Control& h
  * @return Implementation
  * @pre Handle is initialized and points to a control.
  */
-DALI_TOOLKIT_API const Internal::Control& GetImplementation( const Dali::Toolkit::Control& handle );
+DALI_TOOLKIT_API const Internal::Control& GetImplementation(const Dali::Toolkit::Control& handle);
 
 } // namespace Internal
 

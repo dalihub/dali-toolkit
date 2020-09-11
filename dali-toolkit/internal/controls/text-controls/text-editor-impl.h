@@ -116,91 +116,91 @@ private: // From Control
   /**
    * @copydoc Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Control::OnStyleChange()
    */
-  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
+  void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change ) override;
 
   /**
    * @copydoc Control::GetNaturalSize()
    */
-  virtual Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize() override;
 
   /**
    * @copydoc Control::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width );
+  float GetHeightForWidth( float width ) override;
 
   /**
    * @copydoc Control::OnInitialize()
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   /**
    * @copydoc Control::OnKeyInputFocusGained()
    */
-  virtual void OnKeyInputFocusGained();
+  void OnKeyInputFocusGained() override;
 
   /**
    * @copydoc Control::OnKeyInputFocusLost()
    */
-  virtual void OnKeyInputFocusLost();
+  void OnKeyInputFocusLost() override;
 
   /**
    * @copydoc Control::OnTap()
    */
-  virtual void OnTap( const TapGesture& tap );
+  void OnTap( const TapGesture& tap ) override;
 
   /**
    * @copydoc Control::OnPan()
    */
-  virtual void OnPan( const PanGesture& gesture );
+  void OnPan( const PanGesture& gesture ) override;
 
   /**
    * @copydoc Control::OnLongPress()
    */
-  virtual void OnLongPress( const LongPressGesture& gesture );
+  void OnLongPress( const LongPressGesture& gesture ) override;
 
   /**
    * @copydoc Control::OnSceneConnection()
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
    */
-  virtual bool OnKeyEvent(const KeyEvent& event);
+  bool OnKeyEvent(const KeyEvent& event) override;
 
 // From ControlInterface
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
-  virtual void RequestTextRelayout();
+  void RequestTextRelayout() override;
 
 // From EditableControlInterface
 
   /**
    * @copydoc Text::ControlInterface::TextChanged()
    */
-  virtual void TextChanged();
+  void TextChanged() override;
 
   /**
    * @copydoc Text::ControlInterface::MaxLengthReached()
    */
-  virtual void MaxLengthReached();
+  void MaxLengthReached() override;
 
   /**
    * @copydoc Text::ControlInterface::InputStyleChanged()
    */
-  virtual void InputStyleChanged( Text::InputStyle::Mask inputStyleMask );
+  void InputStyleChanged( Text::InputStyle::Mask inputStyleMask ) override;
 
   /**
    * @copydoc Text::ControlInterface::AddDecoration()
    */
-  virtual void AddDecoration( Actor& actor, bool needsClipping );
+  void AddDecoration( Actor& actor, bool needsClipping ) override;
 
 private: // Implementation
 

@@ -125,7 +125,7 @@ public:
    * @param[in] object The visual whose resources are ready
    * @note Overriding method in Visual::EventObserver.
    */
-  virtual void ResourceReady( Visual::Base& object ) override;
+  void ResourceReady( Visual::Base& object ) override;
 
   /**
    * @brief Called when an event occurs.
@@ -133,7 +133,7 @@ public:
    * @param[in] signalId The signal to emit. See Visual to find supported signals
    * @note Overriding method in Visual::EventObserver.
    */
-  virtual void NotifyVisualEvent( Visual::Base& object, Property::Index signalId ) override;
+  void NotifyVisualEvent( Visual::Base& object, Property::Index signalId ) override;
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()

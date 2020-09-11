@@ -21,15 +21,13 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
+#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class ItemView;
@@ -67,18 +65,17 @@ typedef IntrusivePtr<ItemLayout> ItemLayoutPtr;
 class DALI_TOOLKIT_API ItemView : public Scrollable
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_1.18
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Toolkit::Scrollable::PROPERTY_END_INDEX + 1,                        ///< @SINCE_1_1.18
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,                                        ///< Reserve property indices, @SINCE_1_1.18
+    PROPERTY_START_INDEX = Toolkit::Scrollable::PROPERTY_END_INDEX + 1, ///< @SINCE_1_1.18
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,                 ///< Reserve property indices, @SINCE_1_1.18
 
     ANIMATABLE_PROPERTY_START_INDEX = Toolkit::Scrollable::ANIMATABLE_PROPERTY_END_INDEX + 1,
-    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_START_INDEX + 1000                   ///< Reserve animatable property indices @SINCE_1_0.0
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_START_INDEX + 1000 ///< Reserve animatable property indices @SINCE_1_0.0
   };
 
   /**
@@ -195,10 +192,9 @@ public:
 
   // Signals
 
-  typedef Signal< void () > LayoutActivatedSignalType;
+  typedef Signal<void()> LayoutActivatedSignalType;
 
 public:
-
   /**
    * @brief Creates an uninitialized ItemView; this can be initialized with ItemView::New().
    *
@@ -212,7 +208,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] itemView Handle to an object
    */
-  ItemView( const ItemView& itemView );
+  ItemView(const ItemView& itemView);
 
   /**
    * @brief Move constructor
@@ -220,7 +216,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  ItemView( ItemView&& rhs );
+  ItemView(ItemView&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -228,7 +224,7 @@ public:
    * @param[in] itemView Handle to an object
    * @return A reference to this
    */
-  ItemView& operator=( const ItemView& itemView );
+  ItemView& operator=(const ItemView& itemView);
 
   /**
    * @brief Move assignment
@@ -237,7 +233,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  ItemView& operator=( ItemView&& rhs );
+  ItemView& operator=(ItemView&& rhs);
 
   /**
    * @brief Destructor.
@@ -266,7 +262,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A handle to a ItemView or an uninitialized handle
    */
-  static ItemView DownCast( BaseHandle handle );
+  static ItemView DownCast(BaseHandle handle);
 
   /**
    * @brief Queries the number of layouts.
@@ -574,7 +570,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] parentOrigin New parent origin position vector
    */
-  void SetItemsParentOrigin( const Vector3& parentOrigin );
+  void SetItemsParentOrigin(const Vector3& parentOrigin);
 
   /**
    * @brief Get the parent origin of the items.
@@ -591,7 +587,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] anchorPoint New anchor point position vector
    */
-  void SetItemsAnchorPoint( const Vector3& anchorPoint );
+  void SetItemsAnchorPoint(const Vector3& anchorPoint);
 
   /**
    * @brief Get the anchor point of the items.
@@ -610,7 +606,6 @@ public:
   void GetItemsRange(ItemRange& range);
 
 public: // Signals
-
   /**
    * @brief Signal emitted when layout activation is finished.
    *
@@ -625,7 +620,6 @@ public: // Signals
   ItemView::LayoutActivatedSignalType& LayoutActivatedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -641,7 +635,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL ItemView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ItemView(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

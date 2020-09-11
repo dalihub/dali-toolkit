@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PAGE_TURN_PORTRAIT_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,13 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 // Forward declarations
 class PageTurnPortraitView;
-}
+} // namespace DALI_INTERNAL
 
 /**
  * @brief PageTurnPortraitView provides a page turn view in portrait mode
@@ -52,13 +50,13 @@ public:
    * @brief Copy constructor.
    * @SINCE_1_1.4
    */
-  PageTurnPortraitView( const PageTurnPortraitView& pageTurnPortraitView );
+  PageTurnPortraitView(const PageTurnPortraitView& pageTurnPortraitView);
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_1.4
    */
-  PageTurnPortraitView& operator=( const PageTurnPortraitView& pageTurnPortraitView );
+  PageTurnPortraitView& operator=(const PageTurnPortraitView& pageTurnPortraitView);
 
   /**
    * @brief Destructor
@@ -75,7 +73,7 @@ public:
    * @param[in] viewPageSize The size of the page
    * @return A handle to the PageTurnPortraitView control.
    */
-  static PageTurnPortraitView New( PageFactory& pageFactory, const Vector2& viewPageSize );
+  static PageTurnPortraitView New(PageFactory& pageFactory, const Vector2& viewPageSize);
 
   /**
    * @brief Downcast an Object handle to PageTurnPortraitView. If handle points to a PageTurnPortraitView the
@@ -84,24 +82,23 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a PageTurnPortraitView or an uninitialized handle
    */
-  static PageTurnPortraitView DownCast( BaseHandle handle );
+  static PageTurnPortraitView DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_1.4
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL PageTurnPortraitView( Internal::PageTurnPortraitView& implementation );
+  DALI_INTERNAL PageTurnPortraitView(Internal::PageTurnPortraitView& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    * @SINCE_1_1.4
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL PageTurnPortraitView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL PageTurnPortraitView(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

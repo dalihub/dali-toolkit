@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CONTROL_WRAPPER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class TransitionData;
 
 namespace Visual
@@ -37,10 +35,9 @@ class Base;
 
 namespace Internal
 {
-
 class ControlWrapper;
 
-typedef IntrusivePtr< ControlWrapper > ControlWrapperPtr;
+typedef IntrusivePtr<ControlWrapper> ControlWrapperPtr;
 
 /**
  * @copydoc Toolkit::ControlWrapper
@@ -48,7 +45,6 @@ typedef IntrusivePtr< ControlWrapper > ControlWrapperPtr;
 class DALI_TOOLKIT_API ControlWrapper : public Control
 {
 public:
-
   // Flags for the constructor
   enum CustomControlBehaviour
   {
@@ -60,14 +56,14 @@ public:
     LAST_CONTROL_BEHAVIOUR_FLAG
   };
 
-  static const int CONTROL_BEHAVIOUR_FLAG_COUNT = Log< LAST_CONTROL_BEHAVIOUR_FLAG - 1 >::value + 1;      ///< Total count of flags
+  static const int CONTROL_BEHAVIOUR_FLAG_COUNT = Log<LAST_CONTROL_BEHAVIOUR_FLAG - 1>::value + 1; ///< Total count of flags
 
   /**
    * @brief Control constructor
    *
    * @param[in] behaviourFlags Behavioural flags from CustomControlBehaviour enum
    */
-  ControlWrapper( CustomControlBehaviour behaviourFlags );
+  ControlWrapper(CustomControlBehaviour behaviourFlags);
 
   /**
    * Create a new ControlWrapper.
@@ -77,10 +73,9 @@ public:
    *
    * @return A public handle to the newly allocated ControlWrapper.
    */
-  static Dali::Toolkit::ControlWrapper New( const std::string& typeName, ControlWrapper* controlWrapper );
+  static Dali::Toolkit::ControlWrapper New(const std::string& typeName, ControlWrapper* controlWrapper);
 
 public: // From CustomActorImpl
-
   // Size negotiation helpers
 
   /**
@@ -91,74 +86,73 @@ public: // From CustomActorImpl
   /**
    * @copydoc Dali::CustomActorImpl::GetHeightForWidthBase()
    */
-  float GetHeightForWidthBase( float width );
+  float GetHeightForWidthBase(float width);
 
   /**
    * @copydoc Dali::CustomActorImpl::GetWidthForHeightBase()
    */
-  float GetWidthForHeightBase( float height );
+  float GetWidthForHeightBase(float height);
 
   /**
    * @copydoc Dali::CustomActorImpl::CalculateChildSizeBase()
    */
-  float CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension );
+  float CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension);
 
   /**
    * @copydoc Dali::CustomActorImpl::RelayoutDependentOnChildrenBase()
    */
-  bool RelayoutDependentOnChildrenBase( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
+  bool RelayoutDependentOnChildrenBase(Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
 
 public: // From Control
+  /**
+   * @ref Dali::Toolkit::DevelControl::RegisterVisual()
+   */
+  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual);
 
   /**
    * @ref Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual );
+  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, int depthIndex);
 
   /**
    * @ref Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
+  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled);
 
   /**
    * @ref Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
-
-  /**
-   * @ref Dali::Toolkit::DevelControl::RegisterVisual()
-   */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
+  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex);
 
   /**
    * @ref Dali::Toolkit::DevelControl::UnregisterVisual()
    */
-  void UnregisterVisual( Property::Index index );
+  void UnregisterVisual(Property::Index index);
 
   /**
    * @ref Dali::Toolkit::DevelControl::GetVisual()
    */
-  Toolkit::Visual::Base GetVisual( Property::Index index ) const;
+  Toolkit::Visual::Base GetVisual(Property::Index index) const;
 
   /**
    * @ref Dali::Toolkit::DevelControl::EnableVisual()
    */
-  void EnableVisual( Property::Index index, bool enable );
+  void EnableVisual(Property::Index index, bool enable);
 
   /**
    * @ref Dali::Toolkit::DevelControl::IsVisualEnabled()
    */
-  bool IsVisualEnabled( Property::Index index ) const;
+  bool IsVisualEnabled(Property::Index index) const;
 
   /**
    * @ref Dali::Toolkit::DevelControl::CreateTransition()
    */
-  Dali::Animation CreateTransition( const Toolkit::TransitionData& transitionData );
+  Dali::Animation CreateTransition(const Toolkit::TransitionData& transitionData);
 
   /**
    * @copydoc Dali::Toolkit::Internal::Control::EmitKeyInputFocusSignal()
    */
-  void EmitKeyInputFocusSignal( bool focusGained );
+  void EmitKeyInputFocusSignal(bool focusGained);
 
   /**
    * @brief Apply the current style
@@ -176,7 +170,6 @@ public:
   Dali::TypeInfo GetTypeInfo();
 
 protected:
-
   /**
    * Protected Destructor
    * A reference counted object may only be deleted by calling Unreference()
@@ -184,13 +177,12 @@ protected:
   virtual ~ControlWrapper();
 
 private:
-
   /// @cond internal
   /// Undefined.
-  DALI_INTERNAL ControlWrapper( const ControlWrapper& );
+  DALI_INTERNAL ControlWrapper(const ControlWrapper&);
 
   /// Undefined.
-  DALI_INTERNAL ControlWrapper& operator=( const ControlWrapper& rhs );
+  DALI_INTERNAL ControlWrapper& operator=(const ControlWrapper& rhs);
   /// @endcond
 };
 
@@ -198,22 +190,22 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::ControlWrapper& GetControlWrapperImpl( Toolkit::ControlWrapper& publicObject )
+inline Toolkit::Internal::ControlWrapper& GetControlWrapperImpl(Toolkit::ControlWrapper& publicObject)
 {
-  DALI_ASSERT_ALWAYS( publicObject );
+  DALI_ASSERT_ALWAYS(publicObject);
 
   Dali::RefObject& handle = publicObject.GetImplementation();
 
-  return static_cast<Toolkit::Internal::ControlWrapper&>( handle );
+  return static_cast<Toolkit::Internal::ControlWrapper&>(handle);
 }
 
-inline const Toolkit::Internal::ControlWrapper& GetControlWrapperImpl( const Toolkit::ControlWrapper& publicObject )
+inline const Toolkit::Internal::ControlWrapper& GetControlWrapperImpl(const Toolkit::ControlWrapper& publicObject)
 {
-  DALI_ASSERT_ALWAYS( publicObject );
+  DALI_ASSERT_ALWAYS(publicObject);
 
   const Dali::RefObject& handle = publicObject.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::ControlWrapper&>( handle );
+  return static_cast<const Toolkit::Internal::ControlWrapper&>(handle);
 }
 
 } // namespace Toolkit

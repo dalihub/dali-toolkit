@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SCROLL_VIEW_CONSTRAINTS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 
 namespace Dali
 {
-
 struct Vector2;
 struct Vector3;
 struct Vector4;
@@ -52,7 +51,7 @@ namespace Toolkit
  * @param[in] current Current position
  * @param[in] inputs The position input that Actor will move
  */
-DALI_TOOLKIT_API void MoveActorConstraint( Vector3& current, const PropertyInputContainer& inputs );
+DALI_TOOLKIT_API void MoveActorConstraint(Vector3& current, const PropertyInputContainer& inputs);
 
 /**
  * @brief Wraps an Actor's position in accordance with the min/max bounds of domain.
@@ -61,7 +60,7 @@ DALI_TOOLKIT_API void MoveActorConstraint( Vector3& current, const PropertyInput
  * @param[in] position Position to be wrapped
  * @param[in] inputs The input that Actor's position will be wrapped
  */
-DALI_TOOLKIT_API void WrapActorConstraint( Vector3& position, const PropertyInputContainer& inputs );
+DALI_TOOLKIT_API void WrapActorConstraint(Vector3& position, const PropertyInputContainer& inputs);
 
 /**
  * @}

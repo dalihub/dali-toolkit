@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_IMAGE_ATLAS_H
 #define DALI_TOOLKIT_IMAGE_ATLAS_H
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,22 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <stdint.h>
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/images/image-operations.h>
-#include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/pixel-data.h>
+#include <dali/public-api/images/pixel.h>
+#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/rendering/texture.h>
+#include <stdint.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class ImageAtlas;
@@ -50,18 +48,16 @@ class ImageAtlas;
 class DALI_TOOLKIT_API ImageAtlas : public BaseHandle
 {
 public:
-
   typedef uint32_t SizeType;
 
 public:
-
   /**
    * @brief Pack a group of  pixel data into atlas.
    * @param[in] pixelData The group of the pixel data to be packed into the atlas.
    * @param[out] textureRects The list of texture areas where each frame is located inside the atlas.
    * @return The atlas texture.
    */
-  static Texture PackToAtlas( const std::vector<PixelData>& pixelData, Dali::Vector<Vector4>& textureRects  );
+  static Texture PackToAtlas(const std::vector<PixelData>& pixelData, Dali::Vector<Vector4>& textureRects);
 
   /**
    * @brief Create a new ImageAtlas.
@@ -71,8 +67,7 @@ public:
    * @param [in] pixelFormat    The pixel format (rgba 32 bit by default).
    * @return A handle to a new ImageAtlas.
    */
-  static ImageAtlas New( SizeType width, SizeType height,
-                         Pixel::Format pixelFormat = Pixel::RGBA8888 );
+  static ImageAtlas New(SizeType width, SizeType height, Pixel::Format pixelFormat = Pixel::RGBA8888);
 
   /**
    * @brief Create an empty handle.
@@ -91,7 +86,7 @@ public:
    *
    * @param [in] handle A reference to the copied handle
    */
-  ImageAtlas( const ImageAtlas& handle );
+  ImageAtlas(const ImageAtlas& handle);
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -99,7 +94,7 @@ public:
    * @param [in] handle  A reference to the copied handle
    * @return A reference to this
    */
-  ImageAtlas& operator=( const ImageAtlas& handle );
+  ImageAtlas& operator=(const ImageAtlas& handle);
 
   /**
    * @brief Get the atlas image.
@@ -122,7 +117,7 @@ public:
    *
    * @param[in] brokenImageUrl The url of the broken image.
    */
-  void SetBrokenImage( const std::string& brokenImageUrl );
+  void SetBrokenImage(const std::string& brokenImageUrl);
 
   /**
    * @brief Upload a resource image to the atlas.
@@ -141,11 +136,11 @@ public:
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * @return True if there is enough space to fit this image in,false otherwise.
    */
-  bool Upload( Vector4& textureRect,
-               const std::string& url,
-               ImageDimensions size = ImageDimensions(),
-               FittingMode::Type fittingMode = FittingMode::DEFAULT,
-               bool orientationCorrection = true );
+  bool Upload(Vector4&           textureRect,
+              const std::string& url,
+              ImageDimensions    size                  = ImageDimensions(),
+              FittingMode::Type  fittingMode           = FittingMode::DEFAULT,
+              bool               orientationCorrection = true);
 
   /**
    * @brief Upload a resource image to the atlas.
@@ -166,12 +161,12 @@ public:
    * @return True if there is enough space to fit this image in,false otherwise.
    * @note The valid callback function here is required to have the signature of void( void ).
    */
-  bool Upload( Vector4& textureRect,
-               const std::string& url,
-               ImageDimensions size,
-               FittingMode::Type fittingMode,
-               bool orientationCorrection,
-               AtlasUploadObserver* atlasUploadObserver );
+  bool Upload(Vector4&             textureRect,
+              const std::string&   url,
+              ImageDimensions      size,
+              FittingMode::Type    fittingMode,
+              bool                 orientationCorrection,
+              AtlasUploadObserver* atlasUploadObserver);
 
   /**
    * @brief Upload a pixel buffer to atlas
@@ -179,7 +174,7 @@ public:
    * @param [out] textureRect The texture area of the resource image in the atlas.
    * @param [in] pixelData The pixel data.
    */
-  bool Upload( Vector4& textureRect, PixelData pixelData );
+  bool Upload(Vector4& textureRect, PixelData pixelData);
 
   /**
    * @brief Remove the image at the given rectangle.
@@ -188,11 +183,10 @@ public:
    *
    * @param [in] textureRect The texture area to be removed.
    */
-  void Remove( const Vector4& textureRect );
+  void Remove(const Vector4& textureRect);
 
 public: // Not intended for developer use
-
-  explicit DALI_INTERNAL ImageAtlas( Internal::ImageAtlas* impl );
+  explicit DALI_INTERNAL ImageAtlas(Internal::ImageAtlas* impl);
 };
 
 } // namespace Toolkit

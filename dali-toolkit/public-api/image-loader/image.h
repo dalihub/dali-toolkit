@@ -18,26 +18,23 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/frame-buffer.h>
-#include <dali/public-api/adaptor-framework/native-image-source.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * API to interface with the toolkit image
  * Allows developers to add FrameBuffer, PixelData and NativeImageSource to toolkit so that visuals can use them to render
  */
 namespace Image
 {
-
 /**
  * @brief Generate a Url from frame buffer.
  * This Url can be used in visuals to render the frame buffer.
@@ -49,7 +46,7 @@ namespace Image
  * @param[in] height the height for this frame buffer
  * @return the Url string representing this frame buffer
  */
-DALI_TOOLKIT_API std::string GenerateUrl( const Dali::FrameBuffer frameBuffer, Pixel::Format pixelFormat, uint32_t width, uint32_t height );
+DALI_TOOLKIT_API std::string GenerateUrl(const Dali::FrameBuffer frameBuffer, Pixel::Format pixelFormat, uint32_t width, uint32_t height);
 
 /**
  * @brief Generate a Url from frame buffer.
@@ -60,7 +57,7 @@ DALI_TOOLKIT_API std::string GenerateUrl( const Dali::FrameBuffer frameBuffer, P
  * @param[in] index the index of the attached color texture.
  * @return the Url string representing this frame buffer
  */
-DALI_TOOLKIT_API std::string GenerateUrl( const Dali::FrameBuffer frameBuffer, uint8_t index );
+DALI_TOOLKIT_API std::string GenerateUrl(const Dali::FrameBuffer frameBuffer, uint8_t index);
 
 /**
  * @brief Generate a Url from Pixel data.
@@ -69,7 +66,7 @@ DALI_TOOLKIT_API std::string GenerateUrl( const Dali::FrameBuffer frameBuffer, u
  * @param[in] pixelData the pixel data to converted to Url
  * @return the Url string representing this pixel data
  */
-DALI_TOOLKIT_API std::string GenerateUrl( const Dali::PixelData pixelData );
+DALI_TOOLKIT_API std::string GenerateUrl(const Dali::PixelData pixelData);
 
 /**
  * @brief Generate a Url from native image source.
@@ -78,12 +75,12 @@ DALI_TOOLKIT_API std::string GenerateUrl( const Dali::PixelData pixelData );
  * @param[in] nativeImageSource the native image source to converted to Url
  * @return the Url string representing this native image source
  */
-DALI_TOOLKIT_API std::string GenerateUrl( const Dali::NativeImageSourcePtr nativeImageSource );
+DALI_TOOLKIT_API std::string GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource);
 
-} // Image
+} // namespace Image
 
-} // Toolkit
+} // namespace Toolkit
 
-} // Dali
+} // namespace Dali
 
 #endif // DALI_TOOLKIT_IMAGE_H

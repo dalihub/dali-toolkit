@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_COMMON_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,23 +32,23 @@
  * When building a library that uses DALI, HIDE_DALI_INTERNALS.
  */
 #if __GNUC__ >= 4
-#  ifndef HIDE_DALI_INTERNALS
-#    define DALI_TOOLKIT_API
-#  else
-#    define DALI_TOOLKIT_API __attribute__ ((visibility ("default")))
-#  endif
+#ifndef HIDE_DALI_INTERNALS
+#define DALI_TOOLKIT_API
+#else
+#define DALI_TOOLKIT_API __attribute__((visibility("default")))
+#endif
 #else
 #ifdef WIN32
 #ifdef BUILDING_DALI_TOOLKIT
 /** Visibility attribute to hide declarations */
-#  define DALI_TOOLKIT_API __declspec(dllexport)
+#define DALI_TOOLKIT_API __declspec(dllexport)
 #else
 /** Visibility attribute to hide declarations */
-#  define DALI_TOOLKIT_API __declspec(dllimport)
+#define DALI_TOOLKIT_API __declspec(dllimport)
 #endif
 #else
 /** Visibility attribute to show declarations */
-#  define DALI_TOOLKIT_API
+#define DALI_TOOLKIT_API
 #endif
 #endif
 

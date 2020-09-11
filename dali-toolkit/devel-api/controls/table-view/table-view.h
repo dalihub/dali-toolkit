@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TABLE_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,16 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class TableView;
@@ -86,7 +84,6 @@ class TableView;
 class DALI_TOOLKIT_API TableView : public Control
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
@@ -94,10 +91,10 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
 
-    CHILD_PROPERTY_START_INDEX = CHILD_PROPERTY_REGISTRATION_START_INDEX,         ///< @SINCE_1_1.36
-    CHILD_PROPERTY_END_INDEX =   CHILD_PROPERTY_REGISTRATION_START_INDEX + 1000   ///< Reserve child property indices @SINCE_1_1.36
+    CHILD_PROPERTY_START_INDEX = CHILD_PROPERTY_REGISTRATION_START_INDEX,       ///< @SINCE_1_1.36
+    CHILD_PROPERTY_END_INDEX   = CHILD_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve child property indices @SINCE_1_1.36
   };
 
   /**
@@ -155,11 +152,11 @@ public:
      */
     enum
     {
-      CELL_INDEX = CHILD_PROPERTY_START_INDEX,  ///< name "cellIndex",                The top-left cell this child occupies, if not set, the first available cell is used,           type VECTOR2 @SINCE_1_1.36
-      ROW_SPAN,                                 ///< name "rowSpan",                  The number of rows this child occupies, if not set, default value is 1,                        type FLOAT @SINCE_1_1.36
-      COLUMN_SPAN,                              ///< name "columnSpan",               The number of columns this child occupies, if not set, default value is 1,                     type FLOAT @SINCE_1_1.36
-      CELL_HORIZONTAL_ALIGNMENT,                ///< name "cellHorizontalAlignment",  The horizontal alignment of this child inside the cells, if not set, default value is 'left',  type STRING @SINCE_1_1.36
-      CELL_VERTICAL_ALIGNMENT                   ///< name "cellVerticalAlignment",    The vertical alignment of this child inside the cells, if not set, default value is 'top',     type STRING @SINCE_1_1.36
+      CELL_INDEX = CHILD_PROPERTY_START_INDEX, ///< name "cellIndex",                The top-left cell this child occupies, if not set, the first available cell is used,           type VECTOR2 @SINCE_1_1.36
+      ROW_SPAN,                                ///< name "rowSpan",                  The number of rows this child occupies, if not set, default value is 1,                        type FLOAT @SINCE_1_1.36
+      COLUMN_SPAN,                             ///< name "columnSpan",               The number of columns this child occupies, if not set, default value is 1,                     type FLOAT @SINCE_1_1.36
+      CELL_HORIZONTAL_ALIGNMENT,               ///< name "cellHorizontalAlignment",  The horizontal alignment of this child inside the cells, if not set, default value is 'left',  type STRING @SINCE_1_1.36
+      CELL_VERTICAL_ALIGNMENT                  ///< name "cellVerticalAlignment",    The vertical alignment of this child inside the cells, if not set, default value is 'top',     type STRING @SINCE_1_1.36
     };
   };
 
@@ -169,10 +166,10 @@ public:
    */
   enum LayoutPolicy
   {
-    FIXED,      ///< Fixed with the given value. @SINCE_1_0.0
-    RELATIVE,   ///< Calculated as percentage of the remainder after subtracting Padding and Fixed height/width @SINCE_1_0.0
-    FILL,       ///< Default policy, get the remainder of the 100% (after subtracting Fixed, Fit and Relative height/ width) divided evenly between 'fill' rows/columns @SINCE_1_0.0
-    FIT         ///< Fit around its children. @SINCE_1_0.0
+    FIXED,    ///< Fixed with the given value. @SINCE_1_0.0
+    RELATIVE, ///< Calculated as percentage of the remainder after subtracting Padding and Fixed height/width @SINCE_1_0.0
+    FILL,     ///< Default policy, get the remainder of the 100% (after subtracting Fixed, Fit and Relative height/ width) divided evenly between 'fill' rows/columns @SINCE_1_0.0
+    FIT       ///< Fit around its children. @SINCE_1_0.0
   };
 
   /**
@@ -189,11 +186,13 @@ public:
      * @param[in] rowSpan The row span initialized
      * @param[in] columnSpan The column span initialized
      */
-    CellPosition( unsigned int rowIndex = 0, unsigned int columnIndex = 0,
-                    unsigned int rowSpan = 1, unsigned int columnSpan = 1 )
-    : rowIndex( rowIndex ), columnIndex( columnIndex ),
-      rowSpan( rowSpan ), columnSpan( columnSpan )
-    { }
+    CellPosition(unsigned int rowIndex = 0, unsigned int columnIndex = 0, unsigned int rowSpan = 1, unsigned int columnSpan = 1)
+    : rowIndex(rowIndex),
+      columnIndex(columnIndex),
+      rowSpan(rowSpan),
+      columnSpan(columnSpan)
+    {
+    }
 
     unsigned int rowIndex;
     unsigned int columnIndex;
@@ -213,7 +212,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] handle Handle to copy from
    */
-  TableView( const TableView& handle );
+  TableView(const TableView& handle);
 
   /**
    * @brief Assignment operator. Changes this handle to point to another real object.
@@ -221,7 +220,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A reference to this
    */
-  TableView& operator=( const TableView& handle );
+  TableView& operator=(const TableView& handle);
 
   /**
    * @brief Destructor.
@@ -238,7 +237,7 @@ public:
    * @param[in] initialColumns for the table
    * @return A handle to the TableView control
    */
-  static TableView New( unsigned int initialRows, unsigned int initialColumns );
+  static TableView New(unsigned int initialRows, unsigned int initialColumns);
 
   /**
    * @brief Downcasts a handle to TableView handle.
@@ -249,7 +248,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a TableView or an uninitialized handle
    */
-  static TableView DownCast( BaseHandle handle );
+  static TableView DownCast(BaseHandle handle);
 
   /**
    * @brief Adds a child to the table.
@@ -260,7 +259,7 @@ public:
    * @return @c true if the addition succeeded, @c false if the cell is already occupied
    * @pre The child actor has been initialized.
    */
-  bool AddChild( Actor child, CellPosition position );
+  bool AddChild(Actor child, CellPosition position);
 
   /**
    * @brief Returns a child from the given layout position.
@@ -270,7 +269,7 @@ public:
    * @note If there is no child in this position this method returns an uninitialized.
    * Actor handle
    */
-  Actor GetChildAt( CellPosition position );
+  Actor GetChildAt(CellPosition position);
 
   /**
    * @brief Removes a child from the given layout position.
@@ -279,7 +278,7 @@ public:
    * @return Child that was removed or an uninitialized handle
    * @note If there is no child in this position, this method does nothing.
    */
-  Actor RemoveChildAt( CellPosition position );
+  Actor RemoveChildAt(CellPosition position);
 
   /**
    * @brief Finds the child's layout position.
@@ -288,14 +287,14 @@ public:
    * @param[out] position The position for the child
    * @return true if the child was included in this TableView
    */
-  bool FindChildPosition( Actor child, CellPosition& position );
+  bool FindChildPosition(Actor child, CellPosition& position);
 
   /**
    * @brief Inserts a new row to given index.
    * @SINCE_1_0.0
    * @param[in] rowIndex The rowIndex of the new row
    */
-  void InsertRow( unsigned int rowIndex );
+  void InsertRow(unsigned int rowIndex);
 
   /**
    * @brief Deletes a row from the given index.
@@ -303,7 +302,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] rowIndex The rowIndex of the row to delete
    */
-  void DeleteRow( unsigned int rowIndex );
+  void DeleteRow(unsigned int rowIndex);
 
   /**
    * @brief Deletes a row from the given index.
@@ -311,14 +310,14 @@ public:
    * @param[in] rowIndex The rowIndex of the row to delete
    * @param[out] removed The removed elements
    */
-  void DeleteRow( unsigned int rowIndex, std::vector<Actor>& removed );
+  void DeleteRow(unsigned int rowIndex, std::vector<Actor>& removed);
 
   /**
    * @brief Inserts a new column to the given index.
    * @SINCE_1_0.0
    * @param[in] columnIndex The columnIndex of the new column
    */
-  void InsertColumn( unsigned int columnIndex );
+  void InsertColumn(unsigned int columnIndex);
 
   /**
    * @brief Deletes a column from the given index.
@@ -326,7 +325,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] columnIndex The columnIndex of the column to delete
    */
-  void DeleteColumn( unsigned int columnIndex );
+  void DeleteColumn(unsigned int columnIndex);
 
   /**
    * @brief Deletes a column from the given index.
@@ -334,7 +333,7 @@ public:
    * @param[in] columnIndex The columnIndex of the column to delete
    * @param[out] removed The removed elements
    */
-  void DeleteColumn( unsigned int columnIndex, std::vector<Actor>& removed );
+  void DeleteColumn(unsigned int columnIndex, std::vector<Actor>& removed);
 
   /**
    * @brief Resizes the TableView.
@@ -346,7 +345,7 @@ public:
    * use the variant that returns the removed Actors and reinsert them into the table.
    * If an actor spans to a removed row or column, it gets removed from the table.
    */
-  void Resize( unsigned int rows, unsigned int columns );
+  void Resize(unsigned int rows, unsigned int columns);
 
   /**
    * @brief Resizes the TableView.
@@ -357,14 +356,14 @@ public:
    * @note If the new size is smaller than old, superfluous actors get removed.
    * If an actor spans to a removed row or column it gets removed from the table.
    */
-  void Resize( unsigned int rows, unsigned int columns, std::vector<Actor>& removed );
+  void Resize(unsigned int rows, unsigned int columns, std::vector<Actor>& removed);
 
   /**
    * @brief Sets horizontal and vertical padding between cells.
    * @SINCE_1_0.0
    * @param[in] padding Width and height
    */
-  void SetCellPadding( Size padding );
+  void SetCellPadding(Size padding);
 
   /**
    * @brief Gets the current padding as width and height.
@@ -379,7 +378,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] rowIndex The row to set
    */
-  void SetFitHeight( unsigned int rowIndex );
+  void SetFitHeight(unsigned int rowIndex);
 
   /**
    * @brief Checks if the row is a fit row.
@@ -388,7 +387,7 @@ public:
    * @param[in] rowIndex The row to check
    * @return Return true if the row is fit
    */
-  bool IsFitHeight( unsigned int rowIndex ) const;
+  bool IsFitHeight(unsigned int rowIndex) const;
 
   /**
    * @brief Specifies this column as fitting its width to its children.
@@ -396,7 +395,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] columnIndex The column to set
    */
-  void SetFitWidth( unsigned int columnIndex );
+  void SetFitWidth(unsigned int columnIndex);
 
   /**
    * @brief Checks if the column is a fit column.
@@ -405,7 +404,7 @@ public:
    * @param[in] columnIndex The column to check
    * @return Return true if the column is fit
    */
-  bool IsFitWidth( unsigned int columnIndex ) const;
+  bool IsFitWidth(unsigned int columnIndex) const;
 
   /**
    * @brief Sets a row to have fixed height.
@@ -415,7 +414,7 @@ public:
    * @param height The height in world coordinate units
    * @pre The row rowIndex must exist.
    */
-  void SetFixedHeight( unsigned int rowIndex, float height );
+  void SetFixedHeight(unsigned int rowIndex, float height);
 
   /**
    * @brief Gets a row's fixed height.
@@ -425,7 +424,7 @@ public:
    * @pre The row rowIndex must exist.
    * @note The returned value is valid if it has been set before.
    */
-  float GetFixedHeight( unsigned int rowIndex ) const;
+  float GetFixedHeight(unsigned int rowIndex) const;
 
   /**
    * @brief Sets a row to have relative height. Relative height means percentage of
@@ -436,7 +435,7 @@ public:
    * @param heightPercentage between 0.0f and 1.0f
    * @pre The row rowIndex must exist.
    */
-  void SetRelativeHeight( unsigned int rowIndex, float heightPercentage );
+  void SetRelativeHeight(unsigned int rowIndex, float heightPercentage);
 
   /**
    * @brief Gets a row's relative height.
@@ -446,7 +445,7 @@ public:
    * @pre The row rowIndex must exist.
    * @note The returned value is valid if it has been set before.
    */
-  float GetRelativeHeight( unsigned int rowIndex ) const;
+  float GetRelativeHeight(unsigned int rowIndex) const;
 
   /**
    * @brief Sets a column to have fixed width.
@@ -456,7 +455,7 @@ public:
    * @param width The width in world coordinate units
    * @pre The column columnIndex must exist.
    */
-  void SetFixedWidth( unsigned int columnIndex, float width );
+  void SetFixedWidth(unsigned int columnIndex, float width);
 
   /**
    * @brief Gets a column's fixed width.
@@ -466,7 +465,7 @@ public:
    * @pre The column columnIndex must exist.
    * @note The returned value is valid if it has been set before.
    */
-  float GetFixedWidth( unsigned int columnIndex ) const;
+  float GetFixedWidth(unsigned int columnIndex) const;
 
   /**
    * @brief Sets a column to have relative width. Relative width means percentage of
@@ -477,7 +476,7 @@ public:
    * @param widthPercentage The widthPercentage between 0.0f and 1.0f
    * @pre The column columnIndex must exist.
    */
-  void SetRelativeWidth( unsigned int columnIndex, float widthPercentage );
+  void SetRelativeWidth(unsigned int columnIndex, float widthPercentage);
 
   /**
    * @brief Gets a column's relative width.
@@ -487,7 +486,7 @@ public:
    * @pre The column columnIndex must exist.
    * @note The returned value is valid if it has been set before.
    */
-  float GetRelativeWidth( unsigned int columnIndex ) const;
+  float GetRelativeWidth(unsigned int columnIndex) const;
 
   /**
    * @brief Gets the amount of rows in the table.
@@ -513,10 +512,9 @@ public:
    * @param[in] horizontal The horizontal alignment
    * @param[in] vertical The vertical alignment
    */
-  void SetCellAlignment( CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical );
+  void SetCellAlignment(CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -530,7 +528,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL TableView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL TableView(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

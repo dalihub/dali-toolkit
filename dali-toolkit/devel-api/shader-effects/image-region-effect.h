@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_REGION_EFFECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @brief Creates a new ImageRegionEffect
  *
@@ -46,39 +44,38 @@ namespace Toolkit
 inline Property::Map CreateImageRegionEffect()
 {
   std::string vertexShader(
-      "attribute mediump vec2 aPosition;\n"
-      "\n"
-      "uniform mediump mat4 uMvpMatrix;\n"
-      "uniform vec3 uSize;\n"
-      "uniform vec4 uTextureRect;"
-      "\n"
-      "varying vec2 vTexCoord;\n"
+    "attribute mediump vec2 aPosition;\n"
+    "\n"
+    "uniform mediump mat4 uMvpMatrix;\n"
+    "uniform vec3 uSize;\n"
+    "uniform vec4 uTextureRect;"
+    "\n"
+    "varying vec2 vTexCoord;\n"
 
-      "uniform mediump vec2 uTopLeft;\n"
-      "uniform mediump vec2 uBottomRight;\n"
-      "void main()\n"
-      "{\n"
-      "  mediump vec4 position = vec4(aPosition, 0.0, 1.0);\n"
-      "  position.xyz *= uSize;\n"
-      "  gl_Position = uMvpMatrix * position;\n"
-      // The line below is doing the same as the following commented lines:
-      //"  vec2 imageSize = uTextureRect.zw - uTextureRect.xy;\n"
-      //"  vec2 topLeft = uTextureRect.xy + uTopLeft * imageSize;\n"
-      //"  vec2 bottomRight = uTextureRect.xy + uBottomRight * imageSize;\n"
-      //"  vec2 texCoord = (aTexCoord - uTextureRect.xy) / imageSize;\n"
-      //"  vTexCoord = topLeft + texCoord * ( bottomRight - topLeft );\n"
+    "uniform mediump vec2 uTopLeft;\n"
+    "uniform mediump vec2 uBottomRight;\n"
+    "void main()\n"
+    "{\n"
+    "  mediump vec4 position = vec4(aPosition, 0.0, 1.0);\n"
+    "  position.xyz *= uSize;\n"
+    "  gl_Position = uMvpMatrix * position;\n"
+    // The line below is doing the same as the following commented lines:
+    //"  vec2 imageSize = uTextureRect.zw - uTextureRect.xy;\n"
+    //"  vec2 topLeft = uTextureRect.xy + uTopLeft * imageSize;\n"
+    //"  vec2 bottomRight = uTextureRect.xy + uBottomRight * imageSize;\n"
+    //"  vec2 texCoord = (aTexCoord - uTextureRect.xy) / imageSize;\n"
+    //"  vTexCoord = topLeft + texCoord * ( bottomRight - topLeft );\n"
 
-      "  vec2 texCoord = aPosition + vec2(0.5);\n"
-      "  vTexCoord = uTextureRect.xy + uTopLeft * ( uTextureRect.zw - uTextureRect.xy ) + ( texCoord - uTextureRect.xy ) * ( uBottomRight - uTopLeft );\n"
-      "}\n"
-  );
+    "  vec2 texCoord = aPosition + vec2(0.5);\n"
+    "  vTexCoord = uTextureRect.xy + uTopLeft * ( uTextureRect.zw - uTextureRect.xy ) + ( texCoord - uTextureRect.xy ) * ( uBottomRight - uTopLeft );\n"
+    "}\n");
 
   Property::Map map;
 
   Property::Map customShader;
-  customShader[ Visual::Shader::Property::VERTEX_SHADER ] = vertexShader;
+  customShader[Visual::Shader::Property::VERTEX_SHADER] = vertexShader;
 
-  map[ Toolkit::Visual::Property::SHADER ] = customShader;
+  map[Toolkit::Visual::Property::SHADER] = customShader;
   return map;
 }
 

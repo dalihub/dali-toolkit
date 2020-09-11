@@ -21,36 +21,33 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/buttons/push-button-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 PushButton::PushButton()
 : Button()
 {
 }
 
-PushButton::PushButton( Internal::PushButton& implementation )
-: Button( implementation )
+PushButton::PushButton(Internal::PushButton& implementation)
+: Button(implementation)
 {
 }
 
-PushButton::PushButton( const PushButton& pushButton ) = default;
+PushButton::PushButton(const PushButton& pushButton) = default;
 
-PushButton::PushButton( PushButton&& rhs ) = default;
+PushButton::PushButton(PushButton&& rhs) = default;
 
-PushButton& PushButton::operator=( const PushButton& pushButton ) = default;
+PushButton& PushButton::operator=(const PushButton& pushButton) = default;
 
-PushButton& PushButton::operator=( PushButton&& rhs ) = default;
+PushButton& PushButton::operator=(PushButton&& rhs) = default;
 
-PushButton::PushButton( Dali::Internal::CustomActor* internal )
-: Button( internal )
+PushButton::PushButton(Dali::Internal::CustomActor* internal)
+: Button(internal)
 {
   VerifyCustomActorPointer<Internal::PushButton>(internal);
 }
@@ -64,7 +61,7 @@ PushButton PushButton::New()
   return Internal::PushButton::New();
 }
 
-PushButton PushButton::DownCast( BaseHandle handle )
+PushButton PushButton::DownCast(BaseHandle handle)
 {
   return Control::DownCast<PushButton, Internal::PushButton>(handle);
 }

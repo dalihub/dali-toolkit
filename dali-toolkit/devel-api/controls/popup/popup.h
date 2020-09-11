@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_POPUP_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class Popup;
@@ -54,16 +52,14 @@ class Popup;
  */
 class DALI_TOOLKIT_API Popup : public Control
 {
-
 public:
-
   /**
    * @brief The start and end property ranges for this control.
    */
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000 ///< Reserve property indices
   };
 
   /**
@@ -102,10 +98,10 @@ public:
    */
   enum DisplayState
   {
-    SHOWING,           ///< The popup is transitioning in
-    SHOWN,             ///< The popup is fully shown
-    HIDING,            ///< The popup is transitioning out
-    HIDDEN             ///< The popup is fully hidden
+    SHOWING, ///< The popup is transitioning in
+    SHOWN,   ///< The popup is fully shown
+    HIDING,  ///< The popup is transitioning out
+    HIDDEN   ///< The popup is fully hidden
   };
 
   /**
@@ -114,10 +110,10 @@ public:
    */
   enum AnimationMode
   {
-    NONE,              ///< No animation.
-    ZOOM,              ///< Popup zooms in and out animating the scale property.
-    FADE,              ///< Popup fades in and out.
-    CUSTOM             ///< Use the EntryAnimation and ExitAnimation animation properties.
+    NONE,  ///< No animation.
+    ZOOM,  ///< Popup zooms in and out animating the scale property.
+    FADE,  ///< Popup fades in and out.
+    CUSTOM ///< Use the EntryAnimation and ExitAnimation animation properties.
   };
 
   /**
@@ -135,7 +131,6 @@ public:
   };
 
 public:
-
   /**
    * @brief Creates an empty Popup handle.
    */
@@ -161,7 +156,7 @@ public:
    * Creates another handle that points to the same real object
    * @param[in] handle Handle to the copied object
    */
-  Popup( const Popup& handle );
+  Popup(const Popup& handle);
 
   /**
    * @brief Assignment operator.
@@ -170,7 +165,7 @@ public:
    * @param[in] handle Handle to the object
    * @return A reference to this
    */
-  Popup& operator=( const Popup& handle );
+  Popup& operator=(const Popup& handle);
 
   /**
    * @brief Downcast an Object handle to Popup.
@@ -180,16 +175,15 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a Popup or an uninitialized handle
    */
-  static Popup DownCast( BaseHandle handle );
+  static Popup DownCast(BaseHandle handle);
 
 public:
-
   /**
    * @brief Sets a title for this Popup.
    *
    * @param[in] titleActor Any actor can be specified when using this method.
    */
-  void SetTitle( Actor titleActor );
+  void SetTitle(Actor titleActor);
 
   /**
    * @brief Gets the title actor for this Popup.
@@ -204,7 +198,7 @@ public:
    *
    * @param[in] content The actor to use.
    */
-  void SetContent( Actor content );
+  void SetContent(Actor content);
 
   /**
    * @brief Gets the actor currently used for the content.
@@ -218,7 +212,7 @@ public:
    *
    * @param[in] footer The footer actor to be added to this Popup
    */
-  void SetFooter( Actor footer );
+  void SetFooter(Actor footer);
 
   /**
    * @brief Gets the footer actor.
@@ -247,7 +241,7 @@ public:
    *
    * @param[in] displayState The desired display state to change to.
    */
-  void SetDisplayState( Toolkit::Popup::DisplayState displayState );
+  void SetDisplayState(Toolkit::Popup::DisplayState displayState);
 
   /**
    * @brief Gets the current state of the popup.
@@ -259,9 +253,8 @@ public:
   Toolkit::Popup::DisplayState GetDisplayState() const;
 
 public:
-
-  typedef Signal< void () > TouchedOutsideSignalType;     ///< Touched outside signal type.
-  typedef Signal< void () > DisplayStateChangeSignalType; ///< Used for signals emitted when the displayed state changes.
+  typedef Signal<void()> TouchedOutsideSignalType;     ///< Touched outside signal type.
+  typedef Signal<void()> DisplayStateChangeSignalType; ///< Used for signals emitted when the displayed state changes.
 
   /**
    * @brief Signal emitted when user has touched outside of the Dialog.
@@ -289,20 +282,19 @@ public:
   DisplayStateChangeSignalType& HiddenSignal();
 
 public: // Not intended for application developers
-
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL Popup( Internal::Popup& implementation );
+  DALI_INTERNAL Popup(Internal::Popup& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL Popup( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Popup(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

@@ -74,7 +74,7 @@ public:
   /**
    * Destructor.
    */
-  ~RasterizingTask();
+  ~RasterizingTask() override;
 
   /**
    * Do the rasterization with the mRasterizer.
@@ -193,7 +193,7 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~SvgRasterizeThread();
+  ~SvgRasterizeThread() override;
 
 
   /**

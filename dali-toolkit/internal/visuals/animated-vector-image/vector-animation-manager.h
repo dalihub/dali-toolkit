@@ -52,7 +52,7 @@ public:
   /**
    * @brief Destructor.
    */
-  virtual ~VectorAnimationManager();
+  ~VectorAnimationManager() override;
 
   /**
    * Get the vector animation thread.

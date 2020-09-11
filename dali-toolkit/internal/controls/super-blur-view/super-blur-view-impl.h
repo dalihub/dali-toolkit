@@ -117,27 +117,27 @@ private: // from Control
   /**
    * @copydoc Toolkit::Control::OnInitialize
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet()
    */
-  virtual void OnSizeSet(const Vector3& targetSize);
+  void OnSizeSet(const Vector3& targetSize) override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
-  virtual void OnSceneDisconnection();
+  void OnSceneDisconnection() override;
 
   /**
    * @copydoc CustomActorImpl::GetNaturalSize()
    */
-  virtual Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize() override;
 
 private:
 

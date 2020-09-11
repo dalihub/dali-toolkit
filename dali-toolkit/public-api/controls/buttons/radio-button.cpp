@@ -25,32 +25,30 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 RadioButton::RadioButton()
-  : Button()
+: Button()
 {
 }
 
-RadioButton::RadioButton( Internal::RadioButton& implementation )
-  : Button( implementation )
+RadioButton::RadioButton(Internal::RadioButton& implementation)
+: Button(implementation)
 {
 }
 
-RadioButton::RadioButton( const RadioButton& radioButton ) = default;
+RadioButton::RadioButton(const RadioButton& radioButton) = default;
 
-RadioButton::RadioButton( RadioButton&& rhs ) = default;
+RadioButton::RadioButton(RadioButton&& rhs) = default;
 
-RadioButton& RadioButton::operator=( const RadioButton& radioButton ) = default;
+RadioButton& RadioButton::operator=(const RadioButton& radioButton) = default;
 
-RadioButton& RadioButton::operator=( RadioButton&& rhs ) = default;
+RadioButton& RadioButton::operator=(RadioButton&& rhs) = default;
 
-RadioButton::RadioButton( Dali::Internal::CustomActor* internal )
-  : Button( internal )
+RadioButton::RadioButton(Dali::Internal::CustomActor* internal)
+: Button(internal)
 {
-  VerifyCustomActorPointer<Internal::RadioButton>( internal );
+  VerifyCustomActorPointer<Internal::RadioButton>(internal);
 }
 
 RadioButton::~RadioButton()
@@ -62,16 +60,16 @@ RadioButton RadioButton::New()
   return Internal::RadioButton::New();
 }
 
-RadioButton RadioButton::New( const std::string& label )
+RadioButton RadioButton::New(const std::string& label)
 {
   RadioButton radioButton = Internal::RadioButton::New();
-  radioButton.SetProperty( Toolkit::Button::Property::LABEL, label );
+  radioButton.SetProperty(Toolkit::Button::Property::LABEL, label);
   return radioButton;
 }
 
-RadioButton RadioButton::DownCast( BaseHandle handle )
+RadioButton RadioButton::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<RadioButton, Internal::RadioButton>( handle );
+  return Control::DownCast<RadioButton, Internal::RadioButton>(handle);
 }
 
 } // namespace Toolkit

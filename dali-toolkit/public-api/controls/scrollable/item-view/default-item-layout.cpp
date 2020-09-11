@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,18 +25,15 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DefaultItemLayout
 {
-
-ItemLayoutPtr New( Type type )
+ItemLayoutPtr New(Type type)
 {
   ItemLayoutPtr itemLayout;
 
-  switch ( type )
+  switch(type)
   {
     case DEPTH:
     {
@@ -53,7 +50,7 @@ ItemLayoutPtr New( Type type )
     case LIST:
     {
       Internal::GridLayoutPtr layout = Internal::GridLayout::New();
-      layout->SetNumberOfColumns( 1 );
+      layout->SetNumberOfColumns(1);
       itemLayout = layout;
       break;
     }

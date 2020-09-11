@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 // Forward declarations
 
 namespace Internal DALI_INTERNAL
@@ -81,7 +79,6 @@ class CheckBoxButton;
 class DALI_TOOLKIT_API CheckBoxButton : public Button
 {
 public:
-
   /**
    * @brief Creates an uninitialized CheckBoxButton; this can be initialized with CheckBoxButton::New().
    * Calling member functions with an uninitialized Dali::Object is not allowed.
@@ -94,7 +91,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] checkBox Handle to an object
    */
-  CheckBoxButton( const CheckBoxButton& checkBox );
+  CheckBoxButton(const CheckBoxButton& checkBox);
 
   /**
    * @brief Move constructor
@@ -102,7 +99,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  CheckBoxButton( CheckBoxButton&& rhs );
+  CheckBoxButton(CheckBoxButton&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -110,7 +107,7 @@ public:
    * @param[in] checkBox Handle to an object
    * @return A reference to this
    */
-  CheckBoxButton& operator=( const CheckBoxButton& checkBox );
+  CheckBoxButton& operator=(const CheckBoxButton& checkBox);
 
   /**
    * @brief Move assignment
@@ -119,7 +116,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  CheckBoxButton& operator=( CheckBoxButton&& rhs );
+  CheckBoxButton& operator=(CheckBoxButton&& rhs);
 
   /**
    * @brief Destructor.
@@ -145,24 +142,23 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a CheckBoxButton or an uninitialized handle
    */
-  static CheckBoxButton DownCast( BaseHandle handle );
+  static CheckBoxButton DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_0.0
    * @param[in] implementation The Control implementation
    */
-  DALI_INTERNAL CheckBoxButton( Internal::CheckBoxButton& implementation );
+  DALI_INTERNAL CheckBoxButton(Internal::CheckBoxButton& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  DALI_INTERNAL CheckBoxButton( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL CheckBoxButton(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

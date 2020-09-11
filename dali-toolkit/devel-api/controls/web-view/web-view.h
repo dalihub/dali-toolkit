@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_VIEW_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,12 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-  class WebView;
-} // namespace Internal
+class WebView;
+} // namespace DALI_INTERNAL
 
 /**
  * @addtogroup dali_toolkit_controls_web_view
@@ -51,7 +49,6 @@ namespace Internal DALI_INTERNAL
 class DALI_TOOLKIT_API WebView : public Control
 {
 public:
-
   /**
    * @brief A structure used to contain the cache model enumeration.
    */
@@ -112,7 +109,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX = PROPERTY_START_INDEX + 1000,
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,
   };
 
   /**
@@ -264,15 +261,14 @@ public:
   /**
    * @brief WebView signal type related with page loading.
    */
-  typedef Signal< void ( WebView, const std::string& ) > WebViewPageLoadSignalType;
+  typedef Signal<void(WebView, const std::string&)> WebViewPageLoadSignalType;
 
   /**
    * @brief WebView signal type related with page loading error.
    */
-  typedef Signal< void ( WebView, const std::string&, LoadErrorCode ) > WebViewPageLoadErrorSignalType;
+  typedef Signal<void(WebView, const std::string&, LoadErrorCode)> WebViewPageLoadErrorSignalType;
 
 public:
-
   /**
    * @brief Creates an initialized WebView.
    * @return A handle to a newly allocated Dali WebView
@@ -287,7 +283,7 @@ public:
    * @param [in] locale The locale of Web
    * @param [in] timezoneId The timezoneId of Web
    */
-  static WebView New( const std::string& locale, const std::string& timezoneId );
+  static WebView New(const std::string& locale, const std::string& timezoneId);
 
   /**
    * @brief Creates an uninitialized WebView.
@@ -306,7 +302,7 @@ public:
    *
    * @param[in] WebView WebView to copy. The copied WebView will point at the same implementation
    */
-  WebView( const WebView& WebView );
+  WebView(const WebView& WebView);
 
   /**
    * @brief Assignment operator.
@@ -314,7 +310,7 @@ public:
    * @param[in] WebView The WebView to assign from
    * @return The updated WebView
    */
-  WebView& operator=( const WebView& WebView );
+  WebView& operator=(const WebView& WebView);
 
   /**
    * @brief Downcasts a handle to WebView handle.
@@ -325,21 +321,21 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a WebView or an uninitialized handle
    */
-  static WebView DownCast( BaseHandle handle );
+  static WebView DownCast(BaseHandle handle);
 
   /**
    * @brief Loads a web page based on a given URL.
    *
    * @param [in] url The URL of the resource to load
    */
-  void LoadUrl( const std::string& url );
+  void LoadUrl(const std::string& url);
 
   /**
    * @brief Loads a given string as web contents.
    *
    * @param [in] htmlString The string to use as the contents of the web page
    */
-  void LoadHTMLString( const std::string& htmlString );
+  void LoadHTMLString(const std::string& htmlString);
 
   /**
    * @brief Reloads the Web.
@@ -391,14 +387,14 @@ public:
    * @param[in] script The JavaScript code
    * @param[in] resultHandler The callback function to be called by the JavaScript runtime. This carries evaluation result.
    */
-  void EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler );
+  void EvaluateJavaScript(const std::string& script, std::function<void(const std::string&)> resultHandler);
 
   /**
    * @brief Evaluates JavaScript code represented as a string.
    *
    * @param[in] script The JavaScript code
    */
-  void EvaluateJavaScript( const std::string& script );
+  void EvaluateJavaScript(const std::string& script);
 
   /**
    * @brief Inject a JavaScript object with a message handler into the WebView.
@@ -424,7 +420,7 @@ public:
    * @param[in] exposedObjectName The name of exposed object
    * @param[in] handler The callback function
    */
-  void AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler );
+  void AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler);
 
   /**
    * @brief Clears the history of Web.
@@ -463,23 +459,21 @@ public:
   WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @param[in] implementation The WebView implementation
    */
-  DALI_INTERNAL WebView( Internal::WebView& implementation );
+  DALI_INTERNAL WebView(Internal::WebView& implementation);
 
   /**
    * @brief Allows the creation of this WebView from an Internal::CustomActor pointer.
    *
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL WebView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL WebView(Dali::Internal::CustomActor* internal);
   /// @endcond
-
 };
 
 /**

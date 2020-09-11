@@ -20,7 +20,6 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
 /**
@@ -30,7 +29,6 @@ namespace Toolkit
 
 namespace DevelText
 {
-
 /**
  * @brief Enumeration for the type of text renderer required.
  */

@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class FlexContainer;
@@ -104,7 +102,6 @@ class FlexContainer;
 class DALI_TOOLKIT_API FlexContainer : public Control
 {
 public:
-
   /**
    * @brief Enumeration for the direction of the main axis in the flex container. This determines
    * the direction that flex items are laid out in the flex container.
@@ -112,10 +109,10 @@ public:
    */
   enum FlexDirection
   {
-    COLUMN,                  ///< The flexible items are displayed vertically as a column @SINCE_1_1.35
-    COLUMN_REVERSE,          ///< The flexible items are displayed vertically as a column, but in reverse order @SINCE_1_1.35
-    ROW,                     ///< The flexible items are displayed horizontally as a row @SINCE_1_1.35
-    ROW_REVERSE              ///< The flexible items are displayed horizontally as a row, but in reverse order @SINCE_1_1.35
+    COLUMN,         ///< The flexible items are displayed vertically as a column @SINCE_1_1.35
+    COLUMN_REVERSE, ///< The flexible items are displayed vertically as a column, but in reverse order @SINCE_1_1.35
+    ROW,            ///< The flexible items are displayed horizontally as a row @SINCE_1_1.35
+    ROW_REVERSE     ///< The flexible items are displayed horizontally as a row, but in reverse order @SINCE_1_1.35
   };
 
   /**
@@ -125,9 +122,9 @@ public:
    */
   enum ContentDirection
   {
-    INHERIT,                 ///< Inherits the same direction from the parent @SINCE_1_1.35
-    LTR,                     ///< From left to right @SINCE_1_1.35
-    RTL                      ///< From right to left @SINCE_1_1.35
+    INHERIT, ///< Inherits the same direction from the parent @SINCE_1_1.35
+    LTR,     ///< From left to right @SINCE_1_1.35
+    RTL      ///< From right to left @SINCE_1_1.35
   };
 
   /**
@@ -137,11 +134,11 @@ public:
    */
   enum Justification
   {
-    JUSTIFY_FLEX_START,      ///< Items are positioned at the beginning of the container @SINCE_1_1.35
-    JUSTIFY_CENTER,          ///< Items are positioned at the center of the container @SINCE_1_1.35
-    JUSTIFY_FLEX_END,        ///< Items are positioned at the end of the container @SINCE_1_1.35
-    JUSTIFY_SPACE_BETWEEN,   ///< Items are positioned with equal space between the lines @SINCE_1_1.35
-    JUSTIFY_SPACE_AROUND     ///< Items are positioned with equal space before, between, and after the lines @SINCE_1_1.35
+    JUSTIFY_FLEX_START,    ///< Items are positioned at the beginning of the container @SINCE_1_1.35
+    JUSTIFY_CENTER,        ///< Items are positioned at the center of the container @SINCE_1_1.35
+    JUSTIFY_FLEX_END,      ///< Items are positioned at the end of the container @SINCE_1_1.35
+    JUSTIFY_SPACE_BETWEEN, ///< Items are positioned with equal space between the lines @SINCE_1_1.35
+    JUSTIFY_SPACE_AROUND   ///< Items are positioned with equal space before, between, and after the lines @SINCE_1_1.35
   };
 
   /**
@@ -151,11 +148,11 @@ public:
    */
   enum Alignment
   {
-    ALIGN_AUTO,              ///< Inherits the same alignment from the parent (only valid for "alignSelf" property) @SINCE_1_1.35
-    ALIGN_FLEX_START,        ///< At the beginning of the container @SINCE_1_1.35
-    ALIGN_CENTER,            ///< At the center of the container @SINCE_1_1.35
-    ALIGN_FLEX_END,          ///< At the end of the container @SINCE_1_1.35
-    ALIGN_STRETCH            ///< Stretch to fit the container @SINCE_1_1.35
+    ALIGN_AUTO,       ///< Inherits the same alignment from the parent (only valid for "alignSelf" property) @SINCE_1_1.35
+    ALIGN_FLEX_START, ///< At the beginning of the container @SINCE_1_1.35
+    ALIGN_CENTER,     ///< At the center of the container @SINCE_1_1.35
+    ALIGN_FLEX_END,   ///< At the end of the container @SINCE_1_1.35
+    ALIGN_STRETCH     ///< Stretch to fit the container @SINCE_1_1.35
   };
 
   /**
@@ -165,23 +162,22 @@ public:
    */
   enum WrapType
   {
-    NO_WRAP,                 ///< Flex items laid out in single line (shrunk to fit the flex container along the main axis) @SINCE_1_1.35
-    WRAP                     ///< Flex items laid out in multiple lines if needed @SINCE_1_1.35
+    NO_WRAP, ///< Flex items laid out in single line (shrunk to fit the flex container along the main axis) @SINCE_1_1.35
+    WRAP     ///< Flex items laid out in multiple lines if needed @SINCE_1_1.35
   };
 
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_1.35
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,               ///< @SINCE_1_1.35
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,                           ///< Reserve property indices @SINCE_1_1.35
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_1.35
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_1.35
 
-    CHILD_PROPERTY_START_INDEX = CHILD_PROPERTY_REGISTRATION_START_INDEX,         ///< @SINCE_1_1.35
-    CHILD_PROPERTY_END_INDEX =   CHILD_PROPERTY_REGISTRATION_START_INDEX + 1000   ///< Reserve child property indices @SINCE_1_1.35
+    CHILD_PROPERTY_START_INDEX = CHILD_PROPERTY_REGISTRATION_START_INDEX,       ///< @SINCE_1_1.35
+    CHILD_PROPERTY_END_INDEX   = CHILD_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve child property indices @SINCE_1_1.35
   };
 
   /**
@@ -219,9 +215,9 @@ public:
     enum
     {
       // Event side child properties
-      FLEX = CHILD_PROPERTY_START_INDEX,        ///< name "flex",               The proportion of the free space in the container the flex item will receive. If all items in the container set this property, their sizes will be proportional to the specified flex factor,  type FLOAT @SINCE_1_1.35
-      ALIGN_SELF,                               ///< name "alignSelf",          The alignment of the flex item along the cross axis, which, if set, overrides the default alignment for all items in the container,                         @see FlexContainer::Alignment,     type INTEGER @SINCE_1_1.35
-      FLEX_MARGIN                               ///< name "flexMargin",         The space around the flex item,                                                                                                                                                                type VECTOR4 @SINCE_1_1.35
+      FLEX = CHILD_PROPERTY_START_INDEX, ///< name "flex",               The proportion of the free space in the container the flex item will receive. If all items in the container set this property, their sizes will be proportional to the specified flex factor,  type FLOAT @SINCE_1_1.35
+      ALIGN_SELF,                        ///< name "alignSelf",          The alignment of the flex item along the cross axis, which, if set, overrides the default alignment for all items in the container,                         @see FlexContainer::Alignment,     type INTEGER @SINCE_1_1.35
+      FLEX_MARGIN                        ///< name "flexMargin",         The space around the flex item,                                                                                                                                                                type VECTOR4 @SINCE_1_1.35
     };
   };
 
@@ -238,7 +234,7 @@ public:
    *
    * @param[in] handle The handle to copy from
    */
-  FlexContainer( const FlexContainer& handle );
+  FlexContainer(const FlexContainer& handle);
 
   /**
    * @brief Move constructor
@@ -246,7 +242,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  FlexContainer( FlexContainer&& rhs );
+  FlexContainer(FlexContainer&& rhs);
 
   /**
    * @brief Assignment operator. Changes this handle to point to another real object.
@@ -254,7 +250,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A reference to this
    */
-  FlexContainer& operator=( const FlexContainer& handle );
+  FlexContainer& operator=(const FlexContainer& handle);
 
   /**
    * @brief Move assignment
@@ -263,7 +259,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  FlexContainer& operator=( FlexContainer&& rhs );
+  FlexContainer& operator=(FlexContainer&& rhs);
 
   /**
    * @brief Destructor.
@@ -293,11 +289,9 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a FlexContainer or an uninitialized handle
    */
-  static FlexContainer DownCast( BaseHandle handle );
-
+  static FlexContainer DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -305,7 +299,7 @@ public: // Not intended for application developers
    *
    * @param[in] implementation The Control implementation
    */
-  DALI_INTERNAL FlexContainer( Internal::FlexContainer& implementation );
+  DALI_INTERNAL FlexContainer(Internal::FlexContainer& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -313,7 +307,7 @@ public: // Not intended for application developers
    *
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL FlexContainer( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL FlexContainer(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

@@ -20,16 +20,13 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelProgressBar
 {
-
-Toolkit::ProgressBar New( Style progressBarStyle )
+Toolkit::ProgressBar New(Style progressBarStyle)
 {
-  return Internal::ProgressBar::New( progressBarStyle );
+  return Internal::ProgressBar::New(progressBarStyle);
 }
 
 } // namespace DevelProgressBar

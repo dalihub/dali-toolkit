@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
 /**
@@ -30,7 +29,6 @@ namespace Toolkit
 
 namespace Text
 {
-
 /**
  * @brief The available Horizontal alignments for text.
  *
@@ -38,7 +36,6 @@ namespace Text
  */
 namespace HorizontalAlignment
 {
-
 /**
  * @brief Enumerations for Horizontal alignment.
  *
@@ -46,9 +43,9 @@ namespace HorizontalAlignment
  */
 enum Type
 {
-  BEGIN,   ///< @SINCE_1_2.60
-  CENTER,  ///< @SINCE_1_2.60
-  END      ///< @SINCE_1_2.60
+  BEGIN,  ///< @SINCE_1_2.60
+  CENTER, ///< @SINCE_1_2.60
+  END     ///< @SINCE_1_2.60
 };
 
 } // namespace HorizontalAlignment
@@ -60,7 +57,6 @@ enum Type
  */
 namespace VerticalAlignment
 {
-
 /**
  * @brief Enumerations for Vertical alignment.
  *
@@ -68,9 +64,9 @@ namespace VerticalAlignment
  */
 enum Type
 {
-  TOP,     ///< @SINCE_1_2.60
-  CENTER,  ///< @SINCE_1_2.60
-  BOTTOM   ///< @SINCE_1_2.60
+  TOP,    ///< @SINCE_1_2.60
+  CENTER, ///< @SINCE_1_2.60
+  BOTTOM  ///< @SINCE_1_2.60
 };
 
 } // namespace VerticalAlignment
@@ -100,7 +96,6 @@ enum Type
  */
 namespace LineWrap
 {
-
 /**
  * @brief Enumerations specifying how a line is wrapped.
  * @SINCE_1_2.60
@@ -108,8 +103,8 @@ namespace LineWrap
  */
 enum Mode
 {
-  WORD,      ///< @SINCE_1_2.60
-  CHARACTER  ///< @SINCE_1_2.60
+  WORD,     ///< @SINCE_1_2.60
+  CHARACTER ///< @SINCE_1_2.60
 };
 
 } // namespace LineWrap

@@ -2,7 +2,7 @@
 #define DALI_HIDDEN_INPUT_PROPERTIES_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_controls_text_controls
  * @{
@@ -31,14 +29,12 @@ namespace Toolkit
 
 namespace HiddenInput
 {
-
 /**
  * @brief HiddenInput Property.
  * @SINCE_1_2.60
  */
 namespace Property
 {
-
 /**
  * @brief HiddenInput Property.
  * @SINCE_1_2.60
@@ -87,18 +83,17 @@ enum
  */
 namespace Mode
 {
-
 /**
  * @brief The type for HiddenInput::Property::MODE.
  * @SINCE_1_2.60
  */
 enum Type
 {
-  HIDE_NONE,            ///< Do not hide text. @SINCE_1_2.60
-  HIDE_ALL,             ///< Hide all the input text. @SINCE_1_2.60
-  HIDE_COUNT,           ///< Hide n characters from start. @SINCE_1_2.60
-  SHOW_COUNT,           ///< Show n characters from start. @SINCE_1_2.60
-  SHOW_LAST_CHARACTER   ///< Show last character for the duration (use Property::SHOW_LAST_CHARACTER_DURATION to modify duration). @SINCE_1_2.60
+  HIDE_NONE,          ///< Do not hide text. @SINCE_1_2.60
+  HIDE_ALL,           ///< Hide all the input text. @SINCE_1_2.60
+  HIDE_COUNT,         ///< Hide n characters from start. @SINCE_1_2.60
+  SHOW_COUNT,         ///< Show n characters from start. @SINCE_1_2.60
+  SHOW_LAST_CHARACTER ///< Show last character for the duration (use Property::SHOW_LAST_CHARACTER_DURATION to modify duration). @SINCE_1_2.60
 };
 
 } // namespace Mode

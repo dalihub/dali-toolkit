@@ -22,15 +22,13 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 Control Control::New()
 {
   return Internal::Control::New();
@@ -40,21 +38,21 @@ Control::Control()
 {
 }
 
-Control::Control( const Control& uiControl ) = default;
+Control::Control(const Control& uiControl) = default;
 
-Control::Control( Control&& rhs ) = default;
+Control::Control(Control&& rhs) = default;
 
 Control::~Control()
 {
 }
 
-Control& Control::operator=( const Control& handle ) = default;
+Control& Control::operator=(const Control& handle) = default;
 
-Control& Control::operator=( Control&& rhs ) = default;
+Control& Control::operator=(Control&& rhs) = default;
 
-Control Control::DownCast( BaseHandle handle )
+Control Control::DownCast(BaseHandle handle)
 {
-  return DownCast< Control, Internal::Control >(handle);
+  return DownCast<Control, Internal::Control>(handle);
 }
 
 void Control::SetKeyInputFocus()
@@ -92,9 +90,9 @@ LongPressGestureDetector Control::GetLongPressGestureDetector() const
   return Internal::GetImplementation(*this).GetLongPressGestureDetector();
 }
 
-void Control::SetStyleName( const std::string& styleName )
+void Control::SetStyleName(const std::string& styleName)
 {
-  Internal::GetImplementation(*this).SetStyleName( styleName );
+  Internal::GetImplementation(*this).SetStyleName(styleName);
 }
 
 const std::string& Control::GetStyleName() const
@@ -102,9 +100,9 @@ const std::string& Control::GetStyleName() const
   return Internal::GetImplementation(*this).GetStyleName();
 }
 
-void Control::SetBackgroundColor( const Vector4& color )
+void Control::SetBackgroundColor(const Vector4& color)
 {
-  Internal::GetImplementation(*this).SetBackgroundColor( color );
+  Internal::GetImplementation(*this).SetBackgroundColor(color);
 }
 
 void Control::ClearBackground()
@@ -114,17 +112,17 @@ void Control::ClearBackground()
 
 bool Control::IsResourceReady() const
 {
-  const Internal::Control& internalControl = Toolkit::Internal::GetImplementation( *this );
-  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+  const Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(*this);
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(internalControl);
 
   return controlDataImpl.IsResourceReady();
 }
 
-Toolkit::Visual::ResourceStatus Control::GetVisualResourceStatus( Dali::Property::Index index )
+Toolkit::Visual::ResourceStatus Control::GetVisualResourceStatus(Dali::Property::Index index)
 {
-  const Internal::Control& internalControl = Toolkit::Internal::GetImplementation( *this );
-  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
-  return controlDataImpl.GetVisualResourceStatus( index );
+  const Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(*this);
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(internalControl);
+  return controlDataImpl.GetVisualResourceStatus(index);
 }
 
 Control::KeyEventSignalType& Control::KeyEventSignal()
@@ -142,10 +140,10 @@ Control::KeyInputFocusSignalType& Control::KeyInputFocusLostSignal()
   return Internal::GetImplementation(*this).KeyInputFocusLostSignal();
 }
 
-Control::ResourceReadySignalType&  Control::ResourceReadySignal()
+Control::ResourceReadySignalType& Control::ResourceReadySignal()
 {
-  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( *this );
-  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
+  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(*this);
+  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
 
   return controlImpl.mResourceReadySignal;
 }

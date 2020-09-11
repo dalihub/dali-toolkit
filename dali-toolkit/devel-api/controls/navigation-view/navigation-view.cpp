@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,24 +25,22 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 NavigationView::NavigationView()
 {
 }
 
-NavigationView::NavigationView( const NavigationView& handle )
+NavigationView::NavigationView(const NavigationView& handle)
 : Control(handle)
 {
 }
 
-NavigationView& NavigationView::operator=( const NavigationView& handle)
+NavigationView& NavigationView::operator=(const NavigationView& handle)
 {
-  if( &handle != this )
+  if(&handle != this)
   {
-    Control::operator=( handle );
+    Control::operator=(handle);
   }
   return *this;
 }
@@ -56,31 +54,30 @@ NavigationView NavigationView::New()
   return Internal::NavigationView::New();
 }
 
-NavigationView NavigationView::DownCast( BaseHandle handle )
+NavigationView NavigationView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<NavigationView, Internal::NavigationView>(handle);
 }
 
-NavigationView::NavigationView( Internal::NavigationView& implementation )
-: Control( implementation )
+NavigationView::NavigationView(Internal::NavigationView& implementation)
+: Control(implementation)
 {
 }
 
-NavigationView::NavigationView( Dali::Internal::CustomActor* internal )
-: Control( internal)
+NavigationView::NavigationView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::NavigationView>(internal);
 }
 
-
-void NavigationView::Push( Actor actor )
+void NavigationView::Push(Actor actor)
 {
-  GetImpl( *this ).Push( actor );
+  GetImpl(*this).Push(actor);
 }
 
 Actor NavigationView::Pop()
 {
-  return GetImpl( *this ).Pop();
+  return GetImpl(*this).Pop();
 }
 
 } // namespace Toolkit

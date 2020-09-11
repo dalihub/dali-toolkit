@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_KEYBOARD_FOCUS_MANAGER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class KeyboardFocusManager;
@@ -56,20 +54,18 @@ class KeyboardFocusManager;
  */
 class DALI_TOOLKIT_API KeyboardFocusManager : public BaseHandle
 {
-
 public:
-
   /// @brief Pre focus change signal
-  typedef Signal< Actor ( Actor, Actor, Control::KeyboardFocus::Direction ) > PreFocusChangeSignalType;
+  typedef Signal<Actor(Actor, Actor, Control::KeyboardFocus::Direction)> PreFocusChangeSignalType;
 
   /// @brief Focus changed signal
-  typedef Signal< void ( Actor, Actor ) > FocusChangedSignalType;
+  typedef Signal<void(Actor, Actor)> FocusChangedSignalType;
 
   /// @brief Focus group changed signal
-  typedef Signal< void ( Actor, bool ) > FocusGroupChangedSignalType;
+  typedef Signal<void(Actor, bool)> FocusGroupChangedSignalType;
 
   /// @brief Focused actor has the enter key pressed signal
-  typedef Signal< void ( Actor ) > FocusedActorEnterKeySignalType;
+  typedef Signal<void(Actor)> FocusedActorEnterKeySignalType;
 
   /**
    * @brief Creates a KeyboardFocusManager handle; this can be initialized with KeyboardFocusManager::New().
@@ -225,7 +221,6 @@ public:
   void MoveFocusBackward();
 
 public: // Signals
-
   /**
    * @brief This signal is emitted before the focus is going to be changed.
    *
@@ -301,7 +296,7 @@ public: // Signals
    * @SINCE_1_0.0
    * @param[in] impl A pointer to the object
    */
-  explicit DALI_INTERNAL KeyboardFocusManager(Internal::KeyboardFocusManager *impl);
+  explicit DALI_INTERNAL KeyboardFocusManager(Internal::KeyboardFocusManager* impl);
   /// @endcond
 
 }; // class KeyboardFocusManager

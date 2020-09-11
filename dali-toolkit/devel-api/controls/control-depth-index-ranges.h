@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DepthIndex
 {
-
 // The negative value for background effect and background has been
 // chosen so that newer controls can have content without setting
 // depth index, and go in front of native controls with a background.
@@ -40,18 +37,18 @@ namespace DepthIndex
 
 enum Ranges
 {
-  BACKGROUND_EFFECT = -2 * DevelLayer::SIBLING_ORDER_MULTIPLIER/100,
-  BACKGROUND    =     -1 * DevelLayer::SIBLING_ORDER_MULTIPLIER/100,
-  CONTENT       =      0,
-  DECORATION    =      1 * DevelLayer::SIBLING_ORDER_MULTIPLIER/100,
-  FOREGROUND_EFFECT =  2 * DevelLayer::SIBLING_ORDER_MULTIPLIER/100
+  BACKGROUND_EFFECT = -2 * DevelLayer::SIBLING_ORDER_MULTIPLIER / 100,
+  BACKGROUND        = -1 * DevelLayer::SIBLING_ORDER_MULTIPLIER / 100,
+  CONTENT           = 0,
+  DECORATION        = 1 * DevelLayer::SIBLING_ORDER_MULTIPLIER / 100,
+  FOREGROUND_EFFECT = 2 * DevelLayer::SIBLING_ORDER_MULTIPLIER / 100
 };
 
-static_assert( (unsigned int)DevelLayer::ACTOR_DEPTH_MULTIPLIER > (unsigned int)DevelLayer::SIBLING_ORDER_MULTIPLIER );
-static_assert( BACKGROUND_EFFECT < BACKGROUND );
-static_assert( BACKGROUND < CONTENT );
-static_assert( CONTENT < DECORATION );
-static_assert( DECORATION < FOREGROUND_EFFECT );
+static_assert((unsigned int)DevelLayer::ACTOR_DEPTH_MULTIPLIER > (unsigned int)DevelLayer::SIBLING_ORDER_MULTIPLIER);
+static_assert(BACKGROUND_EFFECT < BACKGROUND);
+static_assert(BACKGROUND < CONTENT);
+static_assert(CONTENT < DECORATION);
+static_assert(DECORATION < FOREGROUND_EFFECT);
 
 } // namespace DepthIndex
 

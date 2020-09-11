@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_BLOOM_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,19 +26,16 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-
 /**
  * BloomView implementation class
  */
 class BloomView;
 
-} // namespace Internal
+} // namespace DALI_INTERNAL
 
 /**
  *
@@ -93,7 +90,6 @@ class BloomView;
 class DALI_TOOLKIT_API BloomView : public Control
 {
 public:
-
   /**
    * Create an uninitialized BloomView; this can be initialized with BloomView::New()
    * Calling member functions with an uninitialized Dali::Object is not allowed.
@@ -123,7 +119,7 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a BloomView or an uninitialized handle
    */
-  static BloomView DownCast( BaseHandle handle );
+  static BloomView DownCast(BaseHandle handle);
 
   /**
    * Create an initialized BloomView, using default settings. The default settings are:-\n
@@ -137,7 +133,7 @@ public:
    */
   static BloomView New();
 
- /**
+  /**
   * Create an initialized BloomView.
   * @param numSamples The size of the Gaussian blur kernel (number of samples in horizontal / vertical blur directions) that is used to blur the bloom
   * @param blurBellCurveWidth The constant controlling the Gaussian function, must be > 0.0. Controls the width of the bell curve, i.e. the look of the blur and also indirectly
@@ -152,8 +148,7 @@ public:
   * Useful for downsampling - trades visual quality for processing speed. A value of 1.0f results in no scaling applied.
   * @return A handle to a newly allocated Dali resource
   */
-  static BloomView New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
-                              const float downsampleWidthScale, const float downsampleHeightScale);
+  static BloomView New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale);
 
   /**
    * Start rendering the BloomView. Must be called after you Add() it to the stage.
@@ -208,19 +203,17 @@ public:
   Dali::Property::Index GetImageSaturationPropertyIndex() const;
 
 public:
-
   /**
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The UI Control implementation.
    */
-  DALI_INTERNAL BloomView( Internal::BloomView& implementation );
+  DALI_INTERNAL BloomView(Internal::BloomView& implementation);
 
   /**
    * Allows the creation of this UI Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL BloomView( Dali::Internal::CustomActor* internal );
-
+  explicit DALI_INTERNAL BloomView(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

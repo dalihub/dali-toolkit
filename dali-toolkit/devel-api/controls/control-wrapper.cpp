@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,55 +23,53 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // ControlWrapper
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ControlWrapper ControlWrapper::New( const std::string& typeName, Internal::ControlWrapper& implementation )
+ControlWrapper ControlWrapper::New(const std::string& typeName, Internal::ControlWrapper& implementation)
 {
-  return Internal::ControlWrapper::New( typeName, &implementation );
+  return Internal::ControlWrapper::New(typeName, &implementation);
 }
 
 ControlWrapper::ControlWrapper()
 {
 }
 
-ControlWrapper::ControlWrapper( const ControlWrapper& handle )
-: Control( handle )
+ControlWrapper::ControlWrapper(const ControlWrapper& handle)
+: Control(handle)
 {
 }
 
-ControlWrapper& ControlWrapper::operator=( const ControlWrapper& handle )
+ControlWrapper& ControlWrapper::operator=(const ControlWrapper& handle)
 {
-  if( &handle != this )
+  if(&handle != this)
   {
-    Control::operator=( handle );
+    Control::operator=(handle);
   }
   return *this;
 }
 
-ControlWrapper::ControlWrapper( Internal::ControlWrapper& implementation )
-: Control( implementation )
+ControlWrapper::ControlWrapper(Internal::ControlWrapper& implementation)
+: Control(implementation)
 {
 }
 
-ControlWrapper::ControlWrapper( Dali::Internal::CustomActor* internal )
-: Control( internal )
+ControlWrapper::ControlWrapper(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::ControlWrapper>( internal );
+  VerifyCustomActorPointer<Internal::ControlWrapper>(internal);
 }
 
 ControlWrapper::~ControlWrapper()
 {
 }
 
-ControlWrapper ControlWrapper::DownCast( BaseHandle handle )
+ControlWrapper ControlWrapper::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<ControlWrapper, Internal::ControlWrapper>( handle );
+  return Control::DownCast<ControlWrapper, Internal::ControlWrapper>(handle);
 }
 
 } // namespace Toolkit

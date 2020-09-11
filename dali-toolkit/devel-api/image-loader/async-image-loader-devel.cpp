@@ -23,40 +23,39 @@ namespace Toolkit
 {
 namespace DevelAsyncImageLoader
 {
-
-uint32_t LoadAnimatedImage( AsyncImageLoader asyncImageLoader,
-                            Dali::AnimatedImageLoading animatedImageLoading,
-                            uint32_t frameIndex )
+uint32_t LoadAnimatedImage(AsyncImageLoader           asyncImageLoader,
+                           Dali::AnimatedImageLoading animatedImageLoading,
+                           uint32_t                   frameIndex)
 {
-  return GetImplementation( asyncImageLoader ).LoadAnimatedImage( animatedImageLoading, frameIndex );
+  return GetImplementation(asyncImageLoader).LoadAnimatedImage(animatedImageLoading, frameIndex);
 }
 
-uint32_t Load( AsyncImageLoader asyncImageLoader,
-               const std::string& url,
-               ImageDimensions dimensions,
-               FittingMode::Type fittingMode,
-               SamplingMode::Type samplingMode,
-               bool orientationCorrection,
-               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
+uint32_t Load(AsyncImageLoader                         asyncImageLoader,
+              const std::string&                       url,
+              ImageDimensions                          dimensions,
+              FittingMode::Type                        fittingMode,
+              SamplingMode::Type                       samplingMode,
+              bool                                     orientationCorrection,
+              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  return GetImplementation( asyncImageLoader ).Load( Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
+  return GetImplementation(asyncImageLoader).Load(Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
 }
 
-uint32_t ApplyMask( AsyncImageLoader asyncImageLoader,
-                    Devel::PixelBuffer pixelBuffer,
-                    Devel::PixelBuffer maskPixelBuffer,
-                    float contentScale,
-                    bool cropToMask,
-                    DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
+uint32_t ApplyMask(AsyncImageLoader                         asyncImageLoader,
+                   Devel::PixelBuffer                       pixelBuffer,
+                   Devel::PixelBuffer                       maskPixelBuffer,
+                   float                                    contentScale,
+                   bool                                     cropToMask,
+                   DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  return GetImplementation( asyncImageLoader ).ApplyMask( pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad );
+  return GetImplementation(asyncImageLoader).ApplyMask(pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad);
 }
 
-PixelBufferLoadedSignalType& PixelBufferLoadedSignal( AsyncImageLoader asyncImageLoader )
+PixelBufferLoadedSignalType& PixelBufferLoadedSignal(AsyncImageLoader asyncImageLoader)
 {
-  return GetImplementation( asyncImageLoader ).PixelBufferLoadedSignal();
+  return GetImplementation(asyncImageLoader).PixelBufferLoadedSignal();
 }
 
-} // Devel
-} // Toolkit
-} // Dali
+} // namespace DevelAsyncImageLoader
+} // namespace Toolkit
+} // namespace Dali

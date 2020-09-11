@@ -217,57 +217,57 @@ private: // From Control
   /**
    * @copydoc Control::OnChildAdd(Actor& child)
    */
-  virtual void OnChildAdd( Actor& child );
+  void OnChildAdd( Actor& child ) override;
 
   /**
    * @copydoc Control::OnChildRemove(Actor& child)
    */
-  virtual void OnChildRemove( Actor& child );
+  void OnChildRemove( Actor& child ) override;
 
   /**
    * @copydoc Control::OnRelayout
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   /**
    * @copydoc Control::CalculateChildSize
    */
-  virtual float CalculateChildSize( const Actor& child, Dimension::Type dimension );
+  float CalculateChildSize( const Actor& child, Dimension::Type dimension ) override;
 
   /**
    * @copydoc Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Control::GetNextKeyboardFocusableActor
    */
-  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled );
+  Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled ) override;
 
   /**
    * @copydoc Control::GetNaturalSize()
    */
-  virtual Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize() override;
 
   /**
    * @copydoc Control::RelayoutDependentOnChildren()
    */
-  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
+  bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) override;
 
   /**
    * @copydoc Control::OnCalculateRelayoutSize
    */
-  virtual void OnCalculateRelayoutSize( Dimension::Type dimension );
+  void OnCalculateRelayoutSize( Dimension::Type dimension ) override;
 
   /**
    * @copydoc Control::OnLayoutNegotiated
    */
-  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension );
+  void OnLayoutNegotiated( float size, Dimension::Type dimension ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
-  virtual void OnSizeSet( const Vector3& size );
+  void OnSizeSet( const Vector3& size ) override;
 
 private: // Implementation
 

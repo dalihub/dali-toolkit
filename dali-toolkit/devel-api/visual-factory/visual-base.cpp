@@ -1,5 +1,5 @@
- /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+/*
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 Visual::Base::Base()
 {
 }
@@ -35,74 +33,71 @@ Visual::Base::~Base()
 {
 }
 
-Visual::Base::Base( const Visual::Base& handle )
-: BaseHandle( handle )
+Visual::Base::Base(const Visual::Base& handle)
+: BaseHandle(handle)
 {
 }
 
-Visual::Base& Visual::Base::operator=( const Visual::Base& handle )
+Visual::Base& Visual::Base::operator=(const Visual::Base& handle)
 {
-  BaseHandle::operator=( handle );
+  BaseHandle::operator=(handle);
   return *this;
 }
 
-Visual::Base::Base(Internal::Visual::Base *impl)
-: BaseHandle( impl )
+Visual::Base::Base(Internal::Visual::Base* impl)
+: BaseHandle(impl)
 {
 }
 
-void Visual::Base::SetName( const std::string& name )
+void Visual::Base::SetName(const std::string& name)
 {
-  GetImplementation( *this ).SetName( name );
+  GetImplementation(*this).SetName(name);
 }
 
 const std::string& Visual::Base::GetName() const
 {
-  return GetImplementation( *this ).GetName();
+  return GetImplementation(*this).GetName();
 }
 
-void Visual::Base::SetTransformAndSize( const Dali::Property::Map& transform, Size controlSize )
+void Visual::Base::SetTransformAndSize(const Dali::Property::Map& transform, Size controlSize)
 {
-  GetImplementation( *this ).SetTransformAndSize( transform, controlSize );
+  GetImplementation(*this).SetTransformAndSize(transform, controlSize);
 }
 
-float Visual::Base::GetHeightForWidth( float width )
+float Visual::Base::GetHeightForWidth(float width)
 {
-  return GetImplementation( *this ).GetHeightForWidth( width );
+  return GetImplementation(*this).GetHeightForWidth(width);
 }
 
-float Visual::Base::GetWidthForHeight( float height )
+float Visual::Base::GetWidthForHeight(float height)
 {
-  return GetImplementation( *this ).GetWidthForHeight( height );
+  return GetImplementation(*this).GetWidthForHeight(height);
 }
 
-void Visual::Base::GetNaturalSize(Vector2& naturalSize )
+void Visual::Base::GetNaturalSize(Vector2& naturalSize)
 {
-  GetImplementation( *this ).GetNaturalSize( naturalSize );
+  GetImplementation(*this).GetNaturalSize(naturalSize);
 }
 
-void Visual::Base::SetDepthIndex( int index )
+void Visual::Base::SetDepthIndex(int index)
 {
-  GetImplementation( *this ).SetDepthIndex( index );
+  GetImplementation(*this).SetDepthIndex(index);
 }
 
 int Visual::Base::GetDepthIndex() const
 {
-  return GetImplementation( *this ).GetDepthIndex();
+  return GetImplementation(*this).GetDepthIndex();
 }
 
-void Visual::Base::CreatePropertyMap( Dali::Property::Map& map ) const
+void Visual::Base::CreatePropertyMap(Dali::Property::Map& map) const
 {
-  GetImplementation( *this ).CreatePropertyMap( map );
+  GetImplementation(*this).CreatePropertyMap(map);
 }
 
 Visual::Type Visual::Base::GetType() const
 {
-  return GetImplementation( *this ).GetType();
+  return GetImplementation(*this).GetType();
 }
-
-
-
 
 } // namespace Toolkit
 

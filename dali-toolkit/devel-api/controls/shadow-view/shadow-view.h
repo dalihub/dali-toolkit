@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SHADOW_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,16 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-
 /**
  * ShadowView implementation class
  */
 class ShadowView;
 
-} // namespace Internal
+} // namespace DALI_INTERNAL
 
 /**
  *
@@ -102,7 +99,6 @@ class ShadowView;
 class DALI_TOOLKIT_API ShadowView : public Control
 {
 public:
-
   /**
    * Create an uninitialized ShadowView; this can be initialized with ShadowView::New()
    * Calling member functions with an uninitialized Dali::Object is not allowed.
@@ -132,7 +128,7 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a ShadowView or an uninitialized handle
    */
-  static ShadowView DownCast( BaseHandle handle );
+  static ShadowView DownCast(BaseHandle handle);
 
   /**
   * Create an initialized ShadowView. Add children and call SetShadowPlane to make shadows visible\n
@@ -210,20 +206,18 @@ public:
    */
   Dali::Property::Index GetShadowColorPropertyIndex() const;
 
-
 public:
-
   /**
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The UI Control implementation.
    */
-  DALI_INTERNAL ShadowView( Internal::ShadowView& implementation );
+  DALI_INTERNAL ShadowView(Internal::ShadowView& implementation);
 
   /**
    * Allows the creation of this UI Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL ShadowView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ShadowView(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

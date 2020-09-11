@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 BloomView::BloomView()
 {
 }
@@ -36,13 +34,13 @@ BloomView::~BloomView()
 }
 
 BloomView::BloomView(const BloomView& handle)
-  : Control( handle )
+: Control(handle)
 {
 }
 
 BloomView& BloomView::operator=(const BloomView& rhs)
 {
-  if( &rhs != this )
+  if(&rhs != this)
   {
     Control::operator=(rhs);
   }
@@ -54,25 +52,23 @@ BloomView BloomView::New()
   return Internal::BloomView::New();
 }
 
-BloomView BloomView::New( const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
-                                        const float downsampleWidthScale, const float downsampleHeightScale)
+BloomView BloomView::New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale)
 {
-  return Internal::BloomView::New( numSamples, blurBellCurveWidth, renderTargetPixelFormat,
-                                           downsampleWidthScale, downsampleHeightScale);
+  return Internal::BloomView::New(numSamples, blurBellCurveWidth, renderTargetPixelFormat, downsampleWidthScale, downsampleHeightScale);
 }
 
-BloomView::BloomView( Internal::BloomView& implementation )
-: Control( implementation )
+BloomView::BloomView(Internal::BloomView& implementation)
+: Control(implementation)
 {
 }
 
-BloomView::BloomView( Dali::Internal::CustomActor* internal )
-: Control( internal )
+BloomView::BloomView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::BloomView>(internal);
 }
 
-BloomView BloomView::DownCast( BaseHandle handle )
+BloomView BloomView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<BloomView, Internal::BloomView>(handle);
 }

@@ -59,22 +59,22 @@ protected: // From PageTurnView
   /**
    * @copydoc PageTurnView::OnPageTurnViewInitialize
    */
-  virtual void OnPageTurnViewInitialize();
+  void OnPageTurnViewInitialize() override;
 
   /**
    * @copydoc PageTurnView::OnAddPage
    */
-  virtual void OnAddPage( Actor newPage, bool isLeftSide );
+  void OnAddPage( Actor newPage, bool isLeftSide ) override;
 
   /**
    * @copydoc PageTurnView::SetPanPosition
    */
-  virtual Vector2 SetPanPosition( const Vector2& gesturePosition );
+  Vector2 SetPanPosition( const Vector2& gesturePosition ) override;
 
   /**
    * @copydoc PageTurnView::SetPanActor
    */
-  virtual void SetPanActor( const Vector2& panPosition );
+  void SetPanActor( const Vector2& panPosition ) override;
 
 private:
 

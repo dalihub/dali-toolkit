@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,32 +25,30 @@ using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ScrollViewPagePathEffect ScrollViewPagePathEffect::New(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount)
 {
-  return ScrollViewPagePathEffect(new Internal::ScrollViewPagePathEffect(path, forward, inputPropertyIndex, viewPageSize,pageCount));
+  return ScrollViewPagePathEffect(new Internal::ScrollViewPagePathEffect(path, forward, inputPropertyIndex, viewPageSize, pageCount));
 }
 
 ScrollViewPagePathEffect::ScrollViewPagePathEffect()
 {
 }
 
-ScrollViewPagePathEffect::ScrollViewPagePathEffect(Internal::ScrollViewPagePathEffect *impl)
-:ScrollViewEffect(impl)
+ScrollViewPagePathEffect::ScrollViewPagePathEffect(Internal::ScrollViewPagePathEffect* impl)
+: ScrollViewEffect(impl)
 {
 }
 
-ScrollViewPagePathEffect ScrollViewPagePathEffect::DownCast( BaseHandle handle )
+ScrollViewPagePathEffect ScrollViewPagePathEffect::DownCast(BaseHandle handle)
 {
-  return ScrollViewPagePathEffect( dynamic_cast<Internal::ScrollViewPagePathEffect*>(handle.GetObjectPtr()) );
+  return ScrollViewPagePathEffect(dynamic_cast<Internal::ScrollViewPagePathEffect*>(handle.GetObjectPtr()));
 }
 
-void ScrollViewPagePathEffect::ApplyToPage( Actor page,  unsigned int pageOrder )
+void ScrollViewPagePathEffect::ApplyToPage(Actor page, unsigned int pageOrder)
 {
-  GetImpl(*this).ApplyToPage( page, pageOrder );
+  GetImpl(*this).ApplyToPage(page, pageOrder);
 }
 
 } // namespace Toolkit

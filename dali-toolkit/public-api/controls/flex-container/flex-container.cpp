@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 FlexContainer FlexContainer::New()
 {
   return Internal::FlexContainer::New();
@@ -36,32 +34,32 @@ FlexContainer::FlexContainer()
 {
 }
 
-FlexContainer::FlexContainer( const FlexContainer& handle ) = default;
+FlexContainer::FlexContainer(const FlexContainer& handle) = default;
 
-FlexContainer::FlexContainer( FlexContainer&& rhs ) = default;
+FlexContainer::FlexContainer(FlexContainer&& rhs) = default;
 
-FlexContainer& FlexContainer::operator=( const FlexContainer& handle ) = default;
+FlexContainer& FlexContainer::operator=(const FlexContainer& handle) = default;
 
-FlexContainer& FlexContainer::operator=( FlexContainer&& rhs ) = default;
+FlexContainer& FlexContainer::operator=(FlexContainer&& rhs) = default;
 
 FlexContainer::~FlexContainer()
 {
 }
 
-FlexContainer FlexContainer::DownCast( BaseHandle handle )
+FlexContainer FlexContainer::DownCast(BaseHandle handle)
 {
   return Control::DownCast<FlexContainer, Internal::FlexContainer>(handle);
 }
 
-FlexContainer::FlexContainer( Internal::FlexContainer& implementation )
+FlexContainer::FlexContainer(Internal::FlexContainer& implementation)
 : Control(implementation)
 {
 }
 
-FlexContainer::FlexContainer( Dali::Internal::CustomActor* internal )
-: Control( internal )
+FlexContainer::FlexContainer(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::FlexContainer>( internal );
+  VerifyCustomActorPointer<Internal::FlexContainer>(internal);
 }
 
 } // namespace Toolkit

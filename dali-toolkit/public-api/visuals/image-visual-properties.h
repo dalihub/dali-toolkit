@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_visuals
  * @{
@@ -38,14 +36,12 @@ namespace Toolkit
  */
 namespace ImageVisual
 {
-
 /**
  * @brief ImageVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the instance of properties belonging to the ImageVisual.
  * @SINCE_1_1.45
@@ -272,15 +268,14 @@ enum
  */
 namespace LoadPolicy
 {
-
 /**
  * @brief The available named elements that define the LoadPolicy.
  * @SINCE_1_3_5
  */
 enum Type
 {
-  IMMEDIATE = 0,  ///< The image is loaded when the ImageVisual is created.
-  ATTACHED        ///< The image is loaded when the ImageVisual is attached to the stage.
+  IMMEDIATE = 0, ///< The image is loaded when the ImageVisual is created.
+  ATTACHED       ///< The image is loaded when the ImageVisual is attached to the stage.
 };
 
 } // namespace LoadPolicy
@@ -292,19 +287,18 @@ enum Type
  */
 namespace ReleasePolicy
 {
-
 /**
  * @brief The available named elements that define the ReleasePolicy.
  * @SINCE_1_3_5
  */
 enum Type
 {
-  DETACHED = 0,  ///<  Image deleted from cache when ImageVisual detached from stage.
-  DESTROYED,     ///<  Image deleted from cache when ImageVisual destroyed.
-  NEVER          ///<  Image is never deleted, will survive the lifetime of the application.
+  DETACHED = 0, ///<  Image deleted from cache when ImageVisual detached from stage.
+  DESTROYED,    ///<  Image deleted from cache when ImageVisual destroyed.
+  NEVER         ///<  Image is never deleted, will survive the lifetime of the application.
 };
 
-} // namespace ReleasePolicy;
+} // namespace ReleasePolicy
 
 } // namespace ImageVisual
 

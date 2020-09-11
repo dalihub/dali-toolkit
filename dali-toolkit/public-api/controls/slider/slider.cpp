@@ -25,29 +25,27 @@ using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 Slider::Slider()
 {
 }
 
-Slider::Slider( const Slider& handle ) = default;
+Slider::Slider(const Slider& handle) = default;
 
-Slider::Slider( Slider&& rhs ) = default;
+Slider::Slider(Slider&& rhs) = default;
 
-Slider& Slider::operator=( const Slider& handle ) = default;
+Slider& Slider::operator=(const Slider& handle) = default;
 
-Slider& Slider::operator=( Slider&& rhs ) = default;
+Slider& Slider::operator=(Slider&& rhs) = default;
 
 Slider::Slider(Internal::Slider& implementation)
 : Control(implementation)
 {
 }
 
-Slider::Slider( Dali::Internal::CustomActor* internal )
-: Control( internal )
+Slider::Slider(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::Slider>(internal);
 }
@@ -63,25 +61,23 @@ Slider::~Slider()
 
 Slider::ValueChangedSignalType& Slider::ValueChangedSignal()
 {
-  return GetImpl( *this ).ValueChangedSignal();
+  return GetImpl(*this).ValueChangedSignal();
 }
 
 Slider::ValueChangedSignalType& Slider::SlidingFinishedSignal()
 {
-  return GetImpl( *this ).SlidingFinishedSignal();
+  return GetImpl(*this).SlidingFinishedSignal();
 }
 
 Slider::MarkReachedSignalType& Slider::MarkReachedSignal()
 {
-  return GetImpl( *this ).MarkReachedSignal();
+  return GetImpl(*this).MarkReachedSignal();
 }
 
-Slider Slider::DownCast( BaseHandle handle )
+Slider Slider::DownCast(BaseHandle handle)
 {
   return Control::DownCast<Slider, Internal::Slider>(handle);
 }
-
-
 
 } // namespace Toolkit
 

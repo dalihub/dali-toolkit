@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ALPHA_DISCARD_EFFECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @brief Creates a new Alpha discard effect
  *
@@ -47,26 +45,26 @@ namespace Toolkit
 inline Property::Map CreateAlphaDiscardEffect()
 {
   const char* ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE =
-      "varying mediump vec2 vTexCoord;                                \n"
-      "                                                               \n"
-      "uniform sampler2D sTexture;                                    \n"
-      "uniform lowp vec4 uColor;                                      \n"
-      "void main()                                                    \n"
-      "{                                                              \n"
-      "  mediump vec4 color = texture2D( sTexture, vTexCoord );       \n"
-      "  if(color.a <= 0.0001)                                        \n"
-      "  {                                                            \n"
-      "    discard;                                                   \n"
-      "  }                                                            \n"
-      "  gl_FragColor = color * uColor;                               \n"
-      "}                                                              \n";
+    "varying mediump vec2 vTexCoord;                                \n"
+    "                                                               \n"
+    "uniform sampler2D sTexture;                                    \n"
+    "uniform lowp vec4 uColor;                                      \n"
+    "void main()                                                    \n"
+    "{                                                              \n"
+    "  mediump vec4 color = texture2D( sTexture, vTexCoord );       \n"
+    "  if(color.a <= 0.0001)                                        \n"
+    "  {                                                            \n"
+    "    discard;                                                   \n"
+    "  }                                                            \n"
+    "  gl_FragColor = color * uColor;                               \n"
+    "}                                                              \n";
 
   Property::Map map;
 
   Property::Map customShader;
-  customShader[ Visual::Shader::Property::FRAGMENT_SHADER ] = ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE;
+  customShader[Visual::Shader::Property::FRAGMENT_SHADER] = ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE;
 
-  map[ Toolkit::Visual::Property::SHADER ] = customShader;
+  map[Toolkit::Visual::Property::SHADER] = customShader;
   return map;
 }
 

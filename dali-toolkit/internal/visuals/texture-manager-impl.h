@@ -160,7 +160,7 @@ public:
   /**
    * Destructor.
    */
-  ~TextureManager();
+  ~TextureManager() override;
 
   // TextureManager Main API:
 

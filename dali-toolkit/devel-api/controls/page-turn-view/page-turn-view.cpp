@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,24 +25,22 @@ using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 PageTurnView::PageTurnView()
 {
 }
 
-PageTurnView::PageTurnView( const PageTurnView& handle )
-: Control( handle )
+PageTurnView::PageTurnView(const PageTurnView& handle)
+: Control(handle)
 {
 }
 
-PageTurnView& PageTurnView::operator=( const PageTurnView& handle )
+PageTurnView& PageTurnView::operator=(const PageTurnView& handle)
 {
-  if( &handle != this )
+  if(&handle != this)
   {
-    Control::operator=( handle );
+    Control::operator=(handle);
   }
   return *this;
 }
@@ -51,40 +49,40 @@ PageTurnView::~PageTurnView()
 {
 }
 
-PageTurnView PageTurnView::DownCast( BaseHandle handle )
+PageTurnView PageTurnView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<PageTurnView, Internal::PageTurnView>(handle);
 }
 
-PageTurnView::PageTurnView( Internal::PageTurnView& implementation )
-: Control( implementation )
+PageTurnView::PageTurnView(Internal::PageTurnView& implementation)
+: Control(implementation)
 {
 }
 
-PageTurnView::PageTurnView( Dali::Internal::CustomActor* internal )
-: Control( internal )
+PageTurnView::PageTurnView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::PageTurnView>(internal);
 }
 
 PageTurnView::PageTurnSignal& PageTurnView::PageTurnStartedSignal()
 {
-  return Toolkit::GetImplementation( *this ).PageTurnStartedSignal();
+  return Toolkit::GetImplementation(*this).PageTurnStartedSignal();
 }
 
 PageTurnView::PageTurnSignal& PageTurnView::PageTurnFinishedSignal()
 {
-  return Toolkit::GetImplementation( *this ).PageTurnFinishedSignal();
+  return Toolkit::GetImplementation(*this).PageTurnFinishedSignal();
 }
 
 PageTurnView::PagePanSignal& PageTurnView::PagePanStartedSignal()
 {
-  return Toolkit::GetImplementation( *this ).PagePanStartedSignal();
+  return Toolkit::GetImplementation(*this).PagePanStartedSignal();
 }
 
 PageTurnView::PagePanSignal& PageTurnView::PagePanFinishedSignal()
 {
-  return Toolkit::GetImplementation( *this ).PagePanFinishedSignal();
+  return Toolkit::GetImplementation(*this).PagePanFinishedSignal();
 }
 
 } // namespace Toolkit

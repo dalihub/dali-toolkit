@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 // Forward declarations
 
 namespace Internal DALI_INTERNAL
@@ -34,7 +32,7 @@ namespace Internal DALI_INTERNAL
 // Forward declarations
 
 class PushButton;
-}
+} // namespace DALI_INTERNAL
 /**
  * @addtogroup dali_toolkit_controls_buttons
  * @{
@@ -88,15 +86,14 @@ class PushButton;
 class DALI_TOOLKIT_API PushButton : public Button
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Button::PROPERTY_END_INDEX + 1,          ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserving 1000 property indices @SINCE_1_0.0
+    PROPERTY_START_INDEX = Button::PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000     ///< Reserving 1000 property indices @SINCE_1_0.0
   };
 
   /**
@@ -111,13 +108,12 @@ public:
      */
     enum
     {
-      LABEL_PADDING = PROPERTY_START_INDEX,   ///< Property, name "labelPadding",    type Vector4 @SINCE_1_0.0
-      ICON_PADDING,                           ///< Property, name "iconPadding",     type Vector4 @SINCE_1_0.0
+      LABEL_PADDING = PROPERTY_START_INDEX, ///< Property, name "labelPadding",    type Vector4 @SINCE_1_0.0
+      ICON_PADDING,                         ///< Property, name "iconPadding",     type Vector4 @SINCE_1_0.0
     };
   };
 
 public:
-
   /**
    * @brief Creates an uninitialized PushButton; this can be initialized with PushButton::New().
    *
@@ -131,7 +127,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] pushButton Handle to an object
    */
-  PushButton( const PushButton& pushButton );
+  PushButton(const PushButton& pushButton);
 
   /**
    * @brief Move constructor
@@ -139,7 +135,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  PushButton( PushButton&& rhs );
+  PushButton(PushButton&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -147,7 +143,7 @@ public:
    * @param[in] pushButton Handle to an object
    * @return A reference to this
    */
-  PushButton& operator=( const PushButton& pushButton );
+  PushButton& operator=(const PushButton& pushButton);
 
   /**
    * @brief Move assignment
@@ -156,7 +152,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  PushButton& operator=( PushButton&& rhs );
+  PushButton& operator=(PushButton&& rhs);
 
   /**
    * @brief Destructor.
@@ -184,10 +180,9 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a PushButton or an uninitialized handle
    */
-  static PushButton DownCast( BaseHandle handle );
+  static PushButton DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -195,7 +190,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] implementation The Control implementation
    */
-  DALI_INTERNAL PushButton( Internal::PushButton& implementation );
+  DALI_INTERNAL PushButton(Internal::PushButton& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -203,7 +198,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  DALI_INTERNAL PushButton( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL PushButton(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_BUBBLE_EMMITER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,15 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-  /**
+/**
    * @brief BubbleEmitter implementation class.
    */
-  class BubbleEmitter;
-}
+class BubbleEmitter;
+} // namespace DALI_INTERNAL
 
 /**
  * @brief BubbleEmitter is used to display lots of moving bubbles on the stage.
@@ -44,7 +42,6 @@ namespace Internal DALI_INTERNAL
 class DALI_TOOLKIT_API BubbleEmitter : public Control
 {
 public:
-
   /**
    * @brief Create an empty BubbleEmitter handle.
    */
@@ -64,11 +61,10 @@ public:
    * @param[in] bubbleSizeRange The size range of the bubbles; x component is the low bound, and y component is the up bound.
    * @return The initialized BubbleEmitter object.
    */
-  static BubbleEmitter New( const Vector2& winSize,
-                            Dali::Texture shapeTexture,
-                            unsigned int maximumNumberOfBubble,
-                            const Vector2& bubbleSizeRange );
-
+  static BubbleEmitter New(const Vector2& winSize,
+                           Dali::Texture  shapeTexture,
+                           unsigned int   maximumNumberOfBubble,
+                           const Vector2& bubbleSizeRange);
 
   /**
    * @brief Copy constructor.
@@ -76,7 +72,7 @@ public:
    * Creates another handle that points to the same real object
    * @param[in] handle The handle to copy
    */
-  BubbleEmitter( const BubbleEmitter& handle );
+  BubbleEmitter(const BubbleEmitter& handle);
 
   /**
    * @brief Assignment operator.
@@ -85,7 +81,7 @@ public:
    * @param[in] rhs The object to point at
    * @return A reference to this
    */
-  BubbleEmitter& operator=( const BubbleEmitter& rhs );
+  BubbleEmitter& operator=(const BubbleEmitter& rhs);
 
   /**
    * @brief Downcast an Object handle to SuperBlurView.
@@ -95,7 +91,7 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a BubbleEmitter or an uninitialized handle
    */
-  static BubbleEmitter DownCast( BaseHandle handle );
+  static BubbleEmitter DownCast(BaseHandle handle);
 
   /**
    * @brief Return the root actor of all bubbles, should then be added to stage.
@@ -112,7 +108,7 @@ public:
    * @param[in] hsvDelta The hsv channel difference used to adjust the background image color.
    *            If set these vector as Vector3::Zero, original colors are used.
    */
-  void SetBackground( Dali::Texture bgTexture, const Vector3& hsvDelta );
+  void SetBackground(Dali::Texture bgTexture, const Vector3& hsvDelta);
 
   /**
    * @brief Set bubble shape.
@@ -120,14 +116,14 @@ public:
    * The bubble mesh is a rectangular patch, but its displayed shape is decided by the alpha channel of the shape texture.
    * @param[in] shapeTexture The texture whose alpha channel defines the bubble shape.
    */
-  void SetBubbleShape( Dali::Texture shapeTexture );
+  void SetBubbleShape(Dali::Texture shapeTexture);
 
   /**
    * @brief Set the scale factor applied to all the bubbles.
    *
    * @param [in] scale The scale factor applied on bubbles.
    */
-  void SetBubbleScale( float scale );
+  void SetBubbleScale(float scale);
 
   /**
    * @brief Set the density of the bubble.
@@ -138,7 +134,7 @@ public:
    * By set the density bigger than one, instead of emit one bubble each time, a 'density' number of bubbles are emitted.
    * @param[in] density The density of the bubble.
    */
-  void SetBubbleDensity( unsigned int density );
+  void SetBubbleDensity(unsigned int density);
 
   /**
    * @brief Add a bubble movement to the animation.
@@ -149,7 +145,7 @@ public:
    * @param[in] direction The direction used to constrain the bubble to move in an adjacent direction around it.
    * @param[in] displacement The displacement used to bound the moving distance of the bubble.
    */
-  void EmitBubble( Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement );
+  void EmitBubble(Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement);
 
   /**
    * @brief Reset all the parameters controlling the bubbles after animation.
@@ -157,7 +153,6 @@ public:
   void Restore();
 
 public: // Not intended for developer use
-
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *

@@ -154,7 +154,7 @@ protected:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
-  virtual ~AnimatedImageVisual();
+  ~AnimatedImageVisual() override;
 
   /**
    * @copydoc Visual::Base::DoSetProperties
@@ -216,7 +216,7 @@ private:
    * Called when the next frame is ready.
    * @param[in] textureSet the texture set to apply
    */
-  void FrameReady( TextureSet textureSet );
+  void FrameReady( TextureSet textureSet ) override;
 
   /**
    * Display the next frame. It is called when the mFrameDelayTimer ticks.

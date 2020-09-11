@@ -91,7 +91,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~VisualFactory();
+  ~VisualFactory() override;
 
 private:
   /**

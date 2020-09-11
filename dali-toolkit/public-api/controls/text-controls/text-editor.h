@@ -23,13 +23,11 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-  class TextEditor;
+class TextEditor;
 }
 /**
  * @addtogroup dali_toolkit_controls_text_controls
@@ -49,7 +47,6 @@ namespace Internal DALI_INTERNAL
 class DALI_TOOLKIT_API TextEditor : public Control
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_1.37
@@ -57,7 +54,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX = PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000 ///< Reserve property indices
   };
 
   /**
@@ -452,16 +449,16 @@ public:
      */
     enum Mask
     {
-      NONE = 0x0000, ///< @SINCE_1_2_2
-      COLOR = 0x0001, ///< @SINCE_1_2_2
-      FONT_FAMILY = 0x0002, ///< @SINCE_1_2_2
-      POINT_SIZE = 0x0004, ///< @SINCE_1_2_2
-      FONT_STYLE = 0x0008, ///< @SINCE_1_2_2
+      NONE         = 0x0000, ///< @SINCE_1_2_2
+      COLOR        = 0x0001, ///< @SINCE_1_2_2
+      FONT_FAMILY  = 0x0002, ///< @SINCE_1_2_2
+      POINT_SIZE   = 0x0004, ///< @SINCE_1_2_2
+      FONT_STYLE   = 0x0008, ///< @SINCE_1_2_2
       LINE_SPACING = 0x0010, ///< @SINCE_1_2_2
-      UNDERLINE = 0x0020, ///< @SINCE_1_2_2
-      SHADOW = 0x0040, ///< @SINCE_1_2_2
-      EMBOSS = 0x0080, ///< @SINCE_1_2_2
-      OUTLINE = 0x0100  ///< @SINCE_1_2_2
+      UNDERLINE    = 0x0020, ///< @SINCE_1_2_2
+      SHADOW       = 0x0040, ///< @SINCE_1_2_2
+      EMBOSS       = 0x0080, ///< @SINCE_1_2_2
+      OUTLINE      = 0x0100  ///< @SINCE_1_2_2
     };
   };
 
@@ -479,8 +476,8 @@ public:
      */
     enum Type
     {
-      STARTED,   ///< Scrolling has started. @SINCE_1_2.60
-      FINISHED   ///< Scrolling has finished. @SINCE_1_2.60
+      STARTED, ///< Scrolling has started. @SINCE_1_2.60
+      FINISHED ///< Scrolling has finished. @SINCE_1_2.60
     };
   };
 
@@ -490,22 +487,19 @@ public:
    * @brief Text changed signal type.
    * @SINCE_1_1.37
    */
-  typedef Signal< void
-  ( TextEditor ) > TextChangedSignalType;
+  typedef Signal<void(TextEditor)> TextChangedSignalType;
 
   /**
    * @brief Input Style changed signal type.
    * @SINCE_1_2_2
    */
-  typedef Signal< void
-  ( TextEditor, InputStyle::Mask ) > InputStyleChangedSignalType;
+  typedef Signal<void(TextEditor, InputStyle::Mask)> InputStyleChangedSignalType;
 
   /**
    * @brief Scroll state changed signal type.
    * @SINCE_1_2.60
    */
-  typedef Signal< void
-  ( TextEditor, Scroll::Type ) > ScrollStateChangedSignalType;
+  typedef Signal<void(TextEditor, Scroll::Type)> ScrollStateChangedSignalType;
 
   /**
    * @brief Creates the TextEditor control.
@@ -529,7 +523,7 @@ public:
    * @SINCE_1_1.37
    * @param[in] handle The handle to copy from
    */
-  TextEditor( const TextEditor &handle );
+  TextEditor(const TextEditor& handle);
 
   /**
    * @brief Move constructor
@@ -537,7 +531,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  TextEditor( TextEditor&& rhs );
+  TextEditor(TextEditor&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -546,7 +540,7 @@ public:
    * @param[in] handle The handle to copy from
    * @return A reference to this
    */
-  TextEditor& operator=( const TextEditor &handle );
+  TextEditor& operator=(const TextEditor& handle);
 
   /**
    * @brief Move assignment
@@ -555,7 +549,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  TextEditor& operator=( TextEditor&& rhs );
+  TextEditor& operator=(TextEditor&& rhs);
 
   /**
    * @brief Destructor.
@@ -576,7 +570,7 @@ public:
    * @return Handle to a TextEditor or an empty handle
    */
   static TextEditor
-  DownCast( BaseHandle handle );
+  DownCast(BaseHandle handle);
 
   // Signals
 
@@ -625,7 +619,6 @@ public:
   ScrollStateChangedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -634,7 +627,7 @@ public: // Not intended for application developers
    * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL
-  TextEditor( Internal::TextEditor &implementation );
+  TextEditor(Internal::TextEditor& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -643,7 +636,7 @@ public: // Not intended for application developers
    * @param[in] internal A pointer to the internal CustomActor
    */
   explicit DALI_INTERNAL
-  TextEditor( Dali::Internal::CustomActor *internal );
+  TextEditor(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

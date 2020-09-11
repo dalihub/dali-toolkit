@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_WRAPPER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class ControlWrapper;
@@ -39,9 +37,7 @@ class ControlWrapper;
  */
 class DALI_TOOLKIT_API ControlWrapper : public Control
 {
-
 public:
-
   /**
    * @brief Create a new instance of a ControlWrapper.
    *
@@ -50,7 +46,7 @@ public:
    *
    * @return A handle to a new ControlWrapper.
    */
-  static ControlWrapper New( const std::string& typeName, Internal::ControlWrapper& implementation );
+  static ControlWrapper New(const std::string& typeName, Internal::ControlWrapper& implementation);
 
   /**
    * @brief Creates an empty ControlWrapper handle.
@@ -70,7 +66,7 @@ public:
    * Creates another handle that points to the same real object
    * @param[in] handle Handle to the copied object
    */
-  ControlWrapper( const ControlWrapper& handle );
+  ControlWrapper(const ControlWrapper& handle);
 
   /**
    * @brief Assignment operator.
@@ -79,7 +75,7 @@ public:
    * @param[in] handle Handle to the object
    * @return A reference to this
    */
-  ControlWrapper& operator=( const ControlWrapper& handle );
+  ControlWrapper& operator=(const ControlWrapper& handle);
 
   /**
    * @brief Downcast an Object handle to ControlWrapper.
@@ -89,23 +85,22 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a ControlWrapper or an uninitialized handle
    */
-  static ControlWrapper DownCast( BaseHandle handle );
+  static ControlWrapper DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @param[in]  implementation  The Control implementation.
    */
-  ControlWrapper( Internal::ControlWrapper& implementation );
+  ControlWrapper(Internal::ControlWrapper& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit ControlWrapper( Dali::Internal::CustomActor* internal );
+  explicit ControlWrapper(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

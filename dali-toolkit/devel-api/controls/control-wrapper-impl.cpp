@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,31 +19,27 @@
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/animation/animation.h>
-#include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/actors/custom-actor-devel.h>
+#include <dali/devel-api/object/handle-devel.h>
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
-#include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 BaseHandle Create()
 {
   // empty handle as we cannot create control wrapper
@@ -51,21 +47,21 @@ BaseHandle Create()
 }
 
 // Setup type-registry.
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ControlWrapper, Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_BEGIN(Toolkit::ControlWrapper, Toolkit::Control, Create)
 DALI_TYPE_REGISTRATION_END()
 
-}
+} // namespace
 
 /*
  * Implementation.
  */
 
-Dali::Toolkit::ControlWrapper ControlWrapper::New( const std::string& typeName, ControlWrapper* controlWrapper )
+Dali::Toolkit::ControlWrapper ControlWrapper::New(const std::string& typeName, ControlWrapper* controlWrapper)
 {
-  ControlWrapperPtr wrapper( controlWrapper );
+  ControlWrapperPtr wrapper(controlWrapper);
 
   // Pass ownership to CustomActor via derived handle.
-  Dali::Toolkit::ControlWrapper handle( *wrapper );
+  Dali::Toolkit::ControlWrapper handle(*wrapper);
 
   // Second-phase initialisation of the implementation.
   // This can only be done after the CustomActor connection has been made.
@@ -78,17 +74,17 @@ Dali::Toolkit::ControlWrapper ControlWrapper::New( const std::string& typeName, 
   // Therefore, we have to link each instance with its correct type info if already
   // pre-registered.
 
-  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeName );
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo(typeName);
   if(typeInfo)
   {
-    Dali::DevelHandle::SetTypeInfo( handle, typeInfo );
+    Dali::DevelHandle::SetTypeInfo(handle, typeInfo);
   }
 
   return handle;
 }
 
-ControlWrapper::ControlWrapper( CustomControlBehaviour behaviourFlags )
-: Control( static_cast< ControlBehaviour >( behaviourFlags ) )
+ControlWrapper::ControlWrapper(CustomControlBehaviour behaviourFlags)
+: Control(static_cast<ControlBehaviour>(behaviourFlags))
 {
 }
 
@@ -101,69 +97,69 @@ void ControlWrapper::RelayoutRequest()
   CustomActorImpl::RelayoutRequest();
 }
 
-float ControlWrapper::GetHeightForWidthBase( float width )
+float ControlWrapper::GetHeightForWidthBase(float width)
 {
-  return CustomActorImpl::GetHeightForWidthBase( width );
+  return CustomActorImpl::GetHeightForWidthBase(width);
 }
 
-float ControlWrapper::GetWidthForHeightBase( float height )
+float ControlWrapper::GetWidthForHeightBase(float height)
 {
-  return CustomActorImpl::GetWidthForHeightBase( height );
+  return CustomActorImpl::GetWidthForHeightBase(height);
 }
 
-float ControlWrapper::CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
+float ControlWrapper::CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
 {
-  return CustomActorImpl::CalculateChildSizeBase( child, dimension );
+  return CustomActorImpl::CalculateChildSizeBase(child, dimension);
 }
 
-bool ControlWrapper::RelayoutDependentOnChildrenBase( Dimension::Type dimension )
+bool ControlWrapper::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
 {
-  return CustomActorImpl::RelayoutDependentOnChildrenBase( dimension );
+  return CustomActorImpl::RelayoutDependentOnChildrenBase(dimension);
 }
 
-void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual )
+void ControlWrapper::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual)
 {
-  DevelControl::RegisterVisual( *this, index, visual );
+  DevelControl::RegisterVisual(*this, index, visual);
 }
 
-void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex )
+void ControlWrapper::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, int depthIndex)
 {
-  DevelControl::RegisterVisual( *this, index, visual, depthIndex );
+  DevelControl::RegisterVisual(*this, index, visual, depthIndex);
 }
 
-void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
+void ControlWrapper::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled)
 {
-  DevelControl::RegisterVisual( *this, index, visual, enabled );
+  DevelControl::RegisterVisual(*this, index, visual, enabled);
 }
 
-void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex )
+void ControlWrapper::RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex)
 {
-  DevelControl::RegisterVisual( *this, index, visual, enabled, depthIndex );
+  DevelControl::RegisterVisual(*this, index, visual, enabled, depthIndex);
 }
 
-void ControlWrapper::UnregisterVisual( Property::Index index )
+void ControlWrapper::UnregisterVisual(Property::Index index)
 {
-  DevelControl::UnregisterVisual( *this, index );
+  DevelControl::UnregisterVisual(*this, index);
 }
 
-Toolkit::Visual::Base ControlWrapper::GetVisual( Property::Index index ) const
+Toolkit::Visual::Base ControlWrapper::GetVisual(Property::Index index) const
 {
-  return DevelControl::GetVisual( *this, index );
+  return DevelControl::GetVisual(*this, index);
 }
 
-void ControlWrapper::EnableVisual( Property::Index index, bool enable )
+void ControlWrapper::EnableVisual(Property::Index index, bool enable)
 {
-  DevelControl::EnableVisual( *this, index, enable );
+  DevelControl::EnableVisual(*this, index, enable);
 }
 
-bool ControlWrapper::IsVisualEnabled( Property::Index index ) const
+bool ControlWrapper::IsVisualEnabled(Property::Index index) const
 {
-  return DevelControl::IsVisualEnabled( *this, index );
+  return DevelControl::IsVisualEnabled(*this, index);
 }
 
-Dali::Animation ControlWrapper::CreateTransition( const Toolkit::TransitionData& handle )
+Dali::Animation ControlWrapper::CreateTransition(const Toolkit::TransitionData& handle)
 {
-  return DevelControl::CreateTransition( *this, handle );
+  return DevelControl::CreateTransition(*this, handle);
 }
 
 void ControlWrapper::ApplyThemeStyle()
@@ -171,12 +167,12 @@ void ControlWrapper::ApplyThemeStyle()
   Toolkit::StyleManager styleManager = StyleManager::Get();
 
   // if style manager is available
-  if( styleManager )
+  if(styleManager)
   {
-    StyleManager& styleManagerImpl = GetImpl( styleManager );
+    StyleManager& styleManagerImpl = GetImpl(styleManager);
 
     // Apply the current style
-    styleManagerImpl.ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+    styleManagerImpl.ApplyThemeStyle(Toolkit::Control(GetOwner()));
   }
 }
 
@@ -185,9 +181,9 @@ Dali::TypeInfo ControlWrapper::GetTypeInfo()
   return DevelCustomActor::GetTypeInfo(Self());
 }
 
-void ControlWrapper::EmitKeyInputFocusSignal( bool focusGained )
+void ControlWrapper::EmitKeyInputFocusSignal(bool focusGained)
 {
-  Control::EmitKeyInputFocusSignal( focusGained );
+  Control::EmitKeyInputFocusSignal(focusGained);
 }
 
 } // namespace Internal

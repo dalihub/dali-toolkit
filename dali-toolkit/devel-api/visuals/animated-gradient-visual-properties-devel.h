@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_ANIMATED_GRADIENT_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  *
  */
@@ -36,13 +34,11 @@ namespace Toolkit
  */
 namespace DevelAnimatedGradientVisual
 {
-
 /**
  * @brief AnimatedGradientVisual Property
  */
 namespace Property
 {
-
 /**
  * @brief AnimatedGradientVisual Property
  */
@@ -138,7 +134,6 @@ enum
  */
 namespace GradientType
 {
-
 /**
  * @brief The type of gradient form. It decide the method of calculate gradient coordinate.
  * - If GradientType::Type is LINEAR, gradient coordinate is dot product with the line which contain START_POSITION and END_POSITION.
@@ -147,7 +142,7 @@ namespace GradientType
 enum Type
 {
   LINEAR, ///< Draw gradient linear form.
-  RADIAL ///< Draw gradient radial form.
+  RADIAL  ///< Draw gradient radial form.
 };
 
 } // namespace GradientType
@@ -158,7 +153,6 @@ enum Type
  */
 namespace UnitType
 {
-
 /**
  * @brief The type of coordinate system for certain attributes of the points in a gradients.
  * This applies to the START_POSITION, END_POSITION, and ROTATE_CENTER.
@@ -166,7 +160,7 @@ namespace UnitType
 enum Type
 {
   OBJECT_BOUNDING_BOX, ///< Use positions coordinate in bottom-left(-0.5,-0.5) ~ top-right(0.5,0.5).
-  USER_SPACE, ///< Use positions coordinate in bottom-left(-ActorSize.xy * 0.5) ~ top-right(ActorSize.xy * 0.5).
+  USER_SPACE,          ///< Use positions coordinate in bottom-left(-ActorSize.xy * 0.5) ~ top-right(ActorSize.xy * 0.5).
 };
 
 } // namespace UnitType
@@ -176,15 +170,14 @@ enum Type
  */
 namespace SpreadType
 {
-
 /**
  * @brief The policies that define what happens if the gradient coordinate is not between 0 and 1.
  */
 enum Type
 {
   REFLECT, ///<  Reflect the gradient pattern start-to-end, end-to-start, start-to-end etc.
-  REPEAT, ///< Repeat the gradient pattern start-to-end, start-to-end, start-to-end etc.
-  CLAMP, ///< Use the terminal colors of gradient.
+  REPEAT,  ///< Repeat the gradient pattern start-to-end, start-to-end, start-to-end etc.
+  CLAMP,   ///< Use the terminal colors of gradient.
 };
 
 } // namespace SpreadType
@@ -200,7 +193,6 @@ enum Type
  */
 namespace AnimationParameter
 {
-
 /**
  * @brief AnimatedGradientVisual::AnimationParameter Property
  */
@@ -284,13 +276,12 @@ enum Property
  */
 namespace DirectionType
 {
-
 /**
  * @brief The type of animation direction
  */
 enum Type
 {
-  FORWARD, ///< Animate value from START to TARGET
+  FORWARD,  ///< Animate value from START to TARGET
   BACKWARD, ///< Animate value frome TARGET to START
 };
 
@@ -301,13 +292,12 @@ enum Type
  */
 namespace MotionType
 {
-
 /**
  * @brief The type of animation motion
  */
 enum Type
 {
-  LOOP, ///< Animate loopingmode restart
+  LOOP,   ///< Animate loopingmode restart
   MIRROR, ///< Animate loopingmode auto_reverse
 };
 
@@ -318,15 +308,14 @@ enum Type
  */
 namespace EasingType
 {
-
 /**
  * @brief The type of animation easing
  */
 enum Type
 {
   LINEAR, ///< Easing animation linear
-  IN, ///< Ease-in animation (slow start -> fast finish)
-  OUT, ///< Ease-out animation (fast start -> slow finish)
+  IN,     ///< Ease-in animation (slow start -> fast finish)
+  OUT,    ///< Ease-out animation (fast start -> slow finish)
   IN_OUT, ///< Ease-in and Ease-out animation (slow start -> slow finish)
 };
 

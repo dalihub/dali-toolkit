@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class Button;
@@ -88,7 +86,6 @@ class Button;
 class DALI_TOOLKIT_API Button : public Control
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
@@ -96,7 +93,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_0.0
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_0.0
   };
 
   /**
@@ -218,7 +215,6 @@ public:
   };
 
 public:
-
   /**
    * @brief Creates an uninitialized Button.
    *
@@ -233,7 +229,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] button Handle to an object
    */
-  Button( const Button& button );
+  Button(const Button& button);
 
   /**
    * @brief Move constructor
@@ -241,7 +237,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  Button( Button&& rhs );
+  Button(Button&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -249,7 +245,7 @@ public:
    * @param[in] button Handle to an object
    * @return A reference to this
    */
-  Button& operator=( const Button& button );
+  Button& operator=(const Button& button);
 
   /**
    * @brief Move assignment
@@ -258,7 +254,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Button& operator=( Button&& rhs );
+  Button& operator=(Button&& rhs);
 
   /**
    * @brief Downcasts a handle to Button handle.
@@ -270,7 +266,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A handle to a Button or an uninitialized handle
    */
-  static Button DownCast( BaseHandle handle );
+  static Button DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
@@ -281,12 +277,11 @@ public:
   ~Button();
 
 public: //Signals
-
   /**
    * @brief Button signal type.
    * @SINCE_1_0.0
    */
-  typedef Signal< bool ( Button ) > ButtonSignalType;
+  typedef Signal<bool(Button)> ButtonSignalType;
 
   /**
    * @brief This signal is emitted when the button is touched.
@@ -339,7 +334,6 @@ public: //Signals
   ButtonSignalType& StateChangedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -347,7 +341,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] implementation The Control implementation
    */
-  DALI_INTERNAL Button( Internal::Button& implementation );
+  DALI_INTERNAL Button(Internal::Button& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -355,7 +349,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  DALI_INTERNAL Button( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL Button(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

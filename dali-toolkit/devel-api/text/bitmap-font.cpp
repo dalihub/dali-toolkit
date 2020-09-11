@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,61 +27,62 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelText
 {
-
 Glyph::Glyph()
 : url{},
   utf8{},
-  ascender{ 0.f },
-  descender{ 0.f }
-{}
-
-Glyph::Glyph( const std::string& url, const std::string utf8Character, float ascender, float descender )
-: url{ url },
-  utf8{},
-  ascender{ ascender },
-  descender{ descender }
+  ascender{0.f},
+  descender{0.f}
 {
-  DALI_ASSERT_DEBUG( utf8Character.size() <= 4u );
+}
 
-  std::copy( utf8Character.begin(), utf8Character.end(), utf8 );
+Glyph::Glyph(const std::string& url, const std::string utf8Character, float ascender, float descender)
+: url{url},
+  utf8{},
+  ascender{ascender},
+  descender{descender}
+{
+  DALI_ASSERT_DEBUG(utf8Character.size() <= 4u);
+
+  std::copy(utf8Character.begin(), utf8Character.end(), utf8);
 }
 
 Glyph::~Glyph()
-{}
+{
+}
 
 BitmapFontDescription::BitmapFontDescription()
 : glyphs{},
   name{},
-  underlinePosition{ 0.f },
-  underlineThickness{ 1.f },
-  isColorFont{ false }
-{}
+  underlinePosition{0.f},
+  underlineThickness{1.f},
+  isColorFont{false}
+{
+}
 
 BitmapFontDescription::~BitmapFontDescription()
-{}
-
-void CreateBitmapFont( const BitmapFontDescription& description, TextAbstraction::BitmapFont& bitmapFont )
 {
-  bitmapFont.glyphs.reserve( description.glyphs.size() );
-  bitmapFont.name = description.name;
-  bitmapFont.underlinePosition = description.underlinePosition;
-  bitmapFont.underlineThickness = description.underlineThickness;
-  bitmapFont.isColorFont = description.isColorFont;
+}
 
-  for( const auto& glyph : description.glyphs )
+void CreateBitmapFont(const BitmapFontDescription& description, TextAbstraction::BitmapFont& bitmapFont)
+{
+  bitmapFont.glyphs.reserve(description.glyphs.size());
+  bitmapFont.name               = description.name;
+  bitmapFont.underlinePosition  = description.underlinePosition;
+  bitmapFont.underlineThickness = description.underlineThickness;
+  bitmapFont.isColorFont        = description.isColorFont;
+
+  for(const auto& glyph : description.glyphs)
   {
     uint32_t c = 0u;
-    Text::Utf8ToUtf32( glyph.utf8, Text::GetUtf8Length( glyph.utf8[0u] ), &c );
+    Text::Utf8ToUtf32(glyph.utf8, Text::GetUtf8Length(glyph.utf8[0u]), &c);
 
-    TextAbstraction::BitmapGlyph bitmapGlyph( glyph.url, c, glyph.ascender, glyph.descender );
+    TextAbstraction::BitmapGlyph bitmapGlyph(glyph.url, c, glyph.ascender, glyph.descender);
 
-    bitmapFont.glyphs.push_back( std::move( bitmapGlyph ) );
+    bitmapFont.glyphs.push_back(std::move(bitmapGlyph));
   }
 }
 

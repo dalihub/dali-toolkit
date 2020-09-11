@@ -134,17 +134,17 @@ private: // From Button
   /**
    * @copydoc Toolkit::Internal::Button::OnInitialize
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Toolkit::Internal::Button::OnRelayout
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   /**
    * This method is called when the button is pressed.
    */
-  virtual void OnPressed();
+  void OnPressed() override;
 
 private:
 

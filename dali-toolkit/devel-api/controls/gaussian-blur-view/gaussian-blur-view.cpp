@@ -25,10 +25,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 GaussianBlurView::GaussianBlurView()
 {
 }
@@ -38,13 +36,13 @@ GaussianBlurView::~GaussianBlurView()
 }
 
 GaussianBlurView::GaussianBlurView(const GaussianBlurView& handle)
-  : Control( handle )
+: Control(handle)
 {
 }
 
 GaussianBlurView& GaussianBlurView::operator=(const GaussianBlurView& rhs)
 {
-  if( &rhs != this )
+  if(&rhs != this)
   {
     Control::operator=(rhs);
   }
@@ -56,27 +54,23 @@ GaussianBlurView GaussianBlurView::New()
   return Internal::GaussianBlurView::New();
 }
 
-GaussianBlurView GaussianBlurView::New( const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
-                                        const float downsampleWidthScale, const float downsampleHeightScale,
-                                        bool blurUserImage)
+GaussianBlurView GaussianBlurView::New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale, bool blurUserImage)
 {
-  return Internal::GaussianBlurView::New( numSamples, blurBellCurveWidth, renderTargetPixelFormat,
-                                           downsampleWidthScale, downsampleHeightScale,
-                                           blurUserImage);
+  return Internal::GaussianBlurView::New(numSamples, blurBellCurveWidth, renderTargetPixelFormat, downsampleWidthScale, downsampleHeightScale, blurUserImage);
 }
 
-GaussianBlurView::GaussianBlurView( Internal::GaussianBlurView& implementation )
-: Control( implementation )
+GaussianBlurView::GaussianBlurView(Internal::GaussianBlurView& implementation)
+: Control(implementation)
 {
 }
 
-GaussianBlurView::GaussianBlurView( Dali::Internal::CustomActor* internal )
-: Control( internal )
+GaussianBlurView::GaussianBlurView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::GaussianBlurView>(internal);
 }
 
-GaussianBlurView GaussianBlurView::DownCast( BaseHandle handle )
+GaussianBlurView GaussianBlurView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<GaussianBlurView, Internal::GaussianBlurView>(handle);
 }
@@ -111,7 +105,7 @@ FrameBuffer GaussianBlurView::GetBlurredRenderTarget() const
   return GetImpl(*this).GetBlurredRenderTarget();
 }
 
-void GaussianBlurView::SetBackgroundColor( const Vector4& color )
+void GaussianBlurView::SetBackgroundColor(const Vector4& color)
 {
   GetImpl(*this).SetBackgroundColor(color);
 }

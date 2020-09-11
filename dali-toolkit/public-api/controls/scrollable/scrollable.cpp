@@ -15,17 +15,15 @@
  *
  */
 
-#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
 using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 Scrollable::Scrollable()
 {
 }
@@ -35,25 +33,25 @@ Scrollable::Scrollable(Internal::Scrollable& implementation)
 {
 }
 
-Scrollable::Scrollable( Dali::Internal::CustomActor* internal )
-: Control( internal )
+Scrollable::Scrollable(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::Scrollable>(internal);
 }
 
-Scrollable::Scrollable( const Scrollable& handle ) = default;
+Scrollable::Scrollable(const Scrollable& handle) = default;
 
-Scrollable::Scrollable( Scrollable&& rhs ) = default;
+Scrollable::Scrollable(Scrollable&& rhs) = default;
 
-Scrollable& Scrollable::operator=( const Scrollable& handle ) = default;
+Scrollable& Scrollable::operator=(const Scrollable& handle) = default;
 
-Scrollable& Scrollable::operator=( Scrollable&& rhs ) = default;
+Scrollable& Scrollable::operator=(Scrollable&& rhs) = default;
 
 Scrollable::~Scrollable()
 {
 }
 
-Scrollable Scrollable::DownCast( BaseHandle handle )
+Scrollable Scrollable::DownCast(BaseHandle handle)
 {
   return Control::DownCast<Scrollable, Internal::Scrollable>(handle);
 }
@@ -83,7 +81,7 @@ void Scrollable::SetOvershootEnabled(bool enable)
   GetImpl(*this).SetOvershootEnabled(enable);
 }
 
-void Scrollable::SetOvershootEffectColor( const Vector4& color )
+void Scrollable::SetOvershootEffectColor(const Vector4& color)
 {
   GetImpl(*this).SetOvershootEffectColor(color);
 }
@@ -93,7 +91,7 @@ Vector4 Scrollable::GetOvershootEffectColor() const
   return GetImpl(*this).GetOvershootEffectColor();
 }
 
-void Scrollable::SetOvershootAnimationSpeed( float pixelsPerSecond )
+void Scrollable::SetOvershootAnimationSpeed(float pixelsPerSecond)
 {
   GetImpl(*this).SetOvershootAnimationSpeed(pixelsPerSecond);
 }

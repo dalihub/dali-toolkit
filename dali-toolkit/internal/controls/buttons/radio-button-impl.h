@@ -66,17 +66,17 @@ private: // From Button
   /**
    * @copydoc Toolkit::Internal::Button::OnInitialize
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Toolkit::Internal::Button::OnStateChange
    */
-  virtual void OnStateChange( State newState );
+  void OnStateChange( State newState ) override;
 
   /**
    * @copydoc Toolkit::Internal::Button::OnToggleReleased
    */
-  virtual bool OnToggleReleased();
+  bool OnToggleReleased() override;
 
 private:
 

@@ -212,17 +212,17 @@ private: // from Control
   /**
    * @copydoc Toolkit::Control::OnInitialize
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc Toolkit::Control::OnPan
    */
-  virtual void OnPan( const PanGesture& gesture );
+  void OnPan( const PanGesture& gesture ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
-  virtual void OnSizeSet( const Vector3& size );
+  void OnSizeSet( const Vector3& size ) override;
 
 private:
 

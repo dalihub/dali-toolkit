@@ -29,57 +29,56 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 Button::Button()
-{}
+{
+}
 
-Button::Button( const Button& button ) = default;
+Button::Button(const Button& button) = default;
 
-Button::Button( Button&& rhs ) = default;
+Button::Button(Button&& rhs) = default;
 
-Button& Button::operator=( const Button& button ) = default;
+Button& Button::operator=(const Button& button) = default;
 
-Button& Button::operator=( Button&& rhs ) = default;
+Button& Button::operator=(Button&& rhs) = default;
 
 Button::~Button()
 {
 }
 
-Button Button::DownCast( BaseHandle handle )
+Button Button::DownCast(BaseHandle handle)
 {
   return Control::DownCast<Button, Internal::Button>(handle);
 }
 
 Button::ButtonSignalType& Button::PressedSignal()
 {
-  return Dali::Toolkit::GetImplementation( *this ).PressedSignal();
+  return Dali::Toolkit::GetImplementation(*this).PressedSignal();
 }
 
 Button::ButtonSignalType& Button::ReleasedSignal()
 {
-  return Dali::Toolkit::GetImplementation( *this ).ReleasedSignal();
+  return Dali::Toolkit::GetImplementation(*this).ReleasedSignal();
 }
 
 Button::ButtonSignalType& Button::ClickedSignal()
 {
-  return Dali::Toolkit::GetImplementation( *this ).ClickedSignal();
+  return Dali::Toolkit::GetImplementation(*this).ClickedSignal();
 }
 
 Button::ButtonSignalType& Button::StateChangedSignal()
 {
-  return Dali::Toolkit::GetImplementation( *this ).StateChangedSignal();
+  return Dali::Toolkit::GetImplementation(*this).StateChangedSignal();
 }
 
-Button::Button( Internal::Button& implementation )
-: Control( implementation )
+Button::Button(Internal::Button& implementation)
+: Control(implementation)
 {
 }
 
-Button::Button( Dali::Internal::CustomActor* internal )
-: Control( internal )
+Button::Button(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::Button>(internal);
 }

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CUBE_TRANSITION_FOLD_EFFECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,16 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-  /**
+/**
    * CubeTransitionFoldEffectimplementation class
    */
-  class CubeTransitionFoldEffect;
+class CubeTransitionFoldEffect;
 
-} // namespace Internal
+} // namespace DALI_INTERNAL
 
 /**
  * SubClass of CubeTransitionEffect
@@ -41,31 +39,27 @@ namespace Internal DALI_INTERNAL
  */
 class DALI_TOOLKIT_API CubeTransitionFoldEffect : public CubeTransitionEffect
 {
-
 public:
-
   /**
    * Create an initialized CubeTransitionFoldEffect
    * @param[in] numRows How many rows of cubes
    * @param[in] numColumns How many columns of cubes
    * @return The initialized CubeTransitionFoldEffect object
    */
-  static CubeTransitionFoldEffect New( unsigned int numRows, unsigned int numColumns );
-
+  static CubeTransitionFoldEffect New(unsigned int numRows, unsigned int numColumns);
 
 public: // Not intended for developer use
-
   /**
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL CubeTransitionFoldEffect( Internal::CubeTransitionFoldEffect& implementation );
+  DALI_INTERNAL CubeTransitionFoldEffect(Internal::CubeTransitionFoldEffect& implementation);
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  DALI_INTERNAL CubeTransitionFoldEffect( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL CubeTransitionFoldEffect(Dali::Internal::CustomActor* internal);
 
 }; // class CubeTransitionFoldEffect
 

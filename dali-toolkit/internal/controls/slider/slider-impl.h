@@ -284,7 +284,7 @@ protected:
   /**
    * @copydoc CustomActorImpl::OnRelayout
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
 
 private:
@@ -322,7 +322,7 @@ private:
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * Hit region touch

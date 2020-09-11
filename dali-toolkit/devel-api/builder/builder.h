@@ -19,20 +19,18 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/animation/path-constrainer.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/linear-constrainer.h>
-#include <dali/devel-api/animation/path-constrainer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class Builder;
@@ -121,9 +119,9 @@ class Builder;
  */
 
 class DALI_TOOLKIT_API Builder : public BaseHandle
- {
- public:
-   /**
+{
+public:
+  /**
     * Create an Builder handle; this can be initialised with Builder::New()
     * Calling member functions with an uninitialised handle is not allowed.
     */
@@ -147,7 +145,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    */
   enum UIFormat
   {
-    JSON,                 ///< String is JSON
+    JSON, ///< String is JSON
   };
 
   /**
@@ -159,7 +157,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param data A string represenation of an Actor tree
    * @param format The string representation format ie JSON
    */
-  void LoadFromString( const std::string& data, UIFormat format = JSON );
+  void LoadFromString(const std::string& data, UIFormat format = JSON);
 
   /**
    * @brief Adds user defined constants to all future style template or animation expansions
@@ -172,7 +170,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @pre The Builder has been initialized.
    * @param map The user defined constants used in template expansions.
    */
-  void AddConstants( const Property::Map& map );
+  void AddConstants(const Property::Map& map);
 
   /**
    * @brief Adds or modifies a user defined constant to all future style template or animation expansions
@@ -186,7 +184,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param key The constant name to add or update
    * @param value The new value for the constant.
    */
-  void AddConstant( const std::string& key, const Property::Value& value );
+  void AddConstant(const std::string& key, const Property::Value& value);
 
   /**
    * @brief Gets all currently defined configurations.
@@ -224,7 +222,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @pre The Builder has been initialized.
    * @param key The constant name to search for.
    */
-  const Property::Value& GetConstant( const std::string& key ) const;
+  const Property::Value& GetConstant(const std::string& key) const;
 
   /**
    * Creates an animation from the set of known animations
@@ -237,7 +235,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param animationName The animation name to create
    * @returns The base handle of the created object
    */
-  Animation CreateAnimation( const std::string& animationName );
+  Animation CreateAnimation(const std::string& animationName);
 
   /**
    * @brief Creates an animation from the set of known animations with user defined constants
@@ -255,7 +253,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param map The user defined constants used in style template expansion.
    * @returns The base handle of the created object
    */
-  Animation CreateAnimation( const std::string& animationName, const Property::Map& map );
+  Animation CreateAnimation(const std::string& animationName, const Property::Map& map);
 
   /**
    * @brief Creates an animation from the set of known animations.
@@ -272,7 +270,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param sourceActor The starting point in an actor tree, from which to look for property owners
    * @returns The base handle of the created object
    */
-  Animation CreateAnimation( const std::string& animationName, Dali::Actor sourceActor );
+  Animation CreateAnimation(const std::string& animationName, Dali::Actor sourceActor);
 
   /**
    * @brief Creates an animation from the set of known animations with user defined constants
@@ -293,7 +291,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param sourceActor The starting point in an actor tree, from which to look for property owners
    * @returns The base handle of the created object
    */
-  Animation CreateAnimation( const std::string& animationName, const Property::Map& map, Dali::Actor sourceActor );
+  Animation CreateAnimation(const std::string& animationName, const Property::Map& map, Dali::Actor sourceActor);
 
   /**
    * @brief Creates an object (e.g. an actor) from the set of known style templates
@@ -308,7 +306,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param templateName The template to apply in creation.
    * @returns The base handle of the created object
    */
-  BaseHandle Create( const std::string& templateName );
+  BaseHandle Create(const std::string& templateName);
 
   /**
    * @brief Creates an object from the style templates with user defined constants
@@ -326,7 +324,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param map The user defined constants used in template expansion.
    * @returns The base handle of the created object
    */
-  BaseHandle Create( const std::string& templateName, const Property::Map& map );
+  BaseHandle Create(const std::string& templateName, const Property::Map& map);
 
   /**
    * @brief Creates an object (e.g. an actor) from given json snippet
@@ -339,7 +337,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param json The json snippet used to create the object.
    * @returns The base handle of the created object if any
    */
-  BaseHandle CreateFromJson( const std::string& json );
+  BaseHandle CreateFromJson(const std::string& json);
 
   /**
    * Apply a style (a collection of properties) to an actor.
@@ -350,7 +348,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    *
    * @return Return true if the style was found
    */
-  bool ApplyStyle( const std::string& styleName, Handle& handle );
+  bool ApplyStyle(const std::string& styleName, Handle& handle);
 
   /**
    * Apply a style (a collection of properties) to an actor from the given json snippet
@@ -361,8 +359,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    *
    * @return Return true if the json snippet was parsed
    */
-  bool ApplyFromJson(  Handle& handle, const std::string& json );
-
+  bool ApplyFromJson(Handle& handle, const std::string& json);
 
   /**
    * Add the actor tree in the "stage" section to the actor toActor.
@@ -372,7 +369,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * will create and add the actors to the stage root layer.
    * @param toActor The actor to add the created actors to
    */
-  void AddActors( Actor toActor );
+  void AddActors(Actor toActor);
 
   /**
    * Adds actors in the sectionName to the actor toActor.
@@ -383,14 +380,14 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param sectionName The section name to search for the actor tree
    * @param toActor The actor to add the created actors to
    */
-  void AddActors( const std::string &sectionName, Actor toActor );
+  void AddActors(const std::string& sectionName, Actor toActor);
 
   /**
    * Create a render task set.
    * @pre The Builder has been initialized.
    * @param name The library name of the render task set.
    */
-  void CreateRenderTask( const std::string &name );
+  void CreateRenderTask(const std::string& name);
 
   /**
    * Get or create Path from the Path instance library.
@@ -399,7 +396,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param name The name of a Path in the loaded representation
    * @return A handle to a Path if found, otherwise empty
    */
-  Path GetPath( const std::string &name );
+  Path GetPath(const std::string& name);
 
   /**
    * Get or create a PathConstrainer from the set of known PathConstrainers
@@ -411,7 +408,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param pathConstrainerName The name of the PathConstrainer
    * @returns A handle to a PathConstrainer if found, otherwise empty
    */
-  PathConstrainer GetPathConstrainer( const std::string& pathConstrainerName );
+  PathConstrainer GetPathConstrainer(const std::string& pathConstrainerName);
 
   /**
    * Get or create a LinearConstrainer from the set of known LinearConstrainers
@@ -423,14 +420,14 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * @param linearConstrainerName The name of the LinearConstrainer
    * @returns A handle to a LinearConstrainer if found, otherwise empty
    */
-  LinearConstrainer GetLinearConstrainer( const std::string& linearConstrainerName );
+  LinearConstrainer GetLinearConstrainer(const std::string& linearConstrainerName);
 
   // Signals
 
   /**
    * @brief Builder signal type
    */
-  typedef Signal< void () > BuilderSignalType;
+  typedef Signal<void()> BuilderSignalType;
 
   /**
    * @brief Signal emitted when a quit action is requested by the builder.
@@ -438,7 +435,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
   BuilderSignalType& QuitSignal();
 
 private:
-  explicit DALI_INTERNAL Builder(Internal::Builder *impl);
+  explicit DALI_INTERNAL Builder(Internal::Builder* impl);
 
 }; // class Builder
 

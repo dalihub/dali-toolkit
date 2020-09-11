@@ -119,7 +119,7 @@ public:
   /**
    * @brief Destructor.
    */
-  virtual ~VectorAnimationTask();
+  ~VectorAnimationTask() override;
 
   /**
    * @brief Finalizes the task.

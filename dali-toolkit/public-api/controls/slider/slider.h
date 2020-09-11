@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class Slider;
@@ -50,7 +48,6 @@ class Slider;
 class DALI_TOOLKIT_API Slider : public Control
 {
 public:
-
   // Properties
 
   /**
@@ -60,7 +57,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_1.39
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_1.39
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_1.39
   };
 
   /**
@@ -169,7 +166,6 @@ public:
   };
 
 public:
-
   /**
    * @brief Creates the Slider control.
    * @SINCE_1_1.39
@@ -190,7 +186,7 @@ public:
    * @SINCE_1_1.39
    * @param[in] handle Handle to an object
    */
-  Slider( const Slider& handle );
+  Slider(const Slider& handle);
 
   /**
    * @brief Move constructor
@@ -198,7 +194,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  Slider( Slider&& rhs );
+  Slider(Slider&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -208,7 +204,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A reference to this
    */
-  Slider& operator=( const Slider& handle );
+  Slider& operator=(const Slider& handle);
 
   /**
    * @brief Move assignment
@@ -217,7 +213,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Slider& operator=( Slider&& rhs );
+  Slider& operator=(Slider&& rhs);
 
   /**
    * @brief Destructor.
@@ -236,21 +232,20 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a Slider or an uninitialized handle
    */
-  static Slider DownCast( BaseHandle handle );
+  static Slider DownCast(BaseHandle handle);
 
-public:  // Signals
-
+public: // Signals
   /**
    * @brief Value changed signal type.
    * @SINCE_1_1.39
    */
-  typedef Signal< bool ( Slider, float ) > ValueChangedSignalType;
+  typedef Signal<bool(Slider, float)> ValueChangedSignalType;
 
   /**
    * @brief Mark reached signal type.
    * @SINCE_1_1.39
    */
-  typedef Signal< bool ( Slider, int ) > MarkReachedSignalType;
+  typedef Signal<bool(Slider, int)> MarkReachedSignalType;
 
   /**
    * @brief Signal emitted when the slider value changes.
@@ -289,7 +284,6 @@ public:  // Signals
   MarkReachedSignalType& MarkReachedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -305,7 +299,7 @@ public: // Not intended for application developers
    * @SINCE_1_1.39
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL Slider( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Slider(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

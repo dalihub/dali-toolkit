@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@ using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Popup
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,16 +35,16 @@ Popup::Popup()
 {
 }
 
-Popup::Popup( const Popup& handle )
-: Control( handle )
+Popup::Popup(const Popup& handle)
+: Control(handle)
 {
 }
 
-Popup& Popup::operator=( const Popup& handle )
+Popup& Popup::operator=(const Popup& handle)
 {
-  if( &handle != this )
+  if(&handle != this)
   {
-    Control::operator=( handle );
+    Control::operator=(handle);
   }
   return *this;
 }
@@ -56,8 +54,8 @@ Popup::Popup(Internal::Popup& implementation)
 {
 }
 
-Popup::Popup( Dali::Internal::CustomActor* internal )
-: Control( internal )
+Popup::Popup(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::Popup>(internal);
 }
@@ -71,78 +69,78 @@ Popup::~Popup()
 {
 }
 
-Popup Popup::DownCast( BaseHandle handle )
+Popup Popup::DownCast(BaseHandle handle)
 {
   return Control::DownCast<Popup, Internal::Popup>(handle);
 }
 
 // Properties:
 
-void Popup::SetTitle( Actor titleActor )
+void Popup::SetTitle(Actor titleActor)
 {
-  GetImpl( *this ).SetTitle( titleActor );
+  GetImpl(*this).SetTitle(titleActor);
 }
 
 Actor Popup::GetTitle() const
 {
-  return GetImpl( *this ).GetTitle();
+  return GetImpl(*this).GetTitle();
 }
 
-void Popup::SetContent( Actor content )
+void Popup::SetContent(Actor content)
 {
-  GetImpl( *this ).SetContent( content );
+  GetImpl(*this).SetContent(content);
 }
 
 Actor Popup::GetContent() const
 {
-  return GetImpl( *this ).GetContent();
+  return GetImpl(*this).GetContent();
 }
 
-void Popup::SetFooter( Actor footer )
+void Popup::SetFooter(Actor footer)
 {
-  GetImpl( *this ).SetFooter( footer );
+  GetImpl(*this).SetFooter(footer);
 }
 
 Actor Popup::GetFooter() const
 {
-  return GetImpl( *this ).GetFooter();
+  return GetImpl(*this).GetFooter();
 }
 
-void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
+void Popup::SetDisplayState(Toolkit::Popup::DisplayState displayState)
 {
-  GetImpl( *this ).SetDisplayState( displayState );
+  GetImpl(*this).SetDisplayState(displayState);
 }
 
 Toolkit::Popup::DisplayState Popup::GetDisplayState() const
 {
-  return GetImpl( *this ).GetDisplayState();
+  return GetImpl(*this).GetDisplayState();
 }
 
 // Signals:
 
 Popup::TouchedOutsideSignalType& Popup::OutsideTouchedSignal()
 {
-  return GetImpl( *this ).OutsideTouchedSignal();
+  return GetImpl(*this).OutsideTouchedSignal();
 }
 
 Popup::DisplayStateChangeSignalType& Popup::ShowingSignal()
 {
-  return GetImpl( *this ).ShowingSignal();
+  return GetImpl(*this).ShowingSignal();
 }
 
 Popup::DisplayStateChangeSignalType& Popup::ShownSignal()
 {
-  return GetImpl( *this ).ShownSignal();
+  return GetImpl(*this).ShownSignal();
 }
 
 Popup::DisplayStateChangeSignalType& Popup::HidingSignal()
 {
-  return GetImpl( *this ).HidingSignal();
+  return GetImpl(*this).HidingSignal();
 }
 
 Popup::DisplayStateChangeSignalType& Popup::HiddenSignal()
 {
-  return GetImpl( *this ).HiddenSignal();
+  return GetImpl(*this).HiddenSignal();
 }
 
 } // namespace Toolkit

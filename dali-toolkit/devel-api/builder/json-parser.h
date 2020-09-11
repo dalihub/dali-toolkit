@@ -2,7 +2,7 @@
 #define DALI_JSON_PARSER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,18 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
+#include <dali/public-api/object/base-handle.h>
 #include <list>
 #include <ostream>
-#include <dali/public-api/object/base-handle.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/builder/tree-node.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class JsonParser;
@@ -44,7 +42,6 @@ class JsonParser;
 class DALI_TOOLKIT_API JsonParser : public BaseHandle
 {
 public:
-
   /*
    * Create new parser
    * @return JsonParser
@@ -75,7 +72,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A handle to a JsonParser or an uninitialized handle
    */
-  static JsonParser DownCast( BaseHandle handle );
+  static JsonParser DownCast(BaseHandle handle);
 
   /*
    * Parse the source and construct a node tree.
@@ -133,7 +130,6 @@ public:
   void Write(std::ostream& output, int indent) const;
 
 public: // Not intended for application developers
-
   /**
    * This constructor is used by Dali New() methods
    * @param [in] parser A pointer to a newly allocated Dali resource
@@ -144,6 +140,5 @@ public: // Not intended for application developers
 } // namespace Toolkit
 
 } // namespace Dali
-
 
 #endif // DALI_JSON_PARSER_H

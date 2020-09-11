@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,39 +27,36 @@ using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
-
 ConfirmationPopup::ConfirmationPopup()
 : Popup()
 {
 }
 
-ConfirmationPopup::ConfirmationPopup( Internal::ConfirmationPopup& implementation )
-: Popup( implementation )
+ConfirmationPopup::ConfirmationPopup(Internal::ConfirmationPopup& implementation)
+: Popup(implementation)
 {
 }
 
-ConfirmationPopup::ConfirmationPopup( const ConfirmationPopup& confirmationPopup )
-: Popup( confirmationPopup )
+ConfirmationPopup::ConfirmationPopup(const ConfirmationPopup& confirmationPopup)
+: Popup(confirmationPopup)
 {
 }
 
-ConfirmationPopup& ConfirmationPopup::operator=( const ConfirmationPopup& confirmationPopup )
+ConfirmationPopup& ConfirmationPopup::operator=(const ConfirmationPopup& confirmationPopup)
 {
-  if( &confirmationPopup != this )
+  if(&confirmationPopup != this)
   {
-    Popup::operator=( confirmationPopup );
+    Popup::operator=(confirmationPopup);
   }
   return *this;
 }
 
-ConfirmationPopup::ConfirmationPopup( Dali::Internal::CustomActor* internal )
-: Popup( internal )
+ConfirmationPopup::ConfirmationPopup(Dali::Internal::CustomActor* internal)
+: Popup(internal)
 {
-  VerifyCustomActorPointer<Internal::ConfirmationPopup>( internal );
+  VerifyCustomActorPointer<Internal::ConfirmationPopup>(internal);
 }
 
 ConfirmationPopup::~ConfirmationPopup()
@@ -71,11 +68,10 @@ ConfirmationPopup ConfirmationPopup::New()
   return Internal::ConfirmationPopup::New();
 }
 
-ConfirmationPopup ConfirmationPopup::DownCast( BaseHandle handle )
+ConfirmationPopup ConfirmationPopup::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<ConfirmationPopup, Internal::ConfirmationPopup>( handle );
+  return Control::DownCast<ConfirmationPopup, Internal::ConfirmationPopup>(handle);
 }
-
 
 } // namespace Toolkit
 

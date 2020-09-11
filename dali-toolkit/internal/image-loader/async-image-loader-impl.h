@@ -110,7 +110,7 @@ protected:
   /**
    * Destructor
    */
-  ~AsyncImageLoader();
+  ~AsyncImageLoader() override;
 
 private:
   Toolkit::AsyncImageLoader::ImageLoadedSignalType mLoadedSignal;

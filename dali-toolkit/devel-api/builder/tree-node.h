@@ -2,7 +2,7 @@
 #define DALI_SCRIPT_TREE_NODE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,24 +19,20 @@
  */
 
 // EXTERNAL INCLUDES
-#include <utility> // pair
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <iterator>
 #include <string>
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <utility> // pair
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-
 class TreeNodeManipulator;
 
-} // namespace Internal
-
+} // namespace DALI_INTERNAL
 
 /*
  * TreeNode describes a tree of nodes.
@@ -73,13 +69,13 @@ public:
   class DALI_TOOLKIT_API ConstIterator
   {
   public:
-    typedef KeyNodePair          value_type;
-    typedef KeyNodePair          *pointer;
-    typedef const KeyNodePair    *const_pointer;
-    typedef KeyNodePair          &reference;
-    typedef const KeyNodePair    &const_reference;
-    typedef size_t               size_type;
-    typedef std::ptrdiff_t       difference_type;
+    typedef KeyNodePair               value_type;
+    typedef KeyNodePair*              pointer;
+    typedef const KeyNodePair*        const_pointer;
+    typedef KeyNodePair&              reference;
+    typedef const KeyNodePair&        const_reference;
+    typedef size_t                    size_type;
+    typedef std::ptrdiff_t            difference_type;
     typedef std::forward_iterator_tag iterator_category;
 
     /*
@@ -90,22 +86,23 @@ public:
     /*
      * pre increment
      */
-    ConstIterator& operator ++();
+    ConstIterator& operator++();
 
     /*
      * post increment
      */
-    ConstIterator operator ++(int);
+    ConstIterator operator++(int);
 
     /*
      * != test
      */
-    bool operator!=( const ConstIterator& rhs ) const;
+    bool operator!=(const ConstIterator& rhs) const;
 
     /*
      * pointer semantics
      */
     KeyNodePair operator*();
+
   private:
     TreeNode* mNode;
   };
@@ -212,26 +209,25 @@ private:
   DALI_INTERNAL TreeNode();
 
   // non copyable or assignable
-  DALI_INTERNAL TreeNode(TreeNode &);
+  DALI_INTERNAL TreeNode(TreeNode&);
   DALI_INTERNAL TreeNode& operator=(const TreeNode&);
 
-  const char* mName;                   ///< The nodes name (if any)
+  const char* mName; ///< The nodes name (if any)
 
-  TreeNode* mParent;                   ///< The nodes parent
-  TreeNode* mNextSibling;              ///< The nodes next sibling
-  TreeNode* mFirstChild;               ///< The nodes first child
-  TreeNode* mLastChild;                ///< The nodes last child
+  TreeNode* mParent;      ///< The nodes parent
+  TreeNode* mNextSibling; ///< The nodes next sibling
+  TreeNode* mFirstChild;  ///< The nodes first child
+  TreeNode* mLastChild;   ///< The nodes last child
 
   union
   {
-    const char* mStringValue;          ///< The node string value
-    int mIntValue;                     ///< The node integer value
-    float mFloatValue;                 ///< The node float value
+    const char* mStringValue; ///< The node string value
+    int         mIntValue;    ///< The node integer value
+    float       mFloatValue;  ///< The node float value
   };
 
-  NodeType mType;                      ///< The nodes type
-  bool mSubstituion;                   ///< String substitution flag
-
+  NodeType mType;        ///< The nodes type
+  bool     mSubstituion; ///< String substitution flag
 };
 
 } // namespace Toolkit

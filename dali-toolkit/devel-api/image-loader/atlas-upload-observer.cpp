@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,49 +23,48 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 AtlasUploadObserver::AtlasUploadObserver()
-{}
+{
+}
 
 AtlasUploadObserver::~AtlasUploadObserver()
 {
   // Notify the registerd ImageAtlas object about the destruction of observer.
-  const std::size_t size( mAtlasList.Count() );
-  for( std::size_t i = 0; i < size; ++i )
+  const std::size_t size(mAtlasList.Count());
+  for(std::size_t i = 0; i < size; ++i)
   {
-    if( mAtlasList[i] )
+    if(mAtlasList[i])
     {
-      mAtlasList[i]->ObserverDestroyed( this );
+      mAtlasList[i]->ObserverDestroyed(this);
     }
   }
   mAtlasList.Clear();
 }
 
-void AtlasUploadObserver::Register( Internal::ImageAtlas& imageAtlas )
+void AtlasUploadObserver::Register(Internal::ImageAtlas& imageAtlas)
 {
   // Add to the list so that the ImageAtlas could get notified in the destructor.
   // If the same atlas is exist in the list already, we would still save the duplicated copy.
-  mAtlasList.PushBack( &imageAtlas );
+  mAtlasList.PushBack(&imageAtlas);
 }
 
-void AtlasUploadObserver::Unregister( Internal::ImageAtlas& imageAtlas )
+void AtlasUploadObserver::Unregister(Internal::ImageAtlas& imageAtlas)
 {
-  const std::size_t size( mAtlasList.Count() );
-  for( std::size_t i = 0; i < size; i++ )
+  const std::size_t size(mAtlasList.Count());
+  for(std::size_t i = 0; i < size; i++)
   {
-    if( mAtlasList[i] == &imageAtlas )
+    if(mAtlasList[i] == &imageAtlas)
     {
       // Remove from list
-      mAtlasList.Erase( mAtlasList.Begin() + i );
+      mAtlasList.Erase(mAtlasList.Begin() + i);
       // If there are duplicated copies of same pointer, only the first one is removed
       return;
     }
   }
 }
 
-}
+} // namespace Toolkit
 
-}
+} // namespace Dali

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 Scene3dView::Scene3dView()
 {
 }
@@ -35,79 +33,78 @@ Scene3dView::~Scene3dView()
 {
 }
 
-Scene3dView::Scene3dView( const Scene3dView& handle )
-  : Control( handle )
+Scene3dView::Scene3dView(const Scene3dView& handle)
+: Control(handle)
 {
 }
 
-Scene3dView& Scene3dView::operator=( const Scene3dView& handle )
+Scene3dView& Scene3dView::operator=(const Scene3dView& handle)
 {
-  BaseHandle::operator=( handle );
+  BaseHandle::operator=(handle);
   return *this;
 }
 
-Scene3dView Scene3dView::New( const std::string& filePath )
+Scene3dView Scene3dView::New(const std::string& filePath)
 {
-  return Internal::Scene3dView::New( filePath );
+  return Internal::Scene3dView::New(filePath);
 }
 
-Scene3dView Scene3dView::New( const std::string& filePath, const std::string& diffuseTexturePath, const std::string& specularTexturePath, Vector4 scaleFactor )
+Scene3dView Scene3dView::New(const std::string& filePath, const std::string& diffuseTexturePath, const std::string& specularTexturePath, Vector4 scaleFactor)
 {
-  return Internal::Scene3dView::New( filePath, diffuseTexturePath, specularTexturePath, scaleFactor );
+  return Internal::Scene3dView::New(filePath, diffuseTexturePath, specularTexturePath, scaleFactor);
 }
 
-Scene3dView::Scene3dView( Internal::Scene3dView& implementation )
-  : Control( implementation )
+Scene3dView::Scene3dView(Internal::Scene3dView& implementation)
+: Control(implementation)
 {
 }
 
-Scene3dView::Scene3dView( Dali::Internal::CustomActor* internal )
-  : Control( internal )
+Scene3dView::Scene3dView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::Scene3dView>( internal );
+  VerifyCustomActorPointer<Internal::Scene3dView>(internal);
 }
 
-Scene3dView Scene3dView::DownCast( BaseHandle handle )
+Scene3dView Scene3dView::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<Scene3dView, Internal::Scene3dView>( handle );
+  return Control::DownCast<Scene3dView, Internal::Scene3dView>(handle);
 }
 
 uint32_t Scene3dView::GetAnimationCount()
 {
-  return GetImpl( *this ).GetAnimationCount();
+  return GetImpl(*this).GetAnimationCount();
 }
 
-bool Scene3dView::PlayAnimation( uint32_t index )
+bool Scene3dView::PlayAnimation(uint32_t index)
 {
-  return GetImpl( *this ).PlayAnimation( index );
+  return GetImpl(*this).PlayAnimation(index);
 }
 
 bool Scene3dView::PlayAnimations()
 {
-  return GetImpl( *this ).PlayAnimations();
+  return GetImpl(*this).PlayAnimations();
 }
 
-bool Scene3dView::SetLight( LightType type, Vector3 lightVector, Vector3 lightColor )
+bool Scene3dView::SetLight(LightType type, Vector3 lightVector, Vector3 lightColor)
 {
-  return GetImpl( *this ).SetLight( type, lightVector, lightColor );
+  return GetImpl(*this).SetLight(type, lightVector, lightColor);
 }
 
 CameraActor Scene3dView::GetDefaultCamera()
 {
-  return GetImpl( *this ).GetDefaultCamera();
+  return GetImpl(*this).GetDefaultCamera();
 }
 
 uint32_t Scene3dView::GetCameraCount()
 {
-  return GetImpl( *this ).GetCameraCount();
+  return GetImpl(*this).GetCameraCount();
 }
 
-CameraActor Scene3dView::GetCamera( uint32_t cameraIndex )
+CameraActor Scene3dView::GetCamera(uint32_t cameraIndex)
 {
-  return GetImpl( *this ).GetCamera( cameraIndex );
+  return GetImpl(*this).GetCamera(cameraIndex);
 }
 
-}//namespace Toolkit
+} //namespace Toolkit
 
-}//namespace Dali
-
+} //namespace Dali

@@ -22,17 +22,15 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
 using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // RulerDomain
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +49,7 @@ float RulerDomain::Clamp(float x, float length, float scale) const
   return Clamp(x, length, scale, clamped);
 }
 
-float RulerDomain::Clamp(float x, float length, float scale, ClampState &clamped) const
+float RulerDomain::Clamp(float x, float length, float scale, ClampState& clamped) const
 {
   if(!enabled)
   {
@@ -78,7 +76,7 @@ float RulerDomain::Clamp(float x, float length, float scale, ClampState &clamped
 
 float RulerDomain::GetSize() const
 {
-  return max-min;
+  return max - min;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +86,7 @@ float RulerDomain::GetSize() const
 Ruler::Ruler()
 : mType(FREE),
   mEnabled(true),
-  mDomain(RulerDomain(0.0f,1.0f,false))
+  mDomain(RulerDomain(0.0f, 1.0f, false))
 {
 }
 
@@ -121,14 +119,14 @@ void Ruler::SetDomain(RulerDomain domain)
   mDomain = domain;
 }
 
-const RulerDomain &Ruler::GetDomain() const
+const RulerDomain& Ruler::GetDomain() const
 {
   return mDomain;
 }
 
 void Ruler::DisableDomain()
 {
-  mDomain = RulerDomain(0.0f,1.0f,false);
+  mDomain = RulerDomain(0.0f, 1.0f, false);
 }
 
 float Ruler::Clamp(float x, float length, float scale) const
@@ -136,7 +134,7 @@ float Ruler::Clamp(float x, float length, float scale) const
   return mDomain.Clamp(x, length, scale);
 }
 
-float Ruler::Clamp(float x, float length, float scale, ClampState &clamped) const
+float Ruler::Clamp(float x, float length, float scale, ClampState& clamped) const
 {
   return mDomain.Clamp(x, length, scale, clamped);
 }
@@ -146,7 +144,7 @@ float Ruler::SnapAndClamp(float x, float bias, float length, float scale) const
   return Clamp(Snap(x, bias), length, scale);
 }
 
-float Ruler::SnapAndClamp(float x, float bias, float length, float scale, ClampState &clamped) const
+float Ruler::SnapAndClamp(float x, float bias, float length, float scale, ClampState& clamped) const
 {
   return Clamp(Snap(x, bias), length, scale, clamped);
 }
@@ -165,7 +163,7 @@ float DefaultRuler::Snap(float x, float bias) const
   return x;
 }
 
-float DefaultRuler::GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const
+float DefaultRuler::GetPositionFromPage(unsigned int page, unsigned int& volume, bool wrap) const
 {
   volume = 0;
   return 0.0f;
@@ -190,7 +188,7 @@ FixedRuler::FixedRuler(float spacing)
 {
   if(fabsf(mSpacing) <= Math::MACHINE_EPSILON_1)
   {
-    DALI_LOG_ERROR( "Page spacing too small (%f).\n", double(spacing) );
+    DALI_LOG_ERROR("Page spacing too small (%f).\n", double(spacing));
     mSpacing = spacing >= 0.0f ? Math::MACHINE_EPSILON_1 : -Math::MACHINE_EPSILON_1;
   }
   mType = FIXED;
@@ -201,14 +199,14 @@ float FixedRuler::Snap(float x, float bias) const
   return floor(x / mSpacing + bias) * mSpacing;
 }
 
-float FixedRuler::GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const
+float FixedRuler::GetPositionFromPage(unsigned int page, unsigned int& volume, bool wrap) const
 {
   float position = mDomain.min;
 
   volume = 0;
 
   // spacing must be present.
-  if( mEnabled )
+  if(mEnabled)
   {
     unsigned int column = page;
 
@@ -216,17 +214,17 @@ float FixedRuler::GetPositionFromPage(unsigned int page, unsigned int &volume, b
     if(wrap)
     {
       unsigned int pagesPerVolume = mDomain.GetSize() / mSpacing;
-      if(pagesPerVolume>0)
+      if(pagesPerVolume > 0)
       {
         column += pagesPerVolume;
         column %= pagesPerVolume;
-        volume = page/pagesPerVolume;
+        volume = page / pagesPerVolume;
       }
     }
 
     position = mDomain.min + column * mSpacing;
   }
-  else  // Domain (or Spacing) is not present, carry page to volume.
+  else // Domain (or Spacing) is not present, carry page to volume.
   {
     if(wrap)
     {
@@ -242,9 +240,9 @@ unsigned int FixedRuler::GetPageFromPosition(float position, bool wrap) const
   unsigned int page = 0;
 
   // spacing must be present.
-  if( mEnabled )
+  if(mEnabled)
   {
-    if( wrap )
+    if(wrap)
     {
       position = WrapInDomain(position, mDomain.min, mDomain.max);
     }
@@ -257,7 +255,7 @@ unsigned int FixedRuler::GetPageFromPosition(float position, bool wrap) const
       if(pagesPerVolume < 1u)
       {
         pagesPerVolume = 1u;
-        DALI_LOG_ERROR("Ruler domain(%f) is smaller than its spacing(%f).\n", mDomain.GetSize() * 1.0, mSpacing * 1.0 );
+        DALI_LOG_ERROR("Ruler domain(%f) is smaller than its spacing(%f).\n", mDomain.GetSize() * 1.0, mSpacing * 1.0);
       }
       page %= pagesPerVolume;
     }
@@ -271,7 +269,7 @@ unsigned int FixedRuler::GetTotalPages() const
   unsigned int pagesPerVolume = 1;
 
   // spacing must be present.
-  if( mEnabled )
+  if(mEnabled)
   {
     pagesPerVolume = mDomain.GetSize() / mSpacing;
   }
@@ -292,19 +290,19 @@ ScrollView::ScrollView(Internal::ScrollView& implementation)
 {
 }
 
-ScrollView::ScrollView( Dali::Internal::CustomActor* internal )
-: Scrollable( internal )
+ScrollView::ScrollView(Dali::Internal::CustomActor* internal)
+: Scrollable(internal)
 {
   VerifyCustomActorPointer<Internal::ScrollView>(internal);
 }
 
-ScrollView::ScrollView( const ScrollView& handle ) = default;
+ScrollView::ScrollView(const ScrollView& handle) = default;
 
-ScrollView::ScrollView( ScrollView&& rhs ) = default;
+ScrollView::ScrollView(ScrollView&& rhs) = default;
 
-ScrollView& ScrollView::operator=( const ScrollView& handle ) = default;
+ScrollView& ScrollView::operator=(const ScrollView& handle) = default;
 
-ScrollView& ScrollView::operator=( ScrollView&& rhs ) = default;
+ScrollView& ScrollView::operator=(ScrollView&& rhs) = default;
 
 ScrollView ScrollView::New()
 {
@@ -315,7 +313,7 @@ ScrollView::~ScrollView()
 {
 }
 
-ScrollView ScrollView::DownCast( BaseHandle handle )
+ScrollView ScrollView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<ScrollView, Internal::ScrollView>(handle);
 }
@@ -455,7 +453,7 @@ Vector2 ScrollView::GetMinimumDistanceForFlick() const
   return GetImpl(*this).GetMinimumDistanceForFlick();
 }
 
-void ScrollView::SetMinimumDistanceForFlick( const Vector2& distance )
+void ScrollView::SetMinimumDistanceForFlick(const Vector2& distance)
 {
   GetImpl(*this).SetMinimumDistanceForFlick(distance);
 }
@@ -465,7 +463,7 @@ float ScrollView::GetMinimumSpeedForFlick() const
   return GetImpl(*this).GetMinimumSpeedForFlick();
 }
 
-void ScrollView::SetMinimumSpeedForFlick( float speed )
+void ScrollView::SetMinimumSpeedForFlick(float speed)
 {
   GetImpl(*this).SetMinimumSpeedForFlick(speed);
 }
@@ -500,29 +498,27 @@ unsigned int ScrollView::GetCurrentPage() const
   return GetImpl(*this).GetCurrentPage();
 }
 
-void ScrollView::ScrollTo(const Vector2 &position)
+void ScrollView::ScrollTo(const Vector2& position)
 {
   GetImpl(*this).ScrollTo(position);
 }
 
-void ScrollView::ScrollTo(const Vector2 &position, float duration)
+void ScrollView::ScrollTo(const Vector2& position, float duration)
 {
   GetImpl(*this).ScrollTo(position, duration);
 }
 
-void ScrollView::ScrollTo(const Vector2 &position, float duration, AlphaFunction alpha)
+void ScrollView::ScrollTo(const Vector2& position, float duration, AlphaFunction alpha)
 {
   GetImpl(*this).ScrollTo(position, duration, alpha);
 }
 
-void ScrollView::ScrollTo(const Vector2 &position, float duration,
-                          DirectionBias horizontalBias, DirectionBias verticalBias)
+void ScrollView::ScrollTo(const Vector2& position, float duration, DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   GetImpl(*this).ScrollTo(position, duration, horizontalBias, verticalBias);
 }
 
-void ScrollView::ScrollTo(const Vector2 &position, float duration, AlphaFunction alpha,
-                          DirectionBias horizontalBias, DirectionBias verticalBias)
+void ScrollView::ScrollTo(const Vector2& position, float duration, AlphaFunction alpha, DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   GetImpl(*this).ScrollTo(position, duration, alpha, horizontalBias, verticalBias);
 }
@@ -542,12 +538,12 @@ void ScrollView::ScrollTo(unsigned int page, float duration, DirectionBias bias)
   GetImpl(*this).ScrollTo(page, duration, bias);
 }
 
-void ScrollView::ScrollTo(Actor &actor)
+void ScrollView::ScrollTo(Actor& actor)
 {
   GetImpl(*this).ScrollTo(actor);
 }
 
-void ScrollView::ScrollTo(Actor &actor, float duration)
+void ScrollView::ScrollTo(Actor& actor, float duration)
 {
   GetImpl(*this).ScrollTo(actor, duration);
 }
@@ -597,14 +593,14 @@ ScrollView::SnapStartedSignalType& ScrollView::SnapStartedSignal()
   return GetImpl(*this).SnapStartedSignal();
 }
 
-void ScrollView::SetScrollingDirection( Radian direction, Radian threshold )
+void ScrollView::SetScrollingDirection(Radian direction, Radian threshold)
 {
-  GetImpl(*this).SetScrollingDirection( direction, threshold );
+  GetImpl(*this).SetScrollingDirection(direction, threshold);
 }
 
-void ScrollView::RemoveScrollingDirection( Radian direction )
+void ScrollView::RemoveScrollingDirection(Radian direction)
 {
-  GetImpl(*this).RemoveScrollingDirection( direction );
+  GetImpl(*this).RemoveScrollingDirection(direction);
 }
 
 } // namespace Toolkit

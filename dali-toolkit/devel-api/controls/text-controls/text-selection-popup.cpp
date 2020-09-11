@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,29 +25,27 @@ using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
-TextSelectionPopup TextSelectionPopup::New( TextSelectionPopupCallbackInterface* callbackInterface )
+TextSelectionPopup TextSelectionPopup::New(TextSelectionPopupCallbackInterface* callbackInterface)
 {
-  return Internal::TextSelectionPopup::New( callbackInterface );
+  return Internal::TextSelectionPopup::New(callbackInterface);
 }
 
 TextSelectionPopup::TextSelectionPopup()
 {
 }
 
-TextSelectionPopup::TextSelectionPopup( const TextSelectionPopup& handle )
-: Control( handle )
+TextSelectionPopup::TextSelectionPopup(const TextSelectionPopup& handle)
+: Control(handle)
 {
 }
 
-TextSelectionPopup& TextSelectionPopup::operator=( const TextSelectionPopup& handle )
+TextSelectionPopup& TextSelectionPopup::operator=(const TextSelectionPopup& handle)
 {
-  if( &handle != this )
+  if(&handle != this)
   {
-    Control::operator=( handle );
+    Control::operator=(handle);
   }
   return *this;
 }
@@ -56,19 +54,19 @@ TextSelectionPopup::~TextSelectionPopup()
 {
 }
 
-TextSelectionPopup TextSelectionPopup::DownCast( BaseHandle handle )
+TextSelectionPopup TextSelectionPopup::DownCast(BaseHandle handle)
 {
   return Control::DownCast<TextSelectionPopup, Internal::TextSelectionPopup>(handle);
 }
 
-void TextSelectionPopup::EnableButtons( Toolkit::TextSelectionPopup::Buttons buttonsToEnable )
+void TextSelectionPopup::EnableButtons(Toolkit::TextSelectionPopup::Buttons buttonsToEnable)
 {
-  GetImpl(*this).EnableButtons( buttonsToEnable );
+  GetImpl(*this).EnableButtons(buttonsToEnable);
 }
 
-void TextSelectionPopup::RaiseAbove( Layer target )
+void TextSelectionPopup::RaiseAbove(Layer target)
 {
-  GetImpl(*this).RaiseAbove( target );
+  GetImpl(*this).RaiseAbove(target);
 }
 
 void TextSelectionPopup::ShowPopup()
@@ -81,17 +79,16 @@ void TextSelectionPopup::HidePopup()
   GetImpl(*this).HidePopup();
 }
 
-TextSelectionPopup::TextSelectionPopup( Internal::TextSelectionPopup& implementation )
+TextSelectionPopup::TextSelectionPopup(Internal::TextSelectionPopup& implementation)
 : Control(implementation)
 {
 }
 
-TextSelectionPopup::TextSelectionPopup( Dali::Internal::CustomActor* internal )
-: Control( internal )
+TextSelectionPopup::TextSelectionPopup(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::TextSelectionPopup>( internal );
+  VerifyCustomActorPointer<Internal::TextSelectionPopup>(internal);
 }
-
 
 } // namespace Toolkit
 

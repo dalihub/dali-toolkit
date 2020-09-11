@@ -250,22 +250,22 @@ private: // from Control
   /**
    * @copydoc Toolkit::Control::OnPan
    */
-  virtual void OnPan( const PanGesture& gesture );
+  void OnPan( const PanGesture& gesture ) override;
 
   /**
    * @copydoc Toolkit::Control::OnInitialize
    */
-  virtual void OnInitialize();
+  void OnInitialize() override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  virtual void OnSceneConnection( int depth );
+  void OnSceneConnection( int depth ) override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneDisconnection()
    */
-  virtual void OnSceneDisconnection();
+  void OnSceneDisconnection() override;
 
 private: // implemented differently by PageTurnLandscapeView and PageTurnPortraitView
 

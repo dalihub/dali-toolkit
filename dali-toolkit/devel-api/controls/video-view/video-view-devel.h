@@ -22,25 +22,22 @@
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/animation.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/any.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelVideoView
 {
-
 /**
  * @brief Returns the internal media player.
  * @param[in] videoView The current VideoView
  * @return The internal media player of current VideoView
  */
-DALI_TOOLKIT_API Any GetMediaPlayer( VideoView videoView );
+DALI_TOOLKIT_API Any GetMediaPlayer(VideoView videoView);
 
 /**
  * @brief Creates an initialized VideoView with synchronization mode.
@@ -50,7 +47,7 @@ DALI_TOOLKIT_API Any GetMediaPlayer( VideoView videoView );
  * @param[in] syncMode The synchronization mode between the UI (transparent hole) and VideoPlayer
  * @return A handle to a newly allocated Dali VideoView
  */
-DALI_TOOLKIT_API VideoView New( VideoSyncMode syncMode );
+DALI_TOOLKIT_API VideoView New(VideoSyncMode syncMode);
 
 /**
  * @brief Play the resize or move animation with synchronization between UI(transparent hole) and video player
@@ -61,7 +58,7 @@ DALI_TOOLKIT_API VideoView New( VideoSyncMode syncMode );
  * @param[in] videoView The current VideoView
  * @param[in] animation The animation for video view's resize or move.
  */
-DALI_TOOLKIT_API void PlayAnimation( VideoView videoView, Animation animation );
+DALI_TOOLKIT_API void PlayAnimation(VideoView videoView, Animation animation);
 
 } // namespace DevelVideoView
 

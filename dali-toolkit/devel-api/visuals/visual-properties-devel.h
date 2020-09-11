@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelVisual
 {
-
 /**
  * @brief All the visual types.
  */
@@ -47,9 +44,9 @@ enum Type
   SVG            = Dali::Toolkit::Visual::SVG,
   ANIMATED_IMAGE = Dali::Toolkit::Visual::ANIMATED_IMAGE,
 
-  ANIMATED_GRADIENT     = ANIMATED_IMAGE + 1,  ///< Renders an animated gradient.
-  ANIMATED_VECTOR_IMAGE = ANIMATED_IMAGE + 2,  ///< Renders an animated vector image.
-  ARC                   = ANIMATED_IMAGE + 3,  ///< Renders an arc.
+  ANIMATED_GRADIENT     = ANIMATED_IMAGE + 1, ///< Renders an animated gradient.
+  ANIMATED_VECTOR_IMAGE = ANIMATED_IMAGE + 2, ///< Renders an animated vector image.
+  ARC                   = ANIMATED_IMAGE + 3, ///< Renders an arc.
 };
 
 /**
@@ -93,18 +90,17 @@ enum Type
 
 } // namespace Property
 
-
 /**
  * @brief The values of this enum determine how the visual should be fit to the view
  */
 enum FittingMode
 {
-  FIT_KEEP_ASPECT_RATIO,     ///< The visual should be scaled to fit, preserving aspect ratio
-  FILL,                      ///< The visual should be stretched to fill, not preserving aspect ratio
-  OVER_FIT_KEEP_ASPECT_RATIO,///< The visual should be scaled to fit, preserving aspect ratio. The visual will be filled without empty area, and outside is cropped away.
-  CENTER,                    ///< The visual should keep original size of image. It is not scaled and not strecthed.
-  FIT_HEIGHT,                ///< The visual should be scaled to fit, preserving aspect ratio. Height is scaled proportionately to maintain aspect ratio. It will be deprecated.
-  FIT_WIDTH                  ///< The visual should be scaled to fit, preserving aspect ratio. Width is scaled proportionately to maintain aspect ratio. It will be deprecated.
+  FIT_KEEP_ASPECT_RATIO,      ///< The visual should be scaled to fit, preserving aspect ratio
+  FILL,                       ///< The visual should be stretched to fill, not preserving aspect ratio
+  OVER_FIT_KEEP_ASPECT_RATIO, ///< The visual should be scaled to fit, preserving aspect ratio. The visual will be filled without empty area, and outside is cropped away.
+  CENTER,                     ///< The visual should keep original size of image. It is not scaled and not strecthed.
+  FIT_HEIGHT,                 ///< The visual should be scaled to fit, preserving aspect ratio. Height is scaled proportionately to maintain aspect ratio. It will be deprecated.
+  FIT_WIDTH                   ///< The visual should be scaled to fit, preserving aspect ratio. Width is scaled proportionately to maintain aspect ratio. It will be deprecated.
 };
 
 /**
@@ -112,13 +108,11 @@ enum FittingMode
  */
 namespace Transform
 {
-
 /**
  * @brief Visual Transform Property.
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the type of Transform Property.
  */

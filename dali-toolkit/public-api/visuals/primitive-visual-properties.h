@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_visuals
  * @{
@@ -38,14 +36,12 @@ namespace Toolkit
  */
 namespace PrimitiveVisual
 {
-
 /**
  * @brief PrimitiveVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the instance of properties belonging to the PrimitiveVisual.
  * @SINCE_1_1.45
@@ -200,22 +196,21 @@ enum
  */
 namespace Shape
 {
-
 /**
  * @brief The primitive shape to render as a PrimitiveVisual.
  * @SINCE_1_1.45
  */
 enum Type
 {
-  SPHERE, ///< A perfectly round geometrical object in three-dimensional space. @SINCE_1_1.45
+  SPHERE,          ///< A perfectly round geometrical object in three-dimensional space. @SINCE_1_1.45
   CONICAL_FRUSTUM, ///< The area bound between two circles, i.e. a cone with the tip removed. @SINCE_1_3.15
-  CONE, ///< Equivalent to a conical frustum with top radius of zero. @SINCE_1_1.45
-  CYLINDER, ///< Equivalent to a conical frustum with equal radii for the top and bottom circles. @SINCE_1_1.45
-  CUBE, ///< Equivalent to a bevelled cube with a bevel percentage of zero. @SINCE_1_1.45
-  OCTAHEDRON, ///< Equivalent to a bevelled cube with a bevel percentage of one. @SINCE_1_1.45
-  BEVELLED_CUBE ///< A cube/cuboid with all edges flattened to some degree. @SINCE_1_1.45
+  CONE,            ///< Equivalent to a conical frustum with top radius of zero. @SINCE_1_1.45
+  CYLINDER,        ///< Equivalent to a conical frustum with equal radii for the top and bottom circles. @SINCE_1_1.45
+  CUBE,            ///< Equivalent to a bevelled cube with a bevel percentage of zero. @SINCE_1_1.45
+  OCTAHEDRON,      ///< Equivalent to a bevelled cube with a bevel percentage of one. @SINCE_1_1.45
+  BEVELLED_CUBE    ///< A cube/cuboid with all edges flattened to some degree. @SINCE_1_1.45
 };
-}
+} // namespace Shape
 
 } // namespace PrimitiveVisual
 

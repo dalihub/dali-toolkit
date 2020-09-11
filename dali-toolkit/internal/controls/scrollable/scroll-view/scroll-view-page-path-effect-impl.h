@@ -65,12 +65,12 @@ public:
   /**
    * @copydoc ScrollViewEffect::OnAttach
    */
-  virtual void OnAttach( Toolkit::ScrollView& scrollView );
+  void OnAttach( Toolkit::ScrollView& scrollView ) override;
 
   /**
    * @copydoc ScrollViewEffect::OnDetach
    */
-  virtual void OnDetach( Toolkit::ScrollView& scrollView );
+  void OnDetach( Toolkit::ScrollView& scrollView ) override;
 
 protected:
 

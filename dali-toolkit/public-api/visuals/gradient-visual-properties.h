@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_GRADIENT_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_visuals
  * @{
@@ -38,14 +36,12 @@ namespace Toolkit
  */
 namespace GradientVisual
 {
-
 /**
  * @brief GradientVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the instance of properties belonging to the GradientVisual.
  * @SINCE_1_1.45
@@ -131,7 +127,6 @@ enum
  */
 namespace Units
 {
-
 /**
  * @brief The type of coordinate system for certain attributes of the points in a gradient.
  *
@@ -143,7 +138,7 @@ namespace Units
 enum Type
 {
   OBJECT_BOUNDING_BOX, ///< Uses the normals for the start, end & center points, i.e. top-left is (-0.5, -0.5) and bottom-right is (0.5, 0.5). @SINCE_1_1.45
-  USER_SPACE ///< Uses the user coordinates for the start, end & center points, i.e. in a 200 by 200 control, top-left is (0, 0) and bottom-right is (200, 200). @SINCE_1_1.45
+  USER_SPACE           ///< Uses the user coordinates for the start, end & center points, i.e. in a 200 by 200 control, top-left is (0, 0) and bottom-right is (200, 200). @SINCE_1_1.45
 };
 
 } // namespace Units
@@ -154,16 +149,15 @@ enum Type
  */
 namespace SpreadMethod
 {
-
 /**
  * @brief Policies that define what happens if the gradient starts or ends inside the bounds of the target rectangle.
  * @SINCE_1_1.45
  */
 enum Type
 {
-  PAD, ///< Uses the terminal colors of the gradient to fill the remainder of the quad. @SINCE_1_1.45
+  PAD,     ///< Uses the terminal colors of the gradient to fill the remainder of the quad. @SINCE_1_1.45
   REFLECT, ///< Reflect the gradient pattern start-to-end, end-to-start, start-to-end etc. until the quad is filled. @SINCE_1_1.45
-  REPEAT ///< Repeat the gradient pattern start-to-end, start-to-end, start-to-end etc. until the quad is filled. @SINCE_1_1.45
+  REPEAT   ///< Repeat the gradient pattern start-to-end, start-to-end, start-to-end etc. until the quad is filled. @SINCE_1_1.45
 };
 
 } // namespace SpreadMethod
