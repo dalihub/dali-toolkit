@@ -692,6 +692,8 @@ int UtcDaliVideoViewSyncAniamtionForCoverage(void)
   VideoView videoView = DevelVideoView::New( Dali::VideoSyncMode::ENABLED );
   DALI_TEST_CHECK( videoView );
 
+  application.GetScene().Add( videoView );
+
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
@@ -731,6 +733,8 @@ int UtcDaliVideoViewASyncAniamtionForCoverage(void)
 
   VideoView videoView = DevelVideoView::New( Dali::VideoSyncMode::DISABLED );
   DALI_TEST_CHECK( videoView );
+
+  application.GetScene().Add( videoView );
 
   // Build the animation
   float durationSeconds(1.0f);
