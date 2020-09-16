@@ -184,10 +184,10 @@ void TextSelectionToolbar::OnRelayout( const Vector2& size, RelayoutContainer& c
 void TextSelectionToolbar::SetPopupMaxSize( const Size& maxSize )
 {
   mMaxSize = maxSize;
-  if( mScrollView && mToolbarActor )
+  if (mScrollView && mToolbarLayer )
   {
     mScrollView.SetProperty( Actor::Property::MAXIMUM_SIZE, mMaxSize );
-    mToolbarActor.SetProperty( Actor::Property::MAXIMUM_SIZE, mMaxSize );
+    mToolbarLayer.SetProperty( Actor::Property::MAXIMUM_SIZE, mMaxSize );
   }
 }
 
@@ -224,11 +224,11 @@ void TextSelectionToolbar::SetUp()
 
   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 
-  // Create Actor to house the toolbar.
-  mToolbarActor = Actor::New();
-  mToolbarActor.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-  mToolbarActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  mToolbarActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  // Create Layer to house the toolbar.
+  mToolbarLayer = Layer::New();
+  mToolbarLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+  mToolbarLayer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  mToolbarLayer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   if( !mScrollView )
   {
@@ -243,9 +243,9 @@ void TextSelectionToolbar::SetUp()
   mTableOfButtons.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
 
   mScrollView.Add( mTableOfButtons );
-  mToolbarActor.Add( mScrollView );
+  mToolbarLayer.Add( mScrollView );
 
-  self.Add( mToolbarActor );
+  self.Add( mToolbarLayer );
 }
 
 void TextSelectionToolbar::SetUpScrollBar( bool enable )
@@ -316,9 +316,9 @@ void TextSelectionToolbar::ResizeDividers( Size& size )
   RelayoutRequest();
 }
 
-void TextSelectionToolbar::RaiseAbove( Actor target )
+void TextSelectionToolbar::RaiseAbove( Layer target )
 {
-  mToolbarActor.RaiseAbove( target );
+  mToolbarLayer.RaiseAbove( target );
 }
 
 void TextSelectionToolbar::SetScrollBarPadding( const Vector2& padding )

@@ -83,7 +83,7 @@ public:
   /**
    * @copydoc Toolkit::TextSelectionToolbar::RaiseAbove()
    */
-  void RaiseAbove( Actor target );
+  void RaiseAbove( Layer target );
 
   /**
    * Sets the scroll bar padding.
@@ -180,7 +180,7 @@ private:
 
 private: // Data
 
-  Actor mToolbarActor;                                ///< The actor used to house the toolbar.
+  Layer mToolbarLayer;                                ///< The layer used to house the toolbar.
   Toolkit::TableView mTableOfButtons;                 ///< Actor which holds all the buttons, sensitivity can be set on buttons via this actor
   Toolkit::ScrollView mScrollView;                    ///< Provides scrolling of Toolbar when content does not fit.
   Toolkit::ScrollBar mScrollBar;                      ///< An horizontal scroll bar for the text's popup options.

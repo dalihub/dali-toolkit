@@ -238,11 +238,11 @@ public:
   void EnableButtons( Toolkit::TextSelectionPopup::Buttons buttonsToEnable );
 
   /**
-   * @brief Raises the toolbar's actor above the given @e target actor.
+   * @brief Raises the toolbar's layer above the given @e target layer.
    *
-   * @param[in] target The actor to get above of.
+   * @param[in] target The layer to get above of.
    */
-  void RaiseAbove( Actor target );
+  void RaiseAbove( Layer target );
 
   /**
    * @brief Show the Popup if not being shown

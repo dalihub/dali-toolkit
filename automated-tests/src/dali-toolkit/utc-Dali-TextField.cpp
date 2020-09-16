@@ -1686,6 +1686,8 @@ int utcDaliTextFieldEvent02(void)
   application.Render();
 
   Actor layer = field.GetChildAt( 1u );
+  DALI_TEST_CHECK( layer.GetProperty< bool >( Actor::Property::IS_LAYER ) );
+
   DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
