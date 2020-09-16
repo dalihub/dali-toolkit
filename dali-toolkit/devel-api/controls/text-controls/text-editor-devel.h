@@ -163,6 +163,18 @@ enum Type
    * @note This property is read-only.
    */
   SELECTED_TEXT,
+
+  /**
+   * @brief The font size scale.
+   * @details name "fontSizeScale", type Property::FLOAT.
+   * @note The default value is 1.0 which does nothing.
+   * The given font size scale value is used for multiplying the specified font size before querying fonts.
+   *
+   * e.g. The rendering results of both cases are same.
+   *  - fontSize: 15pt, fontSizeScale: 1.0
+   *  - fontSize: 10pt, fontSizeScale: 1.5
+   */
+  FONT_SIZE_SCALE,
 };
 
 } // namespace Property
