@@ -697,7 +697,7 @@ bool ProgressBar::AccessibleImpl::SetCurrent( double current )
   return true;
 }
 
-double ProgressBar::AccessibleImpl::GetMinimumIncrement() { return 0.001; }
+double ProgressBar::AccessibleImpl::GetMinimumIncrement() { return 0.0; }
 
 } // namespace Internal
 
