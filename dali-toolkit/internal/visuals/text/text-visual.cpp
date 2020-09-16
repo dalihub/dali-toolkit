@@ -58,14 +58,14 @@ const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
+  uniform mediump vec3 uSize;\n
   uniform mediump vec4 pixelArea;\n
 
   varying mediump vec2 vTexCoord;\n
 
   //Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
+  uniform mediump vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n

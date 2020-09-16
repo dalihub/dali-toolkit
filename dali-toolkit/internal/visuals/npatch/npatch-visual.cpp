@@ -51,14 +51,14 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   varying mediump vec2 vMaskTexCoord;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
+  uniform mediump vec3 uSize;\n
   uniform mediump vec2 uNinePatchFactorsX[ FACTOR_SIZE_X ];\n
   uniform mediump vec2 uNinePatchFactorsY[ FACTOR_SIZE_Y ];\n
   \n
 
   // Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
+  uniform mediump vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
@@ -93,13 +93,13 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
     varying mediump vec2 vTexCoord;\n
     varying mediump vec2 vMaskTexCoord;\n
     uniform highp   mat4 uMvpMatrix;\n
-    uniform highp   vec3 uSize;\n
+    uniform mediump vec3 uSize;\n
     uniform mediump vec2 uFixed[ 3 ];\n
     uniform mediump vec2 uStretchTotal;\n
     \n
     //Visual size and offset
     uniform mediump vec2 offset;\n
-    uniform highp   vec2 size;\n
+    uniform mediump vec2 size;\n
     uniform mediump vec4 offsetSizeMode;\n
     uniform mediump vec2 origin;\n
     uniform mediump vec2 anchorPoint;\n
