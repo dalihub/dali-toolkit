@@ -1865,7 +1865,7 @@ void TextEditor::OnSceneConnection( int depth )
 
 bool TextEditor::OnTouched( Actor actor, const TouchEvent& touch )
 {
-  return false;
+  return true;
 }
 
 void TextEditor::OnIdleSignal()
