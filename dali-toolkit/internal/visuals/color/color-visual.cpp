@@ -46,12 +46,12 @@ namespace
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
+  uniform highp   vec3 uSize;\n
   \n
 
   //Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
+  uniform highp   vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
@@ -83,14 +83,14 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 const char* VERTEX_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
+  uniform highp   vec3 uSize;\n
   varying mediump vec2 vPosition;\n
   varying mediump vec2 vRectSize;\n
   varying mediump float vCornerRadius;\n
   \n
   //Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
+  uniform highp   vec2 size;\n
   uniform mediump vec2 extraSize;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
@@ -135,13 +135,13 @@ const char* FRAGMENT_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
 const char* VERTEX_SHADER_BLUR_EDGE = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
+  uniform highp vec3 uSize;\n
   varying mediump vec2 vPosition;\n
   varying mediump vec2 vRectSize;\n
   \n
   //Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
+  uniform highp vec2 size;\n
   uniform mediump vec2 extraSize;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
