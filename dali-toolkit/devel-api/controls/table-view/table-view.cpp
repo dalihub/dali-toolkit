@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,105 +25,103 @@ using std::vector;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 TableView::TableView()
 {
 }
 
-TableView::TableView( const TableView& handle )
-: Control( handle )
+TableView::TableView(const TableView& handle)
+: Control(handle)
 {
 }
 
-TableView& TableView::operator=( const TableView& handle )
+TableView& TableView::operator=(const TableView& handle)
 {
-  if( &handle != this )
+  if(&handle != this)
   {
-    Control::operator=( handle );
+    Control::operator=(handle);
   }
   return *this;
 }
 
-TableView TableView::New( unsigned int initialRows, unsigned int initialColumns )
+TableView TableView::New(unsigned int initialRows, unsigned int initialColumns)
 {
-  return Internal::TableView::New( initialRows, initialColumns );
+  return Internal::TableView::New(initialRows, initialColumns);
 }
 
 TableView::~TableView()
 {
 }
 
-TableView TableView::DownCast( BaseHandle handle )
+TableView TableView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<TableView, Internal::TableView>(handle);
 }
 
-bool TableView::AddChild( Actor child, CellPosition position )
+bool TableView::AddChild(Actor child, CellPosition position)
 {
-  return GetImpl(*this).AddChild( child, position );
+  return GetImpl(*this).AddChild(child, position);
 }
 
-Actor TableView::GetChildAt( CellPosition position )
+Actor TableView::GetChildAt(CellPosition position)
 {
-  return GetImpl(*this).GetChildAt( position );
+  return GetImpl(*this).GetChildAt(position);
 }
 
-Actor TableView::RemoveChildAt( CellPosition position )
+Actor TableView::RemoveChildAt(CellPosition position)
 {
-  return GetImpl(*this).RemoveChildAt( position );
+  return GetImpl(*this).RemoveChildAt(position);
 }
 
-bool TableView::FindChildPosition( Actor child, CellPosition& position )
+bool TableView::FindChildPosition(Actor child, CellPosition& position)
 {
-  return GetImpl(*this).FindChildPosition( child, position );
+  return GetImpl(*this).FindChildPosition(child, position);
 }
 
-void TableView::InsertRow( unsigned int rowIndex )
+void TableView::InsertRow(unsigned int rowIndex)
 {
-  GetImpl(*this).InsertRow( rowIndex );
+  GetImpl(*this).InsertRow(rowIndex);
 }
 
-void TableView::DeleteRow( unsigned int rowIndex )
+void TableView::DeleteRow(unsigned int rowIndex)
 {
-  GetImpl(*this).DeleteRow( rowIndex );
+  GetImpl(*this).DeleteRow(rowIndex);
 }
 
-void TableView::DeleteRow( unsigned int rowIndex, vector<Actor>& removed )
+void TableView::DeleteRow(unsigned int rowIndex, vector<Actor>& removed)
 {
-  GetImpl(*this).DeleteRow( rowIndex, removed );
+  GetImpl(*this).DeleteRow(rowIndex, removed);
 }
 
-void TableView::InsertColumn( unsigned int columnIndex )
+void TableView::InsertColumn(unsigned int columnIndex)
 {
-  GetImpl(*this).InsertColumn( columnIndex );
+  GetImpl(*this).InsertColumn(columnIndex);
 }
 
-void TableView::DeleteColumn( unsigned int columnIndex )
+void TableView::DeleteColumn(unsigned int columnIndex)
 {
-  GetImpl(*this).DeleteColumn( columnIndex );
+  GetImpl(*this).DeleteColumn(columnIndex);
 }
 
-void TableView::DeleteColumn( unsigned int columnIndex, vector<Actor>& removed )
+void TableView::DeleteColumn(unsigned int columnIndex, vector<Actor>& removed)
 {
-  GetImpl(*this).DeleteColumn( columnIndex, removed );
+  GetImpl(*this).DeleteColumn(columnIndex, removed);
 }
 
-void TableView::Resize( unsigned int rows, unsigned int columns )
+void TableView::Resize(unsigned int rows, unsigned int columns)
 {
-  GetImpl(*this).Resize( rows, columns );
+  GetImpl(*this).Resize(rows, columns);
 }
 
-void TableView::Resize( unsigned int rows, unsigned int columns, vector<Actor>& removed )
+void TableView::Resize(unsigned int rows, unsigned int columns, vector<Actor>& removed)
 {
-  GetImpl(*this).Resize( rows, columns, removed );
+  GetImpl(*this).Resize(rows, columns, removed);
 }
 
-void TableView::SetCellPadding( Size padding )
+void TableView::SetCellPadding(Size padding)
 {
-  GetImpl(*this).SetCellPadding( padding );
+  GetImpl(*this).SetCellPadding(padding);
 }
 
 Size TableView::GetCellPadding()
@@ -131,64 +129,64 @@ Size TableView::GetCellPadding()
   return GetImpl(*this).GetCellPadding();
 }
 
-void TableView::SetFitHeight( unsigned int rowIndex )
+void TableView::SetFitHeight(unsigned int rowIndex)
 {
-  GetImpl(*this).SetFitHeight( rowIndex );
+  GetImpl(*this).SetFitHeight(rowIndex);
 }
 
-bool TableView::IsFitHeight( unsigned int rowIndex ) const
+bool TableView::IsFitHeight(unsigned int rowIndex) const
 {
-  return GetImpl(*this).IsFitHeight( rowIndex );
+  return GetImpl(*this).IsFitHeight(rowIndex);
 }
 
-void TableView::SetFitWidth( unsigned int columnIndex )
+void TableView::SetFitWidth(unsigned int columnIndex)
 {
-  GetImpl(*this).SetFitWidth( columnIndex );
+  GetImpl(*this).SetFitWidth(columnIndex);
 }
 
-bool TableView::IsFitWidth( unsigned int columnIndex ) const
+bool TableView::IsFitWidth(unsigned int columnIndex) const
 {
-  return GetImpl(*this).IsFitWidth( columnIndex );
+  return GetImpl(*this).IsFitWidth(columnIndex);
 }
 
-void TableView::SetFixedHeight( unsigned int rowIndex, float height )
+void TableView::SetFixedHeight(unsigned int rowIndex, float height)
 {
-  GetImpl(*this).SetFixedHeight( rowIndex, height );
+  GetImpl(*this).SetFixedHeight(rowIndex, height);
 }
 
-float TableView::GetFixedHeight( unsigned int rowIndex ) const
+float TableView::GetFixedHeight(unsigned int rowIndex) const
 {
-  return GetImpl(*this).GetFixedHeight( rowIndex );
+  return GetImpl(*this).GetFixedHeight(rowIndex);
 }
 
-void TableView::SetRelativeHeight( unsigned int rowIndex, float heightPercentage )
+void TableView::SetRelativeHeight(unsigned int rowIndex, float heightPercentage)
 {
-  GetImpl(*this).SetRelativeHeight( rowIndex, heightPercentage );
+  GetImpl(*this).SetRelativeHeight(rowIndex, heightPercentage);
 }
 
-float TableView::GetRelativeHeight( unsigned int rowIndex ) const
+float TableView::GetRelativeHeight(unsigned int rowIndex) const
 {
-  return GetImpl(*this).GetRelativeHeight( rowIndex );
+  return GetImpl(*this).GetRelativeHeight(rowIndex);
 }
 
-void TableView::SetFixedWidth( unsigned int columnIndex, float width )
+void TableView::SetFixedWidth(unsigned int columnIndex, float width)
 {
-  GetImpl(*this).SetFixedWidth( columnIndex, width );
+  GetImpl(*this).SetFixedWidth(columnIndex, width);
 }
 
-float TableView::GetFixedWidth( unsigned int columnIndex ) const
+float TableView::GetFixedWidth(unsigned int columnIndex) const
 {
-  return GetImpl(*this).GetFixedWidth( columnIndex );
+  return GetImpl(*this).GetFixedWidth(columnIndex);
 }
 
-void TableView::SetRelativeWidth( unsigned int columnIndex, float widthPercentage )
+void TableView::SetRelativeWidth(unsigned int columnIndex, float widthPercentage)
 {
-  GetImpl(*this).SetRelativeWidth( columnIndex, widthPercentage );
+  GetImpl(*this).SetRelativeWidth(columnIndex, widthPercentage);
 }
 
-float TableView::GetRelativeWidth( unsigned int columnIndex ) const
+float TableView::GetRelativeWidth(unsigned int columnIndex) const
 {
-  return GetImpl(*this).GetRelativeWidth( columnIndex );
+  return GetImpl(*this).GetRelativeWidth(columnIndex);
 }
 
 unsigned int TableView::GetRows()
@@ -201,9 +199,9 @@ unsigned int TableView::GetColumns()
   return GetImpl(*this).GetColumns();
 }
 
-void TableView::SetCellAlignment( CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical )
+void TableView::SetCellAlignment(CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical)
 {
-  GetImpl(*this).SetCellAlignment( position, horizontal, vertical );
+  GetImpl(*this).SetCellAlignment(position, horizontal, vertical);
 }
 
 TableView::TableView(Internal::TableView& implementation)
@@ -211,8 +209,8 @@ TableView::TableView(Internal::TableView& implementation)
 {
 }
 
-TableView::TableView( Dali::Internal::CustomActor* internal )
-: Control( internal )
+TableView::TableView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::TableView>(internal);
 }

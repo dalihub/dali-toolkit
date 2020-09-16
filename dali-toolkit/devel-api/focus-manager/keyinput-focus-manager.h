@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_KEYINPUT_FOCUS_MANAGER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class KeyInputFocusManager;
@@ -48,12 +46,10 @@ class KeyInputFocusManager;
 class DALI_TOOLKIT_API KeyInputFocusManager : public BaseHandle
 {
 public:
-
   // KeyInputFocusChanged
-  typedef Signal< void (Control, Control) > KeyInputFocusChangedSignalType;
+  typedef Signal<void(Control, Control)> KeyInputFocusChangedSignalType;
 
 public:
-
   /**
    * Create a KeyInputFocusManager handle; this can be initialised with KeyInputFocusManager::Get()
    * Calling member functions with an uninitialised handle is not allowed.
@@ -100,7 +96,6 @@ public:
   void RemoveFocus(Control control);
 
 public: // Signals
-
   /**
    * This signal is emitted when the key input focus control changes.
    * Two control parameters are sent as part of this signal, the first being the signal that now has the focus, the second
@@ -114,8 +109,7 @@ public: // Signals
   KeyInputFocusChangedSignalType& KeyInputFocusChangedSignal();
 
 private:
-
-  explicit DALI_INTERNAL KeyInputFocusManager(Internal::KeyInputFocusManager *impl);
+  explicit DALI_INTERNAL KeyInputFocusManager(Internal::KeyInputFocusManager* impl);
 
 }; // class KeyInputFocusManager
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,12 @@ using namespace Dali;
 
 namespace
 {
-
 } // unnamed namespace
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Magnifier
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,16 +37,16 @@ Magnifier::Magnifier()
 {
 }
 
-Magnifier::Magnifier( const Magnifier& handle )
-: Control( handle )
+Magnifier::Magnifier(const Magnifier& handle)
+: Control(handle)
 {
 }
 
-Magnifier& Magnifier::operator=( const Magnifier& handle )
+Magnifier& Magnifier::operator=(const Magnifier& handle)
 {
-  if( &handle != this )
+  if(&handle != this)
   {
-    Control::operator=( handle );
+    Control::operator=(handle);
   }
   return *this;
 }
@@ -59,8 +56,8 @@ Magnifier::Magnifier(Internal::Magnifier& implementation)
 {
 }
 
-Magnifier::Magnifier( Dali::Internal::CustomActor* internal )
-: Control( internal )
+Magnifier::Magnifier(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
   VerifyCustomActorPointer<Internal::Magnifier>(internal);
 }
@@ -74,14 +71,14 @@ Magnifier::~Magnifier()
 {
 }
 
-Magnifier Magnifier::DownCast( BaseHandle handle )
+Magnifier Magnifier::DownCast(BaseHandle handle)
 {
   return Control::DownCast<Magnifier, Internal::Magnifier>(handle);
 }
 
 void Magnifier::SetSourceActor(Actor actor)
 {
-  GetImpl(*this).SetSourceActor( actor );
+  GetImpl(*this).SetSourceActor(actor);
 }
 
 } // namespace Toolkit

@@ -1557,8 +1557,6 @@ int utcDaliTextEditorEvent02(void)
   application.Render();
 
   Actor layer = editor.GetChildAt( 1u );
-  DALI_TEST_CHECK( layer.GetProperty< bool >( Actor::Property::IS_LAYER ) );
-
   DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
@@ -2156,6 +2154,23 @@ int utcDaliTextEditorEvent07(void)
 
   // The text is not selected and not changed because of 'SetProperty( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION, false )'
   DALI_TEST_EQUALS( "Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
+
+  // Select all Text
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // replace text with "c"
+  application.ProcessEvent( GenerateKey( "c", "", "c", KEY_C_CODE, 0, 0, Integration::KeyEvent::DOWN, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  //text is "c"
+  DALI_TEST_EQUALS( "c", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   END_TEST;
 }

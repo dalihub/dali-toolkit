@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 // Forward declarations
 
 namespace Internal DALI_INTERNAL
@@ -34,7 +32,7 @@ namespace Internal DALI_INTERNAL
 // Forward declarations
 
 class RadioButton;
-}
+} // namespace DALI_INTERNAL
 /**
  * @addtogroup dali_toolkit_controls_buttons
  * @{
@@ -84,9 +82,9 @@ class RadioButton;
  * @endcode
  * @SINCE_1_0.0
  */
-class DALI_TOOLKIT_API RadioButton: public Button
+class DALI_TOOLKIT_API RadioButton : public Button
 {
- public:
+public:
   /**
    * @brief Creates an uninitialized RadioButton; this can be initialized with RadioButton::New().
    *
@@ -100,7 +98,7 @@ class DALI_TOOLKIT_API RadioButton: public Button
    * @SINCE_1_0.0
    * @param[in] radioButton Handle to an object
    */
-  RadioButton( const RadioButton& radioButton );
+  RadioButton(const RadioButton& radioButton);
 
   /**
    * @brief Move constructor
@@ -108,7 +106,7 @@ class DALI_TOOLKIT_API RadioButton: public Button
    *
    * @param[in] rhs A reference to the moved handle
    */
-  RadioButton( RadioButton&& rhs );
+  RadioButton(RadioButton&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -116,7 +114,7 @@ class DALI_TOOLKIT_API RadioButton: public Button
    * @param[in] radioButton Handle to an object
    * @return A reference to this
    */
-  RadioButton& operator=( const RadioButton& radioButton );
+  RadioButton& operator=(const RadioButton& radioButton);
 
   /**
    * @brief Move assignment
@@ -125,7 +123,7 @@ class DALI_TOOLKIT_API RadioButton: public Button
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  RadioButton& operator=( RadioButton&& rhs );
+  RadioButton& operator=(RadioButton&& rhs);
 
   /**
    * @brief Destructor.
@@ -150,7 +148,7 @@ class DALI_TOOLKIT_API RadioButton: public Button
    * @param[in] label The button label
    * @return A handle to a newly allocated Dali resource
    */
-  static RadioButton New( const std::string& label );
+  static RadioButton New(const std::string& label);
 
   /**
    * @brief Downcasts a handle to RadioButton handle.
@@ -162,10 +160,9 @@ class DALI_TOOLKIT_API RadioButton: public Button
    * @param[in] handle Handle to an object
    * @return A handle to a RadioButton or an uninitialized handle
    */
-  static RadioButton DownCast( BaseHandle handle );
+  static RadioButton DownCast(BaseHandle handle);
 
- public: // Not intended for application developers
-
+public: // Not intended for application developers
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -173,7 +170,7 @@ class DALI_TOOLKIT_API RadioButton: public Button
    * @SINCE_1_0.0
    * @param[in] implementation The Control implementation
    */
-  DALI_INTERNAL RadioButton( Internal::RadioButton& implementation );
+  DALI_INTERNAL RadioButton(Internal::RadioButton& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -181,7 +178,7 @@ class DALI_TOOLKIT_API RadioButton: public Button
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  DALI_INTERNAL RadioButton( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL RadioButton(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

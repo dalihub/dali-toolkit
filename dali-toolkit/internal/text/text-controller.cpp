@@ -53,6 +53,8 @@ const std::string EMPTY_STRING("");
 const std::string KEY_C_NAME = "c";
 const std::string KEY_V_NAME = "v";
 const std::string KEY_X_NAME = "x";
+const std::string KEY_A_NAME = "a";
+const std::string KEY_INSERT_NAME = "Insert";
 
 const char * const PLACEHOLDER_TEXT = "text";
 const char * const PLACEHOLDER_TEXT_FOCUSED = "textFocused";
@@ -2905,12 +2907,12 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Do nothing
       return false;
     }
-    else if ( keyEvent.IsCtrlModifier() )
+    else if ( keyEvent.IsCtrlModifier() && !keyEvent.IsShiftModifier())
     {
       bool consumed = false;
-      if (keyName == KEY_C_NAME)
+      if (keyName == KEY_C_NAME || keyName == KEY_INSERT_NAME)
       {
-        // Ctrl-C to copy the selected text
+        // Ctrl-C or Ctrl+Insert to copy the selected text
         TextPopupButtonTouched( Toolkit::TextSelectionPopup::COPY );
         consumed = true;
       }
@@ -2924,6 +2926,12 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       {
         // Ctrl-X to cut the selected text
         TextPopupButtonTouched( Toolkit::TextSelectionPopup::CUT );
+        consumed = true;
+      }
+      else if (keyName == KEY_A_NAME)
+      {
+        // Ctrl-A to select All the text
+        TextPopupButtonTouched( Toolkit::TextSelectionPopup::SELECT_ALL );
         consumed = true;
       }
       return consumed;

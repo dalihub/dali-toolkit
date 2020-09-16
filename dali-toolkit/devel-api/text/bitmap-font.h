@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_FONT_BITMAP_DEVEL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,22 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <string>
 
 namespace Dali
 {
-
 namespace TextAbstraction
 {
 // Forward declarations
 struct BitmapFont;
-}
+} // namespace TextAbstraction
 
 namespace Toolkit
 {
-
 namespace DevelText
 {
-
 /**
  * @brief Struct that stores the needed info to create a bitmap glyph.
  */
@@ -61,17 +58,17 @@ struct DALI_TOOLKIT_API Glyph
    * @param[in] ascender The ascender of the glyph.
    * @param[in] descender The descender of the glyph.
    */
-  Glyph( const std::string& url, const std::string utf8, float ascender, float descender );
+  Glyph(const std::string& url, const std::string utf8, float ascender, float descender);
 
   /**
    * @brief Default destructor.
    */
   ~Glyph();
 
-  std::string url; ///< The url of the glyph.
-  uint8_t utf8[4]; ///< the glyph encoded in utf8
-  float ascender;  ///< The ascender. The distance from the base line to the top of the glyph.
-  float descender; ///< The descender. The distance from the base line to the bottom of the glyph.
+  std::string url;       ///< The url of the glyph.
+  uint8_t     utf8[4];   ///< the glyph encoded in utf8
+  float       ascender;  ///< The ascender. The distance from the base line to the top of the glyph.
+  float       descender; ///< The descender. The distance from the base line to the bottom of the glyph.
 };
 
 /**
@@ -91,11 +88,11 @@ struct DALI_TOOLKIT_API BitmapFontDescription
    */
   ~BitmapFontDescription();
 
-  std::vector<Glyph> glyphs; ///< Vector of glyphs.
-  std::string name;          ///< Name of the font.
-  float underlinePosition;   ///< The position of the underline from the base line.
-  float underlineThickness;  ///< The thickness of the underline.
-  bool isColorFont:1;        ///< Whether the glyphs of this font have their own colors.
+  std::vector<Glyph> glyphs;             ///< Vector of glyphs.
+  std::string        name;               ///< Name of the font.
+  float              underlinePosition;  ///< The position of the underline from the base line.
+  float              underlineThickness; ///< The thickness of the underline.
+  bool               isColorFont : 1;    ///< Whether the glyphs of this font have their own colors.
 };
 
 /**
@@ -109,7 +106,7 @@ struct DALI_TOOLKIT_API BitmapFontDescription
  *
  * @note If the @e ascender and @e descender of the glyphs are zero, the @e descender value will be left as zero and all the bitmaps will be loaded to find out the @e ascender value.
  */
-DALI_TOOLKIT_API void CreateBitmapFont( const BitmapFontDescription& description, TextAbstraction::BitmapFont& bitmapFont );
+DALI_TOOLKIT_API void CreateBitmapFont(const BitmapFontDescription& description, TextAbstraction::BitmapFont& bitmapFont);
 
 } // namespace DevelText
 

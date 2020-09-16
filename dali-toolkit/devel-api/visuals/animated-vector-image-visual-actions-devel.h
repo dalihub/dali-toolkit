@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_ACTIONS_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelAnimatedVectorImageVisual
 {
-
 /**
  * @brief Actions that the animated vector image visual can perform.  These actions are called through the Visual::Base::DoAction API.
  */
@@ -37,11 +34,11 @@ namespace Action
  */
 enum Type
 {
-  PLAY,            ///< Play the animated vector image.
-  PAUSE,           ///< Pause the animated vector image.
-  STOP,            ///< Stop the animated vector image. This is also Default playback mode.
-  JUMP_TO,         ///< Jump to the specified frame. Property::INTEGER value should be passed.
-  UPDATE_PROPERTY  ///< Update the properties of the animated vector image.
+  PLAY,           ///< Play the animated vector image.
+  PAUSE,          ///< Pause the animated vector image.
+  STOP,           ///< Stop the animated vector image. This is also Default playback mode.
+  JUMP_TO,        ///< Jump to the specified frame. Property::INTEGER value should be passed.
+  UPDATE_PROPERTY ///< Update the properties of the animated vector image.
 };
 
 } // namespace Action

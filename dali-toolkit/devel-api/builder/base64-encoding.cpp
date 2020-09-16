@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,41 +16,39 @@
  */
 
 // EXTERNAL INCLUDES
-#include <sstream>
 #include <iterator>
+#include <sstream>
 
-#include <dali/public-api/object/property-value.h>
-#include <dali/public-api/object/property-array.h>
 #include <dali-toolkit/devel-api/builder/base64-encoding.h>
+#include <dali/public-api/object/property-array.h>
+#include <dali/public-api/object/property-value.h>
 #include <dali-toolkit/third-party/base-n/basen.hpp>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace
 {
 const int MAX_PROPERTY_STRING_LENGTH(64); // Cuts larger strings into blocks of this size.
 
-bool GetStringFromProperty( const Property::Value& value, std::string& output )
+bool GetStringFromProperty(const Property::Value& value, std::string& output)
 {
   bool extracted = false;
-  if( value.Get( output ) )
+  if(value.Get(output))
   {
     extracted = true;
   }
   else
   {
     Property::Array* array = value.GetArray();
-    if( array )
+    if(array)
     {
       const unsigned int arraySize = array->Size();
-      for( unsigned int i = 0; i < arraySize; ++i )
+      for(unsigned int i = 0; i < arraySize; ++i)
       {
         std::string element;
-        if( array->GetElementAt( i ).Get( element ) )
+        if(array->GetElementAt(i).Get(element))
         {
           extracted = true;
           output += element;
@@ -68,50 +66,48 @@ bool GetStringFromProperty( const Property::Value& value, std::string& output )
   return extracted;
 }
 
-}//anonymous namespace
+} //anonymous namespace
 
-bool DecodeBase64PropertyData( const Property::Value& value, std::vector<uint32_t>& outputData )
+bool DecodeBase64PropertyData(const Property::Value& value, std::vector<uint32_t>& outputData)
 {
-  bool decoded = false;
+  bool        decoded = false;
   std::string encodedString;
 
-
-  if( GetStringFromProperty( value, encodedString ) )
+  if(GetStringFromProperty(value, encodedString))
   {
     std::vector<unsigned char> outputTmpData;
-    outputTmpData.reserve( ceil( encodedString.size() * 0.75f ) );
-    bn::decode_b64( encodedString.begin(), encodedString.end(), std::back_inserter(outputTmpData) );
+    outputTmpData.reserve(ceil(encodedString.size() * 0.75f));
+    bn::decode_b64(encodedString.begin(), encodedString.end(), std::back_inserter(outputTmpData));
 
     outputData.clear();
-    outputData.resize( outputTmpData.size() / sizeof(uint32_t) );
+    outputData.resize(outputTmpData.size() / sizeof(uint32_t));
     // Treat as a block of data
-    memcpy( &outputData[0], &outputTmpData[0], outputTmpData.size() );
+    memcpy(&outputData[0], &outputTmpData[0], outputTmpData.size());
 
     decoded = true;
   }
   return decoded;
 }
 
-void EncodeBase64PropertyData( Property::Value& value, const std::vector<uint32_t>& inputData )
+void EncodeBase64PropertyData(Property::Value& value, const std::vector<uint32_t>& inputData)
 {
   std::ostringstream oss;
 
-  bn::encode_b64( reinterpret_cast<const char*>(&inputData[0]),
-                  reinterpret_cast<const char*>(&inputData[0]+inputData.size()),
-                  std::ostream_iterator<unsigned char>(oss, "") );
-
+  bn::encode_b64(reinterpret_cast<const char*>(&inputData[0]),
+                 reinterpret_cast<const char*>(&inputData[0] + inputData.size()),
+                 std::ostream_iterator<unsigned char>(oss, ""));
 
   std::string encodedString = oss.str();
-  if( encodedString.length() > MAX_PROPERTY_STRING_LENGTH)
+  if(encodedString.length() > MAX_PROPERTY_STRING_LENGTH)
   {
     // cut string up into blocks of MAX_PROPERTY_STRING_LENGTH and store to an array
     auto numStrings = encodedString.length() / MAX_PROPERTY_STRING_LENGTH +
                       ((encodedString.length() % MAX_PROPERTY_STRING_LENGTH) != 0);
 
     Property::Array array;
-    for(auto i=0u; i<numStrings; ++i)
+    for(auto i = 0u; i < numStrings; ++i)
     {
-      array.PushBack( encodedString.substr( i*MAX_PROPERTY_STRING_LENGTH, MAX_PROPERTY_STRING_LENGTH));
+      array.PushBack(encodedString.substr(i * MAX_PROPERTY_STRING_LENGTH, MAX_PROPERTY_STRING_LENGTH));
     }
     value = array;
   }
@@ -120,7 +116,6 @@ void EncodeBase64PropertyData( Property::Value& value, const std::vector<uint32_
     value = encodedString;
   }
 }
-
 
 } // namespace Toolkit
 

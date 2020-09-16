@@ -136,7 +136,7 @@ protected:
   /**
    *  A ref counted object may only be deleted by calling Unreference
    */
-  virtual ~TransitionData();
+  ~TransitionData() override;
 
 private: // Unimplemented methods
   TransitionData( const TransitionData& );

@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 TextEditor TextEditor::New()
 {
   return Internal::TextEditor::New();
@@ -36,48 +34,47 @@ TextEditor::TextEditor()
 {
 }
 
-TextEditor::TextEditor( const TextEditor& handle ) = default;
+TextEditor::TextEditor(const TextEditor& handle) = default;
 
-TextEditor::TextEditor( TextEditor&& rhs ) = default;
+TextEditor::TextEditor(TextEditor&& rhs) = default;
 
-TextEditor& TextEditor::operator=( const TextEditor& handle ) = default;
+TextEditor& TextEditor::operator=(const TextEditor& handle) = default;
 
-TextEditor& TextEditor::operator=( TextEditor&& rhs ) = default;
+TextEditor& TextEditor::operator=(TextEditor&& rhs) = default;
 
 TextEditor::~TextEditor()
 {
 }
 
-TextEditor TextEditor::DownCast( BaseHandle handle )
+TextEditor TextEditor::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<TextEditor, Internal::TextEditor>( handle );
+  return Control::DownCast<TextEditor, Internal::TextEditor>(handle);
 }
 
 TextEditor::TextChangedSignalType& TextEditor::TextChangedSignal()
 {
-  return Dali::Toolkit::GetImpl( *this ).TextChangedSignal();
+  return Dali::Toolkit::GetImpl(*this).TextChangedSignal();
 }
 
 TextEditor::InputStyleChangedSignalType& TextEditor::InputStyleChangedSignal()
 {
-  return Dali::Toolkit::GetImpl( *this ).InputStyleChangedSignal();
+  return Dali::Toolkit::GetImpl(*this).InputStyleChangedSignal();
 }
-
 
 TextEditor::ScrollStateChangedSignalType& TextEditor::ScrollStateChangedSignal()
 {
-  return Dali::Toolkit::GetImpl( *this ).ScrollStateChangedSignal();
+  return Dali::Toolkit::GetImpl(*this).ScrollStateChangedSignal();
 }
 
-TextEditor::TextEditor( Internal::TextEditor& implementation )
-: Control( implementation )
+TextEditor::TextEditor(Internal::TextEditor& implementation)
+: Control(implementation)
 {
 }
 
-TextEditor::TextEditor( Dali::Internal::CustomActor* internal )
-: Control( internal )
+TextEditor::TextEditor(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::TextEditor>( internal );
+  VerifyCustomActorPointer<Internal::TextEditor>(internal);
 }
 
 } // namespace Toolkit

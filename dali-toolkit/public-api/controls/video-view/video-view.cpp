@@ -19,29 +19,27 @@
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
+#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/video-view/video-view-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 VideoView::VideoView()
 {
 }
 
-VideoView::VideoView( const VideoView& videoView ) = default;
+VideoView::VideoView(const VideoView& videoView) = default;
 
-VideoView::VideoView( VideoView&& rhs ) = default;
+VideoView::VideoView(VideoView&& rhs) = default;
 
-VideoView& VideoView::operator=( const VideoView& videoView ) = default;
+VideoView& VideoView::operator=(const VideoView& videoView) = default;
 
-VideoView& VideoView::operator=( VideoView&& rhs ) = default;
+VideoView& VideoView::operator=(VideoView&& rhs) = default;
 
 VideoView::~VideoView()
 {
@@ -49,75 +47,75 @@ VideoView::~VideoView()
 
 VideoView VideoView::New()
 {
-  return Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
+  return Internal::VideoView::New(Dali::VideoSyncMode::DISABLED);
 }
 
-VideoView VideoView::New( const std::string& url )
+VideoView VideoView::New(const std::string& url)
 {
-  VideoView videoView = Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
-  Dali::Toolkit::GetImpl( videoView ).SetUrl( url );
+  VideoView videoView = Internal::VideoView::New(Dali::VideoSyncMode::DISABLED);
+  Dali::Toolkit::GetImpl(videoView).SetUrl(url);
   return videoView;
 }
 
-VideoView VideoView::New( bool swCodec )
+VideoView VideoView::New(bool swCodec)
 {
-  VideoView videoView = Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
-  Dali::Toolkit::GetImpl( videoView ).SetSWCodec( swCodec );
+  VideoView videoView = Internal::VideoView::New(Dali::VideoSyncMode::DISABLED);
+  Dali::Toolkit::GetImpl(videoView).SetSWCodec(swCodec);
   return videoView;
 }
 
-VideoView VideoView::New( const std::string& url, bool swCodec )
+VideoView VideoView::New(const std::string& url, bool swCodec)
 {
-  VideoView videoView = Internal::VideoView::New( Dali::VideoSyncMode::DISABLED );
-  Dali::Toolkit::GetImpl( videoView ).SetUrl( url );
-  Dali::Toolkit::GetImpl( videoView ).SetSWCodec( swCodec );
+  VideoView videoView = Internal::VideoView::New(Dali::VideoSyncMode::DISABLED);
+  Dali::Toolkit::GetImpl(videoView).SetUrl(url);
+  Dali::Toolkit::GetImpl(videoView).SetSWCodec(swCodec);
   return videoView;
 }
 
-VideoView VideoView::DownCast( BaseHandle handle )
+VideoView VideoView::DownCast(BaseHandle handle)
 {
-  return Control::DownCast< VideoView, Internal::VideoView >( handle );
+  return Control::DownCast<VideoView, Internal::VideoView>(handle);
 }
 
 void VideoView::Play()
 {
-  Dali::Toolkit::GetImpl( *this ).Play();
+  Dali::Toolkit::GetImpl(*this).Play();
 }
 
 void VideoView::Pause()
 {
-  Dali::Toolkit::GetImpl( *this ).Pause();
+  Dali::Toolkit::GetImpl(*this).Pause();
 }
 
 void VideoView::Stop()
 {
-  Dali::Toolkit::GetImpl( *this ).Stop();
+  Dali::Toolkit::GetImpl(*this).Stop();
 }
 
-void VideoView::Forward( int millisecond )
+void VideoView::Forward(int millisecond)
 {
-  Dali::Toolkit::GetImpl( *this ).Forward( millisecond );
+  Dali::Toolkit::GetImpl(*this).Forward(millisecond);
 }
 
-void VideoView::Backward( int millisecond )
+void VideoView::Backward(int millisecond)
 {
-  Dali::Toolkit::GetImpl( *this ).Backward( millisecond );
+  Dali::Toolkit::GetImpl(*this).Backward(millisecond);
 }
 
 VideoView::VideoViewSignalType& VideoView::FinishedSignal()
 {
-  return Dali::Toolkit::GetImpl( *this ).FinishedSignal();
+  return Dali::Toolkit::GetImpl(*this).FinishedSignal();
 }
 
-VideoView::VideoView( Internal::VideoView& implementation )
-: Control( implementation )
+VideoView::VideoView(Internal::VideoView& implementation)
+: Control(implementation)
 {
 }
 
-VideoView::VideoView( Dali::Internal::CustomActor* internal )
-: Control( internal )
+VideoView::VideoView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
-  VerifyCustomActorPointer< Internal::VideoView >( internal );
+  VerifyCustomActorPointer<Internal::VideoView>(internal);
 }
 
 } // namespace Toolkit

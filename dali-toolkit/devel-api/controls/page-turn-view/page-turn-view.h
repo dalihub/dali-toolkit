@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PAGE_TURN_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 // Forward declarations
 class PageFactory;
 
@@ -66,7 +64,6 @@ class PageTurnView;
 class DALI_TOOLKIT_API PageTurnView : public Control
 {
 public:
-
   /**
    * @brief The start and end property ranges for this control.
    * @SINCE_1_1.4
@@ -74,7 +71,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_1.4
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_1.4
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_1.4
   };
 
   struct Property
@@ -88,7 +85,7 @@ public:
        * The two values are the major&minor radius (in pixels) to form an ellipse shape.
        * The top-left quarter of this ellipse is used to calculate spine normal for simulating shadow.
        */
-      SPINE_SHADOW,                     ///< name "spineShadow",     type Vector2 @SINCE_1_1.4
+      SPINE_SHADOW, ///< name "spineShadow",     type Vector2 @SINCE_1_1.4
     };
   };
 
@@ -104,13 +101,13 @@ public:
    * @SINCE_1_1.4
    * @param[in] handle Handle to copy from
    */
-  PageTurnView( const PageTurnView& handle );
+  PageTurnView(const PageTurnView& handle);
 
   /**
    * @brief Assignment operator. Changes this handle to point to another real object
    * @SINCE_1_1.4
    */
-  PageTurnView& operator=( const PageTurnView& handle );
+  PageTurnView& operator=(const PageTurnView& handle);
 
   /**
    * @brief Destructor
@@ -128,13 +125,12 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a PageTurnView or an uninitialized handle
    */
-  static PageTurnView DownCast( BaseHandle handle );
+  static PageTurnView DownCast(BaseHandle handle);
 
 public: //Signal
-
   // Page Turned signal, with page index and boolean turning direction (true = forward, false = backward)
-  typedef Signal< void ( PageTurnView, unsigned int, bool ) > PageTurnSignal;
-  typedef Signal< void ( PageTurnView ) > PagePanSignal;
+  typedef Signal<void(PageTurnView, unsigned int, bool)> PageTurnSignal;
+  typedef Signal<void(PageTurnView)>                     PagePanSignal;
 
   /**
    * @brief Signal emitted when a page has started to turn over.
@@ -181,7 +177,6 @@ public: //Signal
   PagePanSignal& PagePanFinishedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.

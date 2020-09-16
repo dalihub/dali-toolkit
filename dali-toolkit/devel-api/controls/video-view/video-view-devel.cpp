@@ -21,27 +21,24 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelVideoView
 {
-
-Any GetMediaPlayer( VideoView videoView )
+Any GetMediaPlayer(VideoView videoView)
 {
-  return Dali::Toolkit::GetImpl( videoView ).GetMediaPlayer();
+  return Dali::Toolkit::GetImpl(videoView).GetMediaPlayer();
 }
 
-VideoView New( VideoSyncMode syncMode )
+VideoView New(VideoSyncMode syncMode)
 {
-  VideoView videoView = Internal::VideoView::New( syncMode );
+  VideoView videoView = Internal::VideoView::New(syncMode);
   return videoView;
 }
 
-void PlayAnimation( VideoView videoView, Animation animation )
+void PlayAnimation(VideoView videoView, Animation animation)
 {
-  Dali::Toolkit::GetImpl( videoView ).PlayAnimation( animation );
+  Dali::Toolkit::GetImpl(videoView).PlayAnimation(animation);
 }
 
 } // namespace DevelVideoView

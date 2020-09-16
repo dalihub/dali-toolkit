@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEFAULT_ITEM_LAYOUT_PROPERTY_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
 /**
@@ -34,7 +33,6 @@ namespace Toolkit
  */
 namespace DefaultItemLayoutProperty
 {
-
 /**
  * @brief The properties of each type of item layout.
  * @SINCE_1_2.60
@@ -284,11 +282,10 @@ enum Property
 /**
  * @}
  */
+} // namespace DefaultItemLayoutProperty
+
 } // namespace Toolkit
 
 } // namespace Dali
 
-}
-
 #endif // DALI_TOOLKIT_DEFAULT_ITEM_LAYOUT_PROPERTY_H
-

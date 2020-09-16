@@ -20,13 +20,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelAnimatedImageVisual
 {
-
 /**
  * @brief Actions that the animated image visual can perform.  These actions are called through the Visual::Base::DoAction API.
  */
@@ -37,10 +34,10 @@ namespace Action
  */
 enum Type
 {
-  PLAY,        ///< Play the animated GIF. This is also Default playback mode.
-  PAUSE,       ///< Pause the animated GIF.
-  STOP,        ///< Stop the animated GIF.
-  JUMP_TO      ///< Jump to the specified frame. Property::INTEGER value should be passed.
+  PLAY,   ///< Play the animated GIF. This is also Default playback mode.
+  PAUSE,  ///< Pause the animated GIF.
+  STOP,   ///< Stop the animated GIF.
+  JUMP_TO ///< Jump to the specified frame. Property::INTEGER value should be passed.
 };
 
 } // namespace Action

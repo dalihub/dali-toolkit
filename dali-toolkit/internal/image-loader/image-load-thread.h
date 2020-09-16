@@ -149,7 +149,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~ImageLoadThread();
+  ~ImageLoadThread() override;
 
   /**
    * Add a task in to the loading queue

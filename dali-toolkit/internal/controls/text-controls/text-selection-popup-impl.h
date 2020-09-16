@@ -122,7 +122,7 @@ public:
   /**
    * @copydoc Toolkit::TextSelectionPopup::RaiseAbove()
    */
-  void RaiseAbove( Layer target );
+  void RaiseAbove( Actor target );
 
   /**
    * @copydoc Toolkit::TextSelectionPopup::ShowPopup()

@@ -23,58 +23,55 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelTextLabel
 {
-
 namespace Property
 {
-  enum Type
-  {
-    TEXT = Dali::Toolkit::TextLabel::Property::TEXT,
-    FONT_FAMILY = Dali::Toolkit::TextLabel::Property::FONT_FAMILY,
-    FONT_STYLE = Dali::Toolkit::TextLabel::Property::FONT_STYLE,
-    POINT_SIZE = Dali::Toolkit::TextLabel::Property::POINT_SIZE,
-    MULTI_LINE = Dali::Toolkit::TextLabel::Property::MULTI_LINE,
-    HORIZONTAL_ALIGNMENT = Dali::Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT,
-    VERTICAL_ALIGNMENT = Dali::Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT,
-    ENABLE_MARKUP = Dali::Toolkit::TextLabel::Property::ENABLE_MARKUP,
-    ENABLE_AUTO_SCROLL = Dali::Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL,
-    AUTO_SCROLL_SPEED = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_SPEED,
-    AUTO_SCROLL_LOOP_COUNT = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_LOOP_COUNT,
-    AUTO_SCROLL_GAP = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_GAP,
-    LINE_SPACING = Dali::Toolkit::TextLabel::Property::LINE_SPACING,
-    UNDERLINE = Dali::Toolkit::TextLabel::Property::UNDERLINE,
-    SHADOW = Dali::Toolkit::TextLabel::Property::SHADOW,
-    EMBOSS = Dali::Toolkit::TextLabel::Property::EMBOSS,
-    OUTLINE = Dali::Toolkit::TextLabel::Property::OUTLINE,
-    PIXEL_SIZE = Dali::Toolkit::TextLabel::Property::PIXEL_SIZE,
-    ELLIPSIS = Dali::Toolkit::TextLabel::Property::ELLIPSIS,
-    AUTO_SCROLL_LOOP_DELAY = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_LOOP_DELAY,
-    AUTO_SCROLL_STOP_MODE = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_STOP_MODE,
-    LINE_COUNT = Dali::Toolkit::TextLabel::Property::LINE_COUNT,
-    LINE_WRAP_MODE = Dali::Toolkit::TextLabel::Property::LINE_WRAP_MODE,
+enum Type
+{
+  TEXT                   = Dali::Toolkit::TextLabel::Property::TEXT,
+  FONT_FAMILY            = Dali::Toolkit::TextLabel::Property::FONT_FAMILY,
+  FONT_STYLE             = Dali::Toolkit::TextLabel::Property::FONT_STYLE,
+  POINT_SIZE             = Dali::Toolkit::TextLabel::Property::POINT_SIZE,
+  MULTI_LINE             = Dali::Toolkit::TextLabel::Property::MULTI_LINE,
+  HORIZONTAL_ALIGNMENT   = Dali::Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT,
+  VERTICAL_ALIGNMENT     = Dali::Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT,
+  ENABLE_MARKUP          = Dali::Toolkit::TextLabel::Property::ENABLE_MARKUP,
+  ENABLE_AUTO_SCROLL     = Dali::Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL,
+  AUTO_SCROLL_SPEED      = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_SPEED,
+  AUTO_SCROLL_LOOP_COUNT = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_LOOP_COUNT,
+  AUTO_SCROLL_GAP        = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_GAP,
+  LINE_SPACING           = Dali::Toolkit::TextLabel::Property::LINE_SPACING,
+  UNDERLINE              = Dali::Toolkit::TextLabel::Property::UNDERLINE,
+  SHADOW                 = Dali::Toolkit::TextLabel::Property::SHADOW,
+  EMBOSS                 = Dali::Toolkit::TextLabel::Property::EMBOSS,
+  OUTLINE                = Dali::Toolkit::TextLabel::Property::OUTLINE,
+  PIXEL_SIZE             = Dali::Toolkit::TextLabel::Property::PIXEL_SIZE,
+  ELLIPSIS               = Dali::Toolkit::TextLabel::Property::ELLIPSIS,
+  AUTO_SCROLL_LOOP_DELAY = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_LOOP_DELAY,
+  AUTO_SCROLL_STOP_MODE  = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_STOP_MODE,
+  LINE_COUNT             = Dali::Toolkit::TextLabel::Property::LINE_COUNT,
+  LINE_WRAP_MODE         = Dali::Toolkit::TextLabel::Property::LINE_WRAP_MODE,
 
-    /**
+  /**
      * @brief The direction of the layout.
      * @details Name "textDirection", type [Type](@ref Dali::Toolkit::DevelText::TextDirection::Type) (Property::INTEGER), Read/Write
      * @note The text direction can be changed only by replacing the text itself.
      * @see TextDirection::Type for supported values.
      */
-    TEXT_DIRECTION,
+  TEXT_DIRECTION,
 
-    /**
+  /**
      * @brief Alignment of text within area of single line
      * @details Name "verticalLineAlignment", type [Type](@ref Dali::Toolkit::DevelText::VerticalLineAlignment::Type) (Property::INTEGER), Read/Write
      * @note The default value is TOP
      * @see VerticalLineAlignment::Type for supported values
      */
-    VERTICAL_LINE_ALIGNMENT,
+  VERTICAL_LINE_ALIGNMENT,
 
-    /**
+  /**
      * @brief The default text background parameters.
      * @details Name "textBackground", type Property::MAP.
      * @note Use "textBackground" as property name to avoid conflict with Control's "background" property
@@ -86,16 +83,16 @@ namespace Property
      * | enable               | BOOLEAN  | No       | True to enable the background or false to disable (the default value is false)                                     |
      * | color                | VECTOR4  | No       | The color of the background (the default value is Color::CYAN)                                                     |
      */
-    BACKGROUND,
+  BACKGROUND,
 
-    /**
+  /**
      * @brief Ignore spaces after text.
      * @details Name "ignoreSpacesAfterText", type (Property::BOLEAN), Read/Write
      * @note The default value is true
      */
-    IGNORE_SPACES_AFTER_TEXT,
+  IGNORE_SPACES_AFTER_TEXT,
 
-    /**
+  /**
      * @brief Modifies the default text alignment to match the direction of the system language.
      * @details Name "matchSystemLanguageDirection", type (Property::BOLEAN), Read/Write
      * @note The default value is false
@@ -114,9 +111,9 @@ namespace Property
      * |   ﻡﺮﺤﺑﺍ.                          |                      ﻡﺮﺤﺑﺍ.      |
      *
      */
-    MATCH_SYSTEM_LANGUAGE_DIRECTION,
+  MATCH_SYSTEM_LANGUAGE_DIRECTION,
 
-    /**
+  /**
      * @brief The text fit parameters.
      * @details Name "textFit", type Property::MAP.
      * @note The default value is false
@@ -131,21 +128,21 @@ namespace Property
      * | stepSize             | FLOAT    | No       | Step Size for font increase (the default value is 1.f)                                                     |
      * | fontSizeType         | STRING   | No       | The size type of font, You can choose between "pointSize" or "pixelSize". (the default value is "pointSize")                                                     |
      */
-    TEXT_FIT,
+  TEXT_FIT,
 
-    /**
+  /**
      * @brief Sets the height of the line in points.
      * @details Name "lineSize", type Property::FLOAT.
      * @note If the font size is larger than the line size, it works with the font size.
      */
-    MIN_LINE_SIZE,
+  MIN_LINE_SIZE,
 
-    /**
+  /**
      * @brief The type of rendering e.g. bitmap-based.
      * @details Name "renderingBackend", type Property::INT.
      */
-    RENDERING_BACKEND,
-  };
+  RENDERING_BACKEND,
+};
 
 } // namespace Property
 

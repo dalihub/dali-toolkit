@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SCENE3D_VIEW_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,19 +26,16 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-
 /**
  * Scene3dView implementation class
  */
 class Scene3dView;
 
-}
+} // namespace DALI_INTERNAL
 
 /**
  *
@@ -78,7 +75,6 @@ class Scene3dView;
 class DALI_TOOLKIT_API Scene3dView : public Control
 {
 public:
-
   enum LightType
   {
     // Scene doesn't use both of point and directional light
@@ -104,12 +100,12 @@ public:
   /**
    * @brief Copy constructor. Creates another handle that points to the same real object
    */
-  Scene3dView( const Scene3dView& handle );
+  Scene3dView(const Scene3dView& handle);
 
   /**
    * @brief Assignment operator. Changes this handle to point to another real object
    */
-  Scene3dView& operator=( const Scene3dView& handle );
+  Scene3dView& operator=(const Scene3dView& handle);
 
   /**
    * @brief Destructor
@@ -123,14 +119,14 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a Scene3dView or an uninitialized handle
    */
-  static Scene3dView DownCast( BaseHandle handle );
+  static Scene3dView DownCast(BaseHandle handle);
 
   /**
    * @brief Create an initialized Scene3dView.
    * @param[in] filePath File path of scene format file (e.g., glTF).
    * @return A handle to a newly allocated Dali resource
    */
-  static Scene3dView New( const std::string& filePath );
+  static Scene3dView New(const std::string& filePath);
 
   /**
    * @brief Create an initialized Scene3dView.
@@ -140,7 +136,7 @@ public:
    * @param[in] scaleFactor Scaling factor for the Image Based Lighting.
    * @return A handle to a newly allocated Dali resource
    */
-  static Scene3dView New( const std::string& filePath, const std::string& diffuseTexturePath, const std::string& specularTexturePath, Vector4 scaleFactor );
+  static Scene3dView New(const std::string& filePath, const std::string& diffuseTexturePath, const std::string& specularTexturePath, Vector4 scaleFactor);
 
   /**
    * @brief Get animation count.
@@ -153,7 +149,7 @@ public:
    * @param[in] index Animation index
    * @return true if animation is played.
    */
-  bool PlayAnimation( uint32_t index );
+  bool PlayAnimation(uint32_t index);
 
   /**
    * @brief Play all animations.
@@ -170,7 +166,7 @@ public:
    * @param[in] lightColor Vector3 value that denotes the light color of point light or directional light. Since this is the light color, we don't need to use alpha value.
    * @return true if point light or directional light is set.
    */
-  bool SetLight( LightType type, Vector3 lightVector, Vector3 lightColor );
+  bool SetLight(LightType type, Vector3 lightVector, Vector3 lightColor);
 
   /**
    * @brief Get default CameraActor. Dali::Camera::Type = Dali::Camera::LOOK_AT_TARGET , near clipping plane = 0.1, and camera position = Vector3( 0.0, 0.0, 0.0 ).
@@ -189,18 +185,17 @@ public:
    * @param[in] cameraIndex Index of CameraActor list.
    * @return CameraActor.
    */
-  CameraActor GetCamera( uint32_t cameraIndex );
+  CameraActor GetCamera(uint32_t cameraIndex);
 
   // Not intended for developer use
 public:
-
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The UI Control implementation.
    */
-  DALI_INTERNAL Scene3dView( Toolkit::Internal::Scene3dView& implementation );
+  DALI_INTERNAL Scene3dView(Toolkit::Internal::Scene3dView& implementation);
 
-  explicit DALI_INTERNAL Scene3dView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Scene3dView(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

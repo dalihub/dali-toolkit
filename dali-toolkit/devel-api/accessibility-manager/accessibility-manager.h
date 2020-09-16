@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class AccessibilityManager;
@@ -61,7 +59,6 @@ class AccessibilityManager;
 class DALI_TOOLKIT_API AccessibilityManager : public BaseHandle
 {
 public:
-
   // Typedefs
 
   /**
@@ -70,8 +67,8 @@ public:
    * The connected signal callback should return true if handled.
    * @SINCE_1_0.0
    */
-  typedef Signal< bool ( AccessibilityManager& ) > AccessibilityActionSignalType; ///< Generic signal type @SINCE_1_0.0
-  typedef Signal< bool ( AccessibilityManager&, const Dali::TouchEvent& )> AccessibilityActionScrollSignalType; ///< Scroll signal type @SINCE_1_0.0
+  typedef Signal<bool(AccessibilityManager&)>                          AccessibilityActionSignalType;       ///< Generic signal type @SINCE_1_0.0
+  typedef Signal<bool(AccessibilityManager&, const Dali::TouchEvent&)> AccessibilityActionScrollSignalType; ///< Scroll signal type @SINCE_1_0.0
 
   /**
    * @brief Enumeration for accessibility that needs four information which will be read by screen-reader.
@@ -81,36 +78,35 @@ public:
    */
   enum AccessibilityAttribute
   {
-    ACCESSIBILITY_LABEL = 0, ///< Simple text which contained in ui-control @SINCE_1_0.0
-    ACCESSIBILITY_TRAIT,     ///< Description of ui-control trait @SINCE_1_0.0
-    ACCESSIBILITY_VALUE,     ///< Current value of ui-control (Optional) @SINCE_1_0.0
-    ACCESSIBILITY_HINT,      ///< Hint for action (Optional) @SINCE_1_0.0
+    ACCESSIBILITY_LABEL = 0,    ///< Simple text which contained in ui-control @SINCE_1_0.0
+    ACCESSIBILITY_TRAIT,        ///< Description of ui-control trait @SINCE_1_0.0
+    ACCESSIBILITY_VALUE,        ///< Current value of ui-control (Optional) @SINCE_1_0.0
+    ACCESSIBILITY_HINT,         ///< Hint for action (Optional) @SINCE_1_0.0
     ACCESSIBILITY_ATTRIBUTE_NUM ///< Number of attributes @SINCE_1_0.0
   };
 
-   /**
+  /**
     * @brief Enumeration for overshoot direction.
     * @SINCE_1_0.0
     */
   enum FocusOvershotDirection
   {
     OVERSHOT_PREVIOUS = -1, ///< Try to move previous of the first actor @SINCE_1_0.0
-    OVERSHOT_NEXT = 1,      ///< Try to move next of the last actor @SINCE_1_0.0
+    OVERSHOT_NEXT     = 1,  ///< Try to move next of the last actor @SINCE_1_0.0
   };
 
- public:
-
+public:
   /// @brief Focus changed signal
   /// @SINCE_1_0.0
-  typedef Signal< void ( Actor, Actor ) > FocusChangedSignalType;
+  typedef Signal<void(Actor, Actor)> FocusChangedSignalType;
 
   /// @brief Focus overshooted signal
   /// @SINCE_1_0.0
-  typedef Signal< void ( Actor, FocusOvershotDirection ) > FocusOvershotSignalType;
+  typedef Signal<void(Actor, FocusOvershotDirection)> FocusOvershotSignalType;
 
   /// @brief Focused actor activated signal
   /// @SINCE_1_0.0
-  typedef Signal< void ( Actor ) > FocusedActorActivatedSignalType;
+  typedef Signal<void(Actor)> FocusedActorActivatedSignalType;
 
   /**
    * @brief Creates an AccessibilityManager handle; this can be initialised with AccessibilityManager::New().
@@ -421,8 +417,7 @@ public:
    */
   Vector2 GetReadPosition() const;
 
- public: // Signals
-
+public: // Signals
   /**
    * @brief This signal is emitted when the current focused actor is changed.
    *
@@ -462,8 +457,7 @@ public:
    */
   FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
 
- public: // Accessibility action signals
-
+public: // Accessibility action signals
   /**
    * @brief This is emitted when accessibility(screen-reader) feature turned on or off.
    *
@@ -802,8 +796,7 @@ public:
   AccessibilityActionScrollSignalType& ActionScrollSignal();
 
 public:
-
-  explicit DALI_INTERNAL AccessibilityManager( Internal::AccessibilityManager *impl );
+  explicit DALI_INTERNAL AccessibilityManager(Internal::AccessibilityManager* impl);
 
 }; // class AccessibilityManager
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,20 @@
  *
  */
 
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 
 using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ScrollViewEffect::ScrollViewEffect()
 {
-
 }
 
-ScrollViewEffect::ScrollViewEffect(Internal::ScrollViewEffect *impl)
+ScrollViewEffect::ScrollViewEffect(Internal::ScrollViewEffect* impl)
 : BaseHandle(impl)
 {
 }

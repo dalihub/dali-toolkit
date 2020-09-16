@@ -19,18 +19,16 @@
 #include <dali-toolkit/devel-api/accessibility-manager/accessibility-manager.h>
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/debug.h>
 #include <dali/devel-api/common/singleton-service.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/accessibility-manager/accessibility-manager-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 AccessibilityManager::AccessibilityManager()
 {
 }
@@ -44,8 +42,8 @@ AccessibilityManager AccessibilityManager::Get()
   AccessibilityManager manager;
 
   // Check whether the accessibility manager is already created
-  SingletonService singletonService( SingletonService::Get() );
-  if ( singletonService )
+  SingletonService singletonService(SingletonService::Get());
+  if(singletonService)
   {
     Dali::BaseHandle handle = singletonService.GetSingleton(typeid(AccessibilityManager));
     if(handle)
@@ -58,17 +56,17 @@ AccessibilityManager AccessibilityManager::Get()
     {
       // If not, create the accessibility manager and register it as a singleton
       Internal::AccessibilityManager* internalManager = new Internal::AccessibilityManager();
-      manager = AccessibilityManager( internalManager );
+      manager                                         = AccessibilityManager(internalManager);
       internalManager->Initialise();
-      singletonService.Register( typeid(manager), manager );
+      singletonService.Register(typeid(manager), manager);
     }
   }
 
   return manager;
 }
 
-AccessibilityManager::AccessibilityManager(Internal::AccessibilityManager *impl)
-  : BaseHandle(impl)
+AccessibilityManager::AccessibilityManager(Internal::AccessibilityManager* impl)
+: BaseHandle(impl)
 {
 }
 

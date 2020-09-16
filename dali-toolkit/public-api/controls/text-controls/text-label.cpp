@@ -23,19 +23,17 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 TextLabel TextLabel::New()
 {
   return Internal::TextLabel::New();
 }
 
-TextLabel TextLabel::New( const std::string& text )
+TextLabel TextLabel::New(const std::string& text)
 {
   TextLabel label = Internal::TextLabel::New();
-  label.SetProperty( TextLabel::Property::TEXT, text );
+  label.SetProperty(TextLabel::Property::TEXT, text);
 
   return label;
 }
@@ -44,32 +42,32 @@ TextLabel::TextLabel()
 {
 }
 
-TextLabel::TextLabel( const TextLabel& handle ) = default;
+TextLabel::TextLabel(const TextLabel& handle) = default;
 
-TextLabel::TextLabel( TextLabel&& rhs ) = default;
+TextLabel::TextLabel(TextLabel&& rhs) = default;
 
-TextLabel& TextLabel::operator=( const TextLabel& handle ) = default;
+TextLabel& TextLabel::operator=(const TextLabel& handle) = default;
 
-TextLabel& TextLabel::operator=( TextLabel&& rhs ) = default;
+TextLabel& TextLabel::operator=(TextLabel&& rhs) = default;
 
 TextLabel::~TextLabel()
 {
 }
 
-TextLabel TextLabel::DownCast( BaseHandle handle )
+TextLabel TextLabel::DownCast(BaseHandle handle)
 {
   return Control::DownCast<TextLabel, Internal::TextLabel>(handle);
 }
 
-TextLabel::TextLabel( Internal::TextLabel& implementation )
+TextLabel::TextLabel(Internal::TextLabel& implementation)
 : Control(implementation)
 {
 }
 
-TextLabel::TextLabel( Dali::Internal::CustomActor* internal )
-: Control( internal )
+TextLabel::TextLabel(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::TextLabel>( internal );
+  VerifyCustomActorPointer<Internal::TextLabel>(internal);
 }
 
 } // namespace Toolkit

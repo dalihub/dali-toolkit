@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 KeyInputFocusManager::KeyInputFocusManager()
 {
 }
@@ -43,8 +41,8 @@ KeyInputFocusManager KeyInputFocusManager::Get()
   KeyInputFocusManager manager;
 
   // Check whether the focus manager is already created
-  SingletonService singletonService( SingletonService::Get() );
-  if ( singletonService )
+  SingletonService singletonService(SingletonService::Get());
+  if(singletonService)
   {
     Dali::BaseHandle handle = singletonService.GetSingleton(typeid(KeyInputFocusManager));
     if(handle)
@@ -64,8 +62,8 @@ KeyInputFocusManager KeyInputFocusManager::Get()
   return manager;
 }
 
-KeyInputFocusManager::KeyInputFocusManager(Internal::KeyInputFocusManager *impl)
-  : BaseHandle(impl)
+KeyInputFocusManager::KeyInputFocusManager(Internal::KeyInputFocusManager* impl)
+: BaseHandle(impl)
 {
 }
 
@@ -92,4 +90,3 @@ KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusManager::KeyI
 } // namespace Toolkit
 
 } // namespace Dali
-

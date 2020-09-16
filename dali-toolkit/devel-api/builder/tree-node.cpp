@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,56 +16,52 @@
  */
 
 // EXTERNAL INCLUDES
+#include <algorithm>
 #include <cctype>
 #include <cstring>
 #include <string>
-#include <algorithm>
 
 // INTERNAL INCLUDES
 #include "dali-toolkit/devel-api/builder/tree-node.h"
 #include "dali-toolkit/internal/builder/tree-node-manipulator.h"
 
-
 namespace Dali
 {
-
-bool CaseInsensitiveCharacterCompare( unsigned char a, unsigned char b )
+bool CaseInsensitiveCharacterCompare(unsigned char a, unsigned char b)
 {
   // Converts to lower case in the current locale.
-  return std::tolower( a ) == std::tolower( b );
+  return std::tolower(a) == std::tolower(b);
 }
 
 /**
  * return true if the lower cased ASCII strings are equal.
  */
-bool CaseInsensitiveStringCompare( const std::string& a, const std::string& b )
+bool CaseInsensitiveStringCompare(const std::string& a, const std::string& b)
 {
   bool result = false;
-  if( a.length() == b.length() )
+  if(a.length() == b.length())
   {
-    result = std::equal( a.begin(), a.end(), b.begin(), CaseInsensitiveCharacterCompare );
+    result = std::equal(a.begin(), a.end(), b.begin(), CaseInsensitiveCharacterCompare);
   }
   return result;
 }
 
 namespace Toolkit
 {
-
 TreeNode::TreeNode()
-  : mName(NULL),
-    mParent(NULL),
-    mNextSibling(NULL),
-    mFirstChild(NULL),
-    mLastChild(NULL),
-    mStringValue(NULL),
-    mType(TreeNode::IS_NULL),
-    mSubstituion(false)
+: mName(NULL),
+  mParent(NULL),
+  mNextSibling(NULL),
+  mFirstChild(NULL),
+  mLastChild(NULL),
+  mStringValue(NULL),
+  mType(TreeNode::IS_NULL),
+  mSubstituion(false)
 {
 }
 
 TreeNode::~TreeNode()
 {
-
 }
 
 const char* TreeNode::GetName() const
@@ -105,7 +101,7 @@ bool TreeNode::GetBoolean() const
 
 size_t TreeNode::Size() const
 {
-  size_t c = 0;
+  size_t    c = 0;
   TreeNode* p = mFirstChild;
   while(p)
   {
@@ -133,7 +129,7 @@ const TreeNode* TreeNode::GetChild(const std::string& childName) const
   const TreeNode* p = mFirstChild;
   while(p)
   {
-    if(p->mName && (std::string(p->mName) == childName) )
+    if(p->mName && (std::string(p->mName) == childName))
     {
       return p;
     }
@@ -141,7 +137,6 @@ const TreeNode* TreeNode::GetChild(const std::string& childName) const
   }
   return NULL;
 }
-
 
 const TreeNode* TreeNode::GetChildIgnoreCase(const std::string& childName) const
 {
@@ -151,7 +146,7 @@ const TreeNode* TreeNode::GetChildIgnoreCase(const std::string& childName) const
     if(p->mName)
     {
       std::string nodeName(p->mName);
-      if( CaseInsensitiveStringCompare( nodeName, childName) )
+      if(CaseInsensitiveStringCompare(nodeName, childName))
       {
         return p;
       }
@@ -178,19 +173,17 @@ TreeNode::ConstIterator TreeNode::CBegin() const
   return ConstIterator(mFirstChild);
 }
 
-
 TreeNode::ConstIterator TreeNode::CEnd() const
 {
   return ConstIterator(NULL);
 }
 
-
-TreeNode::ConstIterator::ConstIterator(TreeNode* v) : mNode(v)
+TreeNode::ConstIterator::ConstIterator(TreeNode* v)
+: mNode(v)
 {
-
 }
 
-TreeNode::ConstIterator& TreeNode::ConstIterator::operator ++()
+TreeNode::ConstIterator& TreeNode::ConstIterator::operator++()
 {
   if(mNode)
   {
@@ -203,7 +196,7 @@ TreeNode::ConstIterator& TreeNode::ConstIterator::operator ++()
   return *this;
 }
 
-TreeNode::ConstIterator TreeNode::ConstIterator::operator ++(int)
+TreeNode::ConstIterator TreeNode::ConstIterator::operator++(int)
 {
   TreeNode::ConstIterator ret(mNode);
 
@@ -218,12 +211,12 @@ TreeNode::ConstIterator TreeNode::ConstIterator::operator ++(int)
   return ret;
 }
 
-TreeNode::KeyNodePair TreeNode::ConstIterator::operator *()
+TreeNode::KeyNodePair TreeNode::ConstIterator::operator*()
 {
   return KeyNodePair(mNode->mName, *mNode);
 }
 
-bool TreeNode::ConstIterator::operator!=( const TreeNode::ConstIterator& rhs ) const
+bool TreeNode::ConstIterator::operator!=(const TreeNode::ConstIterator& rhs) const
 {
   return mNode != rhs.mNode;
 }

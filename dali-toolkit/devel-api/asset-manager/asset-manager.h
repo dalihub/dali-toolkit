@@ -25,10 +25,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @brief Retrieves the file system path of the assets.
  */
@@ -61,10 +59,8 @@ public:
   static const std::string GetDaliDataReadOnlyPath();
 };
 
-} // Toolkit
+} // namespace Toolkit
 
-} // Dali
-
+} // namespace Dali
 
 #endif // DALI_TOOLKIT_ASSET_MANAGER_DEVEL_H
-

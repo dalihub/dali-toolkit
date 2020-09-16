@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SELECTION_POPUP_CALLBACK_INTERFACE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @brief Interface used to receive the TextSelectionPopup's button callbacks.
  */
@@ -37,19 +35,19 @@ public:
    * @brief Virtual destructor.
    */
   virtual ~TextSelectionPopupCallbackInterface()
-  {}
+  {
+  }
 
   /**
    * @brief Called when a button is touched.
    *
    * @param[in] button The button identifier.
    */
-  virtual void TextPopupButtonTouched( TextSelectionPopup::Buttons button ) = 0;
+  virtual void TextPopupButtonTouched(TextSelectionPopup::Buttons button) = 0;
 };
 
 } // namespace Toolkit
 
 } // namespace Dali
-
 
 #endif // DALI_TOOLKIT_TEXT_SELECTION_POPUP_CALLBACK_INTERFACE_H

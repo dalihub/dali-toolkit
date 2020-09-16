@@ -53,7 +53,7 @@ public:
   /**
    * @brief Destructor.
    */
-  virtual ~VectorAnimationThread();
+  ~VectorAnimationThread() override;
 
   /**
    * Add a animation task into the vector animation thread, called by main thread.
@@ -143,7 +143,7 @@ private:
     /**
      * @brief Destructor.
      */
-    virtual ~SleepThread();
+    ~SleepThread() override;
 
     /**
      * @brief Sleeps untile the specified time point.

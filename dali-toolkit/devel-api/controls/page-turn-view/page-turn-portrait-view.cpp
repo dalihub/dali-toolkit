@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,36 +23,34 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 PageTurnPortraitView::PageTurnPortraitView()
 : PageTurnView()
 {
 }
 
-PageTurnPortraitView::PageTurnPortraitView( const PageTurnPortraitView& pageTurnPortraitView )
-: PageTurnView( pageTurnPortraitView )
+PageTurnPortraitView::PageTurnPortraitView(const PageTurnPortraitView& pageTurnPortraitView)
+: PageTurnView(pageTurnPortraitView)
 {
 }
 
-PageTurnPortraitView::PageTurnPortraitView( Internal::PageTurnPortraitView& implementation )
-: PageTurnView( implementation )
+PageTurnPortraitView::PageTurnPortraitView(Internal::PageTurnPortraitView& implementation)
+: PageTurnView(implementation)
 {
 }
 
-PageTurnPortraitView::PageTurnPortraitView( Dali::Internal::CustomActor* internal )
-: PageTurnView( internal )
+PageTurnPortraitView::PageTurnPortraitView(Dali::Internal::CustomActor* internal)
+: PageTurnView(internal)
 {
-  VerifyCustomActorPointer<Internal::PageTurnPortraitView>( internal );
+  VerifyCustomActorPointer<Internal::PageTurnPortraitView>(internal);
 }
 
-PageTurnPortraitView& PageTurnPortraitView::operator=( const PageTurnPortraitView& pageTurnPortraitView )
+PageTurnPortraitView& PageTurnPortraitView::operator=(const PageTurnPortraitView& pageTurnPortraitView)
 {
-  if( &pageTurnPortraitView != this)
+  if(&pageTurnPortraitView != this)
   {
-    PageTurnView::operator=( pageTurnPortraitView );
+    PageTurnView::operator=(pageTurnPortraitView);
   }
   return *this;
 }
@@ -61,14 +59,14 @@ PageTurnPortraitView::~PageTurnPortraitView()
 {
 }
 
-PageTurnPortraitView PageTurnPortraitView::New( PageFactory& pageFactory, const Vector2& viewPageSize)
+PageTurnPortraitView PageTurnPortraitView::New(PageFactory& pageFactory, const Vector2& viewPageSize)
 {
   return Internal::PageTurnPortraitView::New(pageFactory, viewPageSize);
 }
 
-PageTurnPortraitView PageTurnPortraitView::DownCast( BaseHandle handle )
+PageTurnPortraitView PageTurnPortraitView::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<PageTurnPortraitView, Internal::PageTurnPortraitView>( handle );
+  return Control::DownCast<PageTurnPortraitView, Internal::PageTurnPortraitView>(handle);
 }
 
 } // namespace Toolkit

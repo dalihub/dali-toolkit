@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,21 +19,19 @@
 #include "visual-factory.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
+#include <dali/devel-api/common/singleton-service.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace
 {
-  const char * const DALI_DEBUG_RENDERING("DALI_DEBUG_RENDERING");
+const char* const DALI_DEBUG_RENDERING("DALI_DEBUG_RENDERING");
 }
 
 VisualFactory VisualFactory::Get()
@@ -41,29 +39,28 @@ VisualFactory VisualFactory::Get()
   VisualFactory factory;
 
   // Check whether the VisualFactory is already created
-  SingletonService singletonService( SingletonService::Get() );
-  if( singletonService )
+  SingletonService singletonService(SingletonService::Get());
+  if(singletonService)
   {
-    BaseHandle handle = singletonService.GetSingleton( typeid(VisualFactory) );
-    if( handle )
+    BaseHandle handle = singletonService.GetSingleton(typeid(VisualFactory));
+    if(handle)
     {
       //If so, downcast the handle of singleton to VisualFactory
-      factory = VisualFactory( dynamic_cast<Internal::VisualFactory*>(handle.GetObjectPtr()) );
+      factory = VisualFactory(dynamic_cast<Internal::VisualFactory*>(handle.GetObjectPtr()));
     }
 
-    if( !factory )// If not, create the VisualFactory and register it as a singleton
+    if(!factory) // If not, create the VisualFactory and register it as a singleton
     {
       // Check whether debug rendering is required
-      if( EnvironmentVariable::GetEnvironmentVariable( DALI_DEBUG_RENDERING ) )
+      if(EnvironmentVariable::GetEnvironmentVariable(DALI_DEBUG_RENDERING))
       {
-        factory = VisualFactory( new Internal::VisualFactory(true) );
+        factory = VisualFactory(new Internal::VisualFactory(true));
       }
       else
       {
-        factory = VisualFactory( new Internal::VisualFactory(false) );
+        factory = VisualFactory(new Internal::VisualFactory(false));
       }
-      singletonService.Register( typeid(VisualFactory), factory );
-
+      singletonService.Register(typeid(VisualFactory), factory);
     }
   }
 
@@ -78,40 +75,40 @@ VisualFactory::~VisualFactory()
 {
 }
 
-VisualFactory::VisualFactory( const VisualFactory& handle )
-: BaseHandle( handle )
+VisualFactory::VisualFactory(const VisualFactory& handle)
+: BaseHandle(handle)
 {
 }
 
-VisualFactory& VisualFactory::operator=( const VisualFactory& handle )
+VisualFactory& VisualFactory::operator=(const VisualFactory& handle)
 {
-  BaseHandle::operator=( handle );
+  BaseHandle::operator=(handle);
   return *this;
 }
 
-VisualFactory::VisualFactory(Internal::VisualFactory *impl)
+VisualFactory::VisualFactory(Internal::VisualFactory* impl)
 : BaseHandle(impl)
 {
 }
 
-Visual::Base VisualFactory::CreateVisual( const Property::Map& propertyMap )
+Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap)
 {
-  return GetImplementation( *this ).CreateVisual( propertyMap );
+  return GetImplementation(*this).CreateVisual(propertyMap);
 }
 
-Visual::Base VisualFactory::CreateVisual( const std::string& url, ImageDimensions size )
+Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageDimensions size)
 {
-  return GetImplementation( *this ).CreateVisual( url, size );
+  return GetImplementation(*this).CreateVisual(url, size);
 }
 
-void VisualFactory::SetPreMultiplyOnLoad( bool preMultiply )
+void VisualFactory::SetPreMultiplyOnLoad(bool preMultiply)
 {
-  GetImplementation( *this ).SetPreMultiplyOnLoad( preMultiply );
+  GetImplementation(*this).SetPreMultiplyOnLoad(preMultiply);
 }
 
 bool VisualFactory::GetPreMultiplyOnLoad() const
 {
-  return GetImplementation( *this ).GetPreMultiplyOnLoad();
+  return GetImplementation(*this).GetPreMultiplyOnLoad();
 }
 
 } // namespace Toolkit

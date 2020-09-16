@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class Scrollable;
@@ -53,7 +51,6 @@ class Scrollable;
 class DALI_TOOLKIT_API Scrollable : public Control
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
@@ -61,10 +58,10 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
 
     ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,
-    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000              ///< Reserve animatable property indices @SINCE_1_0.0
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices @SINCE_1_0.0
   };
 
   /**
@@ -101,12 +98,11 @@ public:
 
   // Typedefs
 
-  typedef Signal< void ( const Vector2& ) > ScrollStartedSignalType;   ///< ScrollStarted signal type @SINCE_1_0.0
-  typedef Signal< void ( const Vector2& ) > ScrollCompletedSignalType; ///< ScrollCompleted signal type @SINCE_1_0.0
-  typedef Signal< void ( const Vector2& ) > ScrollUpdatedSignalType;   ///< Scroll updated signal type @SINCE_1_0.0
+  typedef Signal<void(const Vector2&)> ScrollStartedSignalType;   ///< ScrollStarted signal type @SINCE_1_0.0
+  typedef Signal<void(const Vector2&)> ScrollCompletedSignalType; ///< ScrollCompleted signal type @SINCE_1_0.0
+  typedef Signal<void(const Vector2&)> ScrollUpdatedSignalType;   ///< Scroll updated signal type @SINCE_1_0.0
 
 public:
-
   /**
    * @brief Creates an uninitialized Scrollable handle.
    * @SINCE_1_0.0
@@ -121,7 +117,7 @@ public:
    * @SINCE_1_0.0
    * @param handle to copy from
    */
-  Scrollable( const Scrollable& handle );
+  Scrollable(const Scrollable& handle);
 
   /**
    * @brief Move constructor
@@ -129,7 +125,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  Scrollable( Scrollable&& rhs );
+  Scrollable(Scrollable&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -139,7 +135,7 @@ public:
    * @param[in] handle Handle to copy from
    * @return A reference to this
    */
-  Scrollable& operator=( const Scrollable& handle );
+  Scrollable& operator=(const Scrollable& handle);
 
   /**
    * @brief Move assignment
@@ -148,7 +144,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Scrollable& operator=( Scrollable&& rhs );
+  Scrollable& operator=(Scrollable&& rhs);
 
   /**
    * @brief Destructor.
@@ -168,7 +164,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A handle to a Scrollable or an uninitialized handle
    */
-  static Scrollable DownCast( BaseHandle handle );
+  static Scrollable DownCast(BaseHandle handle);
 
   /**
    * @brief Checks if scroll overshoot has been enabled or not.
@@ -192,7 +188,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] color The color of the overshoot effect
    */
-  void SetOvershootEffectColor( const Vector4& color );
+  void SetOvershootEffectColor(const Vector4& color);
 
   /**
    * @brief Gets the color of the overshoot effect.
@@ -208,7 +204,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] pixelsPerSecond The speed of the overshoot animation
    */
-  void SetOvershootAnimationSpeed( float pixelsPerSecond );
+  void SetOvershootAnimationSpeed(float pixelsPerSecond);
 
   /**
    * @brief Gets the speed of overshoot animation in pixels per second.
@@ -218,7 +214,6 @@ public:
   float GetOvershootAnimationSpeed() const;
 
 public: // Signals
-
   /**
    * @brief Signal emitted when the Scrollable has moved (whether by touch or animation).
    *
@@ -259,7 +254,6 @@ public: // Signals
   ScrollCompletedSignalType& ScrollCompletedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -275,7 +269,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL Scrollable( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Scrollable(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

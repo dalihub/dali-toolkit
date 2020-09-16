@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TOOL_BAR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,13 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 // Forward declarations
 class ToolBar;
-}
+} // namespace DALI_INTERNAL
 
 /**
  * Provides a tool bar where other controls (Dali::Actor) could be placed.
@@ -59,12 +57,12 @@ public:
    * Copy constructor. Creates another handle that points to the same real object
    * @param handle to copy from
    */
-  ToolBar( const ToolBar& handle );
+  ToolBar(const ToolBar& handle);
 
   /**
    * Assignment operator. Changes this handle to point to another real object
    */
-  ToolBar& operator=( const ToolBar& handle );
+  ToolBar& operator=(const ToolBar& handle);
 
   /**
    * @brief Destructor
@@ -85,7 +83,7 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a ToolBar or an uninitialized handle
    */
-  static ToolBar DownCast( BaseHandle handle );
+  static ToolBar DownCast(BaseHandle handle);
 
   /**
    * Adds an additional control to the tool bar.
@@ -96,28 +94,27 @@ public:
    * @param alignment Where to insert controls. Possible values are Toolkit::Alignment::Left, Toolkit::Alignment::Center or Toolkit::Alignment::Right.
    * @param padding Padding values used for the added control (left, right, top, bottom). By default, no padding is added.
    */
-  void AddControl( Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding = DEFAULT_PADDING );
+  void AddControl(Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding = DEFAULT_PADDING);
 
   /**
    * Removes a control from the tool bar.
    * @pre control must have been added before to this tool bar.
    * @param control The control to be removed.
    */
-  void RemoveControl( Actor control );
+  void RemoveControl(Actor control);
 
 public: // Not intended for application developers
-
   /**
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL ToolBar( Internal::ToolBar& implementation );
+  DALI_INTERNAL ToolBar(Internal::ToolBar& implementation);
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL ToolBar( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ToolBar(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

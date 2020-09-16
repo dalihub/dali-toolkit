@@ -57,7 +57,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~RollingImageCache();
+  ~RollingImageCache() override;
 
   /**
    * Get the Nth frame. If it's not ready, this will trigger the

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ namespace Dali
 {
 namespace Toolkit
 {
-
 TransitionData::TransitionData()
 {
 }
@@ -30,46 +29,46 @@ TransitionData::~TransitionData()
 {
 }
 
-TransitionData TransitionData::New( const Property::Array& transition )
+TransitionData TransitionData::New(const Property::Array& transition)
 {
-  Internal::TransitionDataPtr transitionData = Internal::TransitionData::New( transition );
-  return TransitionData( transitionData.Get() );
+  Internal::TransitionDataPtr transitionData = Internal::TransitionData::New(transition);
+  return TransitionData(transitionData.Get());
 }
 
-TransitionData TransitionData::New( const Property::Map& transition )
+TransitionData TransitionData::New(const Property::Map& transition)
 {
-  Internal::TransitionDataPtr transitionData = Internal::TransitionData::New( transition );
-  return TransitionData( transitionData.Get() );
+  Internal::TransitionDataPtr transitionData = Internal::TransitionData::New(transition);
+  return TransitionData(transitionData.Get());
 }
 
-TransitionData TransitionData::DownCast( BaseHandle handle )
+TransitionData TransitionData::DownCast(BaseHandle handle)
 {
-  return TransitionData( dynamic_cast<Dali::Toolkit::Internal::TransitionData*>(handle.GetObjectPtr()));
+  return TransitionData(dynamic_cast<Dali::Toolkit::Internal::TransitionData*>(handle.GetObjectPtr()));
 }
 
-TransitionData::TransitionData( const TransitionData& handle )
-: BaseHandle( handle )
+TransitionData::TransitionData(const TransitionData& handle)
+: BaseHandle(handle)
 {
 }
 
-TransitionData& TransitionData::operator=( const TransitionData& handle )
+TransitionData& TransitionData::operator=(const TransitionData& handle)
 {
-  BaseHandle::operator=( handle );
+  BaseHandle::operator=(handle);
   return *this;
 }
 
 size_t TransitionData::Count() const
 {
-  return GetImplementation( *this ).Count();
+  return GetImplementation(*this).Count();
 }
 
-Property::Map TransitionData::GetAnimatorAt( size_t index )
+Property::Map TransitionData::GetAnimatorAt(size_t index)
 {
-  return GetImplementation( *this ).GetAnimatorAt( index );
+  return GetImplementation(*this).GetAnimatorAt(index);
 }
 
-TransitionData::TransitionData( Internal::TransitionData* pointer )
-: BaseHandle( pointer )
+TransitionData::TransitionData(Internal::TransitionData* pointer)
+: BaseHandle(pointer)
 {
 }
 

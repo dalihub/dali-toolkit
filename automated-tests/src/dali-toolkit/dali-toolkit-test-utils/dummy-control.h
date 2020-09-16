@@ -122,7 +122,7 @@ protected:
 
   DummyControlImpl();
 
-  virtual ~DummyControlImpl();
+  ~DummyControlImpl() override;
 };
 
 namespace Impl
@@ -148,33 +148,33 @@ private:
 
   DummyControl();
 
-  virtual ~DummyControl();
+  ~DummyControl() override;
 
 private: // From Internal::Control
 
-  virtual void OnInitialize();
-  virtual bool OnAccessibilityActivated();
-  virtual bool OnAccessibilityValueChange( bool isIncrease );
+  void OnInitialize() override;
+  bool OnAccessibilityActivated() override;
+  bool OnAccessibilityValueChange( bool isIncrease ) override;
 
-  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
-  virtual void OnPinch(const PinchGesture& pinch);
-  virtual void OnPan(const PanGesture& pan);
-  virtual void OnTap(const TapGesture& tap);
-  virtual void OnLongPress(const LongPressGesture& longPress);
-  virtual Vector3 GetNaturalSize();
-  virtual bool OnKeyEvent(const KeyEvent& event);
+  void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change ) override;
+  void OnPinch(const PinchGesture& pinch) override;
+  void OnPan(const PanGesture& pan) override;
+  void OnTap(const TapGesture& tap) override;
+  void OnLongPress(const LongPressGesture& longPress) override;
+  Vector3 GetNaturalSize() override;
+  bool OnKeyEvent(const KeyEvent& event) override;
 
 private: // From CustomActorImpl
 
-  virtual void OnSceneConnection( int depth );
-  virtual void OnSceneDisconnection();
-  virtual void OnChildAdd(Actor& child);
-  virtual void OnChildRemove(Actor& child);
-  virtual void OnSizeSet(const Vector3& targetSize);
-  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
-  virtual void OnKeyInputFocusGained();
-  virtual void OnKeyInputFocusLost();
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  void OnSceneConnection( int depth ) override;
+  void OnSceneDisconnection() override;
+  void OnChildAdd(Actor& child) override;
+  void OnChildRemove(Actor& child) override;
+  void OnSizeSet(const Vector3& targetSize) override;
+  void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override;
+  void OnKeyInputFocusGained() override;
+  void OnKeyInputFocusLost() override;
+  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
 
   DALI_INTERNAL DummyControl( const DummyControl& );
   DALI_INTERNAL DummyControl& operator=( const DummyControl& );

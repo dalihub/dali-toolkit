@@ -19,12 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/custom-actor.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <dali/public-api/actors/custom-actor.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/events/pinch-gesture-detector.h>
-#include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 
 // INTERNAL INCLUDES
@@ -32,10 +31,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 //Forward declarations.
 
 namespace Internal
@@ -74,16 +71,15 @@ class Control;
 class DALI_TOOLKIT_API Control : public CustomActor
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = PROPERTY_REGISTRATION_START_INDEX,        ///< Start index is used by the property registration macro. @SINCE_1_0.0
-    CONTROL_PROPERTY_START_INDEX = PROPERTY_START_INDEX,             ///< Start index of Control properties. @SINCE_1_0.0
-    CONTROL_PROPERTY_END_INDEX = CONTROL_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices. @SINCE_1_0.0
+    PROPERTY_START_INDEX         = PROPERTY_REGISTRATION_START_INDEX,  ///< Start index is used by the property registration macro. @SINCE_1_0.0
+    CONTROL_PROPERTY_START_INDEX = PROPERTY_START_INDEX,               ///< Start index of Control properties. @SINCE_1_0.0
+    CONTROL_PROPERTY_END_INDEX   = CONTROL_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices. @SINCE_1_0.0
   };
 
   /**
@@ -151,28 +147,27 @@ public:
      */
     enum Direction
     {
-      LEFT,   ///< Move keyboard focus towards the left direction @SINCE_1_0.0
-      RIGHT,  ///< Move keyboard focus towards the right direction @SINCE_1_0.0
-      UP,     ///< Move keyboard focus towards the up direction @SINCE_1_0.0
-      DOWN,    ///< Move keyboard focus towards the down direction @SINCE_1_0.0
-      PAGE_UP,     ///< Move keyboard focus towards the previous page direction @SINCE_1_2.14
-      PAGE_DOWN    ///< Move keyboard focus towards the next page direction @SINCE_1_2.14
+      LEFT,     ///< Move keyboard focus towards the left direction @SINCE_1_0.0
+      RIGHT,    ///< Move keyboard focus towards the right direction @SINCE_1_0.0
+      UP,       ///< Move keyboard focus towards the up direction @SINCE_1_0.0
+      DOWN,     ///< Move keyboard focus towards the down direction @SINCE_1_0.0
+      PAGE_UP,  ///< Move keyboard focus towards the previous page direction @SINCE_1_2.14
+      PAGE_DOWN ///< Move keyboard focus towards the next page direction @SINCE_1_2.14
     };
   };
 
   // Typedefs
 
   /// @brief Key Event signal type. @SINCE_1_0.0
-  typedef Signal<bool ( Control, const KeyEvent& ) > KeyEventSignalType;
+  typedef Signal<bool(Control, const KeyEvent&)> KeyEventSignalType;
 
   /// @brief Key InputFocusType signal type. @SINCE_1_0.0
-  typedef Signal<void ( Control ) > KeyInputFocusSignalType;
+  typedef Signal<void(Control)> KeyInputFocusSignalType;
 
   /// @brief ResourceReady signal type. @SINCE_1_2.60
-  typedef Signal<void ( Control ) > ResourceReadySignalType;
+  typedef Signal<void(Control)> ResourceReadySignalType;
 
 public: // Creation & Destruction
-
   /**
    * @brief Creates a new instance of a Control.
    *
@@ -205,7 +200,7 @@ public: // Creation & Destruction
    * @SINCE_1_9.23
    * @param[in] rhs Handle to move
    */
-  Control( Control&& rhs );
+  Control(Control&& rhs);
 
   /**
    * @brief Dali::Control is intended as a base class.
@@ -216,7 +211,6 @@ public: // Creation & Destruction
   ~Control();
 
 public: // operators
-
   /**
    * @brief Copy assignment operator.
    *
@@ -225,7 +219,7 @@ public: // operators
    * @param[in] handle Object to assign this to
    * @return Reference to this
    */
-  Control& operator=( const Control& handle );
+  Control& operator=(const Control& handle);
 
   /**
    * @brief Move assignment operator.
@@ -234,10 +228,9 @@ public: // operators
    * @param[in] rhs Object to assign this to
    * @return Reference to this
    */
-  Control& operator=( Control&& rhs );
+  Control& operator=(Control&& rhs);
 
 public:
-
   /**
    * @brief Downcasts a handle to Control handle.
    *
@@ -248,7 +241,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A handle to a Control or an uninitialized handle
    */
-  static Control DownCast( BaseHandle handle );
+  static Control DownCast(BaseHandle handle);
 
   // Key Input
 
@@ -332,7 +325,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] styleName A string matching a style described in a stylesheet
    */
-  void SetStyleName( const std::string& styleName );
+  void SetStyleName(const std::string& styleName);
 
   /**
    * @brief Retrieves the name of the style to be applied to the control (if any).
@@ -353,7 +346,7 @@ public:
    *
    * @note The background color fully blends with the actor color.
    */
-  void SetBackgroundColor( const Vector4& color );
+  void SetBackgroundColor(const Vector4& color);
 
   /**
    * @brief Clears the background.
@@ -379,7 +372,7 @@ public:
    * @param[in] index The Property index of the visual
    * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
    */
-  Visual::ResourceStatus GetVisualResourceStatus( const Dali::Property::Index index );
+  Visual::ResourceStatus GetVisualResourceStatus(const Dali::Property::Index index);
 
   // Signals
 
@@ -465,7 +458,6 @@ public:
   ResourceReadySignalType& ResourceReadySignal();
 
 public: // Intended for control developers
-
   /**
    * @brief Creates an initialized Control.
    *
@@ -486,7 +478,6 @@ public: // Intended for control developers
   explicit Control(Dali::Internal::CustomActor* internal);
 
 public: // Templates for Deriving Classes
-
   /**
    * @brief Template to allow deriving controls to DownCast handles to deriving handle classes.
    *
@@ -498,18 +489,18 @@ public: // Templates for Deriving Classes
    * @see DownCast(BaseHandle)
    */
   template<typename T, typename I>
-  DALI_INTERNAL static T DownCast( BaseHandle handle )
+  DALI_INTERNAL static T DownCast(BaseHandle handle)
   {
     T result;
 
-    CustomActor custom = Dali::CustomActor::DownCast( handle );
-    if ( custom )
+    CustomActor custom = Dali::CustomActor::DownCast(handle);
+    if(custom)
     {
       CustomActorImpl& customImpl = custom.GetImplementation();
 
       I* impl = dynamic_cast<I*>(&customImpl);
 
-      if (impl)
+      if(impl)
       {
         result = T(customImpl.GetOwner());
       }
@@ -531,12 +522,11 @@ public: // Templates for Deriving Classes
   {
     // Can have a NULL pointer so we only need to check if the internal implementation is our class
     // when there is a value.
-    if (internal)
+    if(internal)
     {
       DALI_ASSERT_DEBUG(dynamic_cast<I*>(&CustomActor(internal).GetImplementation()));
     }
   }
-
 };
 
 /**

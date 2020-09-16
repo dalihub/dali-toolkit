@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class Model3dView;
@@ -48,18 +46,17 @@ class Model3dView;
 class DALI_TOOLKIT_API Model3dView : public Control
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_1.4
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,  ///< @SINCE_1_1.4
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,              ///< Reserve property indices @SINCE_1_1.4
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_1.4
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_1.4
 
-    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,                    ///< @SINCE_1_1.4
-    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000              ///< Reserve animatable property indices @SINCE_1_1.4
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,       ///< @SINCE_1_1.4
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices @SINCE_1_1.4
   };
 
   /**
@@ -74,15 +71,15 @@ public:
      */
     enum
     {
-      GEOMETRY_URL = PROPERTY_START_INDEX,  ///< name "geometryUrl",       The path to the geometry file,    type STRING @SINCE_1_1.4
-      MATERIAL_URL,                         ///< name "materialUrl",       The path to the material file,    type STRING @SINCE_1_1.4
-      IMAGES_URL,                           ///< name "imagesUrl",         The path to the images directory, type STRING @SINCE_1_1.4
-      ILLUMINATION_TYPE,                    ///< name "illuminationType",  The type of illumination,         type INTEGER @SINCE_1_1.4
-      TEXTURE0_URL,                         ///< name "texture0Url",       The path to first texture,        type STRING @SINCE_1_1.4
-      TEXTURE1_URL,                         ///< name "texture1Url",       The path to second texture,       type STRING @SINCE_1_1.4
-      TEXTURE2_URL,                         ///< name "texture2Url",       The path to third texture,        type STRING @SINCE_1_1.4
+      GEOMETRY_URL = PROPERTY_START_INDEX, ///< name "geometryUrl",       The path to the geometry file,    type STRING @SINCE_1_1.4
+      MATERIAL_URL,                        ///< name "materialUrl",       The path to the material file,    type STRING @SINCE_1_1.4
+      IMAGES_URL,                          ///< name "imagesUrl",         The path to the images directory, type STRING @SINCE_1_1.4
+      ILLUMINATION_TYPE,                   ///< name "illuminationType",  The type of illumination,         type INTEGER @SINCE_1_1.4
+      TEXTURE0_URL,                        ///< name "texture0Url",       The path to first texture,        type STRING @SINCE_1_1.4
+      TEXTURE1_URL,                        ///< name "texture1Url",       The path to second texture,       type STRING @SINCE_1_1.4
+      TEXTURE2_URL,                        ///< name "texture2Url",       The path to third texture,        type STRING @SINCE_1_1.4
 
-      LIGHT_POSITION = ANIMATABLE_PROPERTY_START_INDEX    ///< name "lightPosition",     The coordinates of the light,     type Vector3 @SINCE_1_1.4
+      LIGHT_POSITION = ANIMATABLE_PROPERTY_START_INDEX ///< name "lightPosition",     The coordinates of the light,     type Vector3 @SINCE_1_1.4
     };
   };
 
@@ -92,9 +89,9 @@ public:
    */
   enum IlluminationType
   {
-    DIFFUSE,                 ///< diffuse @SINCE_1_1.4
-    DIFFUSE_WITH_TEXTURE,    ///< diffuse with texture @SINCE_1_1.4
-    DIFFUSE_WITH_NORMAL_MAP  ///< diffuse with normal map @SINCE_1_1.4
+    DIFFUSE,                ///< diffuse @SINCE_1_1.4
+    DIFFUSE_WITH_TEXTURE,   ///< diffuse with texture @SINCE_1_1.4
+    DIFFUSE_WITH_NORMAL_MAP ///< diffuse with normal map @SINCE_1_1.4
   };
 
   /**
@@ -114,8 +111,7 @@ public:
    * @param[in] imagesUrl The path to the images directory
    * @return A handle to the new Model3dView control
    */
-  static Model3dView New( const std::string& objUrl, const std::string& mtlUrl, const std::string& imagesUrl );
-
+  static Model3dView New(const std::string& objUrl, const std::string& mtlUrl, const std::string& imagesUrl);
 
   /**
    * @brief Creates an uninitialized Model3dView.
@@ -139,7 +135,7 @@ public:
    * @SINCE_1_1.4
    * @param[in] model3dView Handle to an object
    */
-  Model3dView( const Model3dView& model3dView );
+  Model3dView(const Model3dView& model3dView);
 
   /**
    * @brief Move constructor
@@ -147,7 +143,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  Model3dView( Model3dView&& rhs );
+  Model3dView(Model3dView&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -155,7 +151,7 @@ public:
    * @param[in] model3dView Handle to an object
    * @return reference to this
    */
-  Model3dView& operator=( const Model3dView& model3dView );
+  Model3dView& operator=(const Model3dView& model3dView);
 
   /**
    * @brief Move assignment
@@ -164,7 +160,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  Model3dView& operator=( Model3dView&& rhs );
+  Model3dView& operator=(Model3dView&& rhs);
 
   /**
    * @brief Downcasts an Object handle to Model3dView.
@@ -176,10 +172,9 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a Model3dView or an uninitialized handle
    */
-  static Model3dView DownCast( BaseHandle handle );
+  static Model3dView DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -187,7 +182,7 @@ public: // Not intended for application developers
    * @SINCE_1_1.4
    * @param[in] implementation The Control implementation
    */
-  DALI_INTERNAL Model3dView( Internal::Model3dView& implementation );
+  DALI_INTERNAL Model3dView(Internal::Model3dView& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -195,9 +190,8 @@ public: // Not intended for application developers
    * @SINCE_1_1.4
    * @param[in] internal A pointer to the internal CustomActor
    */
-  DALI_INTERNAL Model3dView( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL Model3dView(Dali::Internal::CustomActor* internal);
   /// @endcond
-
 };
 
 /**

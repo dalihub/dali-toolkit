@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class ScrollView;
@@ -45,7 +43,7 @@ class ScrollView;
  */
 enum ClampState
 {
-  NOT_CLAMPED,   ///< The quantity isn't clamped @SINCE_1_9.28
+  NOT_CLAMPED,    ///< The quantity isn't clamped @SINCE_1_9.28
   CLAMPED_TO_MIN, ///< The quantity is clamped to the min value @SINCE_1_9.28
   CLAMPED_TO_MAX  ///< The quantity is clamped to the max value @SINCE_1_9.28
 };
@@ -66,8 +64,8 @@ struct ClampState2D
  */
 enum SnapType
 {
-  SNAP,  ///< SNAP @SINCE_1_9.28
-  FLICK  ///< FLICK @SINCE_1_9.28
+  SNAP, ///< SNAP @SINCE_1_9.28
+  FLICK ///< FLICK @SINCE_1_9.28
 };
 
 /**
@@ -76,9 +74,9 @@ enum SnapType
  */
 enum DirectionBias
 {
-  DIRECTION_BIAS_LEFT  = -1,  ///< Bias scroll snap to Left @SINCE_1_9.28
-  DIRECTION_BIAS_NONE  =  0,  ///< Don't bias scroll snap @SINCE_1_9.28
-  DIRECTION_BIAS_RIGHT =  1   ///< Bias scroll snap to Right @SINCE_1_9.28
+  DIRECTION_BIAS_LEFT  = -1, ///< Bias scroll snap to Left @SINCE_1_9.28
+  DIRECTION_BIAS_NONE  = 0,  ///< Don't bias scroll snap @SINCE_1_9.28
+  DIRECTION_BIAS_RIGHT = 1   ///< Bias scroll snap to Right @SINCE_1_9.28
 };
 
 /**
@@ -88,7 +86,6 @@ enum DirectionBias
 class DALI_TOOLKIT_API RulerDomain
 {
 public:
-
   /**
    * @brief Creates Ruler domain allowing a point to traverse between min and max extents.
    *
@@ -100,10 +97,9 @@ public:
   explicit RulerDomain(float min, float max, bool enabled = true);
 
 public:
-
-  float min;    ///< Minimum extent (point cannot traverse less than this)
-  float max;    ///< Maximum extent (point cannot traverse greater than this)
-  bool enabled; ///< Whether domain has been enabled or not.
+  float min;     ///< Minimum extent (point cannot traverse less than this)
+  float max;     ///< Maximum extent (point cannot traverse greater than this)
+  bool  enabled; ///< Whether domain has been enabled or not.
 
   /**
    * @brief Clamps value (x) from (min) to (max).
@@ -132,7 +128,7 @@ public:
    * @param[out] clamped Whether clamping occurred and which size (None, Min or Max)
    * @return The clamped value
    */
-  float Clamp(float x, float length, float scale, ClampState &clamped) const;
+  float Clamp(float x, float length, float scale, ClampState& clamped) const;
 
   /**
    * @brief Returns (max-min) size of ruler.
@@ -141,7 +137,6 @@ public:
    * @return The size of the ruler from min to max
    */
   float GetSize() const;
-
 };
 
 // Forward declare future extension interface
@@ -161,13 +156,13 @@ public:
    * @brief Enumeration for the type of the ruler.
    * @SINCE_1_0.0
    */
-  enum RulerType {
-    FIXED,  ///< A fixed ruler @SINCE_1_9.28
-    FREE    ///< A free ruler @SINCE_1_9.28
+  enum RulerType
+  {
+    FIXED, ///< A fixed ruler @SINCE_1_9.28
+    FREE   ///< A free ruler @SINCE_1_9.28
   };
 
 public:
-
   /**
    * @brief Constructs ruler, enabled by default, with limitless domain.
    * @SINCE_1_0.0
@@ -202,7 +197,7 @@ public:
    * @param[in] wrap Enable wrap mode
    * @return The position representing this page point
    */
-  virtual float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const = 0;
+  virtual float GetPositionFromPage(unsigned int page, unsigned int& volume, bool wrap) const = 0;
 
   /**
    * @brief Returns page from position, based on whatever the ruler
@@ -231,10 +226,12 @@ public:
    * @SINCE_1_0.0
    * @return The extension interface of the Ruler
    */
-  virtual RulerExtension* GetExtension() { return NULL; }
+  virtual RulerExtension* GetExtension()
+  {
+    return NULL;
+  }
 
 public:
-
   /**
    * @brief Gets the ruler type.
    *
@@ -277,7 +274,7 @@ public:
    * @SINCE_1_0.0
    * @return The domain
    */
-  const RulerDomain &GetDomain() const;
+  const RulerDomain& GetDomain() const;
 
   /**
    * @brief Disables Domain (minimum/maximum extents for this axis).
@@ -299,7 +296,6 @@ public:
    */
   float Clamp(float x, float length = 0.0f, float scale = 1.0f) const;
 
-
   /**
    * @brief Clamps value (x) from (min) to (max).
    *
@@ -313,7 +309,7 @@ public:
    * @param[out] clamped Whether clamping occurred and which size (None, Min or Max)
    * @return The clamped value
    */
-  float Clamp(float x, float length, float scale, ClampState &clamped) const;
+  float Clamp(float x, float length, float scale, ClampState& clamped) const;
 
   /**
    * @brief Snaps and Clamps (x) in accordance to ruler settings.
@@ -348,10 +344,9 @@ public:
    * @param[out] clamped Whether clamping occurred and which size (None, Min or Max)
    * @return The clamped value after snapping
    */
-  float SnapAndClamp(float x, float bias, float length, float scale, ClampState &clamped) const;
+  float SnapAndClamp(float x, float bias, float length, float scale, ClampState& clamped) const;
 
 protected:
-
   /**
    * @brief Destructor - A reference counted object may only be deleted by calling Unreference().
    * @SINCE_1_0.0
@@ -359,11 +354,9 @@ protected:
   virtual ~Ruler();
 
 protected:
-
-  RulerType mType;               ///< Type of Ruler (FIXED or FREE).
-  bool mEnabled;                 ///< If the ruler is enabled.
-  RulerDomain mDomain;           ///< The domain of the ruler.
-
+  RulerType   mType;    ///< Type of Ruler (FIXED or FREE).
+  bool        mEnabled; ///< If the ruler is enabled.
+  RulerDomain mDomain;  ///< The domain of the ruler.
 };
 
 typedef IntrusivePtr<Ruler> RulerPtr; ///< Pointer to Dali::Toolkit::Ruler object @SINCE_1_0.0
@@ -389,7 +382,7 @@ public:
   /**
    * @copydoc Toolkit::Ruler::GetPositionFromPage
    */
-  float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const override;
+  float GetPositionFromPage(unsigned int page, unsigned int& volume, bool wrap) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetPageFromPosition
@@ -425,7 +418,7 @@ public:
   /**
    * @copydoc Toolkit::Ruler::GetPositionFromPage
    */
-  float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const override;
+  float GetPositionFromPage(unsigned int page, unsigned int& volume, bool wrap) const override;
 
   /**
    * @copydoc Toolkit::Ruler::GetPageFromPosition
@@ -456,18 +449,16 @@ class ScrollView;
  */
 class DALI_TOOLKIT_API ScrollView : public Scrollable
 {
-
 public:
-
   /**
    * @brief Clamps signal event's data.
    * @SINCE_1_0.0
    */
   struct ClampEvent
   {
-    ClampState2D scale;       ///< Clamp information for scale axes
-    ClampState2D position;    ///< Clamp information for position axes
-    ClampState   rotation;    ///< Clamp information for rotation
+    ClampState2D scale;    ///< Clamp information for scale axes
+    ClampState2D position; ///< Clamp information for position axes
+    ClampState   rotation; ///< Clamp information for rotation
   };
 
   /**
@@ -476,9 +467,9 @@ public:
    */
   struct SnapEvent
   {
-    SnapType type;    ///< Current snap commencing
-    Vector2 position; ///< Target snap position
-    float duration;   ///< Duration of snap animation.
+    SnapType type;     ///< Current snap commencing
+    Vector2  position; ///< Target snap position
+    float    duration; ///< Duration of snap animation.
   };
 
   /**
@@ -487,11 +478,11 @@ public:
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Toolkit::Scrollable::PROPERTY_END_INDEX + 1,                        ///< @SINCE_1_1.18
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,                                        ///< Reserve property indices, @SINCE_1_1.18
+    PROPERTY_START_INDEX = Toolkit::Scrollable::PROPERTY_END_INDEX + 1, ///< @SINCE_1_1.18
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,                 ///< Reserve property indices, @SINCE_1_1.18
 
     ANIMATABLE_PROPERTY_START_INDEX = Toolkit::Scrollable::ANIMATABLE_PROPERTY_END_INDEX + 1,
-    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_START_INDEX + 1000                   ///< Reserve animatable property indices @SINCE_1_0.0
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_START_INDEX + 1000 ///< Reserve animatable property indices @SINCE_1_0.0
   };
 
   /**
@@ -716,10 +707,9 @@ public:
 
   // Typedefs
 
-  typedef Signal< void ( const SnapEvent& ) > SnapStartedSignalType; ///< SnapStarted signal type @SINCE_1_0.0
+  typedef Signal<void(const SnapEvent&)> SnapStartedSignalType; ///< SnapStarted signal type @SINCE_1_0.0
 
 public:
-
   /**
    * @brief Creates an empty ScrollView handle.
    * @SINCE_1_0.0
@@ -734,7 +724,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] handle Handle to copy from
    */
-  ScrollView( const ScrollView& handle );
+  ScrollView(const ScrollView& handle);
 
   /**
    * @brief Move constructor
@@ -742,7 +732,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  ScrollView( ScrollView&& rhs );
+  ScrollView(ScrollView&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -752,7 +742,7 @@ public:
    * @param[in] handle The handle to copy from
    * @return A reference to this
    */
-  ScrollView& operator=( const ScrollView& handle );
+  ScrollView& operator=(const ScrollView& handle);
 
   /**
    * @brief Move assignment
@@ -761,7 +751,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  ScrollView& operator=( ScrollView&& rhs );
+  ScrollView& operator=(ScrollView&& rhs);
 
   /**
    * @brief Destructor.
@@ -789,10 +779,9 @@ public:
    * @param[in] handle Handle to an object
    * @return A handle to a ScrollView or an uninitialized handle
    */
-  static ScrollView DownCast( BaseHandle handle );
+  static ScrollView DownCast(BaseHandle handle);
 
 public:
-
   /**
    * @brief Gets snap-animation's AlphaFunction.
    *
@@ -1084,7 +1073,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] distance The minimum pan distance for a flick
    */
-  void SetMinimumDistanceForFlick( const Vector2& distance );
+  void SetMinimumDistanceForFlick(const Vector2& distance);
 
   /**
    * @brief Returns the minimum pan speed required for a flick gesture in pixels per second.
@@ -1100,7 +1089,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] speed The minimum pan speed for a flick
    */
-  void SetMinimumSpeedForFlick( float speed );
+  void SetMinimumSpeedForFlick(float speed);
 
   /**
    * @brief Gets the maximum flick speed setting for ScrollView when
@@ -1235,8 +1224,7 @@ public:
    * to get to the target page.
    *
    */
-  void ScrollTo(const Vector2& position, float duration,
-                DirectionBias horizontalBias, DirectionBias verticalBias);
+  void ScrollTo(const Vector2& position, float duration, DirectionBias horizontalBias, DirectionBias verticalBias);
 
   /**
    * @brief Scrolls View to position specified (contents will scroll to this position).
@@ -1257,8 +1245,7 @@ public:
    * to get to the target page.
    *
    */
-  void ScrollTo(const Vector2& position, float duration, AlphaFunction alpha,
-                DirectionBias horizontalBias, DirectionBias verticalBias);
+  void ScrollTo(const Vector2& position, float duration, AlphaFunction alpha, DirectionBias horizontalBias, DirectionBias verticalBias);
 
   /**
    * @brief Scrolls View to page currently based on assumption that each page is
@@ -1407,7 +1394,7 @@ public:
    * @param[in] threshold The threshold to apply around the axis
    * @note If no threshold is specified, then the default threshold of PI * 0.25 radians (or 45 degrees) is used.
    */
-  void SetScrollingDirection( Radian direction, Radian threshold = PanGestureDetector::DEFAULT_THRESHOLD );
+  void SetScrollingDirection(Radian direction, Radian threshold = PanGestureDetector::DEFAULT_THRESHOLD);
 
   /**
    * @brief Removes a direction constraint from the scroll view.
@@ -1416,10 +1403,9 @@ public:
    * @param[in] direction The axis to stop constraining to.
    *                      Usually will be PanGestureDetector::DIRECTION_VERTICAL or PanGestureDetector::DIRECTION_HORIZONTAL (but can be any other angle if desired).
    */
-  void RemoveScrollingDirection( Radian direction );
+  void RemoveScrollingDirection(Radian direction);
 
 public: // Signals
-
   /**
    * @brief Signal emitted when the ScrollView has started to snap or flick (it tells the target
    * position, scale, rotation for the snap or flick).
@@ -1435,7 +1421,6 @@ public: // Signals
   SnapStartedSignalType& SnapStartedSignal();
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -1451,7 +1436,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL ScrollView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ScrollView(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

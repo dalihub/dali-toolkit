@@ -26,20 +26,19 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 Model3dView::Model3dView()
-{}
+{
+}
 
-Model3dView::Model3dView( const Model3dView& model3dView ) = default;
+Model3dView::Model3dView(const Model3dView& model3dView) = default;
 
-Model3dView::Model3dView( Model3dView&& rhs ) = default;
+Model3dView::Model3dView(Model3dView&& rhs) = default;
 
-Model3dView& Model3dView::operator=( const Model3dView& model3dView ) = default;
+Model3dView& Model3dView::operator=(const Model3dView& model3dView) = default;
 
-Model3dView& Model3dView::operator=( Model3dView&& rhs ) = default;
+Model3dView& Model3dView::operator=(Model3dView&& rhs) = default;
 
 Model3dView::~Model3dView()
 {
@@ -50,30 +49,30 @@ Model3dView Model3dView::New()
   return Internal::Model3dView::New();
 }
 
-Model3dView Model3dView::New( const std::string& objUrl, const std::string& mtlUrl, const std::string& imagesUrl )
+Model3dView Model3dView::New(const std::string& objUrl, const std::string& mtlUrl, const std::string& imagesUrl)
 {
   Model3dView model3dView = Internal::Model3dView::New();
-  model3dView.SetProperty( Model3dView::Property::GEOMETRY_URL, Dali::Property::Value( objUrl ) );
-  model3dView.SetProperty( Model3dView::Property::MATERIAL_URL, Dali::Property::Value( mtlUrl ) );
-  model3dView.SetProperty( Model3dView::Property::IMAGES_URL, Dali::Property::Value( imagesUrl ) );
+  model3dView.SetProperty(Model3dView::Property::GEOMETRY_URL, Dali::Property::Value(objUrl));
+  model3dView.SetProperty(Model3dView::Property::MATERIAL_URL, Dali::Property::Value(mtlUrl));
+  model3dView.SetProperty(Model3dView::Property::IMAGES_URL, Dali::Property::Value(imagesUrl));
 
   return model3dView;
 }
 
-Model3dView Model3dView::DownCast( BaseHandle handle )
+Model3dView Model3dView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<Model3dView, Internal::Model3dView>(handle);
 }
 
-Model3dView::Model3dView( Internal::Model3dView& implementation )
- : Control( implementation )
+Model3dView::Model3dView(Internal::Model3dView& implementation)
+: Control(implementation)
 {
 }
 
-Model3dView::Model3dView( Dali::Internal::CustomActor* internal )
- : Control( internal )
+Model3dView::Model3dView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::Model3dView>( internal );
+  VerifyCustomActorPointer<Internal::Model3dView>(internal);
 }
 
 } // namespace Toolkit

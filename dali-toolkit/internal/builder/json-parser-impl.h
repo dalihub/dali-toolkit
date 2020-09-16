@@ -57,7 +57,7 @@ public:
 
   /*
    */
-  ~JsonParser();
+  ~JsonParser() override;
 
   /*
    * @copydoc Toolkit::JsonParser::Parse()

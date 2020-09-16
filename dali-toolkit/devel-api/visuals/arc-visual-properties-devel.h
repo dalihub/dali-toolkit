@@ -23,19 +23,15 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelArcVisual
 {
-
 /**
  * @brief ArcVisual Properties.
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the instance of properties belonging to the ArcVisual.
  */
@@ -79,11 +75,10 @@ enum
  */
 namespace Cap
 {
-
 enum Type
 {
-  BUTT,      ///< The arc does not extend beyond its two endpoints.
-  ROUND      ///< The arc will be extended by a half circle with the center at the end.
+  BUTT, ///< The arc does not extend beyond its two endpoints.
+  ROUND ///< The arc will be extended by a half circle with the center at the end.
 };
 
 } // namespace Cap

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NAVIGATION_VIEW_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,18 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/alpha-function.h>
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali/public-api/animation/alpha-function.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 // Forward declarations
 class NavigationView;
-}
+} // namespace DALI_INTERNAL
 
 /**
  * @brief NavigationView implements a view that manages the navigation of hierarchical contents.
@@ -44,9 +42,7 @@ class NavigationView;
  */
 class DALI_TOOLKIT_API NavigationView : public Control
 {
-
 public:
-
   /**
    * @brief Create a NavigationView handle; this can be initialize with NavigationView::New().
    *
@@ -58,14 +54,14 @@ public:
    * @brief Copy Constructor.
    * @param[in] handle Handle to copy.
    */
-  NavigationView( const NavigationView& handle );
+  NavigationView(const NavigationView& handle);
 
- /**
+  /**
   * @brief Assignment operator.
   * @param handle The handle to copy from.
   * @return reference to this
   */
-  NavigationView& operator=( const NavigationView& handle );
+  NavigationView& operator=(const NavigationView& handle);
 
   /**
    * @brief Destructor
@@ -89,13 +85,13 @@ public:
    * @param[in] handle Handle to an object.
    * @return handle to a NavigationView of an uninitialized handle.
    */
-  static NavigationView DownCast( BaseHandle handle );
+  static NavigationView DownCast(BaseHandle handle);
 
   /**
    * @brief Push a new actor tree to the top of the NavigationView stack and show it.
    * @param[in] item An actor tree.
    */
-  void Push( Actor item );
+  void Push(Actor item);
 
   /**
    * @brief Pop the actor tree that is on the top of the NavigationView stack and make it disappear.
@@ -107,22 +103,20 @@ public:
    */
   Actor Pop();
 
-
 public: // Not intended for application developers
-
-/// @cond internal
+        /// @cond internal
   /**
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL NavigationView( Internal::NavigationView& implementation );
+  DALI_INTERNAL NavigationView(Internal::NavigationView& implementation);
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL NavigationView( Dali::Internal::CustomActor* internal );
-/// @endcond
+  explicit DALI_INTERNAL NavigationView(Dali::Internal::CustomActor* internal);
+  /// @endcond
 }; // class NavigationView
 
 } // namespace Toolkit

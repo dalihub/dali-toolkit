@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_ALIGN_ENUMS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,17 @@
  *
  */
 
-
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Direction
 {
-  enum Type
-  {
-    LEFT_TO_RIGHT = 0,
-    RIGHT_TO_LEFT
-  };
+enum Type
+{
+  LEFT_TO_RIGHT = 0,
+  RIGHT_TO_LEFT
+};
 }
 
 } // namespace Toolkit

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_SIGNALS_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelAnimatedVectorImageVisual
 {
-
 /**
  * @brief Signal that the animated vector image visual can emit.
  */
@@ -37,7 +34,7 @@ namespace Signal
  */
 enum Type
 {
-  ANIMATION_FINISHED      ///< Animation has finished.
+  ANIMATION_FINISHED ///< Animation has finished.
 };
 
 } // namespace Signal

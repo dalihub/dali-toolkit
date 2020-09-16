@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class TextField;
@@ -49,7 +47,6 @@ class TextField;
 class DALI_TOOLKIT_API TextField : public Control
 {
 public:
-
   /**
    * @brief The start and end property ranges for this control.
    * @SINCE_1_0.0
@@ -57,7 +54,7 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_0.0
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_0.0
   };
 
   /**
@@ -467,8 +464,8 @@ public:
    */
   enum ExceedPolicy
   {
-    EXCEED_POLICY_ORIGINAL,        ///< The text will be display at original size, and may exceed the TextField boundary. @SINCE_1_0.0
-    EXCEED_POLICY_CLIP             ///< The end of text will be clipped to fit within the TextField. @SINCE_1_0.0
+    EXCEED_POLICY_ORIGINAL, ///< The text will be display at original size, and may exceed the TextField boundary. @SINCE_1_0.0
+    EXCEED_POLICY_CLIP      ///< The end of text will be clipped to fit within the TextField. @SINCE_1_0.0
   };
 
   /**
@@ -478,22 +475,22 @@ public:
    */
   struct InputStyle
   {
-  /**
+    /**
    * @brief Mask used by the signal InputStyleChangedSignal().
    *
    * @SINCE_1_2_2
    */
     enum Mask
     {
-      NONE         = 0x0000, ///< @SINCE_1_2_2
-      COLOR        = 0x0001, ///< @SINCE_1_2_2
-      FONT_FAMILY  = 0x0002, ///< @SINCE_1_2_2
-      POINT_SIZE   = 0x0004, ///< @SINCE_1_2_2
-      FONT_STYLE   = 0x0008, ///< @SINCE_1_2_2
-      UNDERLINE    = 0x0010, ///< @SINCE_1_2_2
-      SHADOW       = 0x0020, ///< @SINCE_1_2_2
-      EMBOSS       = 0x0040, ///< @SINCE_1_2_2
-      OUTLINE      = 0x0080  ///< @SINCE_1_2_2
+      NONE        = 0x0000, ///< @SINCE_1_2_2
+      COLOR       = 0x0001, ///< @SINCE_1_2_2
+      FONT_FAMILY = 0x0002, ///< @SINCE_1_2_2
+      POINT_SIZE  = 0x0004, ///< @SINCE_1_2_2
+      FONT_STYLE  = 0x0008, ///< @SINCE_1_2_2
+      UNDERLINE   = 0x0010, ///< @SINCE_1_2_2
+      SHADOW      = 0x0020, ///< @SINCE_1_2_2
+      EMBOSS      = 0x0040, ///< @SINCE_1_2_2
+      OUTLINE     = 0x0080  ///< @SINCE_1_2_2
     };
   };
 
@@ -503,19 +500,19 @@ public:
    * @brief Text changed signal type.
    * @SINCE_1_0.0
    */
-  typedef Signal<void ( TextField ) > TextChangedSignalType;
+  typedef Signal<void(TextField)> TextChangedSignalType;
 
   /**
    * @brief Max Characters Exceed signal type.
    * @SINCE_1_0.0
    */
-  typedef Signal<void ( TextField ) > MaxLengthReachedSignalType;
+  typedef Signal<void(TextField)> MaxLengthReachedSignalType;
 
   /**
    * @brief Input Style changed signal type.
    * @SINCE_1_2_2
    */
-  typedef Signal<void ( TextField, InputStyle::Mask ) > InputStyleChangedSignalType;
+  typedef Signal<void(TextField, InputStyle::Mask)> InputStyleChangedSignalType;
 
   /**
    * @brief Creates the TextField control.
@@ -536,7 +533,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] handle The handle to copy from
    */
-  TextField( const TextField& handle );
+  TextField(const TextField& handle);
 
   /**
    * @brief Move constructor
@@ -544,7 +541,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  TextField( TextField&& rhs );
+  TextField(TextField&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -553,7 +550,7 @@ public:
    * @param[in] handle The handle to copy from
    * @return A reference to this
    */
-  TextField& operator=( const TextField& handle );
+  TextField& operator=(const TextField& handle);
 
   /**
    * @brief Move assignment
@@ -562,7 +559,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  TextField& operator=( TextField&& rhs );
+  TextField& operator=(TextField&& rhs);
 
   /**
    * @brief Destructor.
@@ -582,7 +579,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a TextField or an empty handle
    */
-  static TextField DownCast( BaseHandle handle );
+  static TextField DownCast(BaseHandle handle);
 
   // Signals
 
@@ -625,14 +622,13 @@ public:
   InputStyleChangedSignalType& InputStyleChangedSignal();
 
 public: // Not intended for application developers
-
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_0.0
    * @param[in] implementation The Control implementation
    */
-  DALI_INTERNAL TextField( Internal::TextField& implementation );
+  DALI_INTERNAL TextField(Internal::TextField& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -640,7 +636,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL TextField( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL TextField(Dali::Internal::CustomActor* internal);
 };
 
 /**

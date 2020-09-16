@@ -111,7 +111,7 @@ protected:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
-  virtual ~AnimatedVectorImageVisual();
+  ~AnimatedVectorImageVisual() override;
 
   /**
    * @copydoc Visual::Base::DoSetProperties

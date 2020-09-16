@@ -108,7 +108,7 @@ protected:
   /**
    * @brief virtual destructor.
    */
-  virtual ~Style();
+  ~Style() override;
 
 private:
   // Not implemented

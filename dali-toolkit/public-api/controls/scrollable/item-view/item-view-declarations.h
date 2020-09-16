@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ITEM_VIEW_DECLARATIONS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@
  */
 
 // EXTERNAL INCLUDES
-#include <utility> // std::pair
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <utility> // std::pair
 
 namespace Dali
 {
-
 namespace Toolkit
 {
 /**
@@ -35,15 +34,15 @@ namespace Toolkit
 
 typedef unsigned int ItemId; ///< Unique identity for each item in the view. @SINCE_1_0.0
 
-typedef std::vector<ItemId> ItemIdContainer;  ///< Item id container type @SINCE_1_0.0
-typedef ItemIdContainer::iterator ItemIdIter; ///< Item id iterator type @SINCE_1_0.0
-typedef ItemIdContainer::const_iterator ConstItemIdIter;  ///< Item id const iterator type @SINCE_1_0.0
+typedef std::vector<ItemId>             ItemIdContainer; ///< Item id container type @SINCE_1_0.0
+typedef ItemIdContainer::iterator       ItemIdIter;      ///< Item id iterator type @SINCE_1_0.0
+typedef ItemIdContainer::const_iterator ConstItemIdIter; ///< Item id const iterator type @SINCE_1_0.0
 
-typedef std::pair<ItemId, Actor> Item;  ///< Item type @SINCE_1_0.0
+typedef std::pair<ItemId, Actor> Item; ///< Item type @SINCE_1_0.0
 
-typedef std::vector<Item> ItemContainer;  ///< Item container type @SINCE_1_0.0
-typedef ItemContainer::iterator ItemIter; ///< Item iterator type @SINCE_1_0.0
-typedef ItemContainer::const_iterator ConstItemIter;  ///< Item const iterator type @SINCE_1_0.0
+typedef std::vector<Item>             ItemContainer; ///< Item container type @SINCE_1_0.0
+typedef ItemContainer::iterator       ItemIter;      ///< Item iterator type @SINCE_1_0.0
+typedef ItemContainer::const_iterator ConstItemIter; ///< Item const iterator type @SINCE_1_0.0
 
 class ItemView;
 class ItemLayout;

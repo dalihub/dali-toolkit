@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,24 +24,22 @@
 #include <dali/public-api/animation/time-period.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout-property.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 struct ItemLayout::Impl
 {
-  Vector3 mItemSize;                              ///< The size of an item in the layout
-  ControlOrientation::Type mOrientation;          ///< the orientation of the layout.
-  Property::Map mProperties;
+  Vector3                  mItemSize;    ///< The size of an item in the layout
+  ControlOrientation::Type mOrientation; ///< the orientation of the layout.
+  Property::Map            mProperties;
 };
 
 ItemLayout::ItemLayout()
-: mImpl( new Impl )
+: mImpl(new Impl)
 {
   mImpl->mOrientation = ControlOrientation::Up;
 }
@@ -61,12 +59,12 @@ ControlOrientation::Type ItemLayout::GetOrientation() const
   return mImpl->mOrientation;
 }
 
-void ItemLayout::GetItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const
+void ItemLayout::GetItemSize(unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize) const
 {
   // If item-size has not been set then get the default size
-  if ( mImpl->mItemSize == Vector3::ZERO )
+  if(mImpl->mItemSize == Vector3::ZERO)
   {
-    GetDefaultItemSize( itemId, layoutSize, itemSize );
+    GetDefaultItemSize(itemId, layoutSize, itemSize);
   }
   else
   {
@@ -74,21 +72,18 @@ void ItemLayout::GetItemSize( unsigned int itemId, const Vector3& layoutSize, Ve
   }
 }
 
-void ItemLayout::SetItemSize( const Vector3& itemSize )
+void ItemLayout::SetItemSize(const Vector3& itemSize)
 {
   mImpl->mItemSize = itemSize;
 }
 
 float ItemLayout::GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize)
 {
-  Vector3 itemPosition = GetItemPosition( itemID, currentLayoutPosition, layoutSize );
+  Vector3 itemPosition = GetItemPosition(itemID, currentLayoutPosition, layoutSize);
   Vector3 itemSize;
   GetItemSize(itemID, layoutSize, itemSize);
   Vector3 onScreenArea = (layoutSize - itemSize) * 0.5f;
-  if (itemPosition.x < -onScreenArea.x
-      || itemPosition.x > onScreenArea.x
-      || itemPosition.y < -onScreenArea.y
-      || itemPosition.y > onScreenArea.y)
+  if(itemPosition.x < -onScreenArea.x || itemPosition.x > onScreenArea.x || itemPosition.y < -onScreenArea.y || itemPosition.y > onScreenArea.y)
   {
     // item not within viewable area
     // safest thing to do here since we have no idea how the implementation will work is to return the scroll to position
@@ -99,13 +94,13 @@ float ItemLayout::GetClosestOnScreenLayoutPosition(int itemID, float currentLayo
 
 int ItemLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
-  switch( direction )
+  switch(direction)
   {
     case Control::KeyboardFocus::LEFT:
     case Control::KeyboardFocus::UP:
     {
       itemID--;
-      if( itemID < 0 )
+      if(itemID < 0)
       {
         itemID = loopEnabled ? maxItems - 1 : 0;
       }
@@ -115,7 +110,7 @@ int ItemLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Cont
     case Control::KeyboardFocus::DOWN:
     {
       itemID++;
-      if( itemID >= maxItems )
+      if(itemID >= maxItems)
       {
         itemID = loopEnabled ? 0 : maxItems - 1;
       }
@@ -137,9 +132,9 @@ float ItemLayout::GetFlickSpeedFactor() const
 
 void ItemLayout::SetLayoutProperties(const Property::Map& properties)
 {
-  for( unsigned int idx = 0, mapCount = properties.Count(); idx < mapCount; ++idx )
+  for(unsigned int idx = 0, mapCount = properties.Count(); idx < mapCount; ++idx)
   {
-    KeyValuePair propertyPair( properties.GetKeyValue( idx ) );
+    KeyValuePair propertyPair(properties.GetKeyValue(idx));
 
     if(propertyPair.first == DefaultItemLayoutProperty::ITEM_SIZE)
     {

@@ -44,7 +44,7 @@ public:
                           float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
                           float  verticalDpi   = DEFAULT_VERTICAL_DPI );
 
-  ~ToolkitTestApplication();
+  ~ToolkitTestApplication() override;
 
   /**
    * @brief Executes the idle callbacks.

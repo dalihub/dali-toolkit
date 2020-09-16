@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEFAULT_ITEM_LAYOUT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
 /**
@@ -37,17 +36,16 @@ namespace Toolkit
  */
 namespace DefaultItemLayout
 {
-
 /**
  * @brief Enumeration for the type of DefaultItemLayout
  * @SINCE_1_0.0
  */
 enum Type
 {
-  DEPTH,     ///< Items arranged in a grid, scrolling along the Z-Axis. @SINCE_1_0.0
-  GRID,      ///< Items arranged in a grid, scrolling along the Y-Axis. @SINCE_1_0.0
-  LIST,      ///< One item per line, scrolling along the Y-Axis. @SINCE_1_0.0
-  SPIRAL     ///< Items arranged in a spiral, centered around the Y-Axis. @SINCE_1_0.0
+  DEPTH, ///< Items arranged in a grid, scrolling along the Z-Axis. @SINCE_1_0.0
+  GRID,  ///< Items arranged in a grid, scrolling along the Y-Axis. @SINCE_1_0.0
+  LIST,  ///< One item per line, scrolling along the Y-Axis. @SINCE_1_0.0
+  SPIRAL ///< Items arranged in a spiral, centered around the Y-Axis. @SINCE_1_0.0
 };
 
 /**
@@ -57,7 +55,7 @@ enum Type
  * @param[in] type The type of layout required
  * @return An ItemLayoutPtr to the newly created layout
  */
-DALI_TOOLKIT_API ItemLayoutPtr New( Type type );
+DALI_TOOLKIT_API ItemLayoutPtr New(Type type);
 
 } // namespace DefaultItemLayout
 

@@ -26,16 +26,13 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-
 class EffectsView;
 
-} // namespace Internal
+} // namespace DALI_INTERNAL
 
 /**
  * EffectsView: Applies an effect to a tree of actors
@@ -63,7 +60,6 @@ class EffectsView;
 class DALI_TOOLKIT_API EffectsView : public Control
 {
 public:
-
   enum EffectType
   {
     DROP_SHADOW,
@@ -76,11 +72,11 @@ public:
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,  ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,              ///< Reserve property indices @SINCE_1_0.0
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
 
-    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,        ///< @SINCE_1_1.18
-    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000  ///< Reserve animatable property indices, @SINCE_1_1.18
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,       ///< @SINCE_1_1.18
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices, @SINCE_1_1.18
   };
 
   /**
@@ -91,7 +87,7 @@ public:
     enum
     {
       // Event side properties
-      EFFECT_SIZE = PROPERTY_START_INDEX,              ///< name "effectSize", type INTEGER
+      EFFECT_SIZE = PROPERTY_START_INDEX, ///< name "effectSize", type INTEGER
 
       // Animatable properties
       EFFECT_OFFSET = ANIMATABLE_PROPERTY_START_INDEX, ///< name "effectOffset", type VECTOR3
@@ -100,13 +96,12 @@ public:
   };
 
 public:
-
   /**
    * Create an EffectsView object with default configuration
    * @param[in] type The type of effect to be performed by the EffectView.
    *                 A member of the EffectType enumeration.
    */
-  static EffectsView New( EffectType type );
+  static EffectsView New(EffectType type);
 
   /**
    * Create an uninitialized EffectsView. Only derived versions can be instantiated.
@@ -117,12 +112,12 @@ public:
   /**
    * Copy constructor.
    */
-  EffectsView( const EffectsView& handle );
+  EffectsView(const EffectsView& handle);
 
   /**
    * Assignment operator.
    */
-  EffectsView& operator=( const EffectsView& rhs );
+  EffectsView& operator=(const EffectsView& rhs);
 
   /**
    * Downcast an Object handle to EffectsView. If handle points to a EffectsView the
@@ -130,7 +125,7 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a EffectsView or an uninitialized handle
    */
-  static EffectsView DownCast( BaseHandle handle );
+  static EffectsView DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor
@@ -140,7 +135,6 @@ public:
   ~EffectsView();
 
 public:
-
   /**
    * Get the effect type
    * @return The type of effect performed by the EffectView. A member of the EffectType enumeration.
@@ -157,39 +151,38 @@ public:
    * @param[in] onDemand Set true to enable on demand rendering, call Refresh() whenever a render is required.
    *                     Set false to render each frame. (EffectsView refresh mode is set to continuous by default).
    */
-  void SetRefreshOnDemand( bool onDemand );
+  void SetRefreshOnDemand(bool onDemand);
 
-   /**
+  /**
     * Set the pixel format for the output
     * @param[in] pixelFormat The pixel format for the output
     */
-   void SetPixelFormat( Pixel::Format pixelFormat );
+  void SetPixelFormat(Pixel::Format pixelFormat);
 
-   /**
+  /**
     * Set background color for the view. The background will be filled with this color.
     * @param[in] color The background color.
     */
-   void SetBackgroundColor( const Vector4& color );
+  void SetBackgroundColor(const Vector4& color);
 
-   /**
+  /**
     * Get the background color.
     * @return The background color.
     */
-   Vector4 GetBackgroundColor() const;
+  Vector4 GetBackgroundColor() const;
 
 public: // Not intended for application developers
-
   /**
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL EffectsView( Internal::EffectsView& implementation );
+  DALI_INTERNAL EffectsView(Internal::EffectsView& implementation);
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL EffectsView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL EffectsView(Dali::Internal::CustomActor* internal);
 
 }; // class EffectsView
 

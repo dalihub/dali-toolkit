@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_visuals
  * @{
@@ -38,24 +36,23 @@ namespace Toolkit
  */
 namespace Visual
 {
-
 /**
  * @brief All the visual types.
  * @SINCE_1_1.45
  */
 enum Type
 {
-  BORDER,           ///< Renders a solid color as an internal border to the control's quad. @SINCE_1_1.45
-  COLOR,            ///< Renders a solid color to the control's quad. @SINCE_1_1.45
-  GRADIENT,         ///< Renders a smooth transition of colors to the control's quad. @SINCE_1_1.45
-  IMAGE,            ///< Renders an image into the control's quad. @SINCE_1_1.45
-  MESH,             ///< Renders a mesh using an "obj" file, optionally with textures provided by an "mtl" file. @SINCE_1_1.45
-  PRIMITIVE,        ///< Renders a simple 3D shape, such as a cube or sphere. @SINCE_1_1.45
-  WIREFRAME,        ///< Renders a simple wire-frame outlining a quad. @SINCE_1_2_2
-  TEXT,             ///< Renders text @SINCE_1_2.60
-  N_PATCH,          ///< Renders an n-patch image. @SINCE_1_2.60
-  SVG,              ///< Renders an SVG image. @SINCE_1_2.60
-  ANIMATED_IMAGE,   ///< Renders a animated image. @SINCE_1_2.60
+  BORDER,         ///< Renders a solid color as an internal border to the control's quad. @SINCE_1_1.45
+  COLOR,          ///< Renders a solid color to the control's quad. @SINCE_1_1.45
+  GRADIENT,       ///< Renders a smooth transition of colors to the control's quad. @SINCE_1_1.45
+  IMAGE,          ///< Renders an image into the control's quad. @SINCE_1_1.45
+  MESH,           ///< Renders a mesh using an "obj" file, optionally with textures provided by an "mtl" file. @SINCE_1_1.45
+  PRIMITIVE,      ///< Renders a simple 3D shape, such as a cube or sphere. @SINCE_1_1.45
+  WIREFRAME,      ///< Renders a simple wire-frame outlining a quad. @SINCE_1_2_2
+  TEXT,           ///< Renders text @SINCE_1_2.60
+  N_PATCH,        ///< Renders an n-patch image. @SINCE_1_2.60
+  SVG,            ///< Renders an SVG image. @SINCE_1_2.60
+  ANIMATED_IMAGE, ///< Renders a animated image. @SINCE_1_2.60
 };
 
 /**
@@ -64,7 +61,6 @@ enum Type
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the instance of properties belonging to the Visual Property.
  * @SINCE_1_1.45
@@ -134,22 +130,20 @@ enum
  */
 namespace Transform
 {
-
 /**
  * @brief Policies used by the transform for the offset or size.
  * @SINCE_1_2.60
  */
 namespace Policy
 {
-
 /**
  * @brief Enumeration for the type of Transform Policy.
  * @SINCE_1_2.60
  */
 enum Type
 {
-  RELATIVE = 0,   ///< Relative to the control (percentage [0.0f to 1.0f] of the control). @SINCE_1_2.60
-  ABSOLUTE = 1    ///< Absolute value in world units. @SINCE_1_2.60
+  RELATIVE = 0, ///< Relative to the control (percentage [0.0f to 1.0f] of the control). @SINCE_1_2.60
+  ABSOLUTE = 1  ///< Absolute value in world units. @SINCE_1_2.60
 };
 
 } // namespace Policy
@@ -160,7 +154,6 @@ enum Type
  */
 namespace Property
 {
-
 /**
  * @brief Enumeration for the type of Transform Property.
  * @SINCE_1_2.60
@@ -257,14 +250,12 @@ enum Type
  */
 namespace Shader
 {
-
 /**
  * @brief Shader Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
-
 /**
  * @brief The type of Shader.
  * @SINCE_1_1.45
@@ -324,7 +315,6 @@ enum
 } // namespace Property
 
 } // namespace Shader
-
 
 /**
  * @brief Status of resource which is used for visual.

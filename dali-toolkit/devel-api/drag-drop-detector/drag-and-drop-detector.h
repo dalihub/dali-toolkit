@@ -2,7 +2,7 @@
 #define DALI_DRAG_AND_DROP_DETECTOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
  *
  */
 
-
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
@@ -30,10 +29,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class DragAndDropDetector;
@@ -110,10 +107,9 @@ class DragAndDropDetector;
 class DALI_TOOLKIT_API DragAndDropDetector : public BaseHandle
 {
 public:
-
   // Typedefs
 
-  using DragAndDropSignal = Signal< void ( Control, DragAndDropDetector ) >; ///< Drag & Drop signal
+  using DragAndDropSignal = Signal<void(Control, DragAndDropDetector)>; ///< Drag & Drop signal
 
   /**
    * @brief Create an initialized DragAndDropDetector.
@@ -256,13 +252,12 @@ public:
   DragAndDropSignal& EndedSignal();
 
 public: // Not intended for application developers
-
   /**
    * @brief This constructor is used by DragAndDropDetector::Get().
    *
    * @param[in] detector A pointer to the drag and drop detector.
    */
-  explicit DALI_INTERNAL DragAndDropDetector( Internal::DragAndDropDetector* detector );
+  explicit DALI_INTERNAL DragAndDropDetector(Internal::DragAndDropDetector* detector);
 };
 
 } // namespace Toolkit

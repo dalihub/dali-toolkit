@@ -21,22 +21,19 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/rendering/texture.h>
-#include <dali/public-api/render-tasks/render-task.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-
 /**
  * GaussianBlurView implementation class
  */
@@ -47,7 +44,7 @@ class GaussianBlurView;
  */
 class BloomView;
 
-} // namespace Internal
+} // namespace DALI_INTERNAL
 /**
  * @addtogroup dali_toolkit_controls_gaussian_blur_view
  * @{
@@ -111,7 +108,7 @@ public:
    * @brief Signal type for notifications
    * @SINCE_1_0.0
    */
-  typedef Signal< void (GaussianBlurView source) > GaussianBlurViewSignal;
+  typedef Signal<void(GaussianBlurView source)> GaussianBlurViewSignal;
 
   /**
    * @brief Create an uninitialized GaussianBlurView; this can be initialized with GaussianBlurView::New().
@@ -149,7 +146,7 @@ public:
    * @param[in] handle Handle to an object
    * @return A handle to a GaussianBlurView or an uninitialized handle
    */
-  static GaussianBlurView DownCast( BaseHandle handle );
+  static GaussianBlurView DownCast(BaseHandle handle);
 
   /**
   * @brief Create an initialized GaussianBlurView, using default settings. The default settings are:-\n
@@ -183,9 +180,7 @@ public:
   * SetUserImageAndOutputRenderTarget().
   * @return A handle to a newly allocated Dali resource
   */
-  static GaussianBlurView New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
-                              const float downsampleWidthScale, const float downsampleHeightScale,
-                              bool blurUserImage = false);
+  static GaussianBlurView New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale, bool blurUserImage = false);
 
   /**
    * @brief Start rendering the GaussianBlurView. Must be called after you Add() it to the stage.
@@ -249,7 +244,7 @@ public:
   * @SINCE_1_0.0
   * @param[in] color The background color.
   */
-  void SetBackgroundColor( const Vector4& color );
+  void SetBackgroundColor(const Vector4& color);
 
   /**
   * @brief Get the background color.
@@ -268,23 +263,21 @@ public: // Signals
   GaussianBlurViewSignal& FinishedSignal();
 
 public:
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_0.0
    * @param[in]  implementation  The UI Control implementation.
    */
-  DALI_INTERNAL GaussianBlurView( Internal::GaussianBlurView& implementation );
+  DALI_INTERNAL GaussianBlurView(Internal::GaussianBlurView& implementation);
 
   /**
    * @brief Allows the creation of this UI Control from an Internal::CustomActor pointer.
    * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  DALI_INTERNAL GaussianBlurView( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL GaussianBlurView(Dali::Internal::CustomActor* internal);
   /// @endcond
-
 };
 
 /**

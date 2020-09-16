@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PAGE_TURN_LANDSCAPE_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,13 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 // Forward declarations
 class PageTurnLandscapeView;
-}
+} // namespace DALI_INTERNAL
 
 /**
  * @brief PageTurnLandscapeView provides a page turn view in landscape mode
@@ -51,13 +49,13 @@ public:
    * @brief Copy constructor.
    * @SINCE_1_0.0
    */
-  PageTurnLandscapeView( const PageTurnLandscapeView& pageTurnLandscapeView );
+  PageTurnLandscapeView(const PageTurnLandscapeView& pageTurnLandscapeView);
 
   /**
    * @brief Assignment operator.
    * @SINCE_1_0.0
    */
-  PageTurnLandscapeView& operator=( const PageTurnLandscapeView& pageTurnLandscapeView );
+  PageTurnLandscapeView& operator=(const PageTurnLandscapeView& pageTurnLandscapeView);
 
   /**
    * @brief Destructor
@@ -74,7 +72,7 @@ public:
    * @param[in] viewPageSize The size of the page
    * @return A handle to the PageTurnLandscapeView control.
    */
-  static PageTurnLandscapeView New( PageFactory& pageFactory, const Vector2& viewPageSize );
+  static PageTurnLandscapeView New(PageFactory& pageFactory, const Vector2& viewPageSize);
 
   /**
    * @brief Downcast an Object handle to PageTurnPortraitView. If handle points to a PageTurnLandscapeView the
@@ -83,24 +81,23 @@ public:
    * @param[in] handle Handle to an object
    * @return handle to a PageTurnLandscapeView or an uninitialized handle
    */
-  static PageTurnLandscapeView DownCast( BaseHandle handle );
+  static PageTurnLandscapeView DownCast(BaseHandle handle);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_0.0
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL PageTurnLandscapeView( Internal::PageTurnLandscapeView& implementation );
+  DALI_INTERNAL PageTurnLandscapeView(Internal::PageTurnLandscapeView& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    * @SINCE_1_0.0
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  explicit DALI_INTERNAL PageTurnLandscapeView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL PageTurnLandscapeView(Dali::Internal::CustomActor* internal);
   /// @endcond
 };
 

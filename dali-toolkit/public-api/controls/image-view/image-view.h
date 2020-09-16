@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class ImageView;
@@ -76,18 +74,17 @@ class ImageView;
 class DALI_TOOLKIT_API ImageView : public Control
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
   {
-    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,  ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,              ///< Reserve property indices @SINCE_1_0.0
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
+    PROPERTY_END_INDEX   = PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
 
-    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,        ///< @SINCE_1_1.18
-    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000  ///< Reserve animatable property indices, @SINCE_1_1.18
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,       ///< @SINCE_1_1.18
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices, @SINCE_1_1.18
   };
 
   /**
@@ -117,7 +114,6 @@ public:
        */
       PRE_MULTIPLIED_ALPHA,
 
-
       // Animatable properties
 
       /**
@@ -130,7 +126,6 @@ public:
   };
 
 public:
-
   /**
    * @brief Creates an uninitialized ImageView.
    * @SINCE_1_0.0
@@ -158,7 +153,7 @@ public:
    * @param[in] url The url of the image resource to display
    * @return A handle to a newly allocated ImageView
    */
-  static ImageView New( const std::string& url );
+  static ImageView New(const std::string& url);
 
   /**
    * @brief Creates an initialized ImageView from a URL to an image resource.
@@ -175,7 +170,7 @@ public:
    *       However, do not set a size that is bigger than the actual image size, as up-scaling is not available.
    *       The content of the area not covered by the actual image is undefined and will not be cleared.
    */
-  static ImageView New( const std::string& url, ImageDimensions size );
+  static ImageView New(const std::string& url, ImageDimensions size);
 
   /**
    * @brief Destructor.
@@ -191,7 +186,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] imageView ImageView to copy. The copied ImageView will point at the same implementation
    */
-  ImageView( const ImageView& imageView );
+  ImageView(const ImageView& imageView);
 
   /**
    * @brief Move constructor
@@ -199,7 +194,7 @@ public:
    *
    * @param[in] rhs A reference to the moved handle
    */
-  ImageView( ImageView&& rhs );
+  ImageView(ImageView&& rhs);
 
   /**
    * @brief Assignment operator.
@@ -208,7 +203,7 @@ public:
    * @param[in] imageView The ImageView to assign from
    * @return The updated ImageView
    */
-  ImageView& operator=( const ImageView& imageView );
+  ImageView& operator=(const ImageView& imageView);
 
   /**
    * @brief Move assignment
@@ -217,7 +212,7 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this
    */
-  ImageView& operator=( ImageView&& rhs );
+  ImageView& operator=(ImageView&& rhs);
 
   /**
    * @brief Downcasts a handle to ImageView handle.
@@ -229,7 +224,7 @@ public:
    * @param[in] handle Handle to an object
    * @return Handle to a ImageView or an uninitialized handle
    */
-  static ImageView DownCast( BaseHandle handle );
+  static ImageView DownCast(BaseHandle handle);
 
   /**
    * @brief Sets this ImageView from the given URL.
@@ -241,7 +236,7 @@ public:
    * @REMARK_STORAGE
    * @param[in] url The URL to the image resource to display
    */
-  void SetImage( const std::string& url );
+  void SetImage(const std::string& url);
 
   /**
    * @brief Sets this ImageView from the given URL.
@@ -254,10 +249,9 @@ public:
    * @param[in] url The URL to the image resource to display
    * @param [in] size The width and height to fit the loaded image to
    */
-  void SetImage( const std::string& url, ImageDimensions size );
+  void SetImage(const std::string& url, ImageDimensions size);
 
 public: // Not intended for application developers
-
   /// @cond internal
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
@@ -265,7 +259,7 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] implementation The ImageView implementation
    */
-  DALI_INTERNAL ImageView( Internal::ImageView& implementation );
+  DALI_INTERNAL ImageView(Internal::ImageView& implementation);
 
   /**
    * @brief Allows the creation of this ImageView from an Internal::CustomActor pointer.
@@ -273,9 +267,8 @@ public: // Not intended for application developers
    * @SINCE_1_0.0
    * @param[in] internal A pointer to the internal CustomActor
    */
-  DALI_INTERNAL ImageView( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL ImageView(Dali::Internal::CustomActor* internal);
   /// @endcond
-
 };
 
 /**

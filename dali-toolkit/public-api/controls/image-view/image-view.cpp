@@ -27,21 +27,19 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 ImageView::ImageView()
 {
 }
 
-ImageView::ImageView( const ImageView& imageView ) = default;
+ImageView::ImageView(const ImageView& imageView) = default;
 
-ImageView::ImageView( ImageView&& rhs ) = default;
+ImageView::ImageView(ImageView&& rhs) = default;
 
-ImageView& ImageView::operator=( const ImageView& imageView ) = default;
+ImageView& ImageView::operator=(const ImageView& imageView) = default;
 
-ImageView& ImageView::operator=( ImageView&& rhs ) = default;
+ImageView& ImageView::operator=(ImageView&& rhs) = default;
 
 ImageView::~ImageView()
 {
@@ -52,44 +50,44 @@ ImageView ImageView::New()
   return Internal::ImageView::New();
 }
 
-ImageView ImageView::New( const std::string& url )
+ImageView ImageView::New(const std::string& url)
 {
   ImageView imageView = Internal::ImageView::New();
-  imageView.SetImage( url, ImageDimensions() );
+  imageView.SetImage(url, ImageDimensions());
   return imageView;
 }
 
-ImageView ImageView::New( const std::string& url, ImageDimensions size )
+ImageView ImageView::New(const std::string& url, ImageDimensions size)
 {
   ImageView imageView = Internal::ImageView::New();
-  imageView.SetImage( url, size );
+  imageView.SetImage(url, size);
   return imageView;
 }
 
-ImageView ImageView::DownCast( BaseHandle handle )
+ImageView ImageView::DownCast(BaseHandle handle)
 {
-  return Control::DownCast<ImageView, Internal::ImageView>( handle );
+  return Control::DownCast<ImageView, Internal::ImageView>(handle);
 }
 
-void ImageView::SetImage( const std::string& url )
+void ImageView::SetImage(const std::string& url)
 {
-  Dali::Toolkit::GetImpl( *this ).SetImage( url, ImageDimensions() );
+  Dali::Toolkit::GetImpl(*this).SetImage(url, ImageDimensions());
 }
 
-void ImageView::SetImage( const std::string& url, ImageDimensions size )
+void ImageView::SetImage(const std::string& url, ImageDimensions size)
 {
-  Dali::Toolkit::GetImpl( *this ).SetImage( url, size );
+  Dali::Toolkit::GetImpl(*this).SetImage(url, size);
 }
 
-ImageView::ImageView( Internal::ImageView& implementation )
- : Control( implementation )
+ImageView::ImageView(Internal::ImageView& implementation)
+: Control(implementation)
 {
 }
 
-ImageView::ImageView( Dali::Internal::CustomActor* internal )
- : Control( internal )
+ImageView::ImageView(Dali::Internal::CustomActor* internal)
+: Control(internal)
 {
-  VerifyCustomActorPointer<Internal::ImageView>( internal );
+  VerifyCustomActorPointer<Internal::ImageView>(internal);
 }
 
 } // namespace Toolkit

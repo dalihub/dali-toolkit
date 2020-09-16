@@ -19,26 +19,23 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/uint-16-pair.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace NPatchUtility
 {
-
 /**
  * The list that includes stretch pixel ranges
  */
-using StretchRanges = Dali::Vector< Uint16Pair >;
+using StretchRanges = Dali::Vector<Uint16Pair>;
 
 /**
  * @brief Get the offset of the red channel for the format.
@@ -47,7 +44,7 @@ using StretchRanges = Dali::Vector< Uint16Pair >;
  * @param[out] byteOffset The byte offset of the red channel.
  * @param[out] bitMask The bit mask of the red channel.
  */
-DALI_TOOLKIT_API void GetRedOffsetAndMask( Dali::Pixel::Format pixelFormat, int& byteOffset, int& bitMask );
+DALI_TOOLKIT_API void GetRedOffsetAndMask(Dali::Pixel::Format pixelFormat, int& byteOffset, int& bitMask);
 
 /**
  * @brief Read the borders of the buffer and determine the child area and stretch borders.
@@ -56,7 +53,7 @@ DALI_TOOLKIT_API void GetRedOffsetAndMask( Dali::Pixel::Format pixelFormat, int&
  * @param[out] stretchPixelsX The horizontal stretchable pixels in the cropped image space.
  * @param[out] stretchPixelsY The vertical stretchable pixels in the cropped image space.
  */
-DALI_TOOLKIT_API void ParseBorders( Devel::PixelBuffer& pixelBuffer, StretchRanges& stretchPixelsX, StretchRanges& stretchPixelsY );
+DALI_TOOLKIT_API void ParseBorders(Devel::PixelBuffer& pixelBuffer, StretchRanges& stretchPixelsX, StretchRanges& stretchPixelsY);
 
 /**
  * @brief Helper method to determine if the filename indicates that the image has a 9 patch or n patch border.
@@ -64,7 +61,7 @@ DALI_TOOLKIT_API void ParseBorders( Devel::PixelBuffer& pixelBuffer, StretchRang
  * @param [in] url The URL of the image file.
  * @return true if it is a 9 patch or n patch image
  */
-DALI_TOOLKIT_API bool IsNinePatchUrl( const std::string& url );
+DALI_TOOLKIT_API bool IsNinePatchUrl(const std::string& url);
 
 } // namespace NPatchUtility
 

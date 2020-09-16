@@ -20,13 +20,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace DevelColorVisual
 {
-
 /**
  * @brief Actions that the color visual can perform. These actions are called through the Visual::Base::DoAction API.
  */
@@ -43,9 +40,9 @@ enum Type
   UPDATE_PROPERTY = 0
 };
 
-} // namespace Actions
+} // namespace Action
 
-} // namespace DevelVisual
+} // namespace DevelColorVisual
 
 } // namespace Toolkit
 
