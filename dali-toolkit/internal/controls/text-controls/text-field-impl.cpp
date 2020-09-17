@@ -134,6 +134,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandlePopup",  
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "textBackground",                 VECTOR4,   BACKGROUND                           )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextField, "selectedText",         STRING,    SELECTED_TEXT                        )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "renderingBackend",               INTEGER,   RENDERING_BACKEND                    )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "selectedTextStart",              INTEGER,   SELECTED_TEXT_START                  )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "selectedTextEnd",                INTEGER,   SELECTED_TEXT_END                    )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -806,6 +808,26 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::SELECTED_TEXT_START:
+      {
+        if( impl.mController )
+        {
+          uint32_t start = static_cast<uint32_t>(value.Get< int >());
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTED_TEXT_START %d\n", impl.mController.Get(), start );
+          impl.SetTextSelectionRange( &start, nullptr );
+        }
+        break;
+      }
+      case Toolkit::DevelTextField::Property::SELECTED_TEXT_END:
+      {
+        if( impl.mController )
+        {
+          uint32_t end = static_cast<uint32_t>(value.Get< int >());
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTED_TEXT_END %d\n", impl.mController.Get(), end );
+          impl.SetTextSelectionRange( nullptr, &end );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1229,6 +1251,18 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::SELECTED_TEXT_START:
+      {
+        Uint32Pair range = impl.GetTextSelectionRange( );
+        value = static_cast<int>(range.first);
+        break;
+      }
+      case Toolkit::DevelTextField::Property::SELECTED_TEXT_END:
+      {
+        Uint32Pair range = impl.GetTextSelectionRange( );
+        value = static_cast<int>(range.second);
+        break;
+      }
     } //switch
   }
 
@@ -1252,6 +1286,26 @@ void TextField::SelectNone()
     SetKeyInputFocus();
   }
 }
+
+void TextField::SetTextSelectionRange(const uint32_t *start, const uint32_t *end)
+{
+  if( mController && mController->IsShowingRealText() )
+  {
+    mController->SetTextSelectionRange( start, end );
+    SetKeyInputFocus();
+  }
+}
+
+Uint32Pair TextField::GetTextSelectionRange() const
+{
+  Uint32Pair range;
+  if( mController && mController->IsShowingRealText() )
+  {
+    range = mController->GetTextSelectionRange();
+  }
+  return range;
+}
+
 
 InputMethodContext TextField::GetInputMethodContext()
 {
@@ -1305,7 +1359,7 @@ void TextField::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New( this, this );
+  mController = Text::Controller::New( this, this ,this);
 
   // When using the vector-based rendering, the size of the GLyphs are different
   TextAbstraction::GlyphType glyphType = (DevelText::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;

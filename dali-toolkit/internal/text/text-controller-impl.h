@@ -48,6 +48,8 @@ const float DEFAULT_TEXTFIT_STEP = 1.f;
 struct CursorInfo;
 struct FontDefaults;
 
+class SelectableControlInterface;
+
 struct Event
 {
   // Used to queue input events until DoRelayout()
@@ -308,9 +310,11 @@ struct OutlineDefaults
 struct Controller::Impl
 {
   Impl( ControlInterface* controlInterface,
-        EditableControlInterface* editableControlInterface )
+        EditableControlInterface* editableControlInterface,
+        SelectableControlInterface* selectableControlInterface )
   : mControlInterface( controlInterface ),
     mEditableControlInterface( editableControlInterface ),
+    mSelectableControlInterface( selectableControlInterface ),
     mModel(),
     mFontDefaults( NULL ),
     mUnderlineDefaults( NULL ),
@@ -623,6 +627,16 @@ struct Controller::Impl
   void OnSelectNoneEvent();
 
   /**
+   * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
+   */
+  void SetTextSelectionRange(const uint32_t *pStart, const uint32_t *pEndf);
+
+  /**
+   * @copydoc Text::SelectableControlInterface::GetTextSelectionRange()
+   */
+  Uint32Pair GetTextSelectionRange() const;
+
+  /**
    * @brief Retrieves the selected text. It removes the text if the @p deleteAfterRetrieval parameter is @e true.
    *
    * @param[out] selectedText The selected text encoded in utf8.
@@ -757,6 +771,7 @@ public:
 
   ControlInterface* mControlInterface;     ///< Reference to the text controller.
   EditableControlInterface* mEditableControlInterface; ///< Reference to the editable text controller.
+  SelectableControlInterface* mSelectableControlInterface; ///< Reference to the selectable text controller.
   ModelPtr mModel;                         ///< Pointer to the text's model.
   FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
   UnderlineDefaults* mUnderlineDefaults;   ///< Avoid allocating this when the user does not specify underline parameters.
