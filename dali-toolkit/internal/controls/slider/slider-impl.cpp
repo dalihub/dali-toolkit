@@ -847,19 +847,9 @@ float Slider::MarkFilter( float value )
 {
   const float MARK_TOLERANCE = GetMarkTolerance();
 
-  float mark;
-  for( MarkList::SizeType i = 0; i < mMarks.Count(); ++i)
-  {
-    const Property::Value& propertyValue = mMarks[i];
-    propertyValue.Get( mark );
-    mark = MapValuePercentage( mark );
-
-    // If close to a mark, return the mark
-    if( fabsf( mark - value ) < MARK_TOLERANCE )
-    {
-      return mark;
-    }
-  }
+  float mark = SnapToMark(value);
+  if (fabsf(mark - value) < MARK_TOLERANCE)
+    return mark;
 
   return value;
 }
