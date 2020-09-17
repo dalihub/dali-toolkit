@@ -272,6 +272,10 @@ void ProgressBar::SetProgressValue( float value )
 
     Toolkit::ProgressBar self = Toolkit::ProgressBar::DownCast( Self() );
     mValueChangedSignal.Emit( self, mProgressValue, mSecondaryProgressValue );
+    if (Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+    {
+      Control::Impl::GetAccessibilityObject(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
+    }
     RelayoutRequest();
   }
 }

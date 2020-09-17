@@ -960,6 +960,10 @@ void Slider::SetValue( float value )
 {
   mValue = value;
   DisplayValue( mValue, true );
+  if (Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+  {
+    Control::Impl::GetAccessibilityObject(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
+  }
 }
 
 float Slider::GetValue() const
