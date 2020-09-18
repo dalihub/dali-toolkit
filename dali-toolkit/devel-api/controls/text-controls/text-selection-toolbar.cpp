@@ -69,7 +69,7 @@ void TextSelectionToolbar::ResizeDividers(Size& size)
   GetImpl(*this).ResizeDividers(size);
 }
 
-void TextSelectionToolbar::RaiseAbove(Layer target)
+void TextSelectionToolbar::RaiseAbove(Actor target)
 {
   GetImpl(*this).RaiseAbove(target);
 }

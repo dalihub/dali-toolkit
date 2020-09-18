@@ -28,6 +28,7 @@
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
+#include <dali-toolkit/internal/text/text-selectable-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 
@@ -42,7 +43,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextField : public Control, public Text::ControlInterface, public Text::EditableControlInterface
+class TextField : public Control, public Text::ControlInterface, public Text::EditableControlInterface, public Text::SelectableControlInterface
 {
 public:
 
@@ -107,7 +108,7 @@ public:
    */
   void SelectWholeText();
 
-    /**
+  /**
    * @brief Called to unselect the whole texts.
    */
   void SelectNone();
@@ -202,6 +203,19 @@ private: // From Control
    * @copydoc Text::ControlInterface::AddDecoration()
    */
   void AddDecoration( Actor& actor, bool needsClipping ) override;
+
+
+// From SelectableControlInterface
+public:
+  /**
+   * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
+   */
+  void SetTextSelectionRange(const uint32_t *start, const uint32_t *end) override;
+
+  /**
+   * @copydoc Text::SelectableControlInterface::GetTextSelectionRange()
+   */
+  Uint32Pair GetTextSelectionRange() const override;
 
 private: // Implementation
 

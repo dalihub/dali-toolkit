@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
+#include <dali-toolkit/internal/text/text-selectable-control-interface.h>
 
 namespace Dali
 {
@@ -187,11 +188,13 @@ public: // Constructor.
    *
    * @param[in] controlInterface The control's interface.
    * @param[in] editableControlInterface The editable control's interface.
+   * @param[in] selectableControlInterface The selectable control's interface.
    *
    * @return A pointer to a new Controller.
    */
   static ControllerPtr New( ControlInterface* controlInterface,
-                            EditableControlInterface* editableControlInterface );
+                            EditableControlInterface* editableControlInterface,
+                            SelectableControlInterface* selectableControlInterface );
 
 public: // Configure the text controller.
 
@@ -1493,6 +1496,16 @@ public: // Text-input Event Queuing.
   void SelectEvent( float x, float y, SelectionType selection );
 
   /**
+   * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
+   */
+  void SetTextSelectionRange(const uint32_t *start, const uint32_t *end);
+
+  /**
+   * @copydoc Text::SelectableControlInterface::GetTextSelectionRange()
+   */
+  Uint32Pair GetTextSelectionRange() const;
+
+  /**
    * @brief Event received from input method context
    *
    * @param[in] inputMethodContext The input method context.
@@ -1698,7 +1711,8 @@ private: // Private contructors & copy operator.
    * @brief Private constructor.
    */
   Controller( ControlInterface* controlInterface,
-              EditableControlInterface* editableControlInterface );
+              EditableControlInterface* editableControlInterface,
+              SelectableControlInterface* selectableControlInterface );
 
   // Undefined
   Controller( const Controller& handle );

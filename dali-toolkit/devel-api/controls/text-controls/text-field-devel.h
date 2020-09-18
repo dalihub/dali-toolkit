@@ -131,7 +131,20 @@ enum
        */
   RENDERING_BACKEND = ELLIPSIS + 7,
 
+  /**
+   * @brief The selected text start position.
+   * @details Name "selectedTextStart", type Property::INTEGER.
+   */
+  SELECTED_TEXT_START,
+
+  /**
+   * @brief The selected text range end position.
+   * @details Name "selectedTextEnd", type Property::INTEGER.
+   */
+  SELECTED_TEXT_END,
+
 };
+
 } // namespace Property
 
 /**

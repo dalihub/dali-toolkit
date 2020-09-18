@@ -2040,6 +2040,54 @@ void Controller::Impl::OnSelectNoneEvent()
   }
 }
 
+void Controller::Impl::SetTextSelectionRange(const uint32_t *pStart, const uint32_t *pEnd)
+{
+  if( nullptr == mEventData )
+  {
+    // Nothing to do if there is no text.
+    return;
+  }
+
+  if( mEventData->mSelectionEnabled && (pStart || pEnd))
+  {
+    uint32_t length = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
+
+    if (pStart)
+    {
+      mEventData->mLeftSelectionPosition = std::min(*pStart, length);
+    }
+    if (pEnd)
+    {
+      mEventData->mRightSelectionPosition = std::min(*pEnd, length);
+    }
+
+    if (mEventData->mLeftSelectionPosition == mEventData->mRightSelectionPosition)
+    {
+      ChangeState( EventData::EDITING );
+      mEventData->mPrimaryCursorPosition = mEventData->mLeftSelectionPosition = mEventData->mRightSelectionPosition;
+      mEventData->mUpdateCursorPosition = true;
+    }
+    else
+    {
+      ChangeState( EventData::SELECTING );
+      mEventData->mUpdateHighlightBox = true;
+    }
+  }
+}
+
+Uint32Pair Controller::Impl::GetTextSelectionRange() const
+{
+  Uint32Pair range;
+
+  if( mEventData )
+  {
+    range.first = mEventData->mLeftSelectionPosition;
+    range.second = mEventData->mRightSelectionPosition;
+  }
+
+  return range;
+}
+
 void Controller::Impl::RetrieveSelection( std::string& selectedText, bool deleteAfterRetrieval )
 {
   if( mEventData->mLeftSelectionPosition == mEventData->mRightSelectionPosition )

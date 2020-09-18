@@ -53,6 +53,8 @@ const std::string EMPTY_STRING("");
 const std::string KEY_C_NAME = "c";
 const std::string KEY_V_NAME = "v";
 const std::string KEY_X_NAME = "x";
+const std::string KEY_A_NAME = "a";
+const std::string KEY_INSERT_NAME = "Insert";
 
 const char * const PLACEHOLDER_TEXT = "text";
 const char * const PLACEHOLDER_TEXT_FOCUSED = "textFocused";
@@ -141,10 +143,12 @@ ControllerPtr Controller::New( ControlInterface* controlInterface )
 }
 
 ControllerPtr Controller::New( ControlInterface* controlInterface,
-                               EditableControlInterface* editableControlInterface )
+                               EditableControlInterface* editableControlInterface,
+                               SelectableControlInterface* selectableControlInterface )
 {
   return ControllerPtr( new Controller( controlInterface,
-                                        editableControlInterface ) );
+                                        editableControlInterface,
+                                        selectableControlInterface ) );
 }
 
 // public : Configure the text controller.
@@ -2905,12 +2909,12 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Do nothing
       return false;
     }
-    else if ( keyEvent.IsCtrlModifier() )
+    else if ( keyEvent.IsCtrlModifier() && !keyEvent.IsShiftModifier())
     {
       bool consumed = false;
-      if (keyName == KEY_C_NAME)
+      if (keyName == KEY_C_NAME || keyName == KEY_INSERT_NAME)
       {
-        // Ctrl-C to copy the selected text
+        // Ctrl-C or Ctrl+Insert to copy the selected text
         TextPopupButtonTouched( Toolkit::TextSelectionPopup::COPY );
         consumed = true;
       }
@@ -2924,6 +2928,12 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       {
         // Ctrl-X to cut the selected text
         TextPopupButtonTouched( Toolkit::TextSelectionPopup::CUT );
+        consumed = true;
+      }
+      else if (keyName == KEY_A_NAME)
+      {
+        // Ctrl-A to select All the text
+        TextPopupButtonTouched( Toolkit::TextSelectionPopup::SELECT_ALL );
         consumed = true;
       }
       return consumed;
@@ -3183,6 +3193,24 @@ void Controller::SelectEvent( float x, float y, SelectionType selectType )
     mImpl->mEventData->mIsRightHandleSelected = true;
     mImpl->RequestRelayout();
   }
+}
+
+void Controller::SetTextSelectionRange(const uint32_t *start, const uint32_t *end)
+{
+  if( mImpl->mEventData )
+  {
+    mImpl->mEventData->mCheckScrollAmount = true;
+    mImpl->mEventData->mIsLeftHandleSelected = true;
+    mImpl->mEventData->mIsRightHandleSelected = true;
+    mImpl->SetTextSelectionRange(start, end);
+    mImpl->RequestRelayout();
+    KeyboardFocusGainEvent();
+  }
+}
+
+Uint32Pair Controller::GetTextSelectionRange() const
+{
+  return mImpl->GetTextSelectionRange();
 }
 
 InputMethodContext::CallbackData Controller::OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent )
@@ -4440,19 +4468,21 @@ Actor Controller::CreateBackgroundActor()
 Controller::Controller()
 : mImpl( NULL )
 {
-  mImpl = new Controller::Impl( NULL, NULL );
+  mImpl = new Controller::Impl( nullptr, nullptr, nullptr );
 }
 
 Controller::Controller( ControlInterface* controlInterface )
 {
-  mImpl = new Controller::Impl( controlInterface, NULL );
+  mImpl = new Controller::Impl( controlInterface, NULL, NULL );
 }
 
 Controller::Controller( ControlInterface* controlInterface,
-                        EditableControlInterface* editableControlInterface )
+                        EditableControlInterface* editableControlInterface,
+                        SelectableControlInterface* selectableControlInterface )
 {
   mImpl = new Controller::Impl( controlInterface,
-                                editableControlInterface );
+                                editableControlInterface,
+                                selectableControlInterface );
 }
 
 // The copy constructor and operator are left unimplemented.

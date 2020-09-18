@@ -139,6 +139,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableGrabHandle",      
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "matchSystemLanguageDirection",   BOOLEAN,   MATCH_SYSTEM_LANGUAGE_DIRECTION      )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "renderingBackend",               INTEGER,   RENDERING_BACKEND                    )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "maxLength",                      INTEGER,   MAX_LENGTH                           )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "selectedTextStart",              INTEGER,   SELECTED_TEXT_START                  )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "selectedTextEnd",                INTEGER,   SELECTED_TEXT_END                    )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -784,6 +786,26 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::SELECTED_TEXT_START:
+      {
+        if( impl.mController )
+        {
+          uint32_t start = static_cast<uint32_t>(value.Get< int >());
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p SELECTED_TEXT_START %d\n", impl.mController.Get(), start );
+          impl.SetTextSelectionRange( &start, nullptr );
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::SELECTED_TEXT_END:
+      {
+        if( impl.mController )
+        {
+          uint32_t end = static_cast<uint32_t>(value.Get< int >());
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p SELECTED_TEXT_END %d\n", impl.mController.Get(), end );
+          impl.SetTextSelectionRange( nullptr, &end );
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -1192,6 +1214,18 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::SELECTED_TEXT_START:
+      {
+        Uint32Pair range = impl.GetTextSelectionRange();
+        value = static_cast<int>(range.first);
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::SELECTED_TEXT_END:
+      {
+        Uint32Pair range = impl.GetTextSelectionRange();
+        value = static_cast<int>(range.second);
+        break;
+      }
     } //switch
   }
 
@@ -1259,7 +1293,7 @@ void TextEditor::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New( this, this );
+  mController = Text::Controller::New( this, this, this);
 
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );
@@ -1706,6 +1740,25 @@ void TextEditor::AddDecoration( Actor& actor, bool needsClipping )
       mActiveLayer = actor;
     }
   }
+}
+
+void TextEditor::SetTextSelectionRange(const uint32_t *start, const uint32_t *end)
+{
+  if( mController && mController->IsShowingRealText() )
+  {
+    mController->SetTextSelectionRange( start, end );
+    SetKeyInputFocus();
+  }
+}
+
+Uint32Pair TextEditor::GetTextSelectionRange() const
+{
+  Uint32Pair range(0, 0);
+  if( mController && mController->IsShowingRealText() )
+  {
+    range = mController->GetTextSelectionRange();
+  }
+  return range;
 }
 
 void TextEditor::UpdateScrollBar()
