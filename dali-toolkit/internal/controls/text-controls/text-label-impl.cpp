@@ -989,6 +989,11 @@ std::string TextLabel::AccessibleImpl::GetNameRaw()
   return slf.GetProperty( Toolkit::TextLabel::Property::TEXT ).Get< std::string >();
 }
 
+Property::Index TextLabel::AccessibleImpl::GetNamePropertyIndex()
+{
+  return Toolkit::TextLabel::Property::TEXT;
+}
+
 std::string TextLabel::AccessibleImpl::GetText( size_t startOffset,
                                                 size_t endOffset )
 {

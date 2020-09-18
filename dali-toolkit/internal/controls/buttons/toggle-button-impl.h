@@ -170,6 +170,7 @@ protected:
 
     Dali::Accessibility::States CalculateStates() override;
     std::string GetDescriptionRaw() override;
+    Property::Index GetDescriptionPropertyIndex() override;
   };
   void OnStateChange( State newState ) override;
 };

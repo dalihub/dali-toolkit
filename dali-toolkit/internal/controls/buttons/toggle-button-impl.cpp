@@ -395,6 +395,11 @@ std::string ToggleButton::AccessibleImpl::GetDescriptionRaw()
   return tooltips[index].Get<std::string>();
 }
 
+Property::Index ToggleButton::AccessibleImpl::GetDescriptionPropertyIndex()
+{
+  return Toolkit::ToggleButton::Property::TOOLTIPS;
+}
+
 void ToggleButton::OnStateChange( State newState )
 {
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used

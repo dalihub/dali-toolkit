@@ -652,27 +652,11 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
       }
       break;
     }
-    case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
-    {
-      if( Dali::Accessibility::IsUp() )
-      {
-        Dali::Accessibility::Accessible::Get(Self())->Emit( Dali::Accessibility::ObjectPropertyChangeEvent::NAME );
-      }
-      break;
-    }
     case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
     {
       if( Dali::Accessibility::IsUp() )
       {
         Dali::Accessibility::Accessible::Get(Self())->Emit( Dali::Accessibility::ObjectPropertyChangeEvent::ROLE );
-      }
-      break;
-    }
-    case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
-    {
-      if( Dali::Accessibility::IsUp() )
-      {
-        Dali::Accessibility::Accessible::Get(Self())->Emit( Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION );
       }
       break;
     }

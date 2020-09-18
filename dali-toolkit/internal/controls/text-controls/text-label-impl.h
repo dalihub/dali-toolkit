@@ -186,6 +186,7 @@ protected:
     bool SetSelection( size_t selectionNum, size_t startOffset,
                        size_t endOffset ) override;
     std::string GetNameRaw() override;
+    Property::Index GetNamePropertyIndex() override;
   };
 };
 

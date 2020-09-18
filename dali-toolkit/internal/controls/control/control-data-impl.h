@@ -590,6 +590,8 @@ public:
     virtual Dali::Accessibility::States CalculateStates();
     virtual void EnsureChildVisible(Actor child);
     virtual void EnsureSelfVisible();
+    virtual Property::Index GetNamePropertyIndex();
+    virtual Property::Index GetDescriptionPropertyIndex();
   };
 
   std::function< std::unique_ptr< Dali::Accessibility::Accessible >( Actor ) > accessibilityConstructor;

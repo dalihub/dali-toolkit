@@ -1882,6 +1882,32 @@ Control::Impl::AccessibleImpl::AccessibleImpl(Dali::Actor self, Dali::Accessibil
   Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
   if( controlImpl.mAccessibilityRole == Dali::Accessibility::Role::UNKNOWN )
     controlImpl.mAccessibilityRole = role;
+
+  self.PropertySetSignal().Connect(&controlImpl, [this, &controlImpl](Dali::Handle &handle, Dali::Property::Index index, Dali::Property::Value value)
+  {
+    if (this->self != Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+    {
+      return;
+    }
+
+    if (index == DevelControl::Property::ACCESSIBILITY_NAME
+      || (index == GetNamePropertyIndex() && !controlImpl.mAccessibilityNameSet))
+    {
+      if (controlImpl.mAccessibilityGetNameSignal.Empty())
+      {
+        Emit(Dali::Accessibility::ObjectPropertyChangeEvent::NAME);
+      }
+    }
+
+    if (index == DevelControl::Property::ACCESSIBILITY_DESCRIPTION
+      || (index == GetDescriptionPropertyIndex() && !controlImpl.mAccessibilityDescriptionSet))
+    {
+      if (controlImpl.mAccessibilityGetDescriptionSignal.Empty())
+      {
+        Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+      }
+    }
+  });
 }
 
 std::string Control::Impl::AccessibleImpl::GetName()
@@ -2216,6 +2242,16 @@ void Control::Impl::AccessibleImpl::EnsureSelfVisible()
   {
     parent->EnsureChildVisible(self);
   }
+}
+
+Property::Index Control::Impl::AccessibleImpl::GetNamePropertyIndex()
+{
+  return Actor::Property::NAME;
+}
+
+Property::Index Control::Impl::AccessibleImpl::GetDescriptionPropertyIndex()
+{
+  return Property::INVALID_INDEX;
 }
 
 void Control::Impl::PositionOrSizeChangedCallback( PropertyNotification &p )

@@ -549,6 +549,7 @@ protected:
 
     Dali::Accessibility::States CalculateStates() override;
     std::string GetNameRaw() override;
+    Property::Index GetNamePropertyIndex() override;
   };
 };
 

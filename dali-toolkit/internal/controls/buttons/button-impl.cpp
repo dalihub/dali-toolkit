@@ -1326,6 +1326,17 @@ std::string Button::AccessibleImpl::GetNameRaw()
   return labelText;
 }
 
+Property::Index Button::AccessibleImpl::GetNamePropertyIndex()
+{
+  Property::Index label = Toolkit::Button::Property::LABEL;
+  Property::Map labelMap = self.GetProperty<Property::Map>(label);
+
+  if (MapContainsTextString(labelMap))
+    return label;
+  else
+    return Property::INVALID_INDEX;
+}
+
 Dali::Accessibility::States Button::AccessibleImpl::CalculateStates()
 {
   auto tmp = Control::Impl::AccessibleImpl::CalculateStates();
