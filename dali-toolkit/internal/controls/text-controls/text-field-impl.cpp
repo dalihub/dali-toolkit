@@ -714,22 +714,16 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::DevelTextField::Property::SELECTED_TEXT_START:
       {
-        if( impl.mController )
-        {
-          uint32_t start = static_cast<uint32_t>(value.Get< int >());
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTED_TEXT_START %d\n", impl.mController.Get(), start );
-          impl.SetTextSelectionRange( &start, nullptr );
-        }
+        uint32_t start = static_cast<uint32_t>(value.Get< int >());
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTED_TEXT_START %d\n", impl.mController.Get(), start );
+        impl.SetTextSelectionRange( &start, nullptr );
         break;
       }
       case Toolkit::DevelTextField::Property::SELECTED_TEXT_END:
       {
-        if( impl.mController )
-        {
-          uint32_t end = static_cast<uint32_t>(value.Get< int >());
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTED_TEXT_END %d\n", impl.mController.Get(), end );
-          impl.SetTextSelectionRange( nullptr, &end );
-        }
+        uint32_t end = static_cast<uint32_t>(value.Get< int >());
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTED_TEXT_END %d\n", impl.mController.Get(), end );
+        impl.SetTextSelectionRange( nullptr, &end );
         break;
       }
       case Toolkit::DevelTextField::Property::ENABLE_EDITING:
@@ -1089,7 +1083,7 @@ void TextField::SelectWholeText()
 {
   if( mController && mController->IsShowingRealText() )
   {
-    mController->SelectEvent( 0.f, 0.f, SelectionType::ALL );
+    mController->SelectWholeText();
     SetKeyInputFocus();
   }
 }
@@ -1098,9 +1092,18 @@ void TextField::SelectNone()
 {
   if( mController && mController->IsShowingRealText() )
   {
-    mController->SelectEvent( 0.f, 0.f, SelectionType::NONE );
-    SetKeyInputFocus();
+    mController->SelectNone();
   }
+}
+
+string TextField::GetSelectedText() const
+{
+  string selectedText = "";
+  if( mController && mController->IsShowingRealText() )
+  {
+    selectedText = mController->GetSelectedText( );
+  }
+  return selectedText;
 }
 
 void TextField::SetTextSelectionRange(const uint32_t *start, const uint32_t *end)

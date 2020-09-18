@@ -143,6 +143,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "maxLength",             
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "selectedTextStart",              INTEGER,   SELECTED_TEXT_START                  )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "selectedTextEnd",                INTEGER,   SELECTED_TEXT_END                    )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableEditing",                  BOOLEAN,   ENABLE_EDITING                       )
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "selectedText",         STRING,    SELECTED_TEXT                        )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -701,22 +702,16 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       }
       case Toolkit::DevelTextEditor::Property::SELECTED_TEXT_START:
       {
-        if( impl.mController )
-        {
-          uint32_t start = static_cast<uint32_t>(value.Get< int >());
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p SELECTED_TEXT_START %d\n", impl.mController.Get(), start );
-          impl.SetTextSelectionRange( &start, nullptr );
-        }
+        uint32_t start = static_cast<uint32_t>(value.Get< int >());
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p SELECTED_TEXT_START %d\n", impl.mController.Get(), start );
+        impl.SetTextSelectionRange( &start, nullptr );
         break;
       }
       case Toolkit::DevelTextEditor::Property::SELECTED_TEXT_END:
       {
-        if( impl.mController )
-        {
-          uint32_t end = static_cast<uint32_t>(value.Get< int >());
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p SELECTED_TEXT_END %d\n", impl.mController.Get(), end );
-          impl.SetTextSelectionRange( nullptr, &end );
-        }
+        uint32_t end = static_cast<uint32_t>(value.Get< int >());
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p SELECTED_TEXT_END %d\n", impl.mController.Get(), end );
+        impl.SetTextSelectionRange( nullptr, &end );
         break;
       }
       case Toolkit::DevelTextEditor::Property::ENABLE_EDITING:
@@ -1040,6 +1035,11 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         value = impl.mController->GetMaximumNumberOfCharacters();
         break;
       }
+      case Toolkit::DevelTextEditor::Property::SELECTED_TEXT:
+      {
+        value = impl.mController->GetSelectedText( );
+        break;
+      }
       case Toolkit::DevelTextEditor::Property::SELECTED_TEXT_START:
       {
         Uint32Pair range = impl.GetTextSelectionRange();
@@ -1061,6 +1061,33 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
   }
 
   return value;
+}
+
+void TextEditor::SelectWholeText()
+{
+  if( mController && mController->IsShowingRealText() )
+  {
+    mController->SelectWholeText();
+    SetKeyInputFocus();
+  }
+}
+
+void TextEditor::SelectNone()
+{
+  if( mController && mController->IsShowingRealText() )
+  {
+    mController->SelectNone();
+  }
+}
+
+string TextEditor::GetSelectedText() const
+{
+  string selectedText = "";
+  if( mController && mController->IsShowingRealText() )
+  {
+    selectedText = mController->GetSelectedText( );
+  }
+  return selectedText;
 }
 
 InputMethodContext TextEditor::GetInputMethodContext()
