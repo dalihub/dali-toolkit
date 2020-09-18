@@ -37,6 +37,7 @@
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -2098,9 +2099,17 @@ bool TextEditor::AccessibleImpl::CutText( size_t startPosition,
 
 Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
 {
-  auto states = Control::Impl::AccessibleImpl::CalculateStates();
   using namespace Dali::Accessibility;
+
+  auto states = Control::Impl::AccessibleImpl::CalculateStates();
   states[State::EDITABLE] = true;
+  states[State::FOCUSABLE] = true;
+
+  Toolkit::Control focusControl = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
+  if (self == focusControl)
+  {
+    states[State::FOCUSED] = true;
+  }
 
   return states;
 }

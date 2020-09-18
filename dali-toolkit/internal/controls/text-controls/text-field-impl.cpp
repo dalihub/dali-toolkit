@@ -2036,9 +2036,19 @@ bool TextField::AccessibleImpl::CutText( size_t startPosition,
 
 Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
 {
-  auto states = Control::Impl::AccessibleImpl::CalculateStates();
   using namespace Dali::Accessibility;
+
+  auto states = Control::Impl::AccessibleImpl::CalculateStates();
+
   states[State::EDITABLE] = true;
+  states[State::FOCUSABLE] = true;
+
+  Toolkit::Control focusControl = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
+  if (self == focusControl)
+  {
+    states[State::FOCUSED] = true;
+  }
+
   return states;
 }
 
