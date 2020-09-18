@@ -189,72 +189,63 @@ void MoveVisual( RegisteredVisualContainer::Iterator sourceIter, RegisteredVisua
  * @param[in] attributes The attributes with which to perfrom this action.
  * @return true if action has been accepted by this control
  */
-const char* ACTION_ACCESSIBILITY_ACTIVATED = "accessibilityActivated";
-const char* ACTION_ACCESSIBILITY_READING_SKIPPED = "ReadingSkipped";
+const char* ACTION_ACCESSIBILITY_ACTIVATED         = "accessibilityActivated";
 const char* ACTION_ACCESSIBILITY_READING_CANCELLED = "ReadingCancelled";
-const char* ACTION_ACCESSIBILITY_READING_STOPPED = "ReadingStopped";
+const char* ACTION_ACCESSIBILITY_READING_PAUSED    = "ReadingPaused";
+const char* ACTION_ACCESSIBILITY_READING_RESUMED   = "ReadingResumed";
+const char* ACTION_ACCESSIBILITY_READING_SKIPPED   = "ReadingSkipped";
+const char* ACTION_ACCESSIBILITY_READING_STOPPED   = "ReadingStopped";
 
 static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
-  bool ret = false;
+  if (!object)
+    return false;
 
-  if( object &&
-      ( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED ) ||
-        actionName == "activate" ) )
+  Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
+  if ( !control )
+    return false;
+
+  if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED ) ||
+        actionName == "activate" )
   {
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-    if( control )
-    {
-      // if cast succeeds there is an implementation so no need to check
-      if (!DevelControl::AccessibilityActivateSignal( control ).Empty()) {
-        DevelControl::AccessibilityActivateSignal( control ).Emit();
-        ret = true;
-      }
-      else
-        ret = Internal::GetImplementation( control ).OnAccessibilityActivated();
-    }
+    // if cast succeeds there is an implementation so no need to check
+    if (!DevelControl::AccessibilityActivateSignal( control ).Empty())
+      DevelControl::AccessibilityActivateSignal( control ).Emit();
+    else
+      return Internal::GetImplementation( control ).OnAccessibilityActivated();
   }
-  else if( object && ( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_SKIPPED ) ) )
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_SKIPPED ) )
   {
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-    if( control )
-    {
-      // if cast succeeds there is an implementation so no need to check
-      if (!DevelControl::AccessibilityReadingSkippedSignal( control ).Empty())
-      {
-        DevelControl::AccessibilityReadingSkippedSignal( control ).Emit();
-        ret = true;
-      }
-    }
+    // if cast succeeds there is an implementation so no need to check
+    if (!DevelControl::AccessibilityReadingSkippedSignal( control ).Empty())
+      DevelControl::AccessibilityReadingSkippedSignal( control ).Emit();
   }
-  else if( object && ( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_CANCELLED ) ) )
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_PAUSED) )
   {
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-    if( control )
-    {
-      // if cast succeeds there is an implementation so no need to check
-      if (!DevelControl::AccessibilityReadingCancelledSignal( control ).Empty())
-      {
-        DevelControl::AccessibilityReadingCancelledSignal( control ).Emit();
-        ret = true;
-      }
-    }
+    // if cast succeeds there is an implementation so no need to check
+    if (!DevelControl::AccessibilityReadingPausedSignal( control ).Empty())
+      DevelControl::AccessibilityReadingPausedSignal( control ).Emit();
   }
-  else if( object && ( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_STOPPED ) ) )
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_RESUMED ) )
   {
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-    if( control )
-    {
-      // if cast succeeds there is an implementation so no need to check
-      if (!DevelControl::AccessibilityReadingStoppedSignal( control ).Empty())
-      {
-        DevelControl::AccessibilityReadingStoppedSignal( control ).Emit();
-        ret = true;
-      }
-    }
+    // if cast succeeds there is an implementation so no need to check
+    if (!DevelControl::AccessibilityReadingResumedSignal( control ).Empty())
+      DevelControl::AccessibilityReadingResumedSignal( control ).Emit();
+  }
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_CANCELLED ) )
+  {
+    // if cast succeeds there is an implementation so no need to check
+    if (!DevelControl::AccessibilityReadingCancelledSignal( control ).Empty())
+      DevelControl::AccessibilityReadingCancelledSignal( control ).Emit();
+  }
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_STOPPED ) )
+  {
+    // if cast succeeds there is an implementation so no need to check
+    if (!DevelControl::AccessibilityReadingStoppedSignal( control ).Empty())
+      DevelControl::AccessibilityReadingStoppedSignal( control ).Emit();
   }
 
-  return ret;
+  return true;
 }
 
 /**
@@ -364,6 +355,8 @@ TypeAction registerAction2( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &D
 TypeAction registerAction3( typeRegistration, ACTION_ACCESSIBILITY_READING_SKIPPED, &DoAction );
 TypeAction registerAction4( typeRegistration, ACTION_ACCESSIBILITY_READING_CANCELLED, &DoAction );
 TypeAction registerAction5( typeRegistration, ACTION_ACCESSIBILITY_READING_STOPPED, &DoAction );
+TypeAction registerAction6( typeRegistration, ACTION_ACCESSIBILITY_READING_PAUSED, &DoAction );
+TypeAction registerAction7( typeRegistration, ACTION_ACCESSIBILITY_READING_RESUMED, &DoAction );
 
 DALI_TYPE_REGISTRATION_END()
 

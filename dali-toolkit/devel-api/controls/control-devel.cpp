@@ -139,6 +139,18 @@ Toolkit::DevelControl::AccessibilityReadingSkippedSignalType &AccessibilityReadi
   return ac->mAccessibilityReadingSkippedSignal;
 }
 
+Toolkit::DevelControl::AccessibilityReadingPausedSignalType &AccessibilityReadingPausedSignal( Toolkit::Control control )
+{
+  auto ac = GetControlImplementationIfAny ( control );
+  return ac->mAccessibilityReadingPausedSignal;
+}
+
+Toolkit::DevelControl::AccessibilityReadingResumedSignalType &AccessibilityReadingResumedSignal( Toolkit::Control control )
+{
+  auto ac = GetControlImplementationIfAny ( control );
+  return ac->mAccessibilityReadingResumedSignal;
+}
+
 Toolkit::DevelControl::AccessibilityReadingCancelledSignalType &AccessibilityReadingCancelledSignal( Toolkit::Control control )
 {
   auto ac = GetControlImplementationIfAny ( control );

@@ -44,6 +44,12 @@ typedef Signal< void ( ) > AccessibilityActivateSignalType;
 /// @brief AccessibilityReadingSkipped signal type.
 typedef Signal< void ( ) > AccessibilityReadingSkippedSignalType;
 
+/// @brief AccessibilityReadingPaused signal type.
+typedef Signal< void ( ) > AccessibilityReadingPausedSignalType;
+
+/// @brief AccessibilityReadingResumed signal type.
+typedef Signal< void ( ) > AccessibilityReadingResumedSignalType;
+
 /// @brief AccessibilityReadingCancelled signal type.
 typedef Signal< void ( ) > AccessibilityReadingCancelledSignalType;
 
@@ -364,6 +370,20 @@ DALI_TOOLKIT_API AccessibilityActivateSignalType &AccessibilityActivateSignal( T
  * @return The signal to connect to
  */
 DALI_TOOLKIT_API AccessibilityReadingSkippedSignalType &AccessibilityReadingSkippedSignal( Toolkit::Control control );
+
+/**
+ * @brief
+ *
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API AccessibilityReadingPausedSignalType &AccessibilityReadingPausedSignal( Toolkit::Control control );
+
+/**
+ * @brief
+ *
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API AccessibilityReadingResumedSignalType &AccessibilityReadingResumedSignal( Toolkit::Control control );
 
 /**
  * @brief The signal is emmited when text send via Dali::Accessibility::Bridge::Say

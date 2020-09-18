@@ -465,6 +465,8 @@ public:
   DevelControl::VisualEventSignalType mVisualEventSignal;
   Toolkit::DevelControl::AccessibilityActivateSignalType mAccessibilityActivateSignal;
   Toolkit::DevelControl::AccessibilityReadingSkippedSignalType mAccessibilityReadingSkippedSignal;
+  Toolkit::DevelControl::AccessibilityReadingPausedSignalType mAccessibilityReadingPausedSignal;
+  Toolkit::DevelControl::AccessibilityReadingResumedSignalType mAccessibilityReadingResumedSignal;
   Toolkit::DevelControl::AccessibilityReadingCancelledSignalType mAccessibilityReadingCancelledSignal;
   Toolkit::DevelControl::AccessibilityReadingStoppedSignalType mAccessibilityReadingStoppedSignal;
 
