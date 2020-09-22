@@ -41,15 +41,14 @@ namespace
 const Flex::SizeTuple ITEM_SIZE = Flex::SizeTuple{ 10.0f, 10.0f };
 const Flex::SizeTuple ITEM_SIZE_CALLBACK_TEST = Flex::SizeTuple{ 15.0f, 15.0f };
 
-Flex::SizeTuple MeasureChild( Actor child, float width, int measureModeWidth, float height, int measureModeHeight)
+void MeasureChild( Actor child, float width, int measureModeWidth, float height, int measureModeHeight, Flex::SizeTuple *childSize)
 {
-  Flex::SizeTuple childSize = ITEM_SIZE;
+  *childSize = ITEM_SIZE;
   if (child.GetProperty< std::string >( Dali::Actor::Property::NAME ) == "callbackTest")
   {
-    childSize = ITEM_SIZE_CALLBACK_TEST;
+    *childSize = ITEM_SIZE_CALLBACK_TEST;
   }
-  tet_printf(" MeasureChild test callback executed (%f,%f)\n", childSize.width, childSize.height );
-  return childSize;
+  tet_printf(" MeasureChild test callback executed (%f,%f)\n", childSize->width, childSize->height );
 }
 
 }
