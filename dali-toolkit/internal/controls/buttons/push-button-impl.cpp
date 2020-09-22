@@ -215,6 +215,13 @@ void PushButton::OnStateChange( State newState )
     Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
       Dali::Accessibility::State::PRESSED, newState == SELECTED_STATE ? 1 : 0, 0
     );
+
+    if (Self().GetProperty<bool>(Toolkit::Button::Property::TOGGLABLE))
+    {
+      Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
+        Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0
+      );
+    }
   }
 }
 
