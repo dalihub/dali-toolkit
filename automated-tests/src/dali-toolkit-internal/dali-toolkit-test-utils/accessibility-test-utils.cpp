@@ -1,4 +1,4 @@
-#include <automated-tests/src/dali-toolkit-accessibility/dali-toolkit-accessibility-test-utils.h>
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
 
 namespace Dali {

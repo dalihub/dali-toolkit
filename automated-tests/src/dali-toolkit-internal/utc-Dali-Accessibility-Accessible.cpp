@@ -23,6 +23,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
 
 void utc_dali_toolkit_accessibility_accessible_startup(void)
 {
@@ -52,7 +53,8 @@ int utcDaliAccessibilityCheckLabelText(void)
   ToolkitTestApplication application;
 
   auto check_box_button = Toolkit::CheckBoxButton::New();
-  check_box_button.SetLabelText( "button" );
+  //check_box_button.SetLabelText( "button" );
+  check_box_button.SetProperty(Toolkit::Button::Property::LABEL, "button");
   auto q = Dali::Accessibility::Accessible::Get( check_box_button );
   DALI_TEST_CHECK( q );
   DALI_TEST_EQUALS( q->GetName(), "button", TEST_LOCATION );

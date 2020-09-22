@@ -8,6 +8,11 @@ SET(CAPI_LIB "dali-toolkit-internal")
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
  utc-Dali-AddOns.cpp
+ utc-Dali-Accessibility-Accessible.cpp
+ utc-Dali-Accessibility-Controls.cpp
+ utc-Dali-Accessibility-Controls-BridgeUp.cpp
+ utc-Dali-Accessibility-Text.cpp
+ utc-Dali-Accessibility-Value.cpp
  utc-Dali-BidirectionalSupport.cpp
  utc-Dali-ColorConversion.cpp
  utc-Dali-Control-internal.cpp
@@ -76,6 +81,7 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-text-utils.cpp
    dali-toolkit-test-utils/dummy-visual.cpp
    dali-toolkit-test-utils/test-addon-manager.cpp
+   dali-toolkit-test-utils/accessibility-test-utils.cpp
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED

@@ -20,9 +20,13 @@
 #include <dali-toolkit-test-suite-utils.h>
 
 #include <dali.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
+
+#include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 
 using namespace Dali::Accessibility;
 

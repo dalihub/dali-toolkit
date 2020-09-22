@@ -1,10 +1,14 @@
 #include <dali-toolkit-test-suite-utils.h>
-#include <automated-tests/src/dali-toolkit-accessibility/dali-toolkit-accessibility-test-utils.h>
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+
+#include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
+#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
 
 using namespace Dali::Toolkit;
 
-using DBusWrapper = Dali::Accessibility::DBusWrapper;
+//using DBusWrapper = Dali::Accessibility::DBusWrapper; // FIXME
 
 void utc_dali_accessibility_controls_startup(void)
 {
@@ -15,7 +19,7 @@ void utc_dali_accessibility_controls_cleanup(void)
 {
   test_return_value = TET_PASS;
   //DBusWrapper::Install({}) is a de-install
-  DBusWrapper::Install({});
+  //DBusWrapper::Install({}); // FIXME
 }
 
 int UtcDaliControlPropertyAccessibilityTranslationDomain(void)
@@ -24,7 +28,7 @@ int UtcDaliControlPropertyAccessibilityTranslationDomain(void)
 
   auto control = Control::New();
 
-  auto accessibility_translation_domain = Control::Property::ACCESSIBILITY_TRANSLATION_DOMAIN;
+  auto accessibility_translation_domain = DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN;
   DALI_TEST_EQUALS( Property::NONE , control.GetProperty( accessibility_translation_domain ).GetType(), TEST_LOCATION );
 
   control.SetProperty( accessibility_translation_domain, "translation_domain_test_1" );
@@ -44,10 +48,10 @@ int UtcDaliControlAccessibilityHighlight(void)
   auto controla = Control::New();
   auto controlb = Control::New();
 
-  DALI_TEST_EQUALS( false, controla.GrabAccessibilityHighlight(), TEST_LOCATION );
-  DALI_TEST_EQUALS( false, controlb.GrabAccessibilityHighlight(), TEST_LOCATION );
-  DALI_TEST_EQUALS( false, controla.ClearAccessibilityHighlight(), TEST_LOCATION );
-  DALI_TEST_EQUALS( false, controlb.ClearAccessibilityHighlight(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, DevelControl::GrabAccessibilityHighlight(controla), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, DevelControl::GrabAccessibilityHighlight(controlb), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, DevelControl::ClearAccessibilityHighlight(controla), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, DevelControl::ClearAccessibilityHighlight(controlb), TEST_LOCATION );
 
   END_TEST;
 }
@@ -62,7 +66,7 @@ int UtcDaliAccessibilityToolBarConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( toolbar );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::ToolBar, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::TOOL_BAR, TEST_LOCATION );
 
   END_TEST;
 }
@@ -76,7 +80,7 @@ int UtcDaliAccessibilityPushButtonConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( pushbutton );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::PushButton, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::PUSH_BUTTON, TEST_LOCATION );
 
   END_TEST;
 }
@@ -94,14 +98,14 @@ int UtcDaliAccessibilityPushButtonStates(void)
   Dali::Accessibility::TestEnableSC( true );
 
   auto states = accessible->GetStates();
-  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::Pressed ] ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::PRESSED ] ), false, TEST_LOCATION );
 
   // auto button = dynamic_cast<Dali::Toolkit::Button* >( accessible ) ;
   pushbutton.SetProperty( Toolkit::Button::Property::TOGGLABLE, true );
   pushbutton.SetProperty( Toolkit::Button::Property::SELECTED, true );
 
   states = accessible->GetStates();
-  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::Pressed ] ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::PRESSED ] ), true, TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( false );
 
@@ -118,7 +122,7 @@ int UtcDaliAccessibilityToggleButtonConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( togglebutton );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::ToggleButton, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::TOGGLE_BUTTON, TEST_LOCATION );
 
   END_TEST;
 }
@@ -133,7 +137,7 @@ int UtcDaliAccessibilityTextSelectionPopupConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( textselectionpopup );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Dialog, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::DIALOG, TEST_LOCATION );
 
   END_TEST;
 }
@@ -147,7 +151,7 @@ int UtcDaliAccessibilityAlignmentConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( alignment );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Filler, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION );
 
   END_TEST;
 }
@@ -166,11 +170,11 @@ int UtcDaliAccessibilityRadioButtonStates(void)
 
   auto states = accessible->GetStates();
   DALI_TEST_CHECK( states );
-  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::Checked ] ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::CHECKED ] ), false, TEST_LOCATION );
   radiobutton.SetProperty( Toolkit::RadioButton::Property::SELECTED, true );
   states = accessible->GetStates();
   DALI_TEST_CHECK( states );
-  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::Checked ] ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::CHECKED ] ), true, TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( false );
 
@@ -186,7 +190,7 @@ int UtcDaliAccessibilityFlexContainerConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( flexcontainer );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Filler, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION );
 
   END_TEST;
 }
@@ -204,10 +208,10 @@ int UtcDaliAccessibilityCheckBoxButton(void)
   Dali::Accessibility::TestEnableSC( true );
 
   auto states = accessible->GetStates();
-  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::Checked ] ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::CHECKED ] ), false, TEST_LOCATION );
   checkboxbutton.SetProperty( Toolkit::CheckBoxButton::Property::SELECTED, true );
   states = accessible->GetStates();
-  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::Checked ] ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::CHECKED ] ), true, TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( false );
 
@@ -224,7 +228,7 @@ int UtcDaliAccessibilityTextSelectionConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( textselectiontoolbar );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::ToolBar, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::TOOL_BAR, TEST_LOCATION );
 
   END_TEST;
 }
@@ -268,7 +272,7 @@ int UtcDaliAccessibilityModel3dViewConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( model3dview );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Image, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::IMAGE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -284,7 +288,7 @@ int UtcDaliAccessibilityEffectsViewConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( effectsview );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Filler, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION );
 
   END_TEST;
 }
@@ -299,7 +303,7 @@ int UtcDaliAccessibilitySuperBlurViewConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( superblurview );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Filler, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION );
 
   END_TEST;
 }
@@ -313,7 +317,7 @@ int UtcDaliAccessibilityImageViewConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( imageview );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Image, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::IMAGE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -369,7 +373,7 @@ int UtcDaliAccessibilityPageTurnViewConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( pageturnlandscapeview );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::PageTabList, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::PAGE_TAB_LIST, TEST_LOCATION );
 
   END_TEST;
 }
@@ -383,7 +387,7 @@ int UtcDaliAccessibilityGaussianBlurViewConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( gaussianblurview );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Filler, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION );
 
   END_TEST;
 }
@@ -397,7 +401,7 @@ int UtcDaliAccessibilityShadowViewConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( shadowview );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Filler, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION );
 
   END_TEST;
 }
@@ -413,7 +417,7 @@ int UtcDaliAccessibilityScrollableConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( scrollview );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::ScrollPane, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::SCROLL_PANE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -428,7 +432,7 @@ int UtcDaliAccessibilityMagnifierConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( magnifier );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Filler, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::FILLER, TEST_LOCATION );
 
   END_TEST;
 }
@@ -442,7 +446,7 @@ int UtcDaliAccessibilityTableViewConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( tableview );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Table, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::TABLE, TEST_LOCATION );
 
   END_TEST;
 }
@@ -457,7 +461,7 @@ int UtcDaliAccessibilityBloomViewConstructor(void)
 
   auto accessible = Dali::Accessibility::Accessible::Get( bloomview );
   DALI_TEST_CHECK( accessible );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Animation, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::ANIMATION, TEST_LOCATION );
 
   END_TEST;
 }
@@ -470,16 +474,16 @@ int UtcDaliAccessibilityTextField(void)
   auto textfield = TextField::New();
   DALI_TEST_CHECK( textfield );
 
-  textfield.SetName( "test" );
-  DALI_TEST_EQUALS( textfield.GetName(), "test", TEST_LOCATION );
+  textfield.SetProperty(Actor::Property::NAME, "test" );
+  DALI_TEST_EQUALS( textfield.GetProperty<std::string>(Actor::Property::NAME), "test", TEST_LOCATION );
 
   auto accessible = Dali::Accessibility::Accessible::Get( textfield );
   DALI_TEST_CHECK( accessible );
 
   DALI_TEST_EQUALS( accessible->GetName(), "", TEST_LOCATION );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Entry, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::ENTRY, TEST_LOCATION );
   auto states = accessible->GetStates();
-  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::Editable ] ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::EDITABLE ] ), true, TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( true );
 
@@ -519,16 +523,16 @@ int UtcDaliAccessibilityTextEditor(void)
   auto texteditor = TextEditor::New();
   DALI_TEST_CHECK( texteditor );
 
-  texteditor.SetName( "test" );
-  DALI_TEST_EQUALS( texteditor.GetName(), "test", TEST_LOCATION );
+  texteditor.SetProperty(Actor::Property::NAME, "test" );
+  DALI_TEST_EQUALS( texteditor.GetProperty<std::string>(Actor::Property::NAME), "test", TEST_LOCATION );
 
   auto accessible = Dali::Accessibility::Accessible::Get( texteditor );
   DALI_TEST_CHECK( accessible );
 
   DALI_TEST_EQUALS( accessible->GetName(), "", TEST_LOCATION );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Entry, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::ENTRY, TEST_LOCATION );
   auto states = accessible->GetStates();
-  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::Editable ] ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::EDITABLE ] ), true, TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( true );
 
@@ -567,14 +571,14 @@ int UtcDaliAccessibilityTextLabel(void)
   auto textlabel = TextLabel::New();
   DALI_TEST_CHECK( textlabel );
 
-  textlabel.SetName( "test" );
-  DALI_TEST_EQUALS( textlabel.GetName(), "test", TEST_LOCATION );
+  textlabel.SetProperty(Actor::Property::NAME, "test" );
+  DALI_TEST_EQUALS( textlabel.GetProperty<std::string>(Actor::Property::NAME), "test", TEST_LOCATION );
 
   auto accessible = Dali::Accessibility::Accessible::Get( textlabel );
   DALI_TEST_CHECK( accessible );
 
   DALI_TEST_EQUALS( accessible->GetName(), "", TEST_LOCATION );
-  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::Label, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::LABEL, TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( true );
 
