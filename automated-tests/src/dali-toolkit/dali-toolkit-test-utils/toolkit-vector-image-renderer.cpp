@@ -21,6 +21,7 @@
 #include <toolkit-application.h>
 #include <toolkit-event-thread-callback.h>
 #include <memory>
+#include <cstring>
 #include <sys/stat.h>
 
 namespace Dali
@@ -37,10 +38,9 @@ class VectorImageRenderer: public Dali::BaseObject
 public:
 
   VectorImageRenderer()
-  : mUrl(),
-    mRenderer(),
-    mWidth( 0 ),
-    mHeight( 0 )
+  : mWidth(0),
+    mHeight(0),
+    mRasterizeSuccess(true)
   {
   }
 
@@ -48,32 +48,25 @@ public:
   {
   }
 
-  bool Render( float scale )
+  bool Load(const Vector<uint8_t>& data, float dpi)
   {
-     return true;
-  }
-
-  void SetBuffer( Dali::Devel::PixelBuffer &buffer )
-  {
-  }
-
-  bool Load( const std::string& url )
-  {
-    struct stat sb;
-    if ( stat(url.c_str(), &sb) == 0 )
+    if(strncmp(reinterpret_cast<char*>(data.Begin()), "invalid", 7) == 0)
     {
-      return true;
+      return false;
     }
-
-    return false;
-  }
-
-  bool Load( const char *data, uint32_t size )
-  {
+    else if(strncmp(reinterpret_cast<char*>(data.Begin()), "Fail to rasterize", strlen("Fail to rasterize")) == 0)
+    {
+      mRasterizeSuccess = false;
+    }
     return true;
   }
 
-  void GetDefaultSize( uint32_t& width, uint32_t& height ) const
+  bool Rasterize(Dali::Devel::PixelBuffer& buffer, float scale)
+  {
+     return mRasterizeSuccess;
+  }
+
+  void GetDefaultSize(uint32_t& width, uint32_t& height) const
   {
     width = 100;
     height = 100;
@@ -81,10 +74,9 @@ public:
 
 public:
 
-  std::string mUrl;
-  Dali::Renderer mRenderer;
   uint32_t mWidth;
   uint32_t mHeight;
+  bool     mRasterizeSuccess;
 };
 
 inline VectorImageRenderer& GetImplementation( Dali::VectorImageRenderer& renderer )
@@ -130,24 +122,14 @@ VectorImageRenderer::VectorImageRenderer( Internal::Adaptor::VectorImageRenderer
 {
 }
 
-void VectorImageRenderer::SetBuffer( Dali::Devel::PixelBuffer &buffer )
+bool VectorImageRenderer::Load(const Vector<uint8_t>& data, float dpi)
 {
-  Internal::Adaptor::GetImplementation( *this ).SetBuffer( buffer );
+  return Internal::Adaptor::GetImplementation(*this).Load(data, dpi);
 }
 
-bool VectorImageRenderer::Render( float scale )
+bool VectorImageRenderer::Rasterize(Dali::Devel::PixelBuffer& buffer, float scale)
 {
-  return Internal::Adaptor::GetImplementation( *this ).Render( scale );
-}
-
-bool VectorImageRenderer::Load( const std::string& url )
-{
-  return Internal::Adaptor::GetImplementation( *this ).Load( url );
-}
-
-bool VectorImageRenderer::Load( const char *data, uint32_t size )
-{
-  return Internal::Adaptor::GetImplementation( *this ).Load( data, size );
+  return Internal::Adaptor::GetImplementation(*this).Rasterize(buffer, scale);
 }
 
 void VectorImageRenderer::GetDefaultSize( uint32_t& width, uint32_t& height ) const
