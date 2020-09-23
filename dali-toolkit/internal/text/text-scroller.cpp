@@ -42,7 +42,7 @@ const int MINIMUM_SCROLL_SPEED = 1; // Speed should be set by Property system.
 const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying highp vec2 vTexCoord;\n
-  uniform mediump vec3 uSize;\n
+  uniform highp vec3 uSize;\n
   uniform mediump float uDelta;\n
   uniform mediump vec2 uTextureSize;\n
   uniform mediump float uGap;\n
@@ -53,7 +53,7 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   \n
   //Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
+  uniform highp vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
@@ -271,7 +271,10 @@ void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, T
 
     // Reset to the original shader and texture before scrolling
     mRenderer.SetShader(mShader);
-    mRenderer.SetTextures( mTextureSet );
+    if( mTextureSet )
+    {
+      mRenderer.SetTextures( mTextureSet );
+    }
   }
 
   mShader = mRenderer.GetShader();

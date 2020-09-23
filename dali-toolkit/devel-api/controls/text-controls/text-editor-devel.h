@@ -122,10 +122,22 @@ enum Type
   RENDERING_BACKEND,
 
   /**
-       * @brief The maximum number of characters that can be inserted.
-       * @details Name "maxLength", type Property::INTEGER.
-       */
+   * @brief The maximum number of characters that can be inserted.
+   * @details Name "maxLength", type Property::INTEGER.
+   */
   MAX_LENGTH,
+
+  /**
+   * @brief The selected text start position.
+   * @details Name "selectedTextStart", type Property::INTEGER.
+   */
+  SELECTED_TEXT_START,
+
+  /**
+   * @brief The selected text range end position.
+   * @details Name "selectedTextEnd", type Property::INTEGER.
+   */
+  SELECTED_TEXT_END,
 };
 
 } // namespace Property

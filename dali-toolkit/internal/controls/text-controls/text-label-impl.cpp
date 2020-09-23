@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
@@ -168,6 +169,8 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
   if( label )
   {
     TextLabel& impl( GetImpl( label ) );
+    DALI_ASSERT_ALWAYS( impl.mController && "No text contoller" );
+
     switch( index )
     {
       case Toolkit::DevelTextLabel::Property::RENDERING_BACKEND:
@@ -185,32 +188,23 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
           impl.mRenderingBackend = backend;
           impl.mTextUpdateNeeded = true;
 
-          if( impl.mController )
-          {
-            // When using the vector-based rendering, the size of the GLyphs are different
-            TextAbstraction::GlyphType glyphType = (DevelText::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
-            impl.mController->SetGlyphType( glyphType );
-          }
+          // When using the vector-based rendering, the size of the GLyphs are different
+          TextAbstraction::GlyphType glyphType = (DevelText::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
+          impl.mController->SetGlyphType( glyphType );
         }
         break;
       }
       case Toolkit::TextLabel::Property::TEXT:
       {
-        if( impl.mController )
-        {
-          impl.mController->SetText( value.Get< std::string >() );
-        }
+        impl.mController->SetText( value.Get< std::string >() );
         break;
       }
       case Toolkit::TextLabel::Property::FONT_FAMILY:
       {
-        if( impl.mController )
-        {
-          const std::string& fontFamily = value.Get< std::string >();
+        const std::string& fontFamily = value.Get< std::string >();
 
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextLabel::SetProperty Property::FONT_FAMILY newFont(%s)\n", fontFamily.c_str() );
-          impl.mController->SetDefaultFontFamily( fontFamily );
-        }
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextLabel::SetProperty Property::FONT_FAMILY newFont(%s)\n", fontFamily.c_str() );
+        impl.mController->SetDefaultFontFamily( fontFamily );
         break;
       }
       case Toolkit::TextLabel::Property::FONT_STYLE:
@@ -220,80 +214,62 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextLabel::Property::POINT_SIZE:
       {
-        if( impl.mController )
-        {
-          const float pointSize = value.Get< float >();
+        const float pointSize = value.Get< float >();
 
-          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
-          {
-            impl.mController->SetDefaultFontSize( pointSize, Text::Controller::POINT_SIZE );
-          }
+        if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
+        {
+          impl.mController->SetDefaultFontSize( pointSize, Text::Controller::POINT_SIZE );
         }
         break;
       }
       case Toolkit::TextLabel::Property::MULTI_LINE:
       {
-        if( impl.mController )
-        {
-          impl.mController->SetMultiLineEnabled( value.Get< bool >() );
-        }
+        impl.mController->SetMultiLineEnabled( value.Get< bool >() );
         break;
       }
       case Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT:
       {
-        if( impl.mController )
+        Text::HorizontalAlignment::Type alignment( static_cast< Text::HorizontalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+        if( Text::GetHorizontalAlignmentEnumeration( value, alignment ) )
         {
-          Text::HorizontalAlignment::Type alignment( static_cast< Text::HorizontalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
-          if( Text::GetHorizontalAlignmentEnumeration( value, alignment ) )
-          {
-            impl.mController->SetHorizontalAlignment( alignment );
-          }
+          impl.mController->SetHorizontalAlignment( alignment );
         }
         break;
       }
       case Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT:
       {
-        if( impl.mController )
+        Toolkit::Text::VerticalAlignment::Type alignment( static_cast< Text::VerticalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+        if( Text::GetVerticalAlignmentEnumeration( value, alignment ) )
         {
-          Toolkit::Text::VerticalAlignment::Type alignment( static_cast< Text::VerticalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
-          if( Text::GetVerticalAlignmentEnumeration( value, alignment ) )
-          {
-            impl.mController->SetVerticalAlignment( alignment );
-          }
+          impl.mController->SetVerticalAlignment( alignment );
         }
         break;
       }
       case Toolkit::TextLabel::Property::ENABLE_MARKUP:
       {
-        if( impl.mController )
-        {
-          const bool enableMarkup = value.Get<bool>();
-          impl.mController->SetMarkupProcessorEnabled( enableMarkup );
-        }
+        const bool enableMarkup = value.Get<bool>();
+        impl.mController->SetMarkupProcessorEnabled( enableMarkup );
         break;
       }
       case Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL:
       {
-        if( impl.mController )
+        const bool enableAutoScroll = value.Get<bool>();
+        // If request to auto scroll is the same as current state then do nothing.
+        if ( enableAutoScroll != impl.mController->IsAutoScrollEnabled() )
         {
-          const bool enableAutoScroll = value.Get<bool>();
-          // If request to auto scroll is the same as current state then do nothing.
-          if ( enableAutoScroll != impl.mController->IsAutoScrollEnabled() )
-          {
-             // If request is disable (false) and auto scrolling is enabled then need to stop it
-             if ( enableAutoScroll == false )
+           // If request is disable (false) and auto scrolling is enabled then need to stop it
+           if ( enableAutoScroll == false )
+           {
+             if( impl.mTextScroller )
              {
-               if( impl.mTextScroller )
-               {
-                 impl.mTextScroller->StopScrolling();
-               }
+               impl.mTextScroller->StopScrolling();
              }
-             // If request is enable (true) then start autoscroll as not already running
-             else
-             {
-               impl.mController->SetAutoScrollEnabled( enableAutoScroll );
-             }
-          }
+           }
+           // If request is enable (true) then start autoscroll as not already running
+           else
+           {
+             impl.mController->SetAutoScrollEnabled( enableAutoScroll );
+           }
         }
         break;
       }
@@ -351,15 +327,12 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextLabel::Property::LINE_SPACING:
       {
-        if( impl.mController )
-        {
-          const float lineSpacing = value.Get<float>();
+        const float lineSpacing = value.Get<float>();
 
-          // Don't trigger anything if the line spacing didn't change
-          if( impl.mController->SetDefaultLineSpacing( lineSpacing ) )
-          {
-            impl.mTextUpdateNeeded = true;
-          }
+        // Don't trigger anything if the line spacing didn't change
+        if( impl.mController->SetDefaultLineSpacing( lineSpacing ) )
+        {
+          impl.mTextUpdateNeeded = true;
         }
         break;
       }
@@ -401,45 +374,36 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextLabel::Property::PIXEL_SIZE:
       {
-        if( impl.mController )
-        {
-          const float pixelSize = value.Get< float >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p PIXEL_SIZE %f\n", impl.mController.Get(), pixelSize );
+        const float pixelSize = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p PIXEL_SIZE %f\n", impl.mController.Get(), pixelSize );
 
-          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
-          {
-            impl.mController->SetDefaultFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
-          }
+        if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
+        {
+          impl.mController->SetDefaultFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
         }
         break;
       }
       case Toolkit::TextLabel::Property::ELLIPSIS:
       {
-        if( impl.mController )
-        {
-          const bool ellipsis = value.Get<bool>();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p ELLIPSIS %d\n", impl.mController.Get(), ellipsis );
+        const bool ellipsis = value.Get<bool>();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p ELLIPSIS %d\n", impl.mController.Get(), ellipsis );
 
-          impl.mController->SetTextElideEnabled( ellipsis );
-        }
+        impl.mController->SetTextElideEnabled( ellipsis );
         break;
       }
       case Toolkit::TextLabel::Property::LINE_WRAP_MODE:
       {
-        if( impl.mController )
+        Text::LineWrap::Mode lineWrapMode( static_cast< Text::LineWrap::Mode >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+        if( GetLineWrapModeEnumeration( value, lineWrapMode ) )
         {
-          Text::LineWrap::Mode lineWrapMode( static_cast< Text::LineWrap::Mode >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
-          if( GetLineWrapModeEnumeration( value, lineWrapMode ) )
-          {
-            DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
-            impl.mController->SetLineWrapMode( lineWrapMode );
-          }
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
+          impl.mController->SetLineWrapMode( lineWrapMode );
         }
         break;
       }
       case Toolkit::DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT:
       {
-        if( impl.mController && impl.mController->GetTextModel() )
+        if( impl.mController->GetTextModel() )
         {
           DevelText::VerticalLineAlignment::Type alignment = static_cast<DevelText::VerticalLineAlignment::Type>( value.Get<int>() );
 
@@ -542,14 +506,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
       {
-        if( impl.mController )
-        {
-          const float lineSize = value.Get<float>();
+        const float lineSize = value.Get<float>();
 
-          if( impl.mController->SetDefaultLineSize( lineSize ) )
-          {
-            impl.mTextUpdateNeeded = true;
-          }
+        if( impl.mController->SetDefaultLineSize( lineSize ) )
+        {
+          impl.mTextUpdateNeeded = true;
         }
         break;
       }
@@ -575,6 +536,8 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
   if( label )
   {
     TextLabel& impl( GetImpl( label ) );
+    DALI_ASSERT_DEBUG( impl.mController && "No text contoller" );
+
     switch( index )
     {
       case Toolkit::DevelTextLabel::Property::RENDERING_BACKEND:
@@ -584,20 +547,14 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextLabel::Property::TEXT:
       {
-        if( impl.mController )
-        {
-          std::string text;
-          impl.mController->GetText( text );
-          value = text;
-        }
+        std::string text;
+        impl.mController->GetText( text );
+        value = text;
         break;
       }
       case Toolkit::TextLabel::Property::FONT_FAMILY:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultFontFamily();
-        }
+        value = impl.mController->GetDefaultFontFamily();
         break;
       }
       case Toolkit::TextLabel::Property::FONT_STYLE:
@@ -607,59 +564,41 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextLabel::Property::POINT_SIZE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE );
-        }
+        value = impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE );
         break;
       }
       case Toolkit::TextLabel::Property::MULTI_LINE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->IsMultiLineEnabled();
-        }
+        value = impl.mController->IsMultiLineEnabled();
         break;
       }
       case Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT:
       {
-        if( impl.mController )
-        {
-          const char* name = Text::GetHorizontalAlignmentString( impl.mController->GetHorizontalAlignment() );
+        const char* name = Text::GetHorizontalAlignmentString( impl.mController->GetHorizontalAlignment() );
 
-           if ( name )
-           {
-             value = std::string( name );
-           }
+        if ( name )
+        {
+          value = std::string( name );
         }
         break;
       }
       case Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT:
       {
-        if( impl.mController )
+        const char* name = Text::GetVerticalAlignmentString( impl.mController->GetVerticalAlignment() );
+        if( name )
         {
-          const char* name = Text::GetVerticalAlignmentString( impl.mController->GetVerticalAlignment() );
-          if( name )
-          {
-            value = std::string( name );
-          }
+          value = std::string( name );
         }
         break;
       }
       case Toolkit::TextLabel::Property::ENABLE_MARKUP:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->IsMarkupProcessorEnabled();
-        }
+        value = impl.mController->IsMarkupProcessorEnabled();
         break;
       }
       case Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->IsAutoScrollEnabled();
-        }
+        value = impl.mController->IsAutoScrollEnabled();
         break;
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_STOP_MODE:
@@ -678,7 +617,6 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_SPEED:
       {
-        TextLabel& impl( GetImpl( label ) );
         if ( impl.mTextScroller )
         {
           value = impl.mTextScroller->GetSpeed();
@@ -687,31 +625,22 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_LOOP_COUNT:
       {
-        if( impl.mController )
+        if ( impl.mTextScroller )
         {
-          TextLabel& impl( GetImpl( label ) );
-          if ( impl.mTextScroller )
-          {
-            value = impl.mTextScroller->GetLoopCount();
-          }
+          value = impl.mTextScroller->GetLoopCount();
         }
         break;
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_LOOP_DELAY:
       {
-        if( impl.mController )
+        if ( impl.mTextScroller )
         {
-          TextLabel& impl( GetImpl( label ) );
-          if ( impl.mTextScroller )
-          {
-            value = impl.mTextScroller->GetLoopDelay();
-          }
+          value = impl.mTextScroller->GetLoopDelay();
         }
         break;
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_GAP:
       {
-        TextLabel& impl( GetImpl( label ) );
         if ( impl.mTextScroller )
         {
           value = impl.mTextScroller->GetGap();
@@ -720,10 +649,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextLabel::Property::LINE_SPACING:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultLineSpacing();
-        }
+        value = impl.mController->GetDefaultLineSpacing();
         break;
       }
       case Toolkit::TextLabel::Property::UNDERLINE:
@@ -748,51 +674,33 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextLabel::Property::PIXEL_SIZE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
-        }
+        value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
         break;
       }
       case Toolkit::TextLabel::Property::ELLIPSIS:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->IsTextElideEnabled();
-        }
+        value = impl.mController->IsTextElideEnabled();
         break;
       }
       case Toolkit::TextLabel::Property::LINE_WRAP_MODE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetLineWrapMode();
-        }
+        value = impl.mController->GetLineWrapMode();
         break;
       }
       case Toolkit::TextLabel::Property::LINE_COUNT:
       {
-        if( impl.mController )
-        {
-          float width = label.GetProperty( Actor::Property::SIZE_WIDTH ).Get<float>();
-          value = impl.mController->GetLineCount( width );
-        }
+        float width = label.GetProperty( Actor::Property::SIZE_WIDTH ).Get<float>();
+        value = impl.mController->GetLineCount( width );
         break;
       }
       case Toolkit::DevelTextLabel::Property::TEXT_DIRECTION:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetTextDirection();
-        }
+        value = impl.mController->GetTextDirection();
         break;
       }
       case Toolkit::DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetVerticalLineAlignment();
-        }
+        value = impl.mController->GetVerticalLineAlignment();
         break;
       }
       case Toolkit::DevelTextLabel::Property::BACKGROUND:
@@ -829,10 +737,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultLineSize();
-        }
+        value = impl.mController->GetDefaultLineSize();
         break;
       }
     }
@@ -854,10 +759,9 @@ void TextLabel::OnInitialize()
   TextVisual::SetAnimatableTextColorProperty( mVisual, Toolkit::TextLabel::Property::TEXT_COLOR );
 
   mController = TextVisual::GetController(mVisual);
-  if( mController )
-  {
-    mController->SetControlInterface(this);
-  }
+  DALI_ASSERT_DEBUG( mController && "Invalid Text Controller")
+
+  mController->SetControlInterface(this);
 
   // Use height-for-width negotiation by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );

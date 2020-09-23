@@ -2860,3 +2860,30 @@ int utcDaliTextEditorMaxCharactersReached(void)
 
   END_TEST;
 }
+
+int UtcDaliTextEditorSelectRange(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("utcDaliTextEditorSelectRange");
+
+  TextEditor textEditor = TextEditor::New();
+  DALI_TEST_CHECK( textEditor );
+
+  application.GetScene().Add( textEditor );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Hello world" );
+
+  textEditor.SetProperty( DevelTextEditor::Property::SELECTED_TEXT_START, 0 );
+  textEditor.SetProperty( DevelTextEditor::Property::SELECTED_TEXT_END, 5 );
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 5, TEST_LOCATION );
+
+  END_TEST;
+}

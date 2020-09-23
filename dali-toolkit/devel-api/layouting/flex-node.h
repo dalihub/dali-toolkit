@@ -113,8 +113,9 @@ struct SizeTuple
  * @note int, width measure specifcation mode
  * @note float, available height for child
  * @note int, height measure specification mode
+ * @note SizeTuple, return value
  */
-using MeasureCallback = SizeTuple (*)(Dali::Actor, float, int, float, int);
+using MeasureCallback = void (*)(Dali::Actor, float , int , float , int, SizeTuple *);
 
 /**
  * This class provides the API for calling into the Flex layout implementation.

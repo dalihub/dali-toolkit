@@ -2958,3 +2958,50 @@ int UtcDaliTextFieldSelectNone(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldSelectRange(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldSelectRange ");
+
+  TextField textField = TextField::New();
+
+  application.GetScene().Add( textField );
+
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textField.SetProperty( TextField::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  textField.SetProperty( DevelTextField::Property::SELECTED_TEXT_START , 0);
+  textField.SetProperty( DevelTextField::Property::SELECTED_TEXT_END , 5);
+
+  // Hello is selected
+  std::string selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "Hello", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 5, TEST_LOCATION );
+
+  textField.SetProperty( DevelTextField::Property::SELECTED_TEXT_START , 6);
+  textField.SetProperty( DevelTextField::Property::SELECTED_TEXT_END , 11);
+
+  // world is selected
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "world", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 6, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 11, TEST_LOCATION );
+
+  END_TEST;
+}

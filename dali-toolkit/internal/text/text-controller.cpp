@@ -143,10 +143,12 @@ ControllerPtr Controller::New( ControlInterface* controlInterface )
 }
 
 ControllerPtr Controller::New( ControlInterface* controlInterface,
-                               EditableControlInterface* editableControlInterface )
+                               EditableControlInterface* editableControlInterface,
+                               SelectableControlInterface* selectableControlInterface )
 {
   return ControllerPtr( new Controller( controlInterface,
-                                        editableControlInterface ) );
+                                        editableControlInterface,
+                                        selectableControlInterface ) );
 }
 
 // public : Configure the text controller.
@@ -3193,6 +3195,24 @@ void Controller::SelectEvent( float x, float y, SelectionType selectType )
   }
 }
 
+void Controller::SetTextSelectionRange(const uint32_t *start, const uint32_t *end)
+{
+  if( mImpl->mEventData )
+  {
+    mImpl->mEventData->mCheckScrollAmount = true;
+    mImpl->mEventData->mIsLeftHandleSelected = true;
+    mImpl->mEventData->mIsRightHandleSelected = true;
+    mImpl->SetTextSelectionRange(start, end);
+    mImpl->RequestRelayout();
+    KeyboardFocusGainEvent();
+  }
+}
+
+Uint32Pair Controller::GetTextSelectionRange() const
+{
+  return mImpl->GetTextSelectionRange();
+}
+
 InputMethodContext::CallbackData Controller::OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent )
 {
   // Whether the text needs to be relaid-out.
@@ -4448,19 +4468,21 @@ Actor Controller::CreateBackgroundActor()
 Controller::Controller()
 : mImpl( NULL )
 {
-  mImpl = new Controller::Impl( NULL, NULL );
+  mImpl = new Controller::Impl( nullptr, nullptr, nullptr );
 }
 
 Controller::Controller( ControlInterface* controlInterface )
 {
-  mImpl = new Controller::Impl( controlInterface, NULL );
+  mImpl = new Controller::Impl( controlInterface, NULL, NULL );
 }
 
 Controller::Controller( ControlInterface* controlInterface,
-                        EditableControlInterface* editableControlInterface )
+                        EditableControlInterface* editableControlInterface,
+                        SelectableControlInterface* selectableControlInterface )
 {
   mImpl = new Controller::Impl( controlInterface,
-                                editableControlInterface );
+                                editableControlInterface,
+                                selectableControlInterface );
 }
 
 // The copy constructor and operator are left unimplemented.

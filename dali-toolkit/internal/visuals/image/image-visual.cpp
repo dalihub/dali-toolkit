@@ -23,6 +23,8 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
@@ -40,7 +42,6 @@
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
 
 namespace Dali
 {
@@ -514,42 +515,78 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   Geometry geometry;
   Shader shader;
 
-  if( !mImpl->mCustomShader )
+  // Get the geometry
+  if( mImpl->mCustomShader )
+  {
+    geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
+  }
+  else // Get any geometry associated with the texture
   {
     TextureManager& textureManager = mFactoryCache.GetTextureManager();
 
     uint32_t firstElementCount {0u};
     uint32_t secondElementCount {0u};
     geometry = textureManager.GetRenderGeometry(mTextureId, firstElementCount, secondElementCount);
-    if(!firstElementCount && !secondElementCount)
+
+    if(!firstElementCount && !secondElementCount) // Otherwise use quad
     {
       geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
     }
+  }
 
-    shader = mImageVisualShaderFactory.GetShader( mFactoryCache,
-                             mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
-                             mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE,
-                             IsRoundedCornerRequired() );
+  std::string vertexShader;
+  bool usesWholeTexture = true;
+  if(mImpl->mCustomShader && !mImpl->mCustomShader->mVertexShader.empty())
+  {
+    vertexShader = mImpl->mCustomShader->mVertexShader;
+    usesWholeTexture = false; // Impossible to tell.
   }
   else
   {
-    geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
-    if( mImpl->mCustomShader->mVertexShader.empty() && mImpl->mCustomShader->mFragmentShader.empty() )
-    {
-      // Use custom hints
-      shader = Shader::New( mImageVisualShaderFactory.GetVertexShaderSource(), mImageVisualShaderFactory.GetFragmentShaderSource(), mImpl->mCustomShader->mHints );
-      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-    }
-    else
-    {
-      shader = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource() : mImpl->mCustomShader->mVertexShader,
-                            mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource() : mImpl->mCustomShader->mFragmentShader,
-                            mImpl->mCustomShader->mHints );
-      if( mImpl->mCustomShader->mVertexShader.empty() )
-      {
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-      }
-    }
+    vertexShader = mImageVisualShaderFactory.GetVertexShaderSource();
+  }
+
+  std::string fragmentShader;
+  if(mImpl->mCustomShader && !mImpl->mCustomShader->mFragmentShader.empty())
+  {
+    fragmentShader = mImpl->mCustomShader->mFragmentShader;
+  }
+  else
+  {
+    fragmentShader = mImageVisualShaderFactory.GetFragmentShaderSource();
+  }
+
+  // If the texture is native, we may need to change prefix and sampler in
+  // the fragment shader
+  bool modifiedFragmentShader = false;
+  if(mTextures && DevelTexture::IsNative(mTextures.GetTexture(0)))
+  {
+    Texture nativeTexture = mTextures.GetTexture(0);
+    modifiedFragmentShader = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragmentShader);
+  }
+
+  const bool useStandardShader = !mImpl->mCustomShader && !modifiedFragmentShader;
+  if(useStandardShader)
+  {
+    // Create and cache the standard shader
+    shader = mImageVisualShaderFactory.GetShader(
+      mFactoryCache,
+      mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
+      mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE,
+      IsRoundedCornerRequired() );
+  }
+  else if(mImpl->mCustomShader)
+  {
+    shader = Shader::New(vertexShader, fragmentShader, mImpl->mCustomShader->mHints);
+  }
+  else
+  {
+    shader = Shader::New(vertexShader, fragmentShader);
+  }
+
+  if(usesWholeTexture)
+  {
+    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
   }
 
   // Set pixel align off as default.
@@ -557,7 +594,9 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   // We should trun it off until issues are resolved
   shader.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF );
 
+  // Create the renderer
   mImpl->mRenderer = Renderer::New( geometry, shader );
+
   if( textureSet )
   {
     mImpl->mRenderer.SetTextures( textureSet );
@@ -569,6 +608,7 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
 
   EnablePreMultipliedAlpha( IsPreMultipliedAlphaEnabled() );
 }
+
 
 void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection,
                                TextureManager::ReloadPolicy forceReload )
