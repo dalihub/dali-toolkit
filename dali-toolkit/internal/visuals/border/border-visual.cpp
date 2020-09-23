@@ -49,13 +49,13 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   attribute mediump vec2 aDrift;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
+  uniform mediump vec3 uSize;\n
   uniform mediump float borderSize;\n
   \n
 
   //Visual size and offset
   uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
+  uniform mediump vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
@@ -89,7 +89,7 @@ const char* VERTEX_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   attribute mediump vec2 aDrift;\n
   uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
+  uniform mediump vec3 uSize;\n
   uniform mediump float borderSize;\n
   varying mediump float vAlpha;\n
   \n
