@@ -2648,14 +2648,14 @@ bool Controller::RemoveText( int cursorOffset,
       Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
       Vector<Character>::Iterator last  = first + numberOfCharacters;
 
-      currentText.Erase( first, last );
-
       if( NULL != mImpl->mEditableControlInterface )
       {
         std::string utf8;
         Utf32ToUtf8( first, numberOfCharacters, utf8 );
         mImpl->mEditableControlInterface->TextDeleted( cursorIndex, numberOfCharacters, utf8 );
       }
+
+      currentText.Erase( first, last );
 
       // Cursor position retreat
       oldCursorIndex = cursorIndex;
