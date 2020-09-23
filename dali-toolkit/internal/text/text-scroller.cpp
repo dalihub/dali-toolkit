@@ -271,10 +271,7 @@ void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, T
 
     // Reset to the original shader and texture before scrolling
     mRenderer.SetShader(mShader);
-    if( mTextureSet )
-    {
-      mRenderer.SetTextures( mTextureSet );
-    }
+    mRenderer.SetTextures( mTextureSet );
   }
 
   mShader = mRenderer.GetShader();
