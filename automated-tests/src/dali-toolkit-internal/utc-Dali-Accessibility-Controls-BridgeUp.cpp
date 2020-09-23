@@ -498,14 +498,14 @@ int UtcDaliAccessibilityParentChildren(void)
     TestGetIndexInParent( child_1_accessible -> GetAddress() );
     DALI_ABORT("Object has parent, test abort");
   }
-  catch(Accessibility::TestDBusWrapper::error){}
+  catch(Accessibility::TestDBusWrapper::error &){}
 
   try
   {
     TestGetChildAtIndex( parent_accessible -> GetAddress(), -1 );
     DALI_ABORT("Positive index, test abort");
   }
-  catch(Accessibility::TestDBusWrapper::error){}
+  catch(Accessibility::TestDBusWrapper::error &){}
 
   DALI_TEST_EQUALS( parent_accessible -> GetChildCount(), 0, TEST_LOCATION );
 
@@ -514,7 +514,7 @@ int UtcDaliAccessibilityParentChildren(void)
     child_1_accessible -> GetIndexInParent();
     DALI_ABORT("Object has parent, test abort");
   }
-  catch (std::domain_error){}
+  catch (std::domain_error &){}
 
   parent.Add(child_1);
   parent.Add(child_2);
@@ -714,28 +714,28 @@ int UtcDaliAccessibilityAction(void)
     b ->GetActionDescription( count );
     DALI_ABORT( "Correct index, abort" );
   }
-  catch( std::domain_error ){}
+  catch( std::domain_error &){}
 
   try
   {
     b ->GetActionName( count );
     DALI_ABORT( "Correct index, abort" );
   }
-  catch( std::domain_error ){}
+  catch( std::domain_error &){}
 
   try
   {
     b ->GetLocalizedActionName( count );
     DALI_ABORT( "Correct index, abort" );
   }
-  catch( std::domain_error ){}
+  catch( std::domain_error &){}
 
   try
   {
     b ->GetActionKeyBinding( count );
     DALI_ABORT( "Correct index, abort" );
   }
-  catch( std::domain_error ){}
+  catch( std::domain_error &){}
 
   count = TestGetActionCount(b -> GetAddress());
 
