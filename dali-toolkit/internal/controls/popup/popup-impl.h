@@ -28,6 +28,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -244,6 +245,12 @@ public:
   static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
 
 protected:
+  struct AccessibleImpl : public Control::Impl::AccessibleImpl
+  {
+    using Control::Impl::AccessibleImpl::AccessibleImpl;
+
+    Dali::Accessibility::States CalculateStates() override;
+  };
 
   /**
    * Construct a new Popup.
@@ -438,7 +445,6 @@ private:
    * Called when the popup is directly or indirectly parented to the stage.
    */
   void OnSceneConnection( int depth ) override;
-  void OnSceneDisconnection() override;
 
   /**
    * From Control; called after a child has been added to the owning actor.
