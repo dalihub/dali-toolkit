@@ -25,6 +25,9 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <toolkit-environment-variable.h> // for setting environment variable: DALI_DEBUG_RENDERING
+
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -75,6 +78,7 @@ void TestDebugVisual( Integration::Scene scene,  Visual::Base& visual, Visual::T
 void dali_debug_rendering_startup(void)
 {
   test_return_value = TET_UNDEF;
+  DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
 void dali_debug_rendering_cleanup(void)

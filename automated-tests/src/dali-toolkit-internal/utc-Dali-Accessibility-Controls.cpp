@@ -6,6 +6,8 @@
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali/devel-api/adaptor-framework/accessibility-impl.h>
 
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+
 using namespace Dali::Toolkit;
 
 //using DBusWrapper = Dali::Accessibility::DBusWrapper; // FIXME
@@ -13,6 +15,7 @@ using namespace Dali::Toolkit;
 void utc_dali_accessibility_controls_startup(void)
 {
   test_return_value = TET_UNDEF;
+  DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
 void utc_dali_accessibility_controls_cleanup(void)

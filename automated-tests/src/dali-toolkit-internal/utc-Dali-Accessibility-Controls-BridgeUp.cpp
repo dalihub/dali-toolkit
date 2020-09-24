@@ -9,6 +9,8 @@
 #include <dali/devel-api/common/stage.h>
 #include <cstdlib>
 
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+
 using namespace Dali::Toolkit;
 
 //using DBusWrapper = Dali::Accessibility::DBusWrapper; // FIXME
@@ -18,6 +20,7 @@ namespace Dali::Accessibility::TestDBusWrapper { struct error {}; } // FIXME
 void utc_dali_accessibility_controls_bridge_up_startup(void)
 {
   test_return_value = TET_UNDEF;
+  DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
 void utc_dali_accessibility_controls_bridge_up_cleanup(void)

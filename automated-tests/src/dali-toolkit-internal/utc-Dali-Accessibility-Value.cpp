@@ -28,11 +28,14 @@
 
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+
 using namespace Dali::Accessibility;
 
 void utc_dali_toolkit_accessibility_value_startup(void)
 {
   test_return_value = TET_UNDEF;
+  DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
 void utc_dali_toolkit_accessibility_value_cleanup(void)

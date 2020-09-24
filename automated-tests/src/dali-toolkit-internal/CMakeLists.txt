@@ -82,13 +82,19 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/dummy-visual.cpp
    dali-toolkit-test-utils/test-addon-manager.cpp
    dali-toolkit-test-utils/accessibility-test-utils.cpp
+   dali-toolkit-test-utils/dbus-wrapper.cpp
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali2-core
     dali2-adaptor
     dali2-toolkit
+    eldbus
+    ecore-input
+    eina
 )
+
+MESSAGE("Libraries to link with:>${${CAPI_LIB}_LIBRARIES}")
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED -fPIC )
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )

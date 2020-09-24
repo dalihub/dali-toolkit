@@ -25,9 +25,12 @@
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+
 void utc_dali_toolkit_accessibility_text_startup(void)
 {
   test_return_value = TET_UNDEF;
+  DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
 void utc_dali_toolkit_accessibility_text_cleanup(void)

@@ -29,7 +29,7 @@
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include "test-application.h"
 
-#undef assert
+//#undef assert
 
 namespace Dali
 {

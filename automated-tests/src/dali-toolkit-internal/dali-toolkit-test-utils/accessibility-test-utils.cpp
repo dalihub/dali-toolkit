@@ -1,5 +1,8 @@
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
+#include "dbus-wrapper.h"
 
 namespace Dali {
     namespace Accessibility {
@@ -14,7 +17,8 @@ namespace Dali {
                 auto bridge = Accessibility::Bridge::GetCurrentBridge();
                 Dali::Stage stage = Dali::Stage::GetCurrent();
                 auto accessible = Accessibility::Accessible::Get( stage.GetRootLayer() );
-                bridge->SetApplicationChild( accessible );
+//                bridge->SetApplicationChild( accessible ); // BART
+                bridge->AddTopLevelWindow( accessible ); // BART
                 bridge->SetApplicationName( "TestApp" );
                 bridge->Initialize();
 
