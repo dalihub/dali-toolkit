@@ -249,6 +249,7 @@ protected:
   {
     using Control::Impl::AccessibleImpl::AccessibleImpl;
 
+    std::string GetNameRaw() override;
     Dali::Accessibility::States CalculateStates() override;
   };
 

@@ -43,6 +43,7 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;
 
@@ -338,6 +339,8 @@ void Popup::OnInitialize()
   SetAsKeyboardFocusGroup( true );
 
   SetupTouch();
+
+  DevelControl::AppendAccessibilityAttribute(self, "sub-role", "Alert");
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor)
   {
@@ -1996,6 +1999,28 @@ void Popup::SetupTouch()
     mPopupLayout.TouchedSignal().Disconnect( this, &Popup::OnDialogTouched );
     mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, false );
   }
+}
+
+std::string Popup::AccessibleImpl::GetNameRaw()
+{
+  auto popup = Toolkit::Popup::DownCast( self );
+  std::string title;
+  Actor popupTitle = popup.GetTitle();
+  if (popupTitle)
+  {
+    std::string titleText = popupTitle.GetProperty<std::string>(Toolkit::TextLabel::Property::TEXT);
+    title = titleText;
+  }
+  else
+  {
+    Actor popupContent = popup.GetContent();
+    if (popupContent)
+    {
+      std::string contentText = popupContent.GetProperty<std::string>(Toolkit::TextLabel::Property::TEXT);
+      title = contentText;
+    }
+  }
+  return title;
 }
 
 Dali::Accessibility::States Popup::AccessibleImpl::CalculateStates()
