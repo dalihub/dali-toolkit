@@ -387,11 +387,10 @@ protected: // Helpers for deriving classes
    */
   enum ControlBehaviour
   {
-    CONTROL_BEHAVIOUR_DEFAULT = 0, ///< Default behaviour: Size negotiation is enabled & listens to Style Change signal, but doesn't receive event callbacks. @SINCE_1_2_10
-
-    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 0), ///< True if needs to support keyboard navigation @SINCE_1_0.0
-
-    DISABLE_STYLE_CHANGE_SIGNALS = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 1), ///< True if control should not monitor style change signals @SINCE_1_2_10
+    CONTROL_BEHAVIOUR_DEFAULT            = 0, ///< Default behaviour: Size negotiation is enabled & listens to Style Change signal, but doesn't receive event callbacks. @SINCE_1_2_10
+    NOT_IN_USE_1                         = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 0),
+    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 1), ///< True if needs to support keyboard navigation @SINCE_1_0.0
+    DISABLE_STYLE_CHANGE_SIGNALS         = 1 << (CustomActorImpl::ACTOR_FLAG_COUNT + 2), ///< True if control should not monitor style change signals @SINCE_1_2_10
 
     LAST_CONTROL_BEHAVIOUR_FLAG
   };
