@@ -22,6 +22,7 @@
 #include <cstring>
 #include <limits>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/public-api/common/dali-common.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/actors/actor-devel.h>
@@ -193,6 +194,8 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
   if( textEditor )
   {
     TextEditor& impl( GetImpl( textEditor ) );
+    DALI_ASSERT_DEBUG( impl.mController && "No text contoller" );
+    DALI_ASSERT_DEBUG( impl.mDecorator && "No text decorator" );
 
     switch( index )
     {
@@ -211,39 +214,30 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       }
       case Toolkit::TextEditor::Property::TEXT:
       {
-        if( impl.mController )
-        {
-          const std::string& text = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p TEXT %s\n", impl.mController.Get(), text.c_str() );
+        const std::string& text = value.Get< std::string >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p TEXT %s\n", impl.mController.Get(), text.c_str() );
 
-          impl.mController->SetText( text );
-        }
+        impl.mController->SetText( text );
         break;
       }
       case Toolkit::TextEditor::Property::TEXT_COLOR:
       {
-        if( impl.mController )
-        {
-          const Vector4& textColor = value.Get< Vector4 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
+        const Vector4& textColor = value.Get< Vector4 >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
 
-          if( impl.mController->GetDefaultColor() != textColor )
-          {
-            impl.mController->SetDefaultColor( textColor );
-            impl.mController->SetInputColor( textColor );
-            impl.mRenderer.Reset();
-          }
+        if( impl.mController->GetDefaultColor() != textColor )
+        {
+          impl.mController->SetDefaultColor( textColor );
+          impl.mController->SetInputColor( textColor );
+          impl.mRenderer.Reset();
         }
         break;
       }
       case Toolkit::TextEditor::Property::FONT_FAMILY:
       {
-        if( impl.mController )
-        {
-          const std::string& fontFamily = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
-          impl.mController->SetDefaultFontFamily( fontFamily );
-        }
+        const std::string& fontFamily = value.Get< std::string >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
+        impl.mController->SetDefaultFontFamily( fontFamily );
         break;
       }
       case Toolkit::TextEditor::Property::FONT_STYLE:
@@ -253,28 +247,22 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       }
       case Toolkit::TextEditor::Property::POINT_SIZE:
       {
-        if( impl.mController )
-        {
-          const float pointSize = value.Get< float >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p POINT_SIZE %f\n", impl.mController.Get(), pointSize );
+        const float pointSize = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p POINT_SIZE %f\n", impl.mController.Get(), pointSize );
 
-          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
-          {
-            impl.mController->SetDefaultFontSize( pointSize, Text::Controller::POINT_SIZE );
-          }
+        if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
+        {
+          impl.mController->SetDefaultFontSize( pointSize, Text::Controller::POINT_SIZE );
         }
         break;
       }
       case Toolkit::TextEditor::Property::HORIZONTAL_ALIGNMENT:
       {
-        if( impl.mController )
+        Text::HorizontalAlignment::Type alignment( static_cast< Text::HorizontalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+        if( Text::GetHorizontalAlignmentEnumeration( value, alignment ) )
         {
-          Text::HorizontalAlignment::Type alignment( static_cast< Text::HorizontalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
-          if( Text::GetHorizontalAlignmentEnumeration( value, alignment ) )
-          {
-            DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p HORIZONTAL_ALIGNMENT %d\n", impl.mController.Get(), alignment );
-            impl.mController->SetHorizontalAlignment( alignment );
-          }
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p HORIZONTAL_ALIGNMENT %d\n", impl.mController.Get(), alignment );
+          impl.mController->SetHorizontalAlignment( alignment );
         }
         break;
       }
@@ -283,10 +271,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         const float threshold = value.Get< float >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p SCROLL_THRESHOLD %f\n", impl.mController.Get(), threshold );
 
-        if( impl.mDecorator )
-        {
-          impl.mDecorator->SetScrollThreshold( threshold );
-        }
+        impl.mDecorator->SetScrollThreshold( threshold );
         break;
       }
       case Toolkit::TextEditor::Property::SCROLL_SPEED:
@@ -294,80 +279,59 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         const float speed = value.Get< float >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p SCROLL_SPEED %f\n", impl.mController.Get(), speed );
 
-        if( impl.mDecorator )
-        {
-          impl.mDecorator->SetScrollSpeed( speed );
-        }
+        impl.mDecorator->SetScrollSpeed( speed );
         break;
       }
       case Toolkit::TextEditor::Property::PRIMARY_CURSOR_COLOR:
       {
-        if( impl.mDecorator )
-        {
-          const Vector4& color = value.Get< Vector4 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PRIMARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
+        const Vector4& color = value.Get< Vector4 >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PRIMARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
-          impl.mDecorator->SetCursorColor( PRIMARY_CURSOR, color );
-          impl.RequestTextRelayout();
-        }
+        impl.mDecorator->SetCursorColor( PRIMARY_CURSOR, color );
+        impl.RequestTextRelayout();
         break;
       }
       case Toolkit::TextEditor::Property::SECONDARY_CURSOR_COLOR:
       {
-        if( impl.mDecorator )
-        {
-          const Vector4& color = value.Get< Vector4 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p SECONDARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
+        const Vector4& color = value.Get< Vector4 >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p SECONDARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
-          impl.mDecorator->SetCursorColor( SECONDARY_CURSOR, color );
-          impl.RequestTextRelayout();
-        }
+        impl.mDecorator->SetCursorColor( SECONDARY_CURSOR, color );
+        impl.RequestTextRelayout();
         break;
       }
       case Toolkit::TextEditor::Property::ENABLE_CURSOR_BLINK:
       {
-        if( impl.mController )
-        {
-          const bool enable = value.Get< bool >();
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p ENABLE_CURSOR_BLINK %d\n", impl.mController.Get(), enable );
+        const bool enable = value.Get< bool >();
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p ENABLE_CURSOR_BLINK %d\n", impl.mController.Get(), enable );
 
-          impl.mController->SetEnableCursorBlink( enable );
-          impl.RequestTextRelayout();
-        }
+        impl.mController->SetEnableCursorBlink( enable );
+        impl.RequestTextRelayout();
         break;
       }
       case Toolkit::TextEditor::Property::CURSOR_BLINK_INTERVAL:
       {
-        if( impl.mDecorator )
-        {
-          const float interval = value.Get< float >();
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p CURSOR_BLINK_INTERVAL %f\n", impl.mController.Get(), interval );
+        const float interval = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p CURSOR_BLINK_INTERVAL %f\n", impl.mController.Get(), interval );
 
-          impl.mDecorator->SetCursorBlinkInterval( interval );
-        }
+        impl.mDecorator->SetCursorBlinkInterval( interval );
         break;
       }
       case Toolkit::TextEditor::Property::CURSOR_BLINK_DURATION:
       {
-        if( impl.mDecorator )
-        {
-          const float duration = value.Get< float >();
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p CURSOR_BLINK_DURATION %f\n", impl.mController.Get(), duration );
+        const float duration = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p CURSOR_BLINK_DURATION %f\n", impl.mController.Get(), duration );
 
-          impl.mDecorator->SetCursorBlinkDuration( duration );
-        }
+        impl.mDecorator->SetCursorBlinkDuration( duration );
         break;
       }
       case Toolkit::TextEditor::Property::CURSOR_WIDTH:
       {
-        if( impl.mDecorator )
-        {
-          const int width = value.Get< int >();
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p CURSOR_WIDTH %d\n", impl.mController.Get(), width );
+        const int width = value.Get< int >();
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p CURSOR_WIDTH %d\n", impl.mController.Get(), width );
 
-          impl.mDecorator->SetCursorWidth( width );
-          impl.mController->GetLayoutEngine().SetCursorWidth( width );
-        }
+        impl.mDecorator->SetCursorWidth( width );
+        impl.mController->GetLayoutEngine().SetCursorWidth( width );
         break;
       }
       case Toolkit::TextEditor::Property::GRAB_HANDLE_IMAGE:
@@ -375,7 +339,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         const std::string imageFileName = value.Get< std::string >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str() );
 
-        if( impl.mDecorator && imageFileName.size() )
+        if( imageFileName.size() )
         {
           impl.mDecorator->SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED, imageFileName );
           impl.RequestTextRelayout();
@@ -387,7 +351,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         const std::string imageFileName = value.Get< std::string >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), imageFileName.c_str() );
 
-        if( impl.mDecorator && imageFileName.size() )
+        if( imageFileName.size() )
         {
           impl.mDecorator->SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_PRESSED, imageFileName );
           impl.RequestTextRelayout();
@@ -398,7 +362,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && filename.size() )
+        if( filename.size() )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, filename );
           impl.RequestTextRelayout();
@@ -409,7 +373,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && filename.size() )
+        if( filename.size() )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, filename );
           impl.RequestTextRelayout();
@@ -420,7 +384,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && filename.size() )
+        if( filename.size() )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, filename );
           impl.RequestTextRelayout();
@@ -431,7 +395,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && filename.size() )
+        if( filename.size() )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, filename );
           impl.RequestTextRelayout();
@@ -442,7 +406,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && filename.size() )
+        if( filename.size() )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, filename );
           impl.RequestTextRelayout();
@@ -453,7 +417,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         const std::string filename = GetImageFileNameFromPropertyValue( value );
 
-        if( impl.mDecorator && filename.size() )
+        if( filename.size() )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, filename );
           impl.RequestTextRelayout();
@@ -465,55 +429,40 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         const Vector4 color = value.Get< Vector4 >();
         DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p SELECTION_HIGHLIGHT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
-        if( impl.mDecorator )
-        {
-          impl.mDecorator->SetHighlightColor( color );
-          impl.RequestTextRelayout();
-        }
+        impl.mDecorator->SetHighlightColor( color );
+        impl.RequestTextRelayout();
         break;
       }
       case Toolkit::TextEditor::Property::DECORATION_BOUNDING_BOX:
       {
-        if( impl.mDecorator )
-        {
-          const Rect<int>& box = value.Get< Rect<int> >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p DECORATION_BOUNDING_BOX %d,%d %dx%d\n", impl.mController.Get(), box.x, box.y, box.width, box.height );
+        const Rect<int>& box = value.Get< Rect<int> >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p DECORATION_BOUNDING_BOX %d,%d %dx%d\n", impl.mController.Get(), box.x, box.y, box.width, box.height );
 
-          impl.mDecorator->SetBoundingBox( box );
-          impl.RequestTextRelayout();
-        }
+        impl.mDecorator->SetBoundingBox( box );
+        impl.RequestTextRelayout();
         break;
       }
       case Toolkit::TextEditor::Property::ENABLE_MARKUP:
       {
-        if( impl.mController )
-        {
-          const bool enableMarkup = value.Get<bool>();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_MARKUP %d\n", impl.mController.Get(), enableMarkup );
+        const bool enableMarkup = value.Get<bool>();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_MARKUP %d\n", impl.mController.Get(), enableMarkup );
 
-          impl.mController->SetMarkupProcessorEnabled( enableMarkup );
-        }
+        impl.mController->SetMarkupProcessorEnabled( enableMarkup );
         break;
       }
       case Toolkit::TextEditor::Property::INPUT_COLOR:
       {
-        if( impl.mController )
-        {
-          const Vector4& inputColor = value.Get< Vector4 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p INPUT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), inputColor.r, inputColor.g, inputColor.b, inputColor.a );
+        const Vector4& inputColor = value.Get< Vector4 >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p INPUT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), inputColor.r, inputColor.g, inputColor.b, inputColor.a );
 
-          impl.mController->SetInputColor( inputColor );
-        }
+        impl.mController->SetInputColor( inputColor );
         break;
       }
       case Toolkit::TextEditor::Property::INPUT_FONT_FAMILY:
       {
-        if( impl.mController )
-        {
-          const std::string& fontFamily = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p INPUT_FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
-          impl.mController->SetInputFontFamily( fontFamily );
-        }
+        const std::string& fontFamily = value.Get< std::string >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p INPUT_FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
+        impl.mController->SetInputFontFamily( fontFamily );
         break;
       }
       case Toolkit::TextEditor::Property::INPUT_FONT_STYLE:
@@ -523,38 +472,28 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       }
       case Toolkit::TextEditor::Property::INPUT_POINT_SIZE:
       {
-        if( impl.mController )
-        {
-          const float pointSize = value.Get< float >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p INPUT_POINT_SIZE %f\n", impl.mController.Get(), pointSize );
-          impl.mController->SetInputFontPointSize( pointSize );
-        }
+        const float pointSize = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p INPUT_POINT_SIZE %f\n", impl.mController.Get(), pointSize );
+        impl.mController->SetInputFontPointSize( pointSize );
         break;
       }
       case Toolkit::TextEditor::Property::LINE_SPACING:
       {
-        if( impl.mController )
-        {
-
-          // The line spacing isn't supported by the TextEditor. Since it's supported
-          // by the TextLabel for now it must be ignored. The property is being shadowed
-          // locally so its value isn't affected.
-          const float lineSpacing = value.Get<float>();
-          impl.mLineSpacing = lineSpacing;
-          // set it to 0.0 due to missing implementation
-          impl.mController->SetDefaultLineSpacing( 0.0f );
-          impl.mRenderer.Reset();
-        }
+        // The line spacing isn't supported by the TextEditor. Since it's supported
+        // by the TextLabel for now it must be ignored. The property is being shadowed
+        // locally so its value isn't affected.
+        const float lineSpacing = value.Get<float>();
+        impl.mLineSpacing = lineSpacing;
+        // set it to 0.0 due to missing implementation
+        impl.mController->SetDefaultLineSpacing( 0.0f );
+        impl.mRenderer.Reset();
         break;
       }
       case Toolkit::TextEditor::Property::INPUT_LINE_SPACING:
       {
-        if( impl.mController )
-        {
-          const float lineSpacing = value.Get<float>();
-          impl.mController->SetInputLineSpacing( lineSpacing );
-          impl.mRenderer.Reset();
-        }
+        const float lineSpacing = value.Get<float>();
+        impl.mController->SetInputLineSpacing( lineSpacing );
+        impl.mRenderer.Reset();
         break;
       }
       case Toolkit::TextEditor::Property::UNDERLINE:
@@ -675,52 +614,40 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       }
       case Toolkit::TextEditor::Property::PIXEL_SIZE:
       {
-        if( impl.mController )
-        {
-          const float pixelSize = value.Get< float >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PIXEL_SIZE %f\n", impl.mController.Get(), pixelSize );
+        const float pixelSize = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PIXEL_SIZE %f\n", impl.mController.Get(), pixelSize );
 
-          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
-          {
-            impl.mController->SetDefaultFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
-          }
+        if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
+        {
+          impl.mController->SetDefaultFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
         }
         break;
       }
       case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT:
       {
-        if( impl.mController )
-        {
-          const std::string& text = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor::OnPropertySet %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
+        const std::string& text = value.Get< std::string >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor::OnPropertySet %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
 
-          impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
-        }
+        impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
         break;
       }
       case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR:
       {
-        if( impl.mController )
-        {
-          const Vector4& textColor = value.Get< Vector4 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PLACEHOLDER_TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
+        const Vector4& textColor = value.Get< Vector4 >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PLACEHOLDER_TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
 
-          if( impl.mController->GetPlaceholderTextColor() != textColor )
-          {
-            impl.mController->SetPlaceholderTextColor( textColor );
-            impl.mRenderer.Reset();
-          }
+        if( impl.mController->GetPlaceholderTextColor() != textColor )
+        {
+          impl.mController->SetPlaceholderTextColor( textColor );
+          impl.mRenderer.Reset();
         }
         break;
       }
       case Toolkit::TextEditor::Property::ENABLE_SELECTION:
       {
-        if( impl.mController )
-        {
-          const bool enableSelection = value.Get< bool >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_SELECTION %d\n", impl.mController.Get(), enableSelection );
-          impl.mController->SetSelectionEnabled( enableSelection );
-        }
+        const bool enableSelection = value.Get< bool >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_SELECTION %d\n", impl.mController.Get(), enableSelection );
+        impl.mController->SetSelectionEnabled( enableSelection );
         break;
       }
       case Toolkit::TextEditor::Property::PLACEHOLDER:
@@ -734,56 +661,41 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       }
       case Toolkit::TextEditor::Property::LINE_WRAP_MODE:
       {
-        if( impl.mController )
+        Text::LineWrap::Mode lineWrapMode( static_cast< Text::LineWrap::Mode >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+        if( GetLineWrapModeEnumeration( value, lineWrapMode ) )
         {
-          Text::LineWrap::Mode lineWrapMode( static_cast< Text::LineWrap::Mode >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
-          if( GetLineWrapModeEnumeration( value, lineWrapMode ) )
-          {
-            DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
-            impl.mController->SetLineWrapMode( lineWrapMode );
-          }
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
+          impl.mController->SetLineWrapMode( lineWrapMode );
         }
         break;
       }
       case Toolkit::DevelTextEditor::Property::ENABLE_SHIFT_SELECTION:
       {
-        if( impl.mController )
-        {
-          const bool shiftSelection = value.Get<bool>();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_SHIFT_SELECTION %d\n", impl.mController.Get(), shiftSelection );
+        const bool shiftSelection = value.Get<bool>();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_SHIFT_SELECTION %d\n", impl.mController.Get(), shiftSelection );
 
-          impl.mController->SetShiftSelectionEnabled( shiftSelection );
-        }
+        impl.mController->SetShiftSelectionEnabled( shiftSelection );
         break;
       }
       case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE:
       {
-        if( impl.mController )
-        {
-          const bool grabHandleEnabled = value.Get<bool>();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_GRAB_HANDLE %d\n", impl.mController.Get(), grabHandleEnabled );
+        const bool grabHandleEnabled = value.Get<bool>();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_GRAB_HANDLE %d\n", impl.mController.Get(), grabHandleEnabled );
 
-          impl.mController->SetGrabHandleEnabled( grabHandleEnabled );
-        }
+        impl.mController->SetGrabHandleEnabled( grabHandleEnabled );
         break;
       }
       case Toolkit::DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
       {
-        if( impl.mController )
-        {
-          impl.mController->SetMatchSystemLanguageDirection(value.Get< bool >());
-        }
+        impl.mController->SetMatchSystemLanguageDirection(value.Get< bool >());
         break;
       }
       case Toolkit::DevelTextEditor::Property::MAX_LENGTH:
       {
-        if( impl.mController )
-        {
-          const int max = value.Get< int >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p MAX_LENGTH %d\n", impl.mController.Get(), max );
+        const int max = value.Get< int >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p MAX_LENGTH %d\n", impl.mController.Get(), max );
 
-          impl.mController->SetMaximumNumberOfCharacters( max );
-        }
+        impl.mController->SetMaximumNumberOfCharacters( max );
         break;
       }
       case Toolkit::DevelTextEditor::Property::SELECTED_TEXT_START:
@@ -819,6 +731,8 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
   if( textEditor )
   {
     TextEditor& impl( GetImpl( textEditor ) );
+    DALI_ASSERT_DEBUG( impl.mController && "No text contoller" );
+    DALI_ASSERT_DEBUG( impl.mDecorator && "No text decorator" );
 
     switch( index )
     {
@@ -829,29 +743,20 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       }
       case Toolkit::TextEditor::Property::TEXT:
       {
-        if( impl.mController )
-        {
-          std::string text;
-          impl.mController->GetText( text );
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p returning text: %s\n", impl.mController.Get(), text.c_str() );
-          value = text;
-        }
+        std::string text;
+        impl.mController->GetText( text );
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p returning text: %s\n", impl.mController.Get(), text.c_str() );
+        value = text;
         break;
       }
       case Toolkit::TextEditor::Property::TEXT_COLOR:
       {
-        if ( impl.mController )
-        {
-          value = impl.mController->GetDefaultColor();
-        }
+        value = impl.mController->GetDefaultColor();
         break;
       }
       case Toolkit::TextEditor::Property::FONT_FAMILY:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultFontFamily();
-        }
+        value = impl.mController->GetDefaultFontFamily();
         break;
       }
       case Toolkit::TextEditor::Property::FONT_STYLE:
@@ -861,54 +766,36 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       }
       case Toolkit::TextEditor::Property::POINT_SIZE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE );
-        }
+        value = impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE );
         break;
       }
       case Toolkit::TextEditor::Property::HORIZONTAL_ALIGNMENT:
       {
-        if( impl.mController )
+        const char* name = GetHorizontalAlignmentString( impl.mController->GetHorizontalAlignment() );
+        if( name )
         {
-          const char* name = GetHorizontalAlignmentString( impl.mController->GetHorizontalAlignment() );
-          if( name )
-          {
-            value = std::string( name );
-          }
+          value = std::string( name );
         }
         break;
       }
       case Toolkit::TextEditor::Property::SCROLL_THRESHOLD:
       {
-        if( impl.mDecorator )
-        {
-          value = impl.mDecorator->GetScrollThreshold();
-        }
+        value = impl.mDecorator->GetScrollThreshold();
         break;
       }
       case Toolkit::TextEditor::Property::SCROLL_SPEED:
       {
-        if( impl.mDecorator )
-        {
-          value = impl.mDecorator->GetScrollSpeed();
-        }
+        value = impl.mDecorator->GetScrollSpeed();
         break;
       }
       case Toolkit::TextEditor::Property::PRIMARY_CURSOR_COLOR:
       {
-        if( impl.mDecorator )
-        {
-          value = impl.mDecorator->GetColor( PRIMARY_CURSOR );
-        }
+        value = impl.mDecorator->GetColor( PRIMARY_CURSOR );
         break;
       }
       case Toolkit::TextEditor::Property::SECONDARY_CURSOR_COLOR:
       {
-        if( impl.mDecorator )
-        {
-          value = impl.mDecorator->GetColor( SECONDARY_CURSOR );
-        }
+        value = impl.mDecorator->GetColor( SECONDARY_CURSOR );
         break;
       }
       case Toolkit::TextEditor::Property::ENABLE_CURSOR_BLINK:
@@ -918,42 +805,27 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       }
       case Toolkit::TextEditor::Property::CURSOR_BLINK_INTERVAL:
       {
-        if( impl.mDecorator )
-        {
-          value = impl.mDecorator->GetCursorBlinkInterval();
-        }
+        value = impl.mDecorator->GetCursorBlinkInterval();
         break;
       }
       case Toolkit::TextEditor::Property::CURSOR_BLINK_DURATION:
       {
-        if( impl.mDecorator )
-        {
-          value = impl.mDecorator->GetCursorBlinkDuration();
-        }
+        value = impl.mDecorator->GetCursorBlinkDuration();
         break;
       }
       case Toolkit::TextEditor::Property::CURSOR_WIDTH:
       {
-        if( impl.mDecorator )
-        {
-          value = impl.mDecorator->GetCursorWidth();
-        }
+        value = impl.mDecorator->GetCursorWidth();
         break;
       }
       case Toolkit::TextEditor::Property::GRAB_HANDLE_IMAGE:
       {
-        if( impl.mDecorator )
-        {
-          value = impl.mDecorator->GetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED );
-        }
+        value = impl.mDecorator->GetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED );
         break;
       }
       case Toolkit::TextEditor::Property::GRAB_HANDLE_PRESSED_IMAGE:
       {
-        if( impl.mDecorator )
-        {
-          value = impl.mDecorator->GetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_PRESSED );
-        }
+        value = impl.mDecorator->GetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_PRESSED );
         break;
       }
       case Toolkit::TextEditor::Property::SELECTION_HANDLE_IMAGE_LEFT:
@@ -988,44 +860,29 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       }
       case Toolkit::TextEditor::Property::SELECTION_HIGHLIGHT_COLOR:
       {
-        if( impl.mDecorator )
-        {
-          value = impl.mDecorator->GetHighlightColor();
-        }
+        value = impl.mDecorator->GetHighlightColor();
         break;
       }
       case Toolkit::TextEditor::Property::DECORATION_BOUNDING_BOX:
       {
-        if( impl.mDecorator )
-        {
-          Rect<int> boundingBox;
-          impl.mDecorator->GetBoundingBox( boundingBox );
-          value = boundingBox;
-        }
+        Rect<int> boundingBox;
+        impl.mDecorator->GetBoundingBox( boundingBox );
+        value = boundingBox;
         break;
       }
       case Toolkit::TextEditor::Property::ENABLE_MARKUP:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->IsMarkupProcessorEnabled();
-        }
+        value = impl.mController->IsMarkupProcessorEnabled();
         break;
       }
       case Toolkit::TextEditor::Property::INPUT_COLOR:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetInputColor();
-        }
+        value = impl.mController->GetInputColor();
         break;
       }
       case Toolkit::TextEditor::Property::INPUT_FONT_FAMILY:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetInputFontFamily();
-        }
+        value = impl.mController->GetInputFontFamily();
         break;
       }
       case Toolkit::TextEditor::Property::INPUT_FONT_STYLE:
@@ -1035,28 +892,19 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       }
       case Toolkit::TextEditor::Property::INPUT_POINT_SIZE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetInputFontPointSize();
-        }
+        value = impl.mController->GetInputFontPointSize();
         break;
       }
       case Toolkit::TextEditor::Property::LINE_SPACING:
       {
-        if( impl.mController )
-        {
-          // LINE_SPACING isn't implemented for the TextEditor. Returning
-          // only shadowed value, not the real one.
-          value = impl.mLineSpacing;
-        }
+        // LINE_SPACING isn't implemented for the TextEditor. Returning
+        // only shadowed value, not the real one.
+        value = impl.mLineSpacing;
         break;
       }
       case Toolkit::TextEditor::Property::INPUT_LINE_SPACING:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetInputLineSpacing();
-        }
+        value = impl.mController->GetInputLineSpacing();
         break;
       }
       case Toolkit::TextEditor::Property::UNDERLINE:
@@ -1126,45 +974,30 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       }
       case Toolkit::TextEditor::Property::PIXEL_SIZE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
-        }
+        value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
         break;
       }
       case Toolkit::TextEditor::Property::LINE_COUNT:
       {
-        if( impl.mController )
-        {
-          float width = textEditor.GetProperty( Actor::Property::SIZE_WIDTH ).Get<float>();
-          value = impl.mController->GetLineCount( width );
-        }
+        float width = textEditor.GetProperty( Actor::Property::SIZE_WIDTH ).Get<float>();
+        value = impl.mController->GetLineCount( width );
         break;
       }
       case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT:
       {
-        if( impl.mController )
-        {
-          std::string text;
-          impl.mController->GetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
-          value = text;
-        }
+        std::string text;
+        impl.mController->GetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
+        value = text;
         break;
       }
       case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetPlaceholderTextColor();
-        }
+        value = impl.mController->GetPlaceholderTextColor();
         break;
       }
       case Toolkit::TextEditor::Property::ENABLE_SELECTION:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->IsSelectionEnabled();
-        }
+        value = impl.mController->IsSelectionEnabled();
         break;
       }
       case Toolkit::TextEditor::Property::PLACEHOLDER:
@@ -1176,42 +1009,27 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       }
       case Toolkit::TextEditor::Property::LINE_WRAP_MODE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetLineWrapMode();
-        }
+        value = impl.mController->GetLineWrapMode();
         break;
       }
       case Toolkit::DevelTextEditor::Property::ENABLE_SHIFT_SELECTION:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->IsShiftSelectionEnabled();
-        }
+        value = impl.mController->IsShiftSelectionEnabled();
         break;
       }
       case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->IsGrabHandleEnabled();
-        }
+        value = impl.mController->IsGrabHandleEnabled();
         break;
       }
       case Toolkit::DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->IsMatchSystemLanguageDirection();
-        }
+        value = impl.mController->IsMatchSystemLanguageDirection();
         break;
       }
       case Toolkit::DevelTextEditor::Property::MAX_LENGTH:
       {
-        if( impl.mController )
-        {
-          value = impl.mController->GetMaximumNumberOfCharacters();
-        }
+        value = impl.mController->GetMaximumNumberOfCharacters();
         break;
       }
       case Toolkit::DevelTextEditor::Property::SELECTED_TEXT_START:

@@ -154,6 +154,9 @@ IF( ENABLE_TRACE )
   ADD_DEFINITIONS("-DTRACE_ENABLED")
 ENDIF()
 
+# Remove below when thorvg is ready
+ADD_DEFINITIONS( "-DNO_THORVG" )
+
 # Set paths
 SET( toolkit_images_dir  ${ROOT_SRC_DIR}/dali-toolkit/styles/images-common )
 SET( toolkit_sounds_dir  ${ROOT_SRC_DIR}/dali-toolkit/sounds )
