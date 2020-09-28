@@ -10,8 +10,6 @@
 
 using namespace Dali::Toolkit;
 
-//using DBusWrapper = Dali::Accessibility::DBusWrapper; // FIXME
-
 void utc_dali_accessibility_controls_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -22,7 +20,7 @@ void utc_dali_accessibility_controls_cleanup(void)
 {
   test_return_value = TET_PASS;
   //DBusWrapper::Install({}) is a de-install
-  //DBusWrapper::Install({}); // FIXME
+  DBusWrapper::Install({});
 }
 
 int UtcDaliControlPropertyAccessibilityTranslationDomain(void)

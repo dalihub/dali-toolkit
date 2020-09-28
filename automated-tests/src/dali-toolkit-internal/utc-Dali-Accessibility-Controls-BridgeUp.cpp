@@ -1,5 +1,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-impl.h>
@@ -13,10 +14,6 @@
 
 using namespace Dali::Toolkit;
 
-//using DBusWrapper = Dali::Accessibility::DBusWrapper; // FIXME
-
-namespace Dali::Accessibility::TestDBusWrapper { struct error {}; } // FIXME
-
 void utc_dali_accessibility_controls_bridge_up_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -27,7 +24,7 @@ void utc_dali_accessibility_controls_bridge_up_cleanup(void)
 {
   test_return_value = TET_PASS;
   //DBusWrapper::Install({}) is a de-install
-  //DBusWrapper::Install({}); // FIXME
+  DBusWrapper::Install({});
 }
 
 namespace Dali {
@@ -501,14 +498,14 @@ int UtcDaliAccessibilityParentChildren(void)
     TestGetIndexInParent( child_1_accessible -> GetAddress() );
     DALI_ABORT("Object has parent, test abort");
   }
-  catch(Accessibility::TestDBusWrapper::error &){}
+  catch(TestDBusWrapper::error &){}
 
   try
   {
     TestGetChildAtIndex( parent_accessible -> GetAddress(), -1 );
     DALI_ABORT("Positive index, test abort");
   }
-  catch(Accessibility::TestDBusWrapper::error &){}
+  catch(TestDBusWrapper::error &){}
 
   DALI_TEST_EQUALS( parent_accessible -> GetChildCount(), 0, TEST_LOCATION );
 
@@ -517,7 +514,7 @@ int UtcDaliAccessibilityParentChildren(void)
     child_1_accessible -> GetIndexInParent();
     DALI_ABORT("Object has parent, test abort");
   }
-  catch (std::domain_error &){}
+  catch (Dali::DaliException &){}
 
   parent.Add(child_1);
   parent.Add(child_2);
@@ -757,28 +754,28 @@ int UtcDaliAccessibilityAction(void)
     TestGetActionDescription( b->GetAddress(), count );
     DALI_ABORT( "Correct index, abort" );
   }
-  catch( Dali::Accessibility::TestDBusWrapper::error ){}
+  catch( TestDBusWrapper::error& ){}
 
   try
   {
     TestGetActionName( b->GetAddress(), count );
     DALI_ABORT( "Correct index, abort" );
   }
-  catch( Dali::Accessibility::TestDBusWrapper::error ){}
+  catch( TestDBusWrapper::error& ){}
 
   try
   {
     TestGetLocalizedActionName( b->GetAddress(), count );
     DALI_ABORT( "Correct index, abort" );
   }
-  catch( Dali::Accessibility::TestDBusWrapper::error ){}
+  catch( TestDBusWrapper::error& ){}
 
   try
   {
     TestGetActionKeyBinding( b->GetAddress(), count );
     DALI_ABORT( "Correct index, abort" );
   }
-  catch( Dali::Accessibility::TestDBusWrapper::error ){}
+  catch( TestDBusWrapper::error& ){}
 
 
   Dali::Accessibility::TestEnableSC( false );
