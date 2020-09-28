@@ -2975,6 +2975,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     else
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", this, keyString.c_str() );
+      if (!IsEditable()) return false;
 
       if( !keyString.empty() )
       {
@@ -3368,6 +3369,20 @@ void Controller::AddDecoration( Actor& actor, bool needsClipping )
   }
 }
 
+bool Controller::IsEditable() const
+{
+  return mImpl->IsEditable();
+}
+
+void Controller::SetEditable( bool editable )
+{
+  mImpl->SetEditable( editable );
+  if(mImpl->mEventData && mImpl->mEventData->mDecorator)
+  {
+    mImpl->mEventData->mDecorator->SetEditable( editable );
+  }
+}
+
 void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected DecorationEvent" );
@@ -3435,6 +3450,7 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
   {
     case Toolkit::TextSelectionPopup::CUT:
     {
+      if (!IsEditable()) return;
       mImpl->SendSelectionToClipboard( true ); // Synchronous call to modify text
       mImpl->mOperationsPending = ALL_OPERATIONS;
 
@@ -4224,6 +4240,8 @@ void Controller::TextDeletedEvent()
     return;
   }
 
+  if (!IsEditable()) return;
+
   mImpl->mEventData->mCheckScrollAmount = true;
 
   // The natural size needs to be re-calculated.
@@ -4246,6 +4264,8 @@ bool Controller::DeleteEvent( int keyCode )
   {
     return removed;
   }
+
+  if (!IsEditable()) return false;
 
   // InputMethodContext is no longer handling key-events
   mImpl->ClearPreEditFlag();

@@ -143,8 +143,13 @@ enum
    */
   SELECTED_TEXT_END,
 
-};
+  /**
+   * @brief The Editable state of control.
+   * @details Name "editable", type Property::BOOL.
+   */
+  ENABLE_EDITING,
 
+};
 } // namespace Property
 
 /**

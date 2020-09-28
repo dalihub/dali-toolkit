@@ -204,7 +204,6 @@ private: // From Control
    */
   void AddDecoration( Actor& actor, bool needsClipping ) override;
 
-
 // From SelectableControlInterface
 public:
   /**
@@ -216,6 +215,16 @@ public:
    * @copydoc Text::SelectableControlInterface::GetTextSelectionRange()
    */
   Uint32Pair GetTextSelectionRange() const override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::IsEditable()
+   */
+  bool IsEditable() const override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::SetEditable()
+   */
+  void SetEditable( bool editable ) override;
 
 private: // Implementation
 
