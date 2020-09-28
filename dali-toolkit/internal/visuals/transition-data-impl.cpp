@@ -101,7 +101,7 @@ void TransitionData::Initialize( const Property::Array& array )
     const Property::Value& element = array.GetElementAt( arrayIdx );
     // Expect each child to be an object representing an animator:
 
-    Property::Map* map = element.GetMap();
+    const Property::Map* map = element.GetMap();
     if( map != NULL )
     {
       TransitionData::Animator* animator = ConvertMap( *map );
@@ -173,12 +173,12 @@ TransitionData::Animator* TransitionData::ConvertMap( const Property::Map& map)
           {
             bool valid = true;
             Vector4 controlPoints;
-            Property::Array *array = value.GetArray();
+            const Property::Array* array = value.GetArray();
             if( array && array->Count() >= 4 )
             {
               for( size_t vecIdx = 0; vecIdx < 4; ++vecIdx )
               {
-                Property::Value& v = array->GetElementAt(vecIdx);
+                const Property::Value& v = array->GetElementAt(vecIdx);
                 if( v.GetType() == Property::FLOAT )
                 {
                   controlPoints[vecIdx] = v.Get<float>();

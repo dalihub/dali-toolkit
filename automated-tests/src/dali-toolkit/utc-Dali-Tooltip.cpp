@@ -272,7 +272,7 @@ int UtcDaliTooltipCreateWithArray(void)
 
   tet_infoline( "Ensure first value is a map and contains the right item" );
   const Property::Value mapValue1 = contentArray->GetElementAt( 0 );
-  Property::Map* map1 = mapValue1.GetMap();
+  const Property::Map* map1 = mapValue1.GetMap();
   DALI_TEST_CHECK( map1 );
   Property::Value* urlValue = map1->Find( ImageVisual::Property::URL );
   DALI_TEST_CHECK( urlValue );
@@ -280,7 +280,7 @@ int UtcDaliTooltipCreateWithArray(void)
 
   tet_infoline( "Ensure second value is a map and contains the right item" );
   const Property::Value mapValue2 = contentArray->GetElementAt( 1 );
-  Property::Map* map2 = mapValue2.GetMap();
+  const Property::Map* map2 = mapValue2.GetMap();
   DALI_TEST_CHECK( map2 );
   Property::Value* textValue = map2->Find( TextVisual::Property::TEXT );
   DALI_TEST_CHECK( textValue );

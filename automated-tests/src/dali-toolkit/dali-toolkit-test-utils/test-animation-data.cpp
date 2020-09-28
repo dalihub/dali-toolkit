@@ -156,7 +156,7 @@ void NewAnimator( const Property::Map& map, TestAnimationData::AnimationDataElem
     {
       if( value.GetType() == Property::MAP )
       {
-        Property::Map* map = value.GetMap();
+        const Property::Map* map = value.GetMap();
         const Property::Map& mapref = *map;
         NewAnimator( mapref, element ); // Merge the map into element
       }
@@ -180,7 +180,7 @@ void NewAnimation( const Property::Array& array, TestAnimationData& outputAnimat
     const Property::Value& value = array.GetElementAt(i);
     if( value.GetType() == Property::MAP )
     {
-      Property::Map* map = value.GetMap();
+      const Property::Map* map = value.GetMap();
       NewAnimator( *map, *element );
       outputAnimationData.Add( element );
     }

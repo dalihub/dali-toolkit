@@ -85,7 +85,7 @@ void Tooltip::SetProperties( const Property::Value& value )
   Toolkit::Control control = mControl.GetHandle();
   if( control )
   {
-    Property::Map* properties = value.GetMap();
+    const Property::Map* properties = value.GetMap();
     if( properties )
     {
       const Property::Map::SizeType count = properties->Count();
@@ -229,7 +229,7 @@ void Tooltip::SetContent( Toolkit::Control& control, const Property::Value& valu
   Property::Type type = value.GetType();
   if( type == Property::MAP )
   {
-    Property::Map* map = value.GetMap();
+    const Property::Map* map = value.GetMap();
     if( map )
     {
       mContentTextVisual.Merge( *map );
@@ -302,7 +302,7 @@ void Tooltip::SetBackground( const Property::Value& value )
   }
   else if( type == Property::MAP )
   {
-    Property::Map* map = value.GetMap();
+    const Property::Map* map = value.GetMap();
     if( map )
     {
       const Property::Map::SizeType count = map->Count();

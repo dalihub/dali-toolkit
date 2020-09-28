@@ -2915,7 +2915,7 @@ void ScrollView::SetProperty( BaseObject* object, Property::Index index, const P
       }
       case Toolkit::ScrollView::Property::SCROLL_MODE:
       {
-        Property::Map* map = value.GetMap();
+        const Property::Map* map = value.GetMap();
         if( map )
         {
           scrollViewImpl.SetScrollMode( *map );

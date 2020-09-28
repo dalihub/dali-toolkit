@@ -589,7 +589,7 @@ void GradientVisual::GetStopOffsets(const Property::Value* value, Vector<float>&
       }
       case Property::ARRAY:
       {
-        Property::Array* offsetArray = value->GetArray();
+        const Property::Array* offsetArray = value->GetArray();
         if( offsetArray )
         {
           unsigned int numStop = offsetArray->Count();

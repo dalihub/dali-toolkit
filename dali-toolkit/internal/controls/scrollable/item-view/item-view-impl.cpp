@@ -1819,7 +1819,7 @@ void ItemView::SetLayoutArray( const Property::Array& layouts )
   {
     const Property::Value& element = layouts.GetElementAt( arrayIdx );
 
-    Property::Map* layout = element.GetMap();
+    const Property::Map* layout = element.GetMap();
     if( layout != NULL )
     {
       for( unsigned int mapIdx = 0, mapCount = (*layout).Count(); mapIdx < mapCount; ++mapIdx )
