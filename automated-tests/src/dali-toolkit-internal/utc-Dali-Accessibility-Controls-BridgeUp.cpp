@@ -39,9 +39,9 @@ namespace Dali {
 
 int UtcDaliControlAccessibilityRaiseBridge(void)
 {
-  ToolkitTestApplication application;
-
   DALI_TEST_CHECK(!Accessibility::IsUp());
+
+  ToolkitTestApplication application;
 
   Dali::Accessibility::TestEnableSC(true);
 
@@ -201,7 +201,7 @@ int UtcDaliControlAccessibilityHighlightable(void)
   Dali::Accessibility::TestEnableSC( true );
 
   auto states_by_bridge = Dali::Accessibility::States { TestGetStates( q->GetAddress() )};
-  DALI_TEST_CHECK( states_by_bridge[ Dali::Accessibility::State::HIGHLIGHTABLE ] );
+  DALI_TEST_CHECK( !states_by_bridge[ Dali::Accessibility::State::HIGHLIGHTABLE ] );
 
   control.SetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
   DALI_TEST_EQUALS( Property::BOOLEAN, control.GetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE ).GetType(), TEST_LOCATION );
@@ -696,10 +696,10 @@ int UtcDaliAccessibilityAction(void)
   auto a = Dali::Accessibility::Accessible::Get( control );
   auto b = dynamic_cast<Dali::Accessibility::Action*>( a );
 
-  std::vector< std::string > actions { "activate", "accessibilityActivated", "ReadingSkipped", "ReadingCancelled", "ReadingStopped", "show", "hide" };
+  std::vector< std::string > actions { "activate", "accessibilityActivated", "ReadingSkipped", "ReadingCancelled", "ReadingStopped", "ReadingPaused", "ReadingResumed", "show", "hide" };
   auto count = b -> GetActionCount();
 
-  DALI_TEST_EQUALS( count, 7, TEST_LOCATION );
+  DALI_TEST_EQUALS( count, 9, TEST_LOCATION );
 
   for (auto i = 0u; i<count; ++i)
   {
@@ -709,37 +709,15 @@ int UtcDaliAccessibilityAction(void)
     DALI_TEST_EQUALS( b -> GetActionKeyBinding( i ), "", TEST_LOCATION );
   }
 
-  try
-  {
-    b ->GetActionDescription( count );
-    DALI_ABORT( "Correct index, abort" );
-  }
-  catch( std::domain_error &){}
-
-  try
-  {
-    b ->GetActionName( count );
-    DALI_ABORT( "Correct index, abort" );
-  }
-  catch( std::domain_error &){}
-
-  try
-  {
-    b ->GetLocalizedActionName( count );
-    DALI_ABORT( "Correct index, abort" );
-  }
-  catch( std::domain_error &){}
-
-  try
-  {
-    b ->GetActionKeyBinding( count );
-    DALI_ABORT( "Correct index, abort" );
-  }
-  catch( std::domain_error &){}
+  // Empty strings should be returned for invalid indices
+  DALI_TEST_EQUALS(b->GetActionDescription(count), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(b->GetActionName(count), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(b->GetLocalizedActionName(count), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(b->GetActionKeyBinding(count), "", TEST_LOCATION);
 
   count = TestGetActionCount(b -> GetAddress());
 
-  DALI_TEST_EQUALS( count, 7, TEST_LOCATION );
+  DALI_TEST_EQUALS( count, 9, TEST_LOCATION );
 
   for (auto i = 0u; i<count; ++i)
   {
@@ -749,34 +727,10 @@ int UtcDaliAccessibilityAction(void)
     DALI_TEST_EQUALS( TestGetActionKeyBinding( b->GetAddress(), i ), "", TEST_LOCATION );
   }
 
-  try
-  {
-    TestGetActionDescription( b->GetAddress(), count );
-    DALI_ABORT( "Correct index, abort" );
-  }
-  catch( TestDBusWrapper::error& ){}
-
-  try
-  {
-    TestGetActionName( b->GetAddress(), count );
-    DALI_ABORT( "Correct index, abort" );
-  }
-  catch( TestDBusWrapper::error& ){}
-
-  try
-  {
-    TestGetLocalizedActionName( b->GetAddress(), count );
-    DALI_ABORT( "Correct index, abort" );
-  }
-  catch( TestDBusWrapper::error& ){}
-
-  try
-  {
-    TestGetActionKeyBinding( b->GetAddress(), count );
-    DALI_ABORT( "Correct index, abort" );
-  }
-  catch( TestDBusWrapper::error& ){}
-
+  DALI_TEST_EQUALS(TestGetActionDescription(b->GetAddress(), count), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(TestGetActionName(b->GetAddress(), count), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(TestGetLocalizedActionName(b->GetAddress(), count), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(TestGetActionKeyBinding(b->GetAddress(), count), "", TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC( false );
 

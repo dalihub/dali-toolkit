@@ -77,7 +77,7 @@ int utcDaliAccessibilityProgressBarGetMinimumIncrement(void)
   auto q = Dali::Accessibility::Accessible::Get(progress_bar);
   auto x = dynamic_cast< Dali::Accessibility::Value* >( q );
   DALI_TEST_CHECK( x );
-  DALI_TEST_EQUALS( x->GetMinimumIncrement(), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( x->GetMinimumIncrement(), 0.0, TEST_LOCATION );
 
   END_TEST;
 }
@@ -228,7 +228,7 @@ int utcDaliAccessibilitySliderGetMinimumIncrement(void)
   auto q = Dali::Accessibility::Accessible::Get(slider);
   auto x = dynamic_cast< Dali::Accessibility::Value* >( q );
   DALI_TEST_CHECK( x );
-  DALI_TEST_EQUALS<float>( x->GetMinimumIncrement(), 0.05, TEST_LOCATION );
+  DALI_TEST_EQUALS<float>( x->GetMinimumIncrement(), 0.0, TEST_LOCATION );
 
   END_TEST;
 }

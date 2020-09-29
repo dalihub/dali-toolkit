@@ -245,7 +245,7 @@ int UtcDaliAccessibilityManager(void)
   auto str = accessmanager->GetAccessibilityAttribute( actor, Toolkit::AccessibilityManager::AccessibilityAttribute::ACCESSIBILITY_LABEL );
   DALI_TEST_EQUALS( str, "", TEST_LOCATION );
   DALI_TEST_EQUALS( accessmanager->GetFocusOrder( actor ), 0, TEST_LOCATION );
-  DALI_TEST_EQUALS( accessmanager->GenerateNewFocusOrder(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessmanager->GenerateNewFocusOrder(), 1, TEST_LOCATION );
   accessmanager->GetActorByFocusOrder( 0 );
   accessmanager->GetCurrentFocusActor();
   accessmanager->GetCurrentFocusGroup();
@@ -258,7 +258,7 @@ int UtcDaliAccessibilityManager(void)
   DALI_TEST_EQUALS( vector.x, 0.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( vector.y, 0.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( accessmanager->GetGroupMode(), false, TEST_LOCATION );
-  DALI_TEST_EQUALS( accessmanager->GetWrapMode(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( accessmanager->GetWrapMode(), true, TEST_LOCATION );
   accessmanager->GetFocusIndicatorActor();
 
   END_TEST;
@@ -578,7 +578,7 @@ int UtcDaliAccessibilityTextLabel(void)
   auto accessible = Dali::Accessibility::Accessible::Get( textlabel );
   DALI_TEST_CHECK( accessible );
 
-  DALI_TEST_EQUALS( accessible->GetName(), "", TEST_LOCATION );
+  DALI_TEST_EQUALS( accessible->GetName(), "test", TEST_LOCATION );
   DALI_TEST_EQUALS( accessible->GetRole(), Accessibility::Role::LABEL, TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( true );
