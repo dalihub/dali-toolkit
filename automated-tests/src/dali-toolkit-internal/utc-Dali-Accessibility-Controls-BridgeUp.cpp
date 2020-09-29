@@ -5,7 +5,7 @@
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-impl.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
+#include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <cstdlib>
@@ -180,7 +180,7 @@ int UtcDaliControlAccessibilityState(void)
 int UtcDaliControlAccessibilityModal(void)
 {
   ToolkitTestApplication application;
-  auto control = TextSelectionPopup::New( NULL );
+  auto control = Dali::Toolkit::Popup::New();
   auto states = DevelControl::GetAccessibilityStates(control);
 
   DALI_TEST_CHECK( states[ Dali::Accessibility::State::MODAL ] );
@@ -228,6 +228,9 @@ int UtcDaliControlAccessibilityHighlightBridgeUp(void)
 
   auto controla = Control::New();
   auto controlb = Control::New();
+
+  controla.SetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
+  controlb.SetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
 
   Dali::Accessibility::TestEnableSC( true );
 
@@ -742,16 +745,17 @@ int UtcDaliAccessibilityDoAction(void)
   ToolkitTestApplication application;
 
   Dali::Accessibility::TestEnableSC( true );
-  thread_local std::vector< bool > actions_done { false, false, false, false };
+  thread_local std::vector< bool > actions_done { false, false, false, false, false, false };
 
   auto control = Control::New(  );
   auto a = Dali::Accessibility::Accessible::Get( control );
   auto b = dynamic_cast<Dali::Accessibility::Action*>( a );
-  std::vector< std::string > actions { "activate", "accessibilityActivated", "ReadingSkipped", "ReadingCancelled", "ReadingStopped", "show", "hide" };
+  std::vector< std::string > actions { "activate", "accessibilityActivated", "ReadingSkipped", "ReadingCancelled", "ReadingStopped", "ReadingPaused", "ReadingResumed", "show", "hide" };
 
-  DALI_TEST_CHECK( b -> DoAction( actions[2] ) );
-  DALI_TEST_CHECK( b -> DoAction( actions[4] ) );
-  DALI_TEST_CHECK( b -> DoAction( actions[4] ) );
+  // Test calling action by name
+  DALI_TEST_CHECK( b -> DoAction( actions[2] ) ); // ReadingSkipped
+  DALI_TEST_CHECK( b -> DoAction( actions[4] ) ); // ReadingStopped
+  DALI_TEST_CHECK( b -> DoAction( actions[4] ) ); // ReadingStopped
 
   DevelControl::AccessibilityReadingSkippedSignal(control).Connect( [] () {
     actions_done[ 1 ] = true;
@@ -762,14 +766,23 @@ int UtcDaliAccessibilityDoAction(void)
   DevelControl::AccessibilityReadingStoppedSignal(control).Connect( [] () {
     actions_done[ 3 ] = true;
   } );
+   DevelControl::AccessibilityReadingPausedSignal(control).Connect( [] () {
+    actions_done[ 4 ] = true;
+  } );
+   DevelControl::AccessibilityReadingResumedSignal(control).Connect( [] () {
+    actions_done[ 5 ] = true;
+  } );
   DevelControl::AccessibilityActivateSignal(control).Connect( [] () {
     actions_done[ 0 ] = true;
   } );
 
+  // Test calling action by index
   DALI_TEST_CHECK( b -> DoAction( 1 ) );
   DALI_TEST_CHECK( b -> DoAction( 2 ) );
   DALI_TEST_CHECK( b -> DoAction( 3 ) );
   DALI_TEST_CHECK( b -> DoAction( 4 ) );
+  DALI_TEST_CHECK( b -> DoAction( 5 ) );
+  DALI_TEST_CHECK( b -> DoAction( 6 ) );
 
   for ( auto i = 0u; i < actions_done.size(); ++i )
     {
@@ -781,6 +794,8 @@ int UtcDaliAccessibilityDoAction(void)
   DALI_TEST_CHECK( TestDoAction( b -> GetAddress(), 2 ) );
   DALI_TEST_CHECK( TestDoAction( b -> GetAddress(), 3 ) );
   DALI_TEST_CHECK( TestDoAction( b -> GetAddress(), 4 ) );
+  DALI_TEST_CHECK( TestDoAction( b -> GetAddress(), 5 ) );
+  DALI_TEST_CHECK( TestDoAction( b -> GetAddress(), 6 ) );
 
   for ( auto i = 0u; i < actions_done.size(); ++i )
     {
@@ -792,6 +807,8 @@ int UtcDaliAccessibilityDoAction(void)
   DALI_TEST_CHECK( TestDoAction( b -> GetAddress(), actions[ 2 ] ) );
   DALI_TEST_CHECK( TestDoAction( b -> GetAddress(), actions[ 3 ] ) );
   DALI_TEST_CHECK( TestDoAction( b -> GetAddress(), actions[ 4 ] ) );
+  DALI_TEST_CHECK( TestDoAction( b -> GetAddress(), actions[ 5 ] ) );
+  DALI_TEST_CHECK( TestDoAction( b -> GetAddress(), actions[ 6 ] ) );
 
   for ( auto i = 0u; i < actions_done.size(); ++i )
       DALI_TEST_CHECK( actions_done[ i ] );
