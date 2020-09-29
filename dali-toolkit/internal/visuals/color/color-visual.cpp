@@ -289,7 +289,7 @@ void ColorVisual::OnDoAction( const Property::Index actionId, const Property::Va
   {
     case DevelColorVisual::Action::UPDATE_PROPERTY:
     {
-      Property::Map* map = attributes.GetMap();
+      const Property::Map* map = attributes.GetMap();
       if( map )
       {
         DoSetProperties( *map );

@@ -835,7 +835,7 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
       {
         bool withTransitions=true;
         const Property::Value* valuePtr=&value;
-        Property::Map* map = value.GetMap();
+        const Property::Map* map = value.GetMap();
         if(map)
         {
           Property::Value* value2 = map->Find("withTransitions");

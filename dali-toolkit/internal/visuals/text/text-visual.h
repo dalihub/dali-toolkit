@@ -81,9 +81,10 @@ public:
 
   /**
    * @brief Converts all strings keys in property map to index keys.  Property Map can then be merged correctly.
-   * @param[in,out] propertyMap containing string keys or a mix of strings and indexes. Will be changed to index keys.
+   * @param[in] propertyMap containing string keys or a mix of strings and indexes.
+   * @return Property::Map containing index keys.
    */
-  static void ConvertStringKeysToIndexKeys( Property::Map& propertyMap );
+  static Property::Map ConvertStringKeysToIndexKeys( const Property::Map& propertyMap );
 
   /**
    * @brief Retrieve the text's controller.

@@ -95,7 +95,7 @@ bool GetPolicyFromValue( const Property::Value& value, Vector2& policy )
   }
   else
   {
-    Property::Array* array = value.GetArray();
+    const Property::Array* array = value.GetArray();
     if( array && array->Size() == 2 )
     {
       Toolkit::Visual::Transform::Policy::Type xPolicy = static_cast< Toolkit::Visual::Transform::Policy::Type >( -1 ); // Assign an invalid value so definitely changes

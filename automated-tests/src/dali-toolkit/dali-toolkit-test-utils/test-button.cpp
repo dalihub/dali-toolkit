@@ -78,13 +78,13 @@ void TestButton::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( value.GetType() == Property::MAP )
         {
-          Property::Map* valueMap = value.GetMap();
+          const Property::Map* valueMap = value.GetMap();
           buttonImpl.mPressTransitionData.Clear();
           NewAnimation( *valueMap, buttonImpl.mPressTransitionData );
         }
         else if( value.GetType() == Property::ARRAY )
         {
-          Property::Array* valueArray = value.GetArray();
+          const Property::Array* valueArray = value.GetArray();
           buttonImpl.mPressTransitionData.Clear();
           NewAnimation( *valueArray, buttonImpl.mPressTransitionData );
         }

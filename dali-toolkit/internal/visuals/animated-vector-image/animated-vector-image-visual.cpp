@@ -217,7 +217,7 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
     }
     case Toolkit::DevelImageVisual::Property::PLAY_RANGE:
     {
-      Property::Array* array = value.GetArray();
+      const Property::Array* array = value.GetArray();
       if( array )
       {
         mAnimationData.playRange = *array;
@@ -406,7 +406,7 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
     }
     case DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY:
     {
-      Property::Map* map = attributes.GetMap();
+      const Property::Map* map = attributes.GetMap();
       if( map )
       {
         DoSetProperties( *map );

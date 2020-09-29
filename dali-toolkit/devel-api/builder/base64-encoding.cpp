@@ -41,7 +41,7 @@ bool GetStringFromProperty(const Property::Value& value, std::string& output)
   }
   else
   {
-    Property::Array* array = value.GetArray();
+    const Property::Array* array = value.GetArray();
     if(array)
     {
       const unsigned int arraySize = array->Size();
