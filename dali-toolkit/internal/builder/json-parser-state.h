@@ -2,7 +2,7 @@
 #define DALI_JSON_PARSE_STATE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace Toolkit
 namespace Internal
 {
 
-/*
+/**
  * A safer std::advance()
  */
 template <typename IteratorType,typename EndIteratorType>
@@ -52,7 +52,7 @@ inline int AdvanceIter(IteratorType& iter, EndIteratorType& end, int n)
   return n;
 }
 
-/*
+/**
  * Maintains parser state machine
  *
  * If a NULL root node is passed in the constructor then a faster non merging parse is performed (the first pass).
@@ -61,13 +61,13 @@ inline int AdvanceIter(IteratorType& iter, EndIteratorType& end, int n)
 class JsonParserState
 {
 public:
-  /*
+  /**
    * Constructor
    * @param tree Tree to start with, pass NULL if no existing tree
    */
   explicit JsonParserState(TreeNode* tree);
 
-  /*
+  /**
    * Parse json source
    * The source is modified in place
    * @param source The vector buffer to parse
@@ -75,43 +75,43 @@ public:
    */
   bool ParseJson(VectorChar& source);
 
-  /*
+  /**
    * Get the root node
    * @return The root TreeNode
    */
   TreeNode* GetRoot();
 
-  /*
+  /**
    * Get the error description of the last parse
    * @return The error description or NULL if no error
    */
   const char* GetErrorDescription() { return mErrorDescription; }
 
-  /*
+  /**
    * Get the error line number
    * @return The line number of the error
    */
   int GetErrorLineNumber() { return mErrorNewLine; }
 
-  /*
+  /**
    * Get the error column
    * @return The error column
    */
   int GetErrorColumn() { return mErrorColumn; }
 
-  /*
+  /**
    * Get the error position
    * @return The error position
    */
   int GetErrorPosition() { return mErrorPosition; }
 
-  /*
+  /**
    * Get the size of the string data that has been parsed
    * @return The size of string data
    */
   int GetParsedStringSize() { return mNumberOfParsedChars; };
 
-  /*
+  /**
    * Get the number of nodes created
    * @return The number of nodes
    */
@@ -131,7 +131,7 @@ private:
   int mNumberOfCreatedNodes;           ///< The number of nodes created
   bool mFirstParse;                    ///< Flag if first parse
 
-  /*
+  /**
    * The current parse state
    */
   enum State
@@ -149,49 +149,49 @@ private:
   JsonParserState(const JsonParserState&);
   const JsonParserState& operator=(const JsonParserState&);
 
-  /*
+  /**
    * Parse over white space
    * Increments the current position
    * @return true if no parse errors
    */
   bool ParseWhiteSpace();
 
-  /*
+  /**
    * Parse over a number, setting the current node if found
    * Increments the current position. Sets error data if parse error.
    * @return true if found, false if parse error
    */
   bool ParseNumber();
 
-  /*
+  /**
    * Parse over a symbol
    * Increments the current position. Sets error data if parse error.
    * @return true if found, false if parse error
    */
   bool ParseSymbol(const std::string& symbol);
 
-  /*
+  /**
    * Parse over 'true' symbol, setting the current node if found
    * Increments the current position. Sets error data if parse error.
    * @return true if found, false if parse error
    */
   bool ParseTrue();
 
-  /*
+  /**
    * Parse over 'false' symbol, setting the current node if found
    * Increments the current position. Sets error data if parse error.
    * @return true if found, false if parse error
    */
   bool ParseFalse();
 
-  /*
+  /**
    * Parse over 'null' symbol, setting the current node if found
    * Increments the current position. Sets error data if parse error.
    * @return true if found, false if parse error
    */
   bool ParseNULL();
 
-  /*
+  /**
    * Parse over a string from the current position and insert escaped
    * control characters in place in the string and a null terminator.
    * This function works from and modifes the current buffer position.
@@ -199,29 +199,29 @@ private:
    */
   char* EncodeString();
 
-  /*
+  /**
    * Create a new node with name and type
    */
   TreeNode* CreateNewNode(const char* name, TreeNode::NodeType type);
 
-  /*
+  /**
    * Create a new node if first parse, else check if the node already
    * exists and set it to a new type
    */
   TreeNode* NewNode(const char* name, TreeNode::NodeType type);
 
-  /*
+  /**
    * Set error meta data
    * @returns always false.
    */
   bool Error(const char* description);
 
-  /*
+  /**
    * Reset state for another parse
    */
   void Reset();
 
-  /*
+  /**
    * Set current to its parent
    * @return true if we had a parent, false and error otherwise
    */
@@ -235,7 +235,7 @@ private:
     return true;
   }
 
-  /*
+  /**
    * Get the current character
    */
   inline char Char()
@@ -243,7 +243,7 @@ private:
     return *mIter;
   }
 
-  /*
+  /**
    * @return True if there are at least n character left
    */
   inline bool AtLeast(int n)
@@ -254,7 +254,7 @@ private:
     return (mEnd - mIter) > n;
   }
 
-  /*
+  /**
    * @return True if at the end of the data to parse
    */
   inline bool AtEnd()
@@ -262,7 +262,7 @@ private:
     return mEnd == mIter;
   }
 
-  /*
+  /**
    * Advance current position by n characters or stop at mEnd
    */
   inline void Advance(int n)
@@ -272,7 +272,7 @@ private:
     mErrorColumn   += c;
   }
 
-  /*
+  /**
    * Advance by n charaters and return true if we reached the end
    */
   inline bool AdvanceEnded(int n)
@@ -283,7 +283,7 @@ private:
     return mEnd == mIter;
   }
 
-  /*
+  /**
    * Advance by at least n characters (stopping at mEnd) and skip any whitespace after n.
    */
   inline void AdvanceSkipWhiteSpace(int n)
@@ -294,7 +294,7 @@ private:
     static_cast<void>( ParseWhiteSpace() );
   }
 
-  /*
+  /**
    * Increment new line counters
    */
   inline void NewLine()
@@ -303,6 +303,122 @@ private:
     mErrorColumn = 0;
   }
 
+  /**
+   * @brief Called by ParseJson if we are in STATE_START.
+   *
+   * @param[in] name The current name
+   * @param[in] currentChar The current character being parsed
+   * @return true if successfully parsed
+   */
+  bool HandleStartState(const char* name, const char currentChar);
+
+  /**
+   * @brief Called by ParseJson if we are in STATE_OBJECT.
+   *
+   * @param[in] currentChar The current character being parsed
+   * @param[in] lastCharacter The last character we parsed
+   * @return true if successfully parsed
+   */
+  bool HandleObjectState(const char currentChar, const char lastCharacter);
+
+  /**
+   * @brief Called by ParseJson if we are in STATE_KEY.
+   *
+   * @param[in/out] name A reference to the name variable
+   * @return true if successfully parsed
+   */
+  bool HandleKeyState(char*& name);
+
+  /**
+   * @brief Called by ParseJson if we are in STATE_VALUE.
+   *
+   * @param[in/out] name A reference to the name variable
+   * @param[in] currentChar The current character being parsed
+   * @param[in] lastCharacter The last character we parsed
+   * @return true if successfully parsed
+   */
+  bool HandleValueState(char*& name, const char currentChar, const char lastCharacter);
+
+  /**
+   * @brief Called by HandleValueState to parse a '"' character.
+   *
+   * @param[in] name The current name
+   * @return true if successfully parsed
+   */
+  bool HandleCharacterQuote(char*& name);
+
+  /**
+   * @brief Called by HandleValueState to parse a number or hyphen character.
+   *
+   * @param[in] name The current name
+   * @return true if successfully parsed
+   */
+  bool HandleCharacterNumberOrHyphen(const char* name);
+
+  /**
+   * @brief Called by HandleValueState to parse a '{' character.
+   *
+   * @param[in] name The current name
+   * @param[in] lastCharacter The last character we parsed
+   * @return true if successfully parsed
+   */
+  bool HandleCharacterBracesStart(const char* name, const char lastCharacter);
+
+  /**
+   * @brief Called by HandleValueState to parse a '}' character.
+   *
+   * @param[in] lastCharacter The last character we parsed
+   * @return true if successfully parsed
+   */
+  bool HandleCharacterBracesEnd(const char lastCharacter);
+
+  /**
+   * @brief Called by HandleValueState to parse a '[' character.
+   *
+   * @param[in] name The current name
+   * @return true if successfully parsed
+   */
+  bool HandleCharacterSquareBracketStart(const char* name);
+
+  /**
+   * @brief Called by HandleValueState to parse a ']' character.
+   *
+   * @param[in] lastCharacter The last character we parsed
+   * @return true if successfully parsed
+   */
+  bool HandleCharacterSquareBracketEnd(const char lastCharacter);
+
+  /**
+   * @brief Called by HandleValueState to parse a 't' character.
+   *
+   * @param[in] name The current name
+   * @return true if successfully parsed
+   */
+  bool HandleCharacterLowercaseT(const char* name);
+
+  /**
+   * @brief Called by HandleValueState to parse a 'n' character.
+   *
+   * @param[in] name The current name
+   * @return true if successfully parsed
+   */
+  bool HandleCharacterLowercaseN(const char* name);
+
+  /**
+   * @brief Called by HandleValueState to parse a 'f' character.
+   *
+   * @param[in] name The current name
+   * @return true if successfully parsed
+   */
+  bool HandleCharacterLowercaseF(const char* name);
+
+  /**
+   * @brief Called by HandleValueState to parse a ',' character.
+   *
+   * @param[in] name The current name
+   * @return true if successfully parsed
+   */
+  bool HandleCharacterComma(const char* name);
 };
 
 
