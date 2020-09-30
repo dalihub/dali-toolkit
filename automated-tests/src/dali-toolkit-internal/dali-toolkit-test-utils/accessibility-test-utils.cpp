@@ -74,6 +74,7 @@ namespace Dali {
             }
             auto wr = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
             wr->fromTestChangeProperty("/org/a11y/bus", "org.a11y.Status", "ScreenReaderEnabled", b);
+            wr->fromTestChangeProperty("/org/a11y/bus", "org.a11y.Status", "IsEnabled", b);
         }
 
         std::vector<Address> TestGetChildren(const Address &adr)
