@@ -180,10 +180,16 @@ int UtcDaliControlAccessibilityState(void)
 int UtcDaliControlAccessibilityModal(void)
 {
   ToolkitTestApplication application;
-  auto control = Dali::Toolkit::Popup::New();
-  auto states = DevelControl::GetAccessibilityStates(control);
 
-  DALI_TEST_CHECK( states[ Dali::Accessibility::State::MODAL ] );
+  auto control = Dali::Toolkit::Popup::New();
+  auto q = Dali::Accessibility::Accessible::Get( control );
+
+  Dali::Accessibility::TestEnableSC( true );
+
+  auto states_by_bridge = Dali::Accessibility::States { TestGetStates( q->GetAddress() )};
+  DALI_TEST_CHECK( states_by_bridge[Dali::Accessibility::State::MODAL] );
+
+  Dali::Accessibility::TestEnableSC( false );
 
   END_TEST;
 }
