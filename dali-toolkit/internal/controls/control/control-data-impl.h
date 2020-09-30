@@ -575,7 +575,6 @@ public:
     double GetAlpha() override;
     bool GrabHighlight() override;
     bool ClearHighlight() override;
-    int GetHighlightIndex() override;
 
     std::string GetActionName( size_t index ) override;
     std::string GetLocalizedActionName( size_t index ) override;

@@ -89,6 +89,7 @@ int UtcDaliControlAccessibilityName(void)
 
   DALI_TEST_EQUALS( "Accessibility_Name_With_Callback" , TestGetName( q->GetAddress()), TEST_LOCATION );
 
+  //TODO test emission of name change signal
   Dali::Accessibility::TestEnableSC( false );
 
   END_TEST;
@@ -120,6 +121,7 @@ int UtcDaliControlAccessibilityDescription(void)
 
   DALI_TEST_EQUALS( "Accessibility_Description_With_Callback" , TestGetDescription( q->GetAddress()), TEST_LOCATION );
 
+  //TODO test emission of description change signal
   Dali::Accessibility::TestEnableSC( false );
 
   END_TEST;
@@ -202,6 +204,11 @@ int UtcDaliControlAccessibilityHighlightable(void)
   auto noneset = control.GetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE );
   DALI_TEST_EQUALS( Property::NONE, noneset.GetType(), TEST_LOCATION );
 
+   // negative testcase - trying to set unconvertible value
+  control.SetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, "deadbeef" );
+  noneset = control.GetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE );
+  DALI_TEST_EQUALS( Property::NONE, noneset.GetType(), TEST_LOCATION );
+
   auto q = Dali::Accessibility::Accessible::Get( control );
 
   Dali::Accessibility::TestEnableSC( true );
@@ -234,6 +241,7 @@ int UtcDaliControlAccessibilityHighlightBridgeUp(void)
 
   auto controla = Control::New();
   auto controlb = Control::New();
+  controla.Add(controlb);
 
   controla.SetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
   controlb.SetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
@@ -763,6 +771,9 @@ int UtcDaliAccessibilityDoAction(void)
   DALI_TEST_CHECK( b -> DoAction( actions[4] ) ); // ReadingStopped
   DALI_TEST_CHECK( b -> DoAction( actions[4] ) ); // ReadingStopped
 
+  // Negative test of calling action with not defined name
+  DALI_TEST_CHECK( !b -> DoAction( "undefined" ) );
+
   DevelControl::AccessibilityReadingSkippedSignal(control).Connect( [] () {
     actions_done[ 1 ] = true;
   } );
@@ -820,6 +831,31 @@ int UtcDaliAccessibilityDoAction(void)
       DALI_TEST_CHECK( actions_done[ i ] );
 
   Dali::Accessibility::TestEnableSC( false );
+
+  END_TEST;
+}
+
+void TestVoidCallback()
+{
+}
+
+int UtcDaliAccessibilitySignals(void)
+{
+  ToolkitTestApplication application;
+  ConnectionTracker connectionTracker;
+  Control control = Control::New();
+
+  DALI_TEST_CHECK( DevelControl::AccessibilityGetNameSignal(control).Empty() );
+  control.ConnectSignal( &connectionTracker, "getName", &TestVoidCallback );
+  DALI_TEST_CHECK( !DevelControl::AccessibilityGetNameSignal(control).Empty() );
+
+  DALI_TEST_CHECK( DevelControl::AccessibilityGetDescriptionSignal(control).Empty() );
+  control.ConnectSignal( &connectionTracker, "getDescription", &TestVoidCallback );
+  DALI_TEST_CHECK( !DevelControl::AccessibilityGetDescriptionSignal(control).Empty() );
+
+  DALI_TEST_CHECK( DevelControl::AccessibilityDoGestureSignal(control).Empty() );
+  control.ConnectSignal( &connectionTracker, "doGesture", &TestVoidCallback );
+  DALI_TEST_CHECK( !DevelControl::AccessibilityDoGestureSignal(control).Empty() );
 
   END_TEST;
 }

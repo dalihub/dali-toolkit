@@ -246,5 +246,23 @@ int utcDaliAccessibilitySliderGetSetCurrent(void)
   DALI_TEST_EQUALS( x->SetCurrent( 0.25 ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( x->GetCurrent(), 0.25, TEST_LOCATION );
 
+  const float MIN_BOUND = 0.0f;
+  const float MAX_BOUND = 1.0f;
+  const int NUM_MARKS = 5;
+  Property::Array marks;
+  for( int i = 0; i < NUM_MARKS; ++i )
+  {
+    marks.PushBack( MIN_BOUND + ( static_cast<float>(i) / ( NUM_MARKS - 1) ) * ( MAX_BOUND - MIN_BOUND ) );
+  }
+  slider.SetProperty( Toolkit::Slider::Property::MARKS, marks );
+  // when current value is not a mark, set new value to the closest mark
+  DALI_TEST_CHECK( x->SetCurrent( 0.1f ) );
+  slider.SetProperty( Toolkit::Slider::Property::SNAP_TO_MARKS, true );
+  DALI_TEST_CHECK( x->SetCurrent( 0.7f ) );
+  DALI_TEST_EQUALS( static_cast<float>( x->GetCurrent() ), marks[3].Get<float>(), TEST_LOCATION );
+  // when current value is a mark at index i set new value to the mark at index i +/- 1
+  // depending if the new value is greater/less than current value
+  DALI_TEST_CHECK( x->SetCurrent( 0.2f ) );
+  DALI_TEST_EQUALS( static_cast<float>( x->GetCurrent() ),  marks[2].Get<float>(), TEST_LOCATION );
   END_TEST;
 }

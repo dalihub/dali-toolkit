@@ -198,54 +198,56 @@ const char* ACTION_ACCESSIBILITY_READING_STOPPED   = "ReadingStopped";
 
 static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
-  if (!object)
-    return false;
+  bool ret = true;
 
-  Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-  if ( !control )
-    return false;
+  Dali::BaseHandle handle( object );
+
+  Toolkit::Control control = Toolkit::Control::DownCast( handle );
+
+  DALI_ASSERT_ALWAYS( control );
 
   if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED ) ||
-        actionName == "activate" )
+     actionName == "activate" )
   {
     // if cast succeeds there is an implementation so no need to check
-    if (!DevelControl::AccessibilityActivateSignal( control ).Empty())
+    if( !DevelControl::AccessibilityActivateSignal( control ).Empty() )
       DevelControl::AccessibilityActivateSignal( control ).Emit();
-    else
-      return Internal::GetImplementation( control ).OnAccessibilityActivated();
+    else ret = Internal::GetImplementation( control ).OnAccessibilityActivated();
   }
   else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_SKIPPED ) )
   {
     // if cast succeeds there is an implementation so no need to check
-    if (!DevelControl::AccessibilityReadingSkippedSignal( control ).Empty())
+    if( !DevelControl::AccessibilityReadingSkippedSignal( control ).Empty() )
       DevelControl::AccessibilityReadingSkippedSignal( control ).Emit();
   }
-  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_PAUSED) )
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_PAUSED ) )
   {
     // if cast succeeds there is an implementation so no need to check
-    if (!DevelControl::AccessibilityReadingPausedSignal( control ).Empty())
+    if( !DevelControl::AccessibilityReadingPausedSignal( control ).Empty() )
       DevelControl::AccessibilityReadingPausedSignal( control ).Emit();
   }
   else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_RESUMED ) )
   {
     // if cast succeeds there is an implementation so no need to check
-    if (!DevelControl::AccessibilityReadingResumedSignal( control ).Empty())
+    if( !DevelControl::AccessibilityReadingResumedSignal( control ).Empty() )
       DevelControl::AccessibilityReadingResumedSignal( control ).Emit();
   }
   else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_CANCELLED ) )
   {
     // if cast succeeds there is an implementation so no need to check
-    if (!DevelControl::AccessibilityReadingCancelledSignal( control ).Empty())
+    if( !DevelControl::AccessibilityReadingCancelledSignal( control ).Empty() )
       DevelControl::AccessibilityReadingCancelledSignal( control ).Emit();
   }
   else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_STOPPED ) )
   {
     // if cast succeeds there is an implementation so no need to check
-    if (!DevelControl::AccessibilityReadingStoppedSignal( control ).Empty())
+    if(!DevelControl::AccessibilityReadingStoppedSignal( control ).Empty())
       DevelControl::AccessibilityReadingStoppedSignal( control ).Emit();
+  } else
+  {
+    ret = false;
   }
-
-  return true;
+  return ret;
 }
 
 /**
@@ -2149,11 +2151,6 @@ bool Control::Impl::AccessibleImpl::ClearHighlight()
     return true;
   }
   return false;
-}
-
-int Control::Impl::AccessibleImpl::GetHighlightIndex()
-{
-  return 0;
 }
 
 std::string Control::Impl::AccessibleImpl::GetActionName( size_t index )
