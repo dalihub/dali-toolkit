@@ -299,7 +299,7 @@ bool ClearAccessibilityHighlight( Dali::Actor control )
 {
   if ( auto ac = GetControlImplementationIfAny ( control ) )
   {
-    auto ptr = dynamic_cast<Dali::Accessibility::Component*>( ac );
+    auto ptr = dynamic_cast<Dali::Accessibility::Component*>( ac->GetAccessibilityObject() );
     if( ptr )
       return ptr->ClearHighlight();
   }
@@ -310,7 +310,7 @@ bool GrabAccessibilityHighlight( Dali::Actor control )
 {
   if ( auto ac = GetControlImplementationIfAny ( control ) )
   {
-    auto ptr = dynamic_cast<Dali::Accessibility::Component*>( ac );
+    auto ptr = dynamic_cast<Dali::Accessibility::Component*>( ac->GetAccessibilityObject() );
     if( ptr )
       return ptr->GrabHighlight();
   }
@@ -321,7 +321,7 @@ Dali::Accessibility::States GetAccessibilityStates( Dali::Actor control )
 {
   if ( auto ac = GetControlImplementationIfAny ( control ) )
   {
-    auto ptr = dynamic_cast<Dali::Accessibility::Component*>( ac );
+    auto ptr = dynamic_cast<Dali::Accessibility::Component*>( ac->GetAccessibilityObject() );
     if(ptr)
       return ptr->GetStates();
   }
