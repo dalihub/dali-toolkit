@@ -4,6 +4,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-impl.h>
+#include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali/devel-api/actors/actor-devel.h>
@@ -157,6 +158,67 @@ int UtcDaliControlAccessibilityRole(void)
 
   DALI_TEST_EQUALS( role_pushbutton , q->GetRole(), TEST_LOCATION);
   DALI_TEST_EQUALS( "push button" , q->GetRoleName(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlAccessibilityRoleToggleButton(void)
+{
+  ToolkitTestApplication application;
+
+  auto control = Dali::Toolkit::ToggleButton::New();
+  auto button = Dali::Accessibility::Role::TOGGLE_BUTTON;
+
+  control.SetProperty(Toolkit::ToggleButton::Property::TOOLTIPS,
+          Property::Array{"option1", "option2"});
+
+  Dali::Accessibility::TestEnableSC( true );
+
+  control.SetProperty( DevelControl::Property::ACCESSIBILITY_ROLE, button );
+  auto q = Dali::Accessibility::Accessible::Get( control );
+
+  DALI_TEST_EQUALS( button , q->GetRole(), TEST_LOCATION);
+  DALI_TEST_EQUALS( "toggle button" , q->GetRoleName(), TEST_LOCATION );
+
+  Dali::Accessibility::States states = q->GetStates();
+  DALI_TEST_EQUALS( true , (bool)states[Dali::Accessibility::State::VISIBLE], TEST_LOCATION);
+
+  DALI_TEST_EQUALS( "option1", q->GetDescription(), TEST_LOCATION );
+
+  auto i = dynamic_cast<Dali::Accessibility::Component*>(q);
+  if (i)
+    i->GrabHighlight();
+
+  control.SetProperty( Toolkit::Button::Property::LABEL, "ToggleButton2" );
+  DALI_TEST_EQUALS( "ToggleButton2", TestGetName( q->GetAddress() ), TEST_LOCATION );
+
+  Dali::Accessibility::TestEnableSC( false );
+
+  END_TEST;
+}
+
+int UtcDaliControlAccessibilityButtonLabel(void)
+{
+  ToolkitTestApplication application;
+
+  auto control = Dali::Toolkit::PushButton::New();
+  auto button = Dali::Accessibility::Role::PUSH_BUTTON;
+
+  Dali::Accessibility::TestEnableSC( true );
+
+  control.SetProperty( DevelControl::Property::ACCESSIBILITY_ROLE, button );
+
+  auto q = Dali::Accessibility::Accessible::Get( control );
+  auto i = dynamic_cast<Dali::Accessibility::Component*>(q);
+
+  if (i)
+    i->GrabHighlight();
+
+  control.SetProperty( Toolkit::Button::Property::LABEL, "Button2" );
+
+  DALI_TEST_EQUALS( "Button2" , TestGetName( q->GetAddress() ), TEST_LOCATION );
+
+  Dali::Accessibility::TestEnableSC( false );
 
   END_TEST;
 }
