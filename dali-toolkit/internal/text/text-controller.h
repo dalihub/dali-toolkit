@@ -1506,6 +1506,16 @@ public: // Text-input Event Queuing.
   Uint32Pair GetTextSelectionRange() const;
 
   /**
+   * @copydoc Text::EditableControlInterface::IsEditable()
+   */
+  virtual bool IsEditable() const;
+
+  /**
+   * @copydoc Text::EditableControlInterface::SetEditable()
+   */
+  virtual void SetEditable( bool editable );
+
+  /**
    * @brief Event received from input method context
    *
    * @param[in] inputMethodContext The input method context.

@@ -3005,3 +3005,48 @@ int UtcDaliTextFieldSelectRange(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldEnableEditing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldEnableEditing ");
+
+  TextField textField = TextField::New();
+
+  application.GetScene().Add( textField );
+
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textField.SetKeyInputFocus();
+  textField.SetProperty( DevelTextField::Property::ENABLE_EDITING, false );
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textField.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "", TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::ENABLE_EDITING ).Get<bool>(), false, TEST_LOCATION );
+
+
+  textField.SetKeyInputFocus();
+  textField.SetProperty( DevelTextField::Property::ENABLE_EDITING, true );
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textField.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "D", TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::ENABLE_EDITING ).Get<bool>(), true, TEST_LOCATION );
+
+  END_TEST;
+}

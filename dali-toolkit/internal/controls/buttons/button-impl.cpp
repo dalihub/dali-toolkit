@@ -379,7 +379,7 @@ void Button::CreateVisualsForComponent( Property::Index index, const Property::V
   else
   {
     // if its not a string then get a Property::Map from the property if possible.
-    Property::Map *map = value.GetMap();
+    const Property::Map *map = value.GetMap();
     if( map && !map->Empty()  ) // Empty map results in current visual removal.
     {
       DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent Using Map(%d)\n", index );
@@ -1151,11 +1151,11 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
         else
         {
           // Get a Property::Map from the property if possible.
-          Property::Map* setPropertyMap = value.GetMap();
+          const Property::Map* setPropertyMap = value.GetMap();
           if( setPropertyMap )
           {
-            TextVisual::ConvertStringKeysToIndexKeys( *setPropertyMap );
-            GetImplementation( button ).MergeWithExistingLabelProperties( *setPropertyMap, outTextVisualProperties );
+            Property::Map indexKeys = TextVisual::ConvertStringKeysToIndexKeys( *setPropertyMap );
+            GetImplementation( button ).MergeWithExistingLabelProperties( indexKeys, outTextVisualProperties );
           }
         }
 

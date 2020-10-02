@@ -432,7 +432,7 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::ImageView::Property::IMAGE:
       {
         std::string imageUrl;
-        Property::Map* map;
+        const Property::Map* map;
         if( value.Get( imageUrl ) )
         {
           impl.SetImage( imageUrl, ImageDimensions() );

@@ -579,6 +579,15 @@ public:
    */
   void SetScrollSpeed( float speed );
 
+ /**
+   * @brief Sets Editable mode decoration.
+   *
+   * If this set to false, Primary cursor and grab will always be hidden.
+   *
+   * @param[in] isEditable enable or disable Editing.
+   */
+  void SetEditable( bool isEditable );
+
   /**
    * @brief Retrieves the scroll speed.
    *

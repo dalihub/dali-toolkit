@@ -276,7 +276,7 @@ void ArcVisual::OnDoAction( const Property::Index actionId, const Property::Valu
   {
     case DevelArcVisual::Action::UPDATE_PROPERTY:
     {
-      Property::Map* map = attributes.GetMap();
+      const Property::Map* map = attributes.GetMap();
       if( map )
       {
         DoSetProperties( *map );
