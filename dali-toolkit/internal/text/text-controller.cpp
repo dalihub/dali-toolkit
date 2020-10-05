@@ -22,48 +22,28 @@
 #include <limits>
 #include <cmath>
 #include <memory.h>
-#include <dali/public-api/adaptor-framework/key.h>
 #include <dali/integration-api/debug.h>
-#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
-#include <dali/devel-api/text-abstraction/font-client.h>
-#include <dali/devel-api/adaptor-framework/key-devel.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/text-controls/placeholder-properties.h>
-#include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
-#include <dali-toolkit/internal/text/multi-language-support.h>
+#include <dali-toolkit/internal/text/text-controller-event-handler.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
+#include <dali-toolkit/internal/text/text-controller-input-font-handler.h>
+#include <dali-toolkit/internal/text/text-controller-placeholder-handler.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
-#include <dali-toolkit/internal/text/text-font-style.h>
 
 namespace
 {
 
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const std::string EMPTY_STRING("");
-
-const std::string KEY_C_NAME = "c";
-const std::string KEY_V_NAME = "v";
-const std::string KEY_X_NAME = "x";
-const std::string KEY_A_NAME = "a";
-const std::string KEY_INSERT_NAME = "Insert";
-
-const char * const PLACEHOLDER_TEXT = "text";
-const char * const PLACEHOLDER_TEXT_FOCUSED = "textFocused";
-const char * const PLACEHOLDER_COLOR = "color";
-const char * const PLACEHOLDER_FONT_FAMILY = "fontFamily";
-const char * const PLACEHOLDER_FONT_STYLE = "fontStyle";
-const char * const PLACEHOLDER_POINT_SIZE = "pointSize";
-const char * const PLACEHOLDER_PIXEL_SIZE = "pixelSize";
-const char * const PLACEHOLDER_ELLIPSIS = "ellipsis";
 
 float ConvertToEven( float value )
 {
@@ -91,44 +71,6 @@ namespace Toolkit
 
 namespace Text
 {
-
-/**
- * @brief Adds a new font description run for the selected text.
- *
- * The new font parameters are added after the call to this method.
- *
- * @param[in] eventData The event data pointer.
- * @param[in] logicalModel The logical model where to add the new font description run.
- * @param[out] startOfSelectedText Index to the first selected character.
- * @param[out] lengthOfSelectedText Number of selected characters.
- */
-FontDescriptionRun& UpdateSelectionFontStyleRun( EventData* eventData,
-                                                 LogicalModelPtr logicalModel,
-                                                 CharacterIndex& startOfSelectedText,
-                                                 Length& lengthOfSelectedText )
-{
-  const bool handlesCrossed = eventData->mLeftSelectionPosition > eventData->mRightSelectionPosition;
-
-  // Get start and end position of selection
-  startOfSelectedText = handlesCrossed ? eventData->mRightSelectionPosition : eventData->mLeftSelectionPosition;
-  lengthOfSelectedText = ( handlesCrossed ? eventData->mLeftSelectionPosition : eventData->mRightSelectionPosition ) - startOfSelectedText;
-
-  // Add the font run.
-  const VectorBase::SizeType numberOfRuns = logicalModel->mFontDescriptionRuns.Count();
-  logicalModel->mFontDescriptionRuns.Resize( numberOfRuns + 1u );
-
-  FontDescriptionRun& fontDescriptionRun = *( logicalModel->mFontDescriptionRuns.Begin() + numberOfRuns );
-
-  fontDescriptionRun.characterRun.characterIndex = startOfSelectedText;
-  fontDescriptionRun.characterRun.numberOfCharacters = lengthOfSelectedText;
-
-  // Recalculate the selection highlight as the metrics may have changed.
-  eventData->mUpdateLeftSelectionPosition = true;
-  eventData->mUpdateRightSelectionPosition = true;
-  eventData->mUpdateHighlightBox = true;
-
-  return fontDescriptionRun;
-}
 
 // public : Constructor.
 
@@ -594,20 +536,12 @@ Vector2 Controller::GetTextFitContentSize() const
 
 void Controller::SetPlaceholderTextElideEnabled( bool enabled )
 {
-  mImpl->mEventData->mIsPlaceholderElideEnabled = enabled;
-  mImpl->mEventData->mPlaceholderEllipsisFlag = true;
-
-  // Update placeholder if there is no text
-  if( mImpl->IsShowingPlaceholderText() ||
-      ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
-  {
-    ShowPlaceholderText();
-  }
+  PlaceholderHandler::SetPlaceholderTextElideEnabled(*this, enabled);
 }
 
 bool Controller::IsPlaceholderTextElideEnabled() const
 {
-  return mImpl->mEventData->mIsPlaceholderElideEnabled;
+  return PlaceholderHandler::IsPlaceholderTextElideEnabled(*this);
 }
 
 void Controller::SetSelectionEnabled( bool enabled )
@@ -776,39 +710,12 @@ void Controller::GetText( std::string& text ) const
 
 void Controller::SetPlaceholderText( PlaceholderType type, const std::string& text )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    if( PLACEHOLDER_TYPE_INACTIVE == type )
-    {
-      mImpl->mEventData->mPlaceholderTextInactive = text;
-    }
-    else
-    {
-      mImpl->mEventData->mPlaceholderTextActive = text;
-    }
-
-    // Update placeholder if there is no text
-    if( mImpl->IsShowingPlaceholderText() ||
-        ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
-    {
-      ShowPlaceholderText();
-    }
-  }
+  PlaceholderHandler::SetPlaceholderText(*this, type, text);
 }
 
 void Controller::GetPlaceholderText( PlaceholderType type, std::string& text ) const
 {
-  if( NULL != mImpl->mEventData )
-  {
-    if( PLACEHOLDER_TYPE_INACTIVE == type )
-    {
-      text = mImpl->mEventData->mPlaceholderTextInactive;
-    }
-    else
-    {
-      text = mImpl->mEventData->mPlaceholderTextActive;
-    }
-  }
+  PlaceholderHandler::GetPlaceholderText(*this, type, text );
 }
 
 void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
@@ -867,29 +774,12 @@ const std::string& Controller::GetDefaultFontFamily() const
 
 void Controller::SetPlaceholderFontFamily( const std::string& placeholderTextFontFamily )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    if( NULL == mImpl->mEventData->mPlaceholderFont )
-    {
-      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
-    }
-
-    mImpl->mEventData->mPlaceholderFont->mFontDescription.family = placeholderTextFontFamily;
-    DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetPlaceholderFontFamily %s\n", placeholderTextFontFamily.c_str());
-    mImpl->mEventData->mPlaceholderFont->familyDefined = !placeholderTextFontFamily.empty();
-
-    mImpl->RequestRelayout();
-  }
+  PlaceholderHandler::SetPlaceholderFontFamily(*this, placeholderTextFontFamily);
 }
 
 const std::string& Controller::GetPlaceholderFontFamily() const
 {
-  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
-  {
-    return mImpl->mEventData->mPlaceholderFont->mFontDescription.family;
-  }
-
-  return EMPTY_STRING;
+  return PlaceholderHandler::GetPlaceholderFontFamily(*this);
 }
 
 void Controller::SetDefaultFontWeight( FontWeight weight )
@@ -940,37 +830,17 @@ FontWeight Controller::GetDefaultFontWeight() const
 
 void Controller::SetPlaceholderTextFontWeight( FontWeight weight )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    if( NULL == mImpl->mEventData->mPlaceholderFont )
-    {
-      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
-    }
-
-    mImpl->mEventData->mPlaceholderFont->mFontDescription.weight = weight;
-    mImpl->mEventData->mPlaceholderFont->weightDefined = true;
-
-    mImpl->RequestRelayout();
-  }
+  PlaceholderHandler::SetPlaceholderTextFontWeight(*this, weight);
 }
 
 bool Controller::IsPlaceholderTextFontWeightDefined() const
 {
-  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
-  {
-    return mImpl->mEventData->mPlaceholderFont->weightDefined;
-  }
-  return false;
+  return PlaceholderHandler::IsPlaceholderTextFontWeightDefined(*this);;
 }
 
 FontWeight Controller::GetPlaceholderTextFontWeight() const
 {
-  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
-  {
-    return mImpl->mEventData->mPlaceholderFont->mFontDescription.weight;
-  }
-
-  return TextAbstraction::FontWeight::NORMAL;
+  return PlaceholderHandler::GetPlaceholderTextFontWeight(*this);
 }
 
 void Controller::SetDefaultFontWidth( FontWidth width )
@@ -1021,37 +891,17 @@ FontWidth Controller::GetDefaultFontWidth() const
 
 void Controller::SetPlaceholderTextFontWidth( FontWidth width )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    if( NULL == mImpl->mEventData->mPlaceholderFont )
-    {
-      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
-    }
-
-    mImpl->mEventData->mPlaceholderFont->mFontDescription.width = width;
-    mImpl->mEventData->mPlaceholderFont->widthDefined = true;
-
-    mImpl->RequestRelayout();
-  }
+  PlaceholderHandler::SetPlaceholderTextFontWidth(*this, width);
 }
 
 bool Controller::IsPlaceholderTextFontWidthDefined() const
 {
-  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
-  {
-    return mImpl->mEventData->mPlaceholderFont->widthDefined;
-  }
-  return false;
+  return PlaceholderHandler::IsPlaceholderTextFontWidthDefined(*this);
 }
 
 FontWidth Controller::GetPlaceholderTextFontWidth() const
 {
-  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
-  {
-    return mImpl->mEventData->mPlaceholderFont->mFontDescription.width;
-  }
-
-  return TextAbstraction::FontWidth::NORMAL;
+  return PlaceholderHandler::GetPlaceholderTextFontWidth(*this);
 }
 
 void Controller::SetDefaultFontSlant( FontSlant slant )
@@ -1101,37 +951,17 @@ FontSlant Controller::GetDefaultFontSlant() const
 
 void Controller::SetPlaceholderTextFontSlant( FontSlant slant )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    if( NULL == mImpl->mEventData->mPlaceholderFont )
-    {
-      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
-    }
-
-    mImpl->mEventData->mPlaceholderFont->mFontDescription.slant = slant;
-    mImpl->mEventData->mPlaceholderFont->slantDefined = true;
-
-    mImpl->RequestRelayout();
-  }
+  PlaceholderHandler::SetPlaceholderTextFontSlant(*this, slant);
 }
 
 bool Controller::IsPlaceholderTextFontSlantDefined() const
 {
-  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
-  {
-    return mImpl->mEventData->mPlaceholderFont->slantDefined;
-  }
-  return false;
+  return PlaceholderHandler::IsPlaceholderTextFontSlantDefined(*this);
 }
 
 FontSlant Controller::GetPlaceholderTextFontSlant() const
 {
-  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
-  {
-    return mImpl->mEventData->mPlaceholderFont->mFontDescription.slant;
-  }
-
-  return TextAbstraction::FontSlant::NORMAL;
+  return PlaceholderHandler::GetPlaceholderTextFontSlant(*this);
 }
 
 void Controller::SetDefaultFontSize( float fontSize, FontSizeType type )
@@ -1211,85 +1041,12 @@ float Controller::GetDefaultFontSize( FontSizeType type ) const
 
 void Controller::SetPlaceholderTextFontSize( float fontSize, FontSizeType type )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    if( NULL == mImpl->mEventData->mPlaceholderFont )
-    {
-      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
-    }
-
-    switch( type )
-    {
-      case POINT_SIZE:
-      {
-        mImpl->mEventData->mPlaceholderFont->mDefaultPointSize = fontSize;
-        mImpl->mEventData->mPlaceholderFont->sizeDefined = true;
-        mImpl->mEventData->mIsPlaceholderPixelSize = false; // Font size flag
-        break;
-      }
-      case PIXEL_SIZE:
-      {
-        // Point size = Pixel size * 72.f / DPI
-        unsigned int horizontalDpi = 0u;
-        unsigned int verticalDpi = 0u;
-        TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-        fontClient.GetDpi( horizontalDpi, verticalDpi );
-
-        mImpl->mEventData->mPlaceholderFont->mDefaultPointSize = ( fontSize * 72.f ) / static_cast< float >( horizontalDpi );
-        mImpl->mEventData->mPlaceholderFont->sizeDefined = true;
-        mImpl->mEventData->mIsPlaceholderPixelSize = true; // Font size flag
-        break;
-      }
-    }
-
-    mImpl->RequestRelayout();
-  }
+  PlaceholderHandler::SetPlaceholderTextFontSize(*this, fontSize, type);
 }
 
 float Controller::GetPlaceholderTextFontSize( FontSizeType type ) const
 {
-  float value = 0.0f;
-  if( NULL != mImpl->mEventData )
-  {
-    switch( type )
-    {
-      case POINT_SIZE:
-      {
-        if( NULL != mImpl->mEventData->mPlaceholderFont )
-        {
-          value = mImpl->mEventData->mPlaceholderFont->mDefaultPointSize;
-        }
-        else
-        {
-          // If the placeholder text font size is not set, then return the default font size.
-          value = GetDefaultFontSize( POINT_SIZE );
-        }
-        break;
-      }
-      case PIXEL_SIZE:
-      {
-        if( NULL != mImpl->mEventData->mPlaceholderFont )
-        {
-          // Pixel size = Point size * DPI / 72.f
-          unsigned int horizontalDpi = 0u;
-          unsigned int verticalDpi = 0u;
-          TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-          fontClient.GetDpi( horizontalDpi, verticalDpi );
-
-          value = mImpl->mEventData->mPlaceholderFont->mDefaultPointSize * static_cast< float >( horizontalDpi ) / 72.f;
-        }
-        else
-        {
-          // If the placeholder text font size is not set, then return the default font size.
-          value = GetDefaultFontSize( PIXEL_SIZE );
-        }
-        break;
-      }
-    }
-    return value;
-  }
-
-  return value;
+  return PlaceholderHandler::GetPlaceholderTextFontSize(*this, type);
 }
 
 void Controller::SetDefaultColor( const Vector4& color )
@@ -1315,26 +1072,12 @@ const Vector4& Controller::GetDefaultColor() const
 
 void Controller::SetPlaceholderTextColor( const Vector4& textColor )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mPlaceholderTextColor = textColor;
-  }
-
-  if( mImpl->IsShowingPlaceholderText() )
-  {
-    mImpl->mModel->mVisualModel->SetTextColor( textColor );
-    mImpl->RequestRelayout();
-  }
+  PlaceholderHandler::SetPlaceholderTextColor(*this, textColor);
 }
 
 const Vector4& Controller::GetPlaceholderTextColor() const
 {
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mPlaceholderTextColor;
-  }
-
-  return Color::BLACK;
+  return PlaceholderHandler::GetPlaceholderTextColor(*this);
 }
 
 void Controller::SetShadowOffset( const Vector2& shadowOffset )
@@ -1581,369 +1324,67 @@ const Vector4& Controller::GetInputColor() const
 
 void Controller::SetInputFontFamily( const std::string& fontFamily )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mInputStyle.familyName = fontFamily;
-    mImpl->mEventData->mInputStyle.isFamilyDefined = true;
-
-    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
-    {
-      CharacterIndex startOfSelectedText = 0u;
-      Length lengthOfSelectedText = 0u;
-
-      if( EventData::SELECTING == mImpl->mEventData->mState )
-      {
-        // Update a font description run for the selecting state.
-        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                              mImpl->mModel->mLogicalModel,
-                                                                              startOfSelectedText,
-                                                                              lengthOfSelectedText );
-
-        fontDescriptionRun.familyLength = fontFamily.size();
-        fontDescriptionRun.familyName = new char[fontDescriptionRun.familyLength];
-        memcpy( fontDescriptionRun.familyName, fontFamily.c_str(), fontDescriptionRun.familyLength );
-        fontDescriptionRun.familyDefined = true;
-
-        // The memory allocated for the font family name is freed when the font description is removed from the logical model.
-
-        mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
-      }
-      else
-      {
-        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
-      }
-
-      // Request to relayout.
-      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                               VALIDATE_FONTS            |
-                                                               SHAPE_TEXT                |
-                                                               GET_GLYPH_METRICS         |
-                                                               LAYOUT                    |
-                                                               UPDATE_LAYOUT_SIZE        |
-                                                               REORDER                   |
-                                                               ALIGN );
-      mImpl->mRecalculateNaturalSize = true;
-      mImpl->RequestRelayout();
-
-      // As the font changes, recalculate the handle positions is needed.
-      mImpl->mEventData->mUpdateLeftSelectionPosition = true;
-      mImpl->mEventData->mUpdateRightSelectionPosition = true;
-      mImpl->mEventData->mUpdateHighlightBox = true;
-      mImpl->mEventData->mScrollAfterUpdatePosition = true;
-    }
-  }
+  InputFontHandler::SetInputFontFamily(*this, fontFamily);
 }
 
 const std::string& Controller::GetInputFontFamily() const
 {
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mInputStyle.familyName;
-  }
-
-  // Return the default font's family if there is no EventData.
-  return GetDefaultFontFamily();
+  return InputFontHandler::GetInputFontFamily(*this);
 }
 
 void Controller::SetInputFontWeight( FontWeight weight )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mInputStyle.weight = weight;
-    mImpl->mEventData->mInputStyle.isWeightDefined = true;
-
-    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
-    {
-      CharacterIndex startOfSelectedText = 0u;
-      Length lengthOfSelectedText = 0u;
-
-      if( EventData::SELECTING == mImpl->mEventData->mState )
-      {
-        // Update a font description run for the selecting state.
-        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                              mImpl->mModel->mLogicalModel,
-                                                                              startOfSelectedText,
-                                                                              lengthOfSelectedText );
-
-        fontDescriptionRun.weight = weight;
-        fontDescriptionRun.weightDefined = true;
-
-        mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
-      }
-      else
-      {
-        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
-      }
-
-      // Request to relayout.
-      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                               VALIDATE_FONTS            |
-                                                               SHAPE_TEXT                |
-                                                               GET_GLYPH_METRICS         |
-                                                               LAYOUT                    |
-                                                               UPDATE_LAYOUT_SIZE        |
-                                                               REORDER                   |
-                                                               ALIGN );
-      mImpl->mRecalculateNaturalSize = true;
-      mImpl->RequestRelayout();
-
-      // As the font might change, recalculate the handle positions is needed.
-      mImpl->mEventData->mUpdateLeftSelectionPosition = true;
-      mImpl->mEventData->mUpdateRightSelectionPosition = true;
-      mImpl->mEventData->mUpdateHighlightBox = true;
-      mImpl->mEventData->mScrollAfterUpdatePosition = true;
-    }
-  }
+  InputFontHandler::SetInputFontWeight(*this, weight);
 }
 
 bool Controller::IsInputFontWeightDefined() const
 {
-  bool defined = false;
-
-  if( NULL != mImpl->mEventData )
-  {
-    defined = mImpl->mEventData->mInputStyle.isWeightDefined;
-  }
-
-  return defined;
+  return InputFontHandler::IsInputFontWeightDefined(*this);
 }
 
 FontWeight Controller::GetInputFontWeight() const
 {
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mInputStyle.weight;
-  }
-
-  return GetDefaultFontWeight();
+  return InputFontHandler::GetInputFontWeight(*this);
 }
 
 void Controller::SetInputFontWidth( FontWidth width )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mInputStyle.width = width;
-    mImpl->mEventData->mInputStyle.isWidthDefined = true;
-
-    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
-    {
-      CharacterIndex startOfSelectedText = 0u;
-      Length lengthOfSelectedText = 0u;
-
-      if( EventData::SELECTING == mImpl->mEventData->mState )
-      {
-        // Update a font description run for the selecting state.
-        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                              mImpl->mModel->mLogicalModel,
-                                                                              startOfSelectedText,
-                                                                              lengthOfSelectedText );
-
-        fontDescriptionRun.width = width;
-        fontDescriptionRun.widthDefined = true;
-
-        mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
-      }
-      else
-      {
-        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
-      }
-
-      // Request to relayout.
-      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                               VALIDATE_FONTS            |
-                                                               SHAPE_TEXT                |
-                                                               GET_GLYPH_METRICS         |
-                                                               LAYOUT                    |
-                                                               UPDATE_LAYOUT_SIZE        |
-                                                               REORDER                   |
-                                                               ALIGN );
-      mImpl->mRecalculateNaturalSize = true;
-      mImpl->RequestRelayout();
-
-      // As the font might change, recalculate the handle positions is needed.
-      mImpl->mEventData->mUpdateLeftSelectionPosition = true;
-      mImpl->mEventData->mUpdateRightSelectionPosition = true;
-      mImpl->mEventData->mUpdateHighlightBox = true;
-      mImpl->mEventData->mScrollAfterUpdatePosition = true;
-    }
-  }
+  InputFontHandler::SetInputFontWidth(*this, width);
 }
 
 bool Controller::IsInputFontWidthDefined() const
 {
-  bool defined = false;
-
-  if( NULL != mImpl->mEventData )
-  {
-    defined = mImpl->mEventData->mInputStyle.isWidthDefined;
-  }
-
-  return defined;
+  return InputFontHandler::IsInputFontWidthDefined(*this);
 }
 
 FontWidth Controller::GetInputFontWidth() const
 {
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mInputStyle.width;
-  }
-
-  return GetDefaultFontWidth();
+  return InputFontHandler::GetInputFontWidth(*this);
 }
 
 void Controller::SetInputFontSlant( FontSlant slant )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mInputStyle.slant = slant;
-    mImpl->mEventData->mInputStyle.isSlantDefined = true;
-
-    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
-    {
-      CharacterIndex startOfSelectedText = 0u;
-      Length lengthOfSelectedText = 0u;
-
-      if( EventData::SELECTING == mImpl->mEventData->mState )
-      {
-        // Update a font description run for the selecting state.
-        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                              mImpl->mModel->mLogicalModel,
-                                                                              startOfSelectedText,
-                                                                              lengthOfSelectedText );
-
-        fontDescriptionRun.slant = slant;
-        fontDescriptionRun.slantDefined = true;
-
-        mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
-      }
-      else
-      {
-        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
-      }
-
-      // Request to relayout.
-      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                               VALIDATE_FONTS            |
-                                                               SHAPE_TEXT                |
-                                                               GET_GLYPH_METRICS         |
-                                                               LAYOUT                    |
-                                                               UPDATE_LAYOUT_SIZE        |
-                                                               REORDER                   |
-                                                               ALIGN );
-      mImpl->mRecalculateNaturalSize = true;
-      mImpl->RequestRelayout();
-
-      // As the font might change, recalculate the handle positions is needed.
-      mImpl->mEventData->mUpdateLeftSelectionPosition = true;
-      mImpl->mEventData->mUpdateRightSelectionPosition = true;
-      mImpl->mEventData->mUpdateHighlightBox = true;
-      mImpl->mEventData->mScrollAfterUpdatePosition = true;
-    }
-  }
+  InputFontHandler::SetInputFontSlant(*this, slant);
 }
 
 bool Controller::IsInputFontSlantDefined() const
 {
-  bool defined = false;
-
-  if( NULL != mImpl->mEventData )
-  {
-    defined = mImpl->mEventData->mInputStyle.isSlantDefined;
-  }
-
-  return defined;
+  return InputFontHandler::IsInputFontSlantDefined(*this);
 }
 
 FontSlant Controller::GetInputFontSlant() const
 {
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mInputStyle.slant;
-  }
-
-  return GetDefaultFontSlant();
+  return InputFontHandler::GetInputFontSlant(*this);
 }
 
 void Controller::SetInputFontPointSize( float size )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mInputStyle.size = size;
-    mImpl->mEventData->mInputStyle.isSizeDefined = true;
-
-    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
-    {
-      CharacterIndex startOfSelectedText = 0u;
-      Length lengthOfSelectedText = 0u;
-
-      if( EventData::SELECTING == mImpl->mEventData->mState )
-      {
-        // Update a font description run for the selecting state.
-        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                              mImpl->mModel->mLogicalModel,
-                                                                              startOfSelectedText,
-                                                                              lengthOfSelectedText );
-
-        fontDescriptionRun.size = static_cast<PointSize26Dot6>( size * 64.f );
-        fontDescriptionRun.sizeDefined = true;
-
-        mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
-      }
-      else
-      {
-        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
-      }
-
-      // Request to relayout.
-      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                               VALIDATE_FONTS            |
-                                                               SHAPE_TEXT                |
-                                                               GET_GLYPH_METRICS         |
-                                                               LAYOUT                    |
-                                                               UPDATE_LAYOUT_SIZE        |
-                                                               REORDER                   |
-                                                               ALIGN );
-      mImpl->mRecalculateNaturalSize = true;
-      mImpl->RequestRelayout();
-
-      // As the font might change, recalculate the handle positions is needed.
-      mImpl->mEventData->mUpdateLeftSelectionPosition = true;
-      mImpl->mEventData->mUpdateRightSelectionPosition = true;
-      mImpl->mEventData->mUpdateHighlightBox = true;
-      mImpl->mEventData->mScrollAfterUpdatePosition = true;
-    }
-  }
+  InputFontHandler::SetInputFontPointSize(*this, size);
 }
 
 float Controller::GetInputFontPointSize() const
 {
-  if( NULL != mImpl->mEventData )
-  {
-    return mImpl->mEventData->mInputStyle.size;
-  }
-
-  // Return the default font's point size if there is no EventData.
-  return GetDefaultFontSize( Text::Controller::POINT_SIZE );
+  return InputFontHandler::GetInputFontPointSize(*this);
 }
 
 void Controller::SetInputLineSpacing( float lineSpacing )
@@ -2433,107 +1874,12 @@ void Controller::GetHiddenInputOption(Property::Map& options )
 
 void Controller::SetPlaceholderProperty( const Property::Map& map )
 {
-  const Property::Map::SizeType count = map.Count();
-
-  for( Property::Map::SizeType position = 0; position < count; ++position )
-  {
-    KeyValuePair keyValue = map.GetKeyValue( position );
-    Property::Key& key = keyValue.first;
-    Property::Value& value = keyValue.second;
-
-    if( key == Toolkit::Text::PlaceHolder::Property::TEXT  || key == PLACEHOLDER_TEXT )
-    {
-      std::string text = "";
-      value.Get( text );
-      SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
-    }
-    else if( key == Toolkit::Text::PlaceHolder::Property::TEXT_FOCUSED || key == PLACEHOLDER_TEXT_FOCUSED )
-    {
-      std::string text = "";
-      value.Get( text );
-      SetPlaceholderText( Controller::PLACEHOLDER_TYPE_ACTIVE, text );
-    }
-    else if( key == Toolkit::Text::PlaceHolder::Property::COLOR || key == PLACEHOLDER_COLOR )
-    {
-      Vector4 textColor;
-      value.Get( textColor );
-      if( GetPlaceholderTextColor() != textColor )
-      {
-        SetPlaceholderTextColor( textColor );
-      }
-    }
-    else if( key == Toolkit::Text::PlaceHolder::Property::FONT_FAMILY || key == PLACEHOLDER_FONT_FAMILY )
-    {
-      std::string fontFamily = "";
-      value.Get( fontFamily );
-      SetPlaceholderFontFamily( fontFamily );
-    }
-    else if( key == Toolkit::Text::PlaceHolder::Property::FONT_STYLE || key == PLACEHOLDER_FONT_STYLE )
-    {
-      SetFontStyleProperty( this, value, Text::FontStyle::PLACEHOLDER );
-    }
-    else if( key == Toolkit::Text::PlaceHolder::Property::POINT_SIZE || key == PLACEHOLDER_POINT_SIZE )
-    {
-      float pointSize;
-      value.Get( pointSize );
-      if( !Equals( GetPlaceholderTextFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
-      {
-        SetPlaceholderTextFontSize( pointSize, Text::Controller::POINT_SIZE );
-      }
-    }
-    else if( key == Toolkit::Text::PlaceHolder::Property::PIXEL_SIZE || key == PLACEHOLDER_PIXEL_SIZE )
-    {
-      float pixelSize;
-      value.Get( pixelSize );
-      if( !Equals( GetPlaceholderTextFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
-      {
-        SetPlaceholderTextFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
-      }
-    }
-    else if( key == Toolkit::Text::PlaceHolder::Property::ELLIPSIS || key == PLACEHOLDER_ELLIPSIS )
-    {
-      bool ellipsis;
-      value.Get( ellipsis );
-      SetPlaceholderTextElideEnabled( ellipsis );
-    }
-  }
+  PlaceholderHandler::SetPlaceholderProperty(*this, map);
 }
 
 void Controller::GetPlaceholderProperty( Property::Map& map )
 {
-  if( NULL != mImpl->mEventData )
-  {
-    if( !mImpl->mEventData->mPlaceholderTextActive.empty() )
-    {
-      map[ Text::PlaceHolder::Property::TEXT_FOCUSED ] = mImpl->mEventData->mPlaceholderTextActive;
-    }
-    if( !mImpl->mEventData->mPlaceholderTextInactive.empty() )
-    {
-      map[ Text::PlaceHolder::Property::TEXT ] = mImpl->mEventData->mPlaceholderTextInactive;
-    }
-
-    map[ Text::PlaceHolder::Property::COLOR ] = mImpl->mEventData->mPlaceholderTextColor;
-    map[ Text::PlaceHolder::Property::FONT_FAMILY ] = GetPlaceholderFontFamily();
-
-    Property::Value fontStyleMapGet;
-    GetFontStyleProperty( this, fontStyleMapGet, Text::FontStyle::PLACEHOLDER );
-    map[ Text::PlaceHolder::Property::FONT_STYLE ] = fontStyleMapGet;
-
-    // Choose font size : POINT_SIZE or PIXEL_SIZE
-    if( !mImpl->mEventData->mIsPlaceholderPixelSize )
-    {
-      map[ Text::PlaceHolder::Property::POINT_SIZE ] = GetPlaceholderTextFontSize( Text::Controller::POINT_SIZE );
-    }
-    else
-    {
-      map[ Text::PlaceHolder::Property::PIXEL_SIZE ] = GetPlaceholderTextFontSize( Text::Controller::PIXEL_SIZE );
-    }
-
-    if( mImpl->mEventData->mPlaceholderEllipsisFlag )
-    {
-      map[ Text::PlaceHolder::Property::ELLIPSIS ] = IsPlaceholderTextElideEnabled();
-    }
-  }
+  PlaceholderHandler::GetPlaceholderProperty(*this, map);
 }
 
 Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
@@ -2783,417 +2129,37 @@ void Controller::ProcessInputStyleChangedSignals()
 
 void Controller::KeyboardFocusGainEvent()
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected KeyboardFocusGainEvent" );
-
-  if( NULL != mImpl->mEventData )
-  {
-    if( ( EventData::INACTIVE == mImpl->mEventData->mState ) ||
-        ( EventData::INTERRUPTED == mImpl->mEventData->mState ) )
-    {
-      mImpl->ChangeState( EventData::EDITING );
-      mImpl->mEventData->mUpdateCursorPosition = true; //If editing started without tap event, cursor update must be triggered.
-      mImpl->mEventData->mUpdateInputStyle = true;
-      mImpl->mEventData->mScrollAfterUpdatePosition = true;
-    }
-    mImpl->NotifyInputMethodContextMultiLineStatus();
-    if( mImpl->IsShowingPlaceholderText() )
-    {
-      // Show alternative placeholder-text when editing
-      ShowPlaceholderText();
-    }
-
-    mImpl->RequestRelayout();
-  }
+  EventHandler::KeyboardFocusGainEvent(*this);
 }
 
 void Controller::KeyboardFocusLostEvent()
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected KeyboardFocusLostEvent" );
-
-  if( NULL != mImpl->mEventData )
-  {
-    if( EventData::INTERRUPTED != mImpl->mEventData->mState )
-    {
-      mImpl->ChangeState( EventData::INACTIVE );
-
-      if( !mImpl->IsShowingRealText() )
-      {
-        // Revert to regular placeholder-text when not editing
-        ShowPlaceholderText();
-      }
-    }
-  }
-  mImpl->RequestRelayout();
+  EventHandler::KeyboardFocusLostEvent(*this);
 }
 
 bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected KeyEvent" );
-
-  bool textChanged = false;
-  bool relayoutNeeded = false;
-
-  if( ( NULL != mImpl->mEventData ) &&
-      ( keyEvent.GetState() == KeyEvent::DOWN ) )
-  {
-    int keyCode = keyEvent.GetKeyCode();
-    const std::string& keyString = keyEvent.GetKeyString();
-    const std::string keyName = keyEvent.GetKeyName();
-
-    const bool isNullKey = ( 0 == keyCode ) && ( keyString.empty() );
-
-    // Pre-process to separate modifying events from non-modifying input events.
-    if( isNullKey )
-    {
-      // In some platforms arrive key events with no key code.
-      // Do nothing.
-      return false;
-    }
-    else if( Dali::DALI_KEY_ESCAPE == keyCode || Dali::DALI_KEY_BACK == keyCode  || Dali::DALI_KEY_SEARCH == keyCode )
-    {
-      // Do nothing
-      return false;
-    }
-    else if( ( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ) ||
-             ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode ) ||
-             ( Dali::DALI_KEY_CURSOR_UP    == keyCode ) ||
-             ( Dali::DALI_KEY_CURSOR_DOWN  == keyCode ) )
-    {
-      // If don't have any text, do nothing.
-      if( !mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters )
-      {
-        return false;
-      }
-
-      uint32_t cursorPosition = mImpl->mEventData->mPrimaryCursorPosition;
-      uint32_t numberOfCharacters = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-      uint32_t cursorLine = mImpl->mModel->mVisualModel->GetLineOfCharacter( cursorPosition );
-      uint32_t numberOfLines = mImpl->mModel->GetNumberOfLines();
-
-      // Logic to determine whether this text control will lose focus or not.
-      if( ( Dali::DALI_KEY_CURSOR_LEFT == keyCode && 0 == cursorPosition && !keyEvent.IsShiftModifier() ) ||
-          ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode && numberOfCharacters == cursorPosition && !keyEvent.IsShiftModifier() ) ||
-          ( Dali::DALI_KEY_CURSOR_DOWN == keyCode && cursorLine == numberOfLines -1 ) ||
-          ( Dali::DALI_KEY_CURSOR_DOWN == keyCode && numberOfCharacters == cursorPosition && cursorLine -1 == numberOfLines -1 ) ||
-          ( Dali::DALI_KEY_CURSOR_UP == keyCode && cursorLine == 0 ) ||
-          ( Dali::DALI_KEY_CURSOR_UP == keyCode && numberOfCharacters == cursorPosition && cursorLine == 1 ) )
-      {
-        // Release the active highlight.
-        if( mImpl->mEventData->mState == EventData::SELECTING )
-        {
-          mImpl->ChangeState( EventData::EDITING );
-
-          // Update selection position.
-          mImpl->mEventData->mLeftSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
-          mImpl->mEventData->mRightSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
-          mImpl->mEventData->mUpdateCursorPosition = true;
-          mImpl->RequestRelayout();
-        }
-        return false;
-      }
-
-      mImpl->mEventData->mCheckScrollAmount = true;
-      Event event( Event::CURSOR_KEY_EVENT );
-      event.p1.mInt = keyCode;
-      event.p2.mBool = keyEvent.IsShiftModifier();
-      mImpl->mEventData->mEventQueue.push_back( event );
-
-      // Will request for relayout.
-      relayoutNeeded = true;
-    }
-    else if ( Dali::DevelKey::DALI_KEY_CONTROL_LEFT == keyCode || Dali::DevelKey::DALI_KEY_CONTROL_RIGHT == keyCode )
-    {
-      // Left or Right Control key event is received before Ctrl-C/V/X key event is received
-      // If not handle it here, any selected text will be deleted
-
-      // Do nothing
-      return false;
-    }
-    else if ( keyEvent.IsCtrlModifier() && !keyEvent.IsShiftModifier())
-    {
-      bool consumed = false;
-      if (keyName == KEY_C_NAME || keyName == KEY_INSERT_NAME)
-      {
-        // Ctrl-C or Ctrl+Insert to copy the selected text
-        TextPopupButtonTouched( Toolkit::TextSelectionPopup::COPY );
-        consumed = true;
-      }
-      else if (keyName == KEY_V_NAME)
-      {
-        // Ctrl-V to paste the copied text
-        TextPopupButtonTouched( Toolkit::TextSelectionPopup::PASTE );
-        consumed = true;
-      }
-      else if (keyName == KEY_X_NAME)
-      {
-        // Ctrl-X to cut the selected text
-        TextPopupButtonTouched( Toolkit::TextSelectionPopup::CUT );
-        consumed = true;
-      }
-      else if (keyName == KEY_A_NAME)
-      {
-        // Ctrl-A to select All the text
-        TextPopupButtonTouched( Toolkit::TextSelectionPopup::SELECT_ALL );
-        consumed = true;
-      }
-      return consumed;
-    }
-    else if( ( Dali::DALI_KEY_BACKSPACE == keyCode ) ||
-             ( Dali::DevelKey::DALI_KEY_DELETE == keyCode ) )
-    {
-      textChanged = DeleteEvent( keyCode );
-
-      // Will request for relayout.
-      relayoutNeeded = true;
-    }
-    else if( IsKey( keyEvent, Dali::DALI_KEY_POWER ) ||
-             IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
-             IsKey( keyEvent, Dali::DALI_KEY_HOME ) )
-    {
-      // Power key/Menu/Home key behaviour does not allow edit mode to resume.
-      mImpl->ChangeState( EventData::INACTIVE );
-
-      // Will request for relayout.
-      relayoutNeeded = true;
-
-      // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
-    }
-    else if( ( Dali::DALI_KEY_SHIFT_LEFT == keyCode ) || ( Dali::DALI_KEY_SHIFT_RIGHT == keyCode ) )
-    {
-      // DALI_KEY_SHIFT_LEFT or DALI_KEY_SHIFT_RIGHT is the key code for Shift. It's sent (by the InputMethodContext?) when the predictive text is enabled
-      // and a character is typed after the type of a upper case latin character.
-
-      // Do nothing.
-      return false;
-    }
-    else if( ( Dali::DALI_KEY_VOLUME_UP == keyCode ) || ( Dali::DALI_KEY_VOLUME_DOWN == keyCode ) )
-    {
-      // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
-      // Do nothing.
-      return false;
-    }
-    else
-    {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", this, keyString.c_str() );
-      if (!IsEditable()) return false;
-
-      if( !keyString.empty() )
-      {
-        // InputMethodContext is no longer handling key-events
-        mImpl->ClearPreEditFlag();
-
-        InsertText( keyString, COMMIT );
-
-        textChanged = true;
-
-        // Will request for relayout.
-        relayoutNeeded = true;
-      }
-
-    }
-
-    if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
-         ( mImpl->mEventData->mState != EventData::INACTIVE ) &&
-         ( !isNullKey ) &&
-         ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) &&
-         ( Dali::DALI_KEY_SHIFT_RIGHT != keyCode ) &&
-         ( Dali::DALI_KEY_VOLUME_UP != keyCode ) &&
-         ( Dali::DALI_KEY_VOLUME_DOWN != keyCode ) )
-    {
-      // Should not change the state if the key is the shift send by the InputMethodContext.
-      // Otherwise, when the state is SELECTING the text controller can't send the right
-      // surrounding info to the InputMethodContext.
-      mImpl->ChangeState( EventData::EDITING );
-
-      // Will request for relayout.
-      relayoutNeeded = true;
-    }
-
-    if( relayoutNeeded )
-    {
-      mImpl->RequestRelayout();
-    }
-  }
-
-  if( textChanged &&
-      ( NULL != mImpl->mEditableControlInterface ) )
-  {
-    // Do this last since it provides callbacks into application code
-    mImpl->mEditableControlInterface->TextChanged();
-  }
-
-  return true;
+  return EventHandler::KeyEvent(*this, keyEvent);
 }
 
 void Controller::TapEvent( unsigned int tapCount, float x, float y )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected TapEvent" );
-
-  if( NULL != mImpl->mEventData )
-  {
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "TapEvent state:%d \n", mImpl->mEventData->mState );
-    EventData::State state( mImpl->mEventData->mState );
-    bool relayoutNeeded( false );   // to avoid unnecessary relayouts when tapping an empty text-field
-
-    if( mImpl->IsClipboardVisible() )
-    {
-      if( EventData::INACTIVE == state || EventData::EDITING == state)
-      {
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
-      }
-      relayoutNeeded = true;
-    }
-    else if( 1u == tapCount )
-    {
-      if( EventData::EDITING_WITH_POPUP == state || EventData::EDITING_WITH_PASTE_POPUP == state )
-      {
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );  // If Popup shown hide it here so can be shown again if required.
-      }
-
-      if( mImpl->IsShowingRealText() && ( EventData::INACTIVE != state ) )
-      {
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
-        relayoutNeeded = true;
-      }
-      else
-      {
-        if( mImpl->IsShowingPlaceholderText() && !mImpl->IsFocusedPlaceholderAvailable() )
-        {
-          // Hide placeholder text
-          ResetText();
-        }
-
-        if( EventData::INACTIVE == state )
-        {
-          mImpl->ChangeState( EventData::EDITING );
-        }
-        else if( !mImpl->IsClipboardEmpty() )
-        {
-          mImpl->ChangeState( EventData::EDITING_WITH_POPUP );
-        }
-        relayoutNeeded = true;
-      }
-    }
-    else if( 2u == tapCount )
-    {
-      if( mImpl->mEventData->mSelectionEnabled &&
-          mImpl->IsShowingRealText() )
-      {
-        relayoutNeeded = true;
-        mImpl->mEventData->mIsLeftHandleSelected = true;
-        mImpl->mEventData->mIsRightHandleSelected = true;
-      }
-    }
-
-    // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
-    if( relayoutNeeded )
-    {
-      Event event( Event::TAP_EVENT );
-      event.p1.mUint = tapCount;
-      event.p2.mFloat = x;
-      event.p3.mFloat = y;
-      mImpl->mEventData->mEventQueue.push_back( event );
-
-      mImpl->RequestRelayout();
-    }
-  }
-
-  // Reset keyboard as tap event has occurred.
-  mImpl->ResetInputMethodContext();
+  EventHandler::TapEvent(*this, tapCount, x, y);
 }
 
 void Controller::PanEvent( GestureState state, const Vector2& displacement )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
-
-  if( NULL != mImpl->mEventData )
-  {
-    Event event( Event::PAN_EVENT );
-    event.p1.mInt = static_cast<int>( state );
-    event.p2.mFloat = displacement.x;
-    event.p3.mFloat = displacement.y;
-    mImpl->mEventData->mEventQueue.push_back( event );
-
-    mImpl->RequestRelayout();
-  }
+  EventHandler::PanEvent(*this, state, displacement);
 }
 
-void Controller::LongPressEvent( GestureState state, float x, float y  )
+void Controller::LongPressEvent( GestureState state, float x, float y )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected LongPressEvent" );
-
-  if( ( state == GestureState::STARTED ) &&
-      ( NULL != mImpl->mEventData ) )
-  {
-    // The 1st long-press on inactive text-field is treated as tap
-    if( EventData::INACTIVE == mImpl->mEventData->mState )
-    {
-      mImpl->ChangeState( EventData::EDITING );
-
-      Event event( Event::TAP_EVENT );
-      event.p1.mUint = 1;
-      event.p2.mFloat = x;
-      event.p3.mFloat = y;
-      mImpl->mEventData->mEventQueue.push_back( event );
-
-      mImpl->RequestRelayout();
-    }
-    else if( !mImpl->IsShowingRealText() )
-    {
-      Event event( Event::LONG_PRESS_EVENT );
-      event.p1.mInt = static_cast<int>( state );
-      event.p2.mFloat = x;
-      event.p3.mFloat = y;
-      mImpl->mEventData->mEventQueue.push_back( event );
-      mImpl->RequestRelayout();
-    }
-    else if( !mImpl->IsClipboardVisible() )
-    {
-      // Reset the InputMethodContext to commit the pre-edit before selecting the text.
-      mImpl->ResetInputMethodContext();
-
-      Event event( Event::LONG_PRESS_EVENT );
-      event.p1.mInt = static_cast<int>( state );
-      event.p2.mFloat = x;
-      event.p3.mFloat = y;
-      mImpl->mEventData->mEventQueue.push_back( event );
-      mImpl->RequestRelayout();
-
-      mImpl->mEventData->mIsLeftHandleSelected = true;
-      mImpl->mEventData->mIsRightHandleSelected = true;
-    }
-  }
+  EventHandler::LongPressEvent(*this, state, x, y);
 }
 
 void Controller::SelectEvent( float x, float y, SelectionType selectType )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SelectEvent\n" );
-
-  if( NULL != mImpl->mEventData )
-  {
-    if( selectType == SelectionType::ALL )
-    {
-      Event event( Event::SELECT_ALL );
-      mImpl->mEventData->mEventQueue.push_back( event );
-    }
-    else if( selectType == SelectionType::NONE )
-    {
-      Event event( Event::SELECT_NONE );
-      mImpl->mEventData->mEventQueue.push_back( event );
-    }
-    else
-    {
-      Event event( Event::SELECT );
-      event.p2.mFloat = x;
-      event.p3.mFloat = y;
-      mImpl->mEventData->mEventQueue.push_back( event );
-    }
-
-    mImpl->mEventData->mCheckScrollAmount = true;
-    mImpl->mEventData->mIsLeftHandleSelected = true;
-    mImpl->mEventData->mIsRightHandleSelected = true;
-    mImpl->RequestRelayout();
-  }
+  EventHandler::SelectEvent(*this, x, y, selectType);
 }
 
 void Controller::SetTextSelectionRange(const uint32_t *start, const uint32_t *end)
@@ -3236,142 +2202,12 @@ string Controller::GetSelectedText() const
 
 InputMethodContext::CallbackData Controller::OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent )
 {
-  // Whether the text needs to be relaid-out.
-  bool requestRelayout = false;
-
-  // Whether to retrieve the text and cursor position to be sent to the InputMethodContext.
-  bool retrieveText = false;
-  bool retrieveCursor = false;
-
-  switch( inputMethodContextEvent.eventName )
-  {
-    case InputMethodContext::COMMIT:
-    {
-      InsertText( inputMethodContextEvent.predictiveString, Text::Controller::COMMIT );
-      requestRelayout = true;
-      retrieveCursor = true;
-      break;
-    }
-    case InputMethodContext::PRE_EDIT:
-    {
-      InsertText( inputMethodContextEvent.predictiveString, Text::Controller::PRE_EDIT );
-      requestRelayout = true;
-      retrieveCursor = true;
-      break;
-    }
-    case InputMethodContext::DELETE_SURROUNDING:
-    {
-      const bool textDeleted = RemoveText( inputMethodContextEvent.cursorOffset,
-                                           inputMethodContextEvent.numberOfChars,
-                                           DONT_UPDATE_INPUT_STYLE );
-
-      if( textDeleted )
-      {
-        if( ( 0u != mImpl->mModel->mLogicalModel->mText.Count() ) ||
-            !mImpl->IsPlaceholderAvailable() )
-        {
-          mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
-        }
-        else
-        {
-          ShowPlaceholderText();
-        }
-        mImpl->mEventData->mUpdateCursorPosition = true;
-        mImpl->mEventData->mScrollAfterDelete = true;
-
-        requestRelayout = true;
-      }
-      break;
-    }
-    case InputMethodContext::GET_SURROUNDING:
-    {
-      retrieveText = true;
-      retrieveCursor = true;
-      break;
-    }
-    case InputMethodContext::PRIVATE_COMMAND:
-    {
-      // PRIVATECOMMAND event is just for getting the private command message
-      retrieveText = true;
-      retrieveCursor = true;
-      break;
-    }
-    case InputMethodContext::VOID:
-    {
-      // do nothing
-      break;
-    }
-  } // end switch
-
-  if( requestRelayout )
-  {
-    mImpl->mOperationsPending = ALL_OPERATIONS;
-    mImpl->RequestRelayout();
-  }
-
-  std::string text;
-  CharacterIndex cursorPosition = 0u;
-  Length numberOfWhiteSpaces = 0u;
-
-  if( retrieveCursor )
-  {
-    numberOfWhiteSpaces = mImpl->GetNumberOfWhiteSpaces( 0u );
-
-    cursorPosition = mImpl->GetLogicalCursorPosition();
-
-    if( cursorPosition < numberOfWhiteSpaces )
-    {
-      cursorPosition = 0u;
-    }
-    else
-    {
-      cursorPosition -= numberOfWhiteSpaces;
-    }
-  }
-
-  if( retrieveText )
-  {
-    if( !mImpl->IsShowingPlaceholderText() )
-    {
-      // Retrieves the normal text string.
-      mImpl->GetText( numberOfWhiteSpaces, text );
-    }
-    else
-    {
-      // When the current text is Placeholder Text, the surrounding text should be empty string.
-      // It means DALi should send empty string ("") to IME.
-      text = "";
-    }
-  }
-
-  InputMethodContext::CallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
-
-  if( requestRelayout &&
-      ( NULL != mImpl->mEditableControlInterface ) )
-  {
-    // Do this last since it provides callbacks into application code
-    mImpl->mEditableControlInterface->TextChanged();
-  }
-
-  return callbackData;
+  return EventHandler::OnInputMethodContextEvent(*this, inputMethodContext, inputMethodContextEvent);
 }
 
 void Controller::PasteClipboardItemEvent()
 {
-  // Retrieve the clipboard contents first
-  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
-  std::string stringToPaste( notifier.GetContent() );
-
-  // Commit the current pre-edit text; the contents of the clipboard should be appended
-  mImpl->ResetInputMethodContext();
-
-  // Temporary disable hiding clipboard
-  mImpl->SetClipboardHideEnable( false );
-
-  // Paste
-  PasteText( stringToPaste );
-
-  mImpl->SetClipboardHideEnable( true );
+  EventHandler::PasteClipboardItemEvent(*this);
 }
 
 // protected : Inherit from Text::Decorator::ControllerInterface.
@@ -3405,138 +2241,14 @@ void Controller::SetEditable( bool editable )
 
 void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected DecorationEvent" );
-
-  if( NULL != mImpl->mEventData )
-  {
-    switch( handleType )
-    {
-      case GRAB_HANDLE:
-      {
-        Event event( Event::GRAB_HANDLE_EVENT );
-        event.p1.mUint  = state;
-        event.p2.mFloat = x;
-        event.p3.mFloat = y;
-
-        mImpl->mEventData->mEventQueue.push_back( event );
-        break;
-      }
-      case LEFT_SELECTION_HANDLE:
-      {
-        Event event( Event::LEFT_SELECTION_HANDLE_EVENT );
-        event.p1.mUint  = state;
-        event.p2.mFloat = x;
-        event.p3.mFloat = y;
-
-        mImpl->mEventData->mEventQueue.push_back( event );
-        break;
-      }
-      case RIGHT_SELECTION_HANDLE:
-      {
-        Event event( Event::RIGHT_SELECTION_HANDLE_EVENT );
-        event.p1.mUint  = state;
-        event.p2.mFloat = x;
-        event.p3.mFloat = y;
-
-        mImpl->mEventData->mEventQueue.push_back( event );
-        break;
-      }
-      case LEFT_SELECTION_HANDLE_MARKER:
-      case RIGHT_SELECTION_HANDLE_MARKER:
-      {
-        // Markers do not move the handles.
-        break;
-      }
-      case HANDLE_TYPE_COUNT:
-      {
-        DALI_ASSERT_DEBUG( !"Controller::HandleEvent. Unexpected handle type" );
-      }
-    }
-
-    mImpl->RequestRelayout();
-  }
+  EventHandler::DecorationEvent(*this, handleType, state, x, y);
 }
 
 // protected : Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
 
 void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button )
 {
-  if( NULL == mImpl->mEventData )
-  {
-    return;
-  }
-
-  switch( button )
-  {
-    case Toolkit::TextSelectionPopup::CUT:
-    {
-      if (!IsEditable()) return;
-      mImpl->SendSelectionToClipboard( true ); // Synchronous call to modify text
-      mImpl->mOperationsPending = ALL_OPERATIONS;
-
-      if( ( 0u != mImpl->mModel->mLogicalModel->mText.Count() ) ||
-          !mImpl->IsPlaceholderAvailable() )
-      {
-        mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
-      }
-      else
-      {
-        ShowPlaceholderText();
-      }
-
-      mImpl->mEventData->mUpdateCursorPosition = true;
-      mImpl->mEventData->mScrollAfterDelete = true;
-
-      mImpl->RequestRelayout();
-
-      if( NULL != mImpl->mEditableControlInterface )
-      {
-        mImpl->mEditableControlInterface->TextChanged();
-      }
-      break;
-    }
-    case Toolkit::TextSelectionPopup::COPY:
-    {
-      mImpl->SendSelectionToClipboard( false ); // Text not modified
-
-      mImpl->mEventData->mUpdateCursorPosition = true;
-
-      mImpl->RequestRelayout(); // Cursor, Handles, Selection Highlight, Popup
-      break;
-    }
-    case Toolkit::TextSelectionPopup::PASTE:
-    {
-      mImpl->RequestGetTextFromClipboard(); // Request clipboard service to retrieve an item
-      break;
-    }
-    case Toolkit::TextSelectionPopup::SELECT:
-    {
-      const Vector2& currentCursorPosition = mImpl->mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
-
-      if( mImpl->mEventData->mSelectionEnabled )
-      {
-        // Creates a SELECT event.
-        SelectEvent( currentCursorPosition.x, currentCursorPosition.y, SelectionType::INTERACTIVE );
-      }
-      break;
-    }
-    case Toolkit::TextSelectionPopup::SELECT_ALL:
-    {
-      // Creates a SELECT_ALL event
-      SelectEvent( 0.f, 0.f, SelectionType::ALL );
-      break;
-    }
-    case Toolkit::TextSelectionPopup::CLIPBOARD:
-    {
-      mImpl->ShowClipboard();
-      break;
-    }
-    case Toolkit::TextSelectionPopup::NONE:
-    {
-      // Nothing to do.
-      break;
-    }
-  }
+  EventHandler::TextPopupButtonTouched(*this, button);
 }
 
 void Controller::DisplayTimeExpired()
@@ -4158,163 +2870,27 @@ void Controller::CalculateVerticalOffset( const Size& controlSize )
 
 void Controller::ProcessModifyEvents()
 {
-  Vector<ModifyEvent>& events = mImpl->mModifyEvents;
-
-  if( 0u == events.Count() )
-  {
-    // Nothing to do.
-    return;
-  }
-
-  for( Vector<ModifyEvent>::ConstIterator it = events.Begin(),
-         endIt = events.End();
-       it != endIt;
-       ++it )
-  {
-    const ModifyEvent& event = *it;
-
-    if( ModifyEvent::TEXT_REPLACED == event.type )
-    {
-      // A (single) replace event should come first, otherwise we wasted time processing NOOP events
-      DALI_ASSERT_DEBUG( it == events.Begin() && "Unexpected TEXT_REPLACED event" );
-
-      TextReplacedEvent();
-    }
-    else if( ModifyEvent::TEXT_INSERTED == event.type )
-    {
-      TextInsertedEvent();
-    }
-    else if( ModifyEvent::TEXT_DELETED == event.type )
-    {
-      // Placeholder-text cannot be deleted
-      if( !mImpl->IsShowingPlaceholderText() )
-      {
-        TextDeletedEvent();
-      }
-    }
-  }
-
-  if( NULL != mImpl->mEventData )
-  {
-    // When the text is being modified, delay cursor blinking
-    mImpl->mEventData->mDecorator->DelayCursorBlink();
-
-    // Update selection position after modifying the text
-    mImpl->mEventData->mLeftSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
-    mImpl->mEventData->mRightSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
-  }
-
-  // DISCARD temporary text
-  events.Clear();
+  EventHandler::ProcessModifyEvents(*this);
 }
 
 void Controller::TextReplacedEvent()
 {
-  // The natural size needs to be re-calculated.
-  mImpl->mRecalculateNaturalSize = true;
-
-  // The text direction needs to be updated.
-  mImpl->mUpdateTextDirection = true;
-
-  // Apply modifications to the model
-  mImpl->mOperationsPending = ALL_OPERATIONS;
+  EventHandler::TextReplacedEvent(*this);
 }
 
 void Controller::TextInsertedEvent()
 {
-  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextInsertedEvent" );
-
-  if( NULL == mImpl->mEventData )
-  {
-    return;
-  }
-
-  mImpl->mEventData->mCheckScrollAmount = true;
-
-  // The natural size needs to be re-calculated.
-  mImpl->mRecalculateNaturalSize = true;
-
-  // The text direction needs to be updated.
-  mImpl->mUpdateTextDirection = true;
-
-  // Apply modifications to the model; TODO - Optimize this
-  mImpl->mOperationsPending = ALL_OPERATIONS;
+  EventHandler::TextInsertedEvent(*this);
 }
 
 void Controller::TextDeletedEvent()
 {
-  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextDeletedEvent" );
-
-  if( NULL == mImpl->mEventData )
-  {
-    return;
-  }
-
-  if (!IsEditable()) return;
-
-  mImpl->mEventData->mCheckScrollAmount = true;
-
-  // The natural size needs to be re-calculated.
-  mImpl->mRecalculateNaturalSize = true;
-
-  // The text direction needs to be updated.
-  mImpl->mUpdateTextDirection = true;
-
-  // Apply modifications to the model; TODO - Optimize this
-  mImpl->mOperationsPending = ALL_OPERATIONS;
+  EventHandler::TextDeletedEvent(*this);
 }
 
 bool Controller::DeleteEvent( int keyCode )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p KeyCode : %d \n", this, keyCode );
-
-  bool removed = false;
-
-  if( NULL == mImpl->mEventData )
-  {
-    return removed;
-  }
-
-  if (!IsEditable()) return false;
-
-  // InputMethodContext is no longer handling key-events
-  mImpl->ClearPreEditFlag();
-
-  if( EventData::SELECTING == mImpl->mEventData->mState )
-  {
-    removed = RemoveSelectedText();
-  }
-  else if( ( mImpl->mEventData->mPrimaryCursorPosition > 0 ) && ( keyCode == Dali::DALI_KEY_BACKSPACE) )
-  {
-    // Remove the character before the current cursor position
-    removed = RemoveText( -1,
-                          1,
-                          UPDATE_INPUT_STYLE );
-  }
-  else if( keyCode == Dali::DevelKey::DALI_KEY_DELETE )
-  {
-    // Remove the character after the current cursor position
-    removed = RemoveText( 0,
-                          1,
-                          UPDATE_INPUT_STYLE );
-  }
-
-  if( removed )
-  {
-    if( ( 0u != mImpl->mModel->mLogicalModel->mText.Count() ) ||
-        !mImpl->IsPlaceholderAvailable() )
-    {
-      mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
-    }
-    else
-    {
-      ShowPlaceholderText();
-    }
-    mImpl->mEventData->mUpdateCursorPosition = true;
-    mImpl->mEventData->mScrollAfterDelete = true;
-  }
-
-  return removed;
+  return EventHandler::DeleteEvent(*this, keyCode);
 }
 
 // private : Helpers.
@@ -4496,23 +3072,20 @@ Actor Controller::CreateBackgroundActor()
 // private : Private contructors & copy operator.
 
 Controller::Controller()
-: mImpl( NULL )
+: Controller(nullptr, nullptr, nullptr)
 {
-  mImpl = new Controller::Impl( nullptr, nullptr, nullptr );
 }
 
 Controller::Controller( ControlInterface* controlInterface )
+:Controller( controlInterface, nullptr, nullptr)
 {
-  mImpl = new Controller::Impl( controlInterface, NULL, NULL );
 }
 
 Controller::Controller( ControlInterface* controlInterface,
                         EditableControlInterface* editableControlInterface,
                         SelectableControlInterface* selectableControlInterface )
+: mImpl(new Controller::Impl(controlInterface, editableControlInterface, selectableControlInterface))
 {
-  mImpl = new Controller::Impl( controlInterface,
-                                editableControlInterface,
-                                selectableControlInterface );
 }
 
 // The copy constructor and operator are left unimplemented.
