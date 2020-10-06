@@ -228,6 +228,11 @@ bool VideoView::IsLooping()
 
 void VideoView::Play()
 {
+  if( mOverlayRenderer )
+  {
+    Self().AddRenderer( mOverlayRenderer );
+  }
+
   mVideoPlayer.Play();
   mIsPlay = true;
 }
@@ -290,6 +295,11 @@ Dali::Toolkit::VideoView::VideoViewSignalType& VideoView::FinishedSignal()
 
 void VideoView::EmitSignalFinish()
 {
+  if( mOverlayRenderer )
+  {
+    Self().RemoveRenderer( mOverlayRenderer );
+  }
+
   if ( !mFinishedSignal.Empty() )
   {
     Dali::Toolkit::VideoView handle( GetOwner() );
@@ -650,7 +660,6 @@ void VideoView::SetWindowSurfaceTarget()
     mOverlayRenderer = Renderer::New( geometry, shader );
     mOverlayRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::OFF );
   }
-  Self().AddRenderer( mOverlayRenderer );
 
   if( mIsPlay )
   {
