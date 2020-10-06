@@ -689,7 +689,7 @@ void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::ScrollBar::Property::SCROLL_POSITION_INTERVALS:
       {
-        Property::Array* array = value.GetArray();
+        const Property::Array* array = value.GetArray();
         if( array )
         {
           Dali::Vector<float> positions;

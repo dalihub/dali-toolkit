@@ -1212,7 +1212,7 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
                                          void(TableView::*funcFit)(unsigned int),
                                          const Property::Value& value )
 {
-  Property::Map* map = value.GetMap();
+  const Property::Map* map = value.GetMap();
   if( map )
   {
     unsigned int index(0);

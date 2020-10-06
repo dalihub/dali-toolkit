@@ -266,7 +266,8 @@ struct Decorator::Impl : public ConnectionTracker
     mHorizontalScrollingEnabled( false ),
     mVerticalScrollingEnabled( false ),
     mSmoothHandlePanEnabled( false ),
-    mIsHighlightBoxActive( false )
+    mIsHighlightBoxActive( false ),
+    mHidePrimaryCursorAndGrabHandle( false )
   {
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mHighlightShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
@@ -290,7 +291,7 @@ struct Decorator::Impl : public ConnectionTracker
     if( mPrimaryCursor )
     {
       const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
-      mPrimaryCursorVisible = ( ( mControlSize.width - ( cursor.position.x + mCursorWidth ) > -Math::MACHINE_EPSILON_1000 ) &&
+      mPrimaryCursorVisible = (!mHidePrimaryCursorAndGrabHandle) && ( ( mControlSize.width - ( cursor.position.x + mCursorWidth ) > -Math::MACHINE_EPSILON_1000 ) &&
                                 ( cursor.position.x > -Math::MACHINE_EPSILON_1000 ) &&
                                 ( mControlSize.height - ( cursor.position.y + cursor.cursorHeight ) > -Math::MACHINE_EPSILON_1000 ) &&
                                 ( cursor.position.y > -Math::MACHINE_EPSILON_1000 ) );
@@ -330,7 +331,7 @@ struct Decorator::Impl : public ConnectionTracker
       grabHandle.verticallyVisible = ( ( ( mControlSize.height - grabHandle.lineHeight ) - grabHandle.position.y > -Math::MACHINE_EPSILON_1000 ) &&
                                        ( grabHandle.position.y > -Math::MACHINE_EPSILON_1000 ) );
 
-      const bool isVisible = grabHandle.horizontallyVisible && grabHandle.verticallyVisible;
+      const bool isVisible = grabHandle.horizontallyVisible && grabHandle.verticallyVisible && (!mHidePrimaryCursorAndGrabHandle);
       if( isVisible )
       {
         CreateGrabHandle();
@@ -1945,6 +1946,7 @@ struct Decorator::Impl : public ConnectionTracker
   bool                mVerticalScrollingEnabled          : 1; ///< Whether the vertical scrolling is enabled.
   bool                mSmoothHandlePanEnabled            : 1; ///< Whether to pan smoothly the handles.
   bool                mIsHighlightBoxActive              : 1; ///< Whether the highlight box is active.
+  bool                mHidePrimaryCursorAndGrabHandle    : 1; ///< Whether the primary cursor and grab are hidden always.
 };
 
 DecoratorPtr Decorator::New( ControllerInterface& controller,
@@ -2093,6 +2095,11 @@ int Decorator::GetCursorWidth() const
   return static_cast<int>( mImpl->mCursorWidth );
 }
 
+void Decorator::SetEditable( bool editable )
+{
+  mImpl->mHidePrimaryCursorAndGrabHandle = !editable;
+  mImpl->Relayout( mImpl->mControlSize );
+}
 /** Handles **/
 
 void Decorator::SetHandleActive( HandleType handleType, bool active )

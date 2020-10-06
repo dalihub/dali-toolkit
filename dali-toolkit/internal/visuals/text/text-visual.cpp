@@ -301,7 +301,7 @@ TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache, const Property:
   return TextVisualPtr;
 }
 
-void TextVisual::ConvertStringKeysToIndexKeys( Property::Map& propertyMap )
+Property::Map TextVisual::ConvertStringKeysToIndexKeys( const Property::Map& propertyMap )
 {
   Property::Map outMap;
 
@@ -319,7 +319,7 @@ void TextVisual::ConvertStringKeysToIndexKeys( Property::Map& propertyMap )
     outMap.Insert( indexKey, keyValue.second );
   }
 
-  propertyMap = outMap;
+  return outMap;
 }
 
 float TextVisual::GetHeightForWidth( float width )

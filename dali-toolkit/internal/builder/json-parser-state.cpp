@@ -249,11 +249,11 @@ bool IsNumber(char c)
 
 JsonParserState::JsonParserState(TreeNode* _root)
   : mRoot(_root), mCurrent(_root),
-    mErrorDescription(NULL), mErrorNewLine(0), mErrorColumn(0), mErrorPosition(0),
+    mErrorDescription(nullptr), mErrorNewLine(0), mErrorColumn(0), mErrorPosition(0),
     mNumberOfParsedChars(0), mNumberOfCreatedNodes(0), mFirstParse(false),
     mState(STATE_START)
 {
-  if(_root == NULL)
+  if(_root == nullptr)
   {
     mFirstParse = true;
   }
@@ -261,13 +261,13 @@ JsonParserState::JsonParserState(TreeNode* _root)
 
 TreeNode* JsonParserState::CreateNewNode(const char* name, TreeNode::NodeType type)
 {
-  TreeNode* node = NULL;
+  TreeNode* node = nullptr;
 
   node = TreeNodeManipulator::NewTreeNode();
   TreeNodeManipulator modifyNew(node);
   modifyNew.SetType(type);
   modifyNew.SetName(name);
-  if(mRoot == NULL)
+  if(mRoot == nullptr)
   {
     mRoot    = node;
     mCurrent = TreeNodeManipulator(mRoot);
@@ -286,7 +286,7 @@ TreeNode* JsonParserState::CreateNewNode(const char* name, TreeNode::NodeType ty
 
 TreeNode* JsonParserState::NewNode(const char* name, TreeNode::NodeType type)
 {
-  TreeNode* node = NULL;
+  TreeNode* node = nullptr;
 
   if(mFirstParse)
   {
@@ -299,7 +299,7 @@ TreeNode* JsonParserState::NewNode(const char* name, TreeNode::NodeType type)
     if(name)
     {
       const TreeNode* found = mCurrent.GetChild(name);
-      if( NULL != found )
+      if( nullptr != found )
       {
         node = const_cast<TreeNode*>(found);
       }
@@ -307,7 +307,7 @@ TreeNode* JsonParserState::NewNode(const char* name, TreeNode::NodeType type)
     else
     {
       // if root node
-      if( mCurrent.GetParent() == NULL )
+      if( mCurrent.GetParent() == nullptr )
       {
         node = mRoot;
       }
@@ -550,7 +550,7 @@ char* JsonParserState::EncodeString()
     if (static_cast<unsigned char>(*mIter) < '\x20')
     {
       static_cast<void>( Error("Control characters not allowed in strings") );
-      return NULL;
+      return nullptr;
     }
     else if (*mIter == '\\' && AtLeast(2))
     {
@@ -602,12 +602,12 @@ char* JsonParserState::EncodeString()
           if( !AtLeast(6) )
           {
             static_cast<void>( Error("Bad unicode codepoint; not enough characters") );
-            return NULL;
+            return nullptr;
           }
           if ( !HexStringToUnsignedInteger(&(*(mIter + 2)), &(*(mIter + 6)), codepoint) )
           {
             static_cast<void>( Error("Bad unicode codepoint") );
-            return NULL;
+            return nullptr;
           }
 
           if (codepoint <= 0x7F)
@@ -633,7 +633,7 @@ char* JsonParserState::EncodeString()
         default:
         {
           static_cast<void>( Error("Unrecognized escape sequence") );
-          return NULL;
+          return nullptr;
         }
       }
 
@@ -682,6 +682,172 @@ char* JsonParserState::EncodeString()
 
 } // ParseString()
 
+bool JsonParserState::HandleStartState(const char* name, const char currentChar)
+{
+  if( '{' == currentChar )
+  {
+    NewNode(name, TreeNode::OBJECT);
+    mState = STATE_OBJECT;
+  }
+  else if( '[' == currentChar )
+  {
+    NewNode(name, TreeNode::ARRAY);
+    mState = STATE_VALUE;
+  }
+  else
+  {
+    return Error("Json must start with object {} or array []");
+  }
+
+  AdvanceSkipWhiteSpace(1);
+  return true;
+}
+
+bool JsonParserState::HandleObjectState(const char currentChar, const char lastCharacter)
+{
+  if( '}' == currentChar )
+  {
+    if(',' == lastCharacter)
+    {
+      return Error("Unexpected comma");
+    }
+
+    if( !UpToParent() )
+    {
+      return false;
+    }
+    mState = STATE_VALUE;
+  }
+  else if ( '"' == currentChar )
+  {
+    mState = STATE_KEY;
+  }
+  else
+  {
+    return Error("Unexpected character");
+  }
+
+  AdvanceSkipWhiteSpace(1);
+  return true;
+}
+
+bool JsonParserState::HandleKeyState(char*& name)
+{
+  name = EncodeString();
+  if( nullptr == name )
+  {
+    return false;
+  }
+  if( !ParseWhiteSpace() )
+  {
+    return false;
+  }
+  if( ':' != Char())
+  {
+    return Error("Expected ':'");
+  }
+  if( !ParseWhiteSpace() )
+  {
+    return false;
+  }
+  mState = STATE_VALUE;
+
+  AdvanceSkipWhiteSpace(1);
+  return true;
+}
+
+bool JsonParserState::HandleCharacterQuote(char*& name)
+{
+  Advance(1);
+  NewNode(name, TreeNode::STRING);
+  if( char* value = EncodeString() )
+  {
+    mCurrent.SetString(value);
+  }
+  else
+  {
+    return false;
+  }
+  if( !UpToParent() )
+  {
+    return false;
+  }
+  AdvanceSkipWhiteSpace(0);
+  return true;
+}
+
+bool JsonParserState::HandleCharacterNumberOrHyphen(const char* name)
+{
+  NewNode(name, TreeNode::IS_NULL);
+  if( !ParseNumber() )
+  {
+    return false;
+  }
+  if( !UpToParent() )
+  {
+    return false;
+  }
+  AdvanceSkipWhiteSpace(0);
+  return true;
+}
+
+bool JsonParserState::HandleValueState(char*& name, const char currentChar, const char lastCharacter)
+{
+  bool handled = true;
+
+  if( '"' == currentChar )
+  {
+    handled = HandleCharacterQuote(name);
+  }
+  else if( IsNumber(currentChar) || currentChar == '-' )
+  {
+    handled = HandleCharacterNumberOrHyphen(name);
+  }
+  else if( '{' == currentChar )
+  {
+    handled = HandleCharacterBracesStart(name, lastCharacter);
+  }
+  else if( '}' == currentChar )
+  {
+    handled = HandleCharacterBracesEnd(lastCharacter);
+  }
+  else if( '[' == currentChar )
+  {
+    handled = HandleCharacterSquareBracketStart(name);
+  }
+  else if( ']' == currentChar )
+  {
+    handled = HandleCharacterSquareBracketEnd(lastCharacter);
+  }
+  else if( 't' == currentChar )
+  {
+    handled = HandleCharacterLowercaseT(name);
+  }
+  else if( 'n' == currentChar )
+  {
+    handled = HandleCharacterLowercaseN(name);
+  }
+  else if( 'f' == currentChar)
+  {
+    handled = HandleCharacterLowercaseF(name);
+  }
+  else if( ',' == currentChar )
+  {
+    handled = HandleCharacterComma(name);
+  }
+  else
+  {
+    handled = Error("Unexpected character");
+  }
+
+  if(handled)
+  {
+    name = nullptr;
+  }
+
+  return handled;
+}
+
 bool JsonParserState::ParseJson(VectorChar& source)
 {
   Reset();
@@ -694,7 +860,7 @@ bool JsonParserState::ParseJson(VectorChar& source)
   mIter = source.begin();
   mEnd  = source.end();
 
-  char* name = NULL;
+  char* name = nullptr;
   char currentChar   = 0;
   char lastCharacter = 0;
 
@@ -712,244 +878,34 @@ bool JsonParserState::ParseJson(VectorChar& source)
     {
       case STATE_START:
       {
-        if( '{' == currentChar )
+        if(!HandleStartState(name, currentChar))
         {
-          NewNode(name, TreeNode::OBJECT);
-          mState = STATE_OBJECT;
+          return false;
         }
-        else if( '[' == currentChar )
-        {
-          NewNode(name, TreeNode::ARRAY);
-          mState = STATE_VALUE;
-        }
-        else
-        {
-          return Error("Json must start with object {} or array []");
-        }
-
-        AdvanceSkipWhiteSpace(1);
         break;
       }
       case STATE_OBJECT:
       {
-        if( '}' == currentChar )
+        if(!HandleObjectState(currentChar, lastCharacter))
         {
-          if(',' == lastCharacter)
-          {
-            return Error("Unexpected comma");
-          }
-
-          if( !UpToParent() )
-          {
-            return false;
-          }
-          mState = STATE_VALUE;
+          return false;
         }
-        else if ( '"' == currentChar )
-        {
-          mState = STATE_KEY;
-        }
-        else
-        {
-          return Error("Unexpected character");
-        }
-
-        AdvanceSkipWhiteSpace(1);
         break;
       }
       case STATE_KEY:
       {
-        name = EncodeString();
-        if( NULL == name )
+        if(!HandleKeyState(name))
         {
           return false;
         }
-        if( !ParseWhiteSpace() )
-        {
-          return false;
-        }
-        if( ':' != Char())
-        {
-          return Error("Expected ':'");
-        }
-        if( !ParseWhiteSpace() )
-        {
-          return false;
-        }
-        mState = STATE_VALUE;
-
-        AdvanceSkipWhiteSpace(1);
         break;
       }
       case STATE_VALUE:
       {
-        if( '"' == currentChar )
+        if(!HandleValueState(name, currentChar, lastCharacter))
         {
-          Advance(1);
-          NewNode(name, TreeNode::STRING);
-          if( char* value = EncodeString() )
-          {
-            mCurrent.SetString(value);
-          }
-          else
-          {
-            return false;
-          }
-          if( !UpToParent() )
-          {
-            return false;
-          }
-          AdvanceSkipWhiteSpace(0);
+          return false;
         }
-        else if( IsNumber(currentChar) || currentChar == '-' )
-        {
-          NewNode(name, TreeNode::IS_NULL);
-          if( !ParseNumber() )
-          {
-            return false;
-          }
-          if( !UpToParent() )
-          {
-            return false;
-          }
-          AdvanceSkipWhiteSpace(0);
-        }
-        else if( '{' == currentChar )
-        {
-          if( '}' == lastCharacter )
-          {
-            return Error("Expected a comma");
-          }
-          else
-          {
-            NewNode(name, TreeNode::OBJECT);
-            mState = STATE_OBJECT;
-            AdvanceSkipWhiteSpace(1);
-          }
-        }
-        else if( '}' == currentChar )
-        {
-          if(',' == lastCharacter)
-          {
-            return Error("Expected another value");
-          }
-
-          if(mCurrent.GetType() != TreeNode::OBJECT)
-          {
-            return Error("Mismatched array definition");
-          }
-
-          if(mCurrent.GetParent() == NULL)
-          {
-            mState = STATE_END;
-          }
-          else
-          {
-            if( !UpToParent() )
-            {
-              return false;
-            }
-          }
-          AdvanceSkipWhiteSpace(1);
-        }
-        else if( '[' == currentChar )
-        {
-          NewNode(name, TreeNode::ARRAY);
-          mState = STATE_VALUE;
-          AdvanceSkipWhiteSpace(1);
-        }
-        else if( ']' == currentChar )
-        {
-          if(',' == lastCharacter)
-          {
-            return Error("Expected a value");
-          }
-
-          if(mCurrent.GetType() != TreeNode::ARRAY)
-          {
-            return Error("Mismatched braces in object definition");
-          }
-
-          if(mCurrent.GetParent() == NULL)
-          {
-            mState = STATE_END;
-          }
-          else
-          {
-            if( !UpToParent() )
-            {
-              return false;
-            }
-          }
-          AdvanceSkipWhiteSpace(1);
-        }
-        else if( 't' == currentChar )
-        {
-          NewNode(name, TreeNode::BOOLEAN);
-          if( !ParseTrue() )
-          {
-            return false;
-          }
-          if( !UpToParent() )
-          {
-            return false;
-          }
-          AdvanceSkipWhiteSpace(0);
-        }
-        else if( 'n' == currentChar )
-        {
-          NewNode(name, TreeNode::IS_NULL);
-          if( !ParseNULL() )
-          {
-            return false;
-          }
-          if( !UpToParent() )
-          {
-            return false;
-          }
-          AdvanceSkipWhiteSpace(0);
-        }
-        else if( 'f' == currentChar)
-        {
-          NewNode(name, TreeNode::BOOLEAN);
-          if( !ParseFalse() )
-          {
-            return false;
-          }
-          if( !UpToParent() )
-          {
-            return false;
-          }
-          AdvanceSkipWhiteSpace(0);
-        }
-        else if( ',' == currentChar )
-        {
-          if( 0 == mCurrent.Size() )
-          {
-            return Error("Missing Value");
-          }
-
-          if(mCurrent.GetType() == TreeNode::OBJECT)
-          {
-            mState = STATE_OBJECT; // to get '"' in '"key":val'
-          }
-          else if(mCurrent.GetType() == TreeNode::ARRAY)
-          {
-            mState = STATE_VALUE; // array so just get next value
-          }
-          else
-          {
-            return Error("Unexpected character");
-          }
-          AdvanceSkipWhiteSpace(1);
-        }
-        else
-        {
-          return Error("Unexpected character");
-        }
-
-        name = NULL;
-
         break;
       } // case STATE_VALUE
       case STATE_END:
@@ -973,17 +929,160 @@ bool JsonParserState::ParseJson(VectorChar& source)
 
 } // ParseJson
 
-
 void JsonParserState::Reset()
 {
   mCurrent = TreeNodeManipulator(mRoot);
 
-  mErrorDescription   = NULL;
+  mErrorDescription   = nullptr;
   mErrorNewLine       = 0;
   mErrorColumn        = 0;
   mErrorPosition      = 0;
 }
 
+bool JsonParserState::HandleCharacterBracesStart(const char* name, const char lastCharacter)
+{
+  if( '}' == lastCharacter )
+  {
+    return Error("Expected a comma");
+  }
+  else
+  {
+    NewNode(name, TreeNode::OBJECT);
+    mState = STATE_OBJECT;
+    AdvanceSkipWhiteSpace(1);
+  }
+  return true;
+}
+
+bool JsonParserState::HandleCharacterBracesEnd(const char lastCharacter)
+{
+  if(',' == lastCharacter)
+  {
+    return Error("Expected another value");
+  }
+
+  if(mCurrent.GetType() != TreeNode::OBJECT)
+  {
+    return Error("Mismatched array definition");
+  }
+
+  if(mCurrent.GetParent() == nullptr)
+  {
+    mState = STATE_END;
+  }
+  else
+  {
+    if( !UpToParent() )
+    {
+      return false;
+    }
+  }
+  AdvanceSkipWhiteSpace(1);
+  return true;
+}
+
+bool JsonParserState::HandleCharacterSquareBracketStart(const char* name)
+{
+  NewNode(name, TreeNode::ARRAY);
+  mState = STATE_VALUE;
+  AdvanceSkipWhiteSpace(1);
+  return true;
+}
+
+bool JsonParserState::HandleCharacterSquareBracketEnd(const char lastCharacter)
+{
+  if(',' == lastCharacter)
+  {
+    return Error("Expected a value");
+  }
+
+  if(mCurrent.GetType() != TreeNode::ARRAY)
+  {
+    return Error("Mismatched braces in object definition");
+  }
+
+  if(mCurrent.GetParent() == nullptr)
+  {
+    mState = STATE_END;
+  }
+  else
+  {
+    if( !UpToParent() )
+    {
+      return false;
+    }
+  }
+  AdvanceSkipWhiteSpace(1);
+  return true;
+}
+
+bool JsonParserState::HandleCharacterLowercaseT(const char* name)
+{
+  NewNode(name, TreeNode::BOOLEAN);
+  if( !ParseTrue() )
+  {
+    return false;
+  }
+  if( !UpToParent() )
+  {
+    return false;
+  }
+  AdvanceSkipWhiteSpace(0);
+  return true;
+}
+
+bool JsonParserState::HandleCharacterLowercaseN(const char* name)
+{
+  NewNode(name, TreeNode::IS_NULL);
+  if( !ParseNULL() )
+  {
+    return false;
+  }
+  if( !UpToParent() )
+  {
+    return false;
+  }
+  AdvanceSkipWhiteSpace(0);
+  return true;
+}
+
+bool JsonParserState::HandleCharacterLowercaseF(const char* name)
+{
+  NewNode(name, TreeNode::BOOLEAN);
+  if( !ParseFalse() )
+  {
+    return false;
+  }
+  if( !UpToParent() )
+  {
+    return false;
+  }
+  AdvanceSkipWhiteSpace(0);
+  return true;
+}
+
+bool JsonParserState::HandleCharacterComma(const char* name)
+{
+  if( 0 == mCurrent.Size() )
+  {
+    return Error("Missing Value");
+  }
+
+  if(mCurrent.GetType() == TreeNode::OBJECT)
+  {
+    mState = STATE_OBJECT; // to get '"' in '"key":val'
+  }
+  else if(mCurrent.GetType() == TreeNode::ARRAY)
+  {
+    mState = STATE_VALUE; // array so just get next value
+  }
+  else
+  {
+    return Error("Unexpected character");
+  }
+  AdvanceSkipWhiteSpace(1);
+  return true;
+}
 
 } // namespace Internal
 

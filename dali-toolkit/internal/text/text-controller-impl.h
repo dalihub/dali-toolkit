@@ -172,6 +172,7 @@ struct EventData
   bool mPlaceholderEllipsisFlag         : 1;   ///< True if the text controller sets the placeholder ellipsis.
   bool mShiftSelectionFlag              : 1;   ///< True if the text selection using Shift key is enabled.
   bool mUpdateAlignment                 : 1;   ///< True if the whole text needs to be full aligned..
+  bool mEditingEnabled                   : 1;   ///< True if the editing is enabled, false otherwise.
 };
 
 struct ModifyEvent
@@ -635,6 +636,16 @@ struct Controller::Impl
    * @copydoc Text::SelectableControlInterface::GetTextSelectionRange()
    */
   Uint32Pair GetTextSelectionRange() const;
+
+  /**
+   * @copydoc Text::EditableControlInterface::IsEditable()
+   */
+  bool IsEditable() const;
+
+  /**
+   * @copydoc Text::EditableControlInterface::SetEditable()
+   */
+  void SetEditable( bool editable );
 
   /**
    * @brief Retrieves the selected text. It removes the text if the @p deleteAfterRetrieval parameter is @e true.

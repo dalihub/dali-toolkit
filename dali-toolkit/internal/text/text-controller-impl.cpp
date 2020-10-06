@@ -159,7 +159,8 @@ EventData::EventData( DecoratorPtr decorator, InputMethodContext& inputMethodCon
   mIsPlaceholderElideEnabled( false ),
   mPlaceholderEllipsisFlag( false ),
   mShiftSelectionFlag( true ),
-  mUpdateAlignment( false )
+  mUpdateAlignment( false ),
+  mEditingEnabled( true )
 {
 }
 
@@ -2088,6 +2089,19 @@ Uint32Pair Controller::Impl::GetTextSelectionRange() const
   return range;
 }
 
+bool Controller::Impl::IsEditable() const
+{
+  return mEventData && mEventData->mEditingEnabled;
+}
+
+void Controller::Impl::SetEditable( bool editable )
+{
+  if( mEventData)
+  {
+    mEventData->mEditingEnabled = editable;
+  }
+}
+
 void Controller::Impl::RetrieveSelection( std::string& selectedText, bool deleteAfterRetrieval )
 {
   if( mEventData->mLeftSelectionPosition == mEventData->mRightSelectionPosition )
@@ -2693,15 +2707,23 @@ void Controller::Impl::SetPopupButtons()
    *  If EDITING_WITH_POPUP : SELECT & SELECT_ALL
    */
 
+  bool isEditable = IsEditable();
   TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::NONE;
 
   if( EventData::SELECTING == mEventData->mState )
   {
-    buttonsToShow = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
+    buttonsToShow = TextSelectionPopup::Buttons( TextSelectionPopup::COPY );
+    if(isEditable)
+    {
+      buttonsToShow = TextSelectionPopup::Buttons( buttonsToShow | TextSelectionPopup::CUT );
+    }
 
     if( !IsClipboardEmpty() )
     {
-      buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+      if(isEditable)
+      {
+        buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+      }
       buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
     }
 
@@ -2719,7 +2741,10 @@ void Controller::Impl::SetPopupButtons()
 
     if( !IsClipboardEmpty() )
     {
-      buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+      if(isEditable)
+      {
+        buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+      }
       buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
     }
   }
@@ -2727,7 +2752,10 @@ void Controller::Impl::SetPopupButtons()
   {
     if ( !IsClipboardEmpty() )
     {
-      buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+      if(isEditable)
+      {
+        buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+      }
       buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
     }
   }

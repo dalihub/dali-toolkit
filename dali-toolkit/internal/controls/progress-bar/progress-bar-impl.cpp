@@ -404,7 +404,7 @@ void ProgressBar::CreateVisualsForComponent( Property::Index index, const Proper
   else // Does this code make text-visual can be accepted as visual?
   {
     // if its not a string then get a Property::Map from the property if possible.
-    Property::Map *map = value.GetMap();
+    const Property::Map *map = value.GetMap();
     if( map && !map->Empty()  ) // Empty map results in current visual removal.
     {
       progressVisual = visualFactory.CreateVisual( *map );

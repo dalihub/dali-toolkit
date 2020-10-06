@@ -2887,3 +2887,47 @@ int UtcDaliTextEditorSelectRange(void)
 
   END_TEST;
 }
+
+int UtcDaliTextEditorEnableEditing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorEnableEditing ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add( textEditor );
+
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textEditor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textEditor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetKeyInputFocus();
+  textEditor.SetProperty( DevelTextEditor::Property::ENABLE_EDITING, false );
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "", TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::ENABLE_EDITING ).Get<bool>(), false, TEST_LOCATION );
+
+  textEditor.SetKeyInputFocus();
+  textEditor.SetProperty( DevelTextEditor::Property::ENABLE_EDITING, true );
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "D", TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::ENABLE_EDITING ).Get<bool>(), true, TEST_LOCATION );
+
+  END_TEST;
+}

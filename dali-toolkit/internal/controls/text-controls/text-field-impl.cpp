@@ -137,6 +137,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextField, "selectedText", 
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "renderingBackend",               INTEGER,   RENDERING_BACKEND                    )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "selectedTextStart",              INTEGER,   SELECTED_TEXT_START                  )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "selectedTextEnd",                INTEGER,   SELECTED_TEXT_END                    )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableEditing",                  BOOLEAN,   ENABLE_EDITING                       )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -731,6 +732,13 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::ENABLE_EDITING:
+      {
+        const bool editable = value.Get< bool >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p ENABLE_EDITING %d\n", impl.mController.Get(), editable );
+        impl.SetEditable( editable );
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1064,6 +1072,11 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         Uint32Pair range = impl.GetTextSelectionRange( );
         value = static_cast<int>(range.second);
+        break;
+      }
+      case Toolkit::DevelTextField::Property::ENABLE_EDITING:
+      {
+        value = impl.IsEditable();
         break;
       }
     } //switch
@@ -1458,7 +1471,7 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
 void TextField::OnKeyInputFocusGained()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnKeyInputFocusGained %p\n", mController.Get() );
-  if ( mInputMethodContext )
+  if ( mInputMethodContext && IsEditable() )
   {
     mInputMethodContext.ApplyOptions( mInputMethodOptions );
 
@@ -1513,7 +1526,7 @@ void TextField::OnKeyInputFocusLost()
 void TextField::OnTap( const TapGesture& gesture )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnTap %p\n", mController.Get() );
-  if ( mInputMethodContext )
+  if ( mInputMethodContext && IsEditable() )
   {
     mInputMethodContext.Activate();
   }
@@ -1533,7 +1546,7 @@ void TextField::OnPan( const PanGesture& gesture )
 
 void TextField::OnLongPress( const LongPressGesture& gesture )
 {
-  if ( mInputMethodContext )
+  if ( mInputMethodContext && IsEditable() )
   {
     mInputMethodContext.Activate();
   }
@@ -1571,6 +1584,20 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
 void TextField::RequestTextRelayout()
 {
   RelayoutRequest();
+}
+
+bool TextField::IsEditable() const
+{
+  return mController->IsEditable();
+}
+
+void TextField::SetEditable( bool editable )
+{
+  mController->SetEditable(editable);
+  if ( mInputMethodContext && !editable )
+  {
+    mInputMethodContext.Deactivate();
+  }
 }
 
 void TextField::TextChanged()

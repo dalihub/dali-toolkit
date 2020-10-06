@@ -136,7 +136,7 @@ void ToggleButton::SetProperty( BaseObject* object, Property::Index propertyInde
       }
       case Toolkit::ToggleButton::Property::TOOLTIPS:
       {
-        Property::Array* tipArray = value.GetArray();
+        const Property::Array* tipArray = value.GetArray();
         if( tipArray )
         {
           std::vector<std::string> tips;

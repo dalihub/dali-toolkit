@@ -174,7 +174,7 @@ void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index in
     case Toolkit::DummyControl::Property::FOCUS_VISUAL:
     case Toolkit::DummyControl::Property::LABEL_VISUAL:
     {
-      Property::Map* map = value.GetMap();
+      const Property::Map* map = value.GetMap();
       if( map != NULL )
       {
         VisualFactory visualFactory = VisualFactory::Get();
