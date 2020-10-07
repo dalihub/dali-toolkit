@@ -1936,7 +1936,7 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
             if (boundary == Dali::Accessibility::TextBoundary::LINE)
               counter++;
           }
-          if ((counter - 1) == offset)
+          if ((counter > 0) && ((counter - 1) == offset))
           {
             range.content = txt.substr(start, index - start + 1);
             range.startOffset = start;
