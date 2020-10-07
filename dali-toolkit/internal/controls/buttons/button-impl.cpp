@@ -1316,15 +1316,19 @@ Padding Button::GetForegroundPadding()
 
 std::string Button::AccessibleImpl::GetNameRaw()
 {
-  auto slf = Toolkit::Button::DownCast( self );
-
-  Property::Map label = slf.GetProperty<Property::Map>( Toolkit::Button::Property::LABEL );
-
   std::string labelText;
-  label.Find( Toolkit::TextVisual::Property::TEXT )->Get( labelText );
+  auto slf = Toolkit::Button::DownCast( self );
+  Property::Map labelMap = slf.GetProperty<Property::Map>( Toolkit::Button::Property::LABEL );
+
+  Property::Value* textPropertyPtr = labelMap.Find( Toolkit::TextVisual::Property::TEXT );
+  if ( textPropertyPtr )
+  {
+    textPropertyPtr->Get( labelText );
+  }
 
   return labelText;
 }
+
 
 Property::Index Button::AccessibleImpl::GetNamePropertyIndex()
 {
