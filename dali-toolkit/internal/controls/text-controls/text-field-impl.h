@@ -185,22 +185,22 @@ private: // From Control
 // From EditableControlInterface
 
   /**
-   * @copydoc Text::ControlInterface::TextChanged()
+   * @copydoc Text::EditableControlInterface::TextChanged()
    */
   void TextChanged() override;
 
   /**
-   * @copydoc Text::ControlInterface::MaxLengthReached()
+   * @copydoc Text::EditableControlInterface::MaxLengthReached()
    */
   void MaxLengthReached() override;
 
   /**
-   * @copydoc Text::ControlInterface::InputStyleChanged()
+   * @copydoc Text::EditableControlInterface::InputStyleChanged()
    */
   void InputStyleChanged( Text::InputStyle::Mask inputStyleMask ) override;
 
   /**
-   * @copydoc Text::ControlInterface::AddDecoration()
+   * @copydoc Text::EditableControlInterface::AddDecoration()
    */
   void AddDecoration( Actor& actor, bool needsClipping ) override;
 
