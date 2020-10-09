@@ -18,8 +18,8 @@
 // EXTERNAL INCLUDES
 #include <algorithm>
 #include <cctype>
-#include <cstring>
 #include <string>
+#include <string_view>
 
 // INTERNAL INCLUDES
 #include "dali-toolkit/devel-api/builder/tree-node.h"
@@ -27,23 +27,15 @@
 
 namespace Dali
 {
-bool CaseInsensitiveCharacterCompare(unsigned char a, unsigned char b)
-{
-  // Converts to lower case in the current locale.
-  return std::tolower(a) == std::tolower(b);
-}
 
 /**
  * return true if the lower cased ASCII strings are equal.
  */
-bool CaseInsensitiveStringCompare(const std::string& a, const std::string& b)
+bool CaseInsensitiveStringCompare(std::string_view a, std::string_view b)
 {
-  bool result = false;
-  if(a.length() == b.length())
-  {
-    result = std::equal(a.begin(), a.end(), b.begin(), CaseInsensitiveCharacterCompare);
-  }
-  return result;
+  return (a.length() == b.length()) && std::equal(a.begin(), a.end(), b.begin(), [](auto x, auto y) {
+           return std::tolower(x) == std::tolower(y);
+         });
 }
 
 namespace Toolkit
@@ -143,13 +135,9 @@ const TreeNode* TreeNode::GetChildIgnoreCase(const std::string& childName) const
   const TreeNode* p = mFirstChild;
   while(p)
   {
-    if(p->mName)
+    if(p->mName && CaseInsensitiveStringCompare(p->mName, childName))
     {
-      std::string nodeName(p->mName);
-      if(CaseInsensitiveStringCompare(nodeName, childName))
-      {
-        return p;
-      }
+      return p;
     }
     p = p->mNextSibling;
   }

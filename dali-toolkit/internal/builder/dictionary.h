@@ -18,11 +18,13 @@
  */
 
 #include <dali/public-api/common/vector-wrapper.h>
+
 #include <algorithm>
+#include <string_view>
 
 namespace Dali
 {
-extern bool CaseInsensitiveStringCompare( const std::string& a, const std::string& b );
+extern bool CaseInsensitiveStringCompare(std::string_view a, std::string_view b);
 
 namespace Toolkit
 {

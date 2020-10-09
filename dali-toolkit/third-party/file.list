@@ -2,8 +2,6 @@
 SET( third_party_src_dir ${ROOT_SRC_DIR}/dali-toolkit/third-party )
 
 SET( third_party_src_files
-   ${third_party_src_dir}/nanosvg/nanosvg.cc
-   ${third_party_src_dir}/nanosvg/nanosvgrast.cc
    ${third_party_src_dir}/yoga/Utils.cpp
    ${third_party_src_dir}/yoga/YGConfig.cpp
    ${third_party_src_dir}/yoga/YGEnums.cpp
