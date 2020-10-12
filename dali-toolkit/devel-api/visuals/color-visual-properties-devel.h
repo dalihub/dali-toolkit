@@ -62,10 +62,6 @@ enum
 
 } // namespace DevelColorVisual
 
-/**
- * @}
- */
-
 } // namespace Toolkit
 
 } // namespace Dali
