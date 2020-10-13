@@ -332,7 +332,7 @@ void NotifyAccessibilityStateChange( Dali::Actor control, Dali::Accessibility::S
 {
   if ( auto ac = GetControlImplementationIfAny ( control ) )
   {
-    ac->GetAccessibilityObject()->NotifyAccessibilityStateChange( states, doRecursive );
+    ac->GetAccessibilityObject()->NotifyAccessibilityStateChange( std::move(states), doRecursive );
   }
 }
 
