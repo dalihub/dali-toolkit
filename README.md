@@ -14,6 +14,7 @@
       * [3. Building for MS Windows](#3-building-for-ms-windows)
          * Build with the Visual Studio project.
          * Build with CMake.
+      * [4. Building for MacOS](#4-building-for-macos)
    * [DALi Scene Loader](#dali-scene-loader)
 
 # Build Instructions
@@ -110,6 +111,26 @@ vcpkg-script folder in the windows-dependencies repository.
     - INSTALL_CMAKE_MODULES    ---> Whether to install the CMake modules (Used by the CMake command find_package() to find previously installed libraries).
     - ENABLE_DEBUG             ---> Whether to build with debug enabled.
     - USE_DEFAULT_RESOURCE_DIR ---> Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR
+
+## 4. Building for MacOS
+
+Here it is expected that the environment variables are set accordingly to
+`dali-core/README.md`.
+
+To build the repository enter the 'build/tizen' folder:
+```bash
+        $ cd dali-toolkit/build/tizen
+```
+Then run the following command to set up the build:
+```bash
+        $ cmake -DCMAKE_INSTALL_PREFIX=$DESKTOP_PREFIX -DCMAKE_TOOLCHAIN_FILE=$VCPKG_FOLDER/scripts/buildsystems/vcpkg.cmake -DINSTALL_CMAKE_MODULES=ON -DENABLE_PKG_CONFIGURE=OFF
+```
+If a Debug build is required, then add `-DCMAKE_BUILD_TYPE=Debug -DENABLE_DEBUG=ON`
+
+To build run:
+```bash
+        $ make install -j8
+```
 
 # DALi Scene Loader
 
