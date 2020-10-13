@@ -2861,6 +2861,107 @@ int utcDaliTextEditorMaxCharactersReached(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorSelectWholeText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorSelectWholeText ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add( textEditor );
+
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textEditor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textEditor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 1u, textEditor.GetChildCount(), TEST_LOCATION );
+
+  DevelTextEditor::SelectWholeText( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+  // Nothing should have been selected. The number of children is still 1
+  DALI_TEST_EQUALS( 1u, textEditor.GetChildCount(), TEST_LOCATION );
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  DevelTextEditor::SelectWholeText( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+  // Should be 2 children, the stencil and the layer
+  DALI_TEST_EQUALS( 2u, textEditor.GetChildCount(), TEST_LOCATION );
+
+  // The offscreen root actor should have two actors: the renderer and the highlight actor.
+  Actor stencil = textEditor.GetChildAt( 0u );
+
+  // The highlight actor is drawn first, so is the first actor in the list
+  Renderer highlight = stencil.GetChildAt( 0u ).GetRendererAt( 0u );
+  DALI_TEST_CHECK( highlight );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorSelectNone(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorSelectWholeText ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add( textEditor );
+
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textEditor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textEditor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  // Nothing is selected
+  std::string selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "", selectedText, TEST_LOCATION );
+
+  DevelTextEditor::SelectWholeText( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+  // whole text is selected
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "Hello world", selectedText, TEST_LOCATION );
+
+  DevelTextEditor::SelectNone( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+  // Nothing is selected
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "", selectedText, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliTextEditorSelectRange(void)
 {
   ToolkitTestApplication application;
@@ -2881,6 +2982,10 @@ int UtcDaliTextEditorSelectRange(void)
 
   textEditor.SetProperty( DevelTextEditor::Property::SELECTED_TEXT_START, 0 );
   textEditor.SetProperty( DevelTextEditor::Property::SELECTED_TEXT_END, 5 );
+
+  // Hello is selected
+  std::string selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "Hello", selectedText, TEST_LOCATION );
 
   DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
   DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 5, TEST_LOCATION );

@@ -28,6 +28,7 @@ SET(TC_SOURCES
  utc-Dali-Text-Typesetter.cpp
  utc-Dali-Text-ViewModel.cpp
  utc-Dali-TextField-internal.cpp
+ utc-Dali-TextEditor-internal.cpp
  utc-Dali-TextSelectionPopup-internal.cpp
  utc-Dali-TextureManager.cpp
  utc-Dali-Visuals-internal.cpp

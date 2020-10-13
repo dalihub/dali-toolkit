@@ -84,41 +84,41 @@ enum Type
   LINE_WRAP_MODE                       = Dali::Toolkit::TextEditor::Property::LINE_WRAP_MODE,
 
   /**
-       * @brief The text to display when the TextEditor is empty and inactive.
-       * @details Name "placeholderText", type Property::STRING.
-       */
+   * @brief The text to display when the TextEditor is empty and inactive.
+   * @details Name "placeholderText", type Property::STRING.
+   */
   PLACEHOLDER_TEXT,
 
   /**
-       * @brief The placeholder-text color.
-       * @details Name "placeholderTextColor", type Property::VECTOR4.
-       */
+   * @brief The placeholder-text color.
+   * @details Name "placeholderTextColor", type Property::VECTOR4.
+   */
   PLACEHOLDER_TEXT_COLOR,
 
   /**
-       * @brief Enables Text selection using Shift key.
-       * @details Name "enableShiftSelection", type Property::BOOLEAN.
-       */
+   * @brief Enables Text selection using Shift key.
+   * @details Name "enableShiftSelection", type Property::BOOLEAN.
+   */
   ENABLE_SHIFT_SELECTION,
 
   /**
-       * @brief Enables the grab handles for text selection.
-       * @details Name "enableGrabHandle", type Property::BOOLEAN.
-       * @note The default value is true, which means the grab handles are enabled by default.
-       */
+   * @brief Enables the grab handles for text selection.
+   * @details Name "enableGrabHandle", type Property::BOOLEAN.
+   * @note The default value is true, which means the grab handles are enabled by default.
+   */
   ENABLE_GRAB_HANDLE,
 
   /**
-       * @brief Modifies the default text alignment to match the direction of the system language.
-       * @details Name "matchSystemLanguageDirection", type (Property::BOOLEAN), Read/Write
-       * @note The default value is false
-       */
+   * @brief Modifies the default text alignment to match the direction of the system language.
+   * @details Name "matchSystemLanguageDirection", type (Property::BOOLEAN), Read/Write
+   * @note The default value is false
+   */
   MATCH_SYSTEM_LANGUAGE_DIRECTION,
 
   /**
-       * @brief The type or rendering e.g. bitmap-based.
-       * @details Name "renderingBackend", type Property::INTEGER.
-       */
+   * @brief The type or rendering e.g. bitmap-based.
+   * @details Name "renderingBackend", type Property::INTEGER.
+   */
   RENDERING_BACKEND,
 
   /**
@@ -141,9 +141,16 @@ enum Type
 
   /**
    * @brief The Editable state of control.
-   * @details Name "editable", type Property::BOOL.
+   * @details Name "enableEditing", type Property::BOOLEAN.
    */
   ENABLE_EDITING,
+
+  /**
+   * @brief The selected text in UTF-8 format.
+   * @details Name "selectedText", type Property::STRING.
+   * @note This property is read-only.
+   */
+  SELECTED_TEXT,
 };
 
 } // namespace Property
@@ -172,6 +179,20 @@ using MaxLengthReachedSignalType = Signal<void(TextEditor)>;
  * @return The signal to connect to
  */
 DALI_TOOLKIT_API MaxLengthReachedSignalType& MaxLengthReachedSignal(TextEditor textEditor);
+
+/**
+ * @brief Select the whole text of TextEditor.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ */
+DALI_TOOLKIT_API void SelectWholeText(TextEditor textEditor);
+
+/**
+ * @brief Unselect the whole text of TextEditor.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ */
+DALI_TOOLKIT_API void SelectNone(TextEditor textEditor);
 
 } // namespace DevelTextEditor
 

@@ -3214,6 +3214,26 @@ Uint32Pair Controller::GetTextSelectionRange() const
   return mImpl->GetTextSelectionRange();
 }
 
+void Controller::SelectWholeText()
+{
+  SelectEvent( 0.f, 0.f, SelectionType::ALL );
+}
+
+void Controller::SelectNone()
+{
+  SelectEvent( 0.f, 0.f, SelectionType::NONE );
+}
+
+string Controller::GetSelectedText() const
+{
+  string text;
+  if( EventData::SELECTING == mImpl->mEventData->mState )
+  {
+    mImpl->RetrieveSelection( text, false );
+  }
+  return text;
+}
+
 InputMethodContext::CallbackData Controller::OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent )
 {
   // Whether the text needs to be relaid-out.
@@ -3924,16 +3944,6 @@ bool Controller::RemoveSelectedText()
   }
 
   return textRemoved;
-}
-
-std::string Controller::GetSelectedText()
-{
-  std::string text;
-  if( EventData::SELECTING == mImpl->mEventData->mState )
-  {
-    mImpl->RetrieveSelection( text, false );
-  }
-  return text;
 }
 
 // private : Relayout.

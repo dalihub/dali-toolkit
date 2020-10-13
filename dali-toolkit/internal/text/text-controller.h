@@ -1506,6 +1506,21 @@ public: // Text-input Event Queuing.
   Uint32Pair GetTextSelectionRange() const;
 
   /**
+   * @copydoc Text::SelectableControlInterface::SelectWholeText()
+   */
+  void SelectWholeText();
+
+  /**
+   * @copydoc Text::SelectableControlInterface::SelectNone()
+   */
+  void SelectNone();
+
+  /**
+   * @copydoc Text::SelectableControlInterface::GetSelectedText()
+   */
+  string GetSelectedText() const;
+
+  /**
    * @copydoc Text::EditableControlInterface::IsEditable()
    */
   virtual bool IsEditable() const;
@@ -1542,13 +1557,6 @@ public: // Text-input Event Queuing.
    * @return the created actor or an empty handle if no background color needs to be rendered.
    */
   Actor CreateBackgroundActor();
-
-  /**
-   * @brief Retrive Selected text.
-   *
-   * @return The seleced text.
-   */
-  std::string GetSelectedText();
 
 protected: // Inherit from Text::Decorator::ControllerInterface.
 

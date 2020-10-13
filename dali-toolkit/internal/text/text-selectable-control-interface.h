@@ -25,6 +25,7 @@ namespace Toolkit
 {
 
 using  Uint32Pair = std::pair<uint32_t,uint32_t>;
+using  string = std::string;
 namespace Text
 {
 
@@ -52,6 +53,22 @@ public:
    * @return pair contains start and end positions.
    */
   virtual Uint32Pair GetTextSelectionRange() const = 0;
+
+  /**
+   * @brief Called to select the whole texts.
+   */
+  virtual void SelectWholeText() = 0;
+
+  /**
+   * @brief Called to unselect the whole texts.
+   */
+  virtual void SelectNone() = 0;
+
+  /**
+   * @brief Retrive Selected text.
+   * @return The seletced text.
+   */
+  virtual string GetSelectedText() const = 0;
 };
 
 } // namespace Text
