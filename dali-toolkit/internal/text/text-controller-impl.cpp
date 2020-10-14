@@ -2072,6 +2072,8 @@ void Controller::Impl::SetTextSelectionRange(const uint32_t *pStart, const uint3
     {
       ChangeState( EventData::SELECTING );
       mEventData->mUpdateHighlightBox = true;
+      mEventData->mUpdateLeftSelectionPosition = true;
+      mEventData->mUpdateRightSelectionPosition = true;
     }
   }
 }
