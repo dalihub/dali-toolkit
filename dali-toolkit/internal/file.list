@@ -142,6 +142,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/text-controller.cpp
    ${toolkit_src_dir}/text/text-controller-event-handler.cpp
    ${toolkit_src_dir}/text/text-controller-impl.cpp
+   ${toolkit_src_dir}/text/text-controller-impl-event-handler.cpp
    ${toolkit_src_dir}/text/text-controller-input-font-handler.cpp
    ${toolkit_src_dir}/text/text-controller-placeholder-handler.cpp
    ${toolkit_src_dir}/text/text-effects-style.cpp
