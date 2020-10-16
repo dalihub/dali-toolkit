@@ -84,51 +84,51 @@ enum
   ELLIPSIS                             = Dali::Toolkit::TextField::Property::ELLIPSIS,
 
   /**
-       * @brief Enables Text selection using Shift key.
-       * @details Name "enableShiftSelection", type Property::BOOLEAN.
-       */
+   * @brief Enables Text selection using Shift key.
+   * @details Name "enableShiftSelection", type Property::BOOLEAN.
+   */
   ENABLE_SHIFT_SELECTION = ELLIPSIS + 1,
 
   /**
-       * @brief Enables the grab handles for text selection.
-       * @details Name "enableGrabHandle", type Property::BOOLEAN.
-       * @note The default value is true, which means the grab handles are enabled by default.
-       */
+   * @brief Enables the grab handles for text selection.
+   * @details Name "enableGrabHandle", type Property::BOOLEAN.
+   * @note The default value is true, which means the grab handles are enabled by default.
+   */
   ENABLE_GRAB_HANDLE = ELLIPSIS + 2,
 
   /**
-       * @brief Modifies the default text alignment to match the direction of the system language.
-       * @details Name "matchSystemLanguageDirection", type (Property::BOOLEAN), Read/Write
-       * @note The default value is false
-       */
+   * @brief Modifies the default text alignment to match the direction of the system language.
+   * @details Name "matchSystemLanguageDirection", type (Property::BOOLEAN), Read/Write
+   * @note The default value is false
+   */
   MATCH_SYSTEM_LANGUAGE_DIRECTION = ELLIPSIS + 3,
 
   /**
-        * @brief Enables the grab handle popup for text selection.
-        * @details Name "enableGrabHandlePopup", type Property::BOOLEAN.
-        * @note The default value is true, which means the grab handle popup is enabled by default.
-        */
+   * @brief Enables the grab handle popup for text selection.
+   * @details Name "enableGrabHandlePopup", type Property::BOOLEAN.
+   * @note The default value is true, which means the grab handle popup is enabled by default.
+   */
   ENABLE_GRAB_HANDLE_POPUP = ELLIPSIS + 4,
 
   /**
-       * @brief The default text background parameters.
-       * @details Name "textBackground", type Property::VECTOR4.
-       * @note Use "textBackground" as property name to avoid conflict with Control's "background" property.
-       * @note The default value is Color::TRANSPARENT.
-       */
+   * @brief The default text background parameters.
+   * @details Name "textBackground", type Property::VECTOR4.
+   * @note Use "textBackground" as property name to avoid conflict with Control's "background" property.
+   * @note The default value is Color::TRANSPARENT.
+   */
   BACKGROUND = ELLIPSIS + 5,
 
   /**
-       * @brief The selected text in UTF-8 format.
-       * @details Name "selectedText", type Property::STRING.
-       * @note This property is read-only.
-       */
+   * @brief The selected text in UTF-8 format.
+   * @details Name "selectedText", type Property::STRING.
+   * @note This property is read-only.
+   */
   SELECTED_TEXT = ELLIPSIS + 6,
 
   /**
-       * @brief The type or rendering e.g. bitmap-based.
-       * @details Name "renderingBackend", type Property::INTEGER.
-       */
+   * @brief The type or rendering e.g. bitmap-based.
+   * @details Name "renderingBackend", type Property::INTEGER.
+   */
   RENDERING_BACKEND = ELLIPSIS + 7,
 
   /**
@@ -145,7 +145,7 @@ enum
 
   /**
    * @brief The Editable state of control.
-   * @details Name "editable", type Property::BOOL.
+   * @details Name "enableEditing", type Property::BOOLEAN.
    */
   ENABLE_EDITING,
 

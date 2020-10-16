@@ -112,3 +112,43 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldSelectText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliTextFieldSelectText" );
+
+  // Create a text field
+  TextField textField = TextField::New();
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 400.f, 60.f ) );
+  textField.SetProperty( TextField::Property::TEXT, "Hello World" );
+
+  // Add the text field to the stage
+  application.GetScene().Add( textField );
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextField& textFieldImpl = GetImpl( textField );
+
+  application.SendNotification();
+  application.Render();
+
+  // Highlight the whole text
+  textFieldImpl.SelectWholeText();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( textFieldImpl.GetSelectedText() == "Hello World" );
+
+  // Select None
+  textFieldImpl.SelectNone();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( textFieldImpl.GetSelectedText() == "" );
+
+  END_TEST;
+}

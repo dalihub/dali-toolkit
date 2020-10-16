@@ -216,6 +216,21 @@ public:
   Uint32Pair GetTextSelectionRange() const override;
 
   /**
+   * @copydoc Text::SelectableControlInterface::SelectWholeText()
+   */
+  void SelectWholeText() override;
+
+  /**
+   * @copydoc Text::SelectableControlInterface::SelectNone()
+   */
+  void SelectNone() override;
+
+  /**
+   * @copydoc Text::SelectableControlInterface::GetSelectedText()
+   */
+  string GetSelectedText() const override;
+
+  /**
    * @copydoc Text::EditableControlInterface::IsEditable()
    */
   bool IsEditable() const override;
