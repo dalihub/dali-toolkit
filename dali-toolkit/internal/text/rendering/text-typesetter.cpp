@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -276,6 +276,149 @@ bool IsGlyphUnderlined( GlyphIndex index,
   }
 
   return false;
+}
+
+/// Helper method to fetch the underline metrics for the specified font glyph
+void FetchFontUnderlineMetrics(
+    TextAbstraction::FontClient& fontClient,
+    const GlyphInfo* const glyphInfo,
+    float& currentUnderlinePosition,
+    const float underlineHeight,
+    float& currentUnderlineThickness,
+    float& maxUnderlineThickness,
+    FontId& lastUnderlinedFontId)
+{
+  FontMetrics fontMetrics;
+  fontClient.GetFontMetrics( glyphInfo->fontId, fontMetrics );
+  currentUnderlinePosition = ceil( fabsf( fontMetrics.underlinePosition ) );
+  const float descender = ceil( fabsf( fontMetrics.descender ) );
+
+  if( fabsf( underlineHeight ) < Math::MACHINE_EPSILON_1000 )
+  {
+    currentUnderlineThickness = fontMetrics.underlineThickness;
+
+    // Ensure underline will be at least a pixel high
+    if ( currentUnderlineThickness < 1.0f )
+    {
+      currentUnderlineThickness = 1.0f;
+    }
+    else
+    {
+      currentUnderlineThickness = ceil( currentUnderlineThickness );
+    }
+  }
+
+  // The underline thickness should be the max underline thickness of all glyphs of the line.
+  if ( currentUnderlineThickness > maxUnderlineThickness )
+  {
+    maxUnderlineThickness = currentUnderlineThickness;
+  }
+
+  // Clamp the underline position at the font descender and check for ( as EFL describes it ) a broken font
+  if( currentUnderlinePosition > descender )
+  {
+    currentUnderlinePosition = descender;
+  }
+
+  if( fabsf( currentUnderlinePosition ) < Math::MACHINE_EPSILON_1000 )
+  {
+    // Move offset down by one ( EFL behavior )
+    currentUnderlinePosition = 1.0f;
+  }
+
+  lastUnderlinedFontId = glyphInfo->fontId;
+}
+
+/// Draws the specified color to the pixel buffer
+void WriteColorToPixelBuffer(
+    GlyphData& glyphData,
+    uint32_t* bitmapBuffer,
+    const Vector4& color,
+    const unsigned int x,
+    const unsigned int y)
+{
+  // Always RGBA image for text with styles
+  uint32_t pixel = *( bitmapBuffer + y * glyphData.width + x );
+  uint8_t* pixelBuffer = reinterpret_cast<uint8_t*>( &pixel );
+
+  // Write the color to the pixel buffer
+  uint8_t colorAlpha = static_cast< uint8_t >( color.a * 255.f );
+  *( pixelBuffer + 3u ) = colorAlpha;
+  *( pixelBuffer + 2u ) = static_cast< uint8_t >( color.b * colorAlpha );
+  *( pixelBuffer + 1u ) = static_cast< uint8_t >( color.g * colorAlpha );
+  *( pixelBuffer      ) = static_cast< uint8_t >( color.r * colorAlpha );
+
+  *( bitmapBuffer + y * glyphData.width + x ) = pixel;
+}
+
+/// Draws the specified underline color to the buffer
+void DrawUnderline(
+    const Vector4& underlineColor,
+    const unsigned int bufferWidth,
+    const unsigned int bufferHeight,
+    GlyphData& glyphData,
+    const float baseline,
+    const float currentUnderlinePosition,
+    const float maxUnderlineThickness,
+    const float lineExtentLeft,
+    const float lineExtentRight)
+{
+  int underlineYOffset = glyphData.verticalOffset + baseline + currentUnderlinePosition;
+  uint32_t* bitmapBuffer = reinterpret_cast< uint32_t* >( glyphData.bitmapBuffer.GetBuffer() );
+
+  for( unsigned int y = underlineYOffset; y < underlineYOffset + maxUnderlineThickness; y++ )
+  {
+    if( y > bufferHeight - 1 )
+    {
+      // Do not write out of bounds.
+      break;
+    }
+
+    for( unsigned int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++ )
+    {
+      if( x > bufferWidth - 1 )
+      {
+        // Do not write out of bounds.
+        break;
+      }
+
+      WriteColorToPixelBuffer(glyphData, bitmapBuffer, underlineColor, x, y);
+    }
+  }
+}
+
+/// Draws the background color to the buffer
+void DrawBackgroundColor(
+    Vector4 backgroundColor,
+    const unsigned int bufferWidth,
+    const unsigned int bufferHeight,
+    GlyphData& glyphData,
+    const float baseline,
+    const LineRun& line,
+    const float lineExtentLeft,
+    const float lineExtentRight)
+{
+  uint32_t* bitmapBuffer = reinterpret_cast< uint32_t* >( glyphData.bitmapBuffer.GetBuffer() );
+
+  for( int y = glyphData.verticalOffset + baseline - line.ascender; y < glyphData.verticalOffset + baseline - line.descender; y++ )
+  {
+    if( ( y < 0 ) || ( y > static_cast<int>(bufferHeight - 1) ) )
+    {
+      // Do not write out of bounds.
+      continue;
+    }
+
+    for( int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++ )
+    {
+      if( ( x < 0 ) || ( x > static_cast<int>(bufferWidth - 1) ) )
+      {
+        // Do not write out of bounds.
+        continue;
+      }
+
+      WriteColorToPixelBuffer(glyphData, bitmapBuffer, backgroundColor, x, y);
+    }
+  }
 }
 
 } // namespace
@@ -593,45 +736,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
       if( underlineGlyph && ( glyphInfo->fontId != lastUnderlinedFontId ) )
       {
         // We need to fetch fresh font underline metrics
-        FontMetrics fontMetrics;
-        fontClient.GetFontMetrics( glyphInfo->fontId, fontMetrics );
-        currentUnderlinePosition = ceil( fabsf( fontMetrics.underlinePosition ) );
-        const float descender = ceil( fabsf( fontMetrics.descender ) );
-
-        if( fabsf( underlineHeight ) < Math::MACHINE_EPSILON_1000 )
-        {
-          currentUnderlineThickness = fontMetrics.underlineThickness;
-
-          // Ensure underline will be at least a pixel high
-          if ( currentUnderlineThickness < 1.0f )
-          {
-            currentUnderlineThickness = 1.0f;
-          }
-          else
-          {
-            currentUnderlineThickness = ceil( currentUnderlineThickness );
-          }
-        }
-
-        // The underline thickness should be the max underline thickness of all glyphs of the line.
-        if ( currentUnderlineThickness > maxUnderlineThickness )
-        {
-          maxUnderlineThickness = currentUnderlineThickness;
-        }
-
-        // Clamp the underline position at the font descender and check for ( as EFL describes it ) a broken font
-        if( currentUnderlinePosition > descender )
-        {
-          currentUnderlinePosition = descender;
-        }
-
-        if( fabsf( currentUnderlinePosition ) < Math::MACHINE_EPSILON_1000 )
-        {
-          // Move offset down by one ( EFL behavior )
-          currentUnderlinePosition = 1.0f;
-        }
-
-        lastUnderlinedFontId = glyphInfo->fontId;
+        FetchFontUnderlineMetrics(fontClient, glyphInfo, currentUnderlinePosition, underlineHeight, currentUnderlineThickness, maxUnderlineThickness, lastUnderlinedFontId);
       } // underline
 
       // Retrieves the glyph's position.
@@ -728,77 +833,13 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
     // Draw the underline from the leftmost glyph to the rightmost glyph
     if ( thereAreUnderlinedGlyphs && style == Typesetter::STYLE_UNDERLINE )
     {
-      int underlineYOffset = glyphData.verticalOffset + baseline + currentUnderlinePosition;
-
-      for( unsigned int y = underlineYOffset; y < underlineYOffset + maxUnderlineThickness; y++ )
-      {
-        if( y > bufferHeight - 1 )
-        {
-          // Do not write out of bounds.
-          break;
-        }
-
-        for( unsigned int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++ )
-        {
-          if( x > bufferWidth - 1 )
-          {
-            // Do not write out of bounds.
-            break;
-          }
-
-          // Always RGBA image for text with styles
-          uint32_t* bitmapBuffer = reinterpret_cast< uint32_t* >( glyphData.bitmapBuffer.GetBuffer() );
-          uint32_t underlinePixel = *( bitmapBuffer + y * glyphData.width + x );
-          uint8_t* underlinePixelBuffer = reinterpret_cast<uint8_t*>( &underlinePixel );
-
-          // Write the underline color to the pixel buffer
-          uint8_t colorAlpha = static_cast< uint8_t >( underlineColor.a * 255.f );
-          *( underlinePixelBuffer + 3u ) = colorAlpha;
-          *( underlinePixelBuffer + 2u ) = static_cast< uint8_t >( underlineColor.b * colorAlpha );
-          *( underlinePixelBuffer + 1u ) = static_cast< uint8_t >( underlineColor.g * colorAlpha );
-          *( underlinePixelBuffer      ) = static_cast< uint8_t >( underlineColor.r * colorAlpha );
-
-          *( bitmapBuffer + y * glyphData.width + x ) = underlinePixel;
-        }
-      }
+      DrawUnderline(underlineColor, bufferWidth, bufferHeight, glyphData, baseline, currentUnderlinePosition, maxUnderlineThickness, lineExtentLeft, lineExtentRight);
     }
 
     // Draw the background color from the leftmost glyph to the rightmost glyph
     if ( style == Typesetter::STYLE_BACKGROUND )
     {
-      Vector4 backgroundColor = mModel->GetBackgroundColor();
-
-      for( int y = glyphData.verticalOffset + baseline - line.ascender; y < glyphData.verticalOffset + baseline - line.descender; y++ )
-      {
-        if( ( y < 0 ) || ( y > static_cast<int>(bufferHeight - 1) ) )
-        {
-          // Do not write out of bounds.
-          continue;
-        }
-
-        for( int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++ )
-        {
-          if( ( x < 0 ) || ( x > static_cast<int>(bufferWidth - 1) ) )
-          {
-            // Do not write out of bounds.
-            continue;
-          }
-
-          // Always RGBA image for text with styles
-          uint32_t* bitmapBuffer = reinterpret_cast< uint32_t* >( glyphData.bitmapBuffer.GetBuffer() );
-          uint32_t backgroundPixel = *( bitmapBuffer + y * glyphData.width + x );
-          uint8_t* backgroundPixelBuffer = reinterpret_cast<uint8_t*>( &backgroundPixel );
-
-          // Write the background color to the pixel buffer
-          uint8_t colorAlpha = static_cast< uint8_t >( backgroundColor.a * 255.f );
-          *( backgroundPixelBuffer + 3u ) = colorAlpha;
-          *( backgroundPixelBuffer + 2u ) = static_cast< uint8_t >( backgroundColor.b * colorAlpha );
-          *( backgroundPixelBuffer + 1u ) = static_cast< uint8_t >( backgroundColor.g * colorAlpha );
-          *( backgroundPixelBuffer      ) = static_cast< uint8_t >( backgroundColor.r * colorAlpha );
-
-          *( bitmapBuffer + y * glyphData.width + x ) = backgroundPixel;
-        }
-      }
+      DrawBackgroundColor(mModel->GetBackgroundColor(), bufferWidth, bufferHeight, glyphData, baseline, line, lineExtentLeft, lineExtentRight);
     }
 
     // Increases the vertical offset with the line's descender.
