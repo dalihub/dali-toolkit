@@ -140,6 +140,18 @@ enum Type
   SELECTED_TEXT_END,
 
   /**
+   * @brief The horizontal scroll position in pixels.
+   * @details Name "horizontalScrollPosition", type Property::FLOAT.
+   */
+  HORIZONTAL_SCROLL_POSITION,
+
+  /**
+   * @brief The vertical scroll position in pixels.
+   * @details Name "verticalScrollPosition", type Property::FLOAT.
+   */
+  VERTICAL_SCROLL_POSITION,
+
+  /**
    * @brief The Editable state of control.
    * @details Name "enableEditing", type Property::BOOLEAN.
    */
@@ -193,6 +205,14 @@ DALI_TOOLKIT_API void SelectWholeText(TextEditor textEditor);
  * @param[in] textEditor The instance of TextEditor.
  */
 DALI_TOOLKIT_API void SelectNone(TextEditor textEditor);
+
+/**
+ * @brief Scroll the TextEditor by specific amount.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ * @param[in] scroll amount (in pixels) of scrolling in horizontal & vectical directions.
+ */
+DALI_TOOLKIT_API void ScrollBy(TextEditor textEditor, Vector2 scroll);
 
 } // namespace DevelTextEditor
 

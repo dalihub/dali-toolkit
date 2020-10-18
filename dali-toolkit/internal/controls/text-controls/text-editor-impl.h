@@ -226,6 +226,25 @@ public:
   void SelectNone() override;
 
   /**
+   * @copydoc Dali::Toolkit::DevelTextEditor::ScrollBy()
+   */
+  void ScrollBy(Vector2 Scroll);
+
+  /**
+   * @brief Get Horizontal scroll position of TextEditor.
+   *
+   * @return Horizontal scroll position (in pixels) of TextEditor.
+   */
+  float GetHorizontalScrollPosition();
+
+  /**
+   * @brief Get Vertical scroll position of TextEditor.
+   *
+   * @return Vertical scroll position (in pixels) of TextEditor.
+   */
+  float GetVerticalScrollPosition();
+
+  /**
    * @copydoc Text::SelectableControlInterface::GetSelectedText()
    */
   string GetSelectedText() const override;

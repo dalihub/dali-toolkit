@@ -45,6 +45,11 @@ void SelectNone(TextEditor textEditor)
   GetImpl(textEditor).SelectNone();
 }
 
+void ScrollBy(TextEditor textEditor, Vector2 scroll)
+{
+  GetImpl(textEditor).ScrollBy(scroll);
+}
+
 } // namespace DevelTextEditor
 
 } // namespace Toolkit

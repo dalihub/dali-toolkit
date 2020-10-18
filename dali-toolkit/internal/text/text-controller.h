@@ -1531,6 +1531,21 @@ public: // Text-input Event Queuing.
   virtual void SetEditable( bool editable );
 
   /**
+   * @copydoc Dali::Toolkit::Internal::TextEditor::ScrollBy()
+   */
+  virtual void ScrollBy( Vector2 scroll );
+
+  /**
+   * @copydoc Dali::Toolkit::Internal::TextEditor::GetHorizontalScrollPosition()
+   */
+  float GetHorizontalScrollPosition();
+
+  /**
+   * @copydoc Dali::Toolkit::Internal::TextEditor::GetVerticalScrollPosition()
+   */
+  float GetVerticalScrollPosition();
+
+  /**
    * @brief Event received from input method context
    *
    * @param[in] inputMethodContext The input method context.

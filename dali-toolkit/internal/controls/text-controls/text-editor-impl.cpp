@@ -142,6 +142,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "renderingBackend",      
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "maxLength",                      INTEGER,   MAX_LENGTH                           )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "selectedTextStart",              INTEGER,   SELECTED_TEXT_START                  )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "selectedTextEnd",                INTEGER,   SELECTED_TEXT_END                    )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "horizontalScrollPosition",       FLOAT,     HORIZONTAL_SCROLL_POSITION           )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "verticalScrollPosition",         INTEGER,   VERTICAL_SCROLL_POSITION             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableEditing",                  BOOLEAN,   ENABLE_EDITING                       )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "selectedText",         STRING,    SELECTED_TEXT                        )
 
@@ -721,6 +723,26 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         impl.SetEditable( editable );
         break;
       }
+      case Toolkit::DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION:
+      {
+        float horizontalScroll = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p HORIZONTAL_SCROLL_POSITION %d\n", impl.mController.Get(), horizontalScroll );
+        if (horizontalScroll >= 0.0f)
+        {
+          impl.ScrollBy( Vector2(horizontalScroll - impl.GetHorizontalScrollPosition(), 0 ));
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::VERTICAL_SCROLL_POSITION:
+      {
+        float verticalScroll = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p VERTICAL_SCROLL_POSITION %d\n", impl.mController.Get(), verticalScroll );
+        if (verticalScroll >= 0.0f)
+        {
+          impl.ScrollBy( Vector2(0, verticalScroll - impl.GetVerticalScrollPosition() ));
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -1057,6 +1079,16 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         value = impl.IsEditable();
         break;
       }
+      case Toolkit::DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION:
+      {
+        value = impl.GetHorizontalScrollPosition();
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::VERTICAL_SCROLL_POSITION:
+      {
+        value = impl.GetVerticalScrollPosition();
+        break;
+      }
     } //switch
   }
 
@@ -1078,6 +1110,32 @@ void TextEditor::SelectNone()
   {
     mController->SelectNone();
   }
+}
+
+void TextEditor::ScrollBy(Vector2 scroll)
+{
+  if( mController && mController->IsShowingRealText() )
+  {
+    mController->ScrollBy(scroll);
+  }
+}
+
+float TextEditor::GetHorizontalScrollPosition()
+{
+  if( mController && mController->IsShowingRealText() )
+  {
+    return mController->GetHorizontalScrollPosition();
+  }
+  return 0;
+}
+
+float TextEditor::GetVerticalScrollPosition()
+{
+  if( mController && mController->IsShowingRealText() )
+  {
+    return mController->GetVerticalScrollPosition();
+  }
+  return 0;
 }
 
 string TextEditor::GetSelectedText() const
