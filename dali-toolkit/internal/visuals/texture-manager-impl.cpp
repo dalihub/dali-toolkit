@@ -824,6 +824,8 @@ void TextureManager::QueueLoadTexture( TextureInfo& textureInfo, TextureUploadOb
 {
   auto textureId = textureInfo.textureId;
   mLoadQueue.PushBack( LoadQueueElement( textureId, observer) );
+
+  observer->DestructionSignal().Connect( this, &TextureManager::ObserverDestroyed );
 }
 
 void TextureManager::LoadTexture( TextureInfo& textureInfo, TextureUploadObserver* observer )
@@ -858,6 +860,11 @@ void TextureManager::ProcessQueuedTextures()
 {
   for( auto&& element : mLoadQueue )
   {
+    if( !element.mObserver )
+    {
+      continue;
+    }
+
     int cacheIndex = GetCacheIndexFromId( element.mTextureId );
     if( cacheIndex != INVALID_CACHE_INDEX )
     {
@@ -1296,6 +1303,15 @@ void TextureManager::ObserverDestroyed( TextureUploadObserver* observer )
       {
         ++j;
       }
+    }
+  }
+
+  // Remove element from the LoadQueue
+  for( auto&& element : mLoadQueue )
+  {
+    if( element.mObserver == observer )
+    {
+      element.mObserver = nullptr;
     }
   }
 }

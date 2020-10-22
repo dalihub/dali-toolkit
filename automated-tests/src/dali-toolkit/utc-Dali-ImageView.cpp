@@ -2766,9 +2766,21 @@ void OnResourceReadySignal( Control control )
   }
 }
 
+void OnResourceReadySignal01( Control control )
+{
+  if(++gResourceReadySignalCounter == 1)
+  {
+    // It makes the first new visual be deleted immediately
+    // The first image will not be loaded.
+    control[ImageView::Property::IMAGE] = Property::Map().Add(ImageVisual::Property::URL, gImage_600_RGB)
+                                                         .Add(ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::NEVER);
+    control[ImageView::Property::IMAGE] = TEST_IMAGE_1;
+  }
 }
 
-int UtcDaliImageViewSetImageOnResourceReadySignal(void)
+}
+
+int UtcDaliImageViewSetImageOnResourceReadySignal01(void)
 {
   tet_infoline("Test setting image from within signal handler.");
 
@@ -2802,6 +2814,34 @@ int UtcDaliImageViewSetImageOnResourceReadySignal(void)
 
   // Run idle callback
   application.RunIdles();
+
+  DALI_TEST_EQUALS( gResourceReadySignalCounter, 2, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewSetImageOnResourceReadySignal02(void)
+{
+  tet_infoline("Test setting image from within signal handler.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  ImageView imageView = ImageView::New( gImage_34_RGBA );
+  imageView.ResourceReadySignal().Connect( &OnResourceReadySignal01 );
+
+  application.GetScene().Add( imageView );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait for loading an image
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( gResourceReadySignalCounter, 2, TEST_LOCATION );
 
