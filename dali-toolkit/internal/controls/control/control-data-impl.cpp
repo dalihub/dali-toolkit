@@ -2012,12 +2012,14 @@ Dali::Accessibility::States Control::Impl::AccessibleImpl::CalculateStates()
   s[Dali::Accessibility::State::ENABLED] = true;
   s[Dali::Accessibility::State::SENSITIVE] = true;
   s[Dali::Accessibility::State::ANIMATED] = self.GetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED ).Get< bool >();
-  s[Dali::Accessibility::State::VISIBLE] = self.GetCurrentProperty< bool >( Actor::Property::VISIBLE );
+  s[Dali::Accessibility::State::VISIBLE] = true;
   if( modal )
   {
     s[Dali::Accessibility::State::MODAL] = true;
   }
-  s[Dali::Accessibility::State::SHOWING] = !self.GetProperty( Dali::DevelActor::Property::CULLED ).Get< bool >();
+  s[Dali::Accessibility::State::SHOWING] = !self.GetProperty( Dali::DevelActor::Property::CULLED ).Get< bool >()
+                                         && self.GetCurrentProperty< bool >( Actor::Property::VISIBLE );
+
   s[Dali::Accessibility::State::DEFUNCT] = !self.GetProperty( Dali::DevelActor::Property::CONNECTED_TO_SCENE ).Get< bool >();
   return s;
 }
