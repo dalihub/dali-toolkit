@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ const float DEFAULT_TEXTFIT_STEP = 1.f;
 //Forward declarations
 struct CursorInfo;
 struct FontDefaults;
+struct ControllerImplEventHandler;
 
 class SelectableControlInterface;
 
@@ -823,6 +824,9 @@ public:
   float mTextFitMaxSize;                   ///< Maximum Font Size for text fit. Default 100
   float mTextFitStepSize;                  ///< Step Size for font intervalse. Default 1
   bool  mTextFitEnabled : 1;               ///< Whether the text's fit is enabled.
+
+private:
+  friend ControllerImplEventHandler;
 };
 
 } // namespace Text
