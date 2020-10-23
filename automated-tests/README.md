@@ -150,7 +150,7 @@ a refspec to the latest commit, or uses the index/working tree.
 Testing on target
 =================
 
-To build for target, first build and install dali-core, dali-adaptor and dali-toolkit, then build dali-capi without --keep-packs option.
+To build for target, first build and install dali-core, dali-adaptor and dali-toolkit.
 
 You will need to install libconfig-tiny-perl:
 
