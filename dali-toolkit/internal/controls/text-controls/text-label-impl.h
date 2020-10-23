@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,6 +141,19 @@ private:
    * @brief Set up Autoscrolling
    */
   void SetUpAutoScrolling();
+
+  /**
+   * Creates a text-scroller if one has not been created.
+   * @return The text scroller.
+   */
+  Text::TextScrollerPtr GetTextScroller()
+  {
+    if( !mTextScroller )
+    {
+      mTextScroller = Text::TextScroller::New( *this );
+    }
+    return mTextScroller;
+  }
 
 private: // Data
 

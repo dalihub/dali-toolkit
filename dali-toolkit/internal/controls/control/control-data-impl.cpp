@@ -26,6 +26,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <cstring>
 #include <limits>
 
@@ -322,7 +323,7 @@ Control::Impl::Impl( Control& controlImpl )
   mDownFocusableActorId( -1 ),
   mStyleName(""),
   mBackgroundColor(Color::TRANSPARENT),
-  mStartingPinchScale( NULL ),
+  mStartingPinchScale(nullptr),
   mMargin( 0, 0, 0, 0 ),
   mPadding( 0, 0, 0, 0 ),
   mKeyEventSignal(),
@@ -336,9 +337,12 @@ Control::Impl::Impl( Control& controlImpl )
   mLongPressGestureDetector(),
   mTooltip( NULL ),
   mInputMethodContext(),
+  mIdleCallback(nullptr),
   mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIsKeyboardNavigationSupported( false ),
-  mIsKeyboardFocusGroup( false )
+  mIsKeyboardFocusGroup( false ),
+  mIsEmittingResourceReadySignal(false),
+  mNeedToEmitResourceReady(false)
 {
 }
 
@@ -346,6 +350,12 @@ Control::Impl::~Impl()
 {
   // All gesture detectors will be destroyed so no need to disconnect.
   delete mStartingPinchScale;
+
+  if(mIdleCallback && Adaptor::IsAvailable())
+  {
+    // Removes the callback from the callback manager in case the control is destroyed before the callback is executed.
+    Adaptor::Get().RemoveIdle(mIdleCallback);
+  }
 }
 
 Control::Impl& Control::Impl::Get( Internal::Control& internalControl )
@@ -670,8 +680,10 @@ void Control::Impl::ResourceReady( Visual::Base& object)
   // Emit signal if all enabled visuals registered by the control are ready.
   if( IsResourceReady() )
   {
-    Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
-    mResourceReadySignal.Emit( handle );
+    // Reset the flag
+    mNeedToEmitResourceReady = false;
+
+    EmitResourceReadySignal();
   }
 }
 
@@ -1446,6 +1458,58 @@ void Control::Impl::ClearShadow()
 
    // Trigger a size negotiation request that may be needed when unregistering a visual.
    mControlImpl.RelayoutRequest();
+}
+
+void Control::Impl::EmitResourceReadySignal()
+{
+  if(!mIsEmittingResourceReadySignal)
+  {
+    // Guard against calls to emit the signal during the callback
+    mIsEmittingResourceReadySignal = true;
+
+    // If the signal handler changes visual, it may become ready during this call & therefore this method will
+    // get called again recursively. If so, mNeedToEmitResourceReady is set below, and we act on it after that secondary
+    // invocation has completed by notifying in an Idle callback to prevent further recursion.
+    Dali::Toolkit::Control handle(mControlImpl.GetOwner());
+    mResourceReadySignal.Emit(handle);
+
+    if(mNeedToEmitResourceReady)
+    {
+      // Add idler to emit the signal again
+      if(!mIdleCallback)
+      {
+        // The callback manager takes the ownership of the callback object.
+        mIdleCallback = MakeCallback( this, &Control::Impl::OnIdleCallback);
+        Adaptor::Get().AddIdle(mIdleCallback, false);
+      }
+    }
+
+    mIsEmittingResourceReadySignal = false;
+  }
+  else
+  {
+    mNeedToEmitResourceReady = true;
+  }
+}
+
+void Control::Impl::OnIdleCallback()
+{
+  if(mNeedToEmitResourceReady)
+  {
+    // Reset the flag
+    mNeedToEmitResourceReady = false;
+
+    // A visual is ready so control may need relayouting if staged
+    if(mControlImpl.Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+    {
+      mControlImpl.RelayoutRequest();
+    }
+
+    EmitResourceReadySignal();
+  }
+
+  // Set the pointer to null as the callback manager deletes the callback after execute it.
+  mIdleCallback = nullptr;
 }
 
 } // namespace Internal

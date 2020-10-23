@@ -62,33 +62,29 @@ namespace Internal
 
 namespace
 {
-  const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::DevelText::DEFAULT_RENDERING_BACKEND;
+const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::DevelText::DEFAULT_RENDERING_BACKEND;
 
-  /**
-   * @brief How the text visual should be aligned vertically inside the control.
-   *
-   * 0.0f aligns the text to the top, 0.5f aligns the text to the center, 1.0f aligns the text to the bottom.
-   * The alignment depends on the alignment value of the text label (Use Text::VerticalAlignment enumerations).
-   */
-  const float VERTICAL_ALIGNMENT_TABLE[ Text::VerticalAlignment::BOTTOM + 1 ] =
-  {
-    0.0f,  // VerticalAlignment::TOP
-    0.5f,  // VerticalAlignment::CENTER
-    1.0f   // VerticalAlignment::BOTTOM
-  };
-
-  const std::string TEXT_FIT_ENABLE_KEY( "enable" );
-  const std::string TEXT_FIT_MIN_SIZE_KEY( "minSize" );
-  const std::string TEXT_FIT_MAX_SIZE_KEY( "maxSize" );
-  const std::string TEXT_FIT_STEP_SIZE_KEY( "stepSize" );
-  const std::string TEXT_FIT_FONT_SIZE_TYPE_KEY( "fontSizeType" );
-}
-
-namespace
+/**
+ * @brief How the text visual should be aligned vertically inside the control.
+ *
+ * 0.0f aligns the text to the top, 0.5f aligns the text to the center, 1.0f aligns the text to the bottom.
+ * The alignment depends on the alignment value of the text label (Use Text::VerticalAlignment enumerations).
+ */
+const float VERTICAL_ALIGNMENT_TABLE[ Text::VerticalAlignment::BOTTOM + 1 ] =
 {
+  0.0f,  // VerticalAlignment::TOP
+  0.5f,  // VerticalAlignment::CENTER
+  1.0f   // VerticalAlignment::BOTTOM
+};
+
+const std::string TEXT_FIT_ENABLE_KEY( "enable" );
+const std::string TEXT_FIT_MIN_SIZE_KEY( "minSize" );
+const std::string TEXT_FIT_MAX_SIZE_KEY( "maxSize" );
+const std::string TEXT_FIT_STEP_SIZE_KEY( "stepSize" );
+const std::string TEXT_FIT_FONT_SIZE_TYPE_KEY( "fontSizeType" );
 
 #if defined ( DEBUG_ENABLED )
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
 const Scripting::StringEnum AUTO_SCROLL_STOP_MODE_TABLE[] =
@@ -144,6 +140,73 @@ DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textCol
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorBlue",  TEXT_COLOR_BLUE,  TEXT_COLOR, 2  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorAlpha", TEXT_COLOR_ALPHA, TEXT_COLOR, 3  )
 DALI_TYPE_REGISTRATION_END()
+
+/// Parses the property map for the TEXT_FIT property
+void ParseTextFitProperty(Text::ControllerPtr& controller, const Property::Map* propertiesMap)
+{
+  if ( propertiesMap && !propertiesMap->Empty() )
+  {
+    bool enabled = false;
+    float minSize = 0.f;
+    float maxSize = 0.f;
+    float stepSize = 0.f;
+    bool isMinSizeSet = false, isMaxSizeSet = false, isStepSizeSet = false;
+    Controller::FontSizeType type = Controller::FontSizeType::POINT_SIZE;
+
+    const unsigned int numberOfItems = propertiesMap->Count();
+
+    // Parses and applies
+    for( unsigned int index = 0u; index < numberOfItems; ++index )
+    {
+      const KeyValuePair& valueGet = propertiesMap->GetKeyValue( index );
+
+      if( ( Controller::TextFitInfo::Property::TEXT_FIT_ENABLE == valueGet.first.indexKey ) || ( TEXT_FIT_ENABLE_KEY == valueGet.first.stringKey ) )
+      {
+        /// Enable key.
+        enabled = valueGet.second.Get< bool >();
+      }
+      else if( ( Controller::TextFitInfo::Property::TEXT_FIT_MIN_SIZE == valueGet.first.indexKey ) || ( TEXT_FIT_MIN_SIZE_KEY == valueGet.first.stringKey ) )
+      {
+        /// min size.
+        minSize = valueGet.second.Get< float >();
+        isMinSizeSet = true;
+      }
+      else if( ( Controller::TextFitInfo::Property::TEXT_FIT_MAX_SIZE == valueGet.first.indexKey ) || ( TEXT_FIT_MAX_SIZE_KEY == valueGet.first.stringKey ) )
+      {
+        /// max size.
+        maxSize = valueGet.second.Get< float >();
+        isMaxSizeSet = true;
+      }
+      else if( ( Controller::TextFitInfo::Property::TEXT_FIT_STEP_SIZE == valueGet.first.indexKey ) || ( TEXT_FIT_STEP_SIZE_KEY == valueGet.first.stringKey ) )
+      {
+        /// step size.
+        stepSize = valueGet.second.Get< float >();
+        isStepSizeSet = true;
+      }
+      else if( ( Controller::TextFitInfo::Property::TEXT_FIT_FONT_SIZE_TYPE == valueGet.first.indexKey ) || ( TEXT_FIT_FONT_SIZE_TYPE_KEY == valueGet.first.stringKey ) )
+      {
+        if( "pixelSize" == valueGet.second.Get< std::string >() )
+        {
+          type = Controller::FontSizeType::PIXEL_SIZE;
+        }
+      }
+    }
+
+    controller->SetTextFitEnabled( enabled );
+    if( isMinSizeSet )
+    {
+      controller->SetTextFitMinSize( minSize, type );
+    }
+    if( isMaxSizeSet )
+    {
+      controller->SetTextFitMaxSize( maxSize, type );
+    }
+    if( isStepSizeSet )
+    {
+      controller->SetTextFitStepSize( stepSize, type );
+    }
+  }
+}
 
 } // namespace
 
@@ -275,101 +338,61 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_STOP_MODE:
       {
-        if( !impl.mTextScroller )
-        {
-          impl.mTextScroller = Text::TextScroller::New( impl );
-        }
-        Toolkit::TextLabel::AutoScrollStopMode::Type stopMode = impl.mTextScroller->GetStopMode();
+        Text::TextScrollerPtr textScroller = impl.GetTextScroller();
+        Toolkit::TextLabel::AutoScrollStopMode::Type stopMode = textScroller->GetStopMode();
         if( Scripting::GetEnumerationProperty< Toolkit::TextLabel::AutoScrollStopMode::Type >( value,
-                                                                                                    AUTO_SCROLL_STOP_MODE_TABLE,
-                                                                                                    AUTO_SCROLL_STOP_MODE_TABLE_COUNT,
-                                                                                                    stopMode ) )
+                                                                                               AUTO_SCROLL_STOP_MODE_TABLE,
+                                                                                               AUTO_SCROLL_STOP_MODE_TABLE_COUNT,
+                                                                                               stopMode ) )
         {
-            impl.mTextScroller->SetStopMode( stopMode );
+          textScroller->SetStopMode( stopMode );
         }
         break;
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_SPEED:
       {
-        if( !impl.mTextScroller )
-        {
-          impl.mTextScroller = Text::TextScroller::New( impl );
-        }
-        impl.mTextScroller->SetSpeed( value.Get<int>() );
+        impl.GetTextScroller()->SetSpeed( value.Get<int>() );
         break;
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_LOOP_COUNT:
       {
-        if( !impl.mTextScroller )
-        {
-          impl.mTextScroller = Text::TextScroller::New( impl );
-        }
-        impl.mTextScroller->SetLoopCount( value.Get<int>() );
+        impl.GetTextScroller()->SetLoopCount( value.Get<int>() );
         break;
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_LOOP_DELAY:
       {
-         if( !impl.mTextScroller )
-        {
-          impl.mTextScroller = Text::TextScroller::New( impl );
-        }
-        impl.mTextScroller->SetLoopDelay( value.Get<float>() );
+        impl.GetTextScroller()->SetLoopDelay( value.Get<float>() );
         break;
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_GAP:
       {
-        if( !impl.mTextScroller )
-        {
-          impl.mTextScroller = Text::TextScroller::New( impl );
-        }
-        impl.mTextScroller->SetGap( value.Get<float>() );
+        impl.GetTextScroller()->SetGap( value.Get<float>() );
         break;
       }
       case Toolkit::TextLabel::Property::LINE_SPACING:
       {
         const float lineSpacing = value.Get<float>();
-
-        // Don't trigger anything if the line spacing didn't change
-        if( impl.mController->SetDefaultLineSpacing( lineSpacing ) )
-        {
-          impl.mTextUpdateNeeded = true;
-        }
+        impl.mTextUpdateNeeded = impl.mController->SetDefaultLineSpacing( lineSpacing ) || impl.mTextUpdateNeeded;
         break;
       }
       case Toolkit::TextLabel::Property::UNDERLINE:
       {
-        const bool update = SetUnderlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
-        if( update )
-        {
-          impl.mTextUpdateNeeded = true;
-        }
+        impl.mTextUpdateNeeded = SetUnderlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT ) || impl.mTextUpdateNeeded;
         break;
       }
       case Toolkit::TextLabel::Property::SHADOW:
       {
-        const bool update = SetShadowProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
-        if( update )
-        {
-          impl.mTextUpdateNeeded = true;
-        }
+        impl.mTextUpdateNeeded = SetShadowProperties( impl.mController, value, Text::EffectStyle::DEFAULT ) || impl.mTextUpdateNeeded;
         break;
       }
       case Toolkit::TextLabel::Property::EMBOSS:
       {
-        const bool update = SetEmbossProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
-        if( update )
-        {
-          impl.mTextUpdateNeeded = true;
-        }
+        impl.mTextUpdateNeeded = SetEmbossProperties( impl.mController, value, Text::EffectStyle::DEFAULT ) || impl.mTextUpdateNeeded;
         break;
       }
       case Toolkit::TextLabel::Property::OUTLINE:
       {
-        const bool update = SetOutlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
-        if( update )
-        {
-          impl.mTextUpdateNeeded = true;
-        }
+        impl.mTextUpdateNeeded = SetOutlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT ) || impl.mTextUpdateNeeded;
         break;
       }
       case Toolkit::TextLabel::Property::PIXEL_SIZE:
@@ -419,11 +442,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::DevelTextLabel::Property::BACKGROUND:
       {
-        const bool update = SetBackgroundProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
-        if( update )
-        {
-          impl.mTextUpdateNeeded = true;
-        }
+        impl.mTextUpdateNeeded = SetBackgroundProperties( impl.mController, value, Text::EffectStyle::DEFAULT ) || impl.mTextUpdateNeeded;
         break;
       }
       case Toolkit::DevelTextLabel::Property::IGNORE_SPACES_AFTER_TEXT:
@@ -438,80 +457,13 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::DevelTextLabel::Property::TEXT_FIT:
       {
-        const Property::Map& propertiesMap = value.Get<Property::Map>();
-
-        bool enabled = false;
-        float minSize = 0.f;
-        float maxSize = 0.f;
-        float stepSize = 0.f;
-        bool isMinSizeSet = false, isMaxSizeSet = false, isStepSizeSet = false;
-        Controller::FontSizeType type = Controller::FontSizeType::POINT_SIZE;
-
-        if ( !propertiesMap.Empty() )
-        {
-          const unsigned int numberOfItems = propertiesMap.Count();
-
-          // Parses and applies
-          for( unsigned int index = 0u; index < numberOfItems; ++index )
-          {
-            const KeyValuePair& valueGet = propertiesMap.GetKeyValue( index );
-
-            if( ( Controller::TextFitInfo::Property::TEXT_FIT_ENABLE == valueGet.first.indexKey ) || ( TEXT_FIT_ENABLE_KEY == valueGet.first.stringKey ) )
-            {
-              /// Enable key.
-              enabled = valueGet.second.Get< bool >();
-            }
-            else if( ( Controller::TextFitInfo::Property::TEXT_FIT_MIN_SIZE == valueGet.first.indexKey ) || ( TEXT_FIT_MIN_SIZE_KEY == valueGet.first.stringKey ) )
-            {
-              /// min size.
-              minSize = valueGet.second.Get< float >();
-              isMinSizeSet = true;
-            }
-            else if( ( Controller::TextFitInfo::Property::TEXT_FIT_MAX_SIZE == valueGet.first.indexKey ) || ( TEXT_FIT_MAX_SIZE_KEY == valueGet.first.stringKey ) )
-            {
-              /// max size.
-              maxSize = valueGet.second.Get< float >();
-              isMaxSizeSet = true;
-            }
-            else if( ( Controller::TextFitInfo::Property::TEXT_FIT_STEP_SIZE == valueGet.first.indexKey ) || ( TEXT_FIT_STEP_SIZE_KEY == valueGet.first.stringKey ) )
-            {
-              /// step size.
-              stepSize = valueGet.second.Get< float >();
-              isStepSizeSet = true;
-            }
-            else if( ( Controller::TextFitInfo::Property::TEXT_FIT_FONT_SIZE_TYPE == valueGet.first.indexKey ) || ( TEXT_FIT_FONT_SIZE_TYPE_KEY == valueGet.first.stringKey ) )
-            {
-              if( "pixelSize" == valueGet.second.Get< std::string >() )
-              {
-                type = Controller::FontSizeType::PIXEL_SIZE;
-              }
-            }
-          }
-
-          impl.mController->SetTextFitEnabled( enabled );
-          if( isMinSizeSet )
-          {
-            impl.mController->SetTextFitMinSize( minSize, type );
-          }
-          if( isMaxSizeSet )
-          {
-            impl.mController->SetTextFitMaxSize( maxSize, type );
-          }
-          if( isStepSizeSet )
-          {
-            impl.mController->SetTextFitStepSize( stepSize, type );
-          }
-        }
+        ParseTextFitProperty(impl.mController, value.GetMap());
         break;
       }
       case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
       {
         const float lineSize = value.Get<float>();
-
-        if( impl.mController->SetDefaultLineSize( lineSize ) )
-        {
-          impl.mTextUpdateNeeded = true;
-        }
+        impl.mTextUpdateNeeded = impl.mController->SetDefaultLineSize( lineSize ) || impl.mTextUpdateNeeded;
         break;
       }
     }

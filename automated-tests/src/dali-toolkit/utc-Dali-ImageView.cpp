@@ -2749,11 +2749,20 @@ void OnResourceReadySignal( Control control )
 {
   gResourceReadySignalCounter++;
 
-  if( gResourceReadySignalCounter == 1 )
+  if(control.GetVisualResourceStatus(ImageView::Property::IMAGE) == Visual::ResourceStatus::READY)
   {
-    // Set image twice
-    ImageView::DownCast( control ).SetImage( gImage_34_RGBA );
-    ImageView::DownCast( control ).SetImage( gImage_34_RGBA );
+    if( gResourceReadySignalCounter == 1 )
+    {
+      // Set image twice
+      // It makes the first new visual be deleted immediately
+      ImageView::DownCast( control ).SetImage( gImage_34_RGBA );
+      ImageView::DownCast( control ).SetImage( gImage_34_RGBA );
+    }
+  }
+  else if(control.GetVisualResourceStatus(ImageView::Property::IMAGE) == Visual::ResourceStatus::FAILED)
+  {
+    // Make the resource ready immediately
+    control[ImageView::Property::IMAGE] = TEST_RESOURCE_DIR "/svg1.svg";
   }
 }
 
@@ -2776,6 +2785,23 @@ int UtcDaliImageViewSetImageOnResourceReadySignal(void)
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS( gResourceReadySignalCounter, 2, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
+
+  // Reset count
+  gResourceReadySignalCounter = 0;
+
+  imageView[ImageView::Property::IMAGE] = "invalid.jpg";
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  // Run idle callback
+  application.RunIdles();
 
   DALI_TEST_EQUALS( gResourceReadySignalCounter, 2, TEST_LOCATION );
 

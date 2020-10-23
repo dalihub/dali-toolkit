@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,114 @@ namespace Toolkit
 {
 namespace Internal
 {
+
+namespace
+{
+
+/// Parses a Property::Array and sets up the animator appropriately
+void ParseArray(TransitionData::Animator* animator, const Property::Array* array)
+{
+  bool valid = true;
+  Vector4 controlPoints;
+  if( array && array->Count() >= 4 )
+  {
+    for( size_t vecIdx = 0; vecIdx < 4; ++vecIdx )
+    {
+      const Property::Value& v = array->GetElementAt(vecIdx);
+      if( v.GetType() == Property::FLOAT )
+      {
+        controlPoints[vecIdx] = v.Get<float>();
+      }
+      else
+      {
+        valid = false;
+        break;
+      }
+    }
+  }
+  else
+  {
+    valid = false;
+  }
+
+  if( valid )
+  {
+    Vector2 controlPoint1( controlPoints.x, controlPoints.y );
+    Vector2 controlPoint2( controlPoints.z, controlPoints.w );
+    animator->alphaFunction = AlphaFunction( controlPoint1, controlPoint2 );
+  }
+  else
+  {
+    animator->animate = false;
+  }
+}
+
+/// Parses a string value and sets up the animator appropriately
+void ParseString(TransitionData::Animator* animator, std::string alphaFunctionValue)
+{
+  if( alphaFunctionValue == "LINEAR" )
+  {
+    animator->alphaFunction = AlphaFunction(AlphaFunction::LINEAR);
+  }
+  else if( ! alphaFunctionValue.compare(0, 5, "EASE_" ) )
+  {
+    if( alphaFunctionValue == "EASE_IN" )
+    {
+      animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN);
+    }
+    else if( alphaFunctionValue == "EASE_OUT" )
+    {
+      animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT);
+    }
+    else if( ! alphaFunctionValue.compare( 5, 3, "IN_" ) )
+    {
+      if( ! alphaFunctionValue.compare(8, -1, "SQUARE" ))
+      {
+        animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_SQUARE);
+      }
+      else if( ! alphaFunctionValue.compare(8, -1, "OUT" ))
+      {
+        animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_OUT);
+      }
+      else if( ! alphaFunctionValue.compare(8, -1, "OUT_SINE" ))
+      {
+        animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_OUT_SINE);
+      }
+      else if( ! alphaFunctionValue.compare(8, -1, "SINE" ))
+      {
+        animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_SINE);
+      }
+    }
+    else if( ! alphaFunctionValue.compare( 5, 4, "OUT_" ) )
+    {
+      if( ! alphaFunctionValue.compare(9, -1, "SQUARE" ) )
+      {
+        animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT_SQUARE);
+      }
+      else if( ! alphaFunctionValue.compare(9, -1, "SINE" ) )
+      {
+        animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT_SINE);
+      }
+      else if( ! alphaFunctionValue.compare(9, -1, "BACK" ) )
+      {
+        animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT_BACK);
+      }
+    }
+  }
+  else if( alphaFunctionValue == "REVERSE" )
+  {
+    animator->alphaFunction = AlphaFunction(AlphaFunction::REVERSE);
+  }
+  else if( alphaFunctionValue == "BOUNCE" )
+  {
+    animator->alphaFunction = AlphaFunction(AlphaFunction::BOUNCE);
+  }
+  else if( alphaFunctionValue == "SIN" )
+  {
+    animator->alphaFunction = AlphaFunction(AlphaFunction::SIN);
+  }
+}
+} // unnamed namespace
 
 TransitionData::TransitionData()
 {
@@ -171,40 +279,7 @@ TransitionData::Animator* TransitionData::ConvertMap( const Property::Map& map)
         {
           if( value.GetType() == Property::ARRAY )
           {
-            bool valid = true;
-            Vector4 controlPoints;
-            const Property::Array* array = value.GetArray();
-            if( array && array->Count() >= 4 )
-            {
-              for( size_t vecIdx = 0; vecIdx < 4; ++vecIdx )
-              {
-                const Property::Value& v = array->GetElementAt(vecIdx);
-                if( v.GetType() == Property::FLOAT )
-                {
-                  controlPoints[vecIdx] = v.Get<float>();
-                }
-                else
-                {
-                  valid = false;
-                  break;
-                }
-              }
-            }
-            else
-            {
-              valid = false;
-            }
-
-            if( valid )
-            {
-              Vector2 controlPoint1( controlPoints.x, controlPoints.y );
-              Vector2 controlPoint2( controlPoints.z, controlPoints.w );
-              animator->alphaFunction = AlphaFunction( controlPoint1, controlPoint2 );
-            }
-            else
-            {
-              animator->animate = false;
-            }
+            ParseArray(animator, value.GetArray());
           }
           else if( value.GetType() == Property::VECTOR4 )
           {
@@ -215,69 +290,7 @@ TransitionData::Animator* TransitionData::ConvertMap( const Property::Map& map)
           }
           else if( value.GetType() == Property::STRING )
           {
-            std::string alphaFunctionValue = value.Get< std::string >();
-
-            if( alphaFunctionValue == "LINEAR" )
-            {
-              animator->alphaFunction = AlphaFunction(AlphaFunction::LINEAR);
-            }
-            else if( ! alphaFunctionValue.compare(0, 5, "EASE_" ) )
-            {
-              if( alphaFunctionValue == "EASE_IN" )
-              {
-                animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN);
-              }
-              else if( alphaFunctionValue == "EASE_OUT" )
-              {
-                animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT);
-              }
-              else if( ! alphaFunctionValue.compare( 5, 3, "IN_" ) )
-              {
-                if( ! alphaFunctionValue.compare(8, -1, "SQUARE" ))
-                {
-                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_SQUARE);
-                }
-                else if( ! alphaFunctionValue.compare(8, -1, "OUT" ))
-                {
-                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_OUT);
-                }
-                else if( ! alphaFunctionValue.compare(8, -1, "OUT_SINE" ))
-                {
-                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_OUT_SINE);
-                }
-                else if( ! alphaFunctionValue.compare(8, -1, "SINE" ))
-                {
-                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_IN_SINE);
-                }
-              }
-              else if( ! alphaFunctionValue.compare( 5, 4, "OUT_" ) )
-              {
-                if( ! alphaFunctionValue.compare(9, -1, "SQUARE" ) )
-                {
-                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT_SQUARE);
-                }
-                else if( ! alphaFunctionValue.compare(9, -1, "SINE" ) )
-                {
-                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT_SINE);
-                }
-                else if( ! alphaFunctionValue.compare(9, -1, "BACK" ) )
-                {
-                  animator->alphaFunction = AlphaFunction(AlphaFunction::EASE_OUT_BACK);
-                }
-              }
-            }
-            else if( alphaFunctionValue == "REVERSE" )
-            {
-              animator->alphaFunction = AlphaFunction(AlphaFunction::REVERSE);
-            }
-            else if( alphaFunctionValue == "BOUNCE" )
-            {
-              animator->alphaFunction = AlphaFunction(AlphaFunction::BOUNCE);
-            }
-            else if( alphaFunctionValue == "SIN" )
-            {
-              animator->alphaFunction = AlphaFunction(AlphaFunction::SIN);
-            }
+            ParseString(animator, value.Get< std::string >());
           }
           else
           {

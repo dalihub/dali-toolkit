@@ -123,10 +123,28 @@ To execute a subset of tests, you can run individual test sets, e.g.
 
     ./execute.sh dali-toolkit
 
-To get coverage output (you need to first build dali libraries with
+To get full coverage output (you need to first build dali libraries with
 --coverage), run
 
     ./coverage.sh
+
+To check the coverage of your patch, (the build server uses its own copy
+of these scripts), you can use
+
+    ./patch-coverage.pl -q [diff-spec]
+
+to get a summary, or
+
+    ./patch-coverage.pl [diff-spec]
+
+to get textual output, or
+
+    ./patch-coverage.pl -o out.html [diff-spec]
+
+to get HTML output (used by build server).
+
+diff-spec is any refspec accepted by git-diff. If it's left out, it creates
+a refspec to the latest commit, or uses the index/working tree.
 
 
 Testing on target
