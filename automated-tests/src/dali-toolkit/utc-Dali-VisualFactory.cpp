@@ -1134,9 +1134,6 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   application.SendNotification();
   application.Render();
 
-  // renderer is not added to actor until the rasterization is completed.
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
-
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   // renderer is added to actor
@@ -1172,9 +1169,6 @@ int UtcDaliVisualFactoryGetSvgVisualLarge(void)
 
   application.SendNotification();
   application.Render();
-
-  // renderer is not added to actor until the rasterization is completed.
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 

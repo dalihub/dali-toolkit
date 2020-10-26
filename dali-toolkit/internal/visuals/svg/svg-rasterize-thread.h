@@ -29,6 +29,7 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/devel-api/adaptor-framework/vector-image-renderer.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
+#include <dali/integration-api/processor-interface.h>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -128,7 +129,7 @@ private:
 /**
  * The worker thread for SVG rasterization.
  */
-class SvgRasterizeThread : public Thread
+class SvgRasterizeThread : public Thread, Integration::Processor
 {
 public:
 
@@ -137,7 +138,7 @@ public:
    *
    * @param[in] trigger The trigger to wake up the main thread.
    */
-  SvgRasterizeThread( EventThreadCallback* trigger );
+  SvgRasterizeThread();
 
   /**
    * Terminate the svg rasterize thread, join and delete.
@@ -176,6 +177,11 @@ public:
    */
   void DeleteImage( VectorImageRenderer vectorImage );
 
+    /**
+   * @copydoc Dali::Integration::Processor::Process()
+   */
+  void Process() override;
+
 private:
 
   /**
@@ -191,6 +197,17 @@ private:
    * @param[in] task The task added to the queue.
    */
   void AddCompletedTask( RasterizingTaskPtr task );
+
+  /**
+   * Applies the rasterized image to material
+   */
+  void ApplyRasterizedSVGToSampler();
+
+  /**
+   * @brief Unregister a previously registered processor
+   *
+   */
+  void UnregisterProcessor();
 
 protected:
 
@@ -225,6 +242,7 @@ private:
   std::unique_ptr< EventThreadCallback > mTrigger;
   const Dali::LogFactoryInterface&       mLogFactory;
   bool                       mIsThreadWaiting;
+  bool                       mProcessorRegistered;
 };
 
 } // namespace Internal
