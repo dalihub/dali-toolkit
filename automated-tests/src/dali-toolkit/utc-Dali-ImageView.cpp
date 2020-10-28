@@ -2467,10 +2467,10 @@ int UtcDaliImageViewLoadRemoteSVG(void)
 
   ToolkitTestApplication application;
   Toolkit::ImageView imageView;
-  imageView = Toolkit::ImageView::New(  );
+  imageView = Toolkit::ImageView::New();
   imageView.SetImage("https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg");
   // Victor. Temporary (or permanent?) update as the url above seems not to work from time to time ...
-  imageView.SetImage("https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/SVG_logo.svg/64px-SVG_logo.svg.png");
+//  imageView.SetImage("https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/SVG_logo.svg/64px-SVG_logo.svg.png");
   imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   imageView.SetProperty( Actor::Property::SIZE, Vector2(300, 300) );
@@ -2614,11 +2614,36 @@ int UtcDaliImageViewSvgLoadingFailure(void)
 {
   ToolkitTestApplication application;
 
-  // Local svg file
+  // Local svg file - invalid file path
   {
     gResourceReadySignalFired = false;
 
-    ImageView imageView = ImageView::New( TEST_RESOURCE_DIR "/Kid1.svg" );
+    ImageView imageView = ImageView::New( TEST_RESOURCE_DIR "/foo.svg" );
+    imageView.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
+
+    DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
+
+    application.GetScene().Add( imageView );
+
+    application.SendNotification();
+
+    // loading started, this waits for the loader thread
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render(16);
+
+    DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+    DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( imageView.GetVisualResourceStatus( ImageView::Property::IMAGE ), Visual::ResourceStatus::FAILED, TEST_LOCATION );
+  }
+
+  // Local svg file - invalid file
+  {
+    gResourceReadySignalFired = false;
+
+    ImageView imageView = ImageView::New( TEST_RESOURCE_DIR "/invalid.svg" );
     imageView.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
     imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
@@ -2667,6 +2692,54 @@ int UtcDaliImageViewSvgLoadingFailure(void)
   END_TEST;
 }
 
+int UtcDaliImageViewSvgRasterizationFailure(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+  ImageView imageView = ImageView::New( TEST_RESOURCE_DIR "/svg1.svg" );
+  imageView.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+  imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
+
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
+
+  application.GetScene().Add( imageView );
+
+  application.SendNotification();
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetVisualResourceStatus( ImageView::Property::IMAGE ), Visual::ResourceStatus::READY, TEST_LOCATION );
+
+  // Reset flag
+  gResourceReadySignalFired = false;
+
+  // Change size
+  imageView.SetProperty( Actor::Property::SIZE, Vector2( 0.f, 0.f ) );
+
+  application.SendNotification();
+
+  // rasterization started, this waits for the rasterize thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
+  // Fail to rasterize because the size is 0.
+  DALI_TEST_EQUALS( imageView.GetVisualResourceStatus( ImageView::Property::IMAGE ), Visual::ResourceStatus::FAILED, TEST_LOCATION );
+
+  END_TEST;
+}
+
 namespace
 {
 
@@ -2676,11 +2749,20 @@ void OnResourceReadySignal( Control control )
 {
   gResourceReadySignalCounter++;
 
-  if( gResourceReadySignalCounter == 1 )
+  if(control.GetVisualResourceStatus(ImageView::Property::IMAGE) == Visual::ResourceStatus::READY)
   {
-    // Set image twice
-    ImageView::DownCast( control ).SetImage( gImage_34_RGBA );
-    ImageView::DownCast( control ).SetImage( gImage_34_RGBA );
+    if( gResourceReadySignalCounter == 1 )
+    {
+      // Set image twice
+      // It makes the first new visual be deleted immediately
+      ImageView::DownCast( control ).SetImage( gImage_34_RGBA );
+      ImageView::DownCast( control ).SetImage( gImage_34_RGBA );
+    }
+  }
+  else if(control.GetVisualResourceStatus(ImageView::Property::IMAGE) == Visual::ResourceStatus::FAILED)
+  {
+    // Make the resource ready immediately
+    control[ImageView::Property::IMAGE] = TEST_RESOURCE_DIR "/svg1.svg";
   }
 }
 
@@ -2703,6 +2785,23 @@ int UtcDaliImageViewSetImageOnResourceReadySignal(void)
 
   application.SendNotification();
   application.Render();
+
+  DALI_TEST_EQUALS( gResourceReadySignalCounter, 2, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
+
+  // Reset count
+  gResourceReadySignalCounter = 0;
+
+  imageView[ImageView::Property::IMAGE] = "invalid.jpg";
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  // Run idle callback
+  application.RunIdles();
 
   DALI_TEST_EQUALS( gResourceReadySignalCounter, 2, TEST_LOCATION );
 

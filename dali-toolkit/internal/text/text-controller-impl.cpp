@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/integration-api/debug.h>
 #include <limits>
@@ -34,6 +33,7 @@
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
+#include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 
 using namespace Dali;
@@ -53,7 +53,7 @@ struct SelectionBoxInfo
 };
 
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
@@ -1341,704 +1341,42 @@ float Controller::Impl::GetDefaultFontLineHeight()
 
 void Controller::Impl::OnCursorKeyEvent( const Event& event )
 {
-  if( NULL == mEventData || !IsShowingRealText() )
-  {
-    // Nothing to do if there is no text input.
-    return;
-  }
-
-  int keyCode = event.p1.mInt;
-  bool isShiftModifier = event.p2.mBool;
-
-  CharacterIndex previousPrimaryCursorPosition = mEventData->mPrimaryCursorPosition;
-
-  if( Dali::DALI_KEY_CURSOR_LEFT == keyCode )
-  {
-    if( mEventData->mPrimaryCursorPosition > 0u )
-    {
-      if ( !isShiftModifier && mEventData->mDecorator->IsHighlightVisible() )
-      {
-        mEventData->mPrimaryCursorPosition = std::min(mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition);
-      }
-      else
-      {
-        mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition - 1u );
-      }
-    }
-  }
-  else if( Dali::DALI_KEY_CURSOR_RIGHT == keyCode )
-  {
-    if( mModel->mLogicalModel->mText.Count() > mEventData->mPrimaryCursorPosition )
-    {
-      if ( !isShiftModifier && mEventData->mDecorator->IsHighlightVisible() )
-      {
-        mEventData->mPrimaryCursorPosition = std::max(mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition);
-      }
-      else
-      {
-        mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition );
-      }
-    }
-  }
-  else if( Dali::DALI_KEY_CURSOR_UP == keyCode && !isShiftModifier )
-  {
-    // Ignore Shift-Up for text selection for now.
-
-    // Get first the line index of the current cursor position index.
-    CharacterIndex characterIndex = 0u;
-
-    if( mEventData->mPrimaryCursorPosition > 0u )
-    {
-      characterIndex = mEventData->mPrimaryCursorPosition - 1u;
-    }
-
-    const LineIndex lineIndex = mModel->mVisualModel->GetLineOfCharacter( characterIndex );
-    const LineIndex previousLineIndex = ( lineIndex > 0 ? lineIndex - 1u : lineIndex );
-
-    // Retrieve the cursor position info.
-    CursorInfo cursorInfo;
-    GetCursorPosition( mEventData->mPrimaryCursorPosition,
-                       cursorInfo );
-
-    // Get the line above.
-    const LineRun& line = *( mModel->mVisualModel->mLines.Begin() + previousLineIndex );
-
-    // Get the next hit 'y' point.
-    const float hitPointY = cursorInfo.lineOffset - 0.5f * ( line.ascender - line.descender );
-
-    // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
-    bool matchedCharacter = false;
-    mEventData->mPrimaryCursorPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
-                                                                      mModel->mLogicalModel,
-                                                                      mMetrics,
-                                                                      mEventData->mCursorHookPositionX,
-                                                                      hitPointY,
-                                                                      CharacterHitTest::TAP,
-                                                                      matchedCharacter );
-  }
-  else if( Dali::DALI_KEY_CURSOR_DOWN == keyCode && !isShiftModifier )
-  {
-    // Ignore Shift-Down for text selection for now.
-
-    // Get first the line index of the current cursor position index.
-    CharacterIndex characterIndex = 0u;
-
-    if( mEventData->mPrimaryCursorPosition > 0u )
-    {
-      characterIndex = mEventData->mPrimaryCursorPosition - 1u;
-    }
-
-    const LineIndex lineIndex = mModel->mVisualModel->GetLineOfCharacter( characterIndex );
-
-    if( lineIndex + 1u < mModel->mVisualModel->mLines.Count() )
-    {
-      // Retrieve the cursor position info.
-      CursorInfo cursorInfo;
-      GetCursorPosition( mEventData->mPrimaryCursorPosition,
-                         cursorInfo );
-
-      // Get the line below.
-      const LineRun& line = *( mModel->mVisualModel->mLines.Begin() + lineIndex + 1u );
-
-      // Get the next hit 'y' point.
-      const float hitPointY = cursorInfo.lineOffset + cursorInfo.lineHeight + 0.5f * ( line.ascender - line.descender );
-
-      // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
-      bool matchedCharacter = false;
-      mEventData->mPrimaryCursorPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
-                                                                        mModel->mLogicalModel,
-                                                                        mMetrics,
-                                                                        mEventData->mCursorHookPositionX,
-                                                                        hitPointY,
-                                                                        CharacterHitTest::TAP,
-                                                                        matchedCharacter );
-    }
-  }
-
-  if ( !isShiftModifier && mEventData->mState != EventData::SELECTING )
-  {
-    // Update selection position after moving the cursor
-    mEventData->mLeftSelectionPosition = mEventData->mPrimaryCursorPosition;
-    mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
-  }
-
-  if ( isShiftModifier && IsShowingRealText() && mEventData->mShiftSelectionFlag )
-  {
-    // Handle text selection
-    bool selecting = false;
-
-    if ( Dali::DALI_KEY_CURSOR_LEFT == keyCode || Dali::DALI_KEY_CURSOR_RIGHT == keyCode )
-    {
-      // Shift-Left/Right to select the text
-      int cursorPositionDelta = mEventData->mPrimaryCursorPosition - previousPrimaryCursorPosition;
-      if ( cursorPositionDelta > 0 || mEventData->mRightSelectionPosition > 0u ) // Check the boundary
-      {
-        mEventData->mRightSelectionPosition += cursorPositionDelta;
-      }
-      selecting = true;
-    }
-    else if ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition )
-    {
-      // Show no grab handles and text highlight if Shift-Up/Down pressed but no selected text
-      selecting = true;
-    }
-
-    if ( selecting )
-    {
-      // Notify the cursor position to the InputMethodContext.
-      if( mEventData->mInputMethodContext )
-      {
-        mEventData->mInputMethodContext.SetCursorPosition( mEventData->mPrimaryCursorPosition );
-        mEventData->mInputMethodContext.NotifyCursorPosition();
-      }
-
-      ChangeState( EventData::SELECTING );
-
-      mEventData->mUpdateLeftSelectionPosition = true;
-      mEventData->mUpdateRightSelectionPosition = true;
-      mEventData->mUpdateGrabHandlePosition = true;
-      mEventData->mUpdateHighlightBox = true;
-
-      // Hide the text selection popup if select the text using keyboard instead of moving grab handles
-      if( mEventData->mGrabHandlePopupEnabled )
-      {
-        mEventData->mDecorator->SetPopupActive( false );
-      }
-    }
-  }
-  else
-  {
-    // Handle normal cursor move
-    ChangeState( EventData::EDITING );
-    mEventData->mUpdateCursorPosition = true;
-  }
-
-  mEventData->mUpdateInputStyle = true;
-  mEventData->mScrollAfterUpdatePosition = true;
+  ControllerImplEventHandler::OnCursorKeyEvent(*this, event);
 }
 
 void Controller::Impl::OnTapEvent( const Event& event )
 {
-  if( NULL != mEventData )
-  {
-    const unsigned int tapCount = event.p1.mUint;
-
-    if( 1u == tapCount )
-    {
-      if( IsShowingRealText() )
-      {
-        // Convert from control's coords to text's coords.
-        const float xPosition = event.p2.mFloat - mModel->mScrollPosition.x;
-        const float yPosition = event.p3.mFloat - mModel->mScrollPosition.y;
-
-        // Keep the tap 'x' position. Used to move the cursor.
-        mEventData->mCursorHookPositionX = xPosition;
-
-        // Whether to touch point hits on a glyph.
-        bool matchedCharacter = false;
-        mEventData->mPrimaryCursorPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
-                                                                          mModel->mLogicalModel,
-                                                                          mMetrics,
-                                                                          xPosition,
-                                                                          yPosition,
-                                                                          CharacterHitTest::TAP,
-                                                                          matchedCharacter );
-
-        // When the cursor position is changing, delay cursor blinking
-        mEventData->mDecorator->DelayCursorBlink();
-      }
-      else
-      {
-        mEventData->mPrimaryCursorPosition = 0u;
-      }
-
-      // Update selection position after tapping
-      mEventData->mLeftSelectionPosition = mEventData->mPrimaryCursorPosition;
-      mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
-
-      mEventData->mUpdateCursorPosition = true;
-      mEventData->mUpdateGrabHandlePosition = true;
-      mEventData->mScrollAfterUpdatePosition = true;
-      mEventData->mUpdateInputStyle = true;
-
-      // Notify the cursor position to the InputMethodContext.
-      if( mEventData->mInputMethodContext )
-      {
-        mEventData->mInputMethodContext.SetCursorPosition( mEventData->mPrimaryCursorPosition );
-        mEventData->mInputMethodContext.NotifyCursorPosition();
-      }
-    }
-    else if( 2u == tapCount )
-    {
-      if( mEventData->mSelectionEnabled )
-      {
-        // Convert from control's coords to text's coords.
-        const float xPosition = event.p2.mFloat - mModel->mScrollPosition.x;
-        const float yPosition = event.p3.mFloat - mModel->mScrollPosition.y;
-
-        // Calculates the logical position from the x,y coords.
-        RepositionSelectionHandles( xPosition,
-                                    yPosition,
-                                    mEventData->mDoubleTapAction );
-      }
-    }
-  }
+  ControllerImplEventHandler::OnTapEvent(*this, event);
 }
 
 void Controller::Impl::OnPanEvent( const Event& event )
 {
-  if( NULL == mEventData )
-  {
-    // Nothing to do if there is no text input.
-    return;
-  }
-
-  const bool isHorizontalScrollEnabled = mEventData->mDecorator->IsHorizontalScrollEnabled();
-  const bool isVerticalScrollEnabled = mEventData->mDecorator->IsVerticalScrollEnabled();
-
-  if( !isHorizontalScrollEnabled && !isVerticalScrollEnabled )
-  {
-    // Nothing to do if scrolling is not enabled.
-    return;
-  }
-
-  const GestureState state = static_cast<GestureState>( event.p1.mInt );
-  switch( state )
-  {
-    case GestureState::STARTED:
-    {
-      // Will remove the cursor, handles or text's popup, ...
-      ChangeState( EventData::TEXT_PANNING );
-      break;
-    }
-    case GestureState::CONTINUING:
-    {
-      const Vector2& layoutSize = mModel->mVisualModel->GetLayoutSize();
-      const Vector2 currentScroll = mModel->mScrollPosition;
-
-      if( isHorizontalScrollEnabled )
-      {
-        const float displacementX = event.p2.mFloat;
-        mModel->mScrollPosition.x += displacementX;
-
-        ClampHorizontalScroll( layoutSize );
-      }
-
-      if( isVerticalScrollEnabled )
-      {
-        const float displacementY = event.p3.mFloat;
-        mModel->mScrollPosition.y += displacementY;
-
-        ClampVerticalScroll( layoutSize );
-      }
-
-      mEventData->mDecorator->UpdatePositions( mModel->mScrollPosition - currentScroll );
-      break;
-    }
-    case GestureState::FINISHED:
-    case GestureState::CANCELLED: // FALLTHROUGH
-    {
-      // Will go back to the previous state to show the cursor, handles, the text's popup, ...
-      ChangeState( mEventData->mPreviousState );
-      break;
-    }
-    default:
-      break;
-  }
+  ControllerImplEventHandler::OnPanEvent(*this, event);
 }
 
 void Controller::Impl::OnLongPressEvent( const Event& event )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::OnLongPressEvent\n" );
-
-  if( !IsShowingRealText() && ( EventData::EDITING == mEventData->mState ) )
-  {
-    ChangeState( EventData::EDITING_WITH_POPUP );
-    mEventData->mDecoratorUpdated = true;
-    mEventData->mUpdateInputStyle = true;
-  }
-  else
-  {
-    if( mEventData->mSelectionEnabled )
-    {
-      // Convert from control's coords to text's coords.
-      const float xPosition = event.p2.mFloat - mModel->mScrollPosition.x;
-      const float yPosition = event.p3.mFloat - mModel->mScrollPosition.y;
-
-      // Calculates the logical position from the x,y coords.
-      RepositionSelectionHandles( xPosition,
-                                  yPosition,
-                                  mEventData->mLongPressAction );
-    }
-  }
+  ControllerImplEventHandler::OnLongPressEvent(*this, event);
 }
 
 void Controller::Impl::OnHandleEvent( const Event& event )
 {
-  if( NULL == mEventData )
-  {
-    // Nothing to do if there is no text input.
-    return;
-  }
-
-  const unsigned int state = event.p1.mUint;
-  const bool handleStopScrolling = ( HANDLE_STOP_SCROLLING == state );
-  const bool isSmoothHandlePanEnabled = mEventData->mDecorator->IsSmoothHandlePanEnabled();
-
-  if( HANDLE_PRESSED == state )
-  {
-    // Convert from decorator's coords to text's coords.
-    const float xPosition = event.p2.mFloat - mModel->mScrollPosition.x;
-    const float yPosition = event.p3.mFloat - mModel->mScrollPosition.y;
-
-    // Need to calculate the handle's new position.
-    bool matchedCharacter = false;
-    const CharacterIndex handleNewPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
-                                                                          mModel->mLogicalModel,
-                                                                          mMetrics,
-                                                                          xPosition,
-                                                                          yPosition,
-                                                                          CharacterHitTest::SCROLL,
-                                                                          matchedCharacter );
-
-    if( Event::GRAB_HANDLE_EVENT == event.type )
-    {
-      ChangeState ( EventData::GRAB_HANDLE_PANNING );
-
-      if( handleNewPosition != mEventData->mPrimaryCursorPosition )
-      {
-        // Updates the cursor position if the handle's new position is different than the current one.
-        mEventData->mUpdateCursorPosition = true;
-        // Does not update the grab handle position if the smooth panning is enabled. (The decorator does it smooth).
-        mEventData->mUpdateGrabHandlePosition = !isSmoothHandlePanEnabled;
-        mEventData->mPrimaryCursorPosition = handleNewPosition;
-      }
-
-      // Updates the decorator if the soft handle panning is enabled. It triggers a relayout in the decorator and the new position of the handle is set.
-      mEventData->mDecoratorUpdated = isSmoothHandlePanEnabled;
-    }
-    else if( Event::LEFT_SELECTION_HANDLE_EVENT == event.type )
-    {
-      ChangeState ( EventData::SELECTION_HANDLE_PANNING );
-
-      if( ( handleNewPosition != mEventData->mLeftSelectionPosition ) &&
-          ( handleNewPosition != mEventData->mRightSelectionPosition ) )
-      {
-        // Updates the highlight box if the handle's new position is different than the current one.
-        mEventData->mUpdateHighlightBox = true;
-        // Does not update the selection handle position if the smooth panning is enabled. (The decorator does it smooth).
-        mEventData->mUpdateLeftSelectionPosition = !isSmoothHandlePanEnabled;
-        mEventData->mLeftSelectionPosition = handleNewPosition;
-      }
-
-      // Updates the decorator if the soft handle panning is enabled. It triggers a relayout in the decorator and the new position of the handle is set.
-      mEventData->mDecoratorUpdated = isSmoothHandlePanEnabled;
-
-      // Will define the order to scroll the text to match the handle position.
-      mEventData->mIsLeftHandleSelected = true;
-      mEventData->mIsRightHandleSelected = false;
-    }
-    else if( Event::RIGHT_SELECTION_HANDLE_EVENT == event.type )
-    {
-      ChangeState ( EventData::SELECTION_HANDLE_PANNING );
-
-      if( ( handleNewPosition != mEventData->mRightSelectionPosition ) &&
-          ( handleNewPosition != mEventData->mLeftSelectionPosition ) )
-      {
-        // Updates the highlight box if the handle's new position is different than the current one.
-        mEventData->mUpdateHighlightBox = true;
-        // Does not update the selection handle position if the smooth panning is enabled. (The decorator does it smooth).
-        mEventData->mUpdateRightSelectionPosition = !isSmoothHandlePanEnabled;
-        mEventData->mRightSelectionPosition = handleNewPosition;
-      }
-
-      // Updates the decorator if the soft handle panning is enabled. It triggers a relayout in the decorator and the new position of the handle is set.
-      mEventData->mDecoratorUpdated = isSmoothHandlePanEnabled;
-
-      // Will define the order to scroll the text to match the handle position.
-      mEventData->mIsLeftHandleSelected = false;
-      mEventData->mIsRightHandleSelected = true;
-    }
-  } // end ( HANDLE_PRESSED == state )
-  else if( ( HANDLE_RELEASED == state ) ||
-           handleStopScrolling )
-  {
-    CharacterIndex handlePosition = 0u;
-    if( handleStopScrolling || isSmoothHandlePanEnabled )
-    {
-      // Convert from decorator's coords to text's coords.
-      const float xPosition = event.p2.mFloat - mModel->mScrollPosition.x;
-      const float yPosition = event.p3.mFloat - mModel->mScrollPosition.y;
-
-      bool matchedCharacter = false;
-      handlePosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
-                                                    mModel->mLogicalModel,
-                                                    mMetrics,
-                                                    xPosition,
-                                                    yPosition,
-                                                    CharacterHitTest::SCROLL,
-                                                    matchedCharacter );
-    }
-
-    if( Event::GRAB_HANDLE_EVENT == event.type )
-    {
-      mEventData->mUpdateCursorPosition = true;
-      mEventData->mUpdateGrabHandlePosition = true;
-      mEventData->mUpdateInputStyle = true;
-
-      if( !IsClipboardEmpty() )
-      {
-        ChangeState( EventData::EDITING_WITH_PASTE_POPUP ); // Moving grabhandle will show Paste Popup
-      }
-
-      if( handleStopScrolling || isSmoothHandlePanEnabled )
-      {
-        mEventData->mScrollAfterUpdatePosition = true;
-        mEventData->mPrimaryCursorPosition = handlePosition;
-      }
-    }
-    else if( Event::LEFT_SELECTION_HANDLE_EVENT == event.type )
-    {
-      ChangeState( EventData::SELECTING );
-
-      mEventData->mUpdateHighlightBox = true;
-      mEventData->mUpdateLeftSelectionPosition = true;
-      mEventData->mUpdateRightSelectionPosition = true;
-
-      if( handleStopScrolling || isSmoothHandlePanEnabled )
-      {
-        mEventData->mScrollAfterUpdatePosition = true;
-
-        if( ( handlePosition != mEventData->mRightSelectionPosition ) &&
-            ( handlePosition != mEventData->mLeftSelectionPosition ) )
-        {
-          mEventData->mLeftSelectionPosition = handlePosition;
-        }
-      }
-    }
-    else if( Event::RIGHT_SELECTION_HANDLE_EVENT == event.type )
-    {
-      ChangeState( EventData::SELECTING );
-
-      mEventData->mUpdateHighlightBox = true;
-      mEventData->mUpdateRightSelectionPosition = true;
-      mEventData->mUpdateLeftSelectionPosition = true;
-
-      if( handleStopScrolling || isSmoothHandlePanEnabled )
-      {
-        mEventData->mScrollAfterUpdatePosition = true;
-        if( ( handlePosition != mEventData->mRightSelectionPosition ) &&
-            ( handlePosition != mEventData->mLeftSelectionPosition ) )
-        {
-          mEventData->mRightSelectionPosition = handlePosition;
-        }
-      }
-    }
-
-    mEventData->mDecoratorUpdated = true;
-  } // end ( ( HANDLE_RELEASED == state ) || ( HANDLE_STOP_SCROLLING == state ) )
-  else if( HANDLE_SCROLLING == state )
-  {
-    const float xSpeed = event.p2.mFloat;
-    const float ySpeed = event.p3.mFloat;
-    const Vector2& layoutSize = mModel->mVisualModel->GetLayoutSize();
-    const Vector2 currentScrollPosition = mModel->mScrollPosition;
-
-    mModel->mScrollPosition.x += xSpeed;
-    mModel->mScrollPosition.y += ySpeed;
-
-    ClampHorizontalScroll( layoutSize );
-    ClampVerticalScroll( layoutSize );
-
-    bool endOfScroll = false;
-    if( Vector2::ZERO == ( currentScrollPosition - mModel->mScrollPosition ) )
-    {
-      // Notify the decorator there is no more text to scroll.
-      // The decorator won't send more scroll events.
-      mEventData->mDecorator->NotifyEndOfScroll();
-      // Still need to set the position of the handle.
-      endOfScroll = true;
-    }
-
-    // Set the position of the handle.
-    const bool scrollRightDirection = xSpeed > 0.f;
-    const bool scrollBottomDirection = ySpeed > 0.f;
-    const bool leftSelectionHandleEvent = Event::LEFT_SELECTION_HANDLE_EVENT == event.type;
-    const bool rightSelectionHandleEvent = Event::RIGHT_SELECTION_HANDLE_EVENT == event.type;
-
-    if( Event::GRAB_HANDLE_EVENT == event.type )
-    {
-      ChangeState( EventData::GRAB_HANDLE_PANNING );
-
-      // Get the grab handle position in decorator coords.
-      Vector2 position = mEventData->mDecorator->GetPosition( GRAB_HANDLE );
-
-      if( mEventData->mDecorator->IsHorizontalScrollEnabled() )
-      {
-        // Position the grag handle close to either the left or right edge.
-        position.x = scrollRightDirection ? 0.f : mModel->mVisualModel->mControlSize.width;
-      }
-
-      if( mEventData->mDecorator->IsVerticalScrollEnabled() )
-      {
-        position.x = mEventData->mCursorHookPositionX;
-
-        // Position the grag handle close to either the top or bottom edge.
-        position.y = scrollBottomDirection ? 0.f : mModel->mVisualModel->mControlSize.height;
-      }
-
-      // Get the new handle position.
-      // The grab handle's position is in decorator's coords. Need to transforms to text's coords.
-      bool matchedCharacter = false;
-      const CharacterIndex handlePosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
-                                                                         mModel->mLogicalModel,
-                                                                         mMetrics,
-                                                                         position.x - mModel->mScrollPosition.x,
-                                                                         position.y - mModel->mScrollPosition.y,
-                                                                         CharacterHitTest::SCROLL,
-                                                                         matchedCharacter );
-
-      if( mEventData->mPrimaryCursorPosition != handlePosition )
-      {
-        mEventData->mUpdateCursorPosition = true;
-        mEventData->mUpdateGrabHandlePosition = !isSmoothHandlePanEnabled;
-        mEventData->mScrollAfterUpdatePosition = true;
-        mEventData->mPrimaryCursorPosition = handlePosition;
-      }
-      mEventData->mUpdateInputStyle = mEventData->mUpdateCursorPosition;
-
-      // Updates the decorator if the soft handle panning is enabled.
-      mEventData->mDecoratorUpdated = isSmoothHandlePanEnabled;
-    }
-    else if( leftSelectionHandleEvent || rightSelectionHandleEvent )
-    {
-      ChangeState( EventData::SELECTION_HANDLE_PANNING );
-
-      // Get the selection handle position in decorator coords.
-      Vector2 position = mEventData->mDecorator->GetPosition( leftSelectionHandleEvent ? Text::LEFT_SELECTION_HANDLE : Text::RIGHT_SELECTION_HANDLE );
-
-      if( mEventData->mDecorator->IsHorizontalScrollEnabled() )
-      {
-        // Position the selection handle close to either the left or right edge.
-        position.x = scrollRightDirection ? 0.f : mModel->mVisualModel->mControlSize.width;
-      }
-
-      if( mEventData->mDecorator->IsVerticalScrollEnabled() )
-      {
-        position.x = mEventData->mCursorHookPositionX;
-
-        // Position the grag handle close to either the top or bottom edge.
-        position.y = scrollBottomDirection ? 0.f : mModel->mVisualModel->mControlSize.height;
-      }
-
-      // Get the new handle position.
-      // The selection handle's position is in decorator's coords. Need to transform to text's coords.
-      bool matchedCharacter = false;
-      const CharacterIndex handlePosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
-                                                                         mModel->mLogicalModel,
-                                                                         mMetrics,
-                                                                         position.x - mModel->mScrollPosition.x,
-                                                                         position.y - mModel->mScrollPosition.y,
-                                                                         CharacterHitTest::SCROLL,
-                                                                         matchedCharacter );
-
-      if( leftSelectionHandleEvent )
-      {
-        const bool differentHandles = ( mEventData->mLeftSelectionPosition != handlePosition ) && ( mEventData->mRightSelectionPosition != handlePosition );
-
-        if( differentHandles || endOfScroll )
-        {
-          mEventData->mUpdateHighlightBox = true;
-          mEventData->mUpdateLeftSelectionPosition = !isSmoothHandlePanEnabled;
-          mEventData->mUpdateRightSelectionPosition = isSmoothHandlePanEnabled;
-          mEventData->mLeftSelectionPosition = handlePosition;
-        }
-      }
-      else
-      {
-        const bool differentHandles = ( mEventData->mRightSelectionPosition != handlePosition ) && ( mEventData->mLeftSelectionPosition != handlePosition );
-        if( differentHandles || endOfScroll )
-        {
-          mEventData->mUpdateHighlightBox = true;
-          mEventData->mUpdateRightSelectionPosition = !isSmoothHandlePanEnabled;
-          mEventData->mUpdateLeftSelectionPosition = isSmoothHandlePanEnabled;
-          mEventData->mRightSelectionPosition = handlePosition;
-        }
-      }
-
-      if( mEventData->mUpdateLeftSelectionPosition || mEventData->mUpdateRightSelectionPosition )
-      {
-        RepositionSelectionHandles();
-
-        mEventData->mScrollAfterUpdatePosition = !isSmoothHandlePanEnabled;
-      }
-    }
-    mEventData->mDecoratorUpdated = true;
-  } // end ( HANDLE_SCROLLING == state )
+  ControllerImplEventHandler::OnHandleEvent(*this, event);
 }
 
 void Controller::Impl::OnSelectEvent( const Event& event )
 {
-  if( NULL == mEventData )
-  {
-    // Nothing to do if there is no text.
-    return;
-  }
-
-  if( mEventData->mSelectionEnabled )
-  {
-    // Convert from control's coords to text's coords.
-    const float xPosition = event.p2.mFloat - mModel->mScrollPosition.x;
-    const float yPosition = event.p3.mFloat - mModel->mScrollPosition.y;
-
-    // Calculates the logical position from the x,y coords.
-    RepositionSelectionHandles( xPosition,
-                                yPosition,
-                                Controller::NoTextTap::HIGHLIGHT );
-  }
+  ControllerImplEventHandler::OnSelectEvent(*this, event);
 }
 
 void Controller::Impl::OnSelectAllEvent()
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "OnSelectAllEvent mEventData->mSelectionEnabled%s \n", mEventData->mSelectionEnabled?"true":"false");
-
-  if( NULL == mEventData )
-  {
-    // Nothing to do if there is no text.
-    return;
-  }
-
-  if( mEventData->mSelectionEnabled )
-  {
-    // Calculates the logical position from the start.
-    RepositionSelectionHandles( 0.f - mModel->mScrollPosition.x,
-                                0.f - mModel->mScrollPosition.y,
-                                Controller::NoTextTap::HIGHLIGHT );
-
-    mEventData->mLeftSelectionPosition = 0u;
-    mEventData->mRightSelectionPosition = mModel->mLogicalModel->mText.Count();
-  }
+  ControllerImplEventHandler::OnSelectAllEvent(*this);
 }
 
 void Controller::Impl::OnSelectNoneEvent()
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "OnSelectNoneEvent mEventData->mSelectionEnabled%s \n", mEventData->mSelectionEnabled?"true":"false");
-
-  if( NULL == mEventData )
-  {
-    // Nothing to do if there is no text.
-    return;
-  }
-
-  if( mEventData->mSelectionEnabled && mEventData->mState == EventData::SELECTING)
-  {
-    mEventData->mPrimaryCursorPosition = 0u;
-    mEventData->mLeftSelectionPosition = mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
-    ChangeState( EventData::INACTIVE );
-    mEventData->mUpdateCursorPosition = true;
-    mEventData->mUpdateInputStyle = true;
-    mEventData->mScrollAfterUpdatePosition = true;
-  }
+  ControllerImplEventHandler::OnSelectNoneEvent(*this);
 }
 
 void Controller::Impl::SetTextSelectionRange(const uint32_t *pStart, const uint32_t *pEnd)
@@ -2072,6 +1410,8 @@ void Controller::Impl::SetTextSelectionRange(const uint32_t *pStart, const uint3
     {
       ChangeState( EventData::SELECTING );
       mEventData->mUpdateHighlightBox = true;
+      mEventData->mUpdateLeftSelectionPosition = true;
+      mEventData->mUpdateRightSelectionPosition = true;
     }
   }
 }

@@ -103,16 +103,6 @@ public:
    */
   Toolkit::TextField::InputStyleChangedSignalType& InputStyleChangedSignal();
 
-  /**
-   * @brief Called to select the whole texts.
-   */
-  void SelectWholeText();
-
-  /**
-   * @brief Called to unselect the whole texts.
-   */
-  void SelectNone();
-
 private: // From Control
 
   /**
@@ -185,22 +175,22 @@ private: // From Control
 // From EditableControlInterface
 
   /**
-   * @copydoc Text::ControlInterface::TextChanged()
+   * @copydoc Text::EditableControlInterface::TextChanged()
    */
   void TextChanged() override;
 
   /**
-   * @copydoc Text::ControlInterface::MaxLengthReached()
+   * @copydoc Text::EditableControlInterface::MaxLengthReached()
    */
   void MaxLengthReached() override;
 
   /**
-   * @copydoc Text::ControlInterface::InputStyleChanged()
+   * @copydoc Text::EditableControlInterface::InputStyleChanged()
    */
   void InputStyleChanged( Text::InputStyle::Mask inputStyleMask ) override;
 
   /**
-   * @copydoc Text::ControlInterface::AddDecoration()
+   * @copydoc Text::EditableControlInterface::AddDecoration()
    */
   void AddDecoration( Actor& actor, bool needsClipping ) override;
 
@@ -215,6 +205,21 @@ public:
    * @copydoc Text::SelectableControlInterface::GetTextSelectionRange()
    */
   Uint32Pair GetTextSelectionRange() const override;
+
+  /**
+   * @copydoc Text::SelectableControlInterface::SelectWholeText()
+   */
+  void SelectWholeText() override;
+
+  /**
+   * @copydoc Text::SelectableControlInterface::SelectNone()
+   */
+  void SelectNone() override;
+
+  /**
+   * @copydoc Text::SelectableControlInterface::GetSelectedText()
+   */
+  string GetSelectedText() const override;
 
   /**
    * @copydoc Text::EditableControlInterface::IsEditable()

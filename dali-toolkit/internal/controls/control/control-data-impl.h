@@ -386,6 +386,16 @@ private:
    */
   void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex = 0 );
 
+  /**
+   * @brief Emits the resource ready signal.
+   */
+  void EmitResourceReadySignal();
+
+  /**
+   * @brief Callbacks called on idle.
+   */
+  void OnIdleCallback();
+
 public:
 
   Control& mControlImpl;
@@ -419,10 +429,13 @@ public:
   TooltipPtr mTooltip;
 
   InputMethodContext mInputMethodContext;
+  CallbackBase* mIdleCallback;             ///< The idle callback to emit the resource ready signal.
 
   ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
+  bool mIsEmittingResourceReadySignal :1;  ///< True during ResourceReady().
+  bool mNeedToEmitResourceReady :1;        ///< True if need to emit the resource ready signal again.
 
   RegisteredVisualContainer mRemoveVisuals;         ///< List of visuals that are being replaced by another visual once ready
 

@@ -144,11 +144,7 @@ void VisualFactoryCache::ApplyRasterizedSVGToSampler()
 {
   while( RasterizingTaskPtr task = mSvgRasterizeThread->NextCompletedTask() )
   {
-#ifdef NO_THORVG
-    task->GetSvgVisual()->ApplyRasterizedImage( task->GetParsedImage(), task->GetPixelData() );
-#else /* NO_THORVG */
-    task->GetSvgVisual()->ApplyRasterizedImage( task->GetVectorRenderer(), task->GetPixelData(), task->IsLoaded() );
-#endif /* NO_THORVG */
+    task->GetSvgVisual()->ApplyRasterizedImage(task->GetVectorRenderer(), task->GetPixelData(), task->IsLoaded());
   }
 }
 

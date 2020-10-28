@@ -178,6 +178,9 @@ void UpdateCharacterRuns( CharacterIndex index,
     {
       T& run = *it;
 
+      if (run.characterRun.numberOfCharacters == 0)
+       continue;
+
       const CharacterIndex lastRunIndex = run.characterRun.characterIndex + run.characterRun.numberOfCharacters - 1u;
 
       if( lastRunIndex < index )
@@ -239,6 +242,9 @@ void UpdateCharacterRuns( CharacterIndex index,
          ++it )
     {
       T& run = *it;
+
+      if (run.characterRun.numberOfCharacters == 0)
+       continue;
 
       // Update the number of characters of the style run.
 

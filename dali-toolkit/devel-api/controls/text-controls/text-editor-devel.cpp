@@ -35,6 +35,16 @@ MaxLengthReachedSignalType& MaxLengthReachedSignal(TextEditor textEditor)
   return GetImpl(textEditor).MaxLengthReachedSignal();
 }
 
+void SelectWholeText(TextEditor textEditor)
+{
+  GetImpl(textEditor).SelectWholeText();
+}
+
+void SelectNone(TextEditor textEditor)
+{
+  GetImpl(textEditor).SelectNone();
+}
+
 } // namespace DevelTextEditor
 
 } // namespace Toolkit
