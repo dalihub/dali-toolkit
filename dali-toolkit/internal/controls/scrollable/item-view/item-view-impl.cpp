@@ -1145,7 +1145,7 @@ bool ItemView::OnTouch( Actor actor, const TouchEvent& touch )
     RemoveAnimation(mScrollAnimation);
   }
 
-  return true; // consume since we're potentially scrolling
+  return false; // Do not consume as we're potentially scrolling (detecting pan gestures)
 }
 
 void ItemView::OnPan( const PanGesture& gesture )
