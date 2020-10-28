@@ -746,13 +746,14 @@ private:
    * @param[in] samplingMode     The SamplingMode to use
    * @param[in] useAtlas         True if atlased
    * @param[in] maskTextureId    The masking texture id (or INVALID_TEXTURE_ID)
-   * @param[in] storageType      Whether the pixel data is stored in the cache, returned with PixelBuffer or uploaded to the GPU
+   * @param[in] isAnimatedImage  The boolean value to know whether the request is for animated image or not
+   * @param[in] frameIndex       The frame index of a frame to be loaded frame
    * @return                     A hash of the provided data for caching.
    */
   TextureHash GenerateHash( const std::string& url, const ImageDimensions size,
                             const FittingMode::Type fittingMode,
                             const Dali::SamplingMode::Type samplingMode, const UseAtlas useAtlas,
-                            TextureId maskTextureId, StorageType storageType );
+                            TextureId maskTextureId, StorageType storageType, bool isAnimatedImage, uint32_t frameIndex );
 
   /**
    * @brief Looks up a cached texture by its hash.
@@ -766,6 +767,8 @@ private:
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
    * @param[in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    * @param[in] storageType       Whether the pixel data is stored in the cache, returned with PixelBuffer or uploaded to the GPU
+   * @param[in] isAnimatedImage   The boolean value to know whether the request is for animated image or not
+   * @param[in] frameIndex        The frame index of a frame to be loaded frame
    * @return                      A TextureId of a cached Texture if found. Or INVALID_TEXTURE_ID if not found.
    */
   TextureManager::TextureId FindCachedTexture(
@@ -777,7 +780,9 @@ private:
     const bool useAtlas,
     TextureId maskTextureId,
     MultiplyOnLoad preMultiplyOnLoad,
-    StorageType storageType );
+    StorageType storageType,
+    bool isAnimatedImage,
+    uint32_t frameIndex );
 
 private:
 
