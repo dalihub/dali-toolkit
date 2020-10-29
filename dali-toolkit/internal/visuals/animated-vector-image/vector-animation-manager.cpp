@@ -45,6 +45,7 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging,
 
 VectorAnimationManager::VectorAnimationManager()
 : mEventCallbacks(),
+  mLifecycleObservers(),
   mVectorAnimationThread( nullptr ),
   mProcessorRegistered( false )
 {
@@ -61,6 +62,26 @@ VectorAnimationManager::~VectorAnimationManager()
   if( mProcessorRegistered )
   {
     Adaptor::Get().UnregisterProcessor( *this );
+  }
+
+  for( auto observer : mLifecycleObservers )
+  {
+    observer->VectorAnimationManagerDestroyed();
+  }
+}
+
+void VectorAnimationManager::AddObserver( VectorAnimationManager::LifecycleObserver& observer )
+{
+  DALI_ASSERT_DEBUG( mLifecycleObservers.end() == std::find( mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer));
+  mLifecycleObservers.push_back( &observer );
+}
+
+void VectorAnimationManager::RemoveObserver( VectorAnimationManager::LifecycleObserver& observer)
+{
+  auto iterator=std::find(mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer);
+  if( iterator != mLifecycleObservers.end() )
+  {
+    mLifecycleObservers.erase(iterator);
   }
 }
 

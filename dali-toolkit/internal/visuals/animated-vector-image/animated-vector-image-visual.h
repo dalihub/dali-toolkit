@@ -30,6 +30,7 @@
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-actions-devel.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-task.h>
+#include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 
 namespace Dali
 {
@@ -55,7 +56,7 @@ using AnimatedVectorImageVisualPtr = IntrusivePtr< AnimatedVectorImageVisual >;
  * | url                      | STRING           |
  *
  */
-class AnimatedVectorImageVisual: public Visual::Base, public ConnectionTracker
+class AnimatedVectorImageVisual: public Visual::Base, public ConnectionTracker, public VectorAnimationManager::LifecycleObserver
 {
 public:
 
@@ -96,6 +97,12 @@ public:  // from Visual
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
   void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+
+protected: // From VectorAnimationManager::LifecycleObserver:
+  /**
+   * @copydoc VectorAnimationManager::LifecycleObserver::VectorAnimationManagerDestroyed()
+   */
+  void VectorAnimationManagerDestroyed() override;
 
 protected:
 
@@ -221,6 +228,7 @@ private:
   DevelImageVisual::PlayState::Type            mPlayState;
   CallbackBase*                                mEventCallback;    // Not owned
   bool                                         mRendererAdded;
+  bool                                         mCoreShutdown;
 };
 
 } // namespace Internal

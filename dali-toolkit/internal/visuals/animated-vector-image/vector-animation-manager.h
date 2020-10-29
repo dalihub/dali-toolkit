@@ -43,6 +43,10 @@ class VectorAnimationThread;
 class VectorAnimationManager: public Integration::Processor
 {
 public:
+  struct LifecycleObserver
+  {
+    virtual void VectorAnimationManagerDestroyed() = 0;
+  };
 
   /**
    * @brief Constructor.
@@ -53,6 +57,18 @@ public:
    * @brief Destructor.
    */
   ~VectorAnimationManager() override;
+
+  /**
+   * Add a lifecycle observer
+   * @param[in] observer The object watching this one
+   */
+  void AddObserver( LifecycleObserver& observer );
+
+  /**
+   * Remove a lifecycle observer
+   * @param[in] observer The object watching this one
+   */
+  void RemoveObserver( LifecycleObserver& observer );
 
   /**
    * Get the vector animation thread.
@@ -93,6 +109,7 @@ private:
 private:
 
   std::vector< CallbackBase* >             mEventCallbacks;
+  std::vector<LifecycleObserver*>         mLifecycleObservers;
   std::unique_ptr< VectorAnimationThread > mVectorAnimationThread;
   bool                                     mProcessorRegistered;
 };
