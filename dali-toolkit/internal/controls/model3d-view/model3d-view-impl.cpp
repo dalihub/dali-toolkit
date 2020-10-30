@@ -30,6 +30,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -461,6 +462,10 @@ void Model3dView::OnInitialize()
   Shader shader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
   mRenderer = Renderer::New( mesh, shader );
 
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::IMAGE ) );
+  } );
 }
 
 void Model3dView::LoadGeometry()

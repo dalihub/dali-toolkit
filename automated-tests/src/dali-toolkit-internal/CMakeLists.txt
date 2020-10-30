@@ -8,6 +8,11 @@ SET(CAPI_LIB "dali-toolkit-internal")
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
  utc-Dali-AddOns.cpp
+ utc-Dali-Accessibility-Accessible.cpp
+ utc-Dali-Accessibility-Controls.cpp
+ utc-Dali-Accessibility-Controls-BridgeUp.cpp
+ utc-Dali-Accessibility-Text.cpp
+ utc-Dali-Accessibility-Value.cpp
  utc-Dali-BidirectionalSupport.cpp
  utc-Dali-ColorConversion.cpp
  utc-Dali-Control-internal.cpp
@@ -39,7 +44,6 @@ SET(TC_SOURCES
 # Append list of test harness files (Won't get parsed for test cases)
 LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-adaptor.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
@@ -77,13 +81,20 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-text-utils.cpp
    dali-toolkit-test-utils/dummy-visual.cpp
    dali-toolkit-test-utils/test-addon-manager.cpp
+   dali-toolkit-test-utils/accessibility-test-utils.cpp
+   dali-toolkit-test-utils/dbus-wrapper.cpp
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali2-core
     dali2-adaptor
     dali2-toolkit
+    eldbus
+    ecore-input
+    eina
 )
+
+MESSAGE("Libraries to link with:>${${CAPI_LIB}_LIBRARIES}")
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED -fPIC )
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
@@ -94,6 +105,8 @@ ADD_DEFINITIONS(-DDALI_ADDONS_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\")
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
     SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
+
+STRING(STRIP ${CMAKE_CXX_LINK_FLAGS} CMAKE_CXX_LINK_FLAGS)
 
 INCLUDE_DIRECTORIES(
     ../../../

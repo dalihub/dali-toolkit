@@ -27,13 +27,15 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
-using namespace Dali::Toolkit::Internal;
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
 
+using namespace Dali::Toolkit::Internal;
 
 void utc_dali_toolkit_texture_manager_startup(void)
 {
   setenv( "LOG_TEXTURE_MANAGER", "3", 1 );
   test_return_value = TET_UNDEF;
+  DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
 void utc_dali_toolkit_texture_manager_cleanup(void)

@@ -36,6 +36,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 // TODO:
 // pixel format / size - set from JSON
@@ -320,6 +321,11 @@ void GaussianBlurView::OnInitialize()
   mInternalRoot.Add( mHorizBlurActor );
   mInternalRoot.Add( mVertBlurActor );
   mInternalRoot.Add( mRenderDownsampledCamera );
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 

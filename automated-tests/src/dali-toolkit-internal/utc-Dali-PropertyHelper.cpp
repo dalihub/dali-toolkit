@@ -18,12 +18,15 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/internal/helpers/property-helper.h>
 
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+
 using namespace Dali;
 using namespace Dali::Toolkit;
 
 void dali_property_helper_startup(void)
 {
   test_return_value = TET_UNDEF;
+  DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
 void dali_property_helper_cleanup(void)

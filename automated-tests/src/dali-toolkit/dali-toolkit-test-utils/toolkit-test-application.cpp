@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <toolkit-adaptor-impl.h>
 #include <toolkit-lifecycle-controller.h>
@@ -46,6 +47,7 @@ ToolkitTestApplication::ToolkitTestApplication( size_t surfaceWidth, size_t surf
 
   // Core needs to be initialized next before we start the adaptor
   InitializeCore();
+  Accessibility::Accessible::SetObjectRegistry(mCore->GetObjectRegistry());
 
   // This will also emit the window created signals
   AdaptorImpl::GetImpl( *mAdaptor ).Start( *mMainWindow );

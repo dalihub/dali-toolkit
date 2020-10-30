@@ -24,12 +24,15 @@
 #include <dali-toolkit/internal/controls/text-controls/text-selection-popup-impl.h>
 #undef private
 
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+
 using namespace Dali;
 using namespace Toolkit;
 
 void dali_textselectionpopupinternal_startup(void)
 {
   test_return_value = TET_UNDEF;
+  DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
 }
 
 void dali_textselectionpopupinternal_cleanup(void)

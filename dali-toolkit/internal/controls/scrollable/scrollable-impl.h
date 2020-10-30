@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -118,6 +119,19 @@ public:
    */
   virtual void SetOvershootSize( const Vector2& size ) = 0;
 
+protected: // From Control
+  struct AccessibleImpl : public Control::Impl::AccessibleImpl
+  {
+    using Control::Impl::AccessibleImpl::AccessibleImpl;
+
+    bool IsScrollable() override;
+  };
+
+  /**
+   * @copydoc Control::OnInitialize
+   */
+  virtual void OnInitialize() override;
+
 private:
 
   /**
@@ -176,9 +190,9 @@ public: //Signals
 protected:
 
   /**
-   * Construct a new Scrollable.
+   * Removed default constructor.
    */
-  Scrollable();
+  Scrollable() = delete;
 
   /**
    * @brief Construct a new Scrollable.

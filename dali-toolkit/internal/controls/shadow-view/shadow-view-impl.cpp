@@ -34,6 +34,7 @@
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/controls/shadow-view/shadow-view-impl.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 // TODO:
 // pixel format / size - set from JSON
@@ -289,6 +290,11 @@ void ShadowView::OnInitialize()
   Constraint blurStrengthConstraint = Constraint::New<float>( mBlurFilter.GetHandleForAnimateBlurStrength(), mBlurFilter.GetBlurStrengthPropertyIndex(), EqualToConstraint() );
   blurStrengthConstraint.AddSource( Source( self, mBlurStrengthPropertyIndex) );
   blurStrengthConstraint.Apply();
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 void ShadowView::OnChildAdd( Actor& child )

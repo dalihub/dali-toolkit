@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/alignment/alignment.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -313,6 +314,11 @@ void ToolBar::OnInitialize()
   mLayout.AddChild( rightSpace, Toolkit::TableView::CellPosition( 0, 1 ) );
   mLayout.SetRelativeWidth( 0, mLeftRelativeSpace );
   mLayout.SetRelativeWidth( 1, mRightRelativeSpace );
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::TOOL_BAR ));
+  } );
 }
 
 void ToolBar::OnChildAdd(Actor& child)

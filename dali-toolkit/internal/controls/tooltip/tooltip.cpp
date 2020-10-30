@@ -277,7 +277,7 @@ void Tooltip::SetContent( Toolkit::Control& control, const Property::Value& valu
     if( value.Get( text ) )
     {
       mContentTextVisual[ Toolkit::TextVisual::Property::TEXT ] = text;
-      mContentTextVisual[ Toolkit::Visual::Property::TYPE ] = Visual::TEXT;
+      mContentTextVisual[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::TEXT;
       mContentArray.Clear();
       connectSignals = true;
     }

@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -95,6 +96,15 @@ void ImageView::OnInitialize()
   // ImageView can relayout in the OnImageReady, alternative to a signal would be to have a upcall from the Control to ImageView
   Dali::Toolkit::Control handle( GetOwner() );
   handle.ResourceReadySignal().Connect( this, &ImageView::OnResourceReady );
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::IMAGE ) );
+  } );
+
+  //Enable highightability
+  Self().SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
+
 }
 
 void ImageView::SetImage( const Property::Map& map )

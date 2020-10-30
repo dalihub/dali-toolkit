@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -540,6 +541,16 @@ private:
 
   // Actions
   bool             mClickActionPerforming;      ///< Used to manage signal emissions during action
+
+protected:
+  struct AccessibleImpl : public Control::Impl::AccessibleImpl
+  {
+    using Control::Impl::AccessibleImpl::AccessibleImpl;
+
+    Dali::Accessibility::States CalculateStates() override;
+    std::string GetNameRaw() override;
+    Property::Index GetNamePropertyIndex() override;
+  };
 };
 
 } // namespace Internal

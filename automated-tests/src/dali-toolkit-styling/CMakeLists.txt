@@ -14,7 +14,6 @@ SET(TC_SOURCES
 LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-harness.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-adaptor.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-color-controller.cpp
@@ -55,6 +54,7 @@ LIST(APPEND TC_SOURCES
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
   dali2-core
+  dali2-adaptor
   dali2-toolkit
 )
 

@@ -662,6 +662,38 @@ public: // Update.
    */
   void UpdateAfterFontChange( const std::string& newDefaultFont );
 
+  /**
+   * @brief The method acquires currently selected text
+   * @param selectedText variable to place selected text in
+   */
+  void RetrieveSelection( std::string& selectedText ) const;
+
+  /**
+   * @brief The method sets selection in given range
+   * @param start index of first character
+   * @param end   index of first character after selection
+   */
+  void SetSelection( int start, int end );
+
+  /**
+   * @brief This method retrieve indexes of current selection
+   *
+   * @return a pair, where first element is left index of selection and second is the right one
+   */
+  std::pair< int, int > GetSelectionIndexes() const;
+
+  /**
+   * Place string in system clipboard
+   * @param source std::string
+   */
+  void CopyStringToClipboard( const std::string& source );
+
+  /**
+   * Place currently selected text in system clipboard
+   * @param deleteAfterSending flag pointing if text should be deleted after sending to clipboard
+   */
+  void SendSelectionToClipboard( bool deleteAfterSending );
+
 public: // Default style & Input style
 
   /**
@@ -1573,6 +1605,19 @@ public: // Text-input Event Queuing.
    */
   Actor CreateBackgroundActor();
 
+  /**
+   * @brief Used to reset the cursor position after setting a new text.
+   *
+   * @param[in] cursorIndex Where to place the cursor.
+   */
+  void ResetCursorPosition( CharacterIndex cursorIndex );
+
+  /**
+   * @brief The method acquires current position of cursor
+   * @return unsigned value with cursor position
+   */
+  CharacterIndex GetCursorPosition();
+
 protected: // Inherit from Text::Decorator::ControllerInterface.
 
   /**
@@ -1715,13 +1760,6 @@ private: // Helpers.
    * @brief Helper to clear text's style data.
    */
   void ClearStyleData();
-
-  /**
-   * @brief Used to reset the cursor position after setting a new text.
-   *
-   * @param[in] cursorIndex Where to place the cursor.
-   */
-  void ResetCursorPosition( CharacterIndex cursorIndex );
 
   /**
    * @brief Used to reset the scroll position after setting a new text.

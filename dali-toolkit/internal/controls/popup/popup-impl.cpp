@@ -39,10 +39,11 @@
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;
 
@@ -338,6 +339,13 @@ void Popup::OnInitialize()
   SetAsKeyboardFocusGroup( true );
 
   SetupTouch();
+
+  DevelControl::AppendAccessibilityAttribute(self, "sub-role", "Alert");
+
+  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor)
+  {
+    return std::unique_ptr<Dali::Accessibility::Accessible>(new AccessibleImpl(actor, Dali::Accessibility::Role::DIALOG, true));
+  });
 }
 
 Popup::~Popup()
@@ -563,8 +571,11 @@ void Popup::DisplayStateChangeComplete()
 
 bool Popup::OnAutoHideTimeReached()
 {
-  // Display timer has expired, auto hide the popup exactly as if the user had clicked outside.
-  SetDisplayState( Toolkit::Popup::HIDDEN );
+  if (!Dali::Accessibility::IsUp() || true) // TODO: remove 'true' in sync with EFL (UX change)
+  {
+    // Display timer has expired, auto hide the popup exactly as if the user had clicked outside.
+    SetDisplayState( Toolkit::Popup::HIDDEN );
+  }
 
   if( mAutoHideTimer )
   {
@@ -711,6 +722,18 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
   if( display == ( ( mDisplayState == Toolkit::Popup::SHOWING ) || ( mDisplayState == Toolkit::Popup::SHOWN ) ) )
   {
     return;
+  }
+
+  auto *accessible = Dali::Accessibility::Accessible::Get(Self());
+  if (display)
+  {
+    Dali::Accessibility::Bridge::GetCurrentBridge()->AddPopup(accessible);
+    accessible->EmitStateChanged(Dali::Accessibility::State::SHOWING, 1, 0);
+  }
+  else
+  {
+    accessible->EmitStateChanged(Dali::Accessibility::State::SHOWING, 0, 0);
+    Dali::Accessibility::Bridge::GetCurrentBridge()->RemovePopup(accessible);
   }
 
   // Convert the bool state to the actual display state to use.
@@ -1976,6 +1999,39 @@ void Popup::SetupTouch()
     mPopupLayout.TouchedSignal().Disconnect( this, &Popup::OnDialogTouched );
     mLayer.SetProperty( Layer::Property::CONSUMES_TOUCH, false );
   }
+}
+
+std::string Popup::AccessibleImpl::GetNameRaw()
+{
+  auto popup = Toolkit::Popup::DownCast( self );
+  std::string title;
+  Actor popupTitle = popup.GetTitle();
+  if (popupTitle)
+  {
+    std::string titleText = popupTitle.GetProperty<std::string>(Toolkit::TextLabel::Property::TEXT);
+    title = titleText;
+  }
+  else
+  {
+    Actor popupContent = popup.GetContent();
+    if (popupContent)
+    {
+      std::string contentText = popupContent.GetProperty<std::string>(Toolkit::TextLabel::Property::TEXT);
+      title = contentText;
+    }
+  }
+  return title;
+}
+
+Dali::Accessibility::States Popup::AccessibleImpl::CalculateStates()
+{
+  auto states = Control::Impl::AccessibleImpl::CalculateStates();
+  auto popup = Toolkit::Popup::DownCast(self);
+  auto displayState = popup.GetProperty<std::string>(Toolkit::Popup::Property::DISPLAY_STATE);
+
+  states[Dali::Accessibility::State::SHOWING] = (displayState == "SHOWN" || displayState == "SHOWING");
+
+  return states;
 }
 
 } // namespace Internal

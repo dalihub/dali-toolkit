@@ -24,6 +24,7 @@
 #include <dali-toolkit/public-api/controls/progress-bar/progress-bar.h>
 #include <dali-toolkit/devel-api/controls/progress-bar/progress-bar-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -269,6 +270,18 @@ private:
   Property::Map mTrackVisualMap;                                      ///< To backup visual properties when switching determinate/indeterminate.
   Property::Map mProgressVisualMap;                                   ///< To backup visual properties when switching determinate/indeterminate.
   Property::Map mSecondaryProgressVisualMap;                          ///< To backup visual properties when switching determinate/indeterminate.
+
+protected:
+  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
+                          public virtual Dali::Accessibility::Value
+  {
+    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    double GetMinimum() override;
+    double GetCurrent() override;
+    double GetMaximum() override;
+    bool SetCurrent( double ) override;
+    double GetMinimumIncrement() override;
+  };
 };
 
 } // namespace Internal
