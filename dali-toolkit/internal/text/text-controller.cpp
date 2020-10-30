@@ -2239,6 +2239,56 @@ void Controller::SetEditable( bool editable )
   }
 }
 
+void Controller::ScrollBy( Vector2 scroll )
+{
+  if( mImpl->mEventData && (fabs(scroll.x) > Math::MACHINE_EPSILON_0 || fabs(scroll.y) > Math::MACHINE_EPSILON_0))
+  {
+      const Vector2& layoutSize = mImpl->mModel->mVisualModel->GetLayoutSize();
+      const Vector2 currentScroll = mImpl->mModel->mScrollPosition;
+
+      scroll.x = -scroll.x;
+      scroll.y = -scroll.y;
+
+      if( fabs(scroll.x) > Math::MACHINE_EPSILON_0 )
+      {
+        mImpl->mModel->mScrollPosition.x += scroll.x;
+        mImpl->ClampHorizontalScroll( layoutSize );
+      }
+
+      if( fabs(scroll.y) > Math::MACHINE_EPSILON_0 )
+      {
+        mImpl->mModel->mScrollPosition.y += scroll.y;
+        mImpl->ClampVerticalScroll( layoutSize );
+      }
+
+      if (mImpl->mModel->mScrollPosition != currentScroll)
+      {
+        mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mModel->mScrollPosition - currentScroll );
+        mImpl->RequestRelayout();
+      }
+  }
+}
+
+float Controller::GetHorizontalScrollPosition()
+{
+  if( mImpl->mEventData )
+  {
+    //scroll values are negative internally so we convert them to positive numbers
+    return -mImpl->mModel->mScrollPosition.x;
+  }
+  return 0;
+}
+
+float Controller::GetVerticalScrollPosition()
+{
+  if( mImpl->mEventData )
+  {
+    //scroll values are negative internally so we convert them to positive numbers
+    return -mImpl->mModel->mScrollPosition.y;
+  }
+  return 0;
+}
+
 void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )
 {
   EventHandler::DecorationEvent(*this, handleType, state, x, y);
