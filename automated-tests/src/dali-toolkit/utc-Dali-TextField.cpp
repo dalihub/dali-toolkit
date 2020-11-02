@@ -3213,3 +3213,35 @@ int UtcDaliTextFieldPrimaryCursorPosition(void)
 
   END_TEST;
 }
+
+// test max length when set after setting long text
+int utcDaliTextFieldMaxCharactersReachedAfterSetText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldMaxCharactersReachedAfterSetText");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  application.GetScene().Add( field );
+
+  field.SetProperty(TextField::Property::TEXT, "123456789");
+
+  const int maxNumberOfCharacters = 3;
+  field.SetProperty( TextField::Property::MAX_LENGTH, maxNumberOfCharacters );
+
+  field.SetKeyInputFocus();
+
+  // connect to the text max lengh reached signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  bool maxLengthReachedSignal = false;
+  field.ConnectSignal( testTracker, "maxLengthReached",   CallbackFunctor(&maxLengthReachedSignal) );
+
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  DALI_TEST_CHECK( maxLengthReachedSignal );
+
+  DALI_TEST_EQUALS( field.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "123456789", TEST_LOCATION );
+
+  END_TEST;
+}
