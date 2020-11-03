@@ -139,6 +139,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "selectedTextStart",      
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "selectedTextEnd",                INTEGER,   SELECTED_TEXT_END                    )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableEditing",                  BOOLEAN,   ENABLE_EDITING                       )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "fontSizeScale",                  FLOAT,     FONT_SIZE_SCALE                      )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "primaryCursorPosition",          INTEGER,   PRIMARY_CURSOR_POSITION              )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -745,6 +746,16 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::PRIMARY_CURSOR_POSITION:
+      {
+        uint32_t position = static_cast<uint32_t>(value.Get< int >());
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_POSITION %d\n", impl.mController.Get(), position );
+        if (impl.mController->SetPrimaryCursorPosition( position ))
+        {
+          impl.SetKeyInputFocus();
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1088,6 +1099,11 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       case Toolkit::DevelTextField::Property::FONT_SIZE_SCALE:
       {
         value = impl.mController->GetFontSizeScale();
+        break;
+      }
+      case Toolkit::DevelTextField::Property::PRIMARY_CURSOR_POSITION:
+      {
+        value = static_cast<int>(impl.mController->GetPrimaryCursorPosition());
         break;
       }
     } //switch

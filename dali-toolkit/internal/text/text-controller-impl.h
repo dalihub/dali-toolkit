@@ -631,6 +631,16 @@ struct Controller::Impl
   void OnSelectNoneEvent();
 
   /**
+   * @copydoc Text::Controller::GetPrimaryCursorPosition()
+   */
+  CharacterIndex GetPrimaryCursorPosition() const;
+
+  /**
+   * @copydoc Text::Controller::SetPrimaryCursorPosition()
+   */
+  bool SetPrimaryCursorPosition( CharacterIndex index );
+
+  /**
    * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
    */
   void SetTextSelectionRange(const uint32_t *pStart, const uint32_t *pEndf);
@@ -759,6 +769,11 @@ struct Controller::Impl
    * This method is called after deleting text.
    */
   void ScrollTextToMatchCursor( const CursorInfo& cursorInfo );
+
+  /**
+   * @brief Scrolls the text to make primary cursor visible.
+   */
+  void ScrollTextToMatchCursor( );
 
   /**
    * @brief Create an actor that renders the text background color

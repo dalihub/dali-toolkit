@@ -148,6 +148,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "verticalScrollPosition",
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableEditing",                  BOOLEAN,   ENABLE_EDITING                       )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "selectedText",         STRING,    SELECTED_TEXT                        )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "fontSizeScale",                  FLOAT,     FONT_SIZE_SCALE                      )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "primaryCursorPosition",          INTEGER,   PRIMARY_CURSOR_POSITION              )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -756,6 +757,16 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::PRIMARY_CURSOR_POSITION:
+      {
+        uint32_t position = static_cast<uint32_t>(value.Get< int >());
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PRIMARY_CURSOR_POSITION %d\n", impl.mController.Get(), position );
+        if (impl.mController->SetPrimaryCursorPosition( position ))
+        {
+          impl.SetKeyInputFocus();
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -1105,6 +1116,11 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       case Toolkit::DevelTextEditor::Property::FONT_SIZE_SCALE:
       {
         value = impl.mController->GetFontSizeScale();
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::PRIMARY_CURSOR_POSITION:
+      {
+        value = static_cast<int>(impl.mController->GetPrimaryCursorPosition());
         break;
       }
     } //switch

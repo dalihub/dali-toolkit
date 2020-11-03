@@ -1422,6 +1422,38 @@ void Controller::Impl::SetTextSelectionRange(const uint32_t *pStart, const uint3
   }
 }
 
+CharacterIndex Controller::Impl::GetPrimaryCursorPosition() const
+{
+  if( nullptr == mEventData )
+  {
+    return 0;
+  }
+  return mEventData->mPrimaryCursorPosition;
+}
+
+bool Controller::Impl::SetPrimaryCursorPosition( CharacterIndex index )
+{
+  if( nullptr == mEventData )
+  {
+    // Nothing to do if there is no text.
+    return false;
+  }
+
+  if( mEventData->mPrimaryCursorPosition == index )
+  {
+    // Nothing for same cursor position.
+    return false;
+  }
+
+  uint32_t length = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
+  mEventData->mPrimaryCursorPosition = std::min(index, length);
+  ChangeState( EventData::EDITING );
+  mEventData->mLeftSelectionPosition = mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
+  mEventData->mUpdateCursorPosition = true;
+  ScrollTextToMatchCursor();
+  return true;
+}
+
 Uint32Pair Controller::Impl::GetTextSelectionRange() const
 {
   Uint32Pair range;
@@ -2673,6 +2705,13 @@ void Controller::Impl::ScrollTextToMatchCursor( const CursorInfo& cursorInfo )
 
   // Makes the new cursor position visible if needed.
   ScrollToMakePositionVisible( cursorInfo.primaryPosition, cursorInfo.lineHeight );
+}
+
+void Controller::Impl::ScrollTextToMatchCursor()
+{
+  CursorInfo cursorInfo;
+  GetCursorPosition( mEventData->mPrimaryCursorPosition, cursorInfo );
+  ScrollTextToMatchCursor(cursorInfo);
 }
 
 void Controller::Impl::RequestRelayout()
