@@ -27,7 +27,9 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
+#if defined(ELDBUS_ENABLED)
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+#endif
 
 using namespace Dali::Toolkit::Internal;
 
@@ -35,7 +37,9 @@ void utc_dali_toolkit_texture_manager_startup(void)
 {
   setenv( "LOG_TEXTURE_MANAGER", "3", 1 );
   test_return_value = TET_UNDEF;
+#if defined(ELDBUS_ENABLED)
   DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
+#endif
 }
 
 void utc_dali_toolkit_texture_manager_cleanup(void)

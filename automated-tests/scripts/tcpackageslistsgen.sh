@@ -12,9 +12,9 @@ if [ ! -f $FILE ]; then
     exit
 fi
 SCRIPT_DIR="$(cd "$(dirname $0)" && pwd)"
-AUTO_NUM=$(cd $SCRIPT_DIR/..; scripts/retriever.sh -anum src/$MODULE_NAME)
+AUTO_NUM=$(cd $SCRIPT_DIR/..; scripts/retriever.sh --anum src/$MODULE_NAME)
 if [ $? -ne 0 ]; then echo $AUTO_NUM; exit 1; fi
-MAN_NUM=$(cd $SCRIPT_DIR/..; scripts/retriever.sh -mnum src/$MODULE_NAME)
+MAN_NUM=$(cd $SCRIPT_DIR/..; scripts/retriever.sh --mnum src/$MODULE_NAME)
 if [ $? -ne 0 ]; then echo $MAN_NUM; exit 1; fi
 
 TFILE="/tmp/tempfile.xml"
@@ -23,7 +23,7 @@ if [ -f $TFILE ]; then
 fi
 
 function regen {
-    awk -v RS='\r\n' -v ORS='\r\n' -v MODULE_NAME=$MODULE_NAME -v AUTO_NUM=$AUTO_NUM -v MAN_NUM=$MAN_NUM '    
+    awk -v RS='\r\n' -v ORS='\r\n' -v MODULE_NAME=$MODULE_NAME -v AUTO_NUM=$AUTO_NUM -v MAN_NUM=$MAN_NUM '
     BEGIN {
         found = 0;
         replaced = 0;

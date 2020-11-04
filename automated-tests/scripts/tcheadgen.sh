@@ -1,16 +1,18 @@
 #!/bin/bash
 
 if [[ -z $1 ]]; then
-    echo "Usage note: tcheadgen.sh <header_filename.h>"
+    echo "Usage note: tcheadgen.sh <header_filename.h> <test-sources>"
     exit 1
 fi
 
 FILE="$PWD/$1"
+shift
+TC_FILES=$*
 TFILE="/tmp/retr.csv$$"
 HEADER_NAME=$(echo $1 | tr '[:lower:]' '[:upper:]' | sed -e 's/-/_/g' -e 's/\./_/')
 SCRIPT_DIR="$(cd "$(dirname $0)" && pwd)"
 
-$SCRIPT_DIR/retriever.sh > $TFILE
+$SCRIPT_DIR/retriever.sh $TC_FILES > $TFILE
 if [ $? -ne 0 ]; then cat $TFILE; exit 1; fi
 awk -F',' -v HEADER_NAME="$HEADER_NAME" '
     BEGIN {
@@ -70,4 +72,3 @@ print ""
 print "#endif // " HEADER_NAME
 }' $TFILE > $FILE
 unlink $TFILE
-

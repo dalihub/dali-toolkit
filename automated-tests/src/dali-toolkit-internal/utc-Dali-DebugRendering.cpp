@@ -26,7 +26,9 @@
 
 #include <toolkit-environment-variable.h> // for setting environment variable: DALI_DEBUG_RENDERING
 
+#if defined(ELDBUS_ENABLED)
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+#endif
 
 #include "dummy-control.h"
 
@@ -78,7 +80,9 @@ void TestDebugVisual( Integration::Scene scene,  Visual::Base& visual, Visual::T
 void dali_debug_rendering_startup(void)
 {
   test_return_value = TET_UNDEF;
+#if defined(ELDBUS_ENABLED)
   DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
+#endif
 }
 
 void dali_debug_rendering_cleanup(void)

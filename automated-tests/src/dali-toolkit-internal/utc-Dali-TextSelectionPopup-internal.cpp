@@ -24,7 +24,9 @@
 #include <dali-toolkit/internal/controls/text-controls/text-selection-popup-impl.h>
 #undef private
 
+#if defined(ELDBUS_ENABLED)
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+#endif
 
 using namespace Dali;
 using namespace Toolkit;
@@ -32,7 +34,9 @@ using namespace Toolkit;
 void dali_textselectionpopupinternal_startup(void)
 {
   test_return_value = TET_UNDEF;
+#if defined(ELDBUS_ENABLED)
   DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
+#endif
 }
 
 void dali_textselectionpopupinternal_cleanup(void)
@@ -51,4 +55,3 @@ int UtcDaliToolkitTextSelectionPopupIconPropertiesN(void)
 
   END_TEST;
 }
-

@@ -8,11 +8,6 @@ SET(CAPI_LIB "dali-toolkit-internal")
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
  utc-Dali-AddOns.cpp
- utc-Dali-Accessibility-Accessible.cpp
- utc-Dali-Accessibility-Controls.cpp
- utc-Dali-Accessibility-Controls-BridgeUp.cpp
- utc-Dali-Accessibility-Text.cpp
- utc-Dali-Accessibility-Value.cpp
  utc-Dali-BidirectionalSupport.cpp
  utc-Dali-ColorConversion.cpp
  utc-Dali-Control-internal.cpp
@@ -41,8 +36,18 @@ SET(TC_SOURCES
  utc-Dali-VisualUrl.cpp
 )
 
-# Append list of test harness files (Won't get parsed for test cases)
-LIST(APPEND TC_SOURCES
+IF(ELDBUS_AVAILABLE)
+  LIST(APPEND TC_SOURCES
+    utc-Dali-Accessibility-Accessible.cpp
+    utc-Dali-Accessibility-Controls.cpp
+    utc-Dali-Accessibility-Controls-BridgeUp.cpp
+    utc-Dali-Accessibility-Text.cpp
+    utc-Dali-Accessibility-Value.cpp
+    )
+ENDIF()
+
+# List of test harness files (Won't get parsed for test cases)
+SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard.cpp
@@ -81,9 +86,15 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-text-utils.cpp
    dali-toolkit-test-utils/dummy-visual.cpp
    dali-toolkit-test-utils/test-addon-manager.cpp
+)
+
+IF(ELDBUS_AVAILABLE)
+  LIST(APPEND TEST_HARNESS_SOURCES
    dali-toolkit-test-utils/accessibility-test-utils.cpp
    dali-toolkit-test-utils/dbus-wrapper.cpp
-)
+    )
+ENDIF()
+
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali2-core
@@ -102,6 +113,11 @@ ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
 ADD_DEFINITIONS(-DDALI_ADDONS_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\")
 
+IF(ELDBUS_AVAILABLE)
+  ADD_COMPILE_OPTIONS(-Wno-error=attributes)
+  ADD_DEFINITIONS(-DELDBUS_ENABLED)
+ENDIF()
+
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
     SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
@@ -109,13 +125,21 @@ ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 STRING(STRIP ${CMAKE_CXX_LINK_FLAGS} CMAKE_CXX_LINK_FLAGS)
 
 INCLUDE_DIRECTORIES(
-    ../../../
-    ${${CAPI_LIB}_INCLUDE_DIRS}
-    ../dali-toolkit/dali-toolkit-test-utils
-    dali-toolkit-test-utils
+  ../../../
+  ${${CAPI_LIB}_INCLUDE_DIRS}
+  ../dali-toolkit/dali-toolkit-test-utils
+  dali-toolkit-test-utils
 )
 
-ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
+ADD_CUSTOM_COMMAND(
+  COMMAND ../../scripts/tcheadgen.sh ${EXEC_NAME}.h ${TC_SOURCES}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  OUTPUT  ${EXEC_NAME}.h
+  COMMENT "Generating test tables"
+  )
+
+# Add explicit dependency on auto-generated header.
+ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.h ${EXEC_NAME}.cpp ${TC_SOURCES} ${TEST_HARNESS_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
     -lpthread --coverage -ldl -rdynamic
