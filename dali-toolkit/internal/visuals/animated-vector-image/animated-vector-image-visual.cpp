@@ -513,7 +513,7 @@ void AnimatedVectorImageVisual::TriggerVectorRasterization()
 {
   if( !mRasterizationTriggered )
   {
-    Stage::GetCurrent().KeepRendering( 1.0f );  // Trigger event processing
+    Stage::GetCurrent().KeepRendering( 0.1f );  // Trigger event processing
 
     Adaptor::Get().RegisterProcessor( *this );
     mRasterizationTriggered = true;
@@ -534,7 +534,7 @@ void AnimatedVectorImageVisual::OnScaleNotification( PropertyNotification& sourc
     SetVectorImageSize();
     SendAnimationData();
 
-    Stage::GetCurrent().KeepRendering( 1.0f );  // Trigger event processing
+    Stage::GetCurrent().KeepRendering( 0.1f );  // Trigger event processing
   }
 }
 
@@ -552,7 +552,7 @@ void AnimatedVectorImageVisual::OnSizeNotification( PropertyNotification& source
     SetVectorImageSize();
     SendAnimationData();
 
-    Stage::GetCurrent().KeepRendering( 1.0f );  // Trigger event processing
+    Stage::GetCurrent().KeepRendering( 0.1f );  // Trigger event processing
   }
 }
 
