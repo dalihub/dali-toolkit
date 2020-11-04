@@ -121,15 +121,20 @@ PixelData RasterizingTask::GetPixelData() const
   return mPixelData;
 }
 
-SvgRasterizeThread::SvgRasterizeThread( EventThreadCallback* trigger )
-: mTrigger( std::unique_ptr< EventThreadCallback >(trigger) ),
+SvgRasterizeThread::SvgRasterizeThread()
+: mTrigger( new EventThreadCallback( MakeCallback( this, &SvgRasterizeThread::ApplyRasterizedSVGToSampler ) ) ),
   mLogFactory( Dali::Adaptor::Get().GetLogFactory() ),
-  mIsThreadWaiting( false )
+  mIsThreadWaiting( false ),
+  mProcessorRegistered( false )
 {
 }
 
 SvgRasterizeThread::~SvgRasterizeThread()
 {
+  if( mProcessorRegistered )
+  {
+    Adaptor::Get().UnregisterProcessor( *this );
+  }
 }
 
 void SvgRasterizeThread::TerminateThread( SvgRasterizeThread*& thread )
@@ -168,6 +173,12 @@ void SvgRasterizeThread::AddTask( RasterizingTaskPtr task )
       }
     }
     mRasterizeTasks.push_back( task );
+
+    if( !mProcessorRegistered )
+    {
+      Adaptor::Get().RegisterProcessor( *this );
+      mProcessorRegistered = true;
+    }
   }
 
   if( wasEmpty)
@@ -209,6 +220,8 @@ void SvgRasterizeThread::RemoveTask( SvgVisual* visual )
       }
     }
   }
+
+  UnregisterProcessor();
 }
 
 void SvgRasterizeThread::DeleteImage( VectorImageRenderer vectorRenderer )
@@ -275,6 +288,34 @@ void SvgRasterizeThread::Run()
     AddCompletedTask( task );
   }
 }
+
+void SvgRasterizeThread::ApplyRasterizedSVGToSampler()
+{
+  while( RasterizingTaskPtr task = NextCompletedTask() )
+  {
+    task->GetSvgVisual()->ApplyRasterizedImage(task->GetVectorRenderer(), task->GetPixelData(), task->IsLoaded());
+  }
+
+  UnregisterProcessor();
+}
+
+void SvgRasterizeThread::Process()
+{
+  ApplyRasterizedSVGToSampler();
+}
+
+void SvgRasterizeThread::UnregisterProcessor()
+{
+  if ( mProcessorRegistered )
+  {
+    if( mRasterizeTasks.empty() && mCompletedTasks.empty() )
+    {
+      Adaptor::Get().UnregisterProcessor( *this );
+      mProcessorRegistered = false;
+    }
+  }
+}
+
 
 } // namespace Internal
 

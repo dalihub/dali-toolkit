@@ -220,13 +220,6 @@ public:
    */
   VectorAnimationManager& GetVectorAnimationManager();
 
-private: // for svg rasterization thread
-
-  /**
-   * Applies the rasterized image to material
-   */
-  void ApplyRasterizedSVGToSampler();
-
 protected:
 
   /**
