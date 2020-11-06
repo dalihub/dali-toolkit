@@ -984,7 +984,7 @@ int UtcDaliVisualFactoryGetNPatchVisual7(void)
   END_TEST;
 }
 
-int UtcDaliNPatchVisualAuxiliaryImage(void)
+int UtcDaliNPatchVisualAuxiliaryImage01(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "NPatchVisual with aux image" );
@@ -1030,6 +1030,38 @@ int UtcDaliNPatchVisualAuxiliaryImage(void)
   Renderer renderer = dummy.GetRendererAt( 0 );
   auto textures = renderer.GetTextures();
   DALI_TEST_EQUALS( textures.GetTextureCount(), 2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliNPatchVisualAuxiliaryImage02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Multiple NPatchVisual with aux image coincidentally" );
+
+  const Property::Value NPATCH_TEST{
+    {ImageVisual::Property::URL, TEST_9_PATCH_FILE_NAME},
+    {DevelImageVisual::Property::AUXILIARY_IMAGE, TEST_AUX_IMAGE}};
+
+  ImageView imageView1 = ImageView::New();
+  imageView1[ImageView::Property::IMAGE] = NPATCH_TEST;
+  application.GetScene().Add( imageView1 );
+
+  ImageView imageView2 = ImageView::New();
+  imageView2[ImageView::Property::IMAGE] = NPATCH_TEST;
+  application.GetScene().Add( imageView2 );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  Renderer renderer1 = imageView1.GetRendererAt( 0 );
+  auto textureSet1 = renderer1.GetTextures();
+
+  Renderer renderer2 = imageView2.GetRendererAt( 0 );
+  auto textureSet2 = renderer2.GetTextures();
+  DALI_TEST_EQUALS( textureSet1 == textureSet2, true, TEST_LOCATION );
 
   END_TEST;
 }
