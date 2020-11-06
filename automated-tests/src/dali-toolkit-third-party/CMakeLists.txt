@@ -10,8 +10,19 @@ SET(TC_SOURCES
  utc-Dali-Flexbox-Layout.cpp
 )
 
-# Append list of test harness files (Won't get parsed for test cases)
-LIST(APPEND TC_SOURCES
+# List of test harness files (Won't get parsed for test cases)
+SET(TEST_HARNESS_SOURCES
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-environment-variable.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-orientation.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-test-suite-utils.cpp
    ../dali-toolkit/dali-toolkit-test-utils/mesh-builder.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-actor-utils.cpp
@@ -59,7 +70,14 @@ INCLUDE_DIRECTORIES(
     ${GTEST_INCLUDE_DIRS}
 )
 
-ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
+ADD_CUSTOM_COMMAND(
+  COMMAND ../../scripts/tcheadgen.sh ${EXEC_NAME}.h ${TC_SOURCES}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  OUTPUT  ${EXEC_NAME}.h
+  COMMENT "Generating test tables"
+  )
+
+ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.h ${EXEC_NAME}.cpp ${TC_SOURCES} ${TEST_HARNESS_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
     -lpthread --coverage

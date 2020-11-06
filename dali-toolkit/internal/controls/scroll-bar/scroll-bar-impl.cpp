@@ -215,6 +215,11 @@ void ScrollBar::OnInitialize()
 {
   CreateDefaultIndicatorActor();
   Self().SetProperty( Actor::Property::DRAW_MODE,DrawMode::OVERLAY_2D);
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::SCROLL_BAR ) );
+  } );
 }
 
 void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize )
@@ -363,6 +368,10 @@ void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification& source)
   if(scrollableHandle)
   {
     mScrollPositionIntervalReachedSignal.Emit( scrollableHandle.GetCurrentProperty< float >( mPropertyScrollPosition ) );
+    if (Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+    {
+      Control::Impl::GetAccessibilityObject(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
+    }
   }
 }
 
@@ -857,6 +866,50 @@ Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
 
   return handle;
 }
+
+double ScrollBar::AccessibleImpl::GetMinimum()
+{
+  auto p = Toolkit::ScrollBar::DownCast( self );
+  Handle scrollableHandle = GetImpl( p ).mScrollableObject.GetHandle();
+  return scrollableHandle ? scrollableHandle.GetCurrentProperty< float >( GetImpl( p ).mPropertyMinScrollPosition ) : 0.0f;
+}
+
+double ScrollBar::AccessibleImpl::GetCurrent()
+{
+  auto p = Toolkit::ScrollBar::DownCast( self );
+  Handle scrollableHandle = GetImpl( p ).mScrollableObject.GetHandle();
+  return scrollableHandle ? scrollableHandle.GetCurrentProperty< float >( GetImpl( p ).mPropertyScrollPosition ) : 0.0f;
+}
+
+double ScrollBar::AccessibleImpl::GetMaximum()
+{
+  auto p = Toolkit::ScrollBar::DownCast( self );
+  Handle scrollableHandle = GetImpl( p ).mScrollableObject.GetHandle();
+  return scrollableHandle ? scrollableHandle.GetCurrentProperty< float >( GetImpl( p ).mPropertyMaxScrollPosition ) : 1.0f;
+}
+
+bool ScrollBar::AccessibleImpl::SetCurrent( double current )
+{
+  if( current < GetMinimum() || current > GetMaximum() )
+    return false;
+
+  auto value_before = GetCurrent();
+
+  auto p = Toolkit::ScrollBar::DownCast( self );
+  Handle scrollableHandle = GetImpl( p ).mScrollableObject.GetHandle();
+  if( !scrollableHandle )
+    return false;
+  scrollableHandle.SetProperty( GetImpl( p ).mPropertyScrollPosition, static_cast< float >( current ) );
+
+  auto value_after = GetCurrent();
+
+  if( ( current != value_before ) && ( value_before == value_after ) )
+    return false;
+
+  return true;
+}
+
+double ScrollBar::AccessibleImpl::GetMinimumIncrement() { return 1.0; }
 
 } // namespace Internal
 

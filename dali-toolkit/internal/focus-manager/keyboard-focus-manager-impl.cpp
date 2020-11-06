@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
-#include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/public-api/animation/constraints.h>
@@ -39,10 +38,10 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
+#include <dali/devel-api/adaptor-framework/accessibility.h>
 
 namespace Dali
 {
@@ -746,11 +745,6 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
 
 void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 {
-  AccessibilityAdaptor accessibilityAdaptor = AccessibilityAdaptor::Get();
-  bool isAccessibilityEnabled = accessibilityAdaptor.IsEnabled();
-
-  Toolkit::AccessibilityManager accessibilityManager = Toolkit::AccessibilityManager::Get();
-
   std::string keyName = event.GetKeyName();
 
   if( mIsFocusIndicatorShown == UNKNOWN )
@@ -764,7 +758,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
   {
     if (keyName == "Left")
     {
-      if(!isAccessibilityEnabled)
+      if(!mIsFocusIndicatorShown)
       {
         if(mIsFocusIndicatorShown == HIDE)
         {
@@ -781,13 +775,15 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       }
       else
       {
-        // Move the accessibility focus backward
-        accessibilityManager.MoveFocusBackward();
+        // Move the focus towards left
+        MoveFocus(Toolkit::Control::KeyboardFocus::LEFT);
       }
+
+      isFocusStartableKey = true;
     }
     else if (keyName == "Right")
     {
-      if(!isAccessibilityEnabled)
+      if(!mIsFocusIndicatorShown)
       {
         if( mIsFocusIndicatorShown == HIDE )
         {
@@ -802,13 +798,13 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       }
       else
       {
-        // Move the accessibility focus forward
-        accessibilityManager.MoveFocusForward();
+        // Move the focus towards right
+        MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT);
       }
 
       isFocusStartableKey = true;
     }
-    else if (keyName == "Up" && !isAccessibilityEnabled)
+    else if (keyName == "Up")
     {
       if( mIsFocusIndicatorShown == HIDE )
       {
@@ -823,7 +819,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if (keyName == "Down" && !isAccessibilityEnabled)
+    else if (keyName == "Down")
     {
       if( mIsFocusIndicatorShown == HIDE )
       {
@@ -838,7 +834,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if (keyName == "Prior" && !isAccessibilityEnabled)
+    else if (keyName == "Prior")
     {
       if( mIsFocusIndicatorShown == HIDE )
       {
@@ -853,7 +849,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if (keyName == "Next" && !isAccessibilityEnabled)
+    else if (keyName == "Next")
     {
       if( mIsFocusIndicatorShown == HIDE )
       {
@@ -868,7 +864,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if (keyName == "Tab" && !isAccessibilityEnabled)
+    else if (keyName == "Tab")
     {
       if( mIsFocusIndicatorShown == HIDE )
       {
@@ -884,7 +880,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if (keyName == "space" && !isAccessibilityEnabled)
+    else if (keyName == "space")
     {
       if( mIsFocusIndicatorShown == HIDE )
       {
@@ -894,7 +890,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if (keyName == "" && !isAccessibilityEnabled)
+    else if (keyName == "")
     {
       // Check the fake key event for evas-plugin case
       if( mIsFocusIndicatorShown == HIDE )
@@ -905,11 +901,11 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
       isFocusStartableKey = true;
     }
-    else if (keyName == "Backspace" && !isAccessibilityEnabled)
+    else if (keyName == "Backspace")
     {
       // Emit signal to go back to the previous view???
     }
-    else if (keyName == "Escape" && !isAccessibilityEnabled)
+    else if (keyName == "Escape")
     {
     }
   }
@@ -917,7 +913,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
   {
     if (keyName == "Return")
     {
-      if((mIsFocusIndicatorShown == HIDE) && !isAccessibilityEnabled)
+      if( mIsFocusIndicatorShown == HIDE )
       {
         // Show focus indicator
         mIsFocusIndicatorShown = SHOW;
@@ -925,16 +921,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // The focused actor has enter pressed on it
-        Actor actor;
-        if( !isAccessibilityEnabled )
-        {
-          actor = GetCurrentFocusActor();
-        }
-        else
-        {
-          actor = accessibilityManager.GetCurrentFocusActor();
-        }
-
+        Actor actor = GetCurrentFocusActor();
         if( actor )
         {
           DoKeyboardEnter( actor );
@@ -945,7 +932,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
   }
 
-  if(isFocusStartableKey && ( mIsFocusIndicatorShown == SHOW ) && !isAccessibilityEnabled)
+  if( isFocusStartableKey && mIsFocusIndicatorShown == SHOW )
   {
     Actor actor = GetCurrentFocusActor();
     if( actor )
@@ -962,6 +949,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       // Let's try to move the initial focus
       MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT);
     }
+
   }
 }
 

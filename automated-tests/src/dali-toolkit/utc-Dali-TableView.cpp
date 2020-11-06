@@ -93,7 +93,7 @@ static void SetupTableViewAndActors(Integration::Scene scene, TableView& tableVi
 
 int UtcDaliTableViewCtorCopyP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   TableView actor1 = TableView::New(10,10);
   TableView actor2( actor1 );

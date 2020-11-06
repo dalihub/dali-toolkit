@@ -66,7 +66,7 @@ static std::string GetButtonText( Button button )
 
 int UtcDaliRadioButtonConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   RadioButton button;
 
@@ -76,7 +76,7 @@ int UtcDaliRadioButtonConstructorP(void)
 
 int UtcDaliRadioButtonCopyConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Initialize an object, ref count == 1
   RadioButton button = RadioButton::New();
@@ -107,7 +107,7 @@ int UtcDaliRadioButtonMoveConstructor(void)
 
 int UtcDaliRadioButtonAssignmentOperatorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   RadioButton button = RadioButton::New();
 

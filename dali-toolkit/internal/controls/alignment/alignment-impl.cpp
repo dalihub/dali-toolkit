@@ -24,6 +24,9 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+
 namespace Dali
 {
 
@@ -185,6 +188,14 @@ void Alignment::SetPadding( const Toolkit::Alignment::Padding& padding )
 const Toolkit::Alignment::Padding& Alignment::GetPadding() const
 {
   return mPadding;
+}
+
+void Alignment::OnInitialize()
+{
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 void Alignment::OnRelayout( const Vector2& size, RelayoutContainer& container )

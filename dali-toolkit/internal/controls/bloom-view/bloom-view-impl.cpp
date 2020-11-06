@@ -35,6 +35,7 @@
 #include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
 #include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -272,6 +273,11 @@ void BloomView::OnInitialize()
 
   // bind properties for / set shader constants to defaults
   SetupProperties();
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::ANIMATION ) );
+  } );
 }
 
 void BloomView::OnSizeSet(const Vector3& targetSize)

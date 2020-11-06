@@ -3084,3 +3084,50 @@ int UtcDaliTextEditorEnableEditing(void)
 
   END_TEST;
 }
+
+int UtcDaliTextEditorScrolling(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorScrolling ");
+
+  TextEditor textEditor = TextEditor::New();
+  DALI_TEST_CHECK( textEditor );
+
+  application.GetScene().Add( textEditor );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, "Tex1\nTex2\nTex3\nTex4\nTex5\nTex6\nTex7\nTex8");
+  textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
+  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+  textEditor.SetProperty(Actor::Property::SIZE, Vector2(60.0f, 160.0f));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::VERTICAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+
+
+  DevelTextEditor::ScrollBy(textEditor, Vector2(1.0f, 1.0f));
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::VERTICAL_SCROLL_POSITION ).Get<float>(), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+
+  DevelTextEditor::ScrollBy(textEditor, Vector2(0.0f, 1000.0f));
+
+  DALI_TEST_NOT_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::VERTICAL_SCROLL_POSITION ).Get<float>(), 1.0f, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+
+  textEditor.SetProperty(DevelTextEditor::Property::VERTICAL_SCROLL_POSITION , 0.0f);
+  textEditor.SetProperty(DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION , 0.0f);
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::VERTICAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+
+  END_TEST;
+}

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-TEMP=`getopt -o rn --long rebuild,no-gen \
+TEMP=`getopt -o r --long rebuild \
      -n 'genmake' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
@@ -10,12 +10,10 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 
 opt_rebuild=false
-opt_generate=true
 
 while true ; do
     case "$1" in
         -r|--rebuild) opt_rebuild=true ; shift ;;
-        -n|--no-gen)  opt_generate=false ; shift ;;
         --) shift ; break ;;
         *) shift ;;   # Ignore
     esac
@@ -28,10 +26,6 @@ fi
 
 function build
 {
-    if [ $opt_generate == true -o $opt_rebuild == false ] ; then
-        (cd src/$1; ../../scripts/tcheadgen.sh tct-$1-core.h)
-        if [ $? -ne 0 ]; then echo "Aborting..."; exit 1; fi
-    fi
     (cd build ; cmake .. -DMODULE=$1 ; make -j7 )
 }
 

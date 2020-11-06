@@ -442,6 +442,12 @@ private: // From Control
   void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor) override;
 
 protected:
+  struct AccessibleImpl : public Scrollable::AccessibleImpl
+  {
+    using Scrollable::AccessibleImpl::AccessibleImpl;
+
+    void EnsureChildVisible(Actor child) override;
+  };
 
   /**
    * Construct a new ItemView.

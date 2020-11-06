@@ -203,8 +203,16 @@ void Slider::OnInitialize()
   // Size the Slider actor to a default
   self.SetProperty( Actor::Property::SIZE, Vector2( DEFAULT_HIT_REGION.x, DEFAULT_HIT_REGION.y ) );
 
+  // Set the Slider to be highlightable in Screen Reader mode
+  self.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
+
   // Connect to the touch signal
   self.TouchedSignal().Connect( this, &Slider::OnTouch );
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::SLIDER ) );
+  } );
 }
 
 void Slider::OnRelayout( const Vector2& size, RelayoutContainer& container )
@@ -606,6 +614,7 @@ Toolkit::TextLabel Slider::CreatePopupText()
   textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
   textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
   textLabel.SetProperty( Actor::Property::PADDING, Padding( POPUP_TEXT_PADDING, POPUP_TEXT_PADDING, 0.0f, 0.0f ) );
+  textLabel.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false );
   return textLabel;
 }
 
@@ -689,6 +698,7 @@ void Slider::CreateHandleValueDisplay()
     mHandleValueTextLabel.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
     mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
     mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
+    mHandleValueTextLabel.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false );
     mHandle.Add( mHandleValueTextLabel );
   }
 }
@@ -837,19 +847,9 @@ float Slider::MarkFilter( float value )
 {
   const float MARK_TOLERANCE = GetMarkTolerance();
 
-  float mark;
-  for( MarkList::SizeType i = 0; i < mMarks.Count(); ++i)
-  {
-    const Property::Value& propertyValue = mMarks[i];
-    propertyValue.Get( mark );
-    mark = MapValuePercentage( mark );
-
-    // If close to a mark, return the mark
-    if( fabsf( mark - value ) < MARK_TOLERANCE )
-    {
-      return mark;
-    }
-  }
+  float mark = SnapToMark(value);
+  if (fabsf(mark - value) < MARK_TOLERANCE)
+    return mark;
 
   return value;
 }
@@ -950,6 +950,10 @@ void Slider::SetValue( float value )
 {
   mValue = value;
   DisplayValue( mValue, true );
+  if (Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+  {
+    Control::Impl::GetAccessibilityObject(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::VALUE);
+  }
 }
 
 float Slider::GetValue() const
@@ -1407,6 +1411,83 @@ Property::Value Slider::GetProperty( BaseObject* object, Property::Index propert
   }
 
   return value;
+}
+
+double Slider::AccessibleImpl::GetMinimum()
+{
+  auto p = Toolkit::Slider::DownCast( self );
+  return p.GetProperty( Toolkit::Slider::Property::LOWER_BOUND ).Get< float >();
+}
+
+double Slider::AccessibleImpl::GetCurrent()
+{
+  auto p = Toolkit::Slider::DownCast( self );
+  return p.GetProperty( Toolkit::Slider::Property::VALUE ).Get< float >();
+}
+
+double Slider::AccessibleImpl::GetMaximum()
+{
+  auto p = Toolkit::Slider::DownCast( self );
+  return p.GetProperty( Toolkit::Slider::Property::UPPER_BOUND ).Get< float >();
+}
+
+bool Slider::AccessibleImpl::SetCurrent( double current )
+{
+  if (current < GetMinimum() || current > GetMaximum())
+    return false;
+
+  auto p = Toolkit::Slider::DownCast( self );
+  auto &impl = Toolkit::GetImpl(p);
+
+  const float prev = p.GetProperty<float>(Toolkit::Slider::Property::VALUE);
+  float next = static_cast<float>(current);
+
+  if (fabsf(next - prev) < Math::MACHINE_EPSILON_0)
+  {
+    // do nothing
+  }
+  else if (p.GetProperty<bool>(Toolkit::Slider::Property::SNAP_TO_MARKS))
+  {
+    auto marks = p.GetProperty<Property::Array>(Toolkit::Slider::Property::MARKS);
+
+    int prevIdx;
+    if (impl.MarkReached(impl.MapValuePercentage(prev), prevIdx))
+    {
+      int nextIdx = prevIdx;
+      nextIdx += (next > prev) ? 1 : -1;
+
+      if (nextIdx < 0 || nextIdx >= static_cast<int>(marks.Count()))
+        return false;
+
+      next = marks[nextIdx].Get<float>();
+    }
+    else
+    {
+      next = impl.MapBounds(impl.SnapToMark(impl.MapValuePercentage(next)), impl.GetLowerBound(), impl.GetUpperBound());
+    }
+  }
+  else
+  {
+    next = impl.MapBounds(impl.MarkFilter(impl.MapValuePercentage(next)), impl.GetLowerBound(), impl.GetUpperBound());
+  }
+
+  impl.SetValue(next);
+  impl.DisplayPopup(next);
+
+  return true;
+}
+
+double Slider::AccessibleImpl::GetMinimumIncrement()
+{
+  auto p = Toolkit::Slider::DownCast( self );
+
+  bool hasMarks = !p.GetProperty<Property::Array>(Toolkit::Slider::Property::MARKS).Empty();
+  float tolerance = p.GetProperty<float>(Toolkit::Slider::Property::MARK_TOLERANCE);
+
+  if (!hasMarks || fabsf(tolerance) < 0.01)
+    return 0.0; // let screen-reader choose the increment
+
+  return Math::MACHINE_EPSILON_10000 + tolerance * (GetMaximum() - GetMinimum());
 }
 
 } // namespace Internal

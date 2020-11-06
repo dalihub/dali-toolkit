@@ -27,6 +27,12 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/devel-api/common/stage.h>
+#include <dali-toolkit/public-api/controls/control.h>
+#include <dali/public-api/object/object-registry.h>
+#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <cstring>
 #include <limits>
 
@@ -39,6 +45,18 @@
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+
+namespace
+{
+  const std::string READING_INFO_TYPE_NAME = "name";
+  const std::string READING_INFO_TYPE_ROLE = "role";
+  const std::string READING_INFO_TYPE_DESCRIPTION = "description";
+  const std::string READING_INFO_TYPE_STATE = "state";
+  const std::string READING_INFO_TYPE_ATTRIBUTE_NAME = "reading_info_type";
+  const std::string READING_INFO_TYPE_SEPARATOR = "|";
+}
 
 namespace Dali
 {
@@ -171,21 +189,64 @@ void MoveVisual( RegisteredVisualContainer::Iterator sourceIter, RegisteredVisua
  * @param[in] attributes The attributes with which to perfrom this action.
  * @return true if action has been accepted by this control
  */
-const char* ACTION_ACCESSIBILITY_ACTIVATED = "accessibilityActivated";
+const char* ACTION_ACCESSIBILITY_ACTIVATED         = "accessibilityActivated";
+const char* ACTION_ACCESSIBILITY_READING_CANCELLED = "ReadingCancelled";
+const char* ACTION_ACCESSIBILITY_READING_PAUSED    = "ReadingPaused";
+const char* ACTION_ACCESSIBILITY_READING_RESUMED   = "ReadingResumed";
+const char* ACTION_ACCESSIBILITY_READING_SKIPPED   = "ReadingSkipped";
+const char* ACTION_ACCESSIBILITY_READING_STOPPED   = "ReadingStopped";
+
 static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
-  bool ret = false;
+  bool ret = true;
 
-  if( object && ( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED ) ) )
+  Dali::BaseHandle handle( object );
+
+  Toolkit::Control control = Toolkit::Control::DownCast( handle );
+
+  DALI_ASSERT_ALWAYS( control );
+
+  if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED ) ||
+     actionName == "activate" )
   {
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-    if( control )
-    {
-      // if cast succeeds there is an implementation so no need to check
-      ret = Internal::GetImplementation( control ).OnAccessibilityActivated();
-    }
+    // if cast succeeds there is an implementation so no need to check
+    if( !DevelControl::AccessibilityActivateSignal( control ).Empty() )
+      DevelControl::AccessibilityActivateSignal( control ).Emit();
+    else ret = Internal::GetImplementation( control ).OnAccessibilityActivated();
   }
-
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_SKIPPED ) )
+  {
+    // if cast succeeds there is an implementation so no need to check
+    if( !DevelControl::AccessibilityReadingSkippedSignal( control ).Empty() )
+      DevelControl::AccessibilityReadingSkippedSignal( control ).Emit();
+  }
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_PAUSED ) )
+  {
+    // if cast succeeds there is an implementation so no need to check
+    if( !DevelControl::AccessibilityReadingPausedSignal( control ).Empty() )
+      DevelControl::AccessibilityReadingPausedSignal( control ).Emit();
+  }
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_RESUMED ) )
+  {
+    // if cast succeeds there is an implementation so no need to check
+    if( !DevelControl::AccessibilityReadingResumedSignal( control ).Empty() )
+      DevelControl::AccessibilityReadingResumedSignal( control ).Emit();
+  }
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_CANCELLED ) )
+  {
+    // if cast succeeds there is an implementation so no need to check
+    if( !DevelControl::AccessibilityReadingCancelledSignal( control ).Empty() )
+      DevelControl::AccessibilityReadingCancelledSignal( control ).Emit();
+  }
+  else if( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_READING_STOPPED ) )
+  {
+    // if cast succeeds there is an implementation so no need to check
+    if(!DevelControl::AccessibilityReadingStoppedSignal( control ).Empty())
+      DevelControl::AccessibilityReadingStoppedSignal( control ).Emit();
+  } else
+  {
+    ret = false;
+  }
   return ret;
 }
 
@@ -205,6 +266,9 @@ const char* SIGNAL_TAPPED = "tapped";
 const char* SIGNAL_PANNED = "panned";
 const char* SIGNAL_PINCHED = "pinched";
 const char* SIGNAL_LONG_PRESSED = "longPressed";
+const char* SIGNAL_GET_NAME = "getName";
+const char* SIGNAL_GET_DESCRIPTION = "getDescription";
+const char* SIGNAL_DO_GESTURE = "doGesture";
 static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
@@ -248,6 +312,19 @@ static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
       controlImpl.EnableGestureDetection( GestureType::LONG_PRESS );
       controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
     }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_GET_NAME ) )
+    {
+      DevelControl::AccessibilityGetNameSignal( control ).Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_GET_DESCRIPTION ) )
+    {
+      DevelControl::AccessibilityGetDescriptionSignal( control ).Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_DO_GESTURE ) )
+    {
+      DevelControl::AccessibilityDoGestureSignal( control ).Connect( tracker, functor );
+    }
+
   }
   return connected;
 }
@@ -271,8 +348,17 @@ SignalConnectorType registerSignal4( typeRegistration, SIGNAL_TAPPED, &DoConnect
 SignalConnectorType registerSignal5( typeRegistration, SIGNAL_PANNED, &DoConnectSignal );
 SignalConnectorType registerSignal6( typeRegistration, SIGNAL_PINCHED, &DoConnectSignal );
 SignalConnectorType registerSignal7( typeRegistration, SIGNAL_LONG_PRESSED, &DoConnectSignal );
+SignalConnectorType registerSignal8( typeRegistration, SIGNAL_GET_NAME, &DoConnectSignal );
+SignalConnectorType registerSignal9( typeRegistration, SIGNAL_GET_DESCRIPTION, &DoConnectSignal );
+SignalConnectorType registerSignal10( typeRegistration, SIGNAL_DO_GESTURE, &DoConnectSignal );
 
-TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &DoAction );
+TypeAction registerAction1( typeRegistration, "activate", &DoAction );
+TypeAction registerAction2( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &DoAction );
+TypeAction registerAction3( typeRegistration, ACTION_ACCESSIBILITY_READING_SKIPPED, &DoAction );
+TypeAction registerAction4( typeRegistration, ACTION_ACCESSIBILITY_READING_CANCELLED, &DoAction );
+TypeAction registerAction5( typeRegistration, ACTION_ACCESSIBILITY_READING_STOPPED, &DoAction );
+TypeAction registerAction6( typeRegistration, ACTION_ACCESSIBILITY_READING_PAUSED, &DoAction );
+TypeAction registerAction7( typeRegistration, ACTION_ACCESSIBILITY_READING_RESUMED, &DoAction );
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -311,7 +397,13 @@ const PropertyRegistration Control::Impl::PROPERTY_12( typeRegistration, "rightF
 const PropertyRegistration Control::Impl::PROPERTY_13( typeRegistration, "upFocusableActorId",    Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,   Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_14( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_15( typeRegistration, "shadow",                Toolkit::DevelControl::Property::SHADOW,                  Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-
+const PropertyRegistration Control::Impl::PROPERTY_16( typeRegistration, "accessibilityAttributes",         Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES,         Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_17( typeRegistration, "accessibilityName",              Toolkit::DevelControl::Property::ACCESSIBILITY_NAME,               Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_18( typeRegistration, "accessibilityDescription",       Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION,         Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_19( typeRegistration, "accessibilityTranslationDomain", Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN, Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_20( typeRegistration, "accessibilityRole",              Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE,               Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_21( typeRegistration, "accessibilityHighlightable",     Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE,      Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_22( typeRegistration, "accessibilityAnimated",          Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED,      Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Control::Impl::Impl( Control& controlImpl )
 : mControlImpl( controlImpl ),
@@ -331,6 +423,9 @@ Control::Impl::Impl( Control& controlImpl )
   mKeyInputFocusLostSignal(),
   mResourceReadySignal(),
   mVisualEventSignal(),
+  mAccessibilityGetNameSignal(),
+  mAccessibilityGetDescriptionSignal(),
+  mAccessibilityDoGestureSignal(),
   mPinchGestureDetector(),
   mPanGestureDetector(),
   mTapGestureDetector(),
@@ -344,10 +439,27 @@ Control::Impl::Impl( Control& controlImpl )
   mIsEmittingResourceReadySignal(false),
   mNeedToEmitResourceReady(false)
 {
+  Dali::Accessibility::Accessible::RegisterControlAccessibilityGetter(
+      []( Dali::Actor actor ) -> Dali::Accessibility::Accessible* {
+        return Control::Impl::GetAccessibilityObject( actor );
+      } );
+
+  accessibilityConstructor =  []( Dali::Actor actor ) -> std::unique_ptr< Dali::Accessibility::Accessible > {
+        return std::unique_ptr< Dali::Accessibility::Accessible >( new AccessibleImpl( actor,
+                                Dali::Accessibility::Role::UNKNOWN ) );
+      };
+
+  size_t len = static_cast<size_t>(Dali::Accessibility::RelationType::MAX_COUNT);
+  mAccessibilityRelations.reserve(len);
+  for (auto i = 0u; i < len; ++i)
+  {
+    mAccessibilityRelations.push_back({});
+  }
 }
 
 Control::Impl::~Impl()
 {
+  AccessibilityDeregister();
   // All gesture detectors will be destroyed so no need to disconnect.
   delete mStartingPinchScale;
 
@@ -827,6 +939,20 @@ void Control::Impl::DoAction( Dali::Property::Index visualIndex, Dali::Property:
   }
 }
 
+void Control::Impl::AppendAccessibilityAttribute( const std::string& key,
+                                               const std::string value )
+{
+  Property::Value* val = mAccessibilityAttributes.Find( key );
+  if( val )
+  {
+    mAccessibilityAttributes[key] = Property::Value( value );
+  }
+  else
+  {
+    mAccessibilityAttributes.Insert( key, value );
+  }
+}
+
 void Control::Impl::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
@@ -896,6 +1022,76 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         if( value.Get( focusId ) )
         {
           controlImpl.mImpl->mRightFocusableActorId = focusId;
+        }
+      }
+      break;
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
+      {
+        std::string name;
+        if( value.Get( name ) )
+        {
+          controlImpl.mImpl->mAccessibilityName = name;
+          controlImpl.mImpl->mAccessibilityNameSet = true;
+        }
+        else
+        {
+          controlImpl.mImpl->mAccessibilityNameSet = false;
+        }
+      }
+      break;
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
+      {
+        std::string txt;
+        if( value.Get( txt ) )
+        {
+          controlImpl.mImpl->mAccessibilityDescription = txt;
+          controlImpl.mImpl->mAccessibilityDescriptionSet = true;
+        }
+        else
+        {
+          controlImpl.mImpl->mAccessibilityDescriptionSet = false;
+        }
+      }
+      break;
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN:
+      {
+        std::string txt;
+        if( value.Get( txt ) )
+        {
+          controlImpl.mImpl->mAccessibilityTranslationDomain = txt;
+          controlImpl.mImpl->mAccessibilityTranslationDomainSet = true;
+        }
+        else
+        {
+          controlImpl.mImpl->mAccessibilityTranslationDomainSet = false;
+        }
+      }
+      break;
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
+      {
+        bool highlightable;
+        if( value.Get( highlightable ) )
+        {
+          controlImpl.mImpl->mAccessibilityHighlightable = highlightable;
+          controlImpl.mImpl->mAccessibilityHighlightableSet = true;
+        }
+        else
+        {
+          controlImpl.mImpl->mAccessibilityHighlightableSet = false;
+        }
+      }
+      break;
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
+      {
+        Dali::Accessibility::Role val;
+        if( value.Get( val ) )
+        {
+          controlImpl.mImpl->mAccessibilityRole = val;
         }
       }
       break;
@@ -1009,6 +1205,17 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         break;
       }
 
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
+      {
+        value.Get( controlImpl.mImpl->mAccessibilityAttributes );
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED:
+      {
+        value.Get( controlImpl.mImpl->mAccessibilityAnimated );
+        break;
+      }
     }
   }
 }
@@ -1052,6 +1259,48 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
       case Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID:
       {
         value = controlImpl.mImpl->mRightFocusableActorId;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
+      {
+        if (controlImpl.mImpl->mAccessibilityNameSet)
+        {
+          value = controlImpl.mImpl->mAccessibilityName;
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
+      {
+        if (controlImpl.mImpl->mAccessibilityDescriptionSet)
+        {
+          value = controlImpl.mImpl->mAccessibilityDescription;
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN:
+      {
+        if (controlImpl.mImpl->mAccessibilityTranslationDomainSet)
+        {
+          value = controlImpl.mImpl->mAccessibilityTranslationDomain;
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
+      {
+        if (controlImpl.mImpl->mAccessibilityHighlightableSet)
+        {
+          value = controlImpl.mImpl->mAccessibilityHighlightable;
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
+      {
+        value = Property::Value(controlImpl.mImpl->mAccessibilityRole);
         break;
       }
 
@@ -1121,12 +1370,105 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
         value = map;
         break;
       }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
+      {
+        value = controlImpl.mImpl->mAccessibilityAttributes;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED:
+      {
+        value = controlImpl.mImpl->mAccessibilityAnimated;
+        break;
+      }
     }
   }
 
   return value;
 }
 
+void Control::Impl::RemoveAccessibilityAttribute( const std::string& key )
+{
+  Property::Value* val = mAccessibilityAttributes.Find( key );
+  if( val )
+    mAccessibilityAttributes[key] = Property::Value();
+}
+
+void Control::Impl::ClearAccessibilityAttributes()
+{
+  mAccessibilityAttributes.Clear();
+}
+
+void Control::Impl::SetAccessibilityReadingInfoType( const Dali::Accessibility::ReadingInfoTypes types )
+{
+  std::string value;
+  if ( types[ Dali::Accessibility::ReadingInfoType::NAME ] )
+  {
+    value += READING_INFO_TYPE_NAME;
+  }
+  if ( types[ Dali::Accessibility::ReadingInfoType::ROLE ] )
+  {
+    if( !value.empty() )
+    {
+      value += READING_INFO_TYPE_SEPARATOR;
+    }
+    value += READING_INFO_TYPE_ROLE;
+  }
+  if ( types[ Dali::Accessibility::ReadingInfoType::DESCRIPTION ] )
+  {
+    if( !value.empty() )
+    {
+      value += READING_INFO_TYPE_SEPARATOR;
+    }
+    value += READING_INFO_TYPE_DESCRIPTION;
+  }
+  if ( types[ Dali::Accessibility::ReadingInfoType::STATE ] )
+  {
+    if( !value.empty() )
+    {
+      value += READING_INFO_TYPE_SEPARATOR;
+    }
+    value += READING_INFO_TYPE_STATE;
+  }
+  AppendAccessibilityAttribute( READING_INFO_TYPE_ATTRIBUTE_NAME, value );
+}
+
+Dali::Accessibility::ReadingInfoTypes Control::Impl::GetAccessibilityReadingInfoType() const
+{
+  std::string value;
+  auto place = mAccessibilityAttributes.Find( READING_INFO_TYPE_ATTRIBUTE_NAME );
+  if( place )
+  {
+    place->Get( value );
+  }
+
+  if ( value.empty() )
+  {
+    return {};
+  }
+
+  Dali::Accessibility::ReadingInfoTypes types;
+
+  if ( value.find( READING_INFO_TYPE_NAME ) != std::string::npos )
+  {
+    types[ Dali::Accessibility::ReadingInfoType::NAME ] = true;
+  }
+  if ( value.find( READING_INFO_TYPE_ROLE ) != std::string::npos )
+  {
+    types[ Dali::Accessibility::ReadingInfoType::ROLE ] = true;
+  }
+  if ( value.find( READING_INFO_TYPE_DESCRIPTION ) != std::string::npos )
+  {
+    types[ Dali::Accessibility::ReadingInfoType::DESCRIPTION ] = true;
+  }
+  if ( value.find( READING_INFO_TYPE_STATE ) != std::string::npos )
+  {
+    types[ Dali::Accessibility::ReadingInfoType::STATE ] = true;
+  }
+
+  return types;
+}
 
 void  Control::Impl::CopyInstancedProperties( RegisteredVisualContainer& visuals, Dictionary<Property::Map>& instancedProperties )
 {
@@ -1510,6 +1852,455 @@ void Control::Impl::OnIdleCallback()
 
   // Set the pointer to null as the callback manager deletes the callback after execute it.
   mIdleCallback = nullptr;
+}
+
+Dali::Accessibility::Accessible *Control::Impl::GetAccessibilityObject()
+{
+  if( !accessibilityObject )
+    accessibilityObject = accessibilityConstructor( mControlImpl.Self() );
+  return accessibilityObject.get();
+}
+
+Dali::Accessibility::Accessible *Control::Impl::GetAccessibilityObject(Dali::Actor actor)
+{
+  if( actor )
+  {
+    auto q = Dali::Toolkit::Control::DownCast( actor );
+    if( q )
+    {
+      auto q2 = static_cast< Internal::Control* >( &q.GetImplementation() );
+      return q2->mImpl->GetAccessibilityObject();
+    }
+  }
+  return nullptr;
+}
+
+Control::Impl::AccessibleImpl::AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal)
+  : self(self), modal(modal)
+{
+  auto control = Dali::Toolkit::Control::DownCast(self);
+
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
+  if( controlImpl.mAccessibilityRole == Dali::Accessibility::Role::UNKNOWN )
+    controlImpl.mAccessibilityRole = role;
+
+  self.PropertySetSignal().Connect(&controlImpl, [this, &controlImpl](Dali::Handle &handle, Dali::Property::Index index, Dali::Property::Value value)
+  {
+    if (this->self != Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+    {
+      return;
+    }
+
+    if (index == DevelControl::Property::ACCESSIBILITY_NAME
+      || (index == GetNamePropertyIndex() && !controlImpl.mAccessibilityNameSet))
+    {
+      if (controlImpl.mAccessibilityGetNameSignal.Empty())
+      {
+        Emit(Dali::Accessibility::ObjectPropertyChangeEvent::NAME);
+      }
+    }
+
+    if (index == DevelControl::Property::ACCESSIBILITY_DESCRIPTION
+      || (index == GetDescriptionPropertyIndex() && !controlImpl.mAccessibilityDescriptionSet))
+    {
+      if (controlImpl.mAccessibilityGetDescriptionSignal.Empty())
+      {
+        Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+      }
+    }
+  });
+}
+
+std::string Control::Impl::AccessibleImpl::GetName()
+{
+  auto control = Dali::Toolkit::Control::DownCast(self);
+
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
+
+  if (!controlImpl.mAccessibilityGetNameSignal.Empty()) {
+      std::string ret;
+      controlImpl.mAccessibilityGetNameSignal.Emit(ret);
+      return ret;
+  }
+
+  if (controlImpl.mAccessibilityNameSet)
+    return controlImpl.mAccessibilityName;
+
+  if (auto raw = GetNameRaw(); !raw.empty())
+    return raw;
+
+  return self.GetProperty< std::string >( Actor::Property::NAME );
+}
+
+std::string Control::Impl::AccessibleImpl::GetNameRaw()
+{
+  return {};
+}
+
+std::string Control::Impl::AccessibleImpl::GetDescription()
+{
+  auto control = Dali::Toolkit::Control::DownCast(self);
+
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
+
+  if (!controlImpl.mAccessibilityGetDescriptionSignal.Empty()) {
+      std::string ret;
+      controlImpl.mAccessibilityGetDescriptionSignal.Emit(ret);
+      return ret;
+  }
+
+  if (controlImpl.mAccessibilityDescriptionSet)
+    return controlImpl.mAccessibilityDescription;
+
+  return GetDescriptionRaw();
+}
+
+std::string Control::Impl::AccessibleImpl::GetDescriptionRaw()
+{
+  return "";
+}
+
+Dali::Accessibility::Accessible* Control::Impl::AccessibleImpl::GetParent()
+{
+  return Dali::Accessibility::Accessible::Get( self.GetParent() );
+}
+
+size_t Control::Impl::AccessibleImpl::GetChildCount()
+{
+  return self.GetChildCount();
+}
+
+Dali::Accessibility::Accessible* Control::Impl::AccessibleImpl::GetChildAtIndex( size_t index )
+{
+  return Dali::Accessibility::Accessible::Get( self.GetChildAt( static_cast< unsigned int >( index ) ) );
+}
+
+size_t Control::Impl::AccessibleImpl::GetIndexInParent()
+{
+  auto s = self;
+  auto parent = s.GetParent();
+  DALI_ASSERT_ALWAYS( parent && "can't call GetIndexInParent on object without parent" );
+  auto count = parent.GetChildCount();
+  for( auto i = 0u; i < count; ++i )
+  {
+    auto c = parent.GetChildAt( i );
+    if( c == s )
+      return i;
+  }
+  DALI_ASSERT_ALWAYS( false && "object isn't child of it's parent" );
+  return static_cast<size_t>(-1);
+}
+
+Dali::Accessibility::Role Control::Impl::AccessibleImpl::GetRole()
+{
+  return self.GetProperty<Dali::Accessibility::Role>( Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE );
+}
+
+Dali::Accessibility::States Control::Impl::AccessibleImpl::CalculateStates()
+{
+  Dali::Accessibility::States s;
+  s[Dali::Accessibility::State::FOCUSABLE] = self.GetProperty< bool >( Actor::Property::KEYBOARD_FOCUSABLE );
+  s[Dali::Accessibility::State::FOCUSED] = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
+  if(self.GetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE ).GetType() == Property::NONE )
+    s[Dali::Accessibility::State::HIGHLIGHTABLE] = false;
+  else
+    s[Dali::Accessibility::State::HIGHLIGHTABLE] = self.GetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE ).Get< bool >();
+  s[Dali::Accessibility::State::HIGHLIGHTED] = GetCurrentlyHighlightedActor() == self;
+  s[Dali::Accessibility::State::ENABLED] = true;
+  s[Dali::Accessibility::State::SENSITIVE] = true;
+  s[Dali::Accessibility::State::ANIMATED] = self.GetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED ).Get< bool >();
+  s[Dali::Accessibility::State::VISIBLE] = true;
+  if( modal )
+  {
+    s[Dali::Accessibility::State::MODAL] = true;
+  }
+  s[Dali::Accessibility::State::SHOWING] = !self.GetProperty( Dali::DevelActor::Property::CULLED ).Get< bool >()
+                                         && self.GetCurrentProperty< bool >( Actor::Property::VISIBLE );
+
+  s[Dali::Accessibility::State::DEFUNCT] = !self.GetProperty( Dali::DevelActor::Property::CONNECTED_TO_SCENE ).Get< bool >();
+  return s;
+}
+
+Dali::Accessibility::States Control::Impl::AccessibleImpl::GetStates()
+{
+  return CalculateStates();
+}
+
+Dali::Accessibility::Attributes Control::Impl::AccessibleImpl::GetAttributes()
+{
+  std::unordered_map< std::string, std::string > attribute_map;
+  auto q = Dali::Toolkit::Control::DownCast( self );
+  auto w =
+      q.GetProperty( Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES );
+  auto z = w.GetMap();
+
+  if( z )
+  {
+    auto map_size = z->Count();
+
+    for( unsigned int i = 0; i < map_size; i++ )
+    {
+      auto map_key = z->GetKeyAt( i );
+      if( map_key.type == Property::Key::STRING )
+      {
+        std::string map_value;
+        if( z->GetValue( i ).Get( map_value ) )
+        {
+          attribute_map.emplace( std::move( map_key.stringKey ),
+                                 std::move( map_value ) );
+        }
+      }
+    }
+  }
+
+  return attribute_map;
+}
+
+Dali::Accessibility::ComponentLayer Control::Impl::AccessibleImpl::GetLayer()
+{
+  return Dali::Accessibility::ComponentLayer::WINDOW;
+}
+
+Dali::Rect<> Control::Impl::AccessibleImpl::GetExtents( Dali::Accessibility::CoordType ctype )
+{
+  Vector2 screenPosition =
+      self.GetProperty( Dali::DevelActor::Property::SCREEN_POSITION )
+          .Get< Vector2 >();
+  auto size = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) * self.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_SCALE );
+  bool positionUsesAnchorPoint =
+      self.GetProperty( Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT )
+          .Get< bool >();
+  Vector3 anchorPointOffSet =
+      size * ( positionUsesAnchorPoint ? self.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT )
+                                       : AnchorPoint::TOP_LEFT );
+  Vector2 position = Vector2( screenPosition.x - anchorPointOffSet.x,
+                              screenPosition.y - anchorPointOffSet.y );
+
+  return { position.x, position.y, size.x, size.y };
+}
+
+int16_t Control::Impl::AccessibleImpl::GetMdiZOrder() { return 0; }
+double Control::Impl::AccessibleImpl::GetAlpha() { return 0; }
+
+bool Control::Impl::AccessibleImpl::GrabFocus()
+{
+  return Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( self );
+}
+
+const char* const FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "keyboard_focus.9.png";
+
+static Dali::Actor CreateHighlightIndicatorActor()
+{
+  // Create the default if it hasn't been set and one that's shared by all the
+  // keyboard focusable actors const char* const FOCUS_BORDER_IMAGE_PATH =
+  // DALI_IMAGE_DIR "keyboard_focus.9.png";
+  auto actor = Toolkit::ImageView::New( FOCUS_BORDER_IMAGE_PATH );
+  actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  DevelControl::AppendAccessibilityAttribute( actor, "highlight", "" );
+  actor.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED, true);
+  actor.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false );
+
+  return actor;
+}
+
+bool Control::Impl::AccessibleImpl::GrabHighlight()
+{
+  auto old = GetCurrentlyHighlightedActor();
+
+  if( !Dali::Accessibility::IsUp() )
+      return false;
+  if( self == old )
+    return true;
+  if( old )
+  {
+    auto c = dynamic_cast< Dali::Accessibility::Component* >( GetAccessibilityObject( old ) );
+    if( c )
+      c->ClearHighlight();
+  }
+  auto highlight = GetHighlightActor();
+  if ( !highlight )
+  {
+    highlight = CreateHighlightIndicatorActor();
+    SetHighlightActor( highlight );
+  }
+  highlight.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  highlight.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  highlight.SetProperty( Actor::Property::POSITION_Z, 1.0f );
+  highlight.SetProperty( Actor::Property::POSITION, Vector2( 0.0f, 0.0f ));
+
+  EnsureSelfVisible();
+  self.Add( highlight );
+  SetCurrentlyHighlightedActor( self );
+  EmitHighlighted( true );
+
+  return true;
+}
+
+
+
+bool Control::Impl::AccessibleImpl::ClearHighlight()
+{
+  if( !Dali::Accessibility::IsUp() )
+    return false;
+  if( GetCurrentlyHighlightedActor() == self )
+  {
+    self.Remove( GetHighlightActor() );
+    SetCurrentlyHighlightedActor( {} );
+    EmitHighlighted( false );
+    return true;
+  }
+  return false;
+}
+
+std::string Control::Impl::AccessibleImpl::GetActionName( size_t index )
+{
+  if ( index >= GetActionCount() ) return "";
+  Dali::TypeInfo type;
+  self.GetTypeInfo( type );
+  DALI_ASSERT_ALWAYS( type && "no TypeInfo object" );
+  return type.GetActionName( index );
+}
+std::string Control::Impl::AccessibleImpl::GetLocalizedActionName( size_t index )
+{
+  // TODO: add localization
+  return GetActionName( index );
+}
+std::string Control::Impl::AccessibleImpl::GetActionDescription( size_t index )
+{
+  return "";
+}
+size_t Control::Impl::AccessibleImpl::GetActionCount()
+{
+  Dali::TypeInfo type;
+  self.GetTypeInfo( type );
+  DALI_ASSERT_ALWAYS( type && "no TypeInfo object" );
+  return type.GetActionCount();
+}
+std::string Control::Impl::AccessibleImpl::GetActionKeyBinding( size_t index )
+{
+  return "";
+}
+bool Control::Impl::AccessibleImpl::DoAction( size_t index )
+{
+  std::string actionName = GetActionName( index );
+  return self.DoAction( actionName, {} );
+}
+bool Control::Impl::AccessibleImpl::DoAction(const std::string& name)
+{
+  return self.DoAction( name, {} );
+}
+
+bool Control::Impl::AccessibleImpl::DoGesture(const Dali::Accessibility::GestureInfo &gestureInfo)
+{
+  auto control = Dali::Toolkit::Control::DownCast(self);
+
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
+
+  if (!controlImpl.mAccessibilityDoGestureSignal.Empty()) {
+      auto ret = std::make_pair(gestureInfo, false);
+      controlImpl.mAccessibilityDoGestureSignal.Emit(ret);
+      return ret.second;
+  }
+
+  return false;
+}
+
+std::vector<Dali::Accessibility::Relation> Control::Impl::AccessibleImpl::GetRelationSet()
+{
+  auto control = Dali::Toolkit::Control::DownCast(self);
+
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
+
+  std::vector<Dali::Accessibility::Relation> ret;
+
+  auto &v = controlImpl.mAccessibilityRelations;
+  for (auto i = 0u; i < v.size(); ++i)
+  {
+    if ( v[i].empty() )
+      continue;
+
+    ret.emplace_back( Accessibility::Relation{ static_cast<Accessibility::RelationType>(i), v[i] } );
+  }
+
+  return ret;
+}
+
+void Control::Impl::AccessibleImpl::EnsureChildVisible(Actor child)
+{
+}
+
+void Control::Impl::AccessibleImpl::EnsureSelfVisible()
+{
+  auto parent = dynamic_cast<Control::Impl::AccessibleImpl*>(GetParent());
+  if (parent)
+  {
+    parent->EnsureChildVisible(self);
+  }
+}
+
+Property::Index Control::Impl::AccessibleImpl::GetNamePropertyIndex()
+{
+  return Actor::Property::NAME;
+}
+
+Property::Index Control::Impl::AccessibleImpl::GetDescriptionPropertyIndex()
+{
+  return Property::INVALID_INDEX;
+}
+
+void Control::Impl::PositionOrSizeChangedCallback( PropertyNotification &p )
+{
+  auto self = Dali::Actor::DownCast(p.GetTarget());
+  if (Dali::Accessibility::IsUp() && !self.GetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED ).Get< bool >())
+  {
+    auto extents = DevelActor::CalculateScreenExtents( self );
+    Dali::Accessibility::Accessible::Get( self )->EmitBoundsChanged( extents );
+  }
+}
+
+void Control::Impl::CulledChangedCallback( PropertyNotification &p)
+{
+  if (Dali::Accessibility::IsUp())
+  {
+    auto self = Dali::Actor::DownCast(p.GetTarget());
+    Dali::Accessibility::Accessible::Get(self)->EmitShowing( !self.GetProperty( DevelActor::Property::CULLED ).Get<bool>() );
+  }
+}
+
+void Control::Impl::AccessibilityRegister()
+{
+  if (!accessibilityNotificationSet)
+  {
+    accessibilityNotificationPosition = mControlImpl.Self().AddPropertyNotification( Actor::Property::POSITION, StepCondition( 0.01f ) );
+    accessibilityNotificationPosition.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
+    accessibilityNotificationPosition.NotifySignal().Connect( &Control::Impl::PositionOrSizeChangedCallback );
+
+    accessibilityNotificationSize = mControlImpl.Self().AddPropertyNotification( Actor::Property::SIZE, StepCondition( 0.01f ) );
+    accessibilityNotificationSize.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
+    accessibilityNotificationSize.NotifySignal().Connect( &Control::Impl::PositionOrSizeChangedCallback );
+
+    accessibilityNotificationCulled = mControlImpl.Self().AddPropertyNotification( DevelActor::Property::CULLED, LessThanCondition( 0.5f ) );
+    accessibilityNotificationCulled.SetNotifyMode( PropertyNotification::NOTIFY_ON_CHANGED );
+    accessibilityNotificationCulled.NotifySignal().Connect( &Control::Impl::CulledChangedCallback );
+
+    accessibilityNotificationSet = true;
+  }
+}
+
+void Control::Impl::AccessibilityDeregister()
+{
+  if (accessibilityNotificationSet)
+  {
+    accessibilityNotificationPosition = {};
+    accessibilityNotificationSize = {};
+    accessibilityNotificationCulled = {};
+    accessibilityNotificationSet = false;
+  }
 }
 
 } // namespace Internal

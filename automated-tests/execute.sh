@@ -118,7 +118,7 @@ else
         do
             echo -e "$ASCII_BOLD"
             echo -e "Executing $mod$ASCII_RESET"
-            build/src/$mod/tct-$mod-core $opt_serial $opt_noFailedRerun
+            dbus-launch build/src/$mod/tct-$mod-core $opt_serial $opt_noFailedRerun
         done
         summary_end
 
@@ -128,7 +128,7 @@ else
         summary_start
         module=$1
         shift;
-        build/src/$module/tct-$module-core $opt_serial $opt_noFailedRerun $*
+        dbus-launch build/src/$module/tct-$module-core $opt_serial $opt_noFailedRerun $*
         summary_end
 
     else
@@ -141,7 +141,7 @@ else
             if [ $ret -ne 6 ] ; then
                 if [ $opt_debug -ne 0 ] ; then
                     echo DEBUGGING:
-                    gdb --args build/src/$mod/tct-$mod-core $1
+                    dbus-launch gdb --args build/src/$mod/tct-$mod-core $1
 
                 else
                     echo $output

@@ -125,7 +125,7 @@ SvgRasterizeThread* VisualFactoryCache::GetSVGRasterizationThread()
 {
   if( !mSvgRasterizeThread )
   {
-    mSvgRasterizeThread = new SvgRasterizeThread( new EventThreadCallback( MakeCallback( this, &VisualFactoryCache::ApplyRasterizedSVGToSampler ) ) );
+    mSvgRasterizeThread = new SvgRasterizeThread();
     mSvgRasterizeThread->Start();
   }
   return mSvgRasterizeThread;
@@ -138,14 +138,6 @@ VectorAnimationManager& VisualFactoryCache::GetVectorAnimationManager()
     mVectorAnimationManager = std::unique_ptr< VectorAnimationManager >( new VectorAnimationManager() );
   }
   return *mVectorAnimationManager;
-}
-
-void VisualFactoryCache::ApplyRasterizedSVGToSampler()
-{
-  while( RasterizingTaskPtr task = mSvgRasterizeThread->NextCompletedTask() )
-  {
-    task->GetSvgVisual()->ApplyRasterizedImage(task->GetVectorRenderer(), task->GetPixelData(), task->IsLoaded());
-  }
 }
 
 Geometry VisualFactoryCache::CreateGridGeometry( Uint16Pair gridSize )

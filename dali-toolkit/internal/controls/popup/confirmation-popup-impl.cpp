@@ -23,6 +23,9 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <cstring>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+
 namespace Dali
 {
 

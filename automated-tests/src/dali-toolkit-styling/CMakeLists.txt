@@ -10,11 +10,10 @@ SET(TC_SOURCES
    utc-Dali-StyleManager.cpp
 )
 
-# Append list of test harness files (Won't get parsed for test cases)
-LIST(APPEND TC_SOURCES
+# List of test harness files (Won't get parsed for test cases)
+SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-harness.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-adaptor.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-color-controller.cpp
@@ -55,6 +54,7 @@ LIST(APPEND TC_SOURCES
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
   dali2-core
+  dali2-adaptor
   dali2-toolkit
 )
 
@@ -74,7 +74,14 @@ INCLUDE_DIRECTORIES(
     ../dali-toolkit/dali-toolkit-test-utils
 )
 
-ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
+ADD_CUSTOM_COMMAND(
+  COMMAND ../../scripts/tcheadgen.sh ${EXEC_NAME}.h ${TC_SOURCES}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  OUTPUT  ${EXEC_NAME}.h
+  COMMENT "Generating test tables"
+  )
+
+ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.h ${EXEC_NAME}.cpp ${TC_SOURCES} ${TEST_HARNESS_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
   ${${CAPI_LIB}_LIBRARIES}
   -lpthread -ldl --coverage

@@ -23,6 +23,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <toolkit-adaptor-impl.h>
+#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include "test-application.h"
+
+//#undef assert
 
 namespace Dali
 {
