@@ -67,6 +67,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollPosition",          VECTOR2
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollSize",              VECTOR2, SCROLL_SIZE                )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "contentSize",             VECTOR2, CONTENT_SIZE               )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "title",                   STRING,  TITLE                      )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "videoHoleEnabled",        BOOLEAN, VIDEO_HOLE_ENABLED         )
 
 DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadStarted",         PAGE_LOAD_STARTED_SIGNAL            )
 DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadFinished",        PAGE_LOAD_FINISHED_SIGNAL           )
@@ -138,7 +139,9 @@ WebView::WebView( const std::string& locale, const std::string& timezoneId )
   mWebEngine(),
   mPageLoadStartedSignal(),
   mPageLoadFinishedSignal(),
-  mPageLoadErrorSignal()
+  mPageLoadErrorSignal(),
+  mVideoHoleEnabled( true ),
+  mWebViewArea ( 0, 0, mWebViewSize.width, mWebViewSize.height )
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -157,7 +160,9 @@ WebView::WebView( int argc, char** argv )
   mWebEngine(),
   mPageLoadStartedSignal(),
   mPageLoadFinishedSignal(),
-  mPageLoadErrorSignal()
+  mPageLoadErrorSignal(),
+  mVideoHoleEnabled( true ),
+  mWebViewArea ( 0, 0, mWebViewSize.width, mWebViewSize.height )
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -175,6 +180,10 @@ WebView::WebView()
 
 WebView::~WebView()
 {
+  if( mWebEngine )
+  {
+    mWebEngine.Destroy();
+  }
 }
 
 Toolkit::WebView WebView::New()
@@ -206,8 +215,17 @@ Toolkit::WebView WebView::New( int argc, char** argv )
 
 void WebView::OnInitialize()
 {
-  Self().SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
-  Self().TouchedSignal().Connect( this, &WebView::OnTouchEvent );
+  Actor self = Self();
+
+  self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
+  self.TouchedSignal().Connect( this, &WebView::OnTouchEvent );
+
+  mPositionUpdateNotification = self.AddPropertyNotification( Actor::Property::WORLD_POSITION, StepCondition( 1.0f, 1.0f ) );
+  mSizeUpdateNotification = self.AddPropertyNotification( Actor::Property::SIZE, StepCondition( 1.0f, 1.0f ) );
+  mScaleUpdateNotification = self.AddPropertyNotification( Actor::Property::WORLD_SCALE, StepCondition( 0.1f, 1.0f ) );
+  mPositionUpdateNotification.NotifySignal().Connect( this, &WebView::UpdateDisplayArea );
+  mSizeUpdateNotification.NotifySignal().Connect( this, &WebView::UpdateDisplayArea );
+  mScaleUpdateNotification.NotifySignal().Connect( this, &WebView::UpdateDisplayArea );
 
   if( mWebEngine )
   {
@@ -269,6 +287,11 @@ void WebView::LoadUrl( const std::string& url )
       DevelControl::RegisterVisual( *this, Toolkit::WebView::Property::URL, mVisual );
       mWebEngine.LoadUrl( url );
     }
+
+    if ( mVideoHoleEnabled )
+    {
+      EnableBlendMode( false );
+    }
   }
 }
 
@@ -282,6 +305,11 @@ void WebView::LoadHtmlString( const std::string& htmlString )
     {
       DevelControl::RegisterVisual( *this, Toolkit::WebView::Property::URL, mVisual );
       mWebEngine.LoadHtmlString( htmlString );
+    }
+
+    if ( mVideoHoleEnabled )
+    {
+      EnableBlendMode( false );
     }
   }
 }
@@ -384,6 +412,59 @@ void WebView::ClearHistory()
   }
 }
 
+void WebView::UpdateDisplayArea( Dali::PropertyNotification& /*source*/ )
+{
+  if( !mWebEngine )
+    return;
+
+  Actor self( Self() );
+
+  bool positionUsesAnchorPoint = self.GetProperty< bool >( Actor::Property::POSITION_USES_ANCHOR_POINT );
+  Vector3 actorSize = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) * self.GetCurrentProperty< Vector3 >( Actor::Property::SCALE );
+  Vector3 anchorPointOffSet = actorSize * ( positionUsesAnchorPoint ? self.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ) : AnchorPoint::TOP_LEFT );
+  Vector2 screenPosition = self.GetProperty< Vector2 >( Actor::Property::SCREEN_POSITION );
+
+  Dali::Rect< int > displayArea;
+  displayArea.x = screenPosition.x - anchorPointOffSet.x;
+  displayArea.y = screenPosition.y - anchorPointOffSet.y;
+  displayArea.width = actorSize.x;
+  displayArea.height = actorSize.y;
+
+  Size displaySize = Size( displayArea.width, displayArea.height );
+  if ( mWebViewSize != displaySize )
+  {
+    mWebViewSize = displaySize;
+  }
+
+  if (mWebViewArea != displayArea )
+  {
+    mWebViewArea = displayArea;
+    mWebEngine.UpdateDisplayArea( mWebViewArea );
+  }
+}
+
+void WebView::EnableVideoHole( bool enabled )
+{
+  mVideoHoleEnabled = enabled;
+
+  EnableBlendMode( !mVideoHoleEnabled );
+
+  if( mWebEngine )
+  {
+    mWebEngine.EnableVideoHole( mVideoHoleEnabled );
+  }
+}
+
+void WebView::EnableBlendMode( bool blendEnabled )
+{
+  Actor self = Self();
+  for (uint32_t i = 0; i < self.GetRendererCount(); i++)
+  {
+    Dali::Renderer render = self.GetRendererAt( i );
+    render.SetProperty( Renderer::Property::BLEND_MODE, blendEnabled ? BlendMode::ON : BlendMode::OFF );
+  }
+}
+
 Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
 {
   return mPageLoadStartedSignal;
@@ -483,19 +564,11 @@ Vector3 WebView::GetNaturalSize()
   return Vector3( mWebViewSize );
 }
 
-void WebView::OnRelayout( const Vector2& size, RelayoutContainer& container )
+void WebView::OnSceneConnection( int depth )
 {
-  Control::OnRelayout( size, container );
+  Control::OnSceneConnection( depth );
 
-  if( size.width > 0 && size.height > 0 && mWebViewSize != size )
-  {
-    mWebViewSize = size;
-
-    if( mWebEngine )
-    {
-      mWebEngine.SetSize( size.width, size.height );
-    }
-  }
+  EnableBlendMode( !mVideoHoleEnabled );
 }
 
 void WebView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
@@ -531,6 +604,15 @@ void WebView::SetProperty( BaseObject* object, Property::Index index, const Prop
         if ( value.Get( input ) )
         {
           impl.SetScrollPosition( input.x, input.y );
+        }
+        break;
+      }
+      case Toolkit::WebView::Property::VIDEO_HOLE_ENABLED:
+      {
+        bool input;
+        if( value.Get( input ) )
+        {
+          impl.EnableVideoHole( input );
         }
         break;
       }
@@ -583,6 +665,11 @@ Property::Value WebView::GetProperty( BaseObject* object, Property::Index proper
       case Toolkit::WebView::Property::TITLE:
       {
         value = impl.GetTitle();
+        break;
+      }
+      case Toolkit::WebView::Property::VIDEO_HOLE_ENABLED:
+      {
+        value = impl.mVideoHoleEnabled;
         break;
       }
       default:

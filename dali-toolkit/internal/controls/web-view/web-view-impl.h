@@ -22,6 +22,7 @@
 #include <memory>
 #include <dali/devel-api/adaptor-framework/web-engine.h>
 #include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/object/property-notification.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
@@ -241,11 +242,6 @@ private: // From Control
   Vector3 GetNaturalSize() override;
 
   /**
-   * @copydoc Toolkit::Control::OnRelayout()
-   */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
-
-  /**
    * Signal occurs when the Web View has been touched.
    * @param[in] actor The Actor Touched
    * @param[in] touch The Touch Data.
@@ -267,6 +263,11 @@ private: // From Control
    * @copydoc Toolkit::Control::OnKeyInputFocusLost()
    */
   void OnKeyInputFocusLost() override;
+
+  /**
+   * @copydoc Toolkit::Control::OnSceneConnection()
+   */
+  void OnSceneConnection( int depth ) override;
 
 private:
 
@@ -323,6 +324,24 @@ private:
   void SetUserAgent( const std::string& userAgent );
 
   /**
+   * @brief Updates display area of web view.
+   * @param[in] source The soource triggers Notification.
+   */
+  void UpdateDisplayArea( Dali::PropertyNotification& source );
+
+  /**
+   * @brief Enable/Disable video hole for video playing.
+   * @param[in] enabled True if video hole is enabled, false otherwise.
+   */
+  void EnableVideoHole( bool enabled );
+
+  /**
+   * @brief Enable blend mode.
+   * @param[in] blendEnabled True if turn on blend mode, false otherwise.
+   */
+  void EnableBlendMode( bool blendEnabled );
+
+  /**
    * @brief Callback function to be called when page load started.
    * @param[in] url The url currently being loaded
    */
@@ -364,6 +383,12 @@ private:
   std::unique_ptr<Dali::Toolkit::WebSettings>            mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList>     mWebBackForwardList;
   Dali::Toolkit::ImageView mFaviconView;
+
+  Dali::PropertyNotification                             mPositionUpdateNotification;
+  Dali::PropertyNotification                             mSizeUpdateNotification;
+  Dali::PropertyNotification                             mScaleUpdateNotification;
+  bool                                                   mVideoHoleEnabled;
+  Dali::Rect< int >                                      mWebViewArea;
 };
 
 } // namespace Internal
