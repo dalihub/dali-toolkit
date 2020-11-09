@@ -23,10 +23,10 @@
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
+#include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <toolkit-application.h>
 
 namespace Dali
@@ -796,6 +796,14 @@ bool WebEngine::SendKeyEvent( const KeyEvent& event )
 }
 
 void WebEngine::SetFocus( bool focused )
+{
+}
+
+void WebEngine::UpdateDisplayArea( Dali::Rect< int > displayArea )
+{
+}
+
+void WebEngine::EnableVideoHole( bool enabled )
 {
 }
 

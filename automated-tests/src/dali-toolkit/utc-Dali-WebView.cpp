@@ -290,6 +290,54 @@ int UtcDaliWebViewFocusGainedAndLost(void)
   END_TEST;
 }
 
+int UtcDaliWebViewMove(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+
+  view.SetProperty( Actor::Property::POSITION, Vector2( 100, 100 ));
+  Vector3 viewPos = view.GetProperty<Vector3>( Actor::Property::POSITION );
+  DALI_TEST_EQUALS( viewPos, Vector3( 100, 100, 0 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewPropertyVideoHole(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  const bool kDefaultValue = true;
+  const bool kTestValue = false;
+
+  // Check default value
+  bool output;
+  Property::Value value = view.GetProperty( WebView::Property::VIDEO_HOLE_ENABLED );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  view.SetProperty( WebView::Property::VIDEO_HOLE_ENABLED, kTestValue );
+  value = view.GetProperty( WebView::Property::VIDEO_HOLE_ENABLED );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliWebViewGetWebBackForwardList(void)
 {
   ToolkitTestApplication application;
