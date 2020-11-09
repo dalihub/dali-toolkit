@@ -165,8 +165,8 @@ function tc_fullinfo {
     ' $*
 }
 
-TEMP=`getopt -o f,a:,m: --long full,anum:,mnum: \
-     -n 'genmake' -- "$@"`
+TEMP=`getopt -o f::,a:,m: --long full::,anum:,mnum: \
+     -n 'retriever.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
@@ -174,18 +174,23 @@ if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 
 opt_full=false
+opt_full_dir=
 opt_anum=
 opt_mnum=
 
 while true ; do
     case "$1" in
-        -f|--full) opt_full=true ; shift ;;
+        -f|--full) opt_full_dir="$2" ; opt_full="true" ; shift 2 ;;
         -a|--anum) opt_anum="$2" ; shift 2 ;;
         -m|--mnum) opt_mnum="$2" ; shift 2 ;;
         --) shift ; break ;;
         *) echo -e $USAGE ; exit 1 ;;
     esac
 done
+
+#echo "###Retriever" >& 2
+#echo opt_full: {$opt_full} >& 2
+#echo opt_full_dir: {$opt_full_dir} >& 2
 
 DIR=.
 if [ -n "$opt_anum" ] ; then
@@ -194,7 +199,13 @@ if [ -n "$opt_anum" ] ; then
 elif [ -n "$opt_mnum" ] ; then
     DIR=$opt_mnum
     echo opt_mnum: DIR=$DIR >& 2
+elif [ "$opt_full" == "true" ] ; then
+    if [ -n $opt_full_dir ] ; then
+        DIR=$opt_full_dir
+        echo opt_full: DIR=$DIR >& 2
+    fi
 fi
+
 
 # get filename from first argument
 if [[ $# == 1 && -f $DIR/$1 ]] ; then
@@ -229,7 +240,7 @@ fi
 
 
 # run appropriate subcommand
-if [ $opt_full == "true" ] ; then
+if [ "$opt_full" == "true" ] ; then
     tc_fullinfo $TC_FILES
 elif [ -n "$opt_anum" ] ; then
     tc_anum $TC_FILES
