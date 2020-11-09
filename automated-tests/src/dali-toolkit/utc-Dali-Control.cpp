@@ -1244,3 +1244,28 @@ int UtcDaliControlDoActionWhenNotStage(void)
 
   END_TEST;
 }
+
+int UtcDaliControlStopObservingVisual(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Test to stop observing a visual when a control is destroyed" );
+
+  Control control = Control::New();
+  control[Actor::Property::SIZE] = Vector2( 200.f, 200.f );
+  control[Control::Property::BACKGROUND] = "invalid.svg";
+
+  application.GetScene().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  // Delete control
+  control.Unparent();
+  control.Reset();
+
+  // SVG rasterization may be finished after the control is deleted.
+  // Ensure it doesn't cause a crash.
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  END_TEST;
+}
