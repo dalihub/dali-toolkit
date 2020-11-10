@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_DICTIONARY_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,17 +39,16 @@ namespace Internal
  * It enables lookup of keys via case-insensitive match.
  */
 
+using DictionaryKeys = std::vector<std::string>;
 
-typedef std::vector<std::string> DictionaryKeys;
 inline void Merge( DictionaryKeys& toDict, const DictionaryKeys& fromDict )
 {
-  for( DictionaryKeys::const_iterator fromIter = fromDict.begin(); fromIter != fromDict.end(); ++fromIter )
+  for(const auto& element : fromDict)
   {
-    const std::string& fromKey = (*fromIter);
-    DictionaryKeys::iterator toIter = std::find( toDict.begin(), toDict.end(), fromKey );
-    if( toIter == toDict.end() )
+    auto iter = std::find(toDict.cbegin(), toDict.cend(), element);
+    if(iter == toDict.cend())
     {
-      toDict.push_back( fromKey );
+      toDict.push_back(element);
     }
   }
 }
@@ -66,105 +65,97 @@ private:
   {
     std::string key;
     EntryType entry;
-    Element( const std::string&name, EntryType entry )
-    : key( name ),
-      entry( entry )
+    Element(std::string name, EntryType entry)
+    : key(std::move(name)),
+      entry(std::move(entry))
     {
     }
   };
-  typedef std::vector<Element> Elements;
+  using Elements = std::vector<Element>;
   Elements container;
+
+  auto FindElementCaseInsensitive(std::string_view key) const
+  {
+    return std::find_if(
+      Begin(), End(), [key](auto& e) { return Dali::CaseInsensitiveStringCompare(e.key, key); });
+  }
+
+  auto FindElement(std::string_view key)
+  {
+    return std::find_if(container.begin(), container.end(), [key](auto& e){
+        return bool(key == e.key);
+      });
+  }
 
 public:
   /**
    * Only allow const iteration over the dictionary
    */
-  typedef typename Elements::const_iterator iterator;
+  using iterator = typename Elements::const_iterator;
 
   /**
    * Constructor
    */
-  Dictionary<EntryType>()
-  {
-  }
+  Dictionary<EntryType>() = default;
 
   /**
    * Add a key value pair to the dictionary.
    * If the entry does not already exist, add it to the dictionary
-   * using a shallow copy
    */
-  bool Add( const std::string& name, const EntryType& entry )
+  bool Add(std::string name, EntryType entry)
   {
-    for( typename Elements::iterator iter = container.begin(); iter != container.end(); ++iter )
+    auto iter = FindElement(name);
+    if(iter != End())
     {
-      if( iter->key == name )
-      {
-        return false;
-      }
+      return false;
     }
-    container.push_back( Element(name, entry) );
+
+    container.push_back(Element(std::move(name), std::move(entry)));
     return true;
   }
 
   /**
    * Add a key-value pair to the dictionary
    * If the entry does not already exist, add it to the dictionary
-   * (shallow copy)
    */
-  bool Add( const char* name, const EntryType& entry )
+  bool Add(const char* name, EntryType entry)
   {
-    bool result=false;
-    if( name != NULL )
+    if(name != nullptr)
     {
-      std::string theName(name);
-      result=Add(theName, entry);
+      return Add(std::string(name), std::move(entry));
     }
-    return result;
+    return false;
   }
 
   /**
    * Remove a key value pair from the dictionary.
    */
-  void Remove( const std::string& name )
+  void Remove(std::string_view name)
   {
-    for( typename Elements::iterator iter = container.begin(); iter != container.end(); ++iter )
+    if(!name.empty())
     {
-      if( iter->key == name )
+      auto iter = FindElement(name);
+
+      if(iter != End())
       {
         container.erase( iter );
-        break;
       }
-    }
-  }
-
-  /**
-   * Remove a key value pair from the dictionary.
-   */
-  void Remove( const char* name )
-  {
-    if( name != NULL )
-    {
-      std::string theName(name);
-      Remove(theName);
     }
   }
 
   void Merge( const Dictionary<EntryType>& dictionary )
   {
-    for( typename Elements::const_iterator fromIter = dictionary.container.begin(); fromIter != dictionary.container.end(); ++fromIter )
+    for(const auto& element : dictionary.container)
     {
-      bool found=false;
-      for( typename Elements::iterator toIter = container.begin(); toIter != container.end(); ++toIter )
+      auto iter = FindElement(element.key);
+
+      if(iter == End())
       {
-        if( fromIter->key == toIter->key )
-        {
-          found=true;
-          toIter->entry = fromIter->entry;
-        }
+        container.push_back(Element(element.key, element.entry));
       }
-      if( !found )
+      else
       {
-        container.push_back( Element(fromIter->key, fromIter->entry) );
+        iter->entry = element.entry;
       }
     }
   }
@@ -173,92 +164,57 @@ public:
    * Find the element in the dictionary pointed at by key, and
    * insensitive search, and return a const pointer to it, or NULL
    */
-  const EntryType* FindConst( const std::string& key ) const
+  const EntryType* FindConst(std::string_view key) const
   {
     if( ! key.empty() )
     {
-      for( typename Elements::const_iterator iter = container.begin(); iter != container.end(); ++iter )
+      auto iter = FindElementCaseInsensitive(key);
+
+      if(iter != End())
       {
-        if( Dali::CaseInsensitiveStringCompare(iter->key, key ))
-        {
-          const EntryType* result = &(iter->entry);
-          return result;
-        }
+        return &(iter->entry);
       }
     }
-    return NULL;
+    return nullptr;
   }
 
   /**
    * Find the element in the dictionary pointed at by key using a case
    * insensitive search, and return a non-const pointer to it, or NULL
    */
-  EntryType* Find( const std::string& key ) const
+  EntryType* Find(std::string_view key) const
   {
-    EntryType* result = NULL;
     if( ! key.empty() )
     {
-      for( typename Elements::const_iterator iter = container.begin(); iter != container.end(); ++iter )
+      auto iter = FindElementCaseInsensitive(key);
+
+      if(iter != End())
       {
-        if( Dali::CaseInsensitiveStringCompare(iter->key, key ))
-        {
-          // Const cast because of const_iterator. const_iterator because, STL.
-          result = const_cast<EntryType*>(&(iter->entry));
-        }
+        return const_cast<EntryType*>(&(iter->entry));
       }
     }
-    return result;
+    return nullptr;
   }
 
-  /**
-   * Find the element in the dictionary pointed at by key using a case
-   * insensitive search, and return a const pointer to it, or NULL
-   */
-  const EntryType* FindConst( const char* key ) const
+  iterator Begin() const
   {
-    if( key != NULL )
-    {
-      std::string theKey(key);
-      return FindConst( theKey );
-    }
-    return NULL;
-  }
-
-  /**
-   * Find the element in the dictionary pointed at by key using a case
-   * insensitive search, and return a non-const pointer to it, or NULL
-   */
-  EntryType* Find( const char* key ) const
-  {
-    if( key != NULL )
-    {
-      std::string theKey(key);
-      return Find( theKey );
-    }
-    return NULL;
-  }
-  /**
-   * Return an iterator pointing at the first entry in the dictionary
-   */
-  typename Elements::const_iterator Begin() const
-  {
-    return container.begin();
+    return container.cbegin();
   }
 
   /**
    * Return an iterator pointing past the last entry in the dictionary
    */
-  typename Elements::const_iterator End() const
+  iterator End() const
   {
-    return container.end();
+    return container.cend();
   }
 
   void GetKeys( DictionaryKeys& keys ) const
   {
     keys.clear();
-    for( typename Elements::const_iterator iter = container.begin(); iter != container.end(); ++iter )
+    for(const auto& element : container)
     {
-      keys.push_back( (*iter).key );
+      keys.push_back(element.key);
     }
   }
 

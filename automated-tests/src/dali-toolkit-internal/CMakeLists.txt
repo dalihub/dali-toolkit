@@ -12,6 +12,7 @@ SET(TC_SOURCES
  utc-Dali-ColorConversion.cpp
  utc-Dali-Control-internal.cpp
  utc-Dali-DebugRendering.cpp
+ utc-Dali-Dictionary.cpp
  utc-Dali-FeedbackStyle.cpp
  utc-Dali-ItemView-internal.cpp
  utc-Dali-LogicalModel.cpp
