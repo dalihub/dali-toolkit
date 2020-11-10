@@ -109,6 +109,9 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
     int keyCode = keyEvent.GetKeyCode();
     const std::string& keyString = keyEvent.GetKeyString();
     const std::string keyName = keyEvent.GetKeyName();
+    // Key will produce same logical-key value when ctrl
+    // is down, regardless of language layout
+    const std::string logicalKey = keyEvent.GetLogicalKey();
 
     const bool isNullKey = ( 0 == keyCode ) && ( keyString.empty() );
 
@@ -182,25 +185,25 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
     else if ( keyEvent.IsCtrlModifier() && !keyEvent.IsShiftModifier())
     {
       bool consumed = false;
-      if (keyName == KEY_C_NAME || keyName == KEY_INSERT_NAME)
+      if (keyName == KEY_C_NAME || keyName == KEY_INSERT_NAME || logicalKey == KEY_C_NAME || logicalKey == KEY_INSERT_NAME)
       {
         // Ctrl-C or Ctrl+Insert to copy the selected text
         controller.TextPopupButtonTouched( Toolkit::TextSelectionPopup::COPY );
         consumed = true;
       }
-      else if (keyName == KEY_V_NAME)
+      else if (keyName == KEY_V_NAME || logicalKey == KEY_V_NAME)
       {
         // Ctrl-V to paste the copied text
         controller.TextPopupButtonTouched( Toolkit::TextSelectionPopup::PASTE );
         consumed = true;
       }
-      else if (keyName == KEY_X_NAME)
+      else if (keyName == KEY_X_NAME || logicalKey == KEY_X_NAME)
       {
         // Ctrl-X to cut the selected text
         controller.TextPopupButtonTouched( Toolkit::TextSelectionPopup::CUT );
         consumed = true;
       }
-      else if (keyName == KEY_A_NAME)
+      else if (keyName == KEY_A_NAME || logicalKey == KEY_A_NAME)
       {
         // Ctrl-A to select All the text
         controller.TextPopupButtonTouched( Toolkit::TextSelectionPopup::SELECT_ALL );

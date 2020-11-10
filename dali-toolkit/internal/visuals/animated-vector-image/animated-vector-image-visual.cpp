@@ -94,25 +94,41 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
   mPlacementActor(),
   mPlayState( DevelImageVisual::PlayState::STOPPED ),
   mEventCallback( nullptr ),
-  mRendererAdded( false )
+  mRendererAdded( false ),
+  mCoreShutdown(false)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 
   mVectorAnimationTask->UploadCompletedSignal().Connect( this, &AnimatedVectorImageVisual::OnUploadCompleted );
   mVectorAnimationTask->SetAnimationFinishedCallback( new EventThreadCallback( MakeCallback( this, &AnimatedVectorImageVisual::OnAnimationFinished ) ) );
+
+  auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
+  vectorAnimationManager.AddObserver(*this);
 }
 
 AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
 {
-  if( mEventCallback )
+  if( ! mCoreShutdown )
   {
-    mFactoryCache.GetVectorAnimationManager().UnregisterEventCallback( mEventCallback );
-  }
+    auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
+    vectorAnimationManager.RemoveObserver(*this);
 
-  // Finalize animation task and disconnect the signal in the main thread
-  mVectorAnimationTask->UploadCompletedSignal().Disconnect( this, &AnimatedVectorImageVisual::OnUploadCompleted );
-  mVectorAnimationTask->Finalize();
+    if( mEventCallback )
+    {
+      mFactoryCache.GetVectorAnimationManager().UnregisterEventCallback( mEventCallback );
+    }
+
+    // Finalize animation task and disconnect the signal in the main thread
+    mVectorAnimationTask->UploadCompletedSignal().Disconnect( this, &AnimatedVectorImageVisual::OnUploadCompleted );
+    mVectorAnimationTask->Finalize();
+  }
+}
+
+void AnimatedVectorImageVisual::VectorAnimationManagerDestroyed()
+{
+  // Core is shutting down. Don't talk to the plugin any more.
+  mCoreShutdown = true;
 }
 
 void AnimatedVectorImageVisual::GetNaturalSize( Vector2& naturalSize )
@@ -500,10 +516,11 @@ void AnimatedVectorImageVisual::StopAnimation()
 
 void AnimatedVectorImageVisual::TriggerVectorRasterization()
 {
-  if( !mEventCallback )
+  if( !mEventCallback && !mCoreShutdown )
   {
     mEventCallback = MakeCallback( this, &AnimatedVectorImageVisual::OnProcessEvents );
-    mFactoryCache.GetVectorAnimationManager().RegisterEventCallback( mEventCallback );
+    auto& vectorAnimationManager = mFactoryCache.GetVectorAnimationManager();
+    vectorAnimationManager.RegisterEventCallback( mEventCallback );
     Stage::GetCurrent().KeepRendering( 0.0f );  // Trigger event processing
   }
 }

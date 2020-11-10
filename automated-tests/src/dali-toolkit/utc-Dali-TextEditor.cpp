@@ -2172,6 +2172,54 @@ int utcDaliTextEditorEvent07(void)
   //text is "c"
   DALI_TEST_EQUALS( "c", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
+  // select all text
+  DevelTextEditor::SelectWholeText(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Copy the selected text using logical keys
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "ؤ", "c", "ؤ", KEY_C_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::DOWN, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // select none
+  DevelTextEditor::SelectNone(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Paste the selected using logical keys
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "ر", "v", "ر", KEY_V_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::DOWN, "v", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  //text is "cc"
+  DALI_TEST_EQUALS( "cc", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
+
+  // select all using logical keys
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "ش", "a", "ش", KEY_A_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // cut text using logical keys
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "ء", "x", "ء", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::DOWN, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  //text is ""
+  DALI_TEST_EQUALS( "", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
+
   END_TEST;
 }
 
