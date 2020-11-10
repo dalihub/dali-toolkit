@@ -81,6 +81,51 @@ DALI_TYPE_REGISTRATION_END()
 
 const std::string kEmptyString;
 
+const char* DEFAULT_SAMPLER_TYPENAME = "sampler2D";
+
+const char* FRAGMENT_SHADER_TEXTURE = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float preMultipliedAlpha;\n
+  \n
+  void main()\n
+  {\n
+      gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * vec4( mixColor, 1.0 );\n
+  }\n
+);
+
+Dali::Toolkit::Visual::Base CreateNativeImageVisual( NativeImageInterfacePtr nativeImageInterface )
+{
+  std::string fragmentShader;
+
+  const char* fragmentPrefix = nativeImageInterface->GetCustomFragmentPrefix();
+  if( fragmentPrefix )
+  {
+    fragmentShader = fragmentPrefix;
+    fragmentShader += FRAGMENT_SHADER_TEXTURE;
+  }
+  else
+  {
+    fragmentShader = FRAGMENT_SHADER_TEXTURE;
+  }
+
+  const char* customSamplerTypename = nativeImageInterface->GetCustomSamplerTypename();
+  if( customSamplerTypename )
+  {
+    fragmentShader.replace( fragmentShader.find( DEFAULT_SAMPLER_TYPENAME ), strlen( DEFAULT_SAMPLER_TYPENAME ), customSamplerTypename );
+  }
+
+  Texture texture = Dali::Texture::New( *nativeImageInterface );
+  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
+
+  return Toolkit::VisualFactory::Get().CreateVisual(
+    { { Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE } ,
+      { Toolkit::Visual::Property::SHADER, { { Toolkit::Visual::Shader::Property::FRAGMENT_SHADER, fragmentShader } } },
+      { Toolkit::ImageVisual::Property::URL, nativeImageUrl } } );
+}
+
 } // anonymous namepsace
 
 #define GET_ENUM_STRING( structName, inputExp ) \
@@ -153,11 +198,7 @@ void WebView::LoadUrl( const std::string& url )
   mUrl = url;
   if( mWebEngine )
   {
-    Texture texture = Dali::Texture::New( *mWebEngine.GetNativeImageSource() );
-    const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
-    mVisual = Toolkit::VisualFactory::Get().CreateVisual(
-      { { Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE } ,
-        { Toolkit::ImageVisual::Property::URL, nativeImageUrl } } );
+    mVisual = CreateNativeImageVisual( mWebEngine.GetNativeImageSource() );
 
     if( mVisual )
     {
@@ -172,11 +213,7 @@ void WebView::LoadHTMLString( const std::string& htmlString )
 {
   if( mWebEngine )
   {
-    Texture texture = Dali::Texture::New( *mWebEngine.GetNativeImageSource() );
-    const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture( texture );
-    mVisual = Toolkit::VisualFactory::Get().CreateVisual(
-      { { Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE } ,
-        { Toolkit::ImageVisual::Property::URL, nativeImageUrl } } );
+    mVisual = CreateNativeImageVisual( mWebEngine.GetNativeImageSource() );
 
     if( mVisual )
     {
