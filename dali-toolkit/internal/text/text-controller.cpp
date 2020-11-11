@@ -989,6 +989,36 @@ FontSlant Controller::GetPlaceholderTextFontSlant() const
   return PlaceholderHandler::GetPlaceholderTextFontSlant(*this);
 }
 
+void Controller::SetFontSizeScale( float scale )
+{
+  mImpl->mFontSizeScale = scale;
+
+  if( mImpl->mEventData )
+  {
+    // Update the cursor position if it's in editing mode
+    if( EventData::IsEditingState( mImpl->mEventData->mState ) )
+    {
+      mImpl->mEventData->mDecoratorUpdated = true;
+      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font size is updated.
+    }
+  }
+
+  // Clear the font-specific data
+  ClearFontData();
+
+  mImpl->RequestRelayout();
+}
+
+float Controller::GetFontSizeScale() const
+{
+  if( nullptr != mImpl->mFontDefaults )
+  {
+    return mImpl->mFontSizeScale;
+  }
+
+  return 1.f;
+}
+
 void Controller::SetDefaultFontSize( float fontSize, FontSizeType type )
 {
   if( NULL == mImpl->mFontDefaults )
@@ -2511,7 +2541,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
       if( addFontSizeRun )
       {
-        fontDescriptionRun.size = static_cast<PointSize26Dot6>( mImpl->mEventData->mInputStyle.size * 64.f );
+        fontDescriptionRun.size = static_cast<PointSize26Dot6>( mImpl->mEventData->mInputStyle.size * mImpl->mFontSizeScale * 64.f );
         fontDescriptionRun.sizeDefined = true;
       }
 

@@ -138,6 +138,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "renderingBackend",       
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "selectedTextStart",              INTEGER,   SELECTED_TEXT_START                  )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "selectedTextEnd",                INTEGER,   SELECTED_TEXT_END                    )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableEditing",                  BOOLEAN,   ENABLE_EDITING                       )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "fontSizeScale",                  FLOAT,     FONT_SIZE_SCALE                      )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -733,6 +734,17 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         impl.SetEditable( editable );
         break;
       }
+      case Toolkit::DevelTextField::Property::FONT_SIZE_SCALE:
+      {
+        const float scale = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_SIZE_SCALE %f\n", impl.mController.Get(), scale );
+
+        if( !Equals( impl.mController->GetFontSizeScale(), scale ) )
+        {
+          impl.mController->SetFontSizeScale( scale );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1071,6 +1083,11 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       case Toolkit::DevelTextField::Property::ENABLE_EDITING:
       {
         value = impl.IsEditable();
+        break;
+      }
+      case Toolkit::DevelTextField::Property::FONT_SIZE_SCALE:
+      {
+        value = impl.mController->GetFontSizeScale();
         break;
       }
     } //switch
