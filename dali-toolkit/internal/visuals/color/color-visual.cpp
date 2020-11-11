@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
@@ -43,140 +44,139 @@ namespace Internal
 namespace
 {
 
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  \n
+const char* VERTEX_SHADER =
+  "INPUT mediump vec2 aPosition;\n"
 
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-  uniform mediump vec2 extraSize;\n
+  "uniform highp mat4 uMvpMatrix;\n"
+  "uniform highp vec3 uSize;\n"
 
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-  }\n
+  "//Visual size and offset\n"
+  "uniform mediump vec2 offset;\n"
+  "uniform highp vec2 size;\n"
+  "uniform mediump vec4 offsetSizeMode;\n"
+  "uniform mediump vec2 origin;\n"
+  "uniform mediump vec2 anchorPoint;\n"
+  "uniform mediump vec2 extraSize;\n"
 
-  void main()\n
-  {\n
-    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
-  }\n
-);
+  "vec4 ComputeVertexPosition()\n"
+  "{\n"
+  "  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;\n"
+  "  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n"
+  "  return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n"
+  "}\n"
 
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = vec4(mixColor, 1.0)*uColor;\n
-  }\n
-);
+  "void main()\n"
+  "{\n"
+  "  gl_Position = uMvpMatrix * ComputeVertexPosition();\n"
+  "}\n";
 
-const char* VERTEX_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  varying mediump vec2 vPosition;\n
-  varying mediump vec2 vRectSize;\n
-  varying mediump float vCornerRadius;\n
-  \n
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
-  uniform mediump vec2 extraSize;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-  uniform mediump float cornerRadius;\n
-  uniform mediump float cornerRadiusPolicy;\n
-  \n
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    mediump float minSize = min( visualSize.x, visualSize.y );\n
-    vCornerRadius = mix( cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);\n
-    vCornerRadius = min( vCornerRadius, minSize * 0.5 );\n
-    vRectSize = visualSize / 2.0 - vCornerRadius;\n
-    vPosition = aPosition* visualSize;\n
-    return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-  }\n
-  \n
-  void main()\n
-  {\n
-    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
-  }\n
-);
+
+const char* FRAGMENT_SHADER =
+  "uniform lowp vec4 uColor;\n"
+  "uniform lowp vec3 mixColor;\n"
+
+  "void main()\n"
+  "{\n"
+  "  OUT_COLOR = vec4(mixColor, 1.0) * uColor;\n"
+  "}\n";
+
+const char* VERTEX_SHADER_ROUNDED_CORNER =
+  "INPUT mediump vec2 aPosition;\n"
+  "OUTPUT mediump vec2 vPosition;\n"
+  "OUTPUT mediump vec2 vRectSize;\n"
+  "OUTPUT mediump float vCornerRadius;\n"
+
+  "uniform highp mat4 uMvpMatrix;\n"
+  "uniform highp vec3 uSize;\n"
+
+  "//Visual size and offset\n"
+  "uniform mediump vec2 offset;\n"
+  "uniform highp vec2 size;\n"
+  "uniform mediump vec2 extraSize;\n"
+  "uniform mediump vec4 offsetSizeMode;\n"
+  "uniform mediump vec2 origin;\n"
+  "uniform mediump vec2 anchorPoint;\n"
+  "uniform mediump float cornerRadius;\n"
+  "uniform mediump float cornerRadiusPolicy;\n"
+
+  "vec4 ComputeVertexPosition()\n"
+  "{\n"
+  "  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;\n"
+  "  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n"
+  "  mediump float minSize = min( visualSize.x, visualSize.y );\n"
+  "  vCornerRadius = mix( cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);\n"
+  "  vCornerRadius = min( vCornerRadius, minSize * 0.5 );\n"
+  "  vRectSize = visualSize / 2.0 - vCornerRadius;\n"
+  "  vPosition = aPosition* visualSize;\n"
+  "  return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n"
+  "}\n"
+
+  "void main()\n"
+  "{\n"
+  "  gl_Position = uMvpMatrix * ComputeVertexPosition();\n"
+  "}\n";
 
 //float distance = length( max( abs( position - center ), size ) - size ) - radius;
-const char* FRAGMENT_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vPosition;\n
-  varying mediump vec2 vRectSize;\n
-  varying mediump float vCornerRadius;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  \n
-  void main()\n
-  {\n
-      mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
-      gl_FragColor = uColor * vec4( mixColor, 1.0 );\n
-      gl_FragColor.a *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
-  }\n
-);
+const char* FRAGMENT_SHADER_ROUNDED_CORNER =
+  "INPUT mediump vec2 vPosition;\n"
+  "INPUT mediump vec2 vRectSize;\n"
+  "INPUT mediump float vCornerRadius;\n"
 
-const char* VERTEX_SHADER_BLUR_EDGE = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp vec3 uSize;\n
-  varying mediump vec2 vPosition;\n
-  varying mediump vec2 vRectSize;\n
-  \n
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform highp vec2 size;\n
-  uniform mediump vec2 extraSize;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-  uniform mediump float blurRadius;\n
-  \n
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize + blurRadius * 2.0;\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    vRectSize = visualSize / 2.0;\n
-    vPosition = aPosition* visualSize;\n
-    return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-  }\n
-  \n
-  void main()\n
-  {\n
-    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
-  }\n
-);
+  "uniform lowp vec4 uColor;\n"
+  "uniform lowp vec3 mixColor;\n"
 
-const char* FRAGMENT_SHADER_BLUR_EDGE = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vPosition;\n
-  varying mediump vec2 vRectSize;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  uniform mediump float blurRadius;\n
-  \n
-  void main()\n
-  {\n
-      mediump vec2 blur = 1.0 - smoothstep( vRectSize - blurRadius * 2.0, vRectSize, abs( vPosition ) );\n
-      gl_FragColor = uColor * vec4( mixColor, 1.0 );\n
-      gl_FragColor.a *= blur.x * blur.y;\n
-  }\n
-);
+  "void main()\n"
+  "{\n"
+  "  mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n"
+  "  OUT_COLOR = vec4(mixColor, 1.0) * uColor;\n"
+  "  OUT_COLOR.a *= 1.0 - smoothstep( -1.0, 1.0, dist );\n"
+  "}\n";
+
+const char* VERTEX_SHADER_BLUR_EDGE =
+  "INPUT mediump vec2 aPosition;\n"
+  "OUTPUT mediump vec2 vPosition;\n"
+  "OUTPUT mediump vec2 vRectSize;\n"
+
+  "uniform highp   mat4 uMvpMatrix;\n"
+  "uniform highp vec3 uSize;\n"
+
+  "//Visual size and offset\n"
+  "uniform mediump vec2 offset;\n"
+  "uniform highp vec2 size;\n"
+  "uniform mediump vec2 extraSize;\n"
+  "uniform mediump vec4 offsetSizeMode;\n"
+  "uniform mediump vec2 origin;\n"
+  "uniform mediump vec2 anchorPoint;\n"
+  "uniform mediump float blurRadius;\n"
+
+  "vec4 ComputeVertexPosition()\n"
+  "{\n"
+  "  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize + blurRadius * 2.0;\n"
+  "  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n"
+  "  vRectSize = visualSize / 2.0;\n"
+  "  vPosition = aPosition* visualSize;\n"
+  "  return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n"
+  "}\n"
+
+  "void main()\n"
+  "{\n"
+  "  gl_Position = uMvpMatrix * ComputeVertexPosition();\n"
+  "}\n";
+
+const char* FRAGMENT_SHADER_BLUR_EDGE =
+  "INPUT mediump vec2 vPosition;\n"
+  "INPUT mediump vec2 vRectSize;\n"
+
+  "uniform lowp vec4 uColor;\n"
+  "uniform lowp vec3 mixColor;\n"
+  "uniform mediump float blurRadius;\n"
+
+  "void main()\n"
+  "{\n"
+  "  mediump vec2 blur = 1.0 - smoothstep( vRectSize - blurRadius * 2.0, vRectSize, abs( vPosition ) );\n"
+  "  OUT_COLOR = vec4(mixColor, 1.0) * uColor;\n"
+  "  OUT_COLOR.a *= blur.x * blur.y;\n"
+  "}\n";
 
 }
 
@@ -309,7 +309,7 @@ void ColorVisual::InitializeRenderer()
     shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER_BLUR_EDGE );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER_BLUR_EDGE, FRAGMENT_SHADER_BLUR_EDGE );
+      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + VERTEX_SHADER_BLUR_EDGE, Dali::Shader::GetFragmentShaderPrefix() + FRAGMENT_SHADER_BLUR_EDGE );
       mFactoryCache.SaveShader( VisualFactoryCache::COLOR_SHADER_BLUR_EDGE, shader );
     }
   }
@@ -318,7 +318,7 @@ void ColorVisual::InitializeRenderer()
     shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + VERTEX_SHADER, Dali::Shader::GetFragmentShaderPrefix() + FRAGMENT_SHADER );
       mFactoryCache.SaveShader( VisualFactoryCache::COLOR_SHADER, shader );
     }
   }
@@ -327,7 +327,7 @@ void ColorVisual::InitializeRenderer()
     shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER_ROUNDED_CORNER, FRAGMENT_SHADER_ROUNDED_CORNER );
+      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + VERTEX_SHADER_ROUNDED_CORNER, Dali::Shader::GetFragmentShaderPrefix() + FRAGMENT_SHADER_ROUNDED_CORNER );
       mFactoryCache.SaveShader( VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER, shader );
     }
   }
@@ -341,7 +341,7 @@ void ColorVisual::InitializeRenderer()
 
   mImpl->mRenderer.RegisterProperty( BLUR_RADIUS_NAME, mBlurRadius );
 
-  if( mImpl->mMixColor.a < 1.f || !EqualsZero( mBlurRadius ) )
+  if( mImpl->mMixColor.a < 1.f || !EqualsZero( mBlurRadius ) || IsAdvancedBlendEquationApplied() )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }

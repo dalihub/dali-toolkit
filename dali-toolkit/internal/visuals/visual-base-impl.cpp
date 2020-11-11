@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -413,6 +413,11 @@ bool Visual::Base::IsPreMultipliedAlphaEnabled() const
   return mImpl->mFlags & Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
+bool Visual::Base::IsAdvancedBlendEquationApplied() const
+{
+  return IsPreMultipliedAlphaEnabled() && DevelRenderer::IsAdvancedBlendEquationApplied( mImpl->mRenderer );
+}
+
 void Visual::Base::DoSetOffScene( Actor& actor )
 {
   actor.RemoveRenderer( mImpl->mRenderer );
@@ -446,7 +451,7 @@ void Visual::Base::RegisterMixColor()
       Vector3(mImpl->mMixColor) );
   }
 
-  if( mImpl->mMixColor.a < 1.f )
+  if( mImpl->mMixColor.a < 1.f || IsAdvancedBlendEquationApplied() )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
@@ -469,7 +474,7 @@ void Visual::Base::SetMixColor( const Vector4& color )
   {
     mImpl->mRenderer.SetProperty( mImpl->mMixColorIndex, Vector3(color) );
     mImpl->mRenderer.SetProperty( DevelRenderer::Property::OPACITY, color.a );
-    if( color.a < 1.f )
+    if( color.a < 1.f || IsAdvancedBlendEquationApplied() )
     {
       mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
     }
@@ -770,7 +775,8 @@ void Visual::Base::SetupBlendMode( Animation& transition, bool isInitialOpaque, 
 {
   // Ensure the blend mode is turned on if we are animating opacity, and
   // turned off after the animation ends if the final value is opaque
-  if( ! isInitialOpaque || mImpl->mMixColor.a < 1.0f )
+  if( ( ! isInitialOpaque || mImpl->mMixColor.a < 1.0f ) ||
+      ( mImpl->mRenderer && IsAdvancedBlendEquationApplied() ) )
   {
     if( mImpl->mRenderer )
     {
@@ -795,8 +801,16 @@ void Visual::Base::OnMixColorFinished( Animation& animation )
   if( mImpl->mRenderer )
   {
     DALI_LOG_INFO( gVisualBaseLogFilter, Debug::General, "Visual::Base::OnMixColorFinished()\n");
-    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE,
-                                  ( mImpl->mMixColor.a < 1.0 ) ? BlendMode::ON : BlendMode::AUTO );
+
+    if( mImpl->mMixColor.a >= 1.f &&
+        !IsAdvancedBlendEquationApplied() )
+    {
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::AUTO );
+    }
+    else
+    {
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+    }
   }
   delete mImpl->mBlendSlotDelegate;
   mImpl->mBlendSlotDelegate = NULL;
