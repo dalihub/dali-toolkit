@@ -541,6 +541,26 @@ bool WebView::OnKeyEvent( const Dali::KeyEvent& event )
   return result;
 }
 
+void WebView::OnKeyInputFocusGained()
+{
+  if( mWebEngine )
+  {
+    mWebEngine.SetFocus( true );
+  }
+
+  EmitKeyInputFocusSignal( true ); // Calls back into the Control hence done last.
+}
+
+void WebView::OnKeyInputFocusLost()
+{
+  if( mWebEngine )
+  {
+    mWebEngine.SetFocus( false );
+  }
+
+  EmitKeyInputFocusSignal( false ); // Calls back into the Control hence done last.
+}
+
 Toolkit::WebView::CacheModel::Type WebView::GetCacheModel() const
 {
   return mWebEngine ? static_cast< Toolkit::WebView::CacheModel::Type >( mWebEngine.GetCacheModel() ) : Toolkit::WebView::CacheModel::DOCUMENT_VIEWER;
