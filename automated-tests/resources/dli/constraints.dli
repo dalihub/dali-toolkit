@@ -1,0 +1,32 @@
+{
+  "scene": 0,
+  "scenes": [ { "nodes": [ 0 ] } ],
+  "nodes": [ {
+    "name": "root",
+    "children": [ 1, 2, 3 ]
+  }, {
+    "name": "Alice",
+    "angle": [ 0.0, -45.0, 10.0 ],
+    "position": [ 500.0, -50.0, 0.0 ]
+  }, {
+    "name": "Bob",
+    "position": [ 1000.0, 1.0, -400.0 ],
+    "angle": [ 10.0, 0.0, -90.0 ],
+    "extras": {
+      "angularVelocity": [ -0.5, 0.0004 ]
+    }
+  }, {
+    "name": "Charlie",
+    "position": [ -400.0, 0.0, 100.0 ],
+    "constraints": {
+      "orientation": 1,
+      "position": 2,
+      "angularVelocity": 2,
+      "invalid": "zero"
+    },
+    "extras": {
+      "angularVelocity": [ 0.0, 0.0 ]
+    }
+  } ]
+}
+

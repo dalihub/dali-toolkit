@@ -1,0 +1,5 @@
+{
+  "scenes": [ { "nodes" : [ 0 ] } ],
+  "nodes": [ { "name": "1" } ],
+  "skeletons": [ { "node": "some-other" } ]
+}

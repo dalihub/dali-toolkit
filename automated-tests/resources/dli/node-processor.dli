@@ -1,0 +1,21 @@
+{
+  "scene": 0,
+  "scenes": [ { "nodes": [ 0 ] }, { "nodes": [ 1 ] } ],
+  "nodes": [ {
+    "name": "rootA",
+    "array": [ 1, 2, 4, 8, -500 ],
+    "object": {
+      "physics": true,
+      "elasticity": 0.27,
+      "drag": 0.91,
+      "inner array": [ "why", "not", false ],
+      "inner object": {
+        "supported": true
+      }
+    },
+    "nickname": "same as name",
+    "favourite number": 63478
+  }, {
+    "name": "rootB"
+  } ]
+}

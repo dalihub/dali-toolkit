@@ -1,0 +1,8 @@
+{
+  "scenes": [ { "nodes" : [ 0 ] } ],
+  "nodes": [ {} ],
+  "meshes": [ {
+    "uri": "mesh.bin",
+	"attributes": 2
+  } ]
+}

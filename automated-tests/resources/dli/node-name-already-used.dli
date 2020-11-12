@@ -1,0 +1,9 @@
+{
+  "scenes": [ { "nodes" : [ 0 ] } ],
+  "nodes": [ {
+    "name": "root",
+    "children" : [ 1 ]
+  }, {
+    "name": "root"
+  } ]
+}

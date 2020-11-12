@@ -1,0 +1,13 @@
+{
+  "scenes": [ { "nodes" : [ 0 ] } ],
+  "nodes": [ {
+    "name": "root"
+  } ],
+  "animations": [ {
+    "properties": [ {
+      "node": "root",
+      "property": "position",
+      "keyFramesBin": { "url": "doesntexist.bin" }
+    } ]
+  } ]
+}

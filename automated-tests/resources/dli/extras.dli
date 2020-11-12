@@ -1,0 +1,19 @@
+{
+  "scene": 0,
+  "scenes": [ { "nodes": [ 0 ] } ],
+  "nodes": [ {
+    "name": "root",
+    "extras": {
+      "fudgeFactor": 9000.1,
+      "fudgeVector": [ 8, 7.0 ],
+      "fudgeVector": [ -0.25, 17.0 ],
+      "isThisTheRealLife": true,
+      "isThisJustFantasy": false,
+      "": 16384,
+      "velocity": [ 0.1, 58.0, -0.2 ],
+      "not a great extra": "this one",
+      "frameOfReference": [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ]
+    }
+  } ]
+}
+

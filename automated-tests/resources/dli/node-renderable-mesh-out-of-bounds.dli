@@ -1,0 +1,9 @@
+{
+  "scenes": [ { "nodes" : [ 0 ] } ],
+  "nodes": [ {
+    "name": "root",
+    "model": {
+      "mesh": 0
+    }
+  } ]
+}
