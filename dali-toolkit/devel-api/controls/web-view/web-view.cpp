@@ -60,6 +60,11 @@ WebView WebView::New( const std::string& locale, const std::string& timezoneId )
   return Internal::WebView::New( locale, timezoneId );
 }
 
+WebView WebView::New( int argc, char** argv )
+{
+  return Internal::WebView::New( argc, argv );
+}
+
 WebView WebView::DownCast( BaseHandle handle )
 {
   return Control::DownCast< WebView, Internal::WebView >( handle );
@@ -93,6 +98,11 @@ void WebView::Suspend()
 void WebView::Resume()
 {
   Dali::Toolkit::GetImpl( *this ).Resume();
+}
+
+void WebView::ScrollBy( int deltaX, int deltaY )
+{
+  Dali::Toolkit::GetImpl( *this ).ScrollBy( deltaX, deltaY );
 }
 
 bool WebView::CanGoForward()
@@ -158,6 +168,11 @@ WebView::WebViewPageLoadSignalType& WebView::PageLoadFinishedSignal()
 WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSignal()
 {
   return Dali::Toolkit::GetImpl( *this ).PageLoadErrorSignal();
+}
+
+WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
+{
+  return Dali::Toolkit::GetImpl( *this ).ScrollEdgeReachedSignal();
 }
 
 WebView::WebView( Internal::WebView& implementation )

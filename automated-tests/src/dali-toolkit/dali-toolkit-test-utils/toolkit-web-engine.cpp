@@ -74,6 +74,9 @@ public:
     , mDefaultTextEncodingName()
     , mDefaultFontSize( 16 )
     , mEvaluating( false )
+    , mScrollPosition( 0, 0 )
+    , mScrollSize( 500, 500 )
+    , mContentSize( 500, 500 )
   {
     gInstanceCount++;
     gInstance = this;
@@ -206,6 +209,36 @@ public:
     mDefaultFontSize = defaultFontSize;
   }
 
+  void ScrollBy( int dx, int dy )
+  {
+    mScrollPosition += Dali::Vector2( dx, dy );
+    if ( mScrollPosition.y + mScrollSize.height > mContentSize.height )
+    {
+      gInstance->mScrollEdgeReachedSignal.Emit( Dali::WebEnginePlugin::ScrollEdge::BOTTOM );
+    }
+  }
+
+  void SetScrollPosition( int x, int y )
+  {
+    mScrollPosition.x = x;
+    mScrollPosition.y = y;
+  }
+
+  Dali::Vector2 GetScrollPosition() const
+  {
+    return mScrollPosition;
+  }
+
+  Dali::Vector2 GetScrollSize() const
+  {
+    return mScrollSize;
+  }
+
+  Dali::Vector2 GetContentSize() const
+  {
+    return  mContentSize;
+  }
+
   Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadStartedSignal()
   {
     return mPageLoadStartedSignal;
@@ -219,6 +252,11 @@ public:
   Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType& PageLoadErrorSignal()
   {
     return mPageLoadErrorSignal;
+  }
+
+  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType& ScrollEdgeReachedSignal()
+  {
+    return mScrollEdgeReachedSignal;
   }
 
   std::string                                                mUrl;
@@ -236,6 +274,11 @@ public:
   Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType    mPageLoadErrorSignal;
   std::vector< std::function< void( const std::string& ) > > mResultCallbacks;
   bool                                                       mEvaluating;
+
+  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
+  Dali::Vector2                                               mScrollPosition;
+  Dali::Vector2                                               mScrollSize;
+  Dali::Vector2                                               mContentSize;
 };
 
 inline WebEngine& GetImplementation( Dali::WebEngine& webEngine )
@@ -523,6 +566,31 @@ void WebEngine::SetDefaultFontSize( int defaultFontSize )
   Internal::Adaptor::GetImplementation( *this ).SetDefaultFontSize( defaultFontSize );
 }
 
+void WebEngine::ScrollBy( int dx, int dy )
+{
+  Internal::Adaptor::GetImplementation( *this ).ScrollBy( dx, dy );
+}
+
+void WebEngine::SetScrollPosition( int x, int y )
+{
+  Internal::Adaptor::GetImplementation( *this ).SetScrollPosition( x, y );
+}
+
+Dali::Vector2 WebEngine::GetScrollPosition() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetScrollPosition();
+}
+
+Dali::Vector2 WebEngine::GetScrollSize() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetScrollSize();
+}
+
+Dali::Vector2 WebEngine::GetContentSize() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetContentSize();
+}
+
 void WebEngine::SetSize( int width, int height )
 {
 }
@@ -535,6 +603,10 @@ bool WebEngine::SendTouchEvent( const TouchData& touch )
 bool WebEngine::SendKeyEvent( const KeyEvent& event )
 {
   return true;
+}
+
+void WebEngine::SetFocus( bool focused )
+{
 }
 
 Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadStartedSignal()
@@ -550,6 +622,11 @@ Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadFinishedS
 Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType& WebEngine::PageLoadErrorSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).PageLoadErrorSignal();
+}
+
+Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType& WebEngine::ScrollEdgeReachedSignal()
+{
+  return Internal::Adaptor::GetImplementation( *this ).ScrollEdgeReachedSignal();
 }
 
 } // namespace Dali;

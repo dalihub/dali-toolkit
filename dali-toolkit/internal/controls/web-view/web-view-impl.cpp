@@ -71,10 +71,14 @@ DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "enableJavaScript",        BOOLEAN
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "loadImagesAutomatically", BOOLEAN, LOAD_IMAGES_AUTOMATICALLY  )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "defaultTextEncodingName", STRING,  DEFAULT_TEXT_ENCODING_NAME )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "defaultFontSize",         INTEGER, DEFAULT_FONT_SIZE          )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollPosition",          VECTOR2, SCROLL_POSITION            )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollSize",              VECTOR2, SCROLL_SIZE                )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "contentSize",             VECTOR2, CONTENT_SIZE               )
 
 DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadStarted",         PAGE_LOAD_STARTED_SIGNAL            )
 DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadFinished",        PAGE_LOAD_FINISHED_SIGNAL           )
 DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadError",           PAGE_LOAD_ERROR_SIGNAL              )
+DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "scrollEdgeReached",       SCROLL_EDGE_REACHED_SIGNAL          )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -107,6 +111,25 @@ WebView::WebView( const std::string& locale, const std::string& timezoneId )
   }
 }
 
+WebView::WebView( int argc, char** argv )
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
+  mUrl(),
+  mVisual(),
+  mWebViewSize( Stage::GetCurrent().GetSize() ),
+  mWebEngine(),
+  mPageLoadStartedSignal(),
+  mPageLoadFinishedSignal(),
+  mPageLoadErrorSignal()
+{
+  mWebEngine = Dali::WebEngine::New();
+
+  // WebEngine is empty when it is not properly initialized.
+  if ( mWebEngine )
+  {
+    mWebEngine.Create( mWebViewSize.width, mWebViewSize.height, argc, argv );
+  }
+}
+
 WebView::WebView()
 : WebView( "", "" )
 {
@@ -134,6 +157,15 @@ Toolkit::WebView WebView::New( const std::string& locale, const std::string& tim
   return handle;
 }
 
+Toolkit::WebView WebView::New( int argc, char** argv )
+{
+  WebView* impl = new WebView( argc, argv );
+  Toolkit::WebView handle = Toolkit::WebView( *impl );
+
+  impl->Initialize();
+  return handle;
+}
+
 void WebView::OnInitialize()
 {
   Self().SetKeyboardFocusable( true );
@@ -144,6 +176,7 @@ void WebView::OnInitialize()
     mWebEngine.PageLoadStartedSignal().Connect( this, &WebView::OnPageLoadStarted );
     mWebEngine.PageLoadFinishedSignal().Connect( this, &WebView::OnPageLoadFinished );
     mWebEngine.PageLoadErrorSignal().Connect( this, &WebView::OnPageLoadError );
+    mWebEngine.ScrollEdgeReachedSignal().Connect( this, &WebView::OnScrollEdgeReached );
   }
 }
 
@@ -208,6 +241,14 @@ void WebView::Resume()
   if( mWebEngine )
   {
     mWebEngine.Resume();
+  }
+}
+
+void WebView::ScrollBy( int deltaX, int deltaY )
+{
+  if ( mWebEngine )
+  {
+    mWebEngine.ScrollBy( deltaX, deltaY );
   }
 }
 
@@ -292,6 +333,11 @@ Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSi
   return mPageLoadErrorSignal;
 }
 
+Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
+{
+  return mScrollEdgeReachedSignal;
+}
+
 void WebView::OnPageLoadStarted( const std::string& url )
 {
   if( !mPageLoadStartedSignal.Empty() )
@@ -319,6 +365,15 @@ void WebView::OnPageLoadError( const std::string& url, int errorCode )
   }
 }
 
+void WebView::OnScrollEdgeReached( Dali::WebEnginePlugin::ScrollEdge edge )
+{
+  if( !mScrollEdgeReachedSignal.Empty() )
+  {
+    Dali::Toolkit::WebView handle( GetOwner() );
+    mScrollEdgeReachedSignal.Emit( handle, edge );
+  }
+}
+
 bool WebView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
@@ -339,6 +394,11 @@ bool WebView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
   else if( 0 == strcmp( signalName.c_str(), PAGE_LOAD_ERROR_SIGNAL ) )
   {
     webView.PageLoadErrorSignal().Connect( tracker, functor );
+    connected = true;
+  }
+  else if( 0 == strcmp( signalName.c_str(), SCROLL_EDGE_REACHED_SIGNAL ) )
+  {
+    webView.ScrollEdgeReachedSignal().Connect( tracker, functor );
     connected = true;
   }
 
@@ -449,6 +509,15 @@ void WebView::SetProperty( BaseObject* object, Property::Index index, const Prop
         }
         break;
       }
+      case Toolkit::WebView::Property::SCROLL_POSITION:
+      {
+        Vector2 input;
+        if ( value.Get( input ) )
+        {
+          impl.SetScrollPosition( input.x, input.y );
+        }
+        break;
+      }
     }
   }
 }
@@ -504,6 +573,21 @@ Property::Value WebView::GetProperty( BaseObject* object, Property::Index proper
         value = impl.GetDefaultFontSize();
         break;
       }
+      case Toolkit::WebView::Property::SCROLL_POSITION:
+      {
+        value = impl.GetScrollPosition();
+        break;
+      }
+      case Toolkit::WebView::Property::SCROLL_SIZE:
+      {
+        value = impl.GetScrollSize();
+        break;
+      }
+      case Toolkit::WebView::Property::CONTENT_SIZE:
+      {
+        value = impl.GetContentSize();
+        break;
+      }
       default:
          break;
     }
@@ -532,6 +616,49 @@ bool WebView::OnKeyEvent( const Dali::KeyEvent& event )
     result = mWebEngine.SendKeyEvent( event );
   }
   return result;
+}
+
+void WebView::OnKeyInputFocusGained()
+{
+  if( mWebEngine )
+  {
+    mWebEngine.SetFocus( true );
+  }
+
+  EmitKeyInputFocusSignal( true ); // Calls back into the Control hence done last.
+}
+
+void WebView::OnKeyInputFocusLost()
+{
+  if( mWebEngine )
+  {
+    mWebEngine.SetFocus( false );
+  }
+
+  EmitKeyInputFocusSignal( false ); // Calls back into the Control hence done last.
+}
+
+void WebView::SetScrollPosition( int x, int y )
+{
+  if( mWebEngine )
+  {
+    mWebEngine.SetScrollPosition( x, y );
+  }
+}
+
+Dali::Vector2 WebView::GetScrollPosition() const
+{
+  return mWebEngine ? mWebEngine.GetScrollPosition() : Dali::Vector2::ZERO;
+}
+
+Dali::Vector2 WebView::GetScrollSize() const
+{
+  return mWebEngine ? mWebEngine.GetScrollSize() : Dali::Vector2::ZERO;
+}
+
+Dali::Vector2 WebView::GetContentSize() const
+{
+  return mWebEngine ? mWebEngine.GetContentSize() : Dali::Vector2::ZERO;
 }
 
 Toolkit::WebView::CacheModel::Type WebView::GetCacheModel() const

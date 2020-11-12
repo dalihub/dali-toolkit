@@ -22,6 +22,7 @@
 #include <functional>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/web-engine-plugin.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
@@ -176,7 +177,25 @@ public:
        * @details Name "defaultFontSize", type Property::INT.
        * @note Default is 16.
        */
-      DEFAULT_FONT_SIZE
+      DEFAULT_FONT_SIZE,
+
+      /**
+       * @brief The current position of scroll.
+       * @details Name "scrollPosition", type Property::VECTOR2.
+       */
+      SCROLL_POSITION,
+
+      /**
+       * @brief The current position of scroll.
+       * @details Name "scrollSize", type Property::VECTOR2. Read-only.
+       */
+      SCROLL_SIZE,
+
+      /**
+       * @brief The current position of scroll.
+       * @details Name "contentSize", type Property::VECTOR2. Read-only.
+       */
+      CONTENT_SIZE,
     };
   };
 
@@ -264,12 +283,17 @@ public:
   /**
    * @brief WebView signal type related with page loading.
    */
-  typedef Signal< void ( WebView, const std::string& ) > WebViewPageLoadSignalType;
+  using WebViewPageLoadSignalType = Signal< void( WebView, const std::string& ) >;
 
   /**
    * @brief WebView signal type related with page loading error.
    */
-  typedef Signal< void ( WebView, const std::string&, LoadErrorCode ) > WebViewPageLoadErrorSignalType;
+  using WebViewPageLoadErrorSignalType = Signal< void( WebView, const std::string&, LoadErrorCode ) >;
+
+  /**
+   * @brief WebView signal type related with scroll edge reached.
+   */
+  using WebViewScrollEdgeReachedSignalType = Signal< void( WebView, Dali::WebEnginePlugin::ScrollEdge ) >;
 
 public:
 
@@ -288,6 +312,14 @@ public:
    * @param [in] timezoneId The timezoneId of Web
    */
   static WebView New( const std::string& locale, const std::string& timezoneId );
+
+  /**
+   * @brief Creates an initialized WebView.
+   *
+   * @param [in] argc The count of arguments of Applications
+   * @param [in] argv The string array of arguments of Applications
+   */
+  static WebView New( int argc, char** argv );
 
   /**
    * @brief Creates an uninitialized WebView.
@@ -360,6 +392,13 @@ public:
    * @brief Resumes the operation associated with the view object after calling Suspend().
    */
   void Resume();
+
+  /**
+   * @brief Scrolls the webpage of view by deltaX and deltaY.
+   * @param[in] deltaX The delta x of scroll
+   * @param[in] deltaY The delta y of scroll
+   */
+  void ScrollBy( int deltaX, int deltaY );
 
   /**
    * @brief Returns whether forward is possible.
@@ -461,6 +500,13 @@ public:
    * @return A signal object to connect with.
    */
   WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when scroll edge is reached.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
 
 public: // Not intended for application developers
 
