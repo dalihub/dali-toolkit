@@ -536,6 +536,10 @@ bool WebEngine::SendKeyEvent( const KeyEvent& event )
   return true;
 }
 
+void WebEngine::SetFocus( bool focused )
+{
+}
+
 Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadStartedSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).PageLoadStartedSignal();
