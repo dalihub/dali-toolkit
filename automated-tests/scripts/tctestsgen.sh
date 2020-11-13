@@ -60,7 +60,9 @@ print "</test_definition>"
     }' $TFILE > $FILE
 }
 
-(cd $SCRIPT_DIR/..; scripts/retriever.sh -f src/$MODULE_NAME $4 > ${TFILE}_pre)
+cmd="cd $SCRIPT_DIR/..; scripts/retriever.sh -fsrc/$MODULE_NAME $4 > ${TFILE}_pre"
+echo "$cmd"
+( eval $cmd )
 if [ $? -ne 0 ]; then cat ${TFILE}_pre; exit 1; fi
 cat ${TFILE}_pre | sort -t',' -k2,2 -s > $TFILE
 gen

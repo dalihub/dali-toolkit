@@ -43,6 +43,7 @@ namespace Text
 const float DEFAULT_TEXTFIT_MIN = 10.f;
 const float DEFAULT_TEXTFIT_MAX = 100.f;
 const float DEFAULT_TEXTFIT_STEP = 1.f;
+const float DEFAULT_FONT_SIZE_SCALE = 1.f;
 
 //Forward declarations
 struct CursorInfo;
@@ -206,11 +207,11 @@ struct FontDefaults
     fontClient.GetDefaultPlatformFontDescription( mFontDescription );
   }
 
-  FontId GetFontId( TextAbstraction::FontClient& fontClient )
+  FontId GetFontId( TextAbstraction::FontClient& fontClient, float fontPointSize )
   {
     if( !mFontId )
     {
-      const PointSize26Dot6 pointSize = static_cast<PointSize26Dot6>( mDefaultPointSize * 64.f );
+      const PointSize26Dot6 pointSize = static_cast<PointSize26Dot6>( fontPointSize * 64.f );
       mFontId = fontClient.GetFontId( mFontDescription, pointSize );
     }
 
@@ -349,7 +350,8 @@ struct Controller::Impl
     mTextFitMinSize( DEFAULT_TEXTFIT_MIN ),
     mTextFitMaxSize( DEFAULT_TEXTFIT_MAX ),
     mTextFitStepSize( DEFAULT_TEXTFIT_STEP ),
-    mTextFitEnabled( false )
+    mTextFitEnabled( false ),
+    mFontSizeScale( DEFAULT_FONT_SIZE_SCALE )
   {
     mModel = Model::New();
 
@@ -828,6 +830,7 @@ public:
   float mTextFitMaxSize;                   ///< Maximum Font Size for text fit. Default 100
   float mTextFitStepSize;                  ///< Step Size for font intervalse. Default 1
   bool  mTextFitEnabled : 1;               ///< Whether the text's fit is enabled.
+  float mFontSizeScale;                    ///< Scale value for Font Size. Default 1.0
 
 private:
   friend ControllerImplEventHandler;

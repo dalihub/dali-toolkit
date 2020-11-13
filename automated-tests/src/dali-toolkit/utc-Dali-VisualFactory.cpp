@@ -1131,9 +1131,9 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   application.GetScene().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f) );
 
+  // Either application.SendNotification() or the trigger can now complete the task.
   application.SendNotification();
   application.Render();
-
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   // renderer is added to actor
@@ -1167,9 +1167,9 @@ int UtcDaliVisualFactoryGetSvgVisualLarge(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   application.GetScene().Add( actor );
 
+  // Either application.SendNotification() or the trigger can now complete the task.
   application.SendNotification();
   application.Render();
-
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   // renderer is added to actor
@@ -1210,12 +1210,10 @@ int UtcDaliVisualFactoryGetSvgVisualAtlas(void)
   application.GetScene().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f) );
 
+  // Either application.SendNotification() or the trigger can now complete the task.
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
   application.SendNotification();
   application.Render();
-
-  // renderer is not added to actor until the rasterization is completed.
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
-
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   // renderer is added to actor

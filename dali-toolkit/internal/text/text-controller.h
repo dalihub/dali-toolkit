@@ -860,6 +860,20 @@ public: // Default style & Input style
   float GetDefaultFontSize( FontSizeType type ) const;
 
   /**
+   * @brief Set the font size scale.
+   *
+   * @param[in] scale The font size scale
+   */
+  void SetFontSizeScale( float scale );
+
+  /**
+   * @brief Get the font size scale.
+   *
+   * @return The font size scale.
+   */
+  float GetFontSizeScale() const;
+
+  /**
    * @brief Sets the Placeholder text font size.
    * @param[in] fontSize The placeholder text font size
    * @param[in] type The font size type is point size or pixel size

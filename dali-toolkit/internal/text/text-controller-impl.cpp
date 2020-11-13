@@ -959,7 +959,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
       // Get the default font's description.
       TextAbstraction::FontDescription defaultFontDescription;
-      TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
+      TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE * mFontSizeScale;
 
       if( IsShowingPlaceholderText() && mEventData && ( NULL != mEventData->mPlaceholderFont ) )
       {
@@ -967,7 +967,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
         defaultFontDescription = mEventData->mPlaceholderFont->mFontDescription;
         if( mEventData->mPlaceholderFont->sizeDefined )
         {
-          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * 64u;
+          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * mFontSizeScale * 64u;
         }
       }
       else if( NULL != mFontDefaults )
@@ -981,7 +981,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
         }
         else
         {
-          defaultPointSize = mFontDefaults->mDefaultPointSize * 64u;
+          defaultPointSize = mFontDefaults->mDefaultPointSize * mFontSizeScale * 64u;
         }
       }
 
@@ -1332,11 +1332,11 @@ float Controller::Impl::GetDefaultFontLineHeight()
   if( NULL == mFontDefaults )
   {
     TextAbstraction::FontDescription fontDescription;
-    defaultFontId = mFontClient.GetFontId( fontDescription );
+    defaultFontId = mFontClient.GetFontId( fontDescription, TextAbstraction::FontClient::DEFAULT_POINT_SIZE * mFontSizeScale );
   }
   else
   {
-    defaultFontId = mFontDefaults->GetFontId( mFontClient );
+    defaultFontId = mFontDefaults->GetFontId( mFontClient, mFontDefaults->mDefaultPointSize * mFontSizeScale );
   }
 
   Text::FontMetrics fontMetrics;

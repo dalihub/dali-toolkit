@@ -147,6 +147,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "horizontalScrollPosition
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "verticalScrollPosition",         INTEGER,   VERTICAL_SCROLL_POSITION             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableEditing",                  BOOLEAN,   ENABLE_EDITING                       )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "selectedText",         STRING,    SELECTED_TEXT                        )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "fontSizeScale",                  FLOAT,     FONT_SIZE_SCALE                      )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -744,6 +745,17 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::FONT_SIZE_SCALE:
+      {
+        const float scale = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p FONT_SIZE_SCALE %f\n", impl.mController.Get(), scale );
+
+        if( !Equals( impl.mController->GetFontSizeScale(), scale ) )
+        {
+          impl.mController->SetFontSizeScale( scale );
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -1088,6 +1100,11 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       case Toolkit::DevelTextEditor::Property::VERTICAL_SCROLL_POSITION:
       {
         value = impl.GetVerticalScrollPosition();
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::FONT_SIZE_SCALE:
+      {
+        value = impl.mController->GetFontSizeScale();
         break;
       }
     } //switch

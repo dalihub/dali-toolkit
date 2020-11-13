@@ -21,6 +21,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <string_view>
 
 namespace Dali
 {
@@ -63,13 +64,13 @@ public:
    * Request the default vertex shader source.
    * @return The default vertex shader source.
    */
-  const char* GetVertexShaderSource();
+  std::string_view GetVertexShaderSource();
 
   /**
    * Request the default fragment shader source.
    * @return The default fragment shader source.
    */
-  const char* GetFragmentShaderSource();
+  std::string_view GetFragmentShaderSource();
 
 protected:
 

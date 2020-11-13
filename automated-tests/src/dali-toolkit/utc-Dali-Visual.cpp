@@ -2817,6 +2817,23 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   DALI_TEST_EQUALS( extraSize, Vector2(0.5f,0.5f), TEST_LOCATION );
 }
 
+int UtcDaliVisualSetTransform01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualSetTransform: ColorVisual" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
+  propertyMap.Insert(Visual::Property::OPACITY, 0.5f);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  TestTransform( application, visual );
+  TestMixColor( visual, ColorVisual::Property::MIX_COLOR, Color::BLUE );
+
+  END_TEST;
+}
+
 int UtcDaliVisualSetTransform0(void)
 {
   ToolkitTestApplication application;

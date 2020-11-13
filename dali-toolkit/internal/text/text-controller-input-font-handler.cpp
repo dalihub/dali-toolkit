@@ -397,7 +397,7 @@ void Controller::InputFontHandler::SetInputFontPointSize(Controller& controller,
                                                                               startOfSelectedText,
                                                                               lengthOfSelectedText );
 
-        fontDescriptionRun.size = static_cast<PointSize26Dot6>( size * 64.f );
+        fontDescriptionRun.size = static_cast<PointSize26Dot6>( size * controller.mImpl->mFontSizeScale * 64.f );
         fontDescriptionRun.sizeDefined = true;
 
         controller.mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;

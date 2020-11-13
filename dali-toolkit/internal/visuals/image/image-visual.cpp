@@ -543,7 +543,7 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   }
   else
   {
-    vertexShader = mImageVisualShaderFactory.GetVertexShaderSource();
+    vertexShader = mImageVisualShaderFactory.GetVertexShaderSource().data();
   }
 
   std::string fragmentShader;
@@ -553,7 +553,7 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   }
   else
   {
-    fragmentShader = mImageVisualShaderFactory.GetFragmentShaderSource();
+    fragmentShader = mImageVisualShaderFactory.GetFragmentShaderSource().data();
   }
 
   // If the texture is native, we may need to change prefix and sampler in

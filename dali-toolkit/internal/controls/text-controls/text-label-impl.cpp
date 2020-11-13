@@ -134,6 +134,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "matchSystemLanguageDi
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textFit",                   MAP,     TEXT_FIT                   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "minLineSize",               FLOAT,   MIN_LINE_SIZE              )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "renderingBackend",          INTEGER, RENDERING_BACKEND          )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "fontSizeScale",             FLOAT,   FONT_SIZE_SCALE            )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -466,6 +467,17 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         impl.mTextUpdateNeeded = impl.mController->SetDefaultLineSize( lineSize ) || impl.mTextUpdateNeeded;
         break;
       }
+      case Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE:
+      {
+        const float scale = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p FONT_SIZE_SCALE %f\n", impl.mController.Get(), scale );
+
+        if( !Equals( impl.mController->GetFontSizeScale(), scale ) )
+        {
+          impl.mController->SetFontSizeScale( scale );
+        }
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -692,6 +704,11 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
       {
         value = impl.mController->GetDefaultLineSize();
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE:
+      {
+        value = impl.mController->GetFontSizeScale();
         break;
       }
     }

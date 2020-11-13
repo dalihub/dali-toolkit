@@ -104,6 +104,7 @@ const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGr
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
 const char* const PROPERTY_NAME_BACKGROUND                           = "textBackground";
+const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
@@ -503,6 +504,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == TextField::Property::ENABLE_SELECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextField::Property::PLACEHOLDER );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextField::Property::ELLIPSIS );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_FONT_SIZE_SCALE ) == DevelTextField::Property::FONT_SIZE_SCALE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextField::Property::ENABLE_SHIFT_SELECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextField::Property::ENABLE_GRAB_HANDLE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
@@ -578,6 +580,10 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  field.SetProperty( DevelTextField::Property::FONT_SIZE_SCALE, 2.5f );
+  DALI_TEST_EQUALS( field.GetProperty<float>( DevelTextField::Property::FONT_SIZE_SCALE ), 2.5f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  field.SetProperty( DevelTextField::Property::FONT_SIZE_SCALE, 1.0f );
 
   // Reset font style.
   fontStyleMapSet.Clear();
@@ -3047,6 +3053,38 @@ int UtcDaliTextFieldEnableEditing(void)
 
   DALI_TEST_EQUALS( textField.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "D", TEST_LOCATION );
   DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::ENABLE_EDITING ).Get<bool>(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextFieldFontSizeScale(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldFontSizeScale");
+
+  TextField textField = TextField::New();
+  textField.SetProperty( TextField::Property::POINT_SIZE, 30.f );
+  textField.SetProperty( TextField::Property::TEXT, "Test" );
+  Vector3 nonScaledSize = textField.GetNaturalSize();
+
+  TextField textFieldScaled = TextField::New();
+  textFieldScaled.SetProperty( TextField::Property::POINT_SIZE, 15.f );
+  textFieldScaled.SetProperty( Toolkit::DevelTextField::Property::FONT_SIZE_SCALE, 2.f );
+  textFieldScaled.SetProperty( TextField::Property::TEXT, "Test" );
+  Vector3 scaledSize = textFieldScaled.GetNaturalSize();
+
+  DALI_TEST_EQUALS( nonScaledSize, scaledSize, TEST_LOCATION );
+
+  textField.SetProperty( TextField::Property::PIXEL_SIZE, 30.f );
+  textField.SetProperty( TextField::Property::TEXT, "Test" );
+  nonScaledSize = textField.GetNaturalSize();
+
+  textFieldScaled.SetProperty( TextField::Property::PIXEL_SIZE, 15.f );
+  textFieldScaled.SetProperty( Toolkit::DevelTextField::Property::FONT_SIZE_SCALE, 2.f );
+  textFieldScaled.SetProperty( TextField::Property::TEXT, "Test" );
+  scaledSize = textFieldScaled.GetNaturalSize();
+
+  DALI_TEST_EQUALS( nonScaledSize, scaledSize, TEST_LOCATION );
 
   END_TEST;
 }
