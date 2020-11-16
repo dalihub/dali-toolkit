@@ -588,6 +588,12 @@ int UtcDaliTransitionDataMap5P(void)
   Animation anim = dummyImpl.CreateTransition( transition );
   DALI_TEST_CHECK( anim );
 
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+
   Renderer renderer = actor.GetRendererAt(0);
   Property::Index mixColorIndex = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
   application.SendNotification();
@@ -595,13 +601,17 @@ int UtcDaliTransitionDataMap5P(void)
 
   DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
   DALI_TEST_EQUALS( renderer.GetProperty<float>( DevelRenderer::Property::OPACITY ), 0.0f, 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
 
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION);
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 0.0f, 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::ON, TEST_LOCATION );
+
+  // The Renderer is transparent. So rendering is skipped. The state should not be changed.
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
 
   anim.Play();
+
+  glEnableStack.Reset();
 
   application.SendNotification();
   application.Render(500); // Start animation
@@ -609,14 +619,19 @@ int UtcDaliTransitionDataMap5P(void)
   application.SendNotification();
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION);
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 0.5f, 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::ON, TEST_LOCATION );
+
+  // Should not be changed
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  glEnableStack.Reset();
 
   application.Render(501); // End of anim
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION );
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 1.0f, 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::AUTO, TEST_LOCATION );
+
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
 
   END_TEST;
 }
@@ -662,6 +677,13 @@ int UtcDaliTransitionDataMap6P(void)
 
   Renderer renderer = actor.GetRendererAt(0);
   Property::Index mixColorIndex = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+
   application.SendNotification();
   application.Render(0);
 
@@ -670,27 +692,33 @@ int UtcDaliTransitionDataMap6P(void)
   DALI_TEST_EQUALS( renderer.GetProperty<float>( DevelRenderer::Property::OPACITY ), 1.0f, 0.001f, TEST_LOCATION );
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 1.0f, 0.001f, TEST_LOCATION );
 
-  // Note, This should be testing for AUTO
-  // this is the same problem as C# target value being set before Play is called.
-  // @todo How was this solved?
-  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::ON, TEST_LOCATION );
+  // Default state is disabled. So test if "Enabled" is not called.
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
 
   anim.Play();
+
+  glEnableStack.Reset();
 
   application.SendNotification();
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
+
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION);
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 0.5f, 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::ON, TEST_LOCATION );
+
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  glEnableStack.Reset();
 
   application.Render(500); // End of anim
   application.SendNotification();
+
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION );
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 0.0f, 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::ON, TEST_LOCATION );
+
+  // GL_BLEND should not be changed: Keep enabled
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
 
   END_TEST;
 }

@@ -117,7 +117,6 @@ bool GetPolicyFromValue( const Property::Value& value, Vector2& policy )
 
 Internal::Visual::Base::Impl::Impl( FittingMode fittingMode, Toolkit::Visual::Type type )
 : mCustomShader( NULL ),
-  mBlendSlotDelegate( NULL ),
   mEventObserver( NULL ),
   mTransform(),
   mMixColor( Color::WHITE ),
@@ -137,7 +136,6 @@ Internal::Visual::Base::Impl::Impl( FittingMode fittingMode, Toolkit::Visual::Ty
 Internal::Visual::Base::Impl::~Impl()
 {
   delete mCustomShader;
-  delete mBlendSlotDelegate;
 }
 
 Internal::Visual::Base::Impl::CustomShader::CustomShader( const Property::Map& map )

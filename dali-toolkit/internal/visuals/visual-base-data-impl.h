@@ -120,7 +120,6 @@ struct Base::Impl
 
   Renderer        mRenderer;
   CustomShader*   mCustomShader;
-  SlotDelegate<Visual::Base>* mBlendSlotDelegate; ///< Used to own mix color animation connection
   EventObserver*  mEventObserver;  ///< Allows controls to observe when the visual has events to notify
   std::string     mName;
   Transform       mTransform;
