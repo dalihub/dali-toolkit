@@ -95,6 +95,11 @@ protected:
   void DoSetOnScene( Actor& actor ) override;
 
   /**
+   * @copydoc Visual::Base::DoSetOffScene
+   */
+  void DoSetOffScene(Actor& actor) override;
+
+  /**
    * @copydoc Visual::Base::OnSetTransform
    */
   void OnSetTransform() override;
@@ -104,11 +109,27 @@ protected:
    */
   void OnDoAction( const Property::Index actionId, const Property::Value& attributes ) override;
 
+  /**
+   * @copydoc Visual::Base::UpdateShader
+   */
+  void UpdateShader() override;
+
+  /**
+   * @copydoc Visual::Base::OnGetPropertyObject
+   */
+  Dali::Property OnGetPropertyObject(Dali::Property::Key key) override;
+
 private:
   /**
    * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
    */
   void InitializeRenderer();
+
+  /**
+   * @brief Get a shader for the current properties.
+   * @return The shader for the current properties.
+   */
+  Shader GetShader();
 
 private:
 
@@ -119,9 +140,10 @@ private:
   ColorVisual& operator=( const ColorVisual& colorRenderer );
 
 private:
-
-  float mBlurRadius;         ///< The blur radius
-  bool mRenderIfTransparent; ///< Whether we should render even if the mix-color is transparent.
+  float           mBlurRadius;          ///< The blur radius
+  Property::Index mBlurRadiusIndex;     ///< The blur radius property index
+  bool            mRenderIfTransparent; ///< Whether we should render even if the mix-color is transparent.
+  bool            mNeedBlurRadius;      ///< Whether we need the blur radius in shader.
 };
 
 } // namespace Internal

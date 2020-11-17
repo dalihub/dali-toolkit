@@ -391,6 +391,11 @@ public:
    */
   void ClearShadow();
 
+  /**
+   * @copydoc DevelControl::GetVisualProperty()
+   */
+  Dali::Property GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey);
+
 private:
 
   /**

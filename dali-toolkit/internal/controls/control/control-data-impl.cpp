@@ -169,6 +169,24 @@ Toolkit::Visual::Base GetVisualByName(
   return visualHandle;
 }
 
+Toolkit::Visual::Base GetVisualByIndex(
+  const RegisteredVisualContainer& visuals,
+  Property::Index                  index)
+{
+  Toolkit::Visual::Base visualHandle;
+
+  RegisteredVisualContainer::Iterator iter;
+  for(iter = visuals.Begin(); iter != visuals.End(); iter++)
+  {
+    if((*iter)->index == index)
+    {
+      visualHandle = (*iter)->visual;
+      break;
+    }
+  }
+  return visualHandle;
+}
+
 /**
  * Move visual from source to destination container
  */
@@ -1818,6 +1836,19 @@ void Control::Impl::ClearShadow()
 
    // Trigger a size negotiation request that may be needed when unregistering a visual.
    mControlImpl.RelayoutRequest();
+}
+
+Dali::Property Control::Impl::GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey)
+{
+  Toolkit::Visual::Base visual = GetVisualByIndex(mVisuals, index);
+  if(visual)
+  {
+    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation(visual);
+    return visualImpl.GetPropertyObject(visualPropertyKey);
+  }
+
+  Handle handle;
+  return Dali::Property(handle, Property::INVALID_INDEX);
 }
 
 void Control::Impl::EmitResourceReadySignal()

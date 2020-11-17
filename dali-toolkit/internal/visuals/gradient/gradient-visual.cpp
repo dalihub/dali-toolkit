@@ -385,6 +385,15 @@ void GradientVisual::DoSetOnScene( Actor& actor )
   ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
+void GradientVisual::UpdateShader()
+{
+  if(mImpl->mRenderer)
+  {
+    Shader shader = GetShader();
+    mImpl->mRenderer.SetShader(shader);
+  }
+}
+
 void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
@@ -436,16 +445,7 @@ void GradientVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 void GradientVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-
-  Toolkit::GradientVisual::Units::Type gradientUnits = mGradient->GetGradientUnits();
-  int roundedCorner = IsRoundedCornerRequired() ? 1 : 0;
-  VisualFactoryCache::ShaderType shaderType = SHADER_TYPE_TABLE[mGradientType][gradientUnits + roundedCorner * 2];
-  Shader shader = mFactoryCache.GetShader( shaderType );
-  if( !shader )
-  {
-    shader = Shader::New( VERTEX_SHADER[gradientUnits + roundedCorner * 2], FRAGMENT_SHADER[ mGradientType + roundedCorner * 2 ] );
-    mFactoryCache.SaveShader( shaderType, shader );
-  }
+  Shader   shader   = GetShader();
 
   //Set up the texture set
   TextureSet textureSet = TextureSet::New();
@@ -552,6 +552,21 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
   }
 
   return true;
+}
+
+Shader GradientVisual::GetShader()
+{
+  Toolkit::GradientVisual::Units::Type gradientUnits = mGradient->GetGradientUnits();
+  int                                  roundedCorner = IsRoundedCornerRequired() ? 1 : 0;
+  VisualFactoryCache::ShaderType       shaderType    = SHADER_TYPE_TABLE[mGradientType][gradientUnits + roundedCorner * 2];
+  Shader                               shader        = mFactoryCache.GetShader(shaderType);
+  if(!shader)
+  {
+    shader = Shader::New(VERTEX_SHADER[gradientUnits + roundedCorner * 2], FRAGMENT_SHADER[mGradientType + roundedCorner * 2]);
+    mFactoryCache.SaveShader(shaderType, shader);
+  }
+
+  return shader;
 }
 
 void GradientVisual::GetStopOffsets(const Property::Value* value, Vector<float>& stopOffsets)

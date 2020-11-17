@@ -203,12 +203,6 @@ public:
   void SetMixColor( const Vector3& color );
 
   /**
-   * Gets the mix color of the visual.
-   * @return The mix color
-   */
-  const Vector4& GetMixColor() const;
-
-  /**
    * Animate the property if it exists in the visual or renderer.
    *
    * If it's a visual property such as mix color or a transform property,
@@ -279,8 +273,15 @@ public:
    */
   Toolkit::Visual::Type GetType() const;
 
- protected:
+  /**
+   * @brief Retrieve the property object associated with the property key.
+   *
+   * @param[in] key The Property key of the visual.
+   * @return The Property object
+   */
+  Dali::Property GetPropertyObject(Dali::Property::Key key);
 
+protected:
   /**
    * @brief Constructor.
    *
@@ -349,6 +350,25 @@ protected:
    * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
    */
   virtual void OnDoAction( const Property::Index actionId, const Property::Value& attributes );
+
+  /**
+   * @brief Update the shader when some properties are changed.
+   */
+  virtual void UpdateShader()
+  {
+  }
+
+  /**
+   * @brief Called by GetPropertyObject() allowing sub classes to respond to the GetPropertyObject event
+   * @note The derived class is required to register the given property.
+   * @param[in] key The key of the visual's property.
+   * @return The Property object
+   */
+  virtual Dali::Property OnGetPropertyObject(Dali::Property::Key key)
+  {
+    Handle handle;
+    return Dali::Property(handle, Property::INVALID_INDEX);
+  }
 
 protected:
 

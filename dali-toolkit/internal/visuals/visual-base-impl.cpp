@@ -323,7 +323,7 @@ void Visual::Base::SetOnScene( Actor& actor )
 
       if( IsRoundedCornerRequired() )
       {
-        mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty( CORNER_RADIUS, mImpl->mCornerRadius );
+        mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
         mImpl->mRenderer.RegisterProperty( CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy );
 
         mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
@@ -340,6 +340,17 @@ void Visual::Base::SetOffScene( Actor& actor )
 {
   if( IsOnScene() )
   {
+    if(mImpl->mRenderer)
+    {
+      // Update values from Renderer
+      mImpl->mMixColor   = mImpl->mRenderer.GetProperty<Vector3>(mImpl->mMixColorIndex);
+      mImpl->mMixColor.a = mImpl->mRenderer.GetProperty<float>(DevelRenderer::Property::OPACITY);
+      if(mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
+      {
+        mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<float>(mImpl->mCornerRadiusIndex);
+      }
+    }
+
     DoSetOffScene( actor );
     mImpl->mMixColorIndex = Property::INVALID_INDEX;
     mImpl->mCornerRadiusIndex = Property::INVALID_INDEX;
@@ -349,11 +360,22 @@ void Visual::Base::SetOffScene( Actor& actor )
 
 void Visual::Base::CreatePropertyMap( Property::Map& map ) const
 {
-  DoCreatePropertyMap( map );
-
-  if( mImpl->mCustomShader )
+  if(mImpl->mRenderer)
   {
-    mImpl->mCustomShader->CreatePropertyMap( map );
+    // Update values from Renderer
+    mImpl->mMixColor   = mImpl->mRenderer.GetProperty<Vector3>(mImpl->mMixColorIndex);
+    mImpl->mMixColor.a = mImpl->mRenderer.GetProperty<float>(DevelRenderer::Property::OPACITY);
+    if(mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
+    {
+      mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<float>(mImpl->mCornerRadiusIndex);
+    }
+  }
+
+  DoCreatePropertyMap(map);
+
+  if(mImpl->mCustomShader)
+  {
+    mImpl->mCustomShader->CreatePropertyMap(map);
   }
 
   Property::Map transform;
@@ -426,7 +448,12 @@ bool Visual::Base::IsOnScene() const
 
 bool Visual::Base::IsRoundedCornerRequired() const
 {
-  return !EqualsZero( mImpl->mCornerRadius );
+  if(mImpl->mRenderer && mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
+  {
+    // Update values from Renderer
+    mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<float>(mImpl->mCornerRadiusIndex);
+  }
+  return !EqualsZero(mImpl->mCornerRadius) || mImpl->mNeedCornerRadius;
 }
 
 void Visual::Base::OnDoAction( const Property::Index actionId, const Property::Value& attributes )
@@ -477,11 +504,6 @@ void Visual::Base::SetMixColor( const Vector3& color )
   {
     mImpl->mRenderer.SetProperty( mImpl->mMixColorIndex, color );
   }
-}
-
-const Vector4& Visual::Base::GetMixColor() const
-{
-  return mImpl->mMixColor;
 }
 
 void Visual::Base::AddEventObserver( Visual::EventObserver& observer)
@@ -624,21 +646,12 @@ void Visual::Base::AnimateProperty(
   }
 #endif
 
-  Property::Map map;
-  DoCreatePropertyMap( map );
-  Property::Value* valuePtr = map.Find( Toolkit::Visual::Property::TYPE );
-  int visualType = -1;
-  if( valuePtr )
-  {
-    valuePtr->Get( visualType );
-  }
-
-  if( animator.propertyKey == Toolkit::Visual::Property::MIX_COLOR ||
-      animator.propertyKey == MIX_COLOR ||
-      ( visualType == Toolkit::Visual::COLOR &&
-        animator.propertyKey == ColorVisual::Property::MIX_COLOR ) ||
-      ( visualType == Toolkit::Visual::PRIMITIVE &&
-        animator.propertyKey == PrimitiveVisual::Property::MIX_COLOR ) )
+  if(animator.propertyKey == Toolkit::Visual::Property::MIX_COLOR ||
+     animator.propertyKey == MIX_COLOR ||
+     (mImpl->mType == Toolkit::Visual::COLOR &&
+      animator.propertyKey == ColorVisual::Property::MIX_COLOR) ||
+     (mImpl->mType == Toolkit::Visual::PRIMITIVE &&
+      animator.propertyKey == PrimitiveVisual::Property::MIX_COLOR))
   {
     AnimateMixColorProperty( transition, animator );
   }
@@ -743,6 +756,65 @@ void Visual::Base::AnimateMixColorProperty(
       SetupTransition( transition, animator, DevelRenderer::Property::OPACITY, initialOpacity, targetOpacity );
     }
   }
+}
+
+Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
+{
+  if(!mImpl->mRenderer)
+  {
+    Handle handle;
+    return Dali::Property(handle, Property::INVALID_INDEX);
+  }
+
+  // Mix color or opacity cases
+  if(key.type == Property::Key::INDEX)
+  {
+    if(key.indexKey == Toolkit::Visual::Property::MIX_COLOR || (mImpl->mType == Toolkit::Visual::COLOR && key.indexKey == ColorVisual::Property::MIX_COLOR) || (mImpl->mType == Toolkit::Visual::PRIMITIVE && key.indexKey == PrimitiveVisual::Property::MIX_COLOR))
+    {
+      return Dali::Property(mImpl->mRenderer, mImpl->mMixColorIndex);
+    }
+    else if(key.indexKey == Toolkit::Visual::Property::OPACITY)
+    {
+      return Dali::Property(mImpl->mRenderer, DevelRenderer::Property::OPACITY);
+    }
+  }
+  else
+  {
+    if(key.stringKey == MIX_COLOR)
+    {
+      return Dali::Property(mImpl->mRenderer, mImpl->mMixColorIndex);
+    }
+    else if(key.stringKey == OPACITY)
+    {
+      return Dali::Property(mImpl->mRenderer, DevelRenderer::Property::OPACITY);
+    }
+  }
+
+  // Other cases
+  Property::Index index = GetPropertyIndex(key);
+  if(index == Property::INVALID_INDEX)
+  {
+    if((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::CORNER_RADIUS) || (key.type == Property::Key::STRING && key.stringKey == CORNER_RADIUS))
+    {
+      // Register CORNER_RADIUS property
+      mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
+      mImpl->mRenderer.RegisterProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
+      index = mImpl->mCornerRadiusIndex;
+
+      mImpl->mNeedCornerRadius = true;
+
+      // Change shader
+      UpdateShader();
+    }
+    else
+    {
+      // We can't find the property in the base class.
+      // Request to child class
+      return OnGetPropertyObject(key);
+    }
+  }
+
+  return Dali::Property(mImpl->mRenderer, index);
 }
 
 } // namespace Internal

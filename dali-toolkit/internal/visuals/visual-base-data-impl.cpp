@@ -115,21 +115,22 @@ bool GetPolicyFromValue( const Property::Value& value, Vector2& policy )
 
 } // unnamed namespace
 
-Internal::Visual::Base::Impl::Impl( FittingMode fittingMode, Toolkit::Visual::Type type )
-: mCustomShader( NULL ),
-  mEventObserver( NULL ),
+Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Type type)
+: mCustomShader(NULL),
+  mEventObserver(NULL),
   mTransform(),
-  mMixColor( Color::WHITE ),
-  mControlSize( Vector2::ZERO ),
-  mCornerRadius( 0.0f ),
-  mCornerRadiusPolicy( 1.0f ),
-  mDepthIndex( 0.0f ),
-  mMixColorIndex( Property::INVALID_INDEX ),
-  mCornerRadiusIndex( Property::INVALID_INDEX ),
-  mFittingMode( fittingMode ),
-  mFlags( 0 ),
-  mResourceStatus( Toolkit::Visual::ResourceStatus::PREPARING ),
-  mType( type )
+  mMixColor(Color::WHITE),
+  mControlSize(Vector2::ZERO),
+  mCornerRadius(0.0f),
+  mCornerRadiusPolicy(1.0f),
+  mDepthIndex(0.0f),
+  mMixColorIndex(Property::INVALID_INDEX),
+  mCornerRadiusIndex(Property::INVALID_INDEX),
+  mFittingMode(fittingMode),
+  mFlags(0),
+  mResourceStatus(Toolkit::Visual::ResourceStatus::PREPARING),
+  mType(type),
+  mNeedCornerRadius(false)
 {
 }
 

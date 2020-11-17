@@ -229,6 +229,11 @@ protected:
    */
   bool IsResourceReady() const override;
 
+  /**
+   * @copydoc Visual::Base::UpdateShader
+   */
+  void UpdateShader() override;
+
 public:
 
   /**
@@ -317,6 +322,12 @@ private:
    * @param[in] value The value
    */
   void DoSetProperty( Property::Index index, const Property::Value& value );
+
+  /**
+   * @brief Get a shader for the current properties.
+   * @return The shader for the current properties.
+   */
+  Shader GetShader();
 
 private:
 

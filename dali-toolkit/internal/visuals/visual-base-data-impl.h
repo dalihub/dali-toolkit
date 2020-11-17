@@ -134,6 +134,7 @@ struct Base::Impl
   int             mFlags;
   Toolkit::Visual::ResourceStatus  mResourceStatus;
   const Toolkit::Visual::Type      mType;
+  bool                             mNeedCornerRadius;
 };
 
 } // namespace Visual
