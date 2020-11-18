@@ -451,11 +451,6 @@ void Visual::Base::RegisterMixColor()
       Vector3(mImpl->mMixColor) );
   }
 
-  if( mImpl->mMixColor.a < 1.f || IsAdvancedBlendEquationApplied() )
-  {
-    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-  }
-
   mImpl->mRenderer.SetProperty( DevelRenderer::Property::OPACITY, mImpl->mMixColor.a );
 
   float preMultipliedAlpha = 0.0f;
@@ -474,10 +469,6 @@ void Visual::Base::SetMixColor( const Vector4& color )
   {
     mImpl->mRenderer.SetProperty( mImpl->mMixColorIndex, Vector3(color) );
     mImpl->mRenderer.SetProperty( DevelRenderer::Property::OPACITY, color.a );
-    if( color.a < 1.f || IsAdvancedBlendEquationApplied() )
-    {
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-    }
   }
 }
 
@@ -671,14 +662,6 @@ void Visual::Base::AnimateOpacityProperty(
   Dali::Animation& transition,
   Internal::TransitionData::Animator& animator )
 {
-  bool isOpaque = mImpl->mMixColor.a >= 1.0f;
-
-  float initialOpacity;
-  if( animator.initialValue.Get( initialOpacity ) )
-  {
-    isOpaque = (initialOpacity >= 1.0f);
-  }
-
   float targetOpacity;
   if( animator.targetValue.Get( targetOpacity ) )
   {
@@ -686,7 +669,6 @@ void Visual::Base::AnimateOpacityProperty(
   }
 
   SetupTransition( transition, animator, DevelRenderer::Property::OPACITY, animator.initialValue, animator.targetValue );
-  SetupBlendMode( transition, isOpaque, animator.animate );
 }
 
 void Visual::Base::AnimateRendererProperty(
@@ -723,7 +705,6 @@ void Visual::Base::AnimateMixColorProperty(
 {
   Property::Index index = mImpl->mMixColorIndex;
   bool animateOpacity = false;
-  bool isOpaque = true;
 
   Property::Value initialOpacity;
   Property::Value targetOpacity;
@@ -738,7 +719,6 @@ void Visual::Base::AnimateMixColorProperty(
       if( animator.initialValue.GetType() == Property::VECTOR4 )
       {
         // if there is an initial color specifying alpha, test it
-        isOpaque = initialColor.a >= 1.0f;
         initialOpacity = initialColor.a;
       }
       initialMixColor = Vector3( initialColor );
@@ -766,54 +746,8 @@ void Visual::Base::AnimateMixColorProperty(
     if( animateOpacity )
     {
       SetupTransition( transition, animator, DevelRenderer::Property::OPACITY, initialOpacity, targetOpacity );
-      SetupBlendMode( transition, isOpaque, animator.animate );
     }
   }
-}
-
-void Visual::Base::SetupBlendMode( Animation& transition, bool isInitialOpaque, bool animating )
-{
-  // Ensure the blend mode is turned on if we are animating opacity, and
-  // turned off after the animation ends if the final value is opaque
-  if( ( ! isInitialOpaque || mImpl->mMixColor.a < 1.0f ) ||
-      ( mImpl->mRenderer && IsAdvancedBlendEquationApplied() ) )
-  {
-    if( mImpl->mRenderer )
-    {
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-
-      if( animating == true && mImpl->mMixColor.a >= 1.0f )
-      {
-        // When it becomes opaque, set the blend mode back to automatically
-        if( ! mImpl->mBlendSlotDelegate )
-        {
-          mImpl->mBlendSlotDelegate = new SlotDelegate<Visual::Base>(this);
-        }
-        transition.FinishedSignal().Connect( *(mImpl->mBlendSlotDelegate),
-                                             &Visual::Base::OnMixColorFinished );
-      }
-    }
-  }
-}
-
-void Visual::Base::OnMixColorFinished( Animation& animation )
-{
-  if( mImpl->mRenderer )
-  {
-    DALI_LOG_INFO( gVisualBaseLogFilter, Debug::General, "Visual::Base::OnMixColorFinished()\n");
-
-    if( mImpl->mMixColor.a >= 1.f &&
-        !IsAdvancedBlendEquationApplied() )
-    {
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::AUTO );
-    }
-    else
-    {
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-    }
-  }
-  delete mImpl->mBlendSlotDelegate;
-  mImpl->mBlendSlotDelegate = NULL;
 }
 
 } // namespace Internal

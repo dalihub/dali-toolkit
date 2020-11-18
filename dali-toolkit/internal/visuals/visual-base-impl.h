@@ -442,25 +442,6 @@ private:
   void AnimateMixColorProperty( Dali::Animation& transition,
                                 Internal::TransitionData::Animator& animator );
 
-  /**
-   * Set up the right blend mode if the opacity is being animated.
-   * Also ensure that when the animation finishes, the blend mode is
-   * set to the appropriate value. It also uses the target value as
-   * set into mMixColor.
-   *
-   * @param[in] transition The transition to listen to
-   * @param[in] isInitialOpaque Whether the initial value is opaque
-   * @param[in] animating If the transition animates the value.
-   */
-  void SetupBlendMode( Dali::Animation& transition,
-                       bool isInitialOpaque, bool animating );
-
-  /**
-   * When a mix color animation has finished, ensure the blend mode is set back
-   * to the right value for the target opacity.
-   */
-  void OnMixColorFinished( Animation& animation );
-
   // Undefined
   Base( const Visual::Base& visual );
 
