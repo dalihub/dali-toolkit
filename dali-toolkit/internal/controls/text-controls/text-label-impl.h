@@ -30,6 +30,7 @@
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-scroller.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 
 namespace Dali
@@ -72,6 +73,8 @@ public:
    * @return The current value of the property.
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
+
+  Text::ControllerPtr getController();
 
 private: // From Control
 
@@ -164,6 +167,27 @@ private: // Data
 
   int mRenderingBackend;
   bool mTextUpdateNeeded:1;
+
+protected:
+  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
+                          public virtual Dali::Accessibility::Text
+  {
+    using Control::Impl::AccessibleImpl::AccessibleImpl;
+
+    std::string GetText( size_t startOffset, size_t endOffset ) override;
+    size_t GetCharacterCount() override;
+    size_t GetCaretOffset() override;
+    bool SetCaretOffset(size_t offset) override;
+    Dali::Accessibility::Range
+    GetTextAtOffset( size_t offset,
+                     Dali::Accessibility::TextBoundary boundary ) override;
+    Dali::Accessibility::Range GetSelection( size_t selectionNum ) override;
+    bool RemoveSelection( size_t selectionNum ) override;
+    bool SetSelection( size_t selectionNum, size_t startOffset,
+                       size_t endOffset ) override;
+    std::string GetNameRaw() override;
+    Property::Index GetNamePropertyIndex() override;
+  };
 };
 
 } // namespace Internal

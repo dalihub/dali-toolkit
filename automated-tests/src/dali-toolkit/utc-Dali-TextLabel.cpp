@@ -72,6 +72,7 @@ const char* const PROPERTY_NAME_BACKGROUND = "textBackground";
 const char* const PROPERTY_NAME_PIXEL_SIZE = "pixelSize";
 const char* const PROPERTY_NAME_ELLIPSIS = "ellipsis";
 const char* const PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY = "autoScrollLoopDelay";
+const char* const PROPERTY_NAME_FONT_SIZE_SCALE = "fontSizeScale";
 
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
@@ -310,6 +311,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == TextLabel::Property::PIXEL_SIZE );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextLabel::Property::ELLIPSIS );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY ) == TextLabel::Property::AUTO_SCROLL_LOOP_DELAY );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_FONT_SIZE_SCALE ) == DevelTextLabel::Property::FONT_SIZE_SCALE );
 
   END_TEST;
 }
@@ -360,6 +362,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   label.SetProperty( TextLabel::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  label.SetProperty( DevelTextLabel::Property::FONT_SIZE_SCALE, 2.5f );
+  DALI_TEST_EQUALS( label.GetProperty<float>( DevelTextLabel::Property::FONT_SIZE_SCALE ), 2.5f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  label.SetProperty( DevelTextLabel::Property::FONT_SIZE_SCALE, 1.0f );
 
   // Reset font style.
   fontStyleMapSet.Clear();
@@ -1686,6 +1692,38 @@ int UtcDaliToolkitTextlabelLastCharacterIndex(void)
 
   DALI_TEST_CHECK( !indexArray.Empty() );
   DALI_TEST_EQUALS( indexArray.GetElementAt(0).Get<int>(), 10, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelFontSizeScale(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelFontSizeScale");
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 30.f );
+  label.SetProperty( TextLabel::Property::TEXT, "Test" );
+  Vector3 nonScaledSize = label.GetNaturalSize();
+
+  TextLabel labelScaled = TextLabel::New();
+  labelScaled.SetProperty( TextLabel::Property::POINT_SIZE, 15.f );
+  labelScaled.SetProperty( Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE, 2.f );
+  labelScaled.SetProperty( TextLabel::Property::TEXT, "Test" );
+  Vector3 scaledSize = labelScaled.GetNaturalSize();
+
+  DALI_TEST_EQUALS( nonScaledSize, scaledSize, TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::PIXEL_SIZE, 30.f );
+  label.SetProperty( TextLabel::Property::TEXT, "Test" );
+  nonScaledSize = label.GetNaturalSize();
+
+  labelScaled.SetProperty( TextLabel::Property::PIXEL_SIZE, 15.f );
+  labelScaled.SetProperty( Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE, 2.f );
+  labelScaled.SetProperty( TextLabel::Property::TEXT, "Test" );
+  scaledSize = labelScaled.GetNaturalSize();
+
+  DALI_TEST_EQUALS( nonScaledSize, scaledSize, TEST_LOCATION );
 
   END_TEST;
 }

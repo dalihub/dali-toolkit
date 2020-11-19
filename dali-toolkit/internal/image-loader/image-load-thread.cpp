@@ -90,7 +90,7 @@ LoadingTask::LoadingTask( uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::Pi
 }
 
 void LoadingTask::Load()
-{;
+{
   if( animatedImageLoading )
   {
     pixelBuffer = animatedImageLoading.LoadFrame( frameIndex );

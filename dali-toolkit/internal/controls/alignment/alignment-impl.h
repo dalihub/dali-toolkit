@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/alignment/alignment.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -80,6 +81,11 @@ public:
 
 
 private: // From Control
+
+  /**
+   * @copydoc Control::OnInitialize()
+   */
+  virtual void OnInitialize() override;
 
   /**
    * @copydoc Control::OnRelayout()

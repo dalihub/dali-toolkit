@@ -619,6 +619,7 @@ void Button::OnInitialize()
   mTapDetector.DetectedSignal().Connect(this, &Button::OnTap);
 
   self.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true );
+  self.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
 
   self.TouchedSignal().Connect( this, &Button::OnTouch );
 }
@@ -1311,6 +1312,43 @@ void Button::SetForegroundPadding( const Padding& padding)
 Padding Button::GetForegroundPadding()
 {
   return mForegroundPadding;
+}
+
+std::string Button::AccessibleImpl::GetNameRaw()
+{
+  std::string labelText;
+  auto slf = Toolkit::Button::DownCast( self );
+  Property::Map labelMap = slf.GetProperty<Property::Map>( Toolkit::Button::Property::LABEL );
+
+  Property::Value* textPropertyPtr = labelMap.Find( Toolkit::TextVisual::Property::TEXT );
+  if ( textPropertyPtr )
+  {
+    textPropertyPtr->Get( labelText );
+  }
+
+  return labelText;
+}
+
+
+Property::Index Button::AccessibleImpl::GetNamePropertyIndex()
+{
+  Property::Index label = Toolkit::Button::Property::LABEL;
+  Property::Map labelMap = self.GetProperty<Property::Map>(label);
+
+  if (MapContainsTextString(labelMap))
+    return label;
+  else
+    return Property::INVALID_INDEX;
+}
+
+Dali::Accessibility::States Button::AccessibleImpl::CalculateStates()
+{
+  auto tmp = Control::Impl::AccessibleImpl::CalculateStates();
+  tmp[Dali::Accessibility::State::SELECTABLE] = true;
+  auto slf = Toolkit::Button::DownCast( self );
+  tmp[Dali::Accessibility::State::ENABLED] = !slf.GetProperty<bool>( Toolkit::Button::Property::DISABLED );
+  tmp[Dali::Accessibility::State::CHECKED] = slf.GetProperty<bool>( Toolkit::Button::Property::SELECTED );
+  return tmp;
 }
 
 } // namespace Internal

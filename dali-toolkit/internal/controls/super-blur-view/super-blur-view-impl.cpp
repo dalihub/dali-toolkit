@@ -35,6 +35,7 @@
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace //Unnamed namespace
 {
@@ -163,6 +164,11 @@ void SuperBlurView::OnInitialize()
   Actor self( Self() );
 
   mBlurStrengthPropertyIndex = self.RegisterProperty( "blurStrength", 0.f );
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 void SuperBlurView::SetTexture( Texture texture )

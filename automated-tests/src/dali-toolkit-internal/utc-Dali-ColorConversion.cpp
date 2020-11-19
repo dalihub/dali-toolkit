@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,19 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/internal/helpers/color-conversion.h>
 
+#if defined(ELDBUS_ENABLED)
+#include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
+#endif
+
 using namespace Dali;
 using namespace Dali::Toolkit;
 
 void dali_color_conversion_startup(void)
 {
   test_return_value = TET_UNDEF;
+#if defined(ELDBUS_ENABLED)
+  DBusWrapper::Install(std::unique_ptr<DBusWrapper>(new TestDBusWrapper));
+#endif
 }
 
 void dali_color_conversion_cleanup(void)

@@ -102,6 +102,7 @@ const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableSh
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGrabHandle";
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
 const char* const PROPERTY_NAME_MAX_LENGTH                           = "maxLength";
+const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
 
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
@@ -487,12 +488,14 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_LINE_COUNT) == TextEditor::Property::LINE_COUNT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == TextEditor::Property::ENABLE_SELECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextEditor::Property::PLACEHOLDER );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_FONT_SIZE_SCALE ) == DevelTextEditor::Property::FONT_SIZE_SCALE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == DevelTextEditor::Property::PLACEHOLDER_TEXT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextEditor::Property::ENABLE_SHIFT_SELECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MAX_LENGTH ) == DevelTextEditor::Property::MAX_LENGTH );
+
 
   END_TEST;
 }
@@ -557,6 +560,10 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  editor.SetProperty( DevelTextEditor::Property::FONT_SIZE_SCALE, 2.5f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::FONT_SIZE_SCALE ), 2.5f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  editor.SetProperty( DevelTextEditor::Property::FONT_SIZE_SCALE, 1.0f );
 
   // Reset font style.
   fontStyleMapSet.Clear();
@@ -3081,6 +3088,85 @@ int UtcDaliTextEditorEnableEditing(void)
 
   DALI_TEST_EQUALS( textEditor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "D", TEST_LOCATION );
   DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::ENABLE_EDITING ).Get<bool>(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorScrolling(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorScrolling ");
+
+  TextEditor textEditor = TextEditor::New();
+  DALI_TEST_CHECK( textEditor );
+
+  application.GetScene().Add( textEditor );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, "Tex1\nTex2\nTex3\nTex4\nTex5\nTex6\nTex7\nTex8");
+  textEditor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
+  textEditor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+  textEditor.SetProperty(Actor::Property::SIZE, Vector2(60.0f, 160.0f));
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::VERTICAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+
+
+  DevelTextEditor::ScrollBy(textEditor, Vector2(1.0f, 1.0f));
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::VERTICAL_SCROLL_POSITION ).Get<float>(), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+
+  DevelTextEditor::ScrollBy(textEditor, Vector2(0.0f, 1000.0f));
+
+  DALI_TEST_NOT_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::VERTICAL_SCROLL_POSITION ).Get<float>(), 1.0f, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+
+  textEditor.SetProperty(DevelTextEditor::Property::VERTICAL_SCROLL_POSITION , 0.0f);
+  textEditor.SetProperty(DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION , 0.0f);
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::VERTICAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::HORIZONTAL_SCROLL_POSITION ).Get<float>(), 0.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextEditorFontSizeScale(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextEditorFontSizeScale");
+
+  TextEditor textEditor = TextEditor::New();
+  textEditor.SetProperty( TextEditor::Property::POINT_SIZE, 30.f );
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Test" );
+  Vector3 nonScaledSize = textEditor.GetNaturalSize();
+
+  TextEditor textEditorScaled = TextEditor::New();
+  textEditorScaled.SetProperty( TextEditor::Property::POINT_SIZE, 15.f );
+  textEditorScaled.SetProperty( Toolkit::DevelTextEditor::Property::FONT_SIZE_SCALE, 2.f );
+  textEditorScaled.SetProperty( TextEditor::Property::TEXT, "Test" );
+  Vector3 scaledSize = textEditorScaled.GetNaturalSize();
+
+  DALI_TEST_EQUALS( nonScaledSize, scaledSize, TEST_LOCATION );
+
+  textEditor.SetProperty( TextEditor::Property::PIXEL_SIZE, 30.f );
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Test" );
+  nonScaledSize = textEditor.GetNaturalSize();
+
+  textEditorScaled.SetProperty( TextEditor::Property::PIXEL_SIZE, 15.f );
+  textEditorScaled.SetProperty( Toolkit::DevelTextEditor::Property::FONT_SIZE_SCALE, 2.f );
+  textEditorScaled.SetProperty( TextEditor::Property::TEXT, "Test" );
+  scaledSize = textEditorScaled.GetNaturalSize();
+
+  DALI_TEST_EQUALS( nonScaledSize, scaledSize, TEST_LOCATION );
 
   END_TEST;
 }

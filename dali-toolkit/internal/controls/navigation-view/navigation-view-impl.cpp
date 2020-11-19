@@ -22,6 +22,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -69,6 +70,14 @@ Toolkit::NavigationView NavigationView::New()
   internalNavigationView->Initialize();
 
   return navigationView;
+}
+
+void NavigationView::OnInitialize()
+{
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 void NavigationView::OnSceneConnection( int depth )

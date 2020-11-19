@@ -163,6 +163,16 @@ private:
   std::vector<Toolkit::Visual::Base> mToggleDisabledSelectedVisuals;  ///< Save all disabled selected visuals.
   std::vector<std::string> mToggleTooltips;               ///< Toggle tooltips.
   unsigned int             mCurrentToggleIndex;       ///< The index of state.
+protected:
+  struct AccessibleImpl : public Button::AccessibleImpl
+  {
+    using Button::AccessibleImpl::AccessibleImpl;
+
+    Dali::Accessibility::States CalculateStates() override;
+    std::string GetDescriptionRaw() override;
+    Property::Index GetDescriptionPropertyIndex() override;
+  };
+  void OnStateChange( State newState ) override;
 };
 
 } // namespace Internal

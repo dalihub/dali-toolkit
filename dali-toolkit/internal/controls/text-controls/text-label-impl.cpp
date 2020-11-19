@@ -134,6 +134,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "matchSystemLanguageDi
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textFit",                   MAP,     TEXT_FIT                   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "minLineSize",               FLOAT,   MIN_LINE_SIZE              )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "renderingBackend",          INTEGER, RENDERING_BACKEND          )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "fontSizeScale",             FLOAT,   FONT_SIZE_SCALE            )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -466,6 +467,17 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         impl.mTextUpdateNeeded = impl.mController->SetDefaultLineSize( lineSize ) || impl.mTextUpdateNeeded;
         break;
       }
+      case Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE:
+      {
+        const float scale = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p FONT_SIZE_SCALE %f\n", impl.mController.Get(), scale );
+
+        if( !Equals( impl.mController->GetFontSizeScale(), scale ) )
+        {
+          impl.mController->SetFontSizeScale( scale );
+        }
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -478,6 +490,8 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
     }
   }
 }
+
+Text::ControllerPtr TextLabel::getController() { return mController; }
 
 Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index index )
 {
@@ -692,6 +706,11 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         value = impl.mController->GetDefaultLineSize();
         break;
       }
+      case Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE:
+      {
+        value = impl.mController->GetFontSizeScale();
+        break;
+      }
     }
   }
 
@@ -719,6 +738,9 @@ void TextLabel::OnInitialize()
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 
+  // Enable highlightability
+  self.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true );
+
   // Enable the text ellipsis.
   mController->SetTextElideEnabled( true );   // If false then text larger than control will overflow
 
@@ -729,6 +751,11 @@ void TextLabel::OnInitialize()
 
   Layout::Engine& engine = mController->GetLayoutEngine();
   engine.SetCursorWidth( 0u ); // Do not layout space for the cursor.
+
+  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new AccessibleImpl( actor, Dali::Accessibility::Role::LABEL ) );
+  } );
 }
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
@@ -971,6 +998,169 @@ TextLabel::TextLabel()
 
 TextLabel::~TextLabel()
 {
+}
+
+std::string TextLabel::AccessibleImpl::GetNameRaw()
+{
+  auto slf = Toolkit::TextLabel::DownCast( self );
+  return slf.GetProperty( Toolkit::TextLabel::Property::TEXT ).Get< std::string >();
+}
+
+Property::Index TextLabel::AccessibleImpl::GetNamePropertyIndex()
+{
+  return Toolkit::TextLabel::Property::TEXT;
+}
+
+std::string TextLabel::AccessibleImpl::GetText( size_t startOffset,
+                                                size_t endOffset )
+{
+  if( endOffset <= startOffset )
+    return {};
+
+  auto slf = Toolkit::TextLabel::DownCast( self );
+  auto txt =
+      slf.GetProperty( Toolkit::TextLabel::Property::TEXT ).Get< std::string >();
+
+  if( startOffset > txt.size() || endOffset > txt.size() )
+    return {};
+
+  return txt.substr( startOffset, endOffset - startOffset );
+}
+
+size_t TextLabel::AccessibleImpl::GetCharacterCount()
+{
+  auto slf = Toolkit::TextLabel::DownCast( self );
+  auto txt =
+      slf.GetProperty( Toolkit::TextLabel::Property::TEXT ).Get< std::string >();
+
+  return txt.size();
+}
+
+size_t TextLabel::AccessibleImpl::GetCaretOffset()
+{
+    return {};
+}
+
+bool TextLabel::AccessibleImpl::SetCaretOffset(size_t offset)
+{
+    return {};
+}
+
+Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(
+    size_t offset, Dali::Accessibility::TextBoundary boundary )
+{
+  auto slf = Toolkit::TextLabel::DownCast( self );
+  auto txt = slf.GetProperty( Toolkit::TextLabel::Property::TEXT ).Get< std::string >();
+  auto txt_size = txt.size();
+
+  auto range = Dali::Accessibility::Range{};
+
+  switch(boundary)
+  {
+    case Dali::Accessibility::TextBoundary::CHARACTER:
+      {
+        if (offset < txt_size)
+        {
+          range.content = txt[offset];
+          range.startOffset = offset;
+          range.endOffset = offset + 1;
+        }
+      }
+      break;
+    case Dali::Accessibility::TextBoundary::WORD:
+    case Dali::Accessibility::TextBoundary::LINE:
+      {
+        auto txt_c_string = txt.c_str();
+        auto breaks = std::vector< char >( txt_size, 0 );
+        if(boundary == Dali::Accessibility::TextBoundary::WORD)
+          Accessibility::Accessible::FindWordSeparationsUtf8((const utf8_t *) txt_c_string, txt_size, "", breaks.data());
+        else
+          Accessibility::Accessible::FindLineSeparationsUtf8((const utf8_t *) txt_c_string, txt_size, "", breaks.data());
+        auto index = 0u;
+        auto counter = 0u;
+        while( index < txt_size && counter <= offset )
+        {
+          auto start = index;
+          if(breaks[index])
+          {
+            while(breaks[index])
+              index++;
+            counter++;
+          }
+          else
+          {
+            if (boundary == Dali::Accessibility::TextBoundary::WORD)
+              index++;
+            if (boundary == Dali::Accessibility::TextBoundary::LINE)
+              counter++;
+          }
+          if ((counter > 0) && ((counter - 1) == offset))
+          {
+            range.content = txt.substr(start, index - start + 1);
+            range.startOffset = start;
+            range.endOffset = index + 1;
+          }
+          if (boundary == Dali::Accessibility::TextBoundary::LINE)
+              index++;
+        }
+      }
+      break;
+    case Dali::Accessibility::TextBoundary::SENTENCE:
+      {
+        /* not supported by efl */
+      }
+      break;
+    case Dali::Accessibility::TextBoundary::PARAGRAPH:
+      {
+        /* Paragraph is not supported by libunibreak library */
+      }
+      break;
+    default:
+      break;
+  }
+
+  return range;
+}
+
+Dali::Accessibility::Range
+TextLabel::AccessibleImpl::GetSelection( size_t selectionNum )
+{
+  // Since DALi supports only one selection indexes higher than 0 are ignored
+  if( selectionNum > 0 )
+    return {};
+
+  auto slf = Toolkit::TextLabel::DownCast( self );
+  auto ctrl = Dali::Toolkit::GetImpl( slf ).getController();
+  std::string ret;
+  ctrl->RetrieveSelection( ret );
+  auto r = ctrl->GetSelectionIndexes();
+
+  return { static_cast<size_t>(r.first), static_cast<size_t>(r.second), ret };
+}
+
+bool TextLabel::AccessibleImpl::RemoveSelection( size_t selectionNum )
+{
+  // Since DALi supports only one selection indexes higher than 0 are ignored
+  if( selectionNum > 0 )
+    return false;
+
+  auto slf = Toolkit::TextLabel::DownCast( self );
+  Dali::Toolkit::GetImpl( slf ).getController()->SetSelection( 0, 0 );
+  return true;
+}
+
+bool TextLabel::AccessibleImpl::SetSelection( size_t selectionNum,
+                                              size_t startOffset,
+                                              size_t endOffset )
+{
+  // Since DALi supports only one selection indexes higher than 0 are ignored
+  if( selectionNum > 0 )
+    return false;
+
+  auto slf = Toolkit::TextLabel::DownCast( self );
+  Dali::Toolkit::GetImpl( slf ).getController()->SetSelection( startOffset,
+                                                               endOffset );
+  return true;
 }
 
 } // namespace Internal

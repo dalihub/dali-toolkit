@@ -57,7 +57,6 @@ AccessibilityManager AccessibilityManager::Get()
       // If not, create the accessibility manager and register it as a singleton
       Internal::AccessibilityManager* internalManager = new Internal::AccessibilityManager();
       manager                                         = AccessibilityManager(internalManager);
-      internalManager->Initialise();
       singletonService.Register(typeid(manager), manager);
     }
   }

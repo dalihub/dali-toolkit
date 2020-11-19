@@ -74,7 +74,7 @@ Dali::Integration::Point GetPointUpInside()
 
 int UtcDaliToggleButtonConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
   tet_infoline(" UtcDaliToggleButtonConstructorP");
 
   ToggleButton button;
@@ -84,7 +84,7 @@ int UtcDaliToggleButtonConstructorP(void)
 
 int UtcDaliToggleButtonCopyConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
   tet_infoline(" UtcDaliToggleButtonCopyConstructorP");
 
   // Initialize an object, ref count == 1
@@ -97,7 +97,7 @@ int UtcDaliToggleButtonCopyConstructorP(void)
 
 int UtcDaliToggleButtonAssignmentOperatorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
   tet_infoline(" UtcDaliToggleButtonAssignmentOperatorP");
 
   ToggleButton button = ToggleButton::New();

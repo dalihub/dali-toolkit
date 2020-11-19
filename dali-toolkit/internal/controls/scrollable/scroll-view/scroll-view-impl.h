@@ -801,6 +801,12 @@ private:
   void SetInternalConstraints();
 
 protected:
+  struct AccessibleImpl : public Scrollable::AccessibleImpl
+  {
+    using Scrollable::AccessibleImpl::AccessibleImpl;
+
+    void EnsureChildVisible(Actor child) override;
+  };
 
   /**
    * Construct a new ScrollView.

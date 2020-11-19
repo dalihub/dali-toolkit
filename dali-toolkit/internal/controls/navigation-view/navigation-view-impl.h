@@ -78,6 +78,11 @@ public:
 private: // override functions from Control
 
   /**
+   * @copydoc Constrol::OnInitialize
+   */
+  virtual void OnInitialize() override;
+
+  /**
    * @copydoc Control::OnSceneConnection( int depth  )
    */
   void OnSceneConnection( int depth ) override;

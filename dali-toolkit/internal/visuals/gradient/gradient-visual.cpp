@@ -25,6 +25,7 @@
 #include <dali/public-api/object/property-array.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
@@ -458,8 +459,8 @@ void GradientVisual::InitializeRenderer()
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetTextures( textureSet );
 
-  // If opaque then no need to have blending
-  if( mIsOpaque )
+  // If opaque and then no need to have blending
+  if( mIsOpaque && !IsAdvancedBlendEquationApplied() )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::OFF );
   }

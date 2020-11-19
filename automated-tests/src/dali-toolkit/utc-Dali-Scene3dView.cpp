@@ -75,7 +75,7 @@ const char* TEST_SPECULAR_TEXTURE = TEST_RESOURCE_DIR "/forest_specular_cubemap.
 
 int UtcDaliScene3dViewConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Scene3dView scene3dView;
 
@@ -85,7 +85,7 @@ int UtcDaliScene3dViewConstructorP(void)
 
 int UtcDaliScene3dViewCopyConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Initialize an object, ref count == 1
   Scene3dView scene3dView = Scene3dView::New( TEST_GLTF_FILE_NAME[0] );
@@ -97,7 +97,7 @@ int UtcDaliScene3dViewCopyConstructorP(void)
 
 int UtcDaliScene3dViewCopyConstructor2P(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Initialize an object, ref count == 1
   Toolkit::Scene3dView scene3dView = Toolkit::Scene3dView::New( TEST_GLTF_FILE_NAME[0], TEST_DIFFUSE_TEXTURE, TEST_SPECULAR_TEXTURE, Vector4::ONE );
@@ -109,7 +109,7 @@ int UtcDaliScene3dViewCopyConstructor2P(void)
 
 int UtcDaliScene3dViewAssignmentOperatorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Scene3dView scene3dView = Scene3dView::New( TEST_GLTF_FILE_NAME[0] );
 

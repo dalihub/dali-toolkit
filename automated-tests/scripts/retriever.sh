@@ -1,10 +1,10 @@
 #!/bin/bash
 
 USAGE=$(cat <<EOF
-Usage note: retriever.sh [option] [directory]
+Usage note: retriever.sh [option] [directory] test-files
 Options:
   none    retrieve TC names with corresponding startup and cleanup functions
-  -f      retrieveve TC name with corresponding "set" and "purpose" clauses
+  -f      retrieve TC name with corresponding "set" and "purpose" clauses
   -anum   retrieve automatic TC number
   -mnum   retrieve manual TC number
 
@@ -46,6 +46,8 @@ function get_tc_files {
     }')
 }
 
+
+
 function tc_names {
     if [[ -z "$1" ]]; then
         exit
@@ -58,6 +60,10 @@ function tc_names {
         clean_fun = "NULL";
         err_flag = 0;
         tc_list = "";
+    }
+    BEGINFILE {
+        start_fun = "NULL";
+        clean_fun = "NULL";
     }
     /^void .*startup\(void\)/ {
         gsub(/^void /, "");
@@ -159,39 +165,73 @@ function tc_fullinfo {
     ' $*
 }
 
+TEMP=`getopt -o f::,a:,m: --long full::,anum:,mnum: \
+     -n 'retriever.sh' -- "$@"`
 
-# usage note and exit:
-# - argument begin with '-' but is not recognised or number of arguments is > 3,
-# - argument doesn't begin with '-' and number of arguments is > 2
-if [[ ( "$1" == -* && ( ! "$1" =~ ^-(anum|mnum|f)$ || $# > 3 ) ) || ( "$1" != -* && $# > 2 ) ]]; then
-    echo -e "$USAGE"
-    exit 1
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+opt_full=false
+opt_full_dir=
+opt_anum=
+opt_mnum=
+
+while true ; do
+    case "$1" in
+        -f|--full) opt_full_dir="$2" ; opt_full="true" ; shift 2 ;;
+        -a|--anum) opt_anum="$2" ; shift 2 ;;
+        -m|--mnum) opt_mnum="$2" ; shift 2 ;;
+        --) shift ; break ;;
+        *) echo -e $USAGE ; exit 1 ;;
+    esac
+done
+
+#echo "###Retriever" >& 2
+#echo opt_full: {$opt_full} >& 2
+#echo opt_full_dir: {$opt_full_dir} >& 2
+
+DIR=.
+if [ -n "$opt_anum" ] ; then
+    DIR=$opt_anum
+    echo opt_anum: DIR=$DIR >& 2
+elif [ -n "$opt_mnum" ] ; then
+    DIR=$opt_mnum
+    echo opt_mnum: DIR=$DIR >& 2
+elif [ "$opt_full" == "true" ] ; then
+    if [ -n $opt_full_dir ] ; then
+        DIR=$opt_full_dir
+        echo opt_full: DIR=$DIR >& 2
+    fi
 fi
 
-# get directory from last argument (or assume current one)
-if [[ ! "$1" =~ ^-(anum|mnum|f)$ ]]; then
-    DIR=${1:-.}
-else
-    DIR=${2:-.}
-fi
 
-# get filename from last argument
-if [[ $# == 3 && -f $DIR/$3 ]] ; then
-    FILE=$3
-elif [[ $# == 2 && -f $DIR/$2 ]] ; then
-    FILE=$2
+# get filename from first argument
+if [[ $# == 1 && -f $DIR/$1 ]] ; then
+    FILE=$1
+    shift;
 fi
 
 #echo "Dir: $DIR  File: $FILE" >& 2
 
-
 # populate $TC_FILES with files declared in CMakeLists.txt
 if [[ -z $FILE ]]; then
-    get_tc_files $DIR
+    if [[ ! $DIR == "." || $# == 0 ]] ; then
+        #echo Get tc files: DIR=$DIR >& 2
+        get_tc_files $DIR
+    else
+        TC_FILES=$(
+            for i in $* ; do
+                echo $DIR/$i
+            done
+            )
+    fi
     if [ $? != 0 ]; then
         exit 1
     fi
-    echo "Got all files" >& 2
+    echo "Got all files in `pwd`" >& 2
+    #echo "TC_FILES: $TC_FILES" >& 2
 else
     TC_FILES="$DIR/$FILE"
     echo "TC_FILES: $TC_FILES" >& 2
@@ -200,13 +240,12 @@ fi
 
 
 # run appropriate subcommand
-case "$1" in
-    -anum)
-        tc_anum $TC_FILES ;;
-    -mnum)
-        tc_mnum $TC_FILES ;;
-    -f)
-        tc_fullinfo $TC_FILES ;;
-    *)
-        tc_names $TC_FILES ;;
-esac
+if [ "$opt_full" == "true" ] ; then
+    tc_fullinfo $TC_FILES
+elif [ -n "$opt_anum" ] ; then
+    tc_anum $TC_FILES
+elif [ -n "$opt_mnum" ] ; then
+    tc_mnum $TC_FILES
+else
+    tc_names $TC_FILES
+fi

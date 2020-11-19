@@ -662,6 +662,38 @@ public: // Update.
    */
   void UpdateAfterFontChange( const std::string& newDefaultFont );
 
+  /**
+   * @brief The method acquires currently selected text
+   * @param selectedText variable to place selected text in
+   */
+  void RetrieveSelection( std::string& selectedText ) const;
+
+  /**
+   * @brief The method sets selection in given range
+   * @param start index of first character
+   * @param end   index of first character after selection
+   */
+  void SetSelection( int start, int end );
+
+  /**
+   * @brief This method retrieve indexes of current selection
+   *
+   * @return a pair, where first element is left index of selection and second is the right one
+   */
+  std::pair< int, int > GetSelectionIndexes() const;
+
+  /**
+   * Place string in system clipboard
+   * @param source std::string
+   */
+  void CopyStringToClipboard( const std::string& source );
+
+  /**
+   * Place currently selected text in system clipboard
+   * @param deleteAfterSending flag pointing if text should be deleted after sending to clipboard
+   */
+  void SendSelectionToClipboard( bool deleteAfterSending );
+
 public: // Default style & Input style
 
   /**
@@ -826,6 +858,20 @@ public: // Default style & Input style
    * @return The default point size.
    */
   float GetDefaultFontSize( FontSizeType type ) const;
+
+  /**
+   * @brief Set the font size scale.
+   *
+   * @param[in] scale The font size scale
+   */
+  void SetFontSizeScale( float scale );
+
+  /**
+   * @brief Get the font size scale.
+   *
+   * @return The font size scale.
+   */
+  float GetFontSizeScale() const;
 
   /**
    * @brief Sets the Placeholder text font size.
@@ -1531,6 +1577,21 @@ public: // Text-input Event Queuing.
   virtual void SetEditable( bool editable );
 
   /**
+   * @copydoc Dali::Toolkit::Internal::TextEditor::ScrollBy()
+   */
+  virtual void ScrollBy( Vector2 scroll );
+
+  /**
+   * @copydoc Dali::Toolkit::Internal::TextEditor::GetHorizontalScrollPosition()
+   */
+  float GetHorizontalScrollPosition();
+
+  /**
+   * @copydoc Dali::Toolkit::Internal::TextEditor::GetVerticalScrollPosition()
+   */
+  float GetVerticalScrollPosition();
+
+  /**
    * @brief Event received from input method context
    *
    * @param[in] inputMethodContext The input method context.
@@ -1557,6 +1618,19 @@ public: // Text-input Event Queuing.
    * @return the created actor or an empty handle if no background color needs to be rendered.
    */
   Actor CreateBackgroundActor();
+
+  /**
+   * @brief Used to reset the cursor position after setting a new text.
+   *
+   * @param[in] cursorIndex Where to place the cursor.
+   */
+  void ResetCursorPosition( CharacterIndex cursorIndex );
+
+  /**
+   * @brief The method acquires current position of cursor
+   * @return unsigned value with cursor position
+   */
+  CharacterIndex GetCursorPosition();
 
 protected: // Inherit from Text::Decorator::ControllerInterface.
 
@@ -1700,13 +1774,6 @@ private: // Helpers.
    * @brief Helper to clear text's style data.
    */
   void ClearStyleData();
-
-  /**
-   * @brief Used to reset the cursor position after setting a new text.
-   *
-   * @param[in] cursorIndex Where to place the cursor.
-   */
-  void ResetCursorPosition( CharacterIndex cursorIndex );
 
   /**
    * @brief Used to reset the scroll position after setting a new text.

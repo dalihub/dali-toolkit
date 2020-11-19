@@ -35,6 +35,7 @@
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
+#include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 using namespace Dali;
 
@@ -245,6 +246,11 @@ bool Controller::Impl::ProcessInputEvents()
     // Calculate the cursor position from the new cursor index.
     GetCursorPosition( mEventData->mPrimaryCursorPosition,
                        cursorInfo );
+
+    if( NULL != mEditableControlInterface )
+    {
+      mEditableControlInterface->CaretMoved( mEventData->mPrimaryCursorPosition );
+    }
 
     if( mEventData->mUpdateCursorHookPosition )
     {
@@ -953,7 +959,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
       // Get the default font's description.
       TextAbstraction::FontDescription defaultFontDescription;
-      TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
+      TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE * mFontSizeScale;
 
       if( IsShowingPlaceholderText() && mEventData && ( NULL != mEventData->mPlaceholderFont ) )
       {
@@ -961,7 +967,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
         defaultFontDescription = mEventData->mPlaceholderFont->mFontDescription;
         if( mEventData->mPlaceholderFont->sizeDefined )
         {
-          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * 64u;
+          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * mFontSizeScale * 64u;
         }
       }
       else if( NULL != mFontDefaults )
@@ -975,7 +981,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
         }
         else
         {
-          defaultPointSize = mFontDefaults->mDefaultPointSize * 64u;
+          defaultPointSize = mFontDefaults->mDefaultPointSize * mFontSizeScale * 64u;
         }
       }
 
@@ -1326,11 +1332,11 @@ float Controller::Impl::GetDefaultFontLineHeight()
   if( NULL == mFontDefaults )
   {
     TextAbstraction::FontDescription fontDescription;
-    defaultFontId = mFontClient.GetFontId( fontDescription );
+    defaultFontId = mFontClient.GetFontId( fontDescription, TextAbstraction::FontClient::DEFAULT_POINT_SIZE * mFontSizeScale );
   }
   else
   {
-    defaultFontId = mFontDefaults->GetFontId( mFontClient );
+    defaultFontId = mFontDefaults->GetFontId( mFontClient, mFontDefaults->mDefaultPointSize * mFontSizeScale );
   }
 
   Text::FontMetrics fontMetrics;
@@ -1519,6 +1525,18 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
   }
 }
 
+void Controller::Impl::SetSelection( int start, int end )
+{
+  mEventData->mLeftSelectionPosition = start;
+  mEventData->mRightSelectionPosition = end;
+  mEventData->mUpdateCursorPosition = true;
+}
+
+std::pair< int, int > Controller::Impl::GetSelectionIndexes() const
+{
+  return { mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition };
+}
+
 void Controller::Impl::ShowClipboard()
 {
   if( mClipboard )
@@ -1540,7 +1558,7 @@ void Controller::Impl::SetClipboardHideEnable(bool enable)
   mClipboardHideEnabled = enable;
 }
 
-bool Controller::Impl::CopyStringToClipboard( std::string& source )
+bool Controller::Impl::CopyStringToClipboard( const std::string& source )
 {
   //Send string to clipboard
   return ( mClipboard && mClipboard.SetItem( source ) );

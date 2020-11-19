@@ -733,6 +733,31 @@ void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
   }
 }
 
+void Controller::RetrieveSelection( std::string& selectedText ) const
+{
+  mImpl->RetrieveSelection( selectedText, false );
+}
+
+void Controller::SetSelection( int start, int end )
+{
+  mImpl->SetSelection( start, end );
+}
+
+std::pair< int, int > Controller::GetSelectionIndexes() const
+{
+  return mImpl->GetSelectionIndexes();
+}
+
+void Controller::CopyStringToClipboard( const std::string& source )
+{
+  mImpl->CopyStringToClipboard( source );
+}
+
+void Controller::SendSelectionToClipboard( bool deleteAfterSending )
+{
+  mImpl->SendSelectionToClipboard( deleteAfterSending );
+}
+
 // public : Default style & Input style
 
 void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
@@ -962,6 +987,36 @@ bool Controller::IsPlaceholderTextFontSlantDefined() const
 FontSlant Controller::GetPlaceholderTextFontSlant() const
 {
   return PlaceholderHandler::GetPlaceholderTextFontSlant(*this);
+}
+
+void Controller::SetFontSizeScale( float scale )
+{
+  mImpl->mFontSizeScale = scale;
+
+  if( mImpl->mEventData )
+  {
+    // Update the cursor position if it's in editing mode
+    if( EventData::IsEditingState( mImpl->mEventData->mState ) )
+    {
+      mImpl->mEventData->mDecoratorUpdated = true;
+      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font size is updated.
+    }
+  }
+
+  // Clear the font-specific data
+  ClearFontData();
+
+  mImpl->RequestRelayout();
+}
+
+float Controller::GetFontSizeScale() const
+{
+  if( nullptr != mImpl->mFontDefaults )
+  {
+    return mImpl->mFontSizeScale;
+  }
+
+  return 1.f;
 }
 
 void Controller::SetDefaultFontSize( float fontSize, FontSizeType type )
@@ -2239,6 +2294,56 @@ void Controller::SetEditable( bool editable )
   }
 }
 
+void Controller::ScrollBy( Vector2 scroll )
+{
+  if( mImpl->mEventData && (fabs(scroll.x) > Math::MACHINE_EPSILON_0 || fabs(scroll.y) > Math::MACHINE_EPSILON_0))
+  {
+      const Vector2& layoutSize = mImpl->mModel->mVisualModel->GetLayoutSize();
+      const Vector2 currentScroll = mImpl->mModel->mScrollPosition;
+
+      scroll.x = -scroll.x;
+      scroll.y = -scroll.y;
+
+      if( fabs(scroll.x) > Math::MACHINE_EPSILON_0 )
+      {
+        mImpl->mModel->mScrollPosition.x += scroll.x;
+        mImpl->ClampHorizontalScroll( layoutSize );
+      }
+
+      if( fabs(scroll.y) > Math::MACHINE_EPSILON_0 )
+      {
+        mImpl->mModel->mScrollPosition.y += scroll.y;
+        mImpl->ClampVerticalScroll( layoutSize );
+      }
+
+      if (mImpl->mModel->mScrollPosition != currentScroll)
+      {
+        mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mModel->mScrollPosition - currentScroll );
+        mImpl->RequestRelayout();
+      }
+  }
+}
+
+float Controller::GetHorizontalScrollPosition()
+{
+  if( mImpl->mEventData )
+  {
+    //scroll values are negative internally so we convert them to positive numbers
+    return -mImpl->mModel->mScrollPosition.x;
+  }
+  return 0;
+}
+
+float Controller::GetVerticalScrollPosition()
+{
+  if( mImpl->mEventData )
+  {
+    //scroll values are negative internally so we convert them to positive numbers
+    return -mImpl->mModel->mScrollPosition.y;
+  }
+  return 0;
+}
+
 void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )
 {
   EventHandler::DecorationEvent(*this, handleType, state, x, y);
@@ -2436,7 +2541,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
       if( addFontSizeRun )
       {
-        fontDescriptionRun.size = static_cast<PointSize26Dot6>( mImpl->mEventData->mInputStyle.size * 64.f );
+        fontDescriptionRun.size = static_cast<PointSize26Dot6>( mImpl->mEventData->mInputStyle.size * mImpl->mFontSizeScale * 64.f );
         fontDescriptionRun.sizeDefined = true;
       }
 
@@ -2447,13 +2552,17 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // Insert at current cursor position.
     Vector<Character>& modifyText = mImpl->mModel->mLogicalModel->mText;
 
+    auto pos = modifyText.End();
     if( cursorIndex < numberOfCharactersInModel )
     {
-      modifyText.Insert( modifyText.Begin() + cursorIndex, utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
+      pos = modifyText.Begin() + cursorIndex;
     }
-    else
+    unsigned int realPos = pos - modifyText.Begin();
+    modifyText.Insert( pos, utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
+
+    if( NULL != mImpl->mEditableControlInterface )
     {
-      modifyText.Insert( modifyText.End(), utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
+      mImpl->mEditableControlInterface->TextInserted( realPos, maxSizeOfNewText, text );
     }
 
     // Mark the first paragraph to be updated.
@@ -2618,6 +2727,13 @@ bool Controller::RemoveText( int cursorOffset,
       // Remove the characters.
       Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
       Vector<Character>::Iterator last  = first + numberOfCharacters;
+
+      if( NULL != mImpl->mEditableControlInterface )
+      {
+        std::string utf8;
+        Utf32ToUtf8( first, numberOfCharacters, utf8 );
+        mImpl->mEditableControlInterface->TextDeleted( cursorIndex, numberOfCharacters, utf8 );
+      }
 
       currentText.Erase( first, last );
 
@@ -3042,6 +3158,14 @@ void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
       mImpl->mEventData->mUpdateCursorPosition = true;
     }
   }
+}
+
+CharacterIndex Controller::GetCursorPosition()
+{
+  if( !mImpl->mEventData )
+    return 0;
+
+  return mImpl->mEventData->mPrimaryCursorPosition;
 }
 
 void Controller::ResetScrollPosition()
