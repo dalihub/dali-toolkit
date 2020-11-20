@@ -3170,3 +3170,36 @@ int UtcDaliToolkitTextEditorFontSizeScale(void)
 
   END_TEST;
 }
+
+int UtcDaliTextEditorPrimaryCursorPosition(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextPrimaryCursorPosition ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add( textEditor );
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "ABCEF");
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textEditor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textEditor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  textEditor.SetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 3);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "ABCDEF", TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION ).Get<int>(), 4, TEST_LOCATION );
+
+  END_TEST;
+}

@@ -175,6 +175,12 @@ enum Type
    *  - fontSize: 10pt, fontSizeScale: 1.5
    */
   FONT_SIZE_SCALE,
+
+  /**
+   * @brief The position for primary cursor.
+   * @details Name "primaryCursorPosition", type Property::INTEGER.
+   */
+  PRIMARY_CURSOR_POSITION,
 };
 
 } // namespace Property

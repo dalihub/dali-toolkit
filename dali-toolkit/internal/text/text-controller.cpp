@@ -2235,6 +2235,28 @@ Uint32Pair Controller::GetTextSelectionRange() const
   return mImpl->GetTextSelectionRange();
 }
 
+CharacterIndex Controller::GetPrimaryCursorPosition() const
+{
+  return mImpl->GetPrimaryCursorPosition();
+}
+
+bool Controller::SetPrimaryCursorPosition( CharacterIndex index )
+{
+  if( mImpl->mEventData )
+  {
+    mImpl->mEventData->mCheckScrollAmount = true;
+    mImpl->mEventData->mIsLeftHandleSelected = true;
+    mImpl->mEventData->mIsRightHandleSelected = true;
+    mImpl->mEventData->mCheckScrollAmount = true;
+    if( mImpl->SetPrimaryCursorPosition(index) )
+    {
+      KeyboardFocusGainEvent();
+      return true;
+    }
+  }
+  return false;
+}
+
 void Controller::SelectWholeText()
 {
   SelectEvent( 0.f, 0.f, SelectionType::ALL );
