@@ -65,6 +65,7 @@ RollingAnimatedImageCache::RollingAnimatedImageCache(
   mAnimatedImageLoading( animatedImageLoading ),
   mFrameCount( frameCount ),
   mFrameIndex( 0 ),
+  mCacheSize( cacheSize ),
   mQueue( cacheSize ),
   mIsSynchronousLoading( isSynchronousLoading ),
   mOnLoading( false )
@@ -114,10 +115,18 @@ TextureSet RollingAnimatedImageCache::Frame( uint32_t frameIndex )
     // If the frame of frameIndex was already loaded, load batch from the last frame of queue
     if( !mQueue.IsEmpty() )
     {
-      mFrameIndex = ( mQueue.Back().mFrameNumber + 1 ) % mFrameCount;
+      if(!mLoadWaitingQueue.empty())
+      {
+        mFrameIndex = ( mLoadWaitingQueue.back() + 1 ) % mFrameCount;
+      }
+      else
+      {
+        mFrameIndex = ( mQueue.Back().mFrameNumber + 1 ) % mFrameCount;
+      }
     }
     else
     {
+      mOnLoading = false;
       // If the request is for the first frame or a jumped frame(JUMP_TO) remove current waiting queue.
       mLoadWaitingQueue.clear();
       // If the queue is empty, and the frame of frameIndex is not loaded synchronously. load batch from the frame of frameIndex
@@ -149,9 +158,38 @@ TextureSet RollingAnimatedImageCache::FirstFrame()
   return Frame( 0u );
 }
 
+TextureSet RollingAnimatedImageCache::NextFrame()
+{
+  TextureSet textureSet;
+  if(!mQueue.IsEmpty())
+  {
+    uint32_t frameIndex = mQueue.Front().mFrameNumber;
+    if(IsFrontReady())
+    {
+      frameIndex = (frameIndex + 1) % mFrameCount;
+    }
+    textureSet = Frame(frameIndex);
+  }
+  else
+  {
+    DALI_LOG_ERROR("Cache is empty.");
+  }
+  
+  return textureSet;
+}
+
 uint32_t RollingAnimatedImageCache::GetFrameInterval( uint32_t frameIndex )
 {
   return mAnimatedImageLoading.GetFrameInterval( frameIndex );
+}
+
+int32_t RollingAnimatedImageCache::GetCurrentFrameIndex()
+{
+  if(mQueue.IsEmpty())
+  {
+    return -1;
+  }
+  return mQueue.Front().mFrameNumber;
 }
 
 bool RollingAnimatedImageCache::IsFrontReady() const
@@ -161,6 +199,12 @@ bool RollingAnimatedImageCache::IsFrontReady() const
 
 void RollingAnimatedImageCache::RequestFrameLoading( uint32_t frameIndex )
 {
+  ImageFrame imageFrame;
+  imageFrame.mFrameNumber = frameIndex;
+  imageFrame.mReady       = false;
+
+  mQueue.PushBack(imageFrame);
+
   mRequestingLoad = true;
 
   bool synchronousLoading = false;
@@ -178,14 +222,8 @@ void RollingAnimatedImageCache::LoadBatch()
   // removed, and another frame is loaded
 
   bool frontFrameReady = IsFrontReady();
-  for( unsigned int i=0; i< mBatchSize && !mQueue.IsFull(); ++i )
+  for( unsigned int i=0; i< mBatchSize && mQueue.Count() + mLoadWaitingQueue.size() < static_cast<uint32_t>(mCacheSize) && !mQueue.IsFull(); ++i )
   {
-    ImageFrame imageFrame;
-    imageFrame.mFrameNumber = mFrameIndex;
-    imageFrame.mReady = false;
-
-    mQueue.PushBack( imageFrame );
-
     if( !mOnLoading )
     {
       mOnLoading = true;

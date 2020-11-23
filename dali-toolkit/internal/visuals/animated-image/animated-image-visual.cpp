@@ -174,7 +174,7 @@ AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache, Imag
   mPixelArea( FULL_TEXTURE_RECT ),
   mImageUrl(),
   mAnimatedImageLoading(),
-  mCurrentFrameIndex( 0 ),
+  mFrameIndexForJumpTo( 0 ),
   mImageUrls( NULL ),
   mImageCache( NULL ),
   mCacheSize( 2 ),
@@ -302,7 +302,7 @@ void AnimatedImageVisual::OnDoAction( const Dali::Property::Index actionId, cons
         else
         {
           mIsJumpTo = true;
-          mCurrentFrameIndex = frameNumber;
+          mFrameIndexForJumpTo = frameNumber;
           if( IsOnScene() )
           {
             DisplayNextFrame();
@@ -544,8 +544,6 @@ void AnimatedImageVisual::CreateRenderer()
   {
     mImpl->mRenderer.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, mPixelArea );
   }
-
-  mCurrentFrameIndex = 0;
 }
 
 void AnimatedImageVisual::LoadFirstBatch()
@@ -618,8 +616,6 @@ void AnimatedImageVisual::StartFirstFrame( TextureSet& textureSet )
     mPlacementActor.Reset();
   }
 
-  mCurrentFrameIndex = 0;
-
   if( mFrameCount > 1 )
   {
     int frameDelay = mFrameDelay; // from URL array
@@ -642,14 +638,10 @@ TextureSet AnimatedImageVisual::PrepareTextureSet()
   {
     textureSet = mImageCache->FirstFrame();
   }
+
   if( textureSet )
   {
     SetImageSize( textureSet );
-  }
-  else
-  {
-    DALI_LOG_INFO( gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::FAILED)\n" );
-    ResourceReady( Toolkit::Visual::ResourceStatus::FAILED );
   }
 
   return textureSet;
@@ -670,26 +662,38 @@ void AnimatedImageVisual::SetImageSize( TextureSet& textureSet )
 
 void AnimatedImageVisual::FrameReady( TextureSet textureSet )
 {
-  SetImageSize( textureSet );
-
-  if( mStartFirstFrame )
+  if(textureSet)
   {
-    StartFirstFrame( textureSet );
+    SetImageSize(textureSet);
+
+    if(mStartFirstFrame)
+    {
+      StartFirstFrame(textureSet);
+    }
+    else
+    {
+      if(mImpl->mRenderer)
+      {
+        mImpl->mRenderer.SetTextures(textureSet);
+      }
+    }
   }
   else
   {
-    if( mImpl->mRenderer )
-    {
-      mImpl->mRenderer.SetTextures( textureSet );
-    }
+    DALI_LOG_INFO( gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::FAILED)\n" );
+    ResourceReady( Toolkit::Visual::ResourceStatus::FAILED );
   }
 }
 
 bool AnimatedImageVisual::DisplayNextFrame()
 {
+  bool nextFrame = false;
+  uint32_t frameIndex = mImageCache->GetCurrentFrameIndex();
+
   if( mIsJumpTo )
   {
     mIsJumpTo = false;
+    frameIndex = mFrameIndexForJumpTo;
   }
   else if( mActionStatus == DevelAnimatedImageVisual::Action::PAUSE )
   {
@@ -697,14 +701,14 @@ bool AnimatedImageVisual::DisplayNextFrame()
   }
   else if( mActionStatus == DevelAnimatedImageVisual::Action::STOP )
   {
-    mCurrentLoopIndex = 0;
+    frameIndex = 0;
     if( mStopBehavior == DevelImageVisual::StopBehavior::FIRST_FRAME )
     {
-      mCurrentFrameIndex = 0;
+      frameIndex = 0;
     }
     else if( mStopBehavior == DevelImageVisual::StopBehavior::LAST_FRAME )
     {
-      mCurrentFrameIndex = mFrameCount - 1;
+      frameIndex = mFrameCount - 1;
     }
     else
     {
@@ -715,23 +719,15 @@ bool AnimatedImageVisual::DisplayNextFrame()
   {
     if( mFrameCount > 1 )
     {
-      // Wrap the frame index
-      bool finished = false;
-      ++mCurrentFrameIndex;
-      if( mCurrentFrameIndex >= mFrameCount )
+      nextFrame = true;
+      frameIndex++;
+      if( frameIndex >= mFrameCount )
       {
+        frameIndex %= mFrameCount;
         ++mCurrentLoopIndex;
-        finished = true;
       }
 
-      if( mLoopCount < 0 || mCurrentLoopIndex < mLoopCount)
-      {
-        if( finished )
-        {
-          mCurrentFrameIndex = 0; // Back to the first frame
-        }
-      }
-      else
+      if(mLoopCount >= 0 && mCurrentLoopIndex >= mLoopCount)
       {
         // This will stop timer
         mActionStatus = DevelAnimatedImageVisual::Action::STOP;
@@ -741,7 +737,7 @@ bool AnimatedImageVisual::DisplayNextFrame()
     // TODO : newly added one.
     if( mAnimatedImageLoading && mImageCache )
     {
-      unsigned int delay = mImageCache->GetFrameInterval( mCurrentFrameIndex );
+      unsigned int delay = mImageCache->GetFrameInterval( frameIndex );
       if( mFrameDelayTimer.GetInterval() != delay )
       {
         mFrameDelayTimer.SetInterval( delay );
@@ -749,12 +745,20 @@ bool AnimatedImageVisual::DisplayNextFrame()
     }
   }
 
-  DALI_LOG_INFO( gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::DisplayNextFrame(this:%p) CurrentFrameIndex:%d\n", this, mCurrentFrameIndex);
+  DALI_LOG_INFO( gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::DisplayNextFrame(this:%p) CurrentFrameIndex:%d\n", this, frameIndex);
 
   TextureSet textureSet;
   if( mImageCache )
   {
-    textureSet = mImageCache->Frame( mCurrentFrameIndex );
+    if(nextFrame)
+    {
+      textureSet = mImageCache->NextFrame();
+    }
+    else
+    {
+      textureSet = mImageCache->Frame( frameIndex );
+    }
+
     if( textureSet )
     {
       SetImageSize( textureSet );

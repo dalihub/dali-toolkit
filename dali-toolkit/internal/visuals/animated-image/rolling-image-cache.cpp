@@ -131,9 +131,38 @@ TextureSet RollingImageCache::FirstFrame()
   return Frame( 0u );
 }
 
+TextureSet RollingImageCache::NextFrame()
+{
+  TextureSet textureSet;
+  if(!mQueue.IsEmpty())
+  {
+    uint32_t frameIndex = mQueue.Front().mUrlIndex;
+    if(IsFrontReady())
+    {
+      frameIndex = (frameIndex + 1) % mImageUrls.size();
+    }
+    textureSet = Frame(frameIndex);
+  }
+  else
+  {
+    DALI_LOG_ERROR("Cache is empty.");
+  }
+
+  return textureSet;
+}
+
 uint32_t RollingImageCache::GetFrameInterval( uint32_t frameIndex )
 {
   return 0u;
+}
+
+int32_t RollingImageCache::GetCurrentFrameIndex()
+{
+  if(mQueue.IsEmpty())
+  {
+    return -1;
+  }
+  return mQueue.Front().mUrlIndex;
 }
 
 bool RollingImageCache::IsFrontReady() const
