@@ -69,6 +69,9 @@ public:
 
     ~Data();
 
+    using ObserverListType = Dali::Vector< TextureUploadObserver* >;
+
+    ObserverListType observerList;                 ///< Container used to store all observer clients of this Texture
     std::string url;                               ///< Url of the N-Patch
     TextureSet textureSet;                         ///< Texture containing the cropped image
     NPatchUtility::StretchRanges stretchPixelsX;   ///< X stretch pixels
@@ -110,10 +113,13 @@ public:
   /**
    * @brief Set loaded PixelBuffer and its information
    *
+   * @param [in] loadSuccess True if the texture load was successful (i.e. the resource is available). If false, then the resource failed to load.
    * @param [in] id cache data id
    * @param [in] pixelBuffer of loaded image
+   * @param [in] url           The url address of the loaded image.
+   * @param [in] preMultiplied True if the image had pre-multiplied alpha applied
    */
-  void SetNPatchData( std::size_t id, Devel::PixelBuffer& pixelBuffer );
+  void SetNPatchData( bool loadSuccess, std::size_t id, Devel::PixelBuffer& pixelBuffer, const Internal::VisualUrl& url, bool preMultiplied );
 
   /**
    * @brief Retrieve N patch data matching to an id

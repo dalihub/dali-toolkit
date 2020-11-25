@@ -38,6 +38,7 @@
 namespace
 {
 
+constexpr auto INITIAL_CACHE_NUMBER = size_t{0u};
 constexpr auto DEFAULT_NUMBER_OF_LOCAL_LOADER_THREADS = size_t{4u};
 constexpr auto DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS = size_t{8u};
 
@@ -454,13 +455,18 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 {
   // First check if the requested Texture is cached.
   bool isAnimatedImage = ( animatedImageLoading ) ? true : false;
-  const TextureHash textureHash = GenerateHash( url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas,
-                                                maskTextureId, storageType, isAnimatedImage, frameIndex );
+
+  TextureHash textureHash = INITIAL_CACHE_NUMBER;
+  int cacheIndex = INVALID_CACHE_INDEX;
+  if(storageType != StorageType::RETURN_PIXEL_BUFFER)
+  {
+    textureHash = GenerateHash(url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId, isAnimatedImage, frameIndex);
+
+    // Look up the texture by hash. Note: The extra parameters are used in case of a hash collision.
+    cacheIndex = FindCachedTexture(textureHash, url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId, preMultiplyOnLoad, isAnimatedImage, frameIndex);
+  }
 
   TextureManager::TextureId textureId = INVALID_TEXTURE_ID;
-  // Look up the texture by hash. Note: The extra parameters are used in case of a hash collision.
-  int cacheIndex = FindCachedTexture( textureHash, url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas,
-                                      maskTextureId, preMultiplyOnLoad, storageType, isAnimatedImage, frameIndex );
 
   // Check if the requested Texture exists in the cache.
   if( cacheIndex != INVALID_CACHE_INDEX )
@@ -1170,7 +1176,6 @@ TextureManager::TextureHash TextureManager::GenerateHash(
   const Dali::SamplingMode::Type samplingMode,
   const UseAtlas                 useAtlas,
   TextureId                      maskTextureId,
-  StorageType                    storageType,
   bool                           isAnimationImage,
   uint32_t                       frameIndex )
 {
@@ -1193,8 +1198,8 @@ TextureManager::TextureHash TextureManager::GenerateHash(
     *hashTargetPtr++ = ( size.GetHeight() >> 8u ) & 0xff;
 
     // Bit-pack the FittingMode, SamplingMode and atlasing.
-    // FittingMode=2bits, SamplingMode=3bits, useAtlas=1bit, storageType=2bits
-    *hashTargetPtr   = ( fittingMode << 6u ) | ( samplingMode << 3 ) | ( useAtlas << 2 ) | static_cast<unsigned int>(storageType);
+    // FittingMode=2bits, SamplingMode=3bits, useAtlas=1bit
+    *hashTargetPtr   = ( fittingMode << 4u ) | ( samplingMode << 1 ) | useAtlas;
   }
   else
   {
@@ -1257,7 +1262,6 @@ int TextureManager::FindCachedTexture(
   const bool                        useAtlas,
   TextureId                         maskTextureId,
   TextureManager::MultiplyOnLoad    preMultiplyOnLoad,
-  StorageType                       storageType,
   bool                              isAnimatedImage,
   uint32_t                          frameIndex )
 {
@@ -1280,7 +1284,6 @@ int TextureManager::FindCachedTexture(
           ( ( size.GetWidth() == 0 && size.GetHeight() == 0 ) ||
             ( fittingMode == textureInfo.fittingMode &&
               samplingMode == textureInfo.samplingMode ) ) &&
-          ( storageType == textureInfo.storageType ) &&
           ( isAnimatedImage == ( ( textureInfo.animatedImageLoading ) ? true : false ) ) &&
           ( frameIndex == textureInfo.frameIndex ) )
       {
@@ -1397,6 +1400,11 @@ void TextureManager::AsyncLoadingHelper::AsyncLoadComplete(uint32_t           id
 void TextureManager::SetBrokenImageUrl(const std::string& brokenImageUrl)
 {
   mBrokenImageUrl = brokenImageUrl;
+}
+
+const std::string TextureManager::GetBrokenImageUrl()
+{
+  return mBrokenImageUrl;
 }
 
 Geometry TextureManager::GetRenderGeometry(TextureId textureId, uint32_t& frontElements, uint32_t& backElements )
