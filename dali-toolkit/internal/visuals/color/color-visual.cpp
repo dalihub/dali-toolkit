@@ -341,7 +341,7 @@ void ColorVisual::InitializeRenderer()
 
   mImpl->mRenderer.RegisterProperty( BLUR_RADIUS_NAME, mBlurRadius );
 
-  if( mImpl->mMixColor.a < 1.f || !EqualsZero( mBlurRadius ) || IsAdvancedBlendEquationApplied() )
+  if( !EqualsZero( mBlurRadius ) )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
