@@ -873,11 +873,17 @@ void NPatchVisual::LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffe
   }
   else
   {
+    Devel::PixelBuffer loadedPixelBuffer;
     if( loadSuccess )
     {
-      mLoader.SetNPatchData( mId, pixelBuffer );
+      loadedPixelBuffer = pixelBuffer;
       EnablePreMultipliedAlpha( preMultiplied );
     }
+    else
+    {
+      loadedPixelBuffer = LoadImageFromFile( mFactoryCache.GetTextureManager().GetBrokenImageUrl() );
+    }
+    mLoader.SetNPatchData( loadSuccess, mId, loadedPixelBuffer, url, preMultiplied );
 
     if( mAuxiliaryPixelBuffer || !mAuxiliaryUrl.IsValid() )
     {

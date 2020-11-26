@@ -3088,3 +3088,36 @@ int UtcDaliToolkitTextFieldFontSizeScale(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldPrimaryCursorPosition(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldPrimaryCursorPosition ");
+
+  TextField textField = TextField::New();
+
+  application.GetScene().Add( textField );
+
+  textField.SetProperty( TextField::Property::TEXT, "ABCEF");
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  textField.SetProperty( DevelTextField::Property::PRIMARY_CURSOR_POSITION, 3);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textField.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "ABCDEF", TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::PRIMARY_CURSOR_POSITION ).Get<int>(), 4, TEST_LOCATION );
+
+  END_TEST;
+}

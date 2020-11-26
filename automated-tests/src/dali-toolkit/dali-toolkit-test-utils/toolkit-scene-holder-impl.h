@@ -67,6 +67,8 @@ public:
 
   Integration::StencilBufferAvailable GetStencilBufferRequired() override { return Integration::StencilBufferAvailable::FALSE; };
 
+  int GetOrientation() const override {return 0;};
+
   void SetBackgroundColor( Vector4 color ) {};
 
   Vector4 GetBackgroundColor() { return Color::WHITE; };

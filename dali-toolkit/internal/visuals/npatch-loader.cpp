@@ -110,9 +110,9 @@ std::size_t NPatchLoader::Load( TextureManager& textureManager, TextureUploadObs
           {
             return index + 1u; // valid indices are from 1 onwards
           }
+          mCache[ index ]->observerList.PushBack( textureObserver );
           data = mCache[ index ];
-          cachedIndex = index + 1u; // valid indices are from 1 onwards
-          break;
+          return index + 1u; // valid indices are from 1 onwards
         }
         else
         {
@@ -176,14 +176,25 @@ std::size_t NPatchLoader::Load( TextureManager& textureManager, TextureUploadObs
   return cachedIndex;
 }
 
-void NPatchLoader::SetNPatchData( std::size_t id, Devel::PixelBuffer& pixelBuffer )
+void NPatchLoader::SetNPatchData( bool loadSuccess, std::size_t id, Devel::PixelBuffer& pixelBuffer, const Internal::VisualUrl& url, bool preMultiplied )
 {
   Data* data;
   data = mCache[ id - 1u ];
 
-  if( !data->loadCompleted )
+  // To prevent recursion.
+  // data->loadCompleted will be set true in the NPatchBuffer::SetLoadedNPatchData when the first observer called this method.
+  if( data->loadCompleted )
   {
-    NPatchBuffer::SetLoadedNPatchData( data, pixelBuffer );
+    return;
+  }
+
+  NPatchBuffer::SetLoadedNPatchData( data, pixelBuffer );
+
+  while( data->observerList.Count() )
+  {
+    TextureUploadObserver* observer = data->observerList[0];
+    observer->LoadComplete( loadSuccess, Devel::PixelBuffer(), url, preMultiplied );
+    data->observerList.Erase( data->observerList.begin() );
   }
 }
 

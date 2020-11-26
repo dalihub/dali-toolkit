@@ -1531,6 +1531,21 @@ public: // Text-input Event Queuing.
   void LongPressEvent( GestureState state, float x, float y );
 
   /**
+   * @brief Used to get the Primary cursor position.
+   *
+   * @return Primary cursor position.
+   */
+  CharacterIndex GetPrimaryCursorPosition() const;
+
+  /**
+   * @brief Used to set the Primary cursor position.
+   *
+   * @param[in] index for the Primary cursor position.
+   * @return[in] true if cursor position changed, false otherwise.
+   */
+  bool SetPrimaryCursorPosition( CharacterIndex index );
+
+  /**
    * @brief Creates a selection event.
    *
    * It could be called from the TapEvent (double tap) or when the text selection popup's sellect all button is pressed.

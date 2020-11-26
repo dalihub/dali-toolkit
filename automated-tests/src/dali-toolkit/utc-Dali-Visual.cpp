@@ -1965,11 +1965,14 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     Dali::Toolkit::TransitionData transition = TransitionData::New( map );
 
     Animation animation = dummyImpl.CreateTransition( transition );
-    Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
-    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
-
     animation.AnimateTo( Property(actor, Actor::Property::COLOR), Color::WHITE );
     animation.Play();
+
+    TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+    glAbstraction.EnableEnableDisableCallTrace( true );
+    TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
+    std::ostringstream blendStr;
+    blendStr << GL_BLEND;
 
     application.SendNotification();
     application.Render(0);
@@ -1980,6 +1983,10 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(0.5f, 0.5f, 0.5f, halfwayColor.a )), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(halfwayColor) ), true, TEST_LOCATION );
 
+    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+    glEnableStack.Reset();
+
     application.Render(2001u); // go past end
     application.SendNotification(); // Trigger signals
 
@@ -1987,8 +1994,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4( 1.0f, 1.0f, 1.0f, TARGET_MIX_COLOR.a ) ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(TARGET_MIX_COLOR) ), true, TEST_LOCATION );
 
-    blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
-    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
+    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
 
     actor.Unparent();
   }

@@ -773,11 +773,14 @@ int UtcDaliImageVisualAnimateMixColor(void)
 
   Animation animation = dummyImpl.CreateTransition( transition );
 
-  blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
-  DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
-
   animation.AnimateTo( Property(actor, Actor::Property::COLOR), Color::WHITE );
   animation.Play();
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
 
   application.SendNotification();
   application.Render(0); // Ensure animation starts
@@ -788,16 +791,21 @@ int UtcDaliImageVisualAnimateMixColor(void)
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>( "uColor", Vector4( 0.5f, 0.5f, 0.5f, 0.75f ) ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>( "mixColor", testColor ), true, TEST_LOCATION );
 
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  glEnableStack.Reset();
+
   application.Render(2000u); // Halfway point between blue and white
 
   DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), Color::WHITE, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>( "uColor", Vector4( 1.0f, 1.0f, 1.0f, 0.5f ) ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>( "mixColor", Vector3( TARGET_MIX_COLOR ) ), true, TEST_LOCATION );
 
-  TestMixColor( visual, Visual::Property::MIX_COLOR, TARGET_MIX_COLOR );
+  // GL_BLEND should not be changed: Keep enabled
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
 
-  blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
-  DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
+  TestMixColor( visual, Visual::Property::MIX_COLOR, TARGET_MIX_COLOR );
 
   END_TEST;
 }
@@ -828,9 +836,16 @@ int UtcDaliImageVisualAnimateOpacity(void)
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
-  Renderer renderer = actor.GetRendererAt(0);
-  Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
-  DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
 
   {
     tet_infoline( "Test that the opacity can be increased to full via animation, and that the blend mode is set appropriately at the start and end of the animation." );
@@ -849,6 +864,8 @@ int UtcDaliImageVisualAnimateOpacity(void)
     Animation animation = dummyImpl.CreateTransition( transition );
     animation.Play();
 
+    glEnableStack.Reset();
+
     application.SendNotification();
     application.Render(0);     // Ensure animation starts
     application.Render(2000u); // Halfway point through animation
@@ -864,8 +881,8 @@ int UtcDaliImageVisualAnimateOpacity(void)
     DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
     DALI_TEST_EQUALS( color.a, 1.0f, TEST_LOCATION );
 
-    blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
-    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
+    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
   }
 
 
@@ -886,8 +903,7 @@ int UtcDaliImageVisualAnimateOpacity(void)
     Animation animation = dummyImpl.CreateTransition( transition );
     animation.Play();
 
-    blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
-    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
+    glEnableStack.Reset();
 
     application.SendNotification();
     application.Render(0);     // Ensure animation starts
@@ -898,16 +914,20 @@ int UtcDaliImageVisualAnimateOpacity(void)
     DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
     DALI_TEST_EQUALS( color.a, 0.55f, TEST_LOCATION );
 
+    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+    glEnableStack.Reset();
+
     application.Render(2016u); // end
     application.SendNotification();
 
     DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
     DALI_TEST_EQUALS( color.a, 0.1f, TEST_LOCATION );
 
-    blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
-    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
+    // GL_BLEND should not be changed: Keep enabled
+    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
   }
-
 
   END_TEST;
 }
@@ -975,17 +995,24 @@ int UtcDaliImageVisualAnimateOpacity02(void)
   animation = dummyImpl.CreateTransition( transition );
   animation.Play();
 
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+
   application.SendNotification();
   application.Render(0);     // Ensure animation starts
   application.Render(2000u); // Halfway point through animation
   application.SendNotification(); // Handle any signals
 
-  blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
-  DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
 
   Vector4 color;
   DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
   DALI_TEST_EQUALS( color.a, 0.5f, TEST_LOCATION );
+
+  glEnableStack.Reset();
 
   application.Render(2001u); // end
   application.SendNotification(); // ensure animation finished signal is sent
@@ -993,8 +1020,7 @@ int UtcDaliImageVisualAnimateOpacity02(void)
   DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
   DALI_TEST_EQUALS( color.a, 1.0f, TEST_LOCATION );
 
-  blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
-  DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
 
   END_TEST;
 }

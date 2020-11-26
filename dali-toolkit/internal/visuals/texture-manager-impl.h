@@ -76,7 +76,7 @@ public:
   /**
    * Whether the pixel data should be kept in TextureManager, returned with pixelBuffer or uploaded for rendering
    */
-  enum StorageType
+  enum class StorageType: uint8_t
   {
     KEEP_PIXEL_BUFFER,
     RETURN_PIXEL_BUFFER,
@@ -86,7 +86,7 @@ public:
   /**
    * Whether the texture should be loaded synchronously or asynchronously.
    */
-  enum LoadType
+  enum class LoadType: uint8_t
   {
     LOAD_ASYNCHRONOUSLY,
     LOAD_SYNCHRONOUSLY
@@ -95,7 +95,7 @@ public:
   /**
    * @brief The LoadState Enumeration represents the current state of a particular Texture's life-cycle.
    */
-  enum LoadState
+  enum class LoadState: uint8_t
   {
     NOT_STARTED,     ///< Default
     LOADING,         ///< Loading has been started, but not finished.
@@ -428,6 +428,12 @@ public:
   void SetBrokenImageUrl(const std::string& brokenImageUrl);
 
   /**
+   * @brief Get an image to be used when a visual has failed to correctly render
+   * @return Returns The broken image url.
+   */
+  const std::string GetBrokenImageUrl();
+
+  /**
    * @brief Returns the geometry associated with texture.
    * @param[in] textureId Id of the texture
    * @param[out] frontElements number of front elements
@@ -530,10 +536,10 @@ private:
       hash( hash ),
       scaleFactor( scaleFactor ),
       referenceCount( 1u ),
-      loadState( NOT_STARTED ),
+      loadState( LoadState::NOT_STARTED ),
       fittingMode( fittingMode ),
       samplingMode( samplingMode ),
-      storageType( UPLOAD_TO_TEXTURE ),
+      storageType( StorageType::UPLOAD_TO_TEXTURE ),
       animatedImageLoading( animatedImageLoading ),
       frameIndex( frameIndex ),
       loadSynchronously( loadSynchronously ),
@@ -563,10 +569,10 @@ private:
     TextureManager::TextureHash hash; ///< The hash used to cache this Texture
     float scaleFactor;             ///< The scale factor to apply to the Texture when masking
     int16_t referenceCount;        ///< The reference count of clients using this Texture
-    LoadState loadState:4;         ///< The load state showing the load progress of the Texture
+    LoadState loadState;           ///< The load state showing the load progress of the Texture
     FittingMode::Type fittingMode:3; ///< The requested FittingMode
     Dali::SamplingMode::Type samplingMode:3; ///< The requested SamplingMode
-    StorageType storageType:2;     ///< CPU storage / GPU upload;
+    StorageType storageType;       ///< CPU storage / GPU upload;
     Dali::AnimatedImageLoading animatedImageLoading; ///< AnimatedImageLoading that contains animated image information.
     uint32_t frameIndex;           ///< frame index that be loaded, in case of animated image
     bool loadSynchronously:1;      ///< True if synchronous loading was requested
@@ -753,7 +759,7 @@ private:
   TextureHash GenerateHash( const std::string& url, const ImageDimensions size,
                             const FittingMode::Type fittingMode,
                             const Dali::SamplingMode::Type samplingMode, const UseAtlas useAtlas,
-                            TextureId maskTextureId, StorageType storageType, bool isAnimatedImage, uint32_t frameIndex );
+                            TextureId maskTextureId, bool isAnimatedImage, uint32_t frameIndex );
 
   /**
    * @brief Looks up a cached texture by its hash.
@@ -766,7 +772,6 @@ private:
    * @param[in] useAtlas          True if atlased
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
    * @param[in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
-   * @param[in] storageType       Whether the pixel data is stored in the cache, returned with PixelBuffer or uploaded to the GPU
    * @param[in] isAnimatedImage   The boolean value to know whether the request is for animated image or not
    * @param[in] frameIndex        The frame index of a frame to be loaded frame
    * @return                      A TextureId of a cached Texture if found. Or INVALID_TEXTURE_ID if not found.
@@ -780,7 +785,6 @@ private:
     const bool useAtlas,
     TextureId maskTextureId,
     MultiplyOnLoad preMultiplyOnLoad,
-    StorageType storageType,
     bool isAnimatedImage,
     uint32_t frameIndex );
 

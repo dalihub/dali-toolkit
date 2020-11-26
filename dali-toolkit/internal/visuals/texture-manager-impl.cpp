@@ -38,6 +38,7 @@
 namespace
 {
 
+constexpr auto INITIAL_CACHE_NUMBER = size_t{0u};
 constexpr auto DEFAULT_NUMBER_OF_LOCAL_LOADER_THREADS = size_t{4u};
 constexpr auto DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS = size_t{8u};
 
@@ -82,15 +83,15 @@ namespace
 Debug::Filter* gTextureManagerLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_TEXTURE_MANAGER" );
 
 #define GET_LOAD_STATE_STRING( loadState ) \
-  loadState == TextureManager::NOT_STARTED ? "NOT_STARTED" :             \
-    loadState == TextureManager::LOADING ? "LOADING" :                   \
-    loadState == TextureManager::LOAD_FINISHED ? "LOAD_FINISHED" :       \
-    loadState == TextureManager::WAITING_FOR_MASK ? "WAITING_FOR_MASK" : \
-    loadState == TextureManager::MASK_APPLYING ? "MASK_APPLYING" :         \
-    loadState == TextureManager::MASK_APPLIED ? "MASK_APPLIED" :         \
-    loadState == TextureManager::UPLOADED ? "UPLOADED" :                 \
-    loadState == TextureManager::CANCELLED ? "CANCELLED" :               \
-    loadState == TextureManager::LOAD_FAILED ? "LOAD_FAILED" : "Unknown"
+  loadState == TextureManager::LoadState::NOT_STARTED ? "NOT_STARTED" :             \
+    loadState == TextureManager::LoadState::LOADING ? "LOADING" :                   \
+    loadState == TextureManager::LoadState::LOAD_FINISHED ? "LOAD_FINISHED" :       \
+    loadState == TextureManager::LoadState::WAITING_FOR_MASK ? "WAITING_FOR_MASK" : \
+    loadState == TextureManager::LoadState::MASK_APPLYING ? "MASK_APPLYING" :         \
+    loadState == TextureManager::LoadState::MASK_APPLIED ? "MASK_APPLIED" :         \
+    loadState == TextureManager::LoadState::UPLOADED ? "UPLOADED" :                 \
+    loadState == TextureManager::LoadState::CANCELLED ? "CANCELLED" :               \
+    loadState == TextureManager::LoadState::LOAD_FAILED ? "LOAD_FAILED" : "Unknown"
 
 #endif
 
@@ -192,10 +193,10 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
   {
     auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
     textureId = RequestLoadInternal( animatedImageLoading.GetUrl(), INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL,
-                                     SamplingMode::BOX_THEN_LINEAR, TextureManager::NO_ATLAS, false, UPLOAD_TO_TEXTURE, textureObserver,
+                                     SamplingMode::BOX_THEN_LINEAR, TextureManager::NO_ATLAS, false, StorageType::UPLOAD_TO_TEXTURE, textureObserver,
                                      true, TextureManager::ReloadPolicy::CACHED, preMultiply, animatedImageLoading, frameIndex );
     TextureManager::LoadState loadState = GetTextureStateInternal( textureId );
-    if( loadState == TextureManager::UPLOADED )
+    if( loadState == TextureManager::LoadState::UPLOADED )
     {
       // UploadComplete has already been called - keep the same texture set
       textureSet = GetTextureSet( textureId );
@@ -231,7 +232,7 @@ Devel::PixelBuffer TextureManager::LoadPixelBuffer(
   else
   {
     RequestLoadInternal( url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, TextureManager::NO_ATLAS,
-                         false, RETURN_PIXEL_BUFFER, textureObserver, orientationCorrection, TextureManager::ReloadPolicy::FORCED,
+                         false, StorageType::RETURN_PIXEL_BUFFER, textureObserver, orientationCorrection, TextureManager::ReloadPolicy::FORCED,
                          preMultiplyOnLoad, Dali::AnimatedImageLoading(), 0u );
   }
 
@@ -359,7 +360,7 @@ TextureSet TextureManager::LoadTexture(
       }
 
       TextureManager::LoadState loadState = GetTextureStateInternal( textureId );
-      if( loadState == TextureManager::UPLOADED )
+      if( loadState == TextureManager::LoadState::UPLOADED )
       {
         // UploadComplete has already been called - keep the same texture set
         textureSet = GetTextureSet( textureId );
@@ -367,11 +368,11 @@ TextureSet TextureManager::LoadTexture(
 
       // If we are loading the texture, or waiting for the ready signal handler to complete, inform
       // caller that they need to wait.
-      loadingStatus = ( loadState == TextureManager::LOADING ||
-                        loadState == TextureManager::WAITING_FOR_MASK ||
-                        loadState == TextureManager::MASK_APPLYING ||
-                        loadState == TextureManager::MASK_APPLIED ||
-                        loadState == TextureManager::NOT_STARTED ||
+      loadingStatus = ( loadState == TextureManager::LoadState::LOADING ||
+                        loadState == TextureManager::LoadState::WAITING_FOR_MASK ||
+                        loadState == TextureManager::LoadState::MASK_APPLYING ||
+                        loadState == TextureManager::LoadState::MASK_APPLIED ||
+                        loadState == TextureManager::LoadState::NOT_STARTED ||
                         mQueueLoadFlag );
 
     }
@@ -403,7 +404,7 @@ TextureManager::TextureId TextureManager::RequestLoad(
   TextureManager::MultiplyOnLoad& preMultiplyOnLoad )
 {
   return RequestLoadInternal( url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, useAtlas,
-                              false, UPLOAD_TO_TEXTURE, observer, orientationCorrection, reloadPolicy,
+                              false, StorageType::UPLOAD_TO_TEXTURE, observer, orientationCorrection, reloadPolicy,
                               preMultiplyOnLoad, Dali::AnimatedImageLoading(), 0u );
 }
 
@@ -422,7 +423,7 @@ TextureManager::TextureId TextureManager::RequestLoad(
   TextureManager::MultiplyOnLoad& preMultiplyOnLoad )
 {
   return RequestLoadInternal( url, maskTextureId, contentScale, desiredSize, fittingMode, samplingMode, useAtlas,
-                              cropToMask, UPLOAD_TO_TEXTURE, observer, orientationCorrection, reloadPolicy,
+                              cropToMask, StorageType::UPLOAD_TO_TEXTURE, observer, orientationCorrection, reloadPolicy,
                               preMultiplyOnLoad, Dali::AnimatedImageLoading(), 0u );
 }
 
@@ -431,7 +432,7 @@ TextureManager::TextureId TextureManager::RequestMaskLoad( const VisualUrl& mask
   // Use the normal load procedure to get the alpha mask.
   auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
   return RequestLoadInternal( maskUrl, INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL,
-                              SamplingMode::NO_FILTER, NO_ATLAS, false, KEEP_PIXEL_BUFFER, NULL, true,
+                              SamplingMode::NO_FILTER, NO_ATLAS, false, StorageType::KEEP_PIXEL_BUFFER, NULL, true,
                               TextureManager::ReloadPolicy::CACHED, preMultiply, Dali::AnimatedImageLoading(), 0u );
 }
 
@@ -454,13 +455,18 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 {
   // First check if the requested Texture is cached.
   bool isAnimatedImage = ( animatedImageLoading ) ? true : false;
-  const TextureHash textureHash = GenerateHash( url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas,
-                                                maskTextureId, storageType, isAnimatedImage, frameIndex );
+
+  TextureHash textureHash = INITIAL_CACHE_NUMBER;
+  int cacheIndex = INVALID_CACHE_INDEX;
+  if(storageType != StorageType::RETURN_PIXEL_BUFFER)
+  {
+    textureHash = GenerateHash(url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId, isAnimatedImage, frameIndex);
+
+    // Look up the texture by hash. Note: The extra parameters are used in case of a hash collision.
+    cacheIndex = FindCachedTexture(textureHash, url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId, preMultiplyOnLoad, isAnimatedImage, frameIndex);
+  }
 
   TextureManager::TextureId textureId = INVALID_TEXTURE_ID;
-  // Look up the texture by hash. Note: The extra parameters are used in case of a hash collision.
-  int cacheIndex = FindCachedTexture( textureHash, url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas,
-                                      maskTextureId, preMultiplyOnLoad, storageType, isAnimatedImage, frameIndex );
 
   // Check if the requested Texture exists in the cache.
   if( cacheIndex != INVALID_CACHE_INDEX )
@@ -508,37 +514,37 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 
   // Force reloading of texture by setting loadState unless already loading or cancelled.
   if ( TextureManager::ReloadPolicy::FORCED == reloadPolicy &&
-       TextureManager::LOADING != textureInfo.loadState &&
-       TextureManager::WAITING_FOR_MASK != textureInfo.loadState &&
-       TextureManager::MASK_APPLYING != textureInfo.loadState &&
-       TextureManager::MASK_APPLIED != textureInfo.loadState &&
-       TextureManager::CANCELLED != textureInfo.loadState )
+       TextureManager::LoadState::LOADING != textureInfo.loadState &&
+       TextureManager::LoadState::WAITING_FOR_MASK != textureInfo.loadState &&
+       TextureManager::LoadState::MASK_APPLYING != textureInfo.loadState &&
+       TextureManager::LoadState::MASK_APPLIED != textureInfo.loadState &&
+       TextureManager::LoadState::CANCELLED != textureInfo.loadState )
   {
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Verbose, "TextureManager::RequestLoad( url=%s observer=%p ) ForcedReload cacheIndex:%d, textureId=%d\n",
                    url.GetUrl().c_str(), observer, cacheIndex, textureId );
 
-    textureInfo.loadState = TextureManager::NOT_STARTED;
+    textureInfo.loadState = TextureManager::LoadState::NOT_STARTED;
   }
 
   // Check if we should add the observer.
   // Only do this if we have not loaded yet and it will not have loaded by the end of this method.
   switch( textureInfo.loadState )
   {
-    case TextureManager::LOAD_FAILED: // Failed notifies observer which then stops observing.
-    case TextureManager::NOT_STARTED:
+    case TextureManager::LoadState::LOAD_FAILED: // Failed notifies observer which then stops observing.
+    case TextureManager::LoadState::NOT_STARTED:
     {
       LoadOrQueueTexture( textureInfo, observer ); // If called inside NotifyObservers, queues until afterwards
       break;
     }
-    case TextureManager::LOADING:
-    case TextureManager::WAITING_FOR_MASK:
-    case TextureManager::MASK_APPLYING:
-    case TextureManager::MASK_APPLIED:
+    case TextureManager::LoadState::LOADING:
+    case TextureManager::LoadState::WAITING_FOR_MASK:
+    case TextureManager::LoadState::MASK_APPLYING:
+    case TextureManager::LoadState::MASK_APPLIED:
     {
       ObserveTexture( textureInfo, observer );
       break;
     }
-    case TextureManager::UPLOADED:
+    case TextureManager::LoadState::UPLOADED:
     {
       if( observer )
       {
@@ -546,15 +552,15 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
       }
       break;
     }
-    case TextureManager::CANCELLED:
+    case TextureManager::LoadState::CANCELLED:
     {
       // A cancelled texture hasn't finished loading yet. Treat as a loading texture
       // (it's ref count has already been incremented, above)
-      textureInfo.loadState = TextureManager::LOADING;
+      textureInfo.loadState = TextureManager::LoadState::LOADING;
       ObserveTexture( textureInfo, observer );
       break;
     }
-    case TextureManager::LOAD_FINISHED:
+    case TextureManager::LoadState::LOAD_FINISHED:
     {
       // Loading has already completed.
       if( observer && textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER )
@@ -589,7 +595,7 @@ void TextureManager::Remove( const TextureManager::TextureId textureId, TextureU
       bool removeTextureInfo = false;
 
       // If loaded, we can remove the TextureInfo and the Atlas (if atlased).
-      if( textureInfo.loadState == UPLOADED )
+      if( textureInfo.loadState == LoadState::UPLOADED )
       {
         if( textureInfo.atlas )
         {
@@ -597,11 +603,11 @@ void TextureManager::Remove( const TextureManager::TextureId textureId, TextureU
         }
         removeTextureInfo = true;
       }
-      else if( textureInfo.loadState == LOADING )
+      else if( textureInfo.loadState == LoadState::LOADING )
       {
         // We mark the textureInfo for removal.
         // Once the load has completed, this method will be called again.
-        textureInfo.loadState = CANCELLED;
+        textureInfo.loadState = LoadState::CANCELLED;
       }
       else
       {
@@ -650,7 +656,7 @@ VisualUrl TextureManager::GetVisualUrl( TextureId textureId )
 
 TextureManager::LoadState TextureManager::GetTextureState( TextureId textureId )
 {
-  LoadState loadState = TextureManager::NOT_STARTED;
+  LoadState loadState = TextureManager::LoadState::NOT_STARTED;
 
   int cacheIndex = GetCacheIndexFromId( textureId );
   if( cacheIndex != INVALID_CACHE_INDEX )
@@ -674,7 +680,7 @@ TextureManager::LoadState TextureManager::GetTextureState( TextureId textureId )
 
 TextureManager::LoadState TextureManager::GetTextureStateInternal( TextureId textureId )
 {
-  LoadState loadState = TextureManager::NOT_STARTED;
+  LoadState loadState = TextureManager::LoadState::NOT_STARTED;
 
   int cacheIndex = GetCacheIndexFromId( textureId );
   if( cacheIndex != INVALID_CACHE_INDEX )
@@ -774,8 +780,8 @@ void TextureManager::LoadOrQueueTexture( TextureInfo& textureInfo, TextureUpload
 {
   switch( textureInfo.loadState )
   {
-    case NOT_STARTED:
-    case LOAD_FAILED:
+    case LoadState::NOT_STARTED:
+    case LoadState::LOAD_FAILED:
     {
       if( mQueueLoadFlag )
       {
@@ -787,7 +793,7 @@ void TextureManager::LoadOrQueueTexture( TextureInfo& textureInfo, TextureUpload
       }
       break;
     }
-    case UPLOADED:
+    case LoadState::UPLOADED:
     {
       if( mQueueLoadFlag )
       {
@@ -803,12 +809,12 @@ void TextureManager::LoadOrQueueTexture( TextureInfo& textureInfo, TextureUpload
       }
       break;
     }
-    case LOADING:
-    case CANCELLED:
-    case LOAD_FINISHED:
-    case WAITING_FOR_MASK:
-    case MASK_APPLYING:
-    case MASK_APPLIED:
+    case LoadState::LOADING:
+    case LoadState::CANCELLED:
+    case LoadState::LOAD_FINISHED:
+    case LoadState::WAITING_FOR_MASK:
+    case LoadState::MASK_APPLYING:
+    case LoadState::MASK_APPLIED:
     {
       break;
     }
@@ -828,7 +834,7 @@ void TextureManager::LoadTexture( TextureInfo& textureInfo, TextureUploadObserve
   DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::LoadTexture(): url:%s sync:%s\n",
                  textureInfo.url.GetUrl().c_str(), textureInfo.loadSynchronously?"T":"F" );
 
-  textureInfo.loadState = LOADING;
+  textureInfo.loadState = LoadState::LOADING;
   if( !textureInfo.loadSynchronously )
   {
     auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
@@ -864,13 +870,13 @@ void TextureManager::ProcessQueuedTextures()
     if( cacheIndex != INVALID_CACHE_INDEX )
     {
       TextureInfo& textureInfo( mTextureInfoContainer[cacheIndex] );
-      if( textureInfo.loadState == UPLOADED )
+      if( textureInfo.loadState == LoadState::UPLOADED )
       {
         element.mObserver->UploadComplete( true, textureInfo.textureId, textureInfo.textureSet,
                                            textureInfo.useAtlas, textureInfo.atlasRect,
                                            textureInfo.preMultiplied );
       }
-      else if ( textureInfo.loadState == LOAD_FINISHED && textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER )
+      else if ( textureInfo.loadState == LoadState::LOAD_FINISHED && textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER )
       {
         element.mObserver->LoadComplete( true, textureInfo.pixelBuffer, textureInfo.url, textureInfo.preMultiplied );
       }
@@ -916,7 +922,7 @@ void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingCo
                        "  textureId:%d Url:%s CacheIndex:%d LoadState: %d\n",
                        textureInfo.textureId, textureInfo.url.GetUrl().c_str(), cacheIndex, textureInfo.loadState );
 
-        if( textureInfo.loadState != CANCELLED )
+        if( textureInfo.loadState != LoadState::CANCELLED )
         {
           // textureInfo can be invalidated after this call (as the mTextureInfoContainer may be modified)
           PostLoad( textureInfo, pixelBuffer );
@@ -941,16 +947,16 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
     textureInfo.useAtlas = NO_ATLAS;
     textureInfo.preMultiplied = pixelBuffer.IsAlphaPreMultiplied();
 
-    if( textureInfo.storageType == UPLOAD_TO_TEXTURE )
+    if( textureInfo.storageType == StorageType::UPLOAD_TO_TEXTURE )
     {
       // If there is a mask texture ID associated with this texture, then apply the mask
       // if it's already loaded. If it hasn't, and the mask is still loading,
       // wait for the mask to finish loading.
       if( textureInfo.maskTextureId != INVALID_TEXTURE_ID )
       {
-        if( textureInfo.loadState == MASK_APPLYING )
+        if( textureInfo.loadState == LoadState::MASK_APPLYING )
         {
-          textureInfo.loadState = MASK_APPLIED;
+          textureInfo.loadState = LoadState::MASK_APPLIED;
           UploadTexture( pixelBuffer, textureInfo );
           NotifyObservers( textureInfo, true );
         }
@@ -958,11 +964,11 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
         {
           LoadState maskLoadState = GetTextureStateInternal( textureInfo.maskTextureId );
           textureInfo.pixelBuffer = pixelBuffer; // Store the pixel buffer temporarily
-          if( maskLoadState == LOADING )
+          if( maskLoadState == LoadState::LOADING )
           {
-            textureInfo.loadState = WAITING_FOR_MASK;
+            textureInfo.loadState = LoadState::WAITING_FOR_MASK;
           }
-          else if( maskLoadState == LOAD_FINISHED )
+          else if( maskLoadState == LoadState::LOAD_FINISHED )
           {
             // Send New Task to Thread
             ApplyMask( textureInfo, textureInfo.maskTextureId );
@@ -978,7 +984,7 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
     else
     {
       textureInfo.pixelBuffer = pixelBuffer; // Store the pixel data
-      textureInfo.loadState = LOAD_FINISHED;
+      textureInfo.loadState = LoadState::LOAD_FINISHED;
 
       if( textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER )
       {
@@ -995,7 +1001,7 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
   else
   {
     // @todo If the load was unsuccessful, upload the broken image.
-    textureInfo.loadState = LOAD_FAILED;
+    textureInfo.loadState = LoadState::LOAD_FAILED;
     CheckForWaitingTexture( textureInfo );
     NotifyObservers( textureInfo, false );
   }
@@ -1010,11 +1016,11 @@ void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
   for( unsigned int cacheIndex = 0; cacheIndex < size; ++cacheIndex )
   {
     if( mTextureInfoContainer[cacheIndex].maskTextureId == maskTextureInfo.textureId &&
-        mTextureInfoContainer[cacheIndex].loadState == WAITING_FOR_MASK )
+        mTextureInfoContainer[cacheIndex].loadState == LoadState::WAITING_FOR_MASK )
     {
       TextureInfo& textureInfo( mTextureInfoContainer[cacheIndex] );
 
-      if( maskTextureInfo.loadState == LOAD_FINISHED )
+      if( maskTextureInfo.loadState == LoadState::LOAD_FINISHED )
       {
         // Send New Task to Thread
         ApplyMask( textureInfo, maskTextureInfo.textureId );
@@ -1022,7 +1028,7 @@ void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
       else
       {
         textureInfo.pixelBuffer.Reset();
-        textureInfo.loadState = LOAD_FAILED;
+        textureInfo.loadState = LoadState::LOAD_FAILED;
         NotifyObservers( textureInfo, false );
       }
     }
@@ -1041,7 +1047,7 @@ void TextureManager::ApplyMask( TextureInfo& textureInfo, TextureId maskTextureI
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::ApplyMask(): url:%s sync:%s\n",
                    textureInfo.url.GetUrl().c_str(), textureInfo.loadSynchronously?"T":"F" );
 
-    textureInfo.loadState = MASK_APPLYING;
+    textureInfo.loadState = LoadState::MASK_APPLYING;
     auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
     auto loadingHelperIt = loadersContainer.GetNext();
     auto premultiplyOnLoad = textureInfo.preMultiplyOnLoad ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
@@ -1081,7 +1087,7 @@ void TextureManager::UploadTexture( Devel::PixelBuffer& pixelBuffer, TextureInfo
   // Note: This is regardless of success as we care about whether a
   // load attempt is in progress or not.  If unsuccessful, a broken
   // image is still loaded.
-  textureInfo.loadState = UPLOADED;
+  textureInfo.loadState = LoadState::UPLOADED;
 }
 
 void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
@@ -1170,7 +1176,6 @@ TextureManager::TextureHash TextureManager::GenerateHash(
   const Dali::SamplingMode::Type samplingMode,
   const UseAtlas                 useAtlas,
   TextureId                      maskTextureId,
-  StorageType                    storageType,
   bool                           isAnimationImage,
   uint32_t                       frameIndex )
 {
@@ -1193,8 +1198,8 @@ TextureManager::TextureHash TextureManager::GenerateHash(
     *hashTargetPtr++ = ( size.GetHeight() >> 8u ) & 0xff;
 
     // Bit-pack the FittingMode, SamplingMode and atlasing.
-    // FittingMode=2bits, SamplingMode=3bits, useAtlas=1bit, storageType=2bits
-    *hashTargetPtr   = ( fittingMode << 6u ) | ( samplingMode << 3 ) | ( useAtlas << 2 ) | storageType;
+    // FittingMode=2bits, SamplingMode=3bits, useAtlas=1bit
+    *hashTargetPtr   = ( fittingMode << 4u ) | ( samplingMode << 1 ) | useAtlas;
   }
   else
   {
@@ -1257,7 +1262,6 @@ int TextureManager::FindCachedTexture(
   const bool                        useAtlas,
   TextureId                         maskTextureId,
   TextureManager::MultiplyOnLoad    preMultiplyOnLoad,
-  StorageType                       storageType,
   bool                              isAnimatedImage,
   uint32_t                          frameIndex )
 {
@@ -1280,7 +1284,6 @@ int TextureManager::FindCachedTexture(
           ( ( size.GetWidth() == 0 && size.GetHeight() == 0 ) ||
             ( fittingMode == textureInfo.fittingMode &&
               samplingMode == textureInfo.samplingMode ) ) &&
-          ( storageType == textureInfo.storageType ) &&
           ( isAnimatedImage == ( ( textureInfo.animatedImageLoading ) ? true : false ) ) &&
           ( frameIndex == textureInfo.frameIndex ) )
       {
@@ -1397,6 +1400,11 @@ void TextureManager::AsyncLoadingHelper::AsyncLoadComplete(uint32_t           id
 void TextureManager::SetBrokenImageUrl(const std::string& brokenImageUrl)
 {
   mBrokenImageUrl = brokenImageUrl;
+}
+
+const std::string TextureManager::GetBrokenImageUrl()
+{
+  return mBrokenImageUrl;
 }
 
 Geometry TextureManager::GetRenderGeometry(TextureId textureId, uint32_t& frontElements, uint32_t& backElements )
