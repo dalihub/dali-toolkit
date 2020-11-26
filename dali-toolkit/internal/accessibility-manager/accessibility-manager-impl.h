@@ -203,6 +203,16 @@ public:
    */
   Vector2 GetReadPosition() const;
 
+  /**
+   * @copydoc Toolkit::AccessibilityManager::EnableAccessibility
+   */
+  void EnableAccessibility( bool enabled );
+
+  /**
+   * @copydoc Toolkit::AccessibilityManager::IsEnabled
+   */
+  bool IsEnabled() const;
+
 public:
 
   /**

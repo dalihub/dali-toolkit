@@ -190,6 +190,16 @@ Vector2 AccessibilityManager::GetReadPosition() const
   return GetImpl(*this).GetReadPosition();
 }
 
+void AccessibilityManager::EnableAccessibility(bool enabled)
+{
+  GetImpl(*this).EnableAccessibility(enabled);
+}
+
+bool AccessibilityManager::IsEnabled() const
+{
+  return GetImpl(*this).IsEnabled();
+}
+
 AccessibilityManager::FocusChangedSignalType& AccessibilityManager::FocusChangedSignal()
 {
   return GetImpl(*this).FocusChangedSignal();

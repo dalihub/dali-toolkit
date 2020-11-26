@@ -417,6 +417,20 @@ public:
    */
   Vector2 GetReadPosition() const;
 
+  /**
+   * @brief Enables Accessibility or not.
+   * @param[in] enabled True if Accessibility should be enabled.
+   */
+  void EnableAccessibility( bool enabled );
+
+  /**
+   * @brief Query whether the accessibility(screen-reader) is enabled.
+   *
+   * The accessibility will be enabled by system setting.
+   * @return True if the accessibility(screen-reader) is enabled.
+   */
+  bool IsEnabled() const;
+
 public: // Signals
   /**
    * @brief This signal is emitted when the current focused actor is changed.

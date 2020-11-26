@@ -558,6 +558,18 @@ Vector2 AccessibilityManager::GetReadPosition() const
   return adaptor.GetReadPosition();
 }
 
+void AccessibilityManager::EnableAccessibility(bool enabled)
+{
+  AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
+  adaptor.EnableAccessibility(enabled);
+}
+
+bool AccessibilityManager::IsEnabled() const
+{
+  AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
+  return adaptor.IsEnabled();
+}
+
 void AccessibilityManager::SetGroupMode(bool enabled)
 {
   mIsFocusWithinGroup = enabled;
