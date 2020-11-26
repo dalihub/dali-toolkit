@@ -459,16 +459,6 @@ Control::Impl::Impl( Control& controlImpl )
 
 Control::Impl::~Impl()
 {
-  for( auto&& iter : mVisuals )
-  {
-    StopObservingVisual( iter->visual );
-  }
-
-  for( auto&& iter : mRemoveVisuals )
-  {
-    StopObservingVisual( iter->visual );
-  }
-
   AccessibilityDeregister();
   // All gesture detectors will be destroyed so no need to disconnect.
   delete mStartingPinchScale;
