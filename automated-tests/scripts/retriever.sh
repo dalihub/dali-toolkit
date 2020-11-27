@@ -29,9 +29,12 @@ function get_tc_files {
         flag = 1;
         next;
     }
+    /LIST\(APPEND TC_SOURCES/ {
+        flag = 1;
+        next;
+    }
     /\)/ {
-        if (flag == 1)
-            exit;
+        flag = 0;
     }
     !/^ *#/ {
         if (flag == 1) {
