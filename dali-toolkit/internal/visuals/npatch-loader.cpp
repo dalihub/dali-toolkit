@@ -34,53 +34,16 @@ namespace Toolkit
 namespace Internal
 {
 
-namespace NPatchBuffer
+namespace
 {
 
-void SetLoadedNPatchData( NPatchLoader::Data* data, Devel::PixelBuffer& pixelBuffer )
-{
-  if( data->border == Rect< int >( 0, 0, 0, 0 ) )
-  {
-    NPatchUtility::ParseBorders( pixelBuffer, data->stretchPixelsX, data->stretchPixelsY );
+constexpr auto INVALID_CACHE_INDEX = int32_t{-1}; ///< Invalid Cache index
+constexpr auto UNINITIALIZED_ID = int32_t{0}; ///< uninitialised id, use to initialize ids
 
-    // Crop the image
-    pixelBuffer.Crop( 1, 1, pixelBuffer.GetWidth() - 2, pixelBuffer.GetHeight() - 2 );
-  }
-  else
-  {
-    data->stretchPixelsX.PushBack( Uint16Pair( data->border.left, ( (pixelBuffer.GetWidth() >= static_cast< unsigned int >( data->border.right )) ? pixelBuffer.GetWidth() - data->border.right : 0 ) ) );
-    data->stretchPixelsY.PushBack( Uint16Pair( data->border.top, ( (pixelBuffer.GetHeight() >= static_cast< unsigned int >( data->border.bottom )) ? pixelBuffer.GetHeight() - data->border.bottom : 0 ) ) );
-  }
-
-  data->croppedWidth = pixelBuffer.GetWidth();
-  data->croppedHeight = pixelBuffer.GetHeight();
-
-  // Create opacity map
-  data->renderingMap = RenderingAddOn::Get().IsValid() ? RenderingAddOn::Get().BuildNPatch(pixelBuffer, data ) : nullptr;
-
-  PixelData pixels = Devel::PixelBuffer::Convert( pixelBuffer ); // takes ownership of buffer
-
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight() );
-  texture.Upload( pixels );
-
-  data->textureSet = TextureSet::New();
-  data->textureSet.SetTexture( 0u, texture );
-
-  data->loadCompleted = true;
-}
-
-} // namespace NPatchBuffer
-
-NPatchLoader::Data::~Data()
-{
-  // If there is an opacity map, it has to be destroyed using addon call
-  if( renderingMap )
-  {
-    RenderingAddOn::Get().DestroyNPatch( renderingMap );
-  }
-}
+} // Anonymous namespace
 
 NPatchLoader::NPatchLoader()
+: mCurrentNPatchDataId(0)
 {
 }
 
@@ -88,125 +51,143 @@ NPatchLoader::~NPatchLoader()
 {
 }
 
+NPatchData::NPatchDataId NPatchLoader::GenerateUniqueNPatchDataId()
+{
+  return mCurrentNPatchDataId++;
+}
+
 std::size_t NPatchLoader::Load( TextureManager& textureManager, TextureUploadObserver* textureObserver, const std::string& url, const Rect< int >& border, bool& preMultiplyOnLoad, bool synchronousLoading )
 {
   std::size_t hash = CalculateHash( url );
-  OwnerContainer< Data* >::SizeType index = UNINITIALIZED_ID;
-  const OwnerContainer< Data* >::SizeType count = mCache.Count();
-  int cachedIndex = -1;
-  Data* data;
+  OwnerContainer< NPatchData* >::SizeType index = UNINITIALIZED_ID;
+  const OwnerContainer< NPatchData* >::SizeType count = mCache.Count();
 
   for( ; index < count; ++index )
   {
-    if( mCache[ index ]->hash == hash )
+    if( mCache[ index ]->GetHash() == hash )
     {
       // hash match, check url as well in case of hash collision
-      if( mCache[ index ]->url == url )
+      if(mCache[ index ]->GetUrl() == url)
       {
         // Use cached data
-        if( mCache[ index ]->border == border )
+        if( mCache[ index ]->GetBorder() == border )
         {
-          if( mCache[ index ]->loadCompleted )
+          if( mCache[ index ]->GetLoadingState() == NPatchData::LoadingState::LOADING )
           {
-            return index + 1u; // valid indices are from 1 onwards
+            mCache[ index ]->AddObserver( textureObserver );
           }
-          mCache[ index ]->observerList.PushBack( textureObserver );
-          data = mCache[ index ];
-          return index + 1u; // valid indices are from 1 onwards
+          return mCache[ index ]->GetId(); // valid indices are from 1 onwards
         }
         else
         {
-          if( mCache[ index ]->loadCompleted )
+          if( mCache[ index ]->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE )
           {
             // Same url but border is different - use the existing texture
-            Data* data = new Data();
-            data->hash = hash;
-            data->url = url;
-            data->croppedWidth = mCache[ index ]->croppedWidth;
-            data->croppedHeight = mCache[ index ]->croppedHeight;
+            NPatchData* newData = new NPatchData();
+            newData->SetId(GenerateUniqueNPatchDataId());
+            newData->SetHash(hash);
+            newData->SetUrl(url);
+            newData->SetCroppedWidth(mCache[ index ]->GetCroppedWidth());
+            newData->SetCroppedHeight(mCache[ index ]->GetCroppedHeight());
 
-            data->textureSet = mCache[ index ]->textureSet;
+            newData->SetTextures(mCache[ index ]->GetTextures());
 
             NPatchUtility::StretchRanges stretchRangesX;
-            stretchRangesX.PushBack( Uint16Pair( border.left, ( (data->croppedWidth >= static_cast< unsigned int >( border.right )) ? data->croppedWidth - border.right : 0 ) ) );
+            stretchRangesX.PushBack( Uint16Pair( border.left, ( (newData->GetCroppedWidth() >= static_cast< unsigned int >( border.right )) ? newData->GetCroppedHeight() - border.right : 0 ) ) );
 
             NPatchUtility::StretchRanges stretchRangesY;
-            stretchRangesY.PushBack( Uint16Pair( border.top, ( (data->croppedHeight >= static_cast< unsigned int >( border.bottom )) ? data->croppedHeight - border.bottom : 0 ) ) );
+            stretchRangesY.PushBack( Uint16Pair( border.top, ( (newData->GetCroppedWidth() >= static_cast< unsigned int >( border.bottom )) ? newData->GetCroppedHeight() - border.bottom : 0 ) ) );
 
-            data->stretchPixelsX = stretchRangesX;
-            data->stretchPixelsY = stretchRangesY;
-            data->border = border;
+            newData->SetStretchPixelsX(stretchRangesX);
+            newData->SetStretchPixelsY(stretchRangesY);
+            newData->SetBorder(border);
 
-            data->loadCompleted = mCache[ index ]->loadCompleted;
+            newData->SetPreMultiplyOnLoad(mCache[ index ]->IsPreMultiplied());
 
-            mCache.PushBack( data );
+            newData->SetLoadingState(NPatchData::LoadingState::LOAD_COMPLETE);
+            newData->AddObserver( textureObserver );
 
-            return mCache.Count(); // valid ids start from 1u
+            mCache.PushBack( newData );
+
+            return newData->GetId(); // valid ids start from 1u
           }
         }
       }
     }
   }
 
-  if( cachedIndex == -1 )
-  {
-    data = new Data();
-    data->loadCompleted = false;
-    data->hash = hash;
-    data->url = url;
-    data->border = border;
-
-    mCache.PushBack( data );
-
-    cachedIndex = mCache.Count();
-  }
+  // If this is new image loading, make new cache data
+  NPatchData* data;
+  data = new NPatchData();
+  data->SetId(GenerateUniqueNPatchDataId());
+  data->SetHash(hash);
+  data->SetUrl(url);
+  data->SetBorder(border);
+  data->SetPreMultiplyOnLoad(preMultiplyOnLoad);
+  data->AddObserver(textureObserver);
+  mCache.PushBack(data);
 
   auto preMultiplyOnLoading = preMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
                                                 : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
   Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer( url, Dali::ImageDimensions(), FittingMode::DEFAULT,
                                                                    SamplingMode::BOX_THEN_LINEAR, synchronousLoading,
-                                                                   textureObserver, true, preMultiplyOnLoading );
+                                                                   data, true, preMultiplyOnLoading );
 
   if( pixelBuffer )
   {
-    NPatchBuffer::SetLoadedNPatchData( data, pixelBuffer );
     preMultiplyOnLoad = ( preMultiplyOnLoading == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD ) ? true : false;
+    data->SetLoadedNPatchData( pixelBuffer, preMultiplyOnLoad );
   }
 
-  return cachedIndex;
+  return data->GetId();
 }
 
-void NPatchLoader::SetNPatchData( bool loadSuccess, std::size_t id, Devel::PixelBuffer& pixelBuffer, const Internal::VisualUrl& url, bool preMultiplied )
+int32_t NPatchLoader::GetCacheIndexFromId( const NPatchData::NPatchDataId id )
 {
-  Data* data;
-  data = mCache[ id - 1u ];
+  const unsigned int size = mCache.Count();
 
-  // To prevent recursion.
-  // data->loadCompleted will be set true in the NPatchBuffer::SetLoadedNPatchData when the first observer called this method.
-  if( data->loadCompleted )
+  for( unsigned int i = 0; i < size; ++i )
+  {
+    if( mCache[i]->GetId() == id )
+    {
+      return i;
+    }
+  }
+
+  DALI_LOG_ERROR("Wrong NPatchDataId is used\n");
+  return INVALID_CACHE_INDEX;
+}
+
+bool NPatchLoader::GetNPatchData( const NPatchData::NPatchDataId id, const NPatchData*& data )
+{
+  int32_t cacheIndex = GetCacheIndexFromId(id);
+  if( cacheIndex != INVALID_CACHE_INDEX )
+  {
+    data = mCache[cacheIndex];
+    return true;
+  }
+  data = nullptr;
+  return false;
+}
+
+void NPatchLoader::Remove( std::size_t id, TextureUploadObserver* textureObserver )
+{
+  int32_t cacheIndex = GetCacheIndexFromId(id);
+  if( cacheIndex == INVALID_CACHE_INDEX )
   {
     return;
   }
 
-  NPatchBuffer::SetLoadedNPatchData( data, pixelBuffer );
+  NPatchData* data;
+  data = mCache[cacheIndex];
 
-  while( data->observerList.Count() )
-  {
-    TextureUploadObserver* observer = data->observerList[0];
-    observer->LoadComplete( loadSuccess, Devel::PixelBuffer(), url, preMultiplied );
-    data->observerList.Erase( data->observerList.begin() );
-  }
-}
+  data->RemoveObserver(textureObserver);
 
-bool NPatchLoader::GetNPatchData( std::size_t id, const Data*& data )
-{
-  if( ( id > UNINITIALIZED_ID )&&( id <= mCache.Count() ) )
+  if(data->GetObserverCount() == 0)
   {
-    data = mCache[ id - 1u ]; // id's start from 1u
-    return true;
+      mCache.Erase( mCache.Begin() + cacheIndex );
   }
-  data = NULL;
-  return false;
 }
 
 } // namespace Internal

@@ -999,7 +999,6 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
   }
   else
   {
-    // @todo If the load was unsuccessful, upload the broken image.
     textureInfo.loadState = LoadState::LOAD_FAILED;
     CheckForWaitingTexture( textureInfo );
     NotifyObservers( textureInfo, false );
@@ -1380,11 +1379,6 @@ void TextureManager::AsyncLoadingHelper::AsyncLoadComplete(uint32_t           id
 void TextureManager::SetBrokenImageUrl(const std::string& brokenImageUrl)
 {
   mBrokenImageUrl = brokenImageUrl;
-}
-
-const std::string TextureManager::GetBrokenImageUrl()
-{
-  return mBrokenImageUrl;
 }
 
 Geometry TextureManager::GetRenderGeometry(TextureId textureId, uint32_t& frontElements, uint32_t& backElements )

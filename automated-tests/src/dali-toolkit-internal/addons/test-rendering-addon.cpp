@@ -76,7 +76,7 @@ static Geometry CreateGeometryMapInternal(const void* opacityMap,
   return Dali::Geometry::New();
 }
 
-static void* NPatchBuildInternal(const Devel::PixelBuffer& pixelBuffer, Toolkit::Internal::NPatchLoader::Data* data )
+static void* NPatchBuildInternal(const Devel::PixelBuffer& pixelBuffer, Toolkit::Internal::NPatchData* data )
 {
   gCallStack.emplace_back( "BuildNPatch" );
   fprintf(stderr, "AddOn::NPatchBuild()\n");

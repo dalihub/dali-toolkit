@@ -27,6 +27,7 @@
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
@@ -211,7 +212,7 @@ private:
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied ) override {}
+  void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied ) override;
 
   /**
    * @copydoc TextureUploadObserver::LoadComplete
@@ -222,16 +223,16 @@ private:
   void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied ) override;
 
 private:
-
-  WeakHandle<Actor>  mPlacementActor;       ///< Weakhandle to contain Actor during texture loading
-  NPatchLoader&      mLoader;               ///< reference to N patch loader for fast access
-  VisualUrl          mImageUrl;             ///< The url to the N patch to load
-  VisualUrl          mAuxiliaryUrl;         ///< An auxiliary image that can be displayed on top of the N-Patch
-  std::size_t        mId;                   ///< id of the N patch (from loader/cache)
-  Devel::PixelBuffer mAuxiliaryPixelBuffer; ///< pixel buffer of the auxiliary mask image
-  bool               mBorderOnly;           ///< if only border is desired
-  Rect<int>          mBorder;               ///< The size of the border
-  float              mAuxiliaryImageAlpha;  ///< The alpha value for the auxiliary image only
+  WeakHandle<Actor>        mPlacementActor;                 ///< Weakhandle to contain Actor during texture loading
+  NPatchLoader&            mLoader;                         ///< reference to N patch loader for fast access
+  VisualUrl                mImageUrl;                       ///< The url to the N patch to load
+  VisualUrl                mAuxiliaryUrl;                   ///< An auxiliary image that can be displayed on top of the N-Patch
+  NPatchData::NPatchDataId mId;                             ///< id of the N patch (from loader/cache)
+  Devel::PixelBuffer       mAuxiliaryPixelBuffer;           ///< pixel buffer of the auxiliary mask image
+  bool                     mBorderOnly;                     ///< if only border is desired
+  Rect<int>                mBorder;                         ///< The size of the border
+  float                    mAuxiliaryImageAlpha;            ///< The alpha value for the auxiliary image only
+  Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy; ///< The release policy to determine when an image should no longer be cached.
 };
 
 } // namespace Internal

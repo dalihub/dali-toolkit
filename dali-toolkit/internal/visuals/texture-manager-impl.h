@@ -428,12 +428,6 @@ public:
   void SetBrokenImageUrl(const std::string& brokenImageUrl);
 
   /**
-   * @brief Get an image to be used when a visual has failed to correctly render
-   * @return Returns The broken image url.
-   */
-  const std::string GetBrokenImageUrl();
-
-  /**
    * @brief Returns the geometry associated with texture.
    * @param[in] textureId Id of the texture
    * @param[out] frontElements number of front elements
