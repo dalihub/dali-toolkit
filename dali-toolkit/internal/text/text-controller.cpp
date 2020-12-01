@@ -26,12 +26,12 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
-#include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
 #include <dali-toolkit/internal/text/text-controller-event-handler.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 #include <dali-toolkit/internal/text/text-controller-input-font-handler.h>
 #include <dali-toolkit/internal/text/text-controller-placeholder-handler.h>
+#include <dali-toolkit/internal/text/text-controller-relayouter.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 namespace
@@ -41,15 +41,9 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
-const float MAX_FLOAT = std::numeric_limits<float>::max();
+constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const std::string EMPTY_STRING("");
-
-float ConvertToEven( float value )
-{
-  int intValue(static_cast<int>( value ));
-  return static_cast<float>( intValue + ( intValue & 1 ) );
-}
 
 int ConvertPixelToPint( float pixel )
 {
@@ -1644,113 +1638,12 @@ View& Controller::GetView()
 
 Vector3 Controller::GetNaturalSize()
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::GetNaturalSize\n" );
-  Vector3 naturalSize;
-
-  // Make sure the model is up-to-date before layouting
-  ProcessModifyEvents();
-
-  if( mImpl->mRecalculateNaturalSize )
-  {
-    // Operations that can be done only once until the text changes.
-    const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
-                                                                           GET_SCRIPTS       |
-                                                                           VALIDATE_FONTS    |
-                                                                           GET_LINE_BREAKS   |
-                                                                           BIDI_INFO         |
-                                                                           SHAPE_TEXT        |
-                                                                           GET_GLYPH_METRICS );
-
-    // Set the update info to relayout the whole text.
-    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
-
-    // Make sure the model is up-to-date before layouting
-    mImpl->UpdateModel( onlyOnceOperations );
-
-    // Layout the text for the new width.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT | REORDER );
-
-    // Store the actual control's size to restore later.
-    const Size actualControlSize = mImpl->mModel->mVisualModel->mControlSize;
-
-    DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
-                static_cast<OperationsMask>( onlyOnceOperations |
-                                             LAYOUT | REORDER ),
-                naturalSize.GetVectorXY() );
-
-    // Do not do again the only once operations.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending & ~onlyOnceOperations );
-
-    // Do the size related operations again.
-    const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
-                                                                        ALIGN  |
-                                                                        REORDER );
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | sizeOperations );
-
-    // Stores the natural size to avoid recalculate it again
-    // unless the text/style changes.
-    mImpl->mModel->mVisualModel->SetNaturalSize( naturalSize.GetVectorXY() );
-
-    mImpl->mRecalculateNaturalSize = false;
-
-    // Clear the update info. This info will be set the next time the text is updated.
-    mImpl->mTextUpdateInfo.Clear();
-    mImpl->mTextUpdateInfo.mClearAll = true;
-
-    // Restore the actual control's size.
-    mImpl->mModel->mVisualModel->mControlSize = actualControlSize;
-
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize calculated %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
-  }
-  else
-  {
-    naturalSize = mImpl->mModel->mVisualModel->GetNaturalSize();
-
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize cached %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
-  }
-
-  naturalSize.x = ConvertToEven( naturalSize.x );
-  naturalSize.y = ConvertToEven( naturalSize.y );
-
-  return naturalSize;
+  return Relayouter::GetNaturalSize(*this);
 }
 
 bool Controller::CheckForTextFit( float pointSize, Size& layoutSize )
 {
-  Size textSize;
-  mImpl->mFontDefaults->mFitPointSize = pointSize;
-  mImpl->mFontDefaults->sizeDefined = true;
-  ClearFontData();
-
-  // Operations that can be done only once until the text changes.
-  const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32 |
-                                                                              GET_SCRIPTS |
-                                                                           VALIDATE_FONTS |
-                                                                          GET_LINE_BREAKS |
-                                                                                BIDI_INFO |
-                                                                                SHAPE_TEXT|
-                                                                         GET_GLYPH_METRICS );
-
-  mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-  mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
-
-  // Make sure the model is up-to-date before layouting
-  mImpl->UpdateModel( onlyOnceOperations );
-
-  DoRelayout( Size( layoutSize.width, MAX_FLOAT ),
-              static_cast<OperationsMask>( onlyOnceOperations | LAYOUT),
-              textSize);
-
-  // Clear the update info. This info will be set the next time the text is updated.
-  mImpl->mTextUpdateInfo.Clear();
-  mImpl->mTextUpdateInfo.mClearAll = true;
-
-  if( textSize.width > layoutSize.width || textSize.height > layoutSize.height )
-  {
-    return false;
-  }
-  return true;
+  return Relayouter::CheckForTextFit(*this, pointSize, layoutSize);
 }
 
 void Controller::FitPointSizeforLayout( Size layoutSize )
@@ -1809,69 +1702,7 @@ void Controller::FitPointSizeforLayout( Size layoutSize )
 
 float Controller::GetHeightForWidth( float width )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::GetHeightForWidth %p width %f\n", this, width );
-  // Make sure the model is up-to-date before layouting
-  ProcessModifyEvents();
-
-  Size layoutSize;
-  if( fabsf( width - mImpl->mModel->mVisualModel->mControlSize.width ) > Math::MACHINE_EPSILON_1000 ||
-                                                         mImpl->mTextUpdateInfo.mFullRelayoutNeeded ||
-                                                         mImpl->mTextUpdateInfo.mClearAll            )
-  {
-    // Operations that can be done only once until the text changes.
-    const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
-                                                                           GET_SCRIPTS       |
-                                                                           VALIDATE_FONTS    |
-                                                                           GET_LINE_BREAKS   |
-                                                                           BIDI_INFO         |
-                                                                           SHAPE_TEXT        |
-                                                                           GET_GLYPH_METRICS );
-
-    // Set the update info to relayout the whole text.
-    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
-
-    // Make sure the model is up-to-date before layouting
-    mImpl->UpdateModel( onlyOnceOperations );
-
-
-    // Layout the text for the new width.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
-
-    // Store the actual control's width.
-    const float actualControlWidth = mImpl->mModel->mVisualModel->mControlSize.width;
-
-    DoRelayout( Size( width, MAX_FLOAT ),
-                static_cast<OperationsMask>( onlyOnceOperations |
-                                             LAYOUT ),
-                layoutSize );
-
-    // Do not do again the only once operations.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending & ~onlyOnceOperations );
-
-    // Do the size related operations again.
-    const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
-                                                                        ALIGN  |
-                                                                        REORDER );
-
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | sizeOperations );
-
-    // Clear the update info. This info will be set the next time the text is updated.
-    mImpl->mTextUpdateInfo.Clear();
-    mImpl->mTextUpdateInfo.mClearAll = true;
-
-    // Restore the actual control's width.
-    mImpl->mModel->mVisualModel->mControlSize.width = actualControlWidth;
-
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth calculated %f\n", layoutSize.height );
-  }
-  else
-  {
-    layoutSize = mImpl->mModel->mVisualModel->GetLayoutSize();
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth cached %f\n", layoutSize.height );
-  }
-
-  return layoutSize.height;
+  return Relayouter::GetHeightForWidth(*this, width);
 }
 
 int Controller::GetLineCount( float width )
@@ -1995,152 +1826,7 @@ void Controller::SetVerticalLineAlignment( Toolkit::DevelText::VerticalLineAlign
 
 Controller::UpdateTextType Controller::Relayout( const Size& size, Dali::LayoutDirection::Type layoutDirection )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, mImpl->mIsAutoScrollEnabled ?"true":"false"  );
-
-  UpdateTextType updateTextType = NONE_UPDATED;
-
-  if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
-  {
-    if( 0u != mImpl->mModel->mVisualModel->mGlyphPositions.Count() )
-    {
-      mImpl->mModel->mVisualModel->mGlyphPositions.Clear();
-      updateTextType = MODEL_UPDATED;
-    }
-
-    // Clear the update info. This info will be set the next time the text is updated.
-    mImpl->mTextUpdateInfo.Clear();
-
-    // Not worth to relayout if width or height is equal to zero.
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout (skipped)\n" );
-
-    return updateTextType;
-  }
-
-  // Whether a new size has been set.
-  const bool newSize = ( size != mImpl->mModel->mVisualModel->mControlSize );
-
-  if( newSize )
-  {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mModel->mVisualModel->mControlSize.width, mImpl->mModel->mVisualModel->mControlSize.height );
-
-    if( ( 0 == mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd ) &&
-        ( 0 == mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters ) &&
-        ( ( mImpl->mModel->mVisualModel->mControlSize.width < Math::MACHINE_EPSILON_1000 ) || ( mImpl->mModel->mVisualModel->mControlSize.height < Math::MACHINE_EPSILON_1000 ) ) )
-    {
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
-    }
-
-    // Layout operations that need to be done if the size changes.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                             LAYOUT                    |
-                                                             ALIGN                     |
-                                                             UPDATE_LAYOUT_SIZE        |
-                                                             REORDER );
-    // Set the update info to relayout the whole text.
-    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
-    mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
-
-    // Store the size used to layout the text.
-    mImpl->mModel->mVisualModel->mControlSize = size;
-  }
-
-  // Whether there are modify events.
-  if( 0u != mImpl->mModifyEvents.Count() )
-  {
-    // Style operations that need to be done if the text is modified.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                             COLOR );
-  }
-
-  // Set the update info to elide the text.
-  if( mImpl->mModel->mElideEnabled ||
-      ( ( NULL != mImpl->mEventData ) && mImpl->mEventData->mIsPlaceholderElideEnabled ) )
-  {
-    // Update Text layout for applying elided
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                             ALIGN                     |
-                                                             LAYOUT                    |
-                                                             UPDATE_LAYOUT_SIZE        |
-                                                             REORDER );
-    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
-    mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
-  }
-
-  if( mImpl->mModel->mMatchSystemLanguageDirection  && mImpl->mLayoutDirection != layoutDirection )
-  {
-    // Clear the update info. This info will be set the next time the text is updated.
-    mImpl->mTextUpdateInfo.mClearAll = true;
-    // Apply modifications to the model
-    // Shape the text again is needed because characters like '()[]{}' have to be mirrored and the glyphs generated again.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                             GET_GLYPH_METRICS         |
-                                                             SHAPE_TEXT                |
-                                                             UPDATE_DIRECTION          |
-                                                             LAYOUT                    |
-                                                             BIDI_INFO                 |
-                                                             REORDER );
-    mImpl->mLayoutDirection = layoutDirection;
-  }
-
-  // Make sure the model is up-to-date before layouting.
-  ProcessModifyEvents();
-  bool updated = mImpl->UpdateModel( mImpl->mOperationsPending );
-
-  // Layout the text.
-  Size layoutSize;
-  updated = DoRelayout( size,
-                        mImpl->mOperationsPending,
-                        layoutSize ) || updated;
-
-
-  if( updated )
-  {
-    updateTextType = MODEL_UPDATED;
-  }
-
-  // Do not re-do any operation until something changes.
-  mImpl->mOperationsPending = NO_OPERATION;
-  mImpl->mModel->mScrollPositionLast = mImpl->mModel->mScrollPosition;
-
-  // Whether the text control is editable
-  const bool isEditable = NULL != mImpl->mEventData;
-
-  // Keep the current offset as it will be used to update the decorator's positions (if the size changes).
-  Vector2 offset;
-  if( newSize && isEditable )
-  {
-    offset = mImpl->mModel->mScrollPosition;
-  }
-
-  if( !isEditable || !IsMultiLineEnabled() )
-  {
-    // After doing the text layout, the vertical offset to place the actor in the desired position can be calculated.
-    CalculateVerticalOffset( size );
-  }
-
-  if( isEditable )
-  {
-    if( newSize )
-    {
-      // If there is a new size, the scroll position needs to be clamped.
-      mImpl->ClampHorizontalScroll( layoutSize );
-
-      // Update the decorator's positions is needed if there is a new size.
-      mImpl->mEventData->mDecorator->UpdatePositions( mImpl->mModel->mScrollPosition - offset );
-    }
-
-    // Move the cursor, grab handle etc.
-    if( mImpl->ProcessInputEvents() )
-    {
-      updateTextType = static_cast<UpdateTextType>( updateTextType | DECORATOR_UPDATED );
-    }
-  }
-
-  // Clear the update info. This info will be set the next time the text is updated.
-  mImpl->mTextUpdateInfo.Clear();
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout\n" );
-
-  return updateTextType;
+  return Relayouter::Relayout(*this, size, layoutDirection);
 }
 
 void Controller::RequestRelayout()
@@ -2802,206 +2488,12 @@ bool Controller::DoRelayout( const Size& size,
                              OperationsMask operationsRequired,
                              Size& layoutSize )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout %p size %f,%f\n", this, size.width, size.height );
-  bool viewUpdated( false );
-
-  // Calculate the operations to be done.
-  const OperationsMask operations = static_cast<OperationsMask>( mImpl->mOperationsPending & operationsRequired );
-
-  const CharacterIndex startIndex = mImpl->mTextUpdateInfo.mParagraphCharacterIndex;
-  const Length requestedNumberOfCharacters = mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters;
-
-  // Get the current layout size.
-  layoutSize = mImpl->mModel->mVisualModel->GetLayoutSize();
-
-  if( NO_OPERATION != ( LAYOUT & operations ) )
-  {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout LAYOUT & operations\n");
-
-    // Some vectors with data needed to layout and reorder may be void
-    // after the first time the text has been laid out.
-    // Fill the vectors again.
-
-    // Calculate the number of glyphs to layout.
-    const Vector<GlyphIndex>& charactersToGlyph = mImpl->mModel->mVisualModel->mCharactersToGlyph;
-    const Vector<Length>& glyphsPerCharacter = mImpl->mModel->mVisualModel->mGlyphsPerCharacter;
-    const GlyphIndex* const charactersToGlyphBuffer = charactersToGlyph.Begin();
-    const Length* const glyphsPerCharacterBuffer = glyphsPerCharacter.Begin();
-
-    const CharacterIndex lastIndex = startIndex + ( ( requestedNumberOfCharacters > 0u ) ? requestedNumberOfCharacters - 1u : 0u );
-    const GlyphIndex startGlyphIndex = mImpl->mTextUpdateInfo.mStartGlyphIndex;
-
-    // Make sure the index is not out of bound
-    if ( charactersToGlyph.Count() != glyphsPerCharacter.Count() ||
-         requestedNumberOfCharacters > charactersToGlyph.Count() ||
-         ( lastIndex > charactersToGlyph.Count() && charactersToGlyph.Count() > 0u ) )
-    {
-      std::string currentText;
-      GetText( currentText );
-
-      DALI_LOG_ERROR( "Controller::DoRelayout: Attempting to access invalid buffer\n" );
-      DALI_LOG_ERROR( "Current text is: %s\n", currentText.c_str() );
-      DALI_LOG_ERROR( "startIndex: %u, lastIndex: %u, requestedNumberOfCharacters: %u, charactersToGlyph.Count = %lu, glyphsPerCharacter.Count = %lu\n", startIndex, lastIndex, requestedNumberOfCharacters, charactersToGlyph.Count(), glyphsPerCharacter.Count());
-
-      return false;
-    }
-
-    const Length numberOfGlyphs = ( requestedNumberOfCharacters > 0u ) ? *( charactersToGlyphBuffer + lastIndex ) + *( glyphsPerCharacterBuffer + lastIndex ) - startGlyphIndex : 0u;
-    const Length totalNumberOfGlyphs = mImpl->mModel->mVisualModel->mGlyphs.Count();
-
-    if( 0u == totalNumberOfGlyphs )
-    {
-      if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
-      {
-        mImpl->mModel->mVisualModel->SetLayoutSize( Size::ZERO );
-      }
-
-      // Nothing else to do if there is no glyphs.
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated true\n" );
-      return true;
-    }
-
-    // Set the layout parameters.
-    Layout::Parameters layoutParameters( size,
-                                         mImpl->mModel);
-
-    // Resize the vector of positions to have the same size than the vector of glyphs.
-    Vector<Vector2>& glyphPositions = mImpl->mModel->mVisualModel->mGlyphPositions;
-    glyphPositions.Resize( totalNumberOfGlyphs );
-
-    // Whether the last character is a new paragraph character.
-    const Character* const textBuffer = mImpl->mModel->mLogicalModel->mText.Begin();
-    mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph =  TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mModel->mLogicalModel->mText.Count() - 1u ) ) );
-    layoutParameters.isLastNewParagraph = mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph;
-
-    // The initial glyph and the number of glyphs to layout.
-    layoutParameters.startGlyphIndex = startGlyphIndex;
-    layoutParameters.numberOfGlyphs = numberOfGlyphs;
-    layoutParameters.startLineIndex = mImpl->mTextUpdateInfo.mStartLineIndex;
-    layoutParameters.estimatedNumberOfLines = mImpl->mTextUpdateInfo.mEstimatedNumberOfLines;
-
-    // Update the ellipsis
-    bool elideTextEnabled = mImpl->mModel->mElideEnabled;
-
-    if( NULL != mImpl->mEventData )
-    {
-      if( mImpl->mEventData->mPlaceholderEllipsisFlag && mImpl->IsShowingPlaceholderText() )
-      {
-        elideTextEnabled = mImpl->mEventData->mIsPlaceholderElideEnabled;
-      }
-      else if( EventData::INACTIVE != mImpl->mEventData->mState )
-      {
-        // Disable ellipsis when editing
-        elideTextEnabled = false;
-      }
-
-      // Reset the scroll position in inactive state
-      if( elideTextEnabled && ( mImpl->mEventData->mState == EventData::INACTIVE ) )
-      {
-        ResetScrollPosition();
-      }
-    }
-
-    // Update the visual model.
-    bool isAutoScrollEnabled = mImpl->mIsAutoScrollEnabled;
-    Size newLayoutSize;
-    viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
-                                                   newLayoutSize,
-                                                   elideTextEnabled,
-                                                   isAutoScrollEnabled );
-    mImpl->mIsAutoScrollEnabled = isAutoScrollEnabled;
-
-    viewUpdated = viewUpdated || ( newLayoutSize != layoutSize );
-
-    if( viewUpdated )
-    {
-      layoutSize = newLayoutSize;
-
-      if( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
-      {
-        mImpl->mIsTextDirectionRTL = false;
-      }
-
-      if ( ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) ) && !mImpl->mModel->mVisualModel->mLines.Empty() )
-      {
-        mImpl->mIsTextDirectionRTL = mImpl->mModel->mVisualModel->mLines[0u].direction;
-      }
-
-      // Sets the layout size.
-      if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
-      {
-        mImpl->mModel->mVisualModel->SetLayoutSize( layoutSize );
-      }
-    } // view updated
-  }
-
-  if( NO_OPERATION != ( ALIGN & operations ) )
-  {
-    // The laid-out lines.
-    Vector<LineRun>& lines = mImpl->mModel->mVisualModel->mLines;
-
-    CharacterIndex alignStartIndex = startIndex;
-    Length alignRequestedNumberOfCharacters = requestedNumberOfCharacters;
-
-    // the whole text needs to be full aligned.
-    // If you do not do a full aligned, only the last line of the multiline input is aligned.
-    if(  mImpl->mEventData && mImpl->mEventData->mUpdateAlignment )
-    {
-      alignStartIndex = 0u;
-      alignRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
-      mImpl->mEventData->mUpdateAlignment = false;
-    }
-
-    // Need to align with the control's size as the text may contain lines
-    // starting either with left to right text or right to left.
-    mImpl->mLayoutEngine.Align( size,
-                                alignStartIndex,
-                                alignRequestedNumberOfCharacters,
-                                mImpl->mModel->mHorizontalAlignment,
-                                lines,
-                                mImpl->mModel->mAlignmentOffset,
-                                mImpl->mLayoutDirection,
-                                mImpl->mModel->mMatchSystemLanguageDirection );
-
-    viewUpdated = true;
-  }
-#if defined(DEBUG_ENABLED)
-  std::string currentText;
-  GetText( currentText );
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mIsTextDirectionRTL[%s] [%s]\n", this, (mImpl->mIsTextDirectionRTL)?"true":"false",  currentText.c_str() );
-#endif
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
-  return viewUpdated;
+  return Relayouter::DoRelayout(*this, size, operationsRequired, layoutSize);
 }
 
 void Controller::CalculateVerticalOffset( const Size& controlSize )
 {
-  Size layoutSize = mImpl->mModel->mVisualModel->GetLayoutSize();
-
-  if( fabsf( layoutSize.height ) < Math::MACHINE_EPSILON_1000 )
-  {
-    // Get the line height of the default font.
-    layoutSize.height = mImpl->GetDefaultFontLineHeight();
-  }
-
-  switch( mImpl->mModel->mVerticalAlignment )
-  {
-    case VerticalAlignment::TOP:
-    {
-      mImpl->mModel->mScrollPosition.y = 0.f;
-      break;
-    }
-    case VerticalAlignment::CENTER:
-    {
-      mImpl->mModel->mScrollPosition.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
-      break;
-    }
-    case VerticalAlignment::BOTTOM:
-    {
-      mImpl->mModel->mScrollPosition.y = controlSize.height - layoutSize.height;
-      break;
-    }
-  }
+  Relayouter::CalculateVerticalOffset(*this, controlSize);
 }
 
 // private : Events.
