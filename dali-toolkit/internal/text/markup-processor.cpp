@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <climits>  // for ULONG_MAX
+#include <functional>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -142,6 +143,17 @@ void Initialize( FontDescriptionRun& fontRun )
   fontRun.widthDefined = false;
   fontRun.slantDefined = false;
   fontRun.sizeDefined = false;
+}
+
+/**
+ * @brief Initializes a color run description to its defaults.
+ *
+ * @param[in,out] colorRun The font description run to initialize.
+ */
+void Initialize( ColorRun& colorRun )
+{
+  colorRun.characterRun.characterIndex = 0u;
+  colorRun.characterRun.numberOfCharacters = 0u;
 }
 
 /**
@@ -486,6 +498,203 @@ bool XHTMLNumericEntityToUtf8 ( const char* markupText, char* utf8 )
   return result;
 }
 
+/**
+ * @brief Processes a particular tag for the required run (color-run or font-run).
+ *
+ * @tparam RunType Whether ColorRun or FontDescriptionRun
+ *
+ * @param[in/out] runsContainer The container containing all the runs
+ * @param[in/out] styleStack The style stack
+ * @param[in] tag The tag we are currently processing
+ * @param[in] characterIndex The current character index
+ * @param[in/out] runIndex The run index
+ * @param[in/out] tagReference The tagReference we should increment/decrement
+ * @param[in] parameterSettingFunction This function will be called to set run specific parameters
+ */
+template <typename RunType>
+void ProcessTagForRun(
+    Vector<RunType>& runsContainer,
+    StyleStack& styleStack,
+    const Tag& tag,
+    const CharacterIndex characterIndex,
+    StyleStack::RunIndex& runIndex,
+    int& tagReference,
+    std::function<void (const Tag&, RunType&)> parameterSettingFunction)
+{
+  if( !tag.isEndTag )
+  {
+    // Create a new run.
+    RunType run;
+    Initialize(run);
+
+    // Fill the run with the parameters.
+    run.characterRun.characterIndex = characterIndex;
+    parameterSettingFunction(tag, run);
+
+    // Push the run in the logical model.
+    runsContainer.PushBack(run);
+
+    // Push the index of the run into the stack.
+    styleStack.Push(runIndex);
+
+    // Point the next free run.
+    ++runIndex;
+
+    // Increase reference
+    ++tagReference;
+  }
+  else
+  {
+    if( tagReference > 0 )
+    {
+      // Pop the top of the stack and set the number of characters of the run.
+      RunType& run = *( runsContainer.Begin() + styleStack.Pop() );
+      run.characterRun.numberOfCharacters = characterIndex - run.characterRun.characterIndex;
+      --tagReference;
+    }
+  }
+}
+
+/**
+ * @brief Processes the item tag
+ *
+ * @param[in/out] markupProcessData The markup process data
+ * @param[in] tag The current tag
+ * @param[in/out] characterIndex The current character index
+ */
+void ProcessItemTag(
+    MarkupProcessData& markupProcessData,
+    const Tag tag,
+    CharacterIndex& characterIndex)
+{
+  if (tag.isEndTag)
+  {
+    // Create an embedded item instance.
+    EmbeddedItem item;
+    item.characterIndex = characterIndex;
+    ProcessEmbeddedItem(tag, item);
+
+    markupProcessData.items.PushBack(item);
+
+    // Insert white space character that will be replaced by the item.
+    markupProcessData.markupProcessedText.append( 1u, WHITE_SPACE );
+    ++characterIndex;
+  }
+}
+
+/**
+ * @brief Resizes the model's vectors
+ *
+ * @param[in/out] markupProcessData The markup process data
+ * @param[in] fontRunIndex The font run index
+ * @param[in] colorRunIndex The color run index
+ */
+void ResizeModelVectors(MarkupProcessData& markupProcessData, const StyleStack::RunIndex fontRunIndex, const StyleStack::RunIndex colorRunIndex)
+{
+  markupProcessData.fontRuns.Resize( fontRunIndex );
+  markupProcessData.colorRuns.Resize( colorRunIndex );
+
+#ifdef DEBUG_ENABLED
+  for( unsigned int i=0; i<colorRunIndex; ++i )
+  {
+    ColorRun& run = markupProcessData.colorRuns[i];
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "run[%d] index: %d, length: %d, color %f,%f,%f,%f\n", i, run.characterRun.characterIndex, run.characterRun.numberOfCharacters, run.color.r, run.color.g, run.color.b, run.color.a );
+  }
+#endif
+}
+
+/**
+ * @brief Processes the markup string buffer
+ *
+ * @param[in/out] markupProcessData The markup process data
+ * @param[in/out] markupStringBuffer The markup string buffer pointer
+ * @param[in] markupStringEndBuffer The markup string end buffer pointer
+ * @param[in/out] characterIndex The current character index
+ */
+void ProcessMarkupStringBuffer(
+    MarkupProcessData& markupProcessData,
+    const char*& markupStringBuffer,
+    const char* const markupStringEndBuffer,
+    CharacterIndex& characterIndex)
+{
+  unsigned char character = *markupStringBuffer;
+  const char* markupBuffer = markupStringBuffer;
+  unsigned char count = GetUtf8Length( character );
+  char utf8[8];
+
+  if( ( BACK_SLASH == character ) && ( markupStringBuffer + 1u < markupStringEndBuffer ) )
+  {
+    // Adding < , >  or & special character.
+    const unsigned char nextCharacter = *( markupStringBuffer + 1u );
+    if( ( LESS_THAN == nextCharacter ) || ( GREATER_THAN == nextCharacter ) || ( AMPERSAND == nextCharacter ) )
+    {
+      character = nextCharacter;
+      ++markupStringBuffer;
+
+      count = GetUtf8Length( character );
+      markupBuffer = markupStringBuffer;
+    }
+  }
+  else   // checking if contains XHTML entity or not
+  {
+    const unsigned int len =  GetXHTMLEntityLength( markupStringBuffer, markupStringEndBuffer);
+
+    // Parse markupStringTxt if it contains XHTML Entity between '&' and ';'
+    if( len > 0 )
+    {
+      char* entityCode = NULL;
+      bool result = false;
+      count = 0;
+
+      // Checking if XHTML Numeric Entity
+      if( HASH == *( markupBuffer + 1u ) )
+      {
+        entityCode = &utf8[0];
+        // markupBuffer is currently pointing to '&'. By adding 2u to markupBuffer it will point to numeric string by skipping "&#'
+        result = XHTMLNumericEntityToUtf8( ( markupBuffer + 2u ), entityCode );
+      }
+      else    // Checking if XHTML Named Entity
+      {
+        entityCode = const_cast<char*> ( NamedEntityToUtf8( markupBuffer, len ) );
+        result = ( entityCode != NULL );
+      }
+      if ( result )
+      {
+        markupBuffer = entityCode; //utf8 text assigned to markupBuffer
+        character = markupBuffer[0];
+      }
+      else
+      {
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Not valid XHTML entity : (%.*s) \n", len, markupBuffer );
+        markupBuffer = NULL;
+      }
+    }
+    else    // in case string conatins Start of XHTML Entity('&') but not its end character(';')
+    {
+      if( character == AMPERSAND )
+      {
+        markupBuffer = NULL;
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Not Well formed XHTML content \n" );
+      }
+    }
+  }
+
+  if( markupBuffer != NULL )
+  {
+    const unsigned char numberOfBytes = GetUtf8Length( character );
+    markupProcessData.markupProcessedText.push_back( character );
+
+    for( unsigned char i = 1u; i < numberOfBytes; ++i )
+    {
+      ++markupBuffer;
+      markupProcessData.markupProcessedText.push_back( *markupBuffer );
+    }
+
+    ++characterIndex;
+    markupStringBuffer += count;
+  }
+}
+
 } // namespace
 
 void ProcessMarkupString( const std::string& markupString, MarkupProcessData& markupProcessData )
@@ -528,317 +737,69 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
     {
       if( TokenComparison( XHTML_COLOR_TAG, tag.buffer, tag.length ) )
       {
-        if( !tag.isEndTag )
-        {
-          // Create a new color run.
-          ColorRun colorRun;
-          colorRun.characterRun.numberOfCharacters = 0u;
-
-          // Set the start character index.
-          colorRun.characterRun.characterIndex = characterIndex;
-
-          // Fill the run with the attributes.
-          ProcessColorTag( tag, colorRun );
-
-          // Push the color run in the logical model.
-          markupProcessData.colorRuns.PushBack( colorRun );
-
-          // Push the index of the run into the stack.
-          styleStack.Push( colorRunIndex );
-
-          // Point the next color run.
-          ++colorRunIndex;
-
-          // Increase reference
-          ++colorTagReference;
-        }
-        else
-        {
-          if( colorTagReference > 0 )
-          {
-            // Pop the top of the stack and set the number of characters of the run.
-            ColorRun& colorRun = *( markupProcessData.colorRuns.Begin() + styleStack.Pop() );
-            colorRun.characterRun.numberOfCharacters = characterIndex - colorRun.characterRun.characterIndex;
-            --colorTagReference;
-          }
-        }
+        ProcessTagForRun<ColorRun>(
+            markupProcessData.colorRuns, styleStack, tag, characterIndex, colorRunIndex, colorTagReference,
+            [] (const Tag& tag, ColorRun& run) { ProcessColorTag( tag, run ); });
       } // <color></color>
       else if( TokenComparison( XHTML_I_TAG, tag.buffer, tag.length ) )
       {
-        if( !tag.isEndTag )
-        {
-          // Create a new font run.
-          FontDescriptionRun fontRun;
-          Initialize( fontRun );
-
-          // Fill the run with the parameters.
-          fontRun.characterRun.characterIndex = characterIndex;
-          fontRun.slant = TextAbstraction::FontSlant::ITALIC;
-          fontRun.slantDefined = true;
-
-          // Push the font run in the logical model.
-          markupProcessData.fontRuns.PushBack( fontRun );
-
-          // Push the index of the run into the stack.
-          styleStack.Push( fontRunIndex );
-
-          // Point the next free font run.
-          ++fontRunIndex;
-
-          // Increase reference
-          ++iTagReference;
-        }
-        else
-        {
-          if( iTagReference > 0 )
-          {
-            // Pop the top of the stack and set the number of characters of the run.
-            FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
-            fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
-            --iTagReference;
-          }
-        }
+        ProcessTagForRun<FontDescriptionRun>(
+            markupProcessData.fontRuns, styleStack, tag, characterIndex, fontRunIndex, iTagReference,
+            [] (const Tag&, FontDescriptionRun& fontRun)
+            {
+              fontRun.slant = TextAbstraction::FontSlant::ITALIC;
+              fontRun.slantDefined = true;
+            });
       } // <i></i>
       else if( TokenComparison( XHTML_U_TAG, tag.buffer, tag.length ) )
       {
-        if( !tag.isEndTag )
-        {
-          // Create a new underline run.
-        }
-        else
-        {
-          // Pop the top of the stack and set the number of characters of the run.
-        }
+        // TODO: If !tag.isEndTag, then create a new underline run.
+        //       else Pop the top of the stack and set the number of characters of the run.
       } // <u></u>
       else if( TokenComparison( XHTML_B_TAG, tag.buffer, tag.length ) )
       {
-        if( !tag.isEndTag )
-        {
-          // Create a new font run.
-          FontDescriptionRun fontRun;
-          Initialize( fontRun );
-
-          // Fill the run with the parameters.
-          fontRun.characterRun.characterIndex = characterIndex;
-          fontRun.weight = TextAbstraction::FontWeight::BOLD;
-          fontRun.weightDefined = true;
-
-          // Push the font run in the logical model.
-          markupProcessData.fontRuns.PushBack( fontRun );
-
-          // Push the index of the run into the stack.
-          styleStack.Push( fontRunIndex );
-
-          // Point the next free font run.
-          ++fontRunIndex;
-
-          // Increase reference
-          ++bTagReference;
-        }
-        else
-        {
-          if( bTagReference > 0 )
-          {
-            // Pop the top of the stack and set the number of characters of the run.
-            FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
-            fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
-            --bTagReference;
-          }
-        }
+        ProcessTagForRun<FontDescriptionRun>(
+            markupProcessData.fontRuns, styleStack, tag, characterIndex, fontRunIndex, bTagReference,
+            [] (const Tag&, FontDescriptionRun& fontRun)
+            {
+              fontRun.weight = TextAbstraction::FontWeight::BOLD;
+              fontRun.weightDefined = true;
+            });
       } // <b></b>
       else if( TokenComparison( XHTML_FONT_TAG, tag.buffer, tag.length ) )
       {
-        if( !tag.isEndTag )
-        {
-          // Create a new font run.
-          FontDescriptionRun fontRun;
-          Initialize( fontRun );
-
-          // Fill the run with the parameters.
-          fontRun.characterRun.characterIndex = characterIndex;
-
-          ProcessFontTag( tag, fontRun );
-
-          // Push the font run in the logical model.
-          markupProcessData.fontRuns.PushBack( fontRun );
-
-          // Push the index of the run into the stack.
-          styleStack.Push( fontRunIndex );
-
-          // Point the next free font run.
-          ++fontRunIndex;
-
-          // Increase reference
-          ++fontTagReference;
-        }
-        else
-        {
-          if( fontTagReference > 0 )
-          {
-            // Pop the top of the stack and set the number of characters of the run.
-            FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
-            fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
-            --fontTagReference;
-          }
-        }
+        ProcessTagForRun<FontDescriptionRun>(
+            markupProcessData.fontRuns, styleStack, tag, characterIndex, fontRunIndex, fontTagReference,
+            [] (const Tag& tag, FontDescriptionRun& fontRun) { ProcessFontTag( tag, fontRun ); });
       } // <font></font>
       else if( TokenComparison( XHTML_SHADOW_TAG, tag.buffer, tag.length ) )
       {
-        if( !tag.isEndTag )
-        {
-          // Create a new shadow run.
-        }
-        else
-        {
-          // Pop the top of the stack and set the number of characters of the run.
-        }
+        // TODO: If !tag.isEndTag, then create a new shadow run.
+        //       else Pop the top of the stack and set the number of characters of the run.
       } // <shadow></shadow>
       else if( TokenComparison( XHTML_GLOW_TAG, tag.buffer, tag.length ) )
       {
-        if( !tag.isEndTag )
-        {
-          // Create a new glow run.
-        }
-        else
-        {
-          // Pop the top of the stack and set the number of characters of the run.
-        }
+        // TODO: If !tag.isEndTag, then create a new glow run.
+        //       else Pop the top of the stack and set the number of characters of the run.
       } // <glow></glow>
       else if( TokenComparison( XHTML_OUTLINE_TAG, tag.buffer, tag.length ) )
       {
-        if( !tag.isEndTag )
-        {
-          // Create a new outline run.
-        }
-        else
-        {
-          // Pop the top of the stack and set the number of characters of the run.
-        }
+        // TODO: If !tag.isEndTag, then create a new outline run.
+        //       else Pop the top of the stack and set the number of characters of the run.
       } // <outline></outline>
       else if (TokenComparison(XHTML_ITEM_TAG, tag.buffer, tag.length))
       {
-        if (tag.isEndTag)
-        {
-          // Create an embedded item instance.
-          EmbeddedItem item;
-          item.characterIndex = characterIndex;
-          ProcessEmbeddedItem(tag, item);
-
-          markupProcessData.items.PushBack(item);
-
-          // Insert white space character that will be replaced by the item.
-          markupProcessData.markupProcessedText.append( 1u, WHITE_SPACE );
-          ++characterIndex;
-        }
+        ProcessItemTag(markupProcessData, tag, characterIndex);
       }
     }  // end if( IsTag() )
     else if( markupStringBuffer < markupStringEndBuffer )
     {
-      unsigned char character = *markupStringBuffer;
-      const char* markupBuffer = markupStringBuffer;
-      unsigned char count = GetUtf8Length( character );
-      char utf8[8];
-
-      if( ( BACK_SLASH == character ) && ( markupStringBuffer + 1u < markupStringEndBuffer ) )
-      {
-        // Adding < , >  or & special character.
-        const unsigned char nextCharacter = *( markupStringBuffer + 1u );
-        if( ( LESS_THAN == nextCharacter ) || ( GREATER_THAN == nextCharacter ) || ( AMPERSAND == nextCharacter ) )
-        {
-          character = nextCharacter;
-          ++markupStringBuffer;
-
-          count = GetUtf8Length( character );
-          markupBuffer = markupStringBuffer;
-        }
-      }
-      else   // checking if conatins XHTML entity or not
-      {
-        const unsigned int len =  GetXHTMLEntityLength( markupStringBuffer, markupStringEndBuffer);
-
-        // Parse markupStringTxt if it contains XHTML Entity between '&' and ';'
-        if( len > 0 )
-        {
-          char* entityCode = NULL;
-          bool result = false;
-          count = 0;
-
-          // Checking if XHTML Numeric Entity
-          if( HASH == *( markupBuffer + 1u ) )
-          {
-            entityCode = &utf8[0];
-            // markupBuffer is currently pointing to '&'. By adding 2u to markupBuffer it will point to numeric string by skipping "&#'
-            result = XHTMLNumericEntityToUtf8( ( markupBuffer + 2u ), entityCode );
-          }
-          else    // Checking if XHTML Named Entity
-          {
-            entityCode = const_cast<char*> ( NamedEntityToUtf8( markupBuffer, len ) );
-            result = ( entityCode != NULL );
-          }
-          if ( result )
-          {
-            markupBuffer = entityCode; //utf8 text assigned to markupBuffer
-            character = markupBuffer[0];
-          }
-          else
-          {
-            DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Not valid XHTML entity : (%.*s) \n", len, markupBuffer );
-            markupBuffer = NULL;
-          }
-        }
-        else    // in case string conatins Start of XHTML Entity('&') but not its end character(';')
-        {
-          if( character == AMPERSAND )
-          {
-            markupBuffer = NULL;
-            DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Not Well formed XHTML content \n" );
-          }
-        }
-      }
-
-      if( markupBuffer != NULL )
-      {
-        const unsigned char numberOfBytes = GetUtf8Length( character );
-        markupProcessData.markupProcessedText.push_back( character );
-
-        for( unsigned char i = 1u; i < numberOfBytes; ++i )
-        {
-          ++markupBuffer;
-          markupProcessData.markupProcessedText.push_back( *markupBuffer );
-        }
-
-        ++characterIndex;
-        markupStringBuffer += count;
-      }
+      ProcessMarkupStringBuffer(markupProcessData, markupStringBuffer, markupStringEndBuffer, characterIndex);
     }
   }
 
   // Resize the model's vectors.
-  if( 0u == fontRunIndex )
-  {
-    markupProcessData.fontRuns.Clear();
-  }
-  else
-  {
-    markupProcessData.fontRuns.Resize( fontRunIndex );
-  }
-
-  if( 0u == colorRunIndex )
-  {
-    markupProcessData.colorRuns.Clear();
-  }
-  else
-  {
-    markupProcessData.colorRuns.Resize( colorRunIndex );
-
-#ifdef DEBUG_ENABLED
-    for( unsigned int i=0; i<colorRunIndex; ++i )
-    {
-      ColorRun& run = markupProcessData.colorRuns[i];
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "run[%d] index: %d, length: %d, color %f,%f,%f,%f\n", i, run.characterRun.characterIndex, run.characterRun.numberOfCharacters, run.color.r, run.color.g, run.color.b, run.color.a );
-    }
-#endif
-  }
+  ResizeModelVectors(markupProcessData, fontRunIndex, colorRunIndex);
 }
 
 } // namespace Text
