@@ -1741,7 +1741,7 @@ bool Controller::GetTextScrollInfo( float& scrollPosition, float& controlHeight,
   return isScrolled;
 }
 
-void Controller::SetHiddenInputOption(const Property::Map& options )
+void Controller::SetHiddenInputOption(const Property::Map& options)
 {
   if( NULL == mImpl->mHiddenInput )
   {
@@ -1750,7 +1750,7 @@ void Controller::SetHiddenInputOption(const Property::Map& options )
   mImpl->mHiddenInput->SetProperties(options);
 }
 
-void Controller::GetHiddenInputOption(Property::Map& options )
+void Controller::GetHiddenInputOption(Property::Map& options)
 {
   if( NULL != mImpl->mHiddenInput )
   {
@@ -2555,75 +2555,7 @@ void Controller::ResetText()
 
 void Controller::ShowPlaceholderText()
 {
-  if( mImpl->IsPlaceholderAvailable() )
-  {
-    DALI_ASSERT_DEBUG( mImpl->mEventData && "No placeholder text available" );
-
-    if( NULL == mImpl->mEventData )
-    {
-      return;
-    }
-
-    mImpl->mEventData->mIsShowingPlaceholderText = true;
-
-    // Disable handles when showing place-holder text
-    mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-    mImpl->mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-    mImpl->mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-
-    const char* text( NULL );
-    size_t size( 0 );
-
-    // TODO - Switch Placeholder text when changing state
-    if( ( EventData::INACTIVE != mImpl->mEventData->mState ) &&
-        ( 0u != mImpl->mEventData->mPlaceholderTextActive.c_str() ) )
-    {
-      text = mImpl->mEventData->mPlaceholderTextActive.c_str();
-      size = mImpl->mEventData->mPlaceholderTextActive.size();
-    }
-    else
-    {
-      text = mImpl->mEventData->mPlaceholderTextInactive.c_str();
-      size = mImpl->mEventData->mPlaceholderTextInactive.size();
-    }
-
-    mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
-    mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-
-    // Reset model for showing placeholder.
-    mImpl->mModel->mLogicalModel->mText.Clear();
-    mImpl->mModel->mVisualModel->SetTextColor( mImpl->mEventData->mPlaceholderTextColor );
-
-    // Convert text into UTF-32
-    Vector<Character>& utf32Characters = mImpl->mModel->mLogicalModel->mText;
-    utf32Characters.Resize( size );
-
-    // This is a bit horrible but std::string returns a (signed) char*
-    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text );
-
-    // Transform a text array encoded in utf8 into an array encoded in utf32.
-    // It returns the actual number of characters.
-    const Length characterCount = Utf8ToUtf32( utf8, size, utf32Characters.Begin() );
-    utf32Characters.Resize( characterCount );
-
-    // The characters to be added.
-    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = characterCount;
-
-    // Reset the cursor position
-    mImpl->mEventData->mPrimaryCursorPosition = 0;
-
-    // The natural size needs to be re-calculated.
-    mImpl->mRecalculateNaturalSize = true;
-
-    // The text direction needs to be updated.
-    mImpl->mUpdateTextDirection = true;
-
-    // Apply modifications to the model
-    mImpl->mOperationsPending = ALL_OPERATIONS;
-
-    // Update the rest of the model during size negotiation
-    mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
-  }
+  PlaceholderHandler::ShowPlaceholderText(*this);
 }
 
 void Controller::ClearFontData()
