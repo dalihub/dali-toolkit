@@ -49,6 +49,7 @@ const float DEFAULT_FONT_SIZE_SCALE = 1.f;
 struct CursorInfo;
 struct FontDefaults;
 struct ControllerImplEventHandler;
+struct SelectionHandleController;
 
 class SelectableControlInterface;
 
@@ -109,7 +110,7 @@ struct EventData
 
   EventData( DecoratorPtr decorator, InputMethodContext& inputMethodContext );
 
-  ~EventData();
+  ~EventData() = default;
 
   static bool IsEditingState( State stateToCheck )
   {
@@ -174,7 +175,7 @@ struct EventData
   bool mPlaceholderEllipsisFlag         : 1;   ///< True if the text controller sets the placeholder ellipsis.
   bool mShiftSelectionFlag              : 1;   ///< True if the text selection using Shift key is enabled.
   bool mUpdateAlignment                 : 1;   ///< True if the whole text needs to be full aligned..
-  bool mEditingEnabled                   : 1;   ///< True if the editing is enabled, false otherwise.
+  bool mEditingEnabled                  : 1;   ///< True if the editing is enabled, false otherwise.
 };
 
 struct ModifyEvent
@@ -614,22 +615,6 @@ struct Controller::Impl
    */
   float GetDefaultFontLineHeight();
 
-  void OnCursorKeyEvent( const Event& event );
-
-  void OnTapEvent( const Event& event );
-
-  void OnPanEvent( const Event& event );
-
-  void OnLongPressEvent( const Event& event );
-
-  void OnHandleEvent( const Event& event );
-
-  void OnSelectEvent( const Event& event );
-
-  void OnSelectAllEvent();
-
-  void OnSelectNoneEvent();
-
   /**
    * @copydoc Text::Controller::GetPrimaryCursorPosition()
    */
@@ -849,6 +834,7 @@ public:
 
 private:
   friend ControllerImplEventHandler;
+  friend SelectionHandleController;
 };
 
 } // namespace Text
