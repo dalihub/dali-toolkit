@@ -59,6 +59,14 @@ struct Controller::Relayouter
   static bool CheckForTextFit(Controller& controller, float pointSize, const Size& layoutSize);
 
   /**
+   * @brief Calculates the point size for text for given layout()
+   *
+   * @param[in] controller A reference to the controller class
+   * @param[in] layoutSize The layout size
+   */
+  static void FitPointSizeforLayout(Controller& controller, const Size& layoutSize);
+
+  /**
    * @brief Called by the Controller to get the height for a particular width.
    *
    * @param[in] controller A reference to the controller class
