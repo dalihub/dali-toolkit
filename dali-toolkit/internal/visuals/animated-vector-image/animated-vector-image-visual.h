@@ -229,6 +229,7 @@ private:
   CallbackBase*                                mEventCallback;    // Not owned
   bool                                         mRendererAdded;
   bool                                         mCoreShutdown;
+  bool                                         mRedrawInScalingDown;
 };
 
 } // namespace Internal
