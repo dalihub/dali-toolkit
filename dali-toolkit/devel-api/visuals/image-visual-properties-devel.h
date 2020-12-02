@@ -138,7 +138,14 @@ enum Type
    * And the array contains 2 integer values which are the frame numbers, the start frame number and the end frame number of the layer.
    * @note This property is read-only.
    */
-  CONTENT_INFO = ORIENTATION_CORRECTION + 10
+  CONTENT_INFO = ORIENTATION_CORRECTION + 10,
+
+  /**
+   * @brief Whether to redraw the image when the visual is scaled down.
+   * @details Name "redrawInScalingDown", type Property::BOOLEAN.
+   * @note It is used in the AnimatedVectorImageVisual. The default is true.
+   */
+  REDRAW_IN_SCALING_DOWN
 };
 
 } //namespace Property

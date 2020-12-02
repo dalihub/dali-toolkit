@@ -180,7 +180,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
              .Add( "loopCount", 3 )
              .Add( "playRange", playRange )
              .Add( "stopBehavior", DevelImageVisual::StopBehavior::FIRST_FRAME )
-             .Add( "loopingMode", DevelImageVisual::LoopingMode::AUTO_REVERSE );
+             .Add( "loopingMode", DevelImageVisual::LoopingMode::AUTO_REVERSE )
+             .Add( "redrawInScalingDown", false );
 
   Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
@@ -231,6 +232,10 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   value = resultMap.Find( DevelImageVisual::Property::LOOPING_MODE, Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< int >() == DevelImageVisual::LoopingMode::AUTO_REVERSE );
+
+  value = resultMap.Find( DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get< bool >() == false );
 
   actor.Unparent( );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
@@ -307,6 +312,10 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
 
   value = resultMap.Find( DevelImageVisual::Property::CONTENT_INFO, Property::MAP );
   DALI_TEST_CHECK( value );
+
+  value = resultMap.Find( DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get< bool >() == true );    // Check default value
 
   // request AnimatedVectorImageVisual with an URL
   Visual::Base visual2 = factory.CreateVisual( TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions() );
