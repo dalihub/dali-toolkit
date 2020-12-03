@@ -174,6 +174,64 @@ bool Controller::Relayouter::CheckForTextFit(Controller& controller, float point
   return true;
 }
 
+void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const Size& layoutSize)
+{
+  Controller::Impl& impl = *controller.mImpl;
+
+  const OperationsMask operations  = impl.mOperationsPending;
+  if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) || impl.mTextFitContentSize != layoutSize )
+  {
+    ModelPtr& model = impl.mModel;
+
+    bool actualellipsis = model->mElideEnabled;
+    float minPointSize = impl.mTextFitMinSize;
+    float maxPointSize = impl.mTextFitMaxSize;
+    float pointInterval = impl.mTextFitStepSize;
+
+    model->mElideEnabled = false;
+    Vector<float> pointSizeArray;
+
+    // check zero value
+    if( pointInterval < 1.f )
+    {
+      impl.mTextFitStepSize = pointInterval = 1.0f;
+    }
+
+    pointSizeArray.Reserve( static_cast< unsigned int >( ceil( ( maxPointSize - minPointSize ) / pointInterval ) ) );
+
+    for( float i = minPointSize; i < maxPointSize; i += pointInterval )
+    {
+      pointSizeArray.PushBack( i );
+    }
+
+    pointSizeArray.PushBack( maxPointSize );
+
+    int bestSizeIndex = 0;
+    int min = bestSizeIndex + 1;
+    int max = pointSizeArray.Size() - 1;
+    while( min <= max )
+    {
+      int destI = ( min + max ) / 2;
+
+      if( CheckForTextFit( controller, pointSizeArray[destI], layoutSize ) )
+      {
+        bestSizeIndex = min;
+        min = destI + 1;
+      }
+      else
+      {
+        max = destI - 1;
+        bestSizeIndex = max;
+      }
+    }
+
+    model->mElideEnabled = actualellipsis;
+    impl.mFontDefaults->mFitPointSize = pointSizeArray[bestSizeIndex];
+    impl.mFontDefaults->sizeDefined = true;
+    controller.ClearFontData();
+  }
+}
+
 float Controller::Relayouter::GetHeightForWidth(Controller& controller, float width)
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::GetHeightForWidth %p width %f\n", &controller, width );

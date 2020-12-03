@@ -1837,6 +1837,7 @@ private:
   struct InputFontHandler;
   struct PlaceholderHandler;
   struct Relayouter;
+  struct TextUpdater;
 
   Impl* mImpl;
 };
