@@ -1012,8 +1012,13 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
   const unsigned int radius = textParameters.radius - static_cast<unsigned int>(maxAscenderDescender);
 
   // Set the layout parameters.
-  internalDataModel.textLayoutArea = Size(static_cast<float>(textParameters.textWidth),
+  Size textLayoutArea = Size(static_cast<float>(textParameters.textWidth),
                                           static_cast<float>(textParameters.textHeight));
+
+  // padding
+  Extents padding = textParameters.padding;
+  internalDataModel.textLayoutArea = Size(textLayoutArea.x - ( padding.start + padding.end ), textLayoutArea.y - ( padding.top + padding.bottom ) );
+
 
   if(isCircularTextLayout)
   {
@@ -1498,7 +1503,7 @@ Dali::Property::Array RenderForLastIndex(RendererParameters& textParameters)
   ////////////////////////////////////////////////////////////////////////////////
   // Layout the text
   ////////////////////////////////////////////////////////////////////////////////
-  int boundingBox           = textParameters.textHeight;
+  int boundingBox           = textParameters.textHeight - (textParameters.padding.top + textParameters.padding.bottom);
   textParameters.textHeight = MAX_INT; // layout for the entire area.
   LayoutText(textParameters, rendererParameters, embeddedItemLayout, internalData);
 
