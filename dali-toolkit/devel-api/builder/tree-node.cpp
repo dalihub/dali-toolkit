@@ -103,7 +103,7 @@ size_t TreeNode::Size() const
   return c;
 }
 
-size_t TreeNode::Count(const std::string& childName) const
+size_t TreeNode::Count(std::string_view childName) const
 {
   const TreeNode* c = GetChild(childName);
   if(c)
@@ -116,12 +116,12 @@ size_t TreeNode::Count(const std::string& childName) const
   }
 }
 
-const TreeNode* TreeNode::GetChild(const std::string& childName) const
+const TreeNode* TreeNode::GetChild(std::string_view childName) const
 {
   const TreeNode* p = mFirstChild;
   while(p)
   {
-    if(p->mName && (std::string(p->mName) == childName))
+    if(p->mName && (std::string_view(p->mName) == childName))
     {
       return p;
     }
@@ -130,7 +130,7 @@ const TreeNode* TreeNode::GetChild(const std::string& childName) const
   return NULL;
 }
 
-const TreeNode* TreeNode::GetChildIgnoreCase(const std::string& childName) const
+const TreeNode* TreeNode::GetChildIgnoreCase(std::string_view childName) const
 {
   const TreeNode* p = mFirstChild;
   while(p)
@@ -144,9 +144,9 @@ const TreeNode* TreeNode::GetChildIgnoreCase(const std::string& childName) const
   return NULL;
 }
 
-const TreeNode* TreeNode::Find(const std::string& childName) const
+const TreeNode* TreeNode::Find(std::string_view childName) const
 {
-  if(mName && std::string(mName) == childName)
+  if(mName && std::string_view(mName) == childName)
   {
     return this;
   }

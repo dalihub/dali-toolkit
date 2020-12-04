@@ -130,7 +130,7 @@ public:
    * @param childName The name of the child to find
    * @return the number of children in the found child
    */
-  size_t Count(const std::string& childName) const;
+  size_t Count(std::string_view childName) const;
 
   /*
    * Get the nodes name
@@ -184,21 +184,21 @@ public:
    * @param name The name of the child.
    * @return The child if found, else NULL
    */
-  const TreeNode* GetChild(const std::string& name) const;
+  const TreeNode* GetChild(std::string_view name) const;
 
   /*
    * Gets a child of the node (using case insensitive matching)
    * @param name The name of the child in lower case
    * @return The child if found, else NULL
    */
-  const TreeNode* GetChildIgnoreCase(const std::string& name) const;
+  const TreeNode* GetChildIgnoreCase(std::string_view name) const;
 
   /*
    * Recursively search for a child of the node
    * @param name The name of the child
    * @return The child if found, else NULL
    */
-  const TreeNode* Find(const std::string& name) const;
+  const TreeNode* Find(std::string_view name) const;
 
 private:
   friend class Internal::TreeNodeManipulator;
