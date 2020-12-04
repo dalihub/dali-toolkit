@@ -1217,13 +1217,21 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
       {
-        value.Get( controlImpl.mImpl->mAccessibilityAttributes );
+        const Property::Map* map = value.GetMap();
+        if( map && !map->Empty() )
+        {
+          controlImpl.mImpl->mAccessibilityAttributes = *map;
+        }
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED:
       {
-        value.Get( controlImpl.mImpl->mAccessibilityAnimated );
+        bool animated;
+        if( value.Get( animated ) )
+        {
+          controlImpl.mImpl->mAccessibilityAnimated = animated;
+        }
         break;
       }
     }

@@ -58,6 +58,7 @@ struct Controller::PlaceholderHandler
   static const Vector4& GetPlaceholderTextColor(const Controller& controller);
   static void SetPlaceholderProperty(Controller& controller, const Property::Map& map );
   static void GetPlaceholderProperty(Controller& controller, Property::Map& map);
+  static void ShowPlaceholderText(Controller& controller);
 };
 
 } // namespace Text

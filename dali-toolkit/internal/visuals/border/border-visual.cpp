@@ -199,7 +199,7 @@ void BorderVisual::DoSetOnScene( Actor& actor )
   InitializeRenderer();
 
   mBorderColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor );
-  if( ( mBorderColor.a < 1.f || mAntiAliasing ) || IsAdvancedBlendEquationApplied() )
+  if( mBorderColor.a < 1.f || mAntiAliasing )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
