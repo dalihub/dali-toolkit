@@ -93,9 +93,21 @@ TextureSet FixedImageCache::FirstFrame()
   return textureSet;
 }
 
-uint32_t FixedImageCache::GetFrameInterval( uint32_t frameIndex )
+TextureSet FixedImageCache::NextFrame()
+{
+  TextureSet textureSet = Frame((mFront + 1) % mImageUrls.size());
+
+  return textureSet;
+}
+
+uint32_t FixedImageCache::GetFrameInterval( uint32_t frameIndex ) const
 {
   return 0u;
+}
+
+int32_t FixedImageCache::GetCurrentFrameIndex() const
+{
+  return static_cast<int32_t>(mFront);
 }
 
 bool FixedImageCache::IsFrontReady() const

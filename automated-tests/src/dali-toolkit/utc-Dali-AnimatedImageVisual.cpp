@@ -392,6 +392,77 @@ int UtcDaliAnimatedImageVisualStopBehavior(void)
 }
 
 
+int UtcDaliAnimatedImageVisualStopBehavior02(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  Property::Array urls;
+  CopyUrlsIntoArray( urls );
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+    propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
+    propertyMap.Insert( DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::LAST_FRAME);
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 2);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 20);
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+
+    // Expect that a batch of 4 textures has been requested. These will be serially loaded
+    // below.
+
+    DummyControl dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    application.GetScene().Add( dummyControl );
+
+    tet_infoline( "Ready the visual after the visual is on stage" );
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( gl.GetLastGenTextureId(), 2, TEST_LOCATION );
+
+    Test::EmitGlobalTimerSignal();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 2, TEST_LOCATION );
+
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::STOP, Property::Map() );
+
+    tet_infoline( "Ready the visual after the visual is on stage" );
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 2, TEST_LOCATION );
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
 int UtcDaliAnimatedImageVisualAnimatedImage01(void)
 {
   ToolkitTestApplication application;

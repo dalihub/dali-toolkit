@@ -246,7 +246,7 @@ private:
   Vector4 mPixelArea;
   VisualUrl mImageUrl;
   Dali::AnimatedImageLoading mAnimatedImageLoading; // Only needed for animated image
-  uint32_t mCurrentFrameIndex; // Frame index into textureRects
+  uint32_t mFrameIndexForJumpTo; // Frame index into textureRects
 
   // Variables for Multi-Image player
   ImageCache::UrlList* mImageUrls;

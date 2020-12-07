@@ -79,6 +79,12 @@ public:
   virtual TextureSet FirstFrame() = 0;
 
   /**
+   * Get the next frame. If it's not ready, this will trigger the
+   * sending of FrameReady() when the image becomes ready.
+   */
+  virtual TextureSet NextFrame() = 0;
+
+  /**
    * Get the Nth frame. If it's not ready, this will trigger the
    * sending of FrameReady() when the image becomes ready.
    */
@@ -87,7 +93,13 @@ public:
   /**
    * Get the interval of Nth frame.
    */
-  virtual uint32_t GetFrameInterval( uint32_t frameIndex ) = 0;
+  virtual uint32_t GetFrameInterval( uint32_t frameIndex ) const = 0;
+
+  /**
+   * Get the current rendered frame index.
+   * If there isn't any loaded frame, returns -1.
+   */
+  virtual int32_t GetCurrentFrameIndex() const = 0;
 
 private:
 
