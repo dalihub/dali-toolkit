@@ -38,8 +38,6 @@
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
-#include <dali-toolkit/internal/controls/text-controls/autofill-container-impl.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -1519,7 +1517,7 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
 void TextField::OnKeyInputFocusGained()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnKeyInputFocusGained %p\n", mController.Get() );
-  if( mInputMethodContext && IsEditable() )
+  if ( mInputMethodContext && IsEditable() )
   {
     mInputMethodContext.ApplyOptions( mInputMethodOptions );
 
@@ -1533,30 +1531,13 @@ void TextField::OnKeyInputFocusGained()
     // When window gain lost focus, the inputMethodContext is deactivated. Thus when window gain focus again, the inputMethodContext must be activated.
     mInputMethodContext.SetRestoreAfterFocusLost( true );
   }
-
   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
-  if( notifier )
+
+  if ( notifier )
   {
     notifier.ContentSelectedSignal().Connect( this, &TextField::OnClipboardTextSelected );
   }
 
-  Toolkit::Control control = Toolkit::Control::DownCast( Self() );
-  Internal::Control& controlImpl = GetImplementation( control );
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
-  bool enableAutofill = controlDataImpl.IsAutofillEnabled();
-  if( enableAutofill )
-  {
-    Toolkit::AutofillContainer container = controlDataImpl.GetAutofillContainer();
-    container.SetFocusedControl( control );
-
-    Internal::AutofillContainer& containerImpl = GetImpl( container );
-    Dali::AutofillGroup containerGroup = containerImpl.GetAutofillGroup();
-    if( containerGroup != nullptr )
-    {
-      containerGroup.RequestAuthentication();
-    }
-
-  }
   mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
 
   EmitKeyInputFocusSignal( true ); // Calls back into the Control hence done last.
