@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/placeholder-properties.h>
+#include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 
@@ -453,6 +454,89 @@ void Controller::PlaceholderHandler::GetPlaceholderProperty(Controller& controll
     }
   }
 }
+
+void Controller::PlaceholderHandler::ShowPlaceholderText(Controller& controller)
+{
+  Controller::Impl& impl = *controller.mImpl;
+
+  if( impl.IsPlaceholderAvailable() )
+  {
+    EventData*& eventData = impl.mEventData;
+    DALI_ASSERT_DEBUG( eventData && "No placeholder text available" );
+
+    if( NULL == eventData )
+    {
+      return;
+    }
+
+    eventData->mIsShowingPlaceholderText = true;
+
+    // Disable handles when showing place-holder text
+    DecoratorPtr& decorator = eventData->mDecorator;
+    decorator->SetHandleActive( GRAB_HANDLE, false );
+    decorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+    decorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+
+    const char* text( NULL );
+    size_t size( 0 );
+
+    // TODO - Switch Placeholder text when changing state
+    std::string& placeholderTextActive = eventData->mPlaceholderTextActive;
+    if( ( EventData::INACTIVE != eventData->mState ) &&
+        ( 0u != placeholderTextActive.c_str() ) )
+    {
+      text = placeholderTextActive.c_str();
+      size = placeholderTextActive.size();
+    }
+    else
+    {
+      std::string& placeholderTextInactive = eventData->mPlaceholderTextInactive;
+      text = placeholderTextInactive.c_str();
+      size = placeholderTextInactive.size();
+    }
+
+    TextUpdateInfo& textUpdateInfo = impl.mTextUpdateInfo;
+    textUpdateInfo.mCharacterIndex = 0u;
+    textUpdateInfo.mNumberOfCharactersToRemove = textUpdateInfo.mPreviousNumberOfCharacters;
+
+    // Reset model for showing placeholder.
+    ModelPtr& model = impl.mModel;
+    LogicalModelPtr& logicalModel = model->mLogicalModel;
+    logicalModel->mText.Clear();
+    model->mVisualModel->SetTextColor( eventData->mPlaceholderTextColor );
+
+    // Convert text into UTF-32
+    Vector<Character>& utf32Characters = logicalModel->mText;
+    utf32Characters.Resize( size );
+
+    // This is a bit horrible but std::string returns a (signed) char*
+    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text );
+
+    // Transform a text array encoded in utf8 into an array encoded in utf32.
+    // It returns the actual number of characters.
+    const Length characterCount = Utf8ToUtf32( utf8, size, utf32Characters.Begin() );
+    utf32Characters.Resize( characterCount );
+
+    // The characters to be added.
+    textUpdateInfo.mNumberOfCharactersToAdd = characterCount;
+
+    // Reset the cursor position
+    eventData->mPrimaryCursorPosition = 0;
+
+    // The natural size needs to be re-calculated.
+    impl.mRecalculateNaturalSize = true;
+
+    // The text direction needs to be updated.
+    impl.mUpdateTextDirection = true;
+
+    // Apply modifications to the model
+    impl.mOperationsPending = ALL_OPERATIONS;
+
+    // Update the rest of the model during size negotiation
+    impl.QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
+  }
+}
+
 
 } // namespace Text
 

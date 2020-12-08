@@ -460,7 +460,7 @@ void GradientVisual::InitializeRenderer()
   mImpl->mRenderer.SetTextures( textureSet );
 
   // If opaque and then no need to have blending
-  if( mIsOpaque && !IsAdvancedBlendEquationApplied() )
+  if( mIsOpaque )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::OFF );
   }

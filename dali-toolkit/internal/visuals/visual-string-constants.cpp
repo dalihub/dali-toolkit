@@ -120,6 +120,7 @@ const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
 const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
 const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
 const char * const ALPHA_MASK_URL("alphaMaskUrl");
+const char * const REDRAW_IN_SCALING_DOWN_NAME("redrawInScalingDown");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

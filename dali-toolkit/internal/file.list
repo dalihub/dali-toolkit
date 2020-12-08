@@ -145,11 +145,14 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/text-controller-impl-event-handler.cpp
    ${toolkit_src_dir}/text/text-controller-input-font-handler.cpp
    ${toolkit_src_dir}/text/text-controller-placeholder-handler.cpp
+   ${toolkit_src_dir}/text/text-controller-relayouter.cpp
+   ${toolkit_src_dir}/text/text-controller-text-updater.cpp
    ${toolkit_src_dir}/text/text-effects-style.cpp
    ${toolkit_src_dir}/text/text-font-style.cpp
    ${toolkit_src_dir}/text/text-io.cpp
    ${toolkit_src_dir}/text/text-model.cpp
    ${toolkit_src_dir}/text/text-scroller.cpp
+   ${toolkit_src_dir}/text/text-selection-handle-controller.cpp
    ${toolkit_src_dir}/text/text-vertical-scroller.cpp
    ${toolkit_src_dir}/text/text-view.cpp
    ${toolkit_src_dir}/text/text-view-interface.cpp

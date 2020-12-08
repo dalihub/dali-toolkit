@@ -413,11 +413,6 @@ bool Visual::Base::IsPreMultipliedAlphaEnabled() const
   return mImpl->mFlags & Impl::IS_PREMULTIPLIED_ALPHA;
 }
 
-bool Visual::Base::IsAdvancedBlendEquationApplied() const
-{
-  return IsPreMultipliedAlphaEnabled() && DevelRenderer::IsAdvancedBlendEquationApplied( mImpl->mRenderer );
-}
-
 void Visual::Base::DoSetOffScene( Actor& actor )
 {
   actor.RemoveRenderer( mImpl->mRenderer );

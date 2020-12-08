@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
+#include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 using namespace Dali;
 
@@ -44,6 +45,225 @@ namespace Toolkit
 
 namespace Text
 {
+
+bool ControllerImplEventHandler::ProcessInputEvents(Controller::Impl& impl)
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::ProcessInputEvents\n" );
+
+  EventData*& eventData = impl.mEventData;
+  if( NULL == eventData )
+  {
+    // Nothing to do if there is no text input.
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::ProcessInputEvents no event data\n" );
+    return false;
+  }
+
+  if( eventData->mDecorator )
+  {
+    for( std::vector<Event>::iterator iter = eventData->mEventQueue.begin();
+         iter != eventData->mEventQueue.end();
+         ++iter )
+    {
+      switch( iter->type )
+      {
+        case Event::CURSOR_KEY_EVENT:
+        {
+          OnCursorKeyEvent(impl, *iter);
+          break;
+        }
+        case Event::TAP_EVENT:
+        {
+          OnTapEvent(impl, *iter);
+          break;
+        }
+        case Event::LONG_PRESS_EVENT:
+        {
+          OnLongPressEvent(impl, *iter);
+          break;
+        }
+        case Event::PAN_EVENT:
+        {
+          OnPanEvent(impl, *iter);
+          break;
+        }
+        case Event::GRAB_HANDLE_EVENT:
+        case Event::LEFT_SELECTION_HANDLE_EVENT:
+        case Event::RIGHT_SELECTION_HANDLE_EVENT: // Fall through
+        {
+          OnHandleEvent(impl, *iter);
+          break;
+        }
+        case Event::SELECT:
+        {
+          OnSelectEvent(impl, *iter);
+          break;
+        }
+        case Event::SELECT_ALL:
+        {
+          OnSelectAllEvent(impl);
+          break;
+        }
+        case Event::SELECT_NONE:
+        {
+          OnSelectNoneEvent(impl);
+          break;
+        }
+      }
+    }
+  }
+
+  if( eventData->mUpdateCursorPosition ||
+      eventData->mUpdateHighlightBox )
+  {
+    impl.NotifyInputMethodContext();
+  }
+
+  // The cursor must also be repositioned after inserts into the model
+  if( eventData->mUpdateCursorPosition )
+  {
+    // Updates the cursor position and scrolls the text to make it visible.
+    CursorInfo cursorInfo;
+    // Calculate the cursor position from the new cursor index.
+    impl.GetCursorPosition(eventData->mPrimaryCursorPosition, cursorInfo);
+
+    if(nullptr != impl.mEditableControlInterface)
+    {
+      impl.mEditableControlInterface->CaretMoved( eventData->mPrimaryCursorPosition );
+    }
+
+    if( eventData->mUpdateCursorHookPosition )
+    {
+      // Update the cursor hook position. Used to move the cursor with the keys 'up' and 'down'.
+      eventData->mCursorHookPositionX = cursorInfo.primaryPosition.x;
+      eventData->mUpdateCursorHookPosition = false;
+    }
+
+    // Scroll first the text after delete ...
+    if( eventData->mScrollAfterDelete )
+    {
+      impl.ScrollTextToMatchCursor(cursorInfo);
+    }
+
+    // ... then, text can be scrolled to make the cursor visible.
+    if( eventData->mScrollAfterUpdatePosition )
+    {
+      const Vector2 currentCursorPosition( cursorInfo.primaryPosition.x, cursorInfo.lineOffset );
+      impl.ScrollToMakePositionVisible( currentCursorPosition, cursorInfo.lineHeight );
+    }
+    eventData->mScrollAfterUpdatePosition = false;
+    eventData->mScrollAfterDelete = false;
+
+    impl.UpdateCursorPosition( cursorInfo );
+
+    eventData->mDecoratorUpdated = true;
+    eventData->mUpdateCursorPosition = false;
+    eventData->mUpdateGrabHandlePosition = false;
+  }
+  else
+  {
+    CursorInfo leftHandleInfo;
+    CursorInfo rightHandleInfo;
+
+    if( eventData->mUpdateHighlightBox )
+    {
+      impl.GetCursorPosition(eventData->mLeftSelectionPosition, leftHandleInfo);
+
+      impl.GetCursorPosition(eventData->mRightSelectionPosition, rightHandleInfo);
+
+      if( eventData->mScrollAfterUpdatePosition && ( eventData->mIsLeftHandleSelected ? eventData->mUpdateLeftSelectionPosition : eventData->mUpdateRightSelectionPosition ) )
+      {
+        if( eventData->mIsLeftHandleSelected && eventData->mIsRightHandleSelected )
+        {
+          CursorInfo& infoLeft = leftHandleInfo;
+
+          const Vector2 currentCursorPositionLeft( infoLeft.primaryPosition.x, infoLeft.lineOffset );
+          impl.ScrollToMakePositionVisible( currentCursorPositionLeft, infoLeft.lineHeight );
+
+          CursorInfo& infoRight = rightHandleInfo;
+
+          const Vector2 currentCursorPositionRight( infoRight.primaryPosition.x, infoRight.lineOffset );
+          impl.ScrollToMakePositionVisible( currentCursorPositionRight, infoRight.lineHeight );
+        }
+        else
+        {
+          CursorInfo& info = eventData->mIsLeftHandleSelected ? leftHandleInfo : rightHandleInfo;
+
+          const Vector2 currentCursorPosition( info.primaryPosition.x, info.lineOffset );
+          impl. ScrollToMakePositionVisible( currentCursorPosition, info.lineHeight );
+        }
+      }
+    }
+
+    if( eventData->mUpdateLeftSelectionPosition )
+    {
+      impl.UpdateSelectionHandle(LEFT_SELECTION_HANDLE, leftHandleInfo);
+
+      impl.SetPopupButtons();
+      eventData->mDecoratorUpdated = true;
+      eventData->mUpdateLeftSelectionPosition = false;
+    }
+
+    if( eventData->mUpdateRightSelectionPosition )
+    {
+      impl.UpdateSelectionHandle(RIGHT_SELECTION_HANDLE, rightHandleInfo);
+
+      impl.SetPopupButtons();
+      eventData->mDecoratorUpdated = true;
+      eventData->mUpdateRightSelectionPosition = false;
+    }
+
+    if( eventData->mUpdateHighlightBox )
+    {
+      impl.RepositionSelectionHandles();
+
+      eventData->mUpdateLeftSelectionPosition = false;
+      eventData->mUpdateRightSelectionPosition = false;
+      eventData->mUpdateHighlightBox = false;
+      eventData->mIsLeftHandleSelected = false;
+      eventData->mIsRightHandleSelected = false;
+    }
+
+    eventData->mScrollAfterUpdatePosition = false;
+  }
+
+  if( eventData->mUpdateInputStyle )
+  {
+    // Keep a copy of the current input style.
+    InputStyle currentInputStyle;
+    currentInputStyle.Copy( eventData->mInputStyle );
+
+    // Set the default style first.
+    impl.RetrieveDefaultInputStyle( eventData->mInputStyle );
+
+    // Get the character index from the cursor index.
+    const CharacterIndex styleIndex = ( eventData->mPrimaryCursorPosition > 0u ) ? eventData->mPrimaryCursorPosition - 1u : 0u;
+
+    // Retrieve the style from the style runs stored in the logical model.
+    impl.mModel->mLogicalModel->RetrieveStyle( styleIndex, eventData->mInputStyle );
+
+    // Compare if the input style has changed.
+    const bool hasInputStyleChanged = !currentInputStyle.Equal( eventData->mInputStyle );
+
+    if( hasInputStyleChanged )
+    {
+      const InputStyle::Mask styleChangedMask = currentInputStyle.GetInputStyleChangeMask( eventData->mInputStyle );
+      // Queue the input style changed signal.
+      eventData->mInputStyleChangedQueue.PushBack( styleChangedMask );
+    }
+
+    eventData->mUpdateInputStyle = false;
+  }
+
+  eventData->mEventQueue.clear();
+
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::ProcessInputEvents\n" );
+
+  const bool decoratorUpdated = eventData->mDecoratorUpdated;
+  eventData->mDecoratorUpdated = false;
+
+  return decoratorUpdated;
+}
+
 
 void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const Event& event)
 {
