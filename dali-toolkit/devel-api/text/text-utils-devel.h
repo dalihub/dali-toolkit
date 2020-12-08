@@ -55,7 +55,8 @@ struct DALI_TOOLKIT_API RendererParameters
     ellipsisEnabled{true},
     markupEnabled{false},
     isTextColorSet{false},
-    minLineSize{0.f}
+    minLineSize{0.f},
+    padding{0u, 0u, 0u, 0u}
   {
   }
 
@@ -87,6 +88,8 @@ struct DALI_TOOLKIT_API RendererParameters
   bool isTextColorSet : 1;         ///< Whether a default color has been set.
                                    //
   float minLineSize;               ///< The line's minimum size (in points).
+
+  Extents padding;                 ///< The padding of the boundaries where the text is going to be laid-out.
 };
 
 /**
