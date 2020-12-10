@@ -510,6 +510,7 @@ void AnimatedImageVisual::DoSetOffScene( Actor& actor )
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
+  mStartFirstFrame = false;
 }
 
 void AnimatedImageVisual::OnSetTransform()
@@ -608,12 +609,13 @@ void AnimatedImageVisual::StartFirstFrame( TextureSet& textureSet )
   if(mImpl->mRenderer)
   {
     mImpl->mRenderer.SetTextures( textureSet );
-  }
-  Actor actor = mPlacementActor.GetHandle();
-  if( actor )
-  {
-    actor.AddRenderer( mImpl->mRenderer );
-    mPlacementActor.Reset();
+
+    Actor actor = mPlacementActor.GetHandle();
+    if( actor )
+    {
+      actor.AddRenderer( mImpl->mRenderer );
+      mPlacementActor.Reset();
+    }
   }
 
   if( mFrameCount > 1 )
@@ -762,7 +764,10 @@ bool AnimatedImageVisual::DisplayNextFrame()
     if( textureSet )
     {
       SetImageSize( textureSet );
-      mImpl->mRenderer.SetTextures( textureSet );
+      if( mImpl->mRenderer )
+      {
+        mImpl->mRenderer.SetTextures( textureSet );
+      }
     }
   }
 
