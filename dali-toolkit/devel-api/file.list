@@ -37,6 +37,11 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/text-controls/text-selection-toolbar.cpp
   ${devel_api_src_dir}/controls/tool-bar/tool-bar.cpp
   ${devel_api_src_dir}/controls/video-view/video-view-devel.cpp
+  ${devel_api_src_dir}/controls/web-view/web-back-forward-list.cpp
+  ${devel_api_src_dir}/controls/web-view/web-back-forward-list-item.cpp
+  ${devel_api_src_dir}/controls/web-view/web-context.cpp
+  ${devel_api_src_dir}/controls/web-view/web-cookie-manager.cpp
+  ${devel_api_src_dir}/controls/web-view/web-settings.cpp
   ${devel_api_src_dir}/controls/web-view/web-view.cpp
   ${devel_api_src_dir}/focus-manager/keyinput-focus-manager.cpp
   ${devel_api_src_dir}/focus-manager/keyboard-focus-manager-devel.cpp
@@ -241,6 +246,11 @@ SET( devel_api_video_view_header_files
 )
 
 SET( devel_api_web_view_header_files
+  ${devel_api_src_dir}/controls/web-view/web-back-forward-list.h
+  ${devel_api_src_dir}/controls/web-view/web-back-forward-list-item.h
+  ${devel_api_src_dir}/controls/web-view/web-context.h
+  ${devel_api_src_dir}/controls/web-view/web-cookie-manager.h
+  ${devel_api_src_dir}/controls/web-view/web-settings.h
   ${devel_api_src_dir}/controls/web-view/web-view.h
 )
 

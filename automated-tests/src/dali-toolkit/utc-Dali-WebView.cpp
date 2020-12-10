@@ -24,9 +24,15 @@
 #include <dali.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/public-api/images/pixel-data.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list-item.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-context.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
-
 
 using namespace Dali;
 using namespace Toolkit;
@@ -207,8 +213,6 @@ int UtcDaliWebViewPageNavigation(void)
   view.Reload();
   view.StopLoading();
   view.ClearHistory();
-  view.ClearCache();
-  view.ClearCookies();
   Test::EmitGlobalTimerSignal();
   DALI_TEST_CHECK( !view.CanGoBack() );
   DALI_TEST_CHECK( !view.CanGoForward() );
@@ -286,6 +290,58 @@ int UtcDaliWebViewFocusGainedAndLost(void)
   END_TEST;
 }
 
+int UtcDaliWebViewGetWebBackForwardList(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebBackForwardList* bfList = view.GetBackForwardList();
+  DALI_TEST_CHECK( bfList != 0 );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewGetWebContext(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebContext* context = view.GetContext();
+  DALI_TEST_CHECK( context != 0 );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewGetWebCookieManager(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebCookieManager* cookieManager = view.GetCookieManager();
+  DALI_TEST_CHECK( cookieManager != 0 );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewGetWebSettings(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 );
+
+  END_TEST;
+}
+
 int UtcDaliWebViewProperty1(void)
 {
   // URL
@@ -299,70 +355,6 @@ int UtcDaliWebViewProperty1(void)
   Property::Value val = view.GetProperty( WebView::Property::URL );
   DALI_TEST_CHECK( val.Get( local ) );
   DALI_TEST_EQUALS( local, TEST_URL1, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliWebViewProperty2(void)
-{
-  // CACHE_MODEL
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK( view );
-
-  const std::string kDefaultValue = "DOCUMENT_VIEWER";
-  const WebView::CacheModel::Type kTestEnum = WebView::CacheModel::PRIMARY_WEB_BROWSER;
-  const std::string kTestValue = "PRIMARY_WEB_BROWSER";
-
-  // Check default value
-  std::string output;
-  Property::Value value = view.GetProperty( WebView::Property::CACHE_MODEL );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
-
-  // Check Set/GetProperty
-  view.SetProperty( WebView::Property::CACHE_MODEL, kTestEnum );
-  value = view.GetProperty( WebView::Property::CACHE_MODEL );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
-
-  view.SetProperty( WebView::Property::CACHE_MODEL, kTestValue );
-  value = view.GetProperty( WebView::Property::CACHE_MODEL );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliWebViewProperty3(void)
-{
-  // COOKIE_ACCEPT_POLICY
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK( view );
-
-  const std::string kDefaultValue = "NO_THIRD_PARTY";
-  const WebView::CookieAcceptPolicy::Type kTestEnum = WebView::CookieAcceptPolicy::NEVER;
-  const std::string kTestValue = "NEVER";
-
-  // Check default value
-  std::string output;
-  Property::Value value = view.GetProperty( WebView::Property::COOKIE_ACCEPT_POLICY );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
-
-  // Check Set/GetProperty
-  view.SetProperty( WebView::Property::COOKIE_ACCEPT_POLICY, kTestEnum );
-  value = view.GetProperty( WebView::Property::COOKIE_ACCEPT_POLICY );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
-
-  view.SetProperty( WebView::Property::COOKIE_ACCEPT_POLICY, kTestValue );
-  value = view.GetProperty( WebView::Property::COOKIE_ACCEPT_POLICY );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
 
   END_TEST;
 }
@@ -387,110 +379,6 @@ int UtcDaliWebViewProperty4(void)
   // Check Set/GetProperty
   view.SetProperty( WebView::Property::USER_AGENT, kTestValue );
   value = view.GetProperty( WebView::Property::USER_AGENT );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliWebViewProperty5(void)
-{
-  // ENABLE_JAVASCRIPT
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK( view );
-
-  const bool kDefaultValue = true;
-  const bool kTestValue = false;
-
-  // Check default value
-  bool output;
-  Property::Value value = view.GetProperty( WebView::Property::ENABLE_JAVASCRIPT );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
-
-  // Check Set/GetProperty
-  view.SetProperty( WebView::Property::ENABLE_JAVASCRIPT, kTestValue );
-  value = view.GetProperty( WebView::Property::ENABLE_JAVASCRIPT );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliWebViewProperty6(void)
-{
-  // LOAD_IMAGES_AUTOMATICALLY
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK( view );
-
-  const bool kDefaultValue = true;
-  const bool kTestValue = false;
-
-  // Check default value
-  bool output;
-  Property::Value value = view.GetProperty( WebView::Property::LOAD_IMAGES_AUTOMATICALLY );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
-
-  // Check Set/GetProperty
-  view.SetProperty( WebView::Property::LOAD_IMAGES_AUTOMATICALLY, kTestValue );
-  value = view.GetProperty( WebView::Property::LOAD_IMAGES_AUTOMATICALLY );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliWebViewProperty7(void)
-{
-  // DEFAULT_TEXT_ENCODING_NAME
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK( view );
-
-  const std::string kDefaultValue;
-  const std::string kTestValue = "UTF-8";
-
-  // Check default value
-  std::string output;
-  Property::Value value = view.GetProperty( WebView::Property::DEFAULT_TEXT_ENCODING_NAME );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
-
-  // Check Set/GetProperty
-  view.SetProperty( WebView::Property::DEFAULT_TEXT_ENCODING_NAME, kTestValue );
-  value = view.GetProperty( WebView::Property::DEFAULT_TEXT_ENCODING_NAME );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliWebViewProperty8(void)
-{
-  // DEFAULT_FONT_SIZE
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK( view );
-
-  const int kDefaultValue = 16;
-  const int kTestValue = 26;
-
-  // Check default value
-  int output;
-  Property::Value value = view.GetProperty( WebView::Property::DEFAULT_FONT_SIZE );
-  DALI_TEST_CHECK( value.Get( output ) );
-  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
-
-  // Check Set/GetProperty
-  view.SetProperty( WebView::Property::DEFAULT_FONT_SIZE, kTestValue );
-  value = view.GetProperty( WebView::Property::DEFAULT_FONT_SIZE );
   DALI_TEST_CHECK( value.Get( output ) );
   DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
 
@@ -525,6 +413,33 @@ int UtcDaliWebViewProperty9(void)
   output = Dali::Vector2::ONE;
   view.GetProperty( WebView::Property::CONTENT_SIZE ).Get( output );
   DALI_TEST_CHECK( output.x == 500 && output.y == 500 );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewPropertyTitleFavicon(void)
+{
+  // SCROLL_POSITION
+  ToolkitTestApplication application;
+
+  char argv[] = "--test";
+  WebView view = WebView::New( 1, (char**)&argv );
+  DALI_TEST_CHECK( view );
+
+  // reset something
+  view.ClearAllTilesResources();
+
+  // Check default value of title
+  std::string testValue("title");
+  std::string output;
+  view.GetProperty( WebView::Property::TITLE ).Get( output );
+  DALI_TEST_EQUALS( output, testValue, TEST_LOCATION );
+
+  // Check default value of favicon
+  Dali::Toolkit::ImageView* favicon = &view.GetFavicon();
+  DALI_TEST_CHECK( favicon );
+  Dali::Vector3 iconsize = favicon->GetProperty< Vector3 >( Dali::Actor::Property::SIZE );
+  DALI_TEST_CHECK( ( int )iconsize.width == 2 && ( int )iconsize.height == 2 );
 
   END_TEST;
 }
@@ -569,7 +484,7 @@ int UtcDaliWebViewEvaluteJavaScript(void)
 
   WebView view = WebView::New( "ko-KR", "Asia/Seoul" );
 
-  view.LoadHTMLString( "<body>Hello World!</body>" );
+  view.LoadHtmlString( "<body>Hello World!</body>" );
   view.EvaluateJavaScript( "jsObject.postMessage('Hello')" );
   view.EvaluateJavaScript( "jsObject.postMessage('World')", OnEvaluateJavaScript );
   Test::EmitGlobalTimerSignal();
@@ -579,14 +494,13 @@ int UtcDaliWebViewEvaluteJavaScript(void)
   END_TEST;
 }
 
-
 int UtcDaliWebViewMethodsForCoverage(void)
 {
   ToolkitTestApplication application;
 
   WebView view = WebView::New( "ko-KR", "Asia/Seoul" );
 
-  view.LoadHTMLString( "<body>Hello World!</body>" );
+  view.LoadHtmlString( "<body>Hello World!</body>" );
   view.AddJavaScriptMessageHandler( "jsObject",
     []( const std::string& arg ) {
     }
@@ -596,3 +510,227 @@ int UtcDaliWebViewMethodsForCoverage(void)
 
   END_TEST;
 }
+
+// test cases for web backforward list.
+
+int UtcDaliWebBackForwardListCheckItem(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebBackForwardList* bfList = view.GetBackForwardList();
+  DALI_TEST_CHECK( bfList != 0 )
+
+  unsigned int itemCount = bfList->GetItemCount();
+  DALI_TEST_CHECK( itemCount == 1 )
+
+  Dali::Toolkit::WebBackForwardListItem* citem = bfList->GetCurrentItem();
+  DALI_TEST_CHECK( citem != 0 );
+
+  const std::string kDefaultUrl( "http://url" );
+  std::string testValue = citem->GetUrl();
+  DALI_TEST_EQUALS( testValue, kDefaultUrl, TEST_LOCATION );
+
+  const std::string kDefaultTitle( "title" );
+  testValue = citem->GetTitle();
+  DALI_TEST_EQUALS( testValue, kDefaultTitle, TEST_LOCATION );
+
+  const std::string kDefaultOriginalUrl( "http://originalurl" );
+  testValue = citem->GetOriginalUrl();
+  DALI_TEST_EQUALS( testValue, kDefaultOriginalUrl, TEST_LOCATION );
+
+  Dali::Toolkit::WebBackForwardListItem* item = bfList->GetItemAtIndex( 0 );
+  DALI_TEST_CHECK( item != 0 );
+
+  END_TEST;
+}
+
+// test cases for web context.
+
+int UtcDaliWebContextGetSetCacheModel(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebContext* context = view.GetContext();
+  DALI_TEST_CHECK( context != 0 )
+
+  std::string kDefaultValue;
+
+  // Reset something
+  context->SetProxyUri( kDefaultValue );
+  context->SetCertificateFilePath( kDefaultValue );
+  context->DisableCache( false );
+  context->SetDefaultProxyAuth( kDefaultValue, kDefaultValue );
+  context->DeleteWebDatabase();
+  context->DeleteWebStorage();
+  context->DeleteLocalFileSystem();
+  context->ClearCache();
+
+  // Check default value
+  Dali::WebEngineContext::CacheModel value = context->GetCacheModel();
+  DALI_TEST_CHECK( value == Dali::WebEngineContext::CacheModel::DOCUMENT_VIEWER );
+
+  // Check Set/GetProperty
+  context->SetCacheModel( Dali::WebEngineContext::CacheModel::DOCUMENT_BROWSER );
+  value = context->GetCacheModel();
+  DALI_TEST_CHECK( value == Dali::WebEngineContext::CacheModel::DOCUMENT_BROWSER );
+
+  END_TEST;
+}
+
+// test cases for web cookie manager.
+
+int UtcDaliWebCookieManagerGetSetCookieAcceptPolicy(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebCookieManager* cookieManager = view.GetCookieManager();
+  DALI_TEST_CHECK( cookieManager != 0 )
+
+  const std::string kDefaultValue;
+
+  // Reset something
+  cookieManager->SetPersistentStorage( kDefaultValue, Dali::WebEngineCookieManager::CookiePersistentStorage::SQLITE );
+  cookieManager->ClearCookies();
+
+  // Check default value
+  Dali::WebEngineCookieManager::CookieAcceptPolicy value = cookieManager->GetCookieAcceptPolicy();
+  DALI_TEST_CHECK( value == Dali::WebEngineCookieManager::CookieAcceptPolicy::NO_THIRD_PARTY );
+
+  // Check Set/GetProperty
+  cookieManager->SetCookieAcceptPolicy( Dali::WebEngineCookieManager::CookieAcceptPolicy::ALWAYS );
+  value = cookieManager->GetCookieAcceptPolicy();
+  DALI_TEST_CHECK( value == Dali::WebEngineCookieManager::CookieAcceptPolicy::ALWAYS );
+
+  END_TEST;
+}
+
+// test cases for web settings.
+
+int UtcDaliWebSettingsGetSetDefaultFontSize(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value
+  int value = settings->GetDefaultFontSize();
+  DALI_TEST_CHECK( value == 16 );
+
+  // Check Set/GetProperty
+  settings->SetDefaultFontSize( 20 );
+  value = settings->GetDefaultFontSize();
+  DALI_TEST_CHECK( value == 20 );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnableJavaScript(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsJavaScriptEnabled();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->EnableJavaScript( false );
+  value = settings->IsJavaScriptEnabled();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckAllowImagesLoadAutomatically(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->AreImagesLoadedAutomatically();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->AllowImagesLoadAutomatically( false );
+  value = settings->AreImagesLoadedAutomatically();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsGetSetDefaultTextEncodingName(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  const std::string kDefaultValue;
+  const std::string kTestValue = "UTF-8";
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value
+  std::string value = settings->GetDefaultTextEncodingName();
+  DALI_TEST_EQUALS( value, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  settings->SetDefaultTextEncodingName( kTestValue );
+  value = settings->GetDefaultTextEncodingName();
+  DALI_TEST_EQUALS( value, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
