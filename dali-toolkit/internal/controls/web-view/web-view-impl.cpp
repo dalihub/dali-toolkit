@@ -20,6 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <cstring>
+#include <dali/devel-api/adaptor-framework/web-engine-back-forward-list.h>
+#include <dali/devel-api/adaptor-framework/web-engine-context.h>
+#include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
+#include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/devel-api/common/stage.h>
@@ -29,6 +33,10 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-context.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
@@ -50,28 +58,10 @@ BaseHandle Create()
   return Toolkit::WebView::New();
 }
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( CacheModel )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::WebView::CacheModel, DOCUMENT_VIEWER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::WebView::CacheModel, DOCUMENT_BROWSER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::WebView::CacheModel, PRIMARY_WEB_BROWSER )
-DALI_ENUM_TO_STRING_TABLE_END( CacheModel )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( CookieAcceptPolicy )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::WebView::CookieAcceptPolicy, ALWAYS )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::WebView::CookieAcceptPolicy, NEVER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::WebView::CookieAcceptPolicy, NO_THIRD_PARTY )
-DALI_ENUM_TO_STRING_TABLE_END( CookieAcceptPolicy )
-
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::WebView, Toolkit::Control, Create )
 
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "url",                     STRING,  URL                        )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "cacheModel",              STRING,  CACHE_MODEL                )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "cookieAcceptPolicy",      STRING,  COOKIE_ACCEPT_POLICY       )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "userAgent",               STRING,  USER_AGENT                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "enableJavaScript",        BOOLEAN, ENABLE_JAVASCRIPT          )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "loadImagesAutomatically", BOOLEAN, LOAD_IMAGES_AUTOMATICALLY  )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "defaultTextEncodingName", STRING,  DEFAULT_TEXT_ENCODING_NAME )
-DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "defaultFontSize",         INTEGER, DEFAULT_FONT_SIZE          )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollPosition",          VECTOR2, SCROLL_POSITION            )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollSize",              VECTOR2, SCROLL_SIZE                )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "contentSize",             VECTOR2, CONTENT_SIZE               )
@@ -150,7 +140,32 @@ void WebView::OnInitialize()
     mWebEngine.PageLoadFinishedSignal().Connect( this, &WebView::OnPageLoadFinished );
     mWebEngine.PageLoadErrorSignal().Connect( this, &WebView::OnPageLoadError );
     mWebEngine.ScrollEdgeReachedSignal().Connect( this, &WebView::OnScrollEdgeReached );
+
+    mWebContext = std::unique_ptr<Dali::Toolkit::WebContext>( new WebContext( mWebEngine.GetContext() ) );
+    mWebCookieManager = std::unique_ptr<Dali::Toolkit::WebCookieManager>( new WebCookieManager( mWebEngine.GetCookieManager() ) );
+    mWebSettings = std::unique_ptr<Dali::Toolkit::WebSettings>( new WebSettings( mWebEngine.GetSettings() ) );
+    mWebBackForwardList = std::unique_ptr<Dali::Toolkit::WebBackForwardList>( new WebBackForwardList( mWebEngine.GetBackForwardList() ) );
   }
+}
+
+Dali::Toolkit::WebSettings* WebView::GetSettings() const
+{
+  return mWebSettings.get();
+}
+
+Dali::Toolkit::WebContext* WebView::GetContext() const
+{
+  return mWebContext.get();
+}
+
+Dali::Toolkit::WebCookieManager* WebView::GetCookieManager() const
+{
+  return mWebCookieManager.get();
+}
+
+Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
+{
+  return mWebBackForwardList.get();
 }
 
 void WebView::LoadUrl( const std::string& url )
@@ -173,7 +188,7 @@ void WebView::LoadUrl( const std::string& url )
   }
 }
 
-void WebView::LoadHTMLString( const std::string& htmlString )
+void WebView::LoadHtmlString( const std::string& htmlString )
 {
   if( mWebEngine )
   {
@@ -186,7 +201,7 @@ void WebView::LoadHTMLString( const std::string& htmlString )
     if( mVisual )
     {
       DevelControl::RegisterVisual( *this, Toolkit::WebView::Property::URL, mVisual );
-      mWebEngine.LoadHTMLString( htmlString );
+      mWebEngine.LoadHtmlString( htmlString );
     }
   }
 }
@@ -278,22 +293,6 @@ void WebView::ClearHistory()
   if( mWebEngine )
   {
     mWebEngine.ClearHistory();
-  }
-}
-
-void WebView::ClearCache()
-{
-  if( mWebEngine )
-  {
-    mWebEngine.ClearCache();
-  }
-}
-
-void WebView::ClearCookies()
-{
-  if( mWebEngine )
-  {
-    mWebEngine.ClearCookies();
   }
 }
 
@@ -429,62 +428,12 @@ void WebView::SetProperty( BaseObject* object, Property::Index index, const Prop
         }
         break;
       }
-      case Toolkit::WebView::Property::CACHE_MODEL:
-      {
-        Toolkit::WebView::CacheModel::Type output = impl.GetCacheModel();
-        GET_ENUM_VALUE( CacheModel, value, output );
-        impl.SetCacheModel( output );
-        break;
-      }
-      case Toolkit::WebView::Property::COOKIE_ACCEPT_POLICY:
-      {
-        Toolkit::WebView::CookieAcceptPolicy::Type output = impl.GetCookieAcceptPolicy();
-        GET_ENUM_VALUE( CookieAcceptPolicy, value, output );
-        impl.SetCookieAcceptPolicy( output );
-        break;
-      }
       case Toolkit::WebView::Property::USER_AGENT:
       {
         std::string input;
         if( value.Get( input ) )
         {
           impl.SetUserAgent( input );
-        }
-        break;
-      }
-      case Toolkit::WebView::Property::ENABLE_JAVASCRIPT:
-      {
-        bool input;
-        if( value.Get( input ) )
-        {
-          impl.EnableJavaScript( input );
-        }
-        break;
-      }
-      case Toolkit::WebView::Property::LOAD_IMAGES_AUTOMATICALLY:
-      {
-        bool input;
-        if( value.Get( input ) )
-        {
-          impl.LoadImagesAutomatically( input );
-        }
-        break;
-      }
-      case Toolkit::WebView::Property::DEFAULT_TEXT_ENCODING_NAME:
-      {
-        std::string input;
-        if( value.Get( input ) )
-        {
-          impl.SetDefaultTextEncodingName( input );
-        }
-        break;
-      }
-      case Toolkit::WebView::Property::DEFAULT_FONT_SIZE:
-      {
-        int input;
-        if( value.Get( input ) )
-        {
-          impl.SetDefaultFontSize( input );
         }
         break;
       }
@@ -517,39 +466,9 @@ Property::Value WebView::GetProperty( BaseObject* object, Property::Index proper
         value = impl.mUrl;
         break;
       }
-      case Toolkit::WebView::Property::CACHE_MODEL:
-      {
-        value = GET_ENUM_STRING( CacheModel, impl.GetCacheModel() );
-        break;
-      }
-      case Toolkit::WebView::Property::COOKIE_ACCEPT_POLICY:
-      {
-        value = GET_ENUM_STRING( CookieAcceptPolicy, impl.GetCookieAcceptPolicy() );
-        break;
-      }
       case Toolkit::WebView::Property::USER_AGENT:
       {
         value = impl.GetUserAgent();
-        break;
-      }
-      case Toolkit::WebView::Property::ENABLE_JAVASCRIPT:
-      {
-        value = impl.IsJavaScriptEnabled();
-        break;
-      }
-      case Toolkit::WebView::Property::LOAD_IMAGES_AUTOMATICALLY:
-      {
-        value = impl.AreImagesAutomaticallyLoaded();
-        break;
-      }
-      case Toolkit::WebView::Property::DEFAULT_TEXT_ENCODING_NAME:
-      {
-        value = impl.GetDefaultTextEncodingName();
-        break;
-      }
-      case Toolkit::WebView::Property::DEFAULT_FONT_SIZE:
-      {
-        value = impl.GetDefaultFontSize();
         break;
       }
       case Toolkit::WebView::Property::SCROLL_POSITION:
@@ -655,32 +574,6 @@ void WebView::GetContentSize( int& width, int& height ) const
   }
 }
 
-Toolkit::WebView::CacheModel::Type WebView::GetCacheModel() const
-{
-  return mWebEngine ? static_cast< Toolkit::WebView::CacheModel::Type >( mWebEngine.GetCacheModel() ) : Toolkit::WebView::CacheModel::DOCUMENT_VIEWER;
-}
-
-void WebView::SetCacheModel( Toolkit::WebView::CacheModel::Type cacheModel )
-{
-  if( mWebEngine )
-  {
-    mWebEngine.SetCacheModel( static_cast< WebEnginePlugin::CacheModel >( cacheModel ) );
-  }
-}
-
-Toolkit::WebView::CookieAcceptPolicy::Type WebView::GetCookieAcceptPolicy() const
-{
-  return mWebEngine ? static_cast< Toolkit::WebView::CookieAcceptPolicy::Type >( mWebEngine.GetCookieAcceptPolicy() ) : Toolkit::WebView::CookieAcceptPolicy::NO_THIRD_PARTY;
-}
-
-void WebView::SetCookieAcceptPolicy( Toolkit::WebView::CookieAcceptPolicy::Type policy )
-{
-  if( mWebEngine )
-  {
-    mWebEngine.SetCookieAcceptPolicy( static_cast< WebEnginePlugin::CookieAcceptPolicy >( policy ) );
-  }
-}
-
 const std::string& WebView::GetUserAgent() const
 {
   return mWebEngine ? mWebEngine.GetUserAgent() : kEmptyString;
@@ -691,58 +584,6 @@ void WebView::SetUserAgent( const std::string& userAgent )
   if( mWebEngine )
   {
     mWebEngine.SetUserAgent( userAgent );
-  }
-}
-
-bool WebView::IsJavaScriptEnabled() const
-{
-  return mWebEngine ? mWebEngine.IsJavaScriptEnabled() : true;
-}
-
-void WebView::EnableJavaScript( bool enabled )
-{
-  if( mWebEngine )
-  {
-    mWebEngine.EnableJavaScript( enabled );
-  }
-}
-
-bool WebView::AreImagesAutomaticallyLoaded() const
-{
-  return mWebEngine ? mWebEngine.AreImagesAutomaticallyLoaded() : true;
-}
-
-void WebView::LoadImagesAutomatically( bool automatic )
-{
-  if( mWebEngine )
-  {
-    mWebEngine.LoadImagesAutomatically( automatic );
-  }
-}
-
-const std::string& WebView::GetDefaultTextEncodingName() const
-{
-  return mWebEngine ? mWebEngine.GetDefaultTextEncodingName() : kEmptyString;
-}
-
-void WebView::SetDefaultTextEncodingName( const std::string& defaultTextEncodingName )
-{
-  if( mWebEngine )
-  {
-    mWebEngine.SetDefaultTextEncodingName( defaultTextEncodingName );
-  }
-}
-
-int WebView::GetDefaultFontSize() const
-{
-  return mWebEngine ? mWebEngine.GetDefaultFontSize() : 0;
-}
-
-void WebView::SetDefaultFontSize( int defaultFontSize )
-{
-  if( mWebEngine )
-  {
-    mWebEngine.SetDefaultFontSize( defaultFontSize );
   }
 }
 

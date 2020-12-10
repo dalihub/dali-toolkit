@@ -19,13 +19,14 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory>
 #include <dali/devel-api/adaptor-framework/web-engine.h>
 #include <dali/public-api/images/image-operations.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/web-view/web-view.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/devel-api/controls/web-view/web-view.h>
 
 namespace Dali
 {
@@ -35,6 +36,10 @@ namespace Toolkit
 
 class KeyEvent;
 class TouchEvent;
+class WebBackForwardList;
+class WebContext;
+class WebCookieManager;
+class WebSettings;
 class WebView;
 
 namespace Internal
@@ -63,6 +68,26 @@ public:
   static Toolkit::WebView New( const std::string& locale, const std::string& timezoneId );
 
   /**
+   * @brief Get settings of WebEngine.
+   */
+  Dali::Toolkit::WebSettings* GetSettings() const;
+
+  /**
+   * @brief Get context of WebEngine.
+   */
+  Dali::Toolkit::WebContext* GetContext() const;
+
+  /**
+   * @brief Get cookie manager of WebEngine.
+   */
+  Dali::Toolkit::WebCookieManager* GetCookieManager() const;
+
+  /**
+   * @brief Get WebBackForwardList of WebEngine.
+   */
+  Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
+
+  /**
    * @copydoc Dali::Toolkit::WebView::LoadUrl()
    */
   void LoadUrl( const std::string& url );
@@ -70,7 +95,7 @@ public:
   /**
    * @copydoc Dali::WebEngine::LoadHTMLString()
    */
-  void LoadHTMLString( const std::string& htmlString );
+  void LoadHtmlString( const std::string& htmlString );
 
   /**
    * @copydoc Dali::Toolkit::WebView::Reload()
@@ -131,16 +156,6 @@ public:
    * @copydoc Dali::Toolkit::WebView::ClearHistory()
    */
   void ClearHistory();
-
-  /**
-   * @copydoc Dali::Toolkit::WebView::ClearCache()
-   */
-  void ClearCache();
-
-  /**
-   * @copydoc Dali::Toolkit::WebView::ClearCookies()
-   */
-  void ClearCookies();
 
   /**
    * @copydoc Dali::Toolkit::WebView::PageLoadStartedSignal()
@@ -269,32 +284,6 @@ private:
   void GetContentSize( int& width, int& height ) const;
 
   /**
-   * @brief Get cache model option. The default isToolkit::WebView::CacheModel::DOCUMENT_VIEWER.
-   * @see Toolkit::WebView::CacheModel::Type
-   */
-  Toolkit::WebView::CacheModel::Type GetCacheModel() const;
-
-  /**
-   * @brief Set cache model option. The default isToolkit::WebView::CacheModel::DOCUMENT_VIEWER.
-   * @param[in] cacheModel The cache model option
-   * @see Toolkit::WebView::CacheModel::Type
-   */
-  void SetCacheModel( Toolkit::WebView::CacheModel::Type cacheModel );
-
-  /**
-   * @brief Gets the cookie acceptance policy. The default is Toolkit::WebView::CookieAcceptPolicy::NO_THIRD_PARTY.
-   * @see Toolkit::WebView::CookieAcceptPolicy::Type
-   */
-  Toolkit::WebView::CookieAcceptPolicy::Type GetCookieAcceptPolicy() const;
-
-  /**
-   * @brief Sets the cookie acceptance policy. The default is Toolkit::WebView::CookieAcceptPolicy::NO_THIRD_PARTY.
-   * @param[in] policy The cookie acceptance policy
-   * @see Toolkit::WebView::CookieAcceptPolicy::Type
-   */
-  void SetCookieAcceptPolicy( Toolkit::WebView::CookieAcceptPolicy::Type policy );
-
-  /**
    * @brief Get user agent string.
    * @return The string value of user agent
    */
@@ -305,62 +294,6 @@ private:
    * @param[in] userAgent The string value of user agent
    */
   void SetUserAgent( const std::string& userAgent );
-
-  /**
-   * @brief Returns whether JavaScript can be executable. The default is true.
-   *
-   * @return true if JavaScript executing is enabled, false otherwise
-   */
-  bool IsJavaScriptEnabled() const;
-
-  /**
-   * @brief Enables/disables JavaScript executing. The default is enabled.
-   *
-   * @param[in] enabled True if JavaScript executing is enabled, false otherwise
-   */
-  void EnableJavaScript( bool enabled );
-
-  /**
-   * @brief Returns whether images can be loaded automatically. The default is true.
-   *
-   * @return true if images are loaded automatically, false otherwise
-   */
-  bool AreImagesAutomaticallyLoaded() const;
-
-  /**
-   * @brief Enables/disables auto loading of images. The default is enabled.
-   *
-   * @param[in] automatic True if images are loaded automatically, false otherwise
-   */
-  void LoadImagesAutomatically( bool automatic );
-
-  /**
-   * @brief Gets the default text encoding name (e.g. UTF-8).
-   *
-   * @return The default text encoding name
-   */
-  const std::string& GetDefaultTextEncodingName() const;
-
-  /**
-   * @brief Sets the default text encoding name (e.g. UTF-8).
-   *
-   * @param[in] defaultTextEncodingName The default text encoding name
-   */
-  void SetDefaultTextEncodingName( const std::string& defaultTextEncodingName );
-
-  /**
-   * @brief Returns the default font size in pixel. The default value is 16.
-   *
-   * @return The default font size
-   */
-  int GetDefaultFontSize() const;
-
-  /**
-   * @brief Sets the default font size in pixel. The default value is 16.
-   *
-   * @param[in] defaultFontSize A new default font size to set
-   */
-  void SetDefaultFontSize( int defaultFontSize );
 
   /**
    * @brief Callback function to be called when page load started.
@@ -398,6 +331,11 @@ private:
   Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadFinishedSignal;
   Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType mPageLoadErrorSignal;
   Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
+
+  std::unique_ptr<Dali::Toolkit::WebContext>             mWebContext;
+  std::unique_ptr<Dali::Toolkit::WebCookieManager>       mWebCookieManager;
+  std::unique_ptr<Dali::Toolkit::WebSettings>            mWebSettings;
+  std::unique_ptr<Dali::Toolkit::WebBackForwardList>     mWebBackForwardList;
 };
 
 } // namespace Internal
