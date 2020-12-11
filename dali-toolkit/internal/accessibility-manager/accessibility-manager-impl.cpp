@@ -560,6 +560,7 @@ Vector2 AccessibilityManager::GetReadPosition() const
 
 void AccessibilityManager::EnableAccessibility(bool enabled)
 {
+  DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Set Enabled Forcibly : %d \n", __FUNCTION__, __LINE__, enabled );
   AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
   adaptor.EnableAccessibility(enabled);
 }
@@ -726,6 +727,8 @@ bool AccessibilityManager::ChangeAccessibilityStatus()
   AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
   mIsAccessibilityTtsEnabled = adaptor.IsEnabled();
   Dali::Toolkit::AccessibilityManager handle( this );
+
+  DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] TtsEnabled : %d \n", __FUNCTION__, __LINE__, mIsAccessibilityTtsEnabled );
 
   if(mIsAccessibilityTtsEnabled)
   {
