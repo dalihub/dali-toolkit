@@ -95,7 +95,8 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
   mPlayState( DevelImageVisual::PlayState::STOPPED ),
   mEventCallback( nullptr ),
   mRendererAdded( false ),
-  mCoreShutdown(false)
+  mCoreShutdown(false),
+  mRedrawInScalingDown(true)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -172,6 +173,7 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   map.Insert( Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mAnimationData.stopBehavior );
   map.Insert( Toolkit::DevelImageVisual::Property::LOOPING_MODE, mAnimationData.loopingMode );
+  map.Insert( Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, mRedrawInScalingDown );
 
   Property::Map layerInfo;
   mVectorAnimationTask->GetLayerInfo( layerInfo );
@@ -210,6 +212,10 @@ void AnimatedVectorImageVisual::DoSetProperties( const Property::Map& propertyMa
        else if( keyValue.first == LOOPING_MODE_NAME )
        {
           DoSetProperty( Toolkit::DevelImageVisual::Property::LOOPING_MODE, keyValue.second );
+       }
+       else if( keyValue.first == REDRAW_IN_SCALING_DOWN_NAME )
+       {
+          DoSetProperty( Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, keyValue.second );
        }
     }
   }
@@ -258,6 +264,15 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
       {
         mAnimationData.loopingMode = DevelImageVisual::LoopingMode::Type( loopingMode );
         mAnimationData.resendFlag |= VectorAnimationTask::RESEND_LOOPING_MODE;
+      }
+      break;
+    }
+    case Toolkit::DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN:
+    {
+      bool redraw;
+      if( value.Get( redraw ) )
+      {
+        mRedrawInScalingDown = redraw;
       }
       break;
     }
@@ -531,15 +546,19 @@ void AnimatedVectorImageVisual::OnScaleNotification( PropertyNotification& sourc
   if( actor )
   {
     Vector3 scale = actor.GetProperty< Vector3 >( Actor::Property::WORLD_SCALE );
-    mVisualScale.width = scale.width;
-    mVisualScale.height = scale.height;
 
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnScaleNotification: scale = %f, %f [%p]\n", mVisualScale.width, mVisualScale.height, this );
+    if(mRedrawInScalingDown || scale.width >= 1.0f || scale.height >= 1.0f)
+    {
+      mVisualScale.width = scale.width;
+      mVisualScale.height = scale.height;
 
-    SetVectorImageSize();
-    SendAnimationData();
+      DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnScaleNotification: scale = %f, %f [%p]\n", mVisualScale.width, mVisualScale.height, this );
 
-    Stage::GetCurrent().KeepRendering( 0.0f );  // Trigger event processing
+      SetVectorImageSize();
+      SendAnimationData();
+
+      Stage::GetCurrent().KeepRendering( 0.0f );  // Trigger event processing
+    }
   }
 }
 

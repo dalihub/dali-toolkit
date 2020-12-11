@@ -36,6 +36,14 @@ namespace Text
 struct ControllerImplEventHandler
 {
   /**
+   * @brief Processes input events
+   *
+   * @param[in] impl A reference to Controller::Impl
+   * @return True if the decorator has been updated
+   */
+  static bool ProcessInputEvents(Controller::Impl& impl);
+
+  /**
    * @brief Called by Controller::Impl when a cursor key event is received.
    *
    * @param controllerImpl A reference to Controller::Impl

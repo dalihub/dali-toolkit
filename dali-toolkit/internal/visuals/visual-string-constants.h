@@ -104,6 +104,7 @@ extern const char * const IMAGE_SAMPLING_MODE;
 extern const char * const IMAGE_DESIRED_WIDTH;
 extern const char * const IMAGE_DESIRED_HEIGHT;
 extern const char * const ALPHA_MASK_URL;
+extern const char * const REDRAW_IN_SCALING_DOWN_NAME;
 
 // Text visual
 extern const char * const TEXT_PROPERTY;
