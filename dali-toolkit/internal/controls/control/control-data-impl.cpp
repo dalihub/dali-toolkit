@@ -47,6 +47,7 @@
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 
 namespace
 {
@@ -2108,14 +2109,13 @@ bool Control::Impl::AccessibleImpl::GrabFocus()
   return Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( self );
 }
 
-const char* const FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "keyboard_focus.9.png";
-
 static Dali::Actor CreateHighlightIndicatorActor()
 {
+  std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
+  focusBorderImagePath += "/keyboard_focus.9.png";
   // Create the default if it hasn't been set and one that's shared by all the
-  // keyboard focusable actors const char* const FOCUS_BORDER_IMAGE_PATH =
-  // DALI_IMAGE_DIR "keyboard_focus.9.png";
-  auto actor = Toolkit::ImageView::New( FOCUS_BORDER_IMAGE_PATH );
+  // keyboard focusable actors
+  auto actor = Toolkit::ImageView::New( focusBorderImagePath );
   actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   DevelControl::AppendAccessibilityAttribute( actor, "highlight", "" );
   actor.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED, true);
