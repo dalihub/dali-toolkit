@@ -49,7 +49,7 @@ enum
 
   /**
    * @brief The blur radius of the visual.
-   * @details Name "blurRadius", type Property::FLOAT.
+   * @details Name "blurRadius", type Property::FLOAT, animatable.
    *          If the value is 0, the edge is sharp. Otherwise, the larger the value, the more the edge is blurred.
    * @note Optional.
    * @note The default is 0.

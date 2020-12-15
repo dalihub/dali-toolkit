@@ -115,6 +115,13 @@ VisualEventSignalType& VisualEventSignal(Control control)
   return controlDataImpl.VisualEventSignal();
 }
 
+Dali::Property GetVisualProperty(Control control, Dali::Property::Index index, Dali::Property::Key visualPropertyKey)
+{
+  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(internalControl);
+  return controlDataImpl.GetVisualProperty(index, visualPropertyKey);
+}
+
 static Toolkit::Internal::Control::Impl *GetControlImplementationIfAny( Dali::Actor actor)
 {
   Dali::Toolkit::Control c = Toolkit::Control::DownCast( actor );

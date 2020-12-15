@@ -3934,3 +3934,261 @@ int UtcDaliVisualGetType(void)
 
   END_TEST;
 }
+
+int UtcDaliVisualGetVisualProperty01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetVisualProperty01: Test animatable property, Visual::Base, ColorVisual" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
+  propertyMap.Insert(Visual::Property::MIX_COLOR, Color::BLUE);
+  propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, 10.0f);
+  propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::RELATIVE);
+  propertyMap.Insert(DevelColorVisual::Property::BLUR_RADIUS, 20.0f);
+  Visual::Base colorVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, colorVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 targetColor(1.0f, 1.0f, 1.0f);
+  float targetOpacity = 0.5f;
+  float targetCornerRadius = 20.0f;
+  float targetBlurRadius = 10.0f;
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::MIX_COLOR), targetColor);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelColorVisual::Property::BLUR_RADIUS), targetBlurRadius);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render();
+  application.Render(1001u); // End of animation
+
+  Property::Map resultMap;
+  colorVisual.CreatePropertyMap( resultMap );
+
+  // Test property values: they should be updated
+  Property::Value* colorValue = resultMap.Find(ColorVisual::Property::MIX_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(colorValue);
+  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(targetColor.r, targetColor.g, targetColor.b, targetOpacity), TEST_LOCATION);
+
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::FLOAT);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< float >(), targetCornerRadius, TEST_LOCATION);
+
+  Property::Value* blurRadiusValue = resultMap.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
+  DALI_TEST_CHECK(blurRadiusValue);
+  DALI_TEST_EQUALS(blurRadiusValue->Get< float >(), targetBlurRadius, TEST_LOCATION);
+
+  // Test uniform values
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("blurRadius", targetBlurRadius), true, TEST_LOCATION);
+
+  // Test not-supported property
+  Property property1 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::PREMULTIPLIED_ALPHA);
+  DALI_TEST_CHECK(!property1.object);
+  DALI_TEST_CHECK(property1.propertyIndex == Property::INVALID_INDEX);
+
+  // Test not-supported property
+  Property property2 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelColorVisual::Property::RENDER_IF_TRANSPARENT);
+  DALI_TEST_CHECK(!property2.object);
+  DALI_TEST_CHECK(property2.propertyIndex == Property::INVALID_INDEX);
+
+  // Test unregistered visual
+  Property property3 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL2, Visual::Property::MIX_COLOR);
+  DALI_TEST_CHECK(!property3.object);
+  DALI_TEST_CHECK(property3.propertyIndex == Property::INVALID_INDEX);
+
+  // Test after the control is unparented
+  dummyControl.Unparent();
+
+  Property property4 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::MIX_COLOR);
+  DALI_TEST_CHECK(!property4.object);
+  DALI_TEST_CHECK(property4.propertyIndex == Property::INVALID_INDEX);
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetVisualProperty02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetVisualProperty02: Test animatable property" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
+  Visual::Base colorVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, colorVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 targetColor(1.0f, 1.0f, 1.0f);
+  float targetOpacity = 0.5f;
+  float targetCornerRadius = 20.0f;
+  float targetBlurRadius = 10.0f;
+
+  // Should work when the properties are not set before
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "mixColor"), targetColor);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "opacity"), targetOpacity);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "cornerRadius"), targetCornerRadius);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "blurRadius"), targetBlurRadius);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render();
+  application.Render(1001u); // End of animation
+
+  Property::Map resultMap;
+  colorVisual.CreatePropertyMap(resultMap);
+
+  // Test property values: they should be updated
+  Property::Value* colorValue = resultMap.Find(ColorVisual::Property::MIX_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(colorValue);
+  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(targetColor.r, targetColor.g, targetColor.b, targetOpacity), TEST_LOCATION);
+
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::FLOAT);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< float >(), targetCornerRadius, TEST_LOCATION);
+
+  Property::Value* blurRadiusValue = resultMap.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
+  DALI_TEST_CHECK(blurRadiusValue);
+  DALI_TEST_EQUALS(blurRadiusValue->Get< float >(), targetBlurRadius, TEST_LOCATION);
+
+  // Test uniform values
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("blurRadius", targetBlurRadius), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetVisualProperty03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetVisualProperty01: Test animatable property, ImageVisual" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  Visual::Base imageVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, imageVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  // Wait for image loading
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  float targetOpacity = 0.5f;
+  float targetCornerRadius = 20.0f;
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render();
+  application.Render(1001u); // End of animation
+
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap( resultMap );
+
+  // Test property values: they should be updated
+  Property::Value* colorValue = resultMap.Find(Visual::Property::MIX_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(colorValue);
+  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(1.0f, 1.0f, 1.0f, targetOpacity), TEST_LOCATION);
+
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::FLOAT);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< float >(), targetCornerRadius, TEST_LOCATION);
+
+  // Test uniform value
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetVisualProperty04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetVisualProperty01: Test animatable property, GradientVisual" );
+
+  Vector2 start(-1.f, -1.f);
+  Vector2 end(1.f, 1.f);
+  Property::Array stopColors;
+  stopColors.PushBack( Color::RED );
+  stopColors.PushBack( Color::GREEN );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::GRADIENT);
+  propertyMap.Insert(GradientVisual::Property::START_POSITION, start);
+  propertyMap.Insert(GradientVisual::Property::END_POSITION, end);
+  propertyMap.Insert(GradientVisual::Property::STOP_OFFSET, Vector2(0.f, 1.f));
+  propertyMap.Insert(GradientVisual::Property::SPREAD_METHOD, GradientVisual::SpreadMethod::REPEAT);
+  propertyMap.Insert(GradientVisual::Property::STOP_COLOR, stopColors);
+  Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, gradientVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  float targetOpacity = 0.5f;
+  float targetCornerRadius = 20.0f;
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render();
+  application.Render(1001u); // End of animation
+
+  Property::Map resultMap;
+  gradientVisual.CreatePropertyMap( resultMap );
+
+  // Test property values: they should be updated
+  Property::Value* colorValue = resultMap.Find(Visual::Property::MIX_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(colorValue);
+  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(1.0f, 1.0f, 1.0f, targetOpacity), TEST_LOCATION);
+
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::FLOAT);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< float >(), targetCornerRadius, TEST_LOCATION);
+
+  // Test uniform value
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+
+  END_TEST;
+}

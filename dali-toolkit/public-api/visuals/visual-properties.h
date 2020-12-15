@@ -107,15 +107,16 @@ enum
 
   /**
    * @brief Mix color is a blend color for any visual.
-   * @details Name "mixColor", type Property::VECTOR3 or Property::VECTOR4.
+   * @details Name "mixColor", type Property::VECTOR3 or Property::VECTOR4, animatable
    * @SINCE_1_2.60
    * @note Optional
+   * @note To animate an opacity, OPACITY property should be used.
    */
   MIX_COLOR,
 
   /**
    * @brief Opacity is the alpha component of the mixColor, above.
-   * @details Name "opacity", type Property::FLOAT.
+   * @details Name "opacity", type Property::FLOAT, animatable
    * @SINCE_1_2.60
    * @note Optional
    */

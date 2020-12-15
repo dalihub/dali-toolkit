@@ -187,10 +187,12 @@ ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache, const Propert
   return colorVisualPtr;
 }
 
-ColorVisual::ColorVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::COLOR ),
-  mBlurRadius( 0.0f ),
-  mRenderIfTransparent( false )
+ColorVisual::ColorVisual(VisualFactoryCache& factoryCache)
+: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::COLOR),
+  mBlurRadius(0.0f),
+  mBlurRadiusIndex(Property::INVALID_INDEX),
+  mRenderIfTransparent(false),
+  mNeedBlurRadius(false)
 {
 }
 
@@ -259,20 +261,42 @@ void ColorVisual::DoSetOnScene( Actor& actor )
   ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
+void ColorVisual::DoSetOffScene(Actor& actor)
+{
+  if(mImpl->mRenderer && mBlurRadiusIndex != Property::INVALID_INDEX)
+  {
+    // Update values from Renderer
+    mBlurRadius = mImpl->mRenderer.GetProperty<float>(mBlurRadiusIndex);
+  }
+
+  actor.RemoveRenderer(mImpl->mRenderer);
+  mImpl->mRenderer.Reset();
+  mBlurRadiusIndex = Property::INVALID_INDEX;
+}
+
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR );
   map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mImpl->mMixColor );
   map.Insert( Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT, mRenderIfTransparent );
-  map.Insert( Toolkit::DevelColorVisual::Property::BLUR_RADIUS, mBlurRadius );
+
+  if(mImpl->mRenderer && mBlurRadiusIndex != Property::INVALID_INDEX)
+  {
+    // Update values from Renderer
+    float blurRadius = mImpl->mRenderer.GetProperty<float>(mBlurRadiusIndex);
+    map.Insert(Toolkit::DevelColorVisual::Property::BLUR_RADIUS, blurRadius);
+  }
+  else
+  {
+    map.Insert(Toolkit::DevelColorVisual::Property::BLUR_RADIUS, mBlurRadius);
+  }
 }
 
 void ColorVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 {
   // Do nothing
 }
-
 
 void ColorVisual::OnSetTransform()
 {
@@ -299,12 +323,42 @@ void ColorVisual::OnDoAction( const Property::Index actionId, const Property::Va
   }
 }
 
+void ColorVisual::UpdateShader()
+{
+  if(mImpl->mRenderer)
+  {
+    Shader shader = GetShader();
+    mImpl->mRenderer.SetShader(shader);
+  }
+}
+
 void ColorVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 
+  Shader shader = GetShader();
+
+  mImpl->mRenderer = Renderer::New(geometry, shader);
+
+  // ColorVisual has it's own index key for mix color - use this instead
+  // of using the new base index to avoid changing existing applications
+  // String keys will get to this property.
+  mImpl->mMixColorIndex = mImpl->mRenderer.RegisterProperty(Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor));
+
+  if(!EqualsZero(mBlurRadius))
+  {
+    mBlurRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
+    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+  }
+
+  // Register transform properties
+  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+}
+
+Shader ColorVisual::GetShader()
+{
   Shader shader;
-  if( !EqualsZero( mBlurRadius ) )
+  if(!EqualsZero(mBlurRadius) || mNeedBlurRadius)
   {
     shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER_BLUR_EDGE );
     if( !shader )
@@ -332,22 +386,33 @@ void ColorVisual::InitializeRenderer()
     }
   }
 
-  mImpl->mRenderer = Renderer::New( geometry, shader );
+  return shader;
+}
 
-  // ColorVisual has it's own index key for mix color - use this instead
-  // of using the new base index to avoid changing existing applications
-  // String keys will get to this property.
-  mImpl->mMixColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor) );
-
-  mImpl->mRenderer.RegisterProperty( BLUR_RADIUS_NAME, mBlurRadius );
-
-  if( !EqualsZero( mBlurRadius ) )
+Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key)
+{
+  if(!mImpl->mRenderer)
   {
-    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+    Handle handle;
+    return Dali::Property(handle, Property::INVALID_INDEX);
   }
 
-  // Register transform properties
-  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  if((key.type == Property::Key::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) || (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME))
+  {
+    mBlurRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
+
+    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+
+    mNeedBlurRadius = true;
+
+    // Change shader
+    UpdateShader();
+
+    return Dali::Property(mImpl->mRenderer, mBlurRadiusIndex);
+  }
+
+  Handle handle;
+  return Dali::Property(handle, Property::INVALID_INDEX);
 }
 
 } // namespace Internal

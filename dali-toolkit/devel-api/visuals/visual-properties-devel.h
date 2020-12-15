@@ -73,7 +73,7 @@ enum Type
 
   /**
    * @brief The radius for the rounded corners of the visual
-   * @details Name "cornerRadius", type Property::FLOAT.
+   * @details Name "cornerRadius", type Property::FLOAT, animatable
    * @note Optional.
    */
   CORNER_RADIUS = OPACITY + 2,
