@@ -689,69 +689,71 @@ void AnimatedImageVisual::FrameReady( TextureSet textureSet )
 
 bool AnimatedImageVisual::DisplayNextFrame()
 {
-  bool nextFrame = false;
-  uint32_t frameIndex = mImageCache->GetCurrentFrameIndex();
+  bool continueTimer = false;
 
-  if( mIsJumpTo )
+  if(mImageCache)
   {
-    mIsJumpTo = false;
-    frameIndex = mFrameIndexForJumpTo;
-  }
-  else if( mActionStatus == DevelAnimatedImageVisual::Action::PAUSE )
-  {
-    return false;
-  }
-  else if( mActionStatus == DevelAnimatedImageVisual::Action::STOP )
-  {
-    frameIndex = 0;
-    if( mStopBehavior == DevelImageVisual::StopBehavior::FIRST_FRAME )
+    bool nextFrame = false;
+    uint32_t frameIndex = mImageCache->GetCurrentFrameIndex();
+
+    if( mIsJumpTo )
+    {
+      mIsJumpTo = false;
+      frameIndex = mFrameIndexForJumpTo;
+    }
+    else if( mActionStatus == DevelAnimatedImageVisual::Action::PAUSE )
+    {
+      return false;
+    }
+    else if( mActionStatus == DevelAnimatedImageVisual::Action::STOP )
     {
       frameIndex = 0;
-    }
-    else if( mStopBehavior == DevelImageVisual::StopBehavior::LAST_FRAME )
-    {
-      frameIndex = mFrameCount - 1;
+      if( mStopBehavior == DevelImageVisual::StopBehavior::FIRST_FRAME )
+      {
+        frameIndex = 0;
+      }
+      else if( mStopBehavior == DevelImageVisual::StopBehavior::LAST_FRAME )
+      {
+        frameIndex = mFrameCount - 1;
+      }
+      else
+      {
+        return false; // Do not draw already rendered scene twice.
+      }
     }
     else
     {
-      return false; // Do not draw already rendered scene twice.
-    }
-  }
-  else
-  {
-    if( mFrameCount > 1 )
-    {
-      nextFrame = true;
-      frameIndex++;
-      if( frameIndex >= mFrameCount )
+      if( mFrameCount > 1 )
       {
-        frameIndex %= mFrameCount;
-        ++mCurrentLoopIndex;
+        nextFrame = true;
+        frameIndex++;
+        if( frameIndex >= mFrameCount )
+        {
+          frameIndex %= mFrameCount;
+          ++mCurrentLoopIndex;
+        }
+
+        if(mLoopCount >= 0 && mCurrentLoopIndex >= mLoopCount)
+        {
+          // This will stop timer
+          mActionStatus = DevelAnimatedImageVisual::Action::STOP;
+          return DisplayNextFrame();
+        }
       }
 
-      if(mLoopCount >= 0 && mCurrentLoopIndex >= mLoopCount)
-      {
-        // This will stop timer
-        mActionStatus = DevelAnimatedImageVisual::Action::STOP;
-        return DisplayNextFrame();
-      }
-    }
-    // TODO : newly added one.
-    if( mAnimatedImageLoading && mImageCache )
-    {
       unsigned int delay = mImageCache->GetFrameInterval( frameIndex );
-      if( mFrameDelayTimer.GetInterval() != delay )
+      if( delay > 0u )
       {
-        mFrameDelayTimer.SetInterval( delay );
+        if( mFrameDelayTimer.GetInterval() != delay )
+        {
+          mFrameDelayTimer.SetInterval( delay );
+        }
       }
     }
-  }
 
-  DALI_LOG_INFO( gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::DisplayNextFrame(this:%p) CurrentFrameIndex:%d\n", this, frameIndex);
+    DALI_LOG_INFO( gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::DisplayNextFrame(this:%p) CurrentFrameIndex:%d\n", this, frameIndex);
 
-  TextureSet textureSet;
-  if( mImageCache )
-  {
+    TextureSet textureSet;
     if(nextFrame)
     {
       textureSet = mImageCache->NextFrame();
@@ -769,9 +771,11 @@ bool AnimatedImageVisual::DisplayNextFrame()
         mImpl->mRenderer.SetTextures( textureSet );
       }
     }
+
+    continueTimer = ( mActionStatus == DevelAnimatedImageVisual::Action::PLAY ) ? true : false;
   }
 
-  return ( mActionStatus == DevelAnimatedImageVisual::Action::PLAY ) ? true : false;
+  return continueTimer;
 }
 
 
