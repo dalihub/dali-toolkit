@@ -241,7 +241,7 @@ void DepthFirst( TreeNode* node, Operation& operation)
  * @param tree The tree to search
  * @return the TreeNode if found, else NULL
  */
-const TreeNode* FindIt(const std::string& childName, const TreeNode* tree);
+const TreeNode* FindIt(std::string_view childName, const TreeNode* tree);
 
 /*
  * Copy string to a buffer
