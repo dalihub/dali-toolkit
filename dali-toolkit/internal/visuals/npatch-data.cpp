@@ -42,6 +42,7 @@ NPatchData::NPatchData()
   mCroppedHeight(0),
   mBorder(0, 0, 0, 0),
   mLoadingState(LoadingState::LOADING),
+  mPreMultiplyOnLoad(false),
   mRenderingMap{nullptr}
 {
 }
