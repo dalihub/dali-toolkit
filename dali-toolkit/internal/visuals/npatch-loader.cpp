@@ -155,7 +155,6 @@ int32_t NPatchLoader::GetCacheIndexFromId( const NPatchData::NPatchDataId id )
     }
   }
 
-  DALI_LOG_ERROR("Wrong NPatchDataId is used\n");
   return INVALID_CACHE_INDEX;
 }
 
