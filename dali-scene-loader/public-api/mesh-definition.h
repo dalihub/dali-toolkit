@@ -81,14 +81,7 @@ struct DALI_SCENE_LOADER_API MeshDefinition
     Blob() = default;
 
     Blob(uint32_t offset, uint32_t length, uint16_t stride = 0, uint16_t elementSizeHint = 0,
-      const std::vector<float>& min = {}, const std::vector<float>& max = {})
-      : mOffset(offset),
-      mLength(length),
-      mStride(stride),
-      mElementSizeHint(elementSizeHint),
-      mMin(min),
-      mMax(max)
-    {}
+      const std::vector<float>& min = {}, const std::vector<float>& max = {});
 
     /**
      * @brief Calculates the size of a tightly-packed buffer for the elements from the blob.

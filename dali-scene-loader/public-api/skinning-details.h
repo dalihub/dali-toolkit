@@ -39,6 +39,8 @@ struct DALI_SCENE_LOADER_API Skinning
    * @brief Name of bone matrix uniform (array).
    */
   static const std::string BONE_UNIFORM_NAME;
+
+  Skinning() = delete;
 };
 
 }

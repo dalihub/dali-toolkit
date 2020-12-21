@@ -32,11 +32,10 @@ Animation::EndAction AnimationDefinition::StopForModification(Animation& anim)
   return endAction;
 }
 
-AnimationDefinition::AnimationDefinition()
-{}
+AnimationDefinition::AnimationDefinition() = default;
 
 AnimationDefinition::AnimationDefinition(AnimationDefinition&& other)
-:  mName(std::move(other.mName)),
+: mName(std::move(other.mName)),
   mDuration(other.mDuration),
   mLoopCount(other.mLoopCount),
   mDisconnectAction(other.mDisconnectAction),

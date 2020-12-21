@@ -64,7 +64,7 @@ private:
 };
 
 
-const std::string QUAD_STRING("quad");
+const std::string QUAD("quad");
 
 ///@brief Reads a blob from the given stream @a source into @a target, which must have
 /// at least @a descriptor.length bytes.
@@ -290,10 +290,10 @@ void CalculateTextureSize(uint32_t totalTextureSize, uint32_t& textureWidth, uin
 {
   DALI_ASSERT_DEBUG(0u != totalTextureSize && "totalTextureSize is zero.")
 
-    // Calculate the dimensions of the texture.
-    // The total size of the texture is the length of the blend shapes blob.
+  // Calculate the dimensions of the texture.
+  // The total size of the texture is the length of the blend shapes blob.
 
-    textureWidth = 0u;
+  textureWidth = 0u;
   textureHeight = 0u;
 
   if (0u == totalTextureSize)
@@ -443,14 +443,14 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, std::ifstream& binFile, 
 }
 
 MeshDefinition::SparseBlob::SparseBlob(const Blob& indices, const Blob& values, uint32_t count)
-:  mIndices{indices},
+: mIndices{indices},
   mValues{values},
   mCount{count}
 {}
 
 MeshDefinition::Accessor::Accessor(const MeshDefinition::Blob& blob,
   const MeshDefinition::SparseBlob& sparse)
-:  mBlob{blob},
+: mBlob{blob},
   mSparse{(sparse.mIndices.IsDefined() && sparse.mValues.IsDefined()) ? new SparseBlob{sparse} : nullptr}
 {}
 
@@ -489,6 +489,15 @@ void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std:
   }
 }
 
+MeshDefinition::Blob::Blob(uint32_t offset, uint32_t length, uint16_t stride, uint16_t elementSizeHint, const std::vector<float>& min, const std::vector<float>& max)
+: mOffset(offset),
+  mLength(length),
+  mStride(stride),
+  mElementSizeHint(elementSizeHint),
+  mMin(min),
+  mMax(max)
+{}
+
 uint32_t MeshDefinition::Blob::GetBufferSize() const
 {
   return IsConsecutive() ? mLength : (mLength * mElementSizeHint / mStride);
@@ -511,7 +520,7 @@ void MeshDefinition::RawData::Attrib::AttachBuffer(Geometry& g) const
 
 bool MeshDefinition::IsQuad() const
 {
-  return CaseInsensitiveStringCompare("quad", mUri);
+  return CaseInsensitiveStringCompare(QUAD, mUri);
 }
 
 bool MeshDefinition::IsSkinned() const

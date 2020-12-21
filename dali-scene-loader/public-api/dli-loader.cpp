@@ -159,9 +159,9 @@ void ReadArcField(const TreeNode* eArc, ArcNode& arc)
   ReadFloat(eArc->GetChild("endAngle"), arc.mEndAngleDegrees);
 }
 
-const TreeNode *Tidx(const TreeNode *node, int index)
+const TreeNode *GetNthChild(const TreeNode *node, uint32_t index)
 {
-  int i = 0;
+  uint32_t i = 0;
   for (TreeNode::ConstIterator it = (*node).CBegin(); it != (*node).CEnd(); ++it, ++i)
   {
     if (i == index)
@@ -463,8 +463,8 @@ void DliLoader::Impl::ParseScene(LoadParams& params)
 void DliLoader::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* tnScenes,
   const Toolkit::TreeNode* tnNodes, LoadParams& params)
 {
-  auto getSceneRootIdx = [&](Index iScene) {
-    auto tn = Tidx(tnScenes, iScene);  // now a "scene" object
+  auto getSceneRootIdx = [tnScenes, tnNodes](Index iScene) {
+    auto tn = GetNthChild(tnScenes, iScene);  // now a "scene" object
     if (!tn)
     {
       ExceptionFlinger(ASSERT_LOCATION) << iScene << " is out of bounds access into " << SCENES << ".";
@@ -483,7 +483,7 @@ void DliLoader::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* 
         " must define a node id.";
     }
 
-    tn = Tidx(tn, 0);  // now the first element of the array
+    tn = GetNthChild(tn, 0);  // now the first element of the array
     Index iRootNode;
     if (!ReadIndex(tn, iRootNode))
     {
@@ -496,7 +496,7 @@ void DliLoader::Impl::ParseSceneInternal(Index iScene, const Toolkit::TreeNode* 
       ExceptionFlinger(ASSERT_LOCATION) << "Root node index << " << iRootNode << " of scene " << iScene << " is out of bounds.";
     }
 
-    tn = Tidx(tnNodes, iRootNode);  // now a "node" object
+    tn = GetNthChild(tnNodes, iRootNode);  // now a "node" object
     if (tn->GetType() != TreeNode::OBJECT)
     {
       ExceptionFlinger(ASSERT_LOCATION) << "Root node of scene " << iScene << " is of invalid JSON type; object required";
@@ -1095,7 +1095,7 @@ void DliLoader::Impl::ParseNodesInternal(const TreeNode* const nodes, Index inde
   std::vector<IndexProperty> resourceIds;
   resourceIds.reserve(4);
 
-  if (auto node = Tidx(nodes, index))
+  if (auto node = GetNthChild(nodes, index))
   {
     NodeDefinition nodeDef;
     nodeDef.mParentIdx = inOutParentStack.empty() ? INVALID_INDEX : inOutParentStack.back();

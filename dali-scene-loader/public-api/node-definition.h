@@ -44,8 +44,7 @@ class ViewProjection;
 class DALI_SCENE_LOADER_API IResourceReceiver
 {
 public:
-  virtual ~IResourceReceiver()
-  {}
+  virtual ~IResourceReceiver() = default;
 
   virtual void Register(ResourceType::Value type, Index id) = 0;
 };
@@ -58,8 +57,7 @@ public:
 class DALI_SCENE_LOADER_API IResourceReflector
 {
 public:
-  virtual ~IResourceReflector()
-  {}
+  virtual ~IResourceReflector() = default;
 
   virtual void Reflect(ResourceType::Value type, Index& id) = 0;
 };
@@ -163,7 +161,7 @@ public:  // TYPES
     Index mShaderIdx = INVALID_INDEX;
 
   public: // METHODS
-    virtual ~Renderable() {}
+    virtual ~Renderable() = default;
 
     virtual void RegisterResources(IResourceReceiver& receiver) const;
     virtual void ReflectResources(IResourceReflector& reflector);
@@ -189,7 +187,7 @@ public:  // TYPES
     virtual void Finish(NodeDefinition& n) = 0;
 
   protected:
-    ~IVisitor() {}
+    ~IVisitor() = default; // deliberately non-virtual these are transient objects and we don't want to pay for the vtable.
   };
 
   class IConstVisitor
@@ -199,7 +197,7 @@ public:  // TYPES
     virtual void Finish(const NodeDefinition& n) = 0;
 
   protected:
-    ~IConstVisitor() {}
+    ~IConstVisitor() = default; // deliberately non-virtual these are transient objects and we don't want to pay for the vtable.
   };
 
   struct Extra

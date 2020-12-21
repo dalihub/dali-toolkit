@@ -68,6 +68,8 @@ struct DALI_SCENE_LOADER_API BlendShapes
    *  on the given @a shader and @a actor.
    */
   static void ConfigureProperties(const std::pair<MeshDefinition, MeshGeometry>& mesh, Shader shader, Actor actor);
+
+  BlendShapes() = delete;
 };
 
 }

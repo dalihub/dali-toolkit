@@ -116,10 +116,7 @@ struct DALI_SCENE_LOADER_API TextureDefinition
   std::string mImageUri;
   SamplerFlags::Type mSamplerFlags;
 
-  TextureDefinition(const std::string& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT)
-  :  mImageUri(imageUri),
-    mSamplerFlags(samplerFlags)
-  {}
+  TextureDefinition(const std::string& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT);
 };
 
 /**

@@ -206,7 +206,7 @@ class ActorCreatorVisitor : public NodeDefinition::IConstVisitor
 {
 public:
   ActorCreatorVisitor(NodeDefinition::CreateParams& params)
-  :  mCreationContext(params)
+  : mCreationContext(params)
   {}
 
   void Start(const NodeDefinition& n)
@@ -400,7 +400,7 @@ SceneDefinition::SceneDefinition()
 }
 
 SceneDefinition::SceneDefinition(SceneDefinition&& other)
-:  mNodes(std::move(other.mNodes)),
+: mNodes(std::move(other.mNodes)),
   mRootNodeIds(std::move(other.mRootNodeIds))
 {
 #ifdef DEBUG_JOINTS

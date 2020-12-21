@@ -100,6 +100,11 @@ Sampler SamplerFlags::MakeSampler(Type flags)
   return sampler;
 }
 
+TextureDefinition::TextureDefinition(const std::string& imageUri, SamplerFlags::Type samplerFlags)
+: mImageUri(imageUri),
+  mSamplerFlags(samplerFlags)
+{}
+
 MaterialDefinition::RawData
   MaterialDefinition::LoadRaw(const std::string& imagesPath) const
 {

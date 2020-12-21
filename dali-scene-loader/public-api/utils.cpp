@@ -35,6 +35,23 @@ namespace
 thread_local char sExceptionFlingerMessageBuffer[ExceptionFlinger::MESSAGE_BUFFER_SIZE]{};
 }
 
+StreamBuffer::StreamBuffer(char* buffer, size_t size) noexcept(true)
+{
+  setp(buffer, buffer + size);
+}
+
+ExceptionFlinger::ExceptionFlinger(const char* location) noexcept(true)
+: mLocation(location),
+  mStreamBuffer(GetMessageBuffer(), MESSAGE_BUFFER_SIZE - 1),
+  mStream(&mStreamBuffer)
+{}
+
+ExceptionFlinger::~ExceptionFlinger() noexcept(false)
+{
+  operator<<('\0');
+  throw DaliException(mLocation, GetMessageBuffer());
+}
+
 char* ExceptionFlinger::GetMessageBuffer() noexcept(true)
 {
   return sExceptionFlingerMessageBuffer;

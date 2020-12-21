@@ -35,23 +35,12 @@ namespace SceneLoader
 
 struct DALI_SCENE_LOADER_API CameraParameters
 {
-  CameraParameters()
-  : matrix(Matrix::IDENTITY),
-    orthographicSize(-1.f, 1.f, 1.f, -1.f),
-    yFov(60.f),
-    zNear(0.1f),
-    zFar(1000.f),
-    isPerspective(true)
-  {}
-
-  ~CameraParameters() = default;
-
-  Matrix matrix;
-  Vector4 orthographicSize;
-  float yFov;
-  float zNear;
-  float zFar;
-  bool isPerspective;
+  Matrix matrix = Matrix::IDENTITY;
+  Vector4 orthographicSize = Vector4{ -1.f, 1.f, 1.f, -1.f };
+  float yFov = 60.f;
+  float zNear = 0.1f;
+  float zFar = 1000.f;
+  bool isPerspective = true;
 
   /**
    * @return The view-projection matrix of the camera.
