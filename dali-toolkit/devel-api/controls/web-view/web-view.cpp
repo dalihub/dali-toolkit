@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/web-view/web-view-impl.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 namespace Dali
 {
@@ -58,6 +59,11 @@ WebView WebView::New(const std::string& locale, const std::string& timezoneId)
   return Internal::WebView::New(locale, timezoneId);
 }
 
+WebView WebView::New( int argc, char** argv )
+{
+  return Internal::WebView::New( argc, argv );
+}
+
 WebView WebView::DownCast(BaseHandle handle)
 {
   return Control::DownCast<WebView, Internal::WebView>(handle);
@@ -81,6 +87,11 @@ Dali::Toolkit::WebCookieManager* WebView::GetCookieManager() const
 Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
 {
   return Dali::Toolkit::GetImpl( *this ).GetBackForwardList();
+}
+
+Dali::Toolkit::ImageView& WebView::GetFavicon()
+{
+  return Dali::Toolkit::GetImpl( *this ).GetFavicon();
 }
 
 void WebView::LoadUrl(const std::string& url)
@@ -151,6 +162,11 @@ void WebView::EvaluateJavaScript(const std::string& script)
 void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler)
 {
   Dali::Toolkit::GetImpl(*this).AddJavaScriptMessageHandler(exposedObjectName, handler);
+}
+
+void WebView::ClearAllTilesResources()
+{
+  Dali::Toolkit::GetImpl( *this ).ClearAllTilesResources();
 }
 
 void WebView::ClearHistory()

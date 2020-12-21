@@ -39,6 +39,7 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 namespace Dali
@@ -65,6 +66,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "userAgent",               STRING,
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollPosition",          VECTOR2, SCROLL_POSITION            )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollSize",              VECTOR2, SCROLL_SIZE                )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "contentSize",             VECTOR2, CONTENT_SIZE               )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "title",                   STRING,  TITLE                      )
 
 DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadStarted",         PAGE_LOAD_STARTED_SIGNAL            )
 DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadFinished",        PAGE_LOAD_FINISHED_SIGNAL           )
@@ -102,6 +104,25 @@ WebView::WebView( const std::string& locale, const std::string& timezoneId )
   }
 }
 
+WebView::WebView( int argc, char** argv )
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
+  mUrl(),
+  mVisual(),
+  mWebViewSize( Stage::GetCurrent().GetSize() ),
+  mWebEngine(),
+  mPageLoadStartedSignal(),
+  mPageLoadFinishedSignal(),
+  mPageLoadErrorSignal()
+{
+  mWebEngine = Dali::WebEngine::New();
+
+  // WebEngine is empty when it is not properly initialized.
+  if ( mWebEngine )
+  {
+    mWebEngine.Create( mWebViewSize.width, mWebViewSize.height, argc, argv );
+  }
+}
+
 WebView::WebView()
 : WebView( "", "" )
 {
@@ -123,6 +144,15 @@ Toolkit::WebView WebView::New()
 Toolkit::WebView WebView::New( const std::string& locale, const std::string& timezoneId )
 {
   WebView* impl = new WebView( locale, timezoneId );
+  Toolkit::WebView handle = Toolkit::WebView( *impl );
+
+  impl->Initialize();
+  return handle;
+}
+
+Toolkit::WebView WebView::New( int argc, char** argv )
+{
+  WebView* impl = new WebView( argc, argv );
   Toolkit::WebView handle = Toolkit::WebView( *impl );
 
   impl->Initialize();
@@ -166,6 +196,19 @@ Dali::Toolkit::WebCookieManager* WebView::GetCookieManager() const
 Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
 {
   return mWebBackForwardList.get();
+}
+
+Dali::Toolkit::ImageView& WebView::GetFavicon()
+{
+  if ( mWebEngine )
+  {
+    Dali::PixelData pixelData = mWebEngine.GetFavicon();
+    std::string url = Dali::Toolkit::Image::GenerateUrl( pixelData );
+    mFaviconView = Dali::Toolkit::ImageView::New( url );
+    mFaviconView.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    mFaviconView.SetProperty( Dali::Actor::Property::SIZE, Vector2( pixelData.GetWidth(), pixelData.GetHeight() ) );
+  }
+  return mFaviconView;
 }
 
 void WebView::LoadUrl( const std::string& url )
@@ -285,6 +328,14 @@ void WebView::AddJavaScriptMessageHandler( const std::string& exposedObjectName,
   if( mWebEngine )
   {
     mWebEngine.AddJavaScriptMessageHandler( exposedObjectName, handler );
+  }
+}
+
+void WebView::ClearAllTilesResources()
+{
+  if( mWebEngine )
+  {
+    mWebEngine.ClearAllTilesResources();
   }
 }
 
@@ -492,6 +543,11 @@ Property::Value WebView::GetProperty( BaseObject* object, Property::Index proper
         value = Vector2( width, height );
         break;
       }
+      case Toolkit::WebView::Property::TITLE:
+      {
+        value = impl.GetTitle();
+        break;
+      }
       default:
          break;
     }
@@ -572,6 +628,11 @@ void WebView::GetContentSize( int& width, int& height ) const
   {
     mWebEngine.GetContentSize( width, height );
   }
+}
+
+std::string WebView::GetTitle() const
+{
+  return mWebEngine ?  mWebEngine.GetTitle() : kEmptyString;
 }
 
 const std::string& WebView::GetUserAgent() const
