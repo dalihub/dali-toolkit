@@ -14,6 +14,7 @@
       * [3. Building for MS Windows](#3-building-for-ms-windows)
          * Build with the Visual Studio project.
          * Build with CMake.
+   * [DALi Scene Loader](#dali-scene-loader)
 
 # Build Instructions
 
@@ -109,3 +110,7 @@ vcpkg-script folder in the windows-dependencies repository.
     - INSTALL_CMAKE_MODULES    ---> Whether to install the CMake modules (Used by the CMake command find_package() to find previously installed libraries).
     - ENABLE_DEBUG             ---> Whether to build with debug enabled.
     - USE_DEFAULT_RESOURCE_DIR ---> Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR
+
+# DALi Scene Loader
+
+For information about the DALi Scene Loader library, refer to dali-scene-loader/README.md.
