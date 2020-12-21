@@ -549,8 +549,7 @@ void TreeNodeManipulator::DoWrite(const TreeNode *value, std::ostream& output, i
   } // switch
 } // DoWrite
 
-
-const TreeNode* FindIt(const std::string& childName, const TreeNode* node)
+const TreeNode* FindIt(std::string_view childName, const TreeNode* node)
 {
   DALI_ASSERT_DEBUG(node);
 

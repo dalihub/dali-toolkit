@@ -771,9 +771,6 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
-    application.GetScene().Remove( actor );
-    DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
-
     Vector2 naturalSize( 0.0f, 0.0f );
     visual.GetNaturalSize( naturalSize );
     DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
@@ -984,6 +981,79 @@ int UtcDaliVisualFactoryGetNPatchVisual7(void)
   END_TEST;
 }
 
+int UtcDaliVisualFactoryGetNPatchVisual8(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual8: Add 9-patch visual on stage, instantly remove it and add new 9-patch visual with same propertyMap" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  // Get actual size of test image
+  ImageDimensions imageSize = Dali::GetClosestImageSize( TEST_9_PATCH_FILE_NAME );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_9_PATCH_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, false );
+  {
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth(), imageSize.GetHeight() ), TEST_LOCATION );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+    application.GetScene().Add( actor );
+    actor.Unparent();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth(), imageSize.GetHeight() ), TEST_LOCATION );
+
+    actor = DummyControl::New(true);
+
+    DummyControlImpl& dummyImpl2 = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+    application.GetScene().Add( actor );
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger(1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    Renderer renderer = actor.GetRendererAt( 0 );
+    auto textures = renderer.GetTextures();
+
+    DALI_TEST_EQUALS( textures.GetTextureCount(), 1, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
 int UtcDaliNPatchVisualAuxiliaryImage01(void)
 {
   ToolkitTestApplication application;
@@ -1061,7 +1131,7 @@ int UtcDaliNPatchVisualAuxiliaryImage02(void)
 
   Renderer renderer2 = imageView2.GetRendererAt( 0 );
   auto textureSet2 = renderer2.GetTextures();
-  DALI_TEST_EQUALS( textureSet1 == textureSet2, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureSet1 != textureSet2, true, TEST_LOCATION );
 
   END_TEST;
 }

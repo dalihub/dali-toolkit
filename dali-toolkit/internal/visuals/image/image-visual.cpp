@@ -916,35 +916,38 @@ Shader ImageVisual::GetShader()
 {
   Shader shader;
 
-  std::string vertexShader;
-  bool        usesWholeTexture = true;
+  std::string_view vertexShaderView;
+  bool usesWholeTexture = true;
   if(mImpl->mCustomShader && !mImpl->mCustomShader->mVertexShader.empty())
   {
-    vertexShader     = mImpl->mCustomShader->mVertexShader;
+    vertexShaderView = mImpl->mCustomShader->mVertexShader;
     usesWholeTexture = false; // Impossible to tell.
   }
   else
   {
-    vertexShader = mImageVisualShaderFactory.GetVertexShaderSource().data();
+    vertexShaderView = mImageVisualShaderFactory.GetVertexShaderSource();
   }
 
-  std::string fragmentShader;
+  std::string_view fragmentShaderView;
   if(mImpl->mCustomShader && !mImpl->mCustomShader->mFragmentShader.empty())
   {
-    fragmentShader = mImpl->mCustomShader->mFragmentShader;
+    fragmentShaderView = mImpl->mCustomShader->mFragmentShader;
   }
   else
   {
-    fragmentShader = mImageVisualShaderFactory.GetFragmentShaderSource().data();
+    fragmentShaderView = mImageVisualShaderFactory.GetFragmentShaderSource();
   }
 
   // If the texture is native, we may need to change prefix and sampler in
   // the fragment shader
   bool modifiedFragmentShader = false;
+  std::string fragmentShaderString;
   if(mTextures && DevelTexture::IsNative(mTextures.GetTexture(0)))
   {
-    Texture nativeTexture  = mTextures.GetTexture(0);
-    modifiedFragmentShader = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragmentShader);
+    Texture nativeTexture = mTextures.GetTexture(0);
+    fragmentShaderString   = std::string(fragmentShaderView);
+    modifiedFragmentShader = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragmentShaderString);
+    fragmentShaderView     = fragmentShaderString;
   }
 
   const bool useStandardShader = !mImpl->mCustomShader && !modifiedFragmentShader;
@@ -955,26 +958,26 @@ Shader ImageVisual::GetShader()
       mFactoryCache,
       mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
       mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE,
-      IsRoundedCornerRequired());
+      IsRoundedCornerRequired() );
   }
   else if(mImpl->mCustomShader)
   {
-    shader = Shader::New(vertexShader, fragmentShader, mImpl->mCustomShader->mHints);
+    shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints);
   }
   else
   {
-    shader = Shader::New(vertexShader, fragmentShader);
+    shader = Shader::New(vertexShaderView, fragmentShaderView);
   }
 
   if(usesWholeTexture)
   {
-    shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
   }
 
   // Set pixel align off as default.
   // ToDo: Pixel align causes issues such as rattling image animation.
   // We should trun it off until issues are resolved
-  shader.RegisterProperty(PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF);
+  shader.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF );
 
   return shader;
 }

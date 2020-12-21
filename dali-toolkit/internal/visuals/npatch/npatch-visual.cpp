@@ -24,7 +24,6 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
@@ -278,15 +277,15 @@ void NPatchVisual::LoadImages()
   TextureManager& textureManager = mFactoryCache.GetTextureManager();
   bool synchronousLoading = mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
 
-  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocalResource() )
+  if( mId == NPatchData::INVALID_NPATCH_DATA_ID && mImageUrl.IsLocalResource() )
   {
     bool preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader ? true : false;
     mId = mLoader.Load( textureManager, this, mImageUrl.GetUrl(), mBorder, preMultiplyOnLoad, synchronousLoading );
 
-    const NPatchLoader::Data* data;
-    if( mLoader.GetNPatchData( mId, data ) && data->loadCompleted )
+    const NPatchData* data;
+    if( mLoader.GetNPatchData( mId, data ) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE )
     {
-      EnablePreMultipliedAlpha( preMultiplyOnLoad );
+      EnablePreMultipliedAlpha( data->IsPreMultiplied() );
     }
   }
 
@@ -306,11 +305,11 @@ void NPatchVisual::GetNaturalSize( Vector2& naturalSize )
   naturalSize.y = 0u;
 
   // load now if not already loaded
-  const NPatchLoader::Data* data;
-  if( mLoader.GetNPatchData( mId, data ) && data->loadCompleted )
+  const NPatchData* data;
+  if( mLoader.GetNPatchData( mId, data ) && data->GetLoadingState() != NPatchData::LoadingState::LOADING )
   {
-    naturalSize.x = data->croppedWidth;
-    naturalSize.y = data->croppedHeight;
+    naturalSize.x = data->GetCroppedWidth();
+    naturalSize.y = data->GetCroppedHeight();
   }
   else
   {
@@ -386,6 +385,12 @@ void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
       mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
     }
   }
+
+  Property::Value* releasePolicy = propertyMap.Find( Toolkit::ImageVisual::Property::RELEASE_POLICY, RELEASE_POLICY_NAME );
+  if( releasePolicy )
+  {
+    releasePolicy->Get( mReleasePolicy );
+  }
 }
 
 void NPatchVisual::DoSetOnScene( Actor& actor )
@@ -393,7 +398,7 @@ void NPatchVisual::DoSetOnScene( Actor& actor )
   // load when first go on stage
   LoadImages();
 
-  const NPatchLoader::Data* data;
+  const NPatchData* data;
   if( mLoader.GetNPatchData( mId, data ) )
   {
     Geometry geometry = CreateGeometry();
@@ -402,11 +407,11 @@ void NPatchVisual::DoSetOnScene( Actor& actor )
     mImpl->mRenderer = Renderer::New( geometry, shader );
 
     mPlacementActor = actor;
-    if( data->loadCompleted )
+    if( data->GetLoadingState() != NPatchData::LoadingState::LOADING )
     {
       if( RenderingAddOn::Get().IsValid() )
       {
-        RenderingAddOn::Get().SubmitRenderTask( mImpl->mRenderer, data->renderingMap );
+        RenderingAddOn::Get().SubmitRenderTask( mImpl->mRenderer, data->GetRenderingMap() );
       }
 
       ApplyTextureAndUniforms();
@@ -421,6 +426,13 @@ void NPatchVisual::DoSetOnScene( Actor& actor )
 
 void NPatchVisual::DoSetOffScene( Actor& actor )
 {
+  if((mId != NPatchData::INVALID_NPATCH_DATA_ID) && mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED)
+  {
+    mLoader.Remove(mId, this);
+    mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
+    mId = NPatchData::INVALID_NPATCH_DATA_ID;
+  }
+
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
@@ -443,6 +455,7 @@ void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
   map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
   map.Insert( Toolkit::ImageVisual::Property::BORDER, mBorder );
+  map.Insert( Toolkit::ImageVisual::Property::RELEASE_POLICY, mReleasePolicy );
 
   if( mAuxiliaryUrl.IsValid() )
   {
@@ -466,25 +479,31 @@ NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
   mLoader( factoryCache.GetNPatchLoader() ),
   mImageUrl(),
   mAuxiliaryUrl(),
-  mId( NPatchLoader::UNINITIALIZED_ID ),
+  mId(NPatchData::INVALID_NPATCH_DATA_ID),
   mBorderOnly( false ),
   mBorder(),
-  mAuxiliaryImageAlpha( 0.0f )
+  mAuxiliaryImageAlpha( 0.0f ),
+  mReleasePolicy( Toolkit::ImageVisual::ReleasePolicy::DETACHED )
 {
   EnablePreMultipliedAlpha( mFactoryCache.GetPreMultiplyOnLoad() );
 }
 
 NPatchVisual::~NPatchVisual()
 {
+  if((mId != NPatchData::INVALID_NPATCH_DATA_ID) && ( mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER ))
+  {
+    mLoader.Remove(mId, this);
+    mId = NPatchData::INVALID_NPATCH_DATA_ID;
+  }
 }
 
 Geometry NPatchVisual::CreateGeometry()
 {
   Geometry geometry;
-  const NPatchLoader::Data* data;
-  if( mLoader.GetNPatchData( mId, data ) && data->loadCompleted )
+  const NPatchData* data;
+  if( mLoader.GetNPatchData( mId, data ) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE )
   {
-    if( data->stretchPixelsX.Size() == 1 && data->stretchPixelsY.Size() == 1 )
+    if( data->GetStretchPixelsX().Size() == 1 && data->GetStretchPixelsY().Size() == 1 )
     {
       if( DALI_UNLIKELY( mBorderOnly ) )
       {
@@ -492,13 +511,13 @@ Geometry NPatchVisual::CreateGeometry()
       }
       else
       {
-        if( data->renderingMap )
+        if( data->GetRenderingMap() )
         {
           uint32_t elementCount[2];
-          geometry = RenderingAddOn::Get().CreateGeometryGrid(data->renderingMap, Uint16Pair(3, 3), elementCount );
+          geometry = RenderingAddOn::Get().CreateGeometryGrid(data->GetRenderingMap(), Uint16Pair(3, 3), elementCount );
           if( mImpl->mRenderer )
           {
-            RenderingAddOn::Get().SubmitRenderTask(mImpl->mRenderer, data->renderingMap);
+            RenderingAddOn::Get().SubmitRenderTask(mImpl->mRenderer, data->GetRenderingMap());
           }
         }
         else
@@ -507,10 +526,10 @@ Geometry NPatchVisual::CreateGeometry()
         }
       }
     }
-    else if( data->stretchPixelsX.Size() > 0 || data->stretchPixelsY.Size() > 0)
+    else if( data->GetStretchPixelsX().Size() > 0 || data->GetStretchPixelsY().Size() > 0)
     {
-      Uint16Pair gridSize( 2 * data->stretchPixelsX.Size() + 1,  2 * data->stretchPixelsY.Size() + 1 );
-      if( !data->renderingMap )
+      Uint16Pair gridSize( 2 * data->GetStretchPixelsX().Size() + 1,  2 * data->GetStretchPixelsY().Size() + 1 );
+      if( !data->GetRenderingMap() )
       {
         geometry = !mBorderOnly ? CreateGridGeometry( gridSize ) : CreateBorderGeometry( gridSize );
       }
@@ -518,10 +537,10 @@ Geometry NPatchVisual::CreateGeometry()
       {
         uint32_t elementCount[2];
         geometry = !mBorderOnly ?
-                   RenderingAddOn::Get().CreateGeometryGrid(data->renderingMap, gridSize, elementCount ) : CreateBorderGeometry(gridSize );
+                   RenderingAddOn::Get().CreateGeometryGrid(data->GetRenderingMap(), gridSize, elementCount ) : CreateBorderGeometry(gridSize );
         if( mImpl->mRenderer )
         {
-          RenderingAddOn::Get().SubmitRenderTask(mImpl->mRenderer, data->renderingMap);
+          RenderingAddOn::Get().SubmitRenderTask(mImpl->mRenderer, data->GetRenderingMap());
         }
       }
     }
@@ -537,7 +556,7 @@ Geometry NPatchVisual::CreateGeometry()
 Shader NPatchVisual::CreateShader()
 {
   Shader shader;
-  const NPatchLoader::Data* data;
+  const NPatchData* data;
   // 0 is either no data (load failed?) or no stretch regions on image
   // for both cases we use the default shader
   NPatchUtility::StretchRanges::SizeType xStretchCount = 0;
@@ -551,8 +570,8 @@ Shader NPatchVisual::CreateShader()
   // ask loader for the regions
   if( mLoader.GetNPatchData( mId, data ) )
   {
-    xStretchCount = data->stretchPixelsX.Count();
-    yStretchCount = data->stretchPixelsY.Count();
+    xStretchCount = data->GetStretchPixelsX().Count();
+    yStretchCount = data->GetStretchPixelsY().Count();
   }
 
   if( DALI_LIKELY( !mImpl->mCustomShader ) )
@@ -616,25 +635,25 @@ Shader NPatchVisual::CreateShader()
 
 void NPatchVisual::ApplyTextureAndUniforms()
 {
-  const NPatchLoader::Data* data;
+  const NPatchData* data;
   TextureSet textureSet;
 
-  if( mLoader.GetNPatchData( mId, data ) && data->loadCompleted )
+  if( mLoader.GetNPatchData( mId, data ) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE )
   {
-    textureSet = data->textureSet;
+    textureSet = data->GetTextures();
 
-    if( data->stretchPixelsX.Size() == 1 && data->stretchPixelsY.Size() == 1 )
+    if( data->GetStretchPixelsX().Size() == 1 && data->GetStretchPixelsY().Size() == 1 )
     {
       //special case for 9 patch
-      Uint16Pair stretchX = data->stretchPixelsX[ 0 ];
-      Uint16Pair stretchY = data->stretchPixelsY[ 0 ];
+      Uint16Pair stretchX = data->GetStretchPixelsX()[ 0 ];
+      Uint16Pair stretchY = data->GetStretchPixelsY()[ 0 ];
 
       uint16_t stretchWidth = ( stretchX.GetY() >= stretchX.GetX() ) ? stretchX.GetY() - stretchX.GetX() : 0;
       uint16_t stretchHeight = ( stretchY.GetY() >= stretchY.GetX() ) ? stretchY.GetY() - stretchY.GetX() : 0;
 
       mImpl->mRenderer.RegisterProperty( "uFixed[0]", Vector2::ZERO );
       mImpl->mRenderer.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
-      mImpl->mRenderer.RegisterProperty( "uFixed[2]", Vector2( data->croppedWidth - stretchWidth, data->croppedHeight - stretchHeight ) );
+      mImpl->mRenderer.RegisterProperty( "uFixed[2]", Vector2( data->GetCroppedWidth() - stretchWidth, data->GetCroppedHeight() - stretchHeight ) );
       mImpl->mRenderer.RegisterProperty( "uStretchTotal", Vector2( stretchWidth, stretchHeight ) );
     }
     else
@@ -642,8 +661,8 @@ void NPatchVisual::ApplyTextureAndUniforms()
       mImpl->mRenderer.RegisterProperty( "uNinePatchFactorsX[0]", Vector2::ZERO );
       mImpl->mRenderer.RegisterProperty( "uNinePatchFactorsY[0]", Vector2::ZERO );
 
-      RegisterStretchProperties( mImpl->mRenderer, "uNinePatchFactorsX", data->stretchPixelsX, data->croppedWidth );
-      RegisterStretchProperties( mImpl->mRenderer, "uNinePatchFactorsY", data->stretchPixelsY, data->croppedHeight );
+      RegisterStretchProperties( mImpl->mRenderer, "uNinePatchFactorsX", data->GetStretchPixelsX(), data->GetCroppedWidth() );
+      RegisterStretchProperties( mImpl->mRenderer, "uNinePatchFactorsY", data->GetStretchPixelsY(), data->GetCroppedHeight() );
     }
   }
   else
@@ -664,10 +683,10 @@ void NPatchVisual::ApplyTextureAndUniforms()
     // If the auxiliary image is smaller than the un-stretched NPatch, use CPU resizing to enlarge it to the
     // same size as the unstretched NPatch. This will give slightly higher quality results than just relying
     // on GL interpolation alone.
-    if( mAuxiliaryPixelBuffer.GetWidth() < data->croppedWidth &&
-        mAuxiliaryPixelBuffer.GetHeight() < data->croppedHeight )
+    if( mAuxiliaryPixelBuffer.GetWidth() < data->GetCroppedWidth() &&
+        mAuxiliaryPixelBuffer.GetHeight() < data->GetCroppedHeight() )
     {
-      mAuxiliaryPixelBuffer.Resize( data->croppedWidth, data->croppedHeight );
+      mAuxiliaryPixelBuffer.Resize( data->GetCroppedWidth(), data->GetCroppedHeight() );
     }
 
     // Note, this resets mAuxiliaryPixelBuffer handle
@@ -838,7 +857,7 @@ Geometry NPatchVisual::CreateBorderGeometry( Uint16Pair gridSize )
 
 void NPatchVisual::SetResource()
 {
-  const NPatchLoader::Data* data;
+  const NPatchData* data;
   if( mImpl->mRenderer && mLoader.GetNPatchData( mId, data ) )
   {
     Geometry geometry = CreateGeometry();
@@ -860,35 +879,32 @@ void NPatchVisual::SetResource()
   }
 }
 
+void NPatchVisual::UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied )
+{
+  EnablePreMultipliedAlpha( preMultiplied );
+  if(!loadSuccess)
+  {
+    // Image loaded and ready to display
+    ResourceReady( Toolkit::Visual::ResourceStatus::FAILED );
+  }
+
+  if( mAuxiliaryPixelBuffer || !mAuxiliaryUrl.IsValid() )
+  {
+    SetResource();
+  }
+}
+
 void NPatchVisual::LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied )
 {
-  if( url.GetUrl() == mAuxiliaryUrl.GetUrl() )
+  if( loadSuccess && url.GetUrl() == mAuxiliaryUrl.GetUrl() )
   {
     mAuxiliaryPixelBuffer = pixelBuffer;
-    const NPatchLoader::Data* data;
-    if( mLoader.GetNPatchData( mId, data ) && data->loadCompleted )
-    {
-      SetResource();
-    }
+    SetResource();
   }
   else
   {
-    Devel::PixelBuffer loadedPixelBuffer;
-    if( loadSuccess )
-    {
-      loadedPixelBuffer = pixelBuffer;
-      EnablePreMultipliedAlpha( preMultiplied );
-    }
-    else
-    {
-      loadedPixelBuffer = LoadImageFromFile( mFactoryCache.GetTextureManager().GetBrokenImageUrl() );
-    }
-    mLoader.SetNPatchData( loadSuccess, mId, loadedPixelBuffer, url, preMultiplied );
-
-    if( mAuxiliaryPixelBuffer || !mAuxiliaryUrl.IsValid() )
-    {
-      SetResource();
-    }
+    // Image loaded and ready to display
+    ResourceReady( Toolkit::Visual::ResourceStatus::FAILED );
   }
 }
 

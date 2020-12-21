@@ -24,6 +24,7 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/npatch-data.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 #include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 
@@ -47,43 +48,6 @@ namespace Internal
  */
 class NPatchLoader
 {
-public:
-
-  enum
-  {
-    UNINITIALIZED_ID = 0 ///< uninitialised id, use to initialize ids
-  };
-
-  struct Data
-  {
-    Data()
-    : url(),
-      textureSet(),
-      hash( 0 ),
-      croppedWidth( 0 ),
-      croppedHeight( 0 ),
-      border( 0, 0, 0, 0 ),
-      loadCompleted( false ),
-      renderingMap{ nullptr }
-    {}
-
-    ~Data();
-
-    using ObserverListType = Dali::Vector< TextureUploadObserver* >;
-
-    ObserverListType observerList;                 ///< Container used to store all observer clients of this Texture
-    std::string url;                               ///< Url of the N-Patch
-    TextureSet textureSet;                         ///< Texture containing the cropped image
-    NPatchUtility::StretchRanges stretchPixelsX;   ///< X stretch pixels
-    NPatchUtility::StretchRanges stretchPixelsY;   ///< Y stretch pixels
-    std::size_t hash;                              ///< Hash code for the Url
-    uint32_t croppedWidth;                         ///< Width of the cropped middle part of N-patch
-    uint32_t croppedHeight;                        ///< Height of the cropped middle part of N-patch
-    Rect< int > border;                            ///< The size of the border
-    bool loadCompleted;                            ///< True if the data loading is completed
-    void* renderingMap;                            ///< NPatch rendering data
-  };
-
 public:
 
   /**
@@ -113,21 +77,35 @@ public:
   /**
    * @brief Set loaded PixelBuffer and its information
    *
-   * @param [in] loadSuccess True if the texture load was successful (i.e. the resource is available). If false, then the resource failed to load.
    * @param [in] id cache data id
    * @param [in] pixelBuffer of loaded image
-   * @param [in] url           The url address of the loaded image.
    * @param [in] preMultiplied True if the image had pre-multiplied alpha applied
    */
-  void SetNPatchData( bool loadSuccess, std::size_t id, Devel::PixelBuffer& pixelBuffer, const Internal::VisualUrl& url, bool preMultiplied );
+  void SetNPatchData( std::size_t id, Devel::PixelBuffer& pixelBuffer, bool preMultiplied );
 
   /**
    * @brief Retrieve N patch data matching to an id
    * @param [in] id of data
-   * @param [out] data const pointer to the data
+   * @param [out] data const pointer to the NPatchData
    * @return true if data matching to id was really found
    */
-  bool GetNPatchData( std::size_t id, const Data*& data );
+  bool GetNPatchData( const NPatchData::NPatchDataId id, const NPatchData*& data );
+
+  /**
+   * @brief Remove a texture matching id.
+   * Erase the observer from the observer list of cache.
+   * If the observer list is empty, the textureSet will be reset.
+   *
+   * @param [in] id cache data id
+   * @param [in] textureObserver The NPatchVisual that requested loading.
+   */
+  void Remove( std::size_t id, TextureUploadObserver* textureObserver );
+
+private:
+
+  NPatchData::NPatchDataId GenerateUniqueNPatchDataId();
+
+  int32_t GetCacheIndexFromId( const NPatchData::NPatchDataId id );
 
 protected:
 
@@ -143,8 +121,8 @@ protected:
 
 private:
 
-  OwnerContainer< Data* > mCache;
-
+  NPatchData::NPatchDataId mCurrentNPatchDataId;
+  OwnerContainer< NPatchData* > mCache;
 };
 
 } // name Internal

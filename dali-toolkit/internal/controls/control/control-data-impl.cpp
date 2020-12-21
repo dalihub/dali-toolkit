@@ -104,17 +104,6 @@ void Remove( DictionaryKeys& keys, const std::string& name )
   }
 }
 
-Toolkit::Visual::Type GetVisualTypeFromMap( const Property::Map& map )
-{
-  Property::Value* typeValue = map.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE  );
-  Toolkit::Visual::Type type = Toolkit::Visual::IMAGE;
-  if( typeValue )
-  {
-    Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, type );
-  }
-  return type;
-}
-
 /**
  *  Finds visual in given array, returning true if found along with the iterator for that visual as a out parameter
  */
@@ -123,6 +112,22 @@ bool FindVisual( Property::Index targetIndex, const RegisteredVisualContainer& v
   for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
   {
     if ( (*iter)->index ==  targetIndex )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ *  Finds visual in given array, returning true if found along with the iterator for that visual as a out parameter
+ */
+bool FindVisual( std::string visualName, const RegisteredVisualContainer& visuals, RegisteredVisualContainer::Iterator& iter )
+{
+  for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
+  {
+    Toolkit::Visual::Base visual = (*iter)->visual;
+    if( visual && visual.GetName() == visualName )
     {
       return true;
     }
@@ -1558,59 +1563,47 @@ void Control::Impl::RecreateChangedVisuals( Dictionary<Property::Map>& stateVisu
     const std::string& visualName = (*iter).key;
     const Property::Map& toMap = (*iter).entry;
 
-    // is it a candidate for re-creation?
-    bool recreate = false;
-
-    Toolkit::Visual::Base visual = GetVisualByName( mVisuals, visualName );
-    if( visual )
+    Actor self = mControlImpl.Self();
+    RegisteredVisualContainer::Iterator registeredVisualsiter;
+    // Check if visual (visualName) is already registered, this is the current visual.
+    if(FindVisual(visualName, mVisuals, registeredVisualsiter))
     {
-      Property::Map fromMap;
-      visual.CreatePropertyMap( fromMap );
-
-      Toolkit::Visual::Type fromType = GetVisualTypeFromMap( fromMap );
-      Toolkit::Visual::Type toType = GetVisualTypeFromMap( toMap );
-
-      if( fromType != toType )
+      Toolkit::Visual::Base& visual = (*registeredVisualsiter)->visual;
+      if(visual)
       {
-        recreate = true;
-      }
-      else
-      {
-        if( fromType == Toolkit::Visual::IMAGE || fromType == Toolkit::Visual::N_PATCH
-            || fromType == Toolkit::Visual::SVG || fromType == Toolkit::Visual::ANIMATED_IMAGE )
+        // No longer required to know if the replaced visual's resources are ready
+        StopObservingVisual(visual);
+
+        // If control staged then visuals will be swapped once ready
+        if(self.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
         {
-          Property::Value* fromUrl = fromMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
-          Property::Value* toUrl = toMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
-
-          if( fromUrl && toUrl )
+          // Check if visual is currently in the process of being replaced ( is in removal container )
+          RegisteredVisualContainer::Iterator visualQueuedForRemoval;
+          if(FindVisual(visualName, mRemoveVisuals, visualQueuedForRemoval))
           {
-            std::string fromUrlString;
-            std::string toUrlString;
-            fromUrl->Get(fromUrlString);
-            toUrl->Get(toUrlString);
-
-            if( fromUrlString != toUrlString )
-            {
-              recreate = true;
-            }
+            // Visual with same visual name is already in removal container so current visual pending
+            // Only the the last requested visual will be displayed so remove current visual which is staged but not ready.
+            Toolkit::GetImplementation(visual).SetOffScene(self);
+            (*registeredVisualsiter)->visual.Reset();
+            mVisuals.Erase(registeredVisualsiter);
           }
+          else
+          {
+            // current visual not already in removal container so add now.
+            DALI_LOG_INFO(gLogFilter, Debug::Verbose, "RegisterVisual Move current registered visual to removal Queue: %s \n", visualName.c_str());
+            MoveVisual(registeredVisualsiter, mVisuals, mRemoveVisuals);
+          }
+        }
+        else
+        {
+          // Control not staged or visual disabled so can just erase from registered visuals and new visual will be added later.
+          (*registeredVisualsiter)->visual.Reset();
+          mVisuals.Erase(registeredVisualsiter);
         }
       }
 
-      const Property::Map* instancedMap = instancedProperties.FindConst( visualName );
-      if( recreate || instancedMap )
-      {
-        RemoveVisual( mVisuals, visualName );
-        Style::ApplyVisual( handle, visualName, toMap, instancedMap );
-      }
-      else
-      {
-        // @todo check to see if we can apply toMap without recreating the visual
-        // e.g. by setting only animatable properties
-        // For now, recreate all visuals, but merge in instance data.
-        RemoveVisual( mVisuals, visualName );
-        Style::ApplyVisual( handle, visualName, toMap, instancedMap );
-      }
+      const Property::Map* instancedMap = instancedProperties.FindConst(visualName);
+      Style::ApplyVisual(handle, visualName, toMap, instancedMap);
     }
   }
 }
