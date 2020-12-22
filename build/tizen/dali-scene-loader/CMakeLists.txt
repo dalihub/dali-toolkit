@@ -144,7 +144,7 @@ if( ANDROID )
 	target_link_libraries(${name} log)
 endif()
 
-install(TARGETS ${name} DESTINATION ${prefix}/lib)
+install(TARGETS ${name} DESTINATION ${LIB_DIR})
 
 file(GLOB scene_loader_include_files ${scene_loader_public_api_dir})
 install(DIRECTORY ${scene_loader_include_files}
