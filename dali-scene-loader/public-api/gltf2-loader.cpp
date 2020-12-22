@@ -903,13 +903,15 @@ float LoadBlendShapeKeyFrames(const std::string& path, const gt::Animation::Chan
   const float duration = LoadDataFromAccessors<float>(path, input, output, inputDataBuffer, outputDataBuffer);
 
   char weightNameBuffer[32];
-  char* const pWeightName = weightNameBuffer + sprintf(weightNameBuffer, "%s[", BLEND_SHAPE_WEIGHTS_UNIFORM.c_str());
+  auto prefixSize = snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s[", BLEND_SHAPE_WEIGHTS_UNIFORM.c_str());
+  char* const pWeightName = weightNameBuffer + prefixSize;
+  const auto remainingSize = sizeof(weightNameBuffer) - prefixSize;
   for (uint32_t weightIndex = 0u, endWeightIndex = channel.mSampler->mOutput->mCount / channel.mSampler->mInput->mCount; weightIndex < endWeightIndex; ++weightIndex)
   {
     AnimatedProperty& animatedProperty = properties[propertyIndex++];
 
     animatedProperty.mNodeName = nodeName;
-    sprintf(pWeightName, "%d]", weightIndex);
+    snprintf(pWeightName, remainingSize, "%d]", weightIndex);
     animatedProperty.mPropertyName = std::string(weightNameBuffer);
 
     animatedProperty.mKeyFrames = KeyFrames::New();

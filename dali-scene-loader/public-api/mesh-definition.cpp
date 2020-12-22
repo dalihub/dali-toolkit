@@ -457,7 +457,7 @@ MeshDefinition::Accessor::Accessor(const MeshDefinition::Blob& blob,
 void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std::vector<float>& max,
   uint32_t count, float* values)
 {
-  DALI_ASSERT_DEBUG(max.empty() || max.size() == min.size());
+  DALI_ASSERT_DEBUG(max.size() == min.size() || max.size() * min.size() == 0);
   const auto numComponents = std::max(min.size(), max.size());
 
   using ClampFn = void(*)(const float*, const float*, uint32_t, float&);

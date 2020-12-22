@@ -41,7 +41,7 @@ namespace SceneLoader
 class DALI_SCENE_LOADER_API StreamBuffer : public std::basic_streambuf<char>
 {
 public:
-  StreamBuffer(char* buffer, size_t size)
+  StreamBuffer(char* buffer, size_t size) noexcept(true)
   {
     setp(buffer, buffer + size);
   }
@@ -57,12 +57,13 @@ class DALI_SCENE_LOADER_API ExceptionFlinger
 public:
   enum { MESSAGE_BUFFER_SIZE = 512 };
 
-  ExceptionFlinger(const char* location)
+  ExceptionFlinger(const char* location) noexcept(true)
   : mLocation(location),
     mStreamBuffer(GetMessageBuffer(), MESSAGE_BUFFER_SIZE - 1),
     mStream(&mStreamBuffer)
   {}
 
+  [[noreturn]]
   ~ExceptionFlinger() noexcept(false)
   {
     operator<<('\0');
@@ -70,14 +71,14 @@ public:
   }
 
   template <typename T>
-  ExceptionFlinger& operator<<(const T& rhs)
+  ExceptionFlinger& operator<<(const T& rhs) noexcept(true)
   {
     mStream << rhs;
     return *this;
   }
 
 private:
-  static char* GetMessageBuffer();
+  static char* GetMessageBuffer() noexcept(true);
 
   const char* mLocation;
   StreamBuffer mStreamBuffer;

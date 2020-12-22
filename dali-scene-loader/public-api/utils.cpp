@@ -35,7 +35,7 @@ namespace
 thread_local char sExceptionFlingerMessageBuffer[ExceptionFlinger::MESSAGE_BUFFER_SIZE]{};
 }
 
-char* ExceptionFlinger::GetMessageBuffer()
+char* ExceptionFlinger::GetMessageBuffer() noexcept(true)
 {
   return sExceptionFlingerMessageBuffer;
 }
