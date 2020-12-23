@@ -3959,6 +3959,8 @@ int UtcDaliVisualGetVisualProperty01(void)
   application.Render();
 
   Vector3 targetColor(1.0f, 1.0f, 1.0f);
+  Vector2 targetOffset(0.05f, 0.05f);
+  Vector2 targetSize(1.1f, 1.1f);
   float targetOpacity = 0.5f;
   float targetCornerRadius = 20.0f;
   float targetBlurRadius = 10.0f;
@@ -3966,6 +3968,8 @@ int UtcDaliVisualGetVisualProperty01(void)
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::MIX_COLOR), targetColor);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Transform::Property::OFFSET), targetOffset);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Transform::Property::SIZE), targetSize);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelColorVisual::Property::BLUR_RADIUS), targetBlurRadius);
   animation.Play();
@@ -3982,6 +3986,18 @@ int UtcDaliVisualGetVisualProperty01(void)
   DALI_TEST_CHECK(colorValue);
   DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(targetColor.r, targetColor.g, targetColor.b, targetOpacity), TEST_LOCATION);
 
+  Property::Value* transformValue = resultMap.Find(Dali::Toolkit::Visual::Property::TRANSFORM);
+  Dali::Property::Map* transformMap = transformValue->GetMap();
+  DALI_TEST_CHECK(transformMap);
+
+  Property::Value* offsetValue = transformMap->Find(Toolkit::Visual::Transform::Property::OFFSET);
+  DALI_TEST_CHECK(offsetValue);
+  DALI_TEST_EQUALS(offsetValue->Get<Vector2>(), targetOffset, TEST_LOCATION);
+
+  Property::Value* sizeValue = transformMap->Find(Toolkit::Visual::Transform::Property::SIZE);
+  DALI_TEST_CHECK(sizeValue);
+  DALI_TEST_EQUALS(sizeValue->Get<Vector2>(), targetSize, TEST_LOCATION);
+
   Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::FLOAT);
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get< float >(), targetCornerRadius, TEST_LOCATION);
@@ -3992,6 +4008,8 @@ int UtcDaliVisualGetVisualProperty01(void)
 
   // Test uniform values
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("blurRadius", targetBlurRadius), true, TEST_LOCATION);
 
@@ -4040,6 +4058,8 @@ int UtcDaliVisualGetVisualProperty02(void)
   application.Render();
 
   Vector3 targetColor(1.0f, 1.0f, 1.0f);
+  Vector2 targetOffset(0.05f, 0.05f);
+  Vector2 targetSize(1.1f, 1.1f);
   float targetOpacity = 0.5f;
   float targetCornerRadius = 20.0f;
   float targetBlurRadius = 10.0f;
@@ -4048,6 +4068,8 @@ int UtcDaliVisualGetVisualProperty02(void)
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "mixColor"), targetColor);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "opacity"), targetOpacity);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "offset"), targetOffset);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "size"), targetSize);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "cornerRadius"), targetCornerRadius);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "blurRadius"), targetBlurRadius);
   animation.Play();
@@ -4064,6 +4086,18 @@ int UtcDaliVisualGetVisualProperty02(void)
   DALI_TEST_CHECK(colorValue);
   DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(targetColor.r, targetColor.g, targetColor.b, targetOpacity), TEST_LOCATION);
 
+  Property::Value* transformValue = resultMap.Find(Dali::Toolkit::Visual::Property::TRANSFORM);
+  Dali::Property::Map* transformMap = transformValue->GetMap();
+  DALI_TEST_CHECK(transformMap);
+
+  Property::Value* offsetValue = transformMap->Find(Toolkit::Visual::Transform::Property::OFFSET);
+  DALI_TEST_CHECK(offsetValue);
+  DALI_TEST_EQUALS(offsetValue->Get<Vector2>(), targetOffset, TEST_LOCATION);
+
+  Property::Value* sizeValue = transformMap->Find(Toolkit::Visual::Transform::Property::SIZE);
+  DALI_TEST_CHECK(sizeValue);
+  DALI_TEST_EQUALS(sizeValue->Get<Vector2>(), targetSize, TEST_LOCATION);
+
   Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::FLOAT);
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get< float >(), targetCornerRadius, TEST_LOCATION);
@@ -4074,6 +4108,8 @@ int UtcDaliVisualGetVisualProperty02(void)
 
   // Test uniform values
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("blurRadius", targetBlurRadius), true, TEST_LOCATION);
 

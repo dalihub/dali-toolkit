@@ -116,6 +116,8 @@ struct Base::Impl
     Vector4 mOffsetSizeMode;
     Toolkit::Align::Type mOrigin;
     Toolkit::Align::Type mAnchorPoint;
+    Property::Index      mOffsetIndex;
+    Property::Index      mSizeIndex;
   };
 
   Renderer        mRenderer;
