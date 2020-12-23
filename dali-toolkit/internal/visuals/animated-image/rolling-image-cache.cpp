@@ -165,6 +165,11 @@ int32_t RollingImageCache::GetCurrentFrameIndex() const
   return mQueue.Front().mUrlIndex;
 }
 
+int32_t RollingImageCache::GetTotalFrameCount() const
+{
+  return mImageUrls.size();
+}
+
 bool RollingImageCache::IsFrontReady() const
 {
   return ( !mQueue.IsEmpty() && mQueue.Front().mReady );

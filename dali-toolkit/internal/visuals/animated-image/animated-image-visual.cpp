@@ -249,6 +249,8 @@ void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::CACHE_SIZE, static_cast<int>(mCacheSize) );
   map.Insert( Toolkit::ImageVisual::Property::FRAME_DELAY, static_cast<int>(mFrameDelay) );
   map.Insert( Toolkit::DevelImageVisual::Property::LOOP_COUNT, static_cast<int>(mLoopCount) );
+  map.Insert( Toolkit::DevelImageVisual::Property::CURRENT_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>(mImageCache->GetCurrentFrameIndex()) : -1 );
+  map.Insert( Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>(mImageCache->GetTotalFrameCount()) : -1 );
 
   map.Insert( Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mStopBehavior );
 }
