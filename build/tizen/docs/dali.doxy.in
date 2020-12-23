@@ -995,6 +995,7 @@ INPUT                  = @DOXYGEN_DOCS_DIR@/content \
                          @prefix@/include/dali/devel-api \
                          ../../../dali-toolkit/public-api \
                          ../../../dali-toolkit/devel-api \
+                         ../../../dali-scene-loader/public-api \
                          ../../../automated-tests/README.md
 
 # This tag can be used to specify the character encoding of the source files
