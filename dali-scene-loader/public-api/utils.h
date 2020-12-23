@@ -67,9 +67,17 @@ public:
   }
 
 private:
+  struct Impl
+  {
+    const char* mLocation;
+
+    [[noreturn]]
+    ~Impl() noexcept(false);
+  };
+
   static char* GetMessageBuffer() noexcept(true);
 
-  const char* mLocation;
+  Impl mImpl;
   StreamBuffer mStreamBuffer;
   std::ostream mStream;
 };

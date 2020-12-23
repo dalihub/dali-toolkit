@@ -40,8 +40,13 @@ StreamBuffer::StreamBuffer(char* buffer, size_t size) noexcept(true)
   setp(buffer, buffer + size);
 }
 
+ExceptionFlinger::Impl::~Impl() noexcept(false)
+{
+  throw DaliException(mLocation, GetMessageBuffer());
+}
+
 ExceptionFlinger::ExceptionFlinger(const char* location) noexcept(true)
-: mLocation(location),
+: mImpl{ location },
   mStreamBuffer(GetMessageBuffer(), MESSAGE_BUFFER_SIZE - 1),
   mStream(&mStreamBuffer)
 {}
@@ -49,7 +54,6 @@ ExceptionFlinger::ExceptionFlinger(const char* location) noexcept(true)
 ExceptionFlinger::~ExceptionFlinger() noexcept(false)
 {
   operator<<('\0');
-  throw DaliException(mLocation, GetMessageBuffer());
 }
 
 char* ExceptionFlinger::GetMessageBuffer() noexcept(true)
