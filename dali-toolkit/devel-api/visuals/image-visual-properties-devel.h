@@ -104,14 +104,14 @@ enum Type
   PLAY_STATE = ORIENTATION_CORRECTION + 5,
 
   /**
-   * @brief The current frame number the AnimatedVectorImageVisual will use.
+   * @brief The current frame number the AnimatedImageVisual and AnimatedVectorImageVisual will use.
    * @details Name "currentFrameNumber", Type Property::INTEGER, between [0, the maximum frame number] or between the play range if specified
    * @note This property is read-only.
    */
   CURRENT_FRAME_NUMBER = ORIENTATION_CORRECTION + 6,
 
   /**
-   * @brief The total frame number the AnimatedVectorImageVisual will use.
+   * @brief The total frame number the AnimatedImageVisual and AnimatedVectorImageVisual will use.
    * @details Name "totalFrameNumber", Type Property::INTEGER.
    * @note This property is read-only.
    */

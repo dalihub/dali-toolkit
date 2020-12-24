@@ -101,6 +101,11 @@ public:
    */
   virtual int32_t GetCurrentFrameIndex() const = 0;
 
+  /**
+   * Get total frame count of the animated image file.
+   */
+  virtual int32_t GetTotalFrameCount() const = 0;
+
 private:
 
   /**
