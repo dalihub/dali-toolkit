@@ -40,6 +40,7 @@ DLI is a JSON based format for representing 3D scenes.
 
 # `scenes`
 The "scenes" element is an array of JSON objects, each of which must define a `nodes` array with the index of the definition of the root node.
+
 :warning: The array must not be empty. Only the first element is used.
 An optional `scene` element with an integer value may be defined to specify the index of the first scene to be created.
 The rest of the scenes are created in the order of their definition (from index 0 to the highest, skipping the default - already created - scene).
@@ -55,6 +56,7 @@ The rest of the scenes are created in the order of their definition (from index 
 
 # `nodes`
 The 3D scene is built using a hierarchy of nodes, which are used to position the objects to render.
+
 :warning: Each node must have a `name` string that 1, is not an empty string and 2, is unique within the DLI document. The use of alpha-numeric characters and underscore only is highly recommeneded.
 
 ## Transformations
@@ -70,6 +72,7 @@ The `visible` optional boolean property defines whether a node and its children 
 
 ## `children`
 An array of 0 or more indices into the top level `nodes` array, which shall inherit the transform and visibility of their parent node.
+
 :warning: Nodes are processed in the order they are encountered during the depth-first traversal of the hierarchy.
 ```js
   "nodes": [ {
@@ -106,11 +109,13 @@ The definition of a `customization` is a single string tag:
 There is support for two types of nodes that define renderable content.
 The definition of these renderables come in sub-objects.
 All of them support a `color` property, which is an array of 3 or 4 numerical values for RGB or RGBA components. For the alpha value to take effect, alpha blending must be enabled; this is controlled by the [material](#materiaL).
+
 :warning: Customizations and renderables are mutually exclusive on the same node.
 
 ### `model`
 Provides definition for a 3D object, which requires a `mesh`, `shader` and `material`.
 Each of these are provided in form of an integer index into the related top-level array of the DLI document.
+
 :warning: `mesh` must be provided; the rest are optional and default to 0.
 ```js
   "nodes": [ {
@@ -182,6 +187,7 @@ Defines configurations of textures (and their samplers) that form materials. The
 
 ## Texture maps
 `albedoMap` / `albedoMetallicMap` / `normalMap` / `normalRoughnessMap` / `metallicRoughnessMap` / `subsurfaceMap`: define various texture semantics, i.e. the role of the texture, which shall be loaded from an image _inside the materials path_, which is up to the application. All of them are optional.
+
 :warning: Semantics shall not overlap within the same material, e.g. multiple albedo definitions, or albedo and albedoMetallic.
 
 # `meshes`
@@ -197,6 +203,7 @@ Those models loaded from a file may provide an accessor, and flag its presence i
 |           |5| 32||Ignored, but reserved for bitangents|
 |`joints0`  |6| 64|Vector4|Joint IDs for skinned meshes|
 |`weights0` |7|128|Vector4|Joint weights for skinned meshes|
+
 E.g. if positions, normals and tangents are provided, the `attributes` property must have a value of 2 + 4 + 16 = 22.
 Each attribute must provide a `byteOffset` and `byteLength` property, which must be correctly sized for the type of the given attribute.
 Finally, to specify what primitives should the geometry be rendered as, a `primitive` property may be provided with one of the following values: `TRIANGLES` (default), `LINES`, `POINTS`.
@@ -251,11 +258,14 @@ For each shader, `vertex` and `fragment` are required string properties pointing
 
 ## Uniforms
 Every property that is not one of the reserved keys above, will be attempted to be registered as a uniform of the same name.
-:warning: boolean values will be converted to floating point 1.0 (for `true`) or 0.0 (for `false`).
-:warning: integer values will be converted to floating point.
-:warning: arrays of numerical values will be treated as one of the vec2 / vec3 / vec4 / mat3 / mat4 types, depending on what do they define sufficient components for.
+
+:warning: Boolean values will be converted to floating point 1.0 (for `true`) or 0.0 (for `false`).
+
+:warning: Integer values will be converted to floating point.
+
+:warning: Arrays of numerical values will be treated as one of the vec2 / vec3 / vec4 / mat3 / mat4 types, depending on what do they define sufficient components for.
 ```js
-  "shader": [ {
+  "shaders": [ {
     "vertex": "dli_pbr.vsh",
     "fragment": "dli_pbr.fsh",
     "defines": [ "HIGHP", SKINNING" ],
@@ -329,12 +339,14 @@ JSON object that defines a keyframe animation in a binary buffer, with the follo
    * `byteOffset`: offset to the start of the buffer
 
 The size of the buffer depends on the property being animated, where  the property value for each frame follows a 4 byte floating point value determining progress (between 0 and 1).
+
 :warning: Only `position` (3D vector of floats, 12 bytes), `rotation` (Quaternion, 12 bytes), and `scale` (3D vector, 12 bytes) properties are supported.
 
 ### `keyFrames`
 JSON array of keyframe objects defined with the following properties:
    * `progress`: a scalar between `0` and `1` to apply to the duration to get the time stamp of the frame;
    * `value`: array of 3 or 4 numerical values depending on which property is being animated;
+
 :warning: Only `position`, `rotation`, and `scale` properties are supported.
 
 ### `value`
