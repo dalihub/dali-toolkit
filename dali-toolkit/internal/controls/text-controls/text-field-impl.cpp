@@ -1519,7 +1519,9 @@ void TextField::OnKeyInputFocusGained()
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnKeyInputFocusGained %p\n", mController.Get() );
   if ( mInputMethodContext && IsEditable() )
   {
+    // All input panel properties, such as layout, return key type, and input hint, should be set before input panel activates (or shows).
     mInputMethodContext.ApplyOptions( mInputMethodOptions );
+    mInputMethodContext.NotifyTextInputMultiLine( false );
 
     mInputMethodContext.StatusChangedSignal().Connect( this, &TextField::KeyboardStatusChanged );
 
