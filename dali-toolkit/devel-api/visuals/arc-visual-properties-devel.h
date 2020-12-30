@@ -39,21 +39,21 @@ enum
 {
   /**
    * @brief The thickness of the arc.
-   * @details Name "thickness", type Property::FLOAT.
+   * @details Name "thickness", type Property::FLOAT, animatable.
    * @note Mandatory.
    */
   THICKNESS = VISUAL_PROPERTY_START_INDEX,
 
   /**
    * @brief The start angle where the arc begins in degrees.
-   * @details Name "startAngle", type Property::FLOAT.
+   * @details Name "startAngle", type Property::FLOAT, animatable.
    * @note Optional. If not specified, the default is 0.
    */
   START_ANGLE,
 
   /**
    * @brief The sweep angle of the arc in degrees.
-   * @details Name "sweepAngle", type Property::FLOAT.
+   * @details Name "sweepAngle", type Property::FLOAT, animatable.
    * The arc starts at a specified start angle and sweeps clockwise, drawing slices of pie.
    * @note Optional. If not specified, the default is 360.
    */
