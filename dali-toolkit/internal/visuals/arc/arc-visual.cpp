@@ -244,13 +244,46 @@ void ArcVisual::DoSetOnScene( Actor& actor )
   ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
+void ArcVisual::DoSetOffScene(Actor& actor)
+{
+  if(mImpl->mRenderer)
+  {
+    // Update values from Renderer
+    mThickness  = mImpl->mRenderer.GetProperty<float>(mThicknessIndex);
+    mStartAngle = mImpl->mRenderer.GetProperty<float>(mStartAngleIndex);
+    mSweepAngle = mImpl->mRenderer.GetProperty<float>(mSweepAngleIndex);
+  }
+
+  actor.RemoveRenderer(mImpl->mRenderer);
+  mImpl->mRenderer.Reset();
+
+  mThicknessIndex  = Property::INVALID_INDEX;
+  mStartAngleIndex = Property::INVALID_INDEX;
+  mSweepAngleIndex = Property::INVALID_INDEX;
+}
+
 void ArcVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
+  float thickness, startAngle, sweepAngle;
+  if(mImpl->mRenderer)
+  {
+    // Update values from Renderer
+    thickness  = mImpl->mRenderer.GetProperty<float>(mThicknessIndex);
+    startAngle = mImpl->mRenderer.GetProperty<float>(mStartAngleIndex);
+    sweepAngle = mImpl->mRenderer.GetProperty<float>(mSweepAngleIndex);
+  }
+  else
+  {
+    thickness  = mThickness;
+    startAngle = mStartAngle;
+    sweepAngle = mSweepAngle;
+  }
+
   map.Clear();
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::ARC );
-  map.Insert( Toolkit::DevelArcVisual::Property::THICKNESS, mThickness );
-  map.Insert( Toolkit::DevelArcVisual::Property::START_ANGLE, mStartAngle );
-  map.Insert( Toolkit::DevelArcVisual::Property::SWEEP_ANGLE, mSweepAngle );
+  map.Insert(Toolkit::DevelArcVisual::Property::THICKNESS, thickness);
+  map.Insert(Toolkit::DevelArcVisual::Property::START_ANGLE, startAngle);
+  map.Insert(Toolkit::DevelArcVisual::Property::SWEEP_ANGLE, sweepAngle);
   map.Insert( Toolkit::DevelArcVisual::Property::CAP, mCapType );
 }
 
@@ -313,9 +346,9 @@ void ArcVisual::InitializeRenderer()
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
-  mThicknessIndex = mImpl->mRenderer.RegisterProperty( THICKNESS_NAME, mThickness );
-  mStartAngleIndex = mImpl->mRenderer.RegisterProperty( START_ANGLE_NAME, mStartAngle );
-  mSweepAngleIndex = mImpl->mRenderer.RegisterProperty( SWEEP_ANGLE_NAME, mSweepAngle );
+  mThicknessIndex  = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::THICKNESS, THICKNESS_NAME, mThickness);
+  mStartAngleIndex = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::START_ANGLE, START_ANGLE_NAME, mStartAngle);
+  mSweepAngleIndex = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::SWEEP_ANGLE, SWEEP_ANGLE_NAME, mSweepAngle);
 
   mRadiusIndex = mImpl->mRenderer.RegisterProperty( RADIUS_NAME, mRadius );
 
