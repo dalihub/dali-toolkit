@@ -22,6 +22,7 @@
 #include <functional>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/web-engine-plugin.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
@@ -173,7 +174,25 @@ public:
        * @details Name "defaultFontSize", type Property::INT.
        * @note Default is 16.
        */
-      DEFAULT_FONT_SIZE
+      DEFAULT_FONT_SIZE,
+
+      /**
+       * @brief The current position of scroll.
+       * @details Name "scrollPosition", type Property::VECTOR2.
+       */
+      SCROLL_POSITION,
+
+      /**
+       * @brief The current position of scroll.
+       * @details Name "scrollSize", type Property::VECTOR2. Read-only.
+       */
+      SCROLL_SIZE,
+
+      /**
+       * @brief The current position of scroll.
+       * @details Name "contentSize", type Property::VECTOR2. Read-only.
+       */
+      CONTENT_SIZE,
     };
   };
 
@@ -268,6 +287,11 @@ public:
    */
   typedef Signal<void(WebView, const std::string&, LoadErrorCode)> WebViewPageLoadErrorSignalType;
 
+  /**
+   * @brief WebView signal type related with scroll edge reached.
+   */
+  typedef Signal<void(WebView, Dali::WebEnginePlugin::ScrollEdge)> WebViewScrollEdgeReachedSignalType;
+
 public:
   /**
    * @brief Creates an initialized WebView.
@@ -356,6 +380,13 @@ public:
    * @brief Resumes the operation associated with the view object after calling Suspend().
    */
   void Resume();
+
+  /**
+   * @brief Scrolls the webpage of view by deltaX and deltaY.
+   * @param[in] deltaX The delta x of scroll
+   * @param[in] deltaY The delta y of scroll
+   */
+  void ScrollBy( int deltaX, int deltaY );
 
   /**
    * @brief Returns whether forward is possible.
@@ -457,6 +488,13 @@ public:
    * @return A signal object to connect with.
    */
   WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when scroll edge is reached.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
 
 public: // Not intended for application developers
   /// @cond internal

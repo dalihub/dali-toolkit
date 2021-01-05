@@ -93,6 +93,11 @@ void WebView::Resume()
   Dali::Toolkit::GetImpl(*this).Resume();
 }
 
+void WebView::ScrollBy( int deltaX, int deltaY )
+{
+  Dali::Toolkit::GetImpl( *this ).ScrollBy( deltaX, deltaY );
+}
+
 bool WebView::CanGoForward()
 {
   return Dali::Toolkit::GetImpl(*this).CanGoForward();
@@ -156,6 +161,11 @@ WebView::WebViewPageLoadSignalType& WebView::PageLoadFinishedSignal()
 WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSignal()
 {
   return Dali::Toolkit::GetImpl(*this).PageLoadErrorSignal();
+}
+
+WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
+{
+  return Dali::Toolkit::GetImpl( *this ).ScrollEdgeReachedSignal();
 }
 
 WebView::WebView(Internal::WebView& implementation)
