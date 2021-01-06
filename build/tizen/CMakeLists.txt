@@ -303,11 +303,11 @@ IF( WIN32 OR APPLE )
 
   FIND_PACKAGE( unofficial-angle REQUIRED )
 
-  IF ( WIN32 )
+  IF(WIN32)
     FIND_PACKAGE( unofficial-fontconfig REQUIRED )
-    FIND_PACKAGE( unofficial-cairo REQUIRED )
   ENDIF()
 
+  FIND_PACKAGE( unofficial-cairo REQUIRED )
   FIND_PACKAGE( WebP REQUIRED )
 
   SET( DALIADAPTOR_LDFLAGS

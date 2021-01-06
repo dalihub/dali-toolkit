@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8.2)
 set(name "dali2-scene-loader")
 
 project(${name} CXX)
@@ -144,7 +144,49 @@ if( ANDROID )
 	target_link_libraries(${name} log)
 endif()
 
-install(TARGETS ${name} DESTINATION ${LIB_DIR})
+IF( INSTALL_CMAKE_MODULES )
+	SET_TARGET_PROPERTIES( ${name}
+		PROPERTIES
+		VERSION ${DALI_SCENE_LOADER_VERSION}
+		SOVERSION ${${name}_VERSION_MAJOR}
+		CLEAN_DIRECT_OUPUT 1
+	)
+
+	IF( ENABLE_DEBUG )
+		SET( BIN_DIR "${BIN_DIR}/debug" )
+		SET( LIB_DIR "${LIB_DIR}/debug" )
+	ENDIF()
+
+	# Install the library files.
+	INSTALL( TARGETS ${name}
+		EXPORT ${name}-targets
+		LIBRARY DESTINATION ${LIB_DIR}
+		ARCHIVE DESTINATION ${LIB_DIR}
+		RUNTIME DESTINATION ${BIN_DIR}
+	)
+
+	# Install the cmake modules.
+	INSTALL(
+		EXPORT ${name}-targets
+		NAMESPACE ${name}::
+		FILE ${name}-targets.cmake
+		DESTINATION share/${name}
+	)
+
+	FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake "
+		include(CMakeFindDependencyMacro)
+		include(\${CMAKE_CURRENT_LIST_DIR}/${name}-targets.cmake)
+	")
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake DESTINATION share/${name})
+
+	# Install the pdb file.
+	IF( ENABLE_DEBUG AND WIN32 )
+		install( FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/${name}.pdb DESTINATION ${BIN_DIR} )
+	ENDIF()
+ELSE()
+	# Install the library so file and symlinks
+	INSTALL( TARGETS ${name} DESTINATION ${LIB_DIR} )
+ENDIF()
 
 file(GLOB scene_loader_include_files ${scene_loader_public_api_dir})
 install(DIRECTORY ${scene_loader_include_files}

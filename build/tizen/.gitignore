@@ -1,2 +1,5 @@
 build
 dali.info
+*.dylib
+dali2-*-config.cmake
+libdali2-scene-loader.so*
