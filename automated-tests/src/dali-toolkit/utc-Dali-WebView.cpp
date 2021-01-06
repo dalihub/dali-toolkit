@@ -254,6 +254,32 @@ int UtcDaliWebViewTouchAndKeys(void)
   END_TEST;
 }
 
+int UtcDaliWebViewFocusGainedAndLost(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+
+  view.SetKeyInputFocus();
+  DALI_TEST_CHECK( view.HasKeyInputFocus() );
+
+  // reset
+  view.ClearKeyInputFocus();
+  DALI_TEST_CHECK( !view.HasKeyInputFocus() );
+
+  END_TEST;
+}
+
 int UtcDaliWebViewProperty1(void)
 {
   // URL

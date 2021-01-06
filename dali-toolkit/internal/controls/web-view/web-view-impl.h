@@ -213,6 +213,16 @@ private: // From Control
    */
   bool OnKeyEvent( const Dali::KeyEvent& event ) override;
 
+  /**
+   * @copydoc Toolkit::Control::OnKeyInputFocusGained()
+   */
+  void OnKeyInputFocusGained() override;
+
+  /**
+   * @copydoc Toolkit::Control::OnKeyInputFocusLost()
+   */
+  void OnKeyInputFocusLost() override;
+
 private:
 
   // Undefined
