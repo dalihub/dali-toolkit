@@ -242,12 +242,14 @@ void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap( Property::Ma
 }
 
 Internal::Visual::Base::Impl::Transform::Transform()
-: mOffset( 0.0f,0.0f ),
-  mSize( 1.0f,1.0f ),
-  mExtraSize( 0.0f,0.0f ),
-  mOffsetSizeMode( 0.0f,0.0f,0.0f,0.0f ),
-  mOrigin( Toolkit::Align::TOP_BEGIN ),
-  mAnchorPoint( Toolkit::Align::TOP_BEGIN )
+: mOffset(0.0f, 0.0f),
+  mSize(1.0f, 1.0f),
+  mExtraSize(0.0f, 0.0f),
+  mOffsetSizeMode(0.0f, 0.0f, 0.0f, 0.0f),
+  mOrigin(Toolkit::Align::TOP_BEGIN),
+  mAnchorPoint(Toolkit::Align::TOP_BEGIN),
+  mOffsetIndex(Property::INVALID_INDEX),
+  mSizeIndex(Property::INVALID_INDEX)
 {
 }
 
@@ -378,8 +380,8 @@ void Internal::Visual::Base::Impl::Transform::GetPropertyMap( Property::Map& map
 
 void Internal::Visual::Base::Impl::Transform::RegisterUniforms( Dali::Renderer renderer, Toolkit::Direction::Type direction )
 {
-  renderer.RegisterProperty( SIZE, mSize );
-  renderer.RegisterProperty( OFFSET, direction == Toolkit::Direction::LEFT_TO_RIGHT ? mOffset : mOffset * Vector2(-1.0f,1.0f));
+  mSizeIndex   = renderer.RegisterProperty(SIZE, mSize);
+  mOffsetIndex = renderer.RegisterProperty(OFFSET, direction == Toolkit::Direction::LEFT_TO_RIGHT ? mOffset : mOffset * Vector2(-1.0f, 1.0f));
   renderer.RegisterProperty( OFFSET_SIZE_MODE, mOffsetSizeMode );
   renderer.RegisterProperty( ORIGIN, PointToVector2( mOrigin, direction ) - Vector2(0.5,0.5) );
   renderer.RegisterProperty( ANCHOR_POINT, Vector2(0.5,0.5) - PointToVector2( mAnchorPoint, direction ) );

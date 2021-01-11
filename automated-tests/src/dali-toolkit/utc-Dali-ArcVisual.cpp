@@ -198,6 +198,52 @@ int UtcDaliArcVisualGetPropertyMap01(void)
   END_TEST;
 }
 
+int UtcDaliArcVisualGetPropertyMap02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliArcVisualGetPropertyMap02" );
+
+  float thickness = 20.0f;
+  float startAngle = 0.0f, sweepAngle = 90.0f;
+
+  Property::Map propertyMap;
+  propertyMap.Add(Visual::Property::TYPE, DevelVisual::ARC)
+             .Add(Visual::Property::MIX_COLOR, Color::RED)
+             .Add(DevelArcVisual::Property::THICKNESS, thickness )
+             .Add(DevelArcVisual::Property::START_ANGLE, startAngle )
+             .Add(DevelArcVisual::Property::SWEEP_ANGLE, sweepAngle )
+             .Add(DevelArcVisual::Property::CAP, DevelArcVisual::Cap::ROUND );
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  Property::Map resultMap;
+  visual.CreatePropertyMap( resultMap );
+
+  // check the property values from the returned map from a visual
+  Property::Value* value = resultMap.Find( Visual::Property::MIX_COLOR, Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector4 >(), Color::RED, TEST_LOCATION );
+
+  value = resultMap.Find( DevelArcVisual::Property::THICKNESS, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< float >(), thickness, TEST_LOCATION );
+
+  value = resultMap.Find( DevelArcVisual::Property::START_ANGLE, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< float >(), startAngle, TEST_LOCATION );
+
+  value = resultMap.Find( DevelArcVisual::Property::SWEEP_ANGLE, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< float >(), sweepAngle, TEST_LOCATION );
+
+  value = resultMap.Find( DevelArcVisual::Property::CAP, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get< int >() == DevelArcVisual::Cap::ROUND );
+
+  END_TEST;
+}
+
 int UtcDaliArcVisualUpdateProperty(void)
 {
   ToolkitTestApplication application;

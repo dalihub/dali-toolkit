@@ -192,6 +192,11 @@ int32_t RollingAnimatedImageCache::GetCurrentFrameIndex() const
   return mQueue.Front().mFrameNumber;
 }
 
+int32_t RollingAnimatedImageCache::GetTotalFrameCount() const
+{
+  return mFrameCount;
+}
+
 bool RollingAnimatedImageCache::IsFrontReady() const
 {
   return ( !mQueue.IsEmpty() && mQueue.Front().mReady );

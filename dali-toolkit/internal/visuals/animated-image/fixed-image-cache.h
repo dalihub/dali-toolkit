@@ -77,6 +77,11 @@ public:
    */
   int32_t GetCurrentFrameIndex() const override;
 
+  /**
+   * Get total frame count of the animated image file.
+   */
+  int32_t GetTotalFrameCount() const override;
+
 private:
   /**
    * @return true if the front frame is ready

@@ -99,6 +99,11 @@ protected:
   void DoSetOnScene( Actor& actor ) override;
 
   /**
+   * @copydoc Visual::Base::DoSetOffScene
+   */
+  void DoSetOffScene(Actor& actor) override;
+
+  /**
    * @copydoc Visual::Base::OnSetTransform
    */
   void OnSetTransform() override;

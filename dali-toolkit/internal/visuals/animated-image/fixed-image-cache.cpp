@@ -110,6 +110,11 @@ int32_t FixedImageCache::GetCurrentFrameIndex() const
   return static_cast<int32_t>(mFront);
 }
 
+int32_t FixedImageCache::GetTotalFrameCount() const
+{
+  return mImageUrls.size();
+}
+
 bool FixedImageCache::IsFrontReady() const
 {
   return ( mReadyFlags.size() > 0 && mReadyFlags[mFront] == true );

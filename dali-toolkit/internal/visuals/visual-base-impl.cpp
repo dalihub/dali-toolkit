@@ -345,6 +345,14 @@ void Visual::Base::SetOffScene( Actor& actor )
       // Update values from Renderer
       mImpl->mMixColor   = mImpl->mRenderer.GetProperty<Vector3>(mImpl->mMixColorIndex);
       mImpl->mMixColor.a = mImpl->mRenderer.GetProperty<float>(DevelRenderer::Property::OPACITY);
+      if(mImpl->mTransform.mOffsetIndex != Property::INVALID_INDEX)
+      {
+        mImpl->mTransform.mOffset = mImpl->mRenderer.GetProperty<Vector2>(mImpl->mTransform.mOffsetIndex);
+      }
+      if(mImpl->mTransform.mSizeIndex != Property::INVALID_INDEX)
+      {
+        mImpl->mTransform.mSize = mImpl->mRenderer.GetProperty<Vector2>(mImpl->mTransform.mSizeIndex);
+      }
       if(mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
       {
         mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<float>(mImpl->mCornerRadiusIndex);
@@ -365,6 +373,14 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
     // Update values from Renderer
     mImpl->mMixColor   = mImpl->mRenderer.GetProperty<Vector3>(mImpl->mMixColorIndex);
     mImpl->mMixColor.a = mImpl->mRenderer.GetProperty<float>(DevelRenderer::Property::OPACITY);
+    if(mImpl->mTransform.mOffsetIndex != Property::INVALID_INDEX)
+    {
+      mImpl->mTransform.mOffset = mImpl->mRenderer.GetProperty<Vector2>(mImpl->mTransform.mOffsetIndex);
+    }
+    if(mImpl->mTransform.mSizeIndex != Property::INVALID_INDEX)
+    {
+      mImpl->mTransform.mSize = mImpl->mRenderer.GetProperty<Vector2>(mImpl->mTransform.mSizeIndex);
+    }
     if(mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
     {
       mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<float>(mImpl->mCornerRadiusIndex);
@@ -777,6 +793,14 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     {
       return Dali::Property(mImpl->mRenderer, DevelRenderer::Property::OPACITY);
     }
+    else if(key.indexKey == Toolkit::Visual::Transform::Property::OFFSET)
+    {
+      return Dali::Property(mImpl->mRenderer, OFFSET);
+    }
+    else if(key.indexKey == Toolkit::Visual::Transform::Property::SIZE)
+    {
+      return Dali::Property(mImpl->mRenderer, SIZE);
+    }
   }
   else
   {
@@ -787,6 +811,14 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     else if(key.stringKey == OPACITY)
     {
       return Dali::Property(mImpl->mRenderer, DevelRenderer::Property::OPACITY);
+    }
+    else if(key.stringKey == OFFSET)
+    {
+      return Dali::Property(mImpl->mRenderer, OFFSET);
+    }
+    else if(key.stringKey == SIZE)
+    {
+      return Dali::Property(mImpl->mRenderer, SIZE);
     }
   }
 
@@ -799,8 +831,10 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
       // Register CORNER_RADIUS property
       mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
       mImpl->mRenderer.RegisterProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
-      index = mImpl->mCornerRadiusIndex;
 
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+
+      index = mImpl->mCornerRadiusIndex;
       mImpl->mNeedCornerRadius = true;
 
       // Change shader

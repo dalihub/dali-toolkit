@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.0.6
+Version:    2.0.8
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -80,6 +80,28 @@ Requires:   %{name} = %{version}-%{release}
 Application development package for Dali 3D engine toolkit - headers and package config
 
 ##############################
+# dali-scene-loader
+##############################
+%define dali2_scene_loader dali2-scene-loader
+%package -n %{dali2_scene_loader}
+Summary:    DLI scene loading library
+Group:      System/Libraries
+License:    Apache-2.0
+
+BuildRequires:  pkgconfig(dali2-toolkit)
+
+%description -n %{dali2_scene_loader}
+Provides functionality for loading and displaying DLI format scenes. See README.md for more details.
+
+%package -n %{dali2_scene_loader}-devel
+Summary:    Development components for dali-scene-loader
+Group:      Development/Building
+Requires:   %{dali2_scene_loader} = %{version}-%{release}
+
+%description -n %{dali2_scene_loader}-devel
+Development components for dali-scene-loader.
+
+##############################
 # Preparation
 ##############################
 %prep
@@ -92,6 +114,8 @@ Application development package for Dali 3D engine toolkit - headers and package
 %define dali_toolkit_sound_files    %{dali_data_ro_dir}/toolkit/sounds/
 %define dali_toolkit_style_files    %{dali_data_ro_dir}/toolkit/styles/
 %define dev_include_path %{_includedir}
+
+%define dali_xml_file_dir     %TZ_SYS_RO_PACKAGES
 
 # PO
 {
@@ -114,6 +138,10 @@ LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -Wl,-Bsymbo
 %if 0%{?enable_coverage}
 CXXFLAGS+=" --coverage "
 LDFLAGS+=" --coverage "
+%endif
+
+%ifarch %{arm}
+CXXFLAGS+=" -D_ARCH_ARM_"
 %endif
 
 libtoolize --force
@@ -388,3 +416,18 @@ esac
 %{dali_toolkit_style_files}/1920x1080/*
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
+
+%files -n %{dali2_scene_loader}
+%if 0%{?enable_dali_smack_rules}
+%manifest dali-scene-loader.manifest-smack
+%else
+%manifest dali-scene-loader.manifest
+%endif
+%defattr(-,root,root,-)
+%{_libdir}/lib%{dali2_scene_loader}.so
+%license LICENSE
+
+%files -n %{dali2_scene_loader}-devel
+%defattr(-,root,root,-)
+%{_includedir}/dali-scene-loader/public-api/*
+%{_libdir}/pkgconfig/dali2-scene-loader.pc

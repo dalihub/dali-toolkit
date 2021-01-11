@@ -45,3 +45,5 @@ build/tizen/CMakeDoxygenDefaults.cmake
 /packaging/home*
 .vscode/
 core
+.clangd/
+compile_commands.json

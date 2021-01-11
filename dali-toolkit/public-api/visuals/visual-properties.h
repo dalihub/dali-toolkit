@@ -163,7 +163,7 @@ enum Type
 {
   /**
    * @brief Offset of the visual, which can be either relative (percentage [0.0f to 1.0f] of the parent) or absolute (in world units).
-   * @details Name "offset", type Property::VECTOR2.
+   * @details Name "offset", type Property::VECTOR2, animatable.
    * @SINCE_1_2.60
    *
    * @see OFFSET_POLICY
@@ -172,7 +172,7 @@ enum Type
 
   /**
    * @brief Size of the visual, which can be either relative (percentage [0.0f to 1.0f] of the parent) or absolute (in world units).
-   * @details Name "size", type Property::VECTOR2.
+   * @details Name "size", type Property::VECTOR2, animatable.
    * @see SIZE_POLICY
    */
   SIZE,

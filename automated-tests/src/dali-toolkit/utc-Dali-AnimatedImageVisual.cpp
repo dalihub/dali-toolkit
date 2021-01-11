@@ -107,7 +107,66 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
 int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliAnimatedImageVisualGetPropertyMap for multi image" );
+  tet_infoline( "UtcDaliAnimatedImageVisualGetPropertyMap for multi image with fixed cache" );
+
+  // request AnimatedImageVisual with a property map
+  VisualFactory factory = VisualFactory::Get();
+  Property::Array urls;
+  CopyUrlsIntoArray( urls );
+
+  Visual::Base animatedImageVisual = factory.CreateVisual(
+    Property::Map()
+    .Add( Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE )
+    .Add( "url", urls )
+    .Add( "batchSize", 4 )
+    .Add( "cacheSize", 20 )
+    .Add( "loopCount", 10 )
+    .Add( "frameDelay", 200 )
+    .Add( "pixelArea", Vector4() )
+    .Add( "wrapModeU", WrapMode::REPEAT )
+    .Add( "wrapModeV", WrapMode::DEFAULT ));
+
+  Property::Map resultMap;
+  animatedImageVisual.CreatePropertyMap( resultMap );
+  // check the property values from the returned map from a visual
+  Property::Value* value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::ANIMATED_IMAGE );
+
+  value = resultMap.Find( ImageVisual::Property::URL, "url" );
+  DALI_TEST_CHECK( value );
+  Property::Array* resultUrls = value->GetArray();
+  DALI_TEST_CHECK( resultUrls );
+  DALI_TEST_EQUALS( resultUrls->Count(), urls.Count(), TEST_LOCATION );
+
+  value = resultMap.Find( ImageVisual::Property::BATCH_SIZE, "batchSize" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), 4, TEST_LOCATION );
+
+  value = resultMap.Find( ImageVisual::Property::CACHE_SIZE, "cacheSize" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), 20, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelImageVisual::Property::LOOP_COUNT, "loopCount" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), 10, TEST_LOCATION );
+
+  value = resultMap.Find( ImageVisual::Property::FRAME_DELAY, "frameDelay" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), 200, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, "totalFrameNumber" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), 11, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedImageVisualGetPropertyMap for multi image rolling cache" );
 
   // request AnimatedImageVisual with a property map
   VisualFactory factory = VisualFactory::Get();
@@ -155,10 +214,14 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<int>(), 200, TEST_LOCATION );
 
+  value = resultMap.Find( Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, "totalFrameNumber" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), 11, TEST_LOCATION );
+
   END_TEST;
 }
 
-int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
+int UtcDaliAnimatedImageVisualGetPropertyMap04(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliAnimatedImageVisualGetPropertyMap" );
@@ -192,6 +255,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
   value = resultMap.Find( ImageVisual::Property::CACHE_SIZE,  Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == 2 );
+
+  value = resultMap.Find( Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, "totalFrameNumber" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), 4, TEST_LOCATION );
 
   END_TEST;
 }
