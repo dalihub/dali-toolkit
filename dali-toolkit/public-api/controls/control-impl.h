@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_IMPL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/style-change.h>
+#include <dali/public-api/animation/alpha-function.h>
+#include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/events/long-press-gesture.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture.h>
@@ -250,6 +252,7 @@ public:
    */
   DALI_INTERNAL void KeyboardEnter();
   /// @endcond
+
 
   // Signals
 
@@ -612,6 +615,21 @@ public: // API for derived classes to override
   virtual Extension* GetControlExtension()
   {
     return NULL;
+  }
+
+  // Transition
+
+  /**
+   * @brief Retrieve visual property animations.
+   * This Control is a destination.
+   *
+   * @param[in] animation generated animation
+   * @param[in] source source control of the animation.
+   * @param[in] alphaFunction AlphaFunction of the animation
+   * @param[in] timePeriod TimePeriod of the animation
+   */
+  virtual void OnCreateTransitions(Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod timePeriod)
+  {
   }
 
 private:
