@@ -27,6 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-effect.h>
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-renderer.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace
 {
@@ -58,60 +59,6 @@ float RandomRange(float f0, float f1, unsigned int& seed)
 {
   return f0 + (rand_r( &seed ) & 0xfff) * (f1-f0) * (1.0f/4095.0f);
 }
-
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  attribute mediump vec2 aTexCoord;\n
-  uniform mediump vec3 uSize;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  varying mediump vec2 vTexCoord;\n
-  \n
-
-  void main()\n
-  {\n
-    gl_Position = uMvpMatrix * vec4(aPosition*uSize.xy,0.0,1.0);
-    vTexCoord = aTexCoord;\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-    precision highp float;\n
-    uniform vec3 uHSVDelta;\n
-    varying mediump vec2 vTexCoord;\n
-    uniform sampler2D sTexture;\n
-    float rand(vec2 co) \n
-    {\n
-      return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); \n}
-    \n
-    vec3 rgb2hsv(vec3 c)\n
-    {\n
-      vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n
-      vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));\n
-      vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));\n
-      \n
-      float d = q.x - min(q.w, q.y);\n
-      float e = 1.0e-10;\n
-      return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\n
-    }\n
-    vec3 hsv2rgb(vec3 c)\n
-    {\n
-      vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\n
-      vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);\n
-      return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);\n
-    }\n
-    void main() {\n
-      vec4 color = texture2D(sTexture, vTexCoord); \n
-      vec3 hsvColor = rgb2hsv( color.rgb );\n
-      // modify the hsv Value
-      hsvColor += uHSVDelta * rand(vTexCoord); \n
-      // if the new vale exceeds one, then decrease it
-      hsvColor -= max(hsvColor*2.0 - vec3(2.0), 0.0);\n
-      // if the new vale drops below zero, then increase it
-      hsvColor -= min(hsvColor*2.0, 0.0);\n
-      color = vec4( hsv2rgb( hsvColor ), 1.0 ); \n
-      gl_FragColor = color; \n
-    }\n
-  );
 
 Dali::Geometry CreateTexturedQuad()
 {
@@ -265,7 +212,7 @@ void BubbleEmitter::SetBackground( Texture bgTexture, const Vector3& hsvDelta )
 
   //Create renderer
   Dali::Geometry geometry = CreateTexturedQuad();
-  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+  Shader shader = Shader::New( SHADER_BUBBLE_EMITTER_VERT, SHADER_BUBBLE_EMITTER_FRAG );
   Renderer renderer = Renderer::New( geometry, shader );
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, bgTexture );

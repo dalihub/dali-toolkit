@@ -1,0 +1,4 @@
+#define TEXTURE_METALLICROUGHNESS
+
+uniform sampler2D uMetallicRoughnessSampler;
+uniform int uMetallicRoughnessTexCoordIndex;

@@ -24,36 +24,6 @@ namespace Toolkit
 namespace Internal
 {
 
-#define DALI_COMPOSE_SHADER(STR) #STR
-
-const char * const BASIC_VERTEX_SOURCE = DALI_COMPOSE_SHADER(
-  precision mediump float;\n
-  attribute mediump vec2 aPosition;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition * uSize.xy, 0.0, 1.0);\n
-    vTexCoord = aPosition + vec2(0.5);
-    gl_Position = uMvpMatrix * vertexPosition;\n
-  }\n
-);
-
-const char * const BASIC_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
-  precision mediump float;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform vec4 uColor;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = texture2D(sTexture, vTexCoord);\n
-    gl_FragColor *= uColor;
-  }\n
-);
-
 Geometry CreateGridGeometry( Uint16Pair gridSize )
 {
   uint16_t gridWidth = gridSize.GetWidth();
@@ -118,7 +88,7 @@ Geometry CreateGridGeometry( Uint16Pair gridSize )
   return geometry;
 }
 
-Dali::Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc )
+Dali::Renderer CreateRenderer( std::string_view vertexSrc, std::string_view fragmentSrc )
 {
   Dali::Shader shader = Dali::Shader::New( vertexSrc, fragmentSrc );
 
@@ -153,7 +123,7 @@ Dali::Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc )
   return renderer;
 }
 
-Dali::Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc, Dali::Shader::Hint::Value hints, Uint16Pair gridSize )
+Dali::Renderer CreateRenderer( std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, Uint16Pair gridSize )
 {
   Dali::Shader shader = Dali::Shader::New( vertexSrc, fragmentSrc, hints );
 

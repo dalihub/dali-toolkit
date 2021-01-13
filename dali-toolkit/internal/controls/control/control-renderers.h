@@ -18,6 +18,7 @@
  */
 
 #include <dali/dali.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -26,9 +27,8 @@ namespace Toolkit
 namespace Internal
 {
 
-extern const char* const BASIC_VERTEX_SOURCE;
-
-extern const char* const BASIC_FRAGMENT_SOURCE;
+#define BASIC_VERTEX_SOURCE SHADER_CONTROL_RENDERERS_VERT
+#define BASIC_FRAGMENT_SOURCE SHADER_CONTROL_RENDERERS_FRAG
 
 /**
  * Helper method for rendering an image with custom shader.
@@ -36,7 +36,7 @@ extern const char* const BASIC_FRAGMENT_SOURCE;
  * @param[in] fragmentSrc The custom fragment shader.
  * @return A newly created renderer.
  */
-Dali::Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc );
+Dali::Renderer CreateRenderer( std::string_view vertexSrc, std::string_view fragmentSrc );
 
 /**
  * Helper method for rendering an image with custom shader.
@@ -45,7 +45,7 @@ Dali::Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc );
  * @param[in] gridSize The number of grid sub-divisions required.
  * @return A newly created renderer.
  */
-Dali::Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc, Dali::Shader::Hint::Value hints, Dali::Uint16Pair gridSize );
+Dali::Renderer CreateRenderer( std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, Dali::Uint16Pair gridSize );
 
 /**
  * Helper method for setting the first texture passed to a renderer.

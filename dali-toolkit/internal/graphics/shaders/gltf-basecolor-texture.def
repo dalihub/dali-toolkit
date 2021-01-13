@@ -1,0 +1,4 @@
+#define TEXTURE_BASECOLOR
+
+uniform sampler2D uBaseColorSampler;
+uniform int uBaseColorTexCoordIndex;

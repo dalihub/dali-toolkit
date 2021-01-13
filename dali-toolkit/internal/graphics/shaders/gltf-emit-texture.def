@@ -1,0 +1,5 @@
+#define TEXTURE_EMIT
+
+uniform sampler2D uEmissiveSampler;
+uniform int uEmissiveTexCoordIndex;
+uniform vec3 uEmissiveFactor;

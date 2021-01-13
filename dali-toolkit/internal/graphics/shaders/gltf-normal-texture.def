@@ -1,0 +1,5 @@
+#define TEXTURE_NORMAL
+
+uniform sampler2D uNormalSampler;
+uniform float uNormalScale;
+uniform int uNormalTexCoordIndex;
