@@ -44,6 +44,12 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/image-loader/image-atlas.cpp
   ${devel_api_src_dir}/image-loader/texture-manager.cpp
   ${devel_api_src_dir}/layouting/flex-node.cpp
+  ${devel_api_src_dir}/shader-effects/alpha-discard-effect.cpp
+  ${devel_api_src_dir}/shader-effects/dissolve-effect.cpp
+  ${devel_api_src_dir}/shader-effects/distance-field-effect.cpp
+  ${devel_api_src_dir}/shader-effects/image-region-effect.cpp
+  ${devel_api_src_dir}/shader-effects/motion-blur-effect.cpp
+  ${devel_api_src_dir}/shader-effects/motion-stretch-effect.cpp
   ${devel_api_src_dir}/styling/style-manager-devel.cpp
   ${devel_api_src_dir}/text/bitmap-font.cpp
   ${devel_api_src_dir}/text/text-utils-devel.cpp
