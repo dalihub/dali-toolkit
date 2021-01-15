@@ -1247,6 +1247,11 @@ int UtcDaliImageVisualSetInvalidSyncImage(void)
   application.SendNotification();
   application.Render();
 
+  // Check resource status
+  Visual::ResourceStatus status = actor.GetVisualResourceStatus(Control::CONTROL_PROPERTY_END_INDEX + 1);
+  DALI_TEST_EQUALS(status, Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+  // The broken image should be shown.
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 

@@ -132,7 +132,6 @@ TextureManager::TextureManager()
   mExternalTextures(),
   mLifecycleObservers(),
   mLoadQueue(),
-  mBrokenImageUrl(""),
   mCurrentTextureId( 0 ),
   mQueueLoadFlag(false)
 {
@@ -163,18 +162,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
     }
     if( !pixelBuffer )
     {
-      // use broken image
-      pixelBuffer = LoadImageFromFile( mBrokenImageUrl );
-      PixelData pixelData;
-      if( pixelBuffer )
-      {
-        pixelData = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
-      }
-      Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(),
-                                      pixelData.GetWidth(), pixelData.GetHeight() );
-      texture.Upload( pixelData );
-      textureSet = TextureSet::New();
-      textureSet.SetTexture( 0u, texture );
+      DALI_LOG_ERROR("TextureManager::LoadAnimatedImageTexture: Synchronous loading is failed\n");
     }
     else
     {
@@ -294,18 +282,7 @@ TextureSet TextureManager::LoadTexture(
     }
     if( !data )
     {
-      // use broken image
-      Devel::PixelBuffer pixelBuffer = LoadImageFromFile( mBrokenImageUrl );
-      if( pixelBuffer )
-      {
-        PreMultiply( pixelBuffer, preMultiplyOnLoad );
-        data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
-      }
-      Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(),
-                                      data.GetWidth(), data.GetHeight() );
-      texture.Upload( data );
-      textureSet = TextureSet::New();
-      textureSet.SetTexture( 0u, texture );
+      DALI_LOG_ERROR("TextureManager::LoadTexture: Synchronous loading is failed\n");
     }
     else
     {
@@ -1374,11 +1351,6 @@ void TextureManager::AsyncLoadingHelper::AsyncLoadComplete(uint32_t           id
                                                            Devel::PixelBuffer pixelBuffer )
 {
   mTextureManager.AsyncLoadComplete( mLoadingInfoContainer, id, pixelBuffer );
-}
-
-void TextureManager::SetBrokenImageUrl(const std::string& brokenImageUrl)
-{
-  mBrokenImageUrl = brokenImageUrl;
 }
 
 Geometry TextureManager::GetRenderGeometry(TextureId textureId, uint32_t& frontElements, uint32_t& backElements )

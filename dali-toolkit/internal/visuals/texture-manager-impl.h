@@ -422,12 +422,6 @@ public:
   void RemoveObserver( TextureManager::LifecycleObserver& observer );
 
   /**
-   * @brief Set an image to be used when a visual has failed to correctly render
-   * @param[in] brokenImageUrl The broken image url.
-   */
-  void SetBrokenImageUrl(const std::string& brokenImageUrl);
-
-  /**
    * @brief Returns the geometry associated with texture.
    * @param[in] textureId Id of the texture
    * @param[out] frontElements number of front elements
@@ -897,7 +891,6 @@ private:  // Member Variables:
   std::vector< ExternalTextureInfo >            mExternalTextures;     ///< Externally provided textures
   Dali::Vector<LifecycleObserver*>              mLifecycleObservers;   ///< Lifecycle observers of texture manager
   Dali::Vector<LoadQueueElement>                mLoadQueue;            ///< Queue of textures to load after NotifyObservers
-  std::string                                   mBrokenImageUrl;       ///< Broken image url
   TextureId                                     mCurrentTextureId;     ///< The current value used for the unique Texture Id generation
   bool                                          mQueueLoadFlag;        ///< Flag that causes Load Textures to be queued.
 };
