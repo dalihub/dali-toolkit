@@ -37,6 +37,7 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 // TODO:
 // pixel format / size - set from JSON
@@ -101,24 +102,6 @@ const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE = 0.5f;
 const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE = 0.5f;
 
 const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
-
-const char* const GAUSSIAN_BLUR_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
-    varying mediump vec2 vTexCoord;\n
-    uniform sampler2D sTexture;\n
-    uniform lowp vec4 uColor;\n
-    uniform mediump vec2 uSampleOffsets[NUM_SAMPLES];\n
-    uniform mediump float uSampleWeights[NUM_SAMPLES];\n
-
-    void main()\n
-    {\n
-       mediump vec4 col = texture2D(sTexture, vTexCoord + uSampleOffsets[0]) * uSampleWeights[0];\n
-       for (int i=1; i<NUM_SAMPLES; ++i)\n
-       {\n
-         col += texture2D(sTexture, vTexCoord + uSampleOffsets[i]) * uSampleWeights[i];\n
-       }\n
-       gl_FragColor = col;\n
-    }\n
-);
 
 } // namespace
 
@@ -255,7 +238,7 @@ void GaussianBlurView::OnInitialize()
 
   std::ostringstream fragmentStringStream;
   fragmentStringStream << "#define NUM_SAMPLES " << mNumSamples << "\n";
-  fragmentStringStream << GAUSSIAN_BLUR_FRAGMENT_SOURCE;
+  fragmentStringStream << SHADER_GAUSSIAN_BLUR_VIEW_FRAG;
   std::string fragmentSource(fragmentStringStream.str());
 
   //////////////////////////////////////////////////////
@@ -264,6 +247,7 @@ void GaussianBlurView::OnInitialize()
   // Create an actor for performing a horizontal blur on the texture
   mHorizBlurActor = Actor::New();
   mHorizBlurActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
+
   Renderer renderer = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
   mHorizBlurActor.AddRenderer( renderer );
 

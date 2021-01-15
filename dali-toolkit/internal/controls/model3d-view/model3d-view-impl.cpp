@@ -29,6 +29,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
@@ -92,185 +93,6 @@ DALI_PROPERTY_REGISTRATION( Toolkit, Model3dView, "texture2Url",  STRING, TEXTUR
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Model3dView, "lightPosition",  VECTOR3, LIGHT_POSITION)
 
 DALI_TYPE_REGISTRATION_END()
-
-
-#define MAKE_SHADER(A)#A
-
-//  Diffuse illumination shader
-
-const char* SIMPLE_VERTEX_SHADER = MAKE_SHADER(
-  attribute highp vec3 aPosition;\n
-  attribute highp vec2 aTexCoord;\n
-  attribute highp vec3 aNormal;\n
-  varying mediump vec3 vIllumination;\n
-  uniform mediump vec3 uSize;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump mat4 uModelView;\n
-  uniform mediump mat3 uNormalMatrix;
-  uniform mediump mat4 uObjectMatrix;\n
-  uniform mediump vec3 uLightPosition;\n
-
-  void main()\n
-  {\n
-    vec4 vertexPosition = vec4(aPosition*min(uSize.x, uSize.y), 1.0);\n
-    vertexPosition = uObjectMatrix * vertexPosition;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-
-    //Illumination in Model-View space - Transform attributes and uniforms\n
-    vec4 vertPos = uModelView * vec4(aPosition.xyz, 1.0);\n
-    vec3 normal = uNormalMatrix * aNormal;\n
-    vec4 lightPos = uModelView * vec4(uLightPosition, 1.0);\n
-    vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
-
-    float lightDiffuse = max( dot( vecToLight, normal ), 0.0 );\n
-    vIllumination = vec3(lightDiffuse * 0.5 + 0.5);\n
-
-    gl_Position = vertexPosition;\n
-  }\n
-);
-
-const char* SIMPLE_FRAGMENT_SHADER = MAKE_SHADER(
-  precision mediump float;\n
-  varying mediump vec3 vIllumination;\n
-  uniform lowp vec4 uColor;\n
-
-  void main()\n
-  {\n
-    gl_FragColor = vec4( vIllumination.rgb * uColor.rgb, uColor.a);\n
-  }\n
-);
-
-//  Diffuse and specular illumination shader with albedo texture
-
-const char* VERTEX_SHADER = MAKE_SHADER(
-  attribute highp vec3 aPosition;\n
-  attribute highp vec2 aTexCoord;\n
-  attribute highp vec3 aNormal;\n
-  varying mediump vec2 vTexCoord;\n
-  varying mediump vec3 vIllumination;\n
-  varying mediump float vSpecular;\n
-  uniform mediump vec3 uSize;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump mat4 uModelView;
-  uniform mediump mat3 uNormalMatrix;
-  uniform mediump mat4 uObjectMatrix;\n
-  uniform mediump vec3 uLightPosition;\n
-
-  void main()
-  {\n
-    vec4 vertexPosition = vec4(aPosition*min(uSize.x, uSize.y), 1.0);\n
-    vertexPosition = uObjectMatrix * vertexPosition;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-
-    //Illumination in Model-View space - Transform attributes and uniforms\n
-    vec4 vertPos = uModelView * vec4(aPosition.xyz, 1.0);\n
-    vec4 lightPos = uModelView * vec4(uLightPosition, 1.0);\n
-    vec3 normal = normalize(uNormalMatrix * aNormal);\n
-
-    vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
-    vec3 viewDir = normalize(-vertPos.xyz);
-
-    vec3 halfVector = normalize(viewDir + vecToLight);
-
-    float lightDiffuse = dot( vecToLight, normal );\n
-    lightDiffuse = max(0.0,lightDiffuse);\n
-    vIllumination = vec3(lightDiffuse * 0.5 + 0.5);\n
-
-    vec3 reflectDir = reflect(-vecToLight, normal);
-    vSpecular = pow( max(dot(reflectDir, viewDir), 0.0), 4.0 );
-
-    vTexCoord = aTexCoord;\n
-    gl_Position = vertexPosition;\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER = MAKE_SHADER(
-  precision mediump float;\n
-  varying mediump vec2 vTexCoord;\n
-  varying mediump vec3 vIllumination;\n
-  varying mediump float vSpecular;\n
-  uniform sampler2D sDiffuse;\n
-  uniform lowp vec4 uColor;\n
-
-  void main()\n
-  {\n
-    vec4 texture = texture2D( sDiffuse, vTexCoord );\n
-    gl_FragColor = vec4( vIllumination.rgb * texture.rgb * uColor.rgb + vSpecular * 0.3, texture.a * uColor.a);\n
-  }\n
-);
-
-//  Diffuse and specular illumination shader with albedo texture, normal map and gloss map shader
-
-const char* NRMMAP_VERTEX_SHADER = MAKE_SHADER(
-  attribute highp vec3 aPosition;\n
-  attribute highp vec2 aTexCoord;\n
-  attribute highp vec3 aNormal;\n
-  attribute highp vec3 aTangent;\n
-  attribute highp vec3 aBiNormal;\n
-  varying mediump vec2 vTexCoord;\n
-  varying mediump vec3 vLightDirection;\n
-  varying mediump vec3 vHalfVector;\n
-  uniform mediump vec3 uSize;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump mat4 uModelView;
-  uniform mediump mat3 uNormalMatrix;
-  uniform mediump mat4 uObjectMatrix;\n
-  uniform mediump vec3 uLightPosition;\n
-
-  void main()
-  {\n
-    vec4 vertexPosition = vec4(aPosition*min(uSize.x, uSize.y), 1.0);\n
-    vertexPosition = uObjectMatrix * vertexPosition;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-
-    vec4 vertPos = uModelView * vec4(aPosition.xyz, 1.0);\n
-    vec4 lightPos = uModelView * vec4(uLightPosition, 1.0);\n
-
-    vec3 tangent = normalize(uNormalMatrix * aTangent);
-    vec3 binormal = normalize(uNormalMatrix * aBiNormal);
-    vec3 normal = normalize(uNormalMatrix * aNormal);
-
-    vec3 vecToLight = normalize( lightPos.xyz - vertPos.xyz );\n
-    vLightDirection.x = dot(vecToLight, tangent);
-    vLightDirection.y = dot(vecToLight, binormal);
-    vLightDirection.z = dot(vecToLight, normal);
-
-    vec3 viewDir = normalize(-vertPos.xyz);
-    vec3 halfVector = normalize(viewDir + vecToLight);
-    vHalfVector.x = dot(halfVector, tangent);
-    vHalfVector.y = dot(halfVector, binormal);
-    vHalfVector.z = dot(halfVector, normal);
-
-    vTexCoord = aTexCoord;\n
-    gl_Position = vertexPosition;\n
-  }\n
-);
-
-const char* NRMMAP_FRAGMENT_SHADER = MAKE_SHADER(
-  precision mediump float;\n
-  varying mediump vec2 vTexCoord;\n
-  varying mediump vec3 vLightDirection;\n
-  varying mediump vec3 vHalfVector;\n
-  uniform sampler2D sDiffuse;\n
-  uniform sampler2D sNormal;\n
-  uniform sampler2D sGloss;\n
-  uniform lowp vec4 uColor;\n
-
-  void main()\n
-  {\n
-    vec4 texture = texture2D( sDiffuse, vTexCoord );\n
-    vec3 normal = normalize( texture2D( sNormal, vTexCoord ).xyz * 2.0 - 1.0 );\n
-    vec4 glossMap = texture2D( sGloss, vTexCoord );\n
-
-    float lightDiffuse = max( 0.0, dot( normal, normalize(vLightDirection) ) );\n
-    lightDiffuse = lightDiffuse * 0.5 + 0.5;\n
-
-    float shininess = pow (max (dot (normalize( vHalfVector ), normal), 0.0), 16.0)  ;
-
-    gl_FragColor = vec4( texture.rgb * uColor.rgb * lightDiffuse + shininess * glossMap.rgb, texture.a * uColor.a);\n
-  }\n
-);
-
 
 } // anonymous namespace
 
@@ -459,7 +281,7 @@ void Model3dView::OnInitialize()
 {
   //Create empty versions of the geometry and material so we always have a Renderer
   Geometry mesh = Geometry::New();
-  Shader shader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
+  Shader shader = Shader::New( SHADER_MODEL3D_VIEW_SIMPLE_SHADER_VERT, SHADER_MODEL3D_VIEW_SIMPLE_SHADER_FRAG );
   mRenderer = Renderer::New( mesh, shader );
 
   DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
@@ -572,21 +394,21 @@ void Model3dView::CreateMaterial()
   {
     if( (mTexture2Url != "") && (mTexture1Url != "") && (mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP) )
     {
-      mShader = Shader::New( NRMMAP_VERTEX_SHADER, NRMMAP_FRAGMENT_SHADER );
+      mShader = Shader::New( SHADER_MODEL3D_VIEW_NRMMAP_SHADER_VERT, SHADER_MODEL3D_VIEW_NRMMAP_SHADER_FRAG );
     }
     else if( mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_TEXTURE ||
              mIlluminationType == Toolkit::Model3dView::DIFFUSE_WITH_NORMAL_MAP )
     {
-      mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+      mShader = Shader::New( SHADER_MODEL3D_VIEW_SHADER_VERT, SHADER_MODEL3D_VIEW_SHADER_FRAG );
     }
     else
     {
-      mShader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
+      mShader = Shader::New( SHADER_MODEL3D_VIEW_SIMPLE_SHADER_VERT, SHADER_MODEL3D_VIEW_SIMPLE_SHADER_FRAG );
     }
   }
   else
   {
-    mShader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
+    mShader = Shader::New( SHADER_MODEL3D_VIEW_SIMPLE_SHADER_VERT, SHADER_MODEL3D_VIEW_SIMPLE_SHADER_FRAG );
   }
 
   mTextureSet = TextureSet::New();

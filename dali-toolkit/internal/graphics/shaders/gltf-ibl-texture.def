@@ -1,0 +1,7 @@
+#define TEXTURE_IBL
+
+uniform sampler2D ubrdfLUT;
+uniform samplerCube uDiffuseEnvSampler;
+uniform samplerCube uSpecularEnvSampler;
+uniform vec4 uScaleIBLAmbient;
+uniform highp float uMipmapLevel;

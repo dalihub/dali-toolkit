@@ -47,3 +47,5 @@ build/tizen/CMakeDoxygenDefaults.cmake
 core
 .clangd/
 compile_commands.json
+dali-toolkit/internal/graphics/generated/*
+dali-toolkit/internal/graphics/builtin-shader-extern-gen.h

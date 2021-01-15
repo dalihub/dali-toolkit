@@ -179,6 +179,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/transition-effects/cube-transition-wave-effect-impl.cpp
    ${toolkit_src_dir}/text/xhtml-entities.cpp
    ${toolkit_src_dir}/drag-drop-detector/drag-and-drop-detector-impl.cpp
+   ${toolkit_src_dir}/graphics/generated/builtin-shader-gen.cpp
 )
 
 SET( SOURCES ${SOURCES}

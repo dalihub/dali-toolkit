@@ -33,6 +33,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 #include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
@@ -84,54 +85,6 @@ const char* const BLOOM_INTENSITY_PROPERTY_NAME = "uBloomIntensity";
 const char* const BLOOM_SATURATION_PROPERTY_NAME = "uBloomSaturation";
 const char* const IMAGE_INTENSITY_PROPERTY_NAME = "uImageIntensity";
 const char* const IMAGE_SATURATION_PROPERTY_NAME = "uImageSaturation";
-
-///////////////////////////////////////////////////////
-//
-// Bloom shaders
-//
-
-const char* const BLOOM_EXTRACT_FRAGMENT_SOURCE =
-  "varying mediump vec2 vTexCoord;\n"
-  "uniform sampler2D sTexture;\n"
-  "uniform lowp vec4 uColor;\n"
-  "uniform mediump float uBloomThreshold;\n"
-  "uniform mediump float uRecipOneMinusBloomThreshold;\n"
-  "void main()\n"
-  "{\n"
-  "  mediump vec4 col;\n"
-  "  col = texture2D(sTexture, vTexCoord);\n"
-  "  col = (col - uBloomThreshold) * uRecipOneMinusBloomThreshold;\n" // remove intensities lower than the thresold and remap intensities above the threshold to [0..1]
-  "  gl_FragColor = clamp(col, 0.0, 1.0);\n"
-  "}\n";
-
-const char* const COMPOSITE_FRAGMENT_SOURCE =
-  "precision mediump float;\n"
-  "varying mediump vec2 vTexCoord;\n"
-  "uniform sampler2D sTexture;\n"
-  "uniform sampler2D sEffect;\n"
-  "uniform lowp vec4 uColor;\n"
-  "uniform float uBloomIntensity;\n"
-  "uniform float uImageIntensity;\n"
-  "uniform float uBloomSaturation;\n"
-  "uniform float uImageSaturation;\n"
-
-  "vec4 ChangeSaturation(vec4 col, float sat)\n"
-  "{\n"
-  "  float grey = dot(col.rgb, vec3(0.3, 0.6, 0.1));\n"
-  "  return mix(vec4(grey, grey, grey, 1.0), col, sat);\n"
-  "}\n"
-
-  "void main()\n"
-  "{\n"
-  "  mediump vec4 image;\n"
-  "  mediump vec4 bloom;\n"
-  "  image = texture2D(sTexture, vTexCoord);\n"
-  "  bloom = texture2D(sEffect, vTexCoord);\n"
-  "  image = ChangeSaturation(image, uImageSaturation) * uImageIntensity;\n"
-  "  bloom = ChangeSaturation(bloom, uBloomSaturation) * uBloomIntensity;\n"
-  "  image *= 1.0 - clamp(bloom, 0.0, 1.0);\n" // darken base where bloom is strong, to prevent excessive burn-out of result
-  "  gl_FragColor = image + bloom;\n"
-  "}\n";
 
 } // namespace
 
@@ -386,7 +339,7 @@ void BloomView::AllocateResources()
     //////////////////////////////////////////////////////
     // Point actors and render tasks at new render targets
 
-    Renderer bloomRenderer = CreateRenderer( BASIC_VERTEX_SOURCE, BLOOM_EXTRACT_FRAGMENT_SOURCE );
+    Renderer bloomRenderer = CreateRenderer( BASIC_VERTEX_SOURCE, SHADER_BLOOM_VIEW_EXTRACT_SHADER_FRAG );
     SetRendererTexture( bloomRenderer, mRenderTargetForRenderingChildren );
     mBloomExtractActor.AddRenderer( bloomRenderer );
     mBloomExtractActor.SetProperty( Actor::Property::SIZE, Vector2( mDownsampledWidth, mDownsampledHeight ) ); // size needs to match render target
@@ -395,7 +348,7 @@ void BloomView::AllocateResources()
     mGaussianBlurView.SetUserImageAndOutputRenderTarget( mBloomExtractTarget.GetColorTexture(), blurExtractTarget );
 
     // use the completed blur in the first buffer and composite with the original child actors render
-    Renderer compositeRenderer = CreateRenderer( BASIC_VERTEX_SOURCE, COMPOSITE_FRAGMENT_SOURCE );
+    Renderer compositeRenderer = CreateRenderer( BASIC_VERTEX_SOURCE, SHADER_BLOOM_VIEW_COMPOSITE_SHADER_FRAG );
     SetRendererTexture( compositeRenderer, mRenderTargetForRenderingChildren );
     TextureSet textureSet = compositeRenderer.GetTextures();
     textureSet.SetTexture( 0u, mRenderTargetForRenderingChildren.GetColorTexture() );

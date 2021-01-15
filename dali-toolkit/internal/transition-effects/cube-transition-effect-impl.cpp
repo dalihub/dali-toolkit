@@ -22,10 +22,11 @@
 #include <cstring> // for strcmp
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 
 namespace Dali
@@ -46,38 +47,6 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::CubeTransitionEffect, Dali::BaseHandle, N
 DALI_SIGNAL_REGISTRATION( Toolkit, CubeTransitionEffect, "transitionCompleted",  SIGNAL_TRANSITION_COMPLETED )
 
 DALI_TYPE_REGISTRATION_END()
-
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  uniform mediump vec4 uTextureRect;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
-    vTexCoord = aPosition + vec2(0.5);\n
-    vTexCoord = mix(uTextureRect.xy, uTextureRect.zw, vTexCoord);\n
-
-    gl_Position = vertexPosition;\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec4 uSamplerRect;
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
-  }\n
-);
 
 Actor CreateTile( const Vector4& samplerRect )
 {
@@ -247,7 +216,7 @@ void CubeTransitionEffect::Initialize()
 void CubeTransitionEffect::OnSceneConnection( int depth )
 {
   Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+  Shader shader = Shader::New( SHADER_CUBE_TRANSITION_EFFECT_VERT, SHADER_CUBE_TRANSITION_EFFECT_FRAG );
 
   TextureSet textureSet = TextureSet::New();
 
