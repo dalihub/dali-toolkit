@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -38,26 +39,6 @@ namespace Internal
 
 namespace
 {
-
-const char* const SPREAD_FRAGMENT_SOURCE =
-{
- "precision highp float;\n"
- "varying mediump vec2 vTexCoord;\n"
- "uniform sampler2D sTexture;\n"
- "uniform int uSpread;\n"
- "uniform vec2 uTexScale;\n"
- "void main()\n"
- "{\n"
- "  vec4 color = texture2D( sTexture, vTexCoord);\n"
- "  for( int i = 1; i <= uSpread; ++i )\n"
- "  {\n"
- "    vec2 offset = uTexScale * float(i);\n"
- "    color = max( texture2D( sTexture, vTexCoord + offset), color );\n"
- "    color = max( texture2D( sTexture, vTexCoord - offset), color );\n"
- "  }\n"
- "  gl_FragColor = color;\n"
- "}\n"
-};
 
 const char* const SPREAD_UNIFORM_NAME( "uSpread" );
 const char* const TEX_SCALE_UNIFORM_NAME( "uTexScale" );
@@ -90,7 +71,7 @@ void SpreadFilter::Enable()
   mActorForInput.RegisterProperty( SPREAD_UNIFORM_NAME, mSpread );
   mActorForInput.RegisterProperty( TEX_SCALE_UNIFORM_NAME, Vector2( 1.0f / mTargetSize.width, 0.0f ) );
 
-  Renderer rendererForInput = CreateRenderer( BASIC_VERTEX_SOURCE, SPREAD_FRAGMENT_SOURCE );
+  Renderer rendererForInput = CreateRenderer( BASIC_VERTEX_SOURCE, SHADER_SPREAD_FILTER_SHADER_FRAG );
   SetRendererTexture( rendererForInput, mInputTexture );
   mActorForInput.AddRenderer( rendererForInput );
 
@@ -106,7 +87,7 @@ void SpreadFilter::Enable()
   // register properties as shader uniforms
   mActorForHorz.RegisterProperty( SPREAD_UNIFORM_NAME, mSpread );
   mActorForHorz.RegisterProperty( TEX_SCALE_UNIFORM_NAME, Vector2( 0.0f, 1.0f / mTargetSize.height ) );
-  Renderer rendererForHorz = CreateRenderer( BASIC_VERTEX_SOURCE, SPREAD_FRAGMENT_SOURCE );
+  Renderer rendererForHorz = CreateRenderer( BASIC_VERTEX_SOURCE, SHADER_SPREAD_FILTER_SHADER_FRAG );
   SetRendererTexture( rendererForHorz, textureForHorz );
   mActorForHorz.AddRenderer( rendererForHorz );
 

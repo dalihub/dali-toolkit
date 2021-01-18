@@ -49,3 +49,5 @@ core
 compile_commands.json
 dali-toolkit/internal/graphics/generated/*
 dali-toolkit/internal/graphics/builtin-shader-extern-gen.h
+dali-scene-loader/internal/graphics/generated/*
+dali-scene-loader/internal/graphics/builtin-shader-extern-gen.h

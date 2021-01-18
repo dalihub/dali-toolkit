@@ -25,6 +25,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -92,89 +93,6 @@ const float DEFAULT_ANIMATION_REPEAT_DELAY = 0.0f;
 const Toolkit::DevelAnimatedGradientVisual::AnimationParameter::DirectionType::Type DEFAULT_ANIMATION_DIRECTION_TYPE = Toolkit::DevelAnimatedGradientVisual::AnimationParameter::DirectionType::FORWARD;
 const Toolkit::DevelAnimatedGradientVisual::AnimationParameter::MotionType::Type    DEFAULT_ANIMATION_MOTION_TYPE    = Toolkit::DevelAnimatedGradientVisual::AnimationParameter::MotionType::LOOP;
 const Toolkit::DevelAnimatedGradientVisual::AnimationParameter::EasingType::Type    DEFAULT_ANIMATION_EASING_TYPE    = Toolkit::DevelAnimatedGradientVisual::AnimationParameter::EasingType::LINEAR;
-
-const char* const BASIC_VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;
-  uniform highp   mat4 uMvpMatrix;
-  uniform highp   vec3 uSize;
-
-  uniform mediump vec2 start_point;
-  uniform mediump vec2 end_point;
-  uniform mediump vec2 rotate_center;
-  uniform mediump float rotate_angle;
-
-  varying mediump vec2 vTexCoord;
-  varying mediump vec2 vStart;
-  varying mediump vec2 vEnd;
-
-  vec2 rotate(vec2 x, vec2 c, float a)
-  {
-    vec2 d = x - c;
-    vec2 r = vec2(d.x * cos(a) - d.y * sin(a), d.x * sin(a) + d.y * cos(a));
-
-\n  #ifdef UNIT_TYPE_BOUNDING_BOX \n return r + c;             \n #endif \n /* UnitType::OBJECT_BOUNDING_BOX */
-\n  #ifdef UNIT_TYPE_USER         \n return (r + c) / uSize.x; \n #endif \n /* UnitType::USER_SPACE          */
-  }
-
-  //Visual size and offset
-  uniform mediump vec2 offset;
-  uniform highp vec2 size;
-  uniform mediump vec4 offsetSizeMode;
-  uniform mediump vec2 origin;
-  uniform mediump vec2 anchorPoint;
-
-  vec4 ComputeVertexPosition()
-  {
-    vec2 visualSize = mix( uSize.xy*size, size, offsetSizeMode.zw );
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy );
-    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );
-  }
-
-  void main()
-  {
-    vStart = rotate( start_point, rotate_center, rotate_angle );
-    vEnd = rotate( end_point, rotate_center, rotate_angle );
-    gl_Position = uMvpMatrix * ComputeVertexPosition();
-
-\n  #ifdef UNIT_TYPE_BOUNDING_BOX \n vTexCoord = vec2(aPosition.x, -aPosition.y);                     \n #endif \n /* UnitType::OBJECT_BOUNDING_BOX */
-\n  #ifdef UNIT_TYPE_USER         \n vTexCoord = vec2(aPosition.x, -aPosition.y * uSize.y / uSize.x); \n #endif \n /* UnitType::USER_SPACE          */
-  }
-);
-
-const char* const BASIC_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  precision mediump float;
-
-  uniform mediump vec4 start_color;
-  uniform mediump vec4 end_color;
-  uniform mediump float gradient_offset;
-
-  varying mediump vec2 vTexCoord;
-  varying mediump vec2 vStart;
-  varying mediump vec2 vEnd;
-
-  float get_position(vec2 x, vec2 s, vec2 e)
-  {
-    vec2 df = e - s;
-    vec2 dx = x - s;
-
-\n  #ifdef GRADIENT_TYPE_LINEAR \n return dot(dx,df)/dot(df,df);       \n #endif \n /* GradientType::LINEAR */
-\n  #ifdef GRADIENT_TYPE_RADIAL \n return sqrt(dot(dx,dx)/dot(df,df)); \n #endif \n /* GradientType::RADIAL */
-  }
-  float recalculate(float r)
-  {
-\n  #ifdef SPREAD_TYPE_REFLECT \n return 1.0 - abs(mod(r, 2.0) - 1.0); \n #endif \n /* SpreadType::REFLECT */
-\n  #ifdef SPREAD_TYPE_REPEAT  \n return fract(r);                     \n #endif \n /* SpreadType::REPEAT  */
-\n  #ifdef SPREAD_TYPE_CLAMP   \n return clamp(r, 0.0, 1.0);           \n #endif \n /* SpreadType::CLAMP   */
-  }
-
-  void main()
-  {
-    float r = get_position( vTexCoord, vStart, vEnd );
-    r = recalculate( r + gradient_offset );
-    vec4 color = mix( start_color, end_color, r );
-    gl_FragColor = color;
-  }
-);
 
 Property::Value GetStartValue( const Property::Map& map, Property::Index index, const char* const name )
 {
@@ -737,10 +655,10 @@ Shader AnimatedGradientVisual::CreateShader()
   std::string frag;
 
   vert = "#define " + tagUnit + "\n"
-       + BASIC_VERTEX_SHADER;
+       + SHADER_ANIMATED_GRADIENT_VISUAL_SHADER_VERT.data();
   frag = "#define " + tagGrad + "\n"
        + "#define " + tagSpread + "\n"
-       + BASIC_FRAGMENT_SHADER;
+       + SHADER_ANIMATED_GRADIENT_VISUAL_SHADER_FRAG.data();
 
   shader = Shader::New( vert, frag );
   return shader;

@@ -36,6 +36,14 @@
 #include <dali-toolkit/internal/visuals/gradient/linear-gradient.h>
 #include <dali-toolkit/internal/visuals/gradient/radial-gradient.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/graphics/generated/gradient-visual-bounding-box-rounded-corner-shader-vert.h>
+#include <dali-toolkit/internal/graphics/generated/gradient-visual-bounding-box-shader-vert.h>
+#include <dali-toolkit/internal/graphics/generated/gradient-visual-linear-rounded-corner-shader-frag.h>
+#include <dali-toolkit/internal/graphics/generated/gradient-visual-linear-shader-frag.h>
+#include <dali-toolkit/internal/graphics/generated/gradient-visual-radial-rounded-corner-shader-frag.h>
+#include <dali-toolkit/internal/graphics/generated/gradient-visual-radial-shader-frag.h>
+#include <dali-toolkit/internal/graphics/generated/gradient-visual-user-space-rounded-corner-shader-vert.h>
+#include <dali-toolkit/internal/graphics/generated/gradient-visual-user-space-shader-vert.h>
 
 namespace Dali
 {
@@ -83,220 +91,34 @@ VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[][4] =
   }
 };
 
-const char* VERTEX_SHADER[] =
+const std::string_view VERTEX_SHADER[] =
 {
-// vertex shader for gradient units as OBJECT_BOUNDING_BOX
-DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  uniform mediump mat3 uAlignmentMatrix;\n
-  varying mediump vec2 vTexCoord;\n
-  \n
+  // vertex shader for gradient units as OBJECT_BOUNDING_BOX
+  SHADER_GRADIENT_VISUAL_BOUNDING_BOX_SHADER_VERT,
 
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
+  // vertex shader for gradient units as USER_SPACE
+  SHADER_GRADIENT_VISUAL_USER_SPACE_SHADER_VERT,
 
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-  }\n
+  // vertex shader for gradient units as OBJECT_BOUNDING_BOX with corner radius
+  SHADER_GRADIENT_VISUAL_BOUNDING_BOX_ROUNDED_CORNER_SHADER_VERT,
 
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
-    \n
-    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
-  }\n
-),
-
-// vertex shader for gradient units as USER_SPACE
-DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  uniform mediump mat3 uAlignmentMatrix;\n
-  varying mediump vec2 vTexCoord;\n
-  \n
-
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-  }\n
-
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
-    \n
-    vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
-  }\n
-),
-
-// vertex shader for gradient units as OBJECT_BOUNDING_BOX with corner radius
-DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  uniform mediump mat3 uAlignmentMatrix;\n
-  varying mediump vec2 vTexCoord;\n
-  varying mediump vec2 vPosition;\n
-  varying mediump vec2 vRectSize;\n
-  varying mediump float vCornerRadius;\n
-  \n
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-  uniform mediump float cornerRadius;\n
-  uniform mediump float cornerRadiusPolicy;\n
-
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    mediump float minSize = min( visualSize.x, visualSize.y );\n
-    vCornerRadius = mix( cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);\n
-    vCornerRadius = min( vCornerRadius, minSize * 0.5 );\n
-    vRectSize = visualSize * 0.5 - vCornerRadius;\n
-    vPosition = aPosition * visualSize;\n
-    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-  }\n
-
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
-    \n
-    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
-  }\n
-),
-
-// vertex shader for gradient units as USER_SPACE with corner radius
-DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  uniform mediump mat3 uAlignmentMatrix;\n
-  varying mediump vec2 vTexCoord;\n
-  varying mediump vec2 vPosition;\n
-  varying mediump vec2 vRectSize;\n
-  varying mediump float vCornerRadius;\n
-  \n
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-  uniform mediump float cornerRadius;\n
-  uniform mediump float cornerRadiusPolicy;\n
-
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    mediump float minSize = min( visualSize.x, visualSize.y );\n
-    vCornerRadius = mix( cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);\n
-    vCornerRadius = min( vCornerRadius, minSize * 0.5 );\n
-    vRectSize = visualSize * 0.5 - vCornerRadius;\n
-    vPosition = aPosition * visualSize;\n
-    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-  }\n
-
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
-    \n
-    vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
-  }\n
-)
+  // vertex shader for gradient units as USER_SPACE with corner radius
+  SHADER_GRADIENT_VISUAL_USER_SPACE_ROUNDED_CORNER_SHADER_VERT
 };
 
-const char* FRAGMENT_SHADER[] =
+const std::string_view FRAGMENT_SHADER[] =
 {
-// fragment shader for linear gradient
-DALI_COMPOSE_SHADER(
-  uniform sampler2D sTexture;\n // sampler1D?
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  varying mediump vec2 vTexCoord;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = texture2D( sTexture, vec2( vTexCoord.y, 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
-  }\n
-),
+  // fragment shader for linear gradient
+  SHADER_GRADIENT_VISUAL_LINEAR_SHADER_FRAG,
 
-// fragment shader for radial gradient
-DALI_COMPOSE_SHADER(
-  uniform sampler2D sTexture;\n // sampler1D?
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  varying mediump vec2 vTexCoord;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = texture2D( sTexture, vec2( length(vTexCoord), 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
-  }\n
-),
+  // fragment shader for radial gradient
+  SHADER_GRADIENT_VISUAL_RADIAL_SHADER_FRAG,
 
-// fragment shader for linear gradient with corner radius
-DALI_COMPOSE_SHADER(
-  uniform sampler2D sTexture;\n // sampler1D?
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  varying mediump vec2 vTexCoord;\n
-  varying mediump vec2 vPosition;\n
-  varying mediump vec2 vRectSize;\n
-  varying mediump float vCornerRadius;\n
-  \n
-  void main()\n
-  {\n
-    mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
-    gl_FragColor = texture2D( sTexture, vec2( vTexCoord.y, 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
-    gl_FragColor *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
-  }\n
-),
+  // fragment shader for linear gradient with corner radius
+  SHADER_GRADIENT_VISUAL_LINEAR_ROUNDED_CORNER_SHADER_FRAG,
 
-// fragment shader for radial gradient with corner radius
-DALI_COMPOSE_SHADER(
-  uniform sampler2D sTexture;\n // sampler1D?
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  varying mediump vec2 vTexCoord;\n
-  varying mediump vec2 vPosition;\n
-  varying mediump vec2 vRectSize;\n
-  varying mediump float vCornerRadius;\n
-  \n
-  void main()\n
-  {\n
-    mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - vCornerRadius;\n
-    gl_FragColor = texture2D( sTexture, vec2( length(vTexCoord), 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
-    gl_FragColor *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
-  }\n
-)
+  // fragment shader for radial gradient with corner radius
+  SHADER_GRADIENT_VISUAL_RADIAL_ROUNDED_CORNER_SHADER_FRAG
 };
 
 Dali::WrapMode::Type GetWrapMode( Toolkit::GradientVisual::SpreadMethod::Type spread )

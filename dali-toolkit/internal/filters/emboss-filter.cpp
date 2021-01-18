@@ -28,6 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -40,35 +41,6 @@ namespace Internal
 
 namespace
 {
-
-const char* EMBOSS_FRAGMENT_SOURCE =
-{
- "precision highp float;\n"
- "varying mediump vec2 vTexCoord;\n"
- "uniform sampler2D sTexture;\n"
- "uniform vec2 uTexScale;\n"
- "uniform vec3 uCoefficient;\n"
- "\n"
- "void main()\n"
- "{\n"
- "  vec4 color  = uCoefficient.x * texture2D( sTexture, vTexCoord + vec2(0.0, -uTexScale.y) );\n"
- "  color += uCoefficient.y * texture2D( sTexture, vTexCoord );\n"
- "  color += uCoefficient.z * texture2D( sTexture, vTexCoord + vec2(0.0, uTexScale.y) );\n"
- "  gl_FragColor = color;\n"
- "}\n"
-};
-
-const char* const COMPOSITE_FRAGMENT_SOURCE =
-{
-  "varying mediump vec2 vTexCoord;\n"
-  "uniform sampler2D sTexture;\n"
-  "uniform lowp vec4 uEffectColor;\n"
-  "void main()\n"
-  "{\n"
-  "  gl_FragColor = uEffectColor;\n"
-  "  gl_FragColor.a *= texture2D( sTexture, vTexCoord).a;\n"
-  "}\n"
-};
 
 const char* const TEX_SCALE_UNIFORM_NAME( "uTexScale" );
 const char* const COEFFICIENT_UNIFORM_NAME( "uCoefficient" );
@@ -103,7 +75,7 @@ void EmbossFilter::Enable()
   mActorForInput1.RegisterProperty( TEX_SCALE_UNIFORM_NAME, textureScale );
   mActorForInput1.RegisterProperty( COEFFICIENT_UNIFORM_NAME, Vector3( 2.f, -1.f, -1.f ) );
   // set EMBOSS custom shader
-  Renderer renderer1 = CreateRenderer( BASIC_VERTEX_SOURCE, EMBOSS_FRAGMENT_SOURCE );
+  Renderer renderer1 = CreateRenderer( BASIC_VERTEX_SOURCE, SHADER_EMBOSS_FILTER_SHADER_FRAG );
   SetRendererTexture( renderer1, mInputTexture );
   mActorForInput1.AddRenderer( renderer1 );
   mRootActor.Add( mActorForInput1 );
@@ -114,7 +86,7 @@ void EmbossFilter::Enable()
   mActorForInput2.RegisterProperty( TEX_SCALE_UNIFORM_NAME, textureScale );
   mActorForInput2.RegisterProperty( COEFFICIENT_UNIFORM_NAME, Vector3( -1.f, -1.f, 2.f ) );
   // set EMBOSS custom shader
-  Renderer renderer2 = CreateRenderer( BASIC_VERTEX_SOURCE, EMBOSS_FRAGMENT_SOURCE );
+  Renderer renderer2 = CreateRenderer( BASIC_VERTEX_SOURCE, SHADER_EMBOSS_FILTER_SHADER_FRAG );
   SetRendererTexture( renderer2, mInputTexture );
   mActorForInput2.AddRenderer( renderer2 );
   mRootActor.Add( mActorForInput2 );
@@ -126,12 +98,12 @@ void EmbossFilter::Enable()
 
   mRootActor.Add( mActorForComposite );
 
-  mRendererForEmboss1 = CreateRenderer( BASIC_VERTEX_SOURCE, COMPOSITE_FRAGMENT_SOURCE );
+  mRendererForEmboss1 = CreateRenderer( BASIC_VERTEX_SOURCE, SHADER_EMBOSS_FILTER_COMPOSITE_SHADER_FRAG );
   SetRendererTexture( mRendererForEmboss1, mFrameBufferForEmboss1 );
   mRendererForEmboss1.RegisterProperty( COLOR_UNIFORM_NAME, Color::BLACK );
   mActorForComposite.AddRenderer( mRendererForEmboss1 );
 
-  mRendererForEmboss2 = CreateRenderer( BASIC_VERTEX_SOURCE, COMPOSITE_FRAGMENT_SOURCE );
+  mRendererForEmboss2 = CreateRenderer( BASIC_VERTEX_SOURCE, SHADER_EMBOSS_FILTER_COMPOSITE_SHADER_FRAG );
   SetRendererTexture( mRendererForEmboss2, mFrameBufferForEmboss2 );
   mRendererForEmboss2.RegisterProperty( COLOR_UNIFORM_NAME, Color::WHITE );
   mActorForComposite.AddRenderer( mRendererForEmboss2 );

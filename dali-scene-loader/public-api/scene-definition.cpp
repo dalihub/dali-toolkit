@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "dali-scene-loader/public-api/blend-shape-details.h"
 #include "dali-scene-loader/public-api/utils.h"
 #include "dali-scene-loader/public-api/skinning-details.h"
+#include "dali-scene-loader/internal/graphics/builtin-shader-extern-gen.h"
 
 //#define DEBUG_SCENE_DEFINITION
 //#define DEBUG_JOINTS
@@ -133,27 +134,6 @@ struct ResourceReflector : IResourceReflector
 
 
 #ifdef DEBUG_JOINTS
-const char* JOINT_DEBUG_VSH = "#version 300 es\n"
-DALI_COMPOSE_SHADER(
-  precision mediump float;
-  uniform mat4 uMvpMatrix;
-  in vec3 aPosition;
-  in float aColor;
-  flat out float vColor;
-  void main() {
-    vColor = aColor;
-    gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
-  });
-
-const char* JOINT_DEBUG_FSH = "#version 300 es\n"
-DALI_COMPOSE_SHADER(
-  precision mediump float;
-  flat in float vColor;
-  out vec4 FragColor;
-  void main() {
-    vec3 rgb = vec3(fract(vColor), fract(vColor * 0.00390625), fract(vColor * 0.00390625 * 0.00390625));
-    FragColor = vec4(rgb, 1.);
-  });
 
 Shader sJointDebugShader;
 int sNumScenes = 0;
@@ -162,7 +142,7 @@ void EnsureJointDebugShaderCreated()
 {
   if (0 == sNumScenes)
   {
-    sJointDebugShader = Shader::New(JOINT_DEBUG_VSH, JOINT_DEBUG_FSH);
+    sJointDebugShader = Shader::New(SHADER_SCENE_LOADER_JOINT_DEBUG_VERT, SHADER_SCENE_LOADER_JOINT_DEBUG_FRAG);
   }
   ++sNumScenes;
 }

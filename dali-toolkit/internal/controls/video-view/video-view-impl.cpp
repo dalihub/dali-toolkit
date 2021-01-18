@@ -34,6 +34,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -85,50 +86,6 @@ const char* const CUSTOM_VERTEX_SHADER( "vertexShader" );
 const char* const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
 const char* const DEFAULT_SAMPLER_TYPE_NAME( "sampler2D" );
 const char* const CUSTOM_SAMPLER_TYPE_NAME( "samplerExternalOES" );
-
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = vec4(0.0);\n
-  }\n
-);
-
-const char* VERTEX_SHADER_TEXTURE = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  varying mediump vec2 sTexCoordRect;\n
-  void main()\n
-  {\n
-    gl_Position = uMvpMatrix * vec4(aPosition * uSize.xy, 0.0, 1.0);\n
-    vTexCoord = aPosition + vec2(0.5);\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER_TEXTURE = DALI_COMPOSE_SHADER(
-  uniform lowp vec4 uColor;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform samplerExternalOES sTexture;\n
-  void main()\n
-  {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
-  }\n
-);
 
 } // anonymous namepsace
 
@@ -652,7 +609,7 @@ void VideoView::SetWindowSurfaceTarget()
   {
     // For underlay rendering mode, video display area have to be transparent.
     Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-    Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    Shader shader = Shader::New( SHADER_VIDEO_VIEW_VERT, SHADER_VIDEO_VIEW_FRAG );
     mOverlayRenderer = Renderer::New( geometry, shader );
     mOverlayRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::OFF );
   }
@@ -856,7 +813,7 @@ Dali::Shader VideoView::CreateShader()
 
     if( !vertexShaderValue || !checkShader )
     {
-      vertexShader = VERTEX_SHADER_TEXTURE;
+      vertexShader = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
     }
 
     Property::Value* fragmentShaderValue = mEffectPropertyMap.Find( CUSTOM_FRAGMENT_SHADER );
@@ -872,13 +829,13 @@ Dali::Shader VideoView::CreateShader()
 
     if( !fragmentShaderValue || !checkShader )
     {
-      fragmentShader += FRAGMENT_SHADER_TEXTURE;
+      fragmentShader += SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
     }
   }
   else
   {
-    vertexShader = VERTEX_SHADER_TEXTURE;
-    fragmentShader += FRAGMENT_SHADER_TEXTURE;
+    vertexShader = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
+    fragmentShader += SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
   }
 
   return Dali::Shader::New( vertexShader, fragmentShader );

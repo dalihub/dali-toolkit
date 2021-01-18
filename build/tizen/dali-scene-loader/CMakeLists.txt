@@ -144,6 +144,16 @@ if( ANDROID )
 	target_link_libraries(${name} log)
 endif()
 
+# Generate source files for shaders
+SET(SHADER_SOURCE_DIR "${scene_loader_dir}/internal/graphics/shaders/")
+SET(SHADER_GENERATED_DIR "${scene_loader_dir}/internal/graphics/generated")
+EXECUTE_PROCESS( COMMAND bash -c "${repo_root_dir}/build/tizen/shader-generator.sh ${SHADER_SOURCE_DIR} ${SHADER_GENERATED_DIR}" )
+
+SET(GENERATED_SHADER_DIR ${scene_loader_dir}/internal/graphics/)
+SET_PROPERTY(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
+             "${GENERATED_SHADER_DIR}/generated/"
+             "${GENERATED_SHADER_DIR}/builtin-shader-extern-gen.h")
+
 IF( INSTALL_CMAKE_MODULES )
 	SET_TARGET_PROPERTIES( ${name}
 		PROPERTIES

@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -38,56 +39,6 @@ namespace
 #endif
 
 const int MINIMUM_SCROLL_SPEED = 1; // Speed should be set by Property system.
-
-const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  varying highp vec2 vTexCoord;\n
-  uniform highp vec3 uSize;\n
-  uniform mediump float uDelta;\n
-  uniform mediump vec2 uTextureSize;\n
-  uniform mediump float uGap;\n
-  uniform mediump float uHorizontalAlign;\n
-  uniform mediump float uVerticalAlign;\n
-  \n
-  uniform highp   mat4 uMvpMatrix;\n
-  \n
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform highp vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-
-  void main()\n
-  {\n
-    mediump vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy );\n
-    mediump vec2 visualSize = mix( uSize.xy * size, size, offsetSizeMode.zw );\n
-    \n
-    vTexCoord.x = ( uDelta + uHorizontalAlign * ( uTextureSize.x - visualSize.x - uGap ) + floor( aPosition.x * visualSize.x ) + 0.5 - uGap * 0.5 ) / uTextureSize.x + 0.5;\n
-    vTexCoord.y = ( uVerticalAlign * ( uTextureSize.y - visualSize.y ) + floor( aPosition.y * visualSize.y ) + 0.5 ) / ( uTextureSize.y ) + 0.5;\n
-    \n
-    mediump vec4 vertexPosition = vec4( floor( ( aPosition + anchorPoint ) * visualSize + ( visualOffset + origin ) * uSize.xy ), 0.0, 1.0 );\n
-    \n
-    gl_Position = uMvpMatrix * vertexPosition;\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  varying highp vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  \n
-  void main()\n
-  {\n
-    if ( vTexCoord.y > 1.0 )\n
-      discard;\n
-    \n
-    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
-    \n
-    gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );
-  }\n
-);
 
 /**
  * @brief How the text should be aligned horizontally when scrolling the text.
@@ -281,7 +232,7 @@ void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, T
   mTextureSet = mRenderer.GetTextures();
 
   // Set the shader and texture for scrolling
-  Shader shader = Shader::New( VERTEX_SHADER_SCROLL, FRAGMENT_SHADER, Shader::Hint::NONE );
+  Shader shader = Shader::New( SHADER_TEXT_SCROLLER_SHADER_VERT, SHADER_TEXT_SCROLLER_SHADER_FRAG, Shader::Hint::NONE );
   mRenderer.SetShader( shader );
   mRenderer.SetTextures( textureSet );
 
