@@ -39,6 +39,7 @@ const char* const TEST_URL2( "http://www.somewhere.valid2.com" );
 
 static int gPageLoadStartedCallbackCalled = 0;
 static int gPageLoadFinishedCallbackCalled = 0;
+static int gScrollEdgeReachedCallbackCalled = 0;
 static int gEvaluateJavaScriptCallbackCalled = 0;
 static bool gTouched = false;
 
@@ -64,6 +65,11 @@ static void OnPageLoadStarted( WebView view, const std::string& url )
 static void OnPageLoadFinished( WebView view, const std::string& url )
 {
   gPageLoadFinishedCallbackCalled++;
+}
+
+static void OnScrollEdgeReached( WebView view, Dali::WebEnginePlugin::ScrollEdge edge )
+{
+  gScrollEdgeReachedCallbackCalled++;
 }
 
 static void OnPageLoadError( WebView view, const std::string& url, WebView::LoadErrorCode errorCode )
@@ -487,6 +493,72 @@ int UtcDaliWebViewProperty8(void)
   value = view.GetProperty( WebView::Property::DEFAULT_FONT_SIZE );
   DALI_TEST_CHECK( value.Get( output ) );
   DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewProperty9(void)
+{
+  // SCROLL_POSITION
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  // Check default value
+  Dali::Vector2 output = Dali::Vector2::ONE;
+  view.GetProperty( WebView::Property::SCROLL_POSITION ).Get( output );
+  DALI_TEST_CHECK( output.x == 0 && output.y == 0 );
+
+  // Check Set/GetProperty
+  Dali::Vector2 testValue = Dali::Vector2( 100, 100 );
+  view.SetProperty( WebView::Property::SCROLL_POSITION, testValue );
+  view.GetProperty( WebView::Property::SCROLL_POSITION ).Get( output );
+  DALI_TEST_EQUALS( output, testValue, TEST_LOCATION );
+
+  // Check default value of scroll size
+  output = Dali::Vector2::ONE;
+  view.GetProperty( WebView::Property::SCROLL_SIZE ).Get( output );
+  DALI_TEST_CHECK( output.x == 500 && output.y == 500 );
+
+  // Check default value of content size
+  output = Dali::Vector2::ONE;
+  view.GetProperty( WebView::Property::CONTENT_SIZE ).Get( output );
+  DALI_TEST_CHECK( output.x == 500 && output.y == 500 );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewScrollBy(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  // load url.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  view.ScrollEdgeReachedSignal().Connect( &OnScrollEdgeReached );
+  bool signal1 = false;
+  view.ConnectSignal( testTracker, "scrollEdgeReached", CallbackFunctor(&signal1) );
+  DALI_TEST_EQUALS( gScrollEdgeReachedCallbackCalled, 0, TEST_LOCATION );
+
+  view.LoadUrl( TEST_URL1 );
+  Test::EmitGlobalTimerSignal();
+
+  // set scroll position.
+  Dali::Vector2 output = Dali::Vector2::ONE;
+  Dali::Vector2 testValue = Dali::Vector2( 100, 100 );
+  view.SetProperty( WebView::Property::SCROLL_POSITION, testValue );
+  view.GetProperty( WebView::Property::SCROLL_POSITION ).Get( output );
+  DALI_TEST_EQUALS( output, testValue, TEST_LOCATION );
+
+  // scroll by and trigger scrollEdgeReached event.
+  view.ScrollBy( 50, 50 );
+  view.GetProperty( WebView::Property::SCROLL_POSITION ).Get( output );
+  DALI_TEST_CHECK( output.x == 150 && output.y == 150 );
+  DALI_TEST_EQUALS( gScrollEdgeReachedCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_CHECK( signal1 );
 
   END_TEST;
 }
