@@ -246,7 +246,6 @@ void VisualFactoryCache::SetBrokenImageUrl(const std::string& brokenImageUrl)
   }
 
   mAtlasManager->SetBrokenImage( mBrokenImageUrl );
-  mTextureManager.SetBrokenImageUrl( mBrokenImageUrl );
 }
 
 } // namespace Internal
