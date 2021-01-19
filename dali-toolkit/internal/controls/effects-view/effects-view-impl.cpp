@@ -32,6 +32,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 #include <dali-toolkit/internal/filters/emboss-filter.h>
 #include <dali-toolkit/internal/filters/spread-filter.h>
@@ -65,39 +66,6 @@ const Pixel::Format EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT = Pixel::RGBA8888;
 const float         ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 const Vector4       EFFECTS_VIEW_DEFAULT_BACKGROUND_COLOR( 0.0f, 0.0f, 0.0f, 0.0 );
 const bool          EFFECTS_VIEW_REFRESH_ON_DEMAND(false);
-
-#define DALI_COMPOSE_SHADER(STR) #STR
-
-const char* EFFECTS_VIEW_VERTEX_SOURCE = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  uniform mediump vec3 effectOffset;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    vertexPosition.xyz += effectOffset;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
-    vTexCoord = aPosition + vec2(0.5);\n
-    gl_Position = vertexPosition;\n
-  }\n
-);
-
-const char* EFFECTS_VIEW_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform lowp vec4 effectColor;\n
-  \n
-  void main()\n
-  {\n
-     gl_FragColor = effectColor;\n
-     gl_FragColor.a *= texture2D( sTexture, vTexCoord).a;\n
-  }\n
-);
 
 const float BLUR_KERNEL0[] = { 12.0f/16.0f,
                                2.0f/16.0f, 2.0f/16.0f };
@@ -299,7 +267,8 @@ void EffectsView::OnSceneConnection( int depth )
   Actor self( Self() );
 
   // Create renderers
-  mRendererPostFilter = CreateRenderer( EFFECTS_VIEW_VERTEX_SOURCE, EFFECTS_VIEW_FRAGMENT_SOURCE );
+  mRendererPostFilter = CreateRenderer( SHADER_EFFECTS_VIEW_VERT,
+                                        SHADER_EFFECTS_VIEW_FRAG );
   mRendererPostFilter.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, DepthIndex::CONTENT );
   self.AddRenderer( mRendererPostFilter );
 

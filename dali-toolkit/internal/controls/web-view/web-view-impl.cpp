@@ -72,10 +72,14 @@ DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "enableJavaScript",        BOOLEAN
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "loadImagesAutomatically", BOOLEAN, LOAD_IMAGES_AUTOMATICALLY  )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "defaultTextEncodingName", STRING,  DEFAULT_TEXT_ENCODING_NAME )
 DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "defaultFontSize",         INTEGER, DEFAULT_FONT_SIZE          )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollPosition",          VECTOR2, SCROLL_POSITION            )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "scrollSize",              VECTOR2, SCROLL_SIZE                )
+DALI_PROPERTY_REGISTRATION( Toolkit, WebView, "contentSize",             VECTOR2, CONTENT_SIZE               )
 
 DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadStarted",         PAGE_LOAD_STARTED_SIGNAL            )
 DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadFinished",        PAGE_LOAD_FINISHED_SIGNAL           )
 DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "pageLoadError",           PAGE_LOAD_ERROR_SIGNAL              )
+DALI_SIGNAL_REGISTRATION(   Toolkit, WebView, "scrollEdgeReached",       SCROLL_EDGE_REACHED_SIGNAL          )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -145,6 +149,7 @@ void WebView::OnInitialize()
     mWebEngine.PageLoadStartedSignal().Connect( this, &WebView::OnPageLoadStarted );
     mWebEngine.PageLoadFinishedSignal().Connect( this, &WebView::OnPageLoadFinished );
     mWebEngine.PageLoadErrorSignal().Connect( this, &WebView::OnPageLoadError );
+    mWebEngine.ScrollEdgeReachedSignal().Connect( this, &WebView::OnScrollEdgeReached );
   }
 }
 
@@ -215,6 +220,14 @@ void WebView::Resume()
   if( mWebEngine )
   {
     mWebEngine.Resume();
+  }
+}
+
+void WebView::ScrollBy( int deltaX, int deltaY )
+{
+  if ( mWebEngine )
+  {
+    mWebEngine.ScrollBy( deltaX, deltaY );
   }
 }
 
@@ -299,6 +312,11 @@ Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSi
   return mPageLoadErrorSignal;
 }
 
+Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
+{
+  return mScrollEdgeReachedSignal;
+}
+
 void WebView::OnPageLoadStarted( const std::string& url )
 {
   if( !mPageLoadStartedSignal.Empty() )
@@ -326,6 +344,15 @@ void WebView::OnPageLoadError( const std::string& url, int errorCode )
   }
 }
 
+void WebView::OnScrollEdgeReached( Dali::WebEnginePlugin::ScrollEdge edge )
+{
+  if( !mScrollEdgeReachedSignal.Empty() )
+  {
+    Dali::Toolkit::WebView handle( GetOwner() );
+    mScrollEdgeReachedSignal.Emit( handle, edge );
+  }
+}
+
 bool WebView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
@@ -346,6 +373,11 @@ bool WebView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
   else if( 0 == strcmp( signalName.c_str(), PAGE_LOAD_ERROR_SIGNAL ) )
   {
     webView.PageLoadErrorSignal().Connect( tracker, functor );
+    connected = true;
+  }
+  else if( 0 == strcmp( signalName.c_str(), SCROLL_EDGE_REACHED_SIGNAL ) )
+  {
+    webView.ScrollEdgeReachedSignal().Connect( tracker, functor );
     connected = true;
   }
 
@@ -456,6 +488,15 @@ void WebView::SetProperty( BaseObject* object, Property::Index index, const Prop
         }
         break;
       }
+      case Toolkit::WebView::Property::SCROLL_POSITION:
+      {
+        Vector2 input;
+        if ( value.Get( input ) )
+        {
+          impl.SetScrollPosition( input.x, input.y );
+        }
+        break;
+      }
     }
   }
 }
@@ -511,6 +552,27 @@ Property::Value WebView::GetProperty( BaseObject* object, Property::Index proper
         value = impl.GetDefaultFontSize();
         break;
       }
+      case Toolkit::WebView::Property::SCROLL_POSITION:
+      {
+        int x, y;
+        impl.GetScrollPosition( x, y );
+        value = Vector2( x, y );
+        break;
+      }
+      case Toolkit::WebView::Property::SCROLL_SIZE:
+      {
+        int width, height;
+        impl.GetScrollSize( width, height );
+        value = Vector2( width, height );
+        break;
+      }
+      case Toolkit::WebView::Property::CONTENT_SIZE:
+      {
+        int width, height;
+        impl.GetContentSize( width, height );
+        value = Vector2( width, height );
+        break;
+      }
       default:
          break;
     }
@@ -559,6 +621,38 @@ void WebView::OnKeyInputFocusLost()
   }
 
   EmitKeyInputFocusSignal( false ); // Calls back into the Control hence done last.
+}
+
+void WebView::SetScrollPosition( int x, int y )
+{
+  if( mWebEngine )
+  {
+    mWebEngine.SetScrollPosition( x, y );
+  }
+}
+
+void WebView::GetScrollPosition( int& x, int& y ) const
+{
+  if( mWebEngine )
+  {
+    mWebEngine.GetScrollPosition( x, y );
+  }
+}
+
+void WebView::GetScrollSize( int& width, int& height ) const
+{
+  if( mWebEngine )
+  {
+    mWebEngine.GetScrollSize( width, height );
+  }
+}
+
+void WebView::GetContentSize( int& width, int& height ) const
+{
+  if( mWebEngine )
+  {
+    mWebEngine.GetContentSize( width, height );
+  }
 }
 
 Toolkit::WebView::CacheModel::Type WebView::GetCacheModel() const

@@ -32,6 +32,7 @@
 // INTERNAL_INCLUDES
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -52,18 +53,6 @@ const float GAUSSIAN_BLUR_DOWNSAMPLE_WIDTH_SCALE = 0.5f;
 const float GAUSSIAN_BLUR_DOWNSAMPLE_HEIGHT_SCALE = 0.5f;
 
 const char* ALPHA_UNIFORM_NAME( "uAlpha" );
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp float uAlpha;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
-    gl_FragColor.a *= uAlpha;
-  }\n
-);
 
 /**
  * The constraint is used to blend the group of blurred images continuously with a unified blur strength property value which ranges from zero to one.
@@ -314,7 +303,7 @@ void SuperBlurView::OnSceneConnection( int depth )
 
   for(unsigned int i=0; i<mBlurLevels+1;i++)
   {
-    mRenderers[i] = CreateRenderer( BASIC_VERTEX_SOURCE, FRAGMENT_SHADER );
+    mRenderers[i] = CreateRenderer( BASIC_VERTEX_SOURCE, SHADER_SUPER_BLUR_VIEW_FRAG );
     mRenderers[i].SetProperty( Dali::Renderer::Property::DEPTH_INDEX, (int)i );
     self.AddRenderer( mRenderers[i] );
 

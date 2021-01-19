@@ -26,6 +26,9 @@
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/texture-set.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+
 namespace Dali
 {
 
@@ -46,31 +49,6 @@ const float LAYER_HEIGHTS[5] =
   26.f * 2.f / 130.f,
   26.f / 130.f
 };
-
-#define MAKE_SHADER(A)#A
-
-// Modify the vertex position according to the bounce coefficient;
-const char* MESH_VERTEX_SHADER = MAKE_SHADER(
-attribute mediump vec3    aPosition1;\n
-attribute mediump vec3    aPosition2;\n
-uniform   mediump mat4    uMvpMatrix;\n
-uniform   mediump vec3    uSize;
-uniform   mediump float   uBounceCoefficient;\n
-\n
-void main()\n
-{\n
-  gl_Position = uMvpMatrix * vec4(mix( aPosition1, aPosition2, abs(uBounceCoefficient) )*uSize, 1.0);\n
-}
-);
-
-// use the actor color to paint every layer
-const char* MESH_FRAGMENT_SHADER = MAKE_SHADER(
-uniform lowp  vec4    uColor;\n
-void main()\n
-{\n
-  gl_FragColor = uColor;\n
-}\n
-);
 
 } // namespace Anon
 
@@ -123,7 +101,7 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   meshGeometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
 
   // Create the shader
-  Shader shader = Shader::New( MESH_VERTEX_SHADER, MESH_FRAGMENT_SHADER );
+  Shader shader = Shader::New( SHADER_BOUNCING_EFFECT_MESH_SHADER_VERT, SHADER_BOUNCING_EFFECT_MESH_SHADER_FRAG );
 
   // Create renderer
   Renderer renderer = Renderer::New( meshGeometry, shader );

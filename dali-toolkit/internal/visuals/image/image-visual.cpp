@@ -143,32 +143,32 @@ ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
   return new ImageVisual( factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode );
 }
 
-ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
-                          ImageVisualShaderFactory& shaderFactory,
-                          const VisualUrl& imageUrl,
-                          ImageDimensions size,
-                          FittingMode::Type fittingMode,
-                          Dali::SamplingMode::Type samplingMode )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::IMAGE ),
-  mPixelArea( FULL_TEXTURE_RECT ),
+ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
+                         ImageVisualShaderFactory& shaderFactory,
+                         const VisualUrl&          imageUrl,
+                         ImageDimensions           size,
+                         FittingMode::Type         fittingMode,
+                         Dali::SamplingMode::Type  samplingMode)
+: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::IMAGE),
+  mPixelArea(FULL_TEXTURE_RECT),
   mPlacementActor(),
-  mImageUrl( imageUrl ),
-  mMaskingData( ),
-  mDesiredSize( size ),
-  mTextureId( TextureManager::INVALID_TEXTURE_ID ),
+  mImageUrl(imageUrl),
+  mMaskingData(),
+  mDesiredSize(size),
+  mTextureId(TextureManager::INVALID_TEXTURE_ID),
   mTextures(),
-  mImageVisualShaderFactory( shaderFactory ),
-  mFittingMode( fittingMode ),
-  mSamplingMode( samplingMode ),
-  mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT ),
-  mLoadPolicy( Toolkit::ImageVisual::LoadPolicy::ATTACHED ),
-  mReleasePolicy( Toolkit::ImageVisual::ReleasePolicy::DETACHED ),
-  mAtlasRect( 0.0f, 0.0f, 0.0f, 0.0f ),
-  mAtlasRectSize( 0, 0 ),
-  mAttemptAtlasing( false ),
-  mLoading( false ),
-  mOrientationCorrection( true )
+  mImageVisualShaderFactory(shaderFactory),
+  mFittingMode(fittingMode),
+  mSamplingMode(samplingMode),
+  mWrapModeU(WrapMode::DEFAULT),
+  mWrapModeV(WrapMode::DEFAULT),
+  mLoadPolicy(Toolkit::ImageVisual::LoadPolicy::ATTACHED),
+  mReleasePolicy(Toolkit::ImageVisual::ReleasePolicy::DETACHED),
+  mAtlasRect(0.0f, 0.0f, 0.0f, 0.0f),
+  mAtlasRectSize(0, 0),
+  mLoadState(TextureManager::LoadState::NOT_STARTED),
+  mAttemptAtlasing(false),
+  mOrientationCorrection(true)
 {
   EnablePreMultipliedAlpha( mFactoryCache.GetPreMultiplyOnLoad() );
 }
@@ -570,15 +570,28 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
     ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
     : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-  textures = textureManager.LoadTexture( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode,
-                                         mMaskingData, IsSynchronousLoadingRequired(), mTextureId,
-                                         atlasRect, mAtlasRectSize, atlasing, mLoading, mWrapModeU,
-                                         mWrapModeV, textureObserver, atlasUploadObserver, atlasManager,
-                                         mOrientationCorrection, forceReload, preMultiplyOnLoad);
+  bool synchronousLoading = IsSynchronousLoadingRequired();
+  bool loadingStatus;
+
+  textures = textureManager.LoadTexture(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, mTextureId, atlasRect, mAtlasRectSize, atlasing, loadingStatus, mWrapModeU, mWrapModeV, textureObserver, atlasUploadObserver, atlasManager, mOrientationCorrection, forceReload, preMultiplyOnLoad);
 
   if( textures )
   {
+    if(loadingStatus)
+    {
+      mLoadState = TextureManager::LoadState::LOADING;
+    }
+    else
+    {
+      mLoadState = TextureManager::LoadState::LOAD_FINISHED;
+    }
+
     EnablePreMultipliedAlpha( preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD );
+  }
+  else if(synchronousLoading)
+  {
+    // Synchronous loading is failed
+    mLoadState = TextureManager::LoadState::LOAD_FAILED;
   }
 
   if( atlasing ) // Flag needs to be set before creating renderer
@@ -666,13 +679,26 @@ void ImageVisual::DoSetOnScene( Actor& actor )
     mImpl->mRenderer.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, mPixelArea );
   }
 
-  if( mLoading == false )
+  if(mLoadState == TextureManager::LoadState::LOAD_FINISHED)
   {
     actor.AddRenderer( mImpl->mRenderer );
     mPlacementActor.Reset();
 
     // Image loaded and ready to display
     ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+  }
+  else if(mLoadState == TextureManager::LoadState::LOAD_FAILED)
+  {
+    Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
+
+    mTextures = TextureSet::New();
+    mTextures.SetTexture(0u, brokenImage);
+    mImpl->mRenderer.SetTextures(mTextures);
+
+    actor.AddRenderer(mImpl->mRenderer);
+    mPlacementActor.Reset();
+
+    ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
   }
 }
 
@@ -686,9 +712,10 @@ void ImageVisual::DoSetOffScene( Actor& actor )
   {
     RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
     mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
+
+    mLoadState = TextureManager::LoadState::NOT_STARTED;
   }
 
-  mLoading = false;
   mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
 }
@@ -791,9 +818,10 @@ void ImageVisual::UploadCompleted()
     // reset the weak handle so that the renderer only get added to actor once
     mPlacementActor.Reset();
   }
+
   // Image loaded
   ResourceReady( Toolkit::Visual::ResourceStatus::READY );
-  mLoading = false;
+  mLoadState = TextureManager::LoadState::LOAD_FINISHED;
 }
 
 // From Texture Manager
@@ -844,10 +872,12 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
   if( loadingSuccess )
   {
     resourceStatus = Toolkit::Visual::ResourceStatus::READY;
+    mLoadState     = TextureManager::LoadState::LOAD_FINISHED;
   }
   else
   {
     resourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
+    mLoadState     = TextureManager::LoadState::LOAD_FAILED;
   }
 
   // use geometry if needed
@@ -882,7 +912,6 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
 
   // Signal to observers ( control ) that resources are ready. Must be all resources.
   ResourceReady( resourceStatus );
-  mLoading = false;
 }
 
 void ImageVisual::RemoveTexture()

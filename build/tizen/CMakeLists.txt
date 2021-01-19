@@ -283,6 +283,16 @@ IF(DEFINED STATIC)
   SET(LIBTYPE STATIC)
 ENDIF()
 
+# Generate source files for shaders
+SET(SHADER_SOURCE_DIR "${ROOT_SRC_DIR}/dali-toolkit/internal/graphics/shaders/")
+SET(SHADER_GENERATED_DIR "${ROOT_SRC_DIR}/dali-toolkit/internal/graphics/generated")
+EXECUTE_PROCESS( COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/shader-generator.sh ${SHADER_SOURCE_DIR} ${SHADER_GENERATED_DIR}" )
+
+SET(GENERATED_SHADER_DIR ${ROOT_SRC_DIR}/dali-toolkit/internal/graphics/)
+SET_PROPERTY(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
+             "${GENERATED_SHADER_DIR}/generated/"
+             "${GENERATED_SHADER_DIR}/builtin-shader-extern-gen.h")
+
 IF( WIN32 OR APPLE )
   SET( DALICORE_LDFLAGS
         "${DALICORE_LDFLAGS}"
