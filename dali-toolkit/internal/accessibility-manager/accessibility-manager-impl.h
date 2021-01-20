@@ -89,6 +89,11 @@ public:
   void SetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityManager::AccessibilityAttribute type, const std::string& text);
 
   /**
+   * @copydoc Toolkit::AccessibilityManager::DeleteAccessibilityAttribute
+   */
+  void DeleteAccessibilityAttribute(Actor actor);
+
+  /**
    * @copydoc Toolkit::AccessibilityManager::GetAccessibilityAttribute
    */
   std::string GetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityManager::AccessibilityAttribute type) const;

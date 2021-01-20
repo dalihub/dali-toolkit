@@ -75,6 +75,11 @@ void AccessibilityManager::SetAccessibilityAttribute(Actor actor, AccessibilityA
   GetImpl(*this).SetAccessibilityAttribute(actor, type, text);
 }
 
+void AccessibilityManager::DeleteAccessibilityAttribute(Actor actor)
+{
+  GetImpl(*this).DeleteAccessibilityAttribute(actor);
+}
+
 std::string AccessibilityManager::GetAccessibilityAttribute(Actor actor, AccessibilityAttribute type) const
 {
   return GetImpl(*this).GetAccessibilityAttribute(actor, type);

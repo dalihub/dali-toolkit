@@ -175,6 +175,15 @@ void AccessibilityManager::SetAccessibilityAttribute(Actor actor, Toolkit::Acces
   }
 }
 
+void AccessibilityManager::DeleteAccessibilityAttribute(Actor actor)
+{
+  if(actor)
+  {
+    unsigned int actorID = actor.GetProperty< int >( Actor::Property::ID );
+    mIDAdditionalInfoContainer.erase(actorID);
+  }
+}
+
 std::string AccessibilityManager::GetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityManager::AccessibilityAttribute type) const
 {
   std::string text;

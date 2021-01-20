@@ -145,6 +145,14 @@ public:
   void SetAccessibilityAttribute(Actor actor, AccessibilityAttribute type, const std::string& text);
 
   /**
+   * @brief Delete the information of the specified actor's accessibility attribute.
+   *
+   * @SINCE_1_9.36
+   * @param actor The actor to delete
+   */
+  void DeleteAccessibilityAttribute(Actor actor);
+
+  /**
    * @brief Gets the text of the specified actor's accessibility attribute.
    *
    * @SINCE_1_0.0
