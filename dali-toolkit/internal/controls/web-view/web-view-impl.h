@@ -93,6 +93,11 @@ public:
   void Resume();
 
   /**
+   * @copydoc Dali::Toolkit::WebView::ScrollBy()
+   */
+  void ScrollBy( int deltaX, int deltaY );
+
+  /**
    * @copydoc Dali::Toolkit::WebView::CanGoForward()
    */
   bool CanGoForward();
@@ -151,6 +156,11 @@ public:
    * @copydoc Dali::Toolkit::WebView::PageLoadErrorSignal()
    */
   Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::ScrollEdgeReachedSignal()
+   */
+  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
 
 public: // Properties
 
@@ -229,6 +239,34 @@ private:
   WebView( const WebView& webView );
 
   WebView& operator=( const WebView& webView );
+
+  /**
+   * @brief Sets an absolute scroll of the given view.
+   * @param[in] x The coordinate x of scroll
+   * @param[in] y The coordinate y of scroll
+   */
+  void SetScrollPosition( int x, int y );
+
+  /**
+   * @brief Gets the current scroll position of the given view.
+   * @param[out] x The coordinate x of scroll
+   * @param[out] y The coordinate y of scroll
+   */
+  void GetScrollPosition( int& x, int& y ) const;
+
+  /**
+   * @brief Gets the possible scroll size of the given view.
+   * @param[out] width The width of scroll size
+   * @param[out] height The height of scroll size
+   */
+  void GetScrollSize( int& width, int& height ) const;
+
+  /**
+   * @brief Gets the last known content's size.
+   * @param[out] width The width of content's size
+   * @param[out] height The height of content's size
+   */
+  void GetContentSize( int& width, int& height ) const;
 
   /**
    * @brief Get cache model option. The default isToolkit::WebView::CacheModel::DOCUMENT_VIEWER.
@@ -343,6 +381,12 @@ private:
    */
   void OnPageLoadError( const std::string& url, int errorCode );
 
+  /**
+   * @brief Callback function to be called when scroll edge is reached.
+   * @param[in] e The scroll edge reached.
+   */
+  void OnScrollEdgeReached( Dali::WebEnginePlugin::ScrollEdge edge );
+
 private:
 
   std::string                                            mUrl;
@@ -353,6 +397,7 @@ private:
   Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadStartedSignal;
   Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadFinishedSignal;
   Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType mPageLoadErrorSignal;
+  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
 };
 
 } // namespace Internal
