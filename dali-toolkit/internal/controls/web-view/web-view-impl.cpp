@@ -524,23 +524,17 @@ Property::Value WebView::GetProperty( BaseObject* object, Property::Index proper
       }
       case Toolkit::WebView::Property::SCROLL_POSITION:
       {
-        int x, y;
-        impl.GetScrollPosition( x, y );
-        value = Vector2( x, y );
+        value = impl.GetScrollPosition();
         break;
       }
       case Toolkit::WebView::Property::SCROLL_SIZE:
       {
-        int width, height;
-        impl.GetScrollSize( width, height );
-        value = Vector2( width, height );
+        value = impl.GetScrollSize();
         break;
       }
       case Toolkit::WebView::Property::CONTENT_SIZE:
       {
-        int width, height;
-        impl.GetContentSize( width, height );
-        value = Vector2( width, height );
+        value = impl.GetContentSize();
         break;
       }
       case Toolkit::WebView::Property::TITLE:
@@ -606,28 +600,19 @@ void WebView::SetScrollPosition( int x, int y )
   }
 }
 
-void WebView::GetScrollPosition( int& x, int& y ) const
+Dali::Vector2 WebView::GetScrollPosition() const
 {
-  if( mWebEngine )
-  {
-    mWebEngine.GetScrollPosition( x, y );
-  }
+  return mWebEngine ? mWebEngine.GetScrollPosition() : Dali::Vector2::ZERO;
 }
 
-void WebView::GetScrollSize( int& width, int& height ) const
+Dali::Vector2 WebView::GetScrollSize() const
 {
-  if( mWebEngine )
-  {
-    mWebEngine.GetScrollSize( width, height );
-  }
+  return mWebEngine ? mWebEngine.GetScrollSize() : Dali::Vector2::ZERO;
 }
 
-void WebView::GetContentSize( int& width, int& height ) const
+Dali::Vector2 WebView::GetContentSize() const
 {
-  if( mWebEngine )
-  {
-    mWebEngine.GetContentSize( width, height );
-  }
+  return mWebEngine ? mWebEngine.GetContentSize() : Dali::Vector2::ZERO;
 }
 
 std::string WebView::GetTitle() const

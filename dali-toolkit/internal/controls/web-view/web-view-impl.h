@@ -287,21 +287,21 @@ private:
    * @param[out] x The coordinate x of scroll
    * @param[out] y The coordinate y of scroll
    */
-  void GetScrollPosition( int& x, int& y ) const;
+  Dali::Vector2 GetScrollPosition() const;
 
   /**
    * @brief Gets the possible scroll size of the given view.
    * @param[out] width The width of scroll size
    * @param[out] height The height of scroll size
    */
-  void GetScrollSize( int& width, int& height ) const;
+  Dali::Vector2 GetScrollSize() const;
 
   /**
    * @brief Gets the last known content's size.
    * @param[out] width The width of content's size
    * @param[out] height The height of content's size
    */
-  void GetContentSize( int& width, int& height ) const;
+  Dali::Vector2 GetContentSize() const;
 
   /**
    * @brief Returns the title of the Web.

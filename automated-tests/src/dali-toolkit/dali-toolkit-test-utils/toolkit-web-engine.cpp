@@ -446,22 +446,19 @@ public:
     mScrollPosition.y = y;
   }
 
-  void GetScrollPosition( int& x, int& y ) const
+  Dali::Vector2 GetScrollPosition() const
   {
-    x = mScrollPosition.x;
-    y = mScrollPosition.y;
+    return mScrollPosition;
   }
 
-  void GetScrollSize( int& w, int& h ) const
+  Dali::Vector2 GetScrollSize() const
   {
-    w = mScrollSize.width;
-    h = mScrollSize.height;
+    return mScrollSize;
   }
 
-  void GetContentSize( int& w, int& h ) const
+  Dali::Vector2 GetContentSize() const
   {
-    w = mContentSize.width;
-    h = mContentSize.height;
+    return  mContentSize;
   }
 
   Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadStartedSignal()
@@ -769,19 +766,19 @@ void WebEngine::SetScrollPosition( int x, int y )
   Internal::Adaptor::GetImplementation( *this ).SetScrollPosition( x, y );
 }
 
-void WebEngine::GetScrollPosition( int& x, int& y ) const
+Dali::Vector2 WebEngine::GetScrollPosition() const
 {
-  Internal::Adaptor::GetImplementation( *this ).GetScrollPosition( x, y );
+  return Internal::Adaptor::GetImplementation( *this ).GetScrollPosition();
 }
 
-void WebEngine::GetScrollSize( int& w, int& h ) const
+Dali::Vector2 WebEngine::GetScrollSize() const
 {
-  Internal::Adaptor::GetImplementation( *this ).GetScrollSize( w, h );
+  return Internal::Adaptor::GetImplementation( *this ).GetScrollSize();
 }
 
-void WebEngine::GetContentSize( int& w, int& h ) const
+Dali::Vector2 WebEngine::GetContentSize() const
 {
-  Internal::Adaptor::GetImplementation( *this ).GetContentSize( w, h );
+  return Internal::Adaptor::GetImplementation( *this ).GetContentSize();
 }
 
 void WebEngine::SetSize( int width, int height )

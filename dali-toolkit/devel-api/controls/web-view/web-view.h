@@ -196,17 +196,17 @@ public:
   /**
    * @brief WebView signal type related with page loading.
    */
-  typedef Signal<void(WebView, const std::string&)> WebViewPageLoadSignalType;
+  using WebViewPageLoadSignalType = Signal< void( WebView, const std::string& ) >;
 
   /**
    * @brief WebView signal type related with page loading error.
    */
-  typedef Signal<void(WebView, const std::string&, LoadErrorCode)> WebViewPageLoadErrorSignalType;
+  using WebViewPageLoadErrorSignalType = Signal< void( WebView, const std::string&, LoadErrorCode ) >;
 
   /**
    * @brief WebView signal type related with scroll edge reached.
    */
-  typedef Signal<void(WebView, Dali::WebEnginePlugin::ScrollEdge)> WebViewScrollEdgeReachedSignalType;
+  using WebViewScrollEdgeReachedSignalType = Signal< void( WebView, Dali::WebEnginePlugin::ScrollEdge ) >;
 
 public:
   /**
