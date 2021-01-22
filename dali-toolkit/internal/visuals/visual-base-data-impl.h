@@ -123,7 +123,7 @@ struct Base::Impl
   Transform                       mTransform;
   Vector4                         mMixColor;
   Size                            mControlSize;
-  float                           mCornerRadius;
+  Vector4                         mCornerRadius;
   float                           mCornerRadiusPolicy;
   int                             mDepthIndex;
   Property::Index                 mMixColorIndex;
