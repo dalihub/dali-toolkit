@@ -141,7 +141,7 @@ void SvgVisual::DoSetOnScene( Actor& actor )
   Shader shader;
   if( !mImpl->mCustomShader )
   {
-    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, mAttemptAtlasing, true, false );
+    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, mAttemptAtlasing, true, IsRoundedCornerRequired() );
   }
   else
   {

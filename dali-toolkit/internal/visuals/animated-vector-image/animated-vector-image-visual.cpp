@@ -293,7 +293,7 @@ void AnimatedVectorImageVisual::DoSetOnScene( Actor& actor )
   }
   else
   {
-    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, false, true, false );
+    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, false, true, IsRoundedCornerRequired() );
   }
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
