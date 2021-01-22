@@ -63,14 +63,34 @@ WebView WebView::DownCast(BaseHandle handle)
   return Control::DownCast<WebView, Internal::WebView>(handle);
 }
 
+Dali::Toolkit::WebSettings* WebView::GetSettings() const
+{
+  return Dali::Toolkit::GetImpl( *this ).GetSettings();
+}
+
+Dali::Toolkit::WebContext* WebView::GetContext() const
+{
+  return Dali::Toolkit::GetImpl( *this ).GetContext();
+}
+
+Dali::Toolkit::WebCookieManager* WebView::GetCookieManager() const
+{
+  return Dali::Toolkit::GetImpl( *this ).GetCookieManager();
+}
+
+Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
+{
+  return Dali::Toolkit::GetImpl( *this ).GetBackForwardList();
+}
+
 void WebView::LoadUrl(const std::string& url)
 {
   Dali::Toolkit::GetImpl(*this).LoadUrl(url);
 }
 
-void WebView::LoadHTMLString(const std::string& htmlString)
+void WebView::LoadHtmlString(const std::string& htmlString)
 {
-  Dali::Toolkit::GetImpl(*this).LoadHTMLString(htmlString);
+  Dali::Toolkit::GetImpl(*this).LoadHtmlString(htmlString);
 }
 
 void WebView::Reload()
@@ -136,16 +156,6 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
 void WebView::ClearHistory()
 {
   Dali::Toolkit::GetImpl(*this).ClearHistory();
-}
-
-void WebView::ClearCache()
-{
-  Dali::Toolkit::GetImpl(*this).ClearCache();
-}
-
-void WebView::ClearCookies()
-{
-  Dali::Toolkit::GetImpl(*this).ClearCookies();
 }
 
 WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
