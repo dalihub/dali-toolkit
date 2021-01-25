@@ -312,6 +312,14 @@ private: // Implementation
   TextField& operator=(const TextField& rhs);
 
   /**
+   * @brief Resize actor to the given size.
+   *
+   * @param[in] actor The actor to be resized.
+   * @param[in] size Size to change.
+   */
+  void ResizeActor( Actor& actor, const Vector2& size );
+
+  /**
    * @brief Render view, create and attach actor(s) to this Text Field.
    */
   void RenderText(Text::Controller::UpdateTextType updateTextType);
