@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -4135,13 +4135,6 @@ int UtcDaliVisualGetVisualProperty01(void)
   Property property3 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL2, Visual::Property::MIX_COLOR);
   DALI_TEST_CHECK(!property3.object);
   DALI_TEST_CHECK(property3.propertyIndex == Property::INVALID_INDEX);
-
-  // Test after the control is unparented
-  dummyControl.Unparent();
-
-  Property property4 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::MIX_COLOR);
-  DALI_TEST_CHECK(!property4.object);
-  DALI_TEST_CHECK(property4.propertyIndex == Property::INVALID_INDEX);
 
   END_TEST;
 }

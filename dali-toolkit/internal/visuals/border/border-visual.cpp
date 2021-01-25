@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ BorderVisualPtr BorderVisual::New( VisualFactoryCache& factoryCache, const Prope
 {
   BorderVisualPtr borderVisualPtr( new BorderVisual( factoryCache ) );
   borderVisualPtr->SetProperties( properties );
+  borderVisualPtr->Initialize();
   return borderVisualPtr;
 }
 
@@ -129,8 +130,6 @@ void BorderVisual::DoSetProperty( Dali::Property::Index index,
 
 void BorderVisual::DoSetOnScene( Actor& actor )
 {
-  InitializeRenderer();
-
   mBorderColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor );
   if( mBorderColor.a < 1.f || mAntiAliasing )
   {
@@ -166,7 +165,7 @@ void BorderVisual::OnSetTransform()
   }
 }
 
-void BorderVisual::InitializeRenderer()
+void BorderVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::BORDER_GEOMETRY );
   if( !geometry )

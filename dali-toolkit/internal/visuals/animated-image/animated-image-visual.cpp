@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,8 @@ AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCach
     visual->LoadFirstBatch();
   }
 
+  visual->Initialize();
+
   return visual;
 }
 
@@ -143,6 +145,8 @@ AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCach
     visual->LoadFirstBatch();
   }
 
+  visual->Initialize();
+
   return visual;
 }
 
@@ -155,6 +159,8 @@ AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCach
   {
     visual->LoadFirstBatch();
   }
+
+  visual->Initialize();
 
   return visual;
 }
@@ -487,7 +493,6 @@ void AnimatedImageVisual::DoSetOnScene( Actor& actor )
 {
   mPlacementActor = actor;
   TextureSet textureSet = PrepareTextureSet();
-  CreateRenderer(); // Always create a renderer when on stage
 
   if( textureSet ) // if the image loading is successful
   {
@@ -510,7 +515,6 @@ void AnimatedImageVisual::DoSetOffScene( Actor& actor )
   }
 
   actor.RemoveRenderer( mImpl->mRenderer );
-  mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
   mStartFirstFrame = false;
 }
@@ -523,7 +527,7 @@ void AnimatedImageVisual::OnSetTransform()
   }
 }
 
-void AnimatedImageVisual::CreateRenderer()
+void AnimatedImageVisual::OnInitialize()
 {
   bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
   bool atlasing = false;

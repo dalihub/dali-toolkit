@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ ArcVisualPtr ArcVisual::New( VisualFactoryCache& factoryCache, const Property::M
 {
   ArcVisualPtr arcVisualPtr( new ArcVisual( factoryCache ) );
   arcVisualPtr->SetProperties( properties );
+  arcVisualPtr->Initialize();
   return arcVisualPtr;
 }
 
@@ -139,8 +140,6 @@ void ArcVisual::DoSetProperties( const Property::Map& propertyMap )
 
 void ArcVisual::DoSetOnScene( Actor& actor )
 {
-  InitializeRenderer();
-
   actor.AddRenderer( mImpl->mRenderer );
 
   // Arc Visual generated and ready to display
@@ -149,20 +148,7 @@ void ArcVisual::DoSetOnScene( Actor& actor )
 
 void ArcVisual::DoSetOffScene(Actor& actor)
 {
-  if(mImpl->mRenderer)
-  {
-    // Update values from Renderer
-    mThickness  = mImpl->mRenderer.GetProperty<float>(mThicknessIndex);
-    mStartAngle = mImpl->mRenderer.GetProperty<float>(mStartAngleIndex);
-    mSweepAngle = mImpl->mRenderer.GetProperty<float>(mSweepAngleIndex);
-  }
-
   actor.RemoveRenderer(mImpl->mRenderer);
-  mImpl->mRenderer.Reset();
-
-  mThicknessIndex  = Property::INVALID_INDEX;
-  mStartAngleIndex = Property::INVALID_INDEX;
-  mSweepAngleIndex = Property::INVALID_INDEX;
 }
 
 void ArcVisual::DoCreatePropertyMap( Property::Map& map ) const
@@ -223,7 +209,7 @@ void ArcVisual::OnDoAction( const Property::Index actionId, const Property::Valu
   }
 }
 
-void ArcVisual::InitializeRenderer()
+void ArcVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache, const Propert
 {
   ColorVisualPtr colorVisualPtr( new ColorVisual( factoryCache ) );
   colorVisualPtr->SetProperties( properties );
+  colorVisualPtr->Initialize();
   return colorVisualPtr;
 }
 
@@ -110,8 +111,6 @@ void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
 
 void ColorVisual::DoSetOnScene( Actor& actor )
 {
-  InitializeRenderer();
-
   // Only add the renderer if it's not fully transparent
   // We cannot avoid creating a renderer as it's used in the base class
   if( mRenderIfTransparent || mImpl->mMixColor.a > 0.0f )
@@ -125,15 +124,7 @@ void ColorVisual::DoSetOnScene( Actor& actor )
 
 void ColorVisual::DoSetOffScene(Actor& actor)
 {
-  if(mImpl->mRenderer && mBlurRadiusIndex != Property::INVALID_INDEX)
-  {
-    // Update values from Renderer
-    mBlurRadius = mImpl->mRenderer.GetProperty<float>(mBlurRadiusIndex);
-  }
-
   actor.RemoveRenderer(mImpl->mRenderer);
-  mImpl->mRenderer.Reset();
-  mBlurRadiusIndex = Property::INVALID_INDEX;
 }
 
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
@@ -194,7 +185,7 @@ void ColorVisual::UpdateShader()
   }
 }
 
-void ColorVisual::InitializeRenderer()
+void ColorVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 

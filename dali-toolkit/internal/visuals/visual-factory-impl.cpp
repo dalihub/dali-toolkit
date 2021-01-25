@@ -1,5 +1,5 @@
- /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+/*
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,7 +155,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
             {
               case VisualUrl::N_PATCH:
               {
-                visualPtr = NPatchVisual::New( GetFactoryCache(), visualUrl, propertyMap );
+                visualPtr = NPatchVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap);
                 break;
               }
               case VisualUrl::SVG:
@@ -224,7 +224,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       std::string imageUrl;
       if( imageURLValue && imageURLValue->Get( imageUrl ) )
       {
-        visualPtr = NPatchVisual::New( GetFactoryCache(), imageUrl, propertyMap );
+        visualPtr = NPatchVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
       }
       break;
     }
@@ -326,7 +326,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
     {
       case VisualUrl::N_PATCH:
       {
-        visualPtr = NPatchVisual::New( GetFactoryCache(), visualUrl );
+        visualPtr = NPatchVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl);
         break;
       }
       case VisualUrl::SVG:

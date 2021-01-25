@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -205,6 +205,11 @@ protected:
   virtual ~ImageVisual();
 
   /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
+
+  /**
    * @copydoc Visual::Base::DoSetProperties
    */
   void DoSetProperties( const Property::Map& propertyMap ) override;
@@ -288,12 +293,6 @@ private:
    * @brief Initializes the Dali::Renderer from the image url
    */
   void InitializeRenderer();
-
-  /**
-   * @brief Creates the Dali::Renderer (potentially from the renderer cache), initializing it
-   * @param[in] textures to use
-   */
-  void CreateRenderer( TextureSet& textures );
 
   /**
    * Creates the texture set and adds the texture to it

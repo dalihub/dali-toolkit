@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,6 +130,7 @@ ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
 {
   ImageVisualPtr imageVisualPtr( new ImageVisual( factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode ) );
   imageVisualPtr->SetProperties( properties );
+  imageVisualPtr->Initialize();
   return imageVisualPtr;
 }
 
@@ -140,7 +141,9 @@ ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
                                  FittingMode::Type fittingMode,
                                  Dali::SamplingMode::Type samplingMode )
 {
-  return new ImageVisual( factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode );
+  ImageVisualPtr imageVisualPtr(new ImageVisual(factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode));
+  imageVisualPtr->Initialize();
+  return imageVisualPtr;
 }
 
 ImageVisual::ImageVisual(VisualFactoryCache&       factoryCache,
@@ -510,7 +513,7 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
   naturalSize = Vector2::ZERO;
 }
 
-void ImageVisual::CreateRenderer( TextureSet& textureSet )
+void ImageVisual::OnInitialize()
 {
   Geometry geometry;
 
@@ -538,18 +541,11 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   // Create the renderer
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
-  if( textureSet )
-  {
-    mImpl->mRenderer.SetTextures( textureSet );
-  }
-  // else still waiting for texture load to finish.
-
   //Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 
   EnablePreMultipliedAlpha( IsPreMultipliedAlphaEnabled() );
 }
-
 
 void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection,
                                TextureManager::ReloadPolicy forceReload )
@@ -635,8 +631,11 @@ void ImageVisual::InitializeRenderer()
     }
   }
 
-  CreateRenderer( mTextures );
-  mTextures.Reset(); // Visual should not keep a handle to the texture after this point.
+  if(mTextures)
+  {
+    mImpl->mRenderer.SetTextures(mTextures);
+    mTextures.Reset(); // Visual should not keep a handle to the texture after this point.
+  }
 
   if( attemptAtlasing ) // the texture is packed inside atlas
   {
@@ -706,17 +705,19 @@ void ImageVisual::DoSetOffScene( Actor& actor )
 {
   // Visual::Base::SetOffScene only calls DoSetOffScene if mRenderer exists (is on onstage)
 
-  // Image release is dependent on the ReleasePolicy, renderer is destroyed.
+  // Image release is dependent on the ReleasePolicy, renderer is removed.
   actor.RemoveRenderer( mImpl->mRenderer);
   if( mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED )
   {
     RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
     mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
 
+    TextureSet textureSet = TextureSet::New();
+    mImpl->mRenderer.SetTextures(textureSet);
+
     mLoadState = TextureManager::LoadState::NOT_STARTED;
   }
 
-  mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
 }
 
@@ -932,7 +933,6 @@ void ImageVisual::RemoveTexture()
     }
 
     TextureSet textureSet = mImpl->mRenderer.GetTextures();
-    mImpl->mRenderer.Reset();
 
     if( index != Property::INVALID_INDEX )
     {

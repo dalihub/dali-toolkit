@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_GRADIENT_VISUAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,6 +195,10 @@ protected:
   virtual ~AnimatedGradientVisual();
 
 protected: //from Visual
+  /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
 
   /**
    * @copydoc Visual::Base::DoSetProperties
@@ -222,11 +226,6 @@ private:
    * @brief Initialize the default value of properies.
    */
   void SetupDefaultValue();
-
-  /**
-   * @brief Initialize the rendere with the geometry from the cache, and shader which made by CreateShader()
-   */
-  void InitializeRenderer();
 
   /**
    * @brief Make animations with GradientAnimationData

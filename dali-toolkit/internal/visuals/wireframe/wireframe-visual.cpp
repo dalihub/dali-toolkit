@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 
 // CLASS HEADER
 #include "wireframe-visual.h"
@@ -51,7 +50,9 @@ WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache, const
 
 WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual )
 {
-  return new WireframeVisual( factoryCache, actualVisual );
+  WireframeVisualPtr wireframeVisual(new WireframeVisual(factoryCache, actualVisual));
+  wireframeVisual->Initialize();
+  return wireframeVisual;
 }
 
 WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual, const Property::Map& properties )
@@ -65,7 +66,7 @@ WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache, Visua
   {
     wireframeVisual->SetTransformAndSize( transformMap, Vector2::ZERO );
   }
-
+  wireframeVisual->Initialize();
   return wireframeVisual;
 }
 
@@ -134,15 +135,13 @@ void WireframeVisual::DoSetProperties( const Property::Map& propertyMap )
 
 void WireframeVisual::DoSetOnScene( Actor& actor )
 {
-  InitializeRenderer();
-
   actor.AddRenderer( mImpl->mRenderer );
 
   // Wireframe generated and ready to display
   ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
-void WireframeVisual::InitializeRenderer()
+void WireframeVisual::OnInitialize()
 {
   Shader shader = mFactoryCache.GetShader( VisualFactoryCache::WIREFRAME_SHADER );
   if( !shader )

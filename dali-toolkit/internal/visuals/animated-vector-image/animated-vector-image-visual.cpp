@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,14 +72,14 @@ AnimatedVectorImageVisualPtr AnimatedVectorImageVisual::New( VisualFactoryCache&
 {
   AnimatedVectorImageVisualPtr visual( new AnimatedVectorImageVisual( factoryCache, shaderFactory, imageUrl ) );
   visual->SetProperties( properties );
-
+  visual->Initialize();
   return visual;
 }
 
 AnimatedVectorImageVisualPtr AnimatedVectorImageVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl )
 {
   AnimatedVectorImageVisualPtr visual( new AnimatedVectorImageVisual( factoryCache, shaderFactory, imageUrl ) );
-
+  visual->Initialize();
   return visual;
 }
 
@@ -279,7 +279,7 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
   }
 }
 
-void AnimatedVectorImageVisual::DoSetOnScene( Actor& actor )
+void AnimatedVectorImageVisual::OnInitialize(void)
 {
   Shader shader;
 
@@ -305,7 +305,10 @@ void AnimatedVectorImageVisual::DoSetOnScene( Actor& actor )
 
   // Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+}
 
+void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
+{
   // Defer the rasterisation task until we get given a size (by Size Negotiation algorithm)
 
   // Hold the weak handle of the placement actor and delay the adding of renderer until the rasterization is finished.
@@ -339,8 +342,6 @@ void AnimatedVectorImageVisual::DoSetOffScene( Actor& actor )
   if( mImpl->mRenderer )
   {
     actor.RemoveRenderer( mImpl->mRenderer );
-    mImpl->mRenderer.Reset();
-
     mRendererAdded = false;
   }
 

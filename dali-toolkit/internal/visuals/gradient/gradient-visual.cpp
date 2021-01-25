@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,6 +147,7 @@ GradientVisualPtr GradientVisual::New( VisualFactoryCache& factoryCache, const P
 {
   GradientVisualPtr gradientVisualPtr( new GradientVisual( factoryCache ) );
   gradientVisualPtr->SetProperties( properties );
+  gradientVisualPtr->Initialize();
   return gradientVisualPtr;
 }
 
@@ -199,8 +200,6 @@ void GradientVisual::OnSetTransform()
 
 void GradientVisual::DoSetOnScene( Actor& actor )
 {
-  InitializeRenderer();
-
   actor.AddRenderer( mImpl->mRenderer );
 
   // Gradient Visual generated and ready to display
@@ -264,7 +263,7 @@ void GradientVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
   // Do nothing
 }
 
-void GradientVisual::InitializeRenderer()
+void GradientVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
   Shader   shader   = GetShader();

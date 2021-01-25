@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,6 +130,7 @@ AnimatedGradientVisualPtr AnimatedGradientVisual::New( VisualFactoryCache& facto
 {
   AnimatedGradientVisualPtr animatedGradientVisualPtr( new AnimatedGradientVisual( factoryCache ) );
   animatedGradientVisualPtr->SetProperties( properties );
+  animatedGradientVisualPtr->Initialize();
   return animatedGradientVisualPtr;
 }
 
@@ -474,7 +475,6 @@ void AnimatedGradientVisual::OnSetTransform()
 
 void AnimatedGradientVisual::DoSetOnScene( Actor& actor )
 {
-  InitializeRenderer();
   actor.AddRenderer( mImpl->mRenderer );
   SetupAnimation();
   PlayAnimation();
@@ -488,7 +488,6 @@ void AnimatedGradientVisual::DoSetOffScene( Actor& actor )
 
   StopAnimation();
   actor.RemoveRenderer( mImpl->mRenderer );
-  mImpl->mRenderer.Reset();
 }
 
 void AnimatedGradientVisual::DoCreatePropertyMap( Property::Map& map ) const
@@ -664,7 +663,7 @@ Shader AnimatedGradientVisual::CreateShader()
   return shader;
 }
 
-void AnimatedGradientVisual::InitializeRenderer()
+void AnimatedGradientVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
   VisualFactoryCache::ShaderType shaderType = GetShaderType( mGradientType, mUnitType, mSpreadType );

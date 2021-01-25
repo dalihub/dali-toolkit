@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShader
   SvgVisualPtr svgVisual( new SvgVisual( factoryCache, shaderFactory, imageUrl ) );
   svgVisual->Load();
   svgVisual->SetProperties(properties);
+  svgVisual->Initialize();
   return svgVisual;
 }
 
@@ -59,6 +60,7 @@ SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShader
 {
   SvgVisualPtr svgVisual( new SvgVisual( factoryCache, shaderFactory, imageUrl ) );
   svgVisual->Load();
+  svgVisual->Initialize();
   return svgVisual;
 }
 
@@ -81,6 +83,26 @@ SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory
 
 SvgVisual::~SvgVisual()
 {
+}
+
+void SvgVisual::OnInitialize()
+{
+  Shader shader;
+  if(!mImpl->mCustomShader)
+  {
+    shader = mImageVisualShaderFactory.GetShader(mFactoryCache, mAttemptAtlasing, true, IsRoundedCornerRequired());
+  }
+  else
+  {
+    shader = Shader::New(mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->mCustomShader->mVertexShader,
+                         mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->mCustomShader->mFragmentShader,
+                         mImpl->mCustomShader->mHints);
+
+    shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+  }
+
+  Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
+  mImpl->mRenderer  = Renderer::New(geometry, shader);
 }
 
 void SvgVisual::DoSetProperties( const Property::Map& propertyMap )
@@ -138,23 +160,7 @@ void SvgVisual::DoSetProperty( Property::Index index, const Property::Value& val
 
 void SvgVisual::DoSetOnScene( Actor& actor )
 {
-  Shader shader;
-  if( !mImpl->mCustomShader )
-  {
-    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, mAttemptAtlasing, true, IsRoundedCornerRequired() );
-  }
-  else
-  {
-    shader = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->mCustomShader->mVertexShader,
-                          mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->mCustomShader->mFragmentShader,
-                          mImpl->mCustomShader->mHints );
-
-    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-  }
-
-  Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
   TextureSet textureSet = TextureSet::New();
-  mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetTextures( textureSet );
 
   // Register transform properties
@@ -174,7 +180,6 @@ void SvgVisual::DoSetOffScene( Actor& actor )
   mFactoryCache.GetSVGRasterizationThread()->RemoveTask( this );
 
   actor.RemoveRenderer( mImpl->mRenderer );
-  mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
 
   // Reset the visual size to zero so that when adding the actor back to stage the SVG rasterization is forced

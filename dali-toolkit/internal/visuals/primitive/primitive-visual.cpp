@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,6 +99,7 @@ PrimitiveVisualPtr PrimitiveVisual::New( VisualFactoryCache& factoryCache, const
 {
   PrimitiveVisualPtr primitiveVisualPtr( new PrimitiveVisual( factoryCache ) );
   primitiveVisualPtr->SetProperties( properties );
+  primitiveVisualPtr->Initialize();
   return primitiveVisualPtr;
 }
 
@@ -333,8 +334,6 @@ void PrimitiveVisual::GetNaturalSize( Vector2& naturalSize )
 
 void PrimitiveVisual::DoSetOnScene( Actor& actor )
 {
-  InitializeRenderer();
-
   actor.AddRenderer( mImpl->mRenderer );
 
   // Primitive generated and ready to display
@@ -372,7 +371,7 @@ void PrimitiveVisual::OnSetTransform()
   }
 }
 
-void PrimitiveVisual::InitializeRenderer()
+void PrimitiveVisual::OnInitialize()
 {
   if( !mGeometry )
   {

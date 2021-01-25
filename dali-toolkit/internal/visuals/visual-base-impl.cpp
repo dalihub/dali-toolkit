@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,25 @@ Visual::Base::~Base()
   delete mImpl;
 }
 
+void Visual::Base::Initialize()
+{
+  // The Renderer should be created inside derived class here.
+  OnInitialize();
+
+  if(mImpl->mRenderer)
+  {
+    RegisterMixColor();
+
+    if(IsRoundedCornerRequired())
+    {
+      mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
+      mImpl->mRenderer.RegisterProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
+
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+    }
+  }
+}
+
 void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
 {
   if( mImpl->mCustomShader )
@@ -87,6 +106,9 @@ void Visual::Base::SetCustomShader( const Property::Map& shaderMap )
   {
     mImpl->mCustomShader = new Impl::CustomShader( shaderMap );
   }
+
+  // Let derived class know
+  UpdateShader();
 }
 
 void Visual::Base::SetProperties( const Property::Map& propertyMap )
@@ -317,22 +339,13 @@ void Visual::Base::SetOnScene( Actor& actor )
     // Thus the calling of actor.AddRenderer() should happen inside derived class as base class does not know the exact timing.
     DoSetOnScene( actor );
 
-    if( mImpl->mRenderer )
+    if(mImpl->mRenderer)
     {
-      RegisterMixColor();
-
-      if( IsRoundedCornerRequired() )
-      {
-        mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
-        mImpl->mRenderer.RegisterProperty( CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy );
-
-        mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-      }
-
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
-      mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-      mImpl->mFlags |= Impl::IS_ON_SCENE; // Only sets the flag if renderer exists
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
+      mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex);
     }
+
+    mImpl->mFlags |= Impl::IS_ON_SCENE;
   }
 }
 
@@ -340,28 +353,7 @@ void Visual::Base::SetOffScene( Actor& actor )
 {
   if( IsOnScene() )
   {
-    if(mImpl->mRenderer)
-    {
-      // Update values from Renderer
-      mImpl->mMixColor   = mImpl->mRenderer.GetProperty<Vector3>(mImpl->mMixColorIndex);
-      mImpl->mMixColor.a = mImpl->mRenderer.GetProperty<float>(DevelRenderer::Property::OPACITY);
-      if(mImpl->mTransform.mOffsetIndex != Property::INVALID_INDEX)
-      {
-        mImpl->mTransform.mOffset = mImpl->mRenderer.GetProperty<Vector2>(mImpl->mTransform.mOffsetIndex);
-      }
-      if(mImpl->mTransform.mSizeIndex != Property::INVALID_INDEX)
-      {
-        mImpl->mTransform.mSize = mImpl->mRenderer.GetProperty<Vector2>(mImpl->mTransform.mSizeIndex);
-      }
-      if(mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
-      {
-        mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<float>(mImpl->mCornerRadiusIndex);
-      }
-    }
-
     DoSetOffScene( actor );
-    mImpl->mMixColorIndex = Property::INVALID_INDEX;
-    mImpl->mCornerRadiusIndex = Property::INVALID_INDEX;
     mImpl->mFlags &= ~Impl::IS_ON_SCENE;
   }
 }
@@ -422,9 +414,6 @@ void Visual::Base::CreateInstancePropertyMap( Property::Map& map ) const
   {
     mImpl->mCustomShader->CreatePropertyMap( map );
   }
-
-  //map.Insert( Toolkit::Visual::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-  //map.Insert( Toolkit::Visual::Property::ENABLED, (bool) mImpl->mRenderer );
 }
 
 
@@ -454,7 +443,6 @@ bool Visual::Base::IsPreMultipliedAlphaEnabled() const
 void Visual::Base::DoSetOffScene( Actor& actor )
 {
   actor.RemoveRenderer( mImpl->mRenderer );
-  mImpl->mRenderer.Reset();
 }
 
 bool Visual::Base::IsOnScene() const

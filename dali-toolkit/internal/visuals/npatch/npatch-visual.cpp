@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,16 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/internal/visuals/npatch-loader.h>
-#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
-#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
-#include <dali-toolkit/internal/visuals/rendering-addon.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
+#include <dali-toolkit/internal/visuals/npatch-loader.h>
+#include <dali-toolkit/internal/visuals/rendering-addon.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -134,20 +135,20 @@ void RegisterStretchProperties( Renderer& renderer, const char * uniformName, co
 
 /////////////////NPatchVisual////////////////
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
+NPatchVisualPtr NPatchVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties)
 {
-  NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
+  NPatchVisualPtr nPatchVisual(new NPatchVisual(factoryCache, shaderFactory));
   nPatchVisual->mImageUrl = imageUrl;
   nPatchVisual->SetProperties( properties );
-
+  nPatchVisual->Initialize();
   return nPatchVisual;
 }
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
+NPatchVisualPtr NPatchVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl)
 {
-  NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
+  NPatchVisualPtr nPatchVisual(new NPatchVisual(factoryCache, shaderFactory));
   nPatchVisual->mImageUrl = imageUrl;
-
+  nPatchVisual->Initialize();
   return nPatchVisual;
 }
 
@@ -283,7 +284,8 @@ void NPatchVisual::DoSetOnScene( Actor& actor )
     Geometry geometry = CreateGeometry();
     Shader shader = CreateShader();
 
-    mImpl->mRenderer = Renderer::New( geometry, shader );
+    mImpl->mRenderer.SetGeometry(geometry);
+    mImpl->mRenderer.SetShader(shader);
 
     mPlacementActor = actor;
     if( data->GetLoadingState() != NPatchData::LoadingState::LOADING )
@@ -313,7 +315,6 @@ void NPatchVisual::DoSetOffScene( Actor& actor )
   }
 
   actor.RemoveRenderer( mImpl->mRenderer );
-  mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
 }
 
@@ -352,17 +353,18 @@ void NPatchVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
   }
 }
 
-NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::N_PATCH ),
+NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory)
+: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::N_PATCH),
   mPlacementActor(),
-  mLoader( factoryCache.GetNPatchLoader() ),
+  mLoader(factoryCache.GetNPatchLoader()),
+  mImageVisualShaderFactory(shaderFactory),
   mImageUrl(),
   mAuxiliaryUrl(),
   mId(NPatchData::INVALID_NPATCH_DATA_ID),
-  mBorderOnly( false ),
+  mBorderOnly(false),
   mBorder(),
-  mAuxiliaryImageAlpha( 0.0f ),
-  mReleasePolicy( Toolkit::ImageVisual::ReleasePolicy::DETACHED )
+  mAuxiliaryImageAlpha(0.0f),
+  mReleasePolicy(Toolkit::ImageVisual::ReleasePolicy::DETACHED)
 {
   EnablePreMultipliedAlpha( mFactoryCache.GetPreMultiplyOnLoad() );
 }
@@ -374,6 +376,18 @@ NPatchVisual::~NPatchVisual()
     mLoader.Remove(mId, this);
     mId = NPatchData::INVALID_NPATCH_DATA_ID;
   }
+}
+
+void NPatchVisual::OnInitialize()
+{
+  // Get basic geometry and shader
+  Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
+  Shader   shader   = mImageVisualShaderFactory.GetShader(mFactoryCache, false, true, false);
+
+  mImpl->mRenderer = Renderer::New(geometry, shader);
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 Geometry NPatchVisual::CreateGeometry()

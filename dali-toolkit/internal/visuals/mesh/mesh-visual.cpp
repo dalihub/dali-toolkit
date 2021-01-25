@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,6 +101,7 @@ MeshVisualPtr MeshVisual::New( VisualFactoryCache& factoryCache, const Property:
 {
   MeshVisualPtr meshVisualPtr( new MeshVisual( factoryCache ) );
   meshVisualPtr->SetProperties( properties );
+  meshVisualPtr->Initialize();
   return meshVisualPtr;
 }
 
@@ -245,8 +246,6 @@ void MeshVisual::OnSetTransform()
 
 void MeshVisual::DoSetOnScene( Actor& actor )
 {
-  InitializeRenderer();
-
   actor.AddRenderer( mImpl->mRenderer );
 
   // Mesh loaded and ready to display
@@ -271,7 +270,7 @@ void MeshVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
   // Do nothing
 }
 
-void MeshVisual::InitializeRenderer()
+void MeshVisual::OnInitialize()
 {
   //Try to load the geometry from the file.
   if( !LoadGeometry() )

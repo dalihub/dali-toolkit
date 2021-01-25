@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_N_PATCH_VISUAL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace Toolkit
 
 namespace Internal
 {
-
+class ImageVisualShaderFactory;
 class NPatchVisual;
 typedef IntrusivePtr< NPatchVisual > NPatchVisualPtr;
 
@@ -60,18 +60,18 @@ typedef IntrusivePtr< NPatchVisual > NPatchVisualPtr;
 class NPatchVisual: public Visual::Base, public TextureUploadObserver
 {
 public:
-
   /**
    * @brief Create an N-patch visual using an image URL.
    *
    * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to 9 patch image resource to use
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties );
+  static NPatchVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties);
 
   /**
    * @brief Create an N-patch visual using an image URL.
@@ -79,10 +79,11 @@ public:
    * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to 9 patch image resource to use
    * @return A smart-pointer to the newly allocated visual.
    */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl );
+  static NPatchVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
 
 public:  // from Visual
 
@@ -108,12 +109,17 @@ protected:
    *
    * @param[in] factoryCache Reference to the VisualFactoryCache object
    */
-  NPatchVisual( VisualFactoryCache& factoryCache );
+  NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~NPatchVisual();
+
+  /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
 
   /**
    * @copydoc Visual::Base::DoSetProperties
@@ -223,15 +229,16 @@ private:
   void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied ) override;
 
 private:
-  WeakHandle<Actor>        mPlacementActor;                 ///< Weakhandle to contain Actor during texture loading
-  NPatchLoader&            mLoader;                         ///< reference to N patch loader for fast access
-  VisualUrl                mImageUrl;                       ///< The url to the N patch to load
-  VisualUrl                mAuxiliaryUrl;                   ///< An auxiliary image that can be displayed on top of the N-Patch
-  NPatchData::NPatchDataId mId;                             ///< id of the N patch (from loader/cache)
-  Devel::PixelBuffer       mAuxiliaryPixelBuffer;           ///< pixel buffer of the auxiliary mask image
-  bool                     mBorderOnly;                     ///< if only border is desired
-  Rect<int>                mBorder;                         ///< The size of the border
-  float                    mAuxiliaryImageAlpha;            ///< The alpha value for the auxiliary image only
+  WeakHandle<Actor>                         mPlacementActor; ///< Weakhandle to contain Actor during texture loading
+  NPatchLoader&                             mLoader;         ///< reference to N patch loader for fast access
+  ImageVisualShaderFactory&                 mImageVisualShaderFactory;
+  VisualUrl                                 mImageUrl;             ///< The url to the N patch to load
+  VisualUrl                                 mAuxiliaryUrl;         ///< An auxiliary image that can be displayed on top of the N-Patch
+  NPatchData::NPatchDataId                  mId;                   ///< id of the N patch (from loader/cache)
+  Devel::PixelBuffer                        mAuxiliaryPixelBuffer; ///< pixel buffer of the auxiliary mask image
+  bool                                      mBorderOnly;           ///< if only border is desired
+  Rect<int>                                 mBorder;               ///< The size of the border
+  float                                     mAuxiliaryImageAlpha;  ///< The alpha value for the auxiliary image only
   Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy; ///< The release policy to determine when an image should no longer be cached.
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,9 +152,10 @@ void OpacityConstraint( float& current, const PropertyInputContainer& inputs )
 
 TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
 {
-  TextVisualPtr TextVisualPtr( new TextVisual( factoryCache ) );
-  TextVisualPtr->SetProperties( properties );
-  return TextVisualPtr;
+  TextVisualPtr textVisualPtr(new TextVisual(factoryCache));
+  textVisualPtr->SetProperties(properties);
+  textVisualPtr->Initialize();
+  return textVisualPtr;
 }
 
 Property::Map TextVisual::ConvertStringKeysToIndexKeys( const Property::Map& propertyMap )
@@ -252,6 +253,14 @@ TextVisual::~TextVisual()
 {
 }
 
+void TextVisual::OnInitialize()
+{
+  Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
+  Shader   shader   = GetTextShader(mFactoryCache, TextType::SINGLE_COLOR_TEXT, TextType::NO_EMOJI, TextType::NO_STYLES);
+
+  mImpl->mRenderer = Renderer::New(geometry, shader);
+}
+
 void TextVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   for( Property::Map::SizeType index = 0u, count = propertyMap.Count(); index < count; ++index )
@@ -282,10 +291,6 @@ void TextVisual::DoSetOnScene( Actor& actor )
 {
   mControl = actor;
 
-  Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-  Shader shader = GetTextShader(mFactoryCache, TextType::SINGLE_COLOR_TEXT, TextType::NO_EMOJI, TextType::NO_STYLES);
-
-  mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT );
 
   // Enable the pre-multiplied alpha to improve the text quality
@@ -336,9 +341,6 @@ void TextVisual::RemoveRenderer( Actor& actor )
 void TextVisual::DoSetOffScene( Actor& actor )
 {
   RemoveRenderer( actor );
-
-  // Resets the renderer.
-  mImpl->mRenderer.Reset();
 
   // Resets the control handle.
   mControl.Reset();
