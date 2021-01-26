@@ -29,6 +29,7 @@ namespace Dali
 {
 namespace Toolkit
 {
+class ImageView;
 class WebBackForwardList;
 class WebContext;
 class WebCookieManager;
@@ -101,6 +102,13 @@ public:
        * @details Name "contentSize", type Property::VECTOR2. Read-only.
        */
       CONTENT_SIZE,
+
+      /**
+       * @brief The title of web page.
+       * @details Name "title", type Property::STRING.
+       * @note The value is read-only.
+       */
+      TITLE,
     };
   };
 
@@ -218,6 +226,14 @@ public:
   static WebView New(const std::string& locale, const std::string& timezoneId);
 
   /**
+   * @brief Creates an initialized WebView.
+   *
+   * @param [in] argc The count of arguments of Applications
+   * @param [in] argv The string array of arguments of Applications
+   */
+  static WebView New( int argc, char** argv );
+
+  /**
    * @brief Creates an uninitialized WebView.
    */
   WebView();
@@ -274,6 +290,13 @@ public:
    * @brief Get WebBackForwardList of WebEngine.
    */
   Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
+
+  /**
+   * @brief Get Favicon of web page.
+   *
+   * @return Handle to a fav icon
+   */
+  Dali::Toolkit::ImageView& GetFavicon();
 
   /**
    * @brief Loads a web page based on a given URL.
@@ -380,6 +403,11 @@ public:
    * @param[in] handler The callback function
    */
   void AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler);
+
+  /**
+   * @brief Clears all tiles resources of Web.
+   */
+  void ClearAllTilesResources();
 
   /**
    * @brief Clears the history of Web.

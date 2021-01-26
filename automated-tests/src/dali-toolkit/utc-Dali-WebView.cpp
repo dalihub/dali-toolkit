@@ -24,6 +24,8 @@
 #include <dali.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/public-api/images/pixel-data.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list-item.h>
@@ -31,7 +33,6 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
-
 
 using namespace Dali;
 using namespace Toolkit;
@@ -412,6 +413,33 @@ int UtcDaliWebViewProperty9(void)
   output = Dali::Vector2::ONE;
   view.GetProperty( WebView::Property::CONTENT_SIZE ).Get( output );
   DALI_TEST_CHECK( output.x == 500 && output.y == 500 );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewPropertyTitleFavicon(void)
+{
+  // SCROLL_POSITION
+  ToolkitTestApplication application;
+
+  char argv[] = "--test";
+  WebView view = WebView::New( 1, (char**)&argv );
+  DALI_TEST_CHECK( view );
+
+  // reset something
+  view.ClearAllTilesResources();
+
+  // Check default value of title
+  std::string testValue("title");
+  std::string output;
+  view.GetProperty( WebView::Property::TITLE ).Get( output );
+  DALI_TEST_EQUALS( output, testValue, TEST_LOCATION );
+
+  // Check default value of favicon
+  Dali::Toolkit::ImageView* favicon = &view.GetFavicon();
+  DALI_TEST_CHECK( favicon );
+  Dali::Vector3 iconsize = favicon->GetProperty< Vector3 >( Dali::Actor::Property::SIZE );
+  DALI_TEST_CHECK( ( int )iconsize.width == 2 && ( int )iconsize.height == 2 );
 
   END_TEST;
 }
