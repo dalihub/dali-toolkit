@@ -29,6 +29,11 @@ namespace Dali
 {
 namespace Toolkit
 {
+class WebBackForwardList;
+class WebContext;
+class WebCookieManager;
+class WebSettings;
+
 namespace Internal DALI_INTERNAL
 {
 class WebView;
@@ -50,59 +55,6 @@ class WebView;
 class DALI_TOOLKIT_API WebView : public Control
 {
 public:
-  /**
-   * @brief A structure used to contain the cache model enumeration.
-   */
-  struct CacheModel
-  {
-    /**
-     * @brief Enumeration for cache model options.
-     */
-    enum Type
-    {
-      /**
-       * @brief Use the smallest cache capacity.
-       */
-      DOCUMENT_VIEWER,
-
-      /**
-       * @brief Use the bigger cache capacity than DocumentBrowser.
-       */
-      DOCUMENT_BROWSER,
-
-      /**
-       * @brief Use the biggest cache capacity.
-       */
-      PRIMARY_WEB_BROWSER
-    };
-  };
-
-  /**
-   * @brief A structure used to contain the cookie acceptance policy enumeration.
-   */
-  struct CookieAcceptPolicy
-  {
-    /**
-     * @brief Enumeration for the cookies accept policies.
-     */
-    enum Type
-    {
-      /**
-       * @brief Accepts every cookie sent from any page.
-       */
-      ALWAYS,
-
-      /**
-       * @brief Rejects all the cookies.
-       */
-      NEVER,
-
-      /**
-       * @brief Accepts only cookies set by the main document that is loaded.
-       */
-      NO_THIRD_PARTY
-    };
-  };
 
   /**
    * @brief Enumeration for the start and end property ranges for this control.
@@ -127,54 +79,10 @@ public:
       URL = PROPERTY_START_INDEX,
 
       /**
-       * @brief The cache model.
-       * @details Name "cacheModel", type WebView::CacheModel::Type (Property::INTEGER) or Property::STRING.
-       * @note Default is WebView::CacheModel::DOCUMENT_VIEWER.
-       * @see WebView::CacheModel::Type
-       */
-      CACHE_MODEL,
-
-      /**
-       * @brief The cookie acceptance policy.
-       * @details Name "cookieAcceptPolicy", type WebView::CookieAcceptPolicy::Type (Property::INTEGER) or Property::STRING.
-       * @note Default is WebView::CookieAcceptPolicy::NO_THIRD_PARTY.
-       * @see WebView::CookieAcceptPolicy::Type
-       */
-      COOKIE_ACCEPT_POLICY,
-
-      /**
        * @brief The user agent string.
        * @details Name "userAgent", type Property::STRING.
        */
       USER_AGENT,
-
-      /**
-       * @brief Whether JavaScript is enabled.
-       * @details Name "enableJavaScript", type Property::BOOLEAN.
-       * @note Default is true.
-       */
-      ENABLE_JAVASCRIPT,
-
-      /**
-       * @brief Whether images can be loaded automatically.
-       * @details Name "loadImagesAutomatically", type Property::BOOLEAN.
-       * @note Default is true.
-       */
-      LOAD_IMAGES_AUTOMATICALLY,
-
-      /**
-       * @brief The default text encoding name.
-       * @details Name "defaultTextEncodingName", type Property::STRING.
-       * @note If the value is not set, the web engine detects web page's text encoding.
-       */
-      DEFAULT_TEXT_ENCODING_NAME,
-
-      /**
-       * @brief The default font size in pixel.
-       * @details Name "defaultFontSize", type Property::INT.
-       * @note Default is 16.
-       */
-      DEFAULT_FONT_SIZE,
 
       /**
        * @brief The current position of scroll.
@@ -348,6 +256,26 @@ public:
   static WebView DownCast(BaseHandle handle);
 
   /**
+   * @brief Get WebSettings of WebEngine.
+   */
+  Dali::Toolkit::WebSettings* GetSettings() const;
+
+  /**
+   * @brief Get WebContext of WebEngine.
+   */
+  Dali::Toolkit::WebContext* GetContext() const;
+
+  /**
+   * @brief Get CookieManager of WebEngine.
+   */
+  Dali::Toolkit::WebCookieManager* GetCookieManager() const;
+
+  /**
+   * @brief Get WebBackForwardList of WebEngine.
+   */
+  Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
+
+  /**
    * @brief Loads a web page based on a given URL.
    *
    * @param [in] url The URL of the resource to load
@@ -359,7 +287,7 @@ public:
    *
    * @param [in] htmlString The string to use as the contents of the web page
    */
-  void LoadHTMLString(const std::string& htmlString);
+  void LoadHtmlString(const std::string& htmlString);
 
   /**
    * @brief Reloads the Web.
@@ -457,16 +385,6 @@ public:
    * @brief Clears the history of Web.
    */
   void ClearHistory();
-
-  /**
-   * @brief Clears the cache of Web.
-   */
-  void ClearCache();
-
-  /**
-   * @brief Clears all the cookies of Web.
-   */
-  void ClearCookies();
 
   /**
    * @brief Connects to this signal to be notified when page loading is started.

@@ -17,12 +17,12 @@
 
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/scene3d-view/gltf-loader.h>
-#include <dali-toolkit/internal/controls/scene3d-view/gltf-shader.h>
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/file-stream.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -1503,35 +1503,35 @@ Actor Loader::AddNode( Scene3dView& scene3dView, uint32_t index )
     bool isEmissiveTexture = false;
 
     std::string VERTEX_SHADER, FRAGMENT_SHADER;
-    VERTEX_SHADER = GLES_VERSION_300;
-    VERTEX_SHADER += PHYSICALLY_BASED_VERTEX_SHADER;
-    FRAGMENT_SHADER = GLES_VERSION_300;
+    VERTEX_SHADER = SHADER_GLTF_GLES_VERSION_300_DEF.data();
+    VERTEX_SHADER += SHADER_GLTF_PHYSICALLY_BASED_SHADER_VERT.data();
+    FRAGMENT_SHADER = SHADER_GLTF_GLES_VERSION_300_DEF.data();
 
     bool useIBL = ( scene3dView.GetLightType() >= Toolkit::Scene3dView::LightType::IMAGE_BASED_LIGHT );
     if( isMaterial )
     {
       MaterialInfo materialInfo = mMaterialArray[meshInfo.materialsIdx];
-      if( SetTextureAndSampler( textureSet, materialInfo.baseColorTexture.index, FRAGMENT_SHADER, DEFINE_BASECOLOR_TEXTURE, addIdx ) )
+      if( SetTextureAndSampler( textureSet, materialInfo.baseColorTexture.index, FRAGMENT_SHADER, SHADER_GLTF_BASECOLOR_TEXTURE_DEF.data(), addIdx ) )
       {
         shaderTypeIndex += static_cast<int32_t>( ShaderType::BASECOLOR_SHADER );
         isBaseColorTexture = true;
       }
-      if( SetTextureAndSampler( textureSet, materialInfo.metallicRoughnessTexture.index, FRAGMENT_SHADER, DEFINE_METALLICROUGHNESS_TEXTURE, addIdx ) )
+      if( SetTextureAndSampler( textureSet, materialInfo.metallicRoughnessTexture.index, FRAGMENT_SHADER, SHADER_GLTF_METALLICROUGHNESS_TEXTURE_DEF.data(), addIdx ) )
       {
         shaderTypeIndex += static_cast<int32_t>( ShaderType::METALLICROUGHNESS_SHADER );
         isMetallicRoughnessTexture = true;
       }
-      if( SetTextureAndSampler( textureSet, materialInfo.normalTexture.index, FRAGMENT_SHADER, DEFINE_NORMAL_TEXTURE, addIdx ) )
+      if( SetTextureAndSampler( textureSet, materialInfo.normalTexture.index, FRAGMENT_SHADER, SHADER_GLTF_NORMAL_TEXTURE_DEF.data(), addIdx ) )
       {
         shaderTypeIndex += static_cast<int32_t>( ShaderType::NORMAL_SHADER );
         isNormalTexture = true;
       }
-      if( SetTextureAndSampler( textureSet, materialInfo.occlusionTexture.index, FRAGMENT_SHADER, DEFINE_OCCLUSION_TEXTURE, addIdx ) )
+      if( SetTextureAndSampler( textureSet, materialInfo.occlusionTexture.index, FRAGMENT_SHADER, SHADER_GLTF_OCCULUSION_TEXTURE_DEF.data(), addIdx ) )
       {
         shaderTypeIndex += static_cast<int32_t>( ShaderType::OCCLUSION_SHADER );
         isOcclusionTexture = true;
       }
-      if( SetTextureAndSampler( textureSet, materialInfo.emissiveTexture.index, FRAGMENT_SHADER, DEFINE_EMIT_TEXTURE, addIdx ) )
+      if( SetTextureAndSampler( textureSet, materialInfo.emissiveTexture.index, FRAGMENT_SHADER, SHADER_GLTF_EMIT_TEXTURE_DEF.data(), addIdx ) )
       {
         shaderTypeIndex += static_cast<int32_t>( ShaderType::EMIT_SHADER );
         isEmissiveTexture = true;
@@ -1540,7 +1540,7 @@ Actor Loader::AddNode( Scene3dView& scene3dView, uint32_t index )
       if( useIBL )
       {
         shaderTypeIndex += static_cast<int32_t>( ShaderType::IBL_SHADER );
-        FRAGMENT_SHADER += DEFINE_IBL_TEXTURE;
+        FRAGMENT_SHADER += SHADER_GLTF_IBL_TEXTURE_DEF.data();
 
         Sampler sampler = Sampler::New();
         sampler.SetFilterMode( FilterMode::DEFAULT, FilterMode::DEFAULT );
@@ -1567,7 +1567,7 @@ Actor Loader::AddNode( Scene3dView& scene3dView, uint32_t index )
       }
     }
 
-    FRAGMENT_SHADER += PHYSICALLY_BASED_FRAGMENT_SHADER;
+    FRAGMENT_SHADER += SHADER_GLTF_PHYSICALLY_BASED_SHADER_FRAG.data();
     if( !mShaderCache[shaderTypeIndex] )
     {
       mShaderCache[shaderTypeIndex] = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );

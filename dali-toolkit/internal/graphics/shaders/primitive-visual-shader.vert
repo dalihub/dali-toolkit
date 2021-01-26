@@ -1,3 +1,5 @@
+//A simple shader that applies diffuse lighting to a mono-coloured object.
+
 attribute highp vec3 aPosition;
 attribute highp vec2 aTexCoord;
 attribute highp vec3 aNormal;

@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-mesh-factory.h>
 #include <dali-toolkit/internal/text/text-view.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -41,52 +42,6 @@ namespace
 #if defined(DEBUG_ENABLED)
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_RENDERING");
 #endif
-
-#define MAKE_SHADER(A)#A
-
-const char* VERTEX_SHADER = MAKE_SHADER(
-attribute mediump vec2    aPosition;
-attribute mediump vec2    aTexCoord;
-attribute mediump vec4    aColor;
-uniform   mediump vec2    uOffset;
-uniform     highp mat4    uMvpMatrix;
-varying   mediump vec2    vTexCoord;
-varying   mediump vec4    vColor;
-
-void main()
-{
-  mediump vec4 position = vec4( aPosition.xy + uOffset, 0.0, 1.0 );
-  gl_Position = uMvpMatrix * position;
-  vTexCoord = aTexCoord;
-  vColor = aColor;
-}
-);
-
-const char* FRAGMENT_SHADER_L8 = MAKE_SHADER(
-uniform lowp    vec4      uColor;
-uniform lowp    vec4      textColorAnimatable;
-uniform         sampler2D sTexture;
-varying mediump vec2      vTexCoord;
-varying mediump vec4      vColor;
-
-void main()
-{
-  mediump vec4 color = texture2D( sTexture, vTexCoord );
-  gl_FragColor = vec4( vColor.rgb * uColor.rgb * textColorAnimatable.rgb, uColor.a * vColor.a * textColorAnimatable.a * color.r );
-}
-);
-
-const char* FRAGMENT_SHADER_RGBA = MAKE_SHADER(
-uniform lowp    vec4      uColor;
-uniform lowp    vec4      textColorAnimatable;
-uniform         sampler2D sTexture;
-varying mediump vec2      vTexCoord;
-
-void main()
-{
-  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * textColorAnimatable;
-}
-);
 
 const float ZERO( 0.0f );
 const float HALF( 0.5f );
@@ -696,7 +651,7 @@ struct AtlasRenderer::Impl
       // The glyph is an emoji and is not a shadow.
       if( !mShaderRgba )
       {
-        mShaderRgba = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_RGBA );
+        mShaderRgba = Shader::New( SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG );
       }
       shader = mShaderRgba;
     }
@@ -705,7 +660,7 @@ struct AtlasRenderer::Impl
       // The glyph is text or a shadow.
       if( !mShaderL8 )
       {
-        mShaderL8 = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_L8 );
+        mShaderL8 = Shader::New( SHADER_TEXT_ATLAS_SHADER_VERT, SHADER_TEXT_ATLAS_L8_SHADER_FRAG );
       }
       shader = mShaderL8;
     }

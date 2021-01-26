@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -44,74 +45,6 @@ namespace
 const char * const POSITION_ATTRIBUTE_NAME("aPosition");
 const char * const DRIFT_ATTRIBUTE_NAME("aDrift");
 const char * const INDEX_NAME("indices");
-
-const char* VERTEX_SHADER =
-  "INPUT mediump vec2 aPosition;\n"
-  "INPUT mediump vec2 aDrift;\n"
-
-  "uniform highp mat4 uMvpMatrix;\n"
-  "uniform highp vec3 uSize;\n"
-  "uniform mediump float borderSize;\n"
-
-  "//Visual size and offset\n"
-  "uniform mediump vec2 offset;\n"
-  "uniform highp vec2 size;\n"
-  "uniform mediump vec4 offsetSizeMode;\n"
-  "uniform mediump vec2 origin;\n"
-  "uniform mediump vec2 anchorPoint;\n"
-
-  "vec2 ComputeVertexPosition()\n"
-  "{\n"
-  "  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n"
-  "  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n"
-  "  return (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy;\n"
-  "}\n"
-
-  "void main()\n"
-  "{\n"
-  "  vec2 position = ComputeVertexPosition() + aDrift*borderSize;\n"
-  "  gl_Position = uMvpMatrix * vec4(position, 0.0, 1.0);\n"
-  "}\n";
-
-const char* FRAGMENT_SHADER =
-  "uniform lowp vec4 uColor;\n"
-  "uniform lowp vec4 borderColor;\n"
-  "uniform lowp vec3 mixColor;\n"
-
-  "void main()\n"
-  "{\n"
-  "  OUT_COLOR = vec4(mixColor, 1.0) * borderColor * uColor;\n"
-  "}\n";
-
-const char* VERTEX_SHADER_ANTI_ALIASING =
-  "INPUT mediump vec2 aPosition;\n"
-  "INPUT mediump vec2 aDrift;\n"
-  "OUTPUT mediump float vAlpha;\n"
-
-  "uniform highp mat4 uMvpMatrix;\n"
-  "uniform highp vec3 uSize;\n"
-  "uniform mediump float borderSize;\n"
-
-  "void main()\n"
-  "{\n"
-  "  vec2 position = aPosition*(uSize.xy+vec2(0.75)) + aDrift*(borderSize+1.5);\n"
-  "  gl_Position = uMvpMatrix * vec4(position, 0.0, 1.0);\n"
-  "  vAlpha = min( abs(aDrift.x), abs(aDrift.y) )*(borderSize+1.5);"
-  "}\n";
-
-const char* FRAGMENT_SHADER_ANTI_ALIASING =
-  "INPUT mediump float vAlpha;\n"
-
-  "uniform lowp vec4 uColor;\n"
-  "uniform lowp vec4 borderColor;\n"
-  "uniform lowp vec3 mixColor;\n"
-  "uniform mediump float borderSize;\n"
-
-  "void main()\n"
-  "{\n"
-  "  OUT_COLOR = vec4(mixColor, 1.0) * borderColor * uColor;\n"
-  "  OUT_COLOR.a *= smoothstep(0.0, 1.5, vAlpha) * smoothstep( borderSize + 1.5, borderSize, vAlpha );\n"
-  "}\n";
 }
 
 BorderVisualPtr BorderVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
@@ -257,7 +190,7 @@ Shader BorderVisual::GetBorderShader()
     shader = mFactoryCache.GetShader( VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING );
     if( !shader )
     {
-      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + VERTEX_SHADER_ANTI_ALIASING, Dali::Shader::GetFragmentShaderPrefix() + FRAGMENT_SHADER_ANTI_ALIASING );
+      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_FRAG.data() );
       mFactoryCache.SaveShader( VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING, shader );
     }
   }
@@ -266,7 +199,7 @@ Shader BorderVisual::GetBorderShader()
     shader = mFactoryCache.GetShader( VisualFactoryCache::BORDER_SHADER );
     if( !shader )
     {
-      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + VERTEX_SHADER, Dali::Shader::GetFragmentShaderPrefix() + FRAGMENT_SHADER );
+      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + SHADER_BORDER_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_BORDER_VISUAL_SHADER_FRAG.data() );
       mFactoryCache.SaveShader( VisualFactoryCache::BORDER_SHADER, shader );
     }
   }

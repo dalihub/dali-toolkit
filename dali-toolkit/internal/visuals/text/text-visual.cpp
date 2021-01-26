@@ -41,6 +41,7 @@
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -54,151 +55,6 @@ namespace Internal
 namespace
 {
 const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
-
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  uniform mediump vec4 pixelArea;\n
-
-  varying mediump vec2 vTexCoord;\n
-
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-  }\n
-
-  void main()\n
-  {\n
-    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
-    vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform lowp vec4 uTextColorAnimatable;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  \n
-  void main()\n
-  {\n
-    mediump float textTexture = texture2D( sTexture, vTexCoord ).r;\n
-
-    // Set the color of the text to what it is animated to.
-    gl_FragColor = uTextColorAnimatable * textTexture * uColor * vec4( mixColor, 1.0 );
-  }\n
-);
-
-const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
-
-    gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );
-  }\n
-);
-
-const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform sampler2D sStyle;\n
-  uniform lowp vec4 uTextColorAnimatable;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  \n
-  void main()\n
-  {\n
-    mediump float textTexture = texture2D( sTexture, vTexCoord ).r;\n
-    mediump vec4 styleTexture = texture2D( sStyle, vTexCoord );\n
-
-    // Draw the text as overlay above the style
-    gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - uTextColorAnimatable.a * textTexture ) ) * uColor * vec4( mixColor, 1.0 );\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform sampler2D sStyle;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
-    mediump vec4 styleTexture = texture2D( sStyle, vTexCoord );\n
-
-    // Draw the text as overlay above the style
-    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, 1.0 );\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform sampler2D sMask;\n
-  uniform lowp vec4 uTextColorAnimatable;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
-    mediump float maskTexture = texture2D( sMask, vTexCoord ).r;\n
-
-    // Set the color of non-transparent pixel in text to what it is animated to.
-    // Markup text with multiple text colors are not animated (but can be supported later on if required).
-    // Emoji color are not animated.
-    mediump float vstep = step( 0.0001, textTexture.a );\n
-    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture );\n
-
-    // Draw the text as overlay above the style
-    gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform sampler2D sStyle;\n
-  uniform sampler2D sMask;\n
-  uniform lowp float uHasMultipleTextColors;\n
-  uniform lowp vec4 uTextColorAnimatable;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
-    mediump vec4 styleTexture = texture2D( sStyle, vTexCoord );\n
-    mediump float maskTexture = texture2D( sMask, vTexCoord ).r;\n
-
-    // Set the color of non-transparent pixel in text to what it is animated to.
-    // Markup text with multiple text colors are not animated (but can be supported later on if required).
-    // Emoji color are not animated.
-    mediump float vstep = step( 0.0001, textTexture.a );\n
-    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) );\n
-
-    // Draw the text as overlay above the style
-    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, 1.0 );\n
-  }\n
-);
 
 /**
  * Return Property index for the given string key
@@ -929,7 +785,7 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_MULTI_COLOR_TEXT );
+      shader = Shader::New( SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT, shader );
     }
@@ -940,7 +796,7 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE );
+      shader = Shader::New( SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_WITH_STYLE_SHADER_FRAG );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE, shader );
     }
@@ -950,7 +806,7 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT );
+      shader = Shader::New( SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_SHADER_FRAG );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT, shader );
     }
@@ -960,7 +816,7 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE );
+      shader = Shader::New( SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_SHADER_FRAG );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE, shader );
     }
@@ -970,7 +826,7 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI );
+      shader = Shader::New( SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_EMOJI_SHADER_FRAG );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI, shader );
     }
@@ -980,7 +836,7 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI );
+      shader = Shader::New( SHADER_TEXT_VISUAL_SHADER_VERT, SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI_SHADER_FRAG );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI, shader );
     }

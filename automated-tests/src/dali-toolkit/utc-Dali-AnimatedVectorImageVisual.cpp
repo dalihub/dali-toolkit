@@ -139,7 +139,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual03(void)
   propertyMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE )
              .Add( ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME  )
              .Add( DevelImageVisual::Property::LOOP_COUNT, 3  )
-             .Add( DevelImageVisual::Property::PLAY_RANGE, playRange  );
+             .Add( DevelImageVisual::Property::PLAY_RANGE, playRange  )
+             .Add( DevelVisual::Property::CORNER_RADIUS, 50.0f );
 
   Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
@@ -170,6 +171,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   tet_infoline( "UtcDaliVisualFactoryGetAnimatedVectorImageVisual04: Request animated vector image visual with a Property::Map" );
 
   int startFrame = 1, endFrame = 3;
+  float cornerRadius = 50.0f;
   Property::Array playRange;
   playRange.PushBack( startFrame );
   playRange.PushBack( endFrame );
@@ -181,7 +183,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
              .Add( "playRange", playRange )
              .Add( "stopBehavior", DevelImageVisual::StopBehavior::FIRST_FRAME )
              .Add( "loopingMode", DevelImageVisual::LoopingMode::AUTO_REVERSE )
-             .Add( "redrawInScalingDown", false );
+             .Add( "redrawInScalingDown", false )
+             .Add( "cornerRadius", cornerRadius );
 
   Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
@@ -237,6 +240,14 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< bool >() == false );
 
+  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< float >(), cornerRadius, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS_POLICY, "cornerRadiusPolicy" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get< int >() == Visual::Transform::Policy::ABSOLUTE );
+
   actor.Unparent( );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
@@ -249,6 +260,7 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   tet_infoline( "UtcDaliAnimatedVectorImageVisualGetPropertyMap01" );
 
   int startFrame = 1, endFrame = 3;
+  float cornerRadius = 50.0f;
   Property::Array playRange;
   playRange.PushBack( startFrame );
   playRange.PushBack( endFrame );
@@ -257,7 +269,9 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   propertyMap.Add( Toolkit::Visual::Property::TYPE,  DevelVisual::ANIMATED_VECTOR_IMAGE )
              .Add( ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME )
              .Add( DevelImageVisual::Property::LOOP_COUNT, 3 )
-             .Add( DevelImageVisual::Property::PLAY_RANGE, playRange );
+             .Add( DevelImageVisual::Property::PLAY_RANGE, playRange )
+             .Add( DevelVisual::Property::CORNER_RADIUS, cornerRadius )
+             .Add( DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::RELATIVE);
 
   // request AnimatedVectorImageVisual with a property map
   VisualFactory factory = VisualFactory::Get();
@@ -316,6 +330,14 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   value = resultMap.Find( DevelImageVisual::Property::REDRAW_IN_SCALING_DOWN, Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< bool >() == true );    // Check default value
+
+  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< float >(), cornerRadius, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS_POLICY, "cornerRadiusPolicy" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get< int >() == Visual::Transform::Policy::RELATIVE );
 
   // request AnimatedVectorImageVisual with an URL
   Visual::Base visual2 = factory.CreateVisual( TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions() );

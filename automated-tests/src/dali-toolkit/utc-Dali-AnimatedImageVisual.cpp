@@ -23,6 +23,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-image-visual-actions-devel.h>
 #include "dummy-control.h"
@@ -74,7 +75,9 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
     .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME )
     .Add( ImageVisual::Property::PIXEL_AREA, Vector4() )
     .Add( ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT )
-    .Add( ImageVisual::Property::WRAP_MODE_V, WrapMode::DEFAULT ));
+    .Add( ImageVisual::Property::WRAP_MODE_V, WrapMode::DEFAULT )
+    .Add( DevelVisual::Property::CORNER_RADIUS, 22.2f )
+    .Add( DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::ABSOLUTE ));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap( resultMap );
@@ -86,6 +89,14 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
+
+  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 22.2f, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::Transform::Policy::ABSOLUTE );
 
   // request AnimatedImageVisual with an URL
   Visual::Base animatedImageVisual2 = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
@@ -124,7 +135,9 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
     .Add( "frameDelay", 200 )
     .Add( "pixelArea", Vector4() )
     .Add( "wrapModeU", WrapMode::REPEAT )
-    .Add( "wrapModeV", WrapMode::DEFAULT ));
+    .Add( "wrapModeV", WrapMode::DEFAULT )
+    .Add( "cornerRadius", 50.0f )
+    .Add( "cornerRadiusPolicy", Visual::Transform::Policy::RELATIVE ));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap( resultMap );
@@ -159,6 +172,14 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<int>(), 11, TEST_LOCATION );
 
+  value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS, "cornerRadius" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 50.0f, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, "cornerRadiusPolicy" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::Transform::Policy::RELATIVE );
+
   END_TEST;
 }
 
@@ -183,7 +204,8 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
     .Add( "frameDelay", 200 )
     .Add( "pixelArea", Vector4() )
     .Add( "wrapModeU", WrapMode::REPEAT )
-    .Add( "wrapModeV", WrapMode::DEFAULT ));
+    .Add( "wrapModeV", WrapMode::DEFAULT )
+    .Add( "cornerRadius", 50.5f ));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap( resultMap );
@@ -217,6 +239,14 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
   value = resultMap.Find( Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, "totalFrameNumber" );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<int>(), 11, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS, "cornerRadius" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 50.5f, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, "cornerRadiusPolicy" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::Transform::Policy::ABSOLUTE );
 
   END_TEST;
 }
@@ -271,12 +301,14 @@ int UtcDaliAnimatedImageVisualSynchronousLoading(void)
 
   {
     Property::Map propertyMap;
-    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE );
-    propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME );
-    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 2);
-    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 2);
-    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 20);
-    propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+    propertyMap.Insert( Visual::Property::TYPE, Visual::ANIMATED_IMAGE );
+    propertyMap.Insert( ImageVisual::Property::URL, TEST_GIF_FILE_NAME );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 2 );
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 2 );
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 20 );
+    propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true );
+    propertyMap.Insert( DevelVisual::Property::CORNER_RADIUS, 0.23f );
+    propertyMap.Insert( DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::ABSOLUTE );
 
     VisualFactory factory = VisualFactory::Get();
     Visual::Base visual = factory.CreateVisual( propertyMap );

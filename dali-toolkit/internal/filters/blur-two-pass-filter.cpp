@@ -28,6 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -58,24 +59,6 @@ const float DEFAULT_KERNEL4[] = { 2.0f/16.0f, 1.5f/16.0f, 1.5f/16.0f, 1.5f/16.0f
                                   1.0f/16.0f, 1.0f/16.0f, 1.0f/16.0f, 0.5f/16.0f,
                                   0.5f/16.0f, 0.5f/16.0f, 0.5f/16.0f };
 
-const char* BLUR_TWO_PASS_FRAGMENT_SOURCE =
-{
- "precision highp float;\n"
- "varying mediump vec2 vTexCoord;\n"
- "uniform sampler2D sTexture;\n"
- "uniform vec2 uSampleOffsets[NUM_SAMPLES];\n"
- "uniform float uSampleWeights[NUM_SAMPLES];\n"
- "void main()\n"
- "{\n"
- "  vec4 color = vec4(0.0);\n"
- "  for( int i = 0; i < NUM_SAMPLES; ++i )\n"
- "  {\n"
- "    color += texture2D( sTexture, vTexCoord + uSampleOffsets[i] ) * uSampleWeights[i];\n"
- "  }\n"
- "  gl_FragColor = color;\n"
- "}\n"
-};
-
 std::string GetOffsetUniformName( int index )
 {
   std::ostringstream oss;
@@ -89,20 +72,6 @@ std::string GetWeightUniformName( int index )
   oss << "uSampleWeights[" << index << "]";
   return oss.str();
 }
-
-const char* BLEND_TWO_IMAGES_FRAGMENT_SOURCE =
-{
- "precision highp float;\n"
- "uniform float uBlurStrength;\n "
- "uniform sampler2D sTexture;\n"
- "uniform sampler2D sEffect;\n"
- "varying mediump vec2 vTexCoord;\n"
- "void main()\n"
- "{\n"
- "  gl_FragColor = texture2D( sTexture, vTexCoord ) * uBlurStrength"
- "               + texture2D( sEffect, vTexCoord )*(1.0-uBlurStrength); \n"
- "}\n"
-};
 
 const char* const BLUR_STRENGTH_UNIFORM_NAME( "uBlurStrength"  );
 const char* const EFFECT_IMAGE_NAME( "sEffect" );
@@ -135,7 +104,7 @@ void BlurTwoPassFilter::Enable()
   // Set up blur-two-pass custom shader
   std::ostringstream sstream;
   sstream << "#define NUM_SAMPLES " << kernelSize << "\n";
-  sstream << BLUR_TWO_PASS_FRAGMENT_SOURCE;
+  sstream << SHADER_BLUR_TWO_PASS_SHADER_FRAG;
   std::string fragmentSource( sstream.str() );
 
   // create actor to render input with applied emboss effect
@@ -165,7 +134,7 @@ void BlurTwoPassFilter::Enable()
   mBlurredFrameBuffer.AttachColorTexture( blurredTexture );
 
   // create an actor to blend the blurred image and the input image with the given blur strength
-  Renderer rendererForBlending = CreateRenderer( BASIC_VERTEX_SOURCE, BLEND_TWO_IMAGES_FRAGMENT_SOURCE );
+  Renderer rendererForBlending = CreateRenderer( BASIC_VERTEX_SOURCE, SHADER_BLUR_TWO_IMAGES_SHADER_FRAG );
   TextureSet textureSetForBlending = rendererForBlending.GetTextures();
   textureSetForBlending.SetTexture( 0u, blurredTexture );
   textureSetForBlending.SetTexture( 1u, mInputTexture );

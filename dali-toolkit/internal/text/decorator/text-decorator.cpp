@@ -34,36 +34,12 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG
 
 #endif
-
-#define MAKE_SHADER(A)#A
-
-namespace
-{
-const char* VERTEX_SHADER = MAKE_SHADER(
-attribute mediump vec2    aPosition;
-uniform   highp mat4      uMvpMatrix;
-
-void main()
-{
-  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
-  gl_Position = uMvpMatrix * position;
-}
-);
-
-const char* FRAGMENT_SHADER = MAKE_SHADER(
-uniform      lowp vec4 uColor;
-
-void main()
-{
-  gl_FragColor = uColor;
-}
-);
-}
 
 namespace Dali
 {
@@ -270,7 +246,7 @@ struct Decorator::Impl : public ConnectionTracker
     mHidePrimaryCursorAndGrabHandle( false )
   {
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
-    mHighlightShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    mHighlightShader = Shader::New( SHADER_TEXT_DECORATOR_SHADER_VERT, SHADER_TEXT_DECORATOR_SHADER_FRAG );
     SetupGestures();
   }
 

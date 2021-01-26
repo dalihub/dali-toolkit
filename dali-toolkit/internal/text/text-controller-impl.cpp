@@ -35,6 +35,7 @@
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 #include <dali-toolkit/internal/text/text-selection-handle-controller.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 using namespace Dali;
 
@@ -44,32 +45,6 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
-
-#define MAKE_SHADER(A)#A
-
-const char* VERTEX_SHADER_BACKGROUND = MAKE_SHADER(
-attribute mediump vec2    aPosition;
-attribute mediump vec4    aColor;
-varying   mediump vec4    vColor;
-uniform   highp mat4      uMvpMatrix;
-
-void main()
-{
-  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
-  gl_Position = uMvpMatrix * position;
-  vColor = aColor;
-}
-);
-
-const char* FRAGMENT_SHADER_BACKGROUND = MAKE_SHADER(
-varying mediump vec4      vColor;
-uniform lowp    vec4      uColor;
-
-void main()
-{
-  gl_FragColor = vColor * uColor;
-}
-);
 
 struct BackgroundVertex
 {
@@ -2108,7 +2083,7 @@ Actor Controller::Impl::CreateBackgroundActor()
 
       if( !mShaderBackground )
       {
-        mShaderBackground = Shader::New( VERTEX_SHADER_BACKGROUND, FRAGMENT_SHADER_BACKGROUND );
+        mShaderBackground = Shader::New( SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_VERT, SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_FRAG );
       }
 
       Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, mShaderBackground );

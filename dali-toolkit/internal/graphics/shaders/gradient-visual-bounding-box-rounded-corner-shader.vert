@@ -24,6 +24,7 @@ vec4 ComputeVertexPosition()
   vCornerRadius = mix( cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);
   vCornerRadius = min( vCornerRadius, minSize * 0.5 );
   vRectSize = visualSize * 0.5 - vCornerRadius;
+  vCornerRadius = max( vCornerRadius, 1.0 );
   vPosition = aPosition * visualSize;
   return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );
 }

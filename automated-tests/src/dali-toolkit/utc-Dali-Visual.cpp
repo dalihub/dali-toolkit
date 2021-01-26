@@ -3617,6 +3617,8 @@ int UtcDaliVisualRoundedCorner(void)
     application.Render();
 
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    // Default corner radius policy is absolute.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
   }
 
   // color visual 1
@@ -3759,7 +3761,113 @@ int UtcDaliVisualRoundedCorner(void)
     application.Render();
 
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    // Default corner radius policy is absolute.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
   }
+
+  // animated image visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float cornerRadius = 24.0f;
+
+    properties[Visual::Property::TYPE] = Visual::ANIMATED_IMAGE;
+    properties[ImageVisual::Property::URL] = TEST_GIF_FILE_NAME;
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius + 10.0f; // Dummy Input
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+    properties["cornerRadiusPolicy"] = Toolkit::Visual::Transform::Policy::ABSOLUTE;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+  }
+
+  // vector image visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float cornerRadius = 27.0f;
+
+    properties[Visual::Property::TYPE] = Visual::SVG;
+    properties[ImageVisual::Property::URL] = TEST_SVG_FILE_NAME;
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    // Default corner radius policy is absolute.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+  }
+
+  // animated vector image visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float cornerRadius = 1.3f;
+
+    properties[Visual::Property::TYPE] = DevelVisual::ANIMATED_VECTOR_IMAGE;
+    properties[ImageVisual::Property::URL] = TEST_VECTOR_IMAGE_FILE_NAME;
+    properties["cornerRadius"] = cornerRadius;
+    properties[DevelVisual::Property::CORNER_RADIUS_POLICY] = Toolkit::Visual::Transform::Policy::RELATIVE;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE ), true, TEST_LOCATION );
+  }
+
 
   END_TEST;
 }

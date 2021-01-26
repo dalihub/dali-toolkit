@@ -25,6 +25,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -39,43 +40,6 @@ namespace
 {
 const char * const POSITION_ATTRIBUTE_NAME("aPosition");
 const char * const INDEX_NAME("indices");
-
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-attribute mediump vec2  aPosition;\n
-uniform   highp   mat4  uMvpMatrix;\n
-uniform   highp   vec3  uSize;\n
-\n
-
-//Visual size and offset
-uniform mediump vec2 offset;\n
-uniform highp   vec2 size;\n
-uniform mediump vec4 offsetSizeMode;\n
-uniform mediump vec2 origin;\n
-uniform mediump vec2 anchorPoint;\n
-
-vec4 ComputeVertexPosition()\n
-{\n
-  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-  return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-}\n
-
-void main()\n
-{\n
-  gl_Position = uMvpMatrix * ComputeVertexPosition();\n
-}\n
-);
-
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-\n
-void main()\n
-{\n
-  gl_FragColor = uColor * vec4( mixColor, 1.0 );\n
-}\n
-);
-
 }
 
 WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
@@ -183,7 +147,7 @@ void WireframeVisual::InitializeRenderer()
   Shader shader = mFactoryCache.GetShader( VisualFactoryCache::WIREFRAME_SHADER );
   if( !shader )
   {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    shader = Shader::New( SHADER_WIREFRAME_VISUAL_SHADER_VERT, SHADER_WIREFRAME_VISUAL_SHADER_FRAG );
     mFactoryCache.SaveShader( VisualFactoryCache::WIREFRAME_SHADER, shader );
   }
 

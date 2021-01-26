@@ -1,7 +1,9 @@
+//Very simple fragment shader that merely applies the vertex shading to the color at each fragment.
+
 precision mediump float;
-varying mediump vec3vIllumination;
-uniform lowpvec4uColor;
-uniform lowpvec3mixColor;
+varying mediump vec3 vIllumination;
+uniform lowp vec4 uColor;
+uniform lowp vec3 mixColor;
 
 void main()
 {

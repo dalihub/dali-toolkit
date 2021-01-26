@@ -29,6 +29,7 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -91,74 +92,6 @@ const char * const STAGE_OFFSET_UNIFORM_NAME( "uStageOffset" );
 const char * const POSITION( "aPosition");
 const char * const NORMAL( "aNormal" );
 const char * const INDICES( "aIndices" );
-
-//A simple shader that applies diffuse lighting to a mono-coloured object.
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute highp   vec3 aPosition;\n
-  attribute highp   vec2 aTexCoord;\n
-  attribute highp   vec3 aNormal;\n
-  varying   mediump vec3 vIllumination;\n
-  uniform   mediump vec3 uSize;\n
-  uniform   mediump vec3 uObjectDimensions;\n
-  uniform   mediump mat4 uMvpMatrix;\n
-  uniform   mediump mat4 uModelView;\n
-  uniform   mediump mat4 uViewMatrix;\n
-  uniform   mediump mat3 uNormalMatrix;\n
-  uniform   mediump mat4 uObjectMatrix;\n
-  uniform   mediump vec3 lightPosition;\n
-  uniform   mediump vec2 uStageOffset;\n
-
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-    float scaleFactor = min( visualSize.x / uObjectDimensions.x, visualSize.y / uObjectDimensions.y );\n
-    vec3 originFlipY =  vec3(origin.x, -origin.y, 0.0);
-    vec3 anchorPointFlipY = vec3( anchorPoint.x, -anchorPoint.y, 0.0);
-    vec3 offset = vec3( ( offset / uSize.xy ) * offsetSizeMode.xy + offset * (1.0-offsetSizeMode.xy), 0.0) * vec3(1.0,-1.0,1.0);\n
-
-    return vec4( (aPosition + anchorPointFlipY)*scaleFactor + (offset + originFlipY)*uSize, 1.0 );\n
-  }\n
-
-  void main()\n
-  {\n
-    vec4 normalisedVertexPosition = ComputeVertexPosition();\n
-    vec4 vertexPosition = uObjectMatrix * normalisedVertexPosition;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-
-     //Illumination in Model-View space - Transform attributes and uniforms\n
-     vec4 mvVertexPosition = uModelView * normalisedVertexPosition;\n
-     vec3 normal = uNormalMatrix * mat3( uObjectMatrix ) * aNormal;\n
-
-     vec4 mvLightPosition = vec4( ( lightPosition.xy - uStageOffset ), lightPosition.z, 1.0 );\n
-     mvLightPosition = uViewMatrix * mvLightPosition;\n
-     vec3 vectorToLight = normalize( mvLightPosition.xyz - mvVertexPosition.xyz );\n
-
-     float lightDiffuse = max( dot( vectorToLight, normal ), 0.0 );\n
-     vIllumination = vec3( lightDiffuse * 0.5 + 0.5 );\n
-
-     gl_Position = vertexPosition;\n
-  }\n
-);
-
-//Very simple fragment shader that merely applies the vertex shading to the color at each fragment.
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  precision mediump float;\n
-  varying   mediump vec3  vIllumination;\n
-  uniform   lowp    vec4  uColor;\n
-  uniform   lowp    vec3  mixColor;\n
-  void main()\n
-  {\n
-      vec4 baseColor = vec4(mixColor, 1.0) * uColor;\n
-    gl_FragColor = vec4( vIllumination.rgb * baseColor.rgb, baseColor.a );\n
-  }\n
-);
 
 } // unnamed namespace
 
@@ -478,7 +411,7 @@ void PrimitiveVisual::UpdateShaderUniforms()
 
 void PrimitiveVisual::CreateShader()
 {
-  mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+  mShader = Shader::New( SHADER_PRIMITIVE_VISUAL_SHADER_VERT, SHADER_PRIMITIVE_VISUAL_SHADER_FRAG );
   UpdateShaderUniforms();
 }
 
