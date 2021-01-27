@@ -67,9 +67,8 @@ public:
    * @param[in] url The URL to svg resource to use.
    * @param[in] width The rasterization width.
    * @param[in] height The rasterization height.
-   * @param[in] loaded The svg resource is loaded or not.
    */
-  RasterizingTask( SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height, bool loaded );
+  RasterizingTask(SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height);
 
   /**
    * Destructor.
@@ -123,7 +122,7 @@ private:
   float           mDpi;
   unsigned int    mWidth;
   unsigned int    mHeight;
-  bool            mLoaded;
+  bool            mLoadSuccess;
 };
 
 /**

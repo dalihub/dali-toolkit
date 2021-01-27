@@ -64,18 +64,18 @@ SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShader
   return svgVisual;
 }
 
-SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::SVG ),
-  mImageVisualShaderFactory( shaderFactory ),
-  mAtlasRect( FULL_TEXTURE_RECT ),
-  mImageUrl( imageUrl ),
-  mVectorRenderer( VectorImageRenderer::New() ),
-  mDefaultWidth( 0 ),
-  mDefaultHeight( 0 ),
-  mLoaded( false ),
+SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl)
+: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::SVG),
+  mImageVisualShaderFactory(shaderFactory),
+  mAtlasRect(FULL_TEXTURE_RECT),
+  mImageUrl(imageUrl),
+  mVectorRenderer(VectorImageRenderer::New()),
+  mDefaultWidth(0),
+  mDefaultHeight(0),
   mPlacementActor(),
   mVisualSize(Vector2::ZERO),
-  mAttemptAtlasing( false )
+  mLoadFailed(false),
+  mAttemptAtlasing(false)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -171,8 +171,20 @@ void SvgVisual::DoSetOnScene( Actor& actor )
   // Hold the weak handle of the placement actor and delay the adding of renderer until the svg rasterization is finished.
   mPlacementActor = actor;
 
-  // SVG visual needs it's size set before it can be rasterized hence set ResourceReady once on stage
-  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+  if(mLoadFailed)
+  {
+    Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
+    textureSet.SetTexture(0u, brokenImage);
+
+    actor.AddRenderer(mImpl->mRenderer);
+
+    ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+  }
+  else
+  {
+    // SVG visual needs it's size set before it can be rasterized hence set ResourceReady once on stage
+    ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+  }
 }
 
 void SvgVisual::DoSetOffScene( Actor& actor )
@@ -188,15 +200,8 @@ void SvgVisual::DoSetOffScene( Actor& actor )
 
 void SvgVisual::GetNaturalSize( Vector2& naturalSize )
 {
-  if(mLoaded)
-  {
-    naturalSize.x = mDefaultWidth;
-    naturalSize.y = mDefaultHeight;
-  }
-  else
-  {
-    naturalSize = Vector2::ZERO;
-  }
+  naturalSize.x = mDefaultWidth;
+  naturalSize.y = mDefaultHeight;
 }
 
 void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
@@ -219,7 +224,7 @@ void SvgVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 void SvgVisual::Load()
 {
   // load remote resource on svg rasterize thread.
-  if(!mLoaded && mImageUrl.IsLocalResource())
+  if(mImageUrl.IsLocalResource())
   {
     Dali::Vector<uint8_t> buffer;
     if(Dali::FileLoader::ReadFile(mImageUrl.GetUrl(), buffer))
@@ -230,14 +235,15 @@ void SvgVisual::Load()
       float meanDpi = (dpi.height + dpi.width) * 0.5f;
       if(!mVectorRenderer.Load(buffer, meanDpi))
       {
+        mLoadFailed = true;
         DALI_LOG_ERROR("SvgVisual::Load: Failed to load file! [%s]\n", mImageUrl.GetUrl().c_str());
         return;
       }
       mVectorRenderer.GetDefaultSize(mDefaultWidth, mDefaultHeight);
-      mLoaded = true;
     }
     else
     {
+      mLoadFailed = true;
       DALI_LOG_ERROR("SvgVisual::Load: Failed to read file! [%s]\n", mImageUrl.GetUrl().c_str());
     }
   }
@@ -253,8 +259,8 @@ void SvgVisual::AddRasterizationTask( const Vector2& size )
     Vector2 dpi = Stage::GetCurrent().GetDpi();
     float meanDpi = ( dpi.height + dpi.width ) * 0.5f;
 
-    RasterizingTaskPtr newTask = new RasterizingTask(this, mVectorRenderer, mImageUrl, meanDpi, width, height, mLoaded);
-    if(IsSynchronousLoadingRequired())
+    RasterizingTaskPtr newTask = new RasterizingTask(this, mVectorRenderer, mImageUrl, meanDpi, width, height);
+    if(IsSynchronousLoadingRequired() && mImageUrl.IsLocalResource())
     {
       newTask->Load();
       newTask->Rasterize();
@@ -269,8 +275,6 @@ void SvgVisual::AddRasterizationTask( const Vector2& size )
 
 void SvgVisual::ApplyRasterizedImage( VectorImageRenderer vectorRenderer, PixelData rasterizedPixelData, bool isLoaded )
 {
-  mLoaded = isLoaded;
-
   if(isLoaded && rasterizedPixelData && IsOnScene())
   {
     TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
@@ -337,6 +341,17 @@ void SvgVisual::ApplyRasterizedImage( VectorImageRenderer vectorRenderer, PixelD
   }
   else if(!isLoaded || !rasterizedPixelData)
   {
+    Actor actor = mPlacementActor.GetHandle();
+    if(actor)
+    {
+      TextureSet textureSet = mImpl->mRenderer.GetTextures();
+
+      Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
+      textureSet.SetTexture(0u, brokenImage);
+
+      actor.AddRenderer(mImpl->mRenderer);
+    }
+
     ResourceReady( Toolkit::Visual::ResourceStatus::FAILED );
   }
 }
@@ -345,7 +360,7 @@ void SvgVisual::OnSetTransform()
 {
   Vector2 visualSize = mImpl->mTransform.GetVisualSize( mImpl->mControlSize );
 
-  if( IsOnScene() )
+  if(IsOnScene() && !mLoadFailed)
   {
     if( visualSize != mVisualSize )
     {

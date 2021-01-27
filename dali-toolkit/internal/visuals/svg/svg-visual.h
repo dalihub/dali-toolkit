@@ -187,9 +187,9 @@ private:
   VectorImageRenderer       mVectorRenderer;
   uint32_t                  mDefaultWidth;
   uint32_t                  mDefaultHeight;
-  bool                      mLoaded;
   WeakHandle<Actor>         mPlacementActor;
   Vector2                   mVisualSize;
+  bool                      mLoadFailed;
   bool                      mAttemptAtlasing;  ///< If true will attempt atlasing, otherwise create unique texture
 };
 

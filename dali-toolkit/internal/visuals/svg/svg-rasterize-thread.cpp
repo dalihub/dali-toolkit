@@ -35,15 +35,14 @@ namespace Toolkit
 
 namespace Internal
 {
-
-RasterizingTask::RasterizingTask( SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height, bool loaded)
-: mSvgVisual( svgRenderer ),
-  mVectorRenderer( vectorRenderer ),
-  mUrl( url ),
-  mDpi( dpi ),
-  mWidth( width ),
-  mHeight( height ),
-  mLoaded( loaded )
+RasterizingTask::RasterizingTask(SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height)
+: mSvgVisual(svgRenderer),
+  mVectorRenderer(vectorRenderer),
+  mUrl(url),
+  mDpi(dpi),
+  mWidth(width),
+  mHeight(height),
+  mLoadSuccess(false)
 {
 
 }
@@ -54,7 +53,7 @@ RasterizingTask::~RasterizingTask()
 
 void RasterizingTask::Load()
 {
-  if(!mLoaded && !mUrl.IsLocalResource())
+  if(!mUrl.IsLocalResource())
   {
     Dali::Vector<uint8_t> remoteBuffer;
     if(!Dali::FileLoader::DownloadFileSynchronously(mUrl.GetUrl(), remoteBuffer))
@@ -71,7 +70,11 @@ void RasterizingTask::Load()
       return;
     }
 
-    mLoaded = true;
+    mLoadSuccess = true;
+  }
+  else
+  {
+    mLoadSuccess = true;
   }
 }
 
@@ -108,7 +111,7 @@ VectorImageRenderer RasterizingTask::GetVectorRenderer() const
 
 bool RasterizingTask::IsLoaded() const
 {
-  return mLoaded;
+  return mLoadSuccess;
 }
 
 SvgVisual* RasterizingTask::GetSvgVisual() const
