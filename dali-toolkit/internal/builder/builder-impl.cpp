@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <dali/public-api/object/type-info.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/signals/functor-delegate.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -156,13 +157,16 @@ Builder::Builder()
 {
   mParser = Dali::Toolkit::JsonParser::New();
 
-  Property::Map defaultDirs;
-  defaultDirs[TOKEN_STRING(DALI_IMAGE_DIR)]       = AssetManager::GetDaliImagePath();
-  defaultDirs[TOKEN_STRING(DALI_SOUND_DIR)]       = AssetManager::GetDaliSoundPath();
-  defaultDirs[TOKEN_STRING(DALI_STYLE_DIR)]       = AssetManager::GetDaliStylePath();
-  defaultDirs[TOKEN_STRING(DALI_STYLE_IMAGE_DIR)] = AssetManager::GetDaliStyleImagePath();
+  Property::Map defaultConstants;
+  defaultConstants[TOKEN_STRING(DALI_IMAGE_DIR)]              = AssetManager::GetDaliImagePath();
+  defaultConstants[TOKEN_STRING(DALI_SOUND_DIR)]              = AssetManager::GetDaliSoundPath();
+  defaultConstants[TOKEN_STRING(DALI_STYLE_DIR)]              = AssetManager::GetDaliStylePath();
+  defaultConstants[TOKEN_STRING(DALI_STYLE_IMAGE_DIR)]        = AssetManager::GetDaliStyleImagePath();
+  defaultConstants[TOKEN_STRING(DALI_SHADER_VERSION_PREFIX)]  = Shader::GetShaderVersionPrefix();
+  defaultConstants[TOKEN_STRING(DALI_VERTEX_SHADER_PREFIX)]   = Shader::GetVertexShaderPrefix();
+  defaultConstants[TOKEN_STRING(DALI_FRAGMENT_SHADER_PREFIX)] = Shader::GetFragmentShaderPrefix();
 
-  AddConstants( defaultDirs );
+  AddConstants(defaultConstants);
 }
 
 void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::UIFormat format )
