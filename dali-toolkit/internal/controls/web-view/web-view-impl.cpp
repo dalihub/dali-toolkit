@@ -205,7 +205,7 @@ Dali::Toolkit::ImageView& WebView::GetFavicon()
     Dali::PixelData pixelData = mWebEngine.GetFavicon();
     std::string url = Dali::Toolkit::Image::GenerateUrl( pixelData );
     mFaviconView = Dali::Toolkit::ImageView::New( url );
-    mFaviconView.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    mFaviconView.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
     mFaviconView.SetProperty( Dali::Actor::Property::SIZE, Vector2( pixelData.GetWidth(), pixelData.GetHeight() ) );
   }
   return mFaviconView;
