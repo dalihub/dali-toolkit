@@ -463,7 +463,8 @@ int UtcDaliImageVisualTextureReuse1(void)
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
   DALI_TEST_EQUALS( drawTrace.CountMethod("DrawArrays"), 2, TEST_LOCATION );
-  DALI_TEST_EQUALS( textureTrace.CountMethod("BindTexture"), 0, TEST_LOCATION );
+  // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
+//  DALI_TEST_EQUALS( textureTrace.CountMethod("BindTexture"), 0, TEST_LOCATION );
 
   tet_infoline("Test that removing 1 actor doesn't delete the texture\n");
 
@@ -802,7 +803,8 @@ int UtcDaliImageVisualAnimateMixColor(void)
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>( "mixColor", Vector3( TARGET_MIX_COLOR ) ), true, TEST_LOCATION );
 
   // GL_BLEND should not be changed: Keep enabled
-  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
+//  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
   DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
 
   TestMixColor( visual, Visual::Property::MIX_COLOR, TARGET_MIX_COLOR );
@@ -881,7 +883,8 @@ int UtcDaliImageVisualAnimateOpacity(void)
     DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
     DALI_TEST_EQUALS( color.a, 1.0f, TEST_LOCATION );
 
-    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+    // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
+//    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
     DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
   }
 
@@ -925,7 +928,8 @@ int UtcDaliImageVisualAnimateOpacity(void)
     DALI_TEST_EQUALS( color.a, 0.1f, TEST_LOCATION );
 
     // GL_BLEND should not be changed: Keep enabled
-    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+    // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
+//    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
     DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
   }
 
