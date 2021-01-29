@@ -335,7 +335,8 @@ void ViewModel::ElideGlyphs()
             // Calculate the width of the ellipsis glyph and check if it fits.
             const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;
 
-            if( ellipsisGlyphWidth < removedGlypsWidth )
+            // If it is the last glyph to remove, add the ellipsis glyph without checking its width.
+            if( ( ellipsisGlyphWidth < removedGlypsWidth ) || ( index == 0u ) )
             {
               GlyphInfo& glyphInfo = *( elidedGlyphsBuffer + index );
               Vector2& position = *( elidedPositionsBuffer + index );
@@ -347,7 +348,11 @@ void ViewModel::ElideGlyphs()
               // Change the 'x' and 'y' position of the ellipsis glyph.
               if( position.x > firstPenX )
               {
-                position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
+                position.x = firstPenX;
+                if (ellipsisGlyphWidth < removedGlypsWidth)
+                {
+                  position.x += removedGlypsWidth - ellipsisGlyphWidth;
+                }
               }
 
               position.x += ellipsisGlyph.xBearing;

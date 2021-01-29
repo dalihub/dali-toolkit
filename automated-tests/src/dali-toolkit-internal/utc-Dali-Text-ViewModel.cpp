@@ -572,6 +572,24 @@ int UtcDaliTextViewModelElideText01(void)
   DALI_TEST_CHECK( NULL != glyphs );
   DALI_TEST_CHECK( NULL != layouts );
 
+  // When the ellipsis is enabled, at least a glyph has to be rendered.
+  // Even if the given width is too narrow for rendering an ellipsis glyph.
+  controller->SetText( "…" );
+  Vector3 sizeEllipsis = controller->GetNaturalSize();
+  controller->SetText( "A" );
+  Vector3 sizeA = controller->GetNaturalSize();
+  float testWidth = sizeA.width < sizeEllipsis.width ? sizeA.width : sizeEllipsis.width - 1.0;
+
+  controller->SetText( "AB" );
+  Vector3 sizeAB = controller->GetNaturalSize();
+
+  controller->Relayout( Size(testWidth, sizeAB.height) );
+
+  // Elide the glyphs.
+  model->ElideGlyphs();
+  DALI_TEST_EQUALS( 1u, model->GetNumberOfGlyphs(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1u, model->GetNumberOfLines(), TEST_LOCATION );
+
   tet_result(TET_PASS);
   END_TEST;
 }
