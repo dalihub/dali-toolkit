@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
+#include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
@@ -352,6 +353,37 @@ public:
     return mUrl;
   }
 
+  std::string GetTitle() const
+  {
+    return std::string("title");
+  }
+
+  Dali::PixelData GetFavicon() const
+  {
+    uint8_t* faviconData = new uint8_t[ 16 ];
+
+    faviconData[ 0 ] = 0xff;
+    faviconData[ 1 ] = 0x00;
+    faviconData[ 2 ] = 0x00;
+    faviconData[ 3 ] = 0xff;
+    faviconData[ 4 ] = 0xff;
+    faviconData[ 5 ] = 0x00;
+    faviconData[ 6 ] = 0x00;
+    faviconData[ 7 ] = 0xff;
+    faviconData[ 8 ] = 0xff;
+    faviconData[ 9 ] = 0x00;
+    faviconData[ 10 ] = 0x00;
+    faviconData[ 11 ] = 0xff;
+    faviconData[ 12 ] = 0xff;
+    faviconData[ 13 ] = 0x00;
+    faviconData[ 14 ] = 0x00;
+    faviconData[ 15 ] = 0xff;
+
+    return Dali::PixelData::New( faviconData, 16, 2, 2,
+                                 Dali::Pixel::Format::RGBA8888,
+                                 Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
+  }
+
   bool CanGoForward() const
   {
     return mHistory.size() > mCurrentPlusOnePos;
@@ -414,22 +446,19 @@ public:
     mScrollPosition.y = y;
   }
 
-  void GetScrollPosition( int& x, int& y ) const
+  Dali::Vector2 GetScrollPosition() const
   {
-    x = mScrollPosition.x;
-    y = mScrollPosition.y;
+    return mScrollPosition;
   }
 
-  void GetScrollSize( int& w, int& h ) const
+  Dali::Vector2 GetScrollSize() const
   {
-    w = mScrollSize.width;
-    h = mScrollSize.height;
+    return mScrollSize;
   }
 
-  void GetContentSize( int& w, int& h ) const
+  Dali::Vector2 GetContentSize() const
   {
-    w = mContentSize.width;
-    h = mContentSize.height;
+    return  mContentSize;
   }
 
   Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadStartedSignal()
@@ -604,6 +633,10 @@ void WebEngine::Create( int width, int height, const std::string& locale, const 
 {
 }
 
+void WebEngine::Create( int width, int height, int argc, char** argv )
+{
+}
+
 void WebEngine::Destroy()
 {
 }
@@ -631,6 +664,16 @@ WebEngineBackForwardList& WebEngine::GetBackForwardList() const
 void WebEngine::LoadUrl( const std::string& url )
 {
   return Internal::Adaptor::GetImplementation( *this ).LoadUrl( url );
+}
+
+std::string WebEngine::GetTitle() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetTitle();
+}
+
+Dali::PixelData WebEngine::GetFavicon() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetFavicon();
 }
 
 const std::string& WebEngine::GetUrl()
@@ -694,6 +737,10 @@ void WebEngine::AddJavaScriptMessageHandler( const std::string& exposedObjectNam
 {
 }
 
+void WebEngine::ClearAllTilesResources()
+{
+}
+
 void WebEngine::ClearHistory()
 {
   Internal::Adaptor::GetImplementation( *this ).ClearHistory();
@@ -719,19 +766,19 @@ void WebEngine::SetScrollPosition( int x, int y )
   Internal::Adaptor::GetImplementation( *this ).SetScrollPosition( x, y );
 }
 
-void WebEngine::GetScrollPosition( int& x, int& y ) const
+Dali::Vector2 WebEngine::GetScrollPosition() const
 {
-  Internal::Adaptor::GetImplementation( *this ).GetScrollPosition( x, y );
+  return Internal::Adaptor::GetImplementation( *this ).GetScrollPosition();
 }
 
-void WebEngine::GetScrollSize( int& w, int& h ) const
+Dali::Vector2 WebEngine::GetScrollSize() const
 {
-  Internal::Adaptor::GetImplementation( *this ).GetScrollSize( w, h );
+  return Internal::Adaptor::GetImplementation( *this ).GetScrollSize();
 }
 
-void WebEngine::GetContentSize( int& w, int& h ) const
+Dali::Vector2 WebEngine::GetContentSize() const
 {
-  Internal::Adaptor::GetImplementation( *this ).GetContentSize( w, h );
+  return Internal::Adaptor::GetImplementation( *this ).GetContentSize();
 }
 
 void WebEngine::SetSize( int width, int height )

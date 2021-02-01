@@ -27,6 +27,7 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 namespace Dali
 {
@@ -52,6 +53,8 @@ protected:
   WebView();
 
   WebView( const std::string& locale, const std::string& timezoneId );
+
+  WebView( int argc, char** argv );
 
   virtual ~WebView();
 
@@ -86,6 +89,18 @@ public:
    * @brief Get WebBackForwardList of WebEngine.
    */
   Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::New( int, char** )
+   */
+  static Toolkit::WebView New( int argc, char** argv );
+
+  /**
+   * @brief Get Favicon of web page.
+   *
+   * @return Handle to a fav icon
+   */
+  Dali::Toolkit::ImageView& GetFavicon();
 
   /**
    * @copydoc Dali::Toolkit::WebView::LoadUrl()
@@ -151,6 +166,11 @@ public:
    * @copydoc Dali::Toolkit::WebView::AddJavaScriptMessageHandler()
    */
   void AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler );
+
+  /**
+   * @brief Clears all tiles resources of Web.
+   */
+  void ClearAllTilesResources();
 
   /**
    * @copydoc Dali::Toolkit::WebView::ClearHistory()
@@ -267,21 +287,28 @@ private:
    * @param[out] x The coordinate x of scroll
    * @param[out] y The coordinate y of scroll
    */
-  void GetScrollPosition( int& x, int& y ) const;
+  Dali::Vector2 GetScrollPosition() const;
 
   /**
    * @brief Gets the possible scroll size of the given view.
    * @param[out] width The width of scroll size
    * @param[out] height The height of scroll size
    */
-  void GetScrollSize( int& width, int& height ) const;
+  Dali::Vector2 GetScrollSize() const;
 
   /**
    * @brief Gets the last known content's size.
    * @param[out] width The width of content's size
    * @param[out] height The height of content's size
    */
-  void GetContentSize( int& width, int& height ) const;
+  Dali::Vector2 GetContentSize() const;
+
+  /**
+   * @brief Returns the title of the Web.
+   *
+   * @return The title of web page
+   */
+  std::string GetTitle() const;
 
   /**
    * @brief Get user agent string.
@@ -336,6 +363,7 @@ private:
   std::unique_ptr<Dali::Toolkit::WebCookieManager>       mWebCookieManager;
   std::unique_ptr<Dali::Toolkit::WebSettings>            mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList>     mWebBackForwardList;
+  Dali::Toolkit::ImageView mFaviconView;
 };
 
 } // namespace Internal
