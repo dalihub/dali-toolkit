@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,8 @@ namespace Dali
 {
 namespace Toolkit
 {
-
-WebContext::WebContext( Dali::WebEngineContext& context)
-: mWebEngineContext( context )
+WebContext::WebContext(Dali::WebEngineContext& context)
+: mWebEngineContext(context)
 {
 }
 
@@ -37,29 +36,29 @@ Dali::WebEngineContext::CacheModel WebContext::GetCacheModel() const
   return mWebEngineContext.GetCacheModel();
 }
 
-void WebContext::SetCacheModel(Dali::WebEngineContext::CacheModel cacheModel )
+void WebContext::SetCacheModel(Dali::WebEngineContext::CacheModel cacheModel)
 {
-  mWebEngineContext.SetCacheModel( cacheModel );
+  mWebEngineContext.SetCacheModel(cacheModel);
 }
 
-void WebContext::SetProxyUri( const std::string& uri )
+void WebContext::SetProxyUri(const std::string& uri)
 {
-  mWebEngineContext.SetProxyUri( uri );
+  mWebEngineContext.SetProxyUri(uri);
 }
 
-void WebContext::SetCertificateFilePath( const std::string& certificatePath )
+void WebContext::SetCertificateFilePath(const std::string& certificatePath)
 {
-  mWebEngineContext.SetCertificateFilePath( certificatePath );
+  mWebEngineContext.SetCertificateFilePath(certificatePath);
 }
 
-void WebContext::DisableCache( bool cacheDisabled )
+void WebContext::DisableCache(bool cacheDisabled)
 {
-  mWebEngineContext.DisableCache( cacheDisabled );
+  mWebEngineContext.DisableCache(cacheDisabled);
 }
 
-void WebContext::SetDefaultProxyAuth( const std::string& username, const std::string& password )
+void WebContext::SetDefaultProxyAuth(const std::string& username, const std::string& password)
 {
-  mWebEngineContext.SetDefaultProxyAuth( username, password );
+  mWebEngineContext.SetDefaultProxyAuth(username, password);
 }
 
 void WebContext::DeleteWebDatabase()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,8 @@ namespace Dali
 {
 namespace Toolkit
 {
-
-WebSettings::WebSettings( Dali::WebEngineSettings& settings )
-: mWebEngineSettings( settings )
+WebSettings::WebSettings(Dali::WebEngineSettings& settings)
+: mWebEngineSettings(settings)
 {
 }
 
@@ -35,14 +34,14 @@ WebSettings::~WebSettings()
 {
 }
 
-void WebSettings::AllowMixedContents( bool allowed )
+void WebSettings::AllowMixedContents(bool allowed)
 {
-  mWebEngineSettings.AllowMixedContents( allowed );
+  mWebEngineSettings.AllowMixedContents(allowed);
 }
 
-void WebSettings::EnableSpatialNavigation( bool enabled )
+void WebSettings::EnableSpatialNavigation(bool enabled)
 {
-  mWebEngineSettings.AllowMixedContents( enabled );
+  mWebEngineSettings.AllowMixedContents(enabled);
 }
 
 int WebSettings::GetDefaultFontSize() const
@@ -50,19 +49,19 @@ int WebSettings::GetDefaultFontSize() const
   return mWebEngineSettings.GetDefaultFontSize();
 }
 
-void WebSettings::SetDefaultFontSize( int defaultFontSize )
+void WebSettings::SetDefaultFontSize(int defaultFontSize)
 {
-  mWebEngineSettings.SetDefaultFontSize( defaultFontSize );
+  mWebEngineSettings.SetDefaultFontSize(defaultFontSize);
 }
 
-void WebSettings::EnableWebSecurity( bool enabled )
+void WebSettings::EnableWebSecurity(bool enabled)
 {
-  mWebEngineSettings.EnableWebSecurity( enabled );
+  mWebEngineSettings.EnableWebSecurity(enabled);
 }
 
-void WebSettings::AllowFileAccessFromExternalUrl( bool allowed )
+void WebSettings::AllowFileAccessFromExternalUrl(bool allowed)
 {
-  mWebEngineSettings.AllowFileAccessFromExternalUrl( allowed );
+  mWebEngineSettings.AllowFileAccessFromExternalUrl(allowed);
 }
 
 bool WebSettings::IsJavaScriptEnabled() const
@@ -70,14 +69,14 @@ bool WebSettings::IsJavaScriptEnabled() const
   return mWebEngineSettings.IsJavaScriptEnabled();
 }
 
-void WebSettings::EnableJavaScript( bool enabled )
+void WebSettings::EnableJavaScript(bool enabled)
 {
-  mWebEngineSettings.EnableJavaScript( enabled );
+  mWebEngineSettings.EnableJavaScript(enabled);
 }
 
-void WebSettings::AllowScriptsOpenWindows( bool allowed )
+void WebSettings::AllowScriptsOpenWindows(bool allowed)
 {
-  mWebEngineSettings.AllowScriptsOpenWindows( allowed );
+  mWebEngineSettings.AllowScriptsOpenWindows(allowed);
 }
 
 bool WebSettings::AreImagesLoadedAutomatically() const
@@ -85,9 +84,9 @@ bool WebSettings::AreImagesLoadedAutomatically() const
   return mWebEngineSettings.AreImagesLoadedAutomatically();
 }
 
-void WebSettings::AllowImagesLoadAutomatically( bool automatic )
+void WebSettings::AllowImagesLoadAutomatically(bool automatic)
 {
-  mWebEngineSettings.AllowImagesLoadAutomatically( automatic );
+  mWebEngineSettings.AllowImagesLoadAutomatically(automatic);
 }
 
 std::string WebSettings::GetDefaultTextEncodingName() const
@@ -95,9 +94,9 @@ std::string WebSettings::GetDefaultTextEncodingName() const
   return mWebEngineSettings.GetDefaultTextEncodingName();
 }
 
-void WebSettings::SetDefaultTextEncodingName( const std::string& defaultTextEncodingName )
+void WebSettings::SetDefaultTextEncodingName(const std::string& defaultTextEncodingName)
 {
-  mWebEngineSettings.SetDefaultTextEncodingName( defaultTextEncodingName );
+  mWebEngineSettings.SetDefaultTextEncodingName(defaultTextEncodingName);
 }
 
 } // namespace Toolkit

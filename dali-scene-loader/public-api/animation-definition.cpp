@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,8 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 const float AnimationDefinition::DEFAULT_DURATION_SECONDS = 1.f;
-const float AnimationDefinition::MIN_DURATION_SECONDS = 1e-2f;
+const float AnimationDefinition::MIN_DURATION_SECONDS     = 1e-2f;
 
 Animation::EndAction AnimationDefinition::StopForModification(Animation& anim)
 {
@@ -43,12 +42,13 @@ AnimationDefinition::AnimationDefinition(AnimationDefinition&& other)
   mSpeedFactor(other.mSpeedFactor),
   mPlayRange(other.mPlayRange),
   mProperties(std::move(other.mProperties))
-{}
+{
+}
 
 void AnimationDefinition::Animate(Animation& animation, AnimatedProperty::GetActor getActor)
 {
   DALI_ASSERT_ALWAYS(animation);
-  for (auto& ap : mProperties)
+  for(auto& ap : mProperties)
   {
     ap.Animate(animation, getActor);
   }
@@ -72,16 +72,16 @@ Animation AnimationDefinition::ReAnimate(AnimatedProperty::GetActor getActor)
 AnimationDefinition& AnimationDefinition::operator=(AnimationDefinition&& other)
 {
   AnimationDefinition tmp(std::move(other));
-  mName = std::move(tmp.mName);
-  mDuration = tmp.mDuration;
-  mLoopCount = tmp.mLoopCount;
+  mName             = std::move(tmp.mName);
+  mDuration         = tmp.mDuration;
+  mLoopCount        = tmp.mLoopCount;
   mDisconnectAction = tmp.mDisconnectAction;
-  mEndAction = tmp.mEndAction;
-  mSpeedFactor = tmp.mSpeedFactor;
-  mPlayRange = tmp.mPlayRange;
+  mEndAction        = tmp.mEndAction;
+  mSpeedFactor      = tmp.mSpeedFactor;
+  mPlayRange        = tmp.mPlayRange;
   mProperties.swap(tmp.mProperties);
   return *this;
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,146 +19,145 @@
 #include <dali-toolkit/internal/controls/scrollable/item-view/depth-layout.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/constraint.h>
+#include <algorithm>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout-property.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
 
 namespace // unnamed namespace
 {
-
 const unsigned int DEFAULT_NUMBER_OF_COLUMNS    = 3;
 const float        DEFAULT_NUMBER_OF_ROWS       = 26.0f;
 const float        DEFAULT_ROW_SPACING          = 55.0f;
 const float        DEFAULT_BOTTOM_MARGIN_FACTOR = 0.2f;
-const Radian       DEFAULT_TILT_ANGLE           ( Math::PI*0.15f );
-const Radian       DEFAULT_ITEM_TILT_ANGLE      ( -Math::PI*0.025f );
-const float        DEFAULT_SCROLL_SPEED_FACTOR  = 0.02f;
-const float        DEFAULT_MAXIMUM_SWIPE_SPEED  = 50.0f;
+const Radian       DEFAULT_TILT_ANGLE(Math::PI * 0.15f);
+const Radian       DEFAULT_ITEM_TILT_ANGLE(-Math::PI * 0.025f);
+const float        DEFAULT_SCROLL_SPEED_FACTOR           = 0.02f;
+const float        DEFAULT_MAXIMUM_SWIPE_SPEED           = 50.0f;
 const float        DEFAULT_ITEM_FLICK_ANIMATION_DURATION = 0.03f;
 
-inline float GetColumnPosition( unsigned int numberOfColumns, unsigned int columnNumber, const Vector3& itemSize, float layoutWidth )
+inline float GetColumnPosition(unsigned int numberOfColumns, unsigned int columnNumber, const Vector3& itemSize, float layoutWidth)
 {
   // Share the available space between margins & column spacings
-  float availableSpace = std::max( 0.0f, ( layoutWidth - itemSize.width * numberOfColumns ) );
+  float availableSpace = std::max(0.0f, (layoutWidth - itemSize.width * numberOfColumns));
 
   float leftMargin = availableSpace / numberOfColumns * 0.5f;
 
-  float columnPosition = leftMargin + itemSize.width * 0.5f + columnNumber * ( itemSize.width + availableSpace / numberOfColumns );
+  float columnPosition = leftMargin + itemSize.width * 0.5f + columnNumber * (itemSize.width + availableSpace / numberOfColumns);
 
   return columnPosition - layoutWidth * 0.5f;
 }
 
 struct DepthPositionConstraint
 {
-  DepthPositionConstraint( unsigned int itemId,
-                           unsigned int numberOfColumns,
-                           unsigned int columnNumber,
-                           const Vector3& itemSize,
-                           float heightScale,
-                           float depthScale )
-  : mItemSize( itemSize ),
-    mItemId( itemId ),
-    mNumberOfColumns( numberOfColumns ),
-    mColumnNumber( columnNumber ),
-    mHeightScale( heightScale ),
-    mDepthScale( depthScale )
+  DepthPositionConstraint(unsigned int   itemId,
+                          unsigned int   numberOfColumns,
+                          unsigned int   columnNumber,
+                          const Vector3& itemSize,
+                          float          heightScale,
+                          float          depthScale)
+  : mItemSize(itemSize),
+    mItemId(itemId),
+    mNumberOfColumns(numberOfColumns),
+    mColumnNumber(columnNumber),
+    mHeightScale(heightScale),
+    mDepthScale(depthScale)
   {
   }
 
-  inline void Orientation0( Vector3& current, float layoutPosition, const Vector3& layoutSize )
+  inline void Orientation0(Vector3& current, float layoutPosition, const Vector3& layoutSize)
   {
-    float rowLayoutPositon = layoutPosition - static_cast< float >( mColumnNumber );
+    float rowLayoutPositon = layoutPosition - static_cast<float>(mColumnNumber);
 
-    current.x = GetColumnPosition( mNumberOfColumns, mColumnNumber, mItemSize, layoutSize.width );
+    current.x = GetColumnPosition(mNumberOfColumns, mColumnNumber, mItemSize, layoutSize.width);
     current.y = rowLayoutPositon * mHeightScale + layoutSize.height * 0.5f - DEFAULT_BOTTOM_MARGIN_FACTOR * layoutSize.height - mItemSize.height * 0.5f;
     current.z = -rowLayoutPositon * mDepthScale;
   }
 
-  inline void Orientation90( Vector3& current, float layoutPosition, const Vector3& layoutSize )
+  inline void Orientation90(Vector3& current, float layoutPosition, const Vector3& layoutSize)
   {
-    float rowLayoutPositon = layoutPosition - static_cast< float >( mColumnNumber ) + mNumberOfColumns * 0.5f;
+    float rowLayoutPositon = layoutPosition - static_cast<float>(mColumnNumber) + mNumberOfColumns * 0.5f;
 
     current.x = rowLayoutPositon * mHeightScale + layoutSize.width * 0.5f - DEFAULT_BOTTOM_MARGIN_FACTOR * layoutSize.width - mItemSize.height * 0.5f;
-    current.y = -GetColumnPosition( mNumberOfColumns, mColumnNumber, mItemSize, layoutSize.height );
+    current.y = -GetColumnPosition(mNumberOfColumns, mColumnNumber, mItemSize, layoutSize.height);
     current.z = -rowLayoutPositon * mDepthScale;
   }
 
-  inline void Orientation180( Vector3& current, float layoutPosition, const Vector3& layoutSize )
+  inline void Orientation180(Vector3& current, float layoutPosition, const Vector3& layoutSize)
   {
-    float rowLayoutPositon = layoutPosition - static_cast< float >( mColumnNumber );
+    float rowLayoutPositon = layoutPosition - static_cast<float>(mColumnNumber);
 
-    current.x = -GetColumnPosition( mNumberOfColumns, mColumnNumber, mItemSize, layoutSize.width );
-    current.y = -( rowLayoutPositon * mHeightScale + layoutSize.height * 0.5f - DEFAULT_BOTTOM_MARGIN_FACTOR * layoutSize.height - mItemSize.height * 0.5f );
+    current.x = -GetColumnPosition(mNumberOfColumns, mColumnNumber, mItemSize, layoutSize.width);
+    current.y = -(rowLayoutPositon * mHeightScale + layoutSize.height * 0.5f - DEFAULT_BOTTOM_MARGIN_FACTOR * layoutSize.height - mItemSize.height * 0.5f);
     current.z = -rowLayoutPositon * mDepthScale;
   }
 
-  inline void Orientation270( Vector3& current, float layoutPosition, const Vector3& layoutSize )
+  inline void Orientation270(Vector3& current, float layoutPosition, const Vector3& layoutSize)
   {
-    float rowLayoutPositon = layoutPosition - static_cast< float >( mColumnNumber ) + mNumberOfColumns * 0.5f;
+    float rowLayoutPositon = layoutPosition - static_cast<float>(mColumnNumber) + mNumberOfColumns * 0.5f;
 
-    current.x = -( rowLayoutPositon * mHeightScale + layoutSize.width * 0.5f - DEFAULT_BOTTOM_MARGIN_FACTOR * layoutSize.width - mItemSize.height * 0.5f );
-    current.y = GetColumnPosition( mNumberOfColumns, mColumnNumber, mItemSize, layoutSize.height );
+    current.x = -(rowLayoutPositon * mHeightScale + layoutSize.width * 0.5f - DEFAULT_BOTTOM_MARGIN_FACTOR * layoutSize.width - mItemSize.height * 0.5f);
+    current.y = GetColumnPosition(mNumberOfColumns, mColumnNumber, mItemSize, layoutSize.height);
     current.z = -rowLayoutPositon * mDepthScale;
   }
 
-  void Orientation0( Vector3& current, const PropertyInputContainer& inputs )
+  void Orientation0(Vector3& current, const PropertyInputContainer& inputs)
   {
-    float layoutPosition = inputs[0]->GetFloat() + static_cast< float >( mItemId );
-    const Vector3& layoutSize = inputs[1]->GetVector3();
-    Orientation0( current, layoutPosition, layoutSize );
+    float          layoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
+    const Vector3& layoutSize     = inputs[1]->GetVector3();
+    Orientation0(current, layoutPosition, layoutSize);
   }
 
-  void Orientation90( Vector3& current, const PropertyInputContainer& inputs )
+  void Orientation90(Vector3& current, const PropertyInputContainer& inputs)
   {
-    float layoutPosition = inputs[0]->GetFloat() + static_cast< float >( mItemId );
-    const Vector3& layoutSize = inputs[1]->GetVector3();
-    Orientation90( current, layoutPosition, layoutSize );
+    float          layoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
+    const Vector3& layoutSize     = inputs[1]->GetVector3();
+    Orientation90(current, layoutPosition, layoutSize);
   }
 
-  void Orientation180( Vector3& current, const PropertyInputContainer& inputs )
+  void Orientation180(Vector3& current, const PropertyInputContainer& inputs)
   {
-    float layoutPosition = inputs[0]->GetFloat() + static_cast< float >( mItemId );
-    const Vector3& layoutSize = inputs[1]->GetVector3();
-    Orientation180( current, layoutPosition, layoutSize );
+    float          layoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
+    const Vector3& layoutSize     = inputs[1]->GetVector3();
+    Orientation180(current, layoutPosition, layoutSize);
   }
 
-  void Orientation270( Vector3& current, const PropertyInputContainer& inputs )
+  void Orientation270(Vector3& current, const PropertyInputContainer& inputs)
   {
-    float layoutPosition = inputs[0]->GetFloat() + static_cast< float >( mItemId );
-    const Vector3& layoutSize = inputs[1]->GetVector3();
-    Orientation270( current, layoutPosition, layoutSize );
+    float          layoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
+    const Vector3& layoutSize     = inputs[1]->GetVector3();
+    Orientation270(current, layoutPosition, layoutSize);
   }
 
-  Vector3 mItemSize;
+  Vector3      mItemSize;
   unsigned int mItemId;
   unsigned int mNumberOfColumns;
   unsigned int mColumnNumber;
-  float mHeightScale;
-  float mDepthScale;
+  float        mHeightScale;
+  float        mDepthScale;
 };
 
 struct DepthRotationConstraint
 {
-  DepthRotationConstraint( Radian angleRadians, ControlOrientation::Type orientation )
-  : mTiltAngle( angleRadians ),
-    mMultiplier( 0.0f )
+  DepthRotationConstraint(Radian angleRadians, ControlOrientation::Type orientation)
+  : mTiltAngle(angleRadians),
+    mMultiplier(0.0f)
   {
-    if ( orientation == ControlOrientation::Up )
+    if(orientation == ControlOrientation::Up)
     {
       mMultiplier = 0.0f;
     }
-    else if ( orientation == ControlOrientation::Left )
+    else if(orientation == ControlOrientation::Left)
     {
       mMultiplier = 1.5f;
     }
-    else if ( orientation == ControlOrientation::Down )
+    else if(orientation == ControlOrientation::Down)
     {
       mMultiplier = -1.0f;
     }
@@ -168,51 +167,51 @@ struct DepthRotationConstraint
     }
   }
 
-  void operator()( Quaternion& current, const PropertyInputContainer& /* inputs */ )
+  void operator()(Quaternion& current, const PropertyInputContainer& /* inputs */)
   {
-    current = Quaternion( Radian( mMultiplier * Math::PI ), Vector3::ZAXIS ) * Quaternion( mTiltAngle, Vector3::XAXIS );
+    current = Quaternion(Radian(mMultiplier * Math::PI), Vector3::ZAXIS) * Quaternion(mTiltAngle, Vector3::XAXIS);
   }
 
   Radian mTiltAngle;
-  float mMultiplier;
+  float  mMultiplier;
 };
 
 struct DepthColorConstraint
 {
-  DepthColorConstraint( unsigned int itemId, unsigned int numberOfColumns, float numberOfRows, unsigned int columnNumber )
-  : mItemId( itemId ),
-    mNumberOfColumns( numberOfColumns ),
-    mNumberOfRows( numberOfRows ),
-    mColumnNumber( columnNumber )
+  DepthColorConstraint(unsigned int itemId, unsigned int numberOfColumns, float numberOfRows, unsigned int columnNumber)
+  : mItemId(itemId),
+    mNumberOfColumns(numberOfColumns),
+    mNumberOfRows(numberOfRows),
+    mColumnNumber(columnNumber)
   {
   }
 
-  void operator()( Vector4& current, const Dali::PropertyInputContainer& inputs )
+  void operator()(Vector4& current, const Dali::PropertyInputContainer& inputs)
   {
-    float layoutPosition = inputs[0]->GetFloat() + static_cast< float >( mItemId );
-    float row = ( layoutPosition - static_cast<float>( mColumnNumber ) ) / mNumberOfColumns;
+    float layoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
+    float row            = (layoutPosition - static_cast<float>(mColumnNumber)) / mNumberOfColumns;
 
     float darkness(1.0f);
     float alpha(1.0f);
 
-    if (row < 0.0f)
+    if(row < 0.0f)
     {
       darkness = alpha = std::max(0.0f, 1.0f + row);
     }
     else
     {
-      if (row > mNumberOfRows)
+      if(row > mNumberOfRows)
       {
         darkness = 0.0f;
       }
       else
       {
-        darkness = 1.0f - ( 1.0f * (row / mNumberOfRows) );
+        darkness = 1.0f - (1.0f * (row / mNumberOfRows));
       }
 
-      if (row > (mNumberOfRows-1.0f))
+      if(row > (mNumberOfRows - 1.0f))
       {
-        alpha = std::max(0.0f, 1.0f - (row-(mNumberOfRows-1.0f)));
+        alpha = std::max(0.0f, 1.0f - (row - (mNumberOfRows - 1.0f)));
       }
     }
 
@@ -222,31 +221,31 @@ struct DepthColorConstraint
 
   unsigned int mItemId;
   unsigned int mNumberOfColumns;
-  float mNumberOfRows;
+  float        mNumberOfRows;
   unsigned int mColumnNumber;
 };
 
 struct DepthVisibilityConstraint
 {
-  DepthVisibilityConstraint( unsigned int itemId, unsigned int numberOfColumns, float numberOfRows, unsigned int columnNumber )
-  : mItemId( itemId ),
+  DepthVisibilityConstraint(unsigned int itemId, unsigned int numberOfColumns, float numberOfRows, unsigned int columnNumber)
+  : mItemId(itemId),
     mNumberOfColumns(numberOfColumns),
     mNumberOfRows(numberOfRows),
     mColumnNumber(columnNumber)
   {
   }
 
-  void operator()( bool& current, const Dali::PropertyInputContainer& inputs )
+  void operator()(bool& current, const Dali::PropertyInputContainer& inputs)
   {
-    float layoutPosition = inputs[0]->GetFloat() + static_cast< float >( mItemId );
-    float row = ( layoutPosition - static_cast< float >( mColumnNumber ) ) / mNumberOfColumns;
+    float layoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
+    float row            = (layoutPosition - static_cast<float>(mColumnNumber)) / mNumberOfColumns;
 
-    current = ( row > -1.0f ) && ( row < mNumberOfRows );
+    current = (row > -1.0f) && (row < mNumberOfRows);
   }
 
   unsigned int mItemId;
   unsigned int mNumberOfColumns;
-  float mNumberOfRows;
+  float        mNumberOfRows;
   unsigned int mColumnNumber;
 };
 
@@ -254,13 +253,10 @@ struct DepthVisibilityConstraint
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 struct DepthLayout::Impl
 {
   Impl()
@@ -330,12 +326,12 @@ float DepthLayout::GetRowSpacing() const
 
 void DepthLayout::SetTiltAngle(Degree angle)
 {
-  mImpl->mTiltAngle = Degree( Clamp( angle, -45.0f, 45.0f ) );
+  mImpl->mTiltAngle = Degree(Clamp(angle, -45.0f, 45.0f));
 }
 
 Degree DepthLayout::GetTiltAngle() const
 {
-  return Degree( mImpl->mTiltAngle );
+  return Degree(mImpl->mTiltAngle);
 }
 
 void DepthLayout::SetItemTiltAngle(Degree angle)
@@ -345,7 +341,7 @@ void DepthLayout::SetItemTiltAngle(Degree angle)
 
 Degree DepthLayout::GetItemTiltAngle() const
 {
-  return Degree( mImpl->mItemTiltAngle );
+  return Degree(mImpl->mItemTiltAngle);
 }
 
 void DepthLayout::SetScrollSpeedFactor(float scrollSpeed)
@@ -391,19 +387,19 @@ float DepthLayout::GetClosestAnchorPosition(float layoutPosition) const
 
 float DepthLayout::GetItemScrollToPosition(unsigned int itemId) const
 {
-  float rowIndex = static_cast< float >( itemId ) / mImpl->mNumberOfColumns;
+  float rowIndex = static_cast<float>(itemId) / mImpl->mNumberOfColumns;
   return -rowIndex * static_cast<float>(mImpl->mNumberOfColumns);
 }
 
 ItemRange DepthLayout::GetItemsWithinArea(float firstItemPosition, Vector3 layoutSize) const
 {
-  float firstRow = -(firstItemPosition/mImpl->mNumberOfColumns);
-  float lastRow = firstRow + mImpl->mNumberOfRows * 0.5f;
+  float firstRow = -(firstItemPosition / mImpl->mNumberOfColumns);
+  float lastRow  = firstRow + mImpl->mNumberOfRows * 0.5f;
 
   unsigned int firstItem = static_cast<unsigned int>(std::max(0.0f, firstRow * mImpl->mNumberOfColumns));
-  unsigned int lastItem  = static_cast<unsigned int>(std::max(0.0f, lastRow  * mImpl->mNumberOfColumns));
+  unsigned int lastItem  = static_cast<unsigned int>(std::max(0.0f, lastRow * mImpl->mNumberOfColumns));
 
-  return ItemRange(firstItem, lastItem+1);
+  return ItemRange(firstItem, lastItem + 1);
 }
 
 unsigned int DepthLayout::GetReserveItemCount(Vector3 layoutSize) const
@@ -413,90 +409,89 @@ unsigned int DepthLayout::GetReserveItemCount(Vector3 layoutSize) const
   return static_cast<unsigned int>(itemsWithinLayout);
 }
 
-void DepthLayout::GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const
+void DepthLayout::GetDefaultItemSize(unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize) const
 {
   // 1x1 aspect ratio
-  itemSize.width = itemSize.height = itemSize.depth = ( IsVertical( GetOrientation() ) ? layoutSize.width : layoutSize.height ) / static_cast<float>( mImpl->mNumberOfColumns + 1 );
+  itemSize.width = itemSize.height = itemSize.depth = (IsVertical(GetOrientation()) ? layoutSize.width : layoutSize.height) / static_cast<float>(mImpl->mNumberOfColumns + 1);
 }
 
 Degree DepthLayout::GetScrollDirection() const
 {
-  Degree scrollDirection(0.0f);
+  Degree                   scrollDirection(0.0f);
   ControlOrientation::Type orientation = GetOrientation();
 
-  if ( orientation == ControlOrientation::Up )
+  if(orientation == ControlOrientation::Up)
   {
-    scrollDirection = Degree( 180.0f );
+    scrollDirection = Degree(180.0f);
   }
-  else if ( orientation == ControlOrientation::Left )
+  else if(orientation == ControlOrientation::Left)
   {
-    scrollDirection = Degree( 270.0f );
+    scrollDirection = Degree(270.0f);
   }
-  else if ( orientation == ControlOrientation::Down )
+  else if(orientation == ControlOrientation::Down)
   {
-    scrollDirection = Degree( 0.0f );
+    scrollDirection = Degree(0.0f);
   }
   else // orientation == ControlOrientation::Right
   {
-    scrollDirection = Degree( 90.0f );
+    scrollDirection = Degree(90.0f);
   }
 
   return scrollDirection;
 }
 
-void DepthLayout::ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor )
+void DepthLayout::ApplyConstraints(Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor)
 {
-
-  Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast( itemViewActor );
-  if( itemView )
+  Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(itemViewActor);
+  if(itemView)
   {
     Vector3 itemSize;
-    GetItemSize( itemId, layoutSize, itemSize );
+    GetItemSize(itemId, layoutSize, itemSize);
 
     ControlOrientation::Type orientation = GetOrientation();
 
     // Position constraint
-    Constraint constraint;
-    DepthPositionConstraint depthPositionStruct( itemId,
-                                                 mImpl->mNumberOfColumns,
-                                                 itemId % mImpl->mNumberOfColumns,
-                                                 itemSize,
-                                                 -sinf( mImpl->mTiltAngle ) * mImpl->mRowSpacing,
-                                                 cosf( mImpl->mTiltAngle ) * mImpl->mRowSpacing );
-    if ( orientation == ControlOrientation::Up )
+    Constraint              constraint;
+    DepthPositionConstraint depthPositionStruct(itemId,
+                                                mImpl->mNumberOfColumns,
+                                                itemId % mImpl->mNumberOfColumns,
+                                                itemSize,
+                                                -sinf(mImpl->mTiltAngle) * mImpl->mRowSpacing,
+                                                cosf(mImpl->mTiltAngle) * mImpl->mRowSpacing);
+    if(orientation == ControlOrientation::Up)
     {
-      constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, depthPositionStruct, &DepthPositionConstraint::Orientation0 );
+      constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, depthPositionStruct, &DepthPositionConstraint::Orientation0);
     }
-    else if ( orientation == ControlOrientation::Left )
+    else if(orientation == ControlOrientation::Left)
     {
-      constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, depthPositionStruct, &DepthPositionConstraint::Orientation90 );
+      constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, depthPositionStruct, &DepthPositionConstraint::Orientation90);
     }
-    else if ( orientation == ControlOrientation::Down )
+    else if(orientation == ControlOrientation::Down)
     {
-      constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, depthPositionStruct, &DepthPositionConstraint::Orientation180 );
+      constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, depthPositionStruct, &DepthPositionConstraint::Orientation180);
     }
     else // orientation == ControlOrientation::Right
     {
-      constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, depthPositionStruct, &DepthPositionConstraint::Orientation270 );
+      constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, depthPositionStruct, &DepthPositionConstraint::Orientation270);
     }
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
-    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+    constraint.AddSource(ParentSource(Toolkit::ItemView::Property::LAYOUT_POSITION));
+    constraint.AddSource(ParentSource(Actor::Property::SIZE));
     constraint.Apply();
 
     // Rotation constraint
-    constraint = Constraint::New< Quaternion >( actor, Actor::Property::ORIENTATION, DepthRotationConstraint( mImpl->mItemTiltAngle, orientation ) );
+    constraint = Constraint::New<Quaternion>(actor, Actor::Property::ORIENTATION, DepthRotationConstraint(mImpl->mItemTiltAngle, orientation));
     constraint.Apply();
 
     // Color constraint
-    constraint = Constraint::New< Vector4 >( actor, Actor::Property::COLOR, DepthColorConstraint( itemId, mImpl->mNumberOfColumns, mImpl->mNumberOfRows*0.5f, itemId % mImpl->mNumberOfColumns ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
-    constraint.SetRemoveAction( Dali::Constraint::DISCARD );
+    constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR, DepthColorConstraint(itemId, mImpl->mNumberOfColumns, mImpl->mNumberOfRows * 0.5f, itemId % mImpl->mNumberOfColumns));
+    constraint.AddSource(ParentSource(Toolkit::ItemView::Property::LAYOUT_POSITION));
+    constraint.SetRemoveAction(Dali::Constraint::DISCARD);
     constraint.Apply();
 
     // Visibility constraint
-    constraint = Constraint::New< bool >( actor, Actor::Property::VISIBLE, DepthVisibilityConstraint( itemId, mImpl->mNumberOfColumns, mImpl->mNumberOfRows*0.5f, itemId % mImpl->mNumberOfColumns ) );
-    constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
-    constraint.SetRemoveAction( Dali::Constraint::DISCARD );
+    constraint = Constraint::New<bool>(actor, Actor::Property::VISIBLE, DepthVisibilityConstraint(itemId, mImpl->mNumberOfColumns, mImpl->mNumberOfRows * 0.5f, itemId % mImpl->mNumberOfColumns));
+    constraint.AddSource(ParentSource(Toolkit::ItemView::Property::LAYOUT_POSITION));
+    constraint.SetRemoveAction(Dali::Constraint::DISCARD);
     constraint.Apply();
   }
 }
@@ -504,9 +499,9 @@ void DepthLayout::ApplyConstraints( Actor& actor, const int itemId, const Vector
 void DepthLayout::SetDepthLayoutProperties(const Property::Map& properties)
 {
   // Set any properties specified for DepthLayout.
-  for( unsigned int idx = 0, mapCount = properties.Count(); idx < mapCount; ++idx )
+  for(unsigned int idx = 0, mapCount = properties.Count(); idx < mapCount; ++idx)
   {
-    KeyValuePair propertyPair = properties.GetKeyValue( idx );
+    KeyValuePair propertyPair = properties.GetKeyValue(idx);
     switch(DefaultItemLayoutProperty::Property(propertyPair.first.indexKey))
     {
       case DefaultItemLayoutProperty::DEPTH_COLUMN_NUMBER:
@@ -557,37 +552,37 @@ void DepthLayout::SetDepthLayoutProperties(const Property::Map& properties)
   }
 }
 
-Vector3 DepthLayout::GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const
+Vector3 DepthLayout::GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const
 {
   Vector3 itemPosition = Vector3::ZERO;
 
-  const float heightScale = -sinf( mImpl->mTiltAngle ) * mImpl->mRowSpacing;
-  const float depthScale  =  cosf( mImpl->mTiltAngle ) * mImpl->mRowSpacing;
+  const float heightScale = -sinf(mImpl->mTiltAngle) * mImpl->mRowSpacing;
+  const float depthScale  = cosf(mImpl->mTiltAngle) * mImpl->mRowSpacing;
 
   Vector3 itemSize;
-  GetItemSize( itemID, layoutSize, itemSize );
-  DepthPositionConstraint positionFunctor = DepthPositionConstraint( itemID,
-                                                                     mImpl->mNumberOfColumns,
-                                                                     itemID % mImpl->mNumberOfColumns,
-                                                                     itemSize,
-                                                                     heightScale,
-                                                                     depthScale );
-  ControlOrientation::Type orientation = GetOrientation();
-  if ( orientation == ControlOrientation::Up )
+  GetItemSize(itemID, layoutSize, itemSize);
+  DepthPositionConstraint  positionFunctor = DepthPositionConstraint(itemID,
+                                                                    mImpl->mNumberOfColumns,
+                                                                    itemID % mImpl->mNumberOfColumns,
+                                                                    itemSize,
+                                                                    heightScale,
+                                                                    depthScale);
+  ControlOrientation::Type orientation     = GetOrientation();
+  if(orientation == ControlOrientation::Up)
   {
-    positionFunctor.Orientation0( itemPosition, currentLayoutPosition + itemID, layoutSize );
+    positionFunctor.Orientation0(itemPosition, currentLayoutPosition + itemID, layoutSize);
   }
-  else if ( orientation == ControlOrientation::Left )
+  else if(orientation == ControlOrientation::Left)
   {
-    positionFunctor.Orientation90( itemPosition, currentLayoutPosition + itemID, layoutSize );
+    positionFunctor.Orientation90(itemPosition, currentLayoutPosition + itemID, layoutSize);
   }
-  else if ( orientation == ControlOrientation::Down )
+  else if(orientation == ControlOrientation::Down)
   {
-    positionFunctor.Orientation180( itemPosition, currentLayoutPosition + itemID, layoutSize );
+    positionFunctor.Orientation180(itemPosition, currentLayoutPosition + itemID, layoutSize);
   }
   else // orientation == ControlOrientation::Right
   {
-    positionFunctor.Orientation270( itemPosition, currentLayoutPosition + itemID, layoutSize );
+    positionFunctor.Orientation270(itemPosition, currentLayoutPosition + itemID, layoutSize);
   }
 
   return itemPosition;
@@ -602,7 +597,7 @@ DepthLayout::DepthLayout()
 float DepthLayout::GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize)
 {
   float scrollTo = currentLayoutPosition;
-  float row = (currentLayoutPosition + itemID - static_cast<float>(itemID % mImpl->mNumberOfColumns)) / mImpl->mNumberOfColumns;
+  float row      = (currentLayoutPosition + itemID - static_cast<float>(itemID % mImpl->mNumberOfColumns)) / mImpl->mNumberOfColumns;
 
   // Check whether item is not within viewable area
   if(row <= -1.0f)
@@ -619,12 +614,12 @@ float DepthLayout::GetClosestOnScreenLayoutPosition(int itemID, float currentLay
 
 int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
-  switch( direction )
+  switch(direction)
   {
     case Toolkit::Control::KeyboardFocus::LEFT:
     {
       itemID--;
-      if( itemID < 0 )
+      if(itemID < 0)
       {
         itemID = loopEnabled ? maxItems - 1 : 0;
       }
@@ -633,7 +628,7 @@ int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Con
     case Toolkit::Control::KeyboardFocus::UP:
     {
       itemID += mImpl->mNumberOfColumns;
-      if( itemID >= maxItems )
+      if(itemID >= maxItems)
       {
         itemID = loopEnabled ? 0 : itemID - mImpl->mNumberOfColumns;
       }
@@ -642,7 +637,7 @@ int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Con
     case Toolkit::Control::KeyboardFocus::RIGHT:
     {
       itemID++;
-      if( itemID >= maxItems )
+      if(itemID >= maxItems)
       {
         itemID = loopEnabled ? 0 : maxItems - 1;
       }
@@ -651,7 +646,7 @@ int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Con
     case Toolkit::Control::KeyboardFocus::DOWN:
     {
       itemID -= mImpl->mNumberOfColumns;
-      if( itemID < 0 )
+      if(itemID < 0)
       {
         itemID = loopEnabled ? itemID + maxItems : itemID + mImpl->mNumberOfColumns;
       }

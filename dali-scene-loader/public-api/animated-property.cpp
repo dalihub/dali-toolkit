@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,18 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 void AnimatedProperty::Animate(Animation& anim, GetActor getActor)
 {
-  if (Actor actor = getActor(mNodeName))
+  if(Actor actor = getActor(mNodeName))
   {
     Property prop = GetProperty(actor);
-    if (mKeyFrames)
+    if(mKeyFrames)
     {
       anim.AnimateBetween(prop, mKeyFrames, mAlphaFunction, mTimePeriod);
     }
-    else if (mValue)
+    else if(mValue)
     {
-      if (mValue->mIsRelative)
+      if(mValue->mIsRelative)
       {
         anim.AnimateBy(prop, mValue->mValue, mAlphaFunction, mTimePeriod);
       }
@@ -44,5 +43,5 @@ void AnimatedProperty::Animate(Animation& anim, GetActor getActor)
   }
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

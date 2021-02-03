@@ -19,29 +19,27 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
-RadialGradient::RadialGradient( const Vector2& center, float radius )
+RadialGradient::RadialGradient(const Vector2& center, float radius)
 : Gradient()
 {
-  SetCenterAndRadius( center, radius );
+  SetCenterAndRadius(center, radius);
 }
 
 RadialGradient::~RadialGradient()
-{}
+{
+}
 
-void RadialGradient::SetCenterAndRadius( const Vector2& center, float radius )
+void RadialGradient::SetCenterAndRadius(const Vector2& center, float radius)
 {
   mCenter = center;
   mRadius = radius;
 
   // Calculate the transform aligning to the circle
-  Matrix3 alignMatrix( mRadius, 0.f, 0.f, 0.f, mRadius, 0.f, mCenter.x, mCenter.y, 1.f );
+  Matrix3 alignMatrix(mRadius, 0.f, 0.f, 0.f, mRadius, 0.f, mCenter.x, mCenter.y, 1.f);
   alignMatrix.Invert();
 
   mAlignmentTransform = alignMatrix;

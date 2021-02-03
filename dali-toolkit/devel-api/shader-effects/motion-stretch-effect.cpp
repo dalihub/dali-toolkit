@@ -24,15 +24,14 @@
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-
-void SetMotionStretchProperties( Actor& actor )
+void SetMotionStretchProperties(Actor& actor)
 {
   actor.RegisterProperty("uGeometryStretchFactor", 0.5f);
   actor.RegisterProperty("uSpeedScalingFactor", 0.5f);
@@ -63,6 +62,5 @@ Property::Map CreateMotionStretchEffect()
   return map;
 }
 
-
-} // Toolkit
-} // Dali
+} // namespace Toolkit
+} // namespace Dali

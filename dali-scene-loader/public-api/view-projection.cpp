@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,16 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 void ViewProjection::Update()
 {
   Matrix::Multiply(mViewProjection, mView, mProjection);
 
   mInvProjection = mProjection;
-  if (!mInvProjection.Invert())
+  if(!mInvProjection.Invert())
   {
     ExceptionFlinger(ASSERT_LOCATION) << "Failed to find inverse of projection matrix " << mProjection << ".";
   }
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

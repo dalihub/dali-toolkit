@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,16 +28,13 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
-void CreatePropertyMap( const TreeNode* const node, Property::Map& map )
+void CreatePropertyMap(const TreeNode* const node, Property::Map& map)
 {
-  switch( node->GetType() )
+  switch(node->GetType())
   {
     case TreeNode::IS_NULL:
     case TreeNode::OBJECT:
@@ -47,7 +44,7 @@ void CreatePropertyMap( const TreeNode* const node, Property::Map& map )
     }
     case TreeNode::STRING:
     {
-      map.Insert( node->GetName(), Property::Value( node->GetString() ) );
+      map.Insert(node->GetName(), Property::Value(node->GetString()));
       break;
     }
     case TreeNode::INTEGER:
@@ -58,23 +55,23 @@ void CreatePropertyMap( const TreeNode* const node, Property::Map& map )
     }
   }
 
-  for( TreeNode::ConstIterator it = node->CBegin(), endIt = node->CEnd(); it != endIt; ++it )
+  for(TreeNode::ConstIterator it = node->CBegin(), endIt = node->CEnd(); it != endIt; ++it)
   {
     const TreeNode::KeyNodePair& pair = *it;
-    CreatePropertyMap( &pair.second, map );
+    CreatePropertyMap(&pair.second, map);
   }
 }
 
-void ParsePropertyString( const std::string& property, Property::Map& map )
+void ParsePropertyString(const std::string& property, Property::Map& map)
 {
   Toolkit::JsonParser parser = Toolkit::JsonParser::New();
 
-  if( parser.Parse( property ) )
+  if(parser.Parse(property))
   {
     const TreeNode* const node = parser.GetRoot();
-    if( node )
+    if(node)
     {
-      CreatePropertyMap( node, map );
+      CreatePropertyMap(node, map);
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,27 +23,20 @@
 
 namespace
 {
-
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
 #endif
 
-}
+} // namespace
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 static void
-EncodeBlobCoordinate( unsigned int cornerX, unsigned int cornerY,
-                      unsigned int atlasX, unsigned int atlasY,
-                      unsigned int nominalWidth, unsigned int nominalHeight,
-                      BlobCoordinate* v )
+EncodeBlobCoordinate(unsigned int cornerX, unsigned int cornerY, unsigned int atlasX, unsigned int atlasY, unsigned int nominalWidth, unsigned int nominalHeight, BlobCoordinate* v)
 {
   DALI_ASSERT_DEBUG(0 == (atlasX & ~0x7F));
   DALI_ASSERT_DEBUG(0 == (atlasY & ~0x7F));
@@ -52,7 +45,7 @@ EncodeBlobCoordinate( unsigned int cornerX, unsigned int cornerY,
   DALI_ASSERT_DEBUG(0 == (nominalWidth & ~0x3F));
   DALI_ASSERT_DEBUG(0 == (nominalHeight & ~0x3F));
 
-  unsigned int x = (((atlasX << 6) | nominalWidth) << 1)  | cornerX;
+  unsigned int x = (((atlasX << 6) | nominalWidth) << 1) | cornerX;
   unsigned int y = (((atlasY << 6) | nominalHeight) << 1) | cornerY;
 
   unsigned int encoded = (x << 16) | y;
@@ -61,21 +54,21 @@ EncodeBlobCoordinate( unsigned int cornerX, unsigned int cornerY,
   v->v = encoded & 0xFFFF;
 }
 
-VectorBlobAtlas::VectorBlobAtlas( unsigned int textureWidth,
-                                  unsigned int textureHeight,
-                                  unsigned int itemWidth,
-                                  unsigned int itemHeightQuantum )
-: mTextureWidth( textureWidth ),
-  mTextureHeight( textureHeight ),
-  mItemWidth( itemWidth ),
-  mItemHeightQuantum( itemHeightQuantum ),
-  mCursorX( 0 ),
-  mCursorY( 0 ),
-  mIsFull( false )
+VectorBlobAtlas::VectorBlobAtlas(unsigned int textureWidth,
+                                 unsigned int textureHeight,
+                                 unsigned int itemWidth,
+                                 unsigned int itemHeightQuantum)
+: mTextureWidth(textureWidth),
+  mTextureHeight(textureHeight),
+  mItemWidth(itemWidth),
+  mItemHeightQuantum(itemHeightQuantum),
+  mCursorX(0),
+  mCursorY(0),
+  mIsFull(false)
 {
-  DALI_LOG_INFO( gLogFilter, Debug::General, "Blob atlas %p size %dx%d, item width %d, height quantum %d\n", this, textureWidth, textureHeight, itemWidth, itemHeightQuantum );
+  DALI_LOG_INFO(gLogFilter, Debug::General, "Blob atlas %p size %dx%d, item width %d, height quantum %d\n", this, textureWidth, textureHeight, itemWidth, itemHeightQuantum);
 
-  mAtlasTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, textureWidth, textureHeight );
+  mAtlasTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, textureWidth, textureHeight);
 
   mTextureSet = TextureSet::New();
   mTextureSet.SetTexture(0, mAtlasTexture);
@@ -86,18 +79,18 @@ bool VectorBlobAtlas::IsFull() const
   return mIsFull;
 }
 
-bool VectorBlobAtlas::FindGlyph( FontId fontId,
-                                 GlyphIndex glyphIndex,
-                                 BlobCoordinate* coords )
+bool VectorBlobAtlas::FindGlyph(FontId          fontId,
+                                GlyphIndex      glyphIndex,
+                                BlobCoordinate* coords)
 {
-  const unsigned int size( mItemLookup.size() );
+  const unsigned int size(mItemLookup.size());
 
-  for( unsigned int i=0; i<size; ++i )
+  for(unsigned int i = 0; i < size; ++i)
   {
-    if( mItemLookup[i].fontId     == fontId &&
-        mItemLookup[i].glyphIndex == glyphIndex )
+    if(mItemLookup[i].fontId == fontId &&
+       mItemLookup[i].glyphIndex == glyphIndex)
     {
-      const Item& item = mItemCache[ mItemLookup[i].cacheIndex ];
+      const Item& item = mItemCache[mItemLookup[i].cacheIndex];
 
       coords[0] = item.coords[0];
       coords[1] = item.coords[1];
@@ -111,15 +104,15 @@ bool VectorBlobAtlas::FindGlyph( FontId fontId,
   return false;
 }
 
-bool VectorBlobAtlas::AddGlyph( unsigned int fontId,
-                                unsigned int glyphIndex,
-                                VectorBlob* blob,
-                                unsigned int length,
-                                unsigned int nominalWidth,
-                                unsigned int nominalHeight,
-                                BlobCoordinate* coords )
+bool VectorBlobAtlas::AddGlyph(unsigned int    fontId,
+                               unsigned int    glyphIndex,
+                               VectorBlob*     blob,
+                               unsigned int    length,
+                               unsigned int    nominalWidth,
+                               unsigned int    nominalHeight,
+                               BlobCoordinate* coords)
 {
-  if( mIsFull )
+  if(mIsFull)
   {
     return false;
   }
@@ -129,14 +122,14 @@ bool VectorBlobAtlas::AddGlyph( unsigned int fontId,
   w = mItemWidth;
   h = (length + w - 1) / w;
 
-  if( mCursorY + h > mTextureHeight )
+  if(mCursorY + h > mTextureHeight)
   {
     // Go to next column
     mCursorX += mItemWidth;
     mCursorY = 0;
   }
 
-  if( mCursorX + w <= mTextureWidth && mCursorY + h <= mTextureHeight )
+  if(mCursorX + w <= mTextureWidth && mCursorY + h <= mTextureHeight)
   {
     x = mCursorX;
     y = mCursorY;
@@ -144,46 +137,42 @@ bool VectorBlobAtlas::AddGlyph( unsigned int fontId,
   }
   else
   {
-    DALI_LOG_INFO( gLogFilter, Debug::General, "Blob atlas %p is now FULL\n", this );
+    DALI_LOG_INFO(gLogFilter, Debug::General, "Blob atlas %p is now FULL\n", this);
 
     // The atlas is now considered to be full
     mIsFull = true;
     return false;
   }
 
-  if (w * h == length)
+  if(w * h == length)
   {
-    TexSubImage( x, y, w, h, blob );
+    TexSubImage(x, y, w, h, blob);
   }
   else
   {
-    TexSubImage( x, y, w, h-1, blob );
+    TexSubImage(x, y, w, h - 1, blob);
 
     // Upload the last row separately
-    TexSubImage( x, y + h - 1, length - (w * (h - 1)), 1 , blob + w * (h - 1));
+    TexSubImage(x, y + h - 1, length - (w * (h - 1)), 1, blob + w * (h - 1));
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::General, "Blob atlas %p capacity %d filled %d %f\%\n",
-                 this,
-                 mTextureWidth*mTextureHeight,
-                 mCursorY*mItemWidth + mCursorX*mTextureHeight,
-                 100.0f * (float)(mCursorY*mItemWidth + mCursorX*mTextureHeight) / (float)(mTextureWidth*mTextureHeight) );
+  DALI_LOG_INFO(gLogFilter, Debug::General, "Blob atlas %p capacity %d filled %d %f\%\n", this, mTextureWidth * mTextureHeight, mCursorY * mItemWidth + mCursorX * mTextureHeight, 100.0f * (float)(mCursorY * mItemWidth + mCursorX * mTextureHeight) / (float)(mTextureWidth * mTextureHeight));
 
   Key key;
-  key.fontId = fontId;
+  key.fontId     = fontId;
   key.glyphIndex = glyphIndex;
   key.cacheIndex = mItemCache.size();
-  mItemLookup.push_back( key );
+  mItemLookup.push_back(key);
 
   x /= mItemWidth;
   y /= mItemHeightQuantum;
 
   Item item;
-  EncodeBlobCoordinate( 0, 0, x, y, nominalWidth, nominalHeight, &item.coords[0] ); // BOTTOM_LEFT
-  EncodeBlobCoordinate( 0, 1, x, y, nominalWidth, nominalHeight, &item.coords[1] ); // TOP_LEFT
-  EncodeBlobCoordinate( 1, 0, x, y, nominalWidth, nominalHeight, &item.coords[2] ); // BOTTOM_RIGHT
-  EncodeBlobCoordinate( 1, 1, x, y, nominalWidth, nominalHeight, &item.coords[3] ); // TOP_RIGHT
-  mItemCache.push_back( item );
+  EncodeBlobCoordinate(0, 0, x, y, nominalWidth, nominalHeight, &item.coords[0]); // BOTTOM_LEFT
+  EncodeBlobCoordinate(0, 1, x, y, nominalWidth, nominalHeight, &item.coords[1]); // TOP_LEFT
+  EncodeBlobCoordinate(1, 0, x, y, nominalWidth, nominalHeight, &item.coords[2]); // BOTTOM_RIGHT
+  EncodeBlobCoordinate(1, 1, x, y, nominalWidth, nominalHeight, &item.coords[3]); // TOP_RIGHT
+  mItemCache.push_back(item);
 
   coords[0] = item.coords[0];
   coords[1] = item.coords[1];
@@ -193,26 +182,26 @@ bool VectorBlobAtlas::AddGlyph( unsigned int fontId,
   return true;
 }
 
-void VectorBlobAtlas::TexSubImage( unsigned int offsetX,
-                                   unsigned int offsetY,
-                                   unsigned int width,
-                                   unsigned int height,
-                                   VectorBlob* blob )
+void VectorBlobAtlas::TexSubImage(unsigned int offsetX,
+                                  unsigned int offsetY,
+                                  unsigned int width,
+                                  unsigned int height,
+                                  VectorBlob*  blob)
 {
-  const size_t size = width * height * 4;
-  uint8_t* pixbuf = new uint8_t[size];
+  const size_t size   = width * height * 4;
+  uint8_t*     pixbuf = new uint8_t[size];
 
   size_t pos;
   size_t dataIndex = 0;
-  for( size_t y = 0; y < height; y++ )
+  for(size_t y = 0; y < height; y++)
   {
     pos = y * mTextureWidth * 4;
-    for( size_t x = 0; x < width; x++ )
+    for(size_t x = 0; x < width; x++)
     {
-      pixbuf[pos+x*4] =  0xFF & blob[dataIndex].r;
-      pixbuf[pos+x*4+1] = 0xFF & blob[dataIndex].g;
-      pixbuf[pos+x*4+2] = 0xFF & blob[dataIndex].b;
-      pixbuf[pos+x*4+3] = 0xFF & blob[dataIndex].a;
+      pixbuf[pos + x * 4]     = 0xFF & blob[dataIndex].r;
+      pixbuf[pos + x * 4 + 1] = 0xFF & blob[dataIndex].g;
+      pixbuf[pos + x * 4 + 2] = 0xFF & blob[dataIndex].b;
+      pixbuf[pos + x * 4 + 3] = 0xFF & blob[dataIndex].a;
       dataIndex++;
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,11 @@
 #include "dali-scene-loader/public-api/resource-bundle.h"
 
 // EXTERNAL
-#include "dali/public-api/rendering/sampler.h"
-#include "dali-toolkit/public-api/image-loader/sync-image-loader.h"
-#include <fstream>
-#include <istream>
 #include <cstring>
 #include <fstream>
+#include <istream>
+#include "dali-toolkit/public-api/image-loader/sync-image-loader.h"
+#include "dali/public-api/rendering/sampler.h"
 
 namespace Dali
 {
@@ -34,7 +33,6 @@ namespace SceneLoader
 {
 namespace
 {
-
 const char* const RESOURCE_TYPE_NAMES[] = {
   "Environment",
   "Shader",
@@ -42,7 +40,7 @@ const char* const RESOURCE_TYPE_NAMES[] = {
   "Material",
 };
 
-}  // nonamespace
+} // namespace
 
 const char* GetResourceTypeName(ResourceType::Value type)
 {
@@ -64,9 +62,9 @@ void ResourceBundle::CountEnvironmentReferences(ResourceRefCounts& refCounts) co
   auto& environmentRefCounts = refCounts[ResourceType::Environment];
 
   const auto& materialRefs = refCounts[ResourceType::Material];
-  for (uint32_t i = 0, iEnd = materialRefs.Size(); i != iEnd; ++i)
+  for(uint32_t i = 0, iEnd = materialRefs.Size(); i != iEnd; ++i)
   {
-    if (materialRefs[i] > 0)
+    if(materialRefs[i] > 0)
     {
       ++environmentRefCounts[mMaterials[i].first.mEnvironmentIdx];
     }
@@ -75,36 +73,36 @@ void ResourceBundle::CountEnvironmentReferences(ResourceRefCounts& refCounts) co
 
 void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvider pathProvider, Options::Type options)
 {
-  const auto kForceLoad = MaskMatch(options, Options::ForceReload);
+  const auto kForceLoad  = MaskMatch(options, Options::ForceReload);
   const auto kKeepUnused = MaskMatch(options, Options::KeepUnused);
 
-  const auto& refCountEnvMaps = refCounts[ResourceType::Environment];
-  auto environmentsPath = pathProvider(ResourceType::Environment);
-  for (uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
+  const auto& refCountEnvMaps  = refCounts[ResourceType::Environment];
+  auto        environmentsPath = pathProvider(ResourceType::Environment);
+  for(uint32_t i = 0, iEnd = refCountEnvMaps.Size(); i != iEnd; ++i)
   {
-    auto refCount = refCountEnvMaps[i];
-    auto& iEnvMap = mEnvironmentMaps[i];
-    if (refCount > 0 && (kForceLoad || !iEnvMap.second.IsLoaded()))
+    auto  refCount = refCountEnvMaps[i];
+    auto& iEnvMap  = mEnvironmentMaps[i];
+    if(refCount > 0 && (kForceLoad || !iEnvMap.second.IsLoaded()))
     {
-      auto raw = iEnvMap.first.LoadRaw(environmentsPath);
+      auto raw       = iEnvMap.first.LoadRaw(environmentsPath);
       iEnvMap.second = iEnvMap.first.Load(std::move(raw));
     }
-    else if (!kKeepUnused && refCount == 0 && iEnvMap.second.IsLoaded())
+    else if(!kKeepUnused && refCount == 0 && iEnvMap.second.IsLoaded())
     {
-      iEnvMap.second.mDiffuse = Texture();
+      iEnvMap.second.mDiffuse  = Texture();
       iEnvMap.second.mSpecular = Texture();
     }
   }
 
   const auto& refCountShaders = refCounts[ResourceType::Shader];
-  auto shadersPath = pathProvider(ResourceType::Shader);
-  for (uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
+  auto        shadersPath     = pathProvider(ResourceType::Shader);
+  for(uint32_t i = 0, iEnd = refCountShaders.Size(); i != iEnd; ++i)
   {
-    auto refCount = refCountShaders[i];
-    auto& iShader = mShaders[i];
-    if (refCount > 0 && (kForceLoad || !iShader.second))
+    auto  refCount = refCountShaders[i];
+    auto& iShader  = mShaders[i];
+    if(refCount > 0 && (kForceLoad || !iShader.second))
     {
-      auto raw = iShader.first.LoadRaw(shadersPath);
+      auto raw       = iShader.first.LoadRaw(shadersPath);
       iShader.second = iShader.first.Load(std::move(raw));
     }
     else if(!kKeepUnused && refCount == 0 && iShader.second)
@@ -114,39 +112,39 @@ void ResourceBundle::LoadResources(const ResourceRefCounts& refCounts, PathProvi
   }
 
   const auto& refCountMeshes = refCounts[ResourceType::Mesh];
-  auto modelsPath = pathProvider(ResourceType::Mesh);
-  for (uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
+  auto        modelsPath     = pathProvider(ResourceType::Mesh);
+  for(uint32_t i = 0, iEnd = refCountMeshes.Size(); i != iEnd; ++i)
   {
-    auto refCount = refCountMeshes[i];
-    auto& iMesh = mMeshes[i];
-    if (refCount > 0 && (kForceLoad || !iMesh.second.geometry))
+    auto  refCount = refCountMeshes[i];
+    auto& iMesh    = mMeshes[i];
+    if(refCount > 0 && (kForceLoad || !iMesh.second.geometry))
     {
-      auto raw = iMesh.first.LoadRaw(modelsPath);
+      auto raw     = iMesh.first.LoadRaw(modelsPath);
       iMesh.second = iMesh.first.Load(std::move(raw));
     }
-    else if (!kKeepUnused && refCount == 0 && iMesh.second.geometry)
+    else if(!kKeepUnused && refCount == 0 && iMesh.second.geometry)
     {
       iMesh.second.geometry = Geometry();
     }
   }
 
   const auto& refCountMaterials = refCounts[ResourceType::Material];
-  auto imagesPath = pathProvider(ResourceType::Material);
-  for (uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
+  auto        imagesPath        = pathProvider(ResourceType::Material);
+  for(uint32_t i = 0, iEnd = refCountMaterials.Size(); i != iEnd; ++i)
   {
-    auto refCount = refCountMaterials[i];
+    auto  refCount  = refCountMaterials[i];
     auto& iMaterial = mMaterials[i];
-    if (refCount > 0 && (kForceLoad || !iMaterial.second))
+    if(refCount > 0 && (kForceLoad || !iMaterial.second))
     {
-      auto raw = iMaterial.first.LoadRaw(imagesPath);
+      auto raw         = iMaterial.first.LoadRaw(imagesPath);
       iMaterial.second = iMaterial.first.Load(mEnvironmentMaps, std::move(raw));
     }
-    else if (!kKeepUnused && refCount == 0 && iMaterial.second)
+    else if(!kKeepUnused && refCount == 0 && iMaterial.second)
     {
       iMaterial.second = TextureSet();
     }
   }
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

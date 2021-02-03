@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,22 @@
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/debug.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-thread.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
+Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
 #endif
 
 } // unnamed namespace
@@ -46,40 +42,40 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging,
 VectorAnimationManager::VectorAnimationManager()
 : mEventCallbacks(),
   mLifecycleObservers(),
-  mVectorAnimationThread( nullptr ),
-  mProcessorRegistered( false )
+  mVectorAnimationThread(nullptr),
+  mProcessorRegistered(false)
 {
 }
 
 VectorAnimationManager::~VectorAnimationManager()
 {
-  for( auto&& iter : mEventCallbacks )
+  for(auto&& iter : mEventCallbacks)
   {
     delete iter;
   }
   mEventCallbacks.clear();
 
-  if( mProcessorRegistered )
+  if(mProcessorRegistered)
   {
-    Adaptor::Get().UnregisterProcessor( *this );
+    Adaptor::Get().UnregisterProcessor(*this);
   }
 
-  for( auto observer : mLifecycleObservers )
+  for(auto observer : mLifecycleObservers)
   {
     observer->VectorAnimationManagerDestroyed();
   }
 }
 
-void VectorAnimationManager::AddObserver( VectorAnimationManager::LifecycleObserver& observer )
+void VectorAnimationManager::AddObserver(VectorAnimationManager::LifecycleObserver& observer)
 {
-  DALI_ASSERT_DEBUG( mLifecycleObservers.end() == std::find( mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer));
-  mLifecycleObservers.push_back( &observer );
+  DALI_ASSERT_DEBUG(mLifecycleObservers.end() == std::find(mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer));
+  mLifecycleObservers.push_back(&observer);
 }
 
-void VectorAnimationManager::RemoveObserver( VectorAnimationManager::LifecycleObserver& observer)
+void VectorAnimationManager::RemoveObserver(VectorAnimationManager::LifecycleObserver& observer)
 {
-  auto iterator=std::find(mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer);
-  if( iterator != mLifecycleObservers.end() )
+  auto iterator = std::find(mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer);
+  if(iterator != mLifecycleObservers.end())
   {
     mLifecycleObservers.erase(iterator);
   }
@@ -87,37 +83,37 @@ void VectorAnimationManager::RemoveObserver( VectorAnimationManager::LifecycleOb
 
 VectorAnimationThread& VectorAnimationManager::GetVectorAnimationThread()
 {
-  if( !mVectorAnimationThread )
+  if(!mVectorAnimationThread)
   {
-    mVectorAnimationThread = std::unique_ptr< VectorAnimationThread >( new VectorAnimationThread() );
+    mVectorAnimationThread = std::unique_ptr<VectorAnimationThread>(new VectorAnimationThread());
     mVectorAnimationThread->Start();
   }
   return *mVectorAnimationThread;
 }
 
-void VectorAnimationManager::RegisterEventCallback( CallbackBase* callback )
+void VectorAnimationManager::RegisterEventCallback(CallbackBase* callback)
 {
-  mEventCallbacks.push_back( callback );
+  mEventCallbacks.push_back(callback);
 
-  if( !mProcessorRegistered )
+  if(!mProcessorRegistered)
   {
-    Adaptor::Get().RegisterProcessor( *this );
+    Adaptor::Get().RegisterProcessor(*this);
     mProcessorRegistered = true;
   }
 }
 
-void VectorAnimationManager::UnregisterEventCallback( CallbackBase* callback )
+void VectorAnimationManager::UnregisterEventCallback(CallbackBase* callback)
 {
-  auto iter = std::find( mEventCallbacks.begin(), mEventCallbacks.end(), callback );
-  if( iter != mEventCallbacks.end() )
+  auto iter = std::find(mEventCallbacks.begin(), mEventCallbacks.end(), callback);
+  if(iter != mEventCallbacks.end())
   {
-    mEventCallbacks.erase( iter );
+    mEventCallbacks.erase(iter);
 
-    if( mEventCallbacks.empty() )
+    if(mEventCallbacks.empty())
     {
-      if( Adaptor::IsAvailable() )
+      if(Adaptor::IsAvailable())
       {
-        Adaptor::Get().UnregisterProcessor( *this );
+        Adaptor::Get().UnregisterProcessor(*this);
         mProcessorRegistered = false;
       }
     }
@@ -126,14 +122,14 @@ void VectorAnimationManager::UnregisterEventCallback( CallbackBase* callback )
 
 void VectorAnimationManager::Process()
 {
-  for( auto&& iter : mEventCallbacks )
+  for(auto&& iter : mEventCallbacks)
   {
-    CallbackBase::Execute( *iter );
+    CallbackBase::Execute(*iter);
     delete iter;
   }
   mEventCallbacks.clear();
 
-  Adaptor::Get().UnregisterProcessor( *this );
+  Adaptor::Get().UnregisterProcessor(*this);
   mProcessorRegistered = false;
 }
 

@@ -21,8 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/segmentation.h>
 #ifdef DEBUG_ENABLED
-#include <string>
 #include <dali/integration-api/debug.h>
+#include <string>
 #endif
 
 // INTERNAL INCLUDES
@@ -32,48 +32,43 @@
 
 namespace
 {
-
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_SEGMENTATION");
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_SEGMENTATION");
 #endif
 
 } // namespace
 
-
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
-void SetLineBreakInfo( const Vector<Character>& text,
-                       CharacterIndex startIndex,
-                       Length numberOfCharacters,
-                       Vector<LineBreakInfo>& lineBreakInfo )
+void SetLineBreakInfo(const Vector<Character>& text,
+                      CharacterIndex           startIndex,
+                      Length                   numberOfCharacters,
+                      Vector<LineBreakInfo>&   lineBreakInfo)
 {
   const Length totalNumberOfCharacters = text.Count();
 
-  if( 0u == totalNumberOfCharacters )
+  if(0u == totalNumberOfCharacters)
   {
     // Nothing to do if there are no characters.
     return;
   }
 
   // Retrieve the line break info.
-  lineBreakInfo.Resize( totalNumberOfCharacters );
+  lineBreakInfo.Resize(totalNumberOfCharacters);
 
   // Whether the current buffer is being updated or is set from scratch.
   const bool updateCurrentBuffer = numberOfCharacters < totalNumberOfCharacters;
 
-  LineBreakInfo* lineBreakInfoBuffer = NULL;
+  LineBreakInfo*        lineBreakInfoBuffer = NULL;
   Vector<LineBreakInfo> newLineBreakInfo;
 
-  if( updateCurrentBuffer )
+  if(updateCurrentBuffer)
   {
-    newLineBreakInfo.Resize( numberOfCharacters );
+    newLineBreakInfo.Resize(numberOfCharacters);
     lineBreakInfoBuffer = newLineBreakInfo.Begin();
   }
   else
@@ -82,63 +77,63 @@ void SetLineBreakInfo( const Vector<Character>& text,
   }
 
   // Retrieve the line break info.
-  TextAbstraction::Segmentation::Get().GetLineBreakPositions( text.Begin() + startIndex,
-                                                              numberOfCharacters,
-                                                              lineBreakInfoBuffer );
+  TextAbstraction::Segmentation::Get().GetLineBreakPositions(text.Begin() + startIndex,
+                                                             numberOfCharacters,
+                                                             lineBreakInfoBuffer);
 
   // If the line break info is updated, it needs to be inserted in the model.
-  if( updateCurrentBuffer )
+  if(updateCurrentBuffer)
   {
-    lineBreakInfo.Insert( lineBreakInfo.Begin() + startIndex,
-                          newLineBreakInfo.Begin(),
-                          newLineBreakInfo.End() );
-    lineBreakInfo.Resize( totalNumberOfCharacters );
+    lineBreakInfo.Insert(lineBreakInfo.Begin() + startIndex,
+                         newLineBreakInfo.Begin(),
+                         newLineBreakInfo.End());
+    lineBreakInfo.Resize(totalNumberOfCharacters);
   }
 
 #ifdef DEBUG_ENABLED
-  if( gLogFilter->IsEnabledFor(Debug::Verbose) )
+  if(gLogFilter->IsEnabledFor(Debug::Verbose))
   {
     std::string utf8;
-    Utf32ToUtf8( text.Begin(), numberOfCharacters, utf8 );
+    Utf32ToUtf8(text.Begin(), numberOfCharacters, utf8);
 
     std::string info;
-    info.reserve( numberOfCharacters );
-    for( unsigned int i=0; i<lineBreakInfo.Count(); ++i )
+    info.reserve(numberOfCharacters);
+    for(unsigned int i = 0; i < lineBreakInfo.Count(); ++i)
     {
-      info.push_back( static_cast<char>('0' + lineBreakInfo[i]) );
+      info.push_back(static_cast<char>('0' + lineBreakInfo[i]));
     }
 
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "SetLineBreakInfo Characters: %s\n", utf8.c_str() );
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "SetLineBreakInfo Break info: %s\n", info.c_str() );
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "SetLineBreakInfo Characters: %s\n", utf8.c_str());
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "SetLineBreakInfo Break info: %s\n", info.c_str());
   }
 #endif
 }
 
-void SetWordBreakInfo( const Vector<Character>& text,
-                       CharacterIndex startIndex,
-                       Length numberOfCharacters,
-                       Vector<WordBreakInfo>& wordBreakInfo )
+void SetWordBreakInfo(const Vector<Character>& text,
+                      CharacterIndex           startIndex,
+                      Length                   numberOfCharacters,
+                      Vector<WordBreakInfo>&   wordBreakInfo)
 {
   const Length totalNumberOfCharacters = text.Count();
 
-  if( 0u == totalNumberOfCharacters )
+  if(0u == totalNumberOfCharacters)
   {
     // Nothing to do if there are no characters.
     return;
   }
 
   // Resize the vector.
-  wordBreakInfo.Resize( totalNumberOfCharacters );
+  wordBreakInfo.Resize(totalNumberOfCharacters);
 
   // Whether the current buffer is being updated or is set from scratch.
   const bool updateCurrentBuffer = numberOfCharacters < totalNumberOfCharacters;
 
-  WordBreakInfo* wordBreakInfoBuffer = NULL;
+  WordBreakInfo*        wordBreakInfoBuffer = NULL;
   Vector<WordBreakInfo> newWordBreakInfo;
 
-  if( updateCurrentBuffer )
+  if(updateCurrentBuffer)
   {
-    newWordBreakInfo.Resize( numberOfCharacters );
+    newWordBreakInfo.Resize(numberOfCharacters);
     wordBreakInfoBuffer = newWordBreakInfo.Begin();
   }
   else
@@ -147,34 +142,34 @@ void SetWordBreakInfo( const Vector<Character>& text,
   }
 
   // Retrieve the word break info.
-  TextAbstraction::Segmentation::Get().GetWordBreakPositions( text.Begin() + startIndex,
-                                                              numberOfCharacters,
-                                                              wordBreakInfoBuffer );
+  TextAbstraction::Segmentation::Get().GetWordBreakPositions(text.Begin() + startIndex,
+                                                             numberOfCharacters,
+                                                             wordBreakInfoBuffer);
 
   // If the word break info is updated, it needs to be inserted in the model.
-  if( updateCurrentBuffer )
+  if(updateCurrentBuffer)
   {
-    wordBreakInfo.Insert( wordBreakInfo.Begin() + startIndex,
-                          newWordBreakInfo.Begin(),
-                          newWordBreakInfo.End() );
-    wordBreakInfo.Resize( totalNumberOfCharacters );
+    wordBreakInfo.Insert(wordBreakInfo.Begin() + startIndex,
+                         newWordBreakInfo.Begin(),
+                         newWordBreakInfo.End());
+    wordBreakInfo.Resize(totalNumberOfCharacters);
   }
 
 #ifdef DEBUG_ENABLED
-  if( gLogFilter->IsEnabledFor(Debug::Verbose) )
+  if(gLogFilter->IsEnabledFor(Debug::Verbose))
   {
     std::string utf8;
-    Utf32ToUtf8( text.Begin(), totalNumberOfCharacters, utf8 );
+    Utf32ToUtf8(text.Begin(), totalNumberOfCharacters, utf8);
 
     std::string info;
-    info.reserve( totalNumberOfCharacters );
-    for( unsigned int i=0; i<wordBreakInfo.Count(); ++i )
+    info.reserve(totalNumberOfCharacters);
+    for(unsigned int i = 0; i < wordBreakInfo.Count(); ++i)
     {
-      info.push_back( static_cast<char>('0' + wordBreakInfo[i]) );
+      info.push_back(static_cast<char>('0' + wordBreakInfo[i]));
     }
 
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "SetWordBreakInfo Characters: %s\n", utf8.c_str() );
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "SetWordBreakInfo Break info: %s\n", info.c_str() );
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "SetWordBreakInfo Characters: %s\n", utf8.c_str());
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "SetWordBreakInfo Break info: %s\n", info.c_str());
   }
 #endif
 }

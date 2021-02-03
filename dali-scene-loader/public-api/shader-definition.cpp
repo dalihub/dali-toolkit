@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,10 @@ namespace SceneLoader
 {
 namespace
 {
-
 const std::string SHADER_HINT_OUTPUT_IS_TRANSPARENT("OUTPUT_IS_TRANSPARENT"); ///< Might generate transparent alpha from opaque inputs.
-const std::string SHADER_HINT_MODIFIES_GEOMETRY("MODIFIES_GEOMETRY");     ///< Might change position of vertices, this option disables any culling optimizations.
+const std::string SHADER_HINT_MODIFIES_GEOMETRY("MODIFIES_GEOMETRY");         ///< Might change position of vertices, this option disables any culling optimizations.
 
-}
+} // namespace
 
 ShaderDefinition::ShaderDefinition(const ShaderDefinition& other)
 : mRendererState(other.mRendererState),
@@ -38,31 +37,32 @@ ShaderDefinition::ShaderDefinition(const ShaderDefinition& other)
   mDefines(other.mDefines),
   mHints(other.mHints),
   mUniforms(other.mUniforms)
-{}
+{
+}
 
 void ShaderDefinition::ApplyDefine(std::string& shaderCode, const std::string& definevar)
 {
   const std::string IF_1 = "#if 1";
 
   std::size_t found = shaderCode.find(definevar);
-  while (found != std::string::npos)
+  while(found != std::string::npos)
   {
     // Greater then "@" character means is a letter,
     // therefore is not has the definevar we looking for.
-    if ((found + definevar.length()) < shaderCode.length() && shaderCode.at(found + definevar.length()) > '@')
+    if((found + definevar.length()) < shaderCode.length() && shaderCode.at(found + definevar.length()) > '@')
     {
       found = shaderCode.find(definevar, found + definevar.length());
       continue;
     }
-    if (found > 0u && shaderCode.at(found - 1) > '@')
+    if(found > 0u && shaderCode.at(found - 1) > '@')
     {
       found = shaderCode.find(definevar, found + definevar.length());
       continue;
     }
 
-    std::size_t defidx = shaderCode.rfind("#ifdef", found);
+    std::size_t defidx     = shaderCode.rfind("#ifdef", found);
     std::size_t newlineidx = shaderCode.rfind("\n", found);
-    if (newlineidx < defidx && defidx != std::string::npos)
+    if(newlineidx < defidx && defidx != std::string::npos)
     {
       shaderCode.replace(defidx, found - defidx + definevar.length(), IF_1);
       found = defidx + IF_1.length();
@@ -76,18 +76,18 @@ void ShaderDefinition::ApplyDefine(std::string& shaderCode, const std::string& d
 }
 
 ShaderDefinition::RawData
-  ShaderDefinition::LoadRaw(const std::string& shadersPath) const
+ShaderDefinition::LoadRaw(const std::string& shadersPath) const
 {
   RawData raw;
 
-  bool fail = false;
+  bool fail               = false;
   raw.mVertexShaderSource = LoadTextFile((shadersPath + mVertexShaderPath).c_str(), &fail);
-  if (!fail)
+  if(!fail)
   {
     raw.mFragmentShaderSource = LoadTextFile((shadersPath + mFragmentShaderPath).c_str(), &fail);
-    if (!fail)
+    if(!fail)
     {
-      for (auto definevar : mDefines)
+      for(auto definevar : mDefines)
       {
         ApplyDefine(raw.mVertexShaderSource, definevar);
         ApplyDefine(raw.mFragmentShaderSource, definevar);
@@ -95,14 +95,12 @@ ShaderDefinition::RawData
     }
     else
     {
-      ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" <<
-        shadersPath + mFragmentShaderPath << "'.";
+      ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" << shadersPath + mFragmentShaderPath << "'.";
     }
   }
   else
   {
-    ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" <<
-      shadersPath + mVertexShaderPath << "'.";
+    ExceptionFlinger(ASSERT_LOCATION) << "Failed to load shader source from '" << shadersPath + mVertexShaderPath << "'.";
   }
   return raw;
 }
@@ -110,21 +108,20 @@ ShaderDefinition::RawData
 Shader ShaderDefinition::Load(RawData&& raw) const
 {
   uint32_t hints = Shader::Hint::NONE;
-  for (const auto& hint : mHints)
+  for(const auto& hint : mHints)
   {
-    if (hint == SHADER_HINT_OUTPUT_IS_TRANSPARENT)
+    if(hint == SHADER_HINT_OUTPUT_IS_TRANSPARENT)
     {
       hints |= Shader::Hint::OUTPUT_IS_TRANSPARENT;
     }
-    else if (hint == SHADER_HINT_MODIFIES_GEOMETRY)
+    else if(hint == SHADER_HINT_MODIFIES_GEOMETRY)
     {
       hints |= Shader::Hint::MODIFIES_GEOMETRY;
     }
   }
 
-  Shader shader = Shader::New(raw.mVertexShaderSource, raw.mFragmentShaderSource,
-    static_cast<Shader::Hint::Value>(hints));
-  for (Property::Map::SizeType i0 = 0, i1 = mUniforms.Count(); i0 != i1; ++i0)
+  Shader shader = Shader::New(raw.mVertexShaderSource, raw.mFragmentShaderSource, static_cast<Shader::Hint::Value>(hints));
+  for(Property::Map::SizeType i0 = 0, i1 = mUniforms.Count(); i0 != i1; ++i0)
   {
     auto pair = mUniforms.GetKeyValue(i0);
     DALI_ASSERT_ALWAYS(pair.first.type == Property::Key::STRING);
@@ -134,5 +131,5 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   return shader;
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

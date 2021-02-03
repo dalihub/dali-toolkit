@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,31 +19,27 @@
 #include <dali-toolkit/internal/controls/text-controls/text-selection-toolbar-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cfloat>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <cfloat>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/internal/helpers/color-conversion.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/helpers/color-conversion.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
-const Dali::Vector2 DEFAULT_SCROLL_BAR_PADDING( 8.0f, 6.0f );
+const Dali::Vector2 DEFAULT_SCROLL_BAR_PADDING(8.0f, 6.0f);
 
 BaseHandle Create()
 {
@@ -52,13 +48,13 @@ BaseHandle Create()
 
 // Setup properties, signals and actions using the type-registry.
 
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextSelectionToolbar, Toolkit::Control, Create );
+DALI_TYPE_REGISTRATION_BEGIN(Toolkit::TextSelectionToolbar, Toolkit::Control, Create);
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "maxSize",  VECTOR2, MAX_SIZE )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enableOvershoot",  BOOLEAN, ENABLE_OVERSHOOT )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enableScrollBar", BOOLEAN, ENABLE_SCROLL_BAR )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "scrollBarPadding", VECTOR2, SCROLL_BAR_PADDING )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "scrollView",  MAP, SCROLL_VIEW )
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionToolbar, "maxSize", VECTOR2, MAX_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionToolbar, "enableOvershoot", BOOLEAN, ENABLE_OVERSHOOT)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionToolbar, "enableScrollBar", BOOLEAN, ENABLE_SCROLL_BAR)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionToolbar, "scrollBarPadding", VECTOR2, SCROLL_BAR_PADDING)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionToolbar, "scrollView", MAP, SCROLL_VIEW)
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -67,10 +63,10 @@ DALI_TYPE_REGISTRATION_END()
 Dali::Toolkit::TextSelectionToolbar TextSelectionToolbar::New()
 {
   // Create the implementation, temporarily owned by this handle on stack
-  IntrusivePtr< TextSelectionToolbar > impl = new TextSelectionToolbar();
+  IntrusivePtr<TextSelectionToolbar> impl = new TextSelectionToolbar();
 
   // Pass ownership to CustomActor handle
-  Dali::Toolkit::TextSelectionToolbar handle( *impl );
+  Dali::Toolkit::TextSelectionToolbar handle(*impl);
 
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
@@ -79,65 +75,65 @@ Dali::Toolkit::TextSelectionToolbar TextSelectionToolbar::New()
   return handle;
 }
 
-void TextSelectionToolbar::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+void TextSelectionToolbar::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
-  Toolkit::TextSelectionToolbar selectionPopup = Toolkit::TextSelectionToolbar::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::TextSelectionToolbar selectionPopup = Toolkit::TextSelectionToolbar::DownCast(Dali::BaseHandle(object));
 
-  if( selectionPopup )
+  if(selectionPopup)
   {
-    TextSelectionToolbar& impl( GetImpl( selectionPopup ) );
+    TextSelectionToolbar& impl(GetImpl(selectionPopup));
 
-    switch( index )
+    switch(index)
     {
       case Toolkit::TextSelectionToolbar::Property::MAX_SIZE:
       {
-       impl.SetPopupMaxSize( value.Get< Vector2 >() );
-       break;
+        impl.SetPopupMaxSize(value.Get<Vector2>());
+        break;
       }
       case Toolkit::TextSelectionToolbar::Property::ENABLE_OVERSHOOT:
       {
-        if( !impl.mScrollView )
+        if(!impl.mScrollView)
         {
-          impl.mScrollView  = Toolkit::ScrollView::New();
+          impl.mScrollView = Toolkit::ScrollView::New();
         }
-        impl.mScrollView.SetOvershootEnabled( value.Get< bool >() );
+        impl.mScrollView.SetOvershootEnabled(value.Get<bool>());
         break;
       }
       case Toolkit::TextSelectionToolbar::Property::ENABLE_SCROLL_BAR:
       {
-        impl.SetUpScrollBar( value.Get< bool >() );
+        impl.SetUpScrollBar(value.Get<bool>());
         break;
       }
       case Toolkit::TextSelectionToolbar::Property::SCROLL_BAR_PADDING:
       {
-        impl.SetScrollBarPadding( value.Get< Vector2 >() );
+        impl.SetScrollBarPadding(value.Get<Vector2>());
         break;
       }
       case Toolkit::TextSelectionToolbar::Property::SCROLL_VIEW:
       {
         // Get a Property::Map from the property if possible.
         Property::Map setPropertyMap;
-        if( value.Get( setPropertyMap ) )
+        if(value.Get(setPropertyMap))
         {
-          impl.ConfigureScrollview( setPropertyMap );
+          impl.ConfigureScrollview(setPropertyMap);
         }
         break;
       }
     } // switch
-  } // TextSelectionToolbar
+  }   // TextSelectionToolbar
 }
 
-Property::Value TextSelectionToolbar::GetProperty( BaseObject* object, Property::Index index )
+Property::Value TextSelectionToolbar::GetProperty(BaseObject* object, Property::Index index)
 {
   Property::Value value;
 
-  Toolkit::TextSelectionToolbar selectionPopup = Toolkit::TextSelectionToolbar::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::TextSelectionToolbar selectionPopup = Toolkit::TextSelectionToolbar::DownCast(Dali::BaseHandle(object));
 
-  if( selectionPopup )
+  if(selectionPopup)
   {
-    TextSelectionToolbar& impl( GetImpl( selectionPopup ) );
+    TextSelectionToolbar& impl(GetImpl(selectionPopup));
 
-    switch( index )
+    switch(index)
     {
       case Toolkit::TextSelectionToolbar::Property::MAX_SIZE:
       {
@@ -168,32 +164,32 @@ void TextSelectionToolbar::OnInitialize()
 {
   SetUp();
 
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::TOOL_BAR ));
-  } );
+  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
+    return std::unique_ptr<Dali::Accessibility::Accessible>(
+      new Control::Impl::AccessibleImpl(actor, Dali::Accessibility::Role::TOOL_BAR));
+  });
 }
 
-void TextSelectionToolbar::OnRelayout( const Vector2& size, RelayoutContainer& container )
+void TextSelectionToolbar::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  float width = std::max ( mTableOfButtons.GetNaturalSize().width, size.width );
-  mRulerX->SetDomain( RulerDomain( 0.0, width, true ) );
-  mScrollView.SetRulerX( mRulerX );
+  float width = std::max(mTableOfButtons.GetNaturalSize().width, size.width);
+  mRulerX->SetDomain(RulerDomain(0.0, width, true));
+  mScrollView.SetRulerX(mRulerX);
 
-  if( mScrollBar )
+  if(mScrollBar)
   {
-    float barWidth = std::min( mTableOfButtons.GetNaturalSize().width, size.width ) - 2.f * mScrollBarPadding.x;
-    mScrollBar.SetProperty( Actor::Property::SIZE, Vector2( 0.0f, barWidth ) );
+    float barWidth = std::min(mTableOfButtons.GetNaturalSize().width, size.width) - 2.f * mScrollBarPadding.x;
+    mScrollBar.SetProperty(Actor::Property::SIZE, Vector2(0.0f, barWidth));
   }
 }
 
-void TextSelectionToolbar::SetPopupMaxSize( const Size& maxSize )
+void TextSelectionToolbar::SetPopupMaxSize(const Size& maxSize)
 {
   mMaxSize = maxSize;
-  if( mScrollView && mToolbarActor )
+  if(mScrollView && mToolbarActor)
   {
-    mScrollView.SetProperty( Actor::Property::MAXIMUM_SIZE, mMaxSize );
-    mToolbarActor.SetProperty( Actor::Property::MAXIMUM_SIZE, mMaxSize );
+    mScrollView.SetProperty(Actor::Property::MAXIMUM_SIZE, mMaxSize);
+    mToolbarActor.SetProperty(Actor::Property::MAXIMUM_SIZE, mMaxSize);
   }
 }
 
@@ -204,172 +200,172 @@ const Dali::Vector2& TextSelectionToolbar::GetPopupMaxSize() const
 
 void TextSelectionToolbar::SetUpScrollView()
 {
-  mScrollView.SetProperty( Dali::Actor::Property::NAME,"TextSelectionScrollView");
-  mScrollView.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-  mScrollView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
-  mScrollView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
+  mScrollView.SetProperty(Dali::Actor::Property::NAME, "TextSelectionScrollView");
+  mScrollView.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+  mScrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
+  mScrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
 
-  mScrollView.SetScrollingDirection( PanGestureDetector::DIRECTION_HORIZONTAL, Degree( 40.0f ) );
-  mScrollView.SetAxisAutoLock( true );
-  mScrollView.ScrollStartedSignal().Connect( this, &TextSelectionToolbar::OnScrollStarted );
-  mScrollView.ScrollCompletedSignal().Connect( this, &TextSelectionToolbar::OnScrollCompleted );
-  mScrollView.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX ); // In a new layer, so clip to scroll-view's bounding box
+  mScrollView.SetScrollingDirection(PanGestureDetector::DIRECTION_HORIZONTAL, Degree(40.0f));
+  mScrollView.SetAxisAutoLock(true);
+  mScrollView.ScrollStartedSignal().Connect(this, &TextSelectionToolbar::OnScrollStarted);
+  mScrollView.ScrollCompletedSignal().Connect(this, &TextSelectionToolbar::OnScrollCompleted);
+  mScrollView.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX); // In a new layer, so clip to scroll-view's bounding box
 
-  mRulerX = new DefaultRuler();  // IntrusivePtr which is unreferenced when ScrollView is destroyed.
+  mRulerX = new DefaultRuler(); // IntrusivePtr which is unreferenced when ScrollView is destroyed.
 
-  RulerPtr rulerY = new DefaultRuler();  // IntrusivePtr which is unreferenced when ScrollView is destroyed.
+  RulerPtr rulerY = new DefaultRuler(); // IntrusivePtr which is unreferenced when ScrollView is destroyed.
   rulerY->Disable();
-  mScrollView.SetRulerY( rulerY );
+  mScrollView.SetRulerY(rulerY);
 
-  mScrollView.SetOvershootEnabled( true );
+  mScrollView.SetOvershootEnabled(true);
 }
 
 void TextSelectionToolbar::SetUp()
 {
   Actor self = Self();
 
-  self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+  self.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
 
   // Create Actor to house the toolbar.
   mToolbarActor = Actor::New();
-  mToolbarActor.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-  mToolbarActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-  mToolbarActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mToolbarActor.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+  mToolbarActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mToolbarActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  if( !mScrollView )
+  if(!mScrollView)
   {
     mScrollView = Toolkit::ScrollView::New();
   }
   SetUpScrollView();
 
   // Toolbar must start with at least one option, adding further options with increase it's size
-  mTableOfButtons = Dali::Toolkit::TableView::New( 1, 1 );
-  mTableOfButtons.SetFitHeight( 0 );
-  mTableOfButtons.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
-  mTableOfButtons.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
+  mTableOfButtons = Dali::Toolkit::TableView::New(1, 1);
+  mTableOfButtons.SetFitHeight(0);
+  mTableOfButtons.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
+  mTableOfButtons.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
 
-  mScrollView.Add( mTableOfButtons );
-  mToolbarActor.Add( mScrollView );
+  mScrollView.Add(mTableOfButtons);
+  mToolbarActor.Add(mScrollView);
 
-  self.Add( mToolbarActor );
+  self.Add(mToolbarActor);
 }
 
-void TextSelectionToolbar::SetUpScrollBar( bool enable )
+void TextSelectionToolbar::SetUpScrollBar(bool enable)
 {
-  if( enable )
+  if(enable)
   {
-    if( ! mScrollBar )
+    if(!mScrollBar)
     {
       Toolkit::ImageView indicator = Toolkit::ImageView::New();
-      indicator.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
-      indicator.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-      indicator.SetStyleName( "TextSelectionScrollIndicator" );
+      indicator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+      indicator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+      indicator.SetStyleName("TextSelectionScrollIndicator");
 
-      mScrollBar = Toolkit::ScrollBar::New( Toolkit::ScrollBar::HORIZONTAL );
-      mScrollBar.SetProperty( Dali::Actor::Property::NAME, "Text popup scroll bar" );
-      mScrollBar.SetStyleName( "TextSelectionScrollBar" );
-      mScrollBar.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );
-      mScrollBar.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
-      mScrollBar.SetProperty( Actor::Property::POSITION, Vector2( mScrollBarPadding.x, -mScrollBarPadding.y ));
-      mScrollBar.SetResizePolicy( Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH );
-      mScrollBar.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) ) );
-      mScrollBar.SetScrollIndicator( indicator );
+      mScrollBar = Toolkit::ScrollBar::New(Toolkit::ScrollBar::HORIZONTAL);
+      mScrollBar.SetProperty(Dali::Actor::Property::NAME, "Text popup scroll bar");
+      mScrollBar.SetStyleName("TextSelectionScrollBar");
+      mScrollBar.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
+      mScrollBar.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+      mScrollBar.SetProperty(Actor::Property::POSITION, Vector2(mScrollBarPadding.x, -mScrollBarPadding.y));
+      mScrollBar.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH);
+      mScrollBar.SetProperty(Actor::Property::ORIENTATION, Quaternion(Quaternion(Radian(1.5f * Math::PI), Vector3::ZAXIS)));
+      mScrollBar.SetScrollIndicator(indicator);
       mScrollBar.GetPanGestureDetector().DetachAll();
-      mScrollView.Add( mScrollBar );
+      mScrollView.Add(mScrollBar);
     }
   }
   else
   {
-    UnparentAndReset( mScrollBar );
+    UnparentAndReset(mScrollBar);
   }
 }
 
-void TextSelectionToolbar::OnScrollStarted( const Vector2& position )
+void TextSelectionToolbar::OnScrollStarted(const Vector2& position)
 {
-  if( mFirstScrollEnd )
+  if(mFirstScrollEnd)
   {
-    mScrollView.SetOvershootEnabled( true );
+    mScrollView.SetOvershootEnabled(true);
   }
-  mTableOfButtons.SetProperty( Actor::Property::SENSITIVE, false );
+  mTableOfButtons.SetProperty(Actor::Property::SENSITIVE, false);
 }
 
-void TextSelectionToolbar::OnScrollCompleted( const Vector2& position )
+void TextSelectionToolbar::OnScrollCompleted(const Vector2& position)
 {
   mFirstScrollEnd = true;
-  mTableOfButtons.SetProperty( Actor::Property::SENSITIVE, true );
+  mTableOfButtons.SetProperty(Actor::Property::SENSITIVE, true);
 }
 
-void TextSelectionToolbar::AddOption( Actor& option )
+void TextSelectionToolbar::AddOption(Actor& option)
 {
-  mTableOfButtons.AddChild( option, Toolkit::TableView::CellPosition( 0, mIndexInTable )  );
-  mTableOfButtons.SetFitWidth( mIndexInTable );
+  mTableOfButtons.AddChild(option, Toolkit::TableView::CellPosition(0, mIndexInTable));
+  mTableOfButtons.SetFitWidth(mIndexInTable);
   mIndexInTable++;
 }
 
-void TextSelectionToolbar::AddDivider( Actor& divider )
+void TextSelectionToolbar::AddDivider(Actor& divider)
 {
-  AddOption( divider );
-  mDividerIndexes.PushBack( mIndexInTable - 1u );
+  AddOption(divider);
+  mDividerIndexes.PushBack(mIndexInTable - 1u);
 }
 
-void TextSelectionToolbar::ResizeDividers( Size& size )
+void TextSelectionToolbar::ResizeDividers(Size& size)
 {
-  for( unsigned int i = 0; i < mDividerIndexes.Count(); ++i )
+  for(unsigned int i = 0; i < mDividerIndexes.Count(); ++i)
   {
-    Actor divider = mTableOfButtons.GetChildAt( Toolkit::TableView::CellPosition( 0, mDividerIndexes[ i ] ) );
-    divider.SetProperty( Actor::Property::SIZE, size );
+    Actor divider = mTableOfButtons.GetChildAt(Toolkit::TableView::CellPosition(0, mDividerIndexes[i]));
+    divider.SetProperty(Actor::Property::SIZE, size);
   }
   RelayoutRequest();
 }
 
-void TextSelectionToolbar::RaiseAbove( Actor target )
+void TextSelectionToolbar::RaiseAbove(Actor target)
 {
-  mToolbarActor.RaiseAbove( target );
+  mToolbarActor.RaiseAbove(target);
 }
 
-void TextSelectionToolbar::SetScrollBarPadding( const Vector2& padding )
+void TextSelectionToolbar::SetScrollBarPadding(const Vector2& padding)
 {
   mScrollBarPadding = padding;
-  if( mScrollBar )
+  if(mScrollBar)
   {
-    mScrollBar.SetProperty( Actor::Property::POSITION, Vector2( mScrollBarPadding.x, -mScrollBarPadding.y ));
+    mScrollBar.SetProperty(Actor::Property::POSITION, Vector2(mScrollBarPadding.x, -mScrollBarPadding.y));
   }
 
   RelayoutRequest();
 }
 
-void TextSelectionToolbar::ScrollTo( const Vector2& position )
+void TextSelectionToolbar::ScrollTo(const Vector2& position)
 {
   mFirstScrollEnd = false;
-  mScrollView.SetOvershootEnabled( false );
-  mScrollView.ScrollTo( position, 0.f );
+  mScrollView.SetOvershootEnabled(false);
+  mScrollView.ScrollTo(position, 0.f);
 }
 
-void TextSelectionToolbar::ConfigureScrollview( const Property::Map& properties )
+void TextSelectionToolbar::ConfigureScrollview(const Property::Map& properties)
 {
   // Set any properties specified for the label by iterating through all property key-value pairs.
-  for( unsigned int i = 0, mapCount = properties.Count(); i < mapCount; ++i )
+  for(unsigned int i = 0, mapCount = properties.Count(); i < mapCount; ++i)
   {
-    const StringValuePair& propertyPair( properties.GetPair( i ) );
+    const StringValuePair& propertyPair(properties.GetPair(i));
 
     // Convert the property string to a property index.
-    Property::Index setPropertyIndex = mScrollView.GetPropertyIndex( propertyPair.first );
-    if( setPropertyIndex != Property::INVALID_INDEX )
+    Property::Index setPropertyIndex = mScrollView.GetPropertyIndex(propertyPair.first);
+    if(setPropertyIndex != Property::INVALID_INDEX)
     {
       // Convert the string representation of a color into a Vector4
-      if( setPropertyIndex == Toolkit::Scrollable::Property::OVERSHOOT_EFFECT_COLOR )
+      if(setPropertyIndex == Toolkit::Scrollable::Property::OVERSHOOT_EFFECT_COLOR)
       {
         Vector4 color;
-        if( ConvertPropertyToColor( propertyPair.second, color ) )
+        if(ConvertPropertyToColor(propertyPair.second, color))
         {
-          mScrollView.SetOvershootEffectColor( color );
+          mScrollView.SetOvershootEffectColor(color);
         }
       }
       else
       {
         // If the conversion worked, we have a valid property index,
         // Set the property to the new value.
-        mScrollView.SetProperty( setPropertyIndex, propertyPair.second );
+        mScrollView.SetProperty(setPropertyIndex, propertyPair.second);
       }
     }
   }
@@ -383,12 +379,12 @@ const Vector2& TextSelectionToolbar::GetScrollBarPadding() const
 }
 
 TextSelectionToolbar::TextSelectionToolbar()
-: Control( ControlBehaviour( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ) ),
-  mMaxSize (),
-  mScrollBarPadding( DEFAULT_SCROLL_BAR_PADDING ),
-  mIndexInTable( 0 ),
+: Control(ControlBehaviour(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT))),
+  mMaxSize(),
+  mScrollBarPadding(DEFAULT_SCROLL_BAR_PADDING),
+  mIndexInTable(0),
   mDividerIndexes(),
-  mFirstScrollEnd( false )
+  mFirstScrollEnd(false)
 {
 }
 

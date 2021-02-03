@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,17 @@
 #include <dali-toolkit/internal/text/multi-language-support-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/debug.h>
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/multi-language-helper-functions.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace
 {
 #if defined(DEBUG_ENABLED)
@@ -39,22 +37,20 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MULT
 #endif
 
 const Dali::Toolkit::Text::Character UTF32_A = 0x0041;
-}
+} // namespace
 
 namespace Text
 {
-
 namespace Internal
 {
-
-bool ValidateFontsPerScript::IsValidFont( FontId fontId ) const
+bool ValidateFontsPerScript::IsValidFont(FontId fontId) const
 {
-  for( Vector<FontId>::ConstIterator it = mValidFonts.Begin(),
-         endIt = mValidFonts.End();
-       it != endIt;
-       ++it )
+  for(Vector<FontId>::ConstIterator it    = mValidFonts.Begin(),
+                                    endIt = mValidFonts.End();
+      it != endIt;
+      ++it)
   {
-    if( fontId == *it )
+    if(fontId == *it)
     {
       return true;
     }
@@ -63,22 +59,22 @@ bool ValidateFontsPerScript::IsValidFont( FontId fontId ) const
   return false;
 }
 
-FontId DefaultFonts::FindFont( TextAbstraction::FontClient& fontClient,
-                               const TextAbstraction::FontDescription& description,
-                               PointSize26Dot6 size ) const
+FontId DefaultFonts::FindFont(TextAbstraction::FontClient&            fontClient,
+                              const TextAbstraction::FontDescription& description,
+                              PointSize26Dot6                         size) const
 {
-  for( std::vector<CacheItem>::const_iterator it = mFonts.begin(),
-         endIt = mFonts.end();
-       it != endIt;
-       ++it )
+  for(std::vector<CacheItem>::const_iterator it    = mFonts.begin(),
+                                             endIt = mFonts.end();
+      it != endIt;
+      ++it)
   {
     const CacheItem& item = *it;
 
-    if( ( ( TextAbstraction::FontWeight::NONE == description.weight ) || ( description.weight == item.description.weight ) ) &&
-        ( ( TextAbstraction::FontWidth::NONE == description.width )   || ( description.width == item.description.width ) ) &&
-        ( ( TextAbstraction::FontSlant::NONE == description.slant )   || ( description.slant == item.description.slant ) ) &&
-        ( size == fontClient.GetPointSize( item.fontId ) ) &&
-        ( description.family.empty() || ( description.family == item.description.family ) ) )
+    if(((TextAbstraction::FontWeight::NONE == description.weight) || (description.weight == item.description.weight)) &&
+       ((TextAbstraction::FontWidth::NONE == description.width) || (description.width == item.description.width)) &&
+       ((TextAbstraction::FontSlant::NONE == description.slant) || (description.slant == item.description.slant)) &&
+       (size == fontClient.GetPointSize(item.fontId)) &&
+       (description.family.empty() || (description.family == item.description.family)))
     {
       return item.fontId;
     }
@@ -87,12 +83,12 @@ FontId DefaultFonts::FindFont( TextAbstraction::FontClient& fontClient,
   return 0u;
 }
 
-void DefaultFonts::Cache( const TextAbstraction::FontDescription& description, FontId fontId )
+void DefaultFonts::Cache(const TextAbstraction::FontDescription& description, FontId fontId)
 {
   CacheItem item;
   item.description = description;
-  item.fontId = fontId;
-  mFonts.push_back( item );
+  item.fontId      = fontId;
+  mFonts.push_back(item);
 }
 
 MultilanguageSupport::MultilanguageSupport()
@@ -101,29 +97,29 @@ MultilanguageSupport::MultilanguageSupport()
 {
   // Initializes the default font cache to zero (invalid font).
   // Reserves space to cache the default fonts and access them with the script as an index.
-  mDefaultFontPerScriptCache.Resize( TextAbstraction::UNKNOWN + 1, NULL );
+  mDefaultFontPerScriptCache.Resize(TextAbstraction::UNKNOWN + 1, NULL);
 
   // Initializes the valid fonts cache to NULL (no valid fonts).
   // Reserves space to cache the valid fonts and access them with the script as an index.
-  mValidFontsPerScriptCache.Resize( TextAbstraction::UNKNOWN + 1, NULL );
+  mValidFontsPerScriptCache.Resize(TextAbstraction::UNKNOWN + 1, NULL);
 }
 
 MultilanguageSupport::~MultilanguageSupport()
 {
   // Destroy the default font per script cache.
-  for( Vector<DefaultFonts*>::Iterator it = mDefaultFontPerScriptCache.Begin(),
-         endIt = mDefaultFontPerScriptCache.End();
-       it != endIt;
-       ++it )
+  for(Vector<DefaultFonts*>::Iterator it    = mDefaultFontPerScriptCache.Begin(),
+                                      endIt = mDefaultFontPerScriptCache.End();
+      it != endIt;
+      ++it)
   {
     delete *it;
   }
 
   // Destroy the valid fonts per script cache.
-  for( Vector<ValidateFontsPerScript*>::Iterator it = mValidFontsPerScriptCache.Begin(),
-         endIt = mValidFontsPerScriptCache.End();
-       it != endIt;
-       ++it )
+  for(Vector<ValidateFontsPerScript*>::Iterator it    = mValidFontsPerScriptCache.Begin(),
+                                                endIt = mValidFontsPerScriptCache.End();
+      it != endIt;
+      ++it)
   {
     delete *it;
   }
@@ -133,33 +129,33 @@ Text::MultilanguageSupport MultilanguageSupport::Get()
 {
   Text::MultilanguageSupport multilanguageSupportHandle;
 
-  SingletonService service( SingletonService::Get() );
-  if( service )
+  SingletonService service(SingletonService::Get());
+  if(service)
   {
     // Check whether the singleton is already created
-    Dali::BaseHandle handle = service.GetSingleton( typeid( Text::MultilanguageSupport ) );
-    if( handle )
+    Dali::BaseHandle handle = service.GetSingleton(typeid(Text::MultilanguageSupport));
+    if(handle)
     {
       // If so, downcast the handle
-      MultilanguageSupport* impl = dynamic_cast< Internal::MultilanguageSupport* >( handle.GetObjectPtr() );
-      multilanguageSupportHandle = Text::MultilanguageSupport( impl );
+      MultilanguageSupport* impl = dynamic_cast<Internal::MultilanguageSupport*>(handle.GetObjectPtr());
+      multilanguageSupportHandle = Text::MultilanguageSupport(impl);
     }
     else // create and register the object
     {
-      multilanguageSupportHandle = Text::MultilanguageSupport( new MultilanguageSupport );
-      service.Register( typeid( multilanguageSupportHandle ), multilanguageSupportHandle );
+      multilanguageSupportHandle = Text::MultilanguageSupport(new MultilanguageSupport);
+      service.Register(typeid(multilanguageSupportHandle), multilanguageSupportHandle);
     }
   }
 
   return multilanguageSupportHandle;
 }
 
-void MultilanguageSupport::SetScripts( const Vector<Character>& text,
-                                       CharacterIndex startIndex,
-                                       Length numberOfCharacters,
-                                       Vector<ScriptRun>& scripts )
+void MultilanguageSupport::SetScripts(const Vector<Character>& text,
+                                      CharacterIndex           startIndex,
+                                      Length                   numberOfCharacters,
+                                      Vector<ScriptRun>&       scripts)
 {
-  if( 0u == numberOfCharacters )
+  if(0u == numberOfCharacters)
   {
     // Nothing to do if there are no characters.
     return;
@@ -167,15 +163,15 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
   // Find the first index where to insert the script.
   ScriptRunIndex scriptIndex = 0u;
-  if( 0u != startIndex )
+  if(0u != startIndex)
   {
-    for( Vector<ScriptRun>::ConstIterator it = scripts.Begin(),
-           endIt = scripts.End();
-         it != endIt;
-         ++it, ++scriptIndex )
+    for(Vector<ScriptRun>::ConstIterator it    = scripts.Begin(),
+                                         endIt = scripts.End();
+        it != endIt;
+        ++it, ++scriptIndex)
     {
       const ScriptRun& run = *it;
-      if( startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters )
+      if(startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters)
       {
         // Run found.
         break;
@@ -185,12 +181,12 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
   // Stores the current script run.
   ScriptRun currentScriptRun;
-  currentScriptRun.characterRun.characterIndex = startIndex;
+  currentScriptRun.characterRun.characterIndex     = startIndex;
   currentScriptRun.characterRun.numberOfCharacters = 0u;
-  currentScriptRun.script = TextAbstraction::UNKNOWN;
+  currentScriptRun.script                          = TextAbstraction::UNKNOWN;
 
   // Reserve some space to reduce the number of reallocations.
-  scripts.Reserve( text.Count() << 2u );
+  scripts.Reserve(text.Count() << 2u);
 
   // Whether the first valid script needs to be set.
   bool isFirstScriptToBeSet = true;
@@ -209,12 +205,12 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
   // Traverse all characters and set the scripts.
   const Length lastCharacter = startIndex + numberOfCharacters;
-  for( Length index = startIndex; index < lastCharacter; ++index )
+  for(Length index = startIndex; index < lastCharacter; ++index)
   {
-    Character character = *( textBuffer + index );
+    Character character = *(textBuffer + index);
 
     // Get the script of the character.
-    Script script = TextAbstraction::GetCharacterScript( character );
+    Script script = TextAbstraction::GetCharacterScript(character);
 
     // Some characters (like white spaces) are valid for many scripts. The rules to set a script
     // for them are:
@@ -226,29 +222,29 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
     // Skip those characters valid for many scripts like white spaces or '\n'.
     bool endOfText = index == lastCharacter;
-    while( !endOfText &&
-           ( TextAbstraction::COMMON == script ) )
+    while(!endOfText &&
+          (TextAbstraction::COMMON == script))
     {
       // Check if whether is right to left markup and Keeps true if the previous value was true.
-      currentScriptRun.isRightToLeft = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftMark( character );
+      currentScriptRun.isRightToLeft = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftMark(character);
 
-      if( TextAbstraction::EMOJI == currentScriptRun.script )
+      if(TextAbstraction::EMOJI == currentScriptRun.script)
       {
         // Emojis doesn't mix well with characters common to all scripts. Insert the emoji run.
-        scripts.Insert( scripts.Begin() + scriptIndex, currentScriptRun );
+        scripts.Insert(scripts.Begin() + scriptIndex, currentScriptRun);
         ++scriptIndex;
 
         // Initialize the new one.
-        currentScriptRun.characterRun.characterIndex = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
+        currentScriptRun.characterRun.characterIndex     = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
         currentScriptRun.characterRun.numberOfCharacters = 0u;
-        currentScriptRun.script = TextAbstraction::UNKNOWN;
-        numberOfAllScriptCharacters = 0u;
+        currentScriptRun.script                          = TextAbstraction::UNKNOWN;
+        numberOfAllScriptCharacters                      = 0u;
       }
 
       // Count all these characters to be added into a script.
       ++numberOfAllScriptCharacters;
 
-      if( TextAbstraction::IsNewParagraph( character ) )
+      if(TextAbstraction::IsNewParagraph(character))
       {
         // The character is a new paragraph.
         // To know when there is a new paragraph is needed because if there is a white space
@@ -260,14 +256,14 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
 
         // Store the script run.
-        scripts.Insert( scripts.Begin() + scriptIndex, currentScriptRun );
+        scripts.Insert(scripts.Begin() + scriptIndex, currentScriptRun);
         ++scriptIndex;
 
         // Initialize the new one.
-        currentScriptRun.characterRun.characterIndex = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
+        currentScriptRun.characterRun.characterIndex     = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
         currentScriptRun.characterRun.numberOfCharacters = 0u;
-        currentScriptRun.script = TextAbstraction::UNKNOWN;
-        numberOfAllScriptCharacters = 0u;
+        currentScriptRun.script                          = TextAbstraction::UNKNOWN;
+        numberOfAllScriptCharacters                      = 0u;
         // Initialize whether is right to left direction
         currentScriptRun.isRightToLeft = false;
       }
@@ -275,14 +271,14 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
       // Get the next character.
       ++index;
       endOfText = index == lastCharacter;
-      if( !endOfText )
+      if(!endOfText)
       {
-        character = *( textBuffer + index );
-        script = TextAbstraction::GetCharacterScript( character );
+        character = *(textBuffer + index);
+        script    = TextAbstraction::GetCharacterScript(character);
       }
     } // end while( !endOfText && ( TextAbstraction::COMMON == script ) )
 
-    if( endOfText )
+    if(endOfText)
     {
       // Last characters of the text are 'white spaces'.
       // There is nothing else to do. Just add the remaining characters to the last script after this bucle.
@@ -290,62 +286,62 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
     }
 
     // Check if it is the first character of a paragraph.
-    if( isFirstScriptToBeSet &&
-        ( TextAbstraction::UNKNOWN != script ) &&
-        ( TextAbstraction::COMMON != script ) &&
-        ( TextAbstraction::EMOJI != script ) )
+    if(isFirstScriptToBeSet &&
+       (TextAbstraction::UNKNOWN != script) &&
+       (TextAbstraction::COMMON != script) &&
+       (TextAbstraction::EMOJI != script))
     {
       // Sets the direction of the first valid script.
-      isParagraphRTL = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftScript( script );
+      isParagraphRTL       = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftScript(script);
       isFirstScriptToBeSet = false;
     }
 
-    if( ( script != currentScriptRun.script ) &&
-        ( TextAbstraction::COMMON != script ) )
+    if((script != currentScriptRun.script) &&
+       (TextAbstraction::COMMON != script))
     {
       // Current run needs to be stored and a new one initialized.
 
-      if( ( isParagraphRTL == TextAbstraction::IsRightToLeftScript( currentScriptRun.script ) ) &&
-          ( TextAbstraction::UNKNOWN != currentScriptRun.script ) )
+      if((isParagraphRTL == TextAbstraction::IsRightToLeftScript(currentScriptRun.script)) &&
+         (TextAbstraction::UNKNOWN != currentScriptRun.script))
       {
         // Previous script has the same direction than the first script of the paragraph.
         // All the previously skipped characters need to be added to the previous script before it's stored.
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
         numberOfAllScriptCharacters = 0u;
       }
-      else if( ( TextAbstraction::IsRightToLeftScript( currentScriptRun.script ) == TextAbstraction::IsRightToLeftScript( script ) ) &&
-               ( TextAbstraction::UNKNOWN != currentScriptRun.script ) )
+      else if((TextAbstraction::IsRightToLeftScript(currentScriptRun.script) == TextAbstraction::IsRightToLeftScript(script)) &&
+              (TextAbstraction::UNKNOWN != currentScriptRun.script))
       {
         // Current script and previous one have the same direction.
         // All the previously skipped characters need to be added to the previous script before it's stored.
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
         numberOfAllScriptCharacters = 0u;
       }
-      else if( ( TextAbstraction::UNKNOWN == currentScriptRun.script ) &&
-               ( TextAbstraction::EMOJI == script ) )
+      else if((TextAbstraction::UNKNOWN == currentScriptRun.script) &&
+              (TextAbstraction::EMOJI == script))
       {
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
         numberOfAllScriptCharacters = 0u;
       }
 
-      if( 0u != currentScriptRun.characterRun.numberOfCharacters )
+      if(0u != currentScriptRun.characterRun.numberOfCharacters)
       {
         // Store the script run.
-        scripts.Insert( scripts.Begin() + scriptIndex, currentScriptRun );
+        scripts.Insert(scripts.Begin() + scriptIndex, currentScriptRun);
         ++scriptIndex;
       }
 
       // Initialize the new one.
-      currentScriptRun.characterRun.characterIndex = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
+      currentScriptRun.characterRun.characterIndex     = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
       currentScriptRun.characterRun.numberOfCharacters = numberOfAllScriptCharacters + 1u; // Adds the white spaces which are at the begining of the script.
-      currentScriptRun.script = script;
-      numberOfAllScriptCharacters = 0u;
+      currentScriptRun.script                          = script;
+      numberOfAllScriptCharacters                      = 0u;
       // Check if whether is right to left script.
-      currentScriptRun.isRightToLeft = TextAbstraction::IsRightToLeftScript( currentScriptRun.script );
+      currentScriptRun.isRightToLeft = TextAbstraction::IsRightToLeftScript(currentScriptRun.script);
     }
     else
     {
-      if( TextAbstraction::UNKNOWN != currentScriptRun.script )
+      if(TextAbstraction::UNKNOWN != currentScriptRun.script)
       {
         // Adds white spaces between characters.
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
@@ -360,60 +356,60 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
   // Add remaining characters into the last script.
   currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
 
-  if( 0u != currentScriptRun.characterRun.numberOfCharacters )
+  if(0u != currentScriptRun.characterRun.numberOfCharacters)
   {
     // Store the last run.
-    scripts.Insert( scripts.Begin() + scriptIndex, currentScriptRun );
+    scripts.Insert(scripts.Begin() + scriptIndex, currentScriptRun);
     ++scriptIndex;
   }
 
-  if( scriptIndex < scripts.Count() )
+  if(scriptIndex < scripts.Count())
   {
     // Update the indices of the next script runs.
-    const ScriptRun& run = *( scripts.Begin() + scriptIndex - 1u );
-    CharacterIndex nextCharacterIndex = run.characterRun.characterIndex + run.characterRun.numberOfCharacters;
+    const ScriptRun& run                = *(scripts.Begin() + scriptIndex - 1u);
+    CharacterIndex   nextCharacterIndex = run.characterRun.characterIndex + run.characterRun.numberOfCharacters;
 
-    for( Vector<ScriptRun>::Iterator it = scripts.Begin() + scriptIndex,
-           endIt = scripts.End();
-         it != endIt;
-         ++it )
+    for(Vector<ScriptRun>::Iterator it    = scripts.Begin() + scriptIndex,
+                                    endIt = scripts.End();
+        it != endIt;
+        ++it)
     {
-      ScriptRun& run = *it;
+      ScriptRun& run                  = *it;
       run.characterRun.characterIndex = nextCharacterIndex;
       nextCharacterIndex += run.characterRun.numberOfCharacters;
     }
   }
 }
 
-void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
-                                          const Vector<ScriptRun>& scripts,
-                                          const Vector<FontDescriptionRun>& fontDescriptions,
-                                          const TextAbstraction::FontDescription& defaultFontDescription,
-                                          TextAbstraction::PointSize26Dot6 defaultFontPointSize,
-                                          CharacterIndex startIndex,
-                                          Length numberOfCharacters,
-                                          Vector<FontRun>& fonts )
+void MultilanguageSupport::ValidateFonts(const Vector<Character>&                text,
+                                         const Vector<ScriptRun>&                scripts,
+                                         const Vector<FontDescriptionRun>&       fontDescriptions,
+                                         const TextAbstraction::FontDescription& defaultFontDescription,
+                                         TextAbstraction::PointSize26Dot6        defaultFontPointSize,
+                                         CharacterIndex                          startIndex,
+                                         Length                                  numberOfCharacters,
+                                         Vector<FontRun>&                        fonts)
 {
-  DALI_LOG_INFO( gLogFilter, Debug::General, "-->MultilanguageSupport::ValidateFonts\n" );
+  DALI_LOG_INFO(gLogFilter, Debug::General, "-->MultilanguageSupport::ValidateFonts\n");
 
-  if( 0u == numberOfCharacters )
+  if(0u == numberOfCharacters)
   {
-    DALI_LOG_INFO( gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n" );
+    DALI_LOG_INFO(gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n");
     // Nothing to do if there are no characters.
     return;
   }
 
   // Find the first index where to insert the font run.
   FontRunIndex fontIndex = 0u;
-  if( 0u != startIndex )
+  if(0u != startIndex)
   {
-    for( Vector<FontRun>::ConstIterator it = fonts.Begin(),
-           endIt = fonts.End();
-         it != endIt;
-         ++it, ++fontIndex )
+    for(Vector<FontRun>::ConstIterator it    = fonts.Begin(),
+                                       endIt = fonts.End();
+        it != endIt;
+        ++it, ++fontIndex)
     {
       const FontRun& run = *it;
-      if( startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters )
+      if(startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters)
       {
         // Run found.
         break;
@@ -424,19 +420,19 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   // Traverse the characters and validate/set the fonts.
 
   // Get the caches.
-  DefaultFonts** defaultFontPerScriptCacheBuffer = mDefaultFontPerScriptCache.Begin();
-  ValidateFontsPerScript** validFontsPerScriptCacheBuffer = mValidFontsPerScriptCache.Begin();
+  DefaultFonts**           defaultFontPerScriptCacheBuffer = mDefaultFontPerScriptCache.Begin();
+  ValidateFontsPerScript** validFontsPerScriptCacheBuffer  = mValidFontsPerScriptCache.Begin();
 
   // Stores the validated font runs.
-  fonts.Reserve( fontDescriptions.Count() );
+  fonts.Reserve(fontDescriptions.Count());
 
   // Initializes a validated font run.
   FontRun currentFontRun;
-  currentFontRun.characterRun.characterIndex = startIndex;
+  currentFontRun.characterRun.characterIndex     = startIndex;
   currentFontRun.characterRun.numberOfCharacters = 0u;
-  currentFontRun.fontId = 0u;
-  currentFontRun.isBoldRequired = false;
-  currentFontRun.isItalicRequired = false;
+  currentFontRun.fontId                          = 0u;
+  currentFontRun.isBoldRequired                  = false;
+  currentFontRun.isItalicRequired                = false;
 
   // Get the font client.
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
@@ -444,51 +440,51 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   const Character* const textBuffer = text.Begin();
 
   // Iterators of the script runs.
-  Vector<ScriptRun>::ConstIterator scriptRunIt = scripts.Begin();
-  Vector<ScriptRun>::ConstIterator scriptRunEndIt = scripts.End();
-  bool isNewParagraphCharacter = false;
+  Vector<ScriptRun>::ConstIterator scriptRunIt             = scripts.Begin();
+  Vector<ScriptRun>::ConstIterator scriptRunEndIt          = scripts.End();
+  bool                             isNewParagraphCharacter = false;
 
   bool isPreviousEmojiScript = false;
 
   CharacterIndex lastCharacter = startIndex + numberOfCharacters;
-  for( Length index = startIndex; index < lastCharacter; ++index )
+  for(Length index = startIndex; index < lastCharacter; ++index)
   {
     // Get the current character.
-    const Character character = *( textBuffer + index );
-    bool isItalicRequired = false;
-    bool isBoldRequired = false;
+    const Character character        = *(textBuffer + index);
+    bool            isItalicRequired = false;
+    bool            isBoldRequired   = false;
 
     // new description for current character
     TextAbstraction::FontDescription currentFontDescription;
     TextAbstraction::PointSize26Dot6 currentFontPointSize = defaultFontPointSize;
-    bool isDefaultFont = true;
-    MergeFontDescriptions( fontDescriptions,
-                           defaultFontDescription,
-                           defaultFontPointSize,
-                           index,
-                           currentFontDescription,
-                           currentFontPointSize,
-                           isDefaultFont );
+    bool                             isDefaultFont        = true;
+    MergeFontDescriptions(fontDescriptions,
+                          defaultFontDescription,
+                          defaultFontPointSize,
+                          index,
+                          currentFontDescription,
+                          currentFontPointSize,
+                          isDefaultFont);
 
     // Get the font for the current character.
-    FontId fontId = fontClient.GetFontId( currentFontDescription, currentFontPointSize );
+    FontId fontId = fontClient.GetFontId(currentFontDescription, currentFontPointSize);
 
     // Get the script for the current character.
-    Script script = GetScript( index,
-                               scriptRunIt,
-                               scriptRunEndIt );
+    Script script = GetScript(index,
+                              scriptRunIt,
+                              scriptRunEndIt);
 
 #ifdef DEBUG_ENABLED
     {
       Dali::TextAbstraction::FontDescription description;
-      fontClient.GetDescription( fontId, description );
+      fontClient.GetDescription(fontId, description);
 
-      DALI_LOG_INFO( gLogFilter,
-                     Debug::Verbose,
-                     "  Initial font set\n  Character : %x, Script : %s, Font : %s \n",
-                     character,
-                     Dali::TextAbstraction::ScriptName[script],
-                     description.path.c_str() );
+      DALI_LOG_INFO(gLogFilter,
+                    Debug::Verbose,
+                    "  Initial font set\n  Character : %x, Script : %s, Font : %s \n",
+                    character,
+                    Dali::TextAbstraction::ScriptName[script],
+                    description.path.c_str());
     }
 #endif
 
@@ -497,46 +493,46 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
     // Check first in the cache of default fonts per script and size.
 
-    FontId cachedDefaultFontId = 0u;
-    DefaultFonts* defaultFonts = *( defaultFontPerScriptCacheBuffer + script );
-    if( NULL != defaultFonts )
+    FontId        cachedDefaultFontId = 0u;
+    DefaultFonts* defaultFonts        = *(defaultFontPerScriptCacheBuffer + script);
+    if(NULL != defaultFonts)
     {
       // This cache stores fall-back fonts.
-      cachedDefaultFontId = defaultFonts->FindFont( fontClient,
-                                                    currentFontDescription,
-                                                    currentFontPointSize );
+      cachedDefaultFontId = defaultFonts->FindFont(fontClient,
+                                                   currentFontDescription,
+                                                   currentFontPointSize);
     }
 
     // Whether the cached default font is valid.
     const bool isValidCachedDefaultFont = 0u != cachedDefaultFontId;
 
     // The font is valid if it matches with the default one for the current script and size and it's different than zero.
-    isValidFont = isValidCachedDefaultFont && ( fontId == cachedDefaultFontId );
+    isValidFont = isValidCachedDefaultFont && (fontId == cachedDefaultFontId);
 
-    if( isValidFont )
+    if(isValidFont)
     {
       // Check if the font supports the character.
-      isValidFont = fontClient.IsCharacterSupportedByFont( fontId, character );
+      isValidFont = fontClient.IsCharacterSupportedByFont(fontId, character);
     }
 
     bool isCommonScript = false;
-    bool isEmojiScript = TextAbstraction::EMOJI == script;
+    bool isEmojiScript  = TextAbstraction::EMOJI == script;
 
-    if( isEmojiScript && !isPreviousEmojiScript )
+    if(isEmojiScript && !isPreviousEmojiScript)
     {
-      if( 0u != currentFontRun.characterRun.numberOfCharacters )
+      if(0u != currentFontRun.characterRun.numberOfCharacters)
       {
         // Store the font run.
-        fonts.Insert( fonts.Begin() + fontIndex, currentFontRun );
+        fonts.Insert(fonts.Begin() + fontIndex, currentFontRun);
         ++fontIndex;
       }
 
       // Initialize the new one.
-      currentFontRun.characterRun.characterIndex = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
+      currentFontRun.characterRun.characterIndex     = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
       currentFontRun.characterRun.numberOfCharacters = 0u;
-      currentFontRun.fontId = fontId;
-      currentFontRun.isItalicRequired = false;
-      currentFontRun.isBoldRequired = false;
+      currentFontRun.fontId                          = fontId;
+      currentFontRun.isItalicRequired                = false;
+      currentFontRun.isBoldRequired                  = false;
     }
 
     // If the given font is not valid, it means either:
@@ -545,7 +541,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     // - the platform default font is different than the default font for the current script.
 
     // Need to check if the given font supports the current character.
-    if( !isValidFont ) // (1)
+    if(!isValidFont) // (1)
     {
       // Whether the current character is common for all scripts (i.e. white spaces, ...)
 
@@ -559,57 +555,57 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       //
       //      Many fonts support 'white spaces' so probably the font set by the user or the platform's default
       //      supports the 'white space'. However, that font may not support the DEVANAGARI script.
-      isCommonScript = TextAbstraction::IsCommonScript( character );
+      isCommonScript = TextAbstraction::IsCommonScript(character);
 
       // Check in the valid fonts cache.
-      ValidateFontsPerScript* validateFontsPerScript = *( validFontsPerScriptCacheBuffer + script );
+      ValidateFontsPerScript* validateFontsPerScript = *(validFontsPerScriptCacheBuffer + script);
 
-      if( NULL != validateFontsPerScript )
+      if(NULL != validateFontsPerScript)
       {
         // This cache stores valid fonts set by the user.
-        isValidFont = validateFontsPerScript->IsValidFont( fontId );
+        isValidFont = validateFontsPerScript->IsValidFont(fontId);
 
         // It may happen that a validated font for a script doesn't have all the glyphs for that script.
         // i.e a font validated for the CJK script may contain glyphs for the chinese language but not for the Japanese.
-        if( isValidFont )
+        if(isValidFont)
         {
           // Checks if the current character is supported by the font is needed.
-          isValidFont = fontClient.IsCharacterSupportedByFont( fontId, character );
+          isValidFont = fontClient.IsCharacterSupportedByFont(fontId, character);
         }
       }
 
-      if( !isValidFont ) // (2)
+      if(!isValidFont) // (2)
       {
         // The selected font is not stored in any cache.
 
         // Checks if the current character is supported by the selected font.
-        isValidFont = fontClient.IsCharacterSupportedByFont( fontId, character );
+        isValidFont = fontClient.IsCharacterSupportedByFont(fontId, character);
 
         // If there is a valid font, cache it.
-        if( isValidFont && !isCommonScript )
+        if(isValidFont && !isCommonScript)
         {
-          if( NULL == validateFontsPerScript )
+          if(NULL == validateFontsPerScript)
           {
             validateFontsPerScript = new ValidateFontsPerScript();
 
-            *( validFontsPerScriptCacheBuffer + script ) = validateFontsPerScript;
+            *(validFontsPerScriptCacheBuffer + script) = validateFontsPerScript;
           }
 
-          validateFontsPerScript->mValidFonts.PushBack( fontId );
+          validateFontsPerScript->mValidFonts.PushBack(fontId);
         }
 
-        if( !isValidFont && ( fontId != cachedDefaultFontId ) && ( !TextAbstraction::IsNewParagraph( character ) )) // (3)
+        if(!isValidFont && (fontId != cachedDefaultFontId) && (!TextAbstraction::IsNewParagraph(character))) // (3)
         {
           // The selected font by the user or the platform's default font has failed to validate the character.
 
           // Checks if the previously discarted cached default font supports the character.
           bool isValidCachedFont = false;
-          if( isValidCachedDefaultFont )
+          if(isValidCachedDefaultFont)
           {
-            isValidCachedFont = fontClient.IsCharacterSupportedByFont( cachedDefaultFontId, character );
+            isValidCachedFont = fontClient.IsCharacterSupportedByFont(cachedDefaultFontId, character);
           }
 
-          if( isValidCachedFont )
+          if(isValidCachedFont)
           {
             // Use the cached default font for the script if there is one.
             fontId = cachedDefaultFontId;
@@ -621,103 +617,103 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
             DefaultFonts* defaultFontsPerScript = NULL;
 
             // Find a fallback-font.
-            fontId = fontClient.FindFallbackFont( character,
-                                                  currentFontDescription,
-                                                  currentFontPointSize,
-                                                  false );
+            fontId = fontClient.FindFallbackFont(character,
+                                                 currentFontDescription,
+                                                 currentFontPointSize,
+                                                 false);
 
-            if( 0u == fontId )
+            if(0u == fontId)
             {
-              fontId = fontClient.FindDefaultFont( UTF32_A, currentFontPointSize );
+              fontId = fontClient.FindDefaultFont(UTF32_A, currentFontPointSize);
             }
 
-            if ( !isCommonScript && (script != TextAbstraction::UNKNOWN) )
+            if(!isCommonScript && (script != TextAbstraction::UNKNOWN))
             {
               // Cache the font if it is not an unknown script
-              if( NULL == defaultFontsPerScript )
+              if(NULL == defaultFontsPerScript)
               {
-                defaultFontsPerScript = *( defaultFontPerScriptCacheBuffer + script );
+                defaultFontsPerScript = *(defaultFontPerScriptCacheBuffer + script);
 
-                if( NULL == defaultFontsPerScript )
+                if(NULL == defaultFontsPerScript)
                 {
-                  defaultFontsPerScript = new DefaultFonts();
-                  *( defaultFontPerScriptCacheBuffer + script ) = defaultFontsPerScript;
+                  defaultFontsPerScript                       = new DefaultFonts();
+                  *(defaultFontPerScriptCacheBuffer + script) = defaultFontsPerScript;
                 }
               }
-              defaultFontsPerScript->Cache( currentFontDescription, fontId );
+              defaultFontsPerScript->Cache(currentFontDescription, fontId);
             }
           }
         } // !isValidFont (3)
-      } // !isValidFont (2)
-    } // !isValidFont (1)
+      }   // !isValidFont (2)
+    }     // !isValidFont (1)
 
 #ifdef DEBUG_ENABLED
     {
       Dali::TextAbstraction::FontDescription description;
-      fontClient.GetDescription( fontId, description );
-      DALI_LOG_INFO( gLogFilter,
-                     Debug::Verbose,
-                     "  Validated font set\n  Character : %x, Script : %s, Font : %s \n",
-                     character,
-                     Dali::TextAbstraction::ScriptName[script],
-                     description.path.c_str() );
+      fontClient.GetDescription(fontId, description);
+      DALI_LOG_INFO(gLogFilter,
+                    Debug::Verbose,
+                    "  Validated font set\n  Character : %x, Script : %s, Font : %s \n",
+                    character,
+                    Dali::TextAbstraction::ScriptName[script],
+                    description.path.c_str());
     }
 #endif
 
     // Whether bols style is required.
-    isBoldRequired = ( currentFontDescription.weight >= TextAbstraction::FontWeight::BOLD );
+    isBoldRequired = (currentFontDescription.weight >= TextAbstraction::FontWeight::BOLD);
 
     // Whether italic style is required.
-    isItalicRequired = ( currentFontDescription.slant >= TextAbstraction::FontSlant::ITALIC );
+    isItalicRequired = (currentFontDescription.slant >= TextAbstraction::FontSlant::ITALIC);
 
     // The font is now validated.
-    if( ( fontId != currentFontRun.fontId ) ||
-        isNewParagraphCharacter ||
-        // If font id is same as previous but style is diffrent, initialize new one
-        ( ( fontId == currentFontRun.fontId ) && ( ( isBoldRequired != currentFontRun.isBoldRequired ) || ( isItalicRequired != currentFontRun.isItalicRequired ) ) ) )
+    if((fontId != currentFontRun.fontId) ||
+       isNewParagraphCharacter ||
+       // If font id is same as previous but style is diffrent, initialize new one
+       ((fontId == currentFontRun.fontId) && ((isBoldRequired != currentFontRun.isBoldRequired) || (isItalicRequired != currentFontRun.isItalicRequired))))
     {
       // Current run needs to be stored and a new one initialized.
 
-      if( 0u != currentFontRun.characterRun.numberOfCharacters )
+      if(0u != currentFontRun.characterRun.numberOfCharacters)
       {
         // Store the font run.
-        fonts.Insert( fonts.Begin() + fontIndex, currentFontRun );
+        fonts.Insert(fonts.Begin() + fontIndex, currentFontRun);
         ++fontIndex;
       }
 
       // Initialize the new one.
-      currentFontRun.characterRun.characterIndex = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
+      currentFontRun.characterRun.characterIndex     = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
       currentFontRun.characterRun.numberOfCharacters = 0u;
-      currentFontRun.fontId = fontId;
-      currentFontRun.isBoldRequired = isBoldRequired;
-      currentFontRun.isItalicRequired = isItalicRequired;
+      currentFontRun.fontId                          = fontId;
+      currentFontRun.isBoldRequired                  = isBoldRequired;
+      currentFontRun.isItalicRequired                = isItalicRequired;
     }
 
     // Add one more character to the run.
     ++currentFontRun.characterRun.numberOfCharacters;
 
     // Whether the current character is a new paragraph character.
-    isNewParagraphCharacter = TextAbstraction::IsNewParagraph( character );
-    isPreviousEmojiScript = isEmojiScript;
+    isNewParagraphCharacter = TextAbstraction::IsNewParagraph(character);
+    isPreviousEmojiScript   = isEmojiScript;
   } // end traverse characters.
 
-  if( 0u != currentFontRun.characterRun.numberOfCharacters )
+  if(0u != currentFontRun.characterRun.numberOfCharacters)
   {
     // Store the last run.
-    fonts.Insert( fonts.Begin() + fontIndex, currentFontRun );
+    fonts.Insert(fonts.Begin() + fontIndex, currentFontRun);
     ++fontIndex;
   }
 
-  if( fontIndex < fonts.Count() )
+  if(fontIndex < fonts.Count())
   {
     // Update the indices of the next font runs.
-    const FontRun& run = *( fonts.Begin() + fontIndex - 1u );
+    const FontRun& run                = *(fonts.Begin() + fontIndex - 1u);
     CharacterIndex nextCharacterIndex = run.characterRun.characterIndex + run.characterRun.numberOfCharacters;
 
-    for( Vector<FontRun>::Iterator it = fonts.Begin() + fontIndex,
-           endIt = fonts.End();
-         it != endIt;
-         ++it )
+    for(Vector<FontRun>::Iterator it    = fonts.Begin() + fontIndex,
+                                  endIt = fonts.End();
+        it != endIt;
+        ++it)
     {
       FontRun& run = *it;
 
@@ -726,7 +722,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     }
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n" );
+  DALI_LOG_INFO(gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n");
 }
 
 } // namespace Internal

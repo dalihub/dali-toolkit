@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,99 +19,95 @@
 #include "keyinput-focus-manager-impl.h"
 
 // EXTERNAL INCLUDES
-#include <cstring> // for strcmp
-#include <dali/public-api/actors/layer.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali/integration-api/debug.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/actors/layer.h>
+#include <cstring> // for strcmp
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 // Signals
 
 const char* const SIGNAL_KEY_INPUT_FOCUS_CHANGED = "keyInputFocusChanged";
 
-}
+} // namespace
 
 KeyInputFocusManager::KeyInputFocusManager()
-: mSlotDelegate( this ),
+: mSlotDelegate(this),
   mCurrentFocusControl()
 {
   // Retrieve all the existing widnows
   Dali::SceneHolderList sceneHolders = Adaptor::Get().GetSceneHolders();
-  for( auto iter = sceneHolders.begin(); iter != sceneHolders.end(); ++iter )
+  for(auto iter = sceneHolders.begin(); iter != sceneHolders.end(); ++iter)
   {
-    ( *iter ).KeyEventGeneratedSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnKeyEvent );
+    (*iter).KeyEventGeneratedSignal().Connect(mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
   }
 
   // Get notified when any new scene holder is created afterwards
-  Adaptor::Get().WindowCreatedSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnSceneHolderCreated );
+  Adaptor::Get().WindowCreatedSignal().Connect(mSlotDelegate, &KeyInputFocusManager::OnSceneHolderCreated);
 }
 
 KeyInputFocusManager::~KeyInputFocusManager()
 {
 }
 
-void KeyInputFocusManager::OnSceneHolderCreated( Dali::Integration::SceneHolder& sceneHolder )
+void KeyInputFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder& sceneHolder)
 {
-  sceneHolder.KeyEventGeneratedSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnKeyEvent );
+  sceneHolder.KeyEventGeneratedSignal().Connect(mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
 }
 
-void KeyInputFocusManager::SetFocus( Toolkit::Control control )
+void KeyInputFocusManager::SetFocus(Toolkit::Control control)
 {
-  if( !control )
+  if(!control)
   {
     // No-op
     return;
   }
 
-  if( control == mCurrentFocusControl )
+  if(control == mCurrentFocusControl)
   {
     // Control already has focus
     return;
   }
 
-  control.OffSceneSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection );
+  control.OffSceneSignal().Connect(mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection);
 
   Dali::Toolkit::Control previousFocusControl = GetCurrentFocusControl();
-  if( previousFocusControl )
+  if(previousFocusControl)
   {
     // Notify the control that it has lost key input focus
-    GetImplementation( previousFocusControl ).OnKeyInputFocusLost();
+    GetImplementation(previousFocusControl).OnKeyInputFocusLost();
   }
 
   // Set control to currentFocusControl
   mCurrentFocusControl = control;
 
   // Tell the new actor that it has gained focus.
-  GetImplementation( control ).OnKeyInputFocusGained();
+  GetImplementation(control).OnKeyInputFocusGained();
 
   // Emit the signal to inform focus change to the application.
-  if ( !mKeyInputFocusChangedSignal.Empty() )
+  if(!mKeyInputFocusChangedSignal.Empty())
   {
-    mKeyInputFocusChangedSignal.Emit( control, previousFocusControl );
+    mKeyInputFocusChangedSignal.Emit(control, previousFocusControl);
   }
 }
 
-void KeyInputFocusManager::RemoveFocus( Toolkit::Control control )
+void KeyInputFocusManager::RemoveFocus(Toolkit::Control control)
 {
-  if( control == mCurrentFocusControl )
+  if(control == mCurrentFocusControl)
   {
-    control.OffSceneSignal().Disconnect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection );
+    control.OffSceneSignal().Disconnect(mSlotDelegate, &KeyInputFocusManager::OnFocusControlSceneDisconnection);
 
     // Notify the control that it has lost key input focus
-    GetImplementation( control ).OnKeyInputFocusLost();
+    GetImplementation(control).OnKeyInputFocusLost();
 
     mCurrentFocusControl.Reset();
   }
@@ -127,36 +123,36 @@ Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusMana
   return mKeyInputFocusChangedSignal;
 }
 
-bool KeyInputFocusManager::OnKeyEvent( const KeyEvent& event )
+bool KeyInputFocusManager::OnKeyEvent(const KeyEvent& event)
 {
   bool consumed = false;
 
   Toolkit::Control control = GetCurrentFocusControl();
-  if( control )
+  if(control)
   {
     // Notify the control about the key event
-    consumed = EmitKeyEventSignal( control, event );
+    consumed = EmitKeyEventSignal(control, event);
   }
 
   return consumed;
 }
 
-bool KeyInputFocusManager::EmitKeyEventSignal( Toolkit::Control control, const KeyEvent& event )
+bool KeyInputFocusManager::EmitKeyEventSignal(Toolkit::Control control, const KeyEvent& event)
 {
   bool consumed = false;
 
-  if( control )
+  if(control)
   {
-    consumed = GetImplementation( control ).EmitKeyEventSignal( event );
+    consumed = GetImplementation(control).EmitKeyEventSignal(event);
 
     // if control doesn't consume KeyEvent, give KeyEvent to its parent.
-    if( !consumed )
+    if(!consumed)
     {
-      Toolkit::Control parent = Toolkit::Control::DownCast( control.GetParent() );
+      Toolkit::Control parent = Toolkit::Control::DownCast(control.GetParent());
 
-      if( parent )
+      if(parent)
       {
-        consumed = EmitKeyEventSignal( parent, event );
+        consumed = EmitKeyEventSignal(parent, event);
       }
     }
   }
@@ -164,22 +160,21 @@ bool KeyInputFocusManager::EmitKeyEventSignal( Toolkit::Control control, const K
   return consumed;
 }
 
-void KeyInputFocusManager::OnFocusControlSceneDisconnection( Dali::Actor actor )
+void KeyInputFocusManager::OnFocusControlSceneDisconnection(Dali::Actor actor)
 {
-  RemoveFocus( Dali::Toolkit::Control::DownCast( actor ) );
+  RemoveFocus(Dali::Toolkit::Control::DownCast(actor));
 }
 
-
-bool KeyInputFocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool KeyInputFocusManager::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  bool connected( true );
-  KeyInputFocusManager* manager = dynamic_cast<KeyInputFocusManager*>( object );
+  bool                  connected(true);
+  KeyInputFocusManager* manager = dynamic_cast<KeyInputFocusManager*>(object);
 
-  if( manager )
+  if(manager)
   {
-    if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_CHANGED ) )
+    if(0 == strcmp(signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_CHANGED))
     {
-      manager->KeyInputFocusChangedSignal().Connect( tracker, functor );
+      manager->KeyInputFocusChangedSignal().Connect(tracker, functor);
     }
     else
     {

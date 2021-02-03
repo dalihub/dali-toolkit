@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,9 @@ namespace Dali
 {
 namespace Toolkit
 {
-
-WebBackForwardList::WebBackForwardList( const Dali::WebEngineBackForwardList& list )
-: mWebEngineBackForwardList( list )
-, mWebBackForwardListItem( 0 )
+WebBackForwardList::WebBackForwardList(const Dali::WebEngineBackForwardList& list)
+: mWebEngineBackForwardList(list),
+  mWebBackForwardListItem(0)
 {
 }
 
@@ -39,13 +38,13 @@ WebBackForwardList::~WebBackForwardList()
 
 WebBackForwardListItem* WebBackForwardList::GetCurrentItem()
 {
-  mWebBackForwardListItem = WebBackForwardListItem( &mWebEngineBackForwardList.GetCurrentItem() );
+  mWebBackForwardListItem = WebBackForwardListItem(&mWebEngineBackForwardList.GetCurrentItem());
   return &mWebBackForwardListItem;
 }
 
-WebBackForwardListItem* WebBackForwardList::GetItemAtIndex( uint32_t index )
+WebBackForwardListItem* WebBackForwardList::GetItemAtIndex(uint32_t index)
 {
-  mWebBackForwardListItem = WebBackForwardListItem( &mWebEngineBackForwardList.GetItemAtIndex( index ) );
+  mWebBackForwardListItem = WebBackForwardListItem(&mWebEngineBackForwardList.GetItemAtIndex(index));
   return &mWebBackForwardListItem;
 }
 

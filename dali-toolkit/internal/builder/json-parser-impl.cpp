@@ -22,59 +22,54 @@
 #include <cstring>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/builder/tree-node-manipulator.h>
 #include <dali-toolkit/internal/builder/json-parser-state.h>
+#include <dali-toolkit/internal/builder/tree-node-manipulator.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 const char ERROR_DESCRIPTION_NONE[] = "No Error";
 
-template <typename IteratorType,typename EndIteratorType>
+template<typename IteratorType, typename EndIteratorType>
 inline IteratorType Advance(IteratorType& iter, EndIteratorType& end, int n)
 {
-  for(int i =0; i < n; ++i)
+  for(int i = 0; i < n; ++i)
   {
     ++iter;
   }
   return iter;
 }
 
-} // anon namespace
-
+} // namespace
 
 JsonParser::JsonParser()
-  : mRoot(NULL),
-    mErrorDescription(ERROR_DESCRIPTION_NONE),
-    mErrorPosition(0),
-    mErrorLine(0),
-    mErrorColumn(0),
-    mNumberOfChars(0),
-    mNumberOfNodes(0)
+: mRoot(NULL),
+  mErrorDescription(ERROR_DESCRIPTION_NONE),
+  mErrorPosition(0),
+  mErrorLine(0),
+  mErrorColumn(0),
+  mNumberOfChars(0),
+  mNumberOfNodes(0)
 {
 }
 
 JsonParser::JsonParser(const TreeNode& tree)
-  : mRoot(NULL),
-    mErrorDescription(ERROR_DESCRIPTION_NONE),
-    mErrorPosition(0),
-    mErrorLine(0),
-    mErrorColumn(0),
-    mNumberOfChars(0),
-    mNumberOfNodes(0)
+: mRoot(NULL),
+  mErrorDescription(ERROR_DESCRIPTION_NONE),
+  mErrorPosition(0),
+  mErrorLine(0),
+  mErrorColumn(0),
+  mNumberOfChars(0),
+  mNumberOfNodes(0)
 {
-  mRoot = TreeNodeManipulator::Copy( tree, mNumberOfNodes, mNumberOfChars );
+  mRoot = TreeNodeManipulator::Copy(tree, mNumberOfNodes, mNumberOfChars);
 
-  mSources.push_back( VectorChar( (sizeof(char) * mNumberOfChars) ) );
+  mSources.push_back(VectorChar((sizeof(char) * mNumberOfChars)));
 
   VectorChar& buffer = mSources.back();
 
@@ -98,39 +93,38 @@ JsonParser::~JsonParser()
 
 bool JsonParser::Parse(const std::string& source)
 {
-  mSources.push_back( VectorChar(source.begin(), source.end()) );
+  mSources.push_back(VectorChar(source.begin(), source.end()));
 
   JsonParserState parserState(mRoot);
 
-  if( parserState.ParseJson(mSources.back()) )
+  if(parserState.ParseJson(mSources.back()))
   {
     mRoot = parserState.GetRoot();
 
     mNumberOfChars += parserState.GetParsedStringSize();
     mNumberOfNodes += parserState.GetCreatedNodeCount();
 
-    mErrorDescription   = ERROR_DESCRIPTION_NONE;
-    mErrorPosition      = 0;
-    mErrorLine          = 0;
-    mErrorColumn        = 0;
+    mErrorDescription = ERROR_DESCRIPTION_NONE;
+    mErrorPosition    = 0;
+    mErrorLine        = 0;
+    mErrorColumn      = 0;
   }
   else
   {
     mRoot = NULL;
 
-    mErrorDescription   = parserState.GetErrorDescription();
+    mErrorDescription = parserState.GetErrorDescription();
     if(NULL == mErrorDescription)
     {
       mErrorDescription = ERROR_DESCRIPTION_NONE;
     }
-    mErrorPosition      = parserState.GetErrorPosition();
-    mErrorLine          = parserState.GetErrorLineNumber();
-    mErrorColumn        = parserState.GetErrorColumn();
+    mErrorPosition = parserState.GetErrorPosition();
+    mErrorLine     = parserState.GetErrorLineNumber();
+    mErrorColumn   = parserState.GetErrorColumn();
   }
 
   return mRoot != NULL;
 }
-
 
 const TreeNode* JsonParser::GetRoot() const
 {
@@ -164,7 +158,7 @@ int JsonParser::GetErrorColumn() const
 
 void JsonParser::Pack(void)
 {
-  mSources.push_back( VectorChar( (sizeof(char) * mNumberOfChars) ) );
+  mSources.push_back(VectorChar((sizeof(char) * mNumberOfChars)));
 
   VectorChar& buffer = mSources.back();
 
@@ -174,7 +168,7 @@ void JsonParser::Pack(void)
 
   modify.MoveStrings(start, buffer.end());
 
-  mSources.erase( mSources.begin(), --mSources.end() );
+  mSources.erase(mSources.begin(), --mSources.end());
 }
 
 void JsonParser::Write(std::ostream& output, int indent) const
@@ -182,7 +176,6 @@ void JsonParser::Write(std::ostream& output, int indent) const
   TreeNodeManipulator modify(mRoot);
   modify.Write(output, indent);
 }
-
 
 } // namespace Internal
 

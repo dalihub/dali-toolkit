@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 Samsung Electronics Co., Ltd.
+* Copyright (c) 2021 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
 *
 */
 #include "dali-scene-loader/internal/gltf2-asset.h"
-#include "dali/public-api/math/matrix.h"
 #include <algorithm>
 #include <map>
+#include "dali/public-api/math/matrix.h"
 
-#define ENUM_STRING_MAPPING(t, x) { #x, t::x }
+#define ENUM_STRING_MAPPING(t, x) \
+  {                               \
+#x, t::x                      \
+  }
 
 using namespace Dali;
 
@@ -27,7 +30,6 @@ namespace gltf2
 {
 namespace
 {
-
 constexpr uint32_t ACCESSOR_TYPE_ELEMENT_COUNT[]{
   1,
   2,
@@ -36,8 +38,7 @@ constexpr uint32_t ACCESSOR_TYPE_ELEMENT_COUNT[]{
   4,
   9,
   16,
-  static_cast<uint32_t>(-1)
-};
+  static_cast<uint32_t>(-1)};
 
 const std::map<std::string_view, AccessorType::Type> ACCESSOR_TYPES{
   ENUM_STRING_MAPPING(AccessorType, SCALAR),
@@ -79,7 +80,7 @@ const std::map<std::string_view, Animation::Channel::Target::Type> ANIMATION_CHA
   ENUM_STRING_MAPPING(Animation::Channel::Target::Type, WEIGHTS),
 };
 
-}
+} // namespace
 
 bool Component::IsUnsigned(Type t)
 {
@@ -88,19 +89,19 @@ bool Component::IsUnsigned(Type t)
 
 uint32_t Component::Size(Type t)
 {
-  switch (t)
+  switch(t)
   {
-  case BYTE:
-  case UNSIGNED_BYTE:
-    return 1;
-  case SHORT:
-  case UNSIGNED_SHORT:
-    return 2;
-  case UNSIGNED_INT:
-  case FLOAT:
-    return 4;
-  default:
-    return -1;
+    case BYTE:
+    case UNSIGNED_BYTE:
+      return 1;
+    case SHORT:
+    case UNSIGNED_SHORT:
+      return 2;
+    case UNSIGNED_INT:
+    case FLOAT:
+      return 4;
+    default:
+      return -1;
   }
 }
 
@@ -112,7 +113,7 @@ uint32_t AccessorType::ElementCount(Type t)
 AccessorType::Type AccessorType::FromString(const char* s, size_t len)
 {
   auto iFind = ACCESSOR_TYPES.find(std::string_view(s, len));
-  if (iFind != ACCESSOR_TYPES.end())
+  if(iFind != ACCESSOR_TYPES.end())
   {
     return iFind->second;
   }
@@ -122,7 +123,7 @@ AccessorType::Type AccessorType::FromString(const char* s, size_t len)
 AlphaMode::Type AlphaMode::FromString(const char* s, size_t len)
 {
   auto iFind = ALPHA_MODE_TYPES.find(std::string_view(s, len));
-  if (iFind != ALPHA_MODE_TYPES.end())
+  if(iFind != ALPHA_MODE_TYPES.end())
   {
     return iFind->second;
   }
@@ -132,7 +133,7 @@ AlphaMode::Type AlphaMode::FromString(const char* s, size_t len)
 Attribute::Type Attribute::FromString(const char* s, size_t len)
 {
   auto iFind = ATTRIBUTE_TYPES.find(std::string_view(s, len));
-  if (iFind != ATTRIBUTE_TYPES.end())
+  if(iFind != ATTRIBUTE_TYPES.end())
   {
     return iFind->second;
   }
@@ -142,7 +143,7 @@ Attribute::Type Attribute::FromString(const char* s, size_t len)
 Animation::Sampler::Interpolation::Type Animation::Sampler::Interpolation::FromString(const char* s, size_t len)
 {
   auto iFind = ANIMATION_SAMPLER_INTERPOLATION.find(std::string_view(s, len));
-  if (iFind != ANIMATION_SAMPLER_INTERPOLATION.end())
+  if(iFind != ANIMATION_SAMPLER_INTERPOLATION.end())
   {
     return iFind->second;
   }
@@ -160,7 +161,7 @@ Animation::Channel::Target::Type Animation::Channel::Target::FromString(const ch
   std::transform(target.begin(), target.end(), target.begin(), ::toupper);
 
   auto iFind = ANIMATION_CHANNEL_TARGET_PATH_TYPES.find(std::string_view(target.c_str(), len));
-  if (iFind != ANIMATION_CHANNEL_TARGET_PATH_TYPES.end())
+  if(iFind != ANIMATION_CHANNEL_TARGET_PATH_TYPES.end())
   {
     return iFind->second;
   }
@@ -172,9 +173,9 @@ void Node::SetMatrix(const Matrix& m)
   m.GetTransformComponents(mTranslation, mRotation, mScale);
 }
 
-Quaternion ReadQuaternion(const json_value_s & j)
+Quaternion ReadQuaternion(const json_value_s& j)
 {
-	return Quaternion(ReadDaliVector<Vector4>(j));
+  return Quaternion(ReadDaliVector<Vector4>(j));
 }
 
-}
+} // namespace gltf2

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,16 @@
 #include "dali-scene-loader/internal/json-util.h"
 
 // EXTERNAL INCLUDES
+#include <array>
+#include "dali/devel-api/common/map-wrapper.h"
 #include "dali/public-api/common/extents.h"
-#include "dali/public-api/math/matrix3.h"
 #include "dali/public-api/math/matrix.h"
+#include "dali/public-api/math/matrix3.h"
 #include "dali/public-api/math/quaternion.h"
 #include "dali/public-api/math/radian.h"
 #include "dali/public-api/math/vector2.h"
 #include "dali/public-api/math/vector3.h"
 #include "dali/public-api/object/property-value.h"
-#include "dali/devel-api/common/map-wrapper.h"
-#include <array>
 
 namespace Dali
 {
@@ -36,24 +36,23 @@ namespace SceneLoader
 {
 namespace
 {
-
-template <typename T>
-Property::Value ReadPrimitiveHelper(const TreeNode* tn, bool(*reader)(const TreeNode*, T&))
+template<typename T>
+Property::Value ReadPrimitiveHelper(const TreeNode* tn, bool (*reader)(const TreeNode*, T&))
 {
   T value;
-  if (reader(tn, value))
+  if(reader(tn, value))
   {
     return Property::Value(value);
   }
   return Property::Value();
 }
 
-template <typename T>
+template<typename T>
 Property::Value ReadVectorHelper(const TreeNode* tn)
 {
   static_assert(sizeof(T) % sizeof(float) == 0, "");
   T value;
-  if (ReadVector(tn, value.AsFloat(), sizeof(T) / sizeof(float)))
+  if(ReadVector(tn, value.AsFloat(), sizeof(T) / sizeof(float)))
   {
     return Property::Value(value);
   }
@@ -63,7 +62,7 @@ Property::Value ReadVectorHelper(const TreeNode* tn)
 Property::Value ReadVectorSingleFloatHelper(const TreeNode* tn)
 {
   float value;
-  if (ReadVector(tn, &value, 1u))
+  if(ReadVector(tn, &value, 1u))
   {
     return Property::Value(value);
   }
@@ -72,39 +71,39 @@ Property::Value ReadVectorSingleFloatHelper(const TreeNode* tn)
 
 Property::Value ReadRotationHelper(const TreeNode* tn)
 {
-  switch (tn->Size())
+  switch(tn->Size())
   {
-  case 3:
-  {
-    // degrees as per spec
-    Vector3 rotation;
-    ReadVector(tn, rotation.AsFloat(), 3u);
-    return Property::Value(Quaternion(Radian(Degree(rotation.x)),
-      Radian(Degree(rotation.y)),
-      Radian(Degree(rotation.z))));
-  }
-  case 4:
-  {
-    Vector4 v;
-    ReadVector(tn, v.AsFloat(), 4u);
-    //Quaternion
-    return Property::Value(Quaternion(v));
-  }
-  default:
-    return Property::Value();
+    case 3:
+    {
+      // degrees as per spec
+      Vector3 rotation;
+      ReadVector(tn, rotation.AsFloat(), 3u);
+      return Property::Value(Quaternion(Radian(Degree(rotation.x)),
+                                        Radian(Degree(rotation.y)),
+                                        Radian(Degree(rotation.z))));
+    }
+    case 4:
+    {
+      Vector4 v;
+      ReadVector(tn, v.AsFloat(), 4u);
+      //Quaternion
+      return Property::Value(Quaternion(v));
+    }
+    default:
+      return Property::Value();
   }
 }
 
-template <typename T>
+template<typename T>
 bool ReadQuadHelper(const TreeNode* tn, const std::array<T*, 4>& quad)
 {
-  auto i = quad.begin();
-  auto iEnd = quad.end();
+  auto i     = quad.begin();
+  auto iEnd  = quad.end();
   auto iJson = tn->CBegin();
-  while (iJson != tn->CEnd() && i != iEnd)
+  while(iJson != tn->CEnd() && i != iEnd)
   {
     int value;
-    if (ReadInt(&(*iJson).second, value) && value <= std::numeric_limits<T>::max())
+    if(ReadInt(&(*iJson).second, value) && value <= std::numeric_limits<T>::max())
     {
       **i = value;
       ++i;
@@ -118,66 +117,65 @@ bool ReadQuadHelper(const TreeNode* tn, const std::array<T*, 4>& quad)
   return true;
 }
 
-const std::map<std::string, Property::Value(*)(const TreeNode*)> kTypeIds {
+const std::map<std::string, Property::Value (*)(const TreeNode*)> kTypeIds{
   // NONE
-  { "boolean", [](const TreeNode* tn) {
-    return ReadPrimitiveHelper<bool>(tn, ReadBool);
-  }},
-  { "float", [](const TreeNode* tn) {
-    return ReadPrimitiveHelper<float>(tn, ReadFloat);
-  }},
-  { "integer", [](const TreeNode* tn) {
-    return ReadPrimitiveHelper<int>(tn, ReadInt);
-  }},
-  { "vector2", ReadVectorHelper<Vector2> },
-  { "vector3", ReadVectorHelper<Vector3> },
-  { "vector4", ReadVectorHelper<Vector4> },
-  { "matrix3", ReadVectorHelper<Matrix3> },
-  { "matrix", ReadVectorHelper<Matrix> },
-  { "rectangle", [](const TreeNode* tn) {
-    Rect<int> value;
-    if (ReadQuadHelper<int>(tn, { &value.x, &value.y, &value.width, &value.height }))
-    {
-      return Property::Value(value);
-    }
-    return Property::Value();
-  }},
-  { "rotation", ReadRotationHelper },
+  {"boolean", [](const TreeNode* tn) {
+     return ReadPrimitiveHelper<bool>(tn, ReadBool);
+   }},
+  {"float", [](const TreeNode* tn) {
+     return ReadPrimitiveHelper<float>(tn, ReadFloat);
+   }},
+  {"integer", [](const TreeNode* tn) {
+     return ReadPrimitiveHelper<int>(tn, ReadInt);
+   }},
+  {"vector2", ReadVectorHelper<Vector2>},
+  {"vector3", ReadVectorHelper<Vector3>},
+  {"vector4", ReadVectorHelper<Vector4>},
+  {"matrix3", ReadVectorHelper<Matrix3>},
+  {"matrix", ReadVectorHelper<Matrix>},
+  {"rectangle", [](const TreeNode* tn) {
+     Rect<int> value;
+     if(ReadQuadHelper<int>(tn, {&value.x, &value.y, &value.width, &value.height}))
+     {
+       return Property::Value(value);
+     }
+     return Property::Value();
+   }},
+  {"rotation", ReadRotationHelper},
   // STRING - not particularly animatable
   // ARRAY - not particularly animatable
   // MAP - not particularly animatable
-  { "extents", [](const TreeNode* tn) {
-    Extents value;
-    if (ReadQuadHelper<uint16_t>(tn, { &value.start, &value.end, &value.top, &value.bottom }))
-    {
-      return Property::Value(value);
-    }
-    return Property::Value();
-  }},
+  {"extents", [](const TreeNode* tn) {
+     Extents value;
+     if(ReadQuadHelper<uint16_t>(tn, {&value.start, &value.end, &value.top, &value.bottom}))
+     {
+       return Property::Value(value);
+     }
+     return Property::Value();
+   }},
 };
 
-Property::Value(* const kArrayPropertyProcessors[])(const TreeNode*) {
+Property::Value (*const kArrayPropertyProcessors[])(const TreeNode*){
   ReadVectorHelper<Matrix>,
   ReadVectorHelper<Matrix3>,
   ReadVectorHelper<Vector4>,
   ReadVectorHelper<Vector3>,
   ReadVectorHelper<Vector2>,
-  ReadVectorSingleFloatHelper
-};
+  ReadVectorSingleFloatHelper};
 
-}  // nonamespace
+} // namespace
 
 bool ReadBool(const TreeNode* node, bool& num)
 {
-  if (!node)
+  if(!node)
   {
     return false;
   }
 
   bool returnValue = false;
-  if (node->GetType() == TreeNode::BOOLEAN)
+  if(node->GetType() == TreeNode::BOOLEAN)
   {
-    num = node->GetBoolean();
+    num         = node->GetBoolean();
     returnValue = true;
   }
 
@@ -186,20 +184,20 @@ bool ReadBool(const TreeNode* node, bool& num)
 
 bool ReadInt(const TreeNode* node, int& num)
 {
-  if (!node)
+  if(!node)
   {
     return false;
   }
 
   bool returnValue = false;
-  if (node->GetType() == TreeNode::INTEGER)
+  if(node->GetType() == TreeNode::INTEGER)
   {
-    num = node->GetInteger();
+    num         = node->GetInteger();
     returnValue = true;
   }
-  else if (node->GetType() == TreeNode::FLOAT)
+  else if(node->GetType() == TreeNode::FLOAT)
   {
-    num = static_cast<int>(node->GetFloat());
+    num         = static_cast<int>(node->GetFloat());
     returnValue = true;
   }
 
@@ -208,20 +206,20 @@ bool ReadInt(const TreeNode* node, int& num)
 
 bool ReadFloat(const TreeNode* node, float& num)
 {
-  if (!node)
+  if(!node)
   {
     return false;
   }
 
   bool returnValue = false;
-  if (node->GetType() == TreeNode::FLOAT)
+  if(node->GetType() == TreeNode::FLOAT)
   {
-    num = node->GetFloat();
+    num         = node->GetFloat();
     returnValue = true;
   }
-  else if (node->GetType() == TreeNode::INTEGER)
+  else if(node->GetType() == TreeNode::INTEGER)
   {
-    num = static_cast<float>(node->GetInteger());
+    num         = static_cast<float>(node->GetInteger());
     returnValue = true;
   }
 
@@ -231,7 +229,7 @@ bool ReadFloat(const TreeNode* node, float& num)
 bool ReadIndex(const Toolkit::TreeNode* node, Index& num)
 {
   bool returnValue = node && node->GetType() == TreeNode::INTEGER;
-  if (returnValue)
+  if(returnValue)
   {
     num = static_cast<Index>(node->GetInteger());
   }
@@ -241,19 +239,19 @@ bool ReadIndex(const Toolkit::TreeNode* node, Index& num)
 
 bool ReadBlob(const Toolkit::TreeNode* node, unsigned int& offset, unsigned int& length)
 {
-  if (!node)
+  if(!node)
   {
     return false;
   }
 
-  int iOffset, iLength;
+  int  iOffset, iLength;
   bool success = ReadInt(node->GetChild("byteOffset"), iOffset) &&
-    ReadInt(node->GetChild("byteLength"), iLength) &&
-    iOffset >= 0 && iLength >= 0;  // 0 length might not be sensible, but is not an error at this stage.
-  if (success)
+                 ReadInt(node->GetChild("byteLength"), iLength) &&
+                 iOffset >= 0 && iLength >= 0; // 0 length might not be sensible, but is not an error at this stage.
+  if(success)
   {
-    offset = static_cast<unsigned int>( iOffset );
-    length = static_cast<unsigned int>( iLength );
+    offset = static_cast<unsigned int>(iOffset);
+    length = static_cast<unsigned int>(iLength);
   }
   return success;
 }
@@ -261,11 +259,11 @@ bool ReadBlob(const Toolkit::TreeNode* node, unsigned int& offset, unsigned int&
 size_t GetNumericalArraySize(const TreeNode* node)
 {
   size_t size = 0;
-  if (node->GetType() == TreeNode::ARRAY)
+  if(node->GetType() == TreeNode::ARRAY)
   {
-    for (auto i0 = node->CBegin(), i1 = node->CEnd(); i0 != i1 &&
-      ((*i0).second.GetType() == TreeNode::FLOAT || (*i0).second.GetType() == TreeNode::INTEGER);
-      ++i0)
+    for(auto i0 = node->CBegin(), i1 = node->CEnd(); i0 != i1 &&
+                                                     ((*i0).second.GetType() == TreeNode::FLOAT || (*i0).second.GetType() == TreeNode::INTEGER);
+        ++i0)
     {
       ++size;
     }
@@ -275,19 +273,19 @@ size_t GetNumericalArraySize(const TreeNode* node)
 
 bool ReadVector(const TreeNode* node, float* num, unsigned int size)
 {
-  if (!node)
+  if(!node)
   {
     return false;
   }
 
   bool returnValue = false;
-  if ((node->Size() >= size) && (node->GetType() == TreeNode::ARRAY))
+  if((node->Size() >= size) && (node->GetType() == TreeNode::ARRAY))
   {
     unsigned int offset = 0u;
-    for (TreeNode::ConstIterator it = node->CBegin(); offset < size; ++it, ++offset)
+    for(TreeNode::ConstIterator it = node->CBegin(); offset < size; ++it, ++offset)
     {
       const TreeNode& coord = (*it).second;
-      if (!ReadFloat(&coord, *(num + offset)))
+      if(!ReadFloat(&coord, *(num + offset)))
       {
         return false;
       }
@@ -300,19 +298,19 @@ bool ReadVector(const TreeNode* node, float* num, unsigned int size)
 
 bool ReadVector(const Toolkit::TreeNode* node, int* num, unsigned int size)
 {
-  if (!node)
+  if(!node)
   {
     return false;
   }
 
   bool returnValue = false;
-  if ((node->Size() >= size) && (node->GetType() == TreeNode::ARRAY))
+  if((node->Size() >= size) && (node->GetType() == TreeNode::ARRAY))
   {
     unsigned int offset = 0u;
-    for (TreeNode::ConstIterator it = node->CBegin(); offset < size; ++it, ++offset)
+    for(TreeNode::ConstIterator it = node->CBegin(); offset < size; ++it, ++offset)
     {
       const TreeNode& coord = (*it).second;
-      if (!ReadInt(&coord, *(num + offset)))
+      if(!ReadInt(&coord, *(num + offset)))
       {
         return false;
       }
@@ -325,14 +323,14 @@ bool ReadVector(const Toolkit::TreeNode* node, int* num, unsigned int size)
 
 bool ReadColor(const TreeNode* node, Vector4& color)
 {
-  if (nullptr == node)
+  if(nullptr == node)
   {
     return false;
   }
 
-  if (!ReadVector(node, color.AsFloat(), 4))
+  if(!ReadVector(node, color.AsFloat(), 4))
   {
-    if (!ReadVector(node, color.AsFloat(), 3))
+    if(!ReadVector(node, color.AsFloat(), 3))
     {
       return false;
     }
@@ -344,12 +342,12 @@ bool ReadColor(const TreeNode* node, Vector4& color)
 
 bool ReadTimePeriod(const TreeNode* node, TimePeriod& timePeriod)
 {
-  if (!node)
+  if(!node)
   {
     return false;
   }
 
-  if (!ReadFloat(node->GetChild("delay"), timePeriod.delaySeconds) || !ReadFloat(node->GetChild("duration"), timePeriod.durationSeconds))
+  if(!ReadFloat(node->GetChild("delay"), timePeriod.delaySeconds) || !ReadFloat(node->GetChild("duration"), timePeriod.durationSeconds))
   {
     return false;
   }
@@ -358,15 +356,15 @@ bool ReadTimePeriod(const TreeNode* node, TimePeriod& timePeriod)
 
 bool ReadString(const TreeNode* node, std::string& strValue)
 {
-  if (!node)
+  if(!node)
   {
     return false;
   }
 
   bool returnValue = false;
-  if (node->GetType() == TreeNode::STRING)
+  if(node->GetType() == TreeNode::STRING)
   {
-    strValue = node->GetString();
+    strValue    = node->GetString();
     returnValue = true;
   }
   return returnValue;
@@ -374,18 +372,18 @@ bool ReadString(const TreeNode* node, std::string& strValue)
 
 bool ReadStringVector(const TreeNode* node, std::vector<std::string>& strvector)
 {
-  if (!node)
+  if(!node)
   {
     return false;
   }
 
   bool returnValue = false;
-  if (node->GetType() == TreeNode::ARRAY)
+  if(node->GetType() == TreeNode::ARRAY)
   {
-    for (TreeNode::ConstIterator it = node->CBegin(); it != node->CEnd(); ++it)
+    for(TreeNode::ConstIterator it = node->CBegin(); it != node->CEnd(); ++it)
     {
       const TreeNode& strNode = (*it).second;
-      if (strNode.GetType() == TreeNode::STRING)
+      if(strNode.GetType() == TreeNode::STRING)
       {
         strvector.push_back(strNode.GetString());
       }
@@ -401,60 +399,60 @@ bool ReadStringVector(const TreeNode* node, std::vector<std::string>& strvector)
 
 Property::Value ReadPropertyValue(const Property::Type& propType, const TreeNode& tn)
 {
-  switch (propType)
+  switch(propType)
   {
-  case Property::BOOLEAN:
-    return ReadPrimitiveHelper<bool>(&tn, ReadBool);
+    case Property::BOOLEAN:
+      return ReadPrimitiveHelper<bool>(&tn, ReadBool);
 
-  case Property::FLOAT:
-    return ReadPrimitiveHelper<float>(&tn, ReadFloat);
+    case Property::FLOAT:
+      return ReadPrimitiveHelper<float>(&tn, ReadFloat);
 
-  case Property::INTEGER:
-    return ReadPrimitiveHelper<int>(&tn, ReadInt);
+    case Property::INTEGER:
+      return ReadPrimitiveHelper<int>(&tn, ReadInt);
 
-  case Property::VECTOR2:
-    return ReadVectorHelper<Vector2>(&tn);
+    case Property::VECTOR2:
+      return ReadVectorHelper<Vector2>(&tn);
 
-  case Property::VECTOR3:
-    return ReadVectorHelper<Vector3>(&tn);
+    case Property::VECTOR3:
+      return ReadVectorHelper<Vector3>(&tn);
 
-  case Property::VECTOR4:
-    return ReadVectorHelper<Vector4>(&tn);
+    case Property::VECTOR4:
+      return ReadVectorHelper<Vector4>(&tn);
 
-  case Property::MATRIX3:
-    return ReadVectorHelper<Matrix3>(&tn);
+    case Property::MATRIX3:
+      return ReadVectorHelper<Matrix3>(&tn);
 
-  case Property::MATRIX:
-    return ReadVectorHelper<Matrix>(&tn);
+    case Property::MATRIX:
+      return ReadVectorHelper<Matrix>(&tn);
 
-  case Property::RECTANGLE:
-  {
-    Rect<int> value;
-    if (ReadQuadHelper<int>(&tn, { &value.x, &value.y, &value.width, &value.height }))
+    case Property::RECTANGLE:
     {
-      return Property::Value(value);
+      Rect<int> value;
+      if(ReadQuadHelper<int>(&tn, {&value.x, &value.y, &value.width, &value.height}))
+      {
+        return Property::Value(value);
+      }
+      break;
     }
-    break;
-  }
 
-  case Property::ROTATION:
-    return ReadRotationHelper(&tn);
+    case Property::ROTATION:
+      return ReadRotationHelper(&tn);
 
-  case Property::EXTENTS:
-  {
-    Extents value;
-    if (ReadQuadHelper<uint16_t>(&tn, { &value.start, &value.end, &value.top, &value.bottom }))
+    case Property::EXTENTS:
     {
-      return Property::Value(value);
+      Extents value;
+      if(ReadQuadHelper<uint16_t>(&tn, {&value.start, &value.end, &value.top, &value.bottom}))
+      {
+        return Property::Value(value);
+      }
+      break;
     }
-    break;
-  }
 
-  case Property::NONE: // fall
-  default:
-  {
-    DALI_ASSERT_ALWAYS(!"Property type incorrect");
-  }
+    case Property::NONE: // fall
+    default:
+    {
+      DALI_ASSERT_ALWAYS(!"Property type incorrect");
+    }
   }
   return Property::Value();
 }
@@ -462,45 +460,45 @@ Property::Value ReadPropertyValue(const Property::Type& propType, const TreeNode
 Property::Value ReadPropertyValue(const Toolkit::TreeNode& tn)
 {
   Property::Value propValue;
-  if (tn.GetType() == TreeNode::OBJECT)  // attempt to disambiguate type.
+  if(tn.GetType() == TreeNode::OBJECT) // attempt to disambiguate type.
   {
     auto jsonType = tn.GetChild("type");
-    if (jsonType && jsonType->GetType() == TreeNode::STRING)
+    if(jsonType && jsonType->GetType() == TreeNode::STRING)
     {
       auto iFind = kTypeIds.find(jsonType->GetString());
-      if (iFind != kTypeIds.end())
+      if(iFind != kTypeIds.end())
       {
         propValue = iFind->second(tn.GetChild("value"));
       }
     }
   }
 
-  if (propValue.GetType() == Property::NONE)
+  if(propValue.GetType() == Property::NONE)
   {
-    if (tn.Size() == 0)
+    if(tn.Size() == 0)
     {
-      switch (tn.GetType())
+      switch(tn.GetType())
       {
-      case TreeNode::BOOLEAN:
-        propValue = ReadPrimitiveHelper<bool>(&tn, ReadBool);
-        break;
+        case TreeNode::BOOLEAN:
+          propValue = ReadPrimitiveHelper<bool>(&tn, ReadBool);
+          break;
 
-      case TreeNode::INTEGER:
-        propValue = ReadPrimitiveHelper<int>(&tn, ReadInt);
-        break;
+        case TreeNode::INTEGER:
+          propValue = ReadPrimitiveHelper<int>(&tn, ReadInt);
+          break;
 
-      case TreeNode::FLOAT:
-        propValue = ReadPrimitiveHelper<float>(&tn, ReadFloat);
-        break;
+        case TreeNode::FLOAT:
+          propValue = ReadPrimitiveHelper<float>(&tn, ReadFloat);
+          break;
 
-      default:
-        break;
+        default:
+          break;
       }
     }
     else
     {
       bool allNumbers = true;
-      for (auto i0 = tn.CBegin(), i1 = tn.CEnd(); i0 != i1; ++i0)
+      for(auto i0 = tn.CBegin(), i1 = tn.CEnd(); i0 != i1; ++i0)
       {
         auto type = (*i0).second.GetType();
         if(!(type == TreeNode::FLOAT || type == TreeNode::INTEGER))
@@ -510,13 +508,13 @@ Property::Value ReadPropertyValue(const Toolkit::TreeNode& tn)
         }
       }
 
-      if (allNumbers)
+      if(allNumbers)
       {
         // NOTE: rotations / rectangles / extents must be disambiguated in all circumstances.
-        for (auto& r : kArrayPropertyProcessors)
+        for(auto& r : kArrayPropertyProcessors)
         {
           propValue = r(&tn);
-          if (propValue.GetType() != Property::NONE)
+          if(propValue.GetType() != Property::NONE)
           {
             break;
           }
@@ -527,5 +525,5 @@ Property::Value ReadPropertyValue(const Toolkit::TreeNode& tn)
   return propValue;
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,45 +23,38 @@
 #include <dali/public-api/object/type-registry.h>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
+#include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
 
 #if defined(DEBUG_ENABLED)
-  extern Debug::Filter* gLogButtonFilter;
+extern Debug::Filter* gLogButtonFilter;
 #endif
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 BaseHandle Create()
 {
   return Toolkit::CheckBoxButton::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::CheckBoxButton), typeid(Toolkit::Button), Create );
+TypeRegistration mType(typeid(Toolkit::CheckBoxButton), typeid(Toolkit::Button), Create);
 
-
-
-}
+} // namespace
 
 Dali::Toolkit::CheckBoxButton CheckBoxButton::New()
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr< CheckBoxButton > internalCheckBoxButton = new CheckBoxButton();
+  IntrusivePtr<CheckBoxButton> internalCheckBoxButton = new CheckBoxButton();
 
   // Pass ownership to CustomActor
-  Dali::Toolkit::CheckBoxButton checkBoxButton( *internalCheckBoxButton );
+  Dali::Toolkit::CheckBoxButton checkBoxButton(*internalCheckBoxButton);
 
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
@@ -73,7 +66,7 @@ Dali::Toolkit::CheckBoxButton CheckBoxButton::New()
 CheckBoxButton::CheckBoxButton()
 : Button()
 {
-  SetTogglableButton( true );
+  SetTogglableButton(true);
 }
 
 CheckBoxButton::~CheckBoxButton()
@@ -84,29 +77,28 @@ void CheckBoxButton::OnInitialize()
 {
   Button::OnInitialize();
 
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new AccessibleImpl( actor, Dali::Accessibility::Role::CHECK_BOX ) );
-  } );
+  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
+    return std::unique_ptr<Dali::Accessibility::Accessible>(
+      new AccessibleImpl(actor, Dali::Accessibility::Role::CHECK_BOX));
+  });
 }
 
 Dali::Accessibility::States CheckBoxButton::AccessibleImpl::CalculateStates()
 {
   auto tmp = Button::AccessibleImpl::CalculateStates();
-  auto slf = Toolkit::Button::DownCast( self );
-  if( slf.GetProperty<bool>( Toolkit::Button::Property::SELECTED ) )
+  auto slf = Toolkit::Button::DownCast(self);
+  if(slf.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
     tmp[Dali::Accessibility::State::CHECKED] = true;
   return tmp;
 }
 
-void CheckBoxButton::OnStateChange( State newState )
+void CheckBoxButton::OnStateChange(State newState)
 {
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if (Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if(Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
     Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
-      Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0
-    );
+      Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
   }
 }
 

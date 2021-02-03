@@ -1,5 +1,5 @@
- /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+/*
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,19 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-const uint32_t DEFAULT_ATLAS_SIZE( 1024u ); // this size can fit 8 by 8 images of average size 128*128
-const uint32_t MAX_ITEM_SIZE( 512u  );
-const uint32_t MAX_ITEM_AREA( MAX_ITEM_SIZE*MAX_ITEM_SIZE  );
-}
+const uint32_t DEFAULT_ATLAS_SIZE(1024u); // this size can fit 8 by 8 images of average size 128*128
+const uint32_t MAX_ITEM_SIZE(512u);
+const uint32_t MAX_ITEM_AREA(MAX_ITEM_SIZE* MAX_ITEM_SIZE);
+} // namespace
 
 ImageAtlasManager::ImageAtlasManager()
-: mBrokenImageUrl( "" )
+: mBrokenImageUrl("")
 {
 }
 
@@ -46,33 +43,31 @@ ImageAtlasManager::~ImageAtlasManager()
 {
 }
 
-TextureSet ImageAtlasManager::Add( Vector4& textureRect,
-                                 const std::string& url,
-                                 ImageDimensions& size,
-                                 FittingMode::Type fittingMode,
-                                 bool orientationCorrection,
-                                 AtlasUploadObserver* atlasUploadObserver )
+TextureSet ImageAtlasManager::Add(Vector4&             textureRect,
+                                  const std::string&   url,
+                                  ImageDimensions&     size,
+                                  FittingMode::Type    fittingMode,
+                                  bool                 orientationCorrection,
+                                  AtlasUploadObserver* atlasUploadObserver)
 {
   ImageDimensions dimensions = size;
   ImageDimensions zero;
-  if( size == zero )
+  if(size == zero)
   {
-    dimensions = Dali::GetClosestImageSize( url );
+    dimensions = Dali::GetClosestImageSize(url);
   }
 
   // big image, atlasing is not applied
-  if( static_cast<uint32_t>(dimensions.GetWidth()) * static_cast<uint32_t>(dimensions.GetHeight()) > MAX_ITEM_AREA
-      || dimensions.GetWidth()>DEFAULT_ATLAS_SIZE
-      || dimensions.GetHeight()>DEFAULT_ATLAS_SIZE)
+  if(static_cast<uint32_t>(dimensions.GetWidth()) * static_cast<uint32_t>(dimensions.GetHeight()) > MAX_ITEM_AREA || dimensions.GetWidth() > DEFAULT_ATLAS_SIZE || dimensions.GetHeight() > DEFAULT_ATLAS_SIZE)
   {
     return TextureSet();
   }
   size = dimensions;
 
   unsigned int i = 0;
-  for( AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)
+  for(AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)
   {
-    if( (*iter).Upload( textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver ) )
+    if((*iter).Upload(textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver))
     {
       return mTextureSetList[i];
     }
@@ -80,26 +75,23 @@ TextureSet ImageAtlasManager::Add( Vector4& textureRect,
   }
 
   CreateNewAtlas();
-  mAtlasList.back().Upload( textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver );
+  mAtlasList.back().Upload(textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver);
   return mTextureSetList.back();
 }
 
-TextureSet ImageAtlasManager::Add( Vector4& textureRect,
-                                   PixelData pixelData )
+TextureSet ImageAtlasManager::Add(Vector4&  textureRect,
+                                  PixelData pixelData)
 {
-
   // big buffer, atlasing is not applied
-  if( static_cast<uint32_t>(pixelData.GetWidth()) * static_cast<uint32_t>(pixelData.GetHeight()) > MAX_ITEM_AREA
-      || pixelData.GetWidth()>DEFAULT_ATLAS_SIZE
-      || pixelData.GetHeight()>DEFAULT_ATLAS_SIZE )
+  if(static_cast<uint32_t>(pixelData.GetWidth()) * static_cast<uint32_t>(pixelData.GetHeight()) > MAX_ITEM_AREA || pixelData.GetWidth() > DEFAULT_ATLAS_SIZE || pixelData.GetHeight() > DEFAULT_ATLAS_SIZE)
   {
     return TextureSet();
   }
 
   unsigned int i = 0;
-  for( AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)
+  for(AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)
   {
-    if( (*iter).Upload( textureRect, pixelData ) )
+    if((*iter).Upload(textureRect, pixelData))
     {
       return mTextureSetList[i];
     }
@@ -107,17 +99,16 @@ TextureSet ImageAtlasManager::Add( Vector4& textureRect,
   }
 
   CreateNewAtlas();
-  mAtlasList.back().Upload( textureRect, pixelData );
+  mAtlasList.back().Upload(textureRect, pixelData);
   return mTextureSetList.back();
-
 }
 
-void ImageAtlasManager::Remove( TextureSet textureSet, const Vector4& textureRect )
+void ImageAtlasManager::Remove(TextureSet textureSet, const Vector4& textureRect)
 {
   unsigned int i = 0;
-  for( TextureSetContainer::iterator iter = mTextureSetList.begin(); iter != mTextureSetList.end(); ++iter)
+  for(TextureSetContainer::iterator iter = mTextureSetList.begin(); iter != mTextureSetList.end(); ++iter)
   {
-    if( (*iter) == textureSet )
+    if((*iter) == textureSet)
     {
       mAtlasList[i].Remove(textureRect);
       return;
@@ -126,9 +117,9 @@ void ImageAtlasManager::Remove( TextureSet textureSet, const Vector4& textureRec
   }
 }
 
-void ImageAtlasManager::SetBrokenImage( const std::string& brokenImageUrl )
+void ImageAtlasManager::SetBrokenImage(const std::string& brokenImageUrl)
 {
-  if( !brokenImageUrl.empty() )
+  if(!brokenImageUrl.empty())
   {
     mBrokenImageUrl = brokenImageUrl;
   }
@@ -136,15 +127,15 @@ void ImageAtlasManager::SetBrokenImage( const std::string& brokenImageUrl )
 
 void ImageAtlasManager::CreateNewAtlas()
 {
-  Toolkit::ImageAtlas newAtlas = Toolkit::ImageAtlas::New( DEFAULT_ATLAS_SIZE, DEFAULT_ATLAS_SIZE  );
-  if( !mBrokenImageUrl.empty() )
+  Toolkit::ImageAtlas newAtlas = Toolkit::ImageAtlas::New(DEFAULT_ATLAS_SIZE, DEFAULT_ATLAS_SIZE);
+  if(!mBrokenImageUrl.empty())
   {
-    newAtlas.SetBrokenImage( mBrokenImageUrl );
+    newAtlas.SetBrokenImage(mBrokenImageUrl);
   }
-  mAtlasList.push_back( newAtlas );
+  mAtlasList.push_back(newAtlas);
   TextureSet textureSet = TextureSet::New();
-  textureSet.SetTexture( 0u, newAtlas.GetAtlas() );
-  mTextureSetList.push_back( textureSet );
+  textureSet.SetTexture(0u, newAtlas.GetAtlas());
+  mTextureSetList.push_back(textureSet);
 }
 
 } // namespace Internal

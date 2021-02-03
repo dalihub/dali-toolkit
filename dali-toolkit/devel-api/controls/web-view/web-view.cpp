@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,9 @@ WebView WebView::New(const std::string& locale, const std::string& timezoneId)
   return Internal::WebView::New(locale, timezoneId);
 }
 
-WebView WebView::New( int argc, char** argv )
+WebView WebView::New(int argc, char** argv)
 {
-  return Internal::WebView::New( argc, argv );
+  return Internal::WebView::New(argc, argv);
 }
 
 WebView WebView::DownCast(BaseHandle handle)
@@ -71,27 +71,27 @@ WebView WebView::DownCast(BaseHandle handle)
 
 Dali::Toolkit::WebSettings* WebView::GetSettings() const
 {
-  return Dali::Toolkit::GetImpl( *this ).GetSettings();
+  return Dali::Toolkit::GetImpl(*this).GetSettings();
 }
 
 Dali::Toolkit::WebContext* WebView::GetContext() const
 {
-  return Dali::Toolkit::GetImpl( *this ).GetContext();
+  return Dali::Toolkit::GetImpl(*this).GetContext();
 }
 
 Dali::Toolkit::WebCookieManager* WebView::GetCookieManager() const
 {
-  return Dali::Toolkit::GetImpl( *this ).GetCookieManager();
+  return Dali::Toolkit::GetImpl(*this).GetCookieManager();
 }
 
 Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
 {
-  return Dali::Toolkit::GetImpl( *this ).GetBackForwardList();
+  return Dali::Toolkit::GetImpl(*this).GetBackForwardList();
 }
 
 Dali::Toolkit::ImageView& WebView::GetFavicon()
 {
-  return Dali::Toolkit::GetImpl( *this ).GetFavicon();
+  return Dali::Toolkit::GetImpl(*this).GetFavicon();
 }
 
 void WebView::LoadUrl(const std::string& url)
@@ -124,9 +124,9 @@ void WebView::Resume()
   Dali::Toolkit::GetImpl(*this).Resume();
 }
 
-void WebView::ScrollBy( int deltaX, int deltaY )
+void WebView::ScrollBy(int deltaX, int deltaY)
 {
-  Dali::Toolkit::GetImpl( *this ).ScrollBy( deltaX, deltaY );
+  Dali::Toolkit::GetImpl(*this).ScrollBy(deltaX, deltaY);
 }
 
 bool WebView::CanGoForward()
@@ -166,7 +166,7 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
 
 void WebView::ClearAllTilesResources()
 {
-  Dali::Toolkit::GetImpl( *this ).ClearAllTilesResources();
+  Dali::Toolkit::GetImpl(*this).ClearAllTilesResources();
 }
 
 void WebView::ClearHistory()
@@ -191,7 +191,7 @@ WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSignal()
 
 WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
 {
-  return Dali::Toolkit::GetImpl( *this ).ScrollEdgeReachedSignal();
+  return Dali::Toolkit::GetImpl(*this).ScrollEdgeReachedSignal();
 }
 
 WebView::WebView(Internal::WebView& implementation)

@@ -19,41 +19,38 @@
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-landscape-view-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PageTurnLandscapeView, Toolkit::PageTurnView, NULL )
+DALI_TYPE_REGISTRATION_BEGIN(Toolkit::PageTurnLandscapeView, Toolkit::PageTurnView, NULL)
 DALI_TYPE_REGISTRATION_END()
 
-}
+} // namespace
 
-PageTurnLandscapeView::PageTurnLandscapeView( PageFactory& pageFactory, const Vector2& viewPageSize )
-: PageTurnView( pageFactory, viewPageSize )
+PageTurnLandscapeView::PageTurnLandscapeView(PageFactory& pageFactory, const Vector2& viewPageSize)
+: PageTurnView(pageFactory, viewPageSize)
 {
 }
 
 PageTurnLandscapeView::~PageTurnLandscapeView()
-{}
+{
+}
 
-Toolkit::PageTurnLandscapeView PageTurnLandscapeView::New( PageFactory& pageFactory, const Vector2& viewPageSize )
+Toolkit::PageTurnLandscapeView PageTurnLandscapeView::New(PageFactory& pageFactory, const Vector2& viewPageSize)
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr< PageTurnLandscapeView > internalPageTurnView = new PageTurnLandscapeView( pageFactory, viewPageSize );
+  IntrusivePtr<PageTurnLandscapeView> internalPageTurnView = new PageTurnLandscapeView(pageFactory, viewPageSize);
 
   // Pass ownership to CustomActor
-  Dali::Toolkit::PageTurnLandscapeView pageTurnView( *internalPageTurnView );
+  Dali::Toolkit::PageTurnLandscapeView pageTurnView(*internalPageTurnView);
 
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
@@ -64,38 +61,38 @@ Toolkit::PageTurnLandscapeView PageTurnLandscapeView::New( PageFactory& pageFact
 
 void PageTurnLandscapeView::OnPageTurnViewInitialize()
 {
-  mTurnEffectShader.RegisterProperty(PROPERTY_TEXTURE_WIDTH, 2.f );
-  mSpineEffectShader.RegisterProperty(PROPERTY_TEXTURE_WIDTH, 2.f );
+  mTurnEffectShader.RegisterProperty(PROPERTY_TEXTURE_WIDTH, 2.f);
+  mSpineEffectShader.RegisterProperty(PROPERTY_TEXTURE_WIDTH, 2.f);
 
-  mControlSize = Vector2( mPageSize.width * 2.f,  mPageSize.height  );
-  Self().SetProperty( Actor::Property::SIZE, mControlSize );
-  mTurningPageLayer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mControlSize = Vector2(mPageSize.width * 2.f, mPageSize.height);
+  Self().SetProperty(Actor::Property::SIZE, mControlSize);
+  mTurningPageLayer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 }
 
-void PageTurnLandscapeView::OnAddPage( Actor newPage, bool isLeftSide )
+void PageTurnLandscapeView::OnAddPage(Actor newPage, bool isLeftSide)
 {
-  newPage.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  newPage.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 }
 
-Vector2 PageTurnLandscapeView::SetPanPosition( const Vector2& gesturePosition )
+Vector2 PageTurnLandscapeView::SetPanPosition(const Vector2& gesturePosition)
 {
-  if( mPages[mIndex].isTurnBack )
+  if(mPages[mIndex].isTurnBack)
   {
-    return Vector2( mPageSize.width - gesturePosition.x, gesturePosition.y );
+    return Vector2(mPageSize.width - gesturePosition.x, gesturePosition.y);
   }
   else
   {
-    return Vector2( gesturePosition.x - mPageSize.width, gesturePosition.y );
+    return Vector2(gesturePosition.x - mPageSize.width, gesturePosition.y);
   }
 }
 
-void PageTurnLandscapeView::SetPanActor( const Vector2& panPosition )
+void PageTurnLandscapeView::SetPanActor(const Vector2& panPosition)
 {
-  if( panPosition.x > mPageSize.width  && mCurrentPageIndex < mTotalPageCount )
+  if(panPosition.x > mPageSize.width && mCurrentPageIndex < mTotalPageCount)
   {
     mTurningPageIndex = mCurrentPageIndex;
   }
-  else if( panPosition.x <= mPageSize.width && mCurrentPageIndex > 0 )
+  else if(panPosition.x <= mPageSize.width && mCurrentPageIndex > 0)
   {
     mTurningPageIndex = mCurrentPageIndex - 1;
   }

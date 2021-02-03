@@ -1,5 +1,5 @@
- /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+/*
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 AtlasGlyphManager::AtlasGlyphManager()
 {
 }
@@ -43,8 +41,8 @@ AtlasGlyphManager AtlasGlyphManager::Get()
   AtlasGlyphManager manager;
 
   // Check whether the AtlasGlyphManager is already created
-  SingletonService singletonService( SingletonService::Get() );
-  if ( singletonService )
+  SingletonService singletonService(SingletonService::Get());
+  if(singletonService)
   {
     Dali::BaseHandle handle = singletonService.GetSingleton(typeid(AtlasGlyphManager));
     if(handle)
@@ -63,54 +61,54 @@ AtlasGlyphManager AtlasGlyphManager::Get()
   return manager;
 }
 
-AtlasGlyphManager::AtlasGlyphManager(Internal::AtlasGlyphManager *impl)
-  : BaseHandle(impl)
+AtlasGlyphManager::AtlasGlyphManager(Internal::AtlasGlyphManager* impl)
+: BaseHandle(impl)
 {
 }
 
-void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
-                             const GlyphStyle& style,
-                             const PixelData& bitmap,
-                             AtlasManager::AtlasSlot& slot )
+void AtlasGlyphManager::Add(const Text::GlyphInfo&   glyph,
+                            const GlyphStyle&        style,
+                            const PixelData&         bitmap,
+                            AtlasManager::AtlasSlot& slot)
 {
-  GetImplementation(*this).Add( glyph, style, bitmap, slot );
+  GetImplementation(*this).Add(glyph, style, bitmap, slot);
 }
 
-void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
-                                          const Vector2& position,
-                                          Toolkit::AtlasManager::Mesh2D& mesh )
+void AtlasGlyphManager::GenerateMeshData(uint32_t                       imageId,
+                                         const Vector2&                 position,
+                                         Toolkit::AtlasManager::Mesh2D& mesh)
 {
-  GetImplementation(*this).GenerateMeshData( imageId,
-                                             position,
-                                             mesh );
+  GetImplementation(*this).GenerateMeshData(imageId,
+                                            position,
+                                            mesh);
 }
 
-bool AtlasGlyphManager::IsCached( Text::FontId fontId,
-                                  Text::GlyphIndex index,
-                                  const GlyphStyle& style,
-                                  AtlasManager::AtlasSlot& slot )
+bool AtlasGlyphManager::IsCached(Text::FontId             fontId,
+                                 Text::GlyphIndex         index,
+                                 const GlyphStyle&        style,
+                                 AtlasManager::AtlasSlot& slot)
 {
-  return GetImplementation(*this).IsCached( fontId, index, style, slot );
+  return GetImplementation(*this).IsCached(fontId, index, style, slot);
 }
 
-void AtlasGlyphManager::SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight )
+void AtlasGlyphManager::SetNewAtlasSize(uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight)
 {
-  GetImplementation(*this).SetNewAtlasSize( width, height, blockWidth, blockHeight );
+  GetImplementation(*this).SetNewAtlasSize(width, height, blockWidth, blockHeight);
 }
 
-Vector2 AtlasGlyphManager::GetAtlasSize( uint32_t atlasId )
+Vector2 AtlasGlyphManager::GetAtlasSize(uint32_t atlasId)
 {
-  return GetImplementation(*this).GetAtlasSize( atlasId );
+  return GetImplementation(*this).GetAtlasSize(atlasId);
 }
 
-Pixel::Format AtlasGlyphManager::GetPixelFormat( uint32_t atlasId )
+Pixel::Format AtlasGlyphManager::GetPixelFormat(uint32_t atlasId)
 {
-  return GetImplementation(*this).GetPixelFormat( atlasId );
+  return GetImplementation(*this).GetPixelFormat(atlasId);
 }
 
-TextureSet AtlasGlyphManager::GetTextures( uint32_t atlasId ) const
+TextureSet AtlasGlyphManager::GetTextures(uint32_t atlasId) const
 {
-  return GetImplementation(*this).GetTextures( atlasId );
+  return GetImplementation(*this).GetTextures(atlasId);
 }
 
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
@@ -118,9 +116,9 @@ const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
   return GetImplementation(*this).GetMetrics();
 }
 
-void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, const GlyphStyle& style, int32_t delta )
+void AtlasGlyphManager::AdjustReferenceCount(Text::FontId fontId, Text::GlyphIndex index, const GlyphStyle& style, int32_t delta)
 {
-  GetImplementation(*this).AdjustReferenceCount( fontId, index, style, delta );
+  GetImplementation(*this).AdjustReferenceCount(fontId, index, style, delta);
 }
 
 } // namespace Toolkit

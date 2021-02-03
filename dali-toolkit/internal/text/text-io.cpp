@@ -19,27 +19,24 @@
 #include <dali-toolkit/internal/text/text-io.h>
 
 // EXTERNAL INCLUDES
-#include <iostream>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/devel-api/text-abstraction/script.h>
+#include <iostream>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
-std::ostream& operator<< (std::ostream& o, const Vector<Character>& text)
+std::ostream& operator<<(std::ostream& o, const Vector<Character>& text)
 {
   o << std::hex;
 
-  for( unsigned int i=0; i<text.Count(); ++i )
+  for(unsigned int i = 0; i < text.Count(); ++i)
   {
     o << text[i];
-    if( i+1 < text.Count() )
+    if(i + 1 < text.Count())
     {
       o << " ";
     }
@@ -48,15 +45,15 @@ std::ostream& operator<< (std::ostream& o, const Vector<Character>& text)
   return o << std::dec;
 }
 
-std::ostream& operator<< (std::ostream& o, const Vector<ScriptRun>& scriptRun)
+std::ostream& operator<<(std::ostream& o, const Vector<ScriptRun>& scriptRun)
 {
-  for( unsigned int i=0; i<scriptRun.Count(); ++i )
+  for(unsigned int i = 0; i < scriptRun.Count(); ++i)
   {
     // e.g. Print "0->9: LATIN" for a ten character run staring from beginning of the model
-    o << scriptRun[i].characterRun.characterIndex << "->" << (scriptRun[i].characterRun.characterIndex + scriptRun[i].characterRun.numberOfCharacters ) << ": ";
+    o << scriptRun[i].characterRun.characterIndex << "->" << (scriptRun[i].characterRun.characterIndex + scriptRun[i].characterRun.numberOfCharacters) << ": ";
     o << TextAbstraction::ScriptName[scriptRun[i].script];
 
-    if( i+1 < scriptRun.Count() )
+    if(i + 1 < scriptRun.Count())
     {
       o << ", ";
     }
@@ -65,21 +62,21 @@ std::ostream& operator<< (std::ostream& o, const Vector<ScriptRun>& scriptRun)
   return o << std::dec;
 }
 
-std::ostream& operator<< (std::ostream& o, const Vector<FontRun>& fontRun)
+std::ostream& operator<<(std::ostream& o, const Vector<FontRun>& fontRun)
 {
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
-  for( unsigned int i=0; i<fontRun.Count(); ++i )
+  for(unsigned int i = 0; i < fontRun.Count(); ++i)
   {
     // e.g. Print "0->9: ID:1 TizenSansKorean style:Regular size:10.0" for a ten character run staring from beginning of the model
-    o << fontRun[i].characterRun.characterIndex << "->" << (fontRun[i].characterRun.characterIndex + fontRun[i].characterRun.numberOfCharacters ) << ": ";
+    o << fontRun[i].characterRun.characterIndex << "->" << (fontRun[i].characterRun.characterIndex + fontRun[i].characterRun.numberOfCharacters) << ": ";
 
-    FontId id = fontRun[i].fontId;
+    FontId                           id = fontRun[i].fontId;
     TextAbstraction::FontDescription fontDescription;
-    fontClient.GetDescription( id, fontDescription );
-    o << "ID:" << id << ", " << fontDescription.family << " width: " << fontDescription.width << " weight: " << fontDescription.weight << " slant: " << fontDescription.slant <<  " size:" << (fontClient.GetPointSize(id) / 64);
+    fontClient.GetDescription(id, fontDescription);
+    o << "ID:" << id << ", " << fontDescription.family << " width: " << fontDescription.width << " weight: " << fontDescription.weight << " slant: " << fontDescription.slant << " size:" << (fontClient.GetPointSize(id) / 64);
 
-    if( i+1 < fontRun.Count() )
+    if(i + 1 < fontRun.Count())
     {
       o << ", ";
     }
@@ -88,18 +85,18 @@ std::ostream& operator<< (std::ostream& o, const Vector<FontRun>& fontRun)
   return o << std::dec;
 }
 
-std::ostream& operator<< (std::ostream& o, const Vector<LineRun>& lineRuns)
+std::ostream& operator<<(std::ostream& o, const Vector<LineRun>& lineRuns)
 {
-  for( unsigned int i=0; i<lineRuns.Count(); ++i )
+  for(unsigned int i = 0; i < lineRuns.Count(); ++i)
   {
     // e.g. Print "Line 0 Glyphs: 0->9 Characters: 0->9 (10)" for a ten character run staring from beginning of the model
-    o << "Line " << i << " Glyphs: " << lineRuns[i].glyphRun.glyphIndex << "->" << (lineRuns[i].glyphRun.glyphIndex + lineRuns[i].glyphRun.numberOfGlyphs );
-    o << " Characters: " << lineRuns[i].characterRun.characterIndex << "->" << (lineRuns[i].characterRun.characterIndex + lineRuns[i].characterRun.numberOfCharacters );
+    o << "Line " << i << " Glyphs: " << lineRuns[i].glyphRun.glyphIndex << "->" << (lineRuns[i].glyphRun.glyphIndex + lineRuns[i].glyphRun.numberOfGlyphs);
+    o << " Characters: " << lineRuns[i].characterRun.characterIndex << "->" << (lineRuns[i].characterRun.characterIndex + lineRuns[i].characterRun.numberOfCharacters);
     o << " Width: " << lineRuns[i].width;
     o << " Ascender: " << lineRuns[i].ascender;
     o << " Descender: " << lineRuns[i].descender;
 
-    if( i+1 < lineRuns.Count() )
+    if(i + 1 < lineRuns.Count())
     {
       o << ", ";
     }

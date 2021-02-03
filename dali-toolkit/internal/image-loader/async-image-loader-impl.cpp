@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,15 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 AsyncImageLoader::AsyncImageLoader()
 : mLoadedSignal(),
-  mLoadThread( new EventThreadCallback( MakeCallback( this, &AsyncImageLoader::ProcessLoadedImage ) ) ),
-  mLoadTaskId( 0u ),
-  mIsLoadThreadStarted( false )
+  mLoadThread(new EventThreadCallback(MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage))),
+  mLoadTaskId(0u),
+  mIsLoadThreadStarted(false)
 {
 }
 
@@ -49,48 +46,48 @@ IntrusivePtr<AsyncImageLoader> AsyncImageLoader::New()
   return internal;
 }
 
-uint32_t AsyncImageLoader::LoadAnimatedImage( Dali::AnimatedImageLoading animatedImageLoading,
-                                              uint32_t frameIndex )
+uint32_t AsyncImageLoader::LoadAnimatedImage(Dali::AnimatedImageLoading animatedImageLoading,
+                                             uint32_t                   frameIndex)
 {
-  if( !mIsLoadThreadStarted )
+  if(!mIsLoadThreadStarted)
   {
     mLoadThread.Start();
     mIsLoadThreadStarted = true;
   }
-  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, animatedImageLoading, frameIndex ) );
+  mLoadThread.AddTask(new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex));
 
   return mLoadTaskId;
 }
 
-uint32_t AsyncImageLoader::Load( const VisualUrl& url,
-                                 ImageDimensions dimensions,
-                                 FittingMode::Type fittingMode,
-                                 SamplingMode::Type samplingMode,
-                                 bool orientationCorrection,
-                                 DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
+uint32_t AsyncImageLoader::Load(const VisualUrl&                         url,
+                                ImageDimensions                          dimensions,
+                                FittingMode::Type                        fittingMode,
+                                SamplingMode::Type                       samplingMode,
+                                bool                                     orientationCorrection,
+                                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  if( !mIsLoadThreadStarted )
+  if(!mIsLoadThreadStarted)
   {
     mLoadThread.Start();
     mIsLoadThreadStarted = true;
   }
-  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, url, dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad ) );
+  mLoadThread.AddTask(new LoadingTask(++mLoadTaskId, url, dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad));
 
   return mLoadTaskId;
 }
 
-uint32_t AsyncImageLoader::ApplyMask( Devel::PixelBuffer pixelBuffer,
-                                      Devel::PixelBuffer maskPixelBuffer,
-                                      float contentScale,
-                                      bool cropToMask,
-                                      DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
+uint32_t AsyncImageLoader::ApplyMask(Devel::PixelBuffer                       pixelBuffer,
+                                     Devel::PixelBuffer                       maskPixelBuffer,
+                                     float                                    contentScale,
+                                     bool                                     cropToMask,
+                                     DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  if( !mIsLoadThreadStarted )
+  if(!mIsLoadThreadStarted)
   {
     mLoadThread.Start();
     mIsLoadThreadStarted = true;
   }
-  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad ) );
+  mLoadThread.AddTask(new LoadingTask(++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad));
 
   return mLoadTaskId;
 }
@@ -105,9 +102,9 @@ Toolkit::DevelAsyncImageLoader::PixelBufferLoadedSignalType& AsyncImageLoader::P
   return mPixelBufferLoadedSignal;
 }
 
-bool AsyncImageLoader::Cancel( uint32_t loadingTaskId )
+bool AsyncImageLoader::Cancel(uint32_t loadingTaskId)
 {
-  return mLoadThread.CancelTask( loadingTaskId );
+  return mLoadThread.CancelTask(loadingTaskId);
 }
 
 void AsyncImageLoader::CancelAll()
@@ -117,20 +114,20 @@ void AsyncImageLoader::CancelAll()
 
 void AsyncImageLoader::ProcessLoadedImage()
 {
-  while( LoadingTask *next = mLoadThread.NextCompletedTask() )
+  while(LoadingTask* next = mLoadThread.NextCompletedTask())
   {
-    if( mPixelBufferLoadedSignal.GetConnectionCount() > 0 )
+    if(mPixelBufferLoadedSignal.GetConnectionCount() > 0)
     {
-      mPixelBufferLoadedSignal.Emit( next->id, next->pixelBuffer );
+      mPixelBufferLoadedSignal.Emit(next->id, next->pixelBuffer);
     }
-    else if( mLoadedSignal.GetConnectionCount() > 0 )
+    else if(mLoadedSignal.GetConnectionCount() > 0)
     {
       PixelData pixelData;
-      if( next->pixelBuffer )
+      if(next->pixelBuffer)
       {
-        pixelData = Devel::PixelBuffer::Convert( next->pixelBuffer );
+        pixelData = Devel::PixelBuffer::Convert(next->pixelBuffer);
       }
-      mLoadedSignal.Emit( next->id, pixelData );
+      mLoadedSignal.Emit(next->id, pixelData);
     }
 
     delete next;

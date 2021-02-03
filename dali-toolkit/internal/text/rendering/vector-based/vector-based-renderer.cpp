@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,17 @@
 #include <dali-toolkit/internal/text/rendering/vector-based/vector-based-renderer.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/rendering/geometry.h>
-#include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/glyph-run.h>
-#include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/text/rendering/vector-based/glyphy-shader/glyphy-shader.h>
-#include <dali-toolkit/internal/text/rendering/vector-based/vector-blob-atlas.h>
 #include <dali-toolkit/internal/text/rendering/vector-based/vector-blob-atlas-share.h>
+#include <dali-toolkit/internal/text/rendering/vector-based/vector-blob-atlas.h>
+#include <dali-toolkit/internal/text/text-view.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -37,79 +37,78 @@ using namespace Dali::Toolkit::Text;
 
 namespace
 {
-
 #if defined(DEBUG_ENABLED)
-  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
 #endif
 
 const float DEFAULT_POINT_SIZE = 13.f;
 
 struct Vertex2D
 {
-  float x;
-  float y;
-  float u;
-  float v;
+  float   x;
+  float   y;
+  float   u;
+  float   v;
   Vector4 color;
 };
 
-void AddVertex( Vector<Vertex2D>& vertices, float x, float y, float u, float v, const Vector4& color )
+void AddVertex(Vector<Vertex2D>& vertices, float x, float y, float u, float v, const Vector4& color)
 {
   Vertex2D meshVertex;
-  meshVertex.x = x;
-  meshVertex.y = y;
-  meshVertex.u = u;
-  meshVertex.v = v;
+  meshVertex.x     = x;
+  meshVertex.y     = y;
+  meshVertex.u     = u;
+  meshVertex.v     = v;
   meshVertex.color = color;
-  vertices.PushBack( meshVertex );
+  vertices.PushBack(meshVertex);
 }
 
-void AddTriangle( Vector<unsigned short>& indices, unsigned int v0, unsigned int v1, unsigned int v2 )
+void AddTriangle(Vector<unsigned short>& indices, unsigned int v0, unsigned int v1, unsigned int v2)
 {
-  indices.PushBack( v0 );
-  indices.PushBack( v1 );
-  indices.PushBack( v2 );
+  indices.PushBack(v0);
+  indices.PushBack(v1);
+  indices.PushBack(v2);
 }
 
-bool CreateGeometry( const Vector<GlyphInfo>& glyphs,
-                     unsigned int numberOfGlyphs,
-                     const Vector<Vector2>& positions,
-                     float xOffset,
-                     float yOffset,
-                     VectorBlobAtlas& atlas,
-                     Dali::TextAbstraction::FontClient& fontClient,
-                     Vector< Vertex2D >& vertices,
-                     Vector< unsigned short >& indices,
-                     const Vector4* const colorsBuffer,
-                     const ColorIndex* const colorIndicesBuffer,
-                     const Vector4& defaultColor )
+bool CreateGeometry(const Vector<GlyphInfo>&           glyphs,
+                    unsigned int                       numberOfGlyphs,
+                    const Vector<Vector2>&             positions,
+                    float                              xOffset,
+                    float                              yOffset,
+                    VectorBlobAtlas&                   atlas,
+                    Dali::TextAbstraction::FontClient& fontClient,
+                    Vector<Vertex2D>&                  vertices,
+                    Vector<unsigned short>&            indices,
+                    const Vector4* const               colorsBuffer,
+                    const ColorIndex* const            colorIndicesBuffer,
+                    const Vector4&                     defaultColor)
 {
   // Whether the default color is used.
-  const bool useDefaultColor = ( NULL == colorsBuffer );
+  const bool useDefaultColor = (NULL == colorsBuffer);
 
-  bool atlasFull( false );
+  bool atlasFull(false);
 
-  for( unsigned int i=0, idx=0; i<numberOfGlyphs && !atlasFull; ++i )
+  for(unsigned int i = 0, idx = 0; i < numberOfGlyphs && !atlasFull; ++i)
   {
-    if( glyphs[i].width  > 0 &&
-        glyphs[i].height > 0 )
+    if(glyphs[i].width > 0 &&
+       glyphs[i].height > 0)
     {
-      bool foundBlob( true );
+      bool foundBlob(true);
 
       BlobCoordinate blobCoords[4];
 
-      if( ! atlas.FindGlyph( glyphs[i].fontId, glyphs[i].index, blobCoords )  )
+      if(!atlas.FindGlyph(glyphs[i].fontId, glyphs[i].index, blobCoords))
       {
         // Add blob to atlas
-        VectorBlob* blob( NULL );
-        unsigned int blobLength( 0 );
-        unsigned int nominalWidth( 0 );
-        unsigned int nominalHeight( 0 );
-        fontClient.CreateVectorBlob( glyphs[i].fontId, glyphs[i].index, blob, blobLength, nominalWidth, nominalHeight );
+        VectorBlob*  blob(NULL);
+        unsigned int blobLength(0);
+        unsigned int nominalWidth(0);
+        unsigned int nominalHeight(0);
+        fontClient.CreateVectorBlob(glyphs[i].fontId, glyphs[i].index, blob, blobLength, nominalWidth, nominalHeight);
 
-        if( 0 != blobLength )
+        if(0 != blobLength)
         {
-          bool glyphAdded = atlas.AddGlyph( glyphs[i].fontId, glyphs[i].index, blob, blobLength, nominalWidth, nominalHeight, blobCoords );
+          bool glyphAdded = atlas.AddGlyph(glyphs[i].fontId, glyphs[i].index, blob, blobLength, nominalWidth, nominalHeight, blobCoords);
 
           foundBlob = glyphAdded;
           atlasFull = !glyphAdded;
@@ -120,28 +119,28 @@ bool CreateGeometry( const Vector<GlyphInfo>& glyphs,
         }
       }
 
-      if( foundBlob )
+      if(foundBlob)
       {
         // Get the color of the character.
-        const ColorIndex colorIndex = useDefaultColor ? 0u : *( colorIndicesBuffer + i );
-        const Vector4& color = ( useDefaultColor || ( 0u == colorIndex ) ) ? defaultColor : *( colorsBuffer + colorIndex - 1u );
+        const ColorIndex colorIndex = useDefaultColor ? 0u : *(colorIndicesBuffer + i);
+        const Vector4&   color      = (useDefaultColor || (0u == colorIndex)) ? defaultColor : *(colorsBuffer + colorIndex - 1u);
 
-        const float x1( xOffset + positions[i].x );
-        const float x2( xOffset + positions[i].x + glyphs[i].width );
-        const float y1( yOffset + positions[i].y );
-        const float y2( yOffset + positions[i].y + glyphs[i].height );
+        const float x1(xOffset + positions[i].x);
+        const float x2(xOffset + positions[i].x + glyphs[i].width);
+        const float y1(yOffset + positions[i].y);
+        const float y2(yOffset + positions[i].y + glyphs[i].height);
 
-        AddVertex( vertices, x1, y2, blobCoords[0].u, blobCoords[0].v, color );
-        AddVertex( vertices, x1, y1, blobCoords[1].u, blobCoords[1].v, color );
-        AddVertex( vertices, x2, y2, blobCoords[2].u, blobCoords[2].v, color );
-        AddTriangle( indices, idx, idx+1, idx+2 );
-        idx+=3;
+        AddVertex(vertices, x1, y2, blobCoords[0].u, blobCoords[0].v, color);
+        AddVertex(vertices, x1, y1, blobCoords[1].u, blobCoords[1].v, color);
+        AddVertex(vertices, x2, y2, blobCoords[2].u, blobCoords[2].v, color);
+        AddTriangle(indices, idx, idx + 1, idx + 2);
+        idx += 3;
 
-        AddVertex( vertices, x1, y1, blobCoords[1].u, blobCoords[1].v, color );
-        AddVertex( vertices, x2, y2, blobCoords[2].u, blobCoords[2].v, color );
-        AddVertex( vertices, x2, y1, blobCoords[3].u, blobCoords[3].v, color );
-        AddTriangle( indices, idx, idx+1, idx+2 );
-        idx+=3;
+        AddVertex(vertices, x1, y1, blobCoords[1].u, blobCoords[1].v, color);
+        AddVertex(vertices, x2, y2, blobCoords[2].u, blobCoords[2].v, color);
+        AddVertex(vertices, x2, y1, blobCoords[3].u, blobCoords[3].v, color);
+        AddTriangle(indices, idx, idx + 1, idx + 2);
+        idx += 3;
       }
     }
   }
@@ -158,16 +157,16 @@ struct VectorBasedRenderer::Impl
   {
     mFontClient = TextAbstraction::FontClient::Get();
 
-    mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
-    mQuadVertexFormat[ "aTexCoord" ] = Property::VECTOR2;
-    mQuadVertexFormat[ "aColor" ] = Property::VECTOR4;
+    mQuadVertexFormat["aPosition"] = Property::VECTOR2;
+    mQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
+    mQuadVertexFormat["aColor"]    = Property::VECTOR4;
   }
 
-  Actor mActor;                            ///< The actor parent which renders the text
+  Actor mActor; ///< The actor parent which renders the text
 
   TextAbstraction::FontClient mFontClient; ///> The font client used to supply glyph information
 
-  Property::Map mQuadVertexFormat;         ///> Describes the vertex format for text
+  Property::Map mQuadVertexFormat; ///> Describes the vertex format for text
 
   Shader mShaderEffect;
 
@@ -176,79 +175,79 @@ struct VectorBasedRenderer::Impl
 
 Text::RendererPtr VectorBasedRenderer::New()
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Text::VectorBasedRenderer::New()\n" );
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Text::VectorBasedRenderer::New()\n");
 
-  return Text::RendererPtr( new VectorBasedRenderer() );
+  return Text::RendererPtr(new VectorBasedRenderer());
 }
 
-Actor VectorBasedRenderer::Render( Text::ViewInterface& view,
-                                   Actor textControl,
-                                   Property::Index animatablePropertyIndex,
-                                   float& alignmentOffset,
-                                   int /*depth*/ )
+Actor VectorBasedRenderer::Render(Text::ViewInterface& view,
+                                  Actor                textControl,
+                                  Property::Index      animatablePropertyIndex,
+                                  float&               alignmentOffset,
+                                  int /*depth*/)
 {
-  UnparentAndReset( mImpl->mActor );
+  UnparentAndReset(mImpl->mActor);
 
   mImpl->mActor = Actor::New();
-  mImpl->mActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-  mImpl->mActor.SetProperty( Actor::Property::SIZE, Vector2( view.GetControlSize() ) );
-  mImpl->mActor.SetProperty( Actor::Property::COLOR, Color::WHITE );
+  mImpl->mActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  mImpl->mActor.SetProperty(Actor::Property::SIZE, Vector2(view.GetControlSize()));
+  mImpl->mActor.SetProperty(Actor::Property::COLOR, Color::WHITE);
 #if defined(DEBUG_ENABLED)
-  mImpl->mActor.SetProperty( Dali::Actor::Property::NAME, "Text renderable actor" );
+  mImpl->mActor.SetProperty(Dali::Actor::Property::NAME, "Text renderable actor");
 #endif
 
   Length numberOfGlyphs = view.GetNumberOfGlyphs();
 
-  if( numberOfGlyphs > 0u )
+  if(numberOfGlyphs > 0u)
   {
     Vector<GlyphInfo> glyphs;
-    glyphs.Resize( numberOfGlyphs );
+    glyphs.Resize(numberOfGlyphs);
 
     Vector<Vector2> positions;
-    positions.Resize( numberOfGlyphs );
+    positions.Resize(numberOfGlyphs);
 
-    numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
-                                     positions.Begin(),
-                                     alignmentOffset,
-                                     0u,
-                                     numberOfGlyphs );
+    numberOfGlyphs = view.GetGlyphs(glyphs.Begin(),
+                                    positions.Begin(),
+                                    alignmentOffset,
+                                    0u,
+                                    numberOfGlyphs);
 
-    glyphs.Resize( numberOfGlyphs );
-    positions.Resize( numberOfGlyphs );
+    glyphs.Resize(numberOfGlyphs);
+    positions.Resize(numberOfGlyphs);
 
-    const Vector4* const colorsBuffer = view.GetColors();
+    const Vector4* const    colorsBuffer       = view.GetColors();
     const ColorIndex* const colorIndicesBuffer = view.GetColorIndices();
-    const Vector4& defaultColor = view.GetTextColor();
+    const Vector4&          defaultColor       = view.GetTextColor();
 
-    Vector< Vertex2D > vertices;
-    Vector< unsigned short > indices;
+    Vector<Vertex2D>       vertices;
+    Vector<unsigned short> indices;
 
     const Vector2& controlSize = view.GetControlSize();
-    float xOffset = -alignmentOffset + controlSize.width * -0.5f;
-    float yOffset = controlSize.height * -0.5f;
+    float          xOffset     = -alignmentOffset + controlSize.width * -0.5f;
+    float          yOffset     = controlSize.height * -0.5f;
 
-    if( ! mImpl->mAtlas ||
-          mImpl->mAtlas->IsFull() )
+    if(!mImpl->mAtlas ||
+       mImpl->mAtlas->IsFull())
     {
       VectorBlobAtlasShare atlasShare = VectorBlobAtlasShare::Get();
-      mImpl->mAtlas = atlasShare.GetCurrentAtlas();
+      mImpl->mAtlas                   = atlasShare.GetCurrentAtlas();
     }
 
     // First try adding the glyphs to the previous shared atlas
-    bool allGlyphsAdded = CreateGeometry( glyphs,
-                                          numberOfGlyphs,
-                                          positions,
-                                          xOffset,
-                                          yOffset,
-                                          *mImpl->mAtlas,
-                                          mImpl->mFontClient,
-                                          vertices,
-                                          indices,
-                                          colorsBuffer,
-                                          colorIndicesBuffer,
-                                          defaultColor );
+    bool allGlyphsAdded = CreateGeometry(glyphs,
+                                         numberOfGlyphs,
+                                         positions,
+                                         xOffset,
+                                         yOffset,
+                                         *mImpl->mAtlas,
+                                         mImpl->mFontClient,
+                                         vertices,
+                                         indices,
+                                         colorsBuffer,
+                                         colorIndicesBuffer,
+                                         defaultColor);
 
-    if( ! allGlyphsAdded )
+    if(!allGlyphsAdded)
     {
       // The current atlas is full, abandon it and use a new one
       mImpl->mAtlas.Reset();
@@ -256,42 +255,41 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view,
       indices.Clear();
 
       VectorBlobAtlasShare atlasShare = VectorBlobAtlasShare::Get();
-      mImpl->mAtlas = atlasShare.GetNewAtlas();
+      mImpl->mAtlas                   = atlasShare.GetNewAtlas();
 
-      CreateGeometry( glyphs,
-                      numberOfGlyphs,
-                      positions,
-                      xOffset,
-                      yOffset,
-                      *mImpl->mAtlas,
-                      mImpl->mFontClient,
-                      vertices,
-                      indices,
-                      colorsBuffer,
-                      colorIndicesBuffer,
-                      defaultColor );
+      CreateGeometry(glyphs,
+                     numberOfGlyphs,
+                     positions,
+                     xOffset,
+                     yOffset,
+                     *mImpl->mAtlas,
+                     mImpl->mFontClient,
+                     vertices,
+                     indices,
+                     colorsBuffer,
+                     colorIndicesBuffer,
+                     defaultColor);
       // Return value ignored; using more than an entire new atlas is not supported
     }
 
-    if( 0 != vertices.Count() )
+    if(0 != vertices.Count())
     {
-      VertexBuffer quadVertices = VertexBuffer::New( mImpl->mQuadVertexFormat );
+      VertexBuffer quadVertices = VertexBuffer::New(mImpl->mQuadVertexFormat);
 
-      quadVertices.SetData( &vertices[ 0 ], vertices.Size() );
-
+      quadVertices.SetData(&vertices[0], vertices.Size());
 
       Geometry quadGeometry = Geometry::New();
-      quadGeometry.AddVertexBuffer( quadVertices );
-      quadGeometry.SetIndexBuffer( &indices[ 0 ], indices.Size() );
+      quadGeometry.AddVertexBuffer(quadVertices);
+      quadGeometry.SetIndexBuffer(&indices[0], indices.Size());
 
       TextureSet texture = mImpl->mAtlas->GetTextureSet();
 
       const Vector4 atlasInfo = mImpl->mAtlas->GetInfo();
-      mImpl->mShaderEffect = GlyphyShader::New( atlasInfo );
+      mImpl->mShaderEffect    = GlyphyShader::New(atlasInfo);
 
-      Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, mImpl->mShaderEffect );
-      renderer.SetTextures( texture );
-      mImpl->mActor.AddRenderer( renderer );
+      Dali::Renderer renderer = Dali::Renderer::New(quadGeometry, mImpl->mShaderEffect);
+      renderer.SetTextures(texture);
+      mImpl->mActor.AddRenderer(renderer);
     }
   }
 

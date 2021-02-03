@@ -18,14 +18,13 @@
 #include <dali-toolkit/devel-api/shader-effects/alpha-discard-effect.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-
 Property::Map CreateAlphaDiscardEffect()
 {
   Property::Map map;

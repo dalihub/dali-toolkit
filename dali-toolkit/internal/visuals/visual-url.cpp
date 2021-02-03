@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,59 +26,57 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 namespace
 {
-
-VisualUrl::ProtocolType ResolveLocation( const std::string& url )
+VisualUrl::ProtocolType ResolveLocation(const std::string& url)
 {
-  const char* urlCStr = url.c_str();
-  const uint32_t length = url.size();
-  if( ( length > 7 ) && urlCStr[5] == ':' && urlCStr[6] == '/' && urlCStr[7] == '/' )
+  const char*    urlCStr = url.c_str();
+  const uint32_t length  = url.size();
+  if((length > 7) && urlCStr[5] == ':' && urlCStr[6] == '/' && urlCStr[7] == '/')
   {
     // https://
-    if( ( 'h' == tolower( urlCStr[0] ) )&&
-        ( 't' == tolower( urlCStr[1] ) )&&
-        ( 't' == tolower( urlCStr[2] ) )&&
-        ( 'p' == tolower( urlCStr[3] ) )&&
-        ( 's' == tolower( urlCStr[4] ) ) )
+    if(('h' == tolower(urlCStr[0])) &&
+       ('t' == tolower(urlCStr[1])) &&
+       ('t' == tolower(urlCStr[2])) &&
+       ('p' == tolower(urlCStr[3])) &&
+       ('s' == tolower(urlCStr[4])))
     {
       return VisualUrl::REMOTE;
     }
   }
-  else if( ( length > 6 ) && urlCStr[4] == ':' && urlCStr[5] == '/' && urlCStr[6] == '/' )
+  else if((length > 6) && urlCStr[4] == ':' && urlCStr[5] == '/' && urlCStr[6] == '/')
   {
     // http:// or dali://
-    const char hOrd = tolower( urlCStr[0] );
-    const char tOra = tolower( urlCStr[1] );
-    const char tOrl = tolower( urlCStr[2] );
-    const char pOri = tolower( urlCStr[3] );
-    if( ( 'h' == hOrd )&&
-        ( 't' == tOra )&&
-        ( 't' == tOrl )&&
-        ( 'p' == pOri ) )
+    const char hOrd = tolower(urlCStr[0]);
+    const char tOra = tolower(urlCStr[1]);
+    const char tOrl = tolower(urlCStr[2]);
+    const char pOri = tolower(urlCStr[3]);
+    if(('h' == hOrd) &&
+       ('t' == tOra) &&
+       ('t' == tOrl) &&
+       ('p' == pOri))
     {
       return VisualUrl::REMOTE;
     }
-    if( ( 'd' == hOrd )&&
-        ( 'a' == tOra )&&
-        ( 'l' == tOrl )&&
-        ( 'i' == pOri ) )
+    if(('d' == hOrd) &&
+       ('a' == tOra) &&
+       ('l' == tOrl) &&
+       ('i' == pOri))
     {
       return VisualUrl::TEXTURE;
     }
   }
-  else if( ( length > 5 ) && urlCStr[3] == ':' && urlCStr[4] == '/' && urlCStr[5] == '/' )
+  else if((length > 5) && urlCStr[3] == ':' && urlCStr[4] == '/' && urlCStr[5] == '/')
   {
     // ftp:// or ssh://
-    const char fOrS = tolower( urlCStr[0] );
-    if( ( 'f' == fOrS )||( 's' == fOrS ) )
+    const char fOrS = tolower(urlCStr[0]);
+    if(('f' == fOrS) || ('s' == fOrS))
     {
-      const char tOrs = tolower( urlCStr[1] );
-      if( ( 't' == tOrs )||( 's' == tOrs ) )
+      const char tOrs = tolower(urlCStr[1]);
+      if(('t' == tOrs) || ('s' == tOrs))
       {
-        const char pOrh = tolower( urlCStr[2] );
-        if( ( 'p' == pOrh )||( 'h' == pOrh ) )
+        const char pOrh = tolower(urlCStr[2]);
+        if(('p' == pOrh) || ('h' == pOrh))
         {
           return VisualUrl::REMOTE;
         }
@@ -88,65 +86,69 @@ VisualUrl::ProtocolType ResolveLocation( const std::string& url )
   return VisualUrl::LOCAL;
 }
 
-
-VisualUrl::Type ResolveType( const std::string& url )
+VisualUrl::Type ResolveType(const std::string& url)
 {
   // if only one char in string, can only be regular image
   const std::size_t count = url.size();
-  if( count > 0 )
+  if(count > 0)
   {
     // parsing from the end for better chance of early outs
-    enum { SUFFIX, HASH, HASH_DOT } state = SUFFIX;
-    char SVG[ 4 ] = { 'g', 'v', 's', '.' };
-    char GIF[ 4 ] = { 'f', 'i', 'g', '.' };
-    char WEBP[ 5 ] = { 'p', 'b', 'e', 'w', '.' };
-    char JSON[ 5 ] = { 'n', 'o', 's', 'j', '.' };
-    unsigned int svgScore = 0;
-    unsigned int gifScore = 0;
+    enum
+    {
+      SUFFIX,
+      HASH,
+      HASH_DOT
+    } state                = SUFFIX;
+    char         SVG[4]    = {'g', 'v', 's', '.'};
+    char         GIF[4]    = {'f', 'i', 'g', '.'};
+    char         WEBP[5]   = {'p', 'b', 'e', 'w', '.'};
+    char         JSON[5]   = {'n', 'o', 's', 'j', '.'};
+    unsigned int svgScore  = 0;
+    unsigned int gifScore  = 0;
     unsigned int webpScore = 0;
     unsigned int jsonScore = 0;
-    int index = count;
-    while( --index >= 0 )
+    int          index     = count;
+    while(--index >= 0)
     {
-      const char currentChar = tolower( url[ index ] );
+      const char        currentChar   = tolower(url[index]);
       const std::size_t offsetFromEnd = count - index - 1u;
-      if( ( offsetFromEnd < sizeof(SVG) )&&( currentChar == SVG[ offsetFromEnd ] ) )
+      if((offsetFromEnd < sizeof(SVG)) && (currentChar == SVG[offsetFromEnd]))
       {
         // early out if SVG as can't be used in N patch for now
-        if( ++svgScore == sizeof(SVG) )
+        if(++svgScore == sizeof(SVG))
         {
           return VisualUrl::SVG;
         }
       }
-      if( ( offsetFromEnd < sizeof(GIF) )&&( currentChar == GIF[ offsetFromEnd ] ) )
+      if((offsetFromEnd < sizeof(GIF)) && (currentChar == GIF[offsetFromEnd]))
       {
         // early out if GIF as can't be used in N patch for now
-        if( ++gifScore == sizeof(GIF) )
+        if(++gifScore == sizeof(GIF))
         {
           return VisualUrl::GIF;
         }
       }
-      if( ( offsetFromEnd < sizeof(WEBP) )&&( currentChar == WEBP[ offsetFromEnd ] ) )
+      if((offsetFromEnd < sizeof(WEBP)) && (currentChar == WEBP[offsetFromEnd]))
       {
         // early out if WEBP as can't be used in N patch for now
-        if( ++webpScore == sizeof(WEBP) )
+        if(++webpScore == sizeof(WEBP))
         {
           return VisualUrl::WEBP;
         }
       }
-      if( ( offsetFromEnd < sizeof(JSON) )&&( currentChar == JSON[ offsetFromEnd ] ) )
+      if((offsetFromEnd < sizeof(JSON)) && (currentChar == JSON[offsetFromEnd]))
       {
         // early out if JSON as can't be used in N patch for now
-        if( ++jsonScore == sizeof(JSON) )
+        if(++jsonScore == sizeof(JSON))
         {
           return VisualUrl::JSON;
         }
       }
-      switch( state )
+      switch(state)
       {
         case SUFFIX:
         {
-          if( '.' == currentChar )
+          if('.' == currentChar)
           {
             state = HASH;
           }
@@ -154,7 +156,7 @@ VisualUrl::Type ResolveType( const std::string& url )
         }
         case HASH:
         {
-          if( ( '#' == currentChar ) || ( '9' == currentChar ) )
+          if(('#' == currentChar) || ('9' == currentChar))
           {
             state = HASH_DOT;
           }
@@ -167,7 +169,7 @@ VisualUrl::Type ResolveType( const std::string& url )
         }
         case HASH_DOT:
         {
-          if( '.' == currentChar )
+          if('.' == currentChar)
           {
             return VisualUrl::N_PATCH;
           }
@@ -185,45 +187,44 @@ VisualUrl::Type ResolveType( const std::string& url )
   return VisualUrl::REGULAR_IMAGE;
 }
 
-}
-
+} // namespace
 
 VisualUrl::VisualUrl()
 : mUrl(),
-  mType( VisualUrl::REGULAR_IMAGE ),
-  mLocation( VisualUrl::LOCAL )
+  mType(VisualUrl::REGULAR_IMAGE),
+  mLocation(VisualUrl::LOCAL)
 {
 }
 
-VisualUrl::VisualUrl( const std::string& url )
-: mUrl( url ),
-  mType( VisualUrl::REGULAR_IMAGE ),
-  mLocation( VisualUrl::LOCAL )
+VisualUrl::VisualUrl(const std::string& url)
+: mUrl(url),
+  mType(VisualUrl::REGULAR_IMAGE),
+  mLocation(VisualUrl::LOCAL)
 {
-  if( ! url.empty() )
+  if(!url.empty())
   {
-    mLocation = ResolveLocation( url );
-    if( VisualUrl::TEXTURE != mLocation )
+    mLocation = ResolveLocation(url);
+    if(VisualUrl::TEXTURE != mLocation)
     {
       // TEXTURE location url doesn't need type resolving, REGULAR_IMAGE is fine
-      mType = ResolveType( url );
+      mType = ResolveType(url);
     }
   }
 }
 
-VisualUrl::VisualUrl( const VisualUrl& url )
-: mUrl( url.mUrl ),
-  mType( url.mType ),
-  mLocation( url.mLocation )
+VisualUrl::VisualUrl(const VisualUrl& url)
+: mUrl(url.mUrl),
+  mType(url.mType),
+  mLocation(url.mLocation)
 {
 }
 
-VisualUrl& VisualUrl::operator=( const VisualUrl& url )
+VisualUrl& VisualUrl::operator=(const VisualUrl& url)
 {
-  if( &url != this )
+  if(&url != this)
   {
-    mUrl = url.mUrl;
-    mType = url.mType;
+    mUrl      = url.mUrl;
+    mType     = url.mType;
     mLocation = url.mLocation;
   }
   return *this;
@@ -256,21 +257,21 @@ bool VisualUrl::IsLocalResource() const
 
 std::string VisualUrl::GetLocation() const
 {
-  const auto location = mUrl.find( "://" );
-  if( std::string::npos != location )
+  const auto location = mUrl.find("://");
+  if(std::string::npos != location)
   {
-    return mUrl.substr( location + 3u ); // 3 characters forwards from the start of ://
+    return mUrl.substr(location + 3u); // 3 characters forwards from the start of ://
   }
   return mUrl;
 }
 
-std::string VisualUrl::CreateTextureUrl( const std::string& location )
+std::string VisualUrl::CreateTextureUrl(const std::string& location)
 {
   return "dali://" + location;
 }
 
-} // Internal
+} // namespace Internal
 
-} // Toolkit
+} // namespace Toolkit
 
-} // Dali
+} // namespace Dali

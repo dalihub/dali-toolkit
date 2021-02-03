@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,23 @@
 #include "accessibility-manager-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-impl.h>
+#include <dali/devel-api/adaptor-framework/accessibility.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 AccessibilityManager::AccessibilityManager()
 {
-  mFocusOrder.push_back( {} ); // zero has a special meaning
+  mFocusOrder.push_back({}); // zero has a special meaning
 }
 
 AccessibilityManager::~AccessibilityManager()
@@ -47,71 +44,71 @@ AccessibilityManager::~AccessibilityManager()
 
 void AccessibilityManager::SetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityManager::AccessibilityAttribute type, const std::string& text)
 {
-  switch ( type )
+  switch(type)
   {
-  case Toolkit::AccessibilityManager::ACCESSIBILITY_LABEL:
-    actor.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_NAME, text );
-    break;
+    case Toolkit::AccessibilityManager::ACCESSIBILITY_LABEL:
+      actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_NAME, text);
+      break;
 
-  case Toolkit::AccessibilityManager::ACCESSIBILITY_HINT:
-    actor.SetProperty( Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION, text );
-    break;
+    case Toolkit::AccessibilityManager::ACCESSIBILITY_HINT:
+      actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION, text);
+      break;
 
-  case Toolkit::AccessibilityManager::ACCESSIBILITY_TRAIT:
-  case Toolkit::AccessibilityManager::ACCESSIBILITY_VALUE:
-  default:
-    break;
+    case Toolkit::AccessibilityManager::ACCESSIBILITY_TRAIT:
+    case Toolkit::AccessibilityManager::ACCESSIBILITY_VALUE:
+    default:
+      break;
   }
 }
 
 std::string AccessibilityManager::GetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityManager::AccessibilityAttribute type) const
 {
-  switch ( type )
+  switch(type)
   {
-  case Toolkit::AccessibilityManager::ACCESSIBILITY_LABEL:
-    return actor.GetProperty< std::string >( Toolkit::DevelControl::Property::ACCESSIBILITY_NAME );
+    case Toolkit::AccessibilityManager::ACCESSIBILITY_LABEL:
+      return actor.GetProperty<std::string>(Toolkit::DevelControl::Property::ACCESSIBILITY_NAME);
 
-  case Toolkit::AccessibilityManager::ACCESSIBILITY_HINT:
-    return actor.GetProperty< std::string >( Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION );
+    case Toolkit::AccessibilityManager::ACCESSIBILITY_HINT:
+      return actor.GetProperty<std::string>(Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION);
 
-  case Toolkit::AccessibilityManager::ACCESSIBILITY_TRAIT:
-  case Toolkit::AccessibilityManager::ACCESSIBILITY_VALUE:
-  default:
-    return "";
+    case Toolkit::AccessibilityManager::ACCESSIBILITY_TRAIT:
+    case Toolkit::AccessibilityManager::ACCESSIBILITY_VALUE:
+    default:
+      return "";
   }
 }
 
 void AccessibilityManager::SetFocusOrder(Actor actor, const unsigned int order)
 {
-  if (order == 0)
+  if(order == 0)
     return;
 
-  if (order >= mFocusOrder.size())
+  if(order >= mFocusOrder.size())
     mFocusOrder.resize(order + 1);
 
   auto it = mFocusOrder.begin() + order;
   mFocusOrder.insert(it, actor);
 
-  if (order > 0)
+  if(order > 0)
   {
     Actor prev = mFocusOrder[order - 1];
-    DevelControl::AppendAccessibilityRelation( prev, actor, Accessibility::RelationType::FLOWS_TO );
-    DevelControl::AppendAccessibilityRelation( actor, prev, Accessibility::RelationType::FLOWS_FROM );
+    DevelControl::AppendAccessibilityRelation(prev, actor, Accessibility::RelationType::FLOWS_TO);
+    DevelControl::AppendAccessibilityRelation(actor, prev, Accessibility::RelationType::FLOWS_FROM);
   }
 
-  if (order + 1 < mFocusOrder.size())
+  if(order + 1 < mFocusOrder.size())
   {
     Actor next = mFocusOrder[order + 1];
-    DevelControl::AppendAccessibilityRelation( actor, next, Accessibility::RelationType::FLOWS_TO );
-    DevelControl::AppendAccessibilityRelation( next, actor, Accessibility::RelationType::FLOWS_FROM );
+    DevelControl::AppendAccessibilityRelation(actor, next, Accessibility::RelationType::FLOWS_TO);
+    DevelControl::AppendAccessibilityRelation(next, actor, Accessibility::RelationType::FLOWS_FROM);
   }
 }
 
 unsigned int AccessibilityManager::GetFocusOrder(Actor actor) const
 {
-  for (auto it = mFocusOrder.begin(); it != mFocusOrder.end(); ++it)
+  for(auto it = mFocusOrder.begin(); it != mFocusOrder.end(); ++it)
   {
-    if (actor == *it)
+    if(actor == *it)
       return it - mFocusOrder.begin();
   }
 
@@ -127,7 +124,7 @@ Actor AccessibilityManager::GetActorByFocusOrder(const unsigned int order)
 {
   Actor actor;
 
-  if (order > 0 && order < mFocusOrder.size())
+  if(order > 0 && order < mFocusOrder.size())
     actor = mFocusOrder[order];
 
   return actor;
@@ -152,11 +149,11 @@ Actor AccessibilityManager::GetCurrentFocusGroup()
 
 unsigned int AccessibilityManager::GetCurrentFocusOrder()
 {
-  auto actor = GetCurrentFocusActor();
+  auto     actor = GetCurrentFocusActor();
   unsigned order = 0;
 
-  if (actor)
-    order = GetFocusOrder( actor );
+  if(actor)
+    order = GetFocusOrder(actor);
 
   return order;
 }
@@ -165,7 +162,7 @@ bool AccessibilityManager::MoveFocusForward()
 {
   unsigned current = GetCurrentFocusOrder();
 
-  if (current + 1 < mFocusOrder.size())
+  if(current + 1 < mFocusOrder.size())
     return SetCurrentFocusActor(mFocusOrder[current + 1]);
 
   return false;
@@ -175,7 +172,7 @@ bool AccessibilityManager::MoveFocusBackward()
 {
   unsigned current = GetCurrentFocusOrder();
 
-  if (current > 1) // zero has a special meaning
+  if(current > 1) // zero has a special meaning
     return SetCurrentFocusActor(mFocusOrder[current - 1]);
 
   return false;
@@ -184,24 +181,24 @@ bool AccessibilityManager::MoveFocusBackward()
 void AccessibilityManager::ClearFocus()
 {
   auto actor = GetCurrentFocusActor();
-  Toolkit::DevelControl::ClearAccessibilityHighlight( actor );
+  Toolkit::DevelControl::ClearAccessibilityHighlight(actor);
 }
 
 void AccessibilityManager::Reset()
 {
   ClearFocus();
 
-  for (std::size_t i = 2; i < mFocusOrder.size(); ++i)
+  for(std::size_t i = 2; i < mFocusOrder.size(); ++i)
   {
     Actor prev = mFocusOrder[i - 1];
     Actor next = mFocusOrder[i];
 
-    DevelControl::RemoveAccessibilityRelation( prev, next, Accessibility::RelationType::FLOWS_TO );
-    DevelControl::RemoveAccessibilityRelation( next, prev, Accessibility::RelationType::FLOWS_FROM );
+    DevelControl::RemoveAccessibilityRelation(prev, next, Accessibility::RelationType::FLOWS_TO);
+    DevelControl::RemoveAccessibilityRelation(next, prev, Accessibility::RelationType::FLOWS_FROM);
   }
 
   mFocusOrder.clear();
-  mFocusOrder.push_back( {} );
+  mFocusOrder.push_back({});
 }
 
 void AccessibilityManager::SetFocusGroup(Actor actor, bool isFocusGroup)
@@ -243,7 +240,7 @@ bool AccessibilityManager::GetWrapMode() const
 
 void AccessibilityManager::SetFocusIndicatorActor(Actor indicator)
 {
-  Dali::Accessibility::Accessible::SetHighlightActor( indicator );
+  Dali::Accessibility::Accessible::SetHighlightActor(indicator);
 }
 
 Actor AccessibilityManager::GetFocusIndicatorActor()

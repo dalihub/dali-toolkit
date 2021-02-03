@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,82 +19,77 @@
 #include "atlas-packer.h"
 
 // EXTERNAL HEADER
-#include <cstdlib> // For abs()
 #include <dali/integration-api/debug.h>
+#include <cstdlib> // For abs()
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
-bool ApproximatelyEqual( uint32_t a, uint32_t b  )
+bool ApproximatelyEqual(uint32_t a, uint32_t b)
 {
-  return std::abs( static_cast<int32_t>( a - b ) ) <= 1;
+  return std::abs(static_cast<int32_t>(a - b)) <= 1;
 }
 
-uint16_t MaxDimension( const Uint16Pair& dimensions )
+uint16_t MaxDimension(const Uint16Pair& dimensions)
 {
   return dimensions.GetWidth() >= dimensions.GetHeight() ? dimensions.GetWidth() : dimensions.GetHeight();
 }
 
-void Swap( Uint16Pair& first, Uint16Pair& second )
+void Swap(Uint16Pair& first, Uint16Pair& second)
 {
   Uint16Pair temp = first;
-  first = second;
-  second = temp;
+  first           = second;
+  second          = temp;
 }
 
-}
+} // namespace
 
-AtlasPacker::Node::Node( Node* parent, SizeType x, SizeType y, SizeType width, SizeType height  )
-: rectArea( x, y, width, height ),
+AtlasPacker::Node::Node(Node* parent, SizeType x, SizeType y, SizeType width, SizeType height)
+: rectArea(x, y, width, height),
   parent(parent),
-  occupied( false )
+  occupied(false)
 {
   child[0] = NULL;
   child[1] = NULL;
 }
 
-AtlasPacker:: AtlasPacker( SizeType atlasWidth, SizeType atlasHeight )
-: mAvailableArea( atlasWidth * atlasHeight )
+AtlasPacker::AtlasPacker(SizeType atlasWidth, SizeType atlasHeight)
+: mAvailableArea(atlasWidth * atlasHeight)
 {
-  mRoot = new Node( NULL, 0u, 0u, atlasWidth, atlasHeight );
+  mRoot = new Node(NULL, 0u, 0u, atlasWidth, atlasHeight);
 }
 
 AtlasPacker::~AtlasPacker()
 {
-  DeleteNode( mRoot );
+  DeleteNode(mRoot);
 }
 
-bool AtlasPacker::Pack( SizeType blockWidth, SizeType blockHeight,
-                        SizeType& packPositionX, SizeType& packPositionY)
+bool AtlasPacker::Pack(SizeType blockWidth, SizeType blockHeight, SizeType& packPositionX, SizeType& packPositionY)
 {
-  Node* firstFit = InsertNode( mRoot, blockWidth, blockHeight );
-  if( firstFit != NULL )
+  Node* firstFit = InsertNode(mRoot, blockWidth, blockHeight);
+  if(firstFit != NULL)
   {
     firstFit->occupied = true;
-    packPositionX = firstFit->rectArea.x;
-    packPositionY = firstFit->rectArea.y;
-    mAvailableArea -= blockWidth*blockHeight;
+    packPositionX      = firstFit->rectArea.x;
+    packPositionY      = firstFit->rectArea.y;
+    mAvailableArea -= blockWidth * blockHeight;
     return true;
   }
   return false;
 }
 
-void AtlasPacker::DeleteBlock( SizeType packPositionX, SizeType packPositionY, SizeType blockWidth, SizeType blockHeight )
+void AtlasPacker::DeleteBlock(SizeType packPositionX, SizeType packPositionY, SizeType blockWidth, SizeType blockHeight)
 {
-  Node* node =  SearchNode( mRoot, packPositionX, packPositionY, blockWidth, blockHeight  );
-  if( node != NULL )
+  Node* node = SearchNode(mRoot, packPositionX, packPositionY, blockWidth, blockHeight);
+  if(node != NULL)
   {
-    mAvailableArea += blockWidth*blockHeight;
-    MergeToNonOccupied( node );
+    mAvailableArea += blockWidth * blockHeight;
+    MergeToNonOccupied(node);
   }
 }
 
@@ -103,18 +98,18 @@ unsigned int AtlasPacker::GetAvailableArea() const
   return mAvailableArea;
 }
 
-AtlasPacker::Node* AtlasPacker::InsertNode( Node* root, SizeType blockWidth, SizeType blockHeight )
+AtlasPacker::Node* AtlasPacker::InsertNode(Node* root, SizeType blockWidth, SizeType blockHeight)
 {
-  if( root == NULL )
+  if(root == NULL)
   {
     return NULL;
   }
 
-  if( root->occupied )
+  if(root->occupied)
   {
     // if not the leaf, then try insert into the first child.
     Node* newNode = InsertNode(root->child[0], blockWidth, blockHeight);
-    if( newNode == NULL )// no room, try insert into the second child.
+    if(newNode == NULL) // no room, try insert into the second child.
     {
       newNode = InsertNode(root->child[1], blockWidth, blockHeight);
     }
@@ -122,58 +117,57 @@ AtlasPacker::Node* AtlasPacker::InsertNode( Node* root, SizeType blockWidth, Siz
   }
 
   // too small, return
-  if( root->rectArea.width < blockWidth || root->rectArea.height < blockHeight )
+  if(root->rectArea.width < blockWidth || root->rectArea.height < blockHeight)
   {
     return NULL;
   }
 
   // right size, accept
-  if( root->rectArea.width == blockWidth && root->rectArea.height == blockHeight )
+  if(root->rectArea.width == blockWidth && root->rectArea.height == blockHeight)
   {
     return root;
   }
 
   //too much room, need to split
-  SplitNode( root, blockWidth, blockHeight );
+  SplitNode(root, blockWidth, blockHeight);
   // insert into the first child created.
-  return InsertNode( root->child[0], blockWidth, blockHeight);
+  return InsertNode(root->child[0], blockWidth, blockHeight);
 }
 
-void AtlasPacker::SplitNode( Node* node, SizeType blockWidth, SizeType blockHeight )
+void AtlasPacker::SplitNode(Node* node, SizeType blockWidth, SizeType blockHeight)
 {
   node->occupied = true;
 
   // decide which way to split
-  SizeType remainingWidth = node->rectArea.width - blockWidth;
+  SizeType remainingWidth  = node->rectArea.width - blockWidth;
   SizeType remainingHeight = node->rectArea.height - blockHeight;
 
-  if( remainingWidth > remainingHeight ) // split vertically
+  if(remainingWidth > remainingHeight) // split vertically
   {
-    node->child[0] = new Node( node, node->rectArea.x, node->rectArea.y, blockWidth, node->rectArea.height  );
-    node->child[1] = new Node( node, node->rectArea.x+blockWidth, node->rectArea.y, node->rectArea.width-blockWidth, node->rectArea.height );
+    node->child[0] = new Node(node, node->rectArea.x, node->rectArea.y, blockWidth, node->rectArea.height);
+    node->child[1] = new Node(node, node->rectArea.x + blockWidth, node->rectArea.y, node->rectArea.width - blockWidth, node->rectArea.height);
   }
   else // split horizontally
   {
-    node->child[0] = new Node( node, node->rectArea.x, node->rectArea.y, node->rectArea.width, blockHeight  );
-    node->child[1] = new Node( node, node->rectArea.x, node->rectArea.y+blockHeight, node->rectArea.width, node->rectArea.height-blockHeight );
+    node->child[0] = new Node(node, node->rectArea.x, node->rectArea.y, node->rectArea.width, blockHeight);
+    node->child[1] = new Node(node, node->rectArea.x, node->rectArea.y + blockHeight, node->rectArea.width, node->rectArea.height - blockHeight);
   }
 }
 
-AtlasPacker::Node* AtlasPacker::SearchNode( Node* node, SizeType packPositionX, SizeType packPositionY, SizeType blockWidth, SizeType blockHeight  )
+AtlasPacker::Node* AtlasPacker::SearchNode(Node* node, SizeType packPositionX, SizeType packPositionY, SizeType blockWidth, SizeType blockHeight)
 {
-  if( node != NULL )
+  if(node != NULL)
   {
-    if( node->child[0] != NULL) //not a leaf
+    if(node->child[0] != NULL) //not a leaf
     {
       Node* newNode = SearchNode(node->child[0], packPositionX, packPositionY, blockWidth, blockHeight);
-      if( newNode == NULL )// try search from the second child.
+      if(newNode == NULL) // try search from the second child.
       {
         newNode = SearchNode(node->child[1], packPositionX, packPositionY, blockWidth, blockHeight);
       }
       return newNode;
     }
-    else if( ApproximatelyEqual(node->rectArea.x, packPositionX) && ApproximatelyEqual(node->rectArea.y, packPositionY )
-        && ApproximatelyEqual(node->rectArea.width, blockWidth) && ApproximatelyEqual( node->rectArea.height, blockHeight) )
+    else if(ApproximatelyEqual(node->rectArea.x, packPositionX) && ApproximatelyEqual(node->rectArea.y, packPositionY) && ApproximatelyEqual(node->rectArea.width, blockWidth) && ApproximatelyEqual(node->rectArea.height, blockHeight))
     {
       return node;
     }
@@ -182,125 +176,123 @@ AtlasPacker::Node* AtlasPacker::SearchNode( Node* node, SizeType packPositionX, 
   return NULL;
 }
 
-void AtlasPacker::MergeToNonOccupied( Node* node )
+void AtlasPacker::MergeToNonOccupied(Node* node)
 {
   node->occupied = false;
-  Node* parent = node->parent;
+  Node* parent   = node->parent;
   // both child are not occupied, merge the space to parent
-  if( parent != NULL && parent->child[0]->occupied == false && parent->child[1]->occupied == false)
+  if(parent != NULL && parent->child[0]->occupied == false && parent->child[1]->occupied == false)
   {
     delete parent->child[0];
     parent->child[0] = NULL;
     delete parent->child[1];
     parent->child[1] = NULL;
 
-    MergeToNonOccupied( parent );
+    MergeToNonOccupied(parent);
   }
 }
 
-void AtlasPacker::DeleteNode( Node *node )
+void AtlasPacker::DeleteNode(Node* node)
 {
-  if( node != NULL )
+  if(node != NULL)
   {
-    DeleteNode( node->child[0] );
-    DeleteNode( node->child[1] );
+    DeleteNode(node->child[0]);
+    DeleteNode(node->child[1]);
     delete node;
   }
 }
 
-Uint16Pair AtlasPacker::GroupPack( const Dali::Vector<Uint16Pair>& blockSizes, Dali::Vector<Uint16Pair>& packPositions )
+Uint16Pair AtlasPacker::GroupPack(const Dali::Vector<Uint16Pair>& blockSizes, Dali::Vector<Uint16Pair>& packPositions)
 {
   uint16_t count = blockSizes.Count();
-  packPositions.Resize( count );
+  packPositions.Resize(count);
 
   // Sort the blocks according to its maximum dimension. The bigger blocks are packed first.
   Dali::Vector<Uint16Pair> packOrder;
-  packOrder.Resize( count );
-  for( uint16_t i = 0; i < count; i++ )
+  packOrder.Resize(count);
+  for(uint16_t i = 0; i < count; i++)
   {
-    packOrder[i].SetX( MaxDimension( blockSizes[i] ) );
-    packOrder[i].SetY( i );
+    packOrder[i].SetX(MaxDimension(blockSizes[i]));
+    packOrder[i].SetY(i);
   }
-  for( uint16_t i = 0; i < count-1; i++ )
-    for( uint16_t j = 0; j < count-i-1; j++ )
+  for(uint16_t i = 0; i < count - 1; i++)
+    for(uint16_t j = 0; j < count - i - 1; j++)
     {
-      if( packOrder[j].GetX() < packOrder[j+1].GetX() )
+      if(packOrder[j].GetX() < packOrder[j + 1].GetX())
       {
-        Swap( packOrder[j], packOrder[j+1] );
+        Swap(packOrder[j], packOrder[j + 1]);
       }
     }
 
-  int index = packOrder[0].GetY();
-  AtlasPacker packer( blockSizes[index].GetWidth(), blockSizes[index].GetHeight() );
+  int         index = packOrder[0].GetY();
+  AtlasPacker packer(blockSizes[index].GetWidth(), blockSizes[index].GetHeight());
 
   SizeType packPositionX, packPositionY;
   // pack the blocks one by one with descending size, grows as necessary to accommodate each subsequent block.
-  for( uint16_t i = 0; i < count; i++ )
+  for(uint16_t i = 0; i < count; i++)
   {
     index = packOrder[i].GetY();
-    packer.GrowPack( blockSizes[index].GetWidth(), blockSizes[index].GetHeight(),
-                     packPositionX, packPositionY );
-    packPositions[index].SetX( packPositionX );
-    packPositions[index].SetY( packPositionY );
+    packer.GrowPack(blockSizes[index].GetWidth(), blockSizes[index].GetHeight(), packPositionX, packPositionY);
+    packPositions[index].SetX(packPositionX);
+    packPositions[index].SetY(packPositionY);
   }
 
-  return Uint16Pair( packer.mRoot->rectArea.width, packer.mRoot->rectArea.height );
+  return Uint16Pair(packer.mRoot->rectArea.width, packer.mRoot->rectArea.height);
 }
 
-void AtlasPacker::GrowPack( SizeType blockWidth, SizeType blockHeight,
-                            SizeType& packPositionX, SizeType& packPositionY )
+void AtlasPacker::GrowPack(SizeType blockWidth, SizeType blockHeight, SizeType& packPositionX, SizeType& packPositionY)
 {
-  Node* firstFit = InsertNode( mRoot, blockWidth, blockHeight );
-  if( firstFit == NULL )
+  Node* firstFit = InsertNode(mRoot, blockWidth, blockHeight);
+  if(firstFit == NULL)
   {
     // Could fit in the current left space, grow the partition tree to get more space.
-    GrowNode( blockWidth, blockHeight );
-    firstFit = InsertNode( mRoot->child[1], blockWidth, blockHeight );
+    GrowNode(blockWidth, blockHeight);
+    firstFit = InsertNode(mRoot->child[1], blockWidth, blockHeight);
   }
 
-  DALI_ASSERT_ALWAYS( firstFit != NULL && "It should never happen!")
+  DALI_ASSERT_ALWAYS(firstFit != NULL && "It should never happen!")
 
   firstFit->occupied = true;
-  packPositionX = firstFit->rectArea.x;
-  packPositionY = firstFit->rectArea.y;
+  packPositionX      = firstFit->rectArea.x;
+  packPositionY      = firstFit->rectArea.y;
 }
 
-void AtlasPacker::GrowNode( SizeType blockWidth, SizeType blockHeight )
+void AtlasPacker::GrowNode(SizeType blockWidth, SizeType blockHeight)
 {
   // Attempts to maintain a roughly square ratio when choosing the growing direction: right or down
   bool canGrowRight = blockWidth <= mRoot->rectArea.width;
-  bool canGrowDown = blockHeight <= mRoot->rectArea.height;
+  bool canGrowDown  = blockHeight <= mRoot->rectArea.height;
 
-  bool shouldGrowRight = canGrowRight && mRoot->rectArea.height >= mRoot->rectArea.width+blockWidth;
-  bool shouldGrowDown = canGrowDown && mRoot->rectArea.width >= mRoot->rectArea.height+blockHeight;
+  bool shouldGrowRight = canGrowRight && mRoot->rectArea.height >= mRoot->rectArea.width + blockWidth;
+  bool shouldGrowDown  = canGrowDown && mRoot->rectArea.width >= mRoot->rectArea.height + blockHeight;
 
-  if( canGrowRight && canGrowDown )
+  if(canGrowRight && canGrowDown)
   {
-    shouldGrowRight = mRoot->rectArea.width+blockWidth <= mRoot->rectArea.height+blockHeight;
-    shouldGrowDown = !shouldGrowRight;
+    shouldGrowRight = mRoot->rectArea.width + blockWidth <= mRoot->rectArea.height + blockHeight;
+    shouldGrowDown  = !shouldGrowRight;
   }
 
-  if( shouldGrowRight || ( canGrowRight && !shouldGrowDown ) )
+  if(shouldGrowRight || (canGrowRight && !shouldGrowDown))
   {
-    Node* newRoot = new Node( NULL, 0u, 0u, mRoot->rectArea.width+blockWidth, mRoot->rectArea.height );
+    Node* newRoot     = new Node(NULL, 0u, 0u, mRoot->rectArea.width + blockWidth, mRoot->rectArea.height);
     newRoot->occupied = true;
     newRoot->child[0] = mRoot;
-    newRoot->child[1] = new Node( newRoot, mRoot->rectArea.width, 0u, blockWidth, mRoot->rectArea.height );
+    newRoot->child[1] = new Node(newRoot, mRoot->rectArea.width, 0u, blockWidth, mRoot->rectArea.height);
 
     mRoot = newRoot;
   }
-  else if( shouldGrowDown || ( canGrowDown && !shouldGrowRight ) )
+  else if(shouldGrowDown || (canGrowDown && !shouldGrowRight))
   {
-    Node* newRoot = new Node( NULL, 0u, 0u, mRoot->rectArea.width, mRoot->rectArea.height+blockHeight );
+    Node* newRoot     = new Node(NULL, 0u, 0u, mRoot->rectArea.width, mRoot->rectArea.height + blockHeight);
     newRoot->occupied = true;
     newRoot->child[0] = mRoot;
-    newRoot->child[1] = new Node( newRoot, 0u, mRoot->rectArea.height, mRoot->rectArea.width, blockHeight );
+    newRoot->child[1] = new Node(newRoot, 0u, mRoot->rectArea.height, mRoot->rectArea.width, blockHeight);
 
     mRoot = newRoot;
   }
   else
   {
-    DALI_LOG_ERROR( " Atlas Packer failed to grow: make sure the packing order is sorted with the block size to avoid this happening");
+    DALI_LOG_ERROR(" Atlas Packer failed to grow: make sure the packing order is sorted with the block size to avoid this happening");
   }
 }
 

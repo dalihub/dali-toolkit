@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,128 +26,123 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
-LoadingTask::LoadingTask( uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex )
+LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex)
 : pixelBuffer(),
   url(),
-  id( id ),
+  id(id),
   dimensions(),
   fittingMode(),
   samplingMode(),
   orientationCorrection(),
-  preMultiplyOnLoad( DevelAsyncImageLoader::PreMultiplyOnLoad::OFF ),
-  isMaskTask( false ),
+  preMultiplyOnLoad(DevelAsyncImageLoader::PreMultiplyOnLoad::OFF),
+  isMaskTask(false),
   maskPixelBuffer(),
-  contentScale( 1.0f ),
-  cropToMask( false ),
-  animatedImageLoading( animatedImageLoading ),
-  frameIndex( frameIndex )
+  contentScale(1.0f),
+  cropToMask(false),
+  animatedImageLoading(animatedImageLoading),
+  frameIndex(frameIndex)
 {
 }
 
-LoadingTask::LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dimensions,
-                          FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
+LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 : pixelBuffer(),
-  url( url ),
-  id( id ),
-  dimensions( dimensions ),
-  fittingMode( fittingMode ),
-  samplingMode( samplingMode ),
-  orientationCorrection( orientationCorrection ),
-  preMultiplyOnLoad( preMultiplyOnLoad ),
-  isMaskTask( false ),
+  url(url),
+  id(id),
+  dimensions(dimensions),
+  fittingMode(fittingMode),
+  samplingMode(samplingMode),
+  orientationCorrection(orientationCorrection),
+  preMultiplyOnLoad(preMultiplyOnLoad),
+  isMaskTask(false),
   maskPixelBuffer(),
-  contentScale( 1.0f ),
-  cropToMask( false ),
+  contentScale(1.0f),
+  cropToMask(false),
   animatedImageLoading(),
-  frameIndex( 0u )
+  frameIndex(0u)
 {
 }
 
-LoadingTask::LoadingTask( uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask,
-                          DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
-: pixelBuffer( pixelBuffer ),
-  url( "" ),
-  id( id ),
+LoadingTask::LoadingTask(uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
+: pixelBuffer(pixelBuffer),
+  url(""),
+  id(id),
   dimensions(),
   fittingMode(),
   samplingMode(),
   orientationCorrection(),
-  preMultiplyOnLoad( preMultiplyOnLoad ),
-  isMaskTask( true ),
-  maskPixelBuffer( maskPixelBuffer ),
-  contentScale( contentScale ),
-  cropToMask( cropToMask ),
+  preMultiplyOnLoad(preMultiplyOnLoad),
+  isMaskTask(true),
+  maskPixelBuffer(maskPixelBuffer),
+  contentScale(contentScale),
+  cropToMask(cropToMask),
   animatedImageLoading(),
-  frameIndex( 0u )
+  frameIndex(0u)
 {
 }
 
 void LoadingTask::Load()
 {
-  if( animatedImageLoading )
+  if(animatedImageLoading)
   {
-    pixelBuffer = animatedImageLoading.LoadFrame( frameIndex );
+    pixelBuffer = animatedImageLoading.LoadFrame(frameIndex);
   }
-  else if( url.IsLocalResource() )
+  else if(url.IsLocalResource())
   {
-    pixelBuffer = Dali::LoadImageFromFile( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
+    pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
   }
   else
   {
-    pixelBuffer = Dali::DownloadImageSynchronously ( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
+    pixelBuffer = Dali::DownloadImageSynchronously(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
   }
 
-  if( !pixelBuffer )
+  if(!pixelBuffer)
   {
-    DALI_LOG_ERROR( "LoadingTask::Load: Loading is failed: %s\n", url.GetUrl().c_str() );
+    DALI_LOG_ERROR("LoadingTask::Load: Loading is failed: %s\n", url.GetUrl().c_str());
   }
 }
 
 void LoadingTask::ApplyMask()
 {
-  pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
+  pixelBuffer.ApplyMask(maskPixelBuffer, contentScale, cropToMask);
 }
 
 void LoadingTask::MultiplyAlpha()
 {
-  if( pixelBuffer && Pixel::HasAlpha( pixelBuffer.GetPixelFormat() ) )
+  if(pixelBuffer && Pixel::HasAlpha(pixelBuffer.GetPixelFormat()))
   {
-    if( preMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON )
+    if(preMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
     {
       pixelBuffer.MultiplyColorByAlpha();
     }
   }
 }
 
-ImageLoadThread::ImageLoadThread( EventThreadCallback* trigger )
-: mTrigger( trigger ),
-  mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
+ImageLoadThread::ImageLoadThread(EventThreadCallback* trigger)
+: mTrigger(trigger),
+  mLogFactory(Dali::Adaptor::Get().GetLogFactory())
 {
 }
 
 ImageLoadThread::~ImageLoadThread()
 {
   // add an empty task would stop the thread from conditional wait.
-  AddTask( NULL );
+  AddTask(NULL);
   // stop the thread
   Join();
 
   delete mTrigger;
 
-  for( auto&& iter : mLoadQueue )
+  for(auto&& iter : mLoadQueue)
   {
     delete iter;
   }
   mLoadQueue.Clear();
 
-  for( auto&& iter : mCompleteQueue )
+  for(auto&& iter : mCompleteQueue)
   {
     delete iter;
   }
@@ -156,12 +151,12 @@ ImageLoadThread::~ImageLoadThread()
 
 void ImageLoadThread::Run()
 {
-  SetThreadName( "ImageLoadThread" );
+  SetThreadName("ImageLoadThread");
   mLogFactory.InstallLogFunction();
 
-  while( LoadingTask* task = NextTaskToProcess() )
+  while(LoadingTask* task = NextTaskToProcess())
   {
-    if( !task->isMaskTask )
+    if(!task->isMaskTask)
     {
       task->Load();
     }
@@ -171,21 +166,21 @@ void ImageLoadThread::Run()
     }
     task->MultiplyAlpha();
 
-    AddCompletedTask( task );
+    AddCompletedTask(task);
   }
 }
 
-void ImageLoadThread::AddTask( LoadingTask* task )
+void ImageLoadThread::AddTask(LoadingTask* task)
 {
   bool wasEmpty = false;
   {
     // Lock while adding task to the queue
-    ConditionalWait::ScopedLock lock( mConditionalWait );
+    ConditionalWait::ScopedLock lock(mConditionalWait);
     wasEmpty = mLoadQueue.Empty();
-    mLoadQueue.PushBack( task );
+    mLoadQueue.PushBack(task);
   }
 
-  if( wasEmpty )
+  if(wasEmpty)
   {
     // wake up the image loading thread
     mConditionalWait.Notify();
@@ -195,31 +190,31 @@ void ImageLoadThread::AddTask( LoadingTask* task )
 LoadingTask* ImageLoadThread::NextCompletedTask()
 {
   // Lock while popping task out from the queue
-  Mutex::ScopedLock lock( mMutex );
+  Mutex::ScopedLock lock(mMutex);
 
-  if( mCompleteQueue.Empty() )
+  if(mCompleteQueue.Empty())
   {
     return NULL;
   }
 
-  Vector< LoadingTask* >::Iterator next = mCompleteQueue.Begin();
-  LoadingTask* nextTask = *next;
-  mCompleteQueue.Erase( next );
+  Vector<LoadingTask*>::Iterator next     = mCompleteQueue.Begin();
+  LoadingTask*                   nextTask = *next;
+  mCompleteQueue.Erase(next);
 
   return nextTask;
 }
 
-bool ImageLoadThread::CancelTask( uint32_t loadingTaskId )
+bool ImageLoadThread::CancelTask(uint32_t loadingTaskId)
 {
   // Lock while remove task from the queue
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  ConditionalWait::ScopedLock lock(mConditionalWait);
 
-  for( Vector< LoadingTask* >::Iterator iter = mLoadQueue.Begin(); iter != mLoadQueue.End(); ++iter )
+  for(Vector<LoadingTask*>::Iterator iter = mLoadQueue.Begin(); iter != mLoadQueue.End(); ++iter)
   {
-    if( (*iter)->id == loadingTaskId )
+    if((*iter)->id == loadingTaskId)
     {
-      delete (*iter);
-      mLoadQueue.Erase( iter );
+      delete(*iter);
+      mLoadQueue.Erase(iter);
       return true;
     }
   }
@@ -227,15 +222,14 @@ bool ImageLoadThread::CancelTask( uint32_t loadingTaskId )
   return false;
 }
 
-
 void ImageLoadThread::CancelAll()
 {
   // Lock while remove task from the queue
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  ConditionalWait::ScopedLock lock(mConditionalWait);
 
-  for( Vector< LoadingTask* >::Iterator iter = mLoadQueue.Begin(); iter != mLoadQueue.End(); ++iter )
+  for(Vector<LoadingTask*>::Iterator iter = mLoadQueue.Begin(); iter != mLoadQueue.End(); ++iter)
   {
-    delete ( *iter );
+    delete(*iter);
   }
   mLoadQueue.Clear();
 }
@@ -243,25 +237,25 @@ void ImageLoadThread::CancelAll()
 LoadingTask* ImageLoadThread::NextTaskToProcess()
 {
   // Lock while popping task out from the queue
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  ConditionalWait::ScopedLock lock(mConditionalWait);
 
-  while( mLoadQueue.Empty() )
+  while(mLoadQueue.Empty())
   {
-    mConditionalWait.Wait( lock );
+    mConditionalWait.Wait(lock);
   }
 
-  Vector< LoadingTask* >::Iterator next = mLoadQueue.Begin();
-  LoadingTask* nextTask = *next;
-  mLoadQueue.Erase( next );
+  Vector<LoadingTask*>::Iterator next     = mLoadQueue.Begin();
+  LoadingTask*                   nextTask = *next;
+  mLoadQueue.Erase(next);
 
   return nextTask;
 }
 
-void ImageLoadThread::AddCompletedTask( LoadingTask* task )
+void ImageLoadThread::AddCompletedTask(LoadingTask* task)
 {
   // Lock while adding task to the queue
-  Mutex::ScopedLock lock( mMutex );
-  mCompleteQueue.PushBack( task );
+  Mutex::ScopedLock lock(mMutex);
+  mCompleteQueue.PushBack(task);
 
   // wake up the main thread
   mTrigger->Trigger();

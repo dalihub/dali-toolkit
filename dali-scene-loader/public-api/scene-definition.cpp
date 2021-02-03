@@ -16,15 +16,15 @@
  */
 
 // EXTERNAL
-#include "dali/public-api/animation/constraints.h"
 #include "dali/devel-api/common/map-wrapper.h"
+#include "dali/public-api/animation/constraints.h"
 
 // INTERNAL
-#include "dali-scene-loader/public-api/scene-definition.h"
-#include "dali-scene-loader/public-api/blend-shape-details.h"
-#include "dali-scene-loader/public-api/utils.h"
-#include "dali-scene-loader/public-api/skinning-details.h"
 #include "dali-scene-loader/internal/graphics/builtin-shader-extern-gen.h"
+#include "dali-scene-loader/public-api/blend-shape-details.h"
+#include "dali-scene-loader/public-api/scene-definition.h"
+#include "dali-scene-loader/public-api/skinning-details.h"
+#include "dali-scene-loader/public-api/utils.h"
 
 //#define DEBUG_SCENE_DEFINITION
 //#define DEBUG_JOINTS
@@ -35,7 +35,7 @@
 #define DEBUG_ONLY(x)
 #endif
 
-#define LOGD(x) DEBUG_ONLY(printf x ; printf("\n"); fflush(stdout))
+#define LOGD(x) DEBUG_ONLY(printf x; printf("\n"); fflush(stdout))
 
 namespace Dali
 {
@@ -43,104 +43,84 @@ namespace SceneLoader
 {
 namespace
 {
+const std::string JOINT_MATRIX{"jointMatrix"};
 
-const std::string JOINT_MATRIX{ "jointMatrix" };
-
-const std::map<Property::Type, Constraint(*)(Actor&, Property::Index)> sConstraintFactory = {
-  {
-    Property::Type::BOOLEAN,
-    [](Actor& a, Property::Index i) {
-      return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs) {
-        current = inputs[0]->GetBoolean();
-      });
-    }
-  },
-  {
-    Property::Type::INTEGER,
-    [](Actor& a, Property::Index i) {
-      return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs) {
-        current = inputs[0]->GetInteger();
-      });
-    }
-  },
-  {
-    Property::Type::FLOAT,
-    [](Actor& a, Property::Index i) {
-      return Constraint::New<float>(a, i, EqualToConstraint());
-    }
-  },
-  {
-    Property::Type::VECTOR2,
-    [](Actor& a, Property::Index i) {
-      return Constraint::New<Vector2>(a, i, EqualToConstraint());
-    }
-  },
-  {
-    Property::Type::VECTOR3,
-    [](Actor& a, Property::Index i) {
-      return Constraint::New<Vector3>(a, i, EqualToConstraint());
-    }
-  },
-  {
-    Property::Type::VECTOR4,
-    [](Actor& a, Property::Index i) {
-      return Constraint::New<Vector4>(a, i, EqualToConstraint());
-    }
-  },
-  {
-    Property::Type::MATRIX,
-    [](Actor& a, Property::Index i) {
-      return Constraint::New<Matrix>(a, i, EqualToConstraint());
-    }
-  },
-  {
-    Property::Type::MATRIX3,
-    [](Actor& a, Property::Index i) {
-      return Constraint::New<Matrix3>(a, i, EqualToConstraint());
-    }
-  },
-  {
-    Property::Type::ROTATION,
-    [](Actor& a, Property::Index i) {
-      return Constraint::New<Quaternion>(a, i, EqualToConstraint());
-    }
-  },
+const std::map<Property::Type, Constraint (*)(Actor&, Property::Index)> sConstraintFactory = {
+  {Property::Type::BOOLEAN,
+   [](Actor& a, Property::Index i) {
+     return Constraint::New<bool>(a, i, [](bool& current, const PropertyInputContainer& inputs) {
+       current = inputs[0]->GetBoolean();
+     });
+   }},
+  {Property::Type::INTEGER,
+   [](Actor& a, Property::Index i) {
+     return Constraint::New<int>(a, i, [](int& current, const PropertyInputContainer& inputs) {
+       current = inputs[0]->GetInteger();
+     });
+   }},
+  {Property::Type::FLOAT,
+   [](Actor& a, Property::Index i) {
+     return Constraint::New<float>(a, i, EqualToConstraint());
+   }},
+  {Property::Type::VECTOR2,
+   [](Actor& a, Property::Index i) {
+     return Constraint::New<Vector2>(a, i, EqualToConstraint());
+   }},
+  {Property::Type::VECTOR3,
+   [](Actor& a, Property::Index i) {
+     return Constraint::New<Vector3>(a, i, EqualToConstraint());
+   }},
+  {Property::Type::VECTOR4,
+   [](Actor& a, Property::Index i) {
+     return Constraint::New<Vector4>(a, i, EqualToConstraint());
+   }},
+  {Property::Type::MATRIX,
+   [](Actor& a, Property::Index i) {
+     return Constraint::New<Matrix>(a, i, EqualToConstraint());
+   }},
+  {Property::Type::MATRIX3,
+   [](Actor& a, Property::Index i) {
+     return Constraint::New<Matrix3>(a, i, EqualToConstraint());
+   }},
+  {Property::Type::ROTATION,
+   [](Actor& a, Property::Index i) {
+     return Constraint::New<Quaternion>(a, i, EqualToConstraint());
+   }},
 };
 
 struct ResourceReflector : IResourceReflector
 {
-  Index* iMesh = nullptr;
+  Index* iMesh   = nullptr;
   Index* iShader = nullptr;
 
   void Reflect(ResourceType::Value type, Index& id)
   {
-    switch (type)
+    switch(type)
     {
-    case ResourceType::Shader:
-      DALI_ASSERT_ALWAYS(!iShader && "Shader index already assigned!");
-      iShader = &id;
-      break;
+      case ResourceType::Shader:
+        DALI_ASSERT_ALWAYS(!iShader && "Shader index already assigned!");
+        iShader = &id;
+        break;
 
-    case ResourceType::Mesh:
-      DALI_ASSERT_ALWAYS(!iMesh && "Mesh index already assigned!");
-      iMesh = &id;
-      break;
+      case ResourceType::Mesh:
+        DALI_ASSERT_ALWAYS(!iMesh && "Mesh index already assigned!");
+        iMesh = &id;
+        break;
 
-    default:  // Other resource types are not relevant to the problem at hand.
-      break;
+      default: // Other resource types are not relevant to the problem at hand.
+        break;
     }
   }
 };
 
-
 #ifdef DEBUG_JOINTS
 
 Shader sJointDebugShader;
-int sNumScenes = 0;
+int    sNumScenes = 0;
 
 void EnsureJointDebugShaderCreated()
 {
-  if (0 == sNumScenes)
+  if(0 == sNumScenes)
   {
     sJointDebugShader = Shader::New(SHADER_SCENE_LOADER_JOINT_DEBUG_VERT, SHADER_SCENE_LOADER_JOINT_DEBUG_FRAG);
   }
@@ -151,24 +131,24 @@ void AddJointDebugVisual(Actor aJoint)
 {
   Property::Map attribs;
   attribs["aPosition"] = Property::Type::VECTOR3;
-  attribs["aColor"] = Property::Type::FLOAT;
+  attribs["aColor"]    = Property::Type::FLOAT;
 
   PropertyBuffer vbo = PropertyBuffer::New(attribs);
 
   struct Vertex
   {
     Vector3 pos;
-    float color;
+    float   color;
   } vertices[] = {
-    { Vector3::ZERO, .999f + .999f * 256.f + .999f * 256.f * 256.f },
-    { Vector3::XAXIS, .999f },
-    { Vector3::YAXIS, .999f * 256.f },
-    { Vector3::ZAXIS, .999f * 256.f * 256.f },
+    {Vector3::ZERO, .999f + .999f * 256.f + .999f * 256.f * 256.f},
+    {Vector3::XAXIS, .999f},
+    {Vector3::YAXIS, .999f * 256.f},
+    {Vector3::ZAXIS, .999f * 256.f * 256.f},
   };
 
   vbo.SetData(&vertices, std::extent<decltype(vertices)>::value);
 
-  uint16_t indices[] = { 0, 1, 0, 2, 0, 3 };
+  uint16_t indices[] = {0, 1, 0, 2, 0, 3};
 
   Geometry geo = Geometry::New();
   geo.AddVertexBuffer(vbo);
@@ -180,21 +160,22 @@ void AddJointDebugVisual(Actor aJoint)
 
   aJoint.SetVisible(true);
 }
-#endif  //DEBUG_JOINTS
+#endif //DEBUG_JOINTS
 
 class ActorCreatorVisitor : public NodeDefinition::IConstVisitor
 {
 public:
   ActorCreatorVisitor(NodeDefinition::CreateParams& params)
   : mCreationContext(params)
-  {}
+  {
+  }
 
   void Start(const NodeDefinition& n)
   {
     mCreationContext.mXforms.modelStack.Push(n.GetLocalSpace());
 
     Actor a = n.CreateActor(mCreationContext);
-    if (!mActorStack.empty())
+    if(!mActorStack.empty())
     {
       mActorStack.back().Add(a);
     }
@@ -218,16 +199,16 @@ public:
 
 private:
   NodeDefinition::CreateParams& mCreationContext;
-  std::vector<Actor> mActorStack;
-  Actor mRoot;
+  std::vector<Actor>            mActorStack;
+  Actor                         mRoot;
 };
 
 bool IsAncestor(const SceneDefinition& scene, Index ancestor, Index node, Index rootHint = INVALID_INDEX)
 {
   bool isAncestor = false;
-  while (node != rootHint && !isAncestor)
+  while(node != rootHint && !isAncestor)
   {
-    node = scene.GetNode(node)->mParentIdx;
+    node       = scene.GetNode(node)->mParentIdx;
     isAncestor = ancestor == node;
   }
   return isAncestor;
@@ -236,7 +217,7 @@ bool IsAncestor(const SceneDefinition& scene, Index ancestor, Index node, Index 
 void InsertUniqueSorted(std::vector<Index>& data, Index value)
 {
   auto iInsert = std::lower_bound(data.begin(), data.end(), value);
-  if (iInsert == data.end() || *iInsert != value)
+  if(iInsert == data.end() || *iInsert != value)
   {
     data.insert(iInsert, value);
   }
@@ -245,7 +226,7 @@ void InsertUniqueSorted(std::vector<Index>& data, Index value)
 void RemoveFromSorted(std::vector<Index>& data, Index value)
 {
   auto iRemove = std::lower_bound(data.begin(), data.end(), value);
-  if (iRemove != data.end() && *iRemove == value)
+  if(iRemove != data.end() && *iRemove == value)
   {
     data.erase(iRemove);
   }
@@ -254,26 +235,24 @@ void RemoveFromSorted(std::vector<Index>& data, Index value)
 Property::Index ConfigureJointMatrix(Actor actor, Actor ancestor, Property::Index propJointMatrix)
 {
   Actor parent = actor.GetParent();
-  if (parent != ancestor)
+  if(parent != ancestor)
   {
     propJointMatrix = ConfigureJointMatrix(parent, ancestor, propJointMatrix);
   }
 
   auto myPropJointMatrix = actor.GetPropertyIndex(JOINT_MATRIX);
-  if (myPropJointMatrix == Property::INVALID_INDEX)
+  if(myPropJointMatrix == Property::INVALID_INDEX)
   {
-    myPropJointMatrix = actor.RegisterProperty(JOINT_MATRIX, Matrix{ false });
-    Constraint constraint = Constraint::New<Matrix>(actor, propJointMatrix,
-      [](Matrix& output, const PropertyInputContainer& inputs)
-      {
-        Matrix jointMatrix{ false };
-        jointMatrix.SetTransformComponents(Vector3::ONE, inputs[0]->GetQuaternion(), inputs[1]->GetVector3());
+    myPropJointMatrix     = actor.RegisterProperty(JOINT_MATRIX, Matrix{false});
+    Constraint constraint = Constraint::New<Matrix>(actor, propJointMatrix, [](Matrix& output, const PropertyInputContainer& inputs) {
+      Matrix jointMatrix{false};
+      jointMatrix.SetTransformComponents(Vector3::ONE, inputs[0]->GetQuaternion(), inputs[1]->GetVector3());
 
-        Matrix::Multiply(output, jointMatrix, inputs[2]->GetMatrix());
-      });
-    constraint.AddSource(Source{ actor, Actor::Property::ORIENTATION });
-    constraint.AddSource(Source{ actor, Actor::Property::POSITION });
-    constraint.AddSource(Source{ parent, propJointMatrix });
+      Matrix::Multiply(output, jointMatrix, inputs[2]->GetMatrix());
+    });
+    constraint.AddSource(Source{actor, Actor::Property::ORIENTATION});
+    constraint.AddSource(Source{actor, Actor::Property::POSITION});
+    constraint.AddSource(Source{parent, propJointMatrix});
     constraint.Apply();
   }
 
@@ -286,38 +265,38 @@ void SortAndDeduplicateSkinningRequests(std::vector<SkinningShaderConfigurationR
   std::sort(requests.begin(), requests.end());
 
   // Remove duplicates.
-  auto i = requests.begin();
-  auto iEnd = requests.end();
-  Shader s = i->mShader;
-  Index skeletonIdx = i->mSkeletonIdx;
+  auto   i           = requests.begin();
+  auto   iEnd        = requests.end();
+  Shader s           = i->mShader;
+  Index  skeletonIdx = i->mSkeletonIdx;
   ++i;
   do
   {
     // Multiple identical shader instances are removed.
-    while (i != iEnd && i->mShader == s)
+    while(i != iEnd && i->mShader == s)
     {
       // Cannot have multiple skeletons input to the same shader.
       // NOTE: DliModel now makes sure this doesn't happen.
       DALI_ASSERT_ALWAYS(i->mSkeletonIdx == skeletonIdx &&
-        "Skinning shader must not be shared between different skeletons.");
+                         "Skinning shader must not be shared between different skeletons.");
 
       i->mShader = Shader();
       ++i;
     }
 
-    if (i == iEnd)
+    if(i == iEnd)
     {
       break;
     }
-    s = i->mShader;
+    s           = i->mShader;
     skeletonIdx = i->mSkeletonIdx;
     ++i;
-  } while (true);
+  } while(true);
 
-  requests.erase(std::remove_if(requests.begin(), requests.end(), [](const SkinningShaderConfigurationRequest& sscr)
-  {
-    return !sscr.mShader;
-  }), requests.end());
+  requests.erase(std::remove_if(requests.begin(), requests.end(), [](const SkinningShaderConfigurationRequest& sscr) {
+                   return !sscr.mShader;
+                 }),
+                 requests.end());
 }
 
 void ConfigureBoneMatrix(const Matrix& ibm, Actor joint, Shader& shader, Index& boneIdx)
@@ -326,40 +305,38 @@ void ConfigureBoneMatrix(const Matrix& ibm, Actor joint, Shader& shader, Index& 
   char propertyNameBuffer[32];
   snprintf(propertyNameBuffer, sizeof(propertyNameBuffer), "%s[%d]", Skinning::BONE_UNIFORM_NAME.c_str(), boneIdx);
   DALI_ASSERT_DEBUG(shader.GetPropertyIndex(propertyNameBuffer) == Property::INVALID_INDEX);
-  auto propBoneXform = shader.RegisterProperty(propertyNameBuffer, Matrix{ false });
+  auto propBoneXform = shader.RegisterProperty(propertyNameBuffer, Matrix{false});
 
   // Constrain bone matrix to joint transform.
-  Constraint constraint = Constraint::New<Matrix>(shader, propBoneXform,
-    [ibm](Matrix& output, const PropertyInputContainer& inputs)
-    {
-      Matrix::Multiply(output, ibm, inputs[0]->GetMatrix());
-    });
+  Constraint constraint = Constraint::New<Matrix>(shader, propBoneXform, [ibm](Matrix& output, const PropertyInputContainer& inputs) {
+    Matrix::Multiply(output, ibm, inputs[0]->GetMatrix());
+  });
 
   auto propJointMatrix = joint.GetPropertyIndex(JOINT_MATRIX);
-  constraint.AddSource(Source{ joint, propJointMatrix });
+  constraint.AddSource(Source{joint, propJointMatrix});
   constraint.Apply();
 
   ++boneIdx;
 }
 
-template <class Visitor, class SceneDefinition>
+template<class Visitor, class SceneDefinition>
 void VisitInternal(Index iNode, const Customization::Choices& choices, Visitor& v, SceneDefinition& sd)
 {
   auto& node = *sd.GetNode(iNode);
   v.Start(node);
 
-  if (node.mCustomization)
+  if(node.mCustomization)
   {
-    if (!node.mChildren.empty())
+    if(!node.mChildren.empty())
     {
-      auto choice = choices.Get(node.mCustomization->mTag);
-      Index i = std::min(choice != Customization::NONE ? choice : 0, static_cast<Index>(node.mChildren.size() - 1));
+      auto  choice = choices.Get(node.mCustomization->mTag);
+      Index i      = std::min(choice != Customization::NONE ? choice : 0, static_cast<Index>(node.mChildren.size() - 1));
       sd.Visit(node.mChildren[i], choices, v);
     }
   }
   else
   {
-    for (auto i : node.mChildren)
+    for(auto i : node.mChildren)
     {
       sd.Visit(i, choices, v);
     }
@@ -368,7 +345,7 @@ void VisitInternal(Index iNode, const Customization::Choices& choices, Visitor& 
   v.Finish(node);
 }
 
-} // nonamespace
+} // namespace
 
 SceneDefinition::SceneDefinition()
 {
@@ -392,7 +369,7 @@ SceneDefinition::~SceneDefinition()
 {
 #ifdef DEBUG_JOINTS
   --sNumScenes;
-  if (sNumScenes == 0)
+  if(sNumScenes == 0)
   {
     sJointDebugShader = Shader();
   }
@@ -401,7 +378,7 @@ SceneDefinition::~SceneDefinition()
 
 uint32_t SceneLoader::SceneDefinition::AddRootNode(Index iNode)
 {
-  if (iNode < mNodes.size())
+  if(iNode < mNodes.size())
   {
     uint32_t result = mRootNodeIds.size();
     mRootNodeIds.push_back(iNode);
@@ -421,7 +398,7 @@ const std::vector<Index>& SceneDefinition::GetRoots() const
 
 void SceneDefinition::RemoveRootNode(Index iRoot)
 {
-  if (iRoot < mRootNodeIds.size())
+  if(iRoot < mRootNodeIds.size())
   {
     mRootNodeIds.erase(mRootNodeIds.begin() + iRoot);
   }
@@ -474,14 +451,15 @@ void SceneDefinition::CountResourceRefs(Index iNode, const Customization::Choice
 
     void Start(const NodeDefinition& n)
     {
-      if (n.mRenderable)
+      if(n.mRenderable)
       {
         n.mRenderable->RegisterResources(counter);
       }
     }
 
     void Finish(const NodeDefinition& n)
-    {}
+    {
+    }
 
   } refCounterVisitor;
   refCounterVisitor.counter.refCounts = &refCounts;
@@ -489,8 +467,7 @@ void SceneDefinition::CountResourceRefs(Index iNode, const Customization::Choice
   Visit(iNode, choices, refCounterVisitor);
 }
 
-Actor SceneDefinition::CreateNodes(Index iNode, const Customization::Choices & choices,
-  NodeDefinition::CreateParams& params) const
+Actor SceneDefinition::CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params) const
 {
   ActorCreatorVisitor actorCreatorVisitor(params);
 
@@ -500,44 +477,46 @@ Actor SceneDefinition::CreateNodes(Index iNode, const Customization::Choices & c
 }
 
 void SceneDefinition::GetCustomizationOptions(const Customization::Choices& choices,
-  Customization::Map& outCustomizationOptions, Customization::Choices* outMissingChoices) const
+                                              Customization::Map&           outCustomizationOptions,
+                                              Customization::Choices*       outMissingChoices) const
 {
   struct : NodeDefinition::IConstVisitor
   {
-    const Customization::Choices* choices;  // choices that we know about.
-    Customization::Map* options;  // tags are registered here. NO OWNERSHIP.
-    Customization::Choices* missingChoices;  // tags will be registered with the default 0. NO OWNERSHIP.
+    const Customization::Choices* choices;        // choices that we know about.
+    Customization::Map*           options;        // tags are registered here. NO OWNERSHIP.
+    Customization::Choices*       missingChoices; // tags will be registered with the default 0. NO OWNERSHIP.
 
     void Start(const NodeDefinition& n)
     {
-      if (n.mCustomization)
+      if(n.mCustomization)
       {
         const std::string& tag = n.mCustomization->mTag;
-        if (missingChoices != nullptr && choices->Get(tag) == Customization::NONE)
+        if(missingChoices != nullptr && choices->Get(tag) == Customization::NONE)
         {
           missingChoices->Set(tag, 0);
         }
 
         auto customization = options->Get(tag);
-        if (!customization)
+        if(!customization)
         {
           customization = options->Set(tag, {});
         }
         customization->nodes.push_back(n.mName);
         customization->numOptions = std::max(customization->numOptions,
-          static_cast<uint32_t>(n.mChildren.size()));
+                                             static_cast<uint32_t>(n.mChildren.size()));
       }
     }
 
     void Finish(const NodeDefinition& n)
-    {}
+    {
+    }
 
   } customizationRegistrationVisitor;
-  customizationRegistrationVisitor.choices = &choices;
-  customizationRegistrationVisitor.options = &outCustomizationOptions;
+  customizationRegistrationVisitor.choices        = &choices;
+  customizationRegistrationVisitor.options        = &outCustomizationOptions;
   customizationRegistrationVisitor.missingChoices = outMissingChoices;
 
-  for (auto i : mRootNodeIds)
+  for(auto i : mRootNodeIds)
   {
     Visit(i, choices, customizationRegistrationVisitor);
   }
@@ -545,13 +524,13 @@ void SceneDefinition::GetCustomizationOptions(const Customization::Choices& choi
 
 NodeDefinition* SceneDefinition::AddNode(std::unique_ptr<NodeDefinition>&& nodeDef)
 {
-  if (FindNode(nodeDef->mName))
+  if(FindNode(nodeDef->mName))
   {
     return nullptr;
   }
 
   // add next index (to which we're about to push) as a child to the designated parent, if any.
-  if (nodeDef->mParentIdx != INVALID_INDEX)
+  if(nodeDef->mParentIdx != INVALID_INDEX)
   {
     mNodes[nodeDef->mParentIdx]->mChildren.push_back(mNodes.size());
   }
@@ -565,20 +544,20 @@ bool SceneDefinition::ReparentNode(const std::string& name, const std::string& n
 {
   LOGD(("reparenting %s to %s @ %d", name.c_str(), newParentName.c_str(), siblingOrder));
 
-  std::unique_ptr<NodeDefinition>* nodePtr = nullptr;
+  std::unique_ptr<NodeDefinition>* nodePtr      = nullptr;
   std::unique_ptr<NodeDefinition>* newParentPtr = nullptr;
-  if (!FindNode(name, &nodePtr) || !FindNode(newParentName, &newParentPtr))
+  if(!FindNode(name, &nodePtr) || !FindNode(newParentName, &newParentPtr))
   {
     return false;
   }
 
-  auto& node = *nodePtr;
-  auto iNode = std::distance(mNodes.data(), nodePtr);
+  auto& node  = *nodePtr;
+  auto  iNode = std::distance(mNodes.data(), nodePtr);
 
   DEBUG_ONLY(auto dumpNode = [](NodeDefinition const& n) {
     std::ostringstream stream;
     stream << n.mName << " (" << n.mParentIdx << "):";
-    for (auto i : n.mChildren)
+    for(auto i : n.mChildren)
     {
       stream << i << ", ";
     }
@@ -586,7 +565,7 @@ bool SceneDefinition::ReparentNode(const std::string& name, const std::string& n
   };)
 
   // Remove node from children of previous parent (if any).
-  if (node->mParentIdx != INVALID_INDEX)
+  if(node->mParentIdx != INVALID_INDEX)
   {
     LOGD(("old parent:"));
     DEBUG_ONLY(dumpNode(*mNodes[node->mParentIdx]);)
@@ -601,7 +580,7 @@ bool SceneDefinition::ReparentNode(const std::string& name, const std::string& n
   LOGD(("new parent:"));
   DEBUG_ONLY(dumpNode(**newParentPtr);)
   auto& children = (*newParentPtr)->mChildren;
-  if (siblingOrder > children.size())
+  if(siblingOrder > children.size())
   {
     siblingOrder = children.size();
   }
@@ -611,7 +590,7 @@ bool SceneDefinition::ReparentNode(const std::string& name, const std::string& n
   // Update parent index.
   LOGD(("node:"));
   DEBUG_ONLY(dumpNode(*node);)
-  auto iParent = std::distance(mNodes.data(), newParentPtr);
+  auto iParent     = std::distance(mNodes.data(), newParentPtr);
   node->mParentIdx = iParent;
   DEBUG_ONLY(dumpNode(*node);)
   return true;
@@ -620,33 +599,33 @@ bool SceneDefinition::ReparentNode(const std::string& name, const std::string& n
 bool SceneDefinition::RemoveNode(const std::string& name)
 {
   std::unique_ptr<NodeDefinition>* node = nullptr;
-  if (!FindNode(name, &node))
+  if(!FindNode(name, &node))
   {
     return false;
   }
 
   // Reset node def pointers recursively.
-  auto& thisNodes = mNodes;
-  unsigned int numReset = 0;
+  auto&                                                 thisNodes = mNodes;
+  unsigned int                                          numReset  = 0;
   std::function<void(std::unique_ptr<NodeDefinition>&)> resetFn =
     [&thisNodes, &resetFn, &numReset](std::unique_ptr<NodeDefinition>& nd) {
-    LOGD(("resetting %d", &nd - thisNodes.data()));
-    for (auto i : nd->mChildren)
-    {
-      resetFn(thisNodes[i]);
-    }
-    nd.reset();
-    ++numReset;
-  };
+      LOGD(("resetting %d", &nd - thisNodes.data()));
+      for(auto i : nd->mChildren)
+      {
+        resetFn(thisNodes[i]);
+      }
+      nd.reset();
+      ++numReset;
+    };
 
   resetFn(*node);
 
   // Gather indices of dead nodes into a vector which we sort on insertion.
   std::vector<Index> offsets;
   offsets.reserve(numReset);
-  for (auto& n : mNodes)
+  for(auto& n : mNodes)
   {
-    if (!n)
+    if(!n)
     {
       offsets.push_back(std::distance(mNodes.data(), &n));
     }
@@ -656,10 +635,13 @@ bool SceneDefinition::RemoveNode(const std::string& name)
   mNodes.erase(std::remove(mNodes.begin(), mNodes.end(), decltype(mNodes)::value_type()), mNodes.end());
 
   // Offset all indices (parent and child) by the index they'd sort into in offsets.
-  enum { INDEX_FOR_REMOVAL = INVALID_INDEX };
+  enum
+  {
+    INDEX_FOR_REMOVAL = INVALID_INDEX
+  };
   auto offsetter = [&offsets](Index& i) {
     auto iFind = std::lower_bound(offsets.begin(), offsets.end(), i);
-    if (iFind != offsets.end() && *iFind == i)
+    if(iFind != offsets.end() && *iFind == i)
     {
       LOGD(("marking %d for removal.", i));
       i = INDEX_FOR_REMOVAL;
@@ -668,7 +650,7 @@ bool SceneDefinition::RemoveNode(const std::string& name)
     else
     {
       auto distance = std::distance(offsets.begin(), iFind);
-      if (distance > 0)
+      if(distance > 0)
       {
         LOGD(("offsetting %d by %d.", i, distance));
         i -= distance;
@@ -677,13 +659,13 @@ bool SceneDefinition::RemoveNode(const std::string& name)
     }
   };
 
-  for (auto& nd : mNodes)
+  for(auto& nd : mNodes)
   {
     bool parentOffsetResult = offsetter(nd->mParentIdx);
-    DALI_ASSERT_ALWAYS(parentOffsetResult);  // since nodes were recursively removed, we should not be finding invalid parents at this point.
+    DALI_ASSERT_ALWAYS(parentOffsetResult); // since nodes were recursively removed, we should not be finding invalid parents at this point.
 
     auto& children = nd->mChildren;
-    for (auto i0 = children.begin(), i1 = children.end(); i0 != i1; ++i0)
+    for(auto i0 = children.begin(), i1 = children.end(); i0 != i1; ++i0)
     {
       offsetter(*i0);
     }
@@ -696,10 +678,10 @@ bool SceneDefinition::RemoveNode(const std::string& name)
 
 void SceneDefinition::GetNodeModelStack(Index index, MatrixStack& model) const
 {
-  auto& thisNodes = mNodes;
+  auto&                    thisNodes  = mNodes;
   std::function<void(int)> buildStack = [&model, &thisNodes, &buildStack](int i) {
     auto node = thisNodes[i].get();
-    if (node->mParentIdx != INVALID_INDEX)
+    if(node->mParentIdx != INVALID_INDEX)
     {
       buildStack(node->mParentIdx);
     }
@@ -708,32 +690,32 @@ void SceneDefinition::GetNodeModelStack(Index index, MatrixStack& model) const
   buildStack(index);
 }
 
-NodeDefinition* SceneDefinition::FindNode(const std::string &name, Index* outIndex)
+NodeDefinition* SceneDefinition::FindNode(const std::string& name, Index* outIndex)
 {
   auto iBegin = mNodes.begin();
-  auto iEnd = mNodes.end();
-  auto iFind = std::find_if(iBegin, iEnd, [&name](const std::unique_ptr<NodeDefinition>& nd) {
+  auto iEnd   = mNodes.end();
+  auto iFind  = std::find_if(iBegin, iEnd, [&name](const std::unique_ptr<NodeDefinition>& nd) {
     return nd->mName == name;
   });
 
   auto result = iFind != iEnd ? iFind->get() : nullptr;
-  if (result && outIndex)
+  if(result && outIndex)
   {
     *outIndex = std::distance(iBegin, iFind);
   }
   return result;
 }
 
-const NodeDefinition* SceneDefinition::FindNode(const std::string &name, Index* outIndex) const
+const NodeDefinition* SceneDefinition::FindNode(const std::string& name, Index* outIndex) const
 {
   auto iBegin = mNodes.begin();
-  auto iEnd = mNodes.end();
-  auto iFind = std::find_if(iBegin, iEnd, [&name](const std::unique_ptr<NodeDefinition>& nd) {
+  auto iEnd   = mNodes.end();
+  auto iFind  = std::find_if(iBegin, iEnd, [&name](const std::unique_ptr<NodeDefinition>& nd) {
     return nd->mName == name;
   });
 
   auto result = iFind != iEnd ? iFind->get() : nullptr;
-  if (result && outIndex)
+  if(result && outIndex)
   {
     *outIndex = std::distance(iBegin, iFind);
   }
@@ -743,24 +725,23 @@ const NodeDefinition* SceneDefinition::FindNode(const std::string &name, Index* 
 Index SceneDefinition::FindNodeIndex(const NodeDefinition& node) const
 {
   auto iBegin = mNodes.begin();
-  auto iEnd = mNodes.end();
-  auto iFind = std::find_if(iBegin, iEnd, [&node](const std::unique_ptr<NodeDefinition>& n) {
+  auto iEnd   = mNodes.end();
+  auto iFind  = std::find_if(iBegin, iEnd, [&node](const std::unique_ptr<NodeDefinition>& n) {
     return n.get() == &node;
   });
   return iFind != iEnd ? std::distance(iBegin, iFind) : INVALID_INDEX;
 }
 
-void SceneDefinition::FindNodes(NodePredicate predicate, NodeConsumer consumer,
-  unsigned int limit)
+void SceneDefinition::FindNodes(NodePredicate predicate, NodeConsumer consumer, unsigned int limit)
 {
   unsigned int n = 0;
-  for (auto& defp : mNodes)
+  for(auto& defp : mNodes)
   {
-    if (predicate(*defp))
+    if(predicate(*defp))
     {
       consumer(*defp);
       ++n;
-      if (n == limit)
+      if(n == limit)
       {
         break;
       }
@@ -768,17 +749,16 @@ void SceneDefinition::FindNodes(NodePredicate predicate, NodeConsumer consumer,
   }
 }
 
-void SceneDefinition::FindNodes(NodePredicate predicate, ConstNodeConsumer consumer,
-  unsigned int limit) const
+void SceneDefinition::FindNodes(NodePredicate predicate, ConstNodeConsumer consumer, unsigned int limit) const
 {
   unsigned int n = 0;
-  for (auto& defp : mNodes)
+  for(auto& defp : mNodes)
   {
-    if (predicate(*defp))
+    if(predicate(*defp))
     {
       consumer(*defp);
       ++n;
-      if (n == limit)
+      if(n == limit)
       {
         break;
       }
@@ -786,51 +766,59 @@ void SceneDefinition::FindNodes(NodePredicate predicate, ConstNodeConsumer consu
   }
 }
 
-void SceneDefinition::ApplyConstraints(Actor& root,
-  std::vector<ConstraintRequest>&& constrainables, StringCallback onError) const
+void SceneDefinition::ApplyConstraints(Actor&                           root,
+                                       std::vector<ConstraintRequest>&& constrainables,
+                                       StringCallback                   onError) const
 {
-  for (auto& cr : constrainables)
+  for(auto& cr : constrainables)
   {
-    auto& nodeDef = mNodes[cr.mConstraint->mSourceIdx];
-    auto sourceName = nodeDef->mName.c_str();
-    Property::Index iTarget = cr.mTarget.GetPropertyIndex(cr.mConstraint->mProperty);
-    if (iTarget != Property::INVALID_INDEX)
+    auto&           nodeDef    = mNodes[cr.mConstraint->mSourceIdx];
+    auto            sourceName = nodeDef->mName.c_str();
+    Property::Index iTarget    = cr.mTarget.GetPropertyIndex(cr.mConstraint->mProperty);
+    if(iTarget != Property::INVALID_INDEX)
     {
       auto propertyType = cr.mTarget.GetPropertyType(iTarget);
-      auto iFind = sConstraintFactory.find(propertyType);
-      if (iFind == sConstraintFactory.end())
+      auto iFind        = sConstraintFactory.find(propertyType);
+      if(iFind == sConstraintFactory.end())
       {
         onError(FormatString("node '%s': Property '%s' has unsupported type '%s'; ignored.",
-          sourceName, cr.mConstraint->mProperty.c_str(), PropertyTypes::GetName(propertyType)));
+                             sourceName,
+                             cr.mConstraint->mProperty.c_str(),
+                             PropertyTypes::GetName(propertyType)));
         continue;
       }
 
       Constraint constraint = iFind->second(cr.mTarget, iTarget);
 
       Actor source = root.FindChildByName(nodeDef->mName);
-      if (!source)
+      if(!source)
       {
         auto targetName = cr.mTarget.GetProperty(Actor::Property::NAME).Get<std::string>();
         onError(FormatString("node '%s': Failed to locate constraint source %s@%s; ignored.",
-          sourceName, cr.mConstraint->mProperty.c_str(), targetName.c_str()));
+                             sourceName,
+                             cr.mConstraint->mProperty.c_str(),
+                             targetName.c_str()));
         continue;
       }
-      else if (source == cr.mTarget)
+      else if(source == cr.mTarget)
       {
         onError(FormatString("node '%s': Cyclic constraint definition for property '%s'; ignored.",
-          sourceName, cr.mConstraint->mProperty.c_str()));
+                             sourceName,
+                             cr.mConstraint->mProperty.c_str()));
         continue;
       }
 
       Property::Index iSource = source.GetPropertyIndex(cr.mConstraint->mProperty);
-      constraint.AddSource(Source{ source, iSource });
+      constraint.AddSource(Source{source, iSource});
       constraint.Apply();
     }
     else
     {
       auto targetName = cr.mTarget.GetProperty(Actor::Property::NAME).Get<std::string>();
       onError(FormatString("node '%s': Failed to create constraint for property %s@%s; ignored.",
-        sourceName, cr.mConstraint->mProperty.c_str(), targetName.c_str()));
+                           sourceName,
+                           cr.mConstraint->mProperty.c_str(),
+                           targetName.c_str()));
     }
   }
 }
@@ -841,29 +829,28 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
   // to the refcount of each node we have visited, in our temporary registry. Those with refcount 1
   // are the leaves, while the most descendant node with the highest refcount is the root of the skeleton.
   std::map<Index, std::vector<Index>> rootsJoints;
-  std::vector<Index> path;
+  std::vector<Index>                  path;
   path.reserve(16);
-  for (auto& s : skeletons)
+  for(auto& s : skeletons)
   {
-    std::map<uint32_t, uint32_t>  jointRefs;
-    for (auto& j : s.mJoints)
+    std::map<uint32_t, uint32_t> jointRefs;
+    for(auto& j : s.mJoints)
     {
       auto nodeIdx = j.mNodeIdx;
       do // Traverse upwards and record each node we have visited until we reach the scene root.
       {
         path.push_back(nodeIdx);
-        if (nodeIdx == iRoot)
+        if(nodeIdx == iRoot)
         {
           break;
         }
         auto node = GetNode(nodeIdx);
-        nodeIdx = node->mParentIdx;
-      }
-      while (nodeIdx != INVALID_INDEX);
+        nodeIdx   = node->mParentIdx;
+      } while(nodeIdx != INVALID_INDEX);
 
-      if (nodeIdx == iRoot)  // If the joint is in the correct scene, increment the reference count for all visited nodes.
+      if(nodeIdx == iRoot) // If the joint is in the correct scene, increment the reference count for all visited nodes.
       {
-        for (auto i : path)
+        for(auto i : path)
         {
           ++jointRefs[i];
         }
@@ -873,31 +860,31 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
     }
 
     // Only record the skeleton if we have encountered the root of the current scene.
-    if (jointRefs.empty())
+    if(jointRefs.empty())
     {
       continue;
     }
 
-    Index root = s.mRootNodeIdx;
+    Index    root   = s.mRootNodeIdx;
     uint32_t maxRef = 0;
-    auto iFind = jointRefs.find(root);
-    if (iFind != jointRefs.end())
+    auto     iFind  = jointRefs.find(root);
+    if(iFind != jointRefs.end())
     {
       maxRef = iFind->second;
     }
 
     std::vector<Index> joints;
-    for (auto& j : jointRefs)  // NOTE: jointRefs are sorted, so joints will also be.
+    for(auto& j : jointRefs) // NOTE: jointRefs are sorted, so joints will also be.
     {
       // The most descendant node with the highest ref count is the root of the skeleton.
-      if (j.second > maxRef || (j.second == maxRef && IsAncestor(*this, root, j.first, iRoot)))
+      if(j.second > maxRef || (j.second == maxRef && IsAncestor(*this, root, j.first, iRoot)))
       {
         maxRef = j.second;
 
         RemoveFromSorted(joints, root);
         root = j.first;
       }
-      else if (j.second == 1)  // This one's a leaf.
+      else if(j.second == 1) // This one's a leaf.
       {
         InsertUniqueSorted(joints, j.first);
       }
@@ -905,20 +892,20 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
 
     // Merge skeletons that share the same root.
     auto& finalJoints = rootsJoints[root];
-    for (auto j : joints)
+    for(auto j : joints)
     {
-      if (std::find_if(finalJoints.begin(), finalJoints.end(), [this, j, root](Index jj) {
-        return IsAncestor(*this, j, jj, root);
-      }) != finalJoints.end())
+      if(std::find_if(finalJoints.begin(), finalJoints.end(), [this, j, root](Index jj) {
+           return IsAncestor(*this, j, jj, root);
+         }) != finalJoints.end())
       {
-        continue;  // if the joint is found to be an ancestor of another joint already registered, move on.
+        continue; // if the joint is found to be an ancestor of another joint already registered, move on.
       }
 
       auto i = j;
-      while (i != root)  // See if the current joint is a better leaf, i.e. descended from another leaf - which we'll then remove.
+      while(i != root) // See if the current joint is a better leaf, i.e. descended from another leaf - which we'll then remove.
       {
         auto node = GetNode(i);
-        i = node->mParentIdx;
+        i         = node->mParentIdx;
 
         RemoveFromSorted(finalJoints, i);
       }
@@ -929,42 +916,43 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
 
   // 2, Merge records where one root joint is descendant of another. Handle leaf node changes - remove previous
   // leaf nodes that now have descendants, and add new ones.
-  auto iRoots = rootsJoints.begin();
+  auto iRoots    = rootsJoints.begin();
   auto iRootsEnd = rootsJoints.end();
-  while (iRoots != iRootsEnd)
+  while(iRoots != iRootsEnd)
   {
-    auto i = iRoots->first;
+    auto i      = iRoots->first;
     bool merged = false;
-    while (i != iRoot)  // Starting with the root joint of the skeleton, traverse upwards.
+    while(i != iRoot) // Starting with the root joint of the skeleton, traverse upwards.
     {
       auto node = GetNode(i);
-      i = node->mParentIdx;
+      i         = node->mParentIdx;
 
       auto iFind = rootsJoints.find(i);
-      if (iFind != rootsJoints.end())  // Check if we've reached the root of another skeleton.
+      if(iFind != rootsJoints.end()) // Check if we've reached the root of another skeleton.
       {
         // Now find out which leaf of iFind is an ancestor, if any.
         auto iFindLeaf = std::find_if(iFind->second.begin(), iFind->second.end(), [this, iRoots, iFind](Index j) {
           return IsAncestor(*this, j, iRoots->first, iFind->first);
         });
-        if (iFindLeaf != iFind->second.end())
+        if(iFindLeaf != iFind->second.end())
         {
-          iFind->second.erase(iFindLeaf);  // Will no longer be a leaf -- remove it.
+          iFind->second.erase(iFindLeaf); // Will no longer be a leaf -- remove it.
         }
 
         // Merge iRoots with iFind
         auto& targetJoints = iFind->second;
-        if (iRoots->second.empty())  // The root is a leaf.
+        if(iRoots->second.empty()) // The root is a leaf.
         {
           InsertUniqueSorted(targetJoints, iRoots->first);
         }
-        else for (auto j : iRoots->second)
-        {
-          InsertUniqueSorted(targetJoints, j);
-        }
+        else
+          for(auto j : iRoots->second)
+          {
+            InsertUniqueSorted(targetJoints, j);
+          }
 
         merged = true;
-        break;  // Traverse no more
+        break; // Traverse no more
       }
     }
 
@@ -972,26 +960,24 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
   }
 
   // 3, For each root, register joint matrices and constraints
-  for (auto r : rootsJoints)
+  for(auto r : rootsJoints)
   {
-    auto node = GetNode(r.first);
+    auto node      = GetNode(r.first);
     auto rootJoint = root.FindChildByName(node->mName);
     DALI_ASSERT_ALWAYS(!!rootJoint);
 
     DALI_ASSERT_DEBUG(rootJoint.GetPropertyIndex(JOINT_MATRIX) == Property::INVALID_INDEX);
-    auto propJointMatrix = rootJoint.RegisterProperty(JOINT_MATRIX, Matrix{ false });
-    Constraint constraint = Constraint::New<Matrix>(rootJoint, propJointMatrix,
-      [](Matrix& output, const PropertyInputContainer& inputs)
-      {
-        output.SetTransformComponents(Vector3::ONE, inputs[0]->GetQuaternion(), inputs[1]->GetVector3());
-      });
+    auto       propJointMatrix = rootJoint.RegisterProperty(JOINT_MATRIX, Matrix{false});
+    Constraint constraint      = Constraint::New<Matrix>(rootJoint, propJointMatrix, [](Matrix& output, const PropertyInputContainer& inputs) {
+      output.SetTransformComponents(Vector3::ONE, inputs[0]->GetQuaternion(), inputs[1]->GetVector3());
+    });
     constraint.AddSource(Source(rootJoint, Actor::Property::ORIENTATION));
     constraint.AddSource(Source(rootJoint, Actor::Property::POSITION));
     constraint.Apply();
 
-    for (auto j : r.second)
+    for(auto j : r.second)
     {
-      node = GetNode(j);
+      node       = GetNode(j);
       auto joint = rootJoint.FindChildByName(node->mName);
       ConfigureJointMatrix(joint, rootJoint, propJointMatrix);
     }
@@ -1001,17 +987,17 @@ void SceneDefinition::ConfigureSkeletonJoints(uint32_t iRoot, const SkeletonDefi
 void SceneDefinition::EnsureUniqueSkinningShaderInstances(ResourceBundle& resources) const
 {
   std::map<Index, std::map<Index, std::vector<Index*>>> skinningShaderUsers;
-  for (auto& node : mNodes)
+  for(auto& node : mNodes)
   {
-    if (node->mRenderable)
+    if(node->mRenderable)
     {
       ResourceReflector reflector;
       node->mRenderable->ReflectResources(reflector);
 
-      if (reflector.iMesh)
+      if(reflector.iMesh)
       {
         const auto& mesh = resources.mMeshes[*reflector.iMesh].first;
-        if (mesh.IsSkinned())
+        if(mesh.IsSkinned())
         {
           skinningShaderUsers[*reflector.iShader][mesh.mSkeletonIdx].push_back(reflector.iShader);
         }
@@ -1022,22 +1008,22 @@ void SceneDefinition::EnsureUniqueSkinningShaderInstances(ResourceBundle& resour
   // For each shader, and each skeleton using the same shader as the first skeleton,
   // update the shader references (from nodes with skinned meshes) with a new copy of
   // the shader definition from the node using the first skeleton.
-  for (auto& users : skinningShaderUsers)
+  for(auto& users : skinningShaderUsers)
   {
-    auto& skeletons = users.second;
-    auto iterSkeleton = skeletons.begin();
+    auto& skeletons    = users.second;
+    auto  iterSkeleton = skeletons.begin();
     // skipping the first skeleton.
     ++iterSkeleton;
 
     resources.mShaders.reserve(resources.mShaders.size() + std::distance(iterSkeleton, skeletons.end()));
     const ShaderDefinition& shaderDef = resources.mShaders[users.first].first;
 
-    while (iterSkeleton != skeletons.end())
+    while(iterSkeleton != skeletons.end())
     {
       Index iShader = resources.mShaders.size();
-      resources.mShaders.push_back({ shaderDef, Shader() });
+      resources.mShaders.push_back({shaderDef, Shader()});
 
-      for (auto& i : iterSkeleton->second)
+      for(auto& i : iterSkeleton->second)
       {
         *i = iShader;
       }
@@ -1046,40 +1032,42 @@ void SceneDefinition::EnsureUniqueSkinningShaderInstances(ResourceBundle& resour
   }
 }
 
-void SceneDefinition::ConfigureSkinningShaders(const ResourceBundle& resources,
-  Actor rootActor, std::vector<SkinningShaderConfigurationRequest>&& requests) const
+void SceneDefinition::ConfigureSkinningShaders(const ResourceBundle&                             resources,
+                                               Actor                                             rootActor,
+                                               std::vector<SkinningShaderConfigurationRequest>&& requests) const
 {
-  if (requests.empty())
+  if(requests.empty())
   {
     return;
   }
 
   SortAndDeduplicateSkinningRequests(requests);
 
-  for (auto& i : requests)
+  for(auto& i : requests)
   {
     auto& skeleton = resources.mSkeletons[i.mSkeletonIdx];
-    if (skeleton.mJoints.empty())
+    if(skeleton.mJoints.empty())
     {
       LOGD(("Skeleton %d has no joints.", i.mSkeletonIdx));
       continue;
     }
 
     Index boneIdx = 0;
-    for (auto& j : skeleton.mJoints)
+    for(auto& j : skeleton.mJoints)
     {
-      auto node = GetNode(j.mNodeIdx);
+      auto  node  = GetNode(j.mNodeIdx);
       Actor actor = rootActor.FindChildByName(node->mName);
       ConfigureBoneMatrix(j.mInverseBindMatrix, actor, i.mShader, boneIdx);
     }
   }
 }
 
-bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle& resources,
-  Actor rootActor, std::vector<BlendshapeShaderConfigurationRequest>&& requests,
-  StringCallback onError ) const
+bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle&                               resources,
+                                                 Actor                                               rootActor,
+                                                 std::vector<BlendshapeShaderConfigurationRequest>&& requests,
+                                                 StringCallback                                      onError) const
 {
-  if (requests.empty())
+  if(requests.empty())
   {
     return true;
   }
@@ -1088,45 +1076,45 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle& resources
   std::sort(requests.begin(), requests.end());
 
   // Remove duplicates.
-  auto i = requests.begin();
-  auto iEnd = requests.end();
-  Shader s = i->mShader;
+  auto   i    = requests.begin();
+  auto   iEnd = requests.end();
+  Shader s    = i->mShader;
   ++i;
   do
   {
     // Multiple identical shader instances are removed.
-    while (i != iEnd && i->mShader == s)
+    while(i != iEnd && i->mShader == s)
     {
       i->mShader = Shader();
       ++i;
     }
 
-    if (i == iEnd)
+    if(i == iEnd)
     {
       break;
     }
     s = i->mShader;
     ++i;
-  } while (true);
+  } while(true);
 
-  requests.erase(std::remove_if(requests.begin(), requests.end(), [](const BlendshapeShaderConfigurationRequest& bscr)
-  {
-    return !bscr.mShader;
-  }), requests.end());
+  requests.erase(std::remove_if(requests.begin(), requests.end(), [](const BlendshapeShaderConfigurationRequest& bscr) {
+                   return !bscr.mShader;
+                 }),
+                 requests.end());
 
   // Configure the rest.
   bool ok = true;
 
-  for (auto& i : requests)
+  for(auto& i : requests)
   {
     Index iNode;
-    if (FindNode(i.mNodeName, &iNode))
+    if(FindNode(i.mNodeName, &iNode))
     {
       const auto& node = GetNode(iNode);
 
       const auto& mesh = resources.mMeshes[i.mMeshIdx];
 
-      if (mesh.first.HasBlendShapes())
+      if(mesh.first.HasBlendShapes())
       {
         Actor actor = rootActor.FindChildByName(node->mName);
 
@@ -1142,17 +1130,17 @@ bool SceneDefinition::ConfigureBlendshapeShaders(const ResourceBundle& resources
 void SceneDefinition::EnsureUniqueBlendShapeShaderInstances(ResourceBundle& resources) const
 {
   std::map<Index, std::map<std::string, std::vector<Index*>>> blendShapeShaderUsers;
-  for (auto& node : mNodes)
+  for(auto& node : mNodes)
   {
-    if (node->mRenderable)
+    if(node->mRenderable)
     {
       ResourceReflector reflector;
       node->mRenderable->ReflectResources(reflector);
 
-      if (reflector.iMesh)
+      if(reflector.iMesh)
       {
         const auto& mesh = resources.mMeshes[*reflector.iMesh].first;
-        if (mesh.HasBlendShapes())
+        if(mesh.HasBlendShapes())
         {
           blendShapeShaderUsers[*reflector.iShader][node->mName].push_back(reflector.iShader);
         }
@@ -1160,22 +1148,22 @@ void SceneDefinition::EnsureUniqueBlendShapeShaderInstances(ResourceBundle& reso
     }
   }
 
-  for (auto& users : blendShapeShaderUsers)
+  for(auto& users : blendShapeShaderUsers)
   {
     resources.mShaders.reserve(resources.mShaders.size() + users.second.size() - 1u);
     const ShaderDefinition& shaderDef = resources.mShaders[users.first].first;
 
-    auto nodesIt = users.second.begin();
+    auto nodesIt    = users.second.begin();
     auto nodesEndIt = users.second.end();
     // skipping the first node.
     ++nodesIt;
     while(nodesIt != nodesEndIt)
     {
       Index iShader = resources.mShaders.size();
-      resources.mShaders.push_back({ shaderDef, Shader() });
+      resources.mShaders.push_back({shaderDef, Shader()});
 
       auto& nodes = *nodesIt;
-      for (auto& shader : nodes.second)
+      for(auto& shader : nodes.second)
       {
         *shader = iShader;
       }
@@ -1197,13 +1185,12 @@ bool SceneDefinition::FindNode(const std::string& name, std::unique_ptr<NodeDefi
   // We're searching from the end assuming a higher probability of operations targeting
   // recently added nodes. (conf.: root, which is immovable, cannot be removed, and was
   // the first to be added, is index 0.)
-  auto iFind = std::find_if(mNodes.rbegin(), mNodes.rend(),
-    [&name](const std::unique_ptr<NodeDefinition>& nd) {
-      return nd->mName == name;
-    }).base();
+  auto iFind = std::find_if(mNodes.rbegin(), mNodes.rend(), [&name](const std::unique_ptr<NodeDefinition>& nd) {
+                 return nd->mName == name;
+               }).base();
 
   const bool success = iFind != mNodes.begin();
-  if (success && result)
+  if(success && result)
   {
     --iFind;
     *result = &*iFind;
@@ -1212,5 +1199,5 @@ bool SceneDefinition::FindNode(const std::string& name, std::unique_ptr<NodeDefi
   return success;
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

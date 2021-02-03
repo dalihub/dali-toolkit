@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,26 +22,25 @@ namespace Toolkit
 {
 namespace Internal
 {
-
-ImageCache::ImageCache( TextureManager&                 textureManager,
-                        ImageCache::FrameReadyObserver& observer,
-                        unsigned int                    batchSize )
-: mTextureManager( textureManager ),
-  mObserver( observer ),
-  mBatchSize( batchSize ),
+ImageCache::ImageCache(TextureManager&                 textureManager,
+                       ImageCache::FrameReadyObserver& observer,
+                       unsigned int                    batchSize)
+: mTextureManager(textureManager),
+  mObserver(observer),
+  mBatchSize(batchSize),
   mUrlIndex(0u),
   mWaitingForReadyFrame(false),
   mRequestingLoad(false),
   mTextureManagerAlive(true)
 {
-  mTextureManager.AddObserver( *this );
+  mTextureManager.AddObserver(*this);
 }
 
 ImageCache::~ImageCache()
 {
-  if( mTextureManagerAlive )
+  if(mTextureManagerAlive)
   {
-    mTextureManager.RemoveObserver( *this );
+    mTextureManager.RemoveObserver(*this);
   }
 }
 

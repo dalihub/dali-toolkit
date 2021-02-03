@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,22 +21,19 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
-Length GetNumberOfGlyphsOfGroup( GlyphIndex glyphIndex,
-                                 GlyphIndex lastGlyphPlusOne,
-                                 const Length* const charactersPerGlyphBuffer )
+Length GetNumberOfGlyphsOfGroup(GlyphIndex          glyphIndex,
+                                GlyphIndex          lastGlyphPlusOne,
+                                const Length* const charactersPerGlyphBuffer)
 {
   Length numberOfGLyphsInGroup = 1u;
 
-  for( GlyphIndex index = glyphIndex; index < lastGlyphPlusOne; ++index )
+  for(GlyphIndex index = glyphIndex; index < lastGlyphPlusOne; ++index)
   {
-    if( 0u == *( charactersPerGlyphBuffer + index ) )
+    if(0u == *(charactersPerGlyphBuffer + index))
     {
       ++numberOfGLyphsInGroup;
     }
@@ -49,50 +46,50 @@ Length GetNumberOfGlyphsOfGroup( GlyphIndex glyphIndex,
   return numberOfGLyphsInGroup;
 }
 
-void GetGlyphsMetrics( GlyphIndex glyphIndex,
-                       Length numberOfGlyphs,
-                       GlyphMetrics& glyphMetrics,
-                       const GlyphInfo* const glyphsBuffer,
-                       MetricsPtr& metrics )
+void GetGlyphsMetrics(GlyphIndex             glyphIndex,
+                      Length                 numberOfGlyphs,
+                      GlyphMetrics&          glyphMetrics,
+                      const GlyphInfo* const glyphsBuffer,
+                      MetricsPtr&            metrics)
 {
-  const GlyphInfo& firstGlyph = *( glyphsBuffer + glyphIndex );
+  const GlyphInfo& firstGlyph = *(glyphsBuffer + glyphIndex);
 
   Text::FontMetrics fontMetrics;
-  if( 0u != firstGlyph.fontId )
+  if(0u != firstGlyph.fontId)
   {
-    metrics->GetFontMetrics( firstGlyph.fontId, fontMetrics );
+    metrics->GetFontMetrics(firstGlyph.fontId, fontMetrics);
   }
-  else if( 0u != firstGlyph.index )
+  else if(0u != firstGlyph.index)
   {
     // It may be an embedded image.
-    fontMetrics.ascender = firstGlyph.height;
+    fontMetrics.ascender  = firstGlyph.height;
     fontMetrics.descender = 0.f;
-    fontMetrics.height = fontMetrics.ascender;
+    fontMetrics.height    = fontMetrics.ascender;
   }
 
-  const bool isItalicFont = metrics->HasItalicStyle( firstGlyph.fontId );
+  const bool isItalicFont = metrics->HasItalicStyle(firstGlyph.fontId);
 
-  glyphMetrics.fontId = firstGlyph.fontId;
+  glyphMetrics.fontId     = firstGlyph.fontId;
   glyphMetrics.fontHeight = fontMetrics.height;
-  glyphMetrics.width = firstGlyph.width;
-  glyphMetrics.advance = firstGlyph.advance;
-  glyphMetrics.ascender = fontMetrics.ascender;
-  glyphMetrics.xBearing = firstGlyph.xBearing;
+  glyphMetrics.width      = firstGlyph.width;
+  glyphMetrics.advance    = firstGlyph.advance;
+  glyphMetrics.ascender   = fontMetrics.ascender;
+  glyphMetrics.xBearing   = firstGlyph.xBearing;
 
-  if( 1u < numberOfGlyphs )
+  if(1u < numberOfGlyphs)
   {
-    float  maxWidthEdge = firstGlyph.xBearing + firstGlyph.width;
+    float maxWidthEdge = firstGlyph.xBearing + firstGlyph.width;
 
-    for( unsigned int i = 1u; i < numberOfGlyphs; ++i )
+    for(unsigned int i = 1u; i < numberOfGlyphs; ++i)
     {
-      const GlyphInfo& glyphInfo = *( glyphsBuffer + glyphIndex + i );
+      const GlyphInfo& glyphInfo = *(glyphsBuffer + glyphIndex + i);
 
       // update the initial xBearing if smaller.
-      glyphMetrics.xBearing = std::min( glyphMetrics.xBearing, glyphMetrics.advance + glyphInfo.xBearing );
+      glyphMetrics.xBearing = std::min(glyphMetrics.xBearing, glyphMetrics.advance + glyphInfo.xBearing);
 
       // update the max width edge if bigger.
       const float currentMaxGlyphWidthEdge = glyphMetrics.advance + glyphInfo.xBearing + glyphInfo.width;
-      maxWidthEdge = std::max( maxWidthEdge, currentMaxGlyphWidthEdge );
+      maxWidthEdge                         = std::max(maxWidthEdge, currentMaxGlyphWidthEdge);
 
       glyphMetrics.advance += glyphInfo.advance;
     }
@@ -100,7 +97,7 @@ void GetGlyphsMetrics( GlyphIndex glyphIndex,
     glyphMetrics.width = maxWidthEdge - glyphMetrics.xBearing;
   }
 
-  glyphMetrics.width += ( firstGlyph.isItalicRequired && !isItalicFont ) ? TextAbstraction::FontClient::DEFAULT_ITALIC_ANGLE * firstGlyph.height : 0.f;
+  glyphMetrics.width += (firstGlyph.isItalicRequired && !isItalicFont) ? TextAbstraction::FontClient::DEFAULT_ITALIC_ANGLE * firstGlyph.height : 0.f;
 }
 
 } // namespace Text

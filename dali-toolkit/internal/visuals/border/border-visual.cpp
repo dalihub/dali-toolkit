@@ -19,49 +19,46 @@
 #include "border-visual.h"
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/debug.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
-#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
-#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-const char * const POSITION_ATTRIBUTE_NAME("aPosition");
-const char * const DRIFT_ATTRIBUTE_NAME("aDrift");
-const char * const INDEX_NAME("indices");
-}
+const char* const POSITION_ATTRIBUTE_NAME("aPosition");
+const char* const DRIFT_ATTRIBUTE_NAME("aDrift");
+const char* const INDEX_NAME("indices");
+} // namespace
 
-BorderVisualPtr BorderVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
+BorderVisualPtr BorderVisual::New(VisualFactoryCache& factoryCache, const Property::Map& properties)
 {
-  BorderVisualPtr borderVisualPtr( new BorderVisual( factoryCache ) );
-  borderVisualPtr->SetProperties( properties );
+  BorderVisualPtr borderVisualPtr(new BorderVisual(factoryCache));
+  borderVisualPtr->SetProperties(properties);
   borderVisualPtr->Initialize();
   return borderVisualPtr;
 }
 
-BorderVisual::BorderVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::BORDER ),
-  mBorderColor( Color::TRANSPARENT ),
-  mBorderSize( 0.f ),
-  mBorderColorIndex( Property::INVALID_INDEX ),
-  mBorderSizeIndex( Property::INVALID_INDEX ),
-  mAntiAliasing( false )
+BorderVisual::BorderVisual(VisualFactoryCache& factoryCache)
+: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::BORDER),
+  mBorderColor(Color::TRANSPARENT),
+  mBorderSize(0.f),
+  mBorderColorIndex(Property::INVALID_INDEX),
+  mBorderSizeIndex(Property::INVALID_INDEX),
+  mAntiAliasing(false)
 {
 }
 
@@ -69,41 +66,41 @@ BorderVisual::~BorderVisual()
 {
 }
 
-void BorderVisual::DoSetProperties( const Property::Map& propertyMap )
+void BorderVisual::DoSetProperties(const Property::Map& propertyMap)
 {
-  for( Property::Map::SizeType iter = 0; iter < propertyMap.Count(); ++iter )
+  for(Property::Map::SizeType iter = 0; iter < propertyMap.Count(); ++iter)
   {
-    KeyValuePair keyValue = propertyMap.GetKeyValue( iter );
-    if( keyValue.first.type == Property::Key::INDEX )
+    KeyValuePair keyValue = propertyMap.GetKeyValue(iter);
+    if(keyValue.first.type == Property::Key::INDEX)
     {
-      DoSetProperty( keyValue.first.indexKey, keyValue.second );
+      DoSetProperty(keyValue.first.indexKey, keyValue.second);
     }
     else
     {
-      if( keyValue.first == COLOR_NAME )
+      if(keyValue.first == COLOR_NAME)
       {
-        DoSetProperty( Toolkit::BorderVisual::Property::COLOR, keyValue.second );
+        DoSetProperty(Toolkit::BorderVisual::Property::COLOR, keyValue.second);
       }
-      else if( keyValue.first == SIZE_NAME )
+      else if(keyValue.first == SIZE_NAME)
       {
-        DoSetProperty( Toolkit::BorderVisual::Property::SIZE, keyValue.second );
+        DoSetProperty(Toolkit::BorderVisual::Property::SIZE, keyValue.second);
       }
-      else if( keyValue.first == ANTI_ALIASING )
+      else if(keyValue.first == ANTI_ALIASING)
       {
-        DoSetProperty( Toolkit::BorderVisual::Property::ANTI_ALIASING, keyValue.second );
+        DoSetProperty(Toolkit::BorderVisual::Property::ANTI_ALIASING, keyValue.second);
       }
     }
   }
 }
 
-void BorderVisual::DoSetProperty( Dali::Property::Index index,
-                                  const Dali::Property::Value& value )
+void BorderVisual::DoSetProperty(Dali::Property::Index        index,
+                                 const Dali::Property::Value& value)
 {
-  switch( index )
+  switch(index)
   {
     case Toolkit::BorderVisual::Property::COLOR:
     {
-      if( !value.Get( mBorderColor ) )
+      if(!value.Get(mBorderColor))
       {
         DALI_LOG_ERROR("BorderVisual: borderColor property has incorrect type\n");
       }
@@ -111,7 +108,7 @@ void BorderVisual::DoSetProperty( Dali::Property::Index index,
     }
     case Toolkit::BorderVisual::Property::SIZE:
     {
-      if( !value.Get( mBorderSize ) )
+      if(!value.Get(mBorderSize))
       {
         DALI_LOG_ERROR("BorderVisual: borderSize property has incorrect type\n");
       }
@@ -119,7 +116,7 @@ void BorderVisual::DoSetProperty( Dali::Property::Index index,
     }
     case Toolkit::BorderVisual::Property::ANTI_ALIASING:
     {
-      if( !value.Get( mAntiAliasing ) )
+      if(!value.Get(mAntiAliasing))
       {
         DALI_LOG_ERROR("BorderVisual: antiAliasing property has incorrect type\n");
       }
@@ -128,78 +125,78 @@ void BorderVisual::DoSetProperty( Dali::Property::Index index,
   }
 }
 
-void BorderVisual::DoSetOnScene( Actor& actor )
+void BorderVisual::DoSetOnScene(Actor& actor)
 {
-  mBorderColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor );
-  if( mBorderColor.a < 1.f || mAntiAliasing )
+  mBorderColorIndex = mImpl->mRenderer.RegisterProperty(Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor);
+  if(mBorderColor.a < 1.f || mAntiAliasing)
   {
-    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
   }
-  mBorderSizeIndex = mImpl->mRenderer.RegisterProperty( Toolkit::BorderVisual::Property::SIZE, SIZE_NAME, mBorderSize );
+  mBorderSizeIndex = mImpl->mRenderer.RegisterProperty(Toolkit::BorderVisual::Property::SIZE, SIZE_NAME, mBorderSize);
 
-  actor.AddRenderer( mImpl->mRenderer );
+  actor.AddRenderer(mImpl->mRenderer);
 
   // Border Visual Generated and ready to display
-  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+  ResourceReady(Toolkit::Visual::ResourceStatus::READY);
 }
 
-void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const
+void BorderVisual::DoCreatePropertyMap(Property::Map& map) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::BORDER );
-  map.Insert( Toolkit::BorderVisual::Property::COLOR, mBorderColor );
-  map.Insert( Toolkit::BorderVisual::Property::SIZE, mBorderSize );
-  map.Insert( Toolkit::BorderVisual::Property::ANTI_ALIASING, mAntiAliasing );
+  map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::BORDER);
+  map.Insert(Toolkit::BorderVisual::Property::COLOR, mBorderColor);
+  map.Insert(Toolkit::BorderVisual::Property::SIZE, mBorderSize);
+  map.Insert(Toolkit::BorderVisual::Property::ANTI_ALIASING, mAntiAliasing);
 }
 
-void BorderVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+void BorderVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 {
   // Do nothing
 }
 
 void BorderVisual::OnSetTransform()
 {
-  if( mImpl->mRenderer )
+  if(mImpl->mRenderer)
   {
-    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 
 void BorderVisual::OnInitialize()
 {
-  Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::BORDER_GEOMETRY );
-  if( !geometry )
+  Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::BORDER_GEOMETRY);
+  if(!geometry)
   {
-    geometry =  CreateBorderGeometry();
-    mFactoryCache.SaveGeometry( VisualFactoryCache::BORDER_GEOMETRY, geometry );
+    geometry = CreateBorderGeometry();
+    mFactoryCache.SaveGeometry(VisualFactoryCache::BORDER_GEOMETRY, geometry);
   }
 
-  Shader shader = GetBorderShader();
-  mImpl->mRenderer = Renderer::New( geometry, shader  );
+  Shader shader    = GetBorderShader();
+  mImpl->mRenderer = Renderer::New(geometry, shader);
 
   //Register transform properties
-  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 Shader BorderVisual::GetBorderShader()
 {
   Shader shader;
-  if( mAntiAliasing )
+  if(mAntiAliasing)
   {
-    shader = mFactoryCache.GetShader( VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING );
-    if( !shader )
+    shader = mFactoryCache.GetShader(VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING);
+    if(!shader)
     {
-      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_FRAG.data() );
-      mFactoryCache.SaveShader( VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING, shader );
+      shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_FRAG.data());
+      mFactoryCache.SaveShader(VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING, shader);
     }
   }
   else
   {
-    shader = mFactoryCache.GetShader( VisualFactoryCache::BORDER_SHADER );
-    if( !shader )
+    shader = mFactoryCache.GetShader(VisualFactoryCache::BORDER_SHADER);
+    if(!shader)
     {
-      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + SHADER_BORDER_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_BORDER_VISUAL_SHADER_FRAG.data() );
-      mFactoryCache.SaveShader( VisualFactoryCache::BORDER_SHADER, shader );
+      shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_BORDER_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_BORDER_VISUAL_SHADER_FRAG.data());
+      mFactoryCache.SaveShader(VisualFactoryCache::BORDER_SHADER, shader);
     }
   }
 
@@ -224,46 +221,50 @@ Shader BorderVisual::GetBorderShader()
  */
 Geometry BorderVisual::CreateBorderGeometry()
 {
-  const float halfWidth = 0.5f;
+  const float halfWidth  = 0.5f;
   const float halfHeight = 0.5f;
-  struct BorderVertex { Vector2 position; Vector2 drift;};
-  BorderVertex borderVertexData[16] =
+  struct BorderVertex
   {
-      { Vector2(-halfWidth, -halfHeight), Vector2(0.f, 0.f) },
-      { Vector2(-halfWidth, -halfHeight), Vector2(1.f, 0.f) },
-      { Vector2(halfWidth, -halfHeight),  Vector2(-1.f, 0.f) },
-      { Vector2(halfWidth, -halfHeight),  Vector2(0.f, 0.f) },
-
-      { Vector2(-halfWidth, -halfHeight), Vector2(0.f, 1.f) },
-      { Vector2(-halfWidth, -halfHeight), Vector2(1.f, 1.f) },
-      { Vector2(halfWidth, -halfHeight),  Vector2(-1.f, 1.f) },
-      { Vector2(halfWidth, -halfHeight),  Vector2(0.f, 1.f) },
-
-      { Vector2(-halfWidth, halfHeight), Vector2(0.f, -1.f) },
-      { Vector2(-halfWidth, halfHeight), Vector2(1.f, -1.f) },
-      { Vector2(halfWidth, halfHeight),  Vector2(-1.f, -1.f) },
-      { Vector2(halfWidth, halfHeight),  Vector2(0.f, -1.f) },
-
-      { Vector2(-halfWidth, halfHeight), Vector2(0.f, 0.f) },
-      { Vector2(-halfWidth, halfHeight), Vector2(1.f, 0.f) },
-      { Vector2(halfWidth, halfHeight),  Vector2(-1.f, 0.f) },
-      { Vector2(halfWidth, halfHeight),  Vector2(0.f, 0.f) },
+    Vector2 position;
+    Vector2 drift;
   };
+  BorderVertex borderVertexData[16] =
+    {
+      {Vector2(-halfWidth, -halfHeight), Vector2(0.f, 0.f)},
+      {Vector2(-halfWidth, -halfHeight), Vector2(1.f, 0.f)},
+      {Vector2(halfWidth, -halfHeight), Vector2(-1.f, 0.f)},
+      {Vector2(halfWidth, -halfHeight), Vector2(0.f, 0.f)},
+
+      {Vector2(-halfWidth, -halfHeight), Vector2(0.f, 1.f)},
+      {Vector2(-halfWidth, -halfHeight), Vector2(1.f, 1.f)},
+      {Vector2(halfWidth, -halfHeight), Vector2(-1.f, 1.f)},
+      {Vector2(halfWidth, -halfHeight), Vector2(0.f, 1.f)},
+
+      {Vector2(-halfWidth, halfHeight), Vector2(0.f, -1.f)},
+      {Vector2(-halfWidth, halfHeight), Vector2(1.f, -1.f)},
+      {Vector2(halfWidth, halfHeight), Vector2(-1.f, -1.f)},
+      {Vector2(halfWidth, halfHeight), Vector2(0.f, -1.f)},
+
+      {Vector2(-halfWidth, halfHeight), Vector2(0.f, 0.f)},
+      {Vector2(-halfWidth, halfHeight), Vector2(1.f, 0.f)},
+      {Vector2(halfWidth, halfHeight), Vector2(-1.f, 0.f)},
+      {Vector2(halfWidth, halfHeight), Vector2(0.f, 0.f)},
+    };
 
   Property::Map borderVertexFormat;
   borderVertexFormat[POSITION_ATTRIBUTE_NAME] = Property::VECTOR2;
-  borderVertexFormat[DRIFT_ATTRIBUTE_NAME] = Property::VECTOR2;
-  VertexBuffer borderVertices = VertexBuffer::New( borderVertexFormat );
-  borderVertices.SetData( borderVertexData, 16 );
+  borderVertexFormat[DRIFT_ATTRIBUTE_NAME]    = Property::VECTOR2;
+  VertexBuffer borderVertices                 = VertexBuffer::New(borderVertexFormat);
+  borderVertices.SetData(borderVertexData, 16);
 
   // Create indices
-  unsigned short indexData[24] = { 1,5,2,6,3,7,7,6,11,10,15,14,14,10,13,9,12,8,8,9,4,5,0,1};
+  unsigned short indexData[24] = {1, 5, 2, 6, 3, 7, 7, 6, 11, 10, 15, 14, 14, 10, 13, 9, 12, 8, 8, 9, 4, 5, 0, 1};
 
   // Create the geometry object
   Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer( borderVertices );
-  geometry.SetIndexBuffer( indexData, sizeof(indexData)/sizeof(indexData[0]) );
-  geometry.SetType( Geometry::TRIANGLE_STRIP );
+  geometry.AddVertexBuffer(borderVertices);
+  geometry.SetIndexBuffer(indexData, sizeof(indexData) / sizeof(indexData[0]));
+  geometry.SetType(Geometry::TRIANGLE_STRIP);
 
   return geometry;
 }

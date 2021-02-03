@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,30 +23,27 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
-bool GetStringFromProperty( const Property::Value& value, std::string& output )
+bool GetStringFromProperty(const Property::Value& value, std::string& output)
 {
   bool extracted = false;
-  if( value.Get( output ) )
+  if(value.Get(output))
   {
     extracted = true;
   }
   else
   {
     const Property::Array* array = value.GetArray();
-    if( array )
+    if(array)
     {
       const unsigned int arraySize = array->Size();
-      for( unsigned int i = 0; i < arraySize; ++i )
+      for(unsigned int i = 0; i < arraySize; ++i)
       {
         std::string element;
-        if( array->GetElementAt( i ).Get( element ) )
+        if(array->GetElementAt(i).Get(element))
         {
           extracted = true;
           output += element + '\n';

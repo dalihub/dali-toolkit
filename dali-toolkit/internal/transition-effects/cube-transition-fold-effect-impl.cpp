@@ -20,24 +20,22 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-CubeTransitionFoldEffect::CubeTransitionFoldEffect( unsigned int numRows, unsigned int numColumns )
-: CubeTransitionEffect( numRows, numColumns )
+CubeTransitionFoldEffect::CubeTransitionFoldEffect(unsigned int numRows, unsigned int numColumns)
+: CubeTransitionEffect(numRows, numColumns)
 {
 }
 
-Toolkit::CubeTransitionFoldEffect CubeTransitionFoldEffect::New(unsigned int numRows, unsigned int numColumns )
+Toolkit::CubeTransitionFoldEffect CubeTransitionFoldEffect::New(unsigned int numRows, unsigned int numColumns)
 {
   // Create the implementation
-  IntrusivePtr< CubeTransitionFoldEffect > internalCubeTransEffect = new CubeTransitionFoldEffect( numRows, numColumns );
+  IntrusivePtr<CubeTransitionFoldEffect> internalCubeTransEffect = new CubeTransitionFoldEffect(numRows, numColumns);
 
   // Pass ownership to CustomActor handle
-  Toolkit::CubeTransitionFoldEffect cubeTransEffect( *internalCubeTransEffect );
+  Toolkit::CubeTransitionFoldEffect cubeTransEffect(*internalCubeTransEffect);
 
   //Initialization
   internalCubeTransEffect->Initialize();
@@ -48,37 +46,37 @@ Toolkit::CubeTransitionFoldEffect CubeTransitionFoldEffect::New(unsigned int num
 void CubeTransitionFoldEffect::OnInitialize()
 {
   unsigned int idx;
-  for( unsigned int y = 0; y < mRows; y++ )
+  for(unsigned int y = 0; y < mRows; y++)
   {
-    idx = y*mColumns;
-    for( unsigned int x = y%2; x < mColumns; x=x+2)
+    idx = y * mColumns;
+    for(unsigned int x = y % 2; x < mColumns; x = x + 2)
     {
-      SetTargetLeft( idx + x );
+      SetTargetLeft(idx + x);
     }
-    for( unsigned int x = (y+1)%2; x < mColumns; x=x+2)
+    for(unsigned int x = (y + 1) % 2; x < mColumns; x = x + 2)
     {
-      SetTargetRight( idx + x );
+      SetTargetRight(idx + x);
     }
   }
 }
 
-void CubeTransitionFoldEffect::OnStartTransition( Vector2 panPosition, Vector2 panDisplacement )
+void CubeTransitionFoldEffect::OnStartTransition(Vector2 panPosition, Vector2 panDisplacement)
 {
   float angle = Math::PI_2;
 
   unsigned int idx;
-  if( panDisplacement.x < 0 )
+  if(panDisplacement.x < 0)
   {
-    for( unsigned int y = 0; y < mRows; y++ )
+    for(unsigned int y = 0; y < mRows; y++)
     {
-      idx = y*mColumns;
-      for( unsigned int x = y%2; x < mColumns; x=x+2)
+      idx = y * mColumns;
+      for(unsigned int x = y % 2; x < mColumns; x = x + 2)
       {
-        SetTargetLeft( idx + x );
+        SetTargetLeft(idx + x);
       }
-      for( unsigned int x = (y+1)%2; x < mColumns; x=x+2)
+      for(unsigned int x = (y + 1) % 2; x < mColumns; x = x + 2)
       {
-        SetTargetRight( idx + x );
+        SetTargetRight(idx + x);
       }
     }
   }
@@ -86,30 +84,30 @@ void CubeTransitionFoldEffect::OnStartTransition( Vector2 panPosition, Vector2 p
   {
     angle = -angle;
 
-    for( unsigned int y = 0; y < mRows; y++ )
+    for(unsigned int y = 0; y < mRows; y++)
     {
-      idx = y*mColumns;
-      for( unsigned int x = y%2; x < mColumns; x=x+2)
+      idx = y * mColumns;
+      for(unsigned int x = y % 2; x < mColumns; x = x + 2)
       {
-        SetTargetRight( idx + x );
+        SetTargetRight(idx + x);
       }
-      for( unsigned int x = (y+1)%2; x < mColumns; x=x+2)
+      for(unsigned int x = (y + 1) % 2; x < mColumns; x = x + 2)
       {
-        SetTargetLeft( idx + x );
+        SetTargetLeft(idx + x);
       }
     }
   }
 
-  for( unsigned int y = 0; y < mRows; y++ )
+  for(unsigned int y = 0; y < mRows; y++)
   {
-    idx = y*mColumns;
-    for( unsigned int x = y%2; x < mColumns; x=x+2)
+    idx = y * mColumns;
+    for(unsigned int x = y % 2; x < mColumns; x = x + 2)
     {
-      SetupAnimation( idx + x, x, angle );
+      SetupAnimation(idx + x, x, angle);
     }
-    for( unsigned int x = (y+1)%2; x < mColumns; x=x+2)
+    for(unsigned int x = (y + 1) % 2; x < mColumns; x = x + 2)
     {
-      SetupAnimation( idx + x, x, -angle );
+      SetupAnimation(idx + x, x, -angle);
     }
   }
 
@@ -117,7 +115,7 @@ void CubeTransitionFoldEffect::OnStartTransition( Vector2 panPosition, Vector2 p
   mIsAnimating = true;
 }
 
-void CubeTransitionFoldEffect::SetupAnimation( unsigned int actorIndex, unsigned int x, float angle )
+void CubeTransitionFoldEffect::SetupAnimation(unsigned int actorIndex, unsigned int x, float angle)
 {
   //rotate and translate the cube such that the edges remain in constant contact
   //calculate the maximum distance the cube has to move when it the box has rotated 45 degrees
@@ -130,14 +128,14 @@ void CubeTransitionFoldEffect::SetupAnimation( unsigned int actorIndex, unsigned
   //accumulating over the length of the row we get:
   //  delta_distance_at_x = x * delta_distance;
 
-  float delta = (float)x * mTileSize.x * ( 1.4142f - 1.0f );
+  float delta = (float)x * mTileSize.x * (1.4142f - 1.0f);
 
-  Vector3 position( mBoxes[ actorIndex ].GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) );
-  mAnimation.AnimateTo( Property( mBoxes[ actorIndex ], Actor::Property::ORIENTATION ), Quaternion( Radian( angle ), Vector3::YAXIS ), AlphaFunction::LINEAR );
-  mAnimation.AnimateTo( Property( mBoxes[ actorIndex ], Actor::Property::POSITION_X ), position.x + delta, AlphaFunction::BOUNCE );
+  Vector3 position(mBoxes[actorIndex].GetCurrentProperty<Vector3>(Actor::Property::POSITION));
+  mAnimation.AnimateTo(Property(mBoxes[actorIndex], Actor::Property::ORIENTATION), Quaternion(Radian(angle), Vector3::YAXIS), AlphaFunction::LINEAR);
+  mAnimation.AnimateTo(Property(mBoxes[actorIndex], Actor::Property::POSITION_X), position.x + delta, AlphaFunction::BOUNCE);
 
-  mAnimation.AnimateTo( Property( mCurrentTiles[ actorIndex ], Actor::Property::COLOR ), HALF_BRIGHTNESS, AlphaFunction::EASE_OUT );
-  mAnimation.AnimateTo( Property( mTargetTiles[ actorIndex ], Actor::Property::COLOR ), FULL_BRIGHTNESS, AlphaFunction::EASE_IN );
+  mAnimation.AnimateTo(Property(mCurrentTiles[actorIndex], Actor::Property::COLOR), HALF_BRIGHTNESS, AlphaFunction::EASE_OUT);
+  mAnimation.AnimateTo(Property(mTargetTiles[actorIndex], Actor::Property::COLOR), FULL_BRIGHTNESS, AlphaFunction::EASE_IN);
 }
 
 } // namespace Internal

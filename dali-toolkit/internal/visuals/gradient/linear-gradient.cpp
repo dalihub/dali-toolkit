@@ -19,31 +19,29 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
-LinearGradient::LinearGradient( const Vector2& startPosition, const Vector2& endPosition )
+LinearGradient::LinearGradient(const Vector2& startPosition, const Vector2& endPosition)
 : Gradient()
 {
-  SetStartAndEndPosition( startPosition, endPosition );
+  SetStartAndEndPosition(startPosition, endPosition);
 }
 
 LinearGradient::~LinearGradient()
-{}
+{
+}
 
-void LinearGradient::SetStartAndEndPosition( const Vector2& startPosition, const Vector2& endPosition )
+void LinearGradient::SetStartAndEndPosition(const Vector2& startPosition, const Vector2& endPosition)
 {
   mStartPosition = startPosition;
-  mEndPosition = endPosition;
+  mEndPosition   = endPosition;
 
   // Calculate the transform aligning to the gradient line
-  float dx = mEndPosition.x - mStartPosition.x;
-  float dy = mEndPosition.y - mStartPosition.y;
-  Matrix3 alignMatrix( dy, -dx, 0.f, dx, dy, 0.f, mStartPosition.x, mStartPosition.y, 1.f );
+  float   dx = mEndPosition.x - mStartPosition.x;
+  float   dy = mEndPosition.y - mStartPosition.y;
+  Matrix3 alignMatrix(dy, -dx, 0.f, dx, dy, 0.f, mStartPosition.x, mStartPosition.y, 1.f);
   alignMatrix.Invert();
 
   mAlignmentTransform = alignMatrix;

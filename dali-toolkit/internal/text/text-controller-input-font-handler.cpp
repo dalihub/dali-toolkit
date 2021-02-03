@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,12 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 namespace
 {
-
 /**
  * @brief Adds a new font description run for the selected text.
  *
@@ -46,30 +42,30 @@ namespace
  * @param[out] startOfSelectedText Index to the first selected character.
  * @param[out] lengthOfSelectedText Number of selected characters.
  */
-FontDescriptionRun& UpdateSelectionFontStyleRun( EventData* eventData,
-                                                 LogicalModelPtr logicalModel,
-                                                 CharacterIndex& startOfSelectedText,
-                                                 Length& lengthOfSelectedText )
+FontDescriptionRun& UpdateSelectionFontStyleRun(EventData*      eventData,
+                                                LogicalModelPtr logicalModel,
+                                                CharacterIndex& startOfSelectedText,
+                                                Length&         lengthOfSelectedText)
 {
   const bool handlesCrossed = eventData->mLeftSelectionPosition > eventData->mRightSelectionPosition;
 
   // Get start and end position of selection
-  startOfSelectedText = handlesCrossed ? eventData->mRightSelectionPosition : eventData->mLeftSelectionPosition;
-  lengthOfSelectedText = ( handlesCrossed ? eventData->mLeftSelectionPosition : eventData->mRightSelectionPosition ) - startOfSelectedText;
+  startOfSelectedText  = handlesCrossed ? eventData->mRightSelectionPosition : eventData->mLeftSelectionPosition;
+  lengthOfSelectedText = (handlesCrossed ? eventData->mLeftSelectionPosition : eventData->mRightSelectionPosition) - startOfSelectedText;
 
   // Add the font run.
   const VectorBase::SizeType numberOfRuns = logicalModel->mFontDescriptionRuns.Count();
-  logicalModel->mFontDescriptionRuns.Resize( numberOfRuns + 1u );
+  logicalModel->mFontDescriptionRuns.Resize(numberOfRuns + 1u);
 
-  FontDescriptionRun& fontDescriptionRun = *( logicalModel->mFontDescriptionRuns.Begin() + numberOfRuns );
+  FontDescriptionRun& fontDescriptionRun = *(logicalModel->mFontDescriptionRuns.Begin() + numberOfRuns);
 
-  fontDescriptionRun.characterRun.characterIndex = startOfSelectedText;
+  fontDescriptionRun.characterRun.characterIndex     = startOfSelectedText;
   fontDescriptionRun.characterRun.numberOfCharacters = lengthOfSelectedText;
 
   // Recalculate the selection highlight as the metrics may have changed.
-  eventData->mUpdateLeftSelectionPosition = true;
+  eventData->mUpdateLeftSelectionPosition  = true;
   eventData->mUpdateRightSelectionPosition = true;
-  eventData->mUpdateHighlightBox = true;
+  eventData->mUpdateHighlightBox           = true;
 
   return fontDescriptionRun;
 }
@@ -78,66 +74,66 @@ FontDescriptionRun& UpdateSelectionFontStyleRun( EventData* eventData,
 
 void Controller::InputFontHandler::SetInputFontFamily(Controller& controller, const std::string& fontFamily)
 {
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
-    controller.mImpl->mEventData->mInputStyle.familyName = fontFamily;
+    controller.mImpl->mEventData->mInputStyle.familyName      = fontFamily;
     controller.mImpl->mEventData->mInputStyle.isFamilyDefined = true;
 
-    if( EventData::SELECTING == controller.mImpl->mEventData->mState || EventData::EDITING == controller.mImpl->mEventData->mState || EventData::INACTIVE == controller.mImpl->mEventData->mState )
+    if(EventData::SELECTING == controller.mImpl->mEventData->mState || EventData::EDITING == controller.mImpl->mEventData->mState || EventData::INACTIVE == controller.mImpl->mEventData->mState)
     {
-      CharacterIndex startOfSelectedText = 0u;
-      Length lengthOfSelectedText = 0u;
+      CharacterIndex startOfSelectedText  = 0u;
+      Length         lengthOfSelectedText = 0u;
 
-      if( EventData::SELECTING == controller.mImpl->mEventData->mState )
+      if(EventData::SELECTING == controller.mImpl->mEventData->mState)
       {
         // Update a font description run for the selecting state.
-        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( controller.mImpl->mEventData,
-                                                                              controller.mImpl->mModel->mLogicalModel,
-                                                                              startOfSelectedText,
-                                                                              lengthOfSelectedText );
+        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun(controller.mImpl->mEventData,
+                                                                             controller.mImpl->mModel->mLogicalModel,
+                                                                             startOfSelectedText,
+                                                                             lengthOfSelectedText);
 
         fontDescriptionRun.familyLength = fontFamily.size();
-        fontDescriptionRun.familyName = new char[fontDescriptionRun.familyLength];
-        memcpy( fontDescriptionRun.familyName, fontFamily.c_str(), fontDescriptionRun.familyLength );
+        fontDescriptionRun.familyName   = new char[fontDescriptionRun.familyLength];
+        memcpy(fontDescriptionRun.familyName, fontFamily.c_str(), fontDescriptionRun.familyLength);
         fontDescriptionRun.familyDefined = true;
 
         // The memory allocated for the font family name is freed when the font description is removed from the logical model.
 
-        controller.mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        controller.mImpl->mTextUpdateInfo.mCharacterIndex             = startOfSelectedText;
         controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
+        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = lengthOfSelectedText;
       }
       else
       {
-        controller.mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        controller.mImpl->mTextUpdateInfo.mCharacterIndex             = 0;
         controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = controller.mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = controller.mImpl->mModel->mLogicalModel->mText.Count();
+        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = controller.mImpl->mModel->mLogicalModel->mText.Count();
       }
 
       // Request to relayout.
-      controller.mImpl->mOperationsPending = static_cast<OperationsMask>( controller.mImpl->mOperationsPending |
-                                                               VALIDATE_FONTS            |
-                                                               SHAPE_TEXT                |
-                                                               GET_GLYPH_METRICS         |
-                                                               LAYOUT                    |
-                                                               UPDATE_LAYOUT_SIZE        |
-                                                               REORDER                   |
-                                                               ALIGN );
+      controller.mImpl->mOperationsPending      = static_cast<OperationsMask>(controller.mImpl->mOperationsPending |
+                                                                         VALIDATE_FONTS |
+                                                                         SHAPE_TEXT |
+                                                                         GET_GLYPH_METRICS |
+                                                                         LAYOUT |
+                                                                         UPDATE_LAYOUT_SIZE |
+                                                                         REORDER |
+                                                                         ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
       controller.mImpl->RequestRelayout();
 
       // As the font changes, recalculate the handle positions is needed.
-      controller.mImpl->mEventData->mUpdateLeftSelectionPosition = true;
+      controller.mImpl->mEventData->mUpdateLeftSelectionPosition  = true;
       controller.mImpl->mEventData->mUpdateRightSelectionPosition = true;
-      controller.mImpl->mEventData->mUpdateHighlightBox = true;
-      controller.mImpl->mEventData->mScrollAfterUpdatePosition = true;
+      controller.mImpl->mEventData->mUpdateHighlightBox           = true;
+      controller.mImpl->mEventData->mScrollAfterUpdatePosition    = true;
     }
   }
 }
 
 const std::string& Controller::InputFontHandler::GetInputFontFamily(const Controller& controller)
 {
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
     return controller.mImpl->mEventData->mInputStyle.familyName;
   }
@@ -148,55 +144,55 @@ const std::string& Controller::InputFontHandler::GetInputFontFamily(const Contro
 
 void Controller::InputFontHandler::SetInputFontWeight(const Controller& controller, FontWeight weight)
 {
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
-    controller.mImpl->mEventData->mInputStyle.weight = weight;
+    controller.mImpl->mEventData->mInputStyle.weight          = weight;
     controller.mImpl->mEventData->mInputStyle.isWeightDefined = true;
 
-    if( EventData::SELECTING == controller.mImpl->mEventData->mState || EventData::EDITING == controller.mImpl->mEventData->mState || EventData::INACTIVE == controller.mImpl->mEventData->mState )
+    if(EventData::SELECTING == controller.mImpl->mEventData->mState || EventData::EDITING == controller.mImpl->mEventData->mState || EventData::INACTIVE == controller.mImpl->mEventData->mState)
     {
-      CharacterIndex startOfSelectedText = 0u;
-      Length lengthOfSelectedText = 0u;
+      CharacterIndex startOfSelectedText  = 0u;
+      Length         lengthOfSelectedText = 0u;
 
-      if( EventData::SELECTING == controller.mImpl->mEventData->mState )
+      if(EventData::SELECTING == controller.mImpl->mEventData->mState)
       {
         // Update a font description run for the selecting state.
-        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( controller.mImpl->mEventData,
-                                                                              controller.mImpl->mModel->mLogicalModel,
-                                                                              startOfSelectedText,
-                                                                              lengthOfSelectedText );
+        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun(controller.mImpl->mEventData,
+                                                                             controller.mImpl->mModel->mLogicalModel,
+                                                                             startOfSelectedText,
+                                                                             lengthOfSelectedText);
 
-        fontDescriptionRun.weight = weight;
+        fontDescriptionRun.weight        = weight;
         fontDescriptionRun.weightDefined = true;
 
-        controller.mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        controller.mImpl->mTextUpdateInfo.mCharacterIndex             = startOfSelectedText;
         controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
+        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = lengthOfSelectedText;
       }
       else
       {
-        controller.mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        controller.mImpl->mTextUpdateInfo.mCharacterIndex             = 0;
         controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = controller.mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = controller.mImpl->mModel->mLogicalModel->mText.Count();
+        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = controller.mImpl->mModel->mLogicalModel->mText.Count();
       }
 
       // Request to relayout.
-      controller.mImpl->mOperationsPending = static_cast<OperationsMask>( controller.mImpl->mOperationsPending |
-                                                               VALIDATE_FONTS            |
-                                                               SHAPE_TEXT                |
-                                                               GET_GLYPH_METRICS         |
-                                                               LAYOUT                    |
-                                                               UPDATE_LAYOUT_SIZE        |
-                                                               REORDER                   |
-                                                               ALIGN );
+      controller.mImpl->mOperationsPending      = static_cast<OperationsMask>(controller.mImpl->mOperationsPending |
+                                                                         VALIDATE_FONTS |
+                                                                         SHAPE_TEXT |
+                                                                         GET_GLYPH_METRICS |
+                                                                         LAYOUT |
+                                                                         UPDATE_LAYOUT_SIZE |
+                                                                         REORDER |
+                                                                         ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
       controller.mImpl->RequestRelayout();
 
       // As the font might change, recalculate the handle positions is needed.
-      controller.mImpl->mEventData->mUpdateLeftSelectionPosition = true;
+      controller.mImpl->mEventData->mUpdateLeftSelectionPosition  = true;
       controller.mImpl->mEventData->mUpdateRightSelectionPosition = true;
-      controller.mImpl->mEventData->mUpdateHighlightBox = true;
-      controller.mImpl->mEventData->mScrollAfterUpdatePosition = true;
+      controller.mImpl->mEventData->mUpdateHighlightBox           = true;
+      controller.mImpl->mEventData->mScrollAfterUpdatePosition    = true;
     }
   }
 }
@@ -205,7 +201,7 @@ bool Controller::InputFontHandler::IsInputFontWeightDefined(const Controller& co
 {
   bool defined = false;
 
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
     defined = controller.mImpl->mEventData->mInputStyle.isWeightDefined;
   }
@@ -215,7 +211,7 @@ bool Controller::InputFontHandler::IsInputFontWeightDefined(const Controller& co
 
 FontWeight Controller::InputFontHandler::GetInputFontWeight(const Controller& controller)
 {
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
     return controller.mImpl->mEventData->mInputStyle.weight;
   }
@@ -225,55 +221,55 @@ FontWeight Controller::InputFontHandler::GetInputFontWeight(const Controller& co
 
 void Controller::InputFontHandler::SetInputFontWidth(Controller& controller, FontWidth width)
 {
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
-    controller.mImpl->mEventData->mInputStyle.width = width;
+    controller.mImpl->mEventData->mInputStyle.width          = width;
     controller.mImpl->mEventData->mInputStyle.isWidthDefined = true;
 
-    if( EventData::SELECTING == controller.mImpl->mEventData->mState || EventData::EDITING == controller.mImpl->mEventData->mState || EventData::INACTIVE == controller.mImpl->mEventData->mState )
+    if(EventData::SELECTING == controller.mImpl->mEventData->mState || EventData::EDITING == controller.mImpl->mEventData->mState || EventData::INACTIVE == controller.mImpl->mEventData->mState)
     {
-      CharacterIndex startOfSelectedText = 0u;
-      Length lengthOfSelectedText = 0u;
+      CharacterIndex startOfSelectedText  = 0u;
+      Length         lengthOfSelectedText = 0u;
 
-      if( EventData::SELECTING == controller.mImpl->mEventData->mState )
+      if(EventData::SELECTING == controller.mImpl->mEventData->mState)
       {
         // Update a font description run for the selecting state.
-        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( controller.mImpl->mEventData,
-                                                                              controller.mImpl->mModel->mLogicalModel,
-                                                                              startOfSelectedText,
-                                                                              lengthOfSelectedText );
+        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun(controller.mImpl->mEventData,
+                                                                             controller.mImpl->mModel->mLogicalModel,
+                                                                             startOfSelectedText,
+                                                                             lengthOfSelectedText);
 
-        fontDescriptionRun.width = width;
+        fontDescriptionRun.width        = width;
         fontDescriptionRun.widthDefined = true;
 
-        controller.mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        controller.mImpl->mTextUpdateInfo.mCharacterIndex             = startOfSelectedText;
         controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
+        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = lengthOfSelectedText;
       }
       else
       {
-        controller.mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        controller.mImpl->mTextUpdateInfo.mCharacterIndex             = 0;
         controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = controller.mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = controller.mImpl->mModel->mLogicalModel->mText.Count();
+        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = controller.mImpl->mModel->mLogicalModel->mText.Count();
       }
 
       // Request to relayout.
-      controller.mImpl->mOperationsPending = static_cast<OperationsMask>( controller.mImpl->mOperationsPending |
-                                                               VALIDATE_FONTS            |
-                                                               SHAPE_TEXT                |
-                                                               GET_GLYPH_METRICS         |
-                                                               LAYOUT                    |
-                                                               UPDATE_LAYOUT_SIZE        |
-                                                               REORDER                   |
-                                                               ALIGN );
+      controller.mImpl->mOperationsPending      = static_cast<OperationsMask>(controller.mImpl->mOperationsPending |
+                                                                         VALIDATE_FONTS |
+                                                                         SHAPE_TEXT |
+                                                                         GET_GLYPH_METRICS |
+                                                                         LAYOUT |
+                                                                         UPDATE_LAYOUT_SIZE |
+                                                                         REORDER |
+                                                                         ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
       controller.mImpl->RequestRelayout();
 
       // As the font might change, recalculate the handle positions is needed.
-      controller.mImpl->mEventData->mUpdateLeftSelectionPosition = true;
+      controller.mImpl->mEventData->mUpdateLeftSelectionPosition  = true;
       controller.mImpl->mEventData->mUpdateRightSelectionPosition = true;
-      controller.mImpl->mEventData->mUpdateHighlightBox = true;
-      controller.mImpl->mEventData->mScrollAfterUpdatePosition = true;
+      controller.mImpl->mEventData->mUpdateHighlightBox           = true;
+      controller.mImpl->mEventData->mScrollAfterUpdatePosition    = true;
     }
   }
 }
@@ -282,7 +278,7 @@ bool Controller::InputFontHandler::IsInputFontWidthDefined(const Controller& con
 {
   bool defined = false;
 
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
     defined = controller.mImpl->mEventData->mInputStyle.isWidthDefined;
   }
@@ -292,7 +288,7 @@ bool Controller::InputFontHandler::IsInputFontWidthDefined(const Controller& con
 
 FontWidth Controller::InputFontHandler::GetInputFontWidth(const Controller& controller)
 {
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
     return controller.mImpl->mEventData->mInputStyle.width;
   }
@@ -302,55 +298,55 @@ FontWidth Controller::InputFontHandler::GetInputFontWidth(const Controller& cont
 
 void Controller::InputFontHandler::SetInputFontSlant(Controller& controller, FontSlant slant)
 {
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
-    controller.mImpl->mEventData->mInputStyle.slant = slant;
+    controller.mImpl->mEventData->mInputStyle.slant          = slant;
     controller.mImpl->mEventData->mInputStyle.isSlantDefined = true;
 
-    if( EventData::SELECTING == controller.mImpl->mEventData->mState || EventData::EDITING == controller.mImpl->mEventData->mState || EventData::INACTIVE == controller.mImpl->mEventData->mState )
+    if(EventData::SELECTING == controller.mImpl->mEventData->mState || EventData::EDITING == controller.mImpl->mEventData->mState || EventData::INACTIVE == controller.mImpl->mEventData->mState)
     {
-      CharacterIndex startOfSelectedText = 0u;
-      Length lengthOfSelectedText = 0u;
+      CharacterIndex startOfSelectedText  = 0u;
+      Length         lengthOfSelectedText = 0u;
 
-      if( EventData::SELECTING == controller.mImpl->mEventData->mState )
+      if(EventData::SELECTING == controller.mImpl->mEventData->mState)
       {
         // Update a font description run for the selecting state.
-        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( controller.mImpl->mEventData,
-                                                                              controller.mImpl->mModel->mLogicalModel,
-                                                                              startOfSelectedText,
-                                                                              lengthOfSelectedText );
+        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun(controller.mImpl->mEventData,
+                                                                             controller.mImpl->mModel->mLogicalModel,
+                                                                             startOfSelectedText,
+                                                                             lengthOfSelectedText);
 
-        fontDescriptionRun.slant = slant;
+        fontDescriptionRun.slant        = slant;
         fontDescriptionRun.slantDefined = true;
 
-        controller.mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        controller.mImpl->mTextUpdateInfo.mCharacterIndex             = startOfSelectedText;
         controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
+        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = lengthOfSelectedText;
       }
       else
       {
-        controller.mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        controller.mImpl->mTextUpdateInfo.mCharacterIndex             = 0;
         controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = controller.mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = controller.mImpl->mModel->mLogicalModel->mText.Count();
+        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = controller.mImpl->mModel->mLogicalModel->mText.Count();
       }
 
       // Request to relayout.
-      controller.mImpl->mOperationsPending = static_cast<OperationsMask>( controller.mImpl->mOperationsPending |
-                                                               VALIDATE_FONTS            |
-                                                               SHAPE_TEXT                |
-                                                               GET_GLYPH_METRICS         |
-                                                               LAYOUT                    |
-                                                               UPDATE_LAYOUT_SIZE        |
-                                                               REORDER                   |
-                                                               ALIGN );
+      controller.mImpl->mOperationsPending      = static_cast<OperationsMask>(controller.mImpl->mOperationsPending |
+                                                                         VALIDATE_FONTS |
+                                                                         SHAPE_TEXT |
+                                                                         GET_GLYPH_METRICS |
+                                                                         LAYOUT |
+                                                                         UPDATE_LAYOUT_SIZE |
+                                                                         REORDER |
+                                                                         ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
       controller.mImpl->RequestRelayout();
 
       // As the font might change, recalculate the handle positions is needed.
-      controller.mImpl->mEventData->mUpdateLeftSelectionPosition = true;
+      controller.mImpl->mEventData->mUpdateLeftSelectionPosition  = true;
       controller.mImpl->mEventData->mUpdateRightSelectionPosition = true;
-      controller.mImpl->mEventData->mUpdateHighlightBox = true;
-      controller.mImpl->mEventData->mScrollAfterUpdatePosition = true;
+      controller.mImpl->mEventData->mUpdateHighlightBox           = true;
+      controller.mImpl->mEventData->mScrollAfterUpdatePosition    = true;
     }
   }
 }
@@ -359,7 +355,7 @@ bool Controller::InputFontHandler::IsInputFontSlantDefined(const Controller& con
 {
   bool defined = false;
 
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
     defined = controller.mImpl->mEventData->mInputStyle.isSlantDefined;
   }
@@ -369,7 +365,7 @@ bool Controller::InputFontHandler::IsInputFontSlantDefined(const Controller& con
 
 FontSlant Controller::InputFontHandler::GetInputFontSlant(const Controller& controller)
 {
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
     return controller.mImpl->mEventData->mInputStyle.slant;
   }
@@ -379,68 +375,68 @@ FontSlant Controller::InputFontHandler::GetInputFontSlant(const Controller& cont
 
 void Controller::InputFontHandler::SetInputFontPointSize(Controller& controller, float size)
 {
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
-    controller.mImpl->mEventData->mInputStyle.size = size;
+    controller.mImpl->mEventData->mInputStyle.size          = size;
     controller.mImpl->mEventData->mInputStyle.isSizeDefined = true;
 
-    if( EventData::SELECTING == controller.mImpl->mEventData->mState || EventData::EDITING == controller.mImpl->mEventData->mState || EventData::INACTIVE == controller.mImpl->mEventData->mState )
+    if(EventData::SELECTING == controller.mImpl->mEventData->mState || EventData::EDITING == controller.mImpl->mEventData->mState || EventData::INACTIVE == controller.mImpl->mEventData->mState)
     {
-      CharacterIndex startOfSelectedText = 0u;
-      Length lengthOfSelectedText = 0u;
+      CharacterIndex startOfSelectedText  = 0u;
+      Length         lengthOfSelectedText = 0u;
 
-      if( EventData::SELECTING == controller.mImpl->mEventData->mState )
+      if(EventData::SELECTING == controller.mImpl->mEventData->mState)
       {
         // Update a font description run for the selecting state.
-        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( controller.mImpl->mEventData,
-                                                                              controller.mImpl->mModel->mLogicalModel,
-                                                                              startOfSelectedText,
-                                                                              lengthOfSelectedText );
+        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun(controller.mImpl->mEventData,
+                                                                             controller.mImpl->mModel->mLogicalModel,
+                                                                             startOfSelectedText,
+                                                                             lengthOfSelectedText);
 
-        fontDescriptionRun.size = static_cast<PointSize26Dot6>( size * controller.mImpl->mFontSizeScale * 64.f );
+        fontDescriptionRun.size        = static_cast<PointSize26Dot6>(size * controller.mImpl->mFontSizeScale * 64.f);
         fontDescriptionRun.sizeDefined = true;
 
-        controller.mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        controller.mImpl->mTextUpdateInfo.mCharacterIndex             = startOfSelectedText;
         controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
+        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = lengthOfSelectedText;
       }
       else
       {
-        controller.mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        controller.mImpl->mTextUpdateInfo.mCharacterIndex             = 0;
         controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = controller.mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = controller.mImpl->mModel->mLogicalModel->mText.Count();
+        controller.mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = controller.mImpl->mModel->mLogicalModel->mText.Count();
       }
 
       // Request to relayout.
-      controller.mImpl->mOperationsPending = static_cast<OperationsMask>( controller.mImpl->mOperationsPending |
-                                                               VALIDATE_FONTS            |
-                                                               SHAPE_TEXT                |
-                                                               GET_GLYPH_METRICS         |
-                                                               LAYOUT                    |
-                                                               UPDATE_LAYOUT_SIZE        |
-                                                               REORDER                   |
-                                                               ALIGN );
+      controller.mImpl->mOperationsPending      = static_cast<OperationsMask>(controller.mImpl->mOperationsPending |
+                                                                         VALIDATE_FONTS |
+                                                                         SHAPE_TEXT |
+                                                                         GET_GLYPH_METRICS |
+                                                                         LAYOUT |
+                                                                         UPDATE_LAYOUT_SIZE |
+                                                                         REORDER |
+                                                                         ALIGN);
       controller.mImpl->mRecalculateNaturalSize = true;
       controller.mImpl->RequestRelayout();
 
       // As the font might change, recalculate the handle positions is needed.
-      controller.mImpl->mEventData->mUpdateLeftSelectionPosition = true;
+      controller.mImpl->mEventData->mUpdateLeftSelectionPosition  = true;
       controller.mImpl->mEventData->mUpdateRightSelectionPosition = true;
-      controller.mImpl->mEventData->mUpdateHighlightBox = true;
-      controller.mImpl->mEventData->mScrollAfterUpdatePosition = true;
+      controller.mImpl->mEventData->mUpdateHighlightBox           = true;
+      controller.mImpl->mEventData->mScrollAfterUpdatePosition    = true;
     }
   }
 }
 
 float Controller::InputFontHandler::GetInputFontPointSize(const Controller& controller)
 {
-  if( NULL != controller.mImpl->mEventData )
+  if(NULL != controller.mImpl->mEventData)
   {
     return controller.mImpl->mEventData->mInputStyle.size;
   }
 
   // Return the default font's point size if there is no EventData.
-  return controller.GetDefaultFontSize( Text::Controller::POINT_SIZE );
+  return controller.GetDefaultFontSize(Text::Controller::POINT_SIZE);
 }
 } // namespace Text
 

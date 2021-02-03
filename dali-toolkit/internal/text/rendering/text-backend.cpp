@@ -23,21 +23,18 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 Backend Backend::Get()
 {
   return Internal::Backend::Get();
 }
 
-RendererPtr Backend::NewRenderer( unsigned int renderingType )
+RendererPtr Backend::NewRenderer(unsigned int renderingType)
 {
-  return GetImplementation(*this).NewRenderer( renderingType );
+  return GetImplementation(*this).NewRenderer(renderingType);
 }
 
 Backend::Backend()
@@ -48,19 +45,19 @@ Backend::~Backend()
 {
 }
 
-Backend::Backend( const Backend& handle )
-: BaseHandle( handle )
+Backend::Backend(const Backend& handle)
+: BaseHandle(handle)
 {
 }
 
-Backend& Backend::operator=( const Backend& handle )
+Backend& Backend::operator=(const Backend& handle)
 {
-  BaseHandle::operator=( handle );
+  BaseHandle::operator=(handle);
   return *this;
 }
 
-Backend::Backend( Internal::Backend* internal )
-: BaseHandle( internal )
+Backend::Backend(Internal::Backend* internal)
+: BaseHandle(internal)
 {
 }
 

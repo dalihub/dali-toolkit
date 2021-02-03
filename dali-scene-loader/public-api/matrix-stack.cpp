@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 Samsung Electronics Co., Ltd.
+* Copyright (c) 2021 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 MatrixStack::MatrixStack()
 {
   mStack.reserve(16);
@@ -34,13 +33,13 @@ bool MatrixStack::IsEmpty() const
 
 void MatrixStack::Push(const Matrix& model)
 {
-  if (mStack.empty())
+  if(mStack.empty())
   {
     mStack.push_back(model);
   }
   else
   {
-    Matrix m{ false };
+    Matrix m{false};
     Matrix::Multiply(m, model, mStack.back());
     mStack.push_back(m);
   }
@@ -62,5 +61,5 @@ void MatrixStack::PopAll()
   mStack.clear();
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
