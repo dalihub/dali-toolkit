@@ -349,6 +349,11 @@ public:
    */
   Dali::Toolkit::WebView::WebViewConsoleMessageSignalType& ConsoleMessageSignal();
 
+  /**
+   * @copydoc Dali::Toolkit::WebView::PolicyDecisionSignal()
+   */
+  Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType& PolicyDecisionSignal();
+
 public: // Properties
   /**
    * @brief Called when a property of an object of this type is set.
@@ -599,7 +604,7 @@ private:
 
   /**
    * @brief Callback function to be called when scroll edge is reached.
-   * @param[in] e The scroll edge reached.
+   * @param[in] edge The scroll edge reached.
    */
   void OnScrollEdgeReached(Dali::WebEnginePlugin::ScrollEdge edge);
 
@@ -670,6 +675,12 @@ private:
    */
   void OnConsoleMessage(std::shared_ptr<Dali::WebEngineConsoleMessage> message);
 
+  /**
+   * @brief Callback function to be called when policy need be decided.
+   * @param[in] decision The policy decided.
+   */
+  void OnPolicyDecisionRequest(std::shared_ptr<Dali::WebEnginePolicyDecision> decision);
+
 private:
   std::string                 mUrl;
   Dali::Toolkit::Visual::Base mVisual;
@@ -686,6 +697,7 @@ private:
   Dali::Toolkit::WebView::WebViewFrameRenderedSignalType      mFrameRenderedSignal;
   Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType mRequestInterceptorSignal;
   Dali::Toolkit::WebView::WebViewConsoleMessageSignalType     mConsoleMessageSignal;
+  Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType     mPolicyDecisionSignal;
 
   std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
   std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
@@ -697,8 +709,8 @@ private:
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;
   Dali::PropertyNotification mScaleUpdateNotification;
-  bool                       mVideoHoleEnabled;
   Dali::Rect<int>            mWebViewArea;
+  bool                       mVideoHoleEnabled;
   bool                       mMouseEventsEnabled;
   bool                       mKeyEventsEnabled;
 

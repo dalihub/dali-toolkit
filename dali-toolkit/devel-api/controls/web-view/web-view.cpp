@@ -349,6 +349,11 @@ WebView::WebViewConsoleMessageSignalType& WebView::ConsoleMessageSignal()
   return Dali::Toolkit::GetImpl(*this).ConsoleMessageSignal();
 }
 
+WebView::WebViewPolicyDecisionSignalType& WebView::PolicyDecisionSignal()
+{
+  return Dali::Toolkit::GetImpl(*this).PolicyDecisionSignal();
+}
+
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)
 {

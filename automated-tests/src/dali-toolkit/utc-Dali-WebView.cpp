@@ -22,6 +22,8 @@
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali.h>
+#include <dali/devel-api/adaptor-framework/web-engine-frame.h>
+#include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
 #include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
@@ -67,12 +69,14 @@ static bool gTouched = false;
 static bool gHovered = false;
 static bool gWheelEventHandled = false;
 static int gFormRepostDecisionCallbackCalled = 0;
-static std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> gFormRepostDecisionInstance;
+static std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> gFormRepostDecisionInstance = nullptr;
 static int gFrameRenderedCallbackCalled = 0;
 static int gRequestInterceptorCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineRequestInterceptor> gRequestInterceptorInstance = nullptr;
 static int gConsoleMessageCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineConsoleMessage> gConsoleMessageInstance = nullptr;
+static int gPolicyDecisionCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEnginePolicyDecision> gPolicyDecisionInstance = nullptr;
 
 struct CallbackFunctor
 {
@@ -106,6 +110,12 @@ static void OnPageLoadFinished( WebView view, const std::string& url )
 static void OnScrollEdgeReached( WebView view, Dali::WebEnginePlugin::ScrollEdge edge )
 {
   gScrollEdgeReachedCallbackCalled++;
+}
+
+static void OnPolicyDecisionRequest(WebView view, std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
+{
+  gPolicyDecisionCallbackCalled++;
+  gPolicyDecisionInstance = std::move(decision);
 }
 
 static void OnUrlChanged( WebView view, const std::string& url )
@@ -179,7 +189,7 @@ static bool OnWheelEvent( Actor actor, const Dali::WheelEvent& wheel )
 static void OnFormRepostDecision(WebView, std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> decision)
 {
   gFormRepostDecisionCallbackCalled++;
-  gFormRepostDecisionInstance = decision;
+  gFormRepostDecisionInstance = std::move(decision);
 }
 
 static void OnFrameRendered(WebView)
@@ -229,7 +239,6 @@ int UtcDaliWebViewBasics(void)
   assign = copy;
   DALI_TEST_CHECK( assign == view );
 
-
   // DownCast Test
   tet_infoline( "UtcDaliWebViewBasic DownCast Test" );
   BaseHandle handle(view);
@@ -238,7 +247,6 @@ int UtcDaliWebViewBasics(void)
   DALI_TEST_CHECK( view );
   DALI_TEST_CHECK( view2 );
   DALI_TEST_CHECK( view == view2 );
-
 
   // TypeRegistry Test
   tet_infoline( "UtcDaliWebViewBasic TypeRegistry Test" );
@@ -1072,6 +1080,55 @@ int UtcDaliWebViewHttpRequestInterceptor(void)
   DALI_TEST_EQUALS(gRequestInterceptorInstance->GetUrl(), testUrl, TEST_LOCATION);
 
   gRequestInterceptorInstance = nullptr;
+
+  END_TEST;
+}
+
+int UtcDaliWebViewPolicyDecisionRequest(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  // load url.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  view.PolicyDecisionSignal().Connect( &OnPolicyDecisionRequest );
+  bool signal1 = false;
+  view.ConnectSignal( testTracker, "policyDecision", CallbackFunctor(&signal1) );
+  DALI_TEST_EQUALS( gPolicyDecisionCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_CHECK(gPolicyDecisionInstance == 0);
+
+  view.LoadUrl( TEST_URL1 );
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gPolicyDecisionCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_CHECK( signal1 );
+
+  // check policy decision & its frame.
+  DALI_TEST_CHECK(gPolicyDecisionInstance != 0);
+  std::string testUrl("http://test.html");
+  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetUrl(), testUrl, TEST_LOCATION);
+  std::string testCookie("test:abc");
+  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetCookie(), testCookie, TEST_LOCATION);
+  Dali::WebEnginePolicyDecision::DecisionType testDecisionType = Dali::WebEnginePolicyDecision::DecisionType::USE;
+  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetDecisionType(), testDecisionType, TEST_LOCATION);
+  std::string testResponseMime("txt/xml");
+  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetResponseMime(), testResponseMime, TEST_LOCATION);
+  int32_t ResponseStatusCode = 500;
+  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetResponseStatusCode(), ResponseStatusCode, TEST_LOCATION);
+  Dali::WebEnginePolicyDecision::NavigationType testNavigationType = Dali::WebEnginePolicyDecision::NavigationType::LINK_CLICKED;
+  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetNavigationType(), testNavigationType, TEST_LOCATION);
+  std::string testScheme("test");
+  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetScheme(), testScheme, TEST_LOCATION);
+  DALI_TEST_CHECK(gPolicyDecisionInstance->Use());
+  DALI_TEST_CHECK(gPolicyDecisionInstance->Ignore());
+  DALI_TEST_CHECK(gPolicyDecisionInstance->Suspend());
+
+  Dali::WebEngineFrame* webFrame = &(gPolicyDecisionInstance->GetFrame());
+  DALI_TEST_CHECK(webFrame);
+  DALI_TEST_CHECK(webFrame->IsMainFrame());
+
+  gPolicyDecisionInstance = nullptr;
 
   END_TEST;
 }

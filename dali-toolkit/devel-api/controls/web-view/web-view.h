@@ -231,6 +231,11 @@ public:
    */
   using WebViewConsoleMessageSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineConsoleMessage>)>;
 
+  /**
+   * @brief WebView signal type related with policy decision.
+   */
+  using WebViewPolicyDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEnginePolicyDecision>)>;
+
 public:
   /**
    * @brief Creates an initialized WebView.
@@ -701,6 +706,13 @@ public:
    * @return A signal object to connect with.
    */
   WebViewConsoleMessageSignalType& ConsoleMessageSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when new policy would be decided.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewPolicyDecisionSignalType& PolicyDecisionSignal();
 
 public: // Not intended for application developers
   /// @cond internal

@@ -24,6 +24,8 @@
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
+#include <dali/devel-api/adaptor-framework/web-engine-frame.h>
+#include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
@@ -232,6 +234,85 @@ public:
   }
 
   void Reply(bool allowed) override {}
+};
+
+class MockWebEngineFrame : public Dali::WebEngineFrame
+{
+public:
+  MockWebEngineFrame()
+  {
+  }
+
+  bool IsMainFrame() const override
+  {
+    return true;
+  }
+};
+
+class MockWebEnginePolicyDecision : public Dali::WebEnginePolicyDecision
+{
+public:
+  MockWebEnginePolicyDecision()
+  {
+  }
+
+  std::string GetUrl() const override
+  {
+    return "http://test.html";
+  }
+
+  std::string GetCookie() const override
+  {
+    return "test:abc";
+  }
+
+  Dali::WebEnginePolicyDecision::DecisionType GetDecisionType() const
+  {
+    return Dali::WebEnginePolicyDecision::DecisionType::USE;
+  }
+
+  std::string GetResponseMime() const
+  {
+    return "txt/xml";
+  }
+
+  int32_t GetResponseStatusCode() const
+  {
+    return 500;
+  }
+
+  Dali::WebEnginePolicyDecision::NavigationType GetNavigationType() const
+  {
+    return Dali::WebEnginePolicyDecision::NavigationType::LINK_CLICKED;
+  }
+
+  Dali::WebEngineFrame& GetFrame() const
+  {
+    return *(Dali::WebEngineFrame*)(&mockWebFrame);
+  }
+
+  std::string GetScheme() const
+  {
+    return "test";
+  }
+
+  bool Use()
+  {
+    return true;
+  }
+
+  bool Ignore()
+  {
+    return true;
+  }
+
+  bool Suspend()
+  {
+    return true;
+  }
+
+private:
+  MockWebEngineFrame mockWebFrame;
 };
 
 class MockWebEngineRequestInterceptor : public WebEngineRequestInterceptor
@@ -902,6 +983,11 @@ public:
     return mConsoleMessageSignal;
   }
 
+  Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType& PolicyDecisionSignal()
+  {
+    return mPolicyDecisionSignal;
+  }
+
   std::string              mUrl;
   std::vector<std::string> mHistory;
   size_t                   mCurrentPlusOnePos;
@@ -917,6 +1003,7 @@ public:
   Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType      mFrameRenderedSignal;
   Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType mRequestInterceptorSignal;
   Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType     mConsoleMessageSignal;
+  Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType     mPolicyDecisionSignal;
 
   bool  mEvaluating;
   float mPageZoomFactor;
@@ -983,8 +1070,8 @@ bool OnLoadUrl()
     gInstance->mPageLoadFinishedSignal.Emit( gInstance->mUrl );
     gInstance->mUrlChangedSignal.Emit( "http://new-test" );
 
-    std::shared_ptr<Dali::WebEngineFormRepostDecision> decision(new MockWebEngineFormRepostDecision());
-    gInstance->mFormRepostDecisionSignal.Emit(std::move(decision));
+    std::shared_ptr<Dali::WebEngineFormRepostDecision> repostDecision(new MockWebEngineFormRepostDecision());
+    gInstance->mFormRepostDecisionSignal.Emit(std::move(repostDecision));
     gInstance->mFrameRenderedSignal.Emit();
     std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor(new MockWebEngineRequestInterceptor());
     gInstance->mRequestInterceptorSignal.Emit(std::move(interceptor));
@@ -993,6 +1080,8 @@ bool OnLoadUrl()
     gInstance->mPageLoadErrorSignal.Emit(std::move(error));
     std::shared_ptr<Dali::WebEngineConsoleMessage> message(new MockWebEngineConsoleMessage());
     gInstance->mConsoleMessageSignal.Emit(std::move(message));
+    std::shared_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
+    gInstance->mPolicyDecisionSignal.Emit(std::move(policyDecision));
   }
   return false;
 }
@@ -1552,7 +1641,7 @@ Dali::WebEnginePlugin::WebEngineUrlChangedSignalType& WebEngine::UrlChangedSigna
 
 Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType& WebEngine::FormRepostDecisionSignal()
 {
-  return Internal::Adaptor::GetImplementation( *this ).FormRepostDecisionSignal();
+  return Internal::Adaptor::GetImplementation(*this).FormRepostDecisionSignal();
 }
 
 Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType& WebEngine::FrameRenderedSignal()
@@ -1568,6 +1657,11 @@ Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType& WebEngine::Request
 Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType& WebEngine::ConsoleMessageSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ConsoleMessageSignal();
+}
+
+Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType& WebEngine::PolicyDecisionSignal()
+{
+  return Internal::Adaptor::GetImplementation(*this).PolicyDecisionSignal();
 }
 
 } // namespace Dali;

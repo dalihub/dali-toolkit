@@ -26,6 +26,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
+#include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/enum-helper.h>
@@ -92,6 +93,7 @@ DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "formRepostDecision", FORM_REPOST_DEC
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "frameRendered",      FRAME_RENDERED_SIGNAL       )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "requestInterceptor", REQUEST_INTERCEPTOR_SIGNAL  )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "consoleMessage",     CONSOLE_MESSAGE_SIGNAL      )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "policyDecision",     POLICY_DECISION             )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -116,8 +118,8 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mPageLoadFinishedSignal(),
   mPageLoadErrorSignal(),
   mUrlChangedSignal(),
-  mVideoHoleEnabled(true),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
+  mVideoHoleEnabled(true),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true)
 {
@@ -140,8 +142,8 @@ WebView::WebView(int argc, char** argv)
   mPageLoadFinishedSignal(),
   mPageLoadErrorSignal(),
   mUrlChangedSignal(),
-  mVideoHoleEnabled(true),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
+  mVideoHoleEnabled(true),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true)
 {
@@ -223,6 +225,7 @@ void WebView::OnInitialize()
     mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnFrameRendered);
     mWebEngine.RequestInterceptorSignal().Connect(this, &WebView::OnInterceptRequest);
     mWebEngine.ConsoleMessageSignal().Connect(this, &WebView::OnConsoleMessage);
+    mWebEngine.PolicyDecisionSignal().Connect(this, &WebView::OnPolicyDecisionRequest);
 
     mWebContext         = std::unique_ptr<Dali::Toolkit::WebContext>(new WebContext(mWebEngine.GetContext()));
     mWebCookieManager   = std::unique_ptr<Dali::Toolkit::WebCookieManager>(new WebCookieManager(mWebEngine.GetCookieManager()));
@@ -726,6 +729,11 @@ Dali::Toolkit::WebView::WebViewConsoleMessageSignalType& WebView::ConsoleMessage
   return mConsoleMessageSignal;
 }
 
+Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType& WebView::PolicyDecisionSignal()
+{
+  return mPolicyDecisionSignal;
+}
+
 void WebView::OnPageLoadStarted(const std::string& url)
 {
   if(!mPageLoadStartedSignal.Empty())
@@ -834,6 +842,15 @@ void WebView::OnConsoleMessage(std::shared_ptr<Dali::WebEngineConsoleMessage> me
   }
 }
 
+void WebView::OnPolicyDecisionRequest(std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
+{
+  if(!mPolicyDecisionSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mPolicyDecisionSignal.Emit(handle, std::move(decision));
+  }
+}
+
 bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
@@ -889,6 +906,11 @@ bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tr
   else if(0 == strcmp(signalName.c_str(), CONSOLE_MESSAGE_SIGNAL))
   {
     webView.ConsoleMessageSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), POLICY_DECISION))
+  {
+    webView.PolicyDecisionSignal().Connect(tracker, functor);
     connected = true;
   }
 
