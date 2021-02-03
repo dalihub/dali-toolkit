@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEST_DUMMY_VISUAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,7 @@ protected:
 
   DummyVisual( VisualFactoryCache& factoryCache );
 
+  void OnInitialize() override;
   void DoCreatePropertyMap( Property::Map& map ) const override;
   void DoCreateInstancePropertyMap( Property::Map& map ) const override;
   void DoSetProperties( const Property::Map& propertyMap ) override;

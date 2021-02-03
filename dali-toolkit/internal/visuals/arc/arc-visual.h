@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ARC_VISUAL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,11 @@ protected:
   virtual ~ArcVisual();
 
   /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
+
+  /**
    * @copydoc Visual::Base::DoSetProperties
    */
   void DoSetProperties( const Property::Map& propertyMap ) override;
@@ -112,13 +117,6 @@ protected:
    * @copydoc Visual::Base::OnDoAction
    */
   void OnDoAction( const Property::Index actionId, const Property::Value& attributes ) override;
-
-private:
-
-  /**
-   * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
-   */
-  void InitializeRenderer();
 
 private:
 

@@ -364,8 +364,6 @@ DALI_TOOLKIT_API VisualEventSignalType& VisualEventSignal(Control control);
  * @param[in] index The Property index of the visual.
  * @param[in] visualPropertyKey The key of the visual's property.
  * @return The Property object
- * @pre The control should be added to the Scene.
- * @pre The returned object is valid for as long as the control is on the Scene.
  */
 DALI_TOOLKIT_API Dali::Property GetVisualProperty(Control control, Dali::Property::Index index, Dali::Property::Key visualPropertyKey);
 

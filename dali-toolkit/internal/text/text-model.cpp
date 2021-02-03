@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,13 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 ModelPtr Model::New()
 {
-  return ModelPtr( new Model() );
+  return ModelPtr(new Model());
 }
 
 const Size& Model::GetControlSize() const
@@ -162,9 +159,9 @@ Length Model::GetNumberOfUnderlineRuns() const
   return mVisualModel->GetNumberOfUnderlineRuns();
 }
 
-void Model::GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const
+void Model::GetUnderlineRuns(GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const
 {
-  mVisualModel->GetUnderlineRuns( underlineRuns, index, numberOfRuns );
+  mVisualModel->GetUnderlineRuns(underlineRuns, index, numberOfRuns);
 }
 
 const Vector4& Model::GetOutlineColor() const
@@ -192,17 +189,17 @@ Model::Model()
   mVisualModel(),
   mScrollPosition(),
   mScrollPositionLast(),
-  mHorizontalAlignment( Text::HorizontalAlignment::BEGIN ),
-  mVerticalAlignment( Text::VerticalAlignment::TOP ),
-  mVerticalLineAlignment( DevelText::VerticalLineAlignment::TOP ),
-  mLineWrapMode( Text::LineWrap::WORD ),
-  mAlignmentOffset( 0.0f ),
-  mElideEnabled( false ),
-  mIgnoreSpacesAfterText( true ),
-  mMatchSystemLanguageDirection( false )
+  mHorizontalAlignment(Text::HorizontalAlignment::BEGIN),
+  mVerticalAlignment(Text::VerticalAlignment::TOP),
+  mVerticalLineAlignment(DevelText::VerticalLineAlignment::TOP),
+  mLineWrapMode(Text::LineWrap::WORD),
+  mAlignmentOffset(0.0f),
+  mElideEnabled(false),
+  mIgnoreSpacesAfterText(true),
+  mMatchSystemLanguageDirection(false)
 {
   mLogicalModel = LogicalModel::New();
-  mVisualModel = VisualModel::New();
+  mVisualModel  = VisualModel::New();
 }
 
 Model::~Model()

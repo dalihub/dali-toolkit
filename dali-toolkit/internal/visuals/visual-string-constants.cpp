@@ -1,5 +1,5 @@
- /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+/*
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,128 +19,124 @@
 #include "visual-string-constants.h"
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( VISUAL_TYPE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, BORDER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, COLOR )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, GRADIENT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, TEXT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, N_PATCH )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, SVG )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, ANIMATED_IMAGE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, ANIMATED_GRADIENT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, ANIMATED_VECTOR_IMAGE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, ARC )
-DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
+DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_TYPE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, BORDER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, COLOR)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, GRADIENT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, IMAGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, MESH)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, PRIMITIVE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, TEXT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, N_PATCH)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, SVG)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, ANIMATED_IMAGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Visual, WIREFRAME)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelVisual, ANIMATED_GRADIENT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelVisual, ANIMATED_VECTOR_IMAGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelVisual, ARC)
+DALI_ENUM_TO_STRING_TABLE_END(VISUAL_TYPE)
 
 // Visual Type
-const char * const VISUAL_TYPE( "visualType" );
+const char* const VISUAL_TYPE("visualType");
 
 // Custom shader
-const char * const CUSTOM_SHADER( "shader" );
-const char * const CUSTOM_VERTEX_SHADER( "vertexShader" );
-const char * const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
-const char * const CUSTOM_SUBDIVIDE_GRID_X( "subdivideGridX" );
-const char * const CUSTOM_SUBDIVIDE_GRID_Y( "subdivideGridY" );
-const char * const CUSTOM_SHADER_HINTS( "hints" );
+const char* const CUSTOM_SHADER("shader");
+const char* const CUSTOM_VERTEX_SHADER("vertexShader");
+const char* const CUSTOM_FRAGMENT_SHADER("fragmentShader");
+const char* const CUSTOM_SUBDIVIDE_GRID_X("subdivideGridX");
+const char* const CUSTOM_SUBDIVIDE_GRID_Y("subdivideGridY");
+const char* const CUSTOM_SHADER_HINTS("hints");
 
 // Transform
-const char * const TRANSFORM( "transform" );
-const char * const SIZE( "size" );
-const char * const OFFSET( "offset" );
-const char * const OFFSET_SIZE_MODE( "offsetSizeMode" );
-const char * const ORIGIN( "origin" );
-const char * const ANCHOR_POINT( "anchorPoint" );
-const char * const EXTRA_SIZE( "extraSize" );
+const char* const TRANSFORM("transform");
+const char* const SIZE("size");
+const char* const OFFSET("offset");
+const char* const OFFSET_SIZE_MODE("offsetSizeMode");
+const char* const ORIGIN("origin");
+const char* const ANCHOR_POINT("anchorPoint");
+const char* const EXTRA_SIZE("extraSize");
 
 // Premultipled alpha
-const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );
+const char* const PREMULTIPLIED_ALPHA("premultipliedAlpha");
 
 // Mix color
-const char * const MIX_COLOR( "mixColor" );
-const char * const OPACITY( "opacity" );
+const char* const MIX_COLOR("mixColor");
+const char* const OPACITY("opacity");
 
 // Fitting mode
-const char * const VISUAL_FITTING_MODE( "visualFittingMode" );
+const char* const VISUAL_FITTING_MODE("visualFittingMode");
 
 // Corner radius
-const char * const CORNER_RADIUS( "cornerRadius" );
-const char * const CORNER_RADIUS_POLICY( "cornerRadiusPolicy" );
+const char* const CORNER_RADIUS("cornerRadius");
+const char* const CORNER_RADIUS_POLICY("cornerRadiusPolicy");
 
 // Color visual
-const char * const RENDER_IF_TRANSPARENT_NAME( "renderIfTransparent" );
-const char * const BLUR_RADIUS_NAME( "blurRadius" );
+const char* const RENDER_IF_TRANSPARENT_NAME("renderIfTransparent");
+const char* const BLUR_RADIUS_NAME("blurRadius");
 
 // Image visual
-const char * const IMAGE_URL_NAME( "url" );
-const char * const ATLAS_RECT_UNIFORM_NAME( "uAtlasRect" );
-const char * const PIXEL_AREA_UNIFORM_NAME( "pixelArea" );
-const char * const WRAP_MODE_UNIFORM_NAME( "wrapMode" );
-const char * const IMAGE_WRAP_MODE_U("wrapModeU");
-const char * const IMAGE_WRAP_MODE_V("wrapModeV");
-const char * const IMAGE_BORDER( "border" );
-const char * const PIXEL_ALIGNED_UNIFORM_NAME( "uPixelAligned" );
-const char * const ANIMATED_IMAGE_URLS_NAME("urls");
-const char * const BATCH_SIZE_NAME("batchSize");
-const char * const CACHE_SIZE_NAME("cacheSize");
-const char * const FRAME_DELAY_NAME("frameDelay");
-const char * const LOOP_COUNT_NAME("loopCount");
-const char * const MASK_CONTENT_SCALE_NAME("maskContentScale");
-const char * const CROP_TO_MASK_NAME("cropToMask");
-const char * const LOAD_POLICY_NAME("loadPolicy");
-const char * const RELEASE_POLICY_NAME("releasePolicy");
-const char * const ORIENTATION_CORRECTION_NAME("orientationCorrection");
-const char * const AUXILIARY_IMAGE_NAME("auxiliaryImage");
-const char * const AUXILIARY_IMAGE_ALPHA_NAME("auxiliaryImageAlpha");
-const char * const PLAY_RANGE_NAME( "playRange" );
-const char * const PLAY_STATE_NAME( "playState" );
-const char * const CURRENT_FRAME_NUMBER_NAME( "currentFrameNumber" );
-const char * const TOTAL_FRAME_NUMBER_NAME( "totalFrameNumber" );
-const char * const STOP_BEHAVIOR_NAME( "stopBehavior" );
-const char * const LOOPING_MODE_NAME( "loopingMode" );
-const char * const IMAGE_ATLASING( "atlasing" );
-const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
-const char * const IMAGE_FITTING_MODE( "fittingMode" );
-const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
-const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
-const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
-const char * const ALPHA_MASK_URL("alphaMaskUrl");
-const char * const REDRAW_IN_SCALING_DOWN_NAME("redrawInScalingDown");
+const char* const IMAGE_URL_NAME("url");
+const char* const ATLAS_RECT_UNIFORM_NAME("uAtlasRect");
+const char* const PIXEL_AREA_UNIFORM_NAME("pixelArea");
+const char* const WRAP_MODE_UNIFORM_NAME("wrapMode");
+const char* const IMAGE_WRAP_MODE_U("wrapModeU");
+const char* const IMAGE_WRAP_MODE_V("wrapModeV");
+const char* const IMAGE_BORDER("border");
+const char* const PIXEL_ALIGNED_UNIFORM_NAME("uPixelAligned");
+const char* const ANIMATED_IMAGE_URLS_NAME("urls");
+const char* const BATCH_SIZE_NAME("batchSize");
+const char* const CACHE_SIZE_NAME("cacheSize");
+const char* const FRAME_DELAY_NAME("frameDelay");
+const char* const LOOP_COUNT_NAME("loopCount");
+const char* const MASK_CONTENT_SCALE_NAME("maskContentScale");
+const char* const CROP_TO_MASK_NAME("cropToMask");
+const char* const LOAD_POLICY_NAME("loadPolicy");
+const char* const RELEASE_POLICY_NAME("releasePolicy");
+const char* const ORIENTATION_CORRECTION_NAME("orientationCorrection");
+const char* const AUXILIARY_IMAGE_NAME("auxiliaryImage");
+const char* const AUXILIARY_IMAGE_ALPHA_NAME("auxiliaryImageAlpha");
+const char* const PLAY_RANGE_NAME("playRange");
+const char* const PLAY_STATE_NAME("playState");
+const char* const CURRENT_FRAME_NUMBER_NAME("currentFrameNumber");
+const char* const TOTAL_FRAME_NUMBER_NAME("totalFrameNumber");
+const char* const STOP_BEHAVIOR_NAME("stopBehavior");
+const char* const LOOPING_MODE_NAME("loopingMode");
+const char* const IMAGE_ATLASING("atlasing");
+const char* const SYNCHRONOUS_LOADING("synchronousLoading");
+const char* const IMAGE_FITTING_MODE("fittingMode");
+const char* const IMAGE_SAMPLING_MODE("samplingMode");
+const char* const IMAGE_DESIRED_WIDTH("desiredWidth");
+const char* const IMAGE_DESIRED_HEIGHT("desiredHeight");
+const char* const ALPHA_MASK_URL("alphaMaskUrl");
+const char* const REDRAW_IN_SCALING_DOWN_NAME("redrawInScalingDown");
 
 // Text visual
-const char * const TEXT_PROPERTY( "text" );
-const char * const FONT_FAMILY_PROPERTY( "fontFamily" );
-const char * const FONT_STYLE_PROPERTY( "fontStyle" );
-const char * const POINT_SIZE_PROPERTY( "pointSize" );
-const char * const MULTI_LINE_PROPERTY( "multiLine" );
-const char * const HORIZONTAL_ALIGNMENT_PROPERTY( "horizontalAlignment" );
-const char * const VERTICAL_ALIGNMENT_PROPERTY( "verticalAlignment" );
-const char * const TEXT_COLOR_PROPERTY( "textColor" );
-const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
-const char * const SHADOW_PROPERTY( "shadow" );
-const char * const UNDERLINE_PROPERTY( "underline" );
-const char * const OUTLINE_PROPERTY( "outline" );
-const char * const BACKGROUND_PROPERTY( "textBackground" );
-
+const char* const TEXT_PROPERTY("text");
+const char* const FONT_FAMILY_PROPERTY("fontFamily");
+const char* const FONT_STYLE_PROPERTY("fontStyle");
+const char* const POINT_SIZE_PROPERTY("pointSize");
+const char* const MULTI_LINE_PROPERTY("multiLine");
+const char* const HORIZONTAL_ALIGNMENT_PROPERTY("horizontalAlignment");
+const char* const VERTICAL_ALIGNMENT_PROPERTY("verticalAlignment");
+const char* const TEXT_COLOR_PROPERTY("textColor");
+const char* const ENABLE_MARKUP_PROPERTY("enableMarkup");
+const char* const SHADOW_PROPERTY("shadow");
+const char* const UNDERLINE_PROPERTY("underline");
+const char* const OUTLINE_PROPERTY("outline");
+const char* const BACKGROUND_PROPERTY("textBackground");
 
 //NPatch visual
-const char * const BORDER_ONLY( "borderOnly" );
-const char * const BORDER( "border" );
+const char* const BORDER_ONLY("borderOnly");
+const char* const BORDER("border");
 
 // non-animated property
 const char* const GRADIENT_TYPE_NAME("gradientType");
@@ -177,48 +173,47 @@ const char* const UNIFORM_ROTATE_ANGLE_NAME("rotate_angle");
 const char* const UNIFORM_OFFSET_NAME("gradient_offset");
 
 // Border visual
-const char * const COLOR_NAME("borderColor");
-const char * const SIZE_NAME("borderSize");
-const char * const ANTI_ALIASING("antiAliasing");
+const char* const COLOR_NAME("borderColor");
+const char* const SIZE_NAME("borderSize");
+const char* const ANTI_ALIASING("antiAliasing");
 
 // properties: radial gradient
-const char * const CENTER_NAME("center"); // Property::VECTOR2
-const char * const RADIUS_NAME("radius"); // Property::FLOAT
+const char* const CENTER_NAME("center"); // Property::VECTOR2
+const char* const RADIUS_NAME("radius"); // Property::FLOAT
 
 // properties: linear&radial gradient
-const char * const STOP_OFFSET_NAME("stopOffset"); // Property::Array FLOAT
-const char * const STOP_COLOR_NAME("stopColor"); // Property::Array VECTOR4
-const char * const UNITS_NAME("units"); // Property::String  "userSpaceOnUse | objectBoundingBox"
-const char * const SPREAD_METHOD_NAME("spreadMethod"); // Property::String  "pad | reflect | repeat"
+const char* const STOP_OFFSET_NAME("stopOffset");     // Property::Array FLOAT
+const char* const STOP_COLOR_NAME("stopColor");       // Property::Array VECTOR4
+const char* const UNITS_NAME("units");                // Property::String  "userSpaceOnUse | objectBoundingBox"
+const char* const SPREAD_METHOD_NAME("spreadMethod"); // Property::String  "pad | reflect | repeat"
 
 //mesh visual
-const char * const OBJECT_URL_NAME( "objectUrl" );
-const char * const MATERIAL_URL_NAME( "materialUrl" );
-const char * const TEXTURES_PATH_NAME( "texturesPath" );
-const char * const SHADING_MODE_NAME( "shadingMode" );
-const char * const USE_MIPMAPPING_NAME( "useMipmapping" );
-const char * const USE_SOFT_NORMALS_NAME( "useSoftNormals" );
-const char * const LIGHT_POSITION_NAME( "lightPosition" );
-
+const char* const OBJECT_URL_NAME("objectUrl");
+const char* const MATERIAL_URL_NAME("materialUrl");
+const char* const TEXTURES_PATH_NAME("texturesPath");
+const char* const SHADING_MODE_NAME("shadingMode");
+const char* const USE_MIPMAPPING_NAME("useMipmapping");
+const char* const USE_SOFT_NORMALS_NAME("useSoftNormals");
+const char* const LIGHT_POSITION_NAME("lightPosition");
 
 //Primitive properties
-const char * const PRIMITIVE_SHAPE( "shape" );
-const char * const SLICES( "slices" );
-const char * const STACKS( "stacks" );
-const char * const SCALE_TOP_RADIUS( "scaleTopRadius" );
-const char * const SCALE_BOTTOM_RADIUS( "scaleBottomRadius" );
-const char * const SCALE_HEIGHT( "scaleHeight" );
-const char * const SCALE_RADIUS( "scaleRadius" );
-const char * const SCALE_DIMENSIONS( "scaleDimensions" );
-const char * const BEVEL_PERCENTAGE( "bevelPercentage" );
-const char * const BEVEL_SMOOTHNESS( "bevelSmoothness" );
-const char * const LIGHT_POSITION_UNIFORM_NAME( "lightPosition" );
+const char* const PRIMITIVE_SHAPE("shape");
+const char* const SLICES("slices");
+const char* const STACKS("stacks");
+const char* const SCALE_TOP_RADIUS("scaleTopRadius");
+const char* const SCALE_BOTTOM_RADIUS("scaleBottomRadius");
+const char* const SCALE_HEIGHT("scaleHeight");
+const char* const SCALE_RADIUS("scaleRadius");
+const char* const SCALE_DIMENSIONS("scaleDimensions");
+const char* const BEVEL_PERCENTAGE("bevelPercentage");
+const char* const BEVEL_SMOOTHNESS("bevelSmoothness");
+const char* const LIGHT_POSITION_UNIFORM_NAME("lightPosition");
 
 // Arc visual
-const char * const THICKNESS_NAME( "thickness" );
-const char * const START_ANGLE_NAME( "startAngle" );
-const char * const SWEEP_ANGLE_NAME( "sweepAngle" );
-const char * const CAP_NAME( "cap" );
+const char* const THICKNESS_NAME("thickness");
+const char* const START_ANGLE_NAME("startAngle");
+const char* const SWEEP_ANGLE_NAME("sweepAngle");
+const char* const CAP_NAME("cap");
 
 } // namespace Internal
 

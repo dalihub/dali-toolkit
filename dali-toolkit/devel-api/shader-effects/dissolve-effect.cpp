@@ -25,11 +25,9 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
-void DissolveEffectSetCentralLine( Actor& actor, const Vector2& position, const Vector2& displacement, float initialProgress )
+void DissolveEffectSetCentralLine(Actor& actor, const Vector2& position, const Vector2& displacement, float initialProgress)
 {
   // the line passes through 'position' and has the direction of 'displacement'
   float coefA, coefB, coefC; //line equation: Ax+By+C=0;
@@ -100,12 +98,12 @@ void DissolveEffectSetCentralLine( Actor& actor, const Vector2& position, const 
   actor.RegisterProperty("uPercentage", initialProgress, Dali::Property::ANIMATABLE);
 }
 
-Property::Map CreateDissolveEffect( bool useHighPrecision )
+Property::Map CreateDissolveEffect(bool useHighPrecision)
 {
   const char* prefixHighPrecision("precision highp float;\n");
   const char* prefixMediumPrecision("precision mediump float;\n");
 
-  const char* vertexShader = SHADER_DISSOLVE_EFFECT_VERT.data();
+  const char* vertexShader   = SHADER_DISSOLVE_EFFECT_VERT.data();
   const char* fragmentShader = SHADER_DISSOLVE_EFFECT_FRAG.data();
 
   Property::Map map;

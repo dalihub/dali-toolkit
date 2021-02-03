@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 Hash::Hash(uint64_t initial)
 : mValue(initial)
-{}
+{
+}
 
 Hash& Hash::Add(bool b)
 {
@@ -54,26 +54,26 @@ Hash& Hash::Add(float f)
   return AddObjectBytes(f);
 }
 
-Hash& Hash::Add(const char * cStr)
+Hash& Hash::Add(const char* cStr)
 {
   return Add(cStr, strlen(cStr));
 }
 
-Hash& Hash::Add(const char * cStr, size_t len)
+Hash& Hash::Add(const char* cStr, size_t len)
 {
   auto i0 = reinterpret_cast<const uint8_t*>(cStr);
   return AddBytes(i0, i0 + len);
 }
 
-Hash& Hash::Add(const std::string & str)
+Hash& Hash::Add(const std::string& str)
 {
   auto i0 = reinterpret_cast<const uint8_t*>(str.c_str());
   return AddBytes(i0, i0 + str.size());
 }
 
-Hash& Hash::AddBytes(const uint8_t * i0, const uint8_t * i1)
+Hash& Hash::AddBytes(const uint8_t* i0, const uint8_t* i1)
 {
-  while (i0 != i1)
+  while(i0 != i1)
   {
     mValue = Concatenate(*i0);
     ++i0;
@@ -91,5 +91,5 @@ uint64_t Hash::Concatenate(uint64_t value)
   return mValue * 31 + value;
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

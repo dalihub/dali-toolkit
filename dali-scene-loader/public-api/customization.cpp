@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,15 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
-struct Customization::Map::Impl {
+struct Customization::Map::Impl
+{
   std::map<Tag, Customization> mCustomizations;
 };
 
 Customization::Map::Map()
-: mImpl{ new Impl }
-{}
+: mImpl{new Impl}
+{
+}
 
 Customization::Map::~Map() = default;
 
@@ -41,8 +42,8 @@ Customization* Customization::Map::Set(Tag tag, Customization&& customization)
 const Customization* Customization::Map::Get(Tag tag) const
 {
   auto& customizations = mImpl->mCustomizations;
-  auto iFind = customizations.find(tag);
-  if (iFind != customizations.end())
+  auto  iFind          = customizations.find(tag);
+  if(iFind != customizations.end())
   {
     return &iFind->second;
   }
@@ -52,8 +53,8 @@ const Customization* Customization::Map::Get(Tag tag) const
 Customization* Customization::Map::Get(Tag tag)
 {
   auto& customizations = mImpl->mCustomizations;
-  auto iFind = customizations.find(tag);
-  if (iFind != customizations.end())
+  auto  iFind          = customizations.find(tag);
+  if(iFind != customizations.end())
   {
     return &iFind->second;
   }
@@ -76,8 +77,9 @@ struct Customization::Choices::Impl
 };
 
 Customization::Choices::Choices()
-: mImpl{ new Impl }
-{}
+: mImpl{new Impl}
+{
+}
 
 Customization::Choices::~Choices() = default;
 
@@ -89,8 +91,8 @@ void Customization::Choices::Set(Tag tag, OptionType option)
 Customization::OptionType Customization::Choices::Get(Tag tag) const
 {
   auto& options = mImpl->mOptions;
-  auto iFind = options.find(tag);
-  if (iFind != options.end())
+  auto  iFind   = options.find(tag);
+  if(iFind != options.end())
   {
     return iFind->second;
   }
@@ -107,5 +109,5 @@ void Customization::Choices::Clear()
   mImpl->mOptions.clear();
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

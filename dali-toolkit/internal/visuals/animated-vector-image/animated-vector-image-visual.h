@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_VECTOR_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,11 @@ protected:
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   ~AnimatedVectorImageVisual() override;
+
+  /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
 
   /**
    * @copydoc Visual::Base::DoSetProperties

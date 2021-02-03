@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 #include <dali-toolkit/internal/feedback/feedback-style.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/integration-api/debug.h>
-#include <dali/public-api/object/object-registry.h>
 #include <dali/devel-api/adaptor-framework/style-monitor.h>
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/object/object-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
@@ -31,7 +31,6 @@
 
 namespace // unnamed namespace
 {
-
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::General, false, "LOG_FEEDBACK");
 #endif
@@ -42,11 +41,11 @@ const char* DEFAULT_FEEDBACK_THEME_FILE_NAME = "default-feedback-theme.json";
 void GetIfString(const Dali::Toolkit::TreeNode& node, const std::string& name, bool& exists, std::string& str)
 {
   const Dali::Toolkit::TreeNode* child = node.GetChild(name);
-  if( child &&
-      Dali::Toolkit::TreeNode::STRING == child->GetType() )
+  if(child &&
+     Dali::Toolkit::TreeNode::STRING == child->GetType())
   {
     exists = true;
-    str = child->GetString();
+    str    = child->GetString();
   }
 }
 
@@ -54,26 +53,23 @@ void GetIfString(const Dali::Toolkit::TreeNode& node, const std::string& name, b
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 struct SignalFeedbackInfo
 {
   /**
    * Default constructor.
    */
   SignalFeedbackInfo()
-  :mHasHapticFeedbackInfo(false),
-   mHasSoundFeedbackInfo(false)
+  : mHasHapticFeedbackInfo(false),
+    mHasSoundFeedbackInfo(false)
   {
   }
 
-  bool mHasHapticFeedbackInfo;
-  bool mHasSoundFeedbackInfo;
+  bool        mHasHapticFeedbackInfo;
+  bool        mHasSoundFeedbackInfo;
   std::string mSignalName;
   std::string mHapticFeedbackPattern;
   std::string mSoundFeedbackPattern;
@@ -81,7 +77,7 @@ struct SignalFeedbackInfo
   std::string mSoundFeedbackFile;
 };
 
-typedef std::vector<SignalFeedbackInfo> SignalFeedbackInfoContainer;
+typedef std::vector<SignalFeedbackInfo>             SignalFeedbackInfoContainer;
 typedef SignalFeedbackInfoContainer::const_iterator SignalFeedbackInfoConstIter;
 
 struct FeedbackStyleInfo
@@ -104,22 +100,20 @@ FeedbackStyle::FeedbackStyle()
 {
   mFeedback = Dali::FeedbackPlayer::Get();
 
-  const std::string styleDirPath = AssetManager::GetDaliStylePath();
+  const std::string styleDirPath         = AssetManager::GetDaliStylePath();
   const std::string defaultThemeFilePath = styleDirPath + DEFAULT_FEEDBACK_THEME_FILE_NAME;
 
   std::string defaultTheme;
 
-  if( mFeedback && mFeedback.LoadFile( defaultThemeFilePath, defaultTheme ) )
+  if(mFeedback && mFeedback.LoadFile(defaultThemeFilePath, defaultTheme))
   {
-    LoadTheme( defaultTheme );
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "ResourceLoader::LoadTheme(%s) - loaded %d bytes\n",
-                   defaultThemeFilePath.c_str(), defaultTheme.size() );
+    LoadTheme(defaultTheme);
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "ResourceLoader::LoadTheme(%s) - loaded %d bytes\n", defaultThemeFilePath.c_str(), defaultTheme.size());
   }
   else
   {
     DALI_LOG_ERROR("ResourceLoader::LoadTheme(%s) - failed to load\n", defaultThemeFilePath.c_str());
   }
-
 }
 
 FeedbackStyle::~FeedbackStyle()
@@ -128,47 +122,45 @@ FeedbackStyle::~FeedbackStyle()
 
 struct PlayFeedbackFromSignal
 {
-  PlayFeedbackFromSignal( FeedbackStyle& controller, const std::string& typeName, const std::string& signalName )
-  : mController( controller ),
-    mTypeName( typeName ),
-    mSignalName( signalName )
+  PlayFeedbackFromSignal(FeedbackStyle& controller, const std::string& typeName, const std::string& signalName)
+  : mController(controller),
+    mTypeName(typeName),
+    mSignalName(signalName)
   {
   }
 
   void operator()()
   {
-    mController.PlayFeedback( mTypeName, mSignalName );
+    mController.PlayFeedback(mTypeName, mSignalName);
   }
 
   FeedbackStyle& mController;
-  std::string mTypeName;
-  std::string mSignalName;
+  std::string    mTypeName;
+  std::string    mSignalName;
 };
 
-
-void FeedbackStyle::ObjectCreated( BaseHandle handle )
+void FeedbackStyle::ObjectCreated(BaseHandle handle)
 {
-  if( handle )
+  if(handle)
   {
     const std::string& type = handle.GetTypeName();
 
-    const FeedbackStyleInfo styleInfo = GetStyleInfo( type );
+    const FeedbackStyleInfo styleInfo = GetStyleInfo(type);
 
-    for( SignalFeedbackInfoConstIter iter = styleInfo.mSignalFeedbackInfoList.begin(); iter != styleInfo.mSignalFeedbackInfoList.end(); ++iter )
+    for(SignalFeedbackInfoConstIter iter = styleInfo.mSignalFeedbackInfoList.begin(); iter != styleInfo.mSignalFeedbackInfoList.end(); ++iter)
     {
       const SignalFeedbackInfo& info = *iter;
 
-      if( info.mHasHapticFeedbackInfo || info.mHasSoundFeedbackInfo )
+      if(info.mHasHapticFeedbackInfo || info.mHasSoundFeedbackInfo)
       {
-        if( !info.mHapticFeedbackPattern.empty() || !info.mHapticFeedbackFile.empty() ||
-            !info.mSoundFeedbackPattern.empty()  || !info.mSoundFeedbackFile.empty() )
+        if(!info.mHapticFeedbackPattern.empty() || !info.mHapticFeedbackFile.empty() ||
+           !info.mSoundFeedbackPattern.empty() || !info.mSoundFeedbackFile.empty())
         {
-          handle.ConnectSignal( this,
-                                info.mSignalName,
-                                PlayFeedbackFromSignal( *this, type, info.mSignalName ) );
+          handle.ConnectSignal(this,
+                               info.mSignalName,
+                               PlayFeedbackFromSignal(*this, type, info.mSignalName));
 
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "FeedbackStyle::Set found Haptic pattern %s for Object type: %s, Signal Type: %s\n",
-                         info.mHapticFeedbackPattern.c_str(), type.c_str(), info.mSignalName.c_str() );
+          DALI_LOG_INFO(gLogFilter, Debug::Verbose, "FeedbackStyle::Set found Haptic pattern %s for Object type: %s, Signal Type: %s\n", info.mHapticFeedbackPattern.c_str(), type.c_str(), info.mSignalName.c_str());
         }
         else
         {
@@ -179,10 +171,10 @@ void FeedbackStyle::ObjectCreated( BaseHandle handle )
   }
 }
 
-const FeedbackStyleInfo& FeedbackStyle::GetStyleInfo( const std::string& type ) const
+const FeedbackStyleInfo& FeedbackStyle::GetStyleInfo(const std::string& type) const
 {
-  std::map<const std::string, FeedbackStyleInfo>::const_iterator iter( mStyleInfoLut.find( type ) );
-  if( iter != mStyleInfoLut.end() )
+  std::map<const std::string, FeedbackStyleInfo>::const_iterator iter(mStyleInfoLut.find(type));
+  if(iter != mStyleInfoLut.end())
   {
     return iter->second;
   }
@@ -192,23 +184,23 @@ const FeedbackStyleInfo& FeedbackStyle::GetStyleInfo( const std::string& type ) 
   }
 }
 
-void FeedbackStyle::StyleChanged( const std::string& userDefinedThemePath, Dali::StyleChange::Type styleChange )
+void FeedbackStyle::StyleChanged(const std::string& userDefinedThemePath, Dali::StyleChange::Type styleChange)
 {
-  if( styleChange == StyleChange::THEME_CHANGE )
+  if(styleChange == StyleChange::THEME_CHANGE)
   {
     std::string userDefinedTheme;
 
-    if( mFeedback && mFeedback.LoadFile( userDefinedThemePath, userDefinedTheme ) )
+    if(mFeedback && mFeedback.LoadFile(userDefinedThemePath, userDefinedTheme))
     {
-      if( !LoadTheme( userDefinedTheme ) )
+      if(!LoadTheme(userDefinedTheme))
       {
         DALI_LOG_ERROR("FeedbackStyle::StyleChanged() User defined theme failed to load! \n");
 
-        const std::string styleDirPath = AssetManager::GetDaliStylePath();
+        const std::string styleDirPath         = AssetManager::GetDaliStylePath();
         const std::string defaultThemeFilePath = styleDirPath + DEFAULT_FEEDBACK_THEME_FILE_NAME;
 
         //If there is any problem is using the user defined theme, then fall back to default theme
-        if( !LoadTheme( defaultThemeFilePath ) )
+        if(!LoadTheme(defaultThemeFilePath))
         {
           //If the default theme fails, Then No luck!
           DALI_LOG_ERROR("FeedbackStyle::StyleChanged() Default theme failed to load! \n");
@@ -216,8 +208,7 @@ void FeedbackStyle::StyleChanged( const std::string& userDefinedThemePath, Dali:
       }
       else
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "ResourceLoader::LoadTheme(%s) - loaded %d bytes\n",
-                       userDefinedThemePath.c_str(), userDefinedTheme.size() );
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "ResourceLoader::LoadTheme(%s) - loaded %d bytes\n", userDefinedThemePath.c_str(), userDefinedTheme.size());
       }
     }
     else
@@ -227,36 +218,36 @@ void FeedbackStyle::StyleChanged( const std::string& userDefinedThemePath, Dali:
   }
 }
 
-bool FeedbackStyle::LoadTheme( const std::string& data )
+bool FeedbackStyle::LoadTheme(const std::string& data)
 {
   bool result = false;
 
   try
   {
-    LoadFromString( data );
+    LoadFromString(data);
 
     result = true;
   }
   catch(...)
   {
     //Problem in user set theme, So fallback to use default theme.
-    DALI_LOG_ERROR( "FeedbackStyle::LoadTheme() Failed to load theme\n" );
+    DALI_LOG_ERROR("FeedbackStyle::LoadTheme() Failed to load theme\n");
   }
 
   return result;
 }
 
-void FeedbackStyle::LoadFromString( const std::string& data )
+void FeedbackStyle::LoadFromString(const std::string& data)
 {
-  Toolkit::JsonParser parser = Toolkit::JsonParser::New();
-  const Toolkit::TreeNode* root = NULL;
+  Toolkit::JsonParser      parser = Toolkit::JsonParser::New();
+  const Toolkit::TreeNode* root   = NULL;
 
-  if( !parser.Parse( data ) )
+  if(!parser.Parse(data))
   {
-    DALI_LOG_WARNING( "JSON Parse Error:'%s'\n", parser.GetErrorDescription().c_str() );
-    DALI_LOG_WARNING( "JSON Parse Line :'%d (%d)'\n",
-                      parser.GetErrorLineNumber(),
-                      parser.GetErrorColumn() );
+    DALI_LOG_WARNING("JSON Parse Error:'%s'\n", parser.GetErrorDescription().c_str());
+    DALI_LOG_WARNING("JSON Parse Line :'%d (%d)'\n",
+                     parser.GetErrorLineNumber(),
+                     parser.GetErrorColumn());
   }
   else
   {
@@ -269,21 +260,21 @@ void FeedbackStyle::LoadFromString( const std::string& data )
     mStyleInfoLut.clear();
 
     // Parse style
-    if( const TreeNode* node = root->GetChild("style") )
+    if(const TreeNode* node = root->GetChild("style"))
     {
       Toolkit::TreeNode::ConstIterator iter = node->CBegin();
-      Toolkit::TreeNode::ConstIterator end = node->CEnd();
-      for( ; iter != end; ++iter )
+      Toolkit::TreeNode::ConstIterator end  = node->CEnd();
+      for(; iter != end; ++iter)
       {
-        const char* key = (*iter).first;
+        const char*       key = (*iter).first;
         FeedbackStyleInfo themeInfo;
         themeInfo.mTypeName = key;
 
-        if( const TreeNode* signals = (*iter).second.GetChild("signals") )
+        if(const TreeNode* signals = (*iter).second.GetChild("signals"))
         {
           TreeNode::ConstIterator signalIter = signals->CBegin();
-          TreeNode::ConstIterator signalEnd = signals->CEnd();
-          for( ; signalIter != signalEnd; ++signalIter )
+          TreeNode::ConstIterator signalEnd  = signals->CEnd();
+          for(; signalIter != signalEnd; ++signalIter)
           {
             SignalFeedbackInfo signalFeedbackInfo;
 
@@ -291,25 +282,17 @@ void FeedbackStyle::LoadFromString( const std::string& data )
             DALI_ASSERT_ALWAYS(type && TreeNode::STRING == type->GetType() && "Signal must have a type");
             signalFeedbackInfo.mSignalName = type->GetString();
 
-            GetIfString( (*signalIter).second, "hapticFeedbackPattern",
-                         signalFeedbackInfo.mHasHapticFeedbackInfo,
-                         signalFeedbackInfo.mHapticFeedbackPattern );
+            GetIfString((*signalIter).second, "hapticFeedbackPattern", signalFeedbackInfo.mHasHapticFeedbackInfo, signalFeedbackInfo.mHapticFeedbackPattern);
 
-            GetIfString( (*signalIter).second, "hapticFeedbackFile",
-                         signalFeedbackInfo.mHasHapticFeedbackInfo,
-                         signalFeedbackInfo.mHapticFeedbackFile );
+            GetIfString((*signalIter).second, "hapticFeedbackFile", signalFeedbackInfo.mHasHapticFeedbackInfo, signalFeedbackInfo.mHapticFeedbackFile);
 
-            GetIfString( (*signalIter).second, "soundFeedbackPattern",
-                         signalFeedbackInfo.mHasSoundFeedbackInfo,
-                         signalFeedbackInfo.mSoundFeedbackPattern );
+            GetIfString((*signalIter).second, "soundFeedbackPattern", signalFeedbackInfo.mHasSoundFeedbackInfo, signalFeedbackInfo.mSoundFeedbackPattern);
 
-            GetIfString( (*signalIter).second, "hapticFeedbackFile",
-                         signalFeedbackInfo.mHasSoundFeedbackInfo,
-                         signalFeedbackInfo.mSoundFeedbackFile );
+            GetIfString((*signalIter).second, "hapticFeedbackFile", signalFeedbackInfo.mHasSoundFeedbackInfo, signalFeedbackInfo.mSoundFeedbackFile);
 
-            if( signalFeedbackInfo.mHasHapticFeedbackInfo || signalFeedbackInfo.mHasSoundFeedbackInfo )
+            if(signalFeedbackInfo.mHasHapticFeedbackInfo || signalFeedbackInfo.mHasSoundFeedbackInfo)
             {
-              AddSignalInfo( themeInfo, std::move( signalFeedbackInfo ) );
+              AddSignalInfo(themeInfo, std::move(signalFeedbackInfo));
             }
           }
         }
@@ -317,20 +300,20 @@ void FeedbackStyle::LoadFromString( const std::string& data )
         mStyleInfoLut[key] = themeInfo;
 
       } // for styles
-    } // if(style)
-  } // if(root)
+    }   // if(style)
+  }     // if(root)
 
 } // LoadFromString()
 
-void FeedbackStyle::AddSignalInfo( FeedbackStyleInfo& styleInfo, SignalFeedbackInfo&& signalInfo )
+void FeedbackStyle::AddSignalInfo(FeedbackStyleInfo& styleInfo, SignalFeedbackInfo&& signalInfo)
 {
-  bool updated = false;
+  bool                                  updated = false;
   SignalFeedbackInfoContainer::iterator iter;
 
   // If info exists for the signal then update it, else add new
-  for( iter = styleInfo.mSignalFeedbackInfoList.begin(); iter != styleInfo.mSignalFeedbackInfoList.end(); ++iter )
+  for(iter = styleInfo.mSignalFeedbackInfoList.begin(); iter != styleInfo.mSignalFeedbackInfoList.end(); ++iter)
   {
-    if( (*iter).mSignalName == signalInfo.mSignalName )
+    if((*iter).mSignalName == signalInfo.mSignalName)
     {
       (*iter).mHasHapticFeedbackInfo = signalInfo.mHasHapticFeedbackInfo;
       (*iter).mHapticFeedbackPattern = signalInfo.mHapticFeedbackPattern;
@@ -344,15 +327,15 @@ void FeedbackStyle::AddSignalInfo( FeedbackStyleInfo& styleInfo, SignalFeedbackI
     }
   }
 
-  if( !updated )
+  if(!updated)
   {
-    styleInfo.mSignalFeedbackInfoList.emplace_back( std::move( signalInfo ) );
+    styleInfo.mSignalFeedbackInfoList.emplace_back(std::move(signalInfo));
   }
 }
 
 void FeedbackStyle::PlayFeedback(const std::string& type, const std::string& signalName)
 {
-  const FeedbackStyleInfo styleInfo = GetStyleInfo(type);
+  const FeedbackStyleInfo     styleInfo = GetStyleInfo(type);
   SignalFeedbackInfoConstIter iter;
 
   for(iter = styleInfo.mSignalFeedbackInfoList.begin(); iter != styleInfo.mSignalFeedbackInfoList.end(); ++iter)
@@ -365,14 +348,13 @@ void FeedbackStyle::PlayFeedback(const std::string& type, const std::string& sig
       {
         if(!info.mHapticFeedbackPattern.empty())
         {
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "FeedbackStyle::PlayFeedback Playing Haptic effect: Object type: %s, Signal type: %s, pattern type: %s\n",
-              type.c_str(), signalName.c_str(), info.mHapticFeedbackPattern.c_str());
+          DALI_LOG_INFO(gLogFilter, Debug::Verbose, "FeedbackStyle::PlayFeedback Playing Haptic effect: Object type: %s, Signal type: %s, pattern type: %s\n", type.c_str(), signalName.c_str(), info.mHapticFeedbackPattern.c_str());
 
-          mFeedback.PlayFeedbackPattern( FEEDBACK_TYPE_VIBRATION, GetFeedbackPattern(info.mHapticFeedbackPattern) );
+          mFeedback.PlayFeedbackPattern(FEEDBACK_TYPE_VIBRATION, GetFeedbackPattern(info.mHapticFeedbackPattern));
         }
         else if(!info.mHapticFeedbackFile.empty())
         {
-          mFeedback.PlayFile( info.mHapticFeedbackFile );
+          mFeedback.PlayFile(info.mHapticFeedbackFile);
         }
       }
 
@@ -380,14 +362,13 @@ void FeedbackStyle::PlayFeedback(const std::string& type, const std::string& sig
       {
         if(!info.mSoundFeedbackPattern.empty())
         {
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "FeedbackStyle::PlayFeedback Playing Sound effect: Object type: %s, Signal type: %s, pattern type: %s\n",
-              type.c_str(), signalName.c_str(), info.mHapticFeedbackPattern.c_str());
+          DALI_LOG_INFO(gLogFilter, Debug::Verbose, "FeedbackStyle::PlayFeedback Playing Sound effect: Object type: %s, Signal type: %s, pattern type: %s\n", type.c_str(), signalName.c_str(), info.mHapticFeedbackPattern.c_str());
 
-          mFeedback.PlayFeedbackPattern( FEEDBACK_TYPE_SOUND, GetFeedbackPattern(info.mSoundFeedbackPattern) );
+          mFeedback.PlayFeedbackPattern(FEEDBACK_TYPE_SOUND, GetFeedbackPattern(info.mSoundFeedbackPattern));
         }
         else if(!info.mSoundFeedbackFile.empty())
         {
-          mFeedback.PlaySound( info.mSoundFeedbackFile );
+          mFeedback.PlaySound(info.mSoundFeedbackFile);
         }
       }
 
@@ -396,9 +377,9 @@ void FeedbackStyle::PlayFeedback(const std::string& type, const std::string& sig
   }
 }
 
-FeedbackPattern FeedbackStyle::GetFeedbackPattern( const std::string &pattern )
+FeedbackPattern FeedbackStyle::GetFeedbackPattern(const std::string& pattern)
 {
-  if( 0 == mFeedbackPatternLut.size() )
+  if(0 == mFeedbackPatternLut.size())
   {
     mFeedbackPatternLut["FEEDBACK_PATTERN_NONE"]                = Dali::FEEDBACK_PATTERN_NONE;
     mFeedbackPatternLut["FEEDBACK_PATTERN_TAP"]                 = Dali::FEEDBACK_PATTERN_TAP;
@@ -452,21 +433,21 @@ FeedbackPattern FeedbackStyle::GetFeedbackPattern( const std::string &pattern )
     mFeedbackPatternLut["FEEDBACK_PATTERN_SLIDER_SWEEP"]        = Dali::FEEDBACK_PATTERN_SLIDER_SWEEP;
   }
 
-  std::map<const std::string, FeedbackPattern>::const_iterator iter( mFeedbackPatternLut.find( pattern ) );
+  std::map<const std::string, FeedbackPattern>::const_iterator iter(mFeedbackPatternLut.find(pattern));
 
-  if( iter != mFeedbackPatternLut.end() )
+  if(iter != mFeedbackPatternLut.end())
   {
     return iter->second;
   }
   else
   {
-    DALI_LOG_ERROR( "Unknown feedback pattern type: %s, So Defaulting to FEEDBACK_PATTERN_NONE!\n" );
+    DALI_LOG_ERROR("Unknown feedback pattern type: %s, So Defaulting to FEEDBACK_PATTERN_NONE!\n");
     return Dali::FEEDBACK_PATTERN_NONE;
   }
 }
 
-} // namespace Toolkit
-
 } // namespace Internal
+
+} // namespace Toolkit
 
 } // namespace Dali

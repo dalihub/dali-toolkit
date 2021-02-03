@@ -1,6 +1,6 @@
 
 /*
-* Copyright (c) 2020 Samsung Electronics Co., Ltd.
+* Copyright (c) 2021 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 const std::string BlendShapes::NUMBER_OF_BLEND_SHAPES("uNumberOfBlendShapes");
 const std::string BlendShapes::UNNORMALIZE_FACTOR("uBlendShapeUnnormalizeFactor");
 const std::string BlendShapes::COMPONENT_SIZE("uBlendShapeComponentSize");
@@ -43,27 +42,27 @@ void BlendShapes::ConfigureProperties(const std::pair<MeshDefinition, MeshGeomet
 {
   unsigned int index = 0u;
 
-  char weightNameBuffer[32];
-  char unnormalizeFactorNameBuffer[64];
+  char        weightNameBuffer[32];
+  char        unnormalizeFactorNameBuffer[64];
   char* const pWeightName = weightNameBuffer + snprintf(weightNameBuffer, sizeof(weightNameBuffer), "%s", WEIGHTS_UNIFORM.c_str());
   char* const pFactorName = unnormalizeFactorNameBuffer + snprintf(unnormalizeFactorNameBuffer, sizeof(unnormalizeFactorNameBuffer), "%s", UNNORMALIZE_FACTOR.c_str());
-  for (const auto& blendShape : mesh.first.mBlendShapes)
+  for(const auto& blendShape : mesh.first.mBlendShapes)
   {
     snprintf(pWeightName, sizeof(weightNameBuffer) - (pWeightName - weightNameBuffer), "[%d]", index);
-    std::string weightName{ weightNameBuffer };
+    std::string weightName{weightNameBuffer};
     actor.RegisterProperty(weightName, blendShape.weight);
 
-    if (mesh.first.mBlendShapeVersion == Version::VERSION_1_0)
+    if(mesh.first.mBlendShapeVersion == Version::VERSION_1_0)
     {
       snprintf(pFactorName, sizeof(unnormalizeFactorNameBuffer) - (pFactorName - unnormalizeFactorNameBuffer), "[%d]", index);
-      std::string factorName{ unnormalizeFactorNameBuffer };
+      std::string factorName{unnormalizeFactorNameBuffer};
       shader.RegisterProperty(factorName, mesh.second.blendShapeUnnormalizeFactor[index]);
     }
 
     ++index;
   }
 
-  if (Version::VERSION_2_0 == mesh.first.mBlendShapeVersion)
+  if(Version::VERSION_2_0 == mesh.first.mBlendShapeVersion)
   {
     shader.RegisterProperty(UNNORMALIZE_FACTOR, mesh.second.blendShapeUnnormalizeFactor[0u]);
   }
@@ -73,13 +72,13 @@ void BlendShapes::ConfigureProperties(const std::pair<MeshDefinition, MeshGeomet
 
   // Create a read only property to preserve the components of the blend shape.
   int32_t components = 0x0;
-  for (auto& bs : mesh.first.mBlendShapes)
+  for(auto& bs : mesh.first.mBlendShapes)
   {
     components |= (bs.deltas.IsDefined() * Component::POSITIONS) |
-      (bs.normals.IsDefined() * Component::NORMALS) | (bs.tangents.IsDefined() * Component::TANGENTS);
+                  (bs.normals.IsDefined() * Component::NORMALS) | (bs.tangents.IsDefined() * Component::TANGENTS);
   }
   shader.RegisterProperty(COMPONENTS, components, Property::AccessMode::READ_ONLY);
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

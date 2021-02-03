@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -754,49 +754,6 @@ int UtcDaliTransitionDataMap1N(void)
   CHECK_MAP_EQUALS( map, transition.GetAnimatorAt(0) );
   END_TEST;
 }
-
-
-int UtcDaliTransitionDataMapN3(void)
-{
-  ToolkitTestApplication application;
-
-  tet_printf("Testing visual lookup with no renderers\n");
-
-  Property::Map map;
-  map["target"] = "visual1";
-  map["property"] = "mixColor";
-  map["initialValue"] = Vector3(Color::MAGENTA);
-  map["targetValue"] = Vector3(Color::RED);
-  map["animator"] = Property::Map()
-    .Add("alphaFunction", "EASE_OUT_BACK")
-    .Add("timePeriod", Property::Map()
-         .Add("delay", 0.5f)
-         .Add("duration", 1.0f));
-
-  Dali::Toolkit::TransitionData transition = TransitionData::New( map );
-  CHECK_MAP_EQUALS( map, transition.GetAnimatorAt(0) );
-
-  DummyControl actor = DummyControl::New();
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  actor.SetProperty( Dali::Actor::Property::NAME,"Actor1");
-  actor.SetProperty( Actor::Property::COLOR,Color::CYAN);
-  // Don't stage actor
-
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  Property::Map visualMap;
-  visualMap[Visual::Property::TYPE] = Visual::COLOR;
-  visualMap[ColorVisual::Property::MIX_COLOR] = Vector3(Color::MAGENTA);
-  Visual::Base visual = VisualFactory::Get().CreateVisual( visualMap );
-  visual.SetName( "visual1" );
-
-  Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
-  dummyImpl.RegisterVisual( visualIndex, visual );
-
-  Animation anim = dummyImpl.CreateTransition( transition );
-  DALI_TEST_CHECK( !anim );
-  END_TEST;
-}
-
 
 int UtcDaliTransitionDataMapN4(void)
 {

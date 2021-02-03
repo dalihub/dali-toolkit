@@ -2627,11 +2627,6 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     application.GetScene().Add( imageView );
 
     application.SendNotification();
-
-    // loading started, this waits for the loader thread
-    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
-
-    application.SendNotification();
     application.Render(16);
 
     DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
@@ -2650,11 +2645,6 @@ int UtcDaliImageViewSvgLoadingFailure(void)
     DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
 
     application.GetScene().Add( imageView );
-
-    application.SendNotification();
-
-    // loading started, this waits for the loader thread
-    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
     application.SendNotification();
     application.Render(16);

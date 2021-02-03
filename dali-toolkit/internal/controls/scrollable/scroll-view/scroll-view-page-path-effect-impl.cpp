@@ -26,72 +26,68 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 ScrollViewPagePathEffect::ScrollViewPagePathEffect(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount)
-:mPageSize(viewPageSize),
- mInputPropertyIndex(inputPropertyIndex),
- mPageCount(pageCount)
+: mPageSize(viewPageSize),
+  mInputPropertyIndex(inputPropertyIndex),
+  mPageCount(pageCount)
 {
   //Create path constrainer
   mPathConstrainer = Dali::PathConstrainer::New();
-  mPathConstrainer.SetProperty( PathConstrainer::Property::FORWARD, forward );
+  mPathConstrainer.SetProperty(PathConstrainer::Property::FORWARD, forward);
 
   Dali::Property::Value pointsProperty = path.GetProperty(Path::Property::POINTS);
-  mPathConstrainer.SetProperty( PathConstrainer::Property::POINTS, pointsProperty );
+  mPathConstrainer.SetProperty(PathConstrainer::Property::POINTS, pointsProperty);
 
   pointsProperty = path.GetProperty(Path::Property::CONTROL_POINTS);
-  mPathConstrainer.SetProperty( PathConstrainer::Property::CONTROL_POINTS, pointsProperty );
+  mPathConstrainer.SetProperty(PathConstrainer::Property::CONTROL_POINTS, pointsProperty);
 
   //Create linear constrainer
-  pointsProperty = Property::Value(Property::ARRAY);
+  pointsProperty         = Property::Value(Property::ARRAY);
   Property::Array* array = pointsProperty.GetArray();
 
-  if( array )
+  if(array)
   {
     array->PushBack(0.0f);
     array->PushBack(1.0f);
     array->PushBack(0.0f);
   }
   mLinearConstrainer = Dali::LinearConstrainer::New();
-  mLinearConstrainer.SetProperty( LinearConstrainer::Property::VALUE, pointsProperty );
+  mLinearConstrainer.SetProperty(LinearConstrainer::Property::VALUE, pointsProperty);
 }
 
 ScrollViewPagePathEffect::~ScrollViewPagePathEffect()
 {
 }
 
-void ScrollViewPagePathEffect::ApplyToPage( Actor page, unsigned int pageOrder )
+void ScrollViewPagePathEffect::ApplyToPage(Actor page, unsigned int pageOrder)
 {
-  float pageHalfSize = mPageSize.x * 0.5f;
-  Vector2 range = Vector2( pageHalfSize - (pageHalfSize*pageOrder),  -pageHalfSize - (pageHalfSize*pageOrder) );
-  Vector2 wrap  = Vector2( range.x, -pageHalfSize*(mPageCount-2) + range.y);
+  float   pageHalfSize = mPageSize.x * 0.5f;
+  Vector2 range        = Vector2(pageHalfSize - (pageHalfSize * pageOrder), -pageHalfSize - (pageHalfSize * pageOrder));
+  Vector2 wrap         = Vector2(range.x, -pageHalfSize * (mPageCount - 2) + range.y);
 
   Toolkit::ScrollView scrollView = GetScrollView();
 
   //Position
-  mPathConstrainer.Apply( Dali::Property( page, Dali::Actor::Property::POSITION ),
-                          Dali::Property( scrollView, mInputPropertyIndex),
-                          range, wrap
-                        );
+  mPathConstrainer.Apply(Dali::Property(page, Dali::Actor::Property::POSITION),
+                         Dali::Property(scrollView, mInputPropertyIndex),
+                         range,
+                         wrap);
 
   //Rotation
-  mPathConstrainer.Apply( Dali::Property( page, Dali::Actor::Property::ORIENTATION ),
-                          Dali::Property( scrollView, mInputPropertyIndex ),
-                          range, wrap
-                        );
+  mPathConstrainer.Apply(Dali::Property(page, Dali::Actor::Property::ORIENTATION),
+                         Dali::Property(scrollView, mInputPropertyIndex),
+                         range,
+                         wrap);
 
   //Alpha
-  mLinearConstrainer.Apply( Dali::Property( page, Dali::Actor::Property::COLOR_ALPHA ),
-                            Dali::Property( scrollView, mInputPropertyIndex ),
-                            range, wrap
-                          );
-
+  mLinearConstrainer.Apply(Dali::Property(page, Dali::Actor::Property::COLOR_ALPHA),
+                           Dali::Property(scrollView, mInputPropertyIndex),
+                           range,
+                           wrap);
 }
 
 void ScrollViewPagePathEffect::OnAttach(Toolkit::ScrollView& scrollView)

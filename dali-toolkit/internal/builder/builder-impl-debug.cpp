@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 
 #ifdef DEBUG_ENABLED
+#include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 #include <dali-toolkit/internal/builder/builder-impl-debug.h>
 #include <dali-toolkit/internal/builder/builder-impl.h>
-#include <dali-toolkit/internal/builder/builder-get-is.inl.h>
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 namespace Dali
 {
@@ -27,16 +27,16 @@ namespace Toolkit
 {
 namespace Internal
 {
-
-void LogTree( const Toolkit::JsonParser& parser )
+void LogTree(const Toolkit::JsonParser& parser)
 {
-  if( OptionalChild constants = IsChild(parser.GetRoot(), "constants") )
+  if(OptionalChild constants = IsChild(parser.GetRoot(), "constants"))
   {
     for(TreeNode::ConstIterator iter = (*constants).CBegin();
-        iter != (*constants).CEnd(); ++iter)
+        iter != (*constants).CEnd();
+        ++iter)
     {
-      if( ( (*iter).first && strcmp( (*iter).first, "DUMP_TREE" ) == 0 ) ||
-          ( (*iter).second.GetType() == TreeNode::STRING && strcmp( (*iter).second.GetString(), "DUMP_TREE" ) == 0 ) )
+      if(((*iter).first && strcmp((*iter).first, "DUMP_TREE") == 0) ||
+         ((*iter).second.GetType() == TreeNode::STRING && strcmp((*iter).second.GetString(), "DUMP_TREE") == 0))
       {
         std::ostringstream oss;
         parser.Write(oss, 2);
@@ -46,7 +46,7 @@ void LogTree( const Toolkit::JsonParser& parser )
   }
 }
 
-std::string PropertyValueToString( const Property::Value& value )
+std::string PropertyValueToString(const Property::Value& value)
 {
   std::ostringstream oss;
   oss << value;
@@ -54,8 +54,8 @@ std::string PropertyValueToString( const Property::Value& value )
   return oss.str();
 }
 
-} // Internal
-} // Toolkit
-} // Dali
+} // namespace Internal
+} // namespace Toolkit
+} // namespace Dali
 
 #endif // DEBUG_ENABLED

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,50 +23,47 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
-CharacterIndex min( CharacterIndex index0,
-                    CharacterIndex index1 )
+CharacterIndex min(CharacterIndex index0,
+                   CharacterIndex index1)
 {
-  return ( index0 < index1 ) ? index0 : index1;
+  return (index0 < index1) ? index0 : index1;
 }
 
-void ShapeText( const Vector<Character>& text,
-                const Vector<LineBreakInfo>& lineBreakInfo,
-                const Vector<ScriptRun>& scripts,
-                const Vector<FontRun>& fonts,
-                CharacterIndex startCharacterIndex,
-                GlyphIndex startGlyphIndex,
-                Length numberOfCharacters,
-                Vector<GlyphInfo>& glyphs,
-                Vector<CharacterIndex>& glyphToCharacterMap,
-                Vector<Length>& charactersPerGlyph,
-                Vector<GlyphIndex>& newParagraphGlyphs )
+void ShapeText(const Vector<Character>&     text,
+               const Vector<LineBreakInfo>& lineBreakInfo,
+               const Vector<ScriptRun>&     scripts,
+               const Vector<FontRun>&       fonts,
+               CharacterIndex               startCharacterIndex,
+               GlyphIndex                   startGlyphIndex,
+               Length                       numberOfCharacters,
+               Vector<GlyphInfo>&           glyphs,
+               Vector<CharacterIndex>&      glyphToCharacterMap,
+               Vector<Length>&              charactersPerGlyph,
+               Vector<GlyphIndex>&          newParagraphGlyphs)
 {
-  if( 0u == numberOfCharacters )
+  if(0u == numberOfCharacters)
   {
     // Nothing to do if there are no characters.
     return;
   }
 
 #ifdef DEBUG_ENABLED
-  const Length numberOfFontRuns = fonts.Count();
-  const Length numberOfScriptRuns = scripts.Count();
+  const Length numberOfFontRuns        = fonts.Count();
+  const Length numberOfScriptRuns      = scripts.Count();
   const Length totalNumberOfCharacters = text.Count();
 #endif
 
-  DALI_ASSERT_DEBUG( ( 0u != numberOfFontRuns ) &&
-                     ( totalNumberOfCharacters == fonts[numberOfFontRuns - 1u].characterRun.characterIndex + fonts[numberOfFontRuns - 1u].characterRun.numberOfCharacters ) &&
-                     "Toolkit::Text::ShapeText. All characters must have a font set." );
+  DALI_ASSERT_DEBUG((0u != numberOfFontRuns) &&
+                    (totalNumberOfCharacters == fonts[numberOfFontRuns - 1u].characterRun.characterIndex + fonts[numberOfFontRuns - 1u].characterRun.numberOfCharacters) &&
+                    "Toolkit::Text::ShapeText. All characters must have a font set.");
 
-  DALI_ASSERT_DEBUG( ( 0u != numberOfScriptRuns ) &&
-                     ( totalNumberOfCharacters == scripts[numberOfScriptRuns - 1u].characterRun.characterIndex + scripts[numberOfScriptRuns - 1u].characterRun.numberOfCharacters ) &&
-                     "Toolkit::Text::ShapeText. All characters must have a script set." );
+  DALI_ASSERT_DEBUG((0u != numberOfScriptRuns) &&
+                    (totalNumberOfCharacters == scripts[numberOfScriptRuns - 1u].characterRun.characterIndex + scripts[numberOfScriptRuns - 1u].characterRun.numberOfCharacters) &&
+                    "Toolkit::Text::ShapeText. All characters must have a script set.");
 
   // The text needs to be split in chunks of consecutive characters.
   // Each chunk must contain characters with the same font id and script set.
@@ -78,10 +75,10 @@ void ShapeText( const Vector<Character>& text,
 
   // Get the font run containing the startCharacterIndex character.
   Vector<FontRun>::ConstIterator fontRunIt = fonts.Begin();
-  for( Vector<FontRun>::ConstIterator endIt = fonts.End(); fontRunIt < endIt; ++fontRunIt )
+  for(Vector<FontRun>::ConstIterator endIt = fonts.End(); fontRunIt < endIt; ++fontRunIt)
   {
     const FontRun& run = *fontRunIt;
-    if( startCharacterIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters )
+    if(startCharacterIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters)
     {
       // Found.
       break;
@@ -90,10 +87,10 @@ void ShapeText( const Vector<Character>& text,
 
   // Get the script run containing the startCharacterIndex character.
   Vector<ScriptRun>::ConstIterator scriptRunIt = scripts.Begin();
-  for( Vector<ScriptRun>::ConstIterator endIt = scripts.End(); scriptRunIt < endIt; ++scriptRunIt )
+  for(Vector<ScriptRun>::ConstIterator endIt = scripts.End(); scriptRunIt < endIt; ++scriptRunIt)
   {
     const ScriptRun& run = *scriptRunIt;
-    if( startCharacterIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters )
+    if(startCharacterIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters)
     {
       // Found.
       break;
@@ -113,40 +110,40 @@ void ShapeText( const Vector<Character>& text,
 
   GlyphInfo glyphInfo;
   glyphInfo.isItalicRequired = false;
-  glyphInfo.isBoldRequired = false;
+  glyphInfo.isBoldRequired   = false;
 
-  const Length currentNumberOfGlyphs = glyphs.Count();
-  const Length numberOfGlyphsReserved = static_cast<Length>( numberOfCharacters * 1.3f );
-  glyphs.Reserve( currentNumberOfGlyphs + numberOfGlyphsReserved );
-  glyphToCharacterMap.Reserve( currentNumberOfGlyphs + numberOfGlyphsReserved );
+  const Length currentNumberOfGlyphs  = glyphs.Count();
+  const Length numberOfGlyphsReserved = static_cast<Length>(numberOfCharacters * 1.3f);
+  glyphs.Reserve(currentNumberOfGlyphs + numberOfGlyphsReserved);
+  glyphToCharacterMap.Reserve(currentNumberOfGlyphs + numberOfGlyphsReserved);
 
   // The actual number of glyphs.
   Length totalNumberOfGlyphs = currentNumberOfGlyphs;
   // The number of new glyphs.
   Length numberOfNewGlyphs = 0u;
 
-  const Character* const textBuffer = text.Begin();
-  const LineBreakInfo* const lineBreakInfoBuffer = lineBreakInfo.Begin();
-  CharacterIndex* glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
+  const Character* const     textBuffer                = text.Begin();
+  const LineBreakInfo* const lineBreakInfoBuffer       = lineBreakInfo.Begin();
+  CharacterIndex*            glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
 
   Length glyphIndex = startGlyphIndex;
 
   // Traverse the characters and shape the text.
   const CharacterIndex lastCharacter = startCharacterIndex + numberOfCharacters;
-  for( previousIndex = startCharacterIndex; previousIndex < lastCharacter; )
+  for(previousIndex = startCharacterIndex; previousIndex < lastCharacter;)
   {
     // Get the font id and the script.
-    const FontRun& fontRun = *fontRunIt;
+    const FontRun&   fontRun   = *fontRunIt;
     const ScriptRun& scriptRun = *scriptRunIt;
 
-    currentFontId = fontRun.fontId;
-    currentScript = scriptRun.script;
+    currentFontId               = fontRun.fontId;
+    currentScript               = scriptRun.script;
     const bool isItalicRequired = fontRun.isItalicRequired;
-    const bool isBoldRequired = fontRun.isBoldRequired;
+    const bool isBoldRequired   = fontRun.isBoldRequired;
 
     // Get the min index to the last character of both runs.
-    CharacterIndex currentIndex = min( fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters,
-                                       scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters );
+    CharacterIndex currentIndex = min(fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters,
+                                      scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters);
 
     // Check if there is a line must break.
     bool mustBreak = false;
@@ -156,43 +153,43 @@ void ShapeText( const Vector<Character>& text,
     // However, the metrics need to be changed in order to not to draw a square.
     bool isNewParagraph = false;
 
-    for( CharacterIndex index = previousIndex; index < currentIndex; ++index )
+    for(CharacterIndex index = previousIndex; index < currentIndex; ++index)
     {
-      mustBreak = TextAbstraction::LINE_MUST_BREAK == *( lineBreakInfoBuffer + index );
-      if( mustBreak )
+      mustBreak = TextAbstraction::LINE_MUST_BREAK == *(lineBreakInfoBuffer + index);
+      if(mustBreak)
       {
-        isNewParagraph = TextAbstraction::IsNewParagraph( *( textBuffer + index ) );
-        currentIndex = index + 1u;
+        isNewParagraph = TextAbstraction::IsNewParagraph(*(textBuffer + index));
+        currentIndex   = index + 1u;
         break;
       }
     }
 
     // Shape the text for the current chunk.
-    const Length numberOfGlyphs = shaping.Shape( textBuffer + previousIndex,
-                                                 ( currentIndex - previousIndex ), // The number of characters to shape.
-                                                 currentFontId,
-                                                 currentScript );
+    const Length numberOfGlyphs = shaping.Shape(textBuffer + previousIndex,
+                                                (currentIndex - previousIndex), // The number of characters to shape.
+                                                currentFontId,
+                                                currentScript);
 
     // Retrieve the glyphs and the glyph to character conversion map.
-    Vector<GlyphInfo> tmpGlyphs;
+    Vector<GlyphInfo>      tmpGlyphs;
     Vector<CharacterIndex> tmpGlyphToCharacterMap;
 
     GlyphInfo glyphInfo;
     glyphInfo.isItalicRequired = isItalicRequired;
-    glyphInfo.isBoldRequired = isBoldRequired;
+    glyphInfo.isBoldRequired   = isBoldRequired;
 
-    tmpGlyphs.Resize( numberOfGlyphs, glyphInfo );
-    tmpGlyphToCharacterMap.Resize( numberOfGlyphs );
-    shaping.GetGlyphs( tmpGlyphs.Begin(),
-                       tmpGlyphToCharacterMap.Begin() );
+    tmpGlyphs.Resize(numberOfGlyphs, glyphInfo);
+    tmpGlyphToCharacterMap.Resize(numberOfGlyphs);
+    shaping.GetGlyphs(tmpGlyphs.Begin(),
+                      tmpGlyphToCharacterMap.Begin());
 
     // Update the new indices of the glyph to character map.
-    if( 0u != totalNumberOfGlyphs )
+    if(0u != totalNumberOfGlyphs)
     {
-      for( Vector<CharacterIndex>::Iterator it = tmpGlyphToCharacterMap.Begin(),
-             endIt = tmpGlyphToCharacterMap.End();
-           it != endIt;
-           ++it )
+      for(Vector<CharacterIndex>::Iterator it    = tmpGlyphToCharacterMap.Begin(),
+                                           endIt = tmpGlyphToCharacterMap.End();
+          it != endIt;
+          ++it)
       {
         *it += previousIndex;
       }
@@ -201,26 +198,26 @@ void ShapeText( const Vector<Character>& text,
     totalNumberOfGlyphs += numberOfGlyphs;
     numberOfNewGlyphs += numberOfGlyphs;
 
-    glyphs.Insert( glyphs.Begin() + glyphIndex, tmpGlyphs.Begin(), tmpGlyphs.End() );
-    glyphToCharacterMap.Insert( glyphToCharacterMap.Begin() + glyphIndex, tmpGlyphToCharacterMap.Begin(), tmpGlyphToCharacterMap.End() );
+    glyphs.Insert(glyphs.Begin() + glyphIndex, tmpGlyphs.Begin(), tmpGlyphs.End());
+    glyphToCharacterMap.Insert(glyphToCharacterMap.Begin() + glyphIndex, tmpGlyphToCharacterMap.Begin(), tmpGlyphToCharacterMap.End());
     glyphIndex += numberOfGlyphs;
 
     // Set the buffer pointers again.
     glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
 
-    if( isNewParagraph )
+    if(isNewParagraph)
     {
       // Add the index of the new paragraph glyph to a vector.
       // Their metrics will be updated in a following step.
-      newParagraphGlyphs.PushBack( glyphIndex - 1u );
+      newParagraphGlyphs.PushBack(glyphIndex - 1u);
     }
 
     // Update the iterators to get the next font or script run.
-    if( currentIndex == fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters )
+    if(currentIndex == fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters)
     {
       ++fontRunIt;
     }
-    if( currentIndex == scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters )
+    if(currentIndex == scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters)
     {
       ++scriptRunIt;
     }
@@ -230,31 +227,31 @@ void ShapeText( const Vector<Character>& text,
   }
 
   // Update indices.
-  for( Length index = startGlyphIndex + numberOfNewGlyphs; index < totalNumberOfGlyphs; ++index )
+  for(Length index = startGlyphIndex + numberOfNewGlyphs; index < totalNumberOfGlyphs; ++index)
   {
-    CharacterIndex& characterIndex = *( glyphToCharacterMapBuffer + index );
+    CharacterIndex& characterIndex = *(glyphToCharacterMapBuffer + index);
     characterIndex += numberOfCharacters;
   }
 
   // Add the number of characters per glyph.
-  charactersPerGlyph.Reserve( totalNumberOfGlyphs );
+  charactersPerGlyph.Reserve(totalNumberOfGlyphs);
   Length* charactersPerGlyphBuffer = charactersPerGlyph.Begin();
 
   const GlyphIndex lastGlyph = startGlyphIndex + numberOfNewGlyphs;
-  previousIndex = startCharacterIndex;
-  for( Length index = startGlyphIndex + 1u; index < lastGlyph; ++index )
+  previousIndex              = startCharacterIndex;
+  for(Length index = startGlyphIndex + 1u; index < lastGlyph; ++index)
   {
-    const CharacterIndex characterIndex = *( glyphToCharacterMapBuffer + index );
+    const CharacterIndex characterIndex = *(glyphToCharacterMapBuffer + index);
 
-    charactersPerGlyph.Insert( charactersPerGlyphBuffer + index - 1u, characterIndex - previousIndex );
+    charactersPerGlyph.Insert(charactersPerGlyphBuffer + index - 1u, characterIndex - previousIndex);
 
     previousIndex = characterIndex;
   }
-  charactersPerGlyph.Insert( charactersPerGlyphBuffer + lastGlyph - 1u, numberOfCharacters + startCharacterIndex - previousIndex );
+  charactersPerGlyph.Insert(charactersPerGlyphBuffer + lastGlyph - 1u, numberOfCharacters + startCharacterIndex - previousIndex);
 
   // Resize the vectors to set the right number of items.
-  glyphs.Resize( totalNumberOfGlyphs );
-  glyphToCharacterMap.Resize( totalNumberOfGlyphs );
+  glyphs.Resize(totalNumberOfGlyphs);
+  glyphToCharacterMap.Resize(totalNumberOfGlyphs);
 }
 
 } // namespace Text

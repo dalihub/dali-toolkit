@@ -15,7 +15,6 @@
  *
  */
 
-
 // CLASS HEADER
 #include "radio-button-impl.h"
 
@@ -24,34 +23,30 @@
 #include <dali/public-api/object/type-registry.h>
 
 #if defined(DEBUG_ENABLED)
-  extern Debug::Filter* gLogButtonFilter;
+extern Debug::Filter* gLogButtonFilter;
 #endif
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 BaseHandle Create()
 {
   return Toolkit::RadioButton::New();
 }
 
-TypeRegistration typeRegistration( typeid( Toolkit::RadioButton ), typeid( Toolkit::Button ), Create);
+TypeRegistration typeRegistration(typeid(Toolkit::RadioButton), typeid(Toolkit::Button), Create);
 
-}
+} // namespace
 
 Dali::Toolkit::RadioButton RadioButton::New()
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr< RadioButton > internalRadioButton = new RadioButton();
+  IntrusivePtr<RadioButton> internalRadioButton = new RadioButton();
 
   // Pass ownership to CustomActor
   Dali::Toolkit::RadioButton radioButton(*internalRadioButton);
@@ -76,10 +71,10 @@ void RadioButton::OnInitialize()
 {
   Button::OnInitialize();
 
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new AccessibleImpl( actor, Dali::Accessibility::Role::RADIO_BUTTON ) );
-  } );
+  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
+    return std::unique_ptr<Dali::Accessibility::Accessible>(
+      new AccessibleImpl(actor, Dali::Accessibility::Role::RADIO_BUTTON));
+  });
 }
 
 bool RadioButton::OnToggleReleased()
@@ -88,40 +83,39 @@ bool RadioButton::OnToggleReleased()
   return false;
 }
 
-void RadioButton::OnStateChange( State newState )
+void RadioButton::OnStateChange(State newState)
 {
   // Radio button can be part of a group, if a button in the group is selected then all others should be unselected
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "RadioButton::OnStateChange state(%d)\n", newState );
+  DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "RadioButton::OnStateChange state(%d)\n", newState);
 
-  if ( SELECTED_STATE ==  newState )
+  if(SELECTED_STATE == newState)
   {
     Actor parent = Self().GetParent();
-    if( parent )
+    if(parent)
     {
-      for( unsigned int i = 0; i < parent.GetChildCount(); ++i )
+      for(unsigned int i = 0; i < parent.GetChildCount(); ++i)
       {
-        Dali::Toolkit::RadioButton radioButtonChild = Dali::Toolkit::RadioButton::DownCast( parent.GetChildAt( i ) );
-        if( radioButtonChild && radioButtonChild != Self() )
+        Dali::Toolkit::RadioButton radioButtonChild = Dali::Toolkit::RadioButton::DownCast(parent.GetChildAt(i));
+        if(radioButtonChild && radioButtonChild != Self())
         {
-          radioButtonChild.SetProperty( Toolkit::Button::Property::SELECTED, false );
+          radioButtonChild.SetProperty(Toolkit::Button::Property::SELECTED, false);
         }
       }
     }
   }
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if (Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if(Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
     Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
-      Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0
-    );
+      Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
   }
 }
 
 Dali::Accessibility::States RadioButton::AccessibleImpl::CalculateStates()
 {
   auto tmp = Button::AccessibleImpl::CalculateStates();
-  auto slf = Toolkit::Button::DownCast( self );
-  if( slf.GetProperty<bool>( Toolkit::Button::Property::SELECTED ) )
+  auto slf = Toolkit::Button::DownCast(self);
+  if(slf.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
     tmp[Dali::Accessibility::State::CHECKED] = true;
   tmp[Dali::Accessibility::State::SELECTABLE] = true;
   return tmp;

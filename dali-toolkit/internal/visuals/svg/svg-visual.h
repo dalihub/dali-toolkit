@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SVG_VISUAL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,11 @@ protected:
   virtual ~SvgVisual();
 
   /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
+
+  /**
    * @copydoc Visual::Base::DoSetProperties
    */
   void DoSetProperties( const Property::Map& propertyMap ) override;
@@ -182,9 +187,9 @@ private:
   VectorImageRenderer       mVectorRenderer;
   uint32_t                  mDefaultWidth;
   uint32_t                  mDefaultHeight;
-  bool                      mLoaded;
   WeakHandle<Actor>         mPlacementActor;
   Vector2                   mVisualSize;
+  bool                      mLoadFailed;
   bool                      mAttemptAtlasing;  ///< If true will attempt atlasing, otherwise create unique texture
 };
 

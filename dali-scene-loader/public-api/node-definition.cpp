@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 void NodeDefinition::Renderable::RegisterResources(IResourceReceiver& receiver) const
 {
   receiver.Register(ResourceType::Shader, mShaderIdx);
@@ -35,15 +34,14 @@ void NodeDefinition::Renderable::ReflectResources(IResourceReflector& reflector)
   reflector.Reflect(ResourceType::Shader, mShaderIdx);
 }
 
-void NodeDefinition::Renderable::OnCreate(const NodeDefinition& node, CreateParams& params,
-  Actor& actor) const
+void NodeDefinition::Renderable::OnCreate(const NodeDefinition& node, CreateParams& params, Actor& actor) const
 {
   DALI_ASSERT_DEBUG(mShaderIdx != INVALID_INDEX);
-  auto& resources = params.mResources;
-  Shader shader = resources.mShaders[mShaderIdx].second;
+  auto&  resources = params.mResources;
+  Shader shader    = resources.mShaders[mShaderIdx].second;
 
   static Geometry defaultGeometry = Geometry::New();
-  Renderer renderer = Renderer::New(defaultGeometry, shader);
+  Renderer        renderer        = Renderer::New(defaultGeometry, shader);
 
   RendererState::Apply(resources.mShaders[mShaderIdx].first.mRendererState, renderer);
 
@@ -66,19 +64,19 @@ Actor NodeDefinition::CreateActor(CreateParams& params) const
 
   actor.RegisterProperty(ORIGINAL_MATRIX_PROPERTY_NAME, GetLocalSpace(), Property::AccessMode::READ_ONLY);
 
-  if (mRenderable)
+  if(mRenderable)
   {
     mRenderable->OnCreate(*this, params, actor);
   }
 
-  for (auto& e : mExtras)
+  for(auto& e : mExtras)
   {
     actor.RegisterProperty(e.mKey, e.mValue);
   }
 
-  for (auto& c : mConstraints)
+  for(auto& c : mConstraints)
   {
-    params.mConstrainables.push_back(ConstraintRequest{ &c, actor });
+    params.mConstrainables.push_back(ConstraintRequest{&c, actor});
   }
 
   return actor;
@@ -86,7 +84,7 @@ Actor NodeDefinition::CreateActor(CreateParams& params) const
 
 Matrix NodeDefinition::GetLocalSpace() const
 {
-  Matrix localSpace{ false };
+  Matrix localSpace{false};
   localSpace.SetTransformComponents(mScale, mOrientation, mPosition);
   return localSpace;
 }
@@ -111,34 +109,34 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
   Renderable::OnCreate(node, params, actor);
 
   auto& resources = params.mResources;
-  auto& mesh = resources.mMeshes[mMeshIdx];
+  auto& mesh      = resources.mMeshes[mMeshIdx];
 
-  auto renderer = actor.GetRendererAt(0);
+  auto     renderer = actor.GetRendererAt(0);
   Geometry geometry = mesh.second.geometry;
   renderer.SetGeometry(geometry);
 
   auto shader = renderer.GetShader();
 
-  if (mesh.first.IsSkinned())
+  if(mesh.first.IsSkinned())
   {
-    params.mSkinnables.push_back(SkinningShaderConfigurationRequest{ mesh.first.mSkeletonIdx, shader });
+    params.mSkinnables.push_back(SkinningShaderConfigurationRequest{mesh.first.mSkeletonIdx, shader});
   }
 
-  if (mesh.first.HasBlendShapes())
+  if(mesh.first.HasBlendShapes())
   {
-    params.mBlendshapeRequests.push_back(BlendshapeShaderConfigurationRequest{ node.mName, mMeshIdx, shader });
+    params.mBlendshapeRequests.push_back(BlendshapeShaderConfigurationRequest{node.mName, mMeshIdx, shader});
   }
 
   TextureSet textures = resources.mMaterials[mMaterialIdx].second;
 
   // Set the blend shape texture.
-  if (mesh.second.blendShapeGeometry)
+  if(mesh.second.blendShapeGeometry)
   {
     TextureSet newTextureSet = TextureSet::New();
     newTextureSet.SetTexture(0u, mesh.second.blendShapeGeometry);
 
     const unsigned int numberOfTextures = textures.GetTextureCount();
-    for (unsigned int index = 0u; index < numberOfTextures; ++index)
+    for(unsigned int index = 0u; index < numberOfTextures; ++index)
     {
       const unsigned int newIndex = index + 1u;
       newTextureSet.SetTexture(newIndex, textures.GetTexture(index));
@@ -160,14 +158,13 @@ void ModelNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParam
   actor.RegisterProperty("uIblIntensity", resources.mEnvironmentMaps[envIdx].first.mIblIntensity);
 
   const auto alphaCutoff = matDef.GetAlphaCutoff();
-  if (alphaCutoff > 0.f)
+  if(alphaCutoff > 0.f)
   {
     actor.RegisterProperty("uAlphaThreshold", alphaCutoff);
   }
 }
 
-void ArcNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params,
-  Actor& actor) const
+void ArcNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const
 {
   ModelNode::OnCreate(node, params, actor);
 
@@ -176,11 +173,11 @@ void ArcNode::OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams&
   actor.RegisterProperty("radius", mRadius);
 
   const float startAngleRadians = mStartAngleDegrees * Math::PI_OVER_180;
-  Vector2 startPolar{ std::cos(startAngleRadians), std::sin(startAngleRadians) };
+  Vector2     startPolar{std::cos(startAngleRadians), std::sin(startAngleRadians)};
   actor.RegisterProperty("startAngle", startPolar);
 
   const float endAngleRadians = mEndAngleDegrees * Math::PI_OVER_180;
-  Vector2 endPolar{ std::cos(endAngleRadians), std::sin(endAngleRadians) };
+  Vector2     endPolar{std::cos(endAngleRadians), std::sin(endAngleRadians)};
   actor.RegisterProperty("endAngle", endPolar);
 }
 
@@ -188,12 +185,12 @@ void ArcNode::GetEndVectorWithDiffAngle(float startAngle, float diffAngle, Vecto
 {
   float endAngle = 0.f;
 
-  if (diffAngle <= 0.001f)
+  if(diffAngle <= 0.001f)
   {
     //0.001 is used to ensure is empty arc when startAngle = endAngle + 360 * N
     endAngle = startAngle + 0.001f;
   }
-  else if (diffAngle >= 360.f)
+  else if(diffAngle >= 360.f)
   {
     endAngle = diffAngle + 359.99f;
   }
@@ -205,5 +202,5 @@ void ArcNode::GetEndVectorWithDiffAngle(float startAngle, float diffAngle, Vecto
   endVector.y = sinf(endAngle * Math::PI_OVER_180);
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

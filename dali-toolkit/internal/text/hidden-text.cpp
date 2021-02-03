@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,119 +23,116 @@
 
 using namespace Dali::Toolkit;
 
-const uint32_t STAR = 0x2A;   // Set default substitute character as '*'
-const int DEFAULT_SHOW_DURATION = 1000;
+const uint32_t STAR                  = 0x2A; // Set default substitute character as '*'
+const int      DEFAULT_SHOW_DURATION = 1000;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
+const char* const PROPERTY_MODE                 = "mode";
+const char* const PROPERTY_SUBSTITUTE_CHARACTER = "substituteCharacter";
+const char* const PROPERTY_SUBSTITUTE_COUNT     = "substituteCount";
+const char* const PROPERTY_SHOW_DURATION        = "showDuration";
 
-const char * const PROPERTY_MODE                      = "mode";
-const char * const PROPERTY_SUBSTITUTE_CHARACTER      = "substituteCharacter";
-const char * const PROPERTY_SUBSTITUTE_COUNT          = "substituteCount";
-const char * const PROPERTY_SHOW_DURATION             = "showDuration";
-
-HiddenText::HiddenText( Observer* observer )
-: mObserver( observer ),
-  mHideMode( static_cast< int >( Toolkit::HiddenInput::Mode::HIDE_NONE ) ),
-  mSubstituteText( STAR ),
-  mDisplayDuration( DEFAULT_SHOW_DURATION ),
-  mSubstituteCount( 0 ),
-  mPreviousTextCount( 0 )
+HiddenText::HiddenText(Observer* observer)
+: mObserver(observer),
+  mHideMode(static_cast<int>(Toolkit::HiddenInput::Mode::HIDE_NONE)),
+  mSubstituteText(STAR),
+  mDisplayDuration(DEFAULT_SHOW_DURATION),
+  mSubstituteCount(0),
+  mPreviousTextCount(0)
 {
-  mTimer = Timer::New( mDisplayDuration );
-  mTimer.TickSignal().Connect( this, &HiddenText::OnTick );
+  mTimer = Timer::New(mDisplayDuration);
+  mTimer.TickSignal().Connect(this, &HiddenText::OnTick);
 }
 
-void HiddenText::SetProperties( const Property::Map& map )
+void HiddenText::SetProperties(const Property::Map& map)
 {
-    const Property::Map::SizeType count = map.Count();
+  const Property::Map::SizeType count = map.Count();
 
-    for ( Property::Map::SizeType position = 0; position < count; ++position )
+  for(Property::Map::SizeType position = 0; position < count; ++position)
+  {
+    KeyValuePair     keyValue = map.GetKeyValue(position);
+    Property::Key&   key      = keyValue.first;
+    Property::Value& value    = keyValue.second;
+
+    if(key == Toolkit::HiddenInput::Property::MODE || key == PROPERTY_MODE)
     {
-      KeyValuePair keyValue = map.GetKeyValue( position );
-      Property::Key& key = keyValue.first;
-      Property::Value& value = keyValue.second;
-
-      if( key == Toolkit::HiddenInput::Property::MODE || key == PROPERTY_MODE )
-      {
-        value.Get( mHideMode );
-      }
-      else if( key == Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER || key == PROPERTY_SUBSTITUTE_CHARACTER )
-      {
-        value.Get( mSubstituteText );
-      }
-      else if( key == Toolkit::HiddenInput::Property::SUBSTITUTE_COUNT || key == PROPERTY_SUBSTITUTE_COUNT )
-      {
-        value.Get( mSubstituteCount );
-      }
-      else if( key == Toolkit::HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION || key == PROPERTY_SHOW_DURATION )
-      {
-        value.Get( mDisplayDuration );
-      }
+      value.Get(mHideMode);
     }
+    else if(key == Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER || key == PROPERTY_SUBSTITUTE_CHARACTER)
+    {
+      value.Get(mSubstituteText);
+    }
+    else if(key == Toolkit::HiddenInput::Property::SUBSTITUTE_COUNT || key == PROPERTY_SUBSTITUTE_COUNT)
+    {
+      value.Get(mSubstituteCount);
+    }
+    else if(key == Toolkit::HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION || key == PROPERTY_SHOW_DURATION)
+    {
+      value.Get(mDisplayDuration);
+    }
+  }
 }
 
-void HiddenText::GetProperties( Property::Map& map )
+void HiddenText::GetProperties(Property::Map& map)
 {
-  map[Toolkit::HiddenInput::Property::MODE] = mHideMode;
-  map[Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER] = mSubstituteText;
-  map[Toolkit::HiddenInput::Property::SUBSTITUTE_COUNT] = mSubstituteCount;
+  map[Toolkit::HiddenInput::Property::MODE]                         = mHideMode;
+  map[Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER]         = mSubstituteText;
+  map[Toolkit::HiddenInput::Property::SUBSTITUTE_COUNT]             = mSubstituteCount;
   map[Toolkit::HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION] = mDisplayDuration;
 }
 
-void HiddenText::Substitute( const Vector<Character>& source, Vector<Character>& destination )
+void HiddenText::Substitute(const Vector<Character>& source, Vector<Character>& destination)
 {
   const Length characterCount = source.Count();
 
-  destination.Resize( characterCount );
+  destination.Resize(characterCount);
 
-  uint32_t* begin = destination.Begin();
-  uint32_t* end = begin + characterCount;
+  uint32_t* begin     = destination.Begin();
+  uint32_t* end       = begin + characterCount;
   uint32_t* hideStart = NULL;
-  uint32_t* hideEnd = NULL;
+  uint32_t* hideEnd   = NULL;
   uint32_t* sourcePos = source.Begin();
 
-  switch ( mHideMode )
+  switch(mHideMode)
   {
     case Toolkit::HiddenInput::Mode::HIDE_NONE:
     {
       hideStart = NULL;
-      hideEnd = NULL;
+      hideEnd   = NULL;
       break;
     }
     case Toolkit::HiddenInput::Mode::HIDE_ALL:
     {
       hideStart = begin;
-      hideEnd = end;
+      hideEnd   = end;
       break;
     }
     case Toolkit::HiddenInput::Mode::HIDE_COUNT:
     {
       hideStart = begin;
-      hideEnd = begin + mSubstituteCount;
+      hideEnd   = begin + mSubstituteCount;
       break;
     }
     case Toolkit::HiddenInput::Mode::SHOW_COUNT:
     {
       hideStart = begin + mSubstituteCount;
-      hideEnd = end;
+      hideEnd   = end;
       break;
     }
     case Toolkit::HiddenInput::Mode::SHOW_LAST_CHARACTER:
     {
-      if (mPreviousTextCount < characterCount)
+      if(mPreviousTextCount < characterCount)
       {
         hideStart = begin;
-        hideEnd = end-1;
-        if ( mDisplayDuration > 0 )
+        hideEnd   = end - 1;
+        if(mDisplayDuration > 0)
         {
-          mTimer.SetInterval( mDisplayDuration );
+          mTimer.SetInterval(mDisplayDuration);
           mTimer.Start();
         }
         else
@@ -146,14 +143,14 @@ void HiddenText::Substitute( const Vector<Character>& source, Vector<Character>&
       else
       {
         hideStart = begin;
-        hideEnd = end;
+        hideEnd   = end;
       }
       break;
     }
   }
-  for (; begin < end; ++begin )
+  for(; begin < end; ++begin)
   {
-    if (begin >= hideStart && begin < hideEnd)
+    if(begin >= hideStart && begin < hideEnd)
     {
       *begin = static_cast<uint32_t>(mSubstituteText);
       sourcePos++;
@@ -168,7 +165,7 @@ void HiddenText::Substitute( const Vector<Character>& source, Vector<Character>&
 
 bool HiddenText::OnTick()
 {
-  if( mObserver != NULL )
+  if(mObserver != NULL)
   {
     mObserver->DisplayTimeExpired();
   }

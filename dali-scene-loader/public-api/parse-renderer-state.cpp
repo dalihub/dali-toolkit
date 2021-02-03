@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
  */
 
 #include "dali-scene-loader/public-api/parse-renderer-state.h"
-#include "dali/devel-api/common/map-wrapper.h"
 #include <cstring>
+#include "dali/devel-api/common/map-wrapper.h"
 
 namespace Dali
 {
@@ -27,9 +27,8 @@ namespace RendererState
 {
 namespace
 {
-
 std::map<std::string_view, Type> COMPARISONS{
-#define DECL_COMPARISON(x) { #x, Comparison::x }
+#define DECL_COMPARISON(x) {#x, Comparison::x}
   DECL_COMPARISON(NEVER),
   DECL_COMPARISON(ALWAYS),
   DECL_COMPARISON(LESS),
@@ -45,7 +44,7 @@ Type InterpretComparison(const std::string_view& str)
 {
   Type value = 0x0;
   auto iFind = COMPARISONS.find(str);
-  if (iFind != COMPARISONS.end())
+  if(iFind != COMPARISONS.end())
   {
     value = iFind->second;
   }
@@ -53,7 +52,7 @@ Type InterpretComparison(const std::string_view& str)
 }
 
 std::map<std::string_view, Type> BLEND_FACTORS{
-#define DECL_BLEND_FACTOR(x) { #x, SceneLoader::BlendFactor::x }
+#define DECL_BLEND_FACTOR(x) {#x, SceneLoader::BlendFactor::x}
   DECL_BLEND_FACTOR(ZERO),
   DECL_BLEND_FACTOR(ONE),
   DECL_BLEND_FACTOR(SRC_COLOR),
@@ -76,7 +75,7 @@ Type InterpretBlendFactor(const std::string_view& str, uint8_t item)
 {
   Type value = 0x0;
   auto iFind = BLEND_FACTORS.find(str);
-  if (iFind != BLEND_FACTORS.end())
+  if(iFind != BLEND_FACTORS.end())
   {
     value = iFind->second << (BLEND_FACTOR_BASE_SHIFT + BLEND_FACTOR_ITEM_BITS * item);
   }
@@ -84,7 +83,7 @@ Type InterpretBlendFactor(const std::string_view& str, uint8_t item)
 }
 
 std::map<std::string_view, Type> BUFFER_MODES{
-#define DECL_BUFFER_MODE(x) { #x, BufferMode::x }
+#define DECL_BUFFER_MODE(x) {#x, BufferMode::x}
   DECL_BUFFER_MODE(NONE),
   DECL_BUFFER_MODE(AUTO),
   DECL_BUFFER_MODE(COLOR),
@@ -96,63 +95,62 @@ Type InterpretBufferMode(const std::string_view& str)
 {
   Type value = 0x0;
   auto iFind = BUFFER_MODES.find(str);
-  if (iFind != BUFFER_MODES.end())
+  if(iFind != BUFFER_MODES.end())
   {
     value = iFind->second << BUFFER_MODE_SHIFT;
   }
   return value;
 }
 
-std::map<std::string_view, Type(*)(const std::string_view&)> RENDERER_STATE_PROCESSORS{
-  { "DEPTH_WRITE", [](const std::string_view&) -> Type { return DEPTH_WRITE; } },
-  { "DEPTH_TEST", [](const std::string_view&) -> Type { return DEPTH_TEST; } },
-  { "CULL_FRONT", [](const std::string_view&) -> Type { return CULL_FRONT; } },
-  { "CULL_BACK", [](const std::string_view&) -> Type { return CULL_BACK; } },
-  { "ALPHA_BLEND", [](const std::string_view&) -> Type { return ALPHA_BLEND; } },
-  { "DEPTH_FUNC", [](const std::string_view& arg) -> Type {
-    Type value = (arg[0] == ':') ?
-      (InterpretComparison(std::string_view(arg.data() + 1, arg.size() - 1)) << DEPTH_FUNCTION_SHIFT) : 0x0;
-    return value;
-  } },
-  { "BLEND_SRC_RGB", [](const std::string_view& arg) -> Type {
-    Type value = (arg[0] == ':') ? InterpretBlendFactor(std::string_view(arg.data() + 1, arg.size() - 1), 0) : 0x0;
-    return value;
-  }},
-  { "BLEND_DST_RGB", [](const std::string_view& arg) -> Type {
-    Type value = (arg[0] == ':') ? InterpretBlendFactor(std::string_view(arg.data() + 1, arg.size() - 1), 1) : 0x0;
-    return value;
-  }},
-  { "BLEND_SRC_ALPHA", [](const std::string_view& arg) -> Type {
-    Type value = (arg[0] == ':') ? InterpretBlendFactor(std::string_view(arg.data() + 1, arg.size() - 1), 2) : 0x0;
-    return value;
-  }},
-  { "BLEND_DST_ALPHA", [](const std::string_view& arg) -> Type {
-    Type value = (arg[0] == ':') ? InterpretBlendFactor(std::string_view(arg.data() + 1, arg.size() - 1), 3) : 0x0;
-    return value;
-  }},
-  { "BUFFER_MODE", [](const std::string_view& arg) -> Type {
-    Type value = (arg[0] == ':') ? InterpretBufferMode(std::string_view(arg.data() + 1, arg.size() - 1)) : 0x0;
-    return value;
-  }},
+std::map<std::string_view, Type (*)(const std::string_view&)> RENDERER_STATE_PROCESSORS{
+  {"DEPTH_WRITE", [](const std::string_view&) -> Type { return DEPTH_WRITE; }},
+  {"DEPTH_TEST", [](const std::string_view&) -> Type { return DEPTH_TEST; }},
+  {"CULL_FRONT", [](const std::string_view&) -> Type { return CULL_FRONT; }},
+  {"CULL_BACK", [](const std::string_view&) -> Type { return CULL_BACK; }},
+  {"ALPHA_BLEND", [](const std::string_view&) -> Type { return ALPHA_BLEND; }},
+  {"DEPTH_FUNC", [](const std::string_view& arg) -> Type {
+     Type value = (arg[0] == ':') ? (InterpretComparison(std::string_view(arg.data() + 1, arg.size() - 1)) << DEPTH_FUNCTION_SHIFT) : 0x0;
+     return value;
+   }},
+  {"BLEND_SRC_RGB", [](const std::string_view& arg) -> Type {
+     Type value = (arg[0] == ':') ? InterpretBlendFactor(std::string_view(arg.data() + 1, arg.size() - 1), 0) : 0x0;
+     return value;
+   }},
+  {"BLEND_DST_RGB", [](const std::string_view& arg) -> Type {
+     Type value = (arg[0] == ':') ? InterpretBlendFactor(std::string_view(arg.data() + 1, arg.size() - 1), 1) : 0x0;
+     return value;
+   }},
+  {"BLEND_SRC_ALPHA", [](const std::string_view& arg) -> Type {
+     Type value = (arg[0] == ':') ? InterpretBlendFactor(std::string_view(arg.data() + 1, arg.size() - 1), 2) : 0x0;
+     return value;
+   }},
+  {"BLEND_DST_ALPHA", [](const std::string_view& arg) -> Type {
+     Type value = (arg[0] == ':') ? InterpretBlendFactor(std::string_view(arg.data() + 1, arg.size() - 1), 3) : 0x0;
+     return value;
+   }},
+  {"BUFFER_MODE", [](const std::string_view& arg) -> Type {
+     Type value = (arg[0] == ':') ? InterpretBufferMode(std::string_view(arg.data() + 1, arg.size() - 1)) : 0x0;
+     return value;
+   }},
 };
 
-}
+} // namespace
 
 Type Parse(const char* string, size_t length, StringCallback onError)
 {
-  if (length == 0)
+  if(length == 0)
   {
     length = strlen(string);
   }
 
   Type value = 0x0;
-  auto iEnd = string + length;
-  while (string != iEnd)
+  auto iEnd  = string + length;
+  while(string != iEnd)
   {
     auto iNextToken = std::find(string, iEnd, '|');
-    auto iColon = std::find(string, iNextToken, ':');
-    auto i = RENDERER_STATE_PROCESSORS.find(std::string_view(string, iColon - string));
-    if (i != RENDERER_STATE_PROCESSORS.end() && size_t(std::distance(string, iNextToken)) >= i->first.size())
+    auto iColon     = std::find(string, iNextToken, ':');
+    auto i          = RENDERER_STATE_PROCESSORS.find(std::string_view(string, iColon - string));
+    if(i != RENDERER_STATE_PROCESSORS.end() && size_t(std::distance(string, iNextToken)) >= i->first.size())
     {
       value |= i->second(std::string_view(string + i->first.size(), iNextToken - iColon));
     }
@@ -167,6 +165,6 @@ Type Parse(const char* string, size_t length, StringCallback onError)
   return value;
 }
 
-}  // RendererState
-}
-}
+} // namespace RendererState
+} // namespace SceneLoader
+} // namespace Dali

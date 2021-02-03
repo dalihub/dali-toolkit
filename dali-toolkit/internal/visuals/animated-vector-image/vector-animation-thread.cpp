@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,39 +19,35 @@
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-thread.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
+#include <dali/devel-api/adaptor-framework/thread-settings.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <thread>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
+constexpr auto DEFAULT_NUMBER_OF_RASTERIZE_THREADS = size_t{4u};
+constexpr auto NUMBER_OF_RASTERIZE_THREADS_ENV     = "DALI_VECTOR_RASTERIZE_THREADS";
 
-constexpr auto DEFAULT_NUMBER_OF_RASTERIZE_THREADS = size_t{ 4u };
-constexpr auto NUMBER_OF_RASTERIZE_THREADS_ENV = "DALI_VECTOR_RASTERIZE_THREADS";
-
-size_t GetNumberOfThreads( const char* environmentVariable, size_t defaultValue )
+size_t GetNumberOfThreads(const char* environmentVariable, size_t defaultValue)
 {
   using Dali::EnvironmentVariable::GetEnvironmentVariable;
-  auto numberString = GetEnvironmentVariable( environmentVariable );
-  auto numberOfThreads = numberString ? std::strtoul( numberString, nullptr, 10 ) : 0;
+  auto           numberString          = GetEnvironmentVariable(environmentVariable);
+  auto           numberOfThreads       = numberString ? std::strtoul(numberString, nullptr, 10) : 0;
   constexpr auto MAX_NUMBER_OF_THREADS = 100u;
-  DALI_ASSERT_DEBUG( numberOfThreads < MAX_NUMBER_OF_THREADS );
-  return ( numberOfThreads > 0 && numberOfThreads < MAX_NUMBER_OF_THREADS ) ? numberOfThreads : defaultValue;
+  DALI_ASSERT_DEBUG(numberOfThreads < MAX_NUMBER_OF_THREADS);
+  return (numberOfThreads > 0 && numberOfThreads < MAX_NUMBER_OF_THREADS) ? numberOfThreads : defaultValue;
 }
 
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
+Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
 #endif
 
 } // unnamed namespace
@@ -60,12 +56,12 @@ VectorAnimationThread::VectorAnimationThread()
 : mAnimationTasks(),
   mCompletedTasks(),
   mWorkingTasks(),
-  mRasterizers( GetNumberOfThreads( NUMBER_OF_RASTERIZE_THREADS_ENV, DEFAULT_NUMBER_OF_RASTERIZE_THREADS ), [&]() { return RasterizeHelper( *this ); } ),
-  mSleepThread( MakeCallback( this, &VectorAnimationThread::OnAwakeFromSleep ) ),
+  mRasterizers(GetNumberOfThreads(NUMBER_OF_RASTERIZE_THREADS_ENV, DEFAULT_NUMBER_OF_RASTERIZE_THREADS), [&]() { return RasterizeHelper(*this); }),
+  mSleepThread(MakeCallback(this, &VectorAnimationThread::OnAwakeFromSleep)),
   mConditionalWait(),
-  mNeedToSleep( false ),
-  mDestroyThread( false ),
-  mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
+  mNeedToSleep(false),
+  mDestroyThread(false),
+  mLogFactory(Dali::Adaptor::Get().GetLogFactory())
 {
   mSleepThread.Start();
 }
@@ -74,88 +70,88 @@ VectorAnimationThread::~VectorAnimationThread()
 {
   // Stop the thread
   {
-    ConditionalWait::ScopedLock lock( mConditionalWait );
+    ConditionalWait::ScopedLock lock(mConditionalWait);
     mDestroyThread = true;
-    mNeedToSleep = false;
-    mConditionalWait.Notify( lock );
+    mNeedToSleep   = false;
+    mConditionalWait.Notify(lock);
   }
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::~VectorAnimationThread: Join [%p]\n", this );
+  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::~VectorAnimationThread: Join [%p]\n", this);
 
   Join();
 }
 
-void VectorAnimationThread::AddTask( VectorAnimationTaskPtr task )
+void VectorAnimationThread::AddTask(VectorAnimationTaskPtr task)
 {
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  ConditionalWait::ScopedLock lock(mConditionalWait);
 
-  if( mAnimationTasks.end() == std::find( mAnimationTasks.begin(), mAnimationTasks.end(), task ) )
+  if(mAnimationTasks.end() == std::find(mAnimationTasks.begin(), mAnimationTasks.end(), task))
   {
-    auto currentTime = task->CalculateNextFrameTime( true );  // Rasterize as soon as possible
+    auto currentTime = task->CalculateNextFrameTime(true); // Rasterize as soon as possible
 
     bool inserted = false;
-    for( auto iter = mAnimationTasks.begin(); iter != mAnimationTasks.end(); ++iter )
+    for(auto iter = mAnimationTasks.begin(); iter != mAnimationTasks.end(); ++iter)
     {
       auto nextTime = (*iter)->GetNextFrameTime();
-      if( nextTime > currentTime )
+      if(nextTime > currentTime)
       {
-        mAnimationTasks.insert( iter, task );
+        mAnimationTasks.insert(iter, task);
         inserted = true;
         break;
       }
     }
 
-    if( !inserted )
+    if(!inserted)
     {
-      mAnimationTasks.push_back( task );
+      mAnimationTasks.push_back(task);
     }
 
     mNeedToSleep = false;
     // wake up the animation thread
-    mConditionalWait.Notify( lock );
+    mConditionalWait.Notify(lock);
   }
 }
 
-void VectorAnimationThread::OnTaskCompleted( VectorAnimationTaskPtr task, bool keepAnimation )
+void VectorAnimationThread::OnTaskCompleted(VectorAnimationTaskPtr task, bool keepAnimation)
 {
-  if( !mDestroyThread )
+  if(!mDestroyThread)
   {
-    ConditionalWait::ScopedLock lock( mConditionalWait );
-    bool needRasterize = false;
+    ConditionalWait::ScopedLock lock(mConditionalWait);
+    bool                        needRasterize = false;
 
-    auto workingTask = std::find( mWorkingTasks.begin(), mWorkingTasks.end(), task );
-    if( workingTask != mWorkingTasks.end() )
+    auto workingTask = std::find(mWorkingTasks.begin(), mWorkingTasks.end(), task);
+    if(workingTask != mWorkingTasks.end())
     {
-      mWorkingTasks.erase( workingTask );
+      mWorkingTasks.erase(workingTask);
     }
 
     // Check pending task
-    if( mAnimationTasks.end() != std::find( mAnimationTasks.begin(), mAnimationTasks.end(), task ) )
+    if(mAnimationTasks.end() != std::find(mAnimationTasks.begin(), mAnimationTasks.end(), task))
     {
       needRasterize = true;
     }
 
-    if( keepAnimation )
+    if(keepAnimation)
     {
-      if( mCompletedTasks.end() == std::find( mCompletedTasks.begin(), mCompletedTasks.end(), task ) )
+      if(mCompletedTasks.end() == std::find(mCompletedTasks.begin(), mCompletedTasks.end(), task))
       {
-        mCompletedTasks.push_back( task );
+        mCompletedTasks.push_back(task);
         needRasterize = true;
       }
     }
 
-    if( needRasterize )
+    if(needRasterize)
     {
       mNeedToSleep = false;
       // wake up the animation thread
-      mConditionalWait.Notify( lock );
+      mConditionalWait.Notify(lock);
     }
   }
 }
 
 void VectorAnimationThread::OnAwakeFromSleep()
 {
-  if( !mDestroyThread )
+  if(!mDestroyThread)
   {
     mNeedToSleep = false;
     // wake up the animation thread
@@ -165,10 +161,10 @@ void VectorAnimationThread::OnAwakeFromSleep()
 
 void VectorAnimationThread::Run()
 {
-  SetThreadName( "VectorAnimationThread" );
+  SetThreadName("VectorAnimationThread");
   mLogFactory.InstallLogFunction();
 
-  while( !mDestroyThread )
+  while(!mDestroyThread)
   {
     Rasterize();
   }
@@ -177,72 +173,72 @@ void VectorAnimationThread::Run()
 void VectorAnimationThread::Rasterize()
 {
   // Lock while popping task out from the queue
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  ConditionalWait::ScopedLock lock(mConditionalWait);
 
   // conditional wait
-  if( mNeedToSleep )
+  if(mNeedToSleep)
   {
-    mConditionalWait.Wait( lock );
+    mConditionalWait.Wait(lock);
   }
 
   mNeedToSleep = true;
 
   // Process completed tasks
-  for( auto&& task : mCompletedTasks )
+  for(auto&& task : mCompletedTasks)
   {
-    if( mAnimationTasks.end() == std::find( mAnimationTasks.begin(), mAnimationTasks.end(), task ) )
+    if(mAnimationTasks.end() == std::find(mAnimationTasks.begin(), mAnimationTasks.end(), task))
     {
       // Should use the frame rate of the animation file
-      auto nextFrameTime = task->CalculateNextFrameTime( false );
+      auto nextFrameTime = task->CalculateNextFrameTime(false);
 
       bool inserted = false;
-      for( auto iter = mAnimationTasks.begin(); iter != mAnimationTasks.end(); ++iter )
+      for(auto iter = mAnimationTasks.begin(); iter != mAnimationTasks.end(); ++iter)
       {
         auto time = (*iter)->GetNextFrameTime();
-        if( time > nextFrameTime )
+        if(time > nextFrameTime)
         {
-          mAnimationTasks.insert( iter, task );
+          mAnimationTasks.insert(iter, task);
           inserted = true;
           break;
         }
       }
 
-      if( !inserted )
+      if(!inserted)
       {
-        mAnimationTasks.push_back( task );
+        mAnimationTasks.push_back(task);
       }
     }
   }
   mCompletedTasks.clear();
 
   // pop out the next task from the queue
-  for( auto it = mAnimationTasks.begin(); it != mAnimationTasks.end(); )
+  for(auto it = mAnimationTasks.begin(); it != mAnimationTasks.end();)
   {
     VectorAnimationTaskPtr nextTask = *it;
 
-    auto currentTime = std::chrono::system_clock::now();
+    auto currentTime   = std::chrono::system_clock::now();
     auto nextFrameTime = nextTask->GetNextFrameTime();
 
 #if defined(DEBUG_ENABLED)
-    auto duration = std::chrono::duration_cast< std::chrono::milliseconds >( nextFrameTime - currentTime );
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nextFrameTime - currentTime);
 
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::Rasterize: [next time = %lld]\n", duration.count() );
+    DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::Rasterize: [next time = %lld]\n", duration.count());
 #endif
 
-    if( nextFrameTime <= currentTime )
+    if(nextFrameTime <= currentTime)
     {
       // If the task is not in the working list
-      if( std::find( mWorkingTasks.begin(), mWorkingTasks.end(), nextTask ) == mWorkingTasks.end() )
+      if(std::find(mWorkingTasks.begin(), mWorkingTasks.end(), nextTask) == mWorkingTasks.end())
       {
-        it = mAnimationTasks.erase( it );
+        it = mAnimationTasks.erase(it);
 
         // Add it to the working list
-        mWorkingTasks.push_back( nextTask );
+        mWorkingTasks.push_back(nextTask);
 
         auto rasterizerHelperIt = mRasterizers.GetNext();
-        DALI_ASSERT_ALWAYS( rasterizerHelperIt != mRasterizers.End() );
+        DALI_ASSERT_ALWAYS(rasterizerHelperIt != mRasterizers.End());
 
-        rasterizerHelperIt->Rasterize( nextTask );
+        rasterizerHelperIt->Rasterize(nextTask);
       }
       else
       {
@@ -251,44 +247,44 @@ void VectorAnimationThread::Rasterize()
     }
     else
     {
-      mSleepThread.SleepUntil( nextFrameTime );
+      mSleepThread.SleepUntil(nextFrameTime);
       break;
     }
   }
 }
 
-VectorAnimationThread::RasterizeHelper::RasterizeHelper( VectorAnimationThread& animationThread )
-: RasterizeHelper( std::unique_ptr< VectorRasterizeThread >( new VectorRasterizeThread() ), animationThread )
+VectorAnimationThread::RasterizeHelper::RasterizeHelper(VectorAnimationThread& animationThread)
+: RasterizeHelper(std::unique_ptr<VectorRasterizeThread>(new VectorRasterizeThread()), animationThread)
 {
 }
 
-VectorAnimationThread::RasterizeHelper::RasterizeHelper( RasterizeHelper&& rhs )
-: RasterizeHelper( std::move( rhs.mRasterizer ), rhs.mAnimationThread )
+VectorAnimationThread::RasterizeHelper::RasterizeHelper(RasterizeHelper&& rhs)
+: RasterizeHelper(std::move(rhs.mRasterizer), rhs.mAnimationThread)
 {
 }
 
-VectorAnimationThread::RasterizeHelper::RasterizeHelper( std::unique_ptr< VectorRasterizeThread > rasterizer, VectorAnimationThread& animationThread )
-: mRasterizer( std::move( rasterizer ) ),
-  mAnimationThread( animationThread )
+VectorAnimationThread::RasterizeHelper::RasterizeHelper(std::unique_ptr<VectorRasterizeThread> rasterizer, VectorAnimationThread& animationThread)
+: mRasterizer(std::move(rasterizer)),
+  mAnimationThread(animationThread)
 {
-  mRasterizer->SetCompletedCallback( MakeCallback( &mAnimationThread, &VectorAnimationThread::OnTaskCompleted ) );
+  mRasterizer->SetCompletedCallback(MakeCallback(&mAnimationThread, &VectorAnimationThread::OnTaskCompleted));
 }
 
-void VectorAnimationThread::RasterizeHelper::Rasterize( VectorAnimationTaskPtr task )
+void VectorAnimationThread::RasterizeHelper::Rasterize(VectorAnimationTaskPtr task)
 {
-  if( task )
+  if(task)
   {
-    mRasterizer->AddTask( task );
+    mRasterizer->AddTask(task);
   }
 }
 
-VectorAnimationThread::SleepThread::SleepThread( CallbackBase* callback )
+VectorAnimationThread::SleepThread::SleepThread(CallbackBase* callback)
 : mConditionalWait(),
-  mAwakeCallback( std::unique_ptr< CallbackBase >( callback ) ),
+  mAwakeCallback(std::unique_ptr<CallbackBase>(callback)),
   mSleepTimePoint(),
-  mLogFactory( Dali::Adaptor::Get().GetLogFactory() ),
-  mNeedToSleep( false ),
-  mDestroyThread( false )
+  mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
+  mNeedToSleep(false),
+  mDestroyThread(false)
 {
 }
 
@@ -296,62 +292,62 @@ VectorAnimationThread::SleepThread::~SleepThread()
 {
   // Stop the thread
   {
-    ConditionalWait::ScopedLock lock( mConditionalWait );
+    ConditionalWait::ScopedLock lock(mConditionalWait);
     mDestroyThread = true;
-    mConditionalWait.Notify( lock );
+    mConditionalWait.Notify(lock);
   }
 
   Join();
 }
 
-void VectorAnimationThread::SleepThread::SleepUntil( std::chrono::time_point< std::chrono::system_clock > timeToSleepUntil )
+void VectorAnimationThread::SleepThread::SleepUntil(std::chrono::time_point<std::chrono::system_clock> timeToSleepUntil)
 {
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  ConditionalWait::ScopedLock lock(mConditionalWait);
   mSleepTimePoint = timeToSleepUntil;
-  mNeedToSleep = true;
-  mConditionalWait.Notify( lock );
+  mNeedToSleep    = true;
+  mConditionalWait.Notify(lock);
 }
 
 void VectorAnimationThread::SleepThread::Run()
 {
-  SetThreadName( "VectorSleepThread" );
+  SetThreadName("VectorSleepThread");
   mLogFactory.InstallLogFunction();
 
-  while( !mDestroyThread )
+  while(!mDestroyThread)
   {
-    bool needToSleep;
-    std::chrono::time_point< std::chrono::system_clock > sleepTimePoint;
+    bool                                               needToSleep;
+    std::chrono::time_point<std::chrono::system_clock> sleepTimePoint;
 
     {
-      ConditionalWait::ScopedLock lock( mConditionalWait );
+      ConditionalWait::ScopedLock lock(mConditionalWait);
 
-      needToSleep = mNeedToSleep;
+      needToSleep    = mNeedToSleep;
       sleepTimePoint = mSleepTimePoint;
 
       mNeedToSleep = false;
     }
 
-    if( needToSleep )
+    if(needToSleep)
     {
 #if defined(DEBUG_ENABLED)
-      auto sleepDuration = std::chrono::duration_cast< std::chrono::milliseconds >( mSleepTimePoint - std::chrono::system_clock::now() );
+      auto sleepDuration = std::chrono::duration_cast<std::chrono::milliseconds>(mSleepTimePoint - std::chrono::system_clock::now());
 
-      DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::SleepThread::Run: [sleep duration = %lld]\n", sleepDuration.count() );
+      DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::SleepThread::Run: [sleep duration = %lld]\n", sleepDuration.count());
 #endif
 
-      std::this_thread::sleep_until( sleepTimePoint );
+      std::this_thread::sleep_until(sleepTimePoint);
 
-      if( mAwakeCallback )
+      if(mAwakeCallback)
       {
-        CallbackBase::Execute( *mAwakeCallback );
+        CallbackBase::Execute(*mAwakeCallback);
       }
     }
 
     {
-      ConditionalWait::ScopedLock lock( mConditionalWait );
-      if( !mDestroyThread && !mNeedToSleep )
+      ConditionalWait::ScopedLock lock(mConditionalWait);
+      if(!mDestroyThread && !mNeedToSleep)
       {
-        mConditionalWait.Wait( lock );
+        mConditionalWait.Wait(lock);
       }
     }
   }

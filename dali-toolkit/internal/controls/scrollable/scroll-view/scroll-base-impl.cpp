@@ -22,25 +22,22 @@ using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // ScrollBase
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ScrollBase::ScrollBase( ControlBehaviour behaviourFlags )
-: Scrollable( behaviourFlags ),
+ScrollBase::ScrollBase(ControlBehaviour behaviourFlags)
+: Scrollable(behaviourFlags),
   mParent(NULL),
   mDelay(0.0f)
 {
 }
 
-void ScrollBase::SetParent(ScrollBase *parent)
+void ScrollBase::SetParent(ScrollBase* parent)
 {
   mParent = parent;
 }
@@ -55,7 +52,7 @@ void ScrollBase::BindActor(Actor child)
   // Apply all our constraints to this new child.
   ConstraintStack::iterator i;
 
-  for(i = mConstraintStack.begin();i!=mConstraintStack.end();i++)
+  for(i = mConstraintStack.begin(); i != mConstraintStack.end(); i++)
   {
     actorInfo->ApplyConstraint(*i);
   }
@@ -64,11 +61,11 @@ void ScrollBase::BindActor(Actor child)
 void ScrollBase::UnbindActor(Actor child)
 {
   // Find the child in mBoundActors, and unparent it
-  for (ActorInfoIter iter = mBoundActors.begin(); iter != mBoundActors.end(); ++iter)
+  for(ActorInfoIter iter = mBoundActors.begin(); iter != mBoundActors.end(); ++iter)
   {
     ActorInfoPtr actorInfo = *iter;
 
-    if( actorInfo->mActor == child )
+    if(actorInfo->mActor == child)
     {
       mBoundActors.erase(iter);
       break;
@@ -95,7 +92,7 @@ void ScrollBase::ApplyConstraintToBoundActors(Constraint constraint)
 {
   mConstraintStack.push_back(constraint);
 
-  for(ActorInfoIter i = mBoundActors.begin();i != mBoundActors.end(); ++i)
+  for(ActorInfoIter i = mBoundActors.begin(); i != mBoundActors.end(); ++i)
   {
     (*i)->ApplyConstraint(constraint);
   }
@@ -105,7 +102,7 @@ void ScrollBase::RemoveConstraintsFromBoundActors()
 {
   mConstraintStack.clear();
 
-  for(ActorInfoIter i = mBoundActors.begin();i != mBoundActors.end(); ++i)
+  for(ActorInfoIter i = mBoundActors.begin(); i != mBoundActors.end(); ++i)
   {
     (*i)->RemoveConstraints();
   }

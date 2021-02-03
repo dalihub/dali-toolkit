@@ -22,23 +22,20 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
 const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 } // namespace
 
 ImageFilter::ImageFilter()
-: mBackgroundColor( Vector4( 1.0f, 1.0f, 1.0f, 0.0f ) ),
-  mTargetSize( Vector2::ZERO ),
-  mPixelFormat( Pixel::RGBA8888 ),
-  mRefreshOnDemand( false )
+: mBackgroundColor(Vector4(1.0f, 1.0f, 1.0f, 0.0f)),
+  mTargetSize(Vector2::ZERO),
+  mPixelFormat(Pixel::RGBA8888),
+  mRefreshOnDemand(false)
 {
 }
 
@@ -46,32 +43,32 @@ ImageFilter::~ImageFilter()
 {
 }
 
-void ImageFilter::SetRefreshOnDemand( bool onDemand )
+void ImageFilter::SetRefreshOnDemand(bool onDemand)
 {
   mRefreshOnDemand = onDemand;
 }
 
-void ImageFilter::SetInputTexture( Texture texture )
+void ImageFilter::SetInputTexture(Texture texture)
 {
   mInputTexture = texture;
 }
 
-void ImageFilter::SetOutputFrameBuffer( FrameBuffer frameBuffer )
+void ImageFilter::SetOutputFrameBuffer(FrameBuffer frameBuffer)
 {
   mOutputFrameBuffer = frameBuffer;
 }
 
-void ImageFilter::SetSize( const Vector2& size )
+void ImageFilter::SetSize(const Vector2& size)
 {
   mTargetSize = size;
 }
 
-void ImageFilter::SetPixelFormat( Pixel::Format pixelFormat )
+void ImageFilter::SetPixelFormat(Pixel::Format pixelFormat)
 {
   mPixelFormat = pixelFormat;
 }
 
-void ImageFilter::SetKernel( const FilterKernel& kernel )
+void ImageFilter::SetKernel(const FilterKernel& kernel)
 {
   mKernel = kernel;
 }
@@ -86,44 +83,44 @@ size_t ImageFilter::GetKernelSize() const
   return mKernel.size();
 }
 
-void ImageFilter::CreateKernel( const float* weights, size_t count )
+void ImageFilter::CreateKernel(const float* weights, size_t count)
 {
-  if( (mTargetSize.width * mTargetSize.height ) > 0.0f )
+  if((mTargetSize.width * mTargetSize.height) > 0.0f)
   {
-    Vector2 pixelsToUV( 1.0f / mTargetSize.width, 1.0f / mTargetSize.height );
+    Vector2 pixelsToUV(1.0f / mTargetSize.width, 1.0f / mTargetSize.height);
 
     mKernel.clear();
 
-    mKernel.push_back( Vector3( 0.0f, 0.0f, weights[0] ) );
-    for( size_t i = 0; i < count >> 1; ++i )
+    mKernel.push_back(Vector3(0.0f, 0.0f, weights[0]));
+    for(size_t i = 0; i < count >> 1; ++i)
     {
       float offset = 1.5f + (i << 1);
 
-      mKernel.push_back( Vector3( pixelsToUV.x * offset, pixelsToUV.y * offset, weights[(i << 1) + 1] ) );
-      mKernel.push_back( Vector3( -pixelsToUV.x * offset, -pixelsToUV.y * offset, weights[(i << 1) + 2] ) );
+      mKernel.push_back(Vector3(pixelsToUV.x * offset, pixelsToUV.y * offset, weights[(i << 1) + 1]));
+      mKernel.push_back(Vector3(-pixelsToUV.x * offset, -pixelsToUV.y * offset, weights[(i << 1) + 2]));
     }
   }
 }
 
-void ImageFilter::SetRootActor( Actor rootActor )
+void ImageFilter::SetRootActor(Actor rootActor)
 {
   mRootActor = rootActor;
 }
 
-void ImageFilter::SetBackgroundColor( const Vector4& color )
+void ImageFilter::SetBackgroundColor(const Vector4& color)
 {
   mBackgroundColor = color;
 }
 
 void ImageFilter::SetupCamera()
 {
-  if( !mCameraActor )
+  if(!mCameraActor)
   {
     // create a camera for the render task, corresponding to its render target size
     mCameraActor = CameraActor::New(mTargetSize);
-    mCameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-    mCameraActor.SetInvertYAxis( true );
-    mRootActor.Add( mCameraActor );
+    mCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    mCameraActor.SetInvertYAxis(true);
+    mRootActor.Add(mCameraActor);
   }
   else
   {
@@ -132,10 +129,9 @@ void ImageFilter::SetupCamera()
     mCameraActor.SetNearClippingPlane(1.0f);
     mCameraActor.SetAspectRatio(mTargetSize.width / mTargetSize.height);
     mCameraActor.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-    mCameraActor.SetProperty( Actor::Property::POSITION, Vector3( 0.0f, 0.0f, ( (mTargetSize.height * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f) ) ) );
+    mCameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, ((mTargetSize.height * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f))));
   }
 }
-
 
 } // namespace Internal
 

@@ -18,14 +18,13 @@
 #include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-
 Property::Map CreateImageRegionEffect()
 {
   Property::Map map;
@@ -37,6 +36,6 @@ Property::Map CreateImageRegionEffect()
   return map;
 }
 
-} // Toolkit
+} // namespace Toolkit
 
-} // Dali
+} // namespace Dali

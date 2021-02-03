@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,33 +19,29 @@
 #include "push-button-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 #if defined(DEBUG_ENABLED)
-  extern Debug::Filter* gLogButtonFilter;
+extern Debug::Filter* gLogButtonFilter;
 #endif
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 BaseHandle Create()
 {
   return Toolkit::PushButton::New();
@@ -53,10 +49,10 @@ BaseHandle Create()
 
 // Properties
 
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PushButton, Toolkit::Button, Create )
+DALI_TYPE_REGISTRATION_BEGIN(Toolkit::PushButton, Toolkit::Button, Create)
 
-DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "labelPadding",  STRING, LABEL_PADDING )
-DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "iconPadding",  STRING, ICON_PADDING )
+DALI_PROPERTY_REGISTRATION(Toolkit, PushButton, "labelPadding", STRING, LABEL_PADDING)
+DALI_PROPERTY_REGISTRATION(Toolkit, PushButton, "iconPadding", STRING, ICON_PADDING)
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -64,16 +60,15 @@ DALI_TYPE_REGISTRATION_END()
 
 namespace
 {
-
 } // unnamed namespace
 
 Dali::Toolkit::PushButton PushButton::New()
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr< PushButton > internalPushButton = new PushButton();
+  IntrusivePtr<PushButton> internalPushButton = new PushButton();
 
   // Pass ownership to CustomActor
-  Dali::Toolkit::PushButton pushButton( *internalPushButton );
+  Dali::Toolkit::PushButton pushButton(*internalPushButton);
 
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
@@ -84,7 +79,7 @@ Dali::Toolkit::PushButton PushButton::New()
 
 PushButton::PushButton()
 : Button(),
-  mIconAlignment( RIGHT )
+  mIconAlignment(RIGHT)
 {
 }
 
@@ -98,42 +93,42 @@ void PushButton::OnInitialize()
 
   // Push button requires the Leave event.
   Actor self = Self();
-  self.SetProperty( Actor::Property::LEAVE_REQUIRED, true );
+  self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
-  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::PUSH_BUTTON ) );
-  } );
+  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
+    return std::unique_ptr<Dali::Accessibility::Accessible>(
+      new AccessibleImpl(actor, Dali::Accessibility::Role::PUSH_BUTTON));
+  });
 }
 
-void PushButton::SetIconAlignment( const PushButton::IconAlignment iconAlignment )
+void PushButton::SetIconAlignment(const PushButton::IconAlignment iconAlignment)
 {
   mIconAlignment = iconAlignment;
   Button::Align labelAlignment;
-  switch ( iconAlignment )
+  switch(iconAlignment)
   {
-  case RIGHT:
-  {
-    labelAlignment = Button::BEGIN;
-    break;
-  }
-  case TOP:
-  {
-    labelAlignment = Button::BOTTOM;
-    break;
-  }
-  case BOTTOM:
-  {
-    labelAlignment = Button::TOP;
-    break;
-  }
-  case LEFT:
-  default:
-    labelAlignment = Button::END;
-    break;
+    case RIGHT:
+    {
+      labelAlignment = Button::BEGIN;
+      break;
+    }
+    case TOP:
+    {
+      labelAlignment = Button::BOTTOM;
+      break;
+    }
+    case BOTTOM:
+    {
+      labelAlignment = Button::TOP;
+      break;
+    }
+    case LEFT:
+    default:
+      labelAlignment = Button::END;
+      break;
   }
 
-  Button::SetLabelAlignment( labelAlignment );
+  Button::SetLabelAlignment(labelAlignment);
 }
 
 const PushButton::IconAlignment PushButton::GetIconAlignment() const
@@ -141,56 +136,56 @@ const PushButton::IconAlignment PushButton::GetIconAlignment() const
   return mIconAlignment;
 }
 
-void PushButton::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
+void PushButton::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)
 {
-  Toolkit::PushButton pushButton = Toolkit::PushButton::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::PushButton pushButton = Toolkit::PushButton::DownCast(Dali::BaseHandle(object));
 
-  if ( pushButton )
+  if(pushButton)
   {
-    PushButton& pushButtonImpl( GetImplementation( pushButton ) );
+    PushButton& pushButtonImpl(GetImplementation(pushButton));
 
     // Properties remain here for Tizen 3.0 legacy requirements. Are now in Button base class
 
-    switch ( propertyIndex )
+    switch(propertyIndex)
     {
       case Toolkit::PushButton::Property::LABEL_PADDING:
       {
-        Vector4 padding ( value.Get< Vector4 >() );
-        pushButtonImpl.Button::SetLabelPadding( Padding( padding.x, padding.y, padding.z, padding.w ) );
+        Vector4 padding(value.Get<Vector4>());
+        pushButtonImpl.Button::SetLabelPadding(Padding(padding.x, padding.y, padding.z, padding.w));
         break;
       }
       case Toolkit::PushButton::Property::ICON_PADDING:
       {
-        Vector4 padding ( value.Get< Vector4 >() );
-        pushButtonImpl.Button::SetForegroundPadding( Padding( padding.x, padding.y, padding.z, padding.w ) );
+        Vector4 padding(value.Get<Vector4>());
+        pushButtonImpl.Button::SetForegroundPadding(Padding(padding.x, padding.y, padding.z, padding.w));
         break;
       }
     }
   }
 }
 
-Property::Value PushButton::GetProperty( BaseObject* object, Property::Index propertyIndex )
+Property::Value PushButton::GetProperty(BaseObject* object, Property::Index propertyIndex)
 {
   Property::Value value;
 
-  Toolkit::PushButton pushButton = Toolkit::PushButton::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::PushButton pushButton = Toolkit::PushButton::DownCast(Dali::BaseHandle(object));
 
-  if ( pushButton )
+  if(pushButton)
   {
-    PushButton& pushButtonImpl( GetImplementation( pushButton ) );
+    PushButton& pushButtonImpl(GetImplementation(pushButton));
 
-    switch ( propertyIndex )
+    switch(propertyIndex)
     {
       case Toolkit::PushButton::Property::LABEL_PADDING:
       {
         Padding padding = pushButtonImpl.Button::GetLabelPadding();
-        value = Vector4( padding.x, padding.y, padding.top, padding.bottom);
+        value           = Vector4(padding.x, padding.y, padding.top, padding.bottom);
         break;
       }
       case Toolkit::PushButton::Property::ICON_PADDING:
       {
         Padding padding = pushButtonImpl.Button::GetForegroundPadding();
-        value = Vector4( padding.x, padding.y, padding.top, padding.bottom);
+        value           = Vector4(padding.x, padding.y, padding.top, padding.bottom);
         break;
       }
     }
@@ -201,26 +196,24 @@ Property::Value PushButton::GetProperty( BaseObject* object, Property::Index pro
 
 Dali::Accessibility::States PushButton::AccessibleImpl::CalculateStates()
 {
-  auto tmp = Button::AccessibleImpl::CalculateStates();
-  auto slf = Toolkit::Button::DownCast( self );
-  tmp[Dali::Accessibility::State::PRESSED] = slf.GetProperty<bool>( Toolkit::Button::Property::SELECTED );
+  auto tmp                                 = Button::AccessibleImpl::CalculateStates();
+  auto slf                                 = Toolkit::Button::DownCast(self);
+  tmp[Dali::Accessibility::State::PRESSED] = slf.GetProperty<bool>(Toolkit::Button::Property::SELECTED);
   return tmp;
 }
 
-void PushButton::OnStateChange( State newState )
+void PushButton::OnStateChange(State newState)
 {
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if (Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if(Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
     Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
-      Dali::Accessibility::State::PRESSED, newState == SELECTED_STATE ? 1 : 0, 0
-    );
+      Dali::Accessibility::State::PRESSED, newState == SELECTED_STATE ? 1 : 0, 0);
 
-    if (Self().GetProperty<bool>(Toolkit::Button::Property::TOGGLABLE))
+    if(Self().GetProperty<bool>(Toolkit::Button::Property::TOGGLABLE))
     {
       Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
-        Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0
-      );
+        Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
     }
   }
 }

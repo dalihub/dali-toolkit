@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 namespace
 {
 const std::string XHTML_FAMILY_ATTRIBUTE("family");
@@ -45,61 +42,61 @@ const std::string XHTML_WIDTH_ATTRIBUTE("width");
 const std::string XHTML_SLANT_ATTRIBUTE("slant");
 
 const unsigned int MAX_FONT_ATTRIBUTE_SIZE = 15u; ///< The maximum length of any of the possible 'weight', 'width' or 'slant' values.
-}
+} // namespace
 
-void ProcessFontTag( const Tag& tag, FontDescriptionRun& fontRun )
+void ProcessFontTag(const Tag& tag, FontDescriptionRun& fontRun)
 {
-  for( Vector<Attribute>::ConstIterator it = tag.attributes.Begin(),
-         endIt = tag.attributes.End();
-       it != endIt;
-       ++it )
+  for(Vector<Attribute>::ConstIterator it    = tag.attributes.Begin(),
+                                       endIt = tag.attributes.End();
+      it != endIt;
+      ++it)
   {
-    const Attribute& attribute( *it );
-    if( TokenComparison( XHTML_FAMILY_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength ) )
+    const Attribute& attribute(*it);
+    if(TokenComparison(XHTML_FAMILY_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
     {
       fontRun.familyDefined = true;
-      fontRun.familyLength = attribute.valueLength;
-      fontRun.familyName = new char[fontRun.familyLength];
-      memcpy( fontRun.familyName, attribute.valueBuffer, fontRun.familyLength );
+      fontRun.familyLength  = attribute.valueLength;
+      fontRun.familyName    = new char[fontRun.familyLength];
+      memcpy(fontRun.familyName, attribute.valueBuffer, fontRun.familyLength);
       // The memory is freed when the font run is removed from the logical model.
     }
-    else if( TokenComparison( XHTML_SIZE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength ) )
+    else if(TokenComparison(XHTML_SIZE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
     {
       // 64.f is used to convert from point size to 26.6 pixel format.
-      fontRun.size = static_cast<PointSize26Dot6>( StringToFloat( attribute.valueBuffer ) * 64.f );
+      fontRun.size        = static_cast<PointSize26Dot6>(StringToFloat(attribute.valueBuffer) * 64.f);
       fontRun.sizeDefined = true;
     }
-    else if( TokenComparison( XHTML_WEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength ) )
+    else if(TokenComparison(XHTML_WEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
     {
       // The StringToWeight() uses the Scripting::GetEnumeration() function which requires the input string to end with a '\0' char.
-      char value[MAX_FONT_ATTRIBUTE_SIZE+1u];
+      char         value[MAX_FONT_ATTRIBUTE_SIZE + 1u];
       const Length length = attribute.valueLength > MAX_FONT_ATTRIBUTE_SIZE ? MAX_FONT_ATTRIBUTE_SIZE : attribute.valueLength;
-      memcpy( value, attribute.valueBuffer, length );
+      memcpy(value, attribute.valueBuffer, length);
       value[length] = 0;
 
-      fontRun.weight = StringToWeight( value );
+      fontRun.weight        = StringToWeight(value);
       fontRun.weightDefined = true;
     }
-    else if( TokenComparison( XHTML_WIDTH_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength ) )
+    else if(TokenComparison(XHTML_WIDTH_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
     {
       // The StringToWidth() uses the Scripting::GetEnumeration() function which requires the input string to end with a '\0' char.
-      char value[MAX_FONT_ATTRIBUTE_SIZE+1u];
+      char         value[MAX_FONT_ATTRIBUTE_SIZE + 1u];
       const Length length = attribute.valueLength > MAX_FONT_ATTRIBUTE_SIZE ? MAX_FONT_ATTRIBUTE_SIZE : attribute.valueLength;
-      memcpy( value, attribute.valueBuffer, length );
+      memcpy(value, attribute.valueBuffer, length);
       value[length] = 0;
 
-      fontRun.width = StringToWidth( value );
+      fontRun.width        = StringToWidth(value);
       fontRun.widthDefined = true;
     }
-    else if( TokenComparison( XHTML_SLANT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength ) )
+    else if(TokenComparison(XHTML_SLANT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
     {
       // The StringToSlant() uses the Scripting::GetEnumeration() function which requires the input string to end with a '\0' char.
-      char value[MAX_FONT_ATTRIBUTE_SIZE+1u];
+      char         value[MAX_FONT_ATTRIBUTE_SIZE + 1u];
       const Length length = attribute.valueLength > MAX_FONT_ATTRIBUTE_SIZE ? MAX_FONT_ATTRIBUTE_SIZE : attribute.valueLength;
-      memcpy( value, attribute.valueBuffer, length );
+      memcpy(value, attribute.valueBuffer, length);
       value[length] = 0;
 
-      fontRun.slant = StringToSlant( value );
+      fontRun.slant        = StringToSlant(value);
       fontRun.slantDefined = true;
     }
   }

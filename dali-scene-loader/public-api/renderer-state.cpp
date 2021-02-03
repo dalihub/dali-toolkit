@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ namespace SceneLoader
 namespace
 {
 // NOTE: values for BlendFactor aren't contiguous, hence we need a mapping.
-const Dali::BlendFactor::Type  kBlendFactors[] = {
+const Dali::BlendFactor::Type kBlendFactors[] = {
   Dali::BlendFactor::ZERO,
   Dali::BlendFactor::ONE,
   Dali::BlendFactor::SRC_COLOR,
@@ -41,7 +41,7 @@ const Dali::BlendFactor::Type  kBlendFactors[] = {
   Dali::BlendFactor::CONSTANT_ALPHA,
   Dali::BlendFactor::ONE_MINUS_CONSTANT_ALPHA,
 };
-}
+} // namespace
 
 namespace RendererState
 {
@@ -55,48 +55,46 @@ void Apply(Type rendererState, Renderer& renderer)
   RENDERER_SET_PROPERTY(BLEND_MODE, MaskMatch(rendererState, ALPHA_BLEND) ? BlendMode::ON : BlendMode::OFF);
 
   const bool cullBack = MaskMatch(rendererState, CULL_BACK);
-  RENDERER_SET_PROPERTY(FACE_CULLING_MODE, MaskMatch(rendererState, CULL_FRONT) ?
-    (cullBack ? FaceCullingMode::FRONT_AND_BACK : FaceCullingMode::FRONT) :
-    (cullBack ? FaceCullingMode::BACK : FaceCullingMode::NONE));
+  RENDERER_SET_PROPERTY(FACE_CULLING_MODE, MaskMatch(rendererState, CULL_FRONT) ? (cullBack ? FaceCullingMode::FRONT_AND_BACK : FaceCullingMode::FRONT) : (cullBack ? FaceCullingMode::BACK : FaceCullingMode::NONE));
 
-  if (auto depthFunc = (rendererState & DEPTH_FUNCTION_MASK) >> DEPTH_FUNCTION_SHIFT)
+  if(auto depthFunc = (rendererState & DEPTH_FUNCTION_MASK) >> DEPTH_FUNCTION_SHIFT)
   {
     RENDERER_SET_PROPERTY(DEPTH_FUNCTION, static_cast<DepthFunction::Type>(depthFunc - 1));
   }
 
-  if (auto blendFactors = (rendererState & BLEND_FACTOR_MASK) >> BLEND_FACTOR_BASE_SHIFT)
+  if(auto blendFactors = (rendererState & BLEND_FACTOR_MASK) >> BLEND_FACTOR_BASE_SHIFT)
   {
-    if (auto srcRgb = (blendFactors & BLEND_FACTOR_ITEM_MASK))
+    if(auto srcRgb = (blendFactors & BLEND_FACTOR_ITEM_MASK))
     {
       RENDERER_SET_PROPERTY(BLEND_FACTOR_SRC_RGB, kBlendFactors[static_cast<BlendFactor::Type>(srcRgb - 1)]);
     }
 
     blendFactors >>= BLEND_FACTOR_ITEM_BITS;
-    if (auto dstRgb = (blendFactors & BLEND_FACTOR_ITEM_MASK))
+    if(auto dstRgb = (blendFactors & BLEND_FACTOR_ITEM_MASK))
     {
       RENDERER_SET_PROPERTY(BLEND_FACTOR_DEST_RGB, kBlendFactors[static_cast<BlendFactor::Type>(dstRgb - 1)]);
     }
 
     blendFactors >>= BLEND_FACTOR_ITEM_BITS;
-    if (auto srcAlpha = (blendFactors & BLEND_FACTOR_ITEM_MASK))
+    if(auto srcAlpha = (blendFactors & BLEND_FACTOR_ITEM_MASK))
     {
       RENDERER_SET_PROPERTY(BLEND_FACTOR_SRC_ALPHA, kBlendFactors[static_cast<BlendFactor::Type>(srcAlpha - 1)]);
     }
 
     blendFactors >>= BLEND_FACTOR_ITEM_BITS;
-    if (auto dstAlpha = (blendFactors & BLEND_FACTOR_ITEM_MASK))
+    if(auto dstAlpha = (blendFactors & BLEND_FACTOR_ITEM_MASK))
     {
       RENDERER_SET_PROPERTY(BLEND_FACTOR_DEST_ALPHA, kBlendFactors[static_cast<BlendFactor::Type>(dstAlpha - 1)]);
     }
   }
 
-  if (auto bufferMode = (rendererState & BUFFER_MODE_MASK) >> BUFFER_MODE_SHIFT)
+  if(auto bufferMode = (rendererState & BUFFER_MODE_MASK) >> BUFFER_MODE_SHIFT)
   {
     RENDERER_SET_PROPERTY(RENDER_MODE, static_cast<RenderMode::Type>(bufferMode - 1));
   }
 }
 
-} // RendererState
+} // namespace RendererState
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

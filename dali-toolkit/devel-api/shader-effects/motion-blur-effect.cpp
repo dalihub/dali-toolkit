@@ -22,15 +22,14 @@
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-
-void SetMotionBlurProperties( Actor& actor, unsigned int numBlurSamples )
+void SetMotionBlurProperties(Actor& actor, unsigned int numBlurSamples)
 {
   actor.RegisterProperty("uBlurTexCoordScale", 0.125f);
   actor.RegisterProperty("uGeometryStretchFactor", 0.05f);
@@ -47,7 +46,6 @@ void SetMotionBlurProperties( Actor& actor, unsigned int numBlurSamples )
   constraint.AddSource(Source(actor, Actor::Property::WORLD_MATRIX));
   constraint.Apply();
 }
-
 
 Property::Map CreateMotionBlurEffect()
 {
@@ -66,5 +64,5 @@ Property::Map CreateMotionBlurEffect()
   return map;
 }
 
-} // Toolkit
-} // Dali
+} // namespace Toolkit
+} // namespace Dali

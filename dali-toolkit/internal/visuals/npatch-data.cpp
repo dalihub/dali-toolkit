@@ -1,5 +1,5 @@
- /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+/*
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 NPatchData::NPatchData()
 : mId(INVALID_NPATCH_DATA_ID),
   mUrl(),
@@ -50,9 +47,9 @@ NPatchData::NPatchData()
 NPatchData::~NPatchData()
 {
   // If there is an opacity map, it has to be destroyed using addon call
-  if( mRenderingMap )
+  if(mRenderingMap)
   {
-    RenderingAddOn::Get().DestroyNPatch( mRenderingMap );
+    RenderingAddOn::Get().DestroyNPatch(mRenderingMap);
   }
 }
 
@@ -68,16 +65,16 @@ NPatchData::NPatchDataId NPatchData::GetId() const
 
 void NPatchData::AddObserver(TextureUploadObserver* textureObserver)
 {
-  mObserverList.PushBack( textureObserver );
+  mObserverList.PushBack(textureObserver);
 }
 
 void NPatchData::RemoveObserver(TextureUploadObserver* textureObserver)
 {
-  for(uint32_t index = 0; index < mObserverList.Count(); ++index )
+  for(uint32_t index = 0; index < mObserverList.Count(); ++index)
   {
     if(textureObserver == mObserverList[index])
     {
-      mObserverList.Erase( mObserverList.begin() + index );
+      mObserverList.Erase(mObserverList.begin() + index);
       break;
     }
   }
@@ -193,45 +190,45 @@ void* NPatchData::GetRenderingMap() const
   return mRenderingMap;
 }
 
-void NPatchData::SetLoadedNPatchData( Devel::PixelBuffer& pixelBuffer, bool preMultiplied )
+void NPatchData::SetLoadedNPatchData(Devel::PixelBuffer& pixelBuffer, bool preMultiplied)
 {
-  if( mBorder == Rect< int >( 0, 0, 0, 0 ) )
+  if(mBorder == Rect<int>(0, 0, 0, 0))
   {
-    NPatchUtility::ParseBorders( pixelBuffer, mStretchPixelsX, mStretchPixelsY );
+    NPatchUtility::ParseBorders(pixelBuffer, mStretchPixelsX, mStretchPixelsY);
 
     // Crop the image
-    pixelBuffer.Crop( 1, 1, pixelBuffer.GetWidth() - 2, pixelBuffer.GetHeight() - 2 );
+    pixelBuffer.Crop(1, 1, pixelBuffer.GetWidth() - 2, pixelBuffer.GetHeight() - 2);
   }
   else
   {
-    mStretchPixelsX.PushBack( Uint16Pair( mBorder.left, ( (pixelBuffer.GetWidth() >= static_cast< unsigned int >( mBorder.right )) ? pixelBuffer.GetWidth() - mBorder.right : 0 ) ) );
-    mStretchPixelsY.PushBack( Uint16Pair( mBorder.top, ( (pixelBuffer.GetHeight() >= static_cast< unsigned int >( mBorder.bottom )) ? pixelBuffer.GetHeight() - mBorder.bottom : 0 ) ) );
+    mStretchPixelsX.PushBack(Uint16Pair(mBorder.left, ((pixelBuffer.GetWidth() >= static_cast<unsigned int>(mBorder.right)) ? pixelBuffer.GetWidth() - mBorder.right : 0)));
+    mStretchPixelsY.PushBack(Uint16Pair(mBorder.top, ((pixelBuffer.GetHeight() >= static_cast<unsigned int>(mBorder.bottom)) ? pixelBuffer.GetHeight() - mBorder.bottom : 0)));
   }
 
-  mCroppedWidth = pixelBuffer.GetWidth();
+  mCroppedWidth  = pixelBuffer.GetWidth();
   mCroppedHeight = pixelBuffer.GetHeight();
 
   // Create opacity map
   mRenderingMap = RenderingAddOn::Get().IsValid() ? RenderingAddOn::Get().BuildNPatch(pixelBuffer, this) : nullptr;
 
-  PixelData pixels = Devel::PixelBuffer::Convert( pixelBuffer ); // takes ownership of buffer
+  PixelData pixels = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
 
-  Texture texture = Texture::New( TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight() );
-  texture.Upload( pixels );
+  Texture texture = Texture::New(TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight());
+  texture.Upload(pixels);
 
   mTextureSet = TextureSet::New();
-  mTextureSet.SetTexture( 0u, texture );
+  mTextureSet.SetTexture(0u, texture);
 
   mPreMultiplyOnLoad = preMultiplied;
 
   mLoadingState = LoadingState::LOAD_COMPLETE;
 }
 
-void NPatchData::LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied )
+void NPatchData::LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied)
 {
   if(loadSuccess)
   {
-    SetLoadedNPatchData( pixelBuffer, preMultiplied );
+    SetLoadedNPatchData(pixelBuffer, preMultiplied);
   }
   else
   {

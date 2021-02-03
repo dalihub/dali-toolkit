@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,60 +26,57 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 namespace
 {
-DALI_ENUM_TO_STRING_TABLE_BEGIN( HORIZONTAL_ALIGNMENT_TYPE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Text::HorizontalAlignment, BEGIN )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Text::HorizontalAlignment, CENTER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Text::HorizontalAlignment, END )
-DALI_ENUM_TO_STRING_TABLE_END( HORIZONTAL_ALIGNMENT_TYPE )
+DALI_ENUM_TO_STRING_TABLE_BEGIN(HORIZONTAL_ALIGNMENT_TYPE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::HorizontalAlignment, BEGIN)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::HorizontalAlignment, CENTER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::HorizontalAlignment, END)
+DALI_ENUM_TO_STRING_TABLE_END(HORIZONTAL_ALIGNMENT_TYPE)
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( VERTICAL_ALIGNMENT_TYPE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Text::VerticalAlignment, TOP )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Text::VerticalAlignment, CENTER )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Text::VerticalAlignment, BOTTOM )
-DALI_ENUM_TO_STRING_TABLE_END( VERTICAL_ALIGNMENT_TYPE )
+DALI_ENUM_TO_STRING_TABLE_BEGIN(VERTICAL_ALIGNMENT_TYPE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::VerticalAlignment, TOP)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::VerticalAlignment, CENTER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::VerticalAlignment, BOTTOM)
+DALI_ENUM_TO_STRING_TABLE_END(VERTICAL_ALIGNMENT_TYPE)
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( LINE_WRAP_MODE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Text::LineWrap, WORD )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Text::LineWrap, CHARACTER )
-DALI_ENUM_TO_STRING_TABLE_END( LINE_WRAP_MODE )
+DALI_ENUM_TO_STRING_TABLE_BEGIN(LINE_WRAP_MODE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::LineWrap, WORD)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::LineWrap, CHARACTER)
+DALI_ENUM_TO_STRING_TABLE_END(LINE_WRAP_MODE)
 } // namespace
 
-bool GetHorizontalAlignmentEnumeration( const Property::Value& propertyValue, Toolkit::Text::HorizontalAlignment::Type& alignment )
+bool GetHorizontalAlignmentEnumeration(const Property::Value& propertyValue, Toolkit::Text::HorizontalAlignment::Type& alignment)
 {
-  return Scripting::GetEnumerationProperty( propertyValue, HORIZONTAL_ALIGNMENT_TYPE_TABLE, HORIZONTAL_ALIGNMENT_TYPE_TABLE_COUNT, alignment );
+  return Scripting::GetEnumerationProperty(propertyValue, HORIZONTAL_ALIGNMENT_TYPE_TABLE, HORIZONTAL_ALIGNMENT_TYPE_TABLE_COUNT, alignment);
 }
 
-bool GetVerticalAlignmentEnumeration( const Property::Value& propertyValue, Toolkit::Text::VerticalAlignment::Type& alignment )
+bool GetVerticalAlignmentEnumeration(const Property::Value& propertyValue, Toolkit::Text::VerticalAlignment::Type& alignment)
 {
-  return Scripting::GetEnumerationProperty( propertyValue, VERTICAL_ALIGNMENT_TYPE_TABLE, VERTICAL_ALIGNMENT_TYPE_TABLE_COUNT, alignment );
+  return Scripting::GetEnumerationProperty(propertyValue, VERTICAL_ALIGNMENT_TYPE_TABLE, VERTICAL_ALIGNMENT_TYPE_TABLE_COUNT, alignment);
 }
 
-bool GetLineWrapModeEnumeration( const Property::Value& propertyValue, Toolkit::Text::LineWrap::Mode& lineWrapMode )
+bool GetLineWrapModeEnumeration(const Property::Value& propertyValue, Toolkit::Text::LineWrap::Mode& lineWrapMode)
 {
-  return Scripting::GetEnumerationProperty( propertyValue, LINE_WRAP_MODE_TABLE, LINE_WRAP_MODE_TABLE_COUNT, lineWrapMode );
+  return Scripting::GetEnumerationProperty(propertyValue, LINE_WRAP_MODE_TABLE, LINE_WRAP_MODE_TABLE_COUNT, lineWrapMode);
 }
 
-const char* GetHorizontalAlignmentString( const Toolkit::Text::HorizontalAlignment::Type& alignment )
+const char* GetHorizontalAlignmentString(const Toolkit::Text::HorizontalAlignment::Type& alignment)
 {
-  return Scripting::GetLinearEnumerationName< Toolkit::Text::HorizontalAlignment::Type >( alignment,
-                                                                                          HORIZONTAL_ALIGNMENT_TYPE_TABLE,
-                                                                                          HORIZONTAL_ALIGNMENT_TYPE_TABLE_COUNT );
+  return Scripting::GetLinearEnumerationName<Toolkit::Text::HorizontalAlignment::Type>(alignment,
+                                                                                       HORIZONTAL_ALIGNMENT_TYPE_TABLE,
+                                                                                       HORIZONTAL_ALIGNMENT_TYPE_TABLE_COUNT);
 }
 
-const char* GetVerticalAlignmentString( const Toolkit::Text::VerticalAlignment::Type& alignment )
+const char* GetVerticalAlignmentString(const Toolkit::Text::VerticalAlignment::Type& alignment)
 {
-  return Scripting::GetLinearEnumerationName< Toolkit::Text::VerticalAlignment::Type >( alignment,
-                                                                                        VERTICAL_ALIGNMENT_TYPE_TABLE,
-                                                                                        VERTICAL_ALIGNMENT_TYPE_TABLE_COUNT );
+  return Scripting::GetLinearEnumerationName<Toolkit::Text::VerticalAlignment::Type>(alignment,
+                                                                                     VERTICAL_ALIGNMENT_TYPE_TABLE,
+                                                                                     VERTICAL_ALIGNMENT_TYPE_TABLE_COUNT);
 }
 
 } // namespace Text
