@@ -110,6 +110,10 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/test-gesture-generator.cpp
   dali-toolkit-test-utils/test-gl-abstraction.cpp
   dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
+  dali-toolkit-test-utils/test-graphics-command-buffer.cpp
+  dali-toolkit-test-utils/test-graphics-controller.cpp
+  dali-toolkit-test-utils/test-graphics-texture.cpp
+  dali-toolkit-test-utils/test-graphics-sampler.cpp
   dali-toolkit-test-utils/test-platform-abstraction.cpp
   dali-toolkit-test-utils/test-render-controller.cpp
   dali-toolkit-test-utils/test-trace-call-stack.cpp

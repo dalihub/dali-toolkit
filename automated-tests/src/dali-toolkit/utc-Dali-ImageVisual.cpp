@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -620,10 +620,10 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
 
   // WITH atlasing, the wrapping is handled manually in shader, so the following gl function should not be called
   std::stringstream out;
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
   DALI_TEST_CHECK( !texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
   out.str("");
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_REPEAT;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_REPEAT;
   DALI_TEST_CHECK( !texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
 
   // test the uniforms which used to handle the wrap mode
@@ -678,8 +678,10 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
+  textureTrace.EnableLogging(true);
   TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
   texParameterTrace.Enable( true );
+  texParameterTrace.EnableLogging( true );
 
   DummyControl actor = DummyControl::New();
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -691,6 +693,7 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
   // loading started
   application.SendNotification();
   application.Render();
+  application.SendNotification();
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
@@ -698,10 +701,10 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
 
   // WITHOUT atlasing, the wrapping is handled by setting gl texture parameters
   std::stringstream out;
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_S << ", " << GL_MIRRORED_REPEAT;
   DALI_TEST_CHECK( texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
   out.str("");
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_REPEAT;
+  out << std::hex << GL_TEXTURE_2D << ", " << GL_TEXTURE_WRAP_T << ", " << GL_REPEAT;
   DALI_TEST_CHECK( texParameterTrace.FindMethodAndParams("TexParameteri", out.str()) );
 
   // test the uniforms which used to handle the wrap mode
