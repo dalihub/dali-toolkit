@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ATLAS_MESH_FACTORY_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,15 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace AtlasMeshFactory
 {
-  typedef uint32_t SizeType;
+typedef uint32_t SizeType;
 
-  /**
+/**
    * @brief Create a Quad that describes an area in an atlas and a position.
    *
    * @param[in]  width Width of area in pixels.
@@ -43,21 +40,21 @@ namespace AtlasMeshFactory
    * @param[in]  position Position to place area in space.
    * @param[out] mesh Mesh object to hold created quad.
    */
-  void CreateQuad( SizeType width,
-                   SizeType height,
-                   SizeType block,
-                   const Toolkit::AtlasManager::AtlasSize& atlasSize,
-                   const Vector2& position,
-                   Toolkit::AtlasManager::Mesh2D& mesh );
+void CreateQuad(SizeType                                width,
+                SizeType                                height,
+                SizeType                                block,
+                const Toolkit::AtlasManager::AtlasSize& atlasSize,
+                const Vector2&                          position,
+                Toolkit::AtlasManager::Mesh2D&          mesh);
 
-  /**
+/**
    * @brief Append one mesh to another.
    *
    * @param[in,out] first Mesh to append to.
    * @param[in]     second Mesh to append.
    */
-  void AppendMesh( Toolkit::AtlasManager::Mesh2D& first,
-                   const Toolkit::AtlasManager::Mesh2D& second );
+void AppendMesh(Toolkit::AtlasManager::Mesh2D&       first,
+                const Toolkit::AtlasManager::Mesh2D& second);
 
 } // namespace AtlasMeshFactory
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_MODEL3D_VIEW_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,14 @@
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/model3d-view/model3d-view.h>
-#include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class Model3dView;
 
 namespace Internal
@@ -45,7 +43,6 @@ namespace Internal
 class Model3dView : public Control
 {
 public:
-
   /**
    * @brief Create a new Model3dView.
    *
@@ -62,7 +59,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * @brief Called to retrieve a property of an object of this type.
@@ -71,12 +68,12 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
   /**
    * @copydoc Control::OnRelayout
    */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
    * @brief Called to load both geometry (.obj) and material (.mtl) files
@@ -85,7 +82,6 @@ public:
   void Load();
 
 protected:
-
   /**
    * @brief Construct a new Model3dView.
    */
@@ -97,7 +93,6 @@ protected:
   virtual ~Model3dView();
 
 private:
-
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
@@ -106,10 +101,9 @@ private:
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  void OnSceneConnection( int depth ) override;
+  void OnSceneConnection(int depth) override;
 
 private:
-
   /**
    * @brief Load geometry (.obj) from file
    */
@@ -145,27 +139,25 @@ private:
    */
   void UpdateShaderUniforms();
 
-
   /*
    * @brief Given a specific shader type, find out which properties are necessary for it.
    *
    * @param[in] illuminationType The type of shader we intend to use.
    * @return A bitmask of the properties we require to be loaded to use the given shader.
    */
-  int GetShaderProperties( Toolkit::Model3dView::IlluminationType illuminationType );
-
+  int GetShaderProperties(Toolkit::Model3dView::IlluminationType illuminationType);
 
   ObjLoader mObjLoader;
 
   //Properties
-  std::string mObjUrl;
-  std::string mTextureSetUrl;
-  std::string mImagesUrl;
-  std::string mTexture0Url;
-  std::string mTexture1Url;
-  std::string mTexture2Url;
-  Vector3 mLightPosition;
-  float mCameraFOV;
+  std::string                            mObjUrl;
+  std::string                            mTextureSetUrl;
+  std::string                            mImagesUrl;
+  std::string                            mTexture0Url;
+  std::string                            mTexture1Url;
+  std::string                            mTexture2Url;
+  Vector3                                mLightPosition;
+  float                                  mCameraFOV;
   Toolkit::Model3dView::IlluminationType mIlluminationType;
 
   //Size
@@ -174,23 +166,23 @@ private:
   Vector3 mSceneSize;
 
   //Render members
-  Shader mShader;
+  Shader     mShader;
   TextureSet mTextureSet;
-  Geometry mMesh;
-  Renderer mRenderer;
+  Geometry   mMesh;
+  Renderer   mRenderer;
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Toolkit::Internal::Model3dView& GetImpl( Toolkit::Model3dView& obj )
+inline Toolkit::Internal::Model3dView& GetImpl(Toolkit::Model3dView& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
   Dali::RefObject& handle = obj.GetImplementation();
   return static_cast<Toolkit::Internal::Model3dView&>(handle);
 }
 
-inline const Toolkit::Internal::Model3dView& GetImpl( const Toolkit::Model3dView& obj )
+inline const Toolkit::Internal::Model3dView& GetImpl(const Toolkit::Model3dView& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
   const Dali::RefObject& handle = obj.GetImplementation();

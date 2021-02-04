@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MULTI_LANGUAGE_SUPPORT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,25 +23,21 @@
 #include <dali/public-api/object/base-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
+#include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 namespace Internal DALI_INTERNAL
 {
-
 class MultilanguageSupport;
 
-} // Internal
+} // namespace DALI_INTERNAL
 
 /**
  * @brief Sets the character's scripts to the model and validates the fonts set by the user or assigns default ones.
@@ -49,7 +45,6 @@ class MultilanguageSupport;
 class MultilanguageSupport : public BaseHandle
 {
 public:
-
   /**
    * @brief Create an uninitialized MultilanguageSupport handle.
    */
@@ -67,7 +62,7 @@ public:
    *
    * @param[in] implementation A pointer to the internal multi-language support object.
    */
-  explicit DALI_INTERNAL MultilanguageSupport( Internal::MultilanguageSupport* implementation );
+  explicit DALI_INTERNAL MultilanguageSupport(Internal::MultilanguageSupport* implementation);
 
   /**
    * @brief Retrieve a handle to the MultilanguageSupport instance.
@@ -94,10 +89,10 @@ public:
    * @param[in] numberOfCharacters The number of characters to set the script.
    * @param[out] scripts Vector containing the script runs for the whole text.
    */
-  void SetScripts( const Vector<Character>& text,
-                   CharacterIndex startIndex,
-                   Length numberOfCharacters,
-                   Vector<ScriptRun>& scripts );
+  void SetScripts(const Vector<Character>& text,
+                  CharacterIndex           startIndex,
+                  Length                   numberOfCharacters,
+                  Vector<ScriptRun>&       scripts);
 
   /**
    * @brief Validates the character's font of the whole text.
@@ -119,14 +114,14 @@ public:
    * @param[in] numberOfCharacters The number of characters to set the font.
    * @param[out] fonts The validated fonts.
    */
-  void ValidateFonts( const Vector<Character>& text,
-                      const Vector<ScriptRun>& scripts,
-                      const Vector<FontDescriptionRun>& fontDescriptions,
-                      const TextAbstraction::FontDescription& defaultFontDescription,
-                      TextAbstraction::PointSize26Dot6 defaultFontPointSize,
-                      CharacterIndex startIndex,
-                      Length numberOfCharacters,
-                      Vector<FontRun>& fonts );
+  void ValidateFonts(const Vector<Character>&                text,
+                     const Vector<ScriptRun>&                scripts,
+                     const Vector<FontDescriptionRun>&       fontDescriptions,
+                     const TextAbstraction::FontDescription& defaultFontDescription,
+                     TextAbstraction::PointSize26Dot6        defaultFontPointSize,
+                     CharacterIndex                          startIndex,
+                     Length                                  numberOfCharacters,
+                     Vector<FontRun>&                        fonts);
 };
 
 } // namespace Text

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_PROPERTY_HELPER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,15 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/public-api/object/property.h>
+#include <string>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * @brief Parses a Property::Value to retrieve the string.
  *
@@ -40,13 +37,12 @@ namespace Internal
  *
  * @return True if a string was extracted successfully.
  */
-bool GetStringFromProperty( const Property::Value& value, std::string& output );
+bool GetStringFromProperty(const Property::Value& value, std::string& output);
 
 } // namespace Internal
 
 } // namespace Toolkit
 
 } // namespace Dali
-
 
 #endif // DALI_TOOLKIT_INTERNAL_PROPERTY_HELPER_H

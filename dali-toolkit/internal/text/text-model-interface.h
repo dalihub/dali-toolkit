@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MODEL_INTERFACE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,18 @@
 #include <dali/public-api/math/vector2.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/text-enumerations.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
-#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Interface class used to retrieve the text's model from the text-controller.
  */
@@ -47,7 +44,8 @@ public:
    * @brief Virtual destructor.
    */
   virtual ~ModelInterface()
-  {}
+  {
+  }
 
   /**
    * @brief Retrives the control's size.
@@ -238,7 +236,7 @@ public:
    * @param[in] index Index of the first underline run to be copied.
    * @param[in] numberOfRuns Number of underline runs to be copied.
    */
-  virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const = 0;
+  virtual void GetUnderlineRuns(GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const = 0;
 
   /**
    * @brief Retrieve the outline color.
@@ -267,7 +265,6 @@ public:
    * @return The background state.
    */
   virtual bool IsBackgroundEnabled() const = 0;
-
 };
 
 } // namespace Text

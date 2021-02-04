@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_EVENT_HANDLER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * Contains all the event handling methods for Text::Controller::Impl
  */
@@ -89,7 +86,7 @@ struct ControllerImplEventHandler
    * @param controllerImpl A reference to Controller::Impl
    * @param event The event
    */
-  static void OnSelectEvent(Controller::Impl& controllerImpl, const Event& event );
+  static void OnSelectEvent(Controller::Impl& controllerImpl, const Event& event);
 
   /**
    * @brief Called by Controller::Impl when a select all event is received.
@@ -108,7 +105,6 @@ struct ControllerImplEventHandler
   static void OnSelectNoneEvent(Controller::Impl& controllerImpl);
 
 private:
-
   /**
    * @brief Called by OnHandleEvent when we are in the Pressed state.
    *

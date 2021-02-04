@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_IMPL_DEBUG_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
  * limitations under the License.
  */
 
-#include <dali/integration-api/debug.h>
 #include <dali-toolkit/devel-api/builder/json-parser.h>
+#include <dali/integration-api/debug.h>
 
-#if defined( DEBUG_ENABLED )
+#if defined(DEBUG_ENABLED)
 
 namespace Dali
 {
@@ -28,36 +28,33 @@ namespace Toolkit
 {
 namespace Internal
 {
-
-#define DUMP_PARSE_TREE(parser)  LogTree(parser)
-#define DUMP_TEST_MAPPINGS(parser)                                      \
-  OptionalChild mappings = IsChild( parser.GetRoot(), KEYNAME_MAPPINGS ); \
-  if( mappings )                                                        \
-  {                                                                     \
-    std::ostringstream oss;                                             \
-    oss << "Mappings: {" << std::endl;                                  \
-    for( TreeNode::ConstIterator iter = (*mappings).CBegin(); iter != (*mappings).CEnd(); ++iter ) \
-    {                                                                   \
-      Property::Value value;                                            \
-      bool converted = GetPropertyMap(*mappings, (*iter).first, Property::NONE, value ); \
-      if( converted )                                                   \
-      {                                                                 \
-        oss << "  " << (*iter).first << ":" << value << std::endl;      \
-      }                                                                 \
-    }                                                                   \
-    oss << "}" << std::endl;                                            \
-    DALI_LOG_INFO( gFilterScript, Debug::Verbose, oss.str().c_str() );  \
+#define DUMP_PARSE_TREE(parser) LogTree(parser)
+#define DUMP_TEST_MAPPINGS(parser)                                                                 \
+  OptionalChild mappings = IsChild(parser.GetRoot(), KEYNAME_MAPPINGS);                            \
+  if(mappings)                                                                                     \
+  {                                                                                                \
+    std::ostringstream oss;                                                                        \
+    oss << "Mappings: {" << std::endl;                                                             \
+    for(TreeNode::ConstIterator iter = (*mappings).CBegin(); iter != (*mappings).CEnd(); ++iter)   \
+    {                                                                                              \
+      Property::Value value;                                                                       \
+      bool            converted = GetPropertyMap(*mappings, (*iter).first, Property::NONE, value); \
+      if(converted)                                                                                \
+      {                                                                                            \
+        oss << "  " << (*iter).first << ":" << value << std::endl;                                 \
+      }                                                                                            \
+    }                                                                                              \
+    oss << "}" << std::endl;                                                                       \
+    DALI_LOG_INFO(gFilterScript, Debug::Verbose, oss.str().c_str());                               \
   }
 
+void LogTree(const Toolkit::JsonParser& mParser);
 
-void LogTree( const Toolkit::JsonParser& mParser );
+std::string PropertyValueToString(const Property::Value& value);
 
-std::string PropertyValueToString( const Property::Value& value );
-
-
-} // Internal
-} // Toolkit
-} // Dali
+} // namespace Internal
+} // namespace Toolkit
+} // namespace Dali
 
 #else
 

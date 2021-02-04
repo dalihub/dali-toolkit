@@ -35,7 +35,7 @@ namespace Toolkit
  * @param[in] actor The actor that registers the uniform properties
  * @param[in] numBlurSamples Number of samples used by the shader
  */
-DALI_TOOLKIT_API void SetMotionBlurProperties( Actor& actor, unsigned int numBlurSamples = 8 );
+DALI_TOOLKIT_API void SetMotionBlurProperties(Actor& actor, unsigned int numBlurSamples = 8);
 
 /**
  * @brief Create a new MotionBlurEffect

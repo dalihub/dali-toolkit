@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_MATRIX_STACK_H_
 #define DALI_SCENE_LOADER_MATRIX_STACK_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,13 @@
 #include "dali-scene-loader/public-api/api.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/math/matrix.h"
 #include "dali/public-api/common/vector-wrapper.h"
+#include "dali/public-api/math/matrix.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /**
  * @brief A stack of matrices whereby each newly pushed matrix is stored
  *  after being multiplied by the previous one (if any).
@@ -39,17 +38,17 @@ class DALI_SCENE_LOADER_API MatrixStack
 public:
   MatrixStack();
 
-  bool IsEmpty() const;
-  void Push(const Matrix& model);
+  bool          IsEmpty() const;
+  void          Push(const Matrix& model);
   const Matrix& Top() const;
-  void Pop();
-  void PopAll();  // clears the stack, but retains the storage.
+  void          Pop();
+  void          PopAll(); // clears the stack, but retains the storage.
 
 private:
   std::vector<Matrix> mStack;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_MATRIX_STACK_H_

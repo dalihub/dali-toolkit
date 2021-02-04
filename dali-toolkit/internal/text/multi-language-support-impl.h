@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MULTI_LANGUAGE_SUPPORT_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,22 +26,18 @@
 
 namespace Dali
 {
-
 namespace TextAbstraction
 {
 //Forward declaration
 class FontClient;
-}
+} // namespace TextAbstraction
 
 namespace Toolkit
 {
-
 namespace Text
 {
-
 namespace Internal
 {
-
 /**
  * @brief Stores valid font ids per script.
  */
@@ -52,13 +48,15 @@ struct ValidateFontsPerScript
    */
   ValidateFontsPerScript()
   : mValidFonts()
-  {}
+  {
+  }
 
   /**
    * Default destructor.
    */
   ~ValidateFontsPerScript()
-  {}
+  {
+  }
 
   /**
    * @brief Whether the given @p fontId is in the vector of valid fonts.
@@ -67,7 +65,7 @@ struct ValidateFontsPerScript
    *
    * @return @e true if the font is in the vector of valid fonts.
    */
-  bool IsValidFont( FontId fontId ) const;
+  bool IsValidFont(FontId fontId) const;
 
   Vector<FontId> mValidFonts;
 };
@@ -80,7 +78,7 @@ struct DefaultFonts
   struct CacheItem
   {
     TextAbstraction::FontDescription description;
-    FontId fontId;
+    FontId                           fontId;
   };
 
   /**
@@ -88,13 +86,15 @@ struct DefaultFonts
    */
   DefaultFonts()
   : mFonts()
-  {}
+  {
+  }
 
   /**
    * Default destructor.
    */
   ~DefaultFonts()
-  {}
+  {
+  }
 
   /**
    * @brief Finds a default font for the given @p size.
@@ -105,11 +105,11 @@ struct DefaultFonts
    *
    * @return The font id of a default font for the given @p size. If there isn't any font cached it returns 0.
    */
-  FontId FindFont( TextAbstraction::FontClient& fontClient,
-                   const TextAbstraction::FontDescription& description,
-                   PointSize26Dot6 size ) const;
+  FontId FindFont(TextAbstraction::FontClient&            fontClient,
+                  const TextAbstraction::FontDescription& description,
+                  PointSize26Dot6                         size) const;
 
-  void Cache( const TextAbstraction::FontDescription& description, FontId fontId );
+  void Cache(const TextAbstraction::FontDescription& description, FontId fontId);
 
   std::vector<CacheItem> mFonts;
 };
@@ -120,7 +120,6 @@ struct DefaultFonts
 class MultilanguageSupport : public BaseObject
 {
 public:
-
   /**
    * Constructor
    */
@@ -141,22 +140,22 @@ public:
   /**
    * @copydoc Dali::MultilanguageSupport::SetScripts()
    */
-  void SetScripts( const Vector<Character>& text,
-                   CharacterIndex startIndex,
-                   Length numberOfCharacters,
-                   Vector<ScriptRun>& scripts );
+  void SetScripts(const Vector<Character>& text,
+                  CharacterIndex           startIndex,
+                  Length                   numberOfCharacters,
+                  Vector<ScriptRun>&       scripts);
 
   /**
    * @copydoc Dali::MultilanguageSupport::ValidateFonts()
    */
-  void ValidateFonts( const Vector<Character>& text,
-                      const Vector<ScriptRun>& scripts,
-                      const Vector<FontDescriptionRun>& fontDescriptions,
-                      const TextAbstraction::FontDescription& defaultFontDescription,
-                      TextAbstraction::PointSize26Dot6 defaultFontPointSize,
-                      CharacterIndex startIndex,
-                      Length numberOfCharacters,
-                      Vector<FontRun>& fonts );
+  void ValidateFonts(const Vector<Character>&                text,
+                     const Vector<ScriptRun>&                scripts,
+                     const Vector<FontDescriptionRun>&       fontDescriptions,
+                     const TextAbstraction::FontDescription& defaultFontDescription,
+                     TextAbstraction::PointSize26Dot6        defaultFontPointSize,
+                     CharacterIndex                          startIndex,
+                     Length                                  numberOfCharacters,
+                     Vector<FontRun>&                        fonts);
 
 private:
   Vector<DefaultFonts*>           mDefaultFontPerScriptCache; ///< Caches default fonts for a script.
@@ -165,18 +164,18 @@ private:
 
 } // namespace Internal
 
-inline static Internal::MultilanguageSupport& GetImplementation( MultilanguageSupport& multilanguageSupport )
+inline static Internal::MultilanguageSupport& GetImplementation(MultilanguageSupport& multilanguageSupport)
 {
-  DALI_ASSERT_ALWAYS( multilanguageSupport && "multi-language handle is empty" );
+  DALI_ASSERT_ALWAYS(multilanguageSupport && "multi-language handle is empty");
   BaseObject& handle = multilanguageSupport.GetBaseObject();
-  return static_cast<Internal::MultilanguageSupport&>( handle );
+  return static_cast<Internal::MultilanguageSupport&>(handle);
 }
 
-inline static const Internal::MultilanguageSupport& GetImplementation( const MultilanguageSupport& multilanguageSupport )
+inline static const Internal::MultilanguageSupport& GetImplementation(const MultilanguageSupport& multilanguageSupport)
 {
-  DALI_ASSERT_ALWAYS( multilanguageSupport && "multi-language handle is empty" );
+  DALI_ASSERT_ALWAYS(multilanguageSupport && "multi-language handle is empty");
   const BaseObject& handle = multilanguageSupport.GetBaseObject();
-  return static_cast<const Internal::MultilanguageSupport&>( handle );
+  return static_cast<const Internal::MultilanguageSupport&>(handle);
 }
 
 } // namespace Text

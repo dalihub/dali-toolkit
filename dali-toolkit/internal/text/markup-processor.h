@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,26 +29,24 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Keeps the plain text and references to vectors from the model which stores runs with text styles.
  */
 struct MarkupProcessData
 {
-MarkupProcessData( Vector<ColorRun>& colorRuns,
-                   Vector<FontDescriptionRun>& fontRuns,
-                   Vector<EmbeddedItem>& items )
-  : colorRuns( colorRuns ),
-    fontRuns( fontRuns ),
+  MarkupProcessData(Vector<ColorRun>&           colorRuns,
+                    Vector<FontDescriptionRun>& fontRuns,
+                    Vector<EmbeddedItem>&       items)
+  : colorRuns(colorRuns),
+    fontRuns(fontRuns),
     items(items),
     markupProcessedText()
-  {}
+  {
+  }
 
   Vector<ColorRun>&           colorRuns;           ///< The color runs.
   Vector<FontDescriptionRun>& fontRuns;            ///< The font description runs.
@@ -62,7 +60,7 @@ MarkupProcessData( Vector<ColorRun>& colorRuns,
  * @param[in] markupString The mark-up string.
  * @param[out] markupProcessData The plain text and the style.
  */
-void ProcessMarkupString( const std::string& markupString, MarkupProcessData& markupProcessData );
+void ProcessMarkupString(const std::string& markupString, MarkupProcessData& markupProcessData);
 
 } // namespace Text
 

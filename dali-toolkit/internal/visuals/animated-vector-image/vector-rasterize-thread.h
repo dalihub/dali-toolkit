@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_IMAGE_RASTERIZE_THREAD_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,31 +18,27 @@
  */
 
 // EXTERNAL INCLUDES
-#include <vector>
-#include <memory>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
+#include <memory>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-task.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * The worker thread for vector image rasterization.
  */
 class VectorRasterizeThread : public Thread
 {
 public:
-
   /**
    * @brief Constructor.
    */
@@ -57,17 +53,16 @@ public:
    * The callback is called from the rasterize thread after the rasterization is completed.
    * @param[in] callBack  The function to call.
    */
-  void SetCompletedCallback( CallbackBase* callback );
+  void SetCompletedCallback(CallbackBase* callback);
 
   /**
    * Add a task to rasterize.
    *
    * @param[in] task The task to rasterize
    */
-  void AddTask( VectorAnimationTaskPtr task );
+  void AddTask(VectorAnimationTaskPtr task);
 
 protected:
-
   /**
    * @brief The entry function of the worker thread.
    *        It rasterizes the vector image.
@@ -75,29 +70,25 @@ protected:
   void Run() override;
 
 private:
-
   /**
    * Rasterizes the tasks.
    */
   void Rasterize();
 
 private:
+  // Undefined
+  VectorRasterizeThread(const VectorRasterizeThread& thread) = delete;
 
   // Undefined
-  VectorRasterizeThread( const VectorRasterizeThread& thread ) = delete;
-
-  // Undefined
-  VectorRasterizeThread& operator=( const VectorRasterizeThread& thread ) = delete;
+  VectorRasterizeThread& operator=(const VectorRasterizeThread& thread) = delete;
 
 private:
-
-  std::vector< VectorAnimationTaskPtr > mRasterizeTasks;
-  ConditionalWait                       mConditionalWait;
-  std::unique_ptr< CallbackBase >       mCompletedCallback;
-  bool                                  mDestroyThread;  ///< Whether the thread be destroyed
-  bool                                  mIsThreadStarted;
-  const Dali::LogFactoryInterface&      mLogFactory; ///< The log factory
-
+  std::vector<VectorAnimationTaskPtr> mRasterizeTasks;
+  ConditionalWait                     mConditionalWait;
+  std::unique_ptr<CallbackBase>       mCompletedCallback;
+  bool                                mDestroyThread; ///< Whether the thread be destroyed
+  bool                                mIsThreadStarted;
+  const Dali::LogFactoryInterface&    mLogFactory; ///< The log factory
 };
 
 } // namespace Internal

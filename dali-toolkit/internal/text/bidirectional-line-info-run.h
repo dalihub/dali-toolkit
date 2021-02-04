@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_BIDIRECTIONAL_LINE_INFO_RUN_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief BidirectionalLineInfoRun
  */
@@ -37,8 +34,8 @@ struct BidirectionalLineInfoRun
 {
   CharacterRun       characterRun;       ///< The initial character index within the whole text and the number of characters of the run.
   CharacterIndex*    visualToLogicalMap; ///< Pointer to the visual to logical map table.
-  CharacterDirection direction:1;        ///< Direction of the first character of the paragraph.
-  bool               isIdentity:1;       ///< Whether the map is the identity.
+  CharacterDirection direction : 1;      ///< Direction of the first character of the paragraph.
+  bool               isIdentity : 1;     ///< Whether the map is the identity.
 };
 
 } // namespace Text

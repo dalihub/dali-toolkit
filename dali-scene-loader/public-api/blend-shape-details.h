@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_BLEND_SHAPE_DETAILS_H
 #define DALI_SCENE_LOADER_BLEND_SHAPE_DETAILS_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,14 @@
 #include "dali-scene-loader/public-api/api.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/rendering/shader.h"
-#include "dali/public-api/actors/actor.h"
 #include <string>
+#include "dali/public-api/actors/actor.h"
+#include "dali/public-api/rendering/shader.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 struct MeshDefinition;
 struct MeshGeometry;
 
@@ -47,21 +46,21 @@ struct DALI_SCENE_LOADER_API BlendShapes
     enum
     {
       POSITIONS = 0x1,
-      NORMALS = 0x2,
-      TANGENTS = 0x4
+      NORMALS   = 0x2,
+      TANGENTS  = 0x4
     };
   };
 
   // shader properties - animatable (uniforms)
-  static const std::string NUMBER_OF_BLEND_SHAPES;  ///< Integer number of blend shapes loaded.
-  static const std::string UNNORMALIZE_FACTOR;  ///< Scalar(s) for position components of blend shapes; Version 1.0: float array (1 per blend shape); Version 2.0: single float.
-  static const std::string COMPONENT_SIZE;  ///< Integer offset from one component (positions / normals / tangents) of a blend shape to the next.
+  static const std::string NUMBER_OF_BLEND_SHAPES; ///< Integer number of blend shapes loaded.
+  static const std::string UNNORMALIZE_FACTOR;     ///< Scalar(s) for position components of blend shapes; Version 1.0: float array (1 per blend shape); Version 2.0: single float.
+  static const std::string COMPONENT_SIZE;         ///< Integer offset from one component (positions / normals / tangents) of a blend shape to the next.
 
   // shader properties - read-only (not available as uniforms)
-  static const std::string COMPONENTS;  ///< Integer bitmask of the blend shape components that the shader uses; refer to the Components enum.
+  static const std::string COMPONENTS; ///< Integer bitmask of the blend shape components that the shader uses; refer to the Components enum.
 
   // actor property (instance) - animatable (uniforms)
-  static const std::string WEIGHTS_UNIFORM;  ///< The weight of each blend shape in a float array
+  static const std::string WEIGHTS_UNIFORM; ///< The weight of each blend shape in a float array
 
   /**
    * @brief Registers properties based on the mesh definition (and geometry) and identified by the above string constants,
@@ -72,7 +71,7 @@ struct DALI_SCENE_LOADER_API BlendShapes
   BlendShapes() = delete;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif // DALI_SCENE_LOADER_BLEND_SHAPE_DETAILS_H

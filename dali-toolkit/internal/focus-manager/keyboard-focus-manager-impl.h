@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_KEYBOARD_FOCUS_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,57 +19,52 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
+#include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 class SceneHolder;
 
 } // namespace Integration
 
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * @copydoc Toolkit::KeyboardFocusManager
  */
 class KeyboardFocusManager : public Dali::BaseObject, public ConnectionTracker
 {
 public:
-
   typedef Toolkit::DevelKeyboardFocusManager::CustomAlgorithmInterface CustomAlgorithmInterface;
 
   enum FocusIndicatorState
   {
-    UNKNOWN = -1,   ///< Unknown state
-    HIDE = 0,          ///< FocusIndicator is hidden
-    SHOW = 1,          ///< FocusIndicator is shown
+    UNKNOWN = -1, ///< Unknown state
+    HIDE    = 0,  ///< FocusIndicator is hidden
+    SHOW    = 1,  ///< FocusIndicator is shown
   };
 
   enum EnableFocusedIndicatorState
   {
-    DISABLE = 0,          ///< FocusIndicator is disable
-    ENABLE = 1,          ///< FocusIndicator is enable
+    DISABLE = 0, ///< FocusIndicator is disable
+    ENABLE  = 1, ///< FocusIndicator is enable
   };
 
   enum FocusedIndicatorModeState
   {
-    NONE = 0,          ///< Set nothing
-    ALWAYS_SHOW = 1,          ///< FocusIndicator is always shown
+    NONE        = 0, ///< Set nothing
+    ALWAYS_SHOW = 1, ///< FocusIndicator is always shown
   };
 
   /**
@@ -158,7 +153,6 @@ public:
   bool IsFocusIndicatorEnabled() const;
 
 public:
-
   /**
    * @copydoc Toolkit::KeyboardFocusManager::PreFocusChangeSignal()
    */
@@ -188,19 +182,17 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 protected:
-
   /**
    * Destructor
    */
   virtual ~KeyboardFocusManager();
 
 private:
-
-  typedef std::vector< WeakHandle< Actor > > FocusStack; ///< Define Dali::Vector< Dali::BaseObject* > as FocusStack to contain focus history
-  typedef FocusStack::iterator FocusStackIterator; ///< Define FocusStack::Iterator as FocusStackIterator to navigate FocusStack
+  typedef std::vector<WeakHandle<Actor> > FocusStack;         ///< Define Dali::Vector< Dali::BaseObject* > as FocusStack to contain focus history
+  typedef FocusStack::iterator            FocusStackIterator; ///< Define FocusStack::Iterator as FocusStackIterator to navigate FocusStack
 
   /**
    * This will be called when the adaptor is initialized
@@ -211,7 +203,7 @@ private:
    * This will be called when a new scene holder is created
    * @param sceneHolder The new scene holder
    */
-  void OnSceneHolderCreated( Dali::Integration::SceneHolder& sceneHolder );
+  void OnSceneHolderCreated(Dali::Integration::SceneHolder& sceneHolder);
 
   /**
    * Get configuration from StyleManager.
@@ -256,7 +248,7 @@ private:
    * This function will emit FocusedActorEnterKeySignal.
    * @param actor The actor to notify
    */
-  void DoKeyboardEnter( Actor actor );
+  void DoKeyboardEnter(Actor actor);
 
   /**
    * Check whether the actor is a layout control that supports two dimensional keyboard navigation.
@@ -274,27 +266,27 @@ private:
    * @param actor The actor to be checked for its parent layout control
    * @return The parent layout control the given actor belongs to or an empty handle if the given actor doesn't belong to a layout control
    */
- Toolkit::Control GetParentLayoutControl(Actor actor) const;
+  Toolkit::Control GetParentLayoutControl(Actor actor) const;
 
   /**
    * Callback for the key event when no actor in the stage has gained the key input focus
    * @param[in] event The KeyEvent event.
    */
-  void OnKeyEvent( const KeyEvent& event );
+  void OnKeyEvent(const KeyEvent& event);
 
   /**
    * Callback for the touch event when the screen is touched and when the touch ends
    * (i.e. the down & up touch events only).
    * @param[in] touch The touch information
    */
-  void OnTouch( const TouchEvent& touch );
+  void OnTouch(const TouchEvent& touch);
 
   /**
    * Called when the window focus is changed.
    * @param[in] window The window whose focus is changed
    * @param[in] focusIn Whether the focus is in/out
    */
-  void OnWindowFocusChanged( Window window, bool focusIn );
+  void OnWindowFocusChanged(Window window, bool focusIn);
 
   /**
    * Get the focus Actor from current window
@@ -302,46 +294,44 @@ private:
   Actor GetFocusActorFromCurrentWindow();
 
 private:
-
   // Undefined
   KeyboardFocusManager(const KeyboardFocusManager&);
 
   KeyboardFocusManager& operator=(const KeyboardFocusManager& rhs);
 
 private:
-
-  Toolkit::KeyboardFocusManager::PreFocusChangeSignalType mPreFocusChangeSignal; ///< The signal to notify the focus will be changed
-  Toolkit::KeyboardFocusManager::FocusChangedSignalType mFocusChangedSignal; ///< The signal to notify the focus change
-  Toolkit::KeyboardFocusManager::FocusGroupChangedSignalType mFocusGroupChangedSignal; ///< The signal to notify the focus group change
+  Toolkit::KeyboardFocusManager::PreFocusChangeSignalType       mPreFocusChangeSignal;       ///< The signal to notify the focus will be changed
+  Toolkit::KeyboardFocusManager::FocusChangedSignalType         mFocusChangedSignal;         ///< The signal to notify the focus change
+  Toolkit::KeyboardFocusManager::FocusGroupChangedSignalType    mFocusGroupChangedSignal;    ///< The signal to notify the focus group change
   Toolkit::KeyboardFocusManager::FocusedActorEnterKeySignalType mFocusedActorEnterKeySignal; ///< The signal to notify that enter has been pressed on the focused actor
 
-  WeakHandle< Actor > mCurrentFocusActor; ///< A weak handle to the current focused actor
+  WeakHandle<Actor> mCurrentFocusActor; ///< A weak handle to the current focused actor
 
   Actor mFocusIndicatorActor; ///< The focus indicator actor shared by all the keyboard focusable actors for highlight
 
   FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
 
-  SlotDelegate< KeyboardFocusManager > mSlotDelegate;
+  SlotDelegate<KeyboardFocusManager> mSlotDelegate;
 
   CustomAlgorithmInterface* mCustomAlgorithmInterface; ///< The user's (application / toolkit) implementation of CustomAlgorithmInterface
 
-  typedef std::vector< std::pair< WeakHandle< Layer >, WeakHandle< Actor > > > FocusActorContainer;
+  typedef std::vector<std::pair<WeakHandle<Layer>, WeakHandle<Actor> > > FocusActorContainer;
 
   FocusActorContainer mCurrentFocusActors; ///< A container of focused actors
 
-  WeakHandle< Layer > mCurrentFocusedWindow; ///< A weak handle to the current focused window's root layer
+  WeakHandle<Layer> mCurrentFocusedWindow; ///< A weak handle to the current focused window's root layer
 
   FocusIndicatorState mIsFocusIndicatorShown; ///< Whether indicator should be shown / hidden when getting focus. It could be enabled when keyboard focus feature is enabled and navigation keys or 'Tab' key are pressed.
 
-  EnableFocusedIndicatorState mEnableFocusIndicator;  ///< Whether use focus indicator
+  EnableFocusedIndicatorState mEnableFocusIndicator; ///< Whether use focus indicator
 
   FocusedIndicatorModeState mAlwaysShowIndicator; ///< Whether always show indicator. If true, the indicator would be directly shown when focused
 
-  bool mFocusGroupLoopEnabled:1; ///< Whether the focus movement is looped within the same focus group
+  bool mFocusGroupLoopEnabled : 1; ///< Whether the focus movement is looped within the same focus group
 
-  bool mIsWaitingKeyboardFocusChangeCommit:1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
+  bool mIsWaitingKeyboardFocusChangeCommit : 1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
 
-  bool mClearFocusOnTouch:1; ///< Whether clear focus on touch.
+  bool mClearFocusOnTouch : 1; ///< Whether clear focus on touch.
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_BLOB_ATLAS_SHARE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief A singleton for sharing atlases containing vector data
  *
@@ -37,7 +34,6 @@ namespace Text
 class VectorBlobAtlasShare : public BaseHandle
 {
 public:
-
   /**
    * @brief Create a VectorBlobAtlasShare handle.
    *
@@ -75,11 +71,9 @@ public:
   VectorBlobAtlas* GetNewAtlas();
 
 private:
-
   class Impl;
 
-  explicit DALI_INTERNAL VectorBlobAtlasShare( VectorBlobAtlasShare::Impl* impl );
-
+  explicit DALI_INTERNAL VectorBlobAtlasShare(VectorBlobAtlasShare::Impl* impl);
 };
 
 } // namespace Text

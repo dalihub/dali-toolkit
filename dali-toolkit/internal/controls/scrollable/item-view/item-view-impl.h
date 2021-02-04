@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ITEM_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,27 +21,24 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/object/property-notification.h>
-#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-array.h>
+#include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/property-notification.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
-#include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class ItemView;
 
 typedef IntrusivePtr<ItemView> ItemViewPtr;
@@ -54,12 +51,10 @@ typedef IntrusivePtr<ItemView> ItemViewPtr;
 class ItemView : public Scrollable
 {
 public:
-
   // Signals
   typedef Toolkit::ItemView::LayoutActivatedSignalType LayoutActivatedSignalType;
 
 public:
-
   /**
    * Create a new ItemView.
    * @param[in] factory The factory which provides ItemView with items.
@@ -240,12 +235,12 @@ public:
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootSize
    */
-  void SetOvershootSize( const Vector2& size );
+  void SetOvershootSize(const Vector2& size);
 
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
    */
-  void SetOvershootEffectColor( const Vector4& color );
+  void SetOvershootEffectColor(const Vector4& color);
 
   /**
    * @brief Set whether to enable automatic refresh or not. When refresh is disabled,
@@ -269,7 +264,7 @@ public:
   /**
    * @copydoc Toolkit::ItemView::SetItemsParentOrigin
    */
-  void SetItemsParentOrigin( const Vector3& parentOrigin );
+  void SetItemsParentOrigin(const Vector3& parentOrigin);
 
   /**
    * @copydoc Toolkit::ItemView::GetItemsParentOrigin
@@ -279,7 +274,7 @@ public:
   /**
    * @copydoc Toolkit::ItemView::SetItemsAnchorPoint
    */
-  void SetItemsAnchorPoint( const Vector3& anchorPoint );
+  void SetItemsAnchorPoint(const Vector3& anchorPoint);
 
   /**
    * @copydoc Toolkit::ItemView::GetItemsAnchorPoint
@@ -308,7 +303,7 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
   //properties
 
@@ -318,7 +313,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -326,7 +321,7 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
   /**
    * Performs actions as requested using the action name.
@@ -335,7 +330,7 @@ public:
    * @param[in] attributes The attributes with which to perfrom this action.
    * @return true if action has been accepted by this control
    */
-  static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes );
+  static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
 
   /**
    * Helper for DoAction( ACTION_STOP_SCROLLING ).
@@ -346,10 +341,9 @@ public:
    * Helper for DoAction( ACTION_ENABLE/DISABLE_REFRESH_NOTIFICATIONS ).
    * @param[in] enabled Whether to disable refresh notifications or not.
    */
-  void SetRefreshNotificationEnabled( bool enabled );
+  void SetRefreshNotificationEnabled(bool enabled);
 
 private:
-
   /**
    * Get all the layouts used in the ItemView.
    * @return The layout array
@@ -360,51 +354,50 @@ private:
    * Set all the layouts. that will be used in the ItemView.
    * @param[in] layouts The layouts used in the itemView.
    */
-  void SetLayoutArray( const Property::Array& layouts );
+  void SetLayoutArray(const Property::Array& layouts);
 
   /**
    * Remove an Actor if found in the ItemPool.
    * @param[in] itemId The item to remove.
    * @return True if the remaining actors were reordered.
    */
-  bool RemoveActor( unsigned int itemId );
+  bool RemoveActor(unsigned int itemId);
 
   /**
    * Remove any Actors outside a given range.
    * @param[in] @param[in] range The range of required items.
    */
-  void RemoveActorsOutsideRange( ItemRange range );
+  void RemoveActorsOutsideRange(ItemRange range);
 
   /**
    * Add a range of Actors, if they are not already in the ItemPool.
    * @param[in] range The range of Item IDs to associate with the new actors.
    * @param[in] layoutSize The layout-size.
    */
-  void AddActorsWithinRange( ItemRange range, const Vector3& layoutSize );
+  void AddActorsWithinRange(ItemRange range, const Vector3& layoutSize);
 
   /**
    * Add a new Actor, if not already in the ItemPool.
    * @param[in] item The ID for the new item.
    * @param[in] layoutSize The layout-size.
    */
-  void AddNewActor( ItemId item, const Vector3& layoutSize );
+  void AddNewActor(ItemId item, const Vector3& layoutSize);
 
   /**
    * Apply the constraints etc. that are required for ItemView children.
    * @param[in] item The item to setup.
    * @param[in] layoutSize The layout-size.
    */
-  void SetupActor( Item item, const Vector3& layoutSize );
+  void SetupActor(Item item, const Vector3& layoutSize);
 
   /**
    * Remove the Actor from the ItemPool and notify the ItemFactory the actor has been released by ItemView.
    * @param[in] item The ID for the item to be released.
    * @param[in] actor The actor to be removed from ItemView.
    */
-  void ReleaseActor( ItemId item, Actor actor );
+  void ReleaseActor(ItemId item, Actor actor);
 
 private: // From CustomActorImpl
-
   /**
    * From CustomActorImpl; called after a child has been added to the owning actor.
    * @param[in] child The child which has been added.
@@ -420,7 +413,6 @@ private: // From CustomActorImpl
   bool OnWheelEvent(Actor actor, const WheelEvent& event);
 
 private: // From Control
-
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
@@ -461,7 +453,6 @@ protected:
   virtual ~ItemView();
 
 private:
-
   // Undefined
   ItemView(const ItemView&);
 
@@ -519,14 +510,14 @@ private:
    * @param[in] touch The touch information.
    * @return True if the event should be consumed.
    */
-  bool OnTouch( Actor actor, const TouchEvent& touch );
+  bool OnTouch(Actor actor, const TouchEvent& touch);
 
   /**
    * Called upon pan gesture event.
    *
    * @param[in] gesture The gesture event.
    */
-  void OnPan( const PanGesture& pan );
+  void OnPan(const PanGesture& pan);
 
   /**
    * Helper to handle anchoring animations.
@@ -568,7 +559,7 @@ private:
   /**
    * @copydoc Toolkit::Internal::Scrollable::EnableScrollOvershoot
    */
-  void EnableScrollOvershoot( bool enable ) override;
+  void EnableScrollOvershoot(bool enable) override;
 
   /**
    * Helper to calculate the scroll overshoot according to the pan gesture displacement.
@@ -613,44 +604,43 @@ private:
   void OnRefreshNotification(PropertyNotification& source);
 
 private:
-
   Property::Array mlayoutArray;
 
-  ItemContainer mItemPool;
-  ItemFactory& mItemFactory;
-  std::vector< ItemLayoutPtr > mLayouts;            ///< Container of Dali::Toolkit::ItemLayout objects
-  Actor mOvershootOverlay;                          ///< The overlay actor for overshoot effect
-  Animation mResizeAnimation;
-  Animation mScrollAnimation;
-  Animation mScrollOvershootAnimation;
-  Timer mWheelEventFinishedTimer;                   ///< The timer to determine whether there is no wheel event received for a certain period of time.
-  PropertyNotification mRefreshNotification;        ///< Stores the property notification used for item view refresh
-  LayoutActivatedSignalType mLayoutActivatedSignal;
-  Vector3 mActiveLayoutTargetSize;
-  Vector3 mItemsParentOrigin;
-  Vector3 mItemsAnchorPoint;
-  Vector2 mTotalPanDisplacement;
-  ItemLayout* mActiveLayout;
+  ItemContainer              mItemPool;
+  ItemFactory&               mItemFactory;
+  std::vector<ItemLayoutPtr> mLayouts;          ///< Container of Dali::Toolkit::ItemLayout objects
+  Actor                      mOvershootOverlay; ///< The overlay actor for overshoot effect
+  Animation                  mResizeAnimation;
+  Animation                  mScrollAnimation;
+  Animation                  mScrollOvershootAnimation;
+  Timer                      mWheelEventFinishedTimer; ///< The timer to determine whether there is no wheel event received for a certain period of time.
+  PropertyNotification       mRefreshNotification;     ///< Stores the property notification used for item view refresh
+  LayoutActivatedSignalType  mLayoutActivatedSignal;
+  Vector3                    mActiveLayoutTargetSize;
+  Vector3                    mItemsParentOrigin;
+  Vector3                    mItemsAnchorPoint;
+  Vector2                    mTotalPanDisplacement;
+  ItemLayout*                mActiveLayout;
 
   float mAnchoringDuration;
-  float mRefreshIntervalLayoutPositions;            ///< Refresh item view when the layout position changes by this interval in both positive and negative directions.
+  float mRefreshIntervalLayoutPositions; ///< Refresh item view when the layout position changes by this interval in both positive and negative directions.
   float mMinimumSwipeSpeed;
   float mMinimumSwipeDistance;
-  float mWheelScrollDistanceStep;                   ///< The step of scroll distance in actor coordinates for each wheel event received.
+  float mWheelScrollDistanceStep; ///< The step of scroll distance in actor coordinates for each wheel event received.
   float mScrollDistance;
   float mScrollSpeed;
   float mScrollOvershoot;
 
-  GestureState mGestureState            : 8;
-  bool mAnimatingOvershootOn            : 1;        ///< Whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
-  bool mAnimateOvershootOff             : 1;        ///< Whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
-  bool mAnchoringEnabled                : 1;
-  bool mRefreshOrderHint                : 1;        ///< True if scrolling towards the last item
-  bool mIsFlicking                      : 1;
-  bool mAddingItems                     : 1;
-  bool mRefreshEnabled                  : 1;        ///< Whether to refresh the cache automatically
-  bool mRefreshNotificationEnabled      : 1;        ///< Whether to disable refresh notifications or not.
-  bool mInAnimation                     : 1;        ///< Keeps track of whether an animation is controlling the overshoot property.
+  GestureState mGestureState : 8;
+  bool         mAnimatingOvershootOn : 1; ///< Whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
+  bool         mAnimateOvershootOff : 1;  ///< Whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
+  bool         mAnchoringEnabled : 1;
+  bool         mRefreshOrderHint : 1; ///< True if scrolling towards the last item
+  bool         mIsFlicking : 1;
+  bool         mAddingItems : 1;
+  bool         mRefreshEnabled : 1;             ///< Whether to refresh the cache automatically
+  bool         mRefreshNotificationEnabled : 1; ///< Whether to disable refresh notifications or not.
+  bool         mInAnimation : 1;                ///< Keeps track of whether an animation is controlling the overshoot property.
 };
 
 } // namespace Internal

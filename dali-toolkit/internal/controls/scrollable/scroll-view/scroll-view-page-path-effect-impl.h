@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_PAGE_PATH_EFFECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/animation/linear-constrainer.h>
 #include <dali/devel-api/animation/path-constrainer.h>
+#include <dali/public-api/animation/linear-constrainer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
@@ -28,21 +28,16 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * @copydoc Toolkit::ScrollViewPagePathEffect
  */
 class ScrollViewPagePathEffect : public ScrollViewEffect
 {
-
 public:
-
   /**
    * Constructor
    * @param[in] path Pages will follow this path
@@ -51,41 +46,37 @@ public:
    * @param[in] viewPageSize size of a page in the scrollview
    * @param[in] pageCount total number of pages in the scrollview
    */
-  ScrollViewPagePathEffect(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount );
+  ScrollViewPagePathEffect(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount);
 
 public:
-
   /**
    * @copydoc ScrollViewEffect::ApplyToActor
    */
-  void ApplyToPage( Actor child, unsigned int pageOrder );
+  void ApplyToPage(Actor child, unsigned int pageOrder);
 
 public:
-
   /**
    * @copydoc ScrollViewEffect::OnAttach
    */
-  void OnAttach( Toolkit::ScrollView& scrollView ) override;
+  void OnAttach(Toolkit::ScrollView& scrollView) override;
 
   /**
    * @copydoc ScrollViewEffect::OnDetach
    */
-  void OnDetach( Toolkit::ScrollView& scrollView ) override;
+  void OnDetach(Toolkit::ScrollView& scrollView) override;
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~ScrollViewPagePathEffect();
 
 private:
-
-  Vector3               mPageSize;            ///< The logical page size for the 3D effect.
-  PathConstrainer       mPathConstrainer;     ///< PathConstrainer used to constraint position and orientation
-  LinearConstrainer     mLinearConstrainer;   ///< LinearConstrainer used to constraint opacity
-  Dali::Property::Index mInputPropertyIndex;  ///< Index of the property in the scrollview used as the parameter for the path
-  unsigned int          mPageCount;           ///< Total number of pages (Needed for wrapping)
+  Vector3               mPageSize;           ///< The logical page size for the 3D effect.
+  PathConstrainer       mPathConstrainer;    ///< PathConstrainer used to constraint position and orientation
+  LinearConstrainer     mLinearConstrainer;  ///< LinearConstrainer used to constraint opacity
+  Dali::Property::Index mInputPropertyIndex; ///< Index of the property in the scrollview used as the parameter for the path
+  unsigned int          mPageCount;          ///< Total number of pages (Needed for wrapping)
 };
 
 } // namespace Internal

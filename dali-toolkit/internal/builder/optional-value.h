@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_OPTIONAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,70 +18,115 @@
  *
  */
 
-template <typename T>
+template<typename T>
 struct OptionalTypes
 {
-  typedef T ValueType;
-  typedef const T& ReturnType;
-  static ReturnType Get(const ValueType& v) { return v; }
-  static ValueType Set(const ReturnType v) { return v; }
-  static bool Ok(const ValueType& v) { return true; }
+  typedef T         ValueType;
+  typedef const T&  ReturnType;
+  static ReturnType Get(const ValueType& v)
+  {
+    return v;
+  }
+  static ValueType Set(const ReturnType v)
+  {
+    return v;
+  }
+  static bool Ok(const ValueType& v)
+  {
+    return true;
+  }
 };
 
-template <typename T>
+template<typename T>
 struct OptionalTypes<T*>
 {
-  typedef T* ValueType;
-  typedef const T* ReturnType;
-  static ReturnType Get(const ValueType v) { return v; }
-  static ValueType Set(const ReturnType v) { return v; }
-  static bool Ok(const ReturnType v) { return NULL != v; }
+  typedef T*        ValueType;
+  typedef const T*  ReturnType;
+  static ReturnType Get(const ValueType v)
+  {
+    return v;
+  }
+  static ValueType Set(const ReturnType v)
+  {
+    return v;
+  }
+  static bool Ok(const ReturnType v)
+  {
+    return NULL != v;
+  }
 };
 
-template <typename T>
+template<typename T>
 struct OptionalTypes<T&>
 {
-  typedef T* ValueType;
-  typedef const T& ReturnType;
-  static ReturnType Get(const ValueType v) { return *v; }
-  static ValueType Set(const ReturnType v) { return &v; }
-  static bool Ok(const ReturnType v) { return true; }
+  typedef T*        ValueType;
+  typedef const T&  ReturnType;
+  static ReturnType Get(const ValueType v)
+  {
+    return *v;
+  }
+  static ValueType Set(const ReturnType v)
+  {
+    return &v;
+  }
+  static bool Ok(const ReturnType v)
+  {
+    return true;
+  }
 };
 
-template <typename T>
+template<typename T>
 class OptionalValue
 {
 public:
-  typedef void ( OptionalValue::*bool_type )() const;
+  typedef void (OptionalValue::*bool_type)() const;
   typedef typename OptionalTypes<T>::ReturnType ReturnType;
-  typedef typename OptionalTypes<T>::ValueType ValueType;
+  typedef typename OptionalTypes<T>::ValueType  ValueType;
 
-  OptionalValue(): mOk(false), mValue() {}
-  OptionalValue( T value ): mOk(OptionalTypes<T>::Ok(value)), mValue(OptionalTypes<T>::Set(value)) {}
-  OptionalValue( bool b, T value ): mOk(b), mValue(OptionalTypes<T>::Set(value)) {}
+  OptionalValue()
+  : mOk(false),
+    mValue()
+  {
+  }
+  OptionalValue(T value)
+  : mOk(OptionalTypes<T>::Ok(value)),
+    mValue(OptionalTypes<T>::Set(value))
+  {
+  }
+  OptionalValue(bool b, T value)
+  : mOk(b),
+    mValue(OptionalTypes<T>::Set(value))
+  {
+  }
 
-  ReturnType operator *() const { return OptionalTypes<T>::Get(mValue); }
+  ReturnType operator*() const
+  {
+    return OptionalTypes<T>::Get(mValue);
+  }
 
   // safe bool idiom
-  operator bool_type() const {
+  operator bool_type() const
+  {
     return mOk == true ? &OptionalValue::this_type_does_not_support_comparisons : 0;
   }
 
 private:
-  bool mOk;
+  bool      mOk;
   ValueType mValue;
-  void this_type_does_not_support_comparisons() const {}
+  void      this_type_does_not_support_comparisons() const
+  {
+  }
 };
 
-template <typename T, typename U>
-bool operator==( const OptionalValue<T>& lhs, const OptionalValue<U>& rhs )
+template<typename T, typename U>
+bool operator==(const OptionalValue<T>& lhs, const OptionalValue<U>& rhs)
 {
   lhs.this_type_does_not_support_comparisons();
   return false;
 }
 
-template <typename T, typename U>
-bool operator!=( const OptionalValue<T>& lhs, const OptionalValue<U>& rhs )
+template<typename T, typename U>
+bool operator!=(const OptionalValue<T>& lhs, const OptionalValue<U>& rhs)
 {
   lhs.this_type_does_not_support_comparisons();
   return false;

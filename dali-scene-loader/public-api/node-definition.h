@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_NODE_DEFINITION_H_
 #define DALI_SCENE_LOADER_NODE_DEFINITION_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,18 @@
 #include "dali-scene-loader/public-api/resource-bundle.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/math/quaternion.h"
-#include "dali/public-api/math/matrix.h"
-#include "dali/public-api/math/vector4.h"
-#include "dali/public-api/actors/actor.h"
-#include <string>
-#include <memory>
 #include <functional>
+#include <memory>
+#include <string>
+#include "dali/public-api/actors/actor.h"
+#include "dali/public-api/math/matrix.h"
+#include "dali/public-api/math/quaternion.h"
+#include "dali/public-api/math/vector4.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 class ViewProjection;
 
 /**
@@ -70,7 +69,7 @@ public:
 struct DALI_SCENE_LOADER_API ConstraintDefinition
 {
   std::string mProperty;  ///< name of the property to constrain.
-  Index mSourceIdx;  ///< index of the node to serve as the source of the constraint.
+  Index       mSourceIdx; ///< index of the node to serve as the source of the constraint.
 
   bool operator<(const ConstraintDefinition& other) const
   {
@@ -90,7 +89,7 @@ struct DALI_SCENE_LOADER_API ConstraintDefinition
 
 struct DALI_SCENE_LOADER_API Transforms
 {
-  MatrixStack modelStack;
+  MatrixStack           modelStack;
   const ViewProjection& viewProjection;
 };
 
@@ -100,7 +99,7 @@ struct DALI_SCENE_LOADER_API Transforms
  */
 struct DALI_SCENE_LOADER_API SkinningShaderConfigurationRequest
 {
-  Index mSkeletonIdx;
+  Index  mSkeletonIdx;
   Shader mShader;
 
   bool operator<(const SkinningShaderConfigurationRequest& other) const
@@ -115,8 +114,8 @@ struct DALI_SCENE_LOADER_API SkinningShaderConfigurationRequest
 struct DALI_SCENE_LOADER_API BlendshapeShaderConfigurationRequest
 {
   std::string mNodeName;
-  Index mMeshIdx;
-  Shader mShader;
+  Index       mMeshIdx;
+  Shader      mShader;
 
   bool operator<(const BlendshapeShaderConfigurationRequest& other) const
   {
@@ -129,8 +128,8 @@ struct DALI_SCENE_LOADER_API BlendshapeShaderConfigurationRequest
  */
 struct DALI_SCENE_LOADER_API ConstraintRequest
 {
-  const ConstraintDefinition* const mConstraint;  ///< Definition of the constraint to create.
-  Actor mTarget;  ///< Target of the constraint.
+  const ConstraintDefinition* const mConstraint; ///< Definition of the constraint to create.
+  Actor                             mTarget;     ///< Target of the constraint.
 };
 
 /**
@@ -140,18 +139,18 @@ struct DALI_SCENE_LOADER_API ConstraintRequest
  */
 struct DALI_SCENE_LOADER_API NodeDefinition
 {
-public:  // TYPES
+public: // TYPES
   using Vector = std::vector<NodeDefinition>;
 
   struct CreateParams
   {
   public: // input
     const ResourceBundle& mResources;
-    Transforms& mXforms;
+    Transforms&           mXforms;
 
   public: // output
-    std::vector<ConstraintRequest> mConstrainables;
-    std::vector<SkinningShaderConfigurationRequest> mSkinnables;
+    std::vector<ConstraintRequest>                    mConstrainables;
+    std::vector<SkinningShaderConfigurationRequest>   mSkinnables;
     std::vector<BlendshapeShaderConfigurationRequest> mBlendshapeRequests;
   };
 
@@ -176,14 +175,14 @@ public:  // TYPES
     {
       auto choice = choices.Get(mTag);
       return std::min(choice != Customization::NONE ? choice : 0,
-        static_cast<Index>(node.mChildren.size() - 1));
+                      static_cast<Index>(node.mChildren.size() - 1));
     }
   };
 
   class IVisitor
   {
   public:
-    virtual void Start(NodeDefinition& n) = 0;
+    virtual void Start(NodeDefinition& n)  = 0;
     virtual void Finish(NodeDefinition& n) = 0;
 
   protected:
@@ -193,7 +192,7 @@ public:  // TYPES
   class IConstVisitor
   {
   public:
-    virtual void Start(const NodeDefinition& n) = 0;
+    virtual void Start(const NodeDefinition& n)  = 0;
     virtual void Finish(const NodeDefinition& n) = 0;
 
   protected:
@@ -202,7 +201,7 @@ public:  // TYPES
 
   struct Extra
   {
-    std::string mKey;
+    std::string     mKey;
     Property::Value mValue;
 
     bool operator<(const Extra& other) const
@@ -211,7 +210,7 @@ public:  // TYPES
     }
   };
 
-public:  // METHODS
+public: // METHODS
   /**
    * @brief Creates a DALi Actor from this definition only.
    * @note Not recursive.
@@ -225,28 +224,28 @@ public: // DATA
 
   std::string mName;
 
-  Vector3 mPosition = Vector3::ZERO;
+  Vector3    mPosition    = Vector3::ZERO;
   Quaternion mOrientation = Quaternion::IDENTITY;
-  Vector3 mScale = Vector3::ONE;
-  Vector3 mSize = Vector3::ONE;
+  Vector3    mScale       = Vector3::ONE;
+  Vector3    mSize        = Vector3::ONE;
 
   bool mIsVisible = true;
 
-  std::unique_ptr<Renderable> mRenderable;
+  std::unique_ptr<Renderable>              mRenderable;
   std::unique_ptr<CustomizationDefinition> mCustomization;
-  std::vector<Extra> mExtras;
-  std::vector<ConstraintDefinition> mConstraints;
+  std::vector<Extra>                       mExtras;
+  std::vector<ConstraintDefinition>        mConstraints;
 
   std::vector<Index> mChildren;
-  Index mParentIdx = INVALID_INDEX;
+  Index              mParentIdx = INVALID_INDEX;
 };
 
 class DALI_SCENE_LOADER_API ModelNode : public NodeDefinition::Renderable
 {
 public: // DATA
-  Vector4 mColor = Color::WHITE;
-  Index mMeshIdx = INVALID_INDEX;
-  Index mMaterialIdx = INVALID_INDEX;
+  Vector4 mColor       = Color::WHITE;
+  Index   mMeshIdx     = INVALID_INDEX;
+  Index   mMaterialIdx = INVALID_INDEX;
 
 public: // METHODS
   void RegisterResources(IResourceReceiver& receiver) const override;
@@ -260,11 +259,11 @@ public: // METHODS
 class DALI_SCENE_LOADER_API ArcNode : public ModelNode
 {
 public: // DATA
-  bool mAntiAliasing = true;
-  int mArcCaps = 0;
+  bool  mAntiAliasing      = true;
+  int   mArcCaps           = 0;
   float mStartAngleDegrees = .0f;
-  float mEndAngleDegrees = .0f;
-  float mRadius = .0f;
+  float mEndAngleDegrees   = .0f;
+  float mRadius            = .0f;
 
 public: // METHODS
   static void GetEndVectorWithDiffAngle(float startAngle, float endAngle, Vector2& endVector);
@@ -272,7 +271,7 @@ public: // METHODS
   void OnCreate(const NodeDefinition& node, NodeDefinition::CreateParams& params, Actor& actor) const override;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_NODE_DEFINITION_H_

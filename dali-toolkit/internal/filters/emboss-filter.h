@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_EMBOSS_FILTER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * An embossing image filter, implements Dali::Toolkit::Internal::ImageFilter
  */
@@ -62,7 +59,7 @@ public: // From ImageFilter
   void Refresh() override;
 
   /// @copydoc Dali::Toolkit::Internal::ImageFilter::SetSize
-  void SetSize( const Vector2& size ) override;
+  void SetSize(const Vector2& size) override;
 
 private:
   /**
@@ -71,21 +68,20 @@ private:
   void CreateRenderTasks();
 
 private:
-  EmbossFilter( const EmbossFilter& );
-  EmbossFilter& operator=( const EmbossFilter& );
+  EmbossFilter(const EmbossFilter&);
+  EmbossFilter& operator=(const EmbossFilter&);
 
 private: // Attributes
-
-  RenderTask            mRenderTaskForEmboss1;
-  RenderTask            mRenderTaskForEmboss2;
-  RenderTask            mRenderTaskForOutput;
-  FrameBuffer           mFrameBufferForEmboss1;
-  FrameBuffer           mFrameBufferForEmboss2;
-  Actor                 mActorForInput1;
-  Actor                 mActorForInput2;
-  Renderer              mRendererForEmboss1;
-  Renderer              mRendererForEmboss2;
-  Actor                 mActorForComposite;
+  RenderTask  mRenderTaskForEmboss1;
+  RenderTask  mRenderTaskForEmboss2;
+  RenderTask  mRenderTaskForOutput;
+  FrameBuffer mFrameBufferForEmboss1;
+  FrameBuffer mFrameBufferForEmboss2;
+  Actor       mActorForInput1;
+  Actor       mActorForInput2;
+  Renderer    mRendererForEmboss1;
+  Renderer    mRendererForEmboss2;
+  Actor       mActorForComposite;
 }; // class EmbossFilter
 
 } // namespace Internal
@@ -95,4 +91,3 @@ private: // Attributes
 } // namespace Dali
 
 #endif // DALI_TOOLKIT_INTERNAL_EMBOSS_FILTER_H
-

@@ -2,7 +2,7 @@
 #define DALI_HIDDEN_TEXT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,15 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/text-controls/hidden-input-properties.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/public-api/controls/text-controls/hidden-input-properties.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * Class to handle the hidden text
  */
@@ -44,7 +41,6 @@ public:
   class Observer
   {
   public:
-
     /**
      * @brief Invoked when the time to show last character is expired
      */
@@ -55,28 +51,27 @@ public:
    * @brief Constructor
    * @param[in] observer The Observer pointer.
    */
-  HiddenText( Observer* observer );
+  HiddenText(Observer* observer);
 
 public: // Intended for internal use
-
   /**
    * @brief Used to set options of hidden text
    * @param[in] map The property map describing the option
    */
-  void SetProperties( const Property::Map& map );
+  void SetProperties(const Property::Map& map);
 
   /**
    * @brief Retrieve property map of hidden text options
    * @param[out] map The hidden text option
    */
-  void GetProperties( Property::Map& map );
+  void GetProperties(Property::Map& map);
 
   /**
    * @brief Convert source text to destination text according to current option
    * @param[in] source The original text
    * @param[out] destination The applied text
    */
-  void Substitute( const Vector<Character>& source, Vector<Character>& destination );
+  void Substitute(const Vector<Character>& source, Vector<Character>& destination);
 
   /**
    * @brief Invoked when the timer is expired
@@ -84,14 +79,13 @@ public: // Intended for internal use
   bool OnTick();
 
 private:
-
-  Timer mTimer;
+  Timer     mTimer;
   Observer* mObserver;
-  int mHideMode;
-  int mSubstituteText;
-  int mDisplayDuration;
-  int mSubstituteCount;
-  Length mPreviousTextCount;
+  int       mHideMode;
+  int       mSubstituteText;
+  int       mDisplayDuration;
+  int       mSubstituteCount;
+  Length    mPreviousTextCount;
 };
 
 } // namespace Text

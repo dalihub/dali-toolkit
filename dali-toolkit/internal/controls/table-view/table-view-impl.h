@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TABLE_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,16 @@
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 #include "array-2d.h"
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * TableView is a custom control for laying out actors in a table layout
  * @see Dali::Toolkit:TableView for more details
@@ -42,77 +39,76 @@ namespace Internal
 class TableView : public Control
 {
 public:
-
   /**
    * Create a new TableView.
    * @return A smart-pointer to the newly allocated TableView.
    */
-  static Toolkit::TableView New( unsigned int initialRows, unsigned int initialColumns );
+  static Toolkit::TableView New(unsigned int initialRows, unsigned int initialColumns);
 
   /**
    * @copydoc Toolkit::TableView::AddChild
    */
-  bool AddChild( Actor& child, const Toolkit::TableView::CellPosition& position );
+  bool AddChild(Actor& child, const Toolkit::TableView::CellPosition& position);
 
   /**
    * @copydoc Toolkit::TableView::GetChildAt
    */
-  Actor GetChildAt( const Toolkit::TableView::CellPosition& position );
+  Actor GetChildAt(const Toolkit::TableView::CellPosition& position);
 
   /**
    * @copydoc Toolkit::TableView::RemoveChildAt
    */
-  Actor RemoveChildAt( const Toolkit::TableView::CellPosition& position );
+  Actor RemoveChildAt(const Toolkit::TableView::CellPosition& position);
 
   /**
    * @copydoc Toolkit::TableView::FindChildPosition
    */
-  bool FindChildPosition( const Actor& child, Toolkit::TableView::CellPosition& positionOut );
+  bool FindChildPosition(const Actor& child, Toolkit::TableView::CellPosition& positionOut);
 
   /**
    * @copydoc Toolkit::TableView::InsertRow
    */
-  void InsertRow( unsigned int rowIndex );
+  void InsertRow(unsigned int rowIndex);
 
   /**
    * @copydoc Toolkit::TableView::DeleteRow( unsigned int rowIndex )
    */
-  void DeleteRow( unsigned int rowIndex );
+  void DeleteRow(unsigned int rowIndex);
 
   /**
    * @copydoc Toolkit::TableView::DeleteRow( unsigned int rowIndex, std::vector<Actor>& removed )
    */
-  void DeleteRow( unsigned int rowIndex, std::vector<Actor>& removed );
+  void DeleteRow(unsigned int rowIndex, std::vector<Actor>& removed);
 
   /**
    * @copydoc Toolkit::TableView::InsertColumn
    */
-  void InsertColumn( unsigned int columnIndex );
+  void InsertColumn(unsigned int columnIndex);
 
   /**
    * @copydoc Toolkit::TableView::DeleteColumn( unsigned int columnIndex )
    */
-  void DeleteColumn( unsigned int columnIndex );
+  void DeleteColumn(unsigned int columnIndex);
 
   /**
    * @copydoc Toolkit::TableView::DeleteColumn( unsigned int columnIndex, std::vector<Actor>& removed )
    */
-  void DeleteColumn( unsigned int columnIndex, std::vector<Actor>& removed );
+  void DeleteColumn(unsigned int columnIndex, std::vector<Actor>& removed);
 
   /**
    * @copydoc Toolkit::TableView::Resize( unsigned int rows, unsigned int columns )
    */
-  void Resize( unsigned int rows, unsigned int columns );
+  void Resize(unsigned int rows, unsigned int columns);
 
   /**
    * @copydoc Toolkit::TableView::Resize( unsigned int rows, unsigned int columns, std::vector<Actor>& removed )
    */
-  void Resize( unsigned int rows, unsigned int columns, std::vector<Actor>& removed );
+  void Resize(unsigned int rows, unsigned int columns, std::vector<Actor>& removed);
 
   /**
    * @copydoc Toolkit::TableView::SetCellPadding
    */
-  void SetCellPadding( Size padding );
+  void SetCellPadding(Size padding);
 
   /**
    * @copydoc Toolkit::TableView::GetCellPadding
@@ -122,62 +118,62 @@ public:
   /**
    * @copydoc Toolkit::TableView::SetFitHeight
    */
-  void SetFitHeight( unsigned int rowIndex );
+  void SetFitHeight(unsigned int rowIndex);
 
   /**
    * @copydoc Toolkit::TableView::IsFitHeight
    */
-  bool IsFitHeight( unsigned int rowIndex ) const;
+  bool IsFitHeight(unsigned int rowIndex) const;
 
   /**
    * @copydoc Toolkit::TableView::SetFitWidth
    */
-  void SetFitWidth( unsigned int columnIndex );
+  void SetFitWidth(unsigned int columnIndex);
 
   /**
    * @copydoc Toolkit::TableView::IsFitWidth
    */
-  bool IsFitWidth( unsigned int columnIndex ) const;
+  bool IsFitWidth(unsigned int columnIndex) const;
 
   /**
    * @copydoc Toolkit::TableView::SetFixedWidth
    */
-  void SetFixedWidth( unsigned int columnIndex, float width );
+  void SetFixedWidth(unsigned int columnIndex, float width);
 
   /**
    * @copydoc Toolkit::TableView::GetFixedWidth
    */
-  float GetFixedWidth( unsigned int columnIndex ) const;
+  float GetFixedWidth(unsigned int columnIndex) const;
 
   /**
    * @copydoc Toolkit::TableView::SetFixedHeight
    */
-  void SetFixedHeight( unsigned int rowIndex, float height );
+  void SetFixedHeight(unsigned int rowIndex, float height);
 
   /**
    * @copydoc Toolkit::TableView::GetFixedHeight
    */
-  float GetFixedHeight( unsigned int rowIndex ) const;
+  float GetFixedHeight(unsigned int rowIndex) const;
 
   /**
    * @copydoc Toolkit::TableView::SetRelativeHeight
    */
-  void SetRelativeHeight( unsigned int rowIndex, float heightPercentage );
+  void SetRelativeHeight(unsigned int rowIndex, float heightPercentage);
 
   /**
    * @copydoc Toolkit::TableView::GetRelativeHeight
    */
-  float GetRelativeHeight( unsigned int rowIndex ) const;
+  float GetRelativeHeight(unsigned int rowIndex) const;
 
   /**
    * @copydoc Toolkit::TableView::SetRelativeWidth
    */
-  void SetRelativeWidth( unsigned int columnIndex, float widthPercentage );
+  void SetRelativeWidth(unsigned int columnIndex, float widthPercentage);
 
   /**
    * @copydoc Toolkit::TableView::GetRelativeWidth
    */
-  float GetRelativeWidth( unsigned int columnIndex ) const;
+  float GetRelativeWidth(unsigned int columnIndex) const;
 
   /**
    * @copydoc Toolkit::TableView::GetRows
@@ -192,7 +188,7 @@ public:
   /**
    * @copydoc Toolkit::TableView::SetCellAlignment
    */
-  void SetCellAlignment( Toolkit::TableView::CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical );
+  void SetCellAlignment(Toolkit::TableView::CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical);
 
   // Properties
 
@@ -202,7 +198,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -210,29 +206,28 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
 private: // From Control
-
   /**
    * @copydoc Control::OnChildAdd(Actor& child)
    */
-  void OnChildAdd( Actor& child ) override;
+  void OnChildAdd(Actor& child) override;
 
   /**
    * @copydoc Control::OnChildRemove(Actor& child)
    */
-  void OnChildRemove( Actor& child ) override;
+  void OnChildRemove(Actor& child) override;
 
   /**
    * @copydoc Control::OnRelayout
    */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
    * @copydoc Control::CalculateChildSize
    */
-  float CalculateChildSize( const Actor& child, Dimension::Type dimension ) override;
+  float CalculateChildSize(const Actor& child, Dimension::Type dimension) override;
 
   /**
    * @copydoc Control::OnInitialize()
@@ -242,7 +237,7 @@ private: // From Control
   /**
    * @copydoc Control::GetNextKeyboardFocusableActor
    */
-  Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled ) override;
+  Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled) override;
 
   /**
    * @copydoc Control::GetNaturalSize()
@@ -252,25 +247,24 @@ private: // From Control
   /**
    * @copydoc Control::RelayoutDependentOnChildren()
    */
-  bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) override;
+  bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override;
 
   /**
    * @copydoc Control::OnCalculateRelayoutSize
    */
-  void OnCalculateRelayoutSize( Dimension::Type dimension ) override;
+  void OnCalculateRelayoutSize(Dimension::Type dimension) override;
 
   /**
    * @copydoc Control::OnLayoutNegotiated
    */
-  void OnLayoutNegotiated( float size, Dimension::Type dimension ) override;
+  void OnLayoutNegotiated(float size, Dimension::Type dimension) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
-  void OnSizeSet( const Vector3& size ) override;
+  void OnSizeSet(const Vector3& size) override;
 
 private: // Implementation
-
   /**
    * Struct to hold data for rows and columns
    *
@@ -283,10 +277,10 @@ private: // Implementation
      * Default constructor
      */
     RowColumnData()
-    : size( 0.0f ),
-      fillRatio( 0.0f ),
-      position( 0.0f ),
-      sizePolicy( Toolkit::TableView::FILL )
+    : size(0.0f),
+      fillRatio(0.0f),
+      position(0.0f),
+      sizePolicy(Toolkit::TableView::FILL)
     {
     }
 
@@ -296,55 +290,53 @@ private: // Implementation
      * @param[in] newSize The size to set for this data
      * @param[in] newSizePolicy The policy used to interpret the size value
      */
-    RowColumnData( float newSize, float newFillRatio, Toolkit::TableView::LayoutPolicy newSizePolicy )
-    : size( newSize ),
-      fillRatio( newFillRatio ),
-      position( 0.0f ),
-      sizePolicy( newSizePolicy )
+    RowColumnData(float newSize, float newFillRatio, Toolkit::TableView::LayoutPolicy newSizePolicy)
+    : size(newSize),
+      fillRatio(newFillRatio),
+      position(0.0f),
+      sizePolicy(newSizePolicy)
     {
     }
 
-    float size;                                  ///< Set or calculated size
-    float fillRatio;                             ///< Ratio to fill remaining space, only valid with RELATIVE or FILL policy
-    float position;                              ///< Position of the row/column, this value is updated during every Relayout round
+    float                            size;       ///< Set or calculated size
+    float                            fillRatio;  ///< Ratio to fill remaining space, only valid with RELATIVE or FILL policy
+    float                            position;   ///< Position of the row/column, this value is updated during every Relayout round
     Toolkit::TableView::LayoutPolicy sizePolicy; ///< The size policy used to interpret the size value
   };
 
   typedef Dali::Vector<RowColumnData> RowColumnArray;
 
 public:
-
   /**
    * Structure for the layout data
    */
   struct CellData
   {
     CellData()
-    : horizontalAlignment( HorizontalAlignment::LEFT ),
-      verticalAlignment( VerticalAlignment::TOP )
+    : horizontalAlignment(HorizontalAlignment::LEFT),
+      verticalAlignment(VerticalAlignment::TOP)
     {
     }
 
     // data members
-    Dali::Actor actor;
+    Dali::Actor                      actor;
     Toolkit::TableView::CellPosition position;
-    HorizontalAlignment::Type horizontalAlignment;
-    VerticalAlignment::Type verticalAlignment;
+    HorizontalAlignment::Type        horizontalAlignment;
+    VerticalAlignment::Type          verticalAlignment;
   };
 
 private:
-
   /**
    * Construct a new TableView.
    */
-  TableView( unsigned int initialRows, unsigned int initialColumns );
+  TableView(unsigned int initialRows, unsigned int initialColumns);
 
   /**
    * Resizes the data containers to match the new size
    * @param [in] rows in the table
    * @param [in] columns in the table
    */
-  void ResizeContainers( unsigned int rows, unsigned int columns );
+  void ResizeContainers(unsigned int rows, unsigned int columns);
 
   /**
    * Resizes the data containers to match the new size
@@ -352,7 +344,7 @@ private:
    * @param [in] columns in the table
    * @param [out] removed celldata
    */
-  void ResizeContainers( unsigned int rows, unsigned int columns, std::vector<CellData>& removed );
+  void ResizeContainers(unsigned int rows, unsigned int columns, std::vector<CellData>& removed);
 
   /**
    * Helper to get the list of lost actors in the case when table looses cells.
@@ -362,29 +354,28 @@ private:
    * @param rowsRemoved from table
    * @param columnsRemoved from table
    */
-  void RemoveAndGetLostActors( const std::vector<CellData>& lost, std::vector<Actor>& removed,
-      unsigned int rowsRemoved, unsigned int columnsRemoved );
+  void RemoveAndGetLostActors(const std::vector<CellData>& lost, std::vector<Actor>& removed, unsigned int rowsRemoved, unsigned int columnsRemoved);
 
   /**
    * Helper to remove all instances of the actor
    * @param child actor to remove
    * @return true if the actor was found
    */
-  bool RemoveAllInstances( const Actor& child );
+  bool RemoveAllInstances(const Actor& child);
 
   /**
    * @brief Calculate the ratio of FILL rows/columns
    *
    * @param[in] data The RowColumn data to compute the relative sizes for
    */
-  void CalculateFillSizes( RowColumnArray& data );
+  void CalculateFillSizes(RowColumnArray& data);
 
   /**
    * @brief Calculate the total fixed sizes for a row or column
    *
    * @param[in] data The row or column data to process
    */
-  float CalculateTotalFixedSize( const RowColumnArray& data );
+  float CalculateTotalFixedSize(const RowColumnArray& data);
 
   /**
    * @brief Calculate the sizes of FIT rows/columns
@@ -392,7 +383,7 @@ private:
    * @param[in] data The row or column data to process
    * @param[in] dimension The dimension being calculated: row == Dimension::HEIGHT, column == Dimension::WIDTH
    */
-  void CalculateFitSizes( RowColumnArray& data, Dimension::Type dimension );
+  void CalculateFitSizes(RowColumnArray& data, Dimension::Type dimension);
 
   /**
    * @brief Search for a FIT cell in the array
@@ -400,7 +391,7 @@ private:
    * @param[in] data The row or column data to process
    * @return Return if a FIT cell was found or not
    */
-  bool FindFit( const RowColumnArray& data );
+  bool FindFit(const RowColumnArray& data);
 
   /**
    * @brief Return the cell padding for a given dimension
@@ -408,7 +399,7 @@ private:
    * @param[in] dimension The dimension to return the padding for
    * @return Return the padding (x = low, y = high)
    */
-  Vector2 GetCellPadding( Dimension::Type dimension );
+  Vector2 GetCellPadding(Dimension::Type dimension);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -416,7 +407,6 @@ private:
   virtual ~TableView();
 
 private: // scripting support
-
   /**
    * Called to set the heights/widths property.
    * @param[in] tableViewImpl The object whose property is set.
@@ -425,11 +415,11 @@ private: // scripting support
    * @param[in] funcFit The set function to call, it can be SetFitHeight or SetFiltWidth.
    * @param[in] value The new property value.
    */
-  static void SetHeightOrWidthProperty( TableView& tableViewImpl,
-                                        void(TableView::*funcFixed)(unsigned int, float),
-                                        void(TableView::*funcRelative)(unsigned int, float),
-                                        void(TableView::*funcFit)(unsigned int),
-                                        const Property::Value& map );
+  static void SetHeightOrWidthProperty(TableView& tableViewImpl,
+                                       void (TableView::*funcFixed)(unsigned int, float),
+                                       void (TableView::*funcRelative)(unsigned int, float),
+                                       void (TableView::*funcFit)(unsigned int),
+                                       const Property::Value& map);
 
   /**
    * Called to retrieve the property value of row heights.
@@ -448,8 +438,7 @@ private: // scripting support
    * @param[in] data The array of row or column data
    * @param[out] map The property value.
    */
-  void GetMapPropertyValue( const RowColumnArray& data, Property::Map& map );
-
+  void GetMapPropertyValue(const RowColumnArray& data, Property::Map& map);
 
   /**
    * Helper class to prevent child adds and removes from causing relayout
@@ -458,12 +447,11 @@ private: // scripting support
   class RelayoutingLock
   {
   public: // API
-
     /**
      * Constructor, sets the lock boolean
      */
-    RelayoutingLock( TableView& parent )
-    : mLock( parent.mLayoutingChild )
+    RelayoutingLock(TableView& parent)
+    : mLock(parent.mLayoutingChild)
     {
       mLock = true;
     }
@@ -486,32 +474,30 @@ private: // scripting support
   };
 
 private:
-
   // Undefined copy constructor and assignment operators
   TableView(const TableView&);
   TableView& operator=(const TableView& rhs);
 
-private: // Data
+private:                       // Data
+  Array2d<CellData> mCellData; ///< Data for each cell: Actor, alignment settings etc
 
-  Array2d<CellData> mCellData;   ///< Data for each cell: Actor, alignment settings etc
+  RowColumnArray mRowData;     ///< Data for each row
+  RowColumnArray mColumnData;  ///< Data for each column
+  Size           mFixedTotals; ///< Accumulated totals for fixed width and height
 
-  RowColumnArray mRowData;       ///< Data for each row
-  RowColumnArray mColumnData;    ///< Data for each column
-  Size mFixedTotals;             ///< Accumulated totals for fixed width and height
-
-  Size mPadding;                 ///< Padding to apply to each cell
+  Size mPadding; ///< Padding to apply to each cell
 
   WeakHandle<Actor> mPreviousFocusedActor; ///< Perviously focused actor
-  bool mLayoutingChild;          ///< Can't be a bitfield due to Relayouting lock
-  bool mRowDirty : 1;            ///< Flag to indicate the row data is dirty
-  bool mColumnDirty : 1;         ///< Flag to indicate the column data is dirty
+  bool              mLayoutingChild;       ///< Can't be a bitfield due to Relayouting lock
+  bool              mRowDirty : 1;         ///< Flag to indicate the row data is dirty
+  bool              mColumnDirty : 1;      ///< Flag to indicate the column data is dirty
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::TableView& GetImpl( Toolkit::TableView& tableView )
+inline Toolkit::Internal::TableView& GetImpl(Toolkit::TableView& tableView)
 {
   DALI_ASSERT_ALWAYS(tableView);
 
@@ -520,7 +506,7 @@ inline Toolkit::Internal::TableView& GetImpl( Toolkit::TableView& tableView )
   return static_cast<Toolkit::Internal::TableView&>(handle);
 }
 
-inline const Toolkit::Internal::TableView& GetImpl( const Toolkit::TableView& tableView )
+inline const Toolkit::Internal::TableView& GetImpl(const Toolkit::TableView& tableView)
 {
   DALI_ASSERT_ALWAYS(tableView);
 

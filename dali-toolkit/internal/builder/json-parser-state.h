@@ -2,7 +2,7 @@
 #define DALI_JSON_PARSE_STATE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,20 +28,17 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * A safer std::advance()
  */
-template <typename IteratorType,typename EndIteratorType>
+template<typename IteratorType, typename EndIteratorType>
 inline int AdvanceIter(IteratorType& iter, EndIteratorType& end, int n)
 {
-  for(int i =0; i < n; ++i)
+  for(int i = 0; i < n; ++i)
   {
     if(iter == end)
     {
@@ -85,51 +82,69 @@ public:
    * Get the error description of the last parse
    * @return The error description or NULL if no error
    */
-  const char* GetErrorDescription() { return mErrorDescription; }
+  const char* GetErrorDescription()
+  {
+    return mErrorDescription;
+  }
 
   /**
    * Get the error line number
    * @return The line number of the error
    */
-  int GetErrorLineNumber() { return mErrorNewLine; }
+  int GetErrorLineNumber()
+  {
+    return mErrorNewLine;
+  }
 
   /**
    * Get the error column
    * @return The error column
    */
-  int GetErrorColumn() { return mErrorColumn; }
+  int GetErrorColumn()
+  {
+    return mErrorColumn;
+  }
 
   /**
    * Get the error position
    * @return The error position
    */
-  int GetErrorPosition() { return mErrorPosition; }
+  int GetErrorPosition()
+  {
+    return mErrorPosition;
+  }
 
   /**
    * Get the size of the string data that has been parsed
    * @return The size of string data
    */
-  int GetParsedStringSize() { return mNumberOfParsedChars; };
+  int GetParsedStringSize()
+  {
+    return mNumberOfParsedChars;
+  };
 
   /**
    * Get the number of nodes created
    * @return The number of nodes
    */
-  int GetCreatedNodeCount() { return mNumberOfCreatedNodes; };
+  int GetCreatedNodeCount()
+  {
+    return mNumberOfCreatedNodes;
+  };
 
 private:
-  VectorCharIter mIter;                ///< Current position
-  VectorCharIter mStart;               ///< Start position
-  VectorCharIter mEnd;                 ///< End of buffer being parsed
-  TreeNode* mRoot;                     ///< Root node created
-  TreeNodeManipulator mCurrent;        ///< The Current modifiable node
-  const char* mErrorDescription;       ///< The error description if set
-  int mErrorNewLine;                   ///< The error line number
-  int mErrorColumn;                    ///< The error column
-  int mErrorPosition;                  ///< The error position
-  int mNumberOfParsedChars;            ///< The size of string data
-  int mNumberOfCreatedNodes;           ///< The number of nodes created
-  bool mFirstParse;                    ///< Flag if first parse
+  VectorCharIter      mIter;                 ///< Current position
+  VectorCharIter      mStart;                ///< Start position
+  VectorCharIter      mEnd;                  ///< End of buffer being parsed
+  TreeNode*           mRoot;                 ///< Root node created
+  TreeNodeManipulator mCurrent;              ///< The Current modifiable node
+  const char*         mErrorDescription;     ///< The error description if set
+  int                 mErrorNewLine;         ///< The error line number
+  int                 mErrorColumn;          ///< The error column
+  int                 mErrorPosition;        ///< The error position
+  int                 mNumberOfParsedChars;  ///< The size of string data
+  int                 mNumberOfCreatedNodes; ///< The number of nodes created
+  bool                mFirstParse;           ///< Flag if first parse
 
   /**
    * The current parse state
@@ -231,7 +246,7 @@ private:
     {
       return Error("Attempt to walk up above root");
     }
-    mCurrent = TreeNodeManipulator( mCurrent.GetParent() );
+    mCurrent = TreeNodeManipulator(mCurrent.GetParent());
     return true;
   }
 
@@ -269,7 +284,7 @@ private:
   {
     int c = AdvanceIter(mIter, mEnd, n);
     mErrorPosition += c;
-    mErrorColumn   += c;
+    mErrorColumn += c;
   }
 
   /**
@@ -279,7 +294,7 @@ private:
   {
     int c = AdvanceIter(mIter, mEnd, n);
     mErrorPosition += c;
-    mErrorColumn   += c;
+    mErrorColumn += c;
     return mEnd == mIter;
   }
 
@@ -290,8 +305,8 @@ private:
   {
     int c = AdvanceIter(mIter, mEnd, n);
     mErrorPosition += c;
-    mErrorColumn   += c;
-    static_cast<void>( ParseWhiteSpace() );
+    mErrorColumn += c;
+    static_cast<void>(ParseWhiteSpace());
   }
 
   /**
@@ -420,7 +435,6 @@ private:
    */
   bool HandleCharacterComma(const char* name);
 };
-
 
 } // namespace Internal
 

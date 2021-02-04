@@ -3,7 +3,7 @@
 #define DALI_TOOLKIT_INTERNAL_ROUND_ROBIN_CONTAINER_VIEW_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * @brief RoundRobinContainerView is a view to a container that allows iterating through the elements cyclically.
  */
@@ -92,9 +89,9 @@ public:
   // default members
   ~RoundRobinContainerView() = default;
 
-  RoundRobinContainerView(const RoundRobinContainerView&)  = delete;
-  RoundRobinContainerView& operator=(const RoundRobinContainerView&)  = delete;
-  RoundRobinContainerView(RoundRobinContainerView&&) = default;
+  RoundRobinContainerView(const RoundRobinContainerView&) = delete;
+  RoundRobinContainerView& operator=(const RoundRobinContainerView&) = delete;
+  RoundRobinContainerView(RoundRobinContainerView&&)                 = default;
   RoundRobinContainerView& operator=(RoundRobinContainerView&&) = default;
 
 private:
@@ -110,8 +107,8 @@ private:
   }
 
 private:
-  ContainerType mElements; //< container of elements
-  size_t mNextIndex;       //< index to the next element to be viewed
+  ContainerType mElements;  //< container of elements
+  size_t        mNextIndex; //< index to the next element to be viewed
 };
 
 } // namespace Internal
@@ -119,6 +116,5 @@ private:
 } // namespace Toolkit
 
 } // namespace Dali
-
 
 #endif // DALI_TOOLKIT_INTERNAL_ROUND_ROBIN_CONTAINER_VIEW_H

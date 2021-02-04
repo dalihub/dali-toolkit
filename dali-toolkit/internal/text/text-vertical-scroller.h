@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VERTICAL_SCROLLER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class TextVerticalScroller;
 
 typedef IntrusivePtr<TextVerticalScroller> TextVerticalScrollerPtr;
@@ -43,7 +40,6 @@ typedef IntrusivePtr<TextVerticalScroller> TextVerticalScrollerPtr;
 class TextVerticalScroller : public RefObject, public ConnectionTracker
 {
 public:
-
   /**
    * @brief Text Scrolling helper, used to automatically scroll text, StartScroll should be called when scrolling is needed.
    *
@@ -57,13 +53,13 @@ public:
    * @param[in] y The new y position
    * @param[in] scrollAmount The distance to destination y position for actor to be animated
    */
-  void CheckStartAnimation( Actor& sourceActor, float x, float y, float scrollAmount );
+  void CheckStartAnimation(Actor& sourceActor, float x, float y, float scrollAmount);
 
   /**
    * @brief Set duration the text should scroll
    * @param[in] duration The duration in seconds
    */
-  void SetDuration( float duration );
+  void SetDuration(float duration);
 
 private: // Implementation
   /**
@@ -77,12 +73,11 @@ private: // Implementation
   virtual ~TextVerticalScroller();
 
 private:
-
-  Animation          mScrollAnimation;          // Animation used to update the actor's position
-  Actor              mScrollingActor;           // The actor being animated
-  float              mDuration;                 // The duration of text scrolling
-  float              mScrollTo;                 // The destination y position
-}; // TextVerticalScroller class
+  Animation mScrollAnimation; // Animation used to update the actor's position
+  Actor     mScrollingActor;  // The actor being animated
+  float     mDuration;        // The duration of text scrolling
+  float     mScrollTo;        // The destination y position
+};                            // TextVerticalScroller class
 
 } // namespace Text
 

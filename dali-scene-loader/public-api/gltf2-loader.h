@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_GLTF2_LOADER_H
 #define DALI_SCENE_LOADER_GLTF2_LOADER_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
  *
  */
 
- // INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include "dali-scene-loader/public-api/api.h"
 
 // EXTERNAL INCLUDES
@@ -38,7 +38,7 @@ class ShaderDefinitionFactory;
  */
 DALI_SCENE_LOADER_API void LoadGltfScene(const std::string& url, ShaderDefinitionFactory& shaderFactory, LoadResult& params);
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_GLTF2_LOADER_H

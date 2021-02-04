@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_COLOR_CONVERSION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,17 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/public-api/object/property.h>
+#include <string>
 
 namespace Dali
 {
-
 struct Vector4;
 
 namespace Toolkit
 {
 namespace Internal
 {
-
 /*
  * @brief Convert the string representation of a color into a Vector4.
  *
@@ -42,7 +40,7 @@ namespace Internal
  * @param[out] outColor The color if found.
  * @return True if the conversion was successful.
  */
-bool ConvertStringToColor( const std::string& colorString, Vector4& outColor );
+bool ConvertStringToColor(const std::string& colorString, Vector4& outColor);
 
 /*
  * @brief Convert a variety of different color representations into a Vector4.
@@ -51,11 +49,10 @@ bool ConvertStringToColor( const std::string& colorString, Vector4& outColor );
  * @param[out] outColor The color if found.
  * @return True if the conversion was successful.
  */
-bool ConvertPropertyToColor( const Property::Value& colorValue, Vector4& outColor );
+bool ConvertPropertyToColor(const Property::Value& colorValue, Vector4& outColor);
 
-} // Internal
-} // Toolkit
-} // Dali
-
+} // namespace Internal
+} // namespace Toolkit
+} // namespace Dali
 
 #endif // DALI_TOOLKIT_INTERNAL_COLOR_CONVERSION_H

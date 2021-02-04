@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_NAVIGATION_CONTROL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,24 +19,21 @@
  */
 
 // EXTERNAL INCLUDES
-#include <list>
 #include <dali/public-api/actors/layer.h>
+#include <list>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/navigation-view/navigation-view.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class NavigationView;
 
 namespace Internal
 {
-
 class NavigationBar;
 
 /**
@@ -48,7 +45,6 @@ class NavigationBar;
 class NavigationView : public Control
 {
 public:
-
   /**
    * Create an initialized NavigationView.
    * @return A handle to a newly allocated Dali resource
@@ -58,7 +54,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::NavigationView::Push()
    */
-  void Push( Actor& actor );
+  void Push(Actor& actor);
 
   /**
    * @copydoc Dali::Toolkit::NavigationView::Pop()
@@ -74,9 +70,7 @@ public:
    */
   //static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& properties );
 
-
 private: // override functions from Control
-
   /**
    * @copydoc Constrol::OnInitialize
    */
@@ -85,7 +79,7 @@ private: // override functions from Control
   /**
    * @copydoc Control::OnSceneConnection( int depth  )
    */
-  void OnSceneConnection( int depth ) override;
+  void OnSceneConnection(int depth) override;
 
   /**
    * @copydoc Control::OnRelayout()
@@ -93,7 +87,6 @@ private: // override functions from Control
   //virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
 protected:
-
   /**
    * Constructor.
    * It initializes the NavigationView members
@@ -106,7 +99,6 @@ protected:
   virtual ~NavigationView();
 
 private:
-
   // Undefined
   NavigationView(const NavigationView&);
 
@@ -114,30 +106,29 @@ private:
   NavigationView& operator=(const NavigationView& rhs);
 
 private:
-
-  std::vector< Actor >         mContentStack;
+  std::vector<Actor> mContentStack;
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::NavigationView& GetImpl( Toolkit::NavigationView& navigationView )
+inline Toolkit::Internal::NavigationView& GetImpl(Toolkit::NavigationView& navigationView)
 {
-  DALI_ASSERT_ALWAYS( navigationView );
+  DALI_ASSERT_ALWAYS(navigationView);
 
   Dali::RefObject& handle = navigationView.GetImplementation();
 
-  return static_cast<Toolkit::Internal::NavigationView&>( handle );
+  return static_cast<Toolkit::Internal::NavigationView&>(handle);
 }
 
-inline const Toolkit::Internal::NavigationView& GetImpl( const Toolkit::NavigationView& navigationView )
+inline const Toolkit::Internal::NavigationView& GetImpl(const Toolkit::NavigationView& navigationView)
 {
-  DALI_ASSERT_ALWAYS( navigationView );
+  DALI_ASSERT_ALWAYS(navigationView);
 
   const Dali::RefObject& handle = navigationView.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::NavigationView&>( handle );
+  return static_cast<const Toolkit::Internal::NavigationView&>(handle);
 }
 
 } // namespace Toolkit

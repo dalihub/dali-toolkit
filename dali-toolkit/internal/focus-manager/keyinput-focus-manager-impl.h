@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_KEYINPUT_FOCUS_MANAGER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/object-registry.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
@@ -29,20 +29,16 @@
 
 namespace Dali
 {
-
 namespace Integration
 {
-
 class SceneHolder;
 
 } // namespace Integration
 
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class KeyInputFocusManager;
 
 /**
@@ -72,7 +68,6 @@ public:
   Toolkit::Control GetCurrentFocusControl() const;
 
 public:
-
   /**
    * @copydoc Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignal()
    */
@@ -87,10 +82,9 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 protected:
-
   /**
    * Destructor
    */
@@ -101,7 +95,7 @@ private:
    * This will be called when a new scene holder is created
    * @param sceneHolder The new scene holder
    */
-  void OnSceneHolderCreated( Dali::Integration::SceneHolder& sceneHolder );
+  void OnSceneHolderCreated(Dali::Integration::SceneHolder& sceneHolder);
 
   /**
    * Callback for the key event when no actor in the stage has gained the key input focus
@@ -113,7 +107,7 @@ private:
    * Signal handler called when a focused Control is removed from Scene.
    * @param[in]  control  The control removed from the scene.
    */
-  void OnFocusControlSceneDisconnection( Dali::Actor control );
+  void OnFocusControlSceneDisconnection(Dali::Actor control);
 
   /**
     *  Recursively deliver events to the control and its parents, until the event is consumed or the stage is reached.
@@ -121,21 +115,19 @@ private:
    * @param[in]  event    The KeyEvent.
    * @return True if KeyEvent is consumed.
     */
-  bool EmitKeyEventSignal( Toolkit::Control control, const KeyEvent& event );
+  bool EmitKeyEventSignal(Toolkit::Control control, const KeyEvent& event);
 
 private:
-
   // Undefined
   KeyInputFocusManager(const KeyInputFocusManager&);
 
   KeyInputFocusManager& operator=(const KeyInputFocusManager& rhs);
 
 private:
-
   // The key input focus change signal
   Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType mKeyInputFocusChangedSignal;
 
-  SlotDelegate< KeyInputFocusManager > mSlotDelegate;
+  SlotDelegate<KeyInputFocusManager> mSlotDelegate;
 
   Toolkit::Control mCurrentFocusControl; ///< The current focused control
 };

@@ -28,16 +28,13 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class ImageVisualShaderFactory;
 class SvgVisual;
-typedef IntrusivePtr< SvgVisual > SvgVisualPtr;
+typedef IntrusivePtr<SvgVisual> SvgVisualPtr;
 
 /**
  * The visual which renders a svg image
@@ -49,10 +46,9 @@ typedef IntrusivePtr< SvgVisual > SvgVisualPtr;
  * | url                      | STRING           |
  *
  */
-class SvgVisual: public Visual::Base
+class SvgVisual : public Visual::Base
 {
 public:
-
   /**
    * @brief Create the SVG Visual using the image URL.
    *
@@ -65,7 +61,7 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static SvgVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties );
+  static SvgVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties);
 
   /**
    * @brief Create the SVG Visual using the image URL.
@@ -78,27 +74,25 @@ public:
    * @param[in] imageUrl The URL to svg resource to use
    * @return A smart-pointer to the newly allocated visual.
    */
-  static SvgVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl );
+  static SvgVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
 
-public:  // from Visual
-
+public: // from Visual
   /**
    * @copydoc Visual::Base::GetNaturalSize
    */
-  void GetNaturalSize( Vector2& naturalSize ) override;
+  void GetNaturalSize(Vector2& naturalSize) override;
 
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
 protected:
-
   /**
    * @brief Constructor.
    *
@@ -106,7 +100,7 @@ protected:
    * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to svg resource to use
    */
-  SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl );
+  SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -121,17 +115,17 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::DoSetOffScene
    */
-  void DoSetOffScene( Actor& actor ) override;
+  void DoSetOffScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
@@ -144,7 +138,6 @@ protected:
   bool IsResourceReady() const override;
 
 public:
-
   /**
    * @bried Apply the rasterized image to the visual.
    *
@@ -152,7 +145,7 @@ public:
    * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
    * @param[in] bool Whether the resource is loaded
    */
-  void ApplyRasterizedImage( VectorImageRenderer vectorImage, PixelData rasterizedPixelData, bool isLoaded );
+  void ApplyRasterizedImage(VectorImageRenderer vectorImage, PixelData rasterizedPixelData, bool isLoaded);
 
 private:
   /**
@@ -165,20 +158,20 @@ private:
    *
    * @param[in] size The target size of the SVG rasterization.
    */
-  void AddRasterizationTask( const Vector2& size );
+  void AddRasterizationTask(const Vector2& size);
 
   /**
    * Helper method to set individual values by index key.
    * @param[in] index The index key of the value
    * @param[in] value The value
    */
-  void DoSetProperty( Property::Index index, const Property::Value& value );
+  void DoSetProperty(Property::Index index, const Property::Value& value);
 
   // Undefined
-  SvgVisual( const SvgVisual& svgRenderer );
+  SvgVisual(const SvgVisual& svgRenderer);
 
   // Undefined
-  SvgVisual& operator=( const SvgVisual& svgRenderer );
+  SvgVisual& operator=(const SvgVisual& svgRenderer);
 
 private:
   ImageVisualShaderFactory& mImageVisualShaderFactory;
@@ -190,7 +183,7 @@ private:
   WeakHandle<Actor>         mPlacementActor;
   Vector2                   mVisualSize;
   bool                      mLoadFailed;
-  bool                      mAttemptAtlasing;  ///< If true will attempt atlasing, otherwise create unique texture
+  bool                      mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_FIXED_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 class FixedImageCache : public ImageCache, public TextureUploadObserver
 {
 public:
@@ -41,10 +40,10 @@ public:
    * This will start loading textures immediately, according to the
    * batch and cache sizes. The cache is as large as the number of urls.
    */
-  FixedImageCache( TextureManager&                 textureManager,
-                   UrlList&                        urlList,
-                   ImageCache::FrameReadyObserver& observer,
-                   unsigned int                    batchSize );
+  FixedImageCache(TextureManager&                 textureManager,
+                  UrlList&                        urlList,
+                  ImageCache::FrameReadyObserver& observer,
+                  unsigned int                    batchSize);
 
   ~FixedImageCache() override;
 
@@ -52,7 +51,7 @@ public:
    * Get the Nth frame. If it's not ready, this will trigger the
    * sending of FrameReady() when the image becomes ready.
    */
-  TextureSet Frame( uint32_t frameIndex ) override;
+  TextureSet Frame(uint32_t frameIndex) override;
 
   /**
    * Get the first frame. If it's not ready, this will trigger the
@@ -69,7 +68,7 @@ public:
   /**
    * Get the interval of Nth frame.
    */
-  uint32_t GetFrameInterval( uint32_t frameIndex ) const override;
+  uint32_t GetFrameInterval(uint32_t frameIndex) const override;
 
   /**
    * Get the current rendered frame index.
@@ -96,7 +95,7 @@ private:
   /**
    * Find the matching image frame, and set it to ready
    */
-  void SetImageFrameReady( TextureManager::TextureId textureId );
+  void SetImageFrameReady(TextureManager::TextureId textureId);
 
   /**
    * Get the texture set of the front frame.
@@ -108,7 +107,7 @@ private:
    * Check if the front frame has become ready - if so, inform observer
    * @param[in] wasReady Readiness before call.
    */
-  void CheckFrontFrame( bool wasReady );
+  void CheckFrontFrame(bool wasReady);
 
 protected:
   void UploadComplete(
@@ -117,18 +116,18 @@ protected:
     TextureSet     textureSet,
     bool           useAtlasing,
     const Vector4& atlasRect,
-    bool           premultiplied ) override;
+    bool           premultiplied) override;
 
   void LoadComplete(
-    bool loadSuccess,
+    bool               loadSuccess,
     Devel::PixelBuffer pixelBuffer,
-    const VisualUrl& url,
-    bool preMultiplied ) override;
+    const VisualUrl&   url,
+    bool               preMultiplied) override;
 
 private:
   std::vector<UrlStore>& mImageUrls;
-  std::vector<bool> mReadyFlags;
-  unsigned int      mFront;
+  std::vector<bool>      mReadyFlags;
+  unsigned int           mFront;
 };
 
 } //namespace Internal

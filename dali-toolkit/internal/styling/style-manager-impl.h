@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_STYLE_MANAGER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +18,25 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/adaptor-framework/style-monitor.h>
+#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/signals/connection-tracker.h>
+#include <string>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali-toolkit/internal/builder/style.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class FeedbackStyle;
 
 /**
@@ -67,11 +64,10 @@ protected:
   virtual ~StyleManager();
 
 public: // Public API
-
   /**
    * @copydoc Toolkit::StyleManager::ApplyTheme
    */
-  void ApplyTheme( const std::string& themeFile );
+  void ApplyTheme(const std::string& themeFile);
 
   /**
    * @copydoc Toolkit::StyleManager::ApplyDefaultTheme
@@ -86,12 +82,12 @@ public: // Public API
   /**
    * @copydoc Toolkit::StyleManager::SetStyleConstant
    */
-  void SetStyleConstant( const std::string& key, const Property::Value& value );
+  void SetStyleConstant(const std::string& key, const Property::Value& value);
 
   /**
    * @copydoc Toolkit::StyleManager::GetStyleConstant
    */
-  bool GetStyleConstant( const std::string& key, Property::Value& valueOut );
+  bool GetStyleConstant(const std::string& key, Property::Value& valueOut);
 
   /**
    * @copydoc Toolkit::StyleManager::GetConfigurations
@@ -103,26 +99,26 @@ public: // Public API
    *
    * @param[in] control The control to apply style.
    */
-  void ApplyThemeStyle( Toolkit::Control control );
+  void ApplyThemeStyle(Toolkit::Control control);
 
   /**
    * @brief Apply the theme style to a control at initialization.
    *
    * @param[in] control The control to apply style.
    */
-  void ApplyThemeStyleAtInit( Toolkit::Control control );
+  void ApplyThemeStyleAtInit(Toolkit::Control control);
 
   /**
    * @copydoc Toolkit::StyleManager::ApplyStyle
    */
-  void ApplyStyle( Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName );
+  void ApplyStyle(Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName);
 
   /**
    * Get the state/style information for the given control
    * @param[in] control The control to get state information for
    * @return The style information (or empty ptr if not found)
    */
-  const StylePtr GetRecordedStyle( Toolkit::Control control );
+  const StylePtr GetRecordedStyle(Toolkit::Control control);
 
 public:
   // SIGNALS
@@ -147,7 +143,7 @@ private:
    * @brief Set the current theme. Called only once per event processing cycle.
    * @param[in] themeFile The name of the theme file to read.
    */
-  void SetTheme( const std::string& themeFile );
+  void SetTheme(const std::string& themeFile);
 
   /**
    * @brief Internal helper method to read a file from file system.
@@ -165,7 +161,7 @@ private:
    *
    * @return Return the newly created builder
    */
-  Toolkit::Builder CreateBuilder( const Property::Map& constants );
+  Toolkit::Builder CreateBuilder(const Property::Map& constants);
 
   /**
    * @brief Load a JSON file into given builder
@@ -174,7 +170,7 @@ private:
    * @param[in] jsonFileName The name of the JSON file to load
    * @return Return true if file was loaded
    */
-  bool LoadJSON( Toolkit::Builder builder, const std::string& jsonFileName );
+  bool LoadJSON(Toolkit::Builder builder, const std::string& jsonFileName);
 
   /**
    * @brief Apply a style to the control using the given builder
@@ -182,7 +178,7 @@ private:
    * @param[in] builder The builder to apply the style from
    * @param[in] control The control to apply the style to
    */
-  void ApplyStyle( Toolkit::Builder builder, Toolkit::Control control );
+  void ApplyStyle(Toolkit::Builder builder, Toolkit::Control control);
 
   /**
    * Search for a builder in the cache
@@ -190,7 +186,7 @@ private:
    * @param[in] key The key the builder was cached under
    * @return Return the cached builder if found or an empty builder object if not found
    */
-  Toolkit::Builder FindCachedBuilder( const std::string& key );
+  Toolkit::Builder FindCachedBuilder(const std::string& key);
 
   /**
    * Store a given builder in the cache keyed to the given key
@@ -198,7 +194,7 @@ private:
    * @param[in] builder The builder object to store
    * @param[in] key The key to store the builder under
    */
-  void CacheBuilder( Toolkit::Builder builder, const std::string& key );
+  void CacheBuilder(Toolkit::Builder builder, const std::string& key);
 
   /**
    * Callback for when style monitor raises a signal
@@ -206,13 +202,12 @@ private:
    * @param[in] styleMonitor The style monitor object
    * @param[in] styleChange The style change type
    */
-  void StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::Type styleChange );
+  void StyleMonitorChange(StyleMonitor styleMonitor, StyleChange::Type styleChange);
 
   /**
    * Emit signals to controls first, app second
    */
-  void EmitStyleChangeSignals( StyleChange::Type styleChange );
-
+  void EmitStyleChangeSignals(StyleChange::Type styleChange);
 
   // Undefined
   StyleManager(const StyleManager&);
@@ -220,48 +215,47 @@ private:
   StyleManager& operator=(const StyleManager& rhs);
 
 private:
-
   // Map to store builders keyed by JSON file name
-  typedef std::map< std::string, Toolkit::Builder > BuilderMap;
+  typedef std::map<std::string, Toolkit::Builder> BuilderMap;
 
-  Toolkit::Builder mThemeBuilder;     ///< Builder for all default theme properties
-  StyleMonitor mStyleMonitor;         ///< Style monitor handle
+  Toolkit::Builder mThemeBuilder; ///< Builder for all default theme properties
+  StyleMonitor     mStyleMonitor; ///< Style monitor handle
 
-  int mDefaultFontSize;               ///< Logical size, not a point-size
+  int         mDefaultFontSize; ///< Logical size, not a point-size
   std::string mDefaultFontFamily;
-  std::string mDefaultThemeFilePath;  ///< The full path of the default theme file
-  std::string mThemeFile;             ///< The full path of the current theme file
+  std::string mDefaultThemeFilePath; ///< The full path of the default theme file
+  std::string mThemeFile;            ///< The full path of the current theme file
 
-  Property::Map mThemeBuilderConstants;   ///< Contants to give the theme builder
-  Property::Map mStyleBuilderConstants;   ///< Constants specific to building styles
+  Property::Map mThemeBuilderConstants; ///< Contants to give the theme builder
+  Property::Map mStyleBuilderConstants; ///< Constants specific to building styles
 
-  BuilderMap mBuilderCache;           ///< Cache of builders keyed by JSON file name
+  BuilderMap mBuilderCache; ///< Cache of builders keyed by JSON file name
 
   Toolkit::Internal::FeedbackStyle* mFeedbackStyle; ///< Feedback style
 
   // Signals
   Toolkit::StyleManager::StyleChangedSignalType mControlStyleChangeSignal; ///< Emitted when the style( theme/font ) changes for the controls to style themselves
-  Toolkit::StyleManager::StyleChangedSignalType mStyleChangedSignal; ///< Emitted after the controls have been styled
+  Toolkit::StyleManager::StyleChangedSignalType mStyleChangedSignal;       ///< Emitted after the controls have been styled
 };
 
 } // namespace Internal
 
-inline Internal::StyleManager& GetImpl( Dali::Toolkit::StyleManager& obj )
+inline Internal::StyleManager& GetImpl(Dali::Toolkit::StyleManager& obj)
 {
-  DALI_ASSERT_ALWAYS( obj );
+  DALI_ASSERT_ALWAYS(obj);
 
   Dali::BaseObject& handle = obj.GetBaseObject();
 
-  return static_cast< Internal::StyleManager& >( handle );
+  return static_cast<Internal::StyleManager&>(handle);
 }
 
-inline const Internal::StyleManager& GetImpl( const Dali::Toolkit::StyleManager& obj )
+inline const Internal::StyleManager& GetImpl(const Dali::Toolkit::StyleManager& obj)
 {
-  DALI_ASSERT_ALWAYS( obj );
+  DALI_ASSERT_ALWAYS(obj);
 
   const Dali::BaseObject& handle = obj.GetBaseObject();
 
-  return static_cast< const Internal::StyleManager& >( handle );
+  return static_cast<const Internal::StyleManager&>(handle);
 }
 
 } // namespace Toolkit

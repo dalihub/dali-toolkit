@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_SET_PROPERTY_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 /**
  * Set a property value from a tree node.
  * This function determines the type of the property from the format of the string in the node.
@@ -31,8 +30,8 @@ namespace Internal
  * @param node  The node string to convert from
  * @param value The property value to set
  */
-void DeterminePropertyFromNode( const TreeNode&  node,
-                                Property::Value& value );
+void DeterminePropertyFromNode(const TreeNode&  node,
+                               Property::Value& value);
 
 /**
  * Set a property value from a tree node as DeterminePropertyFromNode() above
@@ -42,9 +41,9 @@ void DeterminePropertyFromNode( const TreeNode&  node,
  * @param value The property value to set
  * @param replacement The overriding replacement map (if any)
  */
-void DeterminePropertyFromNode( const TreeNode&    node,
-                                Property::Value&   value,
-                                const Replacement& replacement );
+void DeterminePropertyFromNode(const TreeNode&    node,
+                               Property::Value&   value,
+                               const Replacement& replacement);
 
 /**
  * Set a property value as the given type from a tree node.
@@ -53,9 +52,9 @@ void DeterminePropertyFromNode( const TreeNode&    node,
  * @param value The property value to set
  * @return true if the string could be converted to the correct type.
  */
-bool DeterminePropertyFromNode( const TreeNode&  node,
-                                Property::Type   type,
-                                Property::Value& value );
+bool DeterminePropertyFromNode(const TreeNode&  node,
+                               Property::Type   type,
+                               Property::Value& value);
 
 /**
  * Set a property value as the given type from a tree node as DeterminePropertyFromNode() above
@@ -65,14 +64,13 @@ bool DeterminePropertyFromNode( const TreeNode&  node,
  * @param replacement The overriding replacement map (if any)
  * @return true if the string could be converted to the correct type.
  */
-bool DeterminePropertyFromNode( const TreeNode&    node,
-                                Property::Type     type,
-                                Property::Value&   value,
-                                const Replacement& replacement );
+bool DeterminePropertyFromNode(const TreeNode&    node,
+                               Property::Type     type,
+                               Property::Value&   value,
+                               const Replacement& replacement);
 
-
-} // Internal namespace
-} // Toolkit namespace
-} // Dali namespace
+} // namespace Internal
+} // namespace Toolkit
+} // namespace Dali
 
 #endif //DALI_TOOLKIT_INTERNAL_BUILDER_SET_PROPERTY_H

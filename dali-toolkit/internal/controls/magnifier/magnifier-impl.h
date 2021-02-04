@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_MAGNIFIER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +24,18 @@
 #include <dali/public-api/render-tasks/render-task.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/magnifier/magnifier.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class Magnifier;
 
-typedef IntrusivePtr<Magnifier>    MagnifierPtr;
+typedef IntrusivePtr<Magnifier> MagnifierPtr;
 
 /**
  * @copydoc Toolkit::Magnifier
@@ -46,7 +43,6 @@ typedef IntrusivePtr<Magnifier>    MagnifierPtr;
 class Magnifier : public Control
 {
 public:
-
   /**
    * Create a new Magnifier.
    * @return A public handle to the newly allocated Magnifier.
@@ -54,7 +50,6 @@ public:
   static Dali::Toolkit::Magnifier New();
 
 public:
-
   /**
    * @copydoc Toolkit::ImageView::SetSourceActor
    */
@@ -101,7 +96,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -109,10 +104,9 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
 protected:
-
   /**
    * Construct a new Magnifier.
    */
@@ -129,18 +123,15 @@ protected:
   virtual ~Magnifier();
 
 private:
-
   /**
    * Initializes the render task required to render contents.
    */
   void InitializeRenderTask();
 
 private:
-
   void OnSizeSet(const Vector3& targetSize) override;
 
 private:
-
   // Undefined
   Magnifier(const Magnifier&);
 
@@ -148,14 +139,13 @@ private:
   Magnifier& operator=(const Magnifier& rhs);
 
 private:
-
-  RenderTask mTask;                             ///< Render Task to render the source actor contents.
-  CameraActor mCameraActor;                     ///< CameraActor attached to RenderTask
-  Actor mFrame;                                 ///< The Magnifier Frame
-  Actor mSourceActor;                           ///< Source Delegate Actor represents the source position to read.
-  float mDefaultCameraDistance;                 ///< Default RenderTask's camera distance from target.
-  Vector3 mActorSize;                           ///< The Actor size
-  float mMagnificationFactor;                   ///< Magnification factor 1.0f is default. same as content.
+  RenderTask  mTask;                  ///< Render Task to render the source actor contents.
+  CameraActor mCameraActor;           ///< CameraActor attached to RenderTask
+  Actor       mFrame;                 ///< The Magnifier Frame
+  Actor       mSourceActor;           ///< Source Delegate Actor represents the source position to read.
+  float       mDefaultCameraDistance; ///< Default RenderTask's camera distance from target.
+  Vector3     mActorSize;             ///< The Actor size
+  float       mMagnificationFactor;   ///< Magnification factor 1.0f is default. same as content.
 };
 
 } // namespace Internal

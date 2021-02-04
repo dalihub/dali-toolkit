@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_BACKEND_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 namespace Internal DALI_INTERNAL
 {
 class Backend;
@@ -44,7 +41,6 @@ class Backend;
 class Backend : public BaseHandle
 {
 public:
-
   /**
    * @brief Retrieve a handle to the Backend instance.
    *
@@ -58,7 +54,7 @@ public:
    * @param[in] renderingType The type of rendering required.
    * @return A handle to the newly created renderer.
    */
-  RendererPtr NewRenderer( unsigned int renderingType );
+  RendererPtr NewRenderer(unsigned int renderingType);
 
   /**
    * @brief Create an uninitialized TextAbstraction handle.
@@ -77,7 +73,7 @@ public:
    *
    * @param[in] handle A reference to the copied handle.
    */
-  Backend( const Backend& handle );
+  Backend(const Backend& handle);
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -85,16 +81,15 @@ public:
    * @param [in] handle  A reference to the copied handle.
    * @return A reference to this.
    */
-  Backend& operator=( const Backend& handle );
+  Backend& operator=(const Backend& handle);
 
 public: // Not intended for application developers
-
   /**
    * @brief This constructor is used by Backend::Get().
    *
    * @param[in] backend A pointer to the internal backend object.
    */
-  explicit DALI_INTERNAL Backend( Internal::Backend* backend );
+  explicit DALI_INTERNAL Backend(Internal::Backend* backend);
 };
 
 } // namespace Text

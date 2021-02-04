@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SLIDER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,26 +24,23 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class Button;
 
 namespace Internal
 {
-
 class Slider;
 
-typedef Dali::IntrusivePtr< Slider > SliderPtr;
+typedef Dali::IntrusivePtr<Slider> SliderPtr;
 
 /**
  * @copydoc Toolkit::Slider
@@ -51,7 +48,6 @@ typedef Dali::IntrusivePtr< Slider > SliderPtr;
 class Slider : public Control
 {
 public:
-
   typedef Property::Array MarkList;
 
   /**
@@ -62,7 +58,6 @@ public:
   static Dali::Toolkit::Slider New();
 
 public:
-
   // Properties
 
   /**
@@ -70,7 +65,7 @@ public:
    *
    * @param[in] marks The list of marks to set
    */
-  void SetMarks( const MarkList& marks );
+  void SetMarks(const MarkList& marks);
 
   /**
    * Get the list of marks
@@ -84,7 +79,7 @@ public:
    *
    * @param[in] snap Flag to snap to marks or not
    */
-  void SetSnapToMarks( bool snap );
+  void SetSnapToMarks(bool snap);
 
   /**
    * Return if snap to marks is set or not
@@ -98,7 +93,7 @@ public:
    *
    * @param[in] value The value to set. Will be clamped to [lowerBound .. upperBound]
    */
-  void SetValue( float value );
+  void SetValue(float value);
 
   /**
    * Get the value of the slider
@@ -112,7 +107,7 @@ public:
    *
    * @param[in] region The hit region
    */
-  void SetHitRegion( const Vector2& region );
+  void SetHitRegion(const Vector2& region);
 
   /**
    * Get hit region
@@ -126,7 +121,7 @@ public:
    *
    * @param[in] region The track region
    */
-  void SetTrackRegion( const Vector2& region );
+  void SetTrackRegion(const Vector2& region);
 
   /**
    * Get the track region
@@ -140,7 +135,7 @@ public:
    *
    * @param[in] color The disabled color.
    */
-  void SetDisabledColor( const Vector4& color );
+  void SetDisabledColor(const Vector4& color);
 
   /**
    * @brief Get disabled color
@@ -154,7 +149,7 @@ public:
    *
    * @param[in] precision The number of decimal places to use for printing numbers
    */
-  void SetValuePrecision( int precision );
+  void SetValuePrecision(int precision);
 
   /**
    * Get value precision
@@ -168,7 +163,7 @@ public:
    *
    * @param[in] showPopup The show popup flag
    */
-  void SetShowPopup( bool showPopup );
+  void SetShowPopup(bool showPopup);
 
   /**
    * Get show value in popup
@@ -182,7 +177,7 @@ public:
    *
    * @param[in] showValue The show value flag
    */
-  void SetShowValue( bool showValue );
+  void SetShowValue(bool showValue);
 
   /**
    * Get show value on handle
@@ -196,7 +191,7 @@ public:
    *
    * param[in] enabled Set the enabled flag
    */
-  void SetEnabled( bool enabled );
+  void SetEnabled(bool enabled);
 
   /**
    * Return if enabled or not
@@ -213,7 +208,7 @@ public:
    *
    * @param[in] tolerance The percentage of width for which to snap
    */
-  void SetMarkTolerance( float tolerance );
+  void SetMarkTolerance(float tolerance);
 
   /**
    * Return the mark tolerance
@@ -249,8 +244,7 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName,
-                               FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
   // Properties
 
@@ -260,7 +254,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -268,10 +262,9 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+  static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
 protected:
-
   /**
    * Construct a new Slider.
    */
@@ -285,11 +278,9 @@ protected:
   /**
    * @copydoc CustomActorImpl::OnRelayout
    */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
-
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
 private:
-
   /**
    * Domain is a from/to pair
    */
@@ -301,8 +292,9 @@ private:
     Domain()
     {
     }
-    Domain( Vector2 fromVal, Vector2 toVal )
-        : from( fromVal ), to( toVal )
+    Domain(Vector2 fromVal, Vector2 toVal)
+    : from(fromVal),
+      to(toVal)
     {
     }
   };
@@ -319,7 +311,6 @@ private:
   };
 
 private:
-
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
@@ -332,7 +323,7 @@ private:
    * @param[in] touch The touch info
    * @return If touch is handled or not
    */
-  bool OnTouch( Actor actor, const TouchEvent& touch );
+  bool OnTouch(Actor actor, const TouchEvent& touch);
 
   /**
    * Pan gesture event
@@ -340,7 +331,7 @@ private:
    * @param[in] actor The actor the event is raised for
    * @param[in] gesture The pan event info
    */
-  void OnPan( Actor actor, const PanGesture& gesture );
+  void OnPan(Actor actor, const PanGesture& gesture);
 
   /**
    * Map a position onto a domain and return the result as a percentage
@@ -348,7 +339,7 @@ private:
    * @param[in] point The point to map onto the domain
    * @return The result as a percentage [0..1]
    */
-  float MapPercentage( const Vector2& point );
+  float MapPercentage(const Vector2& point);
 
   /**
    * Map a value in the range to a percentage
@@ -356,7 +347,7 @@ private:
    * @param[in] point The value in range [lowerBound..upperBound]
    * @return The result as a percentage [0..1]
    */
-  float MapValuePercentage( float value );
+  float MapValuePercentage(float value);
 
   /**
    * Convert a point in local hit space into domain space
@@ -364,7 +355,7 @@ private:
    * @param[in] x The x position to convert
    * @return The x position in domain space
    */
-  float HitSpaceToDomain( float x );
+  float HitSpaceToDomain(float x);
 
   /**
    * Map a percentage onto the slider's bounds
@@ -374,7 +365,7 @@ private:
    * @param[in] upperBound The upper bound to map onto
    * @return The value of percent mapped from lowerBound to upperBound
    */
-  float MapBounds( float percent, float lowerBound, float upperBound );
+  float MapBounds(float percent, float lowerBound, float upperBound);
 
   /**
    * Get the range of the valid values the slider handle can move between
@@ -382,7 +373,7 @@ private:
    * @param[in] currentSize The current size of the slider
    * @return The range as a domain pair
    */
-  Domain CalcDomain( const Vector2& currentSize );
+  Domain CalcDomain(const Vector2& currentSize);
 
   /**
    * Create the hit region
@@ -465,7 +456,7 @@ private:
    *
    * @param[in] value The value to display in the popup
    */
-  void DisplayPopup( float value );
+  void DisplayPopup(float value);
 
   /**
    * If there are marks present, filter the incoming percent based on snapping to any nearby marks
@@ -473,7 +464,7 @@ private:
    * @param[in] value The incoming value on the slider to filter
    * @return The filtered percentage snapped to any nearby marks
    */
-  float MarkFilter( float value );
+  float MarkFilter(float value);
 
   /**
    * If there are marks present, snap the incoming percent to the nearest mark
@@ -481,7 +472,7 @@ private:
    * @param[in] value The incoming value on the slider to snap
    * @return The filtered percentage snapped to the nearest mark
    */
-  float SnapToMark( float value );
+  float SnapToMark(float value);
 
   /**
    * Search for if a mark has been reached
@@ -490,7 +481,7 @@ private:
    * @param[out] outIndex The index of the mark if found
    * @return If a mark has been found to match percent
    */
-  bool MarkReached( float value, int& outIndex );
+  bool MarkReached(float value, int& outIndex);
 
   /**
    * Handler for when the value view needs to be hidden
@@ -505,21 +496,21 @@ private:
    * @paramp[in] value The value to set
    * @param[in] raiseSignals Configure signals to be raised or not.
    */
-  void DisplayValue( float value, bool raiseSignals );
+  void DisplayValue(float value, bool raiseSignals);
 
   /**
    * Create the image for the track
    *
    * @param[in] filename The track image
    */
-  void SetTrackVisual( const std::string& filename );
+  void SetTrackVisual(const std::string& filename);
 
   /**
    * @brief Set the track visual from an Dali::Property::Map
    *
    * @param[in] map The Dali::Property::Map to use for to display
    */
-  void SetTrackVisual( Dali::Property::Map map );
+  void SetTrackVisual(Dali::Property::Map map);
 
   /**
    * @brief Return the track image.
@@ -533,14 +524,14 @@ private:
    *
    * @param[in] filename The progress bar image
    */
-  void SetProgressVisual( const std::string& filename );
+  void SetProgressVisual(const std::string& filename);
 
   /**
    * @brief Set the progress visual from an Dali::Property::Map
    *
    * @param[in] map The Dali::Property::Map to use for to display
    */
-  void SetProgressVisual( Dali::Property::Map map );
+  void SetProgressVisual(Dali::Property::Map map);
 
   /**
    * @brief Return the progress bar image.
@@ -554,21 +545,21 @@ private:
    *
    * @param[in] filename The popup image
    */
-  void CreatePopupImage( const std::string& filename );
+  void CreatePopupImage(const std::string& filename);
 
   /**
    * @brief Set the popup image
    *
    * @param[in] filename The popup image to set
    */
-  void SetPopupVisual( const std::string& filename );
+  void SetPopupVisual(const std::string& filename);
 
   /**
    * @brief Set the popup from an Dali::Property::Map
    *
    * @param[in] map The Dali::Property::Map to use for to display
    */
-  void SetPopupVisual( Dali::Property::Map map );
+  void SetPopupVisual(Dali::Property::Map map);
 
   /**
    * @brief Return the popup image.
@@ -582,14 +573,14 @@ private:
    *
    * @param[in] filename The popup arrow image to set
    */
-  void SetPopupArrowVisual( const std::string& filename );
+  void SetPopupArrowVisual(const std::string& filename);
 
   /**
    * @brief Set the popup arrow from an Dali::Property::Map
    *
    * @param[in] map The Dali::Property::Map to use for to display
    */
-  void SetPopupArrowVisual( Dali::Property::Map map );
+  void SetPopupArrowVisual(Dali::Property::Map map);
 
   /**
    * @brief Return the popup arrow image.
@@ -603,28 +594,28 @@ private:
    *
    * @param[in] filename The popup arrow image to load and set
    */
-  void CreatePopupArrowImage( const std::string& filename );
+  void CreatePopupArrowImage(const std::string& filename);
 
   /**
    * Set the size of the progress bar region
    *
    * @param[in] region The size of the region to set
    */
-  void ResizeProgressRegion( const Vector2& region );
+  void ResizeProgressRegion(const Vector2& region);
 
   /**
    * Create the image for the handle
    *
    * @param[in] filename The handle image
    */
-  void SetHandleVisual( const std::string& filename );
+  void SetHandleVisual(const std::string& filename);
 
   /**
    * @brief Set the handle visual from an Dali::Property::Map
    *
    * @param[in] map The Dali::Property::Map to use for to display
    */
-  void SetHandleVisual( Property::Map map );
+  void SetHandleVisual(Property::Map map);
 
   /**
    * @brief Return the handle image.
@@ -638,7 +629,7 @@ private:
    *
    * @param[in] size The size of the handle to set
    */
-  void ResizeHandleSize( const Vector2& size );
+  void ResizeHandleSize(const Vector2& size);
 
   /**
    * Create and display the value on the handle
@@ -655,7 +646,7 @@ private:
    *
    * @param[in] size The handle size
    */
-  void SetHandleSize( const Vector2& size );
+  void SetHandleSize(const Vector2& size);
 
   /**
    * Get the size of the handle
@@ -669,7 +660,7 @@ private:
    *
    * @param[in] bound The value to set for the lower bound
    */
-  void SetLowerBound( float bound );
+  void SetLowerBound(float bound);
 
   /**
    * Get the lower bound of the slider's value
@@ -683,7 +674,7 @@ private:
    *
    * @param[in] bound The value to set for the upper bound
    */
-  void SetUpperBound( float bound );
+  void SetUpperBound(float bound);
 
   /**
    * Get the upper bound of the slider's value
@@ -693,69 +684,67 @@ private:
   float GetUpperBound() const;
 
 private:
+  // Undefined
+  Slider(const Slider&);
 
   // Undefined
-  Slider( const Slider& );
-
-  // Undefined
-  Slider& operator=( const Slider& rhs );
+  Slider& operator=(const Slider& rhs);
 
 private:
+  Domain mDomain; ///< Current domain of the handle
 
-  Domain mDomain;                           ///< Current domain of the handle
-
-  Actor mHitArea;                           ///< The input handler
-  Actor mValueDisplay;                      ///< Display of the value
-  Toolkit::ImageView mTrack;                ///< Track image
-  Toolkit::ImageView mHandle;               ///< Slider handle
-  Toolkit::ImageView mProgress;             ///< Progress bar
-  Toolkit::ImageView mPopup;                ///< Popup backing
-  Toolkit::ImageView mPopupArrow;           ///< Popup arrow backing
+  Actor              mHitArea;      ///< The input handler
+  Actor              mValueDisplay; ///< Display of the value
+  Toolkit::ImageView mTrack;        ///< Track image
+  Toolkit::ImageView mHandle;       ///< Slider handle
+  Toolkit::ImageView mProgress;     ///< Progress bar
+  Toolkit::ImageView mPopup;        ///< Popup backing
+  Toolkit::ImageView mPopupArrow;   ///< Popup arrow backing
 
   Toolkit::TextLabel mValueTextLabel;       //< The text value in popup
   Toolkit::TextLabel mHandleValueTextLabel; ///< The text value on handle
-  Vector2 mHandleLastTouchPoint;            ///< The last touch point for the handle
-  Timer mValueTimer;                        ///< Timer used to hide value view
+  Vector2            mHandleLastTouchPoint; ///< The last touch point for the handle
+  Timer              mValueTimer;           ///< Timer used to hide value view
 
-  Toolkit::Slider::ValueChangedSignalType mValueChangedSignal;       ///< Signal emitted when the value is changed
-  Toolkit::Slider::ValueChangedSignalType mSlidingFinishedSignal;    ///< Signal emitted when a sliding is finished
-  Toolkit::Slider::MarkReachedSignalType mMarkReachedSignal;         ///< Signal emitted when a mark is reached
+  Toolkit::Slider::ValueChangedSignalType mValueChangedSignal;    ///< Signal emitted when the value is changed
+  Toolkit::Slider::ValueChangedSignalType mSlidingFinishedSignal; ///< Signal emitted when a sliding is finished
+  Toolkit::Slider::MarkReachedSignalType  mMarkReachedSignal;     ///< Signal emitted when a mark is reached
 
-  SliderState mState;                 ///< The state of the slider
+  SliderState mState; ///< The state of the slider
 
-  PanGestureDetector mPanDetector;    ///< Hit region pan detector
+  PanGestureDetector mPanDetector; ///< Hit region pan detector
 
-  MarkList mMarks;                    ///< List of discreet marks
+  MarkList mMarks; ///< List of discreet marks
 
-  std::string mPopupVisual;           ///< Image for popup image
-  std::string mPopupArrowVisual;      ///< Image for popup arrow image
-  std::string mTrackVisual;           ///< Image for track image
-  std::string mHandleVisual;          ///< Image for handle image
-  std::string mProgressVisual;        ///< Image for progress bar image
+  std::string mPopupVisual;      ///< Image for popup image
+  std::string mPopupArrowVisual; ///< Image for popup arrow image
+  std::string mTrackVisual;      ///< Image for track image
+  std::string mHandleVisual;     ///< Image for handle image
+  std::string mProgressVisual;   ///< Image for progress bar image
 
-  Property::Map mPopupMap;         ///< the Property::Map if the image came from a Property::Map, empty otherwise
-  Property::Map mTrackMap;         ///< the Property::Map if the image came from a Property::Map, empty otherwise
-  Property::Map mHandleMap;        ///< the Property::Map if the image came from a Property::Map, empty otherwise
-  Property::Map mProgressMap;      ///< the Property::Map if the image came from a Property::Map, empty otherwise
-  Property::Map mPopupArrowMap;    ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map mPopupMap;      ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map mTrackMap;      ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map mHandleMap;     ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map mProgressMap;   ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map mPopupArrowMap; ///< the Property::Map if the image came from a Property::Map, empty otherwise
 
-  Vector4 mDisabledColor;    ///< The color to tint the slider when disabled
+  Vector4 mDisabledColor; ///< The color to tint the slider when disabled
 
-  Vector2 mHitRegion;     ///< Size of hit region
-  Vector2 mTrackRegion;   ///< Size of track region
-  Vector2 mHandleSize;    ///< Size of the handle
+  Vector2 mHitRegion;   ///< Size of hit region
+  Vector2 mTrackRegion; ///< Size of track region
+  Vector2 mHandleSize;  ///< Size of the handle
 
-  float mLowerBound = 0.0f;        ///< Lower bound on value
-  float mUpperBound = 1.0f;        ///< Upper bound on value
-  float mValue = 0.0f;             ///< Current value of slider
+  float mLowerBound = 0.0f; ///< Lower bound on value
+  float mUpperBound = 1.0f; ///< Upper bound on value
+  float mValue      = 0.0f; ///< Current value of slider
 
-  float mMarkTolerance = 0.05f;     ///< Tolerance in percentage of slider width for which to snap to marks
+  float mMarkTolerance = 0.05f; ///< Tolerance in percentage of slider width for which to snap to marks
 
-  int mValuePrecision;      ///< The precision to use for outputting the value
+  int mValuePrecision; ///< The precision to use for outputting the value
 
-  bool mShowPopup   : 1,      ///< Show the popup or not
-       mShowValue   : 1,      ///< Whether to display the value number or not on the handle
-       mSnapToMarks : 1;      ///< Turn on or off snapping to marks
+  bool mShowPopup : 1, ///< Show the popup or not
+    mShowValue : 1,    ///< Whether to display the value number or not on the handle
+    mSnapToMarks : 1;  ///< Turn on or off snapping to marks
 
 protected:
   struct AccessibleImpl : public Control::Impl::AccessibleImpl,
@@ -765,7 +754,7 @@ protected:
     double GetMinimum() override;
     double GetCurrent() override;
     double GetMaximum() override;
-    bool SetCurrent( double ) override;
+    bool   SetCurrent(double) override;
     double GetMinimumIncrement() override;
   };
 };
@@ -774,22 +763,22 @@ protected:
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::Slider& GetImpl( Toolkit::Slider& pub )
+inline Toolkit::Internal::Slider& GetImpl(Toolkit::Slider& pub)
 {
-  DALI_ASSERT_ALWAYS( pub );
+  DALI_ASSERT_ALWAYS(pub);
 
   Dali::RefObject& handle = pub.GetImplementation();
 
-  return static_cast< Toolkit::Internal::Slider& >( handle );
+  return static_cast<Toolkit::Internal::Slider&>(handle);
 }
 
-inline const Toolkit::Internal::Slider& GetImpl( const Toolkit::Slider& pub )
+inline const Toolkit::Internal::Slider& GetImpl(const Toolkit::Slider& pub)
 {
-  DALI_ASSERT_ALWAYS( pub );
+  DALI_ASSERT_ALWAYS(pub);
 
   const Dali::RefObject& handle = pub.GetImplementation();
 
-  return static_cast< const Toolkit::Internal::Slider& >( handle );
+  return static_cast<const Toolkit::Internal::Slider&>(handle);
 }
 
 } // namespace Toolkit

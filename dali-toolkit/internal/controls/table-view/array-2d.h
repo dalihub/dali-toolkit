@@ -3,7 +3,7 @@
 #define DALI_ARRAY2D_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 /**
  * Helper wrapper for two dimensional array using std::vector
  * Usage:
@@ -34,40 +33,42 @@ namespace Dali
  *   intArray.Resize( 4, 4 );
  * </code>
  */
-template< typename T >
+template<typename T>
 class Array2d
 {
 public:
-
   /**
    * Default constructor. Creates a 0x0 array
    */
   Array2d()
-  : mArray( 0, std::vector< T >( 0 ) )
-  { }
+  : mArray(0, std::vector<T>(0))
+  {
+  }
 
   /**
    * Constructs an array with given dimensions
    * @param [in] rows for array
    * @param [in] columns for array
    */
-  Array2d( unsigned int rows, unsigned int columns )
-  : mArray( rows, std::vector< T >( columns ) )
-  { }
+  Array2d(unsigned int rows, unsigned int columns)
+  : mArray(rows, std::vector<T>(columns))
+  {
+  }
 
   /**
    * Destructor
    */
   ~Array2d()
-  { } // Nothing to do, vector cleans up itself
+  {
+  } // Nothing to do, vector cleans up itself
 
   /**
    * Copy constructor
    * @param array to copy from
    */
-  Array2d( const Array2d& array )
+  Array2d(const Array2d& array)
   {
-    if( this != &array )
+    if(this != &array)
     {
       mArray = array.mArray;
     }
@@ -78,13 +79,13 @@ public:
    * @param array to copy from
    * @return reference to self for chaining
    */
-  Array2d& operator=( const Array2d& array )
+  Array2d& operator=(const Array2d& array)
   {
-    if( this != &array )
+    if(this != &array)
     {
       mArray = array.mArray;
     }
-  return *this;
+    return *this;
   }
 
   /**
@@ -100,10 +101,10 @@ public:
    */
   unsigned int GetColumns()
   {
-    if( mArray.size() > 0 )
+    if(mArray.size() > 0)
     {
       // all columns are equal length
-      return mArray[ 0 ].size();
+      return mArray[0].size();
     }
     return 0;
   }
@@ -112,28 +113,28 @@ public:
    * @param [in] index of the row
    * @return reference to the row vector for given index
    */
-  std::vector< T >& operator[]( unsigned int index )
+  std::vector<T>& operator[](unsigned int index)
   {
-    return mArray[ index ];
+    return mArray[index];
   }
 
   /**
    * @param [in] index of the row
    * @return const reference to the row vector for given index
    */
-  const std::vector< T >& operator[]( unsigned int index ) const
+  const std::vector<T>& operator[](unsigned int index) const
   {
-    return mArray[ index ];
+    return mArray[index];
   }
 
   /**
    * Insert a new row to given index
    * @param [in] rowIndex of the new row
    */
-  void InsertRow( unsigned int rowIndex )
+  void InsertRow(unsigned int rowIndex)
   {
     // insert default initialized row of elements
-    mArray.insert( mArray.begin() + rowIndex, std::vector< T >( GetColumns() ) );
+    mArray.insert(mArray.begin() + rowIndex, std::vector<T>(GetColumns()));
   }
 
   /**
@@ -141,10 +142,10 @@ public:
    * Removed elements are deleted
    * @param [in] rowIndex of the row to delete
    */
-  void DeleteRow( unsigned int rowIndex )
+  void DeleteRow(unsigned int rowIndex)
   {
     // erase the row
-    mArray.erase( mArray.begin() + rowIndex );
+    mArray.erase(mArray.begin() + rowIndex);
   }
 
   /**
@@ -152,26 +153,26 @@ public:
    * @param [in] rowIndex of the row to delete
    * @param [out] removed elements
    */
-  void DeleteRow( unsigned int rowIndex, std::vector< T >& removed )
+  void DeleteRow(unsigned int rowIndex, std::vector<T>& removed)
   {
     // copy the row elements
-    removed.insert( removed.end(), mArray[ rowIndex ].begin(), mArray[ rowIndex ].end() );
+    removed.insert(removed.end(), mArray[rowIndex].begin(), mArray[rowIndex].end());
     // erase the row
-    mArray.erase( mArray.begin() + rowIndex );
+    mArray.erase(mArray.begin() + rowIndex);
   }
 
   /**
    * Insert a new column to given index
    * @param [in] columnIndex of the new column
    */
-  void InsertColumn( unsigned int columnIndex )
+  void InsertColumn(unsigned int columnIndex)
   {
     // go through all rows
     const unsigned int rows = GetRows();
-    for( unsigned int i = 0; i < rows; ++i )
+    for(unsigned int i = 0; i < rows; ++i)
     {
       // insert default initialized element
-      mArray[ i ].insert( mArray[ i ].begin() + columnIndex, T() );
+      mArray[i].insert(mArray[i].begin() + columnIndex, T());
     }
   }
 
@@ -180,14 +181,14 @@ public:
    * Removed elements are deleted
    * @param [in] columnIndex of the column to delete
    */
-  void DeleteColumn( unsigned int columnIndex )
+  void DeleteColumn(unsigned int columnIndex)
   {
     // go through all rows
     const unsigned int rows = GetRows();
-    for( unsigned int i = 0; i < rows; ++i )
+    for(unsigned int i = 0; i < rows; ++i)
     {
       // erase the column
-      mArray[ i ].erase( mArray[ i ].begin() + columnIndex );
+      mArray[i].erase(mArray[i].begin() + columnIndex);
     }
   }
 
@@ -196,16 +197,16 @@ public:
    * @param [in] columnIndex of the column to delete
    * @param [out] removed elements
    */
-  void DeleteColumn( unsigned int columnIndex, std::vector< T >& removed )
+  void DeleteColumn(unsigned int columnIndex, std::vector<T>& removed)
   {
     // go through all rows
     const unsigned int rows = GetRows();
-    for( unsigned int i = 0; i < rows; ++i )
+    for(unsigned int i = 0; i < rows; ++i)
     {
       // copy the column element of this row
-      removed.push_back( mArray[ i ][ columnIndex ] );
+      removed.push_back(mArray[i][columnIndex]);
       // erase the column
-      mArray[ i ].erase( mArray[ i ].begin() + columnIndex );
+      mArray[i].erase(mArray[i].begin() + columnIndex);
     }
   }
 
@@ -215,14 +216,14 @@ public:
    * @param [in] rows for array
    * @param [in] columns for array
    */
-  void Resize( unsigned int rows, unsigned int columns )
+  void Resize(unsigned int rows, unsigned int columns)
   {
     // resize rows first, may increase or decrease size
-    mArray.resize( rows );
-    for( unsigned int i = 0; i < rows; ++i )
+    mArray.resize(rows);
+    for(unsigned int i = 0; i < rows; ++i)
     {
       // resize each column, may increase or decrease size
-      mArray[ i ].resize( columns );
+      mArray[i].resize(columns);
     }
   }
 
@@ -233,41 +234,39 @@ public:
    * @param [in] columns for array
    * @param [out] removed elements in case array is smaller in either dimension
    */
-  void Resize( unsigned int rows, unsigned int columns, std::vector< T >& removed )
+  void Resize(unsigned int rows, unsigned int columns, std::vector<T>& removed)
   {
     // remember old counts
-    const unsigned int oldRows = GetRows();
+    const unsigned int oldRows    = GetRows();
     const unsigned int oldColumns = GetColumns();
     // are rows being removed ?
-    if( rows < oldRows )
+    if(rows < oldRows)
     {
       // gather the elements of removed rows
-      for( unsigned int i = rows; i < oldRows; ++i )
+      for(unsigned int i = rows; i < oldRows; ++i)
       {
         // copy the row elements, the whole row is gone
-        removed.insert( removed.end(), mArray[ i ].begin(), mArray[ i ].end() );
+        removed.insert(removed.end(), mArray[i].begin(), mArray[i].end());
       }
     }
     // resize the rows, may increase or decrease size
-    mArray.resize( rows );
+    mArray.resize(rows);
     // process columns, need to do all rows as also columns for new row need resizing
-    for( unsigned int i = 0; i < rows; ++i )
+    for(unsigned int i = 0; i < rows; ++i)
     {
       // if this is an old row and columns are being removed
-      if( ( i < oldRows )&&( columns < oldColumns ) )
+      if((i < oldRows) && (columns < oldColumns))
       {
         // copy the columns, the end of row from columns is gone
-        removed.insert( removed.end(), mArray[ i ].begin() + columns, mArray[ i ].end() );
+        removed.insert(removed.end(), mArray[i].begin() + columns, mArray[i].end());
       }
       // resize the column, may increase of decrease size
-      mArray[ i ].resize( columns );
+      mArray[i].resize(columns);
     }
   }
 
 private:
-
-  std::vector< std::vector< T > > mArray;
-
+  std::vector<std::vector<T> > mArray;
 };
 
 } // namespace Dali

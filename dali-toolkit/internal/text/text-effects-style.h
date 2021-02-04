@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_EFFECTS_STYLE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,20 +23,17 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 namespace EffectStyle
 {
-  enum Type
-  {
-    DEFAULT, ///< The default text effect style.
-    INPUT    ///< The input text effect style.
-  };
+enum Type
+{
+  DEFAULT, ///< The default text effect style.
+  INPUT    ///< The input text effect style.
+};
 };
 
 /**
@@ -48,11 +45,11 @@ namespace EffectStyle
  * @param[out] offsetDefined Whether the shadow's offset is defined.
  * @param[out] offset The shadow's offset.
  */
-bool ParseShadowProperties( const Property::Map& shadowProperties,
-                            bool& colorDefined,
-                            Vector4& color,
-                            bool& offsetDefined,
-                            Vector2& offset );
+bool ParseShadowProperties(const Property::Map& shadowProperties,
+                           bool&                colorDefined,
+                           Vector4&             color,
+                           bool&                offsetDefined,
+                           Vector2&             offset);
 
 /**
  * @brief Parses the underline properties.
@@ -64,12 +61,12 @@ bool ParseShadowProperties( const Property::Map& shadowProperties,
  * @param[out] heightDefined Whether the underline's height is defined.
  * @param[out] height The underline's height.
  */
-bool ParseUnderlineProperties( const Property::Map& underlineProperties,
-                               bool& enabled,
-                               bool& colorDefined,
-                               Vector4& color,
-                               bool& heightDefined,
-                               float& height );
+bool ParseUnderlineProperties(const Property::Map& underlineProperties,
+                              bool&                enabled,
+                              bool&                colorDefined,
+                              Vector4&             color,
+                              bool&                heightDefined,
+                              float&               height);
 
 /**
  * @brief Parses the outline properties.
@@ -80,12 +77,11 @@ bool ParseUnderlineProperties( const Property::Map& underlineProperties,
  * @param[out] widthDefined Whether the outline's width is defined.
  * @param[out] width The outline's width.
  */
-bool ParseOutlineProperties( const Property::Map& outlineProperties,
-                               bool& colorDefined,
-                               Vector4& color,
-                               bool& widthDefined,
-                               unsigned int& width );
-
+bool ParseOutlineProperties(const Property::Map& outlineProperties,
+                            bool&                colorDefined,
+                            Vector4&             color,
+                            bool&                widthDefined,
+                            unsigned int&        width);
 
 /**
  * @brief Parses the background properties.
@@ -95,10 +91,10 @@ bool ParseOutlineProperties( const Property::Map& outlineProperties,
  * @param[out] colorDefined Whether the background color is defined.
  * @param[out] color The background color.
  */
-bool ParseBackgroundProperties( const Property::Map& backgroundProperties,
-                                bool& enabled,
-                                bool& colorDefined,
-                                Vector4& color );
+bool ParseBackgroundProperties(const Property::Map& backgroundProperties,
+                               bool&                enabled,
+                               bool&                colorDefined,
+                               Vector4&             color);
 
 /**
  * @brief Sets the underline properties.
@@ -109,7 +105,7 @@ bool ParseBackgroundProperties( const Property::Map& backgroundProperties,
  *
  * @return Whether the underline properties have been updated.
  */
-bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& value, EffectStyle::Type type );
+bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& value, EffectStyle::Type type);
 
 /**
  * @brief Retrieves the underline's properties.
@@ -118,7 +114,7 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
  * @param[out] value The value of the underline's properties.
  * @param[in] type Whether the property is for the default underline or the input underline.
  */
-void GetUnderlineProperties( ControllerPtr controller, Property::Value& value, EffectStyle::Type type );
+void GetUnderlineProperties(ControllerPtr controller, Property::Value& value, EffectStyle::Type type);
 
 /**
  * @brief Sets the shadow properties.
@@ -129,7 +125,7 @@ void GetUnderlineProperties( ControllerPtr controller, Property::Value& value, E
  *
  * @return Whether the shadow properties have been updated.
  */
-bool SetShadowProperties( ControllerPtr controller, const Property::Value& value, EffectStyle::Type type );
+bool SetShadowProperties(ControllerPtr controller, const Property::Value& value, EffectStyle::Type type);
 
 /**
  * @brief Retrieves the shadow's properties.
@@ -138,7 +134,7 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
  * @param[out] value The value of the shadow's properties.
  * @param[in] type Whether the property is for the default shadow or the input shadow.
  */
-void GetShadowProperties( ControllerPtr controller, Property::Value& value, EffectStyle::Type type );
+void GetShadowProperties(ControllerPtr controller, Property::Value& value, EffectStyle::Type type);
 
 /**
  * @brief Sets the emboss properties.
@@ -149,7 +145,7 @@ void GetShadowProperties( ControllerPtr controller, Property::Value& value, Effe
  *
  * @return Whether the emboss properties have been updated.
  */
-bool SetEmbossProperties( ControllerPtr controller, const Property::Value& value, EffectStyle::Type type );
+bool SetEmbossProperties(ControllerPtr controller, const Property::Value& value, EffectStyle::Type type);
 
 /**
  * @brief Retrieves the emboss's properties.
@@ -158,7 +154,7 @@ bool SetEmbossProperties( ControllerPtr controller, const Property::Value& value
  * @param[out] value The value of the emboss's properties.
  * @param[in] type Whether the property is for the default emboss or the input emboss.
  */
-void GetEmbossProperties( ControllerPtr controller, Property::Value& value, EffectStyle::Type type );
+void GetEmbossProperties(ControllerPtr controller, Property::Value& value, EffectStyle::Type type);
 
 /**
  * @brief Sets the outline properties.
@@ -169,7 +165,7 @@ void GetEmbossProperties( ControllerPtr controller, Property::Value& value, Effe
  *
  * @return Whether the outline properties have been updated.
  */
-bool SetOutlineProperties( ControllerPtr controller, const Property::Value& value, EffectStyle::Type type );
+bool SetOutlineProperties(ControllerPtr controller, const Property::Value& value, EffectStyle::Type type);
 
 /**
  * @brief Retrieves the outline's properties.
@@ -178,7 +174,7 @@ bool SetOutlineProperties( ControllerPtr controller, const Property::Value& valu
  * @param[out] value The value of the outline's properties.
  * @param[in] type Whether the property is for the default outline or the input outline.
  */
-void GetOutlineProperties( ControllerPtr controller, Property::Value& value, EffectStyle::Type type );
+void GetOutlineProperties(ControllerPtr controller, Property::Value& value, EffectStyle::Type type);
 
 /**
  * @brief Sets the background properties.
@@ -189,7 +185,7 @@ void GetOutlineProperties( ControllerPtr controller, Property::Value& value, Eff
  *
  * @return Whether the background properties have been updated.
  */
-bool SetBackgroundProperties( ControllerPtr controller, const Property::Value& value, EffectStyle::Type type );
+bool SetBackgroundProperties(ControllerPtr controller, const Property::Value& value, EffectStyle::Type type);
 
 /**
  * @brief Retrieves the background's properties.
@@ -198,7 +194,7 @@ bool SetBackgroundProperties( ControllerPtr controller, const Property::Value& v
  * @param[out] value The value of the underline's properties.
  * @param[in] type Whether the property is for the default background or the input background.
  */
-void GetBackgroundProperties( ControllerPtr controller, Property::Value& value, EffectStyle::Type type );
+void GetBackgroundProperties(ControllerPtr controller, Property::Value& value, EffectStyle::Type type);
 
 } // namespace Text
 

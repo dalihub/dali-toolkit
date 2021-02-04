@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_ENVIRONMENT_DEFINITION_H
 #define DALI_SCENE_LOADER_ENVIRONMENT_DEFINITION_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,18 @@
  *
  */
 
- // INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include "dali-scene-loader/public-api/api.h"
 #include "dali-scene-loader/public-api/ktx-loader.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/rendering/texture.h"
 #include "dali/public-api/math/quaternion.h"
+#include "dali/public-api/rendering/texture.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /**
  * @brief Defines an environment map with either or both of radiance
  *  and irradiance maps.
@@ -39,7 +38,7 @@ struct DALI_SCENE_LOADER_API EnvironmentDefinition
   struct Textures
   {
     Texture mDiffuse;  // irradiance
-    Texture mSpecular;  // radiance
+    Texture mSpecular; // radiance
 
     bool IsLoaded() const
     {
@@ -54,7 +53,7 @@ struct DALI_SCENE_LOADER_API EnvironmentDefinition
   };
 
   using EnvironmentData = std::pair<EnvironmentDefinition, Textures>;
-  using Vector = std::vector<EnvironmentData>;
+  using Vector          = std::vector<EnvironmentData>;
 
   EnvironmentDefinition() = default;
 
@@ -80,11 +79,11 @@ struct DALI_SCENE_LOADER_API EnvironmentDefinition
 public: // DATA
   std::string mDiffuseMapPath;
   std::string mSpecularMapPath;
-  Quaternion mCubeOrientation = Quaternion::IDENTITY;
-  float mIblIntensity = 1.0f;
+  Quaternion  mCubeOrientation = Quaternion::IDENTITY;
+  float       mIblIntensity    = 1.0f;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_ENVIRONMENT_DEFINITION_H

@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_KTX_LOADER_H
 #define DALI_SCENE_LOADER_KTX_LOADER_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,12 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 /**
  * @brief Stores the pixel data objects for each face of the cube texture and their mipmaps.
  */
 struct DALI_SCENE_LOADER_API CubeData
 {
-  std::vector< std::vector<PixelData> > data;
+  std::vector<std::vector<PixelData> > data;
 
   Texture CreateTexture() const;
 };
@@ -48,7 +47,7 @@ struct DALI_SCENE_LOADER_API CubeData
  */
 DALI_SCENE_LOADER_API bool LoadCubeMapData(const std::string& path, CubeData& cubedata);
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif // DALI_SCENE_LOADER_KTX_LOADER_H

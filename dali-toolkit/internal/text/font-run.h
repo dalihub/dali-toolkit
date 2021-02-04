@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_FONT_RUN_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,19 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Run of characters with the same font.
  */
 struct FontRun
 {
-  CharacterRun characterRun;       ///< The initial character index and the number of characters of the run.
-  FontId       fontId;             ///< Font id of the run.
-  bool         isItalicRequired:1; ///< Whether the italic style is required.
-  bool         isBoldRequired:1;   ///< Whether the bold style is required.
+  CharacterRun characterRun;         ///< The initial character index and the number of characters of the run.
+  FontId       fontId;               ///< Font id of the run.
+  bool         isItalicRequired : 1; ///< Whether the italic style is required.
+  bool         isBoldRequired : 1;   ///< Whether the bold style is required.
 };
 
 } // namespace Text

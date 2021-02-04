@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_COLOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 struct Tag;
 struct ColorRun;
 
@@ -36,7 +33,7 @@ struct ColorRun;
  * @param[in] tag The color tag and its attributes.
  * @param[in,out] colorRun The color run.
  */
-void ProcessColorTag( const Tag& tag, ColorRun& colorRun );
+void ProcessColorTag(const Tag& tag, ColorRun& colorRun);
 
 } // namespace Text
 

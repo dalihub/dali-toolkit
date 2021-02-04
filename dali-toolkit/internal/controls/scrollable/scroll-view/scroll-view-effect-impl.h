@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_EFFECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,19 @@
 #include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
 namespace Dali
 {
-
 class Animation;
 
 namespace Toolkit
 {
-
 class ScrollView;
 
 namespace Internal
 {
-
 class ScrollViewEffect;
 
 /**
@@ -46,9 +43,7 @@ class ScrollViewEffect;
  */
 class ScrollViewEffect : public Dali::BaseObject, public ConnectionTracker
 {
-
 public:
-
   ScrollViewEffect();
 
   /**
@@ -68,7 +63,6 @@ public:
   void Detach(Toolkit::ScrollView& scrollView);
 
 public:
-
   /**
    * Called upon Attaching of effect to a scrollView instance.
    *
@@ -88,7 +82,6 @@ public:
   virtual void OnDetach(Toolkit::ScrollView& scrollView) = 0;
 
 protected:
-
   /**
    * Returns the ScrollView handle that this effect is
    * attached to.
@@ -99,16 +92,13 @@ protected:
   Toolkit::ScrollView GetScrollView();
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~ScrollViewEffect();
 
 private:
-
-  Toolkit::Internal::ScrollView *mScrollViewImpl; ///< Attached ScrollView instance (pointer to implementation)
-
+  Toolkit::Internal::ScrollView* mScrollViewImpl; ///< Attached ScrollView instance (pointer to implementation)
 };
 
 } // namespace Internal

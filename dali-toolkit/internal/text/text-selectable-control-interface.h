@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SELECTABLE_CONTROL_INTERFACE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,18 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
-using  Uint32Pair = std::pair<uint32_t,uint32_t>;
-using  string = std::string;
+using Uint32Pair = std::pair<uint32_t, uint32_t>;
+using string     = std::string;
 namespace Text
 {
-
 /**
  * @brief An interface that the Text::Controller used for text selection functionality.
  */
 class SelectableControlInterface
 {
 public:
-
   /**
    * @brief Virtual destructor.
    */
@@ -46,7 +42,7 @@ public:
    * @param start start selection position (pass NULL to ignore).
    * @param end end selection position (pass NULL to ignore).
    */
-  virtual void SetTextSelectionRange(const uint32_t *start, const uint32_t *end) = 0;
+  virtual void SetTextSelectionRange(const uint32_t* start, const uint32_t* end) = 0;
 
   /**
    * @brief Called to return the selection postions in the texts.

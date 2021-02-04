@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_BACKEND_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,23 +26,18 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 namespace Internal
 {
-
 /**
  * Implementation of the text rendering backend
  */
 class Backend : public BaseObject
 {
 public:
-
   /**
    * Constructor
    */
@@ -61,18 +56,16 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::Backend::NewRenderer()
    */
-  RendererPtr NewRenderer( unsigned int renderingType );
+  RendererPtr NewRenderer(unsigned int renderingType);
 
 private:
-
   // Undefined copy constructor.
-  Backend( const Backend& );
+  Backend(const Backend&);
 
   // Undefined assignment constructor.
-  Backend& operator=( Backend& );
+  Backend& operator=(Backend&);
 
 private:
-
   struct Impl;
   Impl* mImpl;
 
@@ -82,14 +75,14 @@ private:
 
 inline static Internal::Backend& GetImplementation(Backend& backend)
 {
-  DALI_ASSERT_ALWAYS( backend && "backend handle is empty" );
+  DALI_ASSERT_ALWAYS(backend && "backend handle is empty");
   BaseObject& handle = backend.GetBaseObject();
   return static_cast<Internal::Backend&>(handle);
 }
 
 inline static const Internal::Backend& GetImplementation(const Backend& backend)
 {
-  DALI_ASSERT_ALWAYS( backend && "backend handle is empty" );
+  DALI_ASSERT_ALWAYS(backend && "backend handle is empty");
   const BaseObject& handle = backend.GetBaseObject();
   return static_cast<const Internal::Backend&>(handle);
 }

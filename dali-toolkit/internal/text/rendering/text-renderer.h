@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_RENDERER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class Renderer;
 typedef IntrusivePtr<Renderer> RendererPtr;
 
@@ -46,7 +43,6 @@ class ViewInterface;
 class Renderer : public RefObject
 {
 public:
-
   /**
    * @brief Render the glyphs from a ViewInterface.
    *
@@ -57,14 +53,13 @@ public:
    * @param[in] depth The depth in the tree of the parent.
    * @return The Renderable actor used to position the text.
    */
-  virtual Actor Render( ViewInterface& view,
-                        Actor textContol,
-                        Property::Index animatablePropertyIndex,
-                        float& alignmentOffset,
-                        int depth ) = 0;
+  virtual Actor Render(ViewInterface&  view,
+                       Actor           textContol,
+                       Property::Index animatablePropertyIndex,
+                       float&          alignmentOffset,
+                       int             depth) = 0;
 
 protected:
-
   /**
    * @brief Constructor.
    */
@@ -76,12 +71,11 @@ protected:
   virtual ~Renderer();
 
 private:
+  // Undefined
+  Renderer(const Renderer& handle);
 
   // Undefined
-  Renderer( const Renderer& handle );
-
-  // Undefined
-  Renderer& operator=( const Renderer& handle );
+  Renderer& operator=(const Renderer& handle);
 };
 
 } // namespace Text

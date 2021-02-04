@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class ImageView;
 
 namespace Internal
@@ -39,7 +37,6 @@ namespace Internal
 class ImageView : public Control
 {
 protected:
-
   /**
    * Construct a new ImageView.
    */
@@ -63,19 +60,19 @@ public:
    * If the handle is empty, ImageView will display nothing
    * @param[in] map The Dali::Property::Map to use for to display.
    */
-  void SetImage( const Dali::Property::Map& map );
+  void SetImage(const Dali::Property::Map& map);
 
   /**
    * @copydoc Dali::Toolkit::SetImage
    */
-  void SetImage( const std::string& imageUrl, ImageDimensions size );
+  void SetImage(const std::string& imageUrl, ImageDimensions size);
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
    *
    * @param[in] preMultipled whether alpha is pre-multiplied.
    */
-  void EnablePreMultipliedAlpha( bool preMultipled );
+  void EnablePreMultipliedAlpha(bool preMultipled);
 
   /**
    * @brief Query whether alpha is pre-multiplied.
@@ -91,7 +88,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -99,7 +96,7 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+  static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
   /**
    * @brief Set the depth index of this image renderer
@@ -108,10 +105,9 @@ public:
    *
    * @param[in] depthIndex The depth index of this renderer
    */
-  void SetDepthIndex( int depthIndex );
+  void SetDepthIndex(int depthIndex);
 
 private: // From Control
-
   /**
    * @copydoc Toolkit::Control::OnInitialize
    */
@@ -125,25 +121,24 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::GetHeightForWidth()
    */
-  float GetHeightForWidth( float width ) override;
+  float GetHeightForWidth(float width) override;
 
   /**
    * @copydoc Toolkit::Control::GetWidthForHeight()
    */
-  float GetWidthForHeight( float height ) override;
+  float GetWidthForHeight(float height) override;
 
   /**
    * @copydoc Toolkit::Control::OnRelayout()
    */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
 private:
-
   /**
    * @brief Callback for ResourceReadySignal
    * param[in] control signal prototype
    */
-  void OnResourceReady( Toolkit::Control control );
+  void OnResourceReady(Toolkit::Control control);
 
   /**
    * @brief Set TransformMap for fittingMode
@@ -153,7 +148,7 @@ private:
    * param[in] fittingMode The mode for fitting image
    * param[in] transformMap  The map for fitting image
    */
-  void SetTransformMapForFittingMode ( Vector2 finalSize, Vector2 textureSize, Vector2 offset, Visual::FittingMode fittingMode, Property::Map& transformMap );
+  void SetTransformMapForFittingMode(Vector2 finalSize, Vector2 textureSize, Vector2 offset, Visual::FittingMode fittingMode, Property::Map& transformMap);
 
   /**
    * @brief Apply fittingMode
@@ -163,36 +158,36 @@ private:
    * param[in] zeroPadding whether padding is zero
    * param[in] transformMap  The map for fitting image
    */
-  void ApplyFittingMode( Vector2 finalSize, Vector2 textureSize, Vector2 offset, bool zeroPadding , Property::Map& transformMap);
+  void ApplyFittingMode(Vector2 finalSize, Vector2 textureSize, Vector2 offset, bool zeroPadding, Property::Map& transformMap);
 
 private:
   // Undefined
-  ImageView( const ImageView& );
-  ImageView& operator=( const ImageView& );
+  ImageView(const ImageView&);
+  ImageView& operator=(const ImageView&);
 
 private:
-  Toolkit::Visual::Base  mVisual;
+  Toolkit::Visual::Base mVisual;
 
-  std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
-  Property::Map    mPropertyMap;  ///< the Property::Map if the image came from a Property::Map, empty otherwise
-  Property::Map    mShaderMap;    ///< the Property::Map if the custom shader is set, empty otherwise
-  ImageDimensions  mImageSize;    ///< the image size
+  std::string     mUrl;         ///< the url for the image if the image came from a URL, empty otherwise
+  Property::Map   mPropertyMap; ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map   mShaderMap;   ///< the Property::Map if the custom shader is set, empty otherwise
+  ImageDimensions mImageSize;   ///< the image size
 
-  bool mImageVisualPaddingSetByTransform :1; //< Flag to indicate Padding was set using a transform.
-  bool mImageViewPixelAreaSetByFittingMode:1; //< Flag to indicate pixel area was set by fitting Mode
+  bool mImageVisualPaddingSetByTransform : 1;   //< Flag to indicate Padding was set using a transform.
+  bool mImageViewPixelAreaSetByFittingMode : 1; //< Flag to indicate pixel area was set by fitting Mode
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Toolkit::Internal::ImageView& GetImpl( Toolkit::ImageView& obj )
+inline Toolkit::Internal::ImageView& GetImpl(Toolkit::ImageView& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
   Dali::RefObject& handle = obj.GetImplementation();
   return static_cast<Toolkit::Internal::ImageView&>(handle);
 }
 
-inline const Toolkit::Internal::ImageView& GetImpl( const Toolkit::ImageView& obj )
+inline const Toolkit::Internal::ImageView& GetImpl(const Toolkit::ImageView& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
   const Dali::RefObject& handle = obj.GetImplementation();

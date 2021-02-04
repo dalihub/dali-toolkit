@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_URL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,13 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class VisualUrl
 {
 public:
-
   /**
    * The type of the URL based on the string contents
    */
@@ -63,19 +59,19 @@ public:
    * Determines type of visual and whether the url is local or remote
    * @param[in] url The URL to store and resolve
    */
-  VisualUrl( const std::string& url );
+  VisualUrl(const std::string& url);
 
   /**
    * Copy constructor
    * @param[in] url The VisualUrl to copy
    */
-  VisualUrl( const VisualUrl& url );
+  VisualUrl(const VisualUrl& url);
 
   /**
    * Assignment operator
    * @param[in] url The VisualUrl to copy
    */
-  VisualUrl& operator=( const VisualUrl& url );
+  VisualUrl& operator=(const VisualUrl& url);
 
   /**
    * Get the full URL
@@ -116,14 +112,13 @@ public:
    * @param location the location of the texture
    * @return the Url
    */
-  static std::string CreateTextureUrl( const std::string& location );
+  static std::string CreateTextureUrl(const std::string& location);
 
 private:
-  std::string mUrl;
-  Type mType;
+  std::string  mUrl;
+  Type         mType;
   ProtocolType mLocation;
 };
-
 
 } // namespace Internal
 

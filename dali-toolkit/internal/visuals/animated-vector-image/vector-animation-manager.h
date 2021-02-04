@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VECTOR_ANIMATION_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,28 +19,25 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/signals/callback.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/integration-api/processor-interface.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/signals/callback.h>
 #include <memory>
 
 // INTERNAL INCLUDES
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class VectorAnimationThread;
 
 /**
  * @brief Vector animation manager
  */
-class VectorAnimationManager: public Integration::Processor
+class VectorAnimationManager : public Integration::Processor
 {
 public:
   struct LifecycleObserver
@@ -62,13 +59,13 @@ public:
    * Add a lifecycle observer
    * @param[in] observer The object watching this one
    */
-  void AddObserver( LifecycleObserver& observer );
+  void AddObserver(LifecycleObserver& observer);
 
   /**
    * Remove a lifecycle observer
    * @param[in] observer The object watching this one
    */
-  void RemoveObserver( LifecycleObserver& observer );
+  void RemoveObserver(LifecycleObserver& observer);
 
   /**
    * Get the vector animation thread.
@@ -82,36 +79,33 @@ public:
    * @param callback The callback to register
    * @note Ownership of the callback is passed onto this class.
    */
-  void RegisterEventCallback( CallbackBase* callback );
+  void RegisterEventCallback(CallbackBase* callback);
 
   /**
    * @brief Unregister a previously registered callback
    *
    * @param callback The callback to unregister
    */
-  void UnregisterEventCallback( CallbackBase* callback );
+  void UnregisterEventCallback(CallbackBase* callback);
 
 protected: // Implementation of Processor
-
   /**
    * @copydoc Dali::Integration::Processor::Process()
    */
   void Process() override;
 
 private:
+  // Undefined
+  VectorAnimationManager(const VectorAnimationManager& manager) = delete;
 
   // Undefined
-  VectorAnimationManager( const VectorAnimationManager& manager ) = delete;
-
-  // Undefined
-  VectorAnimationManager& operator=( const VectorAnimationManager& manager ) = delete;
+  VectorAnimationManager& operator=(const VectorAnimationManager& manager) = delete;
 
 private:
-
-  std::vector< CallbackBase* >             mEventCallbacks;
-  std::vector<LifecycleObserver*>         mLifecycleObservers;
-  std::unique_ptr< VectorAnimationThread > mVectorAnimationThread;
-  bool                                     mProcessorRegistered;
+  std::vector<CallbackBase*>             mEventCallbacks;
+  std::vector<LifecycleObserver*>        mLifecycleObservers;
+  std::unique_ptr<VectorAnimationThread> mVectorAnimationThread;
+  bool                                   mProcessorRegistered;
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_PAGE_TURN_BOOK_SPINE_EFFECT_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,15 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * @brief Creates a new PageTurnBookSpineEffect
  * This is an assisting effect of PageTurnEffect to display a book spine on _static_ pages, and also to flip the image horizontally when needed.
@@ -55,10 +52,10 @@ inline Property::Map CreatePageTurnBookSpineEffect()
 
   Property::Map customShader;
 
-  customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = SHADER_PAGE_TURN_BOOK_SPINE_EFFECT_VERT.data();
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = SHADER_PAGE_TURN_BOOK_SPINE_EFFECT_FRAG.data();
+  customShader[Toolkit::Visual::Shader::Property::VERTEX_SHADER]   = SHADER_PAGE_TURN_BOOK_SPINE_EFFECT_VERT.data();
+  customShader[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = SHADER_PAGE_TURN_BOOK_SPINE_EFFECT_FRAG.data();
 
-  map[ Toolkit::Visual::Property::SHADER ] = customShader;
+  map[Toolkit::Visual::Property::SHADER] = customShader;
   return map;
 }
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SHAPER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class LogicalModel;
 class VisualModel;
 
@@ -52,17 +49,17 @@ class VisualModel;
  * @param[out] charactersPerGlyph Vector containing the number of characters per glyph.
  * @param[out] newParagraphGlyphs Vector containing the indices to the new paragraph glyphs.
  */
-void ShapeText( const Vector<Character>& text,
-                const Vector<LineBreakInfo>& lineBreakInfo,
-                const Vector<ScriptRun>& scripts,
-                const Vector<FontRun>& fonts,
-                CharacterIndex startCharacterIndex,
-                GlyphIndex startGlyphIndex,
-                Length numberOfCharacters,
-                Vector<GlyphInfo>& glyphs,
-                Vector<CharacterIndex>& glyphToCharacterMap,
-                Vector<Length>& charactersPerGlyph,
-                Vector<GlyphIndex>& newParagraphGlyphs );
+void ShapeText(const Vector<Character>&     text,
+               const Vector<LineBreakInfo>& lineBreakInfo,
+               const Vector<ScriptRun>&     scripts,
+               const Vector<FontRun>&       fonts,
+               CharacterIndex               startCharacterIndex,
+               GlyphIndex                   startGlyphIndex,
+               Length                       numberOfCharacters,
+               Vector<GlyphInfo>&           glyphs,
+               Vector<CharacterIndex>&      glyphToCharacterMap,
+               Vector<Length>&              charactersPerGlyph,
+               Vector<GlyphIndex>&          newParagraphGlyphs);
 
 } // namespace Text
 

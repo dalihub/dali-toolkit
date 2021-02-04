@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ENUMERATION_IMPL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,17 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
+/**
+ * @brief Get the alignment from the provided property value.
+ * @param[in] propertyValue The source value (which can be a Property::INTEGER or Property::STRING type)
+ * @param[out] alignment The resulting alignment from the given source
+ * @return true if the resulting alignment has been updated
+ */
+bool GetHorizontalAlignmentEnumeration(const Property::Value& propertyValue, Toolkit::Text::HorizontalAlignment::Type& alignment);
 
 /**
  * @brief Get the alignment from the provided property value.
@@ -39,15 +44,7 @@ namespace Text
  * @param[out] alignment The resulting alignment from the given source
  * @return true if the resulting alignment has been updated
  */
-bool GetHorizontalAlignmentEnumeration( const Property::Value& propertyValue, Toolkit::Text::HorizontalAlignment::Type& alignment );
-
-/**
- * @brief Get the alignment from the provided property value.
- * @param[in] propertyValue The source value (which can be a Property::INTEGER or Property::STRING type)
- * @param[out] alignment The resulting alignment from the given source
- * @return true if the resulting alignment has been updated
- */
-bool GetVerticalAlignmentEnumeration( const Property::Value& propertyValue, Toolkit::Text::VerticalAlignment::Type& alignment );
+bool GetVerticalAlignmentEnumeration(const Property::Value& propertyValue, Toolkit::Text::VerticalAlignment::Type& alignment);
 
 /**
  * @brief Get the line-wrap-mode from the provided property value.
@@ -55,21 +52,21 @@ bool GetVerticalAlignmentEnumeration( const Property::Value& propertyValue, Tool
  * @param[out] alignment The resulting lineWrapMode from the given source
  * @return true if the resulting lineWrapMode has been updated
  */
-bool GetLineWrapModeEnumeration( const Property::Value& propertyValue, Toolkit::Text::LineWrap::Mode& lineWrapMode );
+bool GetLineWrapModeEnumeration(const Property::Value& propertyValue, Toolkit::Text::LineWrap::Mode& lineWrapMode);
 
 /**
  * @brief Get the alignment string from the provided alignment string.
  * @param[in] alignment the Text::HORIZONTAL enum source
  * @return the string equivalent
  */
-const char* GetHorizontalAlignmentString( const Toolkit::Text::HorizontalAlignment::Type& alignment );
+const char* GetHorizontalAlignmentString(const Toolkit::Text::HorizontalAlignment::Type& alignment);
 
 /**
  * @brief Get the alignment string from the provided alignment string.
  * @param[in] alignment the Text::VerticalAlignment enum source
  * @return the string equivalent
  */
-const char* GetVerticalAlignmentString( const Toolkit::Text::VerticalAlignment::Type& alignment );
+const char* GetVerticalAlignmentString(const Toolkit::Text::VerticalAlignment::Type& alignment);
 
 } // namespace Text
 

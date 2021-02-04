@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_GLYPH_METRICS_HELPER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Some characters can be shaped in more than one glyph.
  * This struct is used to retrieve metrics from these group of glyphs.
@@ -37,16 +34,18 @@ namespace Text
 struct GlyphMetrics
 {
   GlyphMetrics()
-  : fontId( 0u ),
-    fontHeight( 0.f ),
-    width( 0.f ),
-    advance( 0.f ),
-    ascender( 0.f ),
-    xBearing( 0.f )
-  {}
+  : fontId(0u),
+    fontHeight(0.f),
+    width(0.f),
+    advance(0.f),
+    ascender(0.f),
+    xBearing(0.f)
+  {
+  }
 
   ~GlyphMetrics()
-  {}
+  {
+  }
 
   FontId fontId;     ///< The font id of the glyphs.
   float  fontHeight; ///< The font's height of those glyphs.
@@ -65,9 +64,9 @@ struct GlyphMetrics
  *
  * @return The number of glyphs of the group.
  */
-Length GetNumberOfGlyphsOfGroup( GlyphIndex glyphIndex,
-                                 GlyphIndex lastGlyphPlusOne,
-                                 const Length* const charactersPerGlyphBuffer );
+Length GetNumberOfGlyphsOfGroup(GlyphIndex          glyphIndex,
+                                GlyphIndex          lastGlyphPlusOne,
+                                const Length* const charactersPerGlyphBuffer);
 
 /**
  * @brief Get some glyph's metrics of a group of glyphs formed as a result of shaping one character.
@@ -78,11 +77,11 @@ Length GetNumberOfGlyphsOfGroup( GlyphIndex glyphIndex,
  * @param[in] glyphsBuffer The glyphs buffer.
  * @param[in] metrics Used to access metrics from FontClient.
  */
-void GetGlyphsMetrics( GlyphIndex glyphIndex,
-                       Length numberOfGlyphs,
-                       GlyphMetrics& glyphMetrics,
-                       const GlyphInfo* const glyphsBuffer,
-                       MetricsPtr& metrics );
+void GetGlyphsMetrics(GlyphIndex             glyphIndex,
+                      Length                 numberOfGlyphs,
+                      GlyphMetrics&          glyphMetrics,
+                      const GlyphInfo* const glyphsBuffer,
+                      MetricsPtr&            metrics);
 
 } // namespace Text
 

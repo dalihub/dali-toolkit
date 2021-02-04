@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NPATCH_LOADER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,25 +18,22 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <dali/public-api/rendering/texture-set.h>
-#include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/devel-api/common/owner-container.h>
+#include <dali/public-api/rendering/texture-set.h>
+#include <string>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include <dali-toolkit/internal/visuals/npatch-data.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
-#include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * The manager for loading Npatch textures.
  * It caches them internally for better performance; i.e. to avoid loading and
@@ -49,7 +46,6 @@ namespace Internal
 class NPatchLoader
 {
 public:
-
   /**
    * Constructor
    */
@@ -72,7 +68,7 @@ public:
    * @param [in] synchronousLoading True if the image will be loaded in synchronous time.
    * @return id of the texture.
    */
-  std::size_t Load( TextureManager& textureManager, TextureUploadObserver* textureObserver, const std::string& url, const Rect< int >& border, bool& preMultiplyOnLoad, bool synchronousLoading );
+  std::size_t Load(TextureManager& textureManager, TextureUploadObserver* textureObserver, const std::string& url, const Rect<int>& border, bool& preMultiplyOnLoad, bool synchronousLoading);
 
   /**
    * @brief Set loaded PixelBuffer and its information
@@ -81,7 +77,7 @@ public:
    * @param [in] pixelBuffer of loaded image
    * @param [in] preMultiplied True if the image had pre-multiplied alpha applied
    */
-  void SetNPatchData( std::size_t id, Devel::PixelBuffer& pixelBuffer, bool preMultiplied );
+  void SetNPatchData(std::size_t id, Devel::PixelBuffer& pixelBuffer, bool preMultiplied);
 
   /**
    * @brief Retrieve N patch data matching to an id
@@ -89,7 +85,7 @@ public:
    * @param [out] data const pointer to the NPatchData
    * @return true if data matching to id was really found
    */
-  bool GetNPatchData( const NPatchData::NPatchDataId id, const NPatchData*& data );
+  bool GetNPatchData(const NPatchData::NPatchDataId id, const NPatchData*& data);
 
   /**
    * @brief Remove a texture matching id.
@@ -99,16 +95,14 @@ public:
    * @param [in] id cache data id
    * @param [in] textureObserver The NPatchVisual that requested loading.
    */
-  void Remove( std::size_t id, TextureUploadObserver* textureObserver );
+  void Remove(std::size_t id, TextureUploadObserver* textureObserver);
 
 private:
-
   NPatchData::NPatchDataId GenerateUniqueNPatchDataId();
 
-  int32_t GetCacheIndexFromId( const NPatchData::NPatchDataId id );
+  int32_t GetCacheIndexFromId(const NPatchData::NPatchDataId id);
 
 protected:
-
   /**
    * Undefined copy constructor.
    */
@@ -120,12 +114,11 @@ protected:
   NPatchLoader& operator=(const NPatchLoader& rhs);
 
 private:
-
-  NPatchData::NPatchDataId mCurrentNPatchDataId;
-  OwnerContainer< NPatchData* > mCache;
+  NPatchData::NPatchDataId    mCurrentNPatchDataId;
+  OwnerContainer<NPatchData*> mCache;
 };
 
-} // name Internal
+} // namespace Internal
 
 } // namespace Toolkit
 

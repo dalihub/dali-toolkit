@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VECTOR_ANIMATION_THREAD_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <memory>
-#include <dali/public-api/signals/connection-tracker.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
+#include <dali/public-api/signals/connection-tracker.h>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/helpers/round-robin-container-view.h>
@@ -31,20 +31,16 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * The main animation thread for vector animations
  */
 class VectorAnimationThread : public Thread
 {
 public:
-
   /**
    * @brief Constructor.
    */
@@ -60,13 +56,13 @@ public:
    *
    * @param[in] task The task added to the thread.
    */
-  void AddTask( VectorAnimationTaskPtr task );
+  void AddTask(VectorAnimationTaskPtr task);
 
   /**
    * @brief Called when the rasterization is completed from the rasterize thread.
    * @param task The completed task
    */
-  void OnTaskCompleted( VectorAnimationTaskPtr task, bool stopped );
+  void OnTaskCompleted(VectorAnimationTaskPtr task, bool stopped);
 
   /**
    * @brief Called when the sleep thread is awaken.
@@ -74,21 +70,18 @@ public:
   void OnAwakeFromSleep();
 
 protected:
-
   /**
    * @brief The entry function of the animation thread.
    */
   void Run() override;
 
 private:
-
   /**
    * Rasterizes the tasks.
    */
   void Rasterize();
 
 private:
-
   /**
    * @brief Helper class to keep the relation between VectorRasterizeThread and corresponding container
    */
@@ -100,32 +93,31 @@ private:
      *
      * @param[in] animationThread Reference to the VectorAnimationThread
      */
-    RasterizeHelper( VectorAnimationThread& animationThread );
+    RasterizeHelper(VectorAnimationThread& animationThread);
 
     /**
      * @brief Rasterizes the task.
      *
      * @param[in] task The task to rasterize.
      */
-    void Rasterize( VectorAnimationTaskPtr task );
+    void Rasterize(VectorAnimationTaskPtr task);
 
   public:
-    RasterizeHelper( const RasterizeHelper& ) = delete;
-    RasterizeHelper& operator=( const RasterizeHelper& ) = delete;
+    RasterizeHelper(const RasterizeHelper&) = delete;
+    RasterizeHelper& operator=(const RasterizeHelper&) = delete;
 
-    RasterizeHelper( RasterizeHelper&& rhs );
-    RasterizeHelper& operator=( RasterizeHelper&& rhs ) = delete;
+    RasterizeHelper(RasterizeHelper&& rhs);
+    RasterizeHelper& operator=(RasterizeHelper&& rhs) = delete;
 
   private:
-
     /**
      * @brief Main constructor that used by all other constructors
      */
-    RasterizeHelper( std::unique_ptr< VectorRasterizeThread > rasterizer, VectorAnimationThread& animationThread );
+    RasterizeHelper(std::unique_ptr<VectorRasterizeThread> rasterizer, VectorAnimationThread& animationThread);
 
   private:
-    std::unique_ptr< VectorRasterizeThread > mRasterizer;
-    VectorAnimationThread&                   mAnimationThread;
+    std::unique_ptr<VectorRasterizeThread> mRasterizer;
+    VectorAnimationThread&                 mAnimationThread;
   };
 
   /**
@@ -134,11 +126,10 @@ private:
   class SleepThread : public Thread
   {
   public:
-
     /**
      * @brief Constructor.
      */
-    SleepThread( CallbackBase* callback );
+    SleepThread(CallbackBase* callback);
 
     /**
      * @brief Destructor.
@@ -148,49 +139,44 @@ private:
     /**
      * @brief Sleeps untile the specified time point.
      */
-    void SleepUntil( std::chrono::time_point< std::chrono::system_clock > timeToSleepUntil );
+    void SleepUntil(std::chrono::time_point<std::chrono::system_clock> timeToSleepUntil);
 
   protected:
-
     /**
      * @brief The entry function of the animation thread.
      */
     void Run() override;
 
   private:
-
-    SleepThread( const SleepThread& thread ) = delete;
-    SleepThread& operator=( const SleepThread& thread ) = delete;
+    SleepThread(const SleepThread& thread) = delete;
+    SleepThread& operator=(const SleepThread& thread) = delete;
 
   private:
-    ConditionalWait                  mConditionalWait;
-    std::unique_ptr< CallbackBase >  mAwakeCallback;
-    std::chrono::time_point< std::chrono::system_clock > mSleepTimePoint;
-    const Dali::LogFactoryInterface& mLogFactory;
-    bool                             mNeedToSleep;
-    bool                             mDestroyThread;
+    ConditionalWait                                    mConditionalWait;
+    std::unique_ptr<CallbackBase>                      mAwakeCallback;
+    std::chrono::time_point<std::chrono::system_clock> mSleepTimePoint;
+    const Dali::LogFactoryInterface&                   mLogFactory;
+    bool                                               mNeedToSleep;
+    bool                                               mDestroyThread;
   };
 
 private:
+  // Undefined
+  VectorAnimationThread(const VectorAnimationThread& thread) = delete;
 
   // Undefined
-  VectorAnimationThread( const VectorAnimationThread& thread ) = delete;
-
-  // Undefined
-  VectorAnimationThread& operator=( const VectorAnimationThread& thread ) = delete;
+  VectorAnimationThread& operator=(const VectorAnimationThread& thread) = delete;
 
 private:
-
-  std::vector< VectorAnimationTaskPtr >      mAnimationTasks;
-  std::vector< VectorAnimationTaskPtr >      mCompletedTasks;
-  std::vector< VectorAnimationTaskPtr >      mWorkingTasks;
-  RoundRobinContainerView< RasterizeHelper > mRasterizers;
-  SleepThread                                mSleepThread;
-  ConditionalWait                            mConditionalWait;
-  bool                                       mNeedToSleep;
-  bool                                       mDestroyThread;
-  const Dali::LogFactoryInterface&           mLogFactory;
-
+  std::vector<VectorAnimationTaskPtr>      mAnimationTasks;
+  std::vector<VectorAnimationTaskPtr>      mCompletedTasks;
+  std::vector<VectorAnimationTaskPtr>      mWorkingTasks;
+  RoundRobinContainerView<RasterizeHelper> mRasterizers;
+  SleepThread                              mSleepThread;
+  ConditionalWait                          mConditionalWait;
+  bool                                     mNeedToSleep;
+  bool                                     mDestroyThread;
+  const Dali::LogFactoryInterface&         mLogFactory;
 };
 
 } // namespace Internal

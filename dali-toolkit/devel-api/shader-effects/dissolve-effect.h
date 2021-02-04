@@ -19,10 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/property-map.h>
+#include <string.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -44,7 +44,7 @@ namespace Toolkit
  * @param[in] displacement The direction of the central line
  * @param[in] initialProgress The normalised initial progress of the shader
  */
-DALI_TOOLKIT_API void DissolveEffectSetCentralLine( Actor& actor, const Vector2& position, const Vector2& displacement, float initialProgress );
+DALI_TOOLKIT_API void DissolveEffectSetCentralLine(Actor& actor, const Vector2& position, const Vector2& displacement, float initialProgress);
 
 /**
  * @brief Create a new Dissolve effect
@@ -58,7 +58,7 @@ DALI_TOOLKIT_API void DissolveEffectSetCentralLine( Actor& actor, const Vector2&
  *  @return The newly created Property::Map with the dissolve effect
  */
 
-DALI_TOOLKIT_API Property::Map CreateDissolveEffect( bool useHighPrecision = true);
+DALI_TOOLKIT_API Property::Map CreateDissolveEffect(bool useHighPrecision = true);
 
 } // namespace Toolkit
 

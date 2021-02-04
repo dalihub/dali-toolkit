@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_BIDIRECTIONAL_SUPPORT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
@@ -30,13 +30,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * Sets the bidirectional info into the logical model.
  *
@@ -49,14 +46,14 @@ namespace Text
  * @param[in] matchSystemLanguageDirection Whether match for system language direction or not.
  * @param[in] layoutDirection The direction of the system language.
  */
-void SetBidirectionalInfo( const Vector<Character>& text,
-                           const Vector<ScriptRun>& scripts,
-                           const Vector<LineBreakInfo>& lineBreakInfo,
-                           CharacterIndex startIndex,
-                           Length numberOfCharacters,
-                           Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
-                           bool matchSystemLanguageDirection = false,
-                           Dali::LayoutDirection::Type layoutDirection = LayoutDirection::LEFT_TO_RIGHT );
+void SetBidirectionalInfo(const Vector<Character>&               text,
+                          const Vector<ScriptRun>&               scripts,
+                          const Vector<LineBreakInfo>&           lineBreakInfo,
+                          CharacterIndex                         startIndex,
+                          Length                                 numberOfCharacters,
+                          Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                          bool                                   matchSystemLanguageDirection = false,
+                          Dali::LayoutDirection::Type            layoutDirection              = LayoutDirection::LEFT_TO_RIGHT);
 
 /**
  * @brief Sets the visual to logical map table for a given line.
@@ -68,12 +65,12 @@ void SetBidirectionalInfo( const Vector<Character>& text,
  * @param[in] numberOfCharacters The number of characters.
  * @param[in] direction The direction of the line.
  */
-void ReorderLine( const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo,
-                  Vector<BidirectionalLineInfoRun>& lineInfoRuns,
-                  BidirectionalLineRunIndex bidiLineIndex,
-                  CharacterIndex startIndex,
-                  Length numberOfCharacters,
-                  CharacterDirection direction );
+void ReorderLine(const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo,
+                 Vector<BidirectionalLineInfoRun>&    lineInfoRuns,
+                 BidirectionalLineRunIndex            bidiLineIndex,
+                 CharacterIndex                       startIndex,
+                 Length                               numberOfCharacters,
+                 CharacterDirection                   direction);
 
 /**
  * @brief Replaces any character in the right to left paragraphs which could be mirrored.
@@ -87,12 +84,12 @@ void ReorderLine( const BidirectionalParagraphInfoRun& bidirectionalParagraphInf
  *
  * @return @e true if a character has been replaced.
  */
-bool GetMirroredText( const Vector<Character>& text,
-                      const Vector<CharacterDirection>& directions,
-                      const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
-                      CharacterIndex startIndex,
-                      Length numberOfCharacters,
-                      Vector<Character>& mirroredText );
+bool GetMirroredText(const Vector<Character>&                     text,
+                     const Vector<CharacterDirection>&            directions,
+                     const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                     CharacterIndex                               startIndex,
+                     Length                                       numberOfCharacters,
+                     Vector<Character>&                           mirroredText);
 
 /**
  * @brief Retrieves the characters' directions.
@@ -106,11 +103,11 @@ bool GetMirroredText( const Vector<Character>& text,
  * @param[in] numberOfCharacters The number of characters.
  * @param[out] directions The direction, @e false is left to right and @e true is right to left, of each character of the paragraph.
  */
-void GetCharactersDirection( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
-                             Length totalNumberOfCharacters,
-                             CharacterIndex startIndex,
-                             Length numberOfCharacters,
-                             Vector<CharacterDirection>& directions );
+void GetCharactersDirection(const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                            Length                                       totalNumberOfCharacters,
+                            CharacterIndex                               startIndex,
+                            Length                                       numberOfCharacters,
+                            Vector<CharacterDirection>&                  directions);
 
 } // namespace Text
 

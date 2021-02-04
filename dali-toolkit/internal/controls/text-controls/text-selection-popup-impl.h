@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,24 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/object/property-map.h>
+#include <string>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/buttons/push-button.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
+#include <dali-toolkit/public-api/controls/buttons/push-button.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 enum PopupCustomisations
 {
   POPUP_MAXIMUM_SIZE,
@@ -51,41 +48,43 @@ enum PopupCustomisations
 class TextSelectionPopup : public Control
 {
 public:
-
   struct ButtonRequirement
   {
     ButtonRequirement()
-    : id( Toolkit::TextSelectionPopup::NONE ),
-      priority( 0u ),
+    : id(Toolkit::TextSelectionPopup::NONE),
+      priority(0u),
       name(),
       caption(),
-      enabled( false )
-    {}
+      enabled(false)
+    {
+    }
 
-    ButtonRequirement( Toolkit::TextSelectionPopup::Buttons buttonId,
-                       std::size_t buttonPriority,
-                       const std::string& buttonName,
-                       const std::string& buttonCaption,
-                       bool buttonEnabled )
-    : id( buttonId ),
-      priority( buttonPriority ),
-      name( buttonName ),
-      caption( buttonCaption ),
-      enabled( buttonEnabled )
-    {}
+    ButtonRequirement(Toolkit::TextSelectionPopup::Buttons buttonId,
+                      std::size_t                          buttonPriority,
+                      const std::string&                   buttonName,
+                      const std::string&                   buttonCaption,
+                      bool                                 buttonEnabled)
+    : id(buttonId),
+      priority(buttonPriority),
+      name(buttonName),
+      caption(buttonCaption),
+      enabled(buttonEnabled)
+    {
+    }
 
     Toolkit::TextSelectionPopup::Buttons id;
-    std::size_t priority;
-    std::string name;
-    std::string caption;
-    bool enabled;
+    std::size_t                          priority;
+    std::string                          name;
+    std::string                          caption;
+    bool                                 enabled;
   };
 
   struct ButtonPriorityCompare
   {
-      bool operator()( const ButtonRequirement& lhs, const ButtonRequirement& rhs ) const {
-        return lhs.priority < rhs.priority;
-      }
+    bool operator()(const ButtonRequirement& lhs, const ButtonRequirement& rhs) const
+    {
+      return lhs.priority < rhs.priority;
+    }
   };
 
   /**
@@ -93,7 +92,7 @@ public:
    * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    * @return A handle to the TextSelectionPopup control.
    */
-  static Toolkit::TextSelectionPopup New( TextSelectionPopupCallbackInterface* callbackInterface );
+  static Toolkit::TextSelectionPopup New(TextSelectionPopupCallbackInterface* callbackInterface);
 
   // Properties
 
@@ -103,7 +102,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * @brief Called to retrieve a property of an object of this type.
@@ -112,17 +111,17 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
   /**
    * @copydoc Toolkit::EnableButtons
    */
-  void EnableButtons( Toolkit::TextSelectionPopup::Buttons buttonsToEnable );
+  void EnableButtons(Toolkit::TextSelectionPopup::Buttons buttonsToEnable);
 
   /**
    * @copydoc Toolkit::TextSelectionPopup::RaiseAbove()
    */
-  void RaiseAbove( Actor target );
+  void RaiseAbove(Actor target);
 
   /**
    * @copydoc Toolkit::TextSelectionPopup::ShowPopup()
@@ -135,57 +134,55 @@ public:
   void HidePopup();
 
 private: // From Control
-
   /**
    * @copydoc Control::OnInitialize()
    */
   void OnInitialize() override;
 
 private: // Implementation
-
-  void HideAnimationFinished( Animation& animation );
+  void HideAnimationFinished(Animation& animation);
 
   /**
    * @brief When the cut button is pressed.
    * @param[in] button the button pressed
    * @return @e true to consume the event.
    */
-  bool OnCutButtonPressed( Toolkit::Button button );
+  bool OnCutButtonPressed(Toolkit::Button button);
 
   /**
    * @brief When the copy button is pressed.
    * @param[in] button the button pressed
    * @return @e true to consume the event.
    */
-  bool OnCopyButtonPressed( Toolkit::Button button );
+  bool OnCopyButtonPressed(Toolkit::Button button);
 
   /**
    * @brief When the paste button is pressed.
    * @param[in] button the button pressed
    * @return @e true to consume the event.
    */
-  bool OnPasteButtonPressed( Toolkit::Button button );
+  bool OnPasteButtonPressed(Toolkit::Button button);
 
   /**
    * @brief When the select button is pressed.
    * @param[in] button the button pressed
    * @return @e true to consume the event.
    */
-  bool OnSelectButtonPressed( Toolkit::Button button );
+  bool OnSelectButtonPressed(Toolkit::Button button);
 
   /**
    * @brief When the select all button is pressed.
    * @param[in] button the button pressed
    * @return @e true to consume the event.
    */
-  bool OnSelectAllButtonPressed( Toolkit::Button button );
+  bool OnSelectAllButtonPressed(Toolkit::Button button);
 
   /**
    * @brief When the clipboard button is pressed.
    * @param[in] button the button pressed
    * @return @e true to consume the event.
    */
-  bool OnClipboardButtonPressed( Toolkit::Button button );
+  bool OnClipboardButtonPressed(Toolkit::Button button);
 
   /**
    * @brief Method to set the dimension or dimension constraint on certain aspects of the Popup.
@@ -193,14 +190,14 @@ private: // Implementation
    * @param[in] settingToCustomise The setting for the PopupCustomisations enum that can be customised
    * @param[in] dimension The size to customise with
    */
-  void SetDimensionToCustomise( const PopupCustomisations& settingToCustomise, const Size& dimension );
+  void SetDimensionToCustomise(const PopupCustomisations& settingToCustomise, const Size& dimension);
 
   /**
    * @brief Method to get the dimension or dimension constraint on certain aspects of the Popup that was previously customised
    *
    * @param[in] setting The setting from the PopupCustomisations enum
    */
-  Size GetDimensionToCustomise( const PopupCustomisations& setting ) const;
+  Size GetDimensionToCustomise(const PopupCustomisations& setting) const;
 
   /**
    * @brief Sets the image for the given button of the Popup.
@@ -208,7 +205,7 @@ private: // Implementation
    * @param[in] button  The button the image should be used for from the Buttons Enum.
    * @param[in] image The image to use.
    */
- void SetButtonImage( Toolkit::TextSelectionPopup::Buttons button, const std::string& image );
+  void SetButtonImage(Toolkit::TextSelectionPopup::Buttons button, const std::string& image);
 
   /**
    * @brief Retrieves the image of the given button used by the popup
@@ -216,14 +213,14 @@ private: // Implementation
    * @param[in] button The button to get the image from
    * @return The image used for that button.
    */
-  const std::string& GetButtonImage( Toolkit::TextSelectionPopup::Buttons button ) const;
+  const std::string& GetButtonImage(Toolkit::TextSelectionPopup::Buttons button) const;
 
   /**
    * @brief Sets the image for the pressed state of a popup option.
    *
    * @param[in]  filename The image filename to use.
    */
-  void SetPressedImage( const std::string& filename);
+  void SetPressedImage(const std::string& filename);
 
   /**
    * @brief Gets the image used for the pressed state of a popup option.
@@ -234,23 +231,23 @@ private: // Implementation
 
   void CreateOrderedListOfPopupOptions();
 
-  void AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption );
+  void AddOption(const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption);
 
   std::size_t GetNumberOfEnabledOptions() const;
 
-  void AddPopupOptionsToToolbar(  bool showIcons, bool showCaptions );
+  void AddPopupOptionsToToolbar(bool showIcons, bool showCaptions);
 
   /**
    * Creates the background-border image
    *
    * @param[in] propertyMap The properties describing the background-border
    */
-  void CreateBackgroundBorder( Property::Map& propertyMap );
+  void CreateBackgroundBorder(Property::Map& propertyMap);
 
   /**
    * Construct a new TextField.
    */
-  TextSelectionPopup( TextSelectionPopupCallbackInterface* callbackInterface );
+  TextSelectionPopup(TextSelectionPopupCallbackInterface* callbackInterface);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -258,17 +255,14 @@ private: // Implementation
   virtual ~TextSelectionPopup();
 
 private:
-
   // Undefined copy constructor and assignment operators
   TextSelectionPopup(const TextSelectionPopup&);
   TextSelectionPopup& operator=(const TextSelectionPopup& rhs);
 
 private: // Data
-
-
   Dali::Toolkit::TextSelectionToolbar mToolbar;
 
-  Dali::Toolkit::TableView mTableOfButtons;           // Actor which holds all the buttons, sensitivity can be set on buttons via this actor
+  Dali::Toolkit::TableView mTableOfButtons; // Actor which holds all the buttons, sensitivity can be set on buttons via this actor
 
   // Images paths to be used by the Popup buttons
   std::string mCutIconImage;
@@ -278,20 +272,20 @@ private: // Data
   std::string mSelectIconImage;
   std::string mSelectAllIconImage;
 
-  Size mPopupMaxSize;                   // Maximum size of the Popup
-  Size mOptionMaxSize;                  // Maximum size of an Option button
-  Size mOptionMinSize;                  // Minimum size of an Option button
-  Size mOptionDividerSize;              // Size of divider line
+  Size mPopupMaxSize;      // Maximum size of the Popup
+  Size mOptionMaxSize;     // Maximum size of an Option button
+  Size mOptionMinSize;     // Minimum size of an Option button
+  Size mOptionDividerSize; // Size of divider line
 
   std::vector<ButtonRequirement> mOrderListOfButtons; // List of buttons in the order to be displayed and a flag to indicate if needed.
 
-  Toolkit::TextSelectionPopup::Buttons mEnabledButtons; // stores enabled buttons
+  Toolkit::TextSelectionPopup::Buttons          mEnabledButtons; // stores enabled buttons
   Toolkit::TextSelectionPopupCallbackInterface* mCallbackInterface;
 
-  std::string mPressedImage;            // Image used for the popup option when pressed.
-  Vector4 mPressedColor;                // Color of the popup option when pressed.
-  Vector4 mDividerColor;                // Color of the divider between buttons
-  Vector4 mIconColor;                   // Color of the popup icon.
+  std::string mPressedImage; // Image used for the popup option when pressed.
+  Vector4     mPressedColor; // Color of the popup option when pressed.
+  Vector4     mDividerColor; // Color of the divider between buttons
+  Vector4     mIconColor;    // Color of the popup icon.
 
   // Priority of Options/Buttons in the Cut and Paste pop-up, higher priority buttons are displayed first, left to right.
   std::size_t mSelectOptionPriority;    // Position of Select Button
@@ -300,32 +294,31 @@ private: // Data
   std::size_t mCopyOptionPriority;      // Position of Copy button
   std::size_t mPasteOptionPriority;     // Position of Paste button
   std::size_t mClipboardOptionPriority; // Position of Clipboard button
-  float mFadeInDuration;                // Duration of the animation to fade in the Popup
-  float mFadeOutDuration;               // Duration of the animation to fade out the Popup
+  float       mFadeInDuration;          // Duration of the animation to fade in the Popup
+  float       mFadeOutDuration;         // Duration of the animation to fade out the Popup
 
-  bool mShowIcons:1; // Flag to show icons
-  bool mShowCaptions:1; // Flag to show text captions
-  bool mPopupShowing:1; // Flag to indicate Popup showing
-  bool mButtonsChanged:1; // Flag to indicate the Popup Buttons have changed
-
+  bool mShowIcons : 1;      // Flag to show icons
+  bool mShowCaptions : 1;   // Flag to show text captions
+  bool mPopupShowing : 1;   // Flag to indicate Popup showing
+  bool mButtonsChanged : 1; // Flag to indicate the Popup Buttons have changed
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::TextSelectionPopup& GetImpl( Toolkit::TextSelectionPopup& textSelectionPopup )
+inline Toolkit::Internal::TextSelectionPopup& GetImpl(Toolkit::TextSelectionPopup& textSelectionPopup)
 {
-  DALI_ASSERT_ALWAYS( textSelectionPopup );
+  DALI_ASSERT_ALWAYS(textSelectionPopup);
 
   Dali::RefObject& handle = textSelectionPopup.GetImplementation();
 
   return static_cast<Toolkit::Internal::TextSelectionPopup&>(handle);
 }
 
-inline const Toolkit::Internal::TextSelectionPopup& GetImpl( const Toolkit::TextSelectionPopup& textSelectionPopup )
+inline const Toolkit::Internal::TextSelectionPopup& GetImpl(const Toolkit::TextSelectionPopup& textSelectionPopup)
 {
-  DALI_ASSERT_ALWAYS( textSelectionPopup );
+  DALI_ASSERT_ALWAYS(textSelectionPopup);
 
   const Dali::RefObject& handle = textSelectionPopup.GetImplementation();
 
@@ -337,4 +330,3 @@ inline const Toolkit::Internal::TextSelectionPopup& GetImpl( const Toolkit::Text
 } // namespace Dali
 
 #endif // DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H
-

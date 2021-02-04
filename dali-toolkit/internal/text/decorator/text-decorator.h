@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_DECORATOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,24 +20,21 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/math/rect.h>
+#include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 namespace Dali
 {
-
 struct Vector2;
 struct Vector4;
 
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class Decorator;
 typedef IntrusivePtr<Decorator> DecoratorPtr;
 
@@ -102,34 +99,32 @@ enum HandleType
 class Decorator : public RefObject
 {
 public:
-
   class ControllerInterface
   {
   public:
-
     /**
      * @brief Constructor.
      */
-    ControllerInterface() {};
+    ControllerInterface(){};
 
     /**
      * @brief Virtual destructor.
      */
-    virtual ~ControllerInterface() {};
+    virtual ~ControllerInterface(){};
 
     /**
      * @brief Query the target size of the UI control.
      *
      * @param[out] targetSize The size of the UI control the decorator is adding it's decorations to.
      */
-    virtual void GetTargetSize( Vector2& targetSize ) = 0;
+    virtual void GetTargetSize(Vector2& targetSize) = 0;
 
     /**
      * @brief Add a decoration to the parent UI control.
      *
      * @param[in] decoration The actor displaying a decoration.
      */
-    virtual void AddDecoration( Actor& actor, bool needsClipping ) = 0;
+    virtual void AddDecoration(Actor& actor, bool needsClipping) = 0;
 
     /**
      * @brief An input event from one of the handles.
@@ -139,7 +134,7 @@ public:
      * @param[in] x The x position relative to the top-left of the parent control.
      * @param[in] y The y position relative to the top-left of the parent control.
      */
-    virtual void DecorationEvent( HandleType handleType, HandleState state, float x, float y ) = 0;
+    virtual void DecorationEvent(HandleType handleType, HandleState state, float x, float y) = 0;
   };
 
   /**
@@ -150,8 +145,8 @@ public:
    *
    * @return A pointer to a new Decorator.
    */
-  static DecoratorPtr New( ControllerInterface& controller,
-                           TextSelectionPopupCallbackInterface& callbackInterface );
+  static DecoratorPtr New(ControllerInterface&                 controller,
+                          TextSelectionPopupCallbackInterface& callbackInterface);
 
   /**
    * @brief Set the bounding box which handles, popup and similar decorations will not exceed.
@@ -173,7 +168,7 @@ public:
    *
    * @param[in] boundingBox Vector( x coordinate, y coordinate, width, height )
    */
-  void SetBoundingBox( const Rect<int>& boundingBox );
+  void SetBoundingBox(const Rect<int>& boundingBox);
 
   /**
    * @brief Retrieve the bounding box origin and dimensions.
@@ -181,21 +176,21 @@ public:
    * default is set once control is added to stage, before this the return vector will be Vector4:ZERO
    * @param[out] boundingBox The bounding box origin, width and height.
    */
-  void GetBoundingBox( Rect<int>& boundingBox ) const;
+  void GetBoundingBox(Rect<int>& boundingBox) const;
 
   /**
    * @brief The decorator waits until a relayout before creating actors etc.
    *
    * @param[in] size The size of the parent control after size-negotiation.
    */
-  void Relayout( const Dali::Vector2& size );
+  void Relayout(const Dali::Vector2& size);
 
   /**
    * @brief Updates the decorator's actor positions after scrolling.
    *
    * @param[in] scrollOffset The scroll offset.
    */
-  void UpdatePositions( const Vector2& scrollOffset );
+  void UpdatePositions(const Vector2& scrollOffset);
 
   /**
    * @brief Sets which of the cursors are active.
@@ -203,7 +198,7 @@ public:
    * @note Cursor will only be visible if within the parent area.
    * @param[in] activeCursor Which of the cursors should be active (if any).
    */
-  void SetActiveCursor( ActiveCursor activeCursor );
+  void SetActiveCursor(ActiveCursor activeCursor);
 
   /**
    * @brief Query which of the cursors are active.
@@ -221,7 +216,7 @@ public:
    * @param[in] cursorHeight The logical height of the cursor.
    * @param[in] lineHeight The logical height of the line.
    */
-  void SetPosition( Cursor cursor, float x, float y, float cursorHeight, float lineHeight );
+  void SetPosition(Cursor cursor, float x, float y, float cursorHeight, float lineHeight);
 
   /**
    * @brief Retrieves the position, height and lineHeight of a cursor.
@@ -232,7 +227,7 @@ public:
    * @param[out] cursorHeight The logical height of the cursor.
    * @param[out] lineHeight The logical height of the line.
    */
-  void GetPosition( Cursor cursor, float& x, float& y, float& cursorHeight, float& lineHeight ) const;
+  void GetPosition(Cursor cursor, float& x, float& y, float& cursorHeight, float& lineHeight) const;
 
   /**
    * @brief Retrieves the position of a cursor.
@@ -241,8 +236,7 @@ public:
    *
    * @return The position.
    */
-  const Vector2& GetPosition( Cursor cursor ) const;
-
+  const Vector2& GetPosition(Cursor cursor) const;
 
   /**
    * @brief Sets the glyph offset of a cursor.
@@ -250,7 +244,7 @@ public:
    * @param[in] cursor The cursor to set.
    * @param[in] glyphoffset The difference of line ascender and glyph ascender.
    */
-  void SetGlyphOffset( Cursor cursor, float glyphOffset );
+  void SetGlyphOffset(Cursor cursor, float glyphOffset);
 
   /**
    * @brief Retrieves the glyph offset of a cursor.
@@ -259,7 +253,7 @@ public:
    *
    * @return The glyph offset. glyph offset means difference of line ascender and glyph ascender.
    */
-  const float GetGlyphOffset( Cursor cursor ) const;
+  const float GetGlyphOffset(Cursor cursor) const;
 
   /**
    * @brief Sets the color for a cursor.
@@ -267,7 +261,7 @@ public:
    * @param[in] cursor Whether this color is for the primary or secondary cursor.
    * @param[in] color The color to use.
    */
-  void SetCursorColor( Cursor cursor, const Dali::Vector4& color );
+  void SetCursorColor(Cursor cursor, const Dali::Vector4& color);
 
   /**
    * @brief Retrieves the color for a cursor.
@@ -275,7 +269,7 @@ public:
    * @param[in] cursor Whether this color is for the primary or secondary cursor.
    * @return The cursor color.
    */
-  const Dali::Vector4& GetColor( Cursor cursor ) const;
+  const Dali::Vector4& GetColor(Cursor cursor) const;
 
   /**
    * @brief Start blinking the cursor; see also SetCursorBlinkDuration().
@@ -297,7 +291,7 @@ public:
    *
    * @param[in] seconds The interval in seconds.
    */
-  void SetCursorBlinkInterval( float seconds );
+  void SetCursorBlinkInterval(float seconds);
 
   /**
    * @brief Retrieves the blink-interval for a cursor.
@@ -311,7 +305,7 @@ public:
    *
    * @param[in] seconds The duration in seconds.
    */
-  void SetCursorBlinkDuration( float seconds );
+  void SetCursorBlinkDuration(float seconds);
 
   /**
    * @brief Retrieves the blink-duration for a cursor.
@@ -325,7 +319,7 @@ public:
    *
    * @param[in] width The width of the cursor in pixels.
    */
-  void SetCursorWidth( int width );
+  void SetCursorWidth(int width);
 
   /**
    * @brief Retrieves the width of the cursors.
@@ -340,8 +334,8 @@ public:
    * @param[in] handleType One of the handles.
    * @param[in] active True if the handle should be active.
    */
-  void SetHandleActive( HandleType handleType,
-                        bool active );
+  void SetHandleActive(HandleType handleType,
+                       bool       active);
 
   /**
    * @brief Query whether a handle is active.
@@ -350,7 +344,7 @@ public:
    *
    * @return True if the handle is active.
    */
-  bool IsHandleActive( HandleType handleType ) const;
+  bool IsHandleActive(HandleType handleType) const;
 
   /**
    * @brief Sets the image file name for one of the handles.
@@ -359,7 +353,7 @@ public:
    * @param[in] handleImageType A different image can be set for the pressed/released states.
    * @param[in] imageFileName The image filename to use.
    */
-  void SetHandleImage( HandleType handleType, HandleImageType handleImageType, const std::string& imageFileName );
+  void SetHandleImage(HandleType handleType, HandleImageType handleImageType, const std::string& imageFileName);
 
   /**
    * @brief Retrieves the file name of the image for one of the handles.
@@ -369,14 +363,14 @@ public:
    *
    * @return The grab handle image string.
    */
-  const std::string& GetHandleImage( HandleType handleType, HandleImageType handleImageType ) const;
+  const std::string& GetHandleImage(HandleType handleType, HandleImageType handleImageType) const;
 
   /**
    * @brief Sets the color of the handles
    *
    * @param[in] color The color to use.
    */
-  void SetHandleColor( const Vector4& color );
+  void SetHandleColor(const Vector4& color);
 
   /**
    * @brief Retrieves the handles color.
@@ -393,7 +387,7 @@ public:
    * @param[in] y The y position relative to the top-left of the parent control.
    * @param[in] lineHeight The logical line height at this position.
    */
-  void SetPosition( HandleType handleType, float x, float y, float lineHeight );
+  void SetPosition(HandleType handleType, float x, float y, float lineHeight);
 
   /**
    * @brief Retrieves the position of a selection handle.
@@ -403,7 +397,7 @@ public:
    * @param[out] y The y position relative to the top-left of the parent control.
    * @param[out] lineHeight The logical line height at this position.
    */
-  void GetPosition( HandleType handleType, float& x, float& y, float& lineHeight ) const;
+  void GetPosition(HandleType handleType, float& x, float& y, float& lineHeight) const;
 
   /**
    * @brief Retrieves the position of a selection handle.
@@ -412,7 +406,7 @@ public:
    *
    * @return The position of the selection handle relative to the top-left of the parent control.
    */
-  const Vector2& GetPosition( HandleType handleType ) const;
+  const Vector2& GetPosition(HandleType handleType) const;
 
   /**
    * @brief Whether to flip vertically a handle.
@@ -420,7 +414,7 @@ public:
    * @param[in] handleType The handle to flip vertically.
    * @param[in] flip Whether to flip vertically.
    */
-  void FlipHandleVertically( HandleType handleType, bool flip );
+  void FlipHandleVertically(HandleType handleType, bool flip);
 
   /**
    * @brief Retrieves whether the handle is vertically flipped.
@@ -429,7 +423,7 @@ public:
    *
    * @return @e ture if the handle is vertically flipped.
    */
-  bool IsHandleVerticallyFlipped( HandleType handleType ) const;
+  bool IsHandleVerticallyFlipped(HandleType handleType) const;
 
   /**
    * @brief Whether to flip the selection handles as soon as they are crossed.
@@ -438,7 +432,7 @@ public:
    *
    * @param[in] enable If @e true the selection handles will flip as soon as they are crossed.
    */
-  void FlipSelectionHandlesOnCrossEnabled( bool enable );
+  void FlipSelectionHandlesOnCrossEnabled(bool enable);
 
   /**
    * @brief Sets info to calculate the handle flip state.
@@ -450,7 +444,7 @@ public:
    * @param[in] left The direction of the character pointed by the primary selection handle.
    * @param[in] right The direction of the character pointed by the secondary selection handle.
    */
-  void SetSelectionHandleFlipState( bool indicesSwapped, bool left, bool right );
+  void SetSelectionHandleFlipState(bool indicesSwapped, bool left, bool right);
 
   /**
    * @brief Adds a quad to the existing selection highlights. Vertices are in decorator's coordinates.
@@ -458,7 +452,7 @@ public:
    * @param[in] index Position in the vector where to add the quad.
    * @param[in] quad The quad. The 'x' and 'y' coordinates store the min 'x' and min 'y'. The 'z' and 'w' coordinates store the max 'x' and max 'y'.
    */
-  void AddHighlight( unsigned int index, const Vector4& quad );
+  void AddHighlight(unsigned int index, const Vector4& quad);
 
   /**
    * @brief Sets the min 'x,y' coordinates and the size of the highlighted box.
@@ -470,9 +464,9 @@ public:
    * @param[in] size The size of the highlighted text.
    * @param[in] outlineOffset The outline's offset.
    */
-  void SetHighLightBox( const Vector2& position,
-                        const Size& size,
-                        float outlineOffset );
+  void SetHighLightBox(const Vector2& position,
+                       const Size&    size,
+                       float          outlineOffset);
 
   /**
    * @brief Removes all of the previously added highlights.
@@ -484,14 +478,14 @@ public:
    *
    * @param[in] numberOfQuads The expected number of quads.
    */
-  void ResizeHighlightQuads( unsigned int numberOfQuads );
+  void ResizeHighlightQuads(unsigned int numberOfQuads);
 
   /**
    * @brief Sets the selection highlight color.
    *
    * @param[in] color The color to use.
    */
-  void SetHighlightColor( const Vector4& color );
+  void SetHighlightColor(const Vector4& color);
 
   /**
    * @brief Retrieves the selection highlight color.
@@ -505,7 +499,7 @@ public:
    *
    * @param[in] active Whether the highlight is active.
    */
-  void SetHighlightActive( bool active );
+  void SetHighlightActive(bool active);
 
   /**
    * @brief Retrieves whether the highlight is active.
@@ -526,13 +520,13 @@ public:
    *
    * @param[in] depth The text's depth.
    */
-  void SetTextDepth( int textDepth );
+  void SetTextDepth(int textDepth);
 
   /**
    * @brief Set the Selection Popup to show or hide via the active flaf
    * @param[in] active true to show, false to hide
    */
-  void SetPopupActive( bool active );
+  void SetPopupActive(bool active);
 
   /**
    * @brief Query whether the Selection Popup is active.
@@ -545,7 +539,7 @@ public:
    * @brief Set a bit mask of the buttons to be shown by Popup
    * @param[in] enabledButtonsBitMask from TextSelectionPopup::Buttons enum
    */
-  void SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButtonsBitMask );
+  void SetEnabledPopupButtons(TextSelectionPopup::Buttons& enabledButtonsBitMask);
 
   /**
    * @brief Get the current bit mask of buttons to be shown by Popup
@@ -561,7 +555,7 @@ public:
    *
    * @param[in] threshold The scroll threshold in pixels.
    */
-  void SetScrollThreshold( float threshold );
+  void SetScrollThreshold(float threshold);
 
   /**
    * @brief Retrieves the scroll threshold.
@@ -577,16 +571,16 @@ public:
    *
    * @param[in] speed The scroll speed in pixels/second.
    */
-  void SetScrollSpeed( float speed );
+  void SetScrollSpeed(float speed);
 
- /**
+  /**
    * @brief Sets Editable mode decoration.
    *
    * If this set to false, Primary cursor and grab will always be hidden.
    *
    * @param[in] isEditable enable or disable Editing.
    */
-  void SetEditable( bool isEditable );
+  void SetEditable(bool isEditable);
 
   /**
    * @brief Retrieves the scroll speed.
@@ -603,7 +597,7 @@ public:
   /**
    * @copydoc Text::Controller::SetHorizontalScrollEnabled()
    */
-  void SetHorizontalScrollEnabled( bool enable );
+  void SetHorizontalScrollEnabled(bool enable);
 
   /**
    * @copydoc Text::Controller::IsHorizontalScrollEnabled()
@@ -613,7 +607,7 @@ public:
   /**
    * @copydoc Text::Controller::SetVerticalScrollEnabled()
    */
-  void SetVerticalScrollEnabled( bool enable );
+  void SetVerticalScrollEnabled(bool enable);
 
   /**
    * @copydoc Text::Controller::IsVerticalScrollEnabled()
@@ -623,7 +617,7 @@ public:
   /**
    * @copydoc Text::Controller::SetSmoothHandlePanEnabled()
    */
-  void SetSmoothHandlePanEnabled( bool enable );
+  void SetSmoothHandlePanEnabled(bool enable);
 
   /**
    * @copydoc Text::Controller::IsSmoothHandlePanEnabled()
@@ -631,30 +625,27 @@ public:
   bool IsSmoothHandlePanEnabled() const;
 
 protected:
-
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~Decorator();
 
 private:
-
   /**
    * @brief Private constructor.
    * @param[in] controller The controller which receives input events from Decorator components.
    * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    */
-  Decorator( ControllerInterface& controller,
-             TextSelectionPopupCallbackInterface& callbackInterface );
+  Decorator(ControllerInterface&                 controller,
+            TextSelectionPopupCallbackInterface& callbackInterface);
 
   // Undefined
-  Decorator( const Decorator& handle );
+  Decorator(const Decorator& handle);
 
   // Undefined
-  Decorator& operator=( const Decorator& handle );
+  Decorator& operator=(const Decorator& handle);
 
 private:
-
   struct Impl;
   Impl* mImpl;
 };

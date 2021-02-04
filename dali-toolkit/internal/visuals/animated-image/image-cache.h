@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
+#include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 
 namespace Dali
 {
@@ -27,7 +27,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 class ImageCache : public TextureManager::LifecycleObserver
 {
 public:
@@ -41,13 +40,13 @@ public:
      * Informs observer when the next texture set is ready to display
      * @param[in] textureSet The ready texture set
      */
-    virtual void FrameReady( TextureSet textureSet ) = 0;
+    virtual void FrameReady(TextureSet textureSet) = 0;
   };
 
   struct UrlStore
   {
     TextureManager::TextureId mTextureId = TextureManager::INVALID_TEXTURE_ID;
-    std::string mUrl;
+    std::string               mUrl;
   };
 
   /**
@@ -66,9 +65,9 @@ public:
    * This will start loading textures immediately, according to the
    * batch and cache sizes. The cache is as large as the number of urls.
    */
-  ImageCache( TextureManager&                 textureManager,
-              ImageCache::FrameReadyObserver& observer,
-              unsigned int                    batchSize );
+  ImageCache(TextureManager&                 textureManager,
+             ImageCache::FrameReadyObserver& observer,
+             unsigned int                    batchSize);
 
   virtual ~ImageCache();
 
@@ -88,12 +87,12 @@ public:
    * Get the Nth frame. If it's not ready, this will trigger the
    * sending of FrameReady() when the image becomes ready.
    */
-  virtual TextureSet Frame( uint32_t frameIndex ) = 0;
+  virtual TextureSet Frame(uint32_t frameIndex) = 0;
 
   /**
    * Get the interval of Nth frame.
    */
-  virtual uint32_t GetFrameInterval( uint32_t frameIndex ) const = 0;
+  virtual uint32_t GetFrameInterval(uint32_t frameIndex) const = 0;
 
   /**
    * Get the current rendered frame index.
@@ -107,20 +106,19 @@ public:
   virtual int32_t GetTotalFrameCount() const = 0;
 
 private:
-
   /**
    * Called before the texture manager is destroyed.
    */
   void TextureManagerDestroyed() final;
 
 protected:
-  TextureManager&        mTextureManager;
-  FrameReadyObserver&    mObserver;
-  unsigned int           mBatchSize;
-  unsigned int           mUrlIndex;
-  bool                   mWaitingForReadyFrame:1;
-  bool                   mRequestingLoad:1;
-  bool                   mTextureManagerAlive:1;
+  TextureManager&     mTextureManager;
+  FrameReadyObserver& mObserver;
+  unsigned int        mBatchSize;
+  unsigned int        mUrlIndex;
+  bool                mWaitingForReadyFrame : 1;
+  bool                mRequestingLoad : 1;
+  bool                mTextureManagerAlive : 1;
 };
 
 } //namespace Internal

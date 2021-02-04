@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_PARAGRAPH_RUN_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief ParagraphRun
  *
@@ -41,8 +38,8 @@ namespace Text
  */
 struct ParagraphRun
 {
-  CharacterRun  characterRun; ///< The initial character index within the whole text and the number of characters of the run.
-  Size          layoutSize;   ///< The size of the paragraph when is laid-out.
+  CharacterRun characterRun; ///< The initial character index within the whole text and the number of characters of the run.
+  Size         layoutSize;   ///< The size of the paragraph when is laid-out.
 };
 
 } // namespace Text

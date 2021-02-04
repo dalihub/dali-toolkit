@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SUPER_BLUR_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,39 +23,34 @@
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/devel-api/controls/super-blur-view/super-blur-view.h>
 #include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/devel-api/controls/super-blur-view/super-blur-view.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class SuperBlurView;
 
 namespace Internal
 {
-
 /**
  * SuperBlurView implementation class
  */
 class SuperBlurView : public Control
 {
-
 public:
-
   /**
    * @copydoc Dali::Toolkit::SuperBlurView::New
    */
-  static Toolkit::SuperBlurView New( unsigned int blurLevels );
+  static Toolkit::SuperBlurView New(unsigned int blurLevels);
 
   /**
    * @copydoc Dali::Toolkit::SuperBlurView::SetImage
    */
-  void SetTexture( Texture texture );
+  void SetTexture(Texture texture);
 
   /**
    * @copydoc Dali::Toolkit::SuperBlurView::GetBlurStrengthPropertyIndex
@@ -65,7 +60,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::SuperBlurView::SetBlurStrength
    */
-  void SetBlurStrength( float blurStrength );
+  void SetBlurStrength(float blurStrength);
 
   /**
    * @copydoc Dali::Toolkit::SuperBlurView::GetCurrentBlurStrength
@@ -80,7 +75,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::SuperBlurView::GetBlurredTexture
    */
-  Texture GetBlurredTexture( unsigned int level );
+  Texture GetBlurredTexture(unsigned int level);
 
   // Properties
 
@@ -90,7 +85,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -98,14 +93,13 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+  static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
 protected:
-
   /**
    * Constructor. It initializes the SuperBlurView members
    */
-  SuperBlurView( unsigned int blurLevels );
+  SuperBlurView(unsigned int blurLevels);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -113,7 +107,6 @@ protected:
   virtual ~SuperBlurView();
 
 private: // from Control
-
   /**
    * @copydoc Toolkit::Control::OnInitialize
    */
@@ -127,7 +120,7 @@ private: // from Control
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  void OnSceneConnection( int depth ) override;
+  void OnSceneConnection(int depth) override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneDisconnection()
@@ -140,19 +133,18 @@ private: // from Control
   Vector3 GetNaturalSize() override;
 
 private:
-
   /**
    * Carry out the idx-th pass of blurring
    * @param[in] idx The blur pass index
    * @param[in] texture The input texture for the current blurring, it is either the original image or the blurred texture from the previous pass
    */
-  void BlurTexture( unsigned int idx, Texture texture );
+  void BlurTexture(unsigned int idx, Texture texture);
 
   /**
    * Signal handler to tell when the last blur view completes
    * @param[in] blurView The blur view that just completed
    */
-  void OnBlurViewFinished( Toolkit::GaussianBlurView blurView );
+  void OnBlurViewFinished(Toolkit::GaussianBlurView blurView);
 
   /**
    * Clear the resources used to create the blurred image
@@ -168,31 +160,31 @@ private:
 
   Toolkit::SuperBlurView::SuperBlurViewSignal mBlurFinishedSignal; ///< Signal emitted when blur has completed.
 
-  std::string                            mUrl;
-  Property::Index                        mBlurStrengthPropertyIndex;
-  unsigned int                           mBlurLevels;
-  bool                                   mResourcesCleared;
+  std::string     mUrl;
+  Property::Index mBlurStrengthPropertyIndex;
+  unsigned int    mBlurLevels;
+  bool            mResourcesCleared;
 };
 
-}
+} // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Toolkit::Internal::SuperBlurView& GetImpl( Toolkit::SuperBlurView& obj )
+inline Toolkit::Internal::SuperBlurView& GetImpl(Toolkit::SuperBlurView& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
   Dali::RefObject& handle = obj.GetImplementation();
   return static_cast<Toolkit::Internal::SuperBlurView&>(handle);
 }
 
-inline const Toolkit::Internal::SuperBlurView& GetImpl( const Toolkit::SuperBlurView& obj )
+inline const Toolkit::Internal::SuperBlurView& GetImpl(const Toolkit::SuperBlurView& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
   const Dali::RefObject& handle = obj.GetImplementation();
   return static_cast<const Toolkit::Internal::SuperBlurView&>(handle);
 }
 
-}
+} // namespace Toolkit
 
-}
+} // namespace Dali
 
 #endif // DALI_TOOLKIT_INTERNAL_SUPER_BLUR_VIEW_H

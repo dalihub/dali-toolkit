@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_TOOLBAR_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,28 +19,24 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/layer.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class TextSelectionToolbar : public Control
 {
 public:
-
   /**
    * @copydoc Dali::Toollkit::TextSelectionToolbar::New()
    */
@@ -54,7 +50,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * @brief Called to retrieve a property of an object of this type.
@@ -63,34 +59,34 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
   /**
    *  @copydoc Toolkit::TextSelectionToolbar::AddOption()
    */
-  void AddOption( Actor& option );
+  void AddOption(Actor& option);
 
   /**
    *  @copydoc Toolkit::TextSelectionToolbar::AddDivider()
    */
-  void AddDivider( Actor& divider );
+  void AddDivider(Actor& divider);
 
   /**
    * @copydoc Toolkit::TextSelectionToolbar::ResizeDividers()
    */
-  void ResizeDividers( Size& size );
+  void ResizeDividers(Size& size);
 
   /**
    * @copydoc Toolkit::TextSelectionToolbar::RaiseAbove()
    */
-  void RaiseAbove( Actor target );
+  void RaiseAbove(Actor target);
 
   /**
    * Sets the scroll bar padding.
    *
    * @param[in] padding The padding value.
    */
-  void SetScrollBarPadding( const Vector2& padding );
+  void SetScrollBarPadding(const Vector2& padding);
 
   /**
    * @return The padding value.
@@ -100,10 +96,9 @@ public:
   /**
    * @copydoc Toolkit::TextSelectionToolbar::ScrollTo()
    */
-  void ScrollTo( const Vector2& position );
+  void ScrollTo(const Vector2& position);
 
 private: // From Control
-
   /**
    * @copydoc Control::OnInitialize()
    */
@@ -112,13 +107,13 @@ private: // From Control
   /**
   * @copydoc Control::OnRelayout()
   */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
    * @brief Set max size of Popup
    * @param[in] maxSize Size (Vector2)
    */
-  void SetPopupMaxSize( const Size& maxSize );
+  void SetPopupMaxSize(const Size& maxSize);
 
   /**
    * @brief Get Max size of Popup
@@ -127,11 +122,10 @@ private: // From Control
   const Dali::Vector2& GetPopupMaxSize() const;
 
 private: // Implementation
-
   /**
    * @copydoc Toolkit::TextSelectionToolbar::ConfigureScrollview()
    */
-  void ConfigureScrollview( const Property::Map& properties );
+  void ConfigureScrollview(const Property::Map& properties);
 
   /**
    * @brief Set up scrollview to scroll Toolbar horizontally
@@ -148,19 +142,19 @@ private: // Implementation
    *
    * @param[in] enable True if the scroll-bar is required
    */
-  void SetUpScrollBar( bool enable );
+  void SetUpScrollBar(bool enable);
 
   /**
    * Toolbar has started to scroll
    * @param[in] position current scroll view position
    */
-  void OnScrollStarted( const Vector2& position );
+  void OnScrollStarted(const Vector2& position);
 
   /**
    * Toolbar has stopped scrolling
    * @param[in] position current scroll view position
    */
-  void OnScrollCompleted( const Vector2& position );
+  void OnScrollCompleted(const Vector2& position);
 
   /**
    * Construct a new TextField.
@@ -173,41 +167,39 @@ private: // Implementation
   virtual ~TextSelectionToolbar();
 
 private:
-
   // Undefined copy constructor and assignment operators
   TextSelectionToolbar(const TextSelectionToolbar&);
   TextSelectionToolbar& operator=(const TextSelectionToolbar& rhs);
 
-private: // Data
-
-  Actor mToolbarActor;                                ///< The actor used to house the toolbar.
-  Toolkit::TableView mTableOfButtons;                 ///< Actor which holds all the buttons, sensitivity can be set on buttons via this actor
-  Toolkit::ScrollView mScrollView;                    ///< Provides scrolling of Toolbar when content does not fit.
-  Toolkit::ScrollBar mScrollBar;                      ///< An horizontal scroll bar for the text's popup options.
-  RulerPtr mRulerX;                                   ///< Ruler to clamp horizontal scrolling. Updates on Relayout
-  Size mMaxSize;                                      ///< Max size of the Toolbar
-  Vector2 mScrollBarPadding;                          ///< The padding used to position the scroll indicator.
-  unsigned int mIndexInTable;                         ///< Index in table to add option
-  Dali::Vector< unsigned int > mDividerIndexes;       ///< Vector of indexes in the Toolbar that contain dividers.
-  bool mFirstScrollEnd;                               ///< Used for RTL mirroring. Avoids the overshoot to be shown the first time the popup is shown.
+private:                                        // Data
+  Actor                      mToolbarActor;     ///< The actor used to house the toolbar.
+  Toolkit::TableView         mTableOfButtons;   ///< Actor which holds all the buttons, sensitivity can be set on buttons via this actor
+  Toolkit::ScrollView        mScrollView;       ///< Provides scrolling of Toolbar when content does not fit.
+  Toolkit::ScrollBar         mScrollBar;        ///< An horizontal scroll bar for the text's popup options.
+  RulerPtr                   mRulerX;           ///< Ruler to clamp horizontal scrolling. Updates on Relayout
+  Size                       mMaxSize;          ///< Max size of the Toolbar
+  Vector2                    mScrollBarPadding; ///< The padding used to position the scroll indicator.
+  unsigned int               mIndexInTable;     ///< Index in table to add option
+  Dali::Vector<unsigned int> mDividerIndexes;   ///< Vector of indexes in the Toolbar that contain dividers.
+  bool                       mFirstScrollEnd;   ///< Used for RTL mirroring. Avoids the overshoot to be shown the first time the popup is shown.
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::TextSelectionToolbar& GetImpl( Toolkit::TextSelectionToolbar& textSelectionToolbar )
+inline Toolkit::Internal::TextSelectionToolbar& GetImpl(Toolkit::TextSelectionToolbar& textSelectionToolbar)
 {
-  DALI_ASSERT_ALWAYS( textSelectionToolbar );
+  DALI_ASSERT_ALWAYS(textSelectionToolbar);
 
   Dali::RefObject& handle = textSelectionToolbar.GetImplementation();
 
   return static_cast<Toolkit::Internal::TextSelectionToolbar&>(handle);
 }
 
-inline const Toolkit::Internal::TextSelectionToolbar& GetImpl( const Toolkit::TextSelectionToolbar& textSelectionToolbar )
+inline const Toolkit::Internal::TextSelectionToolbar& GetImpl(const Toolkit::TextSelectionToolbar& textSelectionToolbar)
 {
-  DALI_ASSERT_ALWAYS( textSelectionToolbar );
+  DALI_ASSERT_ALWAYS(textSelectionToolbar);
 
   const Dali::RefObject& handle = textSelectionToolbar.GetImplementation();
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_FLEX_CONTAINER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * FlexContainer is a custom control for laying out actors in a Flexbox layout
  * @see Dali::Toolkit:FlexContainer for more details
@@ -42,20 +39,18 @@ namespace Internal
 class FlexContainer : public Control
 {
 public:
-
   /**
    * The structure to store the style properties and layout information of flex item
    */
   struct FlexItemNode
   {
-    WeakHandle< Dali::Actor > actor;      ///< Actor handle of the flex item
-    YGNodeRef node;                     ///< The style properties and layout information
+    WeakHandle<Dali::Actor> actor; ///< Actor handle of the flex item
+    YGNodeRef               node;  ///< The style properties and layout information
   };
 
-  typedef std::vector< FlexItemNode > FlexItemNodeContainer;
+  typedef std::vector<FlexItemNode> FlexItemNodeContainer;
 
 public:
-
   /**
    * Construct a new FlexContainer.
    */
@@ -155,7 +150,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -163,10 +158,9 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
 private: // From Control
-
   /**
    * @copydoc Control::OnInitialize()
    */
@@ -175,42 +169,41 @@ private: // From Control
   /**
    * @copydoc Control::OnChildAdd(Actor& child)
    */
-  void OnChildAdd( Actor& child ) override;
+  void OnChildAdd(Actor& child) override;
 
   /**
    * @copydoc Control::OnChildRemove(Actor& child)
    */
-  void OnChildRemove( Actor& child ) override;
+  void OnChildRemove(Actor& child) override;
 
   /**
    * @copydoc Control::OnRelayout
    */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
    * @copydoc Control::RelayoutDependentOnChildren()
    */
-  bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) override;
+  bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override;
 
   /**
    * @copydoc Control::GetNextKeyboardFocusableActor
    */
-  Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled ) override;
+  Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
-  void OnSizeSet( const Vector3& size ) override;
+  void OnSizeSet(const Vector3& size) override;
 
   /**
   * @copydoc OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type )
   * @param[in] actor The actor whose layoutDirection is changed.
   * @param[in] type  The layoutDirection.
   */
-  void OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type );
+  void OnLayoutDirectionChanged(Dali::Actor actor, Dali::LayoutDirection::Type type);
 
 private: // Implementation
-
   /**
    * Calculate the layout properties of all the children
    */
@@ -227,29 +220,27 @@ private: // Implementation
   virtual ~FlexContainer();
 
 private:
-
   // Undefined copy constructor and assignment operators
   FlexContainer(const FlexContainer&);
   FlexContainer& operator=(const FlexContainer& rhs);
 
-private: // Data
+private:                                // Data
+  FlexItemNode          mRootNode;      ///< Style properties and layout information of flex container
+  FlexItemNodeContainer mChildrenNodes; ///< Style properties and layout information of flex items in the container
 
-  FlexItemNode mRootNode;                    ///< Style properties and layout information of flex container
-  FlexItemNodeContainer mChildrenNodes;      ///< Style properties and layout information of flex items in the container
-
-  Toolkit::FlexContainer::ContentDirection mContentDirection;        ///< The content direction of the container
-  Toolkit::FlexContainer::FlexDirection mFlexDirection;              ///< The flex direction of the container
-  Toolkit::FlexContainer::WrapType mFlexWrap;                        ///< The wrap type of the container
-  Toolkit::FlexContainer::Justification mJustifyContent;             ///< The alignment of flex items in the container on the main-axis
-  Toolkit::FlexContainer::Alignment mAlignItems;                     ///< The alignment of flex items in the container on the cross-axis
-  Toolkit::FlexContainer::Alignment mAlignContent;                   ///< The alignment of flex lines in the container on the cross-axis
+  Toolkit::FlexContainer::ContentDirection mContentDirection; ///< The content direction of the container
+  Toolkit::FlexContainer::FlexDirection    mFlexDirection;    ///< The flex direction of the container
+  Toolkit::FlexContainer::WrapType         mFlexWrap;         ///< The wrap type of the container
+  Toolkit::FlexContainer::Justification    mJustifyContent;   ///< The alignment of flex items in the container on the main-axis
+  Toolkit::FlexContainer::Alignment        mAlignItems;       ///< The alignment of flex items in the container on the cross-axis
+  Toolkit::FlexContainer::Alignment        mAlignContent;     ///< The alignment of flex lines in the container on the cross-axis
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::FlexContainer& GetImpl( Toolkit::FlexContainer& flexContainer )
+inline Toolkit::Internal::FlexContainer& GetImpl(Toolkit::FlexContainer& flexContainer)
 {
   DALI_ASSERT_ALWAYS(flexContainer);
 
@@ -258,7 +249,7 @@ inline Toolkit::Internal::FlexContainer& GetImpl( Toolkit::FlexContainer& flexCo
   return static_cast<Toolkit::Internal::FlexContainer&>(handle);
 }
 
-inline const Toolkit::Internal::FlexContainer& GetImpl( const Toolkit::FlexContainer& flexContainer )
+inline const Toolkit::Internal::FlexContainer& GetImpl(const Toolkit::FlexContainer& flexContainer)
 {
   DALI_ASSERT_ALWAYS(flexContainer);
 

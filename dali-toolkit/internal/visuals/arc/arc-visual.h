@@ -22,20 +22,17 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/devel-api/visuals/arc-visual-properties-devel.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class ArcVisual;
-typedef IntrusivePtr< ArcVisual > ArcVisualPtr;
+typedef IntrusivePtr<ArcVisual> ArcVisualPtr;
 
 /**
  * The visual which renders an arc to the control's quad
@@ -49,10 +46,9 @@ typedef IntrusivePtr< ArcVisual > ArcVisualPtr;
  * | SWEEP_ANGLE     | FLOAT       |
  * | CAP             | INTEGER     |
  */
-class ArcVisual: public Visual::Base
+class ArcVisual : public Visual::Base
 {
 public:
-
   /**
    * @brief Create a new arc visual.
    *
@@ -60,28 +56,26 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static ArcVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
+  static ArcVisualPtr New(VisualFactoryCache& factoryCache, const Property::Map& properties);
 
-public:  // from Visual
-
+public: // from Visual
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
 protected:
-
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  ArcVisual( VisualFactoryCache& factoryCache );
+  ArcVisual(VisualFactoryCache& factoryCache);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -96,12 +90,12 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::DoSetOffScene
@@ -116,27 +110,25 @@ protected:
   /**
    * @copydoc Visual::Base::OnDoAction
    */
-  void OnDoAction( const Property::Index actionId, const Property::Value& attributes ) override;
+  void OnDoAction(const Property::Index actionId, const Property::Value& attributes) override;
 
 private:
+  // Undefined
+  ArcVisual(const ArcVisual& arcVisual) = delete;
 
   // Undefined
-  ArcVisual( const ArcVisual& arcVisual ) = delete;
-
-  // Undefined
-  ArcVisual& operator=( const ArcVisual& arcVisual ) = delete;
+  ArcVisual& operator=(const ArcVisual& arcVisual) = delete;
 
 private:
-
-  float mThickness;                    ///< The thickness of the arc.
-  float mRadius;                       ///< The radius of the arc.
-  float mStartAngle;                   ///< The start angle of the arc.
-  float mSweepAngle;                   ///< The sweep angle of the arc.
-  Property::Index mRadiusIndex;        ///< The index of the radius property.
-  Property::Index mThicknessIndex;     ///< The index of the thickness property.
-  Property::Index mStartAngleIndex;    ///< The index of the start angle property.
-  Property::Index mSweepAngleIndex;    ///< The index of the sweep angle property.
-  DevelArcVisual::Cap::Type mCapType;  ///< The cap type.
+  float                     mThickness;       ///< The thickness of the arc.
+  float                     mRadius;          ///< The radius of the arc.
+  float                     mStartAngle;      ///< The start angle of the arc.
+  float                     mSweepAngle;      ///< The sweep angle of the arc.
+  Property::Index           mRadiusIndex;     ///< The index of the radius property.
+  Property::Index           mThicknessIndex;  ///< The index of the thickness property.
+  Property::Index           mStartAngleIndex; ///< The index of the start angle property.
+  Property::Index           mSweepAngleIndex; ///< The index of the sweep angle property.
+  DevelArcVisual::Cap::Type mCapType;         ///< The cap type.
 };
 
 } // namespace Internal
