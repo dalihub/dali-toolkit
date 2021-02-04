@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MODEL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,17 @@
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 // Forward declarations.
 class Model;
 
@@ -46,9 +43,7 @@ typedef IntrusivePtr<Model> ModelPtr;
  */
 class Model : public RefObject, public ModelInterface
 {
-
 public: // Constructor.
-
   /**
    * @brief Create a new instance of a text Model.
    *
@@ -57,7 +52,6 @@ public: // Constructor.
   static ModelPtr New();
 
 public:
-
   /**
    * @copydoc ModelInterface::GetControlSize()
    */
@@ -191,7 +185,7 @@ public:
   /**
    * @copydoc ModelInterface::GetUnderlineRuns()
    */
-  void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const override;
+  void GetUnderlineRuns(GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const override;
 
   /**
    * @copydoc ModelInterface::GetOutlineColor()
@@ -214,42 +208,40 @@ public:
   bool IsBackgroundEnabled() const override;
 
 private: // Private contructors & copy operator.
-
   /**
    * @brief Private constructor.
    */
   Model();
 
   // Undefined.
-  Model( const Model& handle );
+  Model(const Model& handle);
 
   // Undefined.
-  Model& operator=( const Model& handle );
+  Model& operator=(const Model& handle);
 
 protected:
-
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~Model();
 
 public:
-  LogicalModelPtr             mLogicalModel;        ///< Pointer to the logical model.
-  VisualModelPtr              mVisualModel;         ///< Pointer to the visual model.
+  LogicalModelPtr mLogicalModel; ///< Pointer to the logical model.
+  VisualModelPtr  mVisualModel;  ///< Pointer to the visual model.
   /**
    * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
    * Typically this will have a negative value with scrolling occurs.
    */
-  Vector2                                   mScrollPosition;          ///< The text is offset by this position when scrolling.
-  Vector2                                   mScrollPositionLast;      ///< The last offset value of mScrollPosition
-  HorizontalAlignment::Type                 mHorizontalAlignment;     ///< The layout's horizontal alignment.
-  VerticalAlignment::Type                   mVerticalAlignment;       ///< The layout's vertical alignment.
-  DevelText::VerticalLineAlignment::Type    mVerticalLineAlignment;   ///< The layout's vertical line alignment.
-  Text::LineWrap::Mode                      mLineWrapMode;            ///< The text wrap mode
-  float                                     mAlignmentOffset;         ///< The alignment offset.
-  bool                                      mElideEnabled:1;          ///< Whether the text's elide is enabled.
-  bool                                      mIgnoreSpacesAfterText:1; ///< Whether ignoring spaces after text or not. Default is true.
-  bool                                      mMatchSystemLanguageDirection:1; ///< Whether match align for system language direction or not. Default is false.
+  Vector2                                mScrollPosition;                   ///< The text is offset by this position when scrolling.
+  Vector2                                mScrollPositionLast;               ///< The last offset value of mScrollPosition
+  HorizontalAlignment::Type              mHorizontalAlignment;              ///< The layout's horizontal alignment.
+  VerticalAlignment::Type                mVerticalAlignment;                ///< The layout's vertical alignment.
+  DevelText::VerticalLineAlignment::Type mVerticalLineAlignment;            ///< The layout's vertical line alignment.
+  Text::LineWrap::Mode                   mLineWrapMode;                     ///< The text wrap mode
+  float                                  mAlignmentOffset;                  ///< The alignment offset.
+  bool                                   mElideEnabled : 1;                 ///< Whether the text's elide is enabled.
+  bool                                   mIgnoreSpacesAfterText : 1;        ///< Whether ignoring spaces after text or not. Default is true.
+  bool                                   mMatchSystemLanguageDirection : 1; ///< Whether match align for system language direction or not. Default is false.
 };
 
 } // namespace Text

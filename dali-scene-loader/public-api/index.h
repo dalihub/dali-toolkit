@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_INDEX_H_
 #define DALI_SCENE_LOADER_INDEX_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,11 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 using Index = uint32_t;
 
 constexpr Index INVALID_INDEX = static_cast<Index>(-1);
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_INDEX_H_

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_GRID_LAYOUT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,12 @@
 
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
-
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class GridLayout;
 
 typedef IntrusivePtr<GridLayout> GridLayoutPtr; ///< Pointer to a Dali::Toolkit::GridLayout object
@@ -44,7 +40,6 @@ typedef IntrusivePtr<GridLayout> GridLayoutPtr; ///< Pointer to a Dali::Toolkit:
 class GridLayout : public ItemLayout
 {
 public:
-
   /**
    * @brief Create a new grid layout.
    */
@@ -211,7 +206,6 @@ public:
   int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled) override;
 
 private:
-
   /**
    * @copydoc ItemLayout::GetMinimumLayoutPosition()
    */
@@ -240,7 +234,7 @@ private:
   /**
    * @copydoc ItemLayout::GetDefaultItemSize()
    */
-  void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const override;
+  void GetDefaultItemSize(unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize) const override;
 
   /**
    * @copydoc ItemLayout::GetScrollDirection()
@@ -250,30 +244,27 @@ private:
   /**
    * @copydoc ItemLayout::ApplyConstraints()
    */
-  void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor ) override;
+  void ApplyConstraints(Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor) override;
 
   /**
    * @copydoc ItemLayout::GetItemPosition()
    */
-  Vector3 GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const override;
+  Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const override;
 
 protected:
-
   /**
    * @brief Protected constructor; see also GridLayout::New().
    */
   GridLayout();
 
 private:
+  // Undefined
+  GridLayout(const GridLayout& itemLayout);
 
   // Undefined
-  GridLayout( const GridLayout& itemLayout );
-
-  // Undefined
-  GridLayout& operator=( const GridLayout& rhs );
+  GridLayout& operator=(const GridLayout& rhs);
 
 private:
-
   struct Impl;
   Impl* mImpl;
 };

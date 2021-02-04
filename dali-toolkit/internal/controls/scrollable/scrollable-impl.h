@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLLABLE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,16 @@
 #include <dali/public-api/animation/alpha-function.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class Scrollable;
 typedef IntrusivePtr<Scrollable> ScrollablePtr;
 
@@ -44,7 +41,6 @@ typedef IntrusivePtr<Scrollable> ScrollablePtr;
 class Scrollable : public Control
 {
 public:
-
   /**
    * @copydoc Dali::Toolkit::Scrollable::IsOvershootEnabled
    */
@@ -84,13 +80,13 @@ public:
    * @param[in] position The position to scroll to.
    * @param[in] duration The duration of the animation in seconds
    */
-  virtual void ScrollTo(const Vector2 &position, float duration) = 0;
+  virtual void ScrollTo(const Vector2& position, float duration) = 0;
 
   /**
    * Set the color of the overshoot effect.
    * @parm[in] color The color of the overshoot effect
    */
-  virtual void SetOvershootEffectColor( const Vector4& color ) = 0;
+  virtual void SetOvershootEffectColor(const Vector4& color) = 0;
 
   /**
    * Retrieve the color of the overshoot effect.
@@ -101,7 +97,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Scrollable::SetOvershootAnimationSpeed(float pixelsPerSecond)
    */
-  void SetOvershootAnimationSpeed( float pixelsPerSecond );
+  void SetOvershootAnimationSpeed(float pixelsPerSecond);
 
   /**
    * @copydoc Dali::Toolkit::Scrollable::GetOvershootAnimationSpeed()
@@ -117,7 +113,7 @@ public:
    * Set the size of the overshoot effect.
    * @parm[in] size The size of the overshoot effect
    */
-  virtual void SetOvershootSize( const Vector2& size ) = 0;
+  virtual void SetOvershootSize(const Vector2& size) = 0;
 
 protected: // From Control
   struct AccessibleImpl : public Control::Impl::AccessibleImpl
@@ -133,16 +129,16 @@ protected: // From Control
   virtual void OnInitialize() override;
 
 private:
-
   /**
    * Temporary function to override EnableScrollOvershoot functionality for overshoot
    * Only ScrollView needs to override this as HQ has not requested disable functionality in ItemView
    * @param[in] enable true to enable, false to disable overshoot indicator
    */
-  virtual void EnableScrollOvershoot(bool enable) {}
+  virtual void EnableScrollOvershoot(bool enable)
+  {
+  }
 
 public: //Signals
-
   /**
    * @copydoc Dali::Toolkit::Scrollable::ScrollStartedSignal()
    */
@@ -167,7 +163,7 @@ public: //Signals
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
   //properties
 
@@ -177,7 +173,7 @@ public: //Signals
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -185,10 +181,9 @@ public: //Signals
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
 protected:
-
   /**
    * Removed default constructor.
    */
@@ -199,7 +194,7 @@ protected:
    *
    * @param[in] behaviourFlags Flags to enable
    */
-  Scrollable( ControlBehaviour behaviourFlags );
+  Scrollable(ControlBehaviour behaviourFlags);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -207,7 +202,6 @@ protected:
   virtual ~Scrollable();
 
 private:
-
   /**
    * Gets position property.
    *
@@ -216,7 +210,6 @@ private:
   Vector2 GetPropertyPosition() const;
 
 private:
-
   // Undefined
   Scrollable(const Scrollable&);
 
@@ -224,20 +217,18 @@ private:
   Scrollable& operator=(const Scrollable& rhs);
 
 protected:
-
-  Vector4         mOvershootEffectColor;    ///<The color of the overshoot bouncing effect
-  float           mOvershootAnimationSpeed; ///<The speed of the overshoot animation (pixels per second)
-  Vector2         mOvershootSize;           ///<The size of the overshoot effect
+  Vector4 mOvershootEffectColor;    ///<The color of the overshoot bouncing effect
+  float   mOvershootAnimationSpeed; ///<The speed of the overshoot animation (pixels per second)
+  Vector2 mOvershootSize;           ///<The size of the overshoot effect
 
   Dali::AlphaFunction::BuiltinFunction mScrollToAlphaFunction; ///< The ScrollTo() animations use this
 
-  Toolkit::Scrollable::ScrollStartedSignalType mScrollStartedSignal;
-  Toolkit::Scrollable::ScrollUpdatedSignalType mScrollUpdatedSignal;
+  Toolkit::Scrollable::ScrollStartedSignalType   mScrollStartedSignal;
+  Toolkit::Scrollable::ScrollUpdatedSignalType   mScrollUpdatedSignal;
   Toolkit::Scrollable::ScrollCompletedSignalType mScrollCompletedSignal;
 
 private:
-
-  bool mOvershootEnabled:1;
+  bool mOvershootEnabled : 1;
 };
 
 } // namespace Internal

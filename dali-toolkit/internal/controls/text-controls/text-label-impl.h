@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,33 +22,28 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
-#include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-scroller.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
-
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * @brief A control which renders a short text string.
  */
 class TextLabel : public Control, public Text::ControlInterface, public Text::ScrollerInterface
 {
 public:
-
   /**
    * @copydoc Dali::Toollkit::TextLabel::New()
    */
@@ -63,7 +58,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * @brief Called to retrieve a property of an object of this type.
@@ -72,12 +67,11 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
   Text::ControllerPtr getController();
 
 private: // From Control
-
   /**
    * @copydoc Control::OnInitialize()
    */
@@ -86,12 +80,12 @@ private: // From Control
   /**
    * @copydoc Control::OnStyleChange()
    */
-  void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change ) override;
+  void OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change) override;
 
   /**
    * @copydoc Control::OnRelayout()
    */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   /**
    * @copydoc Control::GetNaturalSize()
@@ -101,12 +95,12 @@ private: // From Control
   /**
    * @copydoc Control::GetHeightForWidth()
    */
-  float GetHeightForWidth( float width ) override;
+  float GetHeightForWidth(float width) override;
 
   /**
    * @copydoc Control::OnPropertySet()
    */
-  void OnPropertySet( Property::Index index, const Property::Value& propertyValue ) override ;
+  void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override;
 
   // From ControlInterface
 
@@ -116,14 +110,12 @@ private: // From Control
   void RequestTextRelayout() override;
 
 private: // from TextScroller
-
   /**
    * @copydoc Text::ScrollerInterface::ScrollingFinished()
    */
   void ScrollingFinished() override;
 
 private: // Implementation
-
   /**
    * Construct a new TextLabel.
    */
@@ -135,7 +127,6 @@ private: // Implementation
   virtual ~TextLabel();
 
 private:
-
   // Undefined copy constructor and assignment operators
   TextLabel(const TextLabel&);
   TextLabel& operator=(const TextLabel& rhs);
@@ -151,22 +142,21 @@ private:
    */
   Text::TextScrollerPtr GetTextScroller()
   {
-    if( !mTextScroller )
+    if(!mTextScroller)
     {
-      mTextScroller = Text::TextScroller::New( *this );
+      mTextScroller = Text::TextScroller::New(*this);
     }
     return mTextScroller;
   }
 
 private: // Data
-
-  Text::ControllerPtr mController;
+  Text::ControllerPtr   mController;
   Text::TextScrollerPtr mTextScroller;
 
   Toolkit::Visual::Base mVisual;
 
-  int mRenderingBackend;
-  bool mTextUpdateNeeded:1;
+  int  mRenderingBackend;
+  bool mTextUpdateNeeded : 1;
 
 protected:
   struct AccessibleImpl : public Control::Impl::AccessibleImpl,
@@ -174,19 +164,16 @@ protected:
   {
     using Control::Impl::AccessibleImpl::AccessibleImpl;
 
-    std::string GetText( size_t startOffset, size_t endOffset ) override;
-    size_t GetCharacterCount() override;
-    size_t GetCaretOffset() override;
-    bool SetCaretOffset(size_t offset) override;
-    Dali::Accessibility::Range
-    GetTextAtOffset( size_t offset,
-                     Dali::Accessibility::TextBoundary boundary ) override;
-    Dali::Accessibility::Range GetSelection( size_t selectionNum ) override;
-    bool RemoveSelection( size_t selectionNum ) override;
-    bool SetSelection( size_t selectionNum, size_t startOffset,
-                       size_t endOffset ) override;
-    std::string GetNameRaw() override;
-    Property::Index GetNamePropertyIndex() override;
+    std::string          GetText(size_t startOffset, size_t endOffset) override;
+    size_t               GetCharacterCount() override;
+    size_t               GetCaretOffset() override;
+    bool                 SetCaretOffset(size_t offset) override;
+    Accessibility::Range GetTextAtOffset(size_t offset, Accessibility::TextBoundary boundary) override;
+    Accessibility::Range GetSelection(size_t selectionNum) override;
+    bool                 RemoveSelection(size_t selectionNum) override;
+    bool                 SetSelection(size_t selectionNum, size_t startOffset, size_t endOffset) override;
+    std::string          GetNameRaw() override;
+    Property::Index      GetNamePropertyIndex() override;
   };
 };
 
@@ -194,7 +181,7 @@ protected:
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::TextLabel& GetImpl( Toolkit::TextLabel& textLabel )
+inline Toolkit::Internal::TextLabel& GetImpl(Toolkit::TextLabel& textLabel)
 {
   DALI_ASSERT_ALWAYS(textLabel);
 
@@ -203,7 +190,7 @@ inline Toolkit::Internal::TextLabel& GetImpl( Toolkit::TextLabel& textLabel )
   return static_cast<Toolkit::Internal::TextLabel&>(handle);
 }
 
-inline const Toolkit::Internal::TextLabel& GetImpl( const Toolkit::TextLabel& textLabel )
+inline const Toolkit::Internal::TextLabel& GetImpl(const Toolkit::TextLabel& textLabel)
 {
   DALI_ASSERT_ALWAYS(textLabel);
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GLTF_LOADER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
-#include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/builder/json-parser.h>
@@ -32,16 +32,12 @@ using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace Gltf
 {
-
 enum ShaderType
 {
   NO_TEXTURE_SHADER,
@@ -114,9 +110,9 @@ enum ShaderType
 struct BufferInfo
 {
   BufferInfo()
-    : byteLength( -1 ),
-    uri( "" ),
-    name( "" )
+  : byteLength(-1),
+    uri(""),
+    name("")
   {
   }
 
@@ -124,7 +120,7 @@ struct BufferInfo
   {
   }
 
-  int32_t byteLength;
+  int32_t     byteLength;
   std::string uri;
   std::string name;
 };
@@ -132,12 +128,12 @@ struct BufferInfo
 struct BufferViewInfo
 {
   BufferViewInfo()
-    : buffer( -1 ),
-    byteOffset( 0 ),
-    byteLength( 0 ),
-    byteStride( 0 ),
-    target( 0 ),
-    name( "" )
+  : buffer(-1),
+    byteOffset(0),
+    byteLength(0),
+    byteStride(0),
+    target(0),
+    name("")
   {
   }
 
@@ -145,19 +141,19 @@ struct BufferViewInfo
   {
   }
 
-  int32_t buffer;
-  int32_t byteOffset;
-  int32_t byteLength;
-  int32_t byteStride;
-  int32_t target;
+  int32_t     buffer;
+  int32_t     byteOffset;
+  int32_t     byteLength;
+  int32_t     byteStride;
+  int32_t     target;
   std::string name;
 };
 
 struct TextureInfo
 {
   TextureInfo()
-    : sourceIdx( -1 ),
-    samplerIdx( -1 )
+  : sourceIdx(-1),
+    samplerIdx(-1)
   {
   }
 
@@ -171,9 +167,9 @@ struct TextureInfo
 struct PbrTextureInfo
 {
   PbrTextureInfo()
-    : index( -1 ),
-    texCoord( 0 ),
-    value( 0.0 )
+  : index(-1),
+    texCoord(0),
+    value(0.0)
   {
   }
   ~PbrTextureInfo()
@@ -182,20 +178,20 @@ struct PbrTextureInfo
 
   int32_t index;
   int32_t texCoord;
-  float value;
+  float   value;
 };
 
 struct MaterialInfo
 {
   MaterialInfo()
-    : baseColorFactor( 1, 1, 1, 1 ),
-    metallicFactor( 1.0 ),
-    roughnessFactor( 1.0 ),
-    emissiveFactor( 0.0, 0.0, 0.0 ),
-    alphaMode( "OPAQUE" ),
-    alphaCutoff( 0.5 ),
-    doubleSided( false ),
-    name( "" )
+  : baseColorFactor(1, 1, 1, 1),
+    metallicFactor(1.0),
+    roughnessFactor(1.0),
+    emissiveFactor(0.0, 0.0, 0.0),
+    alphaMode("OPAQUE"),
+    alphaCutoff(0.5),
+    doubleSided(false),
+    name("")
   {
   }
 
@@ -203,13 +199,13 @@ struct MaterialInfo
   {
   }
 
-  Vector4 baseColorFactor;
-  float metallicFactor;
-  float roughnessFactor;
-  Vector3 emissiveFactor;
+  Vector4     baseColorFactor;
+  float       metallicFactor;
+  float       roughnessFactor;
+  Vector3     emissiveFactor;
   std::string alphaMode;
-  float alphaCutoff;
-  bool doubleSided;
+  float       alphaCutoff;
+  bool        doubleSided;
 
   PbrTextureInfo baseColorTexture;
   PbrTextureInfo metallicRoughnessTexture;
@@ -224,15 +220,15 @@ struct MaterialInfo
 struct AccessorInfo
 {
   AccessorInfo()
-    : bufferView( -1 ),
-    byteOffset( 0 ),
-    componentType( -1 ),
-    normalized( false ),
-    count( 0 ),
-    type( "" ),
-    max( 0 ),
-    min( 0 ),
-    name( "" )
+  : bufferView(-1),
+    byteOffset(0),
+    componentType(-1),
+    normalized(false),
+    count(0),
+    type(""),
+    max(0),
+    min(0),
+    name("")
   {
   }
 
@@ -240,14 +236,14 @@ struct AccessorInfo
   {
   }
 
-  int32_t bufferView;
-  int32_t byteOffset;
-  int32_t componentType;
-  bool normalized;
-  int32_t count;
+  int32_t     bufferView;
+  int32_t     byteOffset;
+  int32_t     componentType;
+  bool        normalized;
+  int32_t     count;
   std::string type;
-  int32_t max;
-  int32_t min;
+  int32_t     max;
+  int32_t     min;
   std::string name;
   //need to add max, min
 };
@@ -255,9 +251,9 @@ struct AccessorInfo
 struct Attribute
 {
   Attribute()
-    : POSITION( -1 ),
-    NORMAL( -1 ),
-    TANGENT( -1 )
+  : POSITION(-1),
+    NORMAL(-1),
+    TANGENT(-1)
   {
   }
 
@@ -276,16 +272,16 @@ struct Attribute
 struct MeshInfo
 {
   MeshInfo()
-    : indicesIdx( -1 ),
-    materialsIdx( -1 ),
-    mode( 4 )
+  : indicesIdx(-1),
+    materialsIdx(-1),
+    mode(4)
   {
   }
 
   ~MeshInfo()
   {
   }
-  Geometry geometry;
+  Geometry    geometry;
   std::string name;
 
   int32_t indicesIdx;
@@ -302,9 +298,9 @@ struct MeshInfo
 struct AnimationChannelInfo
 {
   AnimationChannelInfo()
-    : sampler( -1 ),
-    targetNode( -1 ),
-    path( "" )
+  : sampler(-1),
+    targetNode(-1),
+    path("")
   {
   }
 
@@ -312,18 +308,17 @@ struct AnimationChannelInfo
   {
   }
 
-  int32_t sampler;
-  int32_t targetNode;
+  int32_t     sampler;
+  int32_t     targetNode;
   std::string path;
-
 };
 
 struct AnimationSamplerInfo
 {
   AnimationSamplerInfo()
-    : input( -1 ),
-    output( -1 ),
-    interpolation( "" )
+  : input(-1),
+    output(-1),
+    interpolation("")
   {
   }
 
@@ -331,15 +326,15 @@ struct AnimationSamplerInfo
   {
   }
 
-  int32_t input;
-  int32_t output;
+  int32_t     input;
+  int32_t     output;
   std::string interpolation;
 };
 
 struct AnimationInfo
 {
   AnimationInfo()
-    : name( "" )
+  : name("")
   {
   }
 
@@ -347,7 +342,7 @@ struct AnimationInfo
   {
   }
 
-  std::string name;
+  std::string                       name;
   std::vector<AnimationChannelInfo> channelArray;
   std::vector<AnimationSamplerInfo> samplerArray;
 };
@@ -355,10 +350,10 @@ struct AnimationInfo
 struct OrthographicInfo
 {
   OrthographicInfo()
-    : xmag( 0.0f ),
-    ymag( 0.0f ),
-    zfar( 0.0f ),
-    znear( 0.0f )
+  : xmag(0.0f),
+    ymag(0.0f),
+    zfar(0.0f),
+    znear(0.0f)
   {
   }
 
@@ -375,10 +370,10 @@ struct OrthographicInfo
 struct PerspectiveInfo
 {
   PerspectiveInfo()
-    : aspectRatio( 0.0f ),
-    yfov( 0.0f ),
-    zfar( 0.0f ),
-    znear( 0.0f )
+  : aspectRatio(0.0f),
+    yfov(0.0f),
+    zfar(0.0f),
+    znear(0.0f)
   {
   }
 
@@ -395,8 +390,8 @@ struct PerspectiveInfo
 struct CameraInfo
 {
   CameraInfo()
-    : name( "" ),
-    type( "" )
+  : name(""),
+    type("")
   {
   }
 
@@ -404,10 +399,10 @@ struct CameraInfo
   {
   }
 
-  std::string name;
-  std::string type;
+  std::string      name;
+  std::string      type;
   OrthographicInfo orthographic;
-  PerspectiveInfo perspective;
+  PerspectiveInfo  perspective;
 };
 
 /**
@@ -425,7 +420,6 @@ struct CameraInfo
 class Loader
 {
 public:
-
   /**
    * @brief Create an uninitialized Loader.
    */
@@ -442,55 +436,55 @@ public:
    * @param[in] scene3dView Scene3dView data loaded from file.
    * @return true if scene is successfully loaded
    */
-  bool LoadScene( const std::string& filePath, Internal::Scene3dView& scene3dView );
+  bool LoadScene(const std::string& filePath, Internal::Scene3dView& scene3dView);
 
 private:
-  bool ParseGltf( const std::string& filePath );
+  bool ParseGltf(const std::string& filePath);
   bool LoadAssets();
 
-  bool CreateScene( Internal::Scene3dView& scene3dView );
+  bool CreateScene(Internal::Scene3dView& scene3dView);
 
-  void LoadCamera( Scene3dView& scene3dView );
-  bool LoadOrthoGraphic( const TreeNode& camera, CameraInfo& cameraInfo );
-  bool LoadPerspective( const TreeNode& camera, CameraInfo& cameraInfo );
+  void LoadCamera(Scene3dView& scene3dView);
+  bool LoadOrthoGraphic(const TreeNode& camera, CameraInfo& cameraInfo);
+  bool LoadPerspective(const TreeNode& camera, CameraInfo& cameraInfo);
 
-  bool LoadSceneNodes( Scene3dView& scene3dView );
-  Actor AddNode( Scene3dView& scene3dView, uint32_t index );
-  void SetActorCache( Actor& actor, uint32_t index );
-  bool SetTextureAndSampler( TextureSet& textureSet, int32_t textureIdx, std::string& toShader, std::string shader, int32_t& addIdx );
+  bool  LoadSceneNodes(Scene3dView& scene3dView);
+  Actor AddNode(Scene3dView& scene3dView, uint32_t index);
+  void  SetActorCache(Actor& actor, uint32_t index);
+  bool  SetTextureAndSampler(TextureSet& textureSet, int32_t textureIdx, std::string& toShader, std::string shader, int32_t& addIdx);
 
-  bool LoadAnimation( Scene3dView& scene3dView );
-  bool LoadAnimationChannels( const TreeNode& animation, AnimationInfo& animationInfo );
-  bool LoadAnimationSamplers( const TreeNode& animation, AnimationInfo& animationInfo );
+  bool LoadAnimation(Scene3dView& scene3dView);
+  bool LoadAnimationChannels(const TreeNode& animation, AnimationInfo& animationInfo);
+  bool LoadAnimationSamplers(const TreeNode& animation, AnimationInfo& animationInfo);
 
 private:
   Dali::Toolkit::JsonParser mParser;
-  const TreeNode* mNodes;
-  const TreeNode* mRoot;
+  const TreeNode*           mNodes;
+  const TreeNode*           mRoot;
 
   std::string mPath;
 
   std::vector<Actor> mActorCache;
-  Shader mShaderCache[ShaderType::SHADER_TYPE_MAX + 1];
+  Shader             mShaderCache[ShaderType::SHADER_TYPE_MAX + 1];
 
-  std::vector<BufferInfo> mBufferArray;
+  std::vector<BufferInfo>     mBufferArray;
   std::vector<BufferViewInfo> mBufferViewArray;
-  std::vector<AccessorInfo> mAccessorArray;
+  std::vector<AccessorInfo>   mAccessorArray;
 
-  std::vector<MeshInfo> mMeshArray;
+  std::vector<MeshInfo>     mMeshArray;
   std::vector<MaterialInfo> mMaterialArray;
-  std::vector<TextureInfo> mTextureArray;
+  std::vector<TextureInfo>  mTextureArray;
 
   std::vector<Texture> mSourceArray;
   std::vector<Sampler> mSamplerArray;
 };
 
-}//namespace Gltf
+} //namespace Gltf
 
-}//namespace Internal
+} //namespace Internal
 
-}//namespace Toolkit
+} //namespace Toolkit
 
-}//namespace Dali
+} //namespace Dali
 
 #endif // DALI_TOOLKIT_INTERNAL_GLTF_LOADER_H

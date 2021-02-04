@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VIEW_INTERFACE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,13 @@
 
 namespace Dali
 {
-
 struct Vector2;
 struct Vector4;
 
 namespace Toolkit
 {
-
 namespace Text
 {
-
 struct GlyphRun;
 
 /**
@@ -46,7 +43,6 @@ struct GlyphRun;
 class ViewInterface
 {
 public:
-
   /**
    * @brief Constructor.
    */
@@ -93,11 +89,11 @@ public:
    *
    * @return The number of glyphs.
    */
-  virtual Length GetGlyphs( GlyphInfo* glyphs,
-                            Vector2* glyphPositions,
-                            float& minLineOffset,
-                            GlyphIndex glyphIndex,
-                            Length numberOfGlyphs ) const = 0;
+  virtual Length GetGlyphs(GlyphInfo* glyphs,
+                           Vector2*   glyphPositions,
+                           float&     minLineOffset,
+                           GlyphIndex glyphIndex,
+                           Length     numberOfGlyphs) const = 0;
 
   /**
    * @brief Retrieves the vector of colors.
@@ -183,9 +179,9 @@ public:
    * @param[in] index Index of the first underline run to be copied.
    * @param[in] numberOfRuns Number of underline runs to be copied.
    */
-  virtual void GetUnderlineRuns( GlyphRun* underlineRuns,
-                                 UnderlineRunIndex index,
-                                 Length numberOfRuns ) const = 0;
+  virtual void GetUnderlineRuns(GlyphRun*         underlineRuns,
+                                UnderlineRunIndex index,
+                                Length            numberOfRuns) const = 0;
 
   /**
    * @brief Retrieve the outline color.
@@ -200,7 +196,6 @@ public:
    * @return The width of the outline.
    */
   virtual uint16_t GetOutlineWidth() const = 0;
-
 };
 
 } // namespace Text

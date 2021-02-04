@@ -26,12 +26,10 @@
 
 namespace Dali
 {
-
 class WebEngineBackForwardListItem;
 
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_controls_web_view
  * @{
@@ -50,7 +48,7 @@ public:
   /**
    * @brief Creates a WebBackForwardListItem.
    */
-  WebBackForwardListItem( const Dali::WebEngineBackForwardListItem* item );
+  WebBackForwardListItem(const Dali::WebEngineBackForwardListItem* item);
 
   /**
    * @brief Destructor.
@@ -82,7 +80,6 @@ public:
   std::string GetOriginalUrl() const;
 
 private:
-
   const Dali::WebEngineBackForwardListItem* mWebEngineBackForwardListItem;
 };
 

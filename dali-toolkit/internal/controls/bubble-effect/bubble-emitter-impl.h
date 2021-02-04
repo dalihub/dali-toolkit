@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUBBLE_EMITTER_IMPL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/camera-actor.h>
 #include <dali/devel-api/common/stage.h>
-#include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/sampler.h>
@@ -30,18 +30,15 @@
 #include <dali/public-api/rendering/vertex-buffer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/bubble-effect/bubble-emitter.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class BubbleRenderer;
 
 /**
@@ -50,7 +47,6 @@ class BubbleRenderer;
 class BubbleEmitter : public Control
 {
 public:
-
   /**
    * Destructor
    */
@@ -59,10 +55,10 @@ public:
   /**
    * @copydoc Toolkit::BubbleEmitter::New
    */
-  static Toolkit::BubbleEmitter New( const Vector2& winSize,
-                                     Texture shapeTexture,
-                                     unsigned int maximumNumberOfBubble,
-                                     const Vector2& bubbleSizeRange );
+  static Toolkit::BubbleEmitter New(const Vector2& winSize,
+                                    Texture        shapeTexture,
+                                    unsigned int   maximumNumberOfBubble,
+                                    const Vector2& bubbleSizeRange);
 
   /**
    * @copydoc Toolkit::BubbleEmitter::GetRootActor
@@ -72,27 +68,27 @@ public:
   /**
    * @copydoc Toolkit::BubbleEmitter::SetBackground
    */
-  void SetBackground( Texture bgTexture, const Vector3& hsvDelta );
+  void SetBackground(Texture bgTexture, const Vector3& hsvDelta);
 
   /**
    * @copydoc Toolkit::BubbleEmitter::SetShape
    */
-  void SetBubbleShape( Texture shapeTexture );
+  void SetBubbleShape(Texture shapeTexture);
 
   /**
    * @copydoc Toolkit::BubbleEmiter::SetBubbleScale
    */
-  void SetBubbleScale( float scale );
+  void SetBubbleScale(float scale);
 
   /**
    * @copydoc Toolkit::BubbleEmitter::SetBubbleDensity
    */
-  void SetBubbleDensity( unsigned int density );
+  void SetBubbleDensity(unsigned int density);
 
   /**
    * @copydoc Toolkit::BubbleEmitter::EmitBubble
    */
-  void EmitBubble( Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement );
+  void EmitBubble(Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement);
 
   /**
    * @copydoc Toolkit::BubbleEmitter::Restore
@@ -100,7 +96,6 @@ public:
   void Restore();
 
 private:
-
   /**
    * Construct a new BubbleEmitter object.
    * @param[in] movementArea The size of the bubble moving area
@@ -108,10 +103,10 @@ private:
    * @param[in] maximumNumberOfBubble The maximum number of bubble needed.
    * @param[in] bubbleSizeRange The size range of the bubbles; x component is the minimal size, and y component is the maximum size.
    */
-  BubbleEmitter( const Vector2& movementArea,
-                 Texture shapeTexture,
-                 unsigned int maximumNumberOfBubble,
-                 const Vector2& bubbleSizeRange );
+  BubbleEmitter(const Vector2& movementArea,
+                Texture        shapeTexture,
+                unsigned int   maximumNumberOfBubble,
+                const Vector2& bubbleSizeRange);
 
   /**
    * This method is called after the CubeTransitionEffect has been initialized.
@@ -124,7 +119,7 @@ private:
    * @param[in] numOfPatch The triangle number in the mesh is 2*numOfPatch; two triangles for each bubble.
    * @return The mesh geometry.
    */
-  Geometry CreateGeometry( unsigned int numOfPatch );
+  Geometry CreateGeometry(unsigned int numOfPatch);
 
   /**
    * Callback function of the finished signal of off-screen render task.
@@ -145,35 +140,32 @@ private:
    * @param[in] direction The direction used to constrain the bubble to move in an adjacent direction around it.
    * @param[in] displacement The displacement used to bound the moving distance of the bubble.
    */
-  void SetBubbleParameter( BubbleRenderer& bubbleRenderer, unsigned int curUniform,
-                           const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement );
+  void SetBubbleParameter(BubbleRenderer& bubbleRenderer, unsigned int curUniform, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement);
 
 private:
+  Actor       mBubbleRoot;        ///<The bubble root actor. Need to add it to stage to get the bubbles rendered.
+  Texture     mShapeTexture;      ///< The alpha channnel of this texture defines the bubble shape.
+  Texture     mBackgroundTexture; ///< The original background texture
+  Texture     mEffectTexture;     ///< Texture which stores the adjusted color of the background image.The bubbles pick color from this image.
+  FrameBuffer mFrameBuffer;       ///< FrameBuffer used for offscreen rendering
+  CameraActor mCameraActor;       ///< The render task views the scene from the perspective of this actor.
 
-  Actor                       mBubbleRoot;          ///<The bubble root actor. Need to add it to stage to get the bubbles rendered.
-  Texture                     mShapeTexture;        ///< The alpha channnel of this texture defines the bubble shape.
-  Texture                     mBackgroundTexture;   ///< The original background texture
-  Texture                     mEffectTexture;       ///< Texture which stores the adjusted color of the background image.The bubbles pick color from this image.
-  FrameBuffer                 mFrameBuffer;         ///< FrameBuffer used for offscreen rendering
-  CameraActor                 mCameraActor;         ///< The render task views the scene from the perspective of this actor.
+  Geometry                    mMeshGeometry;    ///< The mesh geometry which contains the vertices and indices data
+  TextureSet                  mTextureSet;      ///< The texture set which controls the bubble display
+  std::vector<BubbleRenderer> mBubbleRenderers; ///< The BubbleRenderer vector, its size is mNumShader.
 
-  Geometry                    mMeshGeometry;         ///< The mesh geometry which contains the vertices and indices data
-  TextureSet                  mTextureSet;           ///< The texture set which controls the bubble display
-  std::vector<BubbleRenderer> mBubbleRenderers;      ///< The BubbleRenderer vector, its size is mNumShader.
+  Vector2 mMovementArea;    ///< The size of the bubble moving area, usually the same size as the background.
+  Vector2 mBubbleSizeRange; ///< The size range of the bubbles; x component is the low bound, and y component is the up bound.
+  Vector3 mHSVDelta;        ///< The HSV difference used to adjust the background image color.
 
-  Vector2                     mMovementArea;        ///< The size of the bubble moving area, usually the same size as the background.
-  Vector2                     mBubbleSizeRange;     ///< The size range of the bubbles; x component is the low bound, and y component is the up bound.
-  Vector3                     mHSVDelta;            ///< The HSV difference used to adjust the background image color.
+  unsigned int mNumBubblePerRenderer; ///< How many bubbles for each BubbleRenderer.
+  unsigned int mNumRenderer;          ///< How many BubbleRenderers are used.
+  unsigned int mDensity;              ///< How many bubbles will emit at each time, they are controlled by same uniforms in the shader.
+  unsigned int mTotalNumOfBubble;     ///< mNumBubblePerShader*mNumShader.
+  unsigned int mCurrentBubble;        ///< Keep track of the index for the newly emitted bubble
+  unsigned int mRandomSeed;           ///< Seed to generate random number.
 
-  unsigned int                mNumBubblePerRenderer;   ///< How many bubbles for each BubbleRenderer.
-  unsigned int                mNumRenderer;            ///< How many BubbleRenderers are used.
-  unsigned int                mDensity;             ///< How many bubbles will emit at each time, they are controlled by same uniforms in the shader.
-  unsigned int                mTotalNumOfBubble;    ///< mNumBubblePerShader*mNumShader.
-  unsigned int                mCurrentBubble;       ///< Keep track of the index for the newly emitted bubble
-  unsigned int                mRandomSeed;          ///< Seed to generate random number.
-
-  bool                        mRenderTaskRunning;   ///< If the background render task is currently running
-
+  bool mRenderTaskRunning; ///< If the background render task is currently running
 };
 
 } // namespace Internal

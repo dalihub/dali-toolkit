@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_METRICS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,18 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class Metrics;
 typedef IntrusivePtr<Metrics> MetricsPtr;
 
@@ -43,13 +40,12 @@ typedef IntrusivePtr<Metrics> MetricsPtr;
 class Metrics : public RefObject
 {
 public:
-
   /**
    * Create a new Metrics object
    */
-  static Metrics* New( TextAbstraction::FontClient& fontClient )
+  static Metrics* New(TextAbstraction::FontClient& fontClient)
   {
-    return new Metrics( fontClient );
+    return new Metrics(fontClient);
   }
 
   /**
@@ -57,7 +53,7 @@ public:
    *
    * @param[in] glyphType The type of glyph; note that metrics for bitmap & vector based glyphs are different.
    */
-  void SetGlyphType( TextAbstraction::GlyphType glyphType )
+  void SetGlyphType(TextAbstraction::GlyphType glyphType)
   {
     mGlyphType = glyphType;
   }
@@ -68,9 +64,9 @@ public:
    * @param[in] fontId The ID of the font for the required glyph.
    * @param[out] metrics The font metrics.
    */
-  void GetFontMetrics( FontId fontId, FontMetrics& metrics )
+  void GetFontMetrics(FontId fontId, FontMetrics& metrics)
   {
-    mFontClient.GetFontMetrics( fontId, metrics ); // inline for performance
+    mFontClient.GetFontMetrics(fontId, metrics); // inline for performance
   }
 
   /**
@@ -82,9 +78,9 @@ public:
    * @param[in] size The size of the array.
    * @return True if all of the requested metrics were found.
    */
-  bool GetGlyphMetrics( GlyphInfo* array, uint32_t size )
+  bool GetGlyphMetrics(GlyphInfo* array, uint32_t size)
   {
-    return mFontClient.GetGlyphMetrics( array, size, mGlyphType, true ); // inline for performance
+    return mFontClient.GetGlyphMetrics(array, size, mGlyphType, true); // inline for performance
   }
 
   /**
@@ -94,27 +90,28 @@ public:
    *
    * @return true if the font has italic style.
    */
-  bool HasItalicStyle( FontId fontId ) const
+  bool HasItalicStyle(FontId fontId) const
   {
-    return mFontClient.HasItalicStyle( fontId );
+    return mFontClient.HasItalicStyle(fontId);
   }
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Metrics() {}
+  virtual ~Metrics()
+  {
+  }
 
 private:
-
   /**
    * Constructor.
    */
-  Metrics( TextAbstraction::FontClient& fontClient )
-  : mFontClient( fontClient ),
-    mGlyphType( TextAbstraction::BITMAP_GLYPH )
-  {}
+  Metrics(TextAbstraction::FontClient& fontClient)
+  : mFontClient(fontClient),
+    mGlyphType(TextAbstraction::BITMAP_GLYPH)
+  {
+  }
 
   // Undefined
   Metrics(const Metrics&);
@@ -123,9 +120,8 @@ private:
   Metrics& operator=(const Metrics& rhs);
 
 private:
-
   TextAbstraction::FontClient mFontClient;
-  TextAbstraction::GlyphType mGlyphType;
+  TextAbstraction::GlyphType  mGlyphType;
 };
 
 } // namespace Text

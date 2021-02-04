@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_BIDIRECTIONAL_PARAGRAPH_INFO_RUN_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief BidirectionalParagraphInfoRun
  *
@@ -38,9 +35,9 @@ namespace Text
  */
 struct BidirectionalParagraphInfoRun
 {
-  CharacterRun  characterRun;           ///< The initial character index within the whole text and the number of characters of the run.
-  BidiInfoIndex bidirectionalInfoIndex; ///< Index to the table with the bidirectional info per paragraph.
-  CharacterDirection direction;         ///< The paragraph's direction.
+  CharacterRun       characterRun;           ///< The initial character index within the whole text and the number of characters of the run.
+  BidiInfoIndex      bidirectionalInfoIndex; ///< Index to the table with the bidirectional info per paragraph.
+  CharacterDirection direction;              ///< The paragraph's direction.
 };
 
 } // namespace Text

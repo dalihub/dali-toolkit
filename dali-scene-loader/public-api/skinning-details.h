@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_SKINNING_DETAILS_H_
 #define DALI_SCENE_LOADER_SKINNING_DETAILS_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 #include "dali-scene-loader/public-api/api.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/rendering/shader.h"
 #include <string>
+#include "dali/public-api/rendering/shader.h"
 
 namespace Dali
 {
@@ -43,7 +43,7 @@ struct DALI_SCENE_LOADER_API Skinning
   Skinning() = delete;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif // DALI_SCENE_LOADER_SKINNING_DETAILS_H_

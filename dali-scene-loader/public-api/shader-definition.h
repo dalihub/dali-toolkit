@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_SHADER_DEFINITION_H
 #define DALI_SCENE_LOADER_SHADER_DEFINITION_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,14 @@
 #include "dali-scene-loader/public-api/renderer-state.h"
 
 // EXTERNAL INCLUDES
+#include <memory>
 #include "dali/public-api/common/vector-wrapper.h"
 #include "dali/public-api/rendering/shader.h"
-#include <memory>
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /*
  * @brief Defines a shader with paths to the files which define its
  *  vertex and fragment components, and a mapping of uniform names (which are
@@ -76,15 +75,15 @@ struct DALI_SCENE_LOADER_API ShaderDefinition
 public: // DATA
   RendererState::Type mRendererState = RendererState::NONE;
 
-  std::string mVertexShaderPath;
-  std::string mFragmentShaderPath;
+  std::string              mVertexShaderPath;
+  std::string              mFragmentShaderPath;
   std::vector<std::string> mDefines;
   std::vector<std::string> mHints;
 
   Property::Map mUniforms;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_SHADER_DEFINITION_H

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VECTOR_BLOB_ATLAS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,21 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/shader.h>
-#include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/texture-set.h>
-#include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 typedef Dali::TextAbstraction::VectorBlob VectorBlob;
 
 struct BlobCoordinate
@@ -51,7 +48,6 @@ struct BlobCoordinate
 class VectorBlobAtlas : public RefObject
 {
 public:
-
   /**
    * @brief Create a blob atlas.
    *
@@ -61,10 +57,10 @@ public:
    * @param[in] itemHeightQuantum The item height quantum.
    * When blobs are added to columns in the atlas, the Y position is advanced by a multiple of this value.
    */
-  VectorBlobAtlas( unsigned int textureWidth,
-                   unsigned int textureHeight,
-                   unsigned int itemWidth,
-                   unsigned int itemHeightQuantum );
+  VectorBlobAtlas(unsigned int textureWidth,
+                  unsigned int textureHeight,
+                  unsigned int itemWidth,
+                  unsigned int itemHeightQuantum);
 
   /**
    * @brief Query whether the atlas is full.
@@ -82,9 +78,9 @@ public:
    * Otherwise coords will not be written into.
    * @return True if the glyph was found.
    */
-  bool FindGlyph( FontId fontId,
-                  GlyphIndex glyphIndex,
-                  BlobCoordinate* coords );
+  bool FindGlyph(FontId          fontId,
+                 GlyphIndex      glyphIndex,
+                 BlobCoordinate* coords);
 
   /**
    * @brief Add a glyph to the atlas.
@@ -98,13 +94,13 @@ public:
    * @param[out] coords An array of 4 UV coordinates will be returned.
    * @return True if the glyph was added. Otherwise the atlas is now full.
    */
-  bool AddGlyph( unsigned int fontId,
-                 unsigned int glyphIndex,
-                 VectorBlob* blob,
-                 unsigned int length,
-                 unsigned int nominalWidth,
-                 unsigned int nominalHeight,
-                 BlobCoordinate* coords );
+  bool AddGlyph(unsigned int    fontId,
+                unsigned int    glyphIndex,
+                VectorBlob*     blob,
+                unsigned int    length,
+                unsigned int    nominalWidth,
+                unsigned int    nominalHeight,
+                BlobCoordinate* coords);
 
   /**
    * @brief Get the info required by the GLyphy shader.
@@ -113,7 +109,7 @@ public:
    */
   Vector4 GetInfo() const
   {
-    return Vector4( mTextureWidth, mTextureHeight, mItemWidth, mItemHeightQuantum );
+    return Vector4(mTextureWidth, mTextureHeight, mItemWidth, mItemHeightQuantum);
   }
 
   /**
@@ -127,7 +123,6 @@ public:
   }
 
 private:
-
   /**
    * @brief Helper for uploading data to the texture atlas.
    *
@@ -137,14 +132,13 @@ private:
    * @param[in] height The height of the data to upload.
    * @param[in] blob The blob of data to upload.
    */
-  void TexSubImage( unsigned int offsetX,
-                    unsigned int offsetY,
-                    unsigned int width,
-                    unsigned int height,
-                    VectorBlob* blob );
+  void TexSubImage(unsigned int offsetX,
+                   unsigned int offsetY,
+                   unsigned int width,
+                   unsigned int height,
+                   VectorBlob*  blob);
 
 private:
-
   unsigned int mTextureWidth;
   unsigned int mTextureHeight;
 
@@ -170,8 +164,8 @@ private:
     BlobCoordinate coords[4];
   };
 
-  std::vector< Key >  mItemLookup;
-  std::vector< Item > mItemCache;
+  std::vector<Key>  mItemLookup;
+  std::vector<Item> mItemCache;
 
   bool mIsFull;
 };

@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_API_H
 #define DALI_SCENE_LOADER_API_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@
 
 #elif defined(WIN32)
 #ifdef BUILDING_DALI_SCENE_LOADER
-#define DALI_SCENE_LOADER_API  __declspec(dllexport)
+#define DALI_SCENE_LOADER_API __declspec(dllexport)
 #else
-#define DALI_SCENE_LOADER_API  __declspec(dllimport)
-#endif  // BUILDING_DALI_SCENE_LOADER
+#define DALI_SCENE_LOADER_API __declspec(dllimport)
+#endif // BUILDING_DALI_SCENE_LOADER
 
 #endif
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_LAYOUTING_FLEX_NODE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ struct SizeTuple
  * @note int, height measure specification mode
  * @note SizeTuple, return value
  */
-using MeasureCallback = void (*)(Dali::Actor, float , int , float , int, SizeTuple *);
+using MeasureCallback = void (*)(Dali::Actor, float, int, float, int, SizeTuple*);
 
 /**
  * This class provides the API for calling into the Flex layout implementation.

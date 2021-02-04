@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_MESH_DEFINITION_H
 #define DALI_SCENE_LOADER_MESH_DEFINITION_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,19 @@
 
 // INTERNAL INCLUDES
 #include "dali-scene-loader/public-api/api.h"
-#include "dali-scene-loader/public-api/mesh-geometry.h"
 #include "dali-scene-loader/public-api/blend-shape-details.h"
-#include "dali-scene-loader/public-api/utils.h"
 #include "dali-scene-loader/public-api/index.h"
+#include "dali-scene-loader/public-api/mesh-geometry.h"
+#include "dali-scene-loader/public-api/utils.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/common/vector-wrapper.h"
 #include <memory>
+#include "dali/public-api/common/vector-wrapper.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /**
  * @brief Defines a mesh with its attributes, the primitive type to render it as,
  *  and the file to load it from with the offset and length information for the
@@ -42,25 +41,28 @@ struct DALI_SCENE_LOADER_API MeshDefinition
 {
   using Vector = std::vector<std::pair<MeshDefinition, MeshGeometry>>;
 
-  enum : uint32_t { INVALID = std::numeric_limits<uint32_t>::max() };
+  enum : uint32_t
+  {
+    INVALID = std::numeric_limits<uint32_t>::max()
+  };
 
   enum Flags : uint16_t
   {
     FLIP_UVS_VERTICAL = NthBit(0),
-    U32_INDICES = NthBit(1),  // default is unsigned short
-    U16_JOINT_IDS = NthBit(2), // default is floats
+    U32_INDICES       = NthBit(1), // default is unsigned short
+    U16_JOINT_IDS     = NthBit(2), // default is floats
   };
 
   enum Attributes
   {
-    INDICES = NthBit(0),
-    POSITIONS = NthBit(1),
-    NORMALS = NthBit(2),
-    TEX_COORDS = NthBit(3),
-    TANGENTS = NthBit(4),
-    LEGACY_BITANGENTS = NthBit(5),  // these are ignored; we're calculating them in the (PBR) shader.
-    JOINTS_0 = NthBit(6),
-    WEIGHTS_0 = NthBit(7),
+    INDICES           = NthBit(0),
+    POSITIONS         = NthBit(1),
+    NORMALS           = NthBit(2),
+    TEX_COORDS        = NthBit(3),
+    TANGENTS          = NthBit(4),
+    LEGACY_BITANGENTS = NthBit(5), // these are ignored; we're calculating them in the (PBR) shader.
+    JOINTS_0          = NthBit(6),
+    WEIGHTS_0         = NthBit(7),
   };
 
   /**
@@ -69,10 +71,10 @@ struct DALI_SCENE_LOADER_API MeshDefinition
    */
   struct Blob
   {
-    uint32_t mOffset = INVALID;  // the default means that the blob is undefined.
-    uint32_t mLength = 0;  // if the blob is undefined, its data may still be generated. This is enabled by setting length to some non-0 value. Refer to MeshDefinition for details.
-    uint16_t mStride = 0;  // ignore if 0
-    uint16_t mElementSizeHint = 0;  // ignore if 0 or stride == 0
+    uint32_t           mOffset          = INVALID; // the default means that the blob is undefined.
+    uint32_t           mLength          = 0;       // if the blob is undefined, its data may still be generated. This is enabled by setting length to some non-0 value. Refer to MeshDefinition for details.
+    uint16_t           mStride          = 0;       // ignore if 0
+    uint16_t           mElementSizeHint = 0;       // ignore if 0 or stride == 0
     std::vector<float> mMin;
     std::vector<float> mMax;
 
@@ -80,8 +82,7 @@ struct DALI_SCENE_LOADER_API MeshDefinition
 
     Blob() = default;
 
-    Blob(uint32_t offset, uint32_t length, uint16_t stride = 0, uint16_t elementSizeHint = 0,
-      const std::vector<float>& min = {}, const std::vector<float>& max = {});
+    Blob(uint32_t offset, uint32_t length, uint16_t stride = 0, uint16_t elementSizeHint = 0, const std::vector<float>& min = {}, const std::vector<float>& max = {});
 
     /**
      * @brief Calculates the size of a tightly-packed buffer for the elements from the blob.
@@ -122,14 +123,14 @@ struct DALI_SCENE_LOADER_API MeshDefinition
 
     SparseBlob(const Blob& indices, const Blob& values, uint32_t count);
 
-    Blob mIndices;
-    Blob mValues;
+    Blob     mIndices;
+    Blob     mValues;
     uint32_t mCount = 0u;
   };
 
   struct Accessor
   {
-    Blob mBlob;
+    Blob                        mBlob;
     std::unique_ptr<SparseBlob> mSparse;
 
     Accessor() = default;
@@ -140,8 +141,8 @@ struct DALI_SCENE_LOADER_API MeshDefinition
     Accessor(Accessor&&) = default;
     Accessor& operator=(Accessor&&) = default;
 
-    Accessor(const MeshDefinition::Blob& blob,
-      const MeshDefinition::SparseBlob& sparse);
+    Accessor(const MeshDefinition::Blob&       blob,
+             const MeshDefinition::SparseBlob& sparse);
 
     bool IsDefined() const
     {
@@ -155,30 +156,30 @@ struct DALI_SCENE_LOADER_API MeshDefinition
   struct BlendShape
   {
     std::string name;
-    Accessor deltas;
-    Accessor normals;
-    Accessor tangents;
-    float weight = 0.f;
+    Accessor    deltas;
+    Accessor    normals;
+    Accessor    tangents;
+    float       weight = 0.f;
   };
 
   struct RawData
   {
     struct Attrib
     {
-      std::string mName;
-      Property::Type mType;
-      uint32_t mNumElements;
+      std::string          mName;
+      Property::Type       mType;
+      uint32_t             mNumElements;
       std::vector<uint8_t> mData;
 
       void AttachBuffer(Geometry& g) const;
     };
 
     std::vector<uint16_t> mIndices;
-    std::vector<Attrib> mAttribs;
+    std::vector<Attrib>   mAttribs;
 
-    unsigned int mBlendShapeBufferOffset;
+    unsigned int        mBlendShapeBufferOffset;
     Dali::Vector<float> mBlendShapeUnnormalizeFactor;
-    PixelData mBlendShapeData;
+    PixelData           mBlendShapeData;
   };
 
   MeshDefinition() = default;
@@ -235,25 +236,25 @@ struct DALI_SCENE_LOADER_API MeshDefinition
   MeshGeometry Load(RawData&& raw) const;
 
 public: // DATA
-  uint32_t mFlags = 0x0;
+  uint32_t       mFlags         = 0x0;
   Geometry::Type mPrimitiveType = Geometry::TRIANGLES;
-  std::string mUri;
-  Accessor mIndices;
-  Accessor mPositions;
-  Accessor mNormals;  // data can be generated based on positions
-  Accessor mTexCoords;
-  Accessor mTangents;  // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
-  Accessor mJoints0;
-  Accessor mWeights0;
+  std::string    mUri;
+  Accessor       mIndices;
+  Accessor       mPositions;
+  Accessor       mNormals; // data can be generated based on positions
+  Accessor       mTexCoords;
+  Accessor       mTangents; // data can be generated based on normals and texCoords (the latter isn't mandatory; the results will be better if available)
+  Accessor       mJoints0;
+  Accessor       mWeights0;
 
-  Blob mBlendShapeHeader;
+  Blob                    mBlendShapeHeader;
   std::vector<BlendShape> mBlendShapes;
-  BlendShapes::Version mBlendShapeVersion = BlendShapes::Version::INVALID;
+  BlendShapes::Version    mBlendShapeVersion = BlendShapes::Version::INVALID;
 
   Index mSkeletonIdx = INVALID_INDEX;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_MESH_DEFINITION_H

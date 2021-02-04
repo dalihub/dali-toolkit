@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEPTH_LAYOUT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,12 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
-
-
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class DepthLayout;
 
 typedef IntrusivePtr<DepthLayout> DepthLayoutPtr;
@@ -42,7 +37,6 @@ typedef IntrusivePtr<DepthLayout> DepthLayoutPtr;
 class DepthLayout : public ItemLayout
 {
 public:
-
   /**
    * Create a new spiral layout
    */
@@ -167,7 +161,6 @@ public:
   int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled) override;
 
 private:
-
   /**
    * @copydoc ItemLayout::GetMinimumLayoutPosition()
    */
@@ -196,7 +189,7 @@ private:
   /**
    * @copydoc ItemLayout::GetDefaultItemSize()
    */
-  void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const override;
+  void GetDefaultItemSize(unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize) const override;
 
   /**
    * @copydoc ItemLayout::GetScrollDirection()
@@ -206,30 +199,27 @@ private:
   /**
    * @copydoc ItemLayout::ApplyConstraints()
    */
-  void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor ) override;
+  void ApplyConstraints(Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor) override;
 
   /**
    * @copydoc ItemLayout::GetItemPosition()
    */
-  Vector3 GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const override;
+  Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const override;
 
 protected:
-
   /**
    * Protected constructor; see also DepthLayout::New()
    */
   DepthLayout();
 
 private:
+  // Undefined
+  DepthLayout(const DepthLayout& depthLayout);
 
   // Undefined
-  DepthLayout( const DepthLayout& depthLayout );
-
-  // Undefined
-  DepthLayout& operator=( const DepthLayout& depthLayout );
+  DepthLayout& operator=(const DepthLayout& depthLayout);
 
 private:
-
   struct Impl;
   Impl* mImpl;
 };

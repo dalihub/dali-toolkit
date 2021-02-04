@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VIEW_MODEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,16 @@
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/text-enumerations.h>
-#include <dali-toolkit/internal/text/text-model-interface.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali-toolkit/internal/text/text-model-interface.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Responsible of creating and store temporary modifications of the text model.
  * i.e. The elide of text.
@@ -49,7 +46,7 @@ public:
    *
    * @param[in] model Pointer to the text's model interface.
    */
-  ViewModel( const ModelInterface* const model );
+  ViewModel(const ModelInterface* const model);
 
   /**
    * @brief Virtual destructor.
@@ -191,7 +188,7 @@ public:
   /**
    * @copydoc ModelInterface::GetUnderlineRuns()
    */
-  void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const override;
+  void GetUnderlineRuns(GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const override;
 
   /**
    * @copydoc ModelInterface::GetOutlineColor()
@@ -213,7 +210,7 @@ public:
    */
   bool IsBackgroundEnabled() const override;
 
-/**
+  /**
    * @brief Does the text elide.
    *
    * It stores a copy of the visible glyphs and removes as many glyphs as needed

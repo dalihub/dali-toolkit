@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_UTILS_H_
 #define DALI_SCENE_LOADER_UTILS_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,16 @@
 #include "dali-scene-loader/public-api/api.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/actors/actor.h"
-#include "dali/public-api/rendering/renderer.h"
-#include "dali/public-api/common/dali-common.h"
-#include <sstream>
 #include <cctype>
+#include <sstream>
+#include "dali/public-api/actors/actor.h"
+#include "dali/public-api/common/dali-common.h"
+#include "dali/public-api/rendering/renderer.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /*
  * @brief Fixed size backing buffer to use with std::ostreams where control over
  *  allocations (which this does not make), is required.
@@ -52,14 +51,16 @@ public:
 class DALI_SCENE_LOADER_API ExceptionFlinger
 {
 public:
-  enum { MESSAGE_BUFFER_SIZE = 512 };
+  enum
+  {
+    MESSAGE_BUFFER_SIZE = 512
+  };
 
   ExceptionFlinger(const char* location) noexcept(true);
 
-  [[noreturn]]
-  ~ExceptionFlinger() noexcept(false);
+  [[noreturn]] ~ExceptionFlinger() noexcept(false);
 
-  template <typename T>
+  template<typename T>
   ExceptionFlinger& operator<<(const T& rhs) noexcept(true)
   {
     mStream << rhs;
@@ -71,13 +72,12 @@ private:
   {
     const char* mLocation;
 
-    [[noreturn]]
-    ~Impl() noexcept(false);
+    [[noreturn]] ~Impl() noexcept(false);
   };
 
   static char* GetMessageBuffer() noexcept(true);
 
-  Impl mImpl;
+  Impl         mImpl;
   StreamBuffer mStreamBuffer;
   std::ostream mStream;
 };
@@ -90,13 +90,15 @@ DALI_SCENE_LOADER_API std::string FormatString(const char* format, ...);
 /*
  * @return The @n th bit in a bitmask.
  */
-DALI_SCENE_LOADER_API constexpr size_t NthBit(size_t n) { return 1 << n; }
+DALI_SCENE_LOADER_API constexpr size_t NthBit(size_t n)
+{
+  return 1 << n;
+}
 
 /*
  * @return Whether all of @a mask 's bits are set on @a value.
  */
-inline
-DALI_SCENE_LOADER_API bool MaskMatch(uint32_t value, uint32_t mask)
+inline DALI_SCENE_LOADER_API bool MaskMatch(uint32_t value, uint32_t mask)
 {
   return (value & mask) == mask;
 }
@@ -104,8 +106,7 @@ DALI_SCENE_LOADER_API bool MaskMatch(uint32_t value, uint32_t mask)
 /*
  * @brief Convert a four-letter(, null-terminated) string literal into a uint32_t.
  */
-inline
-DALI_SCENE_LOADER_API constexpr uint32_t FourCC(const char(&fourCC)[5])
+inline DALI_SCENE_LOADER_API constexpr uint32_t FourCC(const char (&fourCC)[5])
 {
   return (fourCC[3] << 24) | (fourCC[2] << 16) | (fourCC[1] << 8) | fourCC[0];
 }
@@ -116,11 +117,10 @@ DALI_SCENE_LOADER_API constexpr uint32_t FourCC(const char(&fourCC)[5])
  * @param[in] b, compare string
  * @return true if strings are equal
  */
-inline
-DALI_SCENE_LOADER_API bool CaseInsensitiveCharacterCompare( unsigned char a, unsigned char b )
+inline DALI_SCENE_LOADER_API bool CaseInsensitiveCharacterCompare(unsigned char a, unsigned char b)
 {
   // Converts to lower case in the current locale.
-  return std::tolower( a ) == std::tolower( b );
+  return std::tolower(a) == std::tolower(b);
 }
 
 /*
@@ -128,13 +128,12 @@ DALI_SCENE_LOADER_API bool CaseInsensitiveCharacterCompare( unsigned char a, uns
  * @param[in] a, compare string
  * @param[in] b, compare string
  */
-inline
-DALI_SCENE_LOADER_API bool CaseInsensitiveStringCompare( const std::string& a, const std::string& b )
+inline DALI_SCENE_LOADER_API bool CaseInsensitiveStringCompare(const std::string& a, const std::string& b)
 {
   bool result = false;
-  if( a.length() == b.length() )
+  if(a.length() == b.length())
   {
-    result = std::equal( a.begin(), a.end(), b.begin(), &CaseInsensitiveCharacterCompare );
+    result = std::equal(a.begin(), a.end(), b.begin(), &CaseInsensitiveCharacterCompare);
   }
   return result;
 }
@@ -154,9 +153,8 @@ DALI_SCENE_LOADER_API std::string LoadTextFile(const char* path, bool* fail = nu
  * @note Use of a @a fn that is itself recursing in @a is also discouraged
  *  for performance and stability reasons.
  */
-template <typename Func>
-inline
-DALI_SCENE_LOADER_API void VisitActor(Actor a, Func fn)
+template<typename Func>
+inline DALI_SCENE_LOADER_API void VisitActor(Actor a, Func fn)
 {
   fn(a);
 
@@ -171,8 +169,7 @@ DALI_SCENE_LOADER_API void VisitActor(Actor a, Func fn)
  * @brief Convenience function to set the given actor @a 's anchor point
  *  and parent origin to center.
  */
-inline
-DALI_SCENE_LOADER_API void SetActorCentered(Actor a)
+inline DALI_SCENE_LOADER_API void SetActorCentered(Actor a)
 {
   a.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   a.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -184,10 +181,10 @@ using Type = uint32_t;
 
 enum DALI_SCENE_LOADER_API Values : Type
 {
-  NONE = 0x00,
+  NONE          = 0x00,
   FLIP_VERTICAL = 0x01,
 };
-}
+} // namespace TexturedQuadOptions
 
 /*
  * @brief Makes... geometry for a textured quad.
@@ -198,9 +195,9 @@ DALI_SCENE_LOADER_API Geometry MakeTexturedQuadGeometry(TexturedQuadOptions::Typ
  * @brief Fixes the path of a file. Replaces the '\\' separator by the '/' one.
  * @param[in,out] path The path to be fixed.
  */
-DALI_SCENE_LOADER_API void ToUnixFileSeparators( std::string& path );
+DALI_SCENE_LOADER_API void ToUnixFileSeparators(std::string& path);
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif /* DALI_SCENE_LOADER_UTILS_H_ */

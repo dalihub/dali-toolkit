@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SPREAD_FILTER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * A spread/thicken filter. Expands an image into transparent areas.
  */
@@ -53,7 +50,7 @@ public:
    * Set the amount of spread in pixels.
    * @param[in] spread The amount of spread
    */
-  void SetSpread( float spread );
+  void SetSpread(float spread);
 
 public: // From ImageFilter
   /// @copydoc Dali::Toolkit::Internal::ImageFilter::Enable
@@ -66,31 +63,29 @@ public: // From ImageFilter
   void Refresh() override;
 
   /// @copydoc Dali::Toolkit::Internal::ImageFilter::SetSize
-  void SetSize( const Vector2& size ) override;
+  void SetSize(const Vector2& size) override;
 
 private:
-
   /**
    * Setup render tasks for blur
    */
   void CreateRenderTasks();
 
 private:
-  SpreadFilter( const SpreadFilter& );
-  SpreadFilter& operator=( const SpreadFilter& );
+  SpreadFilter(const SpreadFilter&);
+  SpreadFilter& operator=(const SpreadFilter&);
 
 private: // Attributes
-
   // To perform horizontal spread from mInputTexture to mFrameBufferForHorz
-  RenderTask         mRenderTaskForHorz;
-  Actor              mActorForInput;
-  FrameBuffer        mFrameBufferForHorz;
+  RenderTask  mRenderTaskForHorz;
+  Actor       mActorForInput;
+  FrameBuffer mFrameBufferForHorz;
 
   // To perform vertical spread from mFrameBufferForHorz to mOutputFrameBuffer
-  RenderTask         mRenderTaskForVert;
-  Actor              mActorForHorz;
+  RenderTask mRenderTaskForVert;
+  Actor      mActorForHorz;
 
-  int                mSpread;
+  int mSpread;
 }; // class SpreadFilter
 
 } // namespace Internal
@@ -100,4 +95,3 @@ private: // Attributes
 } // namespace Dali
 
 #endif // DALI_TOOLKIT_INTERNAL_SPREAD_FILTER_H
-

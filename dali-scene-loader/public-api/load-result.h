@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_OUTPUT_H
 #define DALI_SCENE_LOADER_OUTPUT_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,15 @@
  */
 
 // INTERNAL INCLUDES
-#include "dali-scene-loader/public-api/api.h"
 #include "dali-scene-loader/public-api/animation-definition.h"
-#include "dali-scene-loader/public-api/light-parameters.h"
+#include "dali-scene-loader/public-api/api.h"
 #include "dali-scene-loader/public-api/camera-parameters.h"
+#include "dali-scene-loader/public-api/light-parameters.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 class ResourceBundle;
 class SceneDefinition;
 
@@ -67,7 +66,7 @@ struct DALI_SCENE_LOADER_API LoadResult
   std::vector<LightParameters>& mLightParameters;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_OUTPUT_H

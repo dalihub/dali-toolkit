@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_JSON_UTIL_H_
 #define DALI_SCENE_LOADER_JSON_UTIL_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,16 @@
 #include "dali-scene-loader/public-api/index.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/common/vector-wrapper.h"
-#include "dali/public-api/animation/time-period.h"
-#include "dali/public-api/object/property.h"
-#include "dali/public-api/math/vector4.h"
 #include "dali-toolkit/devel-api/builder/tree-node.h"
+#include "dali/public-api/animation/time-period.h"
+#include "dali/public-api/common/vector-wrapper.h"
+#include "dali/public-api/math/vector4.h"
+#include "dali/public-api/object/property.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 bool ReadBool(const Toolkit::TreeNode* node, bool& num);
 
 bool ReadInt(const Toolkit::TreeNode* node, int& num);
@@ -89,7 +88,7 @@ Property::Value ReadPropertyValue(const Property::Type& propType, const Toolkit:
  */
 Property::Value ReadPropertyValue(const Toolkit::TreeNode& tn);
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_JSON_UTIL_H_

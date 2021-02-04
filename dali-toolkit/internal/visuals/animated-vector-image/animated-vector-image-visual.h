@@ -19,31 +19,28 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/object/weak-handle.h>
-#include <dali/public-api/object/property-notification.h>
-#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/public-api/adaptor-framework/window.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/object/property-notification.h>
+#include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-actions-devel.h>
+#include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
+#include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-task.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
-#include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-actions-devel.h>
-#include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-task.h>
-#include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class ImageVisualShaderFactory;
 class AnimatedVectorImageVisual;
-using AnimatedVectorImageVisualPtr = IntrusivePtr< AnimatedVectorImageVisual >;
+using AnimatedVectorImageVisualPtr = IntrusivePtr<AnimatedVectorImageVisual>;
 
 /**
  * The visual which renders an animated vector image using VectorAnimationRenderer.
@@ -56,10 +53,9 @@ using AnimatedVectorImageVisualPtr = IntrusivePtr< AnimatedVectorImageVisual >;
  * | url                      | STRING           |
  *
  */
-class AnimatedVectorImageVisual: public Visual::Base, public ConnectionTracker, public VectorAnimationManager::LifecycleObserver
+class AnimatedVectorImageVisual : public Visual::Base, public ConnectionTracker, public VectorAnimationManager::LifecycleObserver
 {
 public:
-
   /**
    * @brief Create the AnimatedVectorImageVisual using the image URL.
    *
@@ -69,7 +65,7 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static AnimatedVectorImageVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties );
+  static AnimatedVectorImageVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties);
 
   /**
    * @brief Create the AnimatedVectorImageVisual using the image URL.
@@ -79,24 +75,23 @@ public:
    * @param[in] imageUrl The URL to an animated vector image to use
    * @return A smart-pointer to the newly allocated visual.
    */
-  static AnimatedVectorImageVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl );
+  static AnimatedVectorImageVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
 
-public:  // from Visual
-
+public: // from Visual
   /**
    * @copydoc Visual::Base::GetNaturalSize
    */
-  void GetNaturalSize( Vector2& naturalSize ) override;
+  void GetNaturalSize(Vector2& naturalSize) override;
 
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
 protected: // From VectorAnimationManager::LifecycleObserver:
   /**
@@ -105,7 +100,6 @@ protected: // From VectorAnimationManager::LifecycleObserver:
   void VectorAnimationManagerDestroyed() override;
 
 protected:
-
   /**
    * @brief Constructor.
    *
@@ -113,7 +107,7 @@ protected:
    * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to an animated vector image to use
    */
-  AnimatedVectorImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl );
+  AnimatedVectorImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -128,17 +122,17 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::DoSetOffScene
    */
-  void DoSetOffScene( Actor& actor ) override;
+  void DoSetOffScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
@@ -148,16 +142,15 @@ protected:
   /**
    * @copydoc Visual::Base::OnDoAction
    */
-  void OnDoAction( const Property::Index actionId, const Property::Value& attributes ) override;
+  void OnDoAction(const Property::Index actionId, const Property::Value& attributes) override;
 
 private:
-
   /**
    * Helper method to set individual values by index key.
    * @param[in] index The index key of the value
    * @param[in] value The value
    */
-  void DoSetProperty( Property::Index index, const Property::Value& value );
+  void DoSetProperty(Property::Index index, const Property::Value& value);
 
   /**
    * @brief Called when the texture upload is completed.
@@ -192,22 +185,22 @@ private:
   /**
    * @brief Callback when the world scale factor changes.
    */
-  void OnScaleNotification( PropertyNotification& source );
+  void OnScaleNotification(PropertyNotification& source);
 
   /**
    * @brief Callback when the size changes.
    */
-  void OnSizeNotification( PropertyNotification& source );
+  void OnSizeNotification(PropertyNotification& source);
 
   /**
    * @brief Callback when the visibility of the actor is changed.
    */
-  void OnControlVisibilityChanged( Actor actor, bool visible, DevelActor::VisibilityChange::Type type );
+  void OnControlVisibilityChanged(Actor actor, bool visible, DevelActor::VisibilityChange::Type type);
 
   /**
    * @brief Callback when the visibility of the window is changed.
    */
-  void OnWindowVisibilityChanged( Window window, bool visible );
+  void OnWindowVisibilityChanged(Window window, bool visible);
 
   /**
    * @brief Callback when the event is processed.
@@ -215,26 +208,26 @@ private:
   void OnProcessEvents();
 
   // Undefined
-  AnimatedVectorImageVisual( const AnimatedVectorImageVisual& visual ) = delete;
+  AnimatedVectorImageVisual(const AnimatedVectorImageVisual& visual) = delete;
 
   // Undefined
-  AnimatedVectorImageVisual& operator=( const AnimatedVectorImageVisual& visual ) = delete;
+  AnimatedVectorImageVisual& operator=(const AnimatedVectorImageVisual& visual) = delete;
 
 private:
-  VisualUrl                                    mUrl;
-  VectorAnimationTask::AnimationData           mAnimationData;
-  VectorAnimationTaskPtr                       mVectorAnimationTask;
-  ImageVisualShaderFactory&                    mImageVisualShaderFactory;
-  PropertyNotification                         mScaleNotification;
-  PropertyNotification                         mSizeNotification;
-  Vector2                                      mVisualSize;
-  Vector2                                      mVisualScale;
-  WeakHandle< Actor >                          mPlacementActor;
-  DevelImageVisual::PlayState::Type            mPlayState;
-  CallbackBase*                                mEventCallback;    // Not owned
-  bool                                         mRendererAdded;
-  bool                                         mCoreShutdown;
-  bool                                         mRedrawInScalingDown;
+  VisualUrl                          mUrl;
+  VectorAnimationTask::AnimationData mAnimationData;
+  VectorAnimationTaskPtr             mVectorAnimationTask;
+  ImageVisualShaderFactory&          mImageVisualShaderFactory;
+  PropertyNotification               mScaleNotification;
+  PropertyNotification               mSizeNotification;
+  Vector2                            mVisualSize;
+  Vector2                            mVisualScale;
+  WeakHandle<Actor>                  mPlacementActor;
+  DevelImageVisual::PlayState::Type  mPlayState;
+  CallbackBase*                      mEventCallback; // Not owned
+  bool                               mRendererAdded;
+  bool                               mCoreShutdown;
+  bool                               mRedrawInScalingDown;
 };
 
 } // namespace Internal

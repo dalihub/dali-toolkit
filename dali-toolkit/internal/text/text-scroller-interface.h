@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SCROLLER_INTERFACE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,27 +20,24 @@
 
 namespace Dali
 {
-
 class Actor;
 
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief An interface used by the text-controls which implement auto-scrolling
  */
 class ScrollerInterface
 {
 public:
-
   /**
    * @brief Virtual destructor.
    */
   virtual ~ScrollerInterface()
-  {}
+  {
+  }
 
   /**
    * @brief Called when the scrolling finishes

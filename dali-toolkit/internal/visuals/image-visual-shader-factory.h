@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_SHADER_FACTORY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,22 +25,16 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * ImageVisualShaderFactory is an object that provides and shares shaders between image visuals
  */
 class ImageVisualShaderFactory
 {
 public:
-
-public:
-
   /**
    * @brief Constructor
    */
@@ -58,7 +52,7 @@ public:
    * @param[in] defaultTextureWrapping Whether the default texture wrap mode is applied.
    * @param[in] roundedCorner Whether the rounded corder is applied.
    */
-  Shader GetShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping, bool roundedCorner );
+  Shader GetShader(VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping, bool roundedCorner);
 
   /**
    * Request the default vertex shader source.
@@ -73,7 +67,6 @@ public:
   std::string_view GetFragmentShaderSource();
 
 protected:
-
   /**
    * Undefined copy constructor.
    */

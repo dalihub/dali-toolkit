@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_HASH_H_
 #define DALI_SCENE_LOADER_HASH_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
  *
  */
 
-#include <string>
-#include <cstring>
 #include <cstdint>
+#include <cstring>
+#include <string>
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /**
  * @brief Rudimentary hash generator that follows a builder pattern.
  */
@@ -94,7 +93,7 @@ public:
    * @brief Applies the bytes of an object @a value, to the hash.
    * @return Its updated self.
    */
-  template <typename T>
+  template<typename T>
   Hash& AddObjectBytes(const T& value);
 
   operator uint64_t() const;
@@ -105,13 +104,12 @@ private:
   uint64_t Concatenate(uint64_t value);
 };
 
-
 template<typename T>
-Hash& Hash::AddObjectBytes(const T & value)
+Hash& Hash::AddObjectBytes(const T& value)
 {
   auto i0 = reinterpret_cast<const uint8_t*>(&value);
   auto i1 = i0 + sizeof(T);
-  while (i0 != i1)
+  while(i0 != i1)
   {
     mValue = Concatenate(*i0);
     ++i0;
@@ -119,7 +117,7 @@ Hash& Hash::AddObjectBytes(const T & value)
   return *this;
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif // DALI_SCENE_LOADER_HASH_H_

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_COOKIE_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -31,7 +31,6 @@ class WebEngineCookieManager;
 
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_controls_web_view
  * @{
@@ -47,12 +46,11 @@ namespace Toolkit
 class DALI_TOOLKIT_API WebCookieManager
 {
 public:
-
   /**
    * @brief Creates a WebCookieManager.
    * @param[in] manager A #Dali::WebEngineCookieManager
    */
-  WebCookieManager( Dali::WebEngineCookieManager& manager );
+  WebCookieManager(Dali::WebEngineCookieManager& manager);
 
   /**
    * @brief Destructor.
@@ -67,7 +65,7 @@ public:
    *
    * @param[in] policy A #Dali::WebEngineCookieManager::CookieAcceptPolicy
    */
-  void SetCookieAcceptPolicy(Dali::WebEngineCookieManager::CookieAcceptPolicy policy );
+  void SetCookieAcceptPolicy(Dali::WebEngineCookieManager::CookieAcceptPolicy policy);
 
   /**
    * @brief Gets the cookie acceptance policy. The default is Toolkit::WebCookieManager::CookieAcceptPolicy::NO_THIRD_PARTY.
@@ -93,11 +91,10 @@ public:
    * @param[in] path The path where to read/write Cookies
    * @param[in] storage The type of storage
    */
-  void SetPersistentStorage( const std::string& path, Dali::WebEngineCookieManager::CookiePersistentStorage storage );
+  void SetPersistentStorage(const std::string& path, Dali::WebEngineCookieManager::CookiePersistentStorage storage);
 
 private:
-
-  Dali::WebEngineCookieManager&  mWebEngineCookieManager;
+  Dali::WebEngineCookieManager& mWebEngineCookieManager;
 };
 
 /**

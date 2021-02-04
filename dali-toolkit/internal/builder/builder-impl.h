@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,48 +19,45 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <list>
-#include <map>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/integration-api/debug.h>
+#include <list>
+#include <map>
+#include <string>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/builder/json-parser.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
+#include <dali-toolkit/devel-api/builder/json-parser.h>
 #include <dali-toolkit/internal/builder/builder-declarations.h>
 #include <dali-toolkit/internal/builder/style.h>
 
 // Warning messages usually displayed
 #define DALI_SCRIPT_WARNING(format, ...) \
-  DALI_LOG_WARNING("Script:" format, ## __VA_ARGS__)
+  DALI_LOG_WARNING("Script:" format, ##__VA_ARGS__)
 
 // Info messages are usually debug build
 #define DALI_SCRIPT_INFO(format, ...) \
-  DALI_LOG_INFO(Dali::Toolkit::Internal::gFilterScript, Debug::General, "Script:" format, ## __VA_ARGS__)
+  DALI_LOG_INFO(Dali::Toolkit::Internal::gFilterScript, Debug::General, "Script:" format, ##__VA_ARGS__)
 
 // Info Verbose need to be swiched on in gFilterScript filter constructor (by default set to General)
 #define DALI_SCRIPT_VERBOSE(format, ...) \
-  DALI_LOG_INFO(Dali::Toolkit::Internal::gFilterScript, Debug::Verbose, "Script:" format, ## __VA_ARGS__)
+  DALI_LOG_INFO(Dali::Toolkit::Internal::gFilterScript, Debug::Verbose, "Script:" format, ##__VA_ARGS__)
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-  class TreeNode;
+class TreeNode;
 }
 
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 #if defined(DEBUG_ENABLED)
 extern Dali::Integration::Log::Filter* gFilterScript;
 #endif
@@ -74,24 +71,23 @@ class Replacement;
 class Builder : public Dali::BaseObject
 {
 public:
-
   Builder();
 
   /**
    * @copydoc Toolkit::Builder::LoadFromString
    */
-  void LoadFromString( const std::string &data,
-                       Dali::Toolkit::Builder::UIFormat rep = Dali::Toolkit::Builder::JSON );
+  void LoadFromString(const std::string&               data,
+                      Dali::Toolkit::Builder::UIFormat rep = Dali::Toolkit::Builder::JSON);
 
   /**
    * @copydoc Toolkit::Builder::AddConstants
    */
-  void AddConstants( const Property::Map& map );
+  void AddConstants(const Property::Map& map);
 
   /**
    * @copydoc Toolkit::Builder::AddConstant
    */
-  void AddConstant( const std::string& key, const Property::Value& value );
+  void AddConstant(const std::string& key, const Property::Value& value);
 
   /**
    * @copydoc Toolkit::Builder::GetConfigurations
@@ -106,52 +102,52 @@ public:
   /**
    * @copydoc Toolkit::Builder::GetConstant
    */
-  const Property::Value& GetConstant( const std::string& key ) const;
+  const Property::Value& GetConstant(const std::string& key) const;
 
   /**
    * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName );
    */
-  Animation CreateAnimation( const std::string& animationName );
+  Animation CreateAnimation(const std::string& animationName);
 
   /**
    * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName, const Property::Map& map );
    */
-  Animation CreateAnimation( const std::string& animationName, const Property::Map& map );
+  Animation CreateAnimation(const std::string& animationName, const Property::Map& map);
 
   /**
    * @copydoc Toolkit::Builder::CreateAnimation( const std::string&,Dali::Actor);
    */
-  Animation CreateAnimation( const std::string& animationName, Dali::Actor sourceActor );
+  Animation CreateAnimation(const std::string& animationName, Dali::Actor sourceActor);
 
   /**
    * @copydoc Toolkit::Builder::CreateAnimation( const std::string&,const Property::Map&, Dali::Actor);
    */
-  Animation CreateAnimation( const std::string& animationName, const Property::Map& map, Dali::Actor sourceActor );
+  Animation CreateAnimation(const std::string& animationName, const Property::Map& map, Dali::Actor sourceActor);
 
   /**
    * @copydoc Toolkit::Builder::Create( const std::string& templateName );
    */
-  BaseHandle Create( const std::string& templateName );
+  BaseHandle Create(const std::string& templateName);
 
   /**
    * @copydoc Toolkit::Builder::Create( const std::string& templateName, const Property::Map& map );
    */
-  BaseHandle Create( const std::string& templateName, const Property::Map& map );
+  BaseHandle Create(const std::string& templateName, const Property::Map& map);
 
   /**
    * @copydoc Toolkit::Builder::CreateFromJson( const std::string& json );
    */
-  BaseHandle CreateFromJson( const std::string& json );
+  BaseHandle CreateFromJson(const std::string& json);
 
   /**
    * @copydoc Toolkit::Builder::ApplyFromJson( Handle& handle, const std::string& json );
    */
-  bool ApplyFromJson(  Handle& handle, const std::string& json );
+  bool ApplyFromJson(Handle& handle, const std::string& json);
 
   /**
    * @copydoc Toolkit::Builder::ApplyStyle
    */
-  bool ApplyStyle( const std::string& styleName, Handle& handle );
+  bool ApplyStyle(const std::string& styleName, Handle& handle);
 
   /**
    * Lookup the stylename in builder. If it's found in the parse tree,
@@ -159,7 +155,7 @@ public:
    * @param[in] styleName The style name to search for
    * @return true if the stylename exists
    */
-  bool LookupStyleName( const std::string& styleName );
+  bool LookupStyleName(const std::string& styleName);
 
   /**
    * Lookup the stylename in the recorded Styles - if it exists,
@@ -169,32 +165,32 @@ public:
    * @param[in] styleName The stylename to search for
    * @return A const pointer to the style object
    */
-  const StylePtr GetStyle( const std::string& styleName );
+  const StylePtr GetStyle(const std::string& styleName);
 
   /**
    * @copydoc Toolkit::Builder::AddActors
    */
-  void AddActors( Actor toActor );
+  void AddActors(Actor toActor);
 
   /**
    * @copydoc Toolkit::Builder::AddActors
    */
-  void AddActors( const std::string &sectionName, Actor toActor );
+  void AddActors(const std::string& sectionName, Actor toActor);
 
   /**
    * @copydoc Toolkit::Builder::CreateRenderTask
    */
-  void CreateRenderTask( const std::string &name );
+  void CreateRenderTask(const std::string& name);
 
   /**
    * @copydoc Toolkit::Builder::GetPath
    */
-  Path GetPath( const std::string &name );
+  Path GetPath(const std::string& name);
 
   /**
    * @copydoc Toolkit::Builder::GetPathConstrainer
    */
-  Dali::PathConstrainer GetPathConstrainer( const std::string& name );
+  Dali::PathConstrainer GetPathConstrainer(const std::string& name);
 
   /*
    * Check if a given constrainer is of type PathConstrainer
@@ -202,12 +198,12 @@ public:
    * @return True if constainer is of type PathConstrainer, False otherwise
    *
    */
-  bool IsPathConstrainer( const std::string& name );
+  bool IsPathConstrainer(const std::string& name);
 
   /**
    * @copydoc Toolkit::Builder::GetLinearConstrainer
    */
-  Dali::LinearConstrainer GetLinearConstrainer( const std::string& name );
+  Dali::LinearConstrainer GetLinearConstrainer(const std::string& name);
 
   /*
    * Check if a given constrainer is of type LinearConstrainer
@@ -215,7 +211,7 @@ public:
    * @return True if constainer is of type LinearConstrainer, False otherwise
    *
    */
-  bool IsLinearConstrainer( const std::string& name );
+  bool IsLinearConstrainer(const std::string& name);
 
   /**
    * @copydoc Toolkit::Builder::QuitSignal
@@ -227,17 +223,23 @@ public:
    */
   void EmitQuitSignal();
 
-
 protected:
-
   ~Builder() override;
 
 private:
-  typedef std::vector<const char*> KeyStack;
-  typedef std::vector< TreeNode::KeyNodePair > MappingsLut;
-  typedef struct{ std::string name; Dali::LinearConstrainer linearConstrainer; } LinearConstrainerEntry;
+  typedef std::vector<const char*>           KeyStack;
+  typedef std::vector<TreeNode::KeyNodePair> MappingsLut;
+  typedef struct
+  {
+    std::string             name;
+    Dali::LinearConstrainer linearConstrainer;
+  } LinearConstrainerEntry;
   typedef std::vector<LinearConstrainerEntry> LinearConstrainerLut;
-  typedef struct{ std::string name; Dali::PathConstrainer pathConstrainer; } PathConstrainerEntry;
+  typedef struct
+  {
+    std::string           name;
+    Dali::PathConstrainer pathConstrainer;
+  } PathConstrainerEntry;
   typedef std::vector<PathConstrainerEntry> PathConstrainerLut;
   typedef std::map<const std::string, Path> PathLut;
 
@@ -248,77 +250,77 @@ private:
   // Undefined
   Builder& operator=(const Builder& rhs);
 
-  void LoadConstants( const TreeNode& root, Property::Map& intoMap );
+  void LoadConstants(const TreeNode& root, Property::Map& intoMap);
 
-  void LoadConfiguration( const TreeNode& root, Property::Map& intoMap );
+  void LoadConfiguration(const TreeNode& root, Property::Map& intoMap);
 
-  Animation CreateAnimation( const std::string& animationName,
-                             const Replacement& replacement,
-                             Dali::Actor        sourceActor );
+  Animation CreateAnimation(const std::string& animationName,
+                            const Replacement& replacement,
+                            Dali::Actor        sourceActor);
 
-  BaseHandle Create( const std::string& templateName,
-                     const Replacement& constant );
+  BaseHandle Create(const std::string& templateName,
+                    const Replacement& constant);
 
-  BaseHandle DoCreate( const TreeNode&    root,
-                       const TreeNode&    node,
-                       Actor              parent,
-                       const Replacement& replacements );
+  BaseHandle DoCreate(const TreeNode&    root,
+                      const TreeNode&    node,
+                      Actor              parent,
+                      const Replacement& replacements);
 
-  void SetupTask( RenderTask&              task,
-                  const Toolkit::TreeNode& node,
-                  const Replacement&       replacement );
+  void SetupTask(RenderTask&              task,
+                 const Toolkit::TreeNode& node,
+                 const Replacement&       replacement);
 
-  bool ApplyStyle( const std::string& styleName,
-                   Handle&            handle,
-                   const Replacement& replacement);
+  bool ApplyStyle(const std::string& styleName,
+                  Handle&            handle,
+                  const Replacement& replacement);
 
-  void ApplyAllStyleProperties( const TreeNode&    root,
-                                const TreeNode&    node,
-                                Dali::Handle&      handle,
-                                const Replacement& constant );
+  void ApplyAllStyleProperties(const TreeNode&    root,
+                               const TreeNode&    node,
+                               Dali::Handle&      handle,
+                               const Replacement& constant);
 
-  void RecordStyles( const char*        styleName,
-                     const TreeNode&    node,
-                     Dali::Handle&      handle,
-                     const Replacement& replacements );
-
-  void RecordStyle( StylePtr           style,
+  void RecordStyles(const char*        styleName,
                     const TreeNode&    node,
                     Dali::Handle&      handle,
-                    const Replacement& replacements );
+                    const Replacement& replacements);
 
-  void RecordTransitions( const TreeNode::KeyNodePair& keyValue,
-                          Property::Array& transitions,
-                          const Replacement& replacements );
+  void RecordStyle(StylePtr           style,
+                   const TreeNode&    node,
+                   Dali::Handle&      handle,
+                   const Replacement& replacements);
 
-  void RecordTransitionData( const TreeNode::KeyNodePair& keyNode,
-                             Toolkit::TransitionData& transitionData,
-                             const Replacement& replacements );
+  void RecordTransitions(const TreeNode::KeyNodePair& keyValue,
+                         Property::Array&             transitions,
+                         const Replacement&           replacements);
 
-  void ApplyProperties( const TreeNode&    root,
-                        const TreeNode&    node,
-                        Dali::Handle&      handle,
-                        const Replacement& constant );
+  void RecordTransitionData(const TreeNode::KeyNodePair& keyNode,
+                            Toolkit::TransitionData&     transitionData,
+                            const Replacement&           replacements);
 
-  void ApplySignals( const TreeNode& root,
-                     const TreeNode& node,
-                     Dali::Handle& handle );
+  void ApplyProperties(const TreeNode&    root,
+                       const TreeNode&    node,
+                       Dali::Handle&      handle,
+                       const Replacement& constant);
 
-  void ApplyStylesByActor( const TreeNode&    root,
+  void ApplySignals(const TreeNode& root,
+                    const TreeNode& node,
+                    Dali::Handle&   handle);
+
+  void ApplyStylesByActor(const TreeNode&    root,
+                          const TreeNode&    node,
+                          Dali::Handle&      handle,
+                          const Replacement& constant);
+
+  void SetProperties(const TreeNode&    node,
+                     Handle&            handle,
+                     const Replacement& constant);
+
+  bool MapToTargetProperty(Handle&            propertyObject,
+                           const std::string& key,
                            const TreeNode&    node,
-                           Dali::Handle&      handle,
-                           const Replacement& constant );
-
-  void SetProperties( const TreeNode&    node,
-                      Handle&            handle,
-                      const Replacement& constant );
-
-  bool MapToTargetProperty( Handle&            propertyObject,
-                            const std::string& key,
-                            const TreeNode&    node,
-                            const Replacement& constant,
-                            Property::Index&   index,
-                            Property::Value&   value );
+                           const Replacement& constant,
+                           Property::Index&   index,
+                           Property::Value&   value);
 
   /**
    * Find the key in the mapping table, if it's present, then generate
@@ -330,16 +332,16 @@ private:
    * @param[in] propertyType The property type if known, or NONE
    * @param[in,out] value The string value to test and write back to.
    */
-  bool GetPropertyMap( const TreeNode&  mappingRoot,
-                       const char*      theKey,
-                       Property::Type   propertyType,
-                       Property::Value& value );
+  bool GetPropertyMap(const TreeNode&  mappingRoot,
+                      const char*      theKey,
+                      Property::Type   propertyType,
+                      Property::Value& value);
 
-  void SetCustomProperties( const TreeNode&      node,
-                            Handle&              handle,
-                            const Replacement&   constant,
-                            const std::string&   childName,
-                            Property::AccessMode accessMode );
+  void SetCustomProperties(const TreeNode&      node,
+                           Handle&              handle,
+                           const Replacement&   constant,
+                           const std::string&   childName,
+                           Property::AccessMode accessMode);
 
   /**
    * Find the key in the mapping table, if it's present, then generate
@@ -352,12 +354,11 @@ private:
    * @param[in] propertyType The property type if known, or NONE
    * @param[in,out] value The string value to test and write back to.
    */
-  bool RecursePropertyMap( const TreeNode&  mappingRoot,
-                           KeyStack&        keyStack,
-                           const char*      theKey,
-                           Property::Type   propertyType,
-                           Property::Value& value );
-
+  bool RecursePropertyMap(const TreeNode&  mappingRoot,
+                          KeyStack&        keyStack,
+                          const char*      theKey,
+                          Property::Type   propertyType,
+                          Property::Value& value);
 
   /**
    * Tests if the value is a string delimited by <>. If it is, then it attempts to
@@ -367,9 +368,9 @@ private:
    * @param[in,out] value The string value to test and write back to.
    * @return true if the value was converted, false otherwise.
    */
-  bool ConvertChildValue( const TreeNode& mappingRoot,
-                          KeyStack& keyStack,
-                          Property::Value& value );
+  bool ConvertChildValue(const TreeNode&  mappingRoot,
+                         KeyStack&        keyStack,
+                         Property::Value& value);
 
 private:
   Toolkit::JsonParser                 mParser;

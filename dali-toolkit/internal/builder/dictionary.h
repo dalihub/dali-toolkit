@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_DICTIONARY_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 /**
  * The Dictionary template class enables a means of storing key-value
  * pairs where the keys are strings and the value can be a complex
@@ -41,7 +40,7 @@ namespace Internal
 
 using DictionaryKeys = std::vector<std::string>;
 
-inline void Merge( DictionaryKeys& toDict, const DictionaryKeys& fromDict )
+inline void Merge(DictionaryKeys& toDict, const DictionaryKeys& fromDict)
 {
   for(const auto& element : fromDict)
   {
@@ -53,7 +52,6 @@ inline void Merge( DictionaryKeys& toDict, const DictionaryKeys& fromDict )
   }
 }
 
-
 template<typename EntryType>
 class Dictionary
 {
@@ -64,7 +62,7 @@ private:
   struct Element
   {
     std::string key;
-    EntryType entry;
+    EntryType   entry;
     Element(std::string name, EntryType entry)
     : key(std::move(name)),
       entry(std::move(entry))
@@ -82,9 +80,9 @@ private:
 
   auto FindElement(std::string_view key)
   {
-    return std::find_if(container.begin(), container.end(), [key](auto& e){
-        return bool(key == e.key);
-      });
+    return std::find_if(container.begin(), container.end(), [key](auto& e) {
+      return bool(key == e.key);
+    });
   }
 
 public:
@@ -138,12 +136,12 @@ public:
 
       if(iter != End())
       {
-        container.erase( iter );
+        container.erase(iter);
       }
     }
   }
 
-  void Merge( const Dictionary<EntryType>& dictionary )
+  void Merge(const Dictionary<EntryType>& dictionary)
   {
     for(const auto& element : dictionary.container)
     {
@@ -166,7 +164,7 @@ public:
    */
   const EntryType* FindConst(std::string_view key) const
   {
-    if( ! key.empty() )
+    if(!key.empty())
     {
       auto iter = FindElementCaseInsensitive(key);
 
@@ -184,7 +182,7 @@ public:
    */
   EntryType* Find(std::string_view key) const
   {
-    if( ! key.empty() )
+    if(!key.empty())
     {
       auto iter = FindElementCaseInsensitive(key);
 
@@ -209,7 +207,7 @@ public:
     return container.cend();
   }
 
-  void GetKeys( DictionaryKeys& keys ) const
+  void GetKeys(DictionaryKeys& keys) const
   {
     keys.clear();
     for(const auto& element : container)
@@ -224,10 +222,8 @@ public:
   }
 };
 
-
-
-}//Internal
-}//Toolkit
-}//Dali
+} // namespace Internal
+} // namespace Toolkit
+} // namespace Dali
 
 #endif // DALI_TOOLKIT_INTERNAL_BUILDER_DICTIONARY_H

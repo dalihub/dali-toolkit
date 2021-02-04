@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,40 +23,37 @@
 #include <dali/public-api/events/gesture.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/text-enumerations.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
-#include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
+#include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 #include <dali-toolkit/internal/text/text-selectable-control-interface.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class Controller;
 class ControlInterface;
 class EditableControlInterface;
 class View;
 class RenderingController;
 
-  /**
+/**
    * @brief Text selection operations .
    */
-  enum SelectionType
-  {
-    INTERACTIVE        = 0x0000,
-    ALL                = 0x0001,
-    NONE               = 0x0002
-  };
+enum SelectionType
+{
+  INTERACTIVE = 0x0000,
+  ALL         = 0x0001,
+  NONE        = 0x0002
+};
 
 typedef IntrusivePtr<Controller> ControllerPtr;
 
@@ -74,7 +71,6 @@ typedef IntrusivePtr<Controller> ControllerPtr;
 class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface, public HiddenText::Observer
 {
 public: // Enumerated types.
-
   /**
    * @brief Text related operations to be done in the relayout process.
    */
@@ -139,8 +135,8 @@ public: // Enumerated types.
    */
   enum FontSizeType
   {
-    POINT_SIZE,   // The size of font in points.
-    PIXEL_SIZE    // The size of font in pixels.
+    POINT_SIZE, // The size of font in points.
+    PIXEL_SIZE  // The size of font in pixels.
   };
 
   struct NoTextTap
@@ -166,7 +162,6 @@ public: // Enumerated types.
   };
 
 public: // Constructor.
-
   /**
    * @brief Create a new instance of a Controller.
    *
@@ -181,7 +176,7 @@ public: // Constructor.
    *
    * @return A pointer to a new Controller.
    */
-  static ControllerPtr New( ControlInterface* controlInterface );
+  static ControllerPtr New(ControlInterface* controlInterface);
 
   /**
    * @brief Create a new instance of a Controller.
@@ -192,12 +187,11 @@ public: // Constructor.
    *
    * @return A pointer to a new Controller.
    */
-  static ControllerPtr New( ControlInterface* controlInterface,
-                            EditableControlInterface* editableControlInterface,
-                            SelectableControlInterface* selectableControlInterface );
+  static ControllerPtr New(ControlInterface*           controlInterface,
+                           EditableControlInterface*   editableControlInterface,
+                           SelectableControlInterface* selectableControlInterface);
 
 public: // Configure the text controller.
-
   /**
    * @brief Called to enable text input.
    *
@@ -205,14 +199,14 @@ public: // Configure the text controller.
    * @param[in] decorator Used to create cursor, selection handle decorations etc.
    * @param[in] inputMethodContext Used to manager ime.
    */
-  void EnableTextInput( DecoratorPtr decorator, InputMethodContext& inputMethodContext );
+  void EnableTextInput(DecoratorPtr decorator, InputMethodContext& inputMethodContext);
 
   /**
    * @brief Used to switch between bitmap & vector based glyphs
    *
    * @param[in] glyphType The type of glyph; note that metrics for bitmap & vector based glyphs are different.
    */
-  void SetGlyphType( TextAbstraction::GlyphType glyphType );
+  void SetGlyphType(TextAbstraction::GlyphType glyphType);
 
   /**
    * @brief Enables/disables the mark-up processor.
@@ -221,7 +215,7 @@ public: // Configure the text controller.
    *
    * @param[in] enable Whether to enable the mark-up processor.
    */
-  void SetMarkupProcessorEnabled( bool enable );
+  void SetMarkupProcessorEnabled(bool enable);
 
   /**
    * @brief Retrieves whether the mark-up processor is enabled.
@@ -239,7 +233,7 @@ public: // Configure the text controller.
    *
    * @param[in] enable Whether to enable the auto scrolling
    */
-  void SetAutoScrollEnabled( bool enable );
+  void SetAutoScrollEnabled(bool enable);
 
   /**
    * @brief Retrieves whether auto text scrolling is enabled.
@@ -268,7 +262,7 @@ public: // Configure the text controller.
    *
    * @param[in] enable Whether to enable the horizontal scrolling.
    */
-  void SetHorizontalScrollEnabled( bool enable );
+  void SetHorizontalScrollEnabled(bool enable);
 
   /**
    * @brief Retrieves whether the horizontal scrolling is enabled.
@@ -282,7 +276,7 @@ public: // Configure the text controller.
    *
    * @param[in] enable Whether to enable the vertical scrolling.
    */
-  void SetVerticalScrollEnabled( bool enable );
+  void SetVerticalScrollEnabled(bool enable);
 
   /**
    * @brief Retrieves whether the verticall scrolling is enabled.
@@ -296,7 +290,7 @@ public: // Configure the text controller.
    *
    * @param[in] enable Whether to enable the smooth handle panning.
    */
-  void SetSmoothHandlePanEnabled( bool enable );
+  void SetSmoothHandlePanEnabled(bool enable);
 
   /**
    * @brief Retrieves whether the smooth handle panning is enabled.
@@ -310,7 +304,7 @@ public: // Configure the text controller.
    *
    * @param[in] maxCharacters maximum number of characters to be accepted
    */
-  void SetMaximumNumberOfCharacters( Length maxCharacters );
+  void SetMaximumNumberOfCharacters(Length maxCharacters);
 
   /**
    * @brief Sets the maximum number of characters that can be inserted into the TextModel
@@ -325,7 +319,7 @@ public: // Configure the text controller.
    * @note Only editable controls should calls this.
    * @param[in] enabled Whether the cursor should blink or not.
    */
-  void SetEnableCursorBlink( bool enable );
+  void SetEnableCursorBlink(bool enable);
 
   /**
    * @brief Query whether cursor blink is enabled.
@@ -339,7 +333,7 @@ public: // Configure the text controller.
    *
    * @param[in] enable \e true enables the multi-line (by default)
    */
-  void SetMultiLineEnabled( bool enable );
+  void SetMultiLineEnabled(bool enable);
 
   /**
    * @return Whether the multi-line layout is enabled.
@@ -351,7 +345,7 @@ public: // Configure the text controller.
    *
    * @param[in] alignment The horizontal alignment.
    */
-  void SetHorizontalAlignment( HorizontalAlignment::Type alignment );
+  void SetHorizontalAlignment(HorizontalAlignment::Type alignment);
 
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
@@ -363,7 +357,7 @@ public: // Configure the text controller.
    *
    * @param[in] alignment The vertical alignment.
    */
-  void SetVerticalAlignment( VerticalAlignment::Type alignment );
+  void SetVerticalAlignment(VerticalAlignment::Type alignment);
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
@@ -374,7 +368,7 @@ public: // Configure the text controller.
    * @brief Sets the text's wrap mode
    * @param[in] text wrap mode The unit of wrapping
    */
-  void SetLineWrapMode( Text::LineWrap::Mode textWarpMode );
+  void SetLineWrapMode(Text::LineWrap::Mode textWarpMode);
 
   /**
    * @brief Retrieve text wrap mode previously set.
@@ -387,7 +381,7 @@ public: // Configure the text controller.
    *
    * @param[in] enabled Whether to enable the text elide.
    */
-  void SetTextElideEnabled( bool enabled );
+  void SetTextElideEnabled(bool enabled);
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
@@ -414,7 +408,7 @@ public: // Configure the text controller.
    * @param[in] minimum size value.
    * @param[in] type The font size type is point size or pixel size
    */
-  void SetTextFitMinSize( float pointSize, FontSizeType type );
+  void SetTextFitMinSize(float pointSize, FontSizeType type);
 
   /**
    * @brief Retrieves the minimum point size valid for text fit.
@@ -429,7 +423,7 @@ public: // Configure the text controller.
    * @param[in] maximum size value.
    * @param[in] type The font size type is point size or pixel size
    */
-  void SetTextFitMaxSize( float pointSize, FontSizeType type );
+  void SetTextFitMaxSize(float pointSize, FontSizeType type);
 
   /**
    * @brief Retrieves the maximum point size valid for text fit.
@@ -444,7 +438,7 @@ public: // Configure the text controller.
    * @param[in] step size value.
    * @param[in] type The font size type is point size or pixel size
    */
-  void SetTextFitStepSize( float step, FontSizeType type );
+  void SetTextFitStepSize(float step, FontSizeType type);
 
   /**
    * @brief Retrieves the step point size valid for text fit.
@@ -471,7 +465,7 @@ public: // Configure the text controller.
    * @brief Enable or disable the placeholder text elide.
    * @param enabled Whether to enable the placeholder text elide.
    */
-  void SetPlaceholderTextElideEnabled( bool enabled );
+  void SetPlaceholderTextElideEnabled(bool enabled);
 
   /**
    * @brief Whether the placeholder text elide property is enabled.
@@ -483,7 +477,7 @@ public: // Configure the text controller.
    * @brief Enable or disable the text selection.
    * @param[in] enabled Whether to enable the text selection.
    */
-  void SetSelectionEnabled( bool enabled );
+  void SetSelectionEnabled(bool enabled);
 
   /**
    * @brief Whether the text selection is enabled or not.
@@ -495,7 +489,7 @@ public: // Configure the text controller.
    * @brief Enable or disable the text selection using Shift key.
    * @param enabled Whether to enable the text selection using Shift key
    */
-  void SetShiftSelectionEnabled( bool enabled );
+  void SetShiftSelectionEnabled(bool enabled);
 
   /**
    * @brief Whether the text selection using Shift key is enabled or not.
@@ -508,7 +502,7 @@ public: // Configure the text controller.
    *
    * @param[in] enabled Whether to enable the grab handles
    */
-  void SetGrabHandleEnabled( bool enabled );
+  void SetGrabHandleEnabled(bool enabled);
 
   /**
    * @brief Returns whether the grab handles are enabled.
@@ -522,7 +516,7 @@ public: // Configure the text controller.
    *
    * @param[in] enabled Whether to enable the grab handles
    */
-  void SetGrabHandlePopupEnabled( bool enabled );
+  void SetGrabHandlePopupEnabled(bool enabled);
 
   /**
    * @brief Returns whether the grab handles are enabled.
@@ -538,7 +532,7 @@ public: // Configure the text controller.
    *
    * @param[in] passwordInput True if password input is enabled.
    */
-  void SetInputModePassword( bool passwordInput );
+  void SetInputModePassword(bool passwordInput);
 
   /**
    * @brief Returns whether the input mode type is set as password.
@@ -552,7 +546,7 @@ public: // Configure the text controller.
    *
    * @param[in] action The action to do.
    */
-  void SetNoTextDoubleTapAction( NoTextTap::Action action );
+  void SetNoTextDoubleTapAction(NoTextTap::Action action);
 
   /**
    * @brief Retrieves the action when there is a double tap event on top of a text area with no text.
@@ -566,7 +560,7 @@ public: // Configure the text controller.
    *
    * @param[in] action The action to do.
    */
-  void SetNoTextLongPressAction( NoTextTap::Action action );
+  void SetNoTextLongPressAction(NoTextTap::Action action);
 
   /**
    * @brief Retrieves the action when there is a long press event on top of a text area with no text.
@@ -585,7 +579,7 @@ public: // Configure the text controller.
    * Set method underline setting were set by
    * @param[in] bool, true if set by string
    */
-  void UnderlineSetByString( bool setByString );
+  void UnderlineSetByString(bool setByString);
 
   /**
    * @brief Query if shadow settings were provided by string or map
@@ -597,7 +591,7 @@ public: // Configure the text controller.
    * Set method shadow setting were set by
    * @param[in] bool, true if set by string
    */
-  void ShadowSetByString( bool setByString );
+  void ShadowSetByString(bool setByString);
 
   /**
    * @brief Query if outline settings were provided by string or map
@@ -609,7 +603,7 @@ public: // Configure the text controller.
    * Set method outline setting were set by
    * @param[in] bool, true if set by string
    */
-  void OutlineSetByString( bool setByString );
+  void OutlineSetByString(bool setByString);
 
   /**
    * @brief Query if font style settings were provided by string or map
@@ -621,24 +615,23 @@ public: // Configure the text controller.
    * Set method font style setting were set by
    * @param[in] bool, true if set by string
    */
-  void FontStyleSetByString( bool setByString );
+  void FontStyleSetByString(bool setByString);
 
 public: // Update.
-
   /**
    * @brief Replaces any text previously set.
    *
    * @note This will be converted into UTF-32 when stored in the text model.
    * @param[in] text A string of UTF-8 characters.
    */
-  void SetText( const std::string& text );
+  void SetText(const std::string& text);
 
   /**
    * @brief Retrieve any text previously set.
    *
    * @param[out] text A string of UTF-8 characters.
    */
-  void GetText( std::string& text ) const;
+  void GetText(std::string& text) const;
 
   /**
    * @brief Replaces any placeholder text previously set.
@@ -646,7 +639,7 @@ public: // Update.
    * @param[in] type Different placeholder-text can be shown when the control is active/inactive.
    * @param[in] text A string of UTF-8 characters.
    */
-  void SetPlaceholderText( PlaceholderType type, const std::string& text );
+  void SetPlaceholderText(PlaceholderType type, const std::string& text);
 
   /**
    * @brief Retrieve any placeholder text previously set.
@@ -654,54 +647,53 @@ public: // Update.
    * @param[in] type Different placeholder-text can be shown when the control is active/inactive.
    * @param[out] A string of UTF-8 characters.
    */
-  void GetPlaceholderText( PlaceholderType type, std::string& text ) const;
+  void GetPlaceholderText(PlaceholderType type, std::string& text) const;
 
   /**
    * @ brief Update the text after a font change
    * @param[in] newDefaultFont The new font to change to
    */
-  void UpdateAfterFontChange( const std::string& newDefaultFont );
+  void UpdateAfterFontChange(const std::string& newDefaultFont);
 
   /**
    * @brief The method acquires currently selected text
    * @param selectedText variable to place selected text in
    */
-  void RetrieveSelection( std::string& selectedText ) const;
+  void RetrieveSelection(std::string& selectedText) const;
 
   /**
    * @brief The method sets selection in given range
    * @param start index of first character
    * @param end   index of first character after selection
    */
-  void SetSelection( int start, int end );
+  void SetSelection(int start, int end);
 
   /**
    * @brief This method retrieve indexes of current selection
    *
    * @return a pair, where first element is left index of selection and second is the right one
    */
-  std::pair< int, int > GetSelectionIndexes() const;
+  std::pair<int, int> GetSelectionIndexes() const;
 
   /**
    * Place string in system clipboard
    * @param source std::string
    */
-  void CopyStringToClipboard( const std::string& source );
+  void CopyStringToClipboard(const std::string& source);
 
   /**
    * Place currently selected text in system clipboard
    * @param deleteAfterSending flag pointing if text should be deleted after sending to clipboard
    */
-  void SendSelectionToClipboard( bool deleteAfterSending );
+  void SendSelectionToClipboard(bool deleteAfterSending);
 
 public: // Default style & Input style
-
   /**
    * @brief Set the default font family.
    *
    * @param[in] defaultFontFamily The default font family.
    */
-  void SetDefaultFontFamily( const std::string& defaultFontFamily );
+  void SetDefaultFontFamily(const std::string& defaultFontFamily);
 
   /**
    * @brief Retrieve the default font family.
@@ -714,7 +706,7 @@ public: // Default style & Input style
    * @brief Sets the placeholder text font family.
    * @param[in] placeholderTextFontFamily The placeholder text font family.
    */
-  void SetPlaceholderFontFamily( const std::string& placeholderTextFontFamily );
+  void SetPlaceholderFontFamily(const std::string& placeholderTextFontFamily);
 
   /**
    * @brief Retrieves the placeholder text font family.
@@ -728,7 +720,7 @@ public: // Default style & Input style
    *
    * @param[in] weight The font weight.
    */
-  void SetDefaultFontWeight( FontWeight weight );
+  void SetDefaultFontWeight(FontWeight weight);
 
   /**
    * @brief Whether the font's weight has been defined.
@@ -747,7 +739,7 @@ public: // Default style & Input style
    *
    * @param[in] weight The font weight
    */
-  void SetPlaceholderTextFontWeight( FontWeight weight );
+  void SetPlaceholderTextFontWeight(FontWeight weight);
 
   /**
    * @brief Whether the font's weight has been defined.
@@ -768,7 +760,7 @@ public: // Default style & Input style
    *
    * @param[in] width The font width.
    */
-  void SetDefaultFontWidth( FontWidth width );
+  void SetDefaultFontWidth(FontWidth width);
 
   /**
    * @brief Whether the font's width has been defined.
@@ -787,7 +779,7 @@ public: // Default style & Input style
    *
    * @param[in] width The font width
    */
-  void SetPlaceholderTextFontWidth( FontWidth width );
+  void SetPlaceholderTextFontWidth(FontWidth width);
 
   /**
    * @brief Whether the font's width has been defined.
@@ -808,7 +800,7 @@ public: // Default style & Input style
    *
    * @param[in] slant The font slant.
    */
-  void SetDefaultFontSlant( FontSlant slant );
+  void SetDefaultFontSlant(FontSlant slant);
 
   /**
    * @brief Whether the font's slant has been defined.
@@ -827,7 +819,7 @@ public: // Default style & Input style
    *
    * @param[in] slant The font slant
    */
-  void SetPlaceholderTextFontSlant( FontSlant slant );
+  void SetPlaceholderTextFontSlant(FontSlant slant);
 
   /**
    * @brief Whether the font's slant has been defined.
@@ -849,7 +841,7 @@ public: // Default style & Input style
    * @param[in] fontSize The default font size
    * @param[in] type The font size type is point size or pixel size
    */
-  void SetDefaultFontSize( float fontSize, FontSizeType type );
+  void SetDefaultFontSize(float fontSize, FontSizeType type);
 
   /**
    * @brief Retrieve the default point size.
@@ -857,14 +849,14 @@ public: // Default style & Input style
    * @param[in] type The font size type
    * @return The default point size.
    */
-  float GetDefaultFontSize( FontSizeType type ) const;
+  float GetDefaultFontSize(FontSizeType type) const;
 
   /**
    * @brief Set the font size scale.
    *
    * @param[in] scale The font size scale
    */
-  void SetFontSizeScale( float scale );
+  void SetFontSizeScale(float scale);
 
   /**
    * @brief Get the font size scale.
@@ -878,21 +870,21 @@ public: // Default style & Input style
    * @param[in] fontSize The placeholder text font size
    * @param[in] type The font size type is point size or pixel size
    */
-  void SetPlaceholderTextFontSize( float fontSize, FontSizeType type );
+  void SetPlaceholderTextFontSize(float fontSize, FontSizeType type);
 
   /**
    * @brief Retrieves the Placeholder text font size.
    * @param[in] type The font size type
    * @return The placeholder font size
    */
-  float GetPlaceholderTextFontSize( FontSizeType type ) const;
+  float GetPlaceholderTextFontSize(FontSizeType type) const;
 
   /**
    * @brief Sets the text's default color.
    *
    * @param color The default color.
    */
-  void SetDefaultColor( const Vector4& color );
+  void SetDefaultColor(const Vector4& color);
 
   /**
    * @brief Retrieves the text's default color.
@@ -906,7 +898,7 @@ public: // Default style & Input style
    *
    * @param textColor The text color
    */
-  void SetPlaceholderTextColor( const Vector4& textColor );
+  void SetPlaceholderTextColor(const Vector4& textColor);
 
   /**
    * @brief Retrieve the text color
@@ -920,7 +912,7 @@ public: // Default style & Input style
    *
    * @param[in] shadowOffset The shadow offset, 0,0 indicates no shadow.
    */
-  void SetShadowOffset( const Vector2& shadowOffset );
+  void SetShadowOffset(const Vector2& shadowOffset);
 
   /**
    * @brief Retrieve the shadow offset.
@@ -934,7 +926,7 @@ public: // Default style & Input style
    *
    * @param[in] shadowColor The shadow color.
    */
-  void SetShadowColor( const Vector4& shadowColor );
+  void SetShadowColor(const Vector4& shadowColor);
 
   /**
    * @brief Retrieve the shadow color.
@@ -948,7 +940,7 @@ public: // Default style & Input style
    *
    * @param[in] shadowBlurRadius The shadow blur radius, 0,0 indicates no blur.
    */
-  void SetShadowBlurRadius( const float& shadowBlurRadius );
+  void SetShadowBlurRadius(const float& shadowBlurRadius);
 
   /**
    * @brief Retrieve the shadow blur radius.
@@ -962,7 +954,7 @@ public: // Default style & Input style
    *
    * @param[in] color color of underline.
    */
-  void SetUnderlineColor( const Vector4& color );
+  void SetUnderlineColor(const Vector4& color);
 
   /**
    * @brief Retrieve the underline color.
@@ -976,7 +968,7 @@ public: // Default style & Input style
    *
    * @param[in] enabled The underline enabled flag.
    */
-  void SetUnderlineEnabled( bool enabled );
+  void SetUnderlineEnabled(bool enabled);
 
   /**
    * @brief Returns whether the text is underlined or not.
@@ -990,7 +982,7 @@ public: // Default style & Input style
    *
    * @param[in] height The height in pixels of the underline
    */
-  void SetUnderlineHeight( float height );
+  void SetUnderlineHeight(float height);
 
   /**
    * @brief Retrieves the override height of an underline, 0 indicates height is supplied by font metrics
@@ -1004,7 +996,7 @@ public: // Default style & Input style
    *
    * @param[in] color color of outline.
    */
-  void SetOutlineColor( const Vector4& color );
+  void SetOutlineColor(const Vector4& color);
 
   /**
    * @brief Retrieve the outline color.
@@ -1018,7 +1010,7 @@ public: // Default style & Input style
    *
    * @param[in] width The width in pixels of the outline, 0 indicates no outline
    */
-  void SetOutlineWidth( uint16_t width );
+  void SetOutlineWidth(uint16_t width);
 
   /**
    * @brief Retrieves the width of an outline
@@ -1032,7 +1024,7 @@ public: // Default style & Input style
    *
    * @param[in] color color of background.
    */
-  void SetBackgroundColor( const Vector4& color );
+  void SetBackgroundColor(const Vector4& color);
 
   /**
    * @brief Retrieve the background color.
@@ -1046,7 +1038,7 @@ public: // Default style & Input style
    *
    * @param[in] enabled The background enabled flag.
    */
-  void SetBackgroundEnabled( bool enabled );
+  void SetBackgroundEnabled(bool enabled);
 
   /**
    * @brief Returns whether to enable text background or not.
@@ -1062,7 +1054,7 @@ public: // Default style & Input style
    *
    * @param[in] embossProperties The emboss's properties string.
    */
-  void SetDefaultEmbossProperties( const std::string& embossProperties );
+  void SetDefaultEmbossProperties(const std::string& embossProperties);
 
   /**
    * @brief Retrieves the emboss's properties string.
@@ -1078,7 +1070,7 @@ public: // Default style & Input style
    *
    * @param[in] outlineProperties The outline's properties string.
    */
-  void SetDefaultOutlineProperties( const std::string& outlineProperties );
+  void SetDefaultOutlineProperties(const std::string& outlineProperties);
 
   /**
    * @brief Retrieves the outline's properties string.
@@ -1094,7 +1086,7 @@ public: // Default style & Input style
    *
    * @return True if lineSpacing has been updated, false otherwise
    */
-  bool SetDefaultLineSpacing( float lineSpacing );
+  bool SetDefaultLineSpacing(float lineSpacing);
 
   /**
    * @brief Retrieves the default line spacing.
@@ -1110,7 +1102,7 @@ public: // Default style & Input style
    *
    * @return True if lineSize has been updated, false otherwise
    */
-  bool SetDefaultLineSize( float lineSize );
+  bool SetDefaultLineSize(float lineSize);
 
   /**
    * @brief Retrieves the default line size.
@@ -1124,7 +1116,7 @@ public: // Default style & Input style
    *
    * @param[in] color The input text's color.
    */
-  void SetInputColor( const Vector4& color );
+  void SetInputColor(const Vector4& color);
 
   /**
    * @brief Retrieves the input text's color.
@@ -1138,7 +1130,7 @@ public: // Default style & Input style
    *
    * @param[in] fontFamily The text's font family name.
    */
-  void SetInputFontFamily( const std::string& fontFamily );
+  void SetInputFontFamily(const std::string& fontFamily);
 
   /**
    * @brief Retrieves the input text's font family name.
@@ -1152,7 +1144,7 @@ public: // Default style & Input style
    *
    * @param[in] weight The input font's weight.
    */
-  void SetInputFontWeight( FontWeight weight );
+  void SetInputFontWeight(FontWeight weight);
 
   /**
    * @return Whether the font's weight has been defined.
@@ -1171,7 +1163,7 @@ public: // Default style & Input style
    *
    * @param[in] width The input font's width.
    */
-  void SetInputFontWidth( FontWidth width );
+  void SetInputFontWidth(FontWidth width);
 
   /**
    * @return Whether the font's width has been defined.
@@ -1190,7 +1182,7 @@ public: // Default style & Input style
    *
    * @param[in] slant The input font's slant.
    */
-  void SetInputFontSlant( FontSlant slant );
+  void SetInputFontSlant(FontSlant slant);
 
   /**
    * @return Whether the font's slant has been defined.
@@ -1209,7 +1201,7 @@ public: // Default style & Input style
    *
    * @param[in] size The input font's point size.
    */
-  void SetInputFontPointSize( float size );
+  void SetInputFontPointSize(float size);
 
   /**
    * @brief Retrieves the input font's point size.
@@ -1223,7 +1215,7 @@ public: // Default style & Input style
    *
    * @param[in] lineSpacing The line spacing.
    */
-  void SetInputLineSpacing( float lineSpacing );
+  void SetInputLineSpacing(float lineSpacing);
 
   /**
    * @brief Retrieves the input line spacing.
@@ -1239,7 +1231,7 @@ public: // Default style & Input style
    *
    * @param[in] shadowProperties The shadow's properties string.
    */
-  void SetInputShadowProperties( const std::string& shadowProperties );
+  void SetInputShadowProperties(const std::string& shadowProperties);
 
   /**
    * @brief Retrieves the input shadow's properties string.
@@ -1255,7 +1247,7 @@ public: // Default style & Input style
    *
    * @param[in] underlineProperties The underline's properties string.
    */
-  void SetInputUnderlineProperties( const std::string& underlineProperties );
+  void SetInputUnderlineProperties(const std::string& underlineProperties);
 
   /**
    * @brief Retrieves the input underline's properties string.
@@ -1271,7 +1263,7 @@ public: // Default style & Input style
    *
    * @param[in] embossProperties The emboss's properties string.
    */
-  void SetInputEmbossProperties( const std::string& embossProperties );
+  void SetInputEmbossProperties(const std::string& embossProperties);
 
   /**
    * @brief Retrieves the input emboss's properties string.
@@ -1287,7 +1279,7 @@ public: // Default style & Input style
    *
    * @param[in] outlineProperties The outline's properties string.
    */
-  void SetInputOutlineProperties( const std::string& outlineProperties );
+  void SetInputOutlineProperties(const std::string& outlineProperties);
 
   /**
    * @brief Retrieves the input outline's properties string.
@@ -1301,10 +1293,9 @@ public: // Default style & Input style
    *
    * @param[in] controlInterface The control's interface.
    */
-  void SetControlInterface( ControlInterface* controlInterface );
+  void SetControlInterface(ControlInterface* controlInterface);
 
 public: // Queries & retrieves.
-
   /**
    * @brief Return the layout engine.
    *
@@ -1327,26 +1318,26 @@ public: // Queries & retrieves.
   /**
    * @copydoc Control::GetHeightForWidth()
    */
-  float GetHeightForWidth( float width );
+  float GetHeightForWidth(float width);
 
   /**
    * @brief Calculates the point size for text for given layout()
    */
-  void FitPointSizeforLayout( Size layoutSize );
+  void FitPointSizeforLayout(Size layoutSize);
 
   /**
    * @brief Checks if the point size fits within the layout size.
    *
    * @return Whether the point size fits within the layout size.
    */
-  bool CheckForTextFit( float pointSize, Size& layoutSize );
+  bool CheckForTextFit(float pointSize, Size& layoutSize);
 
   /**
    * @brief Retrieves the text's number of lines for a given width.
    * @param[in] width The width of the text's area.
    * @ return The number of lines.
    */
-  int GetLineCount( float width );
+  int GetLineCount(float width);
 
   /**
    * @brief Retrieves the text's model.
@@ -1372,31 +1363,31 @@ public: // Queries & retrieves.
    *
    * @return Whether the text scroll position is changed or not after last update.
    */
-  bool GetTextScrollInfo( float& scrollPosition, float& controlHeight, float& layoutHeight );
+  bool GetTextScrollInfo(float& scrollPosition, float& controlHeight, float& layoutHeight);
 
   /**
    * @brief Used to set the hidden input option
    */
-  void SetHiddenInputOption( const Property::Map& options );
+  void SetHiddenInputOption(const Property::Map& options);
 
   /**
    * @brief Used to get the hidden input option
    */
-  void GetHiddenInputOption( Property::Map& options );
+  void GetHiddenInputOption(Property::Map& options);
 
   /**
    * @brief Sets the Placeholder Properties.
    *
    * @param[in] map The placeholder property map
    */
-  void SetPlaceholderProperty( const Property::Map& map );
+  void SetPlaceholderProperty(const Property::Map& map);
 
   /**
    * @brief Retrieves the Placeholder Property map.
    *
    * @param[out] map The property map
    */
-  void GetPlaceholderProperty( Property::Map& map );
+  void GetPlaceholderProperty(Property::Map& map);
 
   /**
    * @brief Checks text direction.
@@ -1414,7 +1405,7 @@ public: // Queries & retrieves.
    * @brief Sets vertical line alignment
    * @param[in] alignment The vertical line alignment for the text
    */
-  void SetVerticalLineAlignment( Toolkit::DevelText::VerticalLineAlignment::Type alignment );
+  void SetVerticalLineAlignment(Toolkit::DevelText::VerticalLineAlignment::Type alignment);
 
   /**
    * @brief Retrieves ignoreSpaceAfterText value from model
@@ -1426,7 +1417,7 @@ public: // Queries & retrieves.
    * @brief Sets ignoreSpaceAfterText value to model
    * @param[in] ignore The value of ignoreSpacesAfterText for the text
    */
-  void SetIgnoreSpacesAfterText( bool ignore );
+  void SetIgnoreSpacesAfterText(bool ignore);
 
   /**
    * @brief Retrieves matchSystemLanguageDirection value from model
@@ -1438,13 +1429,13 @@ public: // Queries & retrieves.
    * @brief Sets matchSystemLanguageDirection value to model
    * @param[in] match The value of matchSystemLanguageDirection for the text
    */
-  void SetMatchSystemLanguageDirection( bool match );
+  void SetMatchSystemLanguageDirection(bool match);
 
   /**
    * @brief Sets layoutDirection value
    * @param[in] layoutDirection The value of system language direction
    */
-  void SetLayoutDirection( Dali::LayoutDirection::Type layoutDirection );
+  void SetLayoutDirection(Dali::LayoutDirection::Type layoutDirection);
 
   /**
    * @brief Retrieves if showing real text or not.
@@ -1453,7 +1444,6 @@ public: // Queries & retrieves.
   bool IsShowingRealText() const;
 
 public: // Relayout.
-
   /**
    * @brief Triggers a relayout which updates View (if necessary).
    *
@@ -1463,7 +1453,7 @@ public: // Relayout.
    *
    * @return Whether the text model or decorations were updated.
    */
-  UpdateTextType Relayout( const Size& size, Dali::LayoutDirection::Type layoutDirection = Dali::LayoutDirection::LEFT_TO_RIGHT );
+  UpdateTextType Relayout(const Size& size, Dali::LayoutDirection::Type layoutDirection = Dali::LayoutDirection::LEFT_TO_RIGHT);
 
   /**
    * @brief Request a relayout using the ControlInterface.
@@ -1471,7 +1461,6 @@ public: // Relayout.
   void RequestRelayout();
 
 public: // Input style change signals.
-
   /**
    * @return Whether the queue of input style changed signals is empty.
    */
@@ -1486,7 +1475,6 @@ public: // Input style change signals.
   void ProcessInputStyleChangedSignals();
 
 public: // Text-input Event Queuing.
-
   /**
    * @brief Called by editable UI controls when keyboard focus is gained.
    */
@@ -1503,7 +1491,7 @@ public: // Text-input Event Queuing.
    * @param[in] event The key event.
    * @param[in] type Used to distinguish between regular key events and InputMethodContext events.
    */
-  bool KeyEvent( const Dali::KeyEvent& event );
+  bool KeyEvent(const Dali::KeyEvent& event);
 
   /**
    * @brief Called by editable UI controls when a tap gesture occurs.
@@ -1511,7 +1499,7 @@ public: // Text-input Event Queuing.
    * @param[in] x The x position relative to the top-left of the parent control.
    * @param[in] y The y position relative to the top-left of the parent control.
    */
-  void TapEvent( unsigned int tapCount, float x, float y );
+  void TapEvent(unsigned int tapCount, float x, float y);
 
   /**
    * @brief Called by editable UI controls when a pan gesture occurs.
@@ -1519,7 +1507,7 @@ public: // Text-input Event Queuing.
    * @param[in] state The state of the gesture.
    * @param[in] displacement This distance panned since the last pan gesture.
    */
-  void PanEvent( GestureState state, const Vector2& displacement );
+  void PanEvent(GestureState state, const Vector2& displacement);
 
   /**
    * @brief Called by editable UI controls when a long press gesture occurs.
@@ -1528,7 +1516,7 @@ public: // Text-input Event Queuing.
    * @param[in] x The x position relative to the top-left of the parent control.
    * @param[in] y The y position relative to the top-left of the parent control.
    */
-  void LongPressEvent( GestureState state, float x, float y );
+  void LongPressEvent(GestureState state, float x, float y);
 
   /**
    * @brief Used to get the Primary cursor position.
@@ -1543,7 +1531,7 @@ public: // Text-input Event Queuing.
    * @param[in] index for the Primary cursor position.
    * @return[in] true if cursor position changed, false otherwise.
    */
-  bool SetPrimaryCursorPosition( CharacterIndex index );
+  bool SetPrimaryCursorPosition(CharacterIndex index);
 
   /**
    * @brief Creates a selection event.
@@ -1554,12 +1542,12 @@ public: // Text-input Event Queuing.
    * @param[in] y The y position relative to the top-left of the parent control.
    * @param[in] selection type like the whole text is selected or unselected.
    */
-  void SelectEvent( float x, float y, SelectionType selection );
+  void SelectEvent(float x, float y, SelectionType selection);
 
   /**
    * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
    */
-  void SetTextSelectionRange(const uint32_t *start, const uint32_t *end);
+  void SetTextSelectionRange(const uint32_t* start, const uint32_t* end);
 
   /**
    * @copydoc Text::SelectableControlInterface::GetTextSelectionRange()
@@ -1589,12 +1577,12 @@ public: // Text-input Event Queuing.
   /**
    * @copydoc Text::EditableControlInterface::SetEditable()
    */
-  virtual void SetEditable( bool editable );
+  virtual void SetEditable(bool editable);
 
   /**
    * @copydoc Dali::Toolkit::Internal::TextEditor::ScrollBy()
    */
-  virtual void ScrollBy( Vector2 scroll );
+  virtual void ScrollBy(Vector2 scroll);
 
   /**
    * @copydoc Dali::Toolkit::Internal::TextEditor::GetHorizontalScrollPosition()
@@ -1613,7 +1601,7 @@ public: // Text-input Event Queuing.
    * @param[in] inputMethodContextEvent The event received.
    * @return A data struture indicating if update is needed, cursor position and current text.
    */
-  InputMethodContext::CallbackData OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent );
+  InputMethodContext::CallbackData OnInputMethodContextEvent(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
 
   /**
    * @brief Event from Clipboard notifying an Item has been selected for pasting
@@ -1639,7 +1627,7 @@ public: // Text-input Event Queuing.
    *
    * @param[in] cursorIndex Where to place the cursor.
    */
-  void ResetCursorPosition( CharacterIndex cursorIndex );
+  void ResetCursorPosition(CharacterIndex cursorIndex);
 
   /**
    * @brief The method acquires current position of cursor
@@ -1648,51 +1636,47 @@ public: // Text-input Event Queuing.
   CharacterIndex GetCursorPosition();
 
 protected: // Inherit from Text::Decorator::ControllerInterface.
-
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::GetTargetSize()
    */
-  void GetTargetSize( Vector2& targetSize ) override;
+  void GetTargetSize(Vector2& targetSize) override;
 
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::AddDecoration()
    */
-  void AddDecoration( Actor& actor, bool needsClipping ) override;
+  void AddDecoration(Actor& actor, bool needsClipping) override;
 
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::DecorationEvent()
    */
-  void DecorationEvent( HandleType handle, HandleState state, float x, float y ) override;
+  void DecorationEvent(HandleType handle, HandleState state, float x, float y) override;
 
 protected: // Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
-
   /**
    * @copydoc Dali::Toolkit::TextSelectionPopup::TextPopupButtonCallbackInterface::TextPopupButtonTouched()
    */
-  void TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button ) override;
+  void TextPopupButtonTouched(Dali::Toolkit::TextSelectionPopup::Buttons button) override;
 
 protected: // Inherit from HiddenText.
-
   /**
    * @brief Invoked from HiddenText when showing time of the last character was expired
    */
   void DisplayTimeExpired() override;
 
 private: // Update.
-
   /**
    * @brief Called by editable UI controls when key events are received.
    *
    * @param[in] text The text to insert.
    * @param[in] type Used to distinguish between regular key events and InputMethodContext events.
    */
-  void InsertText( const std::string& text, InsertType type );
+  void InsertText(const std::string& text, InsertType type);
 
   /**
    * @brief Paste given string into Text model
    * @param[in] stringToPaste this string will be inserted into the text model
    */
-  void PasteText( const std::string& stringToPaste );
+  void PasteText(const std::string& stringToPaste);
 
   /**
    * @brief Remove a given number of characters
@@ -1706,9 +1690,9 @@ private: // Update.
    * @param[in] type Whether to update the input style.
    * @return True if the remove was successful.
    */
-  bool RemoveText( int cursorOffset,
-                   int numberOfCharacters,
-                   UpdateInputStyleType type  );
+  bool RemoveText(int                  cursorOffset,
+                  int                  numberOfCharacters,
+                  UpdateInputStyleType type);
 
   /**
    * @brief Checks if text is selected and if so removes it.
@@ -1717,7 +1701,6 @@ private: // Update.
   bool RemoveSelectedText();
 
 private: // Relayout.
-
   /**
    * @brief Lays-out the text.
    *
@@ -1727,19 +1710,18 @@ private: // Relayout.
    * @param[in] operations The layout operations which need to be done.
    * @param[out] layoutSize The size of the laid-out text.
    */
-  bool DoRelayout( const Size& size,
-                   OperationsMask operations,
-                   Size& layoutSize );
+  bool DoRelayout(const Size&    size,
+                  OperationsMask operations,
+                  Size&          layoutSize);
 
   /**
    * @brief Calulates the vertical offset to align the text inside the bounding box.
    *
    * @param[in] size The size of the bounding box.
    */
-  void CalculateVerticalOffset( const Size& size );
+  void CalculateVerticalOffset(const Size& size);
 
 private: // Events.
-
   /**
    * @brief Process queued events which modify the model.
    */
@@ -1766,10 +1748,9 @@ private: // Events.
    * @param[in] keyCode The keycode for the key pressed
    * @return True if a character was deleted.
    */
-  bool DeleteEvent( int keyCode );
+  bool DeleteEvent(int keyCode);
 
 private: // Helpers.
-
   /**
    * @brief Used to remove the text included the placeholder text.
    */
@@ -1796,7 +1777,6 @@ private: // Helpers.
   void ResetScrollPosition();
 
 private: // Private contructors & copy operator.
-
   /**
    * @brief Private constructor.
    */
@@ -1805,34 +1785,31 @@ private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
    */
-  Controller( ControlInterface* controlInterface );
+  Controller(ControlInterface* controlInterface);
 
   /**
    * @brief Private constructor.
    */
-  Controller( ControlInterface* controlInterface,
-              EditableControlInterface* editableControlInterface,
-              SelectableControlInterface* selectableControlInterface );
+  Controller(ControlInterface*           controlInterface,
+             EditableControlInterface*   editableControlInterface,
+             SelectableControlInterface* selectableControlInterface);
 
   // Undefined
-  Controller( const Controller& handle );
+  Controller(const Controller& handle);
 
   // Undefined
-  Controller& operator=( const Controller& handle );
+  Controller& operator=(const Controller& handle);
 
 protected: // Destructor.
-
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~Controller();
 
 public:
-
   struct Impl; ///< Made public for testing purposes
 
 private:
-
   struct EventHandler;
   struct InputFontHandler;
   struct PlaceholderHandler;

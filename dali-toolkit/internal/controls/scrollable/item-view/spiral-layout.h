@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SPIRAL_LAYOUT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,12 @@
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
-
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class SpiralLayout;
 
 typedef IntrusivePtr<SpiralLayout> SpiralLayoutPtr;
@@ -42,7 +38,6 @@ typedef IntrusivePtr<SpiralLayout> SpiralLayoutPtr;
 class SpiralLayout : public ItemLayout
 {
 public:
-
   /**
    * Create a new spiral layout
    */
@@ -139,7 +134,6 @@ public:
   float GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) override;
 
 private:
-
   /**
    * @copydoc ItemLayout::GetMinimumLayoutPosition()
    */
@@ -168,7 +162,7 @@ private:
   /**
    * @copydoc ItemLayout::GetDefaultItemSize()
    */
-  void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const override;
+  void GetDefaultItemSize(unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize) const override;
 
   /**
    * @copydoc ItemLayout::GetScrollDirection()
@@ -178,30 +172,27 @@ private:
   /**
    * @copydoc ItemLayout::ApplyConstraints()
    */
-  void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor ) override;
+  void ApplyConstraints(Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor) override;
 
   /**
    * @copydoc ItemLayout::GetItemPosition()
    */
-  Vector3 GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const override;
+  Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const override;
 
 protected:
-
   /**
    * Protected constructor; see also SpiralLayout::New()
    */
   SpiralLayout();
 
 private:
+  // Undefined
+  SpiralLayout(const SpiralLayout& spiralLayout);
 
   // Undefined
-  SpiralLayout( const SpiralLayout& spiralLayout );
-
-  // Undefined
-  SpiralLayout& operator=( const SpiralLayout& spiralLayout );
+  SpiralLayout& operator=(const SpiralLayout& spiralLayout);
 
 private:
-
   struct Impl;
   Impl* mImpl;
 };

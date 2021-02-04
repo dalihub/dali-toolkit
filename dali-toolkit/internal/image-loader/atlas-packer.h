@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ATLAS_PACKER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,17 @@
  * limitations under the License.
  */
 
-#include <stdint.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/uint-16-pair.h>
+#include <stdint.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * Binary space tree based bin packing algorithm.
  * It is initialised with a fixed width and height and will fit each block into the first node where it fits
@@ -39,11 +36,10 @@ namespace Internal
 class AtlasPacker
 {
 public:
-
   /**
    * rectangular area (x,y,width,height)
    */
-  typedef uint32_t SizeType;
+  typedef uint32_t       SizeType;
   typedef Rect<SizeType> RectArea;
 
   /**
@@ -51,12 +47,12 @@ public:
    */
   struct Node
   {
-    Node( Node* parent, SizeType x, SizeType y, SizeType width, SizeType height );
+    Node(Node* parent, SizeType x, SizeType y, SizeType width, SizeType height);
 
     RectArea rectArea;
-    Node* parent;
-    Node* child[2];
-    bool occupied;
+    Node*    parent;
+    Node*    child[2];
+    bool     occupied;
   };
 
   /**
@@ -65,7 +61,7 @@ public:
    * @param[in] atlasWidth The width of the atlas.
    * @param[in] atlasHeight The height of the atlas.
    */
-  AtlasPacker( SizeType atlasWidth, SizeType atlasHeight );
+  AtlasPacker(SizeType atlasWidth, SizeType atlasHeight);
 
   /**
    * Destructor
@@ -81,8 +77,7 @@ public:
    * @param[out] packPositionY The y coordinate of the position to pack the block.
    * @return True if there are room for this block, false otherwise.
    */
-  bool Pack( SizeType blockWidth, SizeType blockHeight,
-             SizeType& packPositionX, SizeType& packPositionY);
+  bool Pack(SizeType blockWidth, SizeType blockHeight, SizeType& packPositionX, SizeType& packPositionY);
 
   /**
    * Delete the block.
@@ -92,7 +87,7 @@ public:
    * @param[in] blockWidth The width of the block to delete.
    * @param[in] blockHeight The height of the block to delete.
    */
-  void DeleteBlock( SizeType packPositionX, SizeType packPositionY, SizeType blockWidth, SizeType blockHeight );
+  void DeleteBlock(SizeType packPositionX, SizeType packPositionY, SizeType blockWidth, SizeType blockHeight);
 
   /**
    * Query how much empty space left.
@@ -107,10 +102,9 @@ public:
    * @param[out] packPositions The packing position of each block.
    * @return The required size to accommodate all the blocks.
    */
-  static Uint16Pair GroupPack( const Dali::Vector<Uint16Pair>& blockSizes, Dali::Vector<Uint16Pair>& packPositions );
+  static Uint16Pair GroupPack(const Dali::Vector<Uint16Pair>& blockSizes, Dali::Vector<Uint16Pair>& packPositions);
 
 private:
-
   /*
    * Search the node which can pack the block with given size.
    *
@@ -120,7 +114,7 @@ private:
    * @return The poniter pointing to node that can pack the block.
    *          If it is NULL, there are no room in the subtree to pack the block.
    */
-  Node* InsertNode( Node* root, SizeType blockWidth, SizeType blockHeight );
+  Node* InsertNode(Node* root, SizeType blockWidth, SizeType blockHeight);
 
   /**
    * Split the node into two to fit the block width/size.
@@ -129,7 +123,7 @@ private:
    * @param[in] blockWidth The width of the block to pack.
    * @param[in] blockHeight The height of the block to pack.
    */
-  void SplitNode( Node* node, SizeType blockWidth, SizeType blockHeight );
+  void SplitNode(Node* node, SizeType blockWidth, SizeType blockHeight);
 
   /**
    * Search the node at the given position and with the given size.
@@ -140,21 +134,21 @@ private:
    * @param[in] blockWidth The width of the block.
    * @param[in] blockHeight The height of the block.
    */
-  Node* SearchNode( Node* node, SizeType packPositionX, SizeType packPositionY, SizeType blockWidth, SizeType blockHeight  );
+  Node* SearchNode(Node* node, SizeType packPositionX, SizeType packPositionY, SizeType blockWidth, SizeType blockHeight);
 
   /**
    * Merge the rect of the node to non-occupied area.
    *
    * @param[in] node The node to me merged to the non-occupied area
    */
-  void MergeToNonOccupied( Node* node );
+  void MergeToNonOccupied(Node* node);
 
   /**
    * Delete a node and its subtree.
    *
    * @parm[in] node The node to delete.
    */
-  void DeleteNode( Node* node );
+  void DeleteNode(Node* node);
 
   /**
    * Pack a block into the atlas. If there is no enough room, grow the partition tree.
@@ -164,8 +158,7 @@ private:
    * @param[out] packPositionX The x coordinate of the position to pack the block.
    * @param[out] packPositionY The y coordinate of the position to pack the block.
    */
-  void GrowPack( SizeType blockWidth, SizeType blockHeight,
-                 SizeType& packPositionX, SizeType& packPositionY );
+  void GrowPack(SizeType blockWidth, SizeType blockHeight, SizeType& packPositionX, SizeType& packPositionY);
 
   /**
    * Add extra node into the partition tree to accommodate the given block.
@@ -173,21 +166,18 @@ private:
    * @param[in] blockWidth The width of the block to pack.
    * @param[in] blockHeight The height of the block to pack.
    */
-  void GrowNode( SizeType blockWidth, SizeType blockHeight );
+  void GrowNode(SizeType blockWidth, SizeType blockHeight);
 
   // Undefined
-  AtlasPacker( const AtlasPacker& atlasPacker);
+  AtlasPacker(const AtlasPacker& atlasPacker);
 
   // Undefined
-  AtlasPacker& operator=( const AtlasPacker& atlasPacker );
+  AtlasPacker& operator=(const AtlasPacker& atlasPacker);
 
 private:
-
-  Node* mRoot; ///< The root of the binary space tree
+  Node*        mRoot; ///< The root of the binary space tree
   unsigned int mAvailableArea;
-
 };
-
 
 } // namespace Internal
 

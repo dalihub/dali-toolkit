@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_ATLAS_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
-#include <dali/devel-api/common/owner-container.h>
-#include <dali/devel-api/common/owner-container.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
@@ -35,20 +34,17 @@ class EventThreadCallback;
 
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class ImageAtlas : public BaseObject, public ConnectionTracker
 {
 public:
-
   typedef Toolkit::ImageAtlas::SizeType SizeType;
 
   /**
    * @copydoc ImageAtlas::PackToAtlas( const std::vector<PixelData>&, Dali::Vector<Vector4>& )
    */
-  static Texture PackToAtlas( const std::vector<PixelData>& pixelData, Dali::Vector<Vector4>& textureRects  );
+  static Texture PackToAtlas(const std::vector<PixelData>& pixelData, Dali::Vector<Vector4>& textureRects);
 
   /**
    * Constructor
@@ -56,12 +52,12 @@ public:
    * @param [in] height         The atlas height in pixels.
    * @param [in] pixelFormat    The pixel format.
    */
-  ImageAtlas( SizeType width, SizeType height, Pixel::Format pixelFormat );
+  ImageAtlas(SizeType width, SizeType height, Pixel::Format pixelFormat);
 
   /**
    * @copydoc Toolkit::ImageAtlas::New
    */
-  static IntrusivePtr<ImageAtlas> New( SizeType width, SizeType height, Pixel::Format pixelFormat );
+  static IntrusivePtr<ImageAtlas> New(SizeType width, SizeType height, Pixel::Format pixelFormat);
 
   /**
    * @copydoc Toolkit::ImageAtlas::GetAtlas
@@ -76,81 +72,79 @@ public:
   /**
    * @copydoc Toolkit::ImageAtlas::SetBrokenImage
    */
-  void SetBrokenImage( const std::string& brokenImageUrl );
+  void SetBrokenImage(const std::string& brokenImageUrl);
 
   /**
    * @copydoc Toolkit::ImageAtlas::Upload( Vector4&, const std::string&, ImageDimensions,FittingMode::Type, bool )
    */
-  bool Upload( Vector4& textureRect,
-               const std::string& url,
-               ImageDimensions size,
-               FittingMode::Type fittingMode,
-               bool orientationCorrection,
-               AtlasUploadObserver* atlasUploadObserver );
+  bool Upload(Vector4&             textureRect,
+              const std::string&   url,
+              ImageDimensions      size,
+              FittingMode::Type    fittingMode,
+              bool                 orientationCorrection,
+              AtlasUploadObserver* atlasUploadObserver);
 
   /**
    * @copydoc Toolkit::ImageAtlas::Upload( Vector4&, PixelData )
    */
-  bool Upload( Vector4& textureRect, PixelData pixelData );
+  bool Upload(Vector4& textureRect, PixelData pixelData);
 
   /**
    * @copydoc Toolkit::ImageAtlas::Remove
    */
-  void Remove( const Vector4& textureRect );
+  void Remove(const Vector4& textureRect);
 
   /**
    * Resets the destroying observer pointer so that we know not to call methods of this object any more.
    */
-  void ObserverDestroyed( AtlasUploadObserver* observer );
+  void ObserverDestroyed(AtlasUploadObserver* observer);
 
 protected:
-
   /**
    * Destructor
    */
   ~ImageAtlas();
 
 private:
-
   /**
    * @copydoc PixelDataRequester::ProcessPixels
    */
-  void UploadToAtlas( uint32_t id, PixelData pixelData );
+  void UploadToAtlas(uint32_t id, PixelData pixelData);
 
   /**
    * Upload broken image
    *
    * @param[in] area The pixel area for uploading.
    */
-  void UploadBrokenImage( const Rect<unsigned int>& area );
+  void UploadBrokenImage(const Rect<unsigned int>& area);
 
   // Undefined
-  ImageAtlas( const ImageAtlas& imageAtlas);
+  ImageAtlas(const ImageAtlas& imageAtlas);
 
   // Undefined
-  ImageAtlas& operator=( const ImageAtlas& imageAtlas );
+  ImageAtlas& operator=(const ImageAtlas& imageAtlas);
 
 private:
-
   /**
    * Each loading task( identified with an ID ) is associated with a rect region for packing the loaded pixel data into the atlas,
    * and an AtlasUploadObserver whose UploadCompleted method should get executed once the sub texture is ready.
    */
   struct LoadingTaskInfo
   {
-    LoadingTaskInfo( unsigned short loadTaskId,
-                     unsigned int packPositionX,
-                     unsigned int packPositionY,
-                     unsigned int width,
-                     unsigned int height,
-                     AtlasUploadObserver* observer )
-    : loadTaskId( loadTaskId ),
-      packRect( packPositionX, packPositionY, width, height ),
-      observer( observer )
-    {}
+    LoadingTaskInfo(unsigned short       loadTaskId,
+                    unsigned int         packPositionX,
+                    unsigned int         packPositionY,
+                    unsigned int         width,
+                    unsigned int         height,
+                    AtlasUploadObserver* observer)
+    : loadTaskId(loadTaskId),
+      packRect(packPositionX, packPositionY, width, height),
+      observer(observer)
+    {
+    }
 
-    unsigned short loadTaskId;
-    Rect<unsigned int> packRect;
+    unsigned short       loadTaskId;
+    Rect<unsigned int>   packRect;
     AtlasUploadObserver* observer;
   };
 
@@ -164,24 +158,22 @@ private:
   float                     mWidth;
   float                     mHeight;
   Pixel::Format             mPixelFormat;
-
-
 };
 
 } // namespace Internal
 
-inline const Internal::ImageAtlas& GetImplementation( const Toolkit::ImageAtlas& imageAtlas )
+inline const Internal::ImageAtlas& GetImplementation(const Toolkit::ImageAtlas& imageAtlas)
 {
-  DALI_ASSERT_ALWAYS( imageAtlas && "ImageAtlas handle is empty" );
+  DALI_ASSERT_ALWAYS(imageAtlas && "ImageAtlas handle is empty");
 
   const BaseObject& handle = imageAtlas.GetBaseObject();
 
   return static_cast<const Internal::ImageAtlas&>(handle);
 }
 
-inline Internal::ImageAtlas& GetImplementation( Toolkit::ImageAtlas& imageAtlas )
+inline Internal::ImageAtlas& GetImplementation(Toolkit::ImageAtlas& imageAtlas)
 {
-  DALI_ASSERT_ALWAYS( imageAtlas && "ImageAtlas handle is empty" );
+  DALI_ASSERT_ALWAYS(imageAtlas && "ImageAtlas handle is empty");
 
   BaseObject& handle = imageAtlas.GetBaseObject();
 

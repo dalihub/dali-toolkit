@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_PAGE_TURN_LANDSCAPE_VIEW_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +24,17 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class PageTurnLandscapeView : public PageTurnView
 {
 public:
-
   /**
    * @copydoc Toolkit::PageTurnLandscapeView::New( PageFactory&, const Vector2& )
    */
-  static Toolkit::PageTurnLandscapeView New( PageFactory& pageFactory, const Vector2& viewPageSize );
+  static Toolkit::PageTurnLandscapeView New(PageFactory& pageFactory, const Vector2& viewPageSize);
 
 protected:
   /**
@@ -47,7 +43,7 @@ protected:
    * @param[in] pageFactory The factory which provides image to PageTurnView as the page content.
    * @param[in] viewPageSize The size of the page
    */
-  PageTurnLandscapeView( PageFactory& pageFactory, const Vector2& viewPageSize );
+  PageTurnLandscapeView(PageFactory& pageFactory, const Vector2& viewPageSize);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -55,7 +51,6 @@ protected:
   virtual ~PageTurnLandscapeView();
 
 protected: // From PageTurnView
-
   /**
    * @copydoc PageTurnView::OnPageTurnViewInitialize
    */
@@ -64,26 +59,24 @@ protected: // From PageTurnView
   /**
    * @copydoc PageTurnView::OnAddPage
    */
-  void OnAddPage( Actor newPage, bool isLeftSide ) override;
+  void OnAddPage(Actor newPage, bool isLeftSide) override;
 
   /**
    * @copydoc PageTurnView::SetPanPosition
    */
-  Vector2 SetPanPosition( const Vector2& gesturePosition ) override;
+  Vector2 SetPanPosition(const Vector2& gesturePosition) override;
 
   /**
    * @copydoc PageTurnView::SetPanActor
    */
-  void SetPanActor( const Vector2& panPosition ) override;
+  void SetPanActor(const Vector2& panPosition) override;
 
 private:
-
   //Undefined
-  PageTurnLandscapeView( const PageTurnLandscapeView& );
+  PageTurnLandscapeView(const PageTurnLandscapeView&);
 
   //undefined
   PageTurnLandscapeView& operator=(const PageTurnLandscapeView& rhs);
-
 };
 
 } // namespace Internal

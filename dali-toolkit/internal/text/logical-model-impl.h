@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,20 +28,17 @@
 #include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/embedded-item.h>
-#include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
+#include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/paragraph-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class LogicalModel;
 typedef IntrusivePtr<LogicalModel> LogicalModelPtr;
 struct InputStyle;
@@ -55,7 +52,6 @@ struct InputStyle;
 class LogicalModel : public RefObject
 {
 public:
-
   /**
    * @brief Create a new instance of a LogicalModel.
    *
@@ -72,7 +68,7 @@ public:
    *
    * @return The character's script.
    */
-  Script GetScript( CharacterIndex characterIndex ) const;
+  Script GetScript(CharacterIndex characterIndex) const;
 
   // Bidirectional support interface.
 
@@ -85,7 +81,7 @@ public:
    *
    * @return The character's direction.
    */
-  CharacterDirection GetCharacterDirection( CharacterIndex characterIndex ) const;
+  CharacterDirection GetCharacterDirection(CharacterIndex characterIndex) const;
 
   // Visual <--> Logical conversion tables.
 
@@ -99,7 +95,7 @@ public:
    *
    * @return The logical cursor index.
    */
-  CharacterIndex GetLogicalCursorIndex( CharacterIndex visualCursorIndex );
+  CharacterIndex GetLogicalCursorIndex(CharacterIndex visualCursorIndex);
 
   /**
    * @brief Retrieves the logical character index for the given visual character index.
@@ -111,7 +107,7 @@ public:
    *
    * @return The logical character index.
    */
-  CharacterIndex GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex );
+  CharacterIndex GetLogicalCharacterIndex(CharacterIndex visualCharacterIndex);
 
   /**
    * @brief Fetch the bidirectional line info for the given character.
@@ -122,7 +118,7 @@ public:
    *
    * @return @e true if the given @e character is in a bidirectional line.
    */
-  bool FetchBidirectionalLineInfo( CharacterIndex characterIndex );
+  bool FetchBidirectionalLineInfo(CharacterIndex characterIndex);
 
   /**
    * @brief Retrieves the last fetched bidirectional line info.
@@ -139,7 +135,7 @@ public:
    * @param[in] index The character's index.
    * @param[in] numberOfCharacters The number of characters added or removed. If the value is negative the characters are removed.
    */
-  void UpdateTextStyleRuns( CharacterIndex index, int numberOfCharacters );
+  void UpdateTextStyleRuns(CharacterIndex index, int numberOfCharacters);
 
   /**
    * @brief Retrieves the text's style for the given character index.
@@ -147,7 +143,7 @@ public:
    * @param[in] index The character index.
    * @param[out] style The text's style in the given style.
    */
-  void RetrieveStyle( CharacterIndex index, InputStyle& style );
+  void RetrieveStyle(CharacterIndex index, InputStyle& style);
 
   /**
    * @brief Clears the font description runs.
@@ -164,8 +160,8 @@ public:
    * @param[in] startIndex The character from where the paragraph info is set.
    * @param[in] numberOfCharacters The number of characters.
    */
-  void CreateParagraphInfo( CharacterIndex startIndex,
-                            Length numberOfCharacters );
+  void CreateParagraphInfo(CharacterIndex startIndex,
+                           Length         numberOfCharacters);
 
   /**
    * @brief Find the paragraphs which contains the given characters.
@@ -174,9 +170,9 @@ public:
    * @param[in] numberOfCharacters The number of characters of the run.
    * @param[out] paragraphs Indices to the paragraphs which contain the characters.
    */
-  void FindParagraphs( CharacterIndex index,
-                       Length numberOfCharacters,
-                       Vector<ParagraphRunIndex>& paragraphs );
+  void FindParagraphs(CharacterIndex             index,
+                      Length                     numberOfCharacters,
+                      Vector<ParagraphRunIndex>& paragraphs);
 
   // Embedded images
 
@@ -186,27 +182,24 @@ public:
   void ClearEmbeddedImages();
 
 protected:
-
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~LogicalModel();
 
 private:
-
   /**
    * @brief Private constructor.
    */
   LogicalModel();
 
   // Undefined
-  LogicalModel( const LogicalModel& handle );
+  LogicalModel(const LogicalModel& handle);
 
   // Undefined
-  LogicalModel& operator=( const LogicalModel& handle );
+  LogicalModel& operator=(const LogicalModel& handle);
 
 public:
-
   Vector<Character>                     mText;
   Vector<ScriptRun>                     mScriptRuns;
   Vector<FontRun>                       mFontRuns;
@@ -216,11 +209,11 @@ public:
   Vector<LineBreakInfo>                 mLineBreakInfo;
   Vector<ParagraphRun>                  mParagraphInfo;
   Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;
-  Vector<CharacterDirection>            mCharacterDirections;              ///< For each character, whether is right to left. ( @e flase is left to right, @e true right to left ).
+  Vector<CharacterDirection>            mCharacterDirections; ///< For each character, whether is right to left. ( @e flase is left to right, @e true right to left ).
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
   Vector<EmbeddedItem>                  mEmbeddedItems;
 
-  BidirectionalLineRunIndex             mBidirectionalLineIndex;           ///< The last fetched bidirectional line info.
+  BidirectionalLineRunIndex mBidirectionalLineIndex; ///< The last fetched bidirectional line info.
 };
 
 } // namespace Text

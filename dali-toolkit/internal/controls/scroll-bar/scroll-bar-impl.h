@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_BAR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,26 +20,23 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/timer.h>
-#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class ScrollBar;
 
 typedef IntrusivePtr<ScrollBar> ScrollBarPtr;
@@ -50,15 +47,12 @@ typedef IntrusivePtr<ScrollBar> ScrollBarPtr;
  */
 class ScrollBar : public Control
 {
-
 public:
-
   // Signals
-  typedef Toolkit::ScrollBar::PanFinishedSignalType PanFinishedSignalType;
+  typedef Toolkit::ScrollBar::PanFinishedSignalType                   PanFinishedSignalType;
   typedef Toolkit::ScrollBar::ScrollPositionIntervalReachedSignalType ScrollPositionIntervalReachedSignalType;
 
 public:
-
   /**
    * @copydoc Toolkit::ScrollBar::New()
    */
@@ -67,12 +61,12 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::SetScrollPropertySource()
    */
-  void SetScrollPropertySource( Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize );
+  void SetScrollPropertySource(Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize);
 
   /**
    * @copydoc Toolkit::ScrollBar::SetScrollIndicator()
    */
-  void SetScrollIndicator( Actor indicator );
+  void SetScrollIndicator(Actor indicator);
 
   /**
    * @copydoc Toolkit::ScrollBar::GetScrollIndicator()
@@ -82,7 +76,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::SetScrollPositionIntervals()
    */
-  void SetScrollPositionIntervals( const Dali::Vector<float>& positions );
+  void SetScrollPositionIntervals(const Dali::Vector<float>& positions);
 
   /**
    * @copydoc Toolkit::ScrollBar::GetScrollPositionIntervals()
@@ -92,7 +86,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::SetScrollDirection()
    */
-  void SetScrollDirection( Toolkit::ScrollBar::Direction direction );
+  void SetScrollDirection(Toolkit::ScrollBar::Direction direction);
 
   /**
    * @copydoc Toolkit::ScrollBar::GetScrollDirection()
@@ -102,7 +96,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::SetIndicatorHeightPolicy()
    */
-  void SetIndicatorHeightPolicy( Toolkit::ScrollBar::IndicatorHeightPolicy policy );
+  void SetIndicatorHeightPolicy(Toolkit::ScrollBar::IndicatorHeightPolicy policy);
 
   /**
    * @copydoc Toolkit::ScrollBar::GetIndicatorHeightPolicy()
@@ -112,7 +106,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::SetIndicatorFixedHeight()
    */
-  void SetIndicatorFixedHeight( float height );
+  void SetIndicatorFixedHeight(float height);
 
   /**
    * @copydoc Toolkit::ScrollBar::GetIndicatorFixedHeight()
@@ -122,7 +116,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::SetIndicatorShowDuration()
    */
-  void SetIndicatorShowDuration( float durationSeconds );
+  void SetIndicatorShowDuration(float durationSeconds);
 
   /**
    * @copydoc Toolkit::ScrollBar::GetIndicatorShowDuration()
@@ -132,7 +126,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::SetIndicatorHideDuration()
    */
-  void SetIndicatorHideDuration( float durationSeconds );
+  void SetIndicatorHideDuration(float durationSeconds);
 
   /**
    * @copydoc Toolkit::ScrollBar::GetIndicatorHideDuration()
@@ -154,23 +148,23 @@ public:
    */
   void ShowTransientIndicator();
 
- /**
+  /**
   * @copydoc Toolkit::ScrollBar::PanFinishedSignal()
   */
- PanFinishedSignalType& PanFinishedSignal()
- {
-   return mPanFinishedSignal;
- }
+  PanFinishedSignalType& PanFinishedSignal()
+  {
+    return mPanFinishedSignal;
+  }
 
- /**
+  /**
   * @copydoc Toolkit::ScrollBar::ScrollPositionIntervalReachedSignal()
   */
- ScrollPositionIntervalReachedSignalType& ScrollPositionIntervalReachedSignal()
- {
-   return mScrollPositionIntervalReachedSignal;
- }
+  ScrollPositionIntervalReachedSignalType& ScrollPositionIntervalReachedSignal()
+  {
+    return mScrollPositionIntervalReachedSignal;
+  }
 
- /**
+  /**
   * Connects a callback function with the object's signals.
   * @param[in] object The object providing the signal.
   * @param[in] tracker Used to disconnect the signal.
@@ -179,37 +173,36 @@ public:
   * @return True if the signal was connected.
   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
   */
- static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
- // Properties
+  // Properties
 
- /**
+  /**
   * Called when a property of an object of this type is set.
   * @param[in] object The object whose property is set.
   * @param[in] index The property index.
   * @param[in] value The new property value.
   */
- static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
- /**
+  /**
   * Called to retrieve a property of an object of this type.
   * @param[in] object The object whose property is to be retrieved.
   * @param[in] index The property index.
   * @return The current value of the property.
   */
- static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
- /**
+  /**
   * Performs actions as requested using the action name.
   * @param[in] object The object on which to perform the action.
   * @param[in] actionName The action to perform.
   * @param[in] attributes The attributes with which to perfrom this action.
   * @return true if action has been accepted by this control
   */
- static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes );
+  static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
 
 private: // from Control
-
   /**
    * @copydoc Toolkit::Control::OnInitialize
    */
@@ -218,15 +211,14 @@ private: // from Control
   /**
    * @copydoc Toolkit::Control::OnPan
    */
-  void OnPan( const PanGesture& gesture ) override;
+  void OnPan(const PanGesture& gesture) override;
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
-  void OnSizeSet( const Vector3& size ) override;
+  void OnSizeSet(const Vector3& size) override;
 
 private:
-
   /**
    * Create the default indicator actor.
    */
@@ -264,12 +256,11 @@ private:
   void OnIndicatorHeightPolicyPropertySet(Property::Value propertyValue);
 
 private:
-
   /**
    * Constructor.
    * It initializes ScrollBar members.
    */
-  ScrollBar( Toolkit::ScrollBar::Direction direction );
+  ScrollBar(Toolkit::ScrollBar::Direction direction);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -277,49 +268,48 @@ private:
   virtual ~ScrollBar();
 
 private:
+  Actor     mIndicator;          ///< Image of scroll indicator.
+  float     mIndicatorShowAlpha; ///< The alpha value when the indicator is fully shown
+  Animation mAnimation;          ///< Scroll indicator Show/Hide Animation.
 
-  Actor mIndicator;                                                  ///< Image of scroll indicator.
-  float mIndicatorShowAlpha;                                         ///< The alpha value when the indicator is fully shown
-  Animation mAnimation;                                              ///< Scroll indicator Show/Hide Animation.
+  Toolkit::ScrollBar::Direction mDirection; ///< The direction of scroll bar (vertical or horizontal)
 
-  Toolkit::ScrollBar::Direction mDirection;                          ///< The direction of scroll bar (vertical or horizontal)
+  WeakHandle<Handle> mScrollableObject; ///< Object to be scrolled
 
-  WeakHandle<Handle> mScrollableObject;                              ///< Object to be scrolled
+  Property::Index mPropertyScrollPosition    = 0; ///< Index of scroll position property owned by the object to be scrolled
+  Property::Index mPropertyMinScrollPosition = 0; ///< Index of minimum scroll position property owned by the object to be scrolled
+  Property::Index mPropertyMaxScrollPosition = 1; ///< Index of maximum scroll position property owned by the object to be scrolled
+  Property::Index mPropertyScrollContentSize;     ///< Index of scroll content size property owned by the object to be scrolled
 
-  Property::Index mPropertyScrollPosition = 0;                       ///< Index of scroll position property owned by the object to be scrolled
-  Property::Index mPropertyMinScrollPosition = 0;                    ///< Index of minimum scroll position property owned by the object to be scrolled
-  Property::Index mPropertyMaxScrollPosition = 1;                    ///< Index of maximum scroll position property owned by the object to be scrolled
-  Property::Index mPropertyScrollContentSize;                        ///< Index of scroll content size property owned by the object to be scrolled
+  float mIndicatorShowDuration;      ///< The duration of scroll indicator show animation
+  float mIndicatorHideDuration;      ///< The duration of scroll indicator hide animation
+  float mTransientIndicatorDuration; ///< The duration before hiding transient indicator
 
-  float mIndicatorShowDuration;                                      ///< The duration of scroll indicator show animation
-  float mIndicatorHideDuration;                                      ///< The duration of scroll indicator hide animation
-  float mTransientIndicatorDuration;                                 ///< The duration before hiding transient indicator
+  float   mScrollStart;         ///< Scroll Start position (start of drag)
+  Vector2 mGestureDisplacement; ///< Gesture Displacement.
 
-  float mScrollStart;                                                ///< Scroll Start position (start of drag)
-  Vector2 mGestureDisplacement;                                      ///< Gesture Displacement.
-
-  float mCurrentScrollPosition;                                      ///< The current scroll position updated by the pan gesture
+  float mCurrentScrollPosition; ///< The current scroll position updated by the pan gesture
 
   Toolkit::ScrollBar::IndicatorHeightPolicy mIndicatorHeightPolicy;  ///< The height policy of scroll indicator (variable or fixed)
-  float mIndicatorFixedHeight;                                       ///< The fixed height of scroll indicator
-  float mIndicatorMinimumHeight;                                     ///< The minimum height for a variable size indicator
-  float mIndicatorStartPadding;                                      ///< The padding at the start of the indicator
-  float mIndicatorEndPadding;                                        ///< The padding at the end of the indicator
+  float                                     mIndicatorFixedHeight;   ///< The fixed height of scroll indicator
+  float                                     mIndicatorMinimumHeight; ///< The minimum height for a variable size indicator
+  float                                     mIndicatorStartPadding;  ///< The padding at the start of the indicator
+  float                                     mIndicatorEndPadding;    ///< The padding at the end of the indicator
 
-  Timer mContractDelayTimer;                                         ///< Timer guarantee contract delay time.
-  Timer mPanProcessTimer;                                            ///< The timer to process the pan gesture after the gesture is started.
+  Timer mContractDelayTimer; ///< Timer guarantee contract delay time.
+  Timer mPanProcessTimer;    ///< The timer to process the pan gesture after the gesture is started.
 
-  Dali::Vector<float> mScrollPositionIntervals;                      ///< List of values to receive notification for when the current scroll position goes above or below them
-  PropertyNotification mPositionNotification;                        ///< Stores the property notification used for scroll position changes
+  Dali::Vector<float>  mScrollPositionIntervals; ///< List of values to receive notification for when the current scroll position goes above or below them
+  PropertyNotification mPositionNotification;    ///< Stores the property notification used for scroll position changes
 
-  PanFinishedSignalType mPanFinishedSignal;
+  PanFinishedSignalType                   mPanFinishedSignal;
   ScrollPositionIntervalReachedSignalType mScrollPositionIntervalReachedSignal;
 
   Constraint mIndicatorPositionConstraint;
   Constraint mIndicatorSizeConstraint;
 
-  bool mIsPanning                 : 1;                               ///< Whether the scroll bar is being panned.
-  bool mIndicatorFirstShow        : 1;                               ///< True if the indicator has never been shown
+  bool mIsPanning : 1;          ///< Whether the scroll bar is being panned.
+  bool mIndicatorFirstShow : 1; ///< True if the indicator has never been shown
 
 protected:
   struct AccessibleImpl : public Control::Impl::AccessibleImpl,
@@ -329,7 +319,7 @@ protected:
     double GetMinimum() override;
     double GetCurrent() override;
     double GetMaximum() override;
-    bool SetCurrent( double ) override;
+    bool   SetCurrent(double) override;
     double GetMinimumIncrement() override;
   };
 };

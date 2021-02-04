@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_INTERNAL_CONTROL_DEBUG_H
 #define DALI_TOOLKIT_INTERNAL_CONTROL_DEBUG_H
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 
 #if defined(DEBUG_ENABLED)
 
-#include <dali/public-api/object/handle.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali/public-api/object/handle.h>
 #include <iostream>
 #include <string>
 
@@ -29,24 +29,23 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 /**
  * Convert properties of handle into JSON output, separated into 'normal' and 'child' properties.
  * @param[in] ouputStream the output stream to write to
  * @param[in] handle The handle of the object from which to retrieve properties
  * @return The output stream
  */
-std::ostream& DumpProperties( std::ostream& outputStream, Handle handle );
+std::ostream& DumpProperties(std::ostream& outputStream, Handle handle);
 
 /**
  * Dumps control internals, visuals and properties to a string in JSON format
  */
-std::string DumpControl( const Internal::Control& control );
+std::string DumpControl(const Internal::Control& control);
 
 /**
  * Dumps actor internals and properties to a string in JSON format
  */
-std::string DumpActor( Actor actor );
+std::string DumpActor(Actor actor);
 
 /**
  * Dumps actor hierarchy from a given root, but expands Control output to encompass Control internals.
@@ -54,7 +53,7 @@ std::string DumpActor( Actor actor );
  * @param[in] ouputStream the output stream to write to
  * @param[in] root The root actor
  */
-void DumpControlHierarchy( std::ostream& outputStream, Actor rootActor );
+void DumpControlHierarchy(std::ostream& outputStream, Actor rootActor);
 
 } // namespace Internal
 

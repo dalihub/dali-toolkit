@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_ANIMATED_PROPERTY_H
 #define DALI_SCENE_LOADER_ANIMATED_PROPERTY_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,16 @@
 #include "dali-scene-loader/public-api/api.h"
 
 // EXTERNAL INCLUDES
+#include <functional>
+#include <memory>
 #include "dali/public-api/actors/actor.h"
 #include "dali/public-api/animation/animation.h"
 #include "dali/public-api/object/property.h"
-#include <memory>
-#include <functional>
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /**
  * @brief Intermediate representation for a property that's given to
  *  a Animation to animate. Since there is no getting an
@@ -78,20 +77,20 @@ public: // DATA
   struct Value
   {
     Property::Value mValue;
-    bool mIsRelative;
+    bool            mIsRelative;
   };
 
   std::string mNodeName;
   std::string mPropertyName;
 
-  KeyFrames mKeyFrames;
+  KeyFrames              mKeyFrames;
   std::unique_ptr<Value> mValue;
 
   AlphaFunction mAlphaFunction = AlphaFunction::DEFAULT;
-  TimePeriod mTimePeriod = TimePeriod(0.f);
+  TimePeriod    mTimePeriod    = TimePeriod(0.f);
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_ANIMATED_PROPERTY_H

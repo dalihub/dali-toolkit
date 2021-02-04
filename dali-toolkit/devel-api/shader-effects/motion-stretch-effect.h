@@ -32,7 +32,7 @@ namespace Toolkit
 /**
  * @brief Set the properties for the motion stretch
  */
-DALI_TOOLKIT_API void SetMotionStretchProperties( Actor& actor );
+DALI_TOOLKIT_API void SetMotionStretchProperties(Actor& actor);
 
 /**
  * @brief Creates a new MotionStretchEffect

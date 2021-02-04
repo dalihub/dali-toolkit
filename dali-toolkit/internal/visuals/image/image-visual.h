@@ -27,26 +27,23 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 namespace Dali
 {
-
 class NativeImage;
 
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class ImageVisualShaderFactory;
 class ImageVisual;
-typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
+typedef IntrusivePtr<ImageVisual> ImageVisualPtr;
 
 /**
  * The visual which renders an image to a quad geometry
@@ -110,10 +107,9 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  * If the Visual is in a LayerUI it will pixel align the image, using a Layer3D will disable pixel alignment.
  * Changing layer behaviour between LayerUI to Layer3D whilst the visual is already staged will not have an effect.
  */
-class ImageVisual: public Visual::Base, public ConnectionTracker, public AtlasUploadObserver, public TextureUploadObserver
+class ImageVisual : public Visual::Base, public ConnectionTracker, public AtlasUploadObserver, public TextureUploadObserver
 {
 public:
-
   /**
    * @brief Create a new image visual with a URL.
    *
@@ -128,13 +124,13 @@ public:
    * @param[in] samplingMode The SamplingMode of the resource to load
    * @return A smart-pointer to the newly allocated visual.
    */
-  static ImageVisualPtr New( VisualFactoryCache& factoryCache,
-                             ImageVisualShaderFactory& shaderFactory,
-                             const VisualUrl& imageUrl,
-                             const Property::Map& properties,
-                             ImageDimensions size = ImageDimensions(),
-                             FittingMode::Type fittingMode = FittingMode::DEFAULT,
-                             Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
+  static ImageVisualPtr New(VisualFactoryCache&       factoryCache,
+                            ImageVisualShaderFactory& shaderFactory,
+                            const VisualUrl&          imageUrl,
+                            const Property::Map&      properties,
+                            ImageDimensions           size         = ImageDimensions(),
+                            FittingMode::Type         fittingMode  = FittingMode::DEFAULT,
+                            Dali::SamplingMode::Type  samplingMode = SamplingMode::BOX_THEN_LINEAR);
 
   /**
    * @brief Create a new image visual with a URL.
@@ -149,37 +145,35 @@ public:
    * @param[in] samplingMode The SamplingMode of the resource to load
    * @return A smart-pointer to the newly allocated visual.
    */
-  static ImageVisualPtr New( VisualFactoryCache& factoryCache,
-                             ImageVisualShaderFactory& shaderFactory,
-                             const VisualUrl& imageUrl,
-                             ImageDimensions size = ImageDimensions(),
-                             FittingMode::Type fittingMode = FittingMode::DEFAULT,
-                             Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
+  static ImageVisualPtr New(VisualFactoryCache&       factoryCache,
+                            ImageVisualShaderFactory& shaderFactory,
+                            const VisualUrl&          imageUrl,
+                            ImageDimensions           size         = ImageDimensions(),
+                            FittingMode::Type         fittingMode  = FittingMode::DEFAULT,
+                            Dali::SamplingMode::Type  samplingMode = SamplingMode::BOX_THEN_LINEAR);
 
-public:  // from Visual
-
+public: // from Visual
   /**
    * @copydoc Visual::Base::GetNaturalSize
    */
-  void GetNaturalSize( Vector2& naturalSize ) override;
+  void GetNaturalSize(Vector2& naturalSize) override;
 
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::OnDoAction
    */
-  void OnDoAction( const Dali::Property::Index actionName, const Dali::Property::Value& attributes ) override;
+  void OnDoAction(const Dali::Property::Index actionName, const Dali::Property::Value& attributes) override;
 
 protected:
-
   /**
    * @brief Constructor with a URL.
    *
@@ -192,12 +186,12 @@ protected:
    * @param[in] fittingMode The FittingMode of the resource to load
    * @param[in] samplingMode The SamplingMode of the resource to load
    */
-  ImageVisual( VisualFactoryCache& factoryCache,
-               ImageVisualShaderFactory& shaderFactory,
-               const VisualUrl& imageUrl,
-               ImageDimensions size,
-               FittingMode::Type fittingMode,
-               Dali::SamplingMode::Type samplingMode );
+  ImageVisual(VisualFactoryCache&       factoryCache,
+              ImageVisualShaderFactory& shaderFactory,
+              const VisualUrl&          imageUrl,
+              ImageDimensions           size,
+              FittingMode::Type         fittingMode,
+              Dali::SamplingMode::Type  samplingMode);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -212,17 +206,17 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::DoSetOffScene
    */
-  void DoSetOffScene( Actor& actor ) override;
+  void DoSetOffScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
@@ -240,7 +234,6 @@ protected:
   void UpdateShader() override;
 
 public:
-
   /**
    * @copydoc AtlasUploadObserver::UploadCompleted
    *
@@ -255,18 +248,18 @@ public:
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  void UploadComplete( bool success, int32_t textureId, TextureSet textureSet,
-                       bool usingAtlas, const Vector4& atlasRectangle, bool preMultiplied ) override;
+  void UploadComplete(bool success, int32_t textureId, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle, bool preMultiplied) override;
 
 private:
-
   /**
    * @copydoc TextureUploadObserver::LoadComplete
    *
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the PixelBuffer loading is finished.
    */
-  void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied ) override {}
+  void LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied) override
+  {
+  }
 
   /**
    * Allocate the mask data when a masking property is defined in the property map
@@ -281,7 +274,7 @@ private:
    * @param[in] orientationCorrection flag determines if orientation correction should be performed
    * @param[in] forceReload flag determines if the texture should be reloaded from its source or use the cached texture.
    */
-  void LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection, TextureManager::ReloadPolicy forceReload );
+  void LoadTexture(bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection, TextureManager::ReloadPolicy forceReload);
 
   /**
    * @brief Checks if atlasing should be attempted
@@ -302,13 +295,13 @@ private:
    * @param[in] attemptAtlasing If true will attempt atlasing, otherwise create unique texture
    * @return the texture set to use
    */
-  TextureSet CreateTextureSet( Vector4& textureRect, bool synchronousLoading, bool attemptAtlasing );
+  TextureSet CreateTextureSet(Vector4& textureRect, bool synchronousLoading, bool attemptAtlasing);
 
   /**
    * Set the value to the uTextureRect uniform
    * @param[in] textureRect The texture rectangular area.
    */
-  void SetTextureRectUniform( const Vector4& textureRect  );
+  void SetTextureRectUniform(const Vector4& textureRect);
 
   /**
    * Remove texture with valid TextureId
@@ -320,7 +313,7 @@ private:
    * @param[in] index The index key of the value
    * @param[in] value The value
    */
-  void DoSetProperty( Property::Index index, const Property::Value& value );
+  void DoSetProperty(Property::Index index, const Property::Value& value);
 
   /**
    * @brief Get a shader for the current properties.
@@ -329,29 +322,28 @@ private:
   Shader GetShader();
 
 private:
-
-  Vector4 mPixelArea;
-  WeakHandle<Actor> mPlacementActor;
-  VisualUrl mImageUrl;
+  Vector4                            mPixelArea;
+  WeakHandle<Actor>                  mPlacementActor;
+  VisualUrl                          mImageUrl;
   TextureManager::MaskingDataPointer mMaskingData;
 
-  Dali::ImageDimensions mDesiredSize;
+  Dali::ImageDimensions     mDesiredSize;
   TextureManager::TextureId mTextureId;
-  TextureSet mTextures;
+  TextureSet                mTextures;
 
   ImageVisualShaderFactory& mImageVisualShaderFactory;
 
-  Dali::FittingMode::Type mFittingMode:3;
-  Dali::SamplingMode::Type mSamplingMode:4;
-  Dali::WrapMode::Type mWrapModeU:3;
-  Dali::WrapMode::Type mWrapModeV:3;
-  Dali::Toolkit::ImageVisual::LoadPolicy::Type mLoadPolicy;
+  Dali::FittingMode::Type                         mFittingMode : 3;
+  Dali::SamplingMode::Type                        mSamplingMode : 4;
+  Dali::WrapMode::Type                            mWrapModeU : 3;
+  Dali::WrapMode::Type                            mWrapModeV : 3;
+  Dali::Toolkit::ImageVisual::LoadPolicy::Type    mLoadPolicy;
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
-  Vector4 mAtlasRect;
-  Dali::ImageDimensions mAtlasRectSize;
-  TextureManager::LoadState                       mLoadState;       ///< The texture loading state
-  bool mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
-  bool mOrientationCorrection; ///< true if the image will have it's orientation corrected.
+  Vector4                                         mAtlasRect;
+  Dali::ImageDimensions                           mAtlasRectSize;
+  TextureManager::LoadState                       mLoadState;             ///< The texture loading state
+  bool                                            mAttemptAtlasing;       ///< If true will attempt atlasing, otherwise create unique texture
+  bool                                            mOrientationCorrection; ///< true if the image will have it's orientation corrected.
 };
 
 } // namespace Internal

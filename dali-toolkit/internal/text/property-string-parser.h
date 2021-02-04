@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_PROPERTY_STRING_PARSER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,19 +25,16 @@
 
 namespace Dali
 {
-
 // Forward declaration
 struct Vector2;
 
 namespace Toolkit
 {
-
 // Forward declaration
 class TreeNode;
 
 namespace Text
 {
-
 /**
  * @brief Creates a map with pairs 'key,value' with the property's parameters.
  *
@@ -45,7 +42,7 @@ namespace Text
  * @param[out] map A map with the property's parameters.
  *
  */
-void CreatePropertyMap( const TreeNode* const node, Property::Map& map );
+void CreatePropertyMap(const TreeNode* const node, Property::Map& map);
 
 /**
  * @brief Parses a property string.
@@ -54,7 +51,7 @@ void CreatePropertyMap( const TreeNode* const node, Property::Map& map );
  * @param[out] map A map with the property's parameters.
  *
  */
-void ParsePropertyString( const std::string& property, Property::Map& map );
+void ParsePropertyString(const std::string& property, Property::Map& map);
 
 } //namespace Text
 

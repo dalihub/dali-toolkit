@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_COLOR_ADJUSTER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,19 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
-inline void SetColorAdjusterProperties( Actor& actor, const Vector3& hsvDelta, bool ignoreAlpha = false )
+inline void SetColorAdjusterProperties(Actor& actor, const Vector3& hsvDelta, bool ignoreAlpha = false)
 {
-  actor.RegisterProperty( "uHSVDelta", hsvDelta );
-  actor.RegisterProperty( "uIgnoreAlpha", ignoreAlpha ? 1.f : 0.f );
+  actor.RegisterProperty("uHSVDelta", hsvDelta);
+  actor.RegisterProperty("uIgnoreAlpha", ignoreAlpha ? 1.f : 0.f);
 }
 
 /**
@@ -51,10 +48,10 @@ inline void SetColorAdjusterProperties( Actor& actor, const Vector3& hsvDelta, b
 inline Property::Map CreateColorAdjuster()
 {
   Property::Map customShader;
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = SHADER_BUBBLE_EFFECT_COLOR_ADJUSTER_FRAG.data();
+  customShader[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = SHADER_BUBBLE_EFFECT_COLOR_ADJUSTER_FRAG.data();
 
   Property::Map map;
-  map[ Toolkit::Visual::Property::SHADER ] = customShader;
+  map[Toolkit::Visual::Property::SHADER] = customShader;
 
   return map;
 }

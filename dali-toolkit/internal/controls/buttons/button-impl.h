@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUTTON_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,19 @@
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
-#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class Button;
 
 namespace Internal
 {
-
 /**
  * @copydoc Toolkit::Button
  *
@@ -53,27 +50,24 @@ namespace Internal
  */
 class Button : public Control
 {
-
 public:
-
   /**
    * Enum describing the position the text label can be in relation to the control (and foreground/icon)
    */
   enum Align
   {
-    BEGIN,  // At the start of the control before the foreground/icon
-    END,    // At the end of the control after the foreground/icon
-    TOP,    // At the top of the control above the foreground/icon
-    BOTTOM  // At the bottom of the control below the foreground/icon
+    BEGIN, // At the start of the control before the foreground/icon
+    END,   // At the end of the control after the foreground/icon
+    TOP,   // At the top of the control above the foreground/icon
+    BOTTOM // At the bottom of the control below the foreground/icon
   };
 
 public:
-
   /**
    * @brief Sets the button as \e disabled.
    * @param[in] disabled Disabled property
    */
-  void SetDisabled( bool disabled );
+  void SetDisabled(bool disabled);
 
   /**
    * @brief Returns if the button is disabled.
@@ -85,31 +79,31 @@ public:
    * @brief Sets the \e autorepeating property.
    * @param[in] autoRepeating \e autorepeating property
    */
-  void SetAutoRepeating( bool autoRepeating );
+  void SetAutoRepeating(bool autoRepeating);
 
   /**
    * @brief Sets the initial autorepeating delay.
    * @param[in] initialAutoRepeatingDelay in seconds
    */
-  void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay );
+  void SetInitialAutoRepeatingDelay(float initialAutoRepeatingDelay);
 
   /**
    * @brief Sets the next autorepeating delay.
    * @param[in] nextAutoRepeatingDelay in seconds
    */
-  void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay );
+  void SetNextAutoRepeatingDelay(float nextAutoRepeatingDelay);
 
   /**
    * @brief Sets the \e togglable property.
    * @param[in] togglable Togglable property
    */
-  void SetTogglableButton( bool togglable );
+  void SetTogglableButton(bool togglable);
 
   /**
    * @brief Sets the button as selected or unselected.
    * @param[in] selected Selected property
    */
-  void SetSelected( bool selected );
+  void SetSelected(bool selected);
 
   /**
    * @brief Returns if the selected property is set and the button is togglable.
@@ -124,7 +118,7 @@ public:
    * @param[in] properties A Property::Map of key-value pairs of properties to set.
    * @param[out] properties A Property::Map of text visual properties to set after merging inMap with existing maps
    */
-  void MergeWithExistingLabelProperties( const Property::Map& inMap, Property::Map& outMap );
+  void MergeWithExistingLabelProperties(const Property::Map& inMap, Property::Map& outMap);
 
   /**
    * Performs actions as requested using the action name.
@@ -133,20 +127,19 @@ public:
    * @param[in] attributes The attributes with which to perfrom this action.
    * @return true if action has been accepted by this control
    */
-  static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes );
+  static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
 
 public:
-
   /**
    * Button's state
    */
   enum State
   {
-    UNSELECTED_STATE,              ///< The button is unselected.
-    SELECTED_STATE,                ///< The button is selected.
-    DISABLED_UNSELECTED_STATE,     ///< The button is disabled and unselected.
-    DISABLED_SELECTED_STATE,       ///< The button is disabled and selected.
-    STATE_COUNT,                   ///< Number of States
+    UNSELECTED_STATE,          ///< The button is unselected.
+    SELECTED_STATE,            ///< The button is selected.
+    DISABLED_UNSELECTED_STATE, ///< The button is disabled and unselected.
+    DISABLED_SELECTED_STATE,   ///< The button is disabled and selected.
+    STATE_COUNT,               ///< Number of States
   };
 
   /**
@@ -176,16 +169,15 @@ public:
   };
 
 protected:
-
   /**
    * Button press state which is not the same as the actual button's state.
    * For example An UNSELECTED button can be DEPRESSED, but until released, the actual button state doesn't change to SELECTED
    */
   enum PressState
   {
-    DEPRESSED,                           ///< The button is up.
-    UNPRESSED,                           ///< The button is down.
-    TOGGLE_DEPRESSED,                    ///< The button has been pressed down and will stay depressed when released.
+    DEPRESSED,        ///< The button is up.
+    UNPRESSED,        ///< The button is down.
+    TOGGLE_DEPRESSED, ///< The button has been pressed down and will stay depressed when released.
   };
 
   /**
@@ -213,13 +205,12 @@ protected:
   Actor GetSelectedImage();
 
 private:
-
   /**
    * Perform the click action to click the button.
    * @param[in] attributes The attributes to perfrom this action.
    * @return true if this control can perform action.
    */
-  bool DoClickAction( const Property::Map& attributes );
+  bool DoClickAction(const Property::Map& attributes);
 
   /**
    * This method is called when the button is a Toggle button and released
@@ -243,25 +234,32 @@ private:
   /**
    * This method is called when the \e selected property is changed.
    */
-  virtual void OnStateChange( State newState ){}
+  virtual void OnStateChange(State newState)
+  {
+  }
 
   /**
    * This method is called when the \e disabled property is changed.
    */
-  virtual void OnDisabled() {}
+  virtual void OnDisabled()
+  {
+  }
 
   /**
    * This method is called when the button is pressed.
    */
-  virtual void OnPressed() {}
+  virtual void OnPressed()
+  {
+  }
 
   /**
    * This method is called when the button is released.
    */
-  virtual void OnReleased() {}
+  virtual void OnReleased()
+  {
+  }
 
 public:
-
   /**
    * @copydoc Dali::Toolkit::PushButton::PressedSignal()
    */
@@ -291,7 +289,7 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
   // Properties
 
@@ -301,7 +299,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -309,10 +307,9 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+  static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
 protected: // From Control
-
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    * @note If overridden by deriving button classes, then an up-call to Button::OnInitialize MUST be made at the start.
@@ -338,7 +335,7 @@ protected: // From Control
   /**
    * @copydoc Toolkit::Control::OnSceneConnection()
    */
-  void OnSceneConnection( int depth ) override;
+  void OnSceneConnection(int depth) override;
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize
@@ -348,22 +345,21 @@ protected: // From Control
   /**
    * @copydoc Toolkit::Control::OnSetResizePolicy
    */
-  void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) override;
+  void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) override;
 
   /**
    * @copydoc Toolkit::Control::OnRelayout
    */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
 private:
-
   /**
    * @brief Handler for touch data
    * @param[in]  actor  The touched actor.
    * @param[in]  touch  The touch info.
    * @return true, if consumed, false otherwise.
    */
-  bool OnTouch( Actor actor, const TouchEvent& touch );
+  bool OnTouch(Actor actor, const TouchEvent& touch);
 
   /**
    * Handler for tap events.
@@ -379,7 +375,7 @@ private:
    * Sets up the autorepeating timer.
    * @param[in] delay The delay time in seconds.
    */
-  void SetUpTimer( float delay );
+  void SetUpTimer(float delay);
 
   /**
    * Button has been pressed
@@ -407,13 +403,13 @@ private:
    *  @param[in] requestedState check if can transition to this state
    *  @return bool true if state change valid
    */
-  bool ValidateState( State requestedState );
+  bool ValidateState(State requestedState);
 
   /**
    * Changes the button state when an action occurs on it
    * @param[in] requestedState the state to change to
    */
-  void ChangeState( State requestedState );
+  void ChangeState(State requestedState);
 
   /**
    * This method is called when the button is released.
@@ -421,12 +417,11 @@ private:
   void Released();
 
 protected:
-
   /**
    * Set Text Label Padding
    * @param[in] padding BEGIN END BOTTOM TOP
    */
-  void SetLabelPadding( const Padding& padding );
+  void SetLabelPadding(const Padding& padding);
 
   /**
    * Get Text Label padding
@@ -438,7 +433,7 @@ protected:
    * Set Foreground/icon Padding
    * @param[in] padding BEGIN END BOTTOM TOP
    */
-  void SetForegroundPadding( const Padding& padding);
+  void SetForegroundPadding(const Padding& padding);
 
   /**
    * Get Foreground padding
@@ -452,7 +447,7 @@ protected:
    * @param[in] value the value to set on the component
    * @param[in] visualDepth the depth of the visual if overlapping another
    */
-  void CreateVisualsForComponent( Property::Index index, const Property::Value& value, const int visualDepth );
+  void CreateVisualsForComponent(Property::Index index, const Property::Value& value, const int visualDepth);
 
   /**
    * @brief Get the Property map for the given Visual
@@ -460,7 +455,7 @@ protected:
    * @param[out] retreivedMap the property map used to construct the required visual
    * @return bool success flag, true if visual found
    */
-  bool GetPropertyMapForVisual( Property::Index visualIndex, Property::Map& retreivedMap ) const;
+  bool GetPropertyMapForVisual(Property::Index visualIndex, Property::Map& retreivedMap) const;
   /**
    * Returns the animation to be used for transition, creating the animation if needed.
    * @return The initialised transition animation.
@@ -471,7 +466,7 @@ protected:
    * @brief Set the position of the label relative to foreground/icon, if both present
    * @param[in] labelAlignment given alignment setting
    */
-  void SetLabelAlignment( Align labelAlignment);
+  void SetLabelAlignment(Align labelAlignment);
 
   /**
    * @brief Get set alignment of label in relation to foreground/icon
@@ -485,62 +480,59 @@ protected:
    * define the required behaviour.
    * Can decide to only remove specified visuals via index
    */
-  virtual void OnButtonVisualRemoval( Property::Index visualIndex );
-
+  virtual void OnButtonVisualRemoval(Property::Index visualIndex);
 
 private:
-
   /**
    * Removes the visual from the button and prepares it to be transitioned out
    * @param[in] visualIndex the visual to remove
    */
-  void RemoveVisual( Property::Index visualIndex );
+  void RemoveVisual(Property::Index visualIndex);
 
   /**
    * Adds the required visual to the button.
    * @param[in] visualIndex The Property index of the visual required
    */
-  void SelectRequiredVisual( Property::Index visualIndex );
+  void SelectRequiredVisual(Property::Index visualIndex);
 
   // Undefined
-  Button( const Button& );
+  Button(const Button&);
 
   // Undefined
-  Button& operator = ( const Button& );
+  Button& operator=(const Button&);
 
 private:
-
   // Signals
-  Toolkit::Button::ButtonSignalType mPressedSignal;           ///< Signal emitted when the button is pressed.
-  Toolkit::Button::ButtonSignalType mReleasedSignal;          ///< Signal emitted when the button is released.
-  Toolkit::Button::ButtonSignalType mClickedSignal;           ///< Signal emitted when the button is clicked.
-  Toolkit::Button::ButtonSignalType mStateChangedSignal;      ///< Signal emitted when the button's state is changed.
+  Toolkit::Button::ButtonSignalType mPressedSignal;      ///< Signal emitted when the button is pressed.
+  Toolkit::Button::ButtonSignalType mReleasedSignal;     ///< Signal emitted when the button is released.
+  Toolkit::Button::ButtonSignalType mClickedSignal;      ///< Signal emitted when the button is clicked.
+  Toolkit::Button::ButtonSignalType mStateChangedSignal; ///< Signal emitted when the button's state is changed.
 
-  Timer            mAutoRepeatingTimer;
+  Timer mAutoRepeatingTimer;
 
-  Actor            mLabel;                      ///< Stores the button text label.
-  Padding          mLabelPadding;               ///< The padding around the label (if present).
-  Padding          mForegroundPadding;          ///< The padding around the foreground/icon visual (if present).
+  Actor   mLabel;             ///< Stores the button text label.
+  Padding mLabelPadding;      ///< The padding around the label (if present).
+  Padding mForegroundPadding; ///< The padding around the foreground/icon visual (if present).
 
-  Align            mTextLabelAlignment;           ///< Position of text label in relation to foreground/icon when both are present.
+  Align mTextLabelAlignment; ///< Position of text label in relation to foreground/icon when both are present.
 
   TapGestureDetector mTapDetector;
 
-  bool             mAutoRepeating;              ///< Stores the autorepeating property.
-  bool             mTogglableButton;            ///< Stores the togglable property as a flag.
-  bool             mTextStringSetFlag;          ///< Stores if text has been set. Required in relayout but don't want to calculate there.
+  bool mAutoRepeating;     ///< Stores the autorepeating property.
+  bool mTogglableButton;   ///< Stores the togglable property as a flag.
+  bool mTextStringSetFlag; ///< Stores if text has been set. Required in relayout but don't want to calculate there.
 
-  float            mInitialAutoRepeatingDelay;  ///< Stores the initial autorepeating delay in seconds.
-  float            mNextAutoRepeatingDelay;     ///< Stores the next autorepeating delay in seconds.
+  float mInitialAutoRepeatingDelay; ///< Stores the initial autorepeating delay in seconds.
+  float mNextAutoRepeatingDelay;    ///< Stores the next autorepeating delay in seconds.
 
-  float            mAnimationTime;
+  float mAnimationTime;
 
-  PressState       mButtonPressedState;         ///< In relation to the button being pressed/released
-  State            mButtonState;
-  State            mPreviousButtonState;        ///< During a transition between two states, this stores the previous state so Visuals can be removed.
+  PressState mButtonPressedState; ///< In relation to the button being pressed/released
+  State      mButtonState;
+  State      mPreviousButtonState; ///< During a transition between two states, this stores the previous state so Visuals can be removed.
 
   // Actions
-  bool             mClickActionPerforming;      ///< Used to manage signal emissions during action
+  bool mClickActionPerforming; ///< Used to manage signal emissions during action
 
 protected:
   struct AccessibleImpl : public Control::Impl::AccessibleImpl
@@ -548,8 +540,8 @@ protected:
     using Control::Impl::AccessibleImpl::AccessibleImpl;
 
     Dali::Accessibility::States CalculateStates() override;
-    std::string GetNameRaw() override;
-    Property::Index GetNamePropertyIndex() override;
+    std::string                 GetNameRaw() override;
+    Property::Index             GetNamePropertyIndex() override;
   };
 };
 
@@ -557,22 +549,22 @@ protected:
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::Button& GetImplementation( Toolkit::Button& button )
+inline Toolkit::Internal::Button& GetImplementation(Toolkit::Button& button)
 {
-  DALI_ASSERT_ALWAYS( button );
+  DALI_ASSERT_ALWAYS(button);
 
   Dali::RefObject& handle = button.GetImplementation();
 
-  return static_cast<Toolkit::Internal::Button&>( handle );
+  return static_cast<Toolkit::Internal::Button&>(handle);
 }
 
-inline const Toolkit::Internal::Button& GetImplementation( const Toolkit::Button& button )
+inline const Toolkit::Internal::Button& GetImplementation(const Toolkit::Button& button)
 {
-  DALI_ASSERT_ALWAYS( button );
+  DALI_ASSERT_ALWAYS(button);
 
   const Dali::RefObject& handle = button.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::Button&>( handle );
+  return static_cast<const Toolkit::Internal::Button&>(handle);
 }
 
 } // namespace Toolkit

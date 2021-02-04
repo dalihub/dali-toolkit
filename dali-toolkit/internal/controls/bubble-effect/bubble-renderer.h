@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUBBLE_RENDERER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * BubbleRenderer renders a group of bubbles.Each bubble can be moved separately.
  * Its custom shader achieves similar effect of particle system by applying on a specially created mesh
@@ -41,7 +38,6 @@ namespace Internal
 class BubbleRenderer
 {
 public:
-
   /**
    * Constructor   *
    * @return A newly allocated object.
@@ -51,7 +47,9 @@ public:
   /**
    * @brief Destructor
    */
-  ~BubbleRenderer(){}
+  ~BubbleRenderer()
+  {
+  }
 
   /**
    * Prepare for the rendering: create the renderer, and register properties
@@ -65,7 +63,7 @@ public:
    * @param[in] textureSet The texture set to be used by the renderer
    * @param[in] shader The shader set to be used by the renderer
    */
-  void Initialize( unsigned int numberOfBubble, const Vector2& movementArea, Geometry geometry, TextureSet textureSet, Shader shader  );
+  void Initialize(unsigned int numberOfBubble, const Vector2& movementArea, Geometry geometry, TextureSet textureSet, Shader shader);
 
   /**
    * Return the mesh actor which is used to display the bubbles
@@ -76,14 +74,14 @@ public:
    * Sets the geometry to be used by the renderer
    * @param[in] geometry The geometry to be used by the renderer
    */
-  void SetGeometry( Geometry geometry );
+  void SetGeometry(Geometry geometry);
 
   /**
    * Set the start and end positions of the index-th bubble's movement.
    * @param[in] index Indicate which bubble these properties are applied on.
    * @param[in] startAndEndPosition The start and the end position of movement.
    */
-  void SetStartAndEndPosition( unsigned int index, const Vector4& startAndEndPosition );
+  void SetStartAndEndPosition(unsigned int index, const Vector4& startAndEndPosition);
 
   /**
    * Set the movement completed percentage of the index-th bubble.
@@ -93,26 +91,26 @@ public:
    * @param[in] index Indicate which bubble this property is applied on.
    * @param[in] percentage Set the percentage property value ( between zero and one ).
    */
-  void SetPercentage( unsigned int index, float percentage );
+  void SetPercentage(unsigned int index, float percentage);
 
   /**
    * Set the gravity applied to the y direction, which makes the bubbles no longer moving on a straight line.
    * @param[in] gravity The gravity on the y direction.
    */
-  void SetGravity( float gravity );
+  void SetGravity(float gravity);
 
   /**
    * Set the scale factor applied to the bubbles
    * @param[in] scale The scale factor applied on all bubbles.
    */
-  void SetDynamicScale( float scale );
+  void SetDynamicScale(float scale);
 
   /**
    * Get the idx-th percentage property.
    * @param[in] idx The percentage property index.
    * @return the idx-th percentage property.
    */
-  Property GetPercentageProperty( unsigned int idx );
+  Property GetPercentageProperty(unsigned int idx);
 
   /**
    * Reset the uniform values to default.
@@ -120,8 +118,7 @@ public:
   void ResetProperties();
 
 private:
-
-  Renderer     mRenderer;
+  Renderer mRenderer;
 
   //properties mapped as uniforms
   std::vector<Property::Index> mIndicesOffset;             ///< Indices of the properties mapping to uniform array 'uOffset'

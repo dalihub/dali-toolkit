@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LAYOUT_ENGINE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,23 @@
  */
 
 // EXTERNAL INCLUDE
+#include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/public-api/actors/actor-enumerations.h>
 
 // INTERNAL INCLUDE
-#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/metrics.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 namespace Layout
 {
-
 struct Parameters;
 
 /**
@@ -48,7 +44,6 @@ struct Parameters;
 class Engine
 {
 public:
-
   enum Type
   {
     SINGLE_LINE_BOX,
@@ -70,14 +65,14 @@ public:
    *
    * @param[in] metrics Used to get metrics
    */
-  void SetMetrics( MetricsPtr& metrics );
+  void SetMetrics(MetricsPtr& metrics);
 
   /**
    * @brief Choose the required layout.
    *
    * @param[in] layout The required layout.
    */
-  void SetLayout( Type layout );
+  void SetLayout(Type layout);
 
   /**
    * @brief Query the required layout.
@@ -91,7 +86,7 @@ public:
    *
    * @param[in] width The width of the cursor in pixels.
    */
-  void SetCursorWidth( int width );
+  void SetCursorWidth(int width);
 
   /**
    * @brief Retrieves the width of the cursor.
@@ -112,10 +107,10 @@ public:
    *
    * @return \e true if the text has been re-laid-out. \e false means the given width is too small to layout even a single character.
    */
-  bool LayoutText( Parameters& layoutParameters,
-                   Size& layoutSize,
-                   bool elideTextEnabled,
-                   bool& isAutoScrollEnabled );
+  bool LayoutText(Parameters& layoutParameters,
+                  Size&       layoutSize,
+                  bool        elideTextEnabled,
+                  bool&       isAutoScrollEnabled);
 
   /**
    * @brief Aligns the laid out lines.
@@ -129,21 +124,21 @@ public:
    * @param[in] layoutDirection The direction of the system language.
    * @param[in] matchSystemLanguageDirection Whether match align for system language direction or not.
    */
-  void Align( const Size& size,
-              CharacterIndex startIndex,
-              Length numberOfCharacters,
-              Text::HorizontalAlignment::Type horizontalAlignment,
-              Vector<LineRun>& lines,
-              float& alignmentOffset,
-              Dali::LayoutDirection::Type layoutDirection,
-              bool matchSystemLanguageDirection );
+  void Align(const Size&                     size,
+             CharacterIndex                  startIndex,
+             Length                          numberOfCharacters,
+             Text::HorizontalAlignment::Type horizontalAlignment,
+             Vector<LineRun>&                lines,
+             float&                          alignmentOffset,
+             Dali::LayoutDirection::Type     layoutDirection,
+             bool                            matchSystemLanguageDirection);
 
   /**
    * @brief Sets the default line spacing.
    *
    * @param[in] lineSpacing The line spacing.
    */
-  void SetDefaultLineSpacing( float lineSpacing );
+  void SetDefaultLineSpacing(float lineSpacing);
 
   /**
    * @brief Retrieves the default line spacing.
@@ -157,7 +152,7 @@ public:
    *
    * @param[in] lineSize The line size.
    */
-  void SetDefaultLineSize( float lineSize );
+  void SetDefaultLineSize(float lineSize);
 
   /**
    * @brief Retrieves the default line size.
@@ -167,15 +162,13 @@ public:
   float GetDefaultLineSize() const;
 
 private:
+  // Undefined
+  Engine(const Engine& handle);
 
   // Undefined
-  Engine( const Engine& handle );
-
-  // Undefined
-  Engine& operator=( const Engine& handle );
+  Engine& operator=(const Engine& handle);
 
 private:
-
   struct Impl;
   Impl* mImpl;
 };

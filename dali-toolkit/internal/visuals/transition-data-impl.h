@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TRANSITION_DATA_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/base-object.h>
-#include <dali/public-api/animation/alpha-function.h>
-#include <dali/public-api/object/property-key.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/public-api/animation/alpha-function.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/property-key.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
@@ -32,7 +32,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 class TransitionData;
 typedef IntrusivePtr<TransitionData> TransitionDataPtr;
 
@@ -42,48 +41,47 @@ typedef IntrusivePtr<TransitionData> TransitionDataPtr;
 class TransitionData : public BaseObject
 {
 public:
-
   /**
    * @brief TransitionDataElement Describes one animator of an transition.
    */
   struct Animator
   {
     Animator()
-    : propertyKey( Property::INVALID_INDEX ),
-      alphaFunction( AlphaFunction::DEFAULT ),
-      timePeriodDelay( 0.0f ),
-      timePeriodDuration( 1.0f ),
+    : propertyKey(Property::INVALID_INDEX),
+      alphaFunction(AlphaFunction::DEFAULT),
+      timePeriodDelay(0.0f),
+      timePeriodDuration(1.0f),
       animate(false)
     {
     }
 
-    std::string objectName;   ///< An identifier of the actor or visual
-    Property::Key propertyKey; ///< A property key of the property owner
-    Property::Value initialValue; ///< The value to set at the start of the transition
-    Property::Value targetValue;   ///< The value to set or animate to
+    std::string         objectName;   ///< An identifier of the actor or visual
+    Property::Key       propertyKey;  ///< A property key of the property owner
+    Property::Value     initialValue; ///< The value to set at the start of the transition
+    Property::Value     targetValue;  ///< The value to set or animate to
     Dali::AlphaFunction alphaFunction;
-    float timePeriodDelay;
-    float timePeriodDuration;
-    bool animate;
+    float               timePeriodDelay;
+    float               timePeriodDuration;
+    bool                animate;
   };
 
   /**
    * @brief TransitionData holds the required data required to define an
    * transition to be performed on a property owner
    */
-  typedef Dali::OwnerContainer< Animator* > AnimatorList;
-  typedef AnimatorList::Iterator Iterator;
+  typedef Dali::OwnerContainer<Animator*> AnimatorList;
+  typedef AnimatorList::Iterator          Iterator;
 
 public:
   /**
    * @copydoc Dali::Transition::New()
    */
-  static TransitionDataPtr New( const Property::Array& value );
+  static TransitionDataPtr New(const Property::Array& value);
 
   /**
    * @copydoc Dali::Transition::New()
    */
-  static TransitionDataPtr New( const Property::Map& value );
+  static TransitionDataPtr New(const Property::Map& value);
 
   /**
    * @brief Iterator to the beginning of the data
@@ -103,7 +101,7 @@ public:
   /**
    * @copydoc Dali::Transition::GetAnimatorAt()
    */
-  Property::Map GetAnimatorAt( size_t index );
+  Property::Map GetAnimatorAt(size_t index);
 
 private: // Implementation
   /**
@@ -114,23 +112,23 @@ private: // Implementation
   /**
    * Second stage initialiazation
    */
-  void Initialize( const Property::Map& value );
+  void Initialize(const Property::Map& value);
 
   /**
    * Second stage initialiazation
    */
-  void Initialize( const Property::Array& value );
+  void Initialize(const Property::Array& value);
 
   /**
    * @brief Adds one Animator to the list to describe a transition.
    * @param[in] animator An animator data structure
    */
-  void Add( Animator* animator );
+  void Add(Animator* animator);
 
   /**
    * Convert a Property map into Animator data
    */
-  Animator* ConvertMap( const Property::Map& map );
+  Animator* ConvertMap(const Property::Map& map);
 
 protected:
   /**
@@ -139,24 +137,24 @@ protected:
   ~TransitionData() override;
 
 private: // Unimplemented methods
-  TransitionData( const TransitionData& );
-  TransitionData& operator=( const TransitionData& );
+  TransitionData(const TransitionData&);
+  TransitionData& operator=(const TransitionData&);
 
-private: // Data members
+private:                   // Data members
   AnimatorList mAnimators; ///< A vector of individual property transitions from which to generate a Dali::Animation.
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::TransitionData& GetImplementation( Dali::Toolkit::TransitionData& handle )
+inline Internal::TransitionData& GetImplementation(Dali::Toolkit::TransitionData& handle)
 {
   DALI_ASSERT_ALWAYS(handle && "TransitionData handle is empty");
   BaseObject& object = handle.GetBaseObject();
   return static_cast<Internal::TransitionData&>(object);
 }
 
-inline const Internal::TransitionData& GetImplementation( const Dali::Toolkit::TransitionData& handle )
+inline const Internal::TransitionData& GetImplementation(const Dali::Toolkit::TransitionData& handle)
 {
   DALI_ASSERT_ALWAYS(handle && "TransitionData handle is empty");
   const BaseObject& object = handle.GetBaseObject();
@@ -165,6 +163,5 @@ inline const Internal::TransitionData& GetImplementation( const Dali::Toolkit::T
 
 } // namespace Toolkit
 } // namespace Dali
-
 
 #endif // DALI_TOOLKIT_INTERNAL_TRANSITION_DATA_H

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_EVENT_HANDLER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/events/gesture-enumerations.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/devel-api/adaptor-framework/input-method-context.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
@@ -31,13 +31,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 struct Controller::EventHandler
 {
   static void KeyboardFocusGainEvent(Controller& controller);
@@ -52,7 +49,11 @@ struct Controller::EventHandler
   static void TextInsertedEvent(Controller& controller);
   static void TextDeletedEvent(Controller& controller);
   static bool DeleteEvent(Controller& controller, int keyCode);
-  static InputMethodContext::CallbackData OnInputMethodContextEvent(Controller& controller, InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent);
+
+  static InputMethodContext::CallbackData OnInputMethodContextEvent(Controller&                          controller,
+                                                                    InputMethodContext&                  inputMethodContext,
+                                                                    const InputMethodContext::EventData& inputMethodContextEvent);
+
   static void PasteClipboardItemEvent(Controller& controller);
   static void DecorationEvent(Controller& controller, HandleType handleType, HandleState state, float x, float y);
   static void TextPopupButtonTouched(Controller& controller, Dali::Toolkit::TextSelectionPopup::Buttons button);

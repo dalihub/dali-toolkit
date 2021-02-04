@@ -2,7 +2,7 @@
 #define DALI_JSON_PARSER_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <list>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
+#include <list>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/builder/json-parser.h>
@@ -32,13 +32,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /*
  * Parses JSON
  */
@@ -105,45 +102,42 @@ public:
   void Write(std::ostream& output, int indent) const;
 
 private:
-  typedef std::vector<char> VectorChar;
+  typedef std::vector<char>    VectorChar;
   typedef VectorChar::iterator VectorCharIter;
 
-  typedef std::list<VectorChar> SourceContainer;
+  typedef std::list<VectorChar>           SourceContainer;
   typedef std::list<VectorChar>::iterator SourceContainerIter;
 
-  JsonParser(JsonParser &);
+  JsonParser(JsonParser&);
   JsonParser& operator=(const JsonParser&);
 
-  SourceContainer mSources;         ///< List of strings from Parse() merge operations
+  SourceContainer mSources; ///< List of strings from Parse() merge operations
 
-  TreeNode* mRoot;                  ///< Tree root
+  TreeNode* mRoot; ///< Tree root
 
-  const char *mErrorDescription;    ///< Last parse error description
-  int mErrorPosition;               ///< Last parse error position
-  int mErrorLine;                   ///< Last parse error line
-  int mErrorColumn;                 ///< Last parse error column
+  const char* mErrorDescription; ///< Last parse error description
+  int         mErrorPosition;    ///< Last parse error position
+  int         mErrorLine;        ///< Last parse error line
+  int         mErrorColumn;      ///< Last parse error column
 
-  int mNumberOfChars;               ///< The size of string data for all nodes
-  int mNumberOfNodes;               ///< Node count
-
+  int mNumberOfChars; ///< The size of string data for all nodes
+  int mNumberOfNodes; ///< Node count
 };
 
 } // namespace Internal
 
-
 inline const Internal::JsonParser& GetImplementation(const Toolkit::JsonParser& parser)
 {
-  DALI_ASSERT_ALWAYS( parser && "JsonParser handle is empty" );
+  DALI_ASSERT_ALWAYS(parser && "JsonParser handle is empty");
 
   const BaseObject& handle = parser.GetBaseObject();
 
   return static_cast<const Internal::JsonParser&>(handle);
 }
 
-
 inline Internal::JsonParser& GetImplementation(Toolkit::JsonParser& parser)
 {
-  DALI_ASSERT_ALWAYS( parser && "JsonParser handle is empty" );
+  DALI_ASSERT_ALWAYS(parser && "JsonParser handle is empty");
 
   BaseObject& handle = parser.GetBaseObject();
 
@@ -153,6 +147,5 @@ inline Internal::JsonParser& GetImplementation(Toolkit::JsonParser& parser)
 } // namespace Toolkit
 
 } // namespace Dali
-
 
 #endif // DALI_JSON_PARSER_IMPL_H

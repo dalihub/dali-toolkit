@@ -2,7 +2,7 @@
 #define DALI_SCRIPT_TREE_NODE_MANIPULATOR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <utility> // pair
-#include <iterator>
 #include <cstring>
+#include <iterator>
+#include <utility> // pair
 
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -31,13 +31,11 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-typedef std::vector<char> VectorChar;
+typedef std::vector<char>    VectorChar;
 typedef VectorChar::iterator VectorCharIter;
 
 /*
@@ -92,7 +90,7 @@ public:
    * @param child The child to add
    * @return the added child
    */
-  TreeNode *AddChild(TreeNode *child);
+  TreeNode* AddChild(TreeNode* child);
 
   /*
    * Change the type of the Node
@@ -100,13 +98,13 @@ public:
    *     the children are removed
    * @param type The new type
    */
-  void SetType( TreeNode::NodeType type);
+  void SetType(TreeNode::NodeType type);
 
   /*
    * Set the name of the node
    * @param name The name to set
    */
-  void SetName( const char* name );
+  void SetName(const char* name);
 
   /*
    * Set the substituion flag
@@ -114,7 +112,7 @@ public:
    * in the tree.
    * @param on The state
    */
-  void SetSubstitution( bool on );
+  void SetSubstitution(bool on);
 
   /*
    * Get the nodes type
@@ -132,25 +130,25 @@ public:
    * Set the node as a string value
    * @param string The string value
    */
-  void SetString( const char* string );
+  void SetString(const char* string);
 
   /*
    * Set the node as an integer value
    * @param i The integer
    */
-  void SetInteger( int i );
+  void SetInteger(int i);
 
   /*
    * Set the node as an float value
    * @param f The float
    */
-  void SetFloat( float f );
+  void SetFloat(float f);
 
   /*
    * Set the node as an boolean value
    * @param b The boolean
    */
-  void SetBoolean( bool b );
+  void SetBoolean(bool b);
 
   /*
    * Get the nodes parent
@@ -171,7 +169,7 @@ public:
   void Write(std::ostream& output, int indent) const;
 
 private:
-  TreeNode *mNode;
+  TreeNode* mNode;
 
   /*
    * Move the nodes strings to the buffer
@@ -191,8 +189,7 @@ private:
   /*
    * Do write to string stream
    */
-  void DoWrite(const TreeNode *value, std::ostream& output, int level, int ident, bool groupChildren) const;
-
+  void DoWrite(const TreeNode* value, std::ostream& output, int level, int ident, bool groupChildren) const;
 };
 
 /*
@@ -200,7 +197,7 @@ private:
  */
 struct CollectNodes
 {
-  CollectNodes() {};
+  CollectNodes(){};
 
   /*
    * Call operator to add nodes to the list
@@ -212,7 +209,7 @@ struct CollectNodes
   }
 
   typedef std::vector<const TreeNode*> VectorNodes;
-  typedef VectorNodes::iterator iterator;
+  typedef VectorNodes::iterator        iterator;
 
   VectorNodes nodes; ///< List of collected nodes
 };
@@ -220,19 +217,18 @@ struct CollectNodes
 /*
  * Depth first walk of nodes applying given operation (unary_function)
  */
-template <typename Operation>
-void DepthFirst( TreeNode* node, Operation& operation)
+template<typename Operation>
+void DepthFirst(TreeNode* node, Operation& operation)
 {
   DALI_ASSERT_DEBUG(node && "Operation on NULL JSON node");
 
   for(TreeNode::ConstIterator iter = node->CBegin(); iter != node->CEnd(); ++iter)
   {
     // iterator access is const for external api but were modifying
-    DepthFirst( const_cast<TreeNode*>(&((*iter).second)), operation);
+    DepthFirst(const_cast<TreeNode*>(&((*iter).second)), operation);
   }
 
   operation(node);
-
 }
 
 /*
@@ -251,8 +247,7 @@ const TreeNode* FindIt(std::string_view childName, const TreeNode* tree);
  * @param sentinel The buffer sentinel
  * @return The start of the given buffer
  */
-char *CopyString( const char *fromString, VectorCharIter& iter, const VectorCharIter& sentinel);
-
+char* CopyString(const char* fromString, VectorCharIter& iter, const VectorCharIter& sentinel);
 
 } // namespace Internal
 

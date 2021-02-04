@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <functional>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/web-engine-plugin.h>
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali/devel-api/adaptor-framework/web-engine-plugin.h>
 
 namespace Dali
 {
@@ -56,7 +56,6 @@ class WebView;
 class DALI_TOOLKIT_API WebView : public Control
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    */
@@ -126,37 +125,37 @@ public:
    */
   enum class LoadErrorCode
   {
-    UNKNOWN = 0,            ///< Unknown.
-    CANCELED,               ///< User canceled.
-    CANT_SUPPORT_MIMETYPE,  ///< Can't show the page for this MIME type.
-    FAILED_FILE_IO,         ///< File IO error.
-    CANT_CONNECT,           ///< Cannot connect to the network.
-    CANT_LOOKUP_HOST,       ///< Fail to look up host from the DNS.
-    FAILED_TLS_HANDSHAKE,   ///< Fail to SSL/TLS handshake.
-    INVALID_CERTIFICATE,    ///< Received certificate is invalid.
-    REQUEST_TIMEOUT,        ///< Connection timeout.
-    TOO_MANY_REDIRECTS,     ///< Too many redirects.
-    TOO_MANY_REQUESTS,      ///< Too many requests during this load.
-    BAD_URL,                ///< Malformed URL.
-    UNSUPPORTED_SCHEME,     ///< Unsupported scheme.
-    AUTHENTICATION,         ///< User authentication failed on the server.
-    INTERNAL_SERVER         ///< Web server has an internal server error.
+    UNKNOWN = 0,           ///< Unknown.
+    CANCELED,              ///< User canceled.
+    CANT_SUPPORT_MIMETYPE, ///< Can't show the page for this MIME type.
+    FAILED_FILE_IO,        ///< File IO error.
+    CANT_CONNECT,          ///< Cannot connect to the network.
+    CANT_LOOKUP_HOST,      ///< Fail to look up host from the DNS.
+    FAILED_TLS_HANDSHAKE,  ///< Fail to SSL/TLS handshake.
+    INVALID_CERTIFICATE,   ///< Received certificate is invalid.
+    REQUEST_TIMEOUT,       ///< Connection timeout.
+    TOO_MANY_REDIRECTS,    ///< Too many redirects.
+    TOO_MANY_REQUESTS,     ///< Too many requests during this load.
+    BAD_URL,               ///< Malformed URL.
+    UNSUPPORTED_SCHEME,    ///< Unsupported scheme.
+    AUTHENTICATION,        ///< User authentication failed on the server.
+    INTERNAL_SERVER        ///< Web server has an internal server error.
   };
 
   /**
    * @brief WebView signal type related with page loading.
    */
-  using WebViewPageLoadSignalType = Signal< void( WebView, const std::string& ) >;
+  using WebViewPageLoadSignalType = Signal<void(WebView, const std::string&)>;
 
   /**
    * @brief WebView signal type related with page loading error.
    */
-  using WebViewPageLoadErrorSignalType = Signal< void( WebView, const std::string&, LoadErrorCode ) >;
+  using WebViewPageLoadErrorSignalType = Signal<void(WebView, const std::string&, LoadErrorCode)>;
 
   /**
    * @brief WebView signal type related with scroll edge reached.
    */
-  using WebViewScrollEdgeReachedSignalType = Signal< void( WebView, Dali::WebEnginePlugin::ScrollEdge ) >;
+  using WebViewScrollEdgeReachedSignalType = Signal<void(WebView, Dali::WebEnginePlugin::ScrollEdge)>;
 
 public:
   /**
@@ -181,7 +180,7 @@ public:
    * @param [in] argc The count of arguments of Applications
    * @param [in] argv The string array of arguments of Applications
    */
-  static WebView New( int argc, char** argv );
+  static WebView New(int argc, char** argv);
 
   /**
    * @brief Creates an uninitialized WebView.
@@ -287,7 +286,7 @@ public:
    * @param[in] deltaX The delta x of scroll
    * @param[in] deltaY The delta y of scroll
    */
-  void ScrollBy( int deltaX, int deltaY );
+  void ScrollBy(int deltaX, int deltaY);
 
   /**
    * @brief Returns whether forward is possible.

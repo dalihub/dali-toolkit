@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_ATLAS_MANAGER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +18,32 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class AtlasUploadObserver;
 
 namespace Internal
 {
-
 /**
  * The manager for automatic image atlasing. Owned by VisualFactory
  */
 class ImageAtlasManager : public RefObject
 {
 public:
-  typedef std::vector< Toolkit::ImageAtlas > AtlasContainer;
-  typedef std::vector< TextureSet > TextureSetContainer;
+  typedef std::vector<Toolkit::ImageAtlas> AtlasContainer;
+  typedef std::vector<TextureSet>          TextureSetContainer;
 
 public:
-
   /**
    * Construtor
    *
@@ -70,12 +66,12 @@ public:
    * @param [in] atlasUploadObserver The object to observe the uploading state inside ImageAtlas.
    * @return The texture set containing the image.
    */
-  TextureSet Add( Vector4& textureRect,
-                  const std::string& url,
-                  ImageDimensions& size,
-                  FittingMode::Type fittingMode = FittingMode::DEFAULT,
-                  bool orientationCorrection = true,
-                  AtlasUploadObserver* atlasUploadObserver = NULL );
+  TextureSet Add(Vector4&             textureRect,
+                 const std::string&   url,
+                 ImageDimensions&     size,
+                 FittingMode::Type    fittingMode           = FittingMode::DEFAULT,
+                 bool                 orientationCorrection = true,
+                 AtlasUploadObserver* atlasUploadObserver   = NULL);
   /**
    * @brief Add a pixel buffer to the atlas
    *
@@ -83,8 +79,8 @@ public:
    * @param [in] pixelData The pixel data.
    * @return The texture set containing the image.
    */
-  TextureSet Add( Vector4& textureRect,
-                  PixelData pixelData );
+  TextureSet Add(Vector4&  textureRect,
+                 PixelData pixelData);
 
   /**
    * Remove the image at the given rectangle from the texture set.
@@ -92,14 +88,14 @@ public:
    * @param [in] textureSet The texture set containing the atlas image.
    * @param [in] textureRect The texture area to be removed.
    */
-  void Remove( TextureSet textureSet, const Vector4& textureRect );
+  void Remove(TextureSet textureSet, const Vector4& textureRect);
 
   /**
    * @brief Set the broken image which is used to replace the image if loading fails.
    *
    * @param[in] brokenImageUrl The url of the broken image.
    */
-  void SetBrokenImage( const std::string& brokenImageUrl );
+  void SetBrokenImage(const std::string& brokenImageUrl);
 
   /**
    * @brief Get shader
@@ -107,7 +103,6 @@ public:
   Shader GetShader() const;
 
 private:
-
   /**
    * @brief Create a new atlas.
    *
@@ -116,7 +111,6 @@ private:
   void CreateNewAtlas();
 
 protected:
-
   /**
    * Destructor
    */
@@ -132,16 +126,13 @@ protected:
    */
   ImageAtlasManager& operator=(const ImageAtlasManager& rhs);
 
-
 private:
-
-  AtlasContainer    mAtlasList;
+  AtlasContainer      mAtlasList;
   TextureSetContainer mTextureSetList;
-  std::string       mBrokenImageUrl;
-
+  std::string         mBrokenImageUrl;
 };
 
-} // name Internal
+} // namespace Internal
 
 } // namespace Toolkit
 

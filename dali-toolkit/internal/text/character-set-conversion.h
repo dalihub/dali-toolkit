@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CHARACTER_SET_CONVERSION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Retrieves the number of bytes of a utf8 character.
  *
@@ -38,7 +35,7 @@ namespace Text
  *
  * @return The number of bytes of the character.
  */
-uint8_t GetUtf8Length( uint8_t utf8LeadByte );
+uint8_t GetUtf8Length(uint8_t utf8LeadByte);
 
 /**
  * @brief Retrieves the number of characters of the text array encoded in UTF8
@@ -48,7 +45,7 @@ uint8_t GetUtf8Length( uint8_t utf8LeadByte );
  *
  * @return The number of characters.
  */
-uint32_t GetNumberOfUtf8Characters( const uint8_t* const utf8, uint32_t length );
+uint32_t GetNumberOfUtf8Characters(const uint8_t* const utf8, uint32_t length);
 
 /**
  * @brief Retrieves the number of bytes needed to encode in UTF8 the given text array encoded in UTF32.
@@ -58,7 +55,7 @@ uint32_t GetNumberOfUtf8Characters( const uint8_t* const utf8, uint32_t length )
  *
  * @return The number of bytes.
  */
-uint32_t GetNumberOfUtf8Bytes( const uint32_t* const utf32, uint32_t numberOfCharacters );
+uint32_t GetNumberOfUtf8Bytes(const uint32_t* const utf32, uint32_t numberOfCharacters);
 
 /**
  * @brief Converts a text array encoded in UTF8 into a text array encoded in UTF32.
@@ -76,7 +73,7 @@ uint32_t GetNumberOfUtf8Bytes( const uint32_t* const utf32, uint32_t numberOfCha
  *
  * @return The number of characters.
  */
-uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf32 );
+uint32_t Utf8ToUtf32(const uint8_t* const utf8, uint32_t length, uint32_t* utf32);
 
 /**
  * @brief Converts a text array encoded in UTF32 into a text array encoded in UTF8.
@@ -89,7 +86,7 @@ uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf3
  *
  * @return The number of bytes.
  */
-uint32_t Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, uint8_t* utf8 );
+uint32_t Utf32ToUtf8(const uint32_t* const utf32, uint32_t numberOfCharacters, uint8_t* utf8);
 
 /**
  * @brief Converts a text array encoded in UTF32 into a text array encoded in UTF8.
@@ -98,7 +95,7 @@ uint32_t Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, 
  * @param[in] numberOfCharacters The number of characters of the UTF32 array.
  * @param[out] utf8 The UTF8 characters will be stored here.
  */
-void Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, std::string& utf8 );
+void Utf32ToUtf8(const uint32_t* const utf32, uint32_t numberOfCharacters, std::string& utf8);
 
 } // namespace Text
 

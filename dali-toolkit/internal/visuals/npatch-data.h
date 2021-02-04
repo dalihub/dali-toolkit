@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NPATCH_DATA_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,27 +18,24 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <dali/public-api/rendering/texture-set.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/public-api/rendering/texture-set.h>
+#include <string>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 #include <dali-toolkit/devel-api/utility/npatch-utilities.h>
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class NPatchData : public Dali::Toolkit::TextureUploadObserver
 {
 public:
-  typedef int32_t NPatchDataId;                 ///< The NPatchDataId type. This is used as a handle to refer to a particular Npatch Data.
+  typedef int32_t  NPatchDataId;                ///< The NPatchDataId type. This is used as a handle to refer to a particular Npatch Data.
   static const int INVALID_NPATCH_DATA_ID = -1; ///< Used to represent a null TextureId or error
 
   /**
@@ -52,7 +49,6 @@ public:
   };
 
 public:
-
   /**
    * Constructor
    */
@@ -64,7 +60,6 @@ public:
   ~NPatchData();
 
 public:
-
   /**
    * @brief Set cache data id.
    *
@@ -240,7 +235,6 @@ public:
    */
   LoadingState GetLoadingState() const;
 
-
   /**
    * @brief Retrieve NPatch rendering data.
    *
@@ -254,17 +248,18 @@ public:
    * @param [in] pixelBuffer loaded pixel buffer.
    * @param [in] preMultiplied whether the loaded image is premultiplied or not
    */
-  void SetLoadedNPatchData( Devel::PixelBuffer& pixelBuffer, bool preMultiplied );
+  void SetLoadedNPatchData(Devel::PixelBuffer& pixelBuffer, bool preMultiplied);
 
 private:
-
   /**
    * @copydoc TextureUploadObserver::UploadCompleted
    *
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied ) override {}
+  void UploadComplete(bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied) override
+  {
+  }
 
   /**
    * @copydoc TextureUploadObserver::LoadComplete
@@ -272,11 +267,9 @@ private:
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied ) override;
-
+  void LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied) override;
 
 private:
-
   using ObserverListType = Dali::Vector<TextureUploadObserver*>;
 
   NPatchDataId                 mId;

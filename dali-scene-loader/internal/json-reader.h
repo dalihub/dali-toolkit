@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_JSON_READER_H_
 #define DALI_SCENE_LOADER_JSON_READER_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,16 @@
 #include "dali-scene-loader/third-party/json.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/common/vector-wrapper.h"
 #include <algorithm>
-#include <map>
-#include <string_view>
-#include <sstream>
 #include <cstring>
+#include <map>
 #include <memory>
+#include <sstream>
+#include <string_view>
+#include "dali/public-api/common/vector-wrapper.h"
 
 namespace json
 {
-
 /**
  * @brief Helper for freeing the memory allocated by json_parse()
  */
@@ -60,9 +59,8 @@ int StrCmp(const json_string_s& js, const std::string& s);
  * @brief Convenience function to compare json_string_s and other supported string type,
  *  in swapped order.
  */
-template <typename String>
-inline
-int StrCmp(String& s, const json_string_s& js)
+template<typename String>
+inline int StrCmp(String& s, const json_string_s& js)
 {
   return -StrCmp(js, s);
 }
@@ -77,28 +75,33 @@ namespace detail
 /**
  * @brief Compile-time type-enum mapping.
  */
-template <typename T>
+template<typename T>
 struct Type2Enum
-{};
-
-#define TYPE2ENUM(x) template<> struct Type2Enum<json_## x ##_s>\
-{\
-  enum { VALUE = json_type_## x };\
+{
 };
+
+#define TYPE2ENUM(x)             \
+  template<>                     \
+  struct Type2Enum<json_##x##_s> \
+  {                              \
+    enum                         \
+    {                            \
+      VALUE = json_type_##x      \
+    };                           \
+  };
 
 TYPE2ENUM(object)
 TYPE2ENUM(array)
 TYPE2ENUM(string)
 TYPE2ENUM(number)
 #undef TYPE2ENUM
-}
+} // namespace detail
 
 /**
  * @brief Casts the payload of a json_value_s to the given type.
  */
-template <typename Out>
-inline
-const Out& Cast(const json_value_s& j)
+template<typename Out>
+inline const Out& Cast(const json_value_s& j)
 {
   Validate(j, static_cast<json_type_e>(detail::Type2Enum<typename std::decay<Out>::type>::VALUE));
   return *static_cast<const Out*>(j.payload);
@@ -108,9 +111,8 @@ const Out& Cast(const json_value_s& j)
  * @brief Casts the payload of a json_value_s to the given type.
  * @note std::runtime_error is thrown if the value is not the given type.
  */
-template <typename Out>
-inline
-Out& Cast(json_value_s& j)
+template<typename Out>
+inline Out& Cast(json_value_s& j)
 {
   Validate(j, static_cast<json_type_e>(detail::Type2Enum<typename std::decay<Out>::type>::VALUE));
   return *static_cast<Out*>(j.payload);
@@ -129,11 +131,11 @@ struct Read
 {
   static bool Boolean(const json_value_s& j)
   {
-    if (j.type == json_type_true)
+    if(j.type == json_type_true)
     {
       return true;
     }
-    else if (j.type == json_type_false)
+    else if(j.type == json_type_false)
     {
       return false;
     }
@@ -143,25 +145,25 @@ struct Read
     }
   }
 
-  template <typename T>
+  template<typename T>
   static T Number(const json_value_s& j)
   {
-    auto& jn = Cast<const json_number_s>(j);
+    auto&             jn = Cast<const json_number_s>(j);
     std::stringstream ss;
-    for (auto i0 = jn.number, i1 = i0 + jn.number_size; i0 != i1; ++i0)
+    for(auto i0 = jn.number, i1 = i0 + jn.number_size; i0 != i1; ++i0)
     {
       ss.put(*i0);
     }
 
     T result;
-    if (ss >> result)
+    if(ss >> result)
     {
       return result;
     }
     throw std::runtime_error("Failed to convert value to number");
   }
 
-  template <typename E>
+  template<typename E>
   static E Enum(const json_value_s& j)
   {
     size_t number = Number<size_t>(j);
@@ -180,14 +182,14 @@ struct Read
     return std::string(js.string, js.string_size);
   }
 
-  template <typename T, T(*readElement)(const json_value_s&)>
+  template<typename T, T (*readElement)(const json_value_s&)>
   static std::vector<T> Array(const json_value_s& j)
   {
-    auto& ja = Cast<const json_array_s>(j);
+    auto&          ja = Cast<const json_array_s>(j);
     std::vector<T> result;
     result.reserve(ja.length);
     auto i = ja.start;
-    while (i)
+    while(i)
     {
       result.push_back(std::move(readElement(*i->value)));
       i = i->next;
@@ -204,9 +206,13 @@ struct PropertyCore
 protected:
   explicit PropertyCore(const std::string& key)
   : mKey(key)
-  {}
+  {
+  }
 
-  const std::string& GetKey() const { return mKey; }
+  const std::string& GetKey() const
+  {
+    return mKey;
+  }
 
 private:
   std::string mKey;
@@ -215,17 +221,19 @@ private:
 /**
  * @brief Base class for the properties of a type T.
  */
-template <typename T>
+template<typename T>
 struct PropertyBase : PropertyCore
 {
   using PropertyCore::GetKey;
 
   explicit PropertyBase(const std::string& key)
   : PropertyCore(key)
-  {}
+  {
+  }
 
   virtual ~PropertyBase()
-  {}
+  {
+  }
 
   virtual void Read(const json_value_s& j, T& obj) = 0;
 };
@@ -233,28 +241,31 @@ struct PropertyBase : PropertyCore
 /**
  * @brief Concrete property of an object to read into from JSON with a given function.
  */
-template <class T, typename U>
+template<class T, typename U>
 struct Property : PropertyBase<T>
 {
-  using ReadFn = U(*)(const json_value_s&);
-  using MemberPtr = U T::*;
+  using ReadFn        = U (*)(const json_value_s&);
+  using MemberPtr     = U T::*;
   using SetterArgType = typename std::conditional<sizeof(U) <= sizeof(uintptr_t), U, const U&>::type;
-  using Setter = void (T::*)(SetterArgType);
+  using Setter        = void (T::*)(SetterArgType);
 
   Property(const std::string& key, ReadFn read, MemberPtr ptr)
   : PropertyBase<T>(key),
     mRead(read),
     mAccessor(new DirectAccessor(ptr))
-  {}
+  {
+  }
 
   Property(const std::string& key, ReadFn read, Setter setter)
   : PropertyBase<T>(key),
     mRead(read),
     mAccessor(new SetterAccessor(setter))
-  {}
+  {
+  }
 
   ~Property()
-  {}
+  {
+  }
 
   void Read(const json_value_s& j, T& obj) override
   {
@@ -265,7 +276,8 @@ private:
   struct AccessorBase
   {
     virtual ~AccessorBase()
-    {}
+    {
+    }
 
     virtual void Set(U value, T& obj) const = 0;
   };
@@ -274,7 +286,8 @@ private:
   {
     DirectAccessor(MemberPtr ptr)
     : mPointer(ptr)
-    {}
+    {
+    }
 
     void Set(U value, T& obj) const override
     {
@@ -288,7 +301,8 @@ private:
   {
     SetterAccessor(Setter setter)
     : mSetter(setter)
-    {}
+    {
+    }
 
     void Set(U value, T& obj) const override
     {
@@ -298,16 +312,15 @@ private:
     Setter mSetter;
   };
 
-  ReadFn mRead;
+  ReadFn                        mRead;
   std::unique_ptr<AccessorBase> mAccessor;
 };
 
 /**
  * @brief Helper function to make a Property for a member of type U, of object of type T.
  */
-template <class T, typename U>
-Property<T, U>* MakeProperty(const std::string& key, typename Property<T, U>::ReadFn readFn,
-  U T::* ptr)
+template<class T, typename U>
+Property<T, U>* MakeProperty(const std::string& key, typename Property<T, U>::ReadFn readFn, U T::*ptr)
 {
   return new Property<T, U>(key, readFn, ptr);
 }
@@ -333,7 +346,7 @@ protected:
  * @brief Object Reader template for reading into an object of a given type,
  *  with properties registered for the various members.
  */
-template <typename T>
+template<typename T>
 class Reader : protected ReaderCore
 {
 public:
@@ -347,7 +360,7 @@ public:
 
   ~Reader()
   {
-    for (auto& p : mProperties)
+    for(auto& p : mProperties)
     {
       delete Cast(p);
     }
@@ -355,9 +368,8 @@ public:
 
   Reader<T>& Register(PropertyBase<T>& prop)
   {
-    auto iInsert = std::lower_bound(mProperties.begin(), mProperties.end(), &prop,
-      SortPredicate);
-    if (iInsert == mProperties.end() || Cast(*iInsert)->GetKey() != prop.GetKey())
+    auto iInsert = std::lower_bound(mProperties.begin(), mProperties.end(), &prop, SortPredicate);
+    if(iInsert == mProperties.end() || Cast(*iInsert)->GetKey() != prop.GetKey())
     {
       mProperties.insert(iInsert, &prop);
     }
@@ -372,14 +384,13 @@ public:
   void Read(const json_object_s& jo, T& obj) const
   {
     auto i = jo.start;
-    while (i)
+    while(i)
     {
-      auto iFind = std::lower_bound(mProperties.begin(), mProperties.end(),
-        *i->name, FindPredicate);
-      if (iFind != mProperties.end())
+      auto iFind = std::lower_bound(mProperties.begin(), mProperties.end(), *i->name, FindPredicate);
+      if(iFind != mProperties.end())
       {
         auto prop = Cast(*iFind);
-        if (0 == StrCmp(*i->name, prop->GetKey()))
+        if(0 == StrCmp(*i->name, prop->GetKey()))
         {
           prop->Read(*i->value, obj);
         }
@@ -411,29 +422,29 @@ private:
  * @brief Wraps a Reader<T> in a function usable as a Property<T>::ReadFn, i.e. to facilitate
  *  deserializing structures of nested objects.
  */
-template <typename T>
+template<typename T>
 struct ObjectReader
 {
   static const Reader<T>* sReader;
 
   static T Read(const json_value_s& j)
   {
-    T result;
+    T     result;
     auto& jo = Cast<json_object_s>(j);
     sReader->Read(jo, result);
     return result;
   }
 };
 
-template <typename T>
+template<typename T>
 const Reader<T>* ObjectReader<T>::sReader = nullptr;
 
-template <typename T>
+template<typename T>
 void SetObjectReader(const Reader<T>& r)
 {
   ObjectReader<T>::sReader = &r;
 }
 
-} // json
+} // namespace json
 
 #endif //DALI_SCENE_LOADER_JSON_READER_H_

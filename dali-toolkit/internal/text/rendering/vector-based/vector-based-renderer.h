@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VECTOR_BASED_RENDERER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief A vector-based renderer
  *
@@ -37,7 +34,6 @@ namespace Text
 class VectorBasedRenderer : public Renderer
 {
 public:
-
   /**
    * @brief Create the renderer.
    */
@@ -46,14 +42,13 @@ public:
   /**
    * @copydoc Renderer::Render()
    */
-  virtual Actor Render( ViewInterface& view,
-                        Actor textControl,  // Functionality not supported but defined in interface
-                        Property::Index animatablePropertyIndex, // Functionality not supported but defined in interface
-                        float& alignmentOffset,
-                        int depth );
+  virtual Actor Render(ViewInterface&  view,
+                       Actor           textControl,             // Functionality not supported but defined in interface
+                       Property::Index animatablePropertyIndex, // Functionality not supported but defined in interface
+                       float&          alignmentOffset,
+                       int             depth);
 
 protected:
-
   /**
    * @brief Constructor.
    */
@@ -65,15 +60,13 @@ protected:
   virtual ~VectorBasedRenderer();
 
 private:
+  // Undefined
+  VectorBasedRenderer(const VectorBasedRenderer& handle);
 
   // Undefined
-  VectorBasedRenderer( const VectorBasedRenderer& handle );
-
-  // Undefined
-  VectorBasedRenderer& operator=( const VectorBasedRenderer& handle );
+  VectorBasedRenderer& operator=(const VectorBasedRenderer& handle);
 
 private:
-
   struct Impl;
   Impl* mImpl;
 };

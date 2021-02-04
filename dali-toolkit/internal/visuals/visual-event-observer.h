@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOOLKIT_VISUAL_EVENT_OBSERVER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ namespace Internal
 {
 namespace Visual
 {
-
 class Base;
 
 /**
@@ -37,22 +36,20 @@ class Base;
 class EventObserver
 {
 public:
-
   /**
    * Inform the observer of the object when a resource is ready.
    * @param[in] object The connection owner
    */
-  virtual void ResourceReady( Visual::Base& object ) = 0;
+  virtual void ResourceReady(Visual::Base& object) = 0;
 
   /**
    * Inform the observer of the object when an event occurs.
    * @param[in] object The connection owner
    * @param[in] signalId The signal to emit. See Visual to find supported signals
    */
-  virtual void NotifyVisualEvent( Visual::Base& object, Property::Index signalId ) = 0;
+  virtual void NotifyVisualEvent(Visual::Base& object, Property::Index signalId) = 0;
 
 protected:
-
   /**
    * constructor
    */
@@ -68,15 +65,15 @@ protected:
   }
 
   // Undefined copy constructor.
-  EventObserver( const EventObserver& ) = delete;
+  EventObserver(const EventObserver&) = delete;
 
   // Undefined assignment operator.
-  EventObserver& operator=( const EventObserver& ) = delete;
+  EventObserver& operator=(const EventObserver&) = delete;
 };
 
-} // Visual
-} // Internal
-} // Toolkit
-} // Dali
+} // namespace Visual
+} // namespace Internal
+} // namespace Toolkit
+} // namespace Dali
 
 #endif // DALI_INTERNAL_TOOLKIT_VISUAL_EVENT_OBSERVER_H

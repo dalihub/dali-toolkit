@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_GRADIENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,15 +29,12 @@
 
 namespace Dali
 {
-
 class Vector4;
 
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * Gradients consist of continuously smooth color transitions along a vector from one color to another,
  * possibly followed by additional transitions along the same vector to other colors.
@@ -45,27 +42,27 @@ namespace Internal
 class Gradient : public RefObject
 {
 public:
-
   /**
    * The stop node tells the gradient what color it should be at certain position.
    */
   struct GradientStop
   {
-    GradientStop( float offset, const Vector4& color )
-    : mOffset( offset ), mStopColor( color )
-    {}
+    GradientStop(float offset, const Vector4& color)
+    : mOffset(offset),
+      mStopColor(color)
+    {
+    }
 
     bool operator<(const GradientStop& rhs) const
     {
       return mOffset < rhs.mOffset;
     }
 
-    float   mOffset;     // A value ranging from 0 to 1 to indicate where the gradient stop is placed.
-    Vector4 mStopColor;  // The color to use at this gradient stop
+    float   mOffset;    // A value ranging from 0 to 1 to indicate where the gradient stop is placed.
+    Vector4 mStopColor; // The color to use at this gradient stop
   };
 
 public:
-
   /**
    * Add a gradient stop.
    *
@@ -84,7 +81,7 @@ public:
    * Set the coordinate system used by the gradient attributes.
    * @param[in] gradientUnits The the attributes are defined using the current user coordinate system or the bounding box of the shape.
    */
-  void SetGradientUnits( Toolkit::GradientVisual::Units::Type gradientUnits );
+  void SetGradientUnits(Toolkit::GradientVisual::Units::Type gradientUnits);
 
   /**
    * Get the coordinate system used by the gradient attributes.
@@ -98,7 +95,7 @@ public:
    *
    * @param[in] spread The method to fill the remainder of target region which is outside the gradient bounds
    */
-  void SetSpreadMethod( Toolkit::GradientVisual::SpreadMethod::Type spread );
+  void SetSpreadMethod(Toolkit::GradientVisual::SpreadMethod::Type spread);
 
   /**
    * Get the filling method for the the remainder of target region which is outside the gradient boun.
@@ -119,7 +116,6 @@ public:
   Dali::Texture GenerateLookupTexture();
 
 private:
-
   /**
    * Estimate the resolution of the lookup texture.
    * Note: Only call this function after the gradient stops are sorted in order.
@@ -127,7 +123,6 @@ private:
   unsigned int EstimateTextureResolution();
 
 protected:
-
   /**
    * Construct a new Gradient object
    * Called in the constructor of subclasses
@@ -140,18 +135,16 @@ protected:
   virtual ~Gradient();
 
   // Undefined
-  Gradient( const Gradient& gradient );
+  Gradient(const Gradient& gradient);
 
   // Undefined
-  Gradient& operator=( const Gradient& handle );
+  Gradient& operator=(const Gradient& handle);
 
 protected:
-
   Vector<GradientStop>                        mGradientStops;
   Matrix3                                     mAlignmentTransform;
   Toolkit::GradientVisual::Units::Type        mGradientUnits;
   Toolkit::GradientVisual::SpreadMethod::Type mSpreadMethod;
-
 };
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ATLAS_RENDERER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Implementation of a text renderer based on dynamic atlases.
  *
@@ -37,7 +34,6 @@ namespace Text
 class AtlasRenderer : public Renderer
 {
 public:
-
   /**
    * @brief Create the renderer.
    */
@@ -46,14 +42,13 @@ public:
   /**
    * @copydoc Renderer::Render()
    */
-  virtual Actor Render( ViewInterface& view,
-                        Actor textControl,
-                        Property::Index animatablePropertyIndex,
-                        float& alignmentOffset,
-                        int depth );
+  virtual Actor Render(ViewInterface&  view,
+                       Actor           textControl,
+                       Property::Index animatablePropertyIndex,
+                       float&          alignmentOffset,
+                       int             depth);
 
 protected:
-
   /**
    * @brief Constructor.
    */
@@ -65,15 +60,13 @@ protected:
   virtual ~AtlasRenderer();
 
 private:
+  // Undefined
+  AtlasRenderer(const AtlasRenderer& handle);
 
   // Undefined
-  AtlasRenderer( const AtlasRenderer& handle );
-
-  // Undefined
-  AtlasRenderer& operator=( const AtlasRenderer& handle );
+  AtlasRenderer& operator=(const AtlasRenderer& handle);
 
 private:
-
   struct Impl;
   Impl* mImpl;
 };

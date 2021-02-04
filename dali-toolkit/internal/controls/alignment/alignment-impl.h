@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ALIGNMENT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,18 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/alignment/alignment.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class Alignment;
 
 namespace Internal
 {
-
 /**
  * Alignment is a control to position and resize actors inside other container actors.
  * @see Dali::Toolkit::Alignment for more details.
@@ -41,18 +38,17 @@ namespace Internal
 class Alignment : public Control
 {
 public:
-
   /**
    * Create an initialized Alignment.
    * @param type Type of alignment.
    * @return A handle to a newly allocated Dali resource.
    */
-  static Toolkit::Alignment New( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical );
+  static Toolkit::Alignment New(Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical);
 
   /**
    * @copydoc Dali::Toolkit::Alignment::SetAlignmentType()
    */
-  void SetAlignmentType( Toolkit::Alignment::Type type );
+  void SetAlignmentType(Toolkit::Alignment::Type type);
 
   /**
    * @copydoc Dali::Toolkit::Alignment::GetAlignmentType()
@@ -62,7 +58,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Alignment::SetScaling()
    */
-  void SetScaling( Toolkit::Alignment::Scaling scaling );
+  void SetScaling(Toolkit::Alignment::Scaling scaling);
 
   /**
    * @copydoc Dali::Toolkit::Alignment::GetScaling()
@@ -72,16 +68,14 @@ public:
   /**
    * @copydoc Dali::Toolkit::Alignment::SetPadding()
    */
-  void SetPadding( const Toolkit::Alignment::Padding& padding );
+  void SetPadding(const Toolkit::Alignment::Padding& padding);
 
   /**
    * @copydoc Dali::Toolkit::Alignment::GetPadding()
    */
   const Toolkit::Alignment::Padding& GetPadding() const;
 
-
 private: // From Control
-
   /**
    * @copydoc Control::OnInitialize()
    */
@@ -90,15 +84,14 @@ private: // From Control
   /**
    * @copydoc Control::OnRelayout()
    */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
 private:
-
   /**
    * Constructor.
    * It initializes Alignment members.
    */
-  Alignment( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical );
+  Alignment(Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -106,7 +99,6 @@ private:
   virtual ~Alignment();
 
 private:
-
   // Undefined
   Alignment(const Alignment&);
   Alignment& operator=(const Alignment&);
@@ -120,25 +112,24 @@ private:
 
 } // namespace Internal
 
-
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::Alignment& GetImpl( Toolkit::Alignment& alignment )
+inline Toolkit::Internal::Alignment& GetImpl(Toolkit::Alignment& alignment)
 {
-  DALI_ASSERT_ALWAYS( alignment );
+  DALI_ASSERT_ALWAYS(alignment);
 
   Dali::RefObject& handle = alignment.GetImplementation();
 
-  return static_cast<Toolkit::Internal::Alignment&>( handle );
+  return static_cast<Toolkit::Internal::Alignment&>(handle);
 }
 
-inline const Toolkit::Internal::Alignment& GetImpl( const Toolkit::Alignment& alignment )
+inline const Toolkit::Internal::Alignment& GetImpl(const Toolkit::Alignment& alignment)
 {
-  DALI_ASSERT_ALWAYS( alignment );
+  DALI_ASSERT_ALWAYS(alignment);
 
   const Dali::RefObject& handle = alignment.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::Alignment&>( handle );
+  return static_cast<const Toolkit::Internal::Alignment&>(handle);
 }
 
 } // namespace Toolkit

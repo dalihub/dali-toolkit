@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_LIGHT_PARAMETERS_H
 #define DALI_SCENE_LOADER_LIGHT_PARAMETERS_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,27 +21,26 @@
 #include "dali-scene-loader/public-api/api.h"
 
 // EXTERNAL INCLUDES
+#include <stdint.h>
 #include "dali/public-api/math/matrix.h"
 #include "dali/public-api/math/vector3.h"
-#include <stdint.h>
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 struct DALI_SCENE_LOADER_API LightParameters
 {
   Matrix transform;
 
-  Vector3 color;
-  float intensity;
-  float shadowIntensity;
+  Vector3  color;
+  float    intensity;
+  float    shadowIntensity;
   uint32_t shadowMapSize;
-  float orthographicSize;
+  float    orthographicSize;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif // DALI_SCENE_LOADER_LIGHT_PARAMETERS_H

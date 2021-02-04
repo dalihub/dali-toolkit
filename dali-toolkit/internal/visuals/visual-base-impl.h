@@ -27,26 +27,22 @@
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/direction-enums.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/devel-api/direction-enums.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace Visual
 {
-
 class EventObserver;
 
 using FittingMode = DevelVisual::FittingMode;
@@ -74,17 +70,16 @@ using FittingMode = DevelVisual::FittingMode;
 class Base : public BaseObject
 {
 public:
-
   /**
    * Setting the properties of the visual, this API should only called by the VisualFactory
    * @param[in] propertyMap The properties for the requested Visual object.
    */
-  void SetProperties( const Property::Map& propertyMap );
+  void SetProperties(const Property::Map& propertyMap);
 
   /**
    * @copydoc Toolkit::Visual::Base::SetName
    */
-  void SetName( const std::string& name );
+  void SetName(const std::string& name);
 
   /**
    * @copydoc Toolkit::Visual::Base::GetName
@@ -94,7 +89,7 @@ public:
   /**
    * @copydoc Toolkit::Visual::Base::SetSize
    */
-  void SetTransformAndSize( const Property::Map& transform, Size controlSize );
+  void SetTransformAndSize(const Property::Map& transform, Size controlSize);
 
   /**
    * @brief Performs an action on the visual with the given action name and attributes.
@@ -102,27 +97,27 @@ public:
    * @param[in] actionName The name of the action to perform this API only takes an Index
    * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
    */
-  void DoAction( const Dali::Property::Index actionName, const Dali::Property::Value attributes );
+  void DoAction(const Dali::Property::Index actionName, const Dali::Property::Value attributes);
 
   /**
    * @copydoc Toolkit::Visual::Base::GetHeightForWidth
    */
-  virtual float GetHeightForWidth( float width );
+  virtual float GetHeightForWidth(float width);
 
   /**
    * @copydoc Toolkit::Visual::Base::GetWidthForHeight
    */
-  virtual float GetWidthForHeight( float height );
+  virtual float GetWidthForHeight(float height);
 
   /**
    * @copydoc Toolkit::Visual::Base::GetNaturalSize
    */
-  virtual void GetNaturalSize( Vector2& naturalSize );
+  virtual void GetNaturalSize(Vector2& naturalSize);
 
   /**
    * @copydoc Toolkit::Visual::Base::SetDepthIndex
    */
-  void SetDepthIndex( int index );
+  void SetDepthIndex(int index);
 
   /**
    * @copydoc Toolkit::Visual::Base::GetDepthIndex
@@ -133,17 +128,17 @@ public:
    * @copydoc Toolkit::Visual::Base::SetOnScene
    * @pre Impl->mGeometry must be created before this method is called
    */
-  void SetOnScene( Actor& actor );
+  void SetOnScene(Actor& actor);
 
   /**
    * @copydoc Toolkit::Visual::Base::SetOffScene
    */
-  void SetOffScene( Actor& actor );
+  void SetOffScene(Actor& actor);
 
   /**
    * @copydoc Toolkit::Visual::Base::CreatePropertyMap
    */
-  void CreatePropertyMap( Property::Map& map ) const;
+  void CreatePropertyMap(Property::Map& map) const;
 
   /**
    * @brief Create a property map containing per-instance visual properties.
@@ -153,14 +148,14 @@ public:
    * (e.g. for image visual, the desired size, and for text visual, the actual text).
    * @param[in] map The property map into which to write
    */
-  void CreateInstancePropertyMap( Property::Map& map ) const;
+  void CreateInstancePropertyMap(Property::Map& map) const;
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
    *
    * @param[in] preMultiplied whether alpha is pre-multiplied.
    */
-  void EnablePreMultipliedAlpha( bool preMultiplied );
+  void EnablePreMultipliedAlpha(bool preMultiplied);
 
   /**
    * @brief Query whether alpha is pre-multiplied.
@@ -173,17 +168,17 @@ public:
    * @brief Sets properties of custom shader
    * @param[in] propertyMap Property map containing the custom shader data
    */
-  void SetCustomShader( const Property::Map& propertyMap );
+  void SetCustomShader(const Property::Map& propertyMap);
 
   /**
    * @copydoc Toolkit::Visual::Base::SetProperty
    */
-  void SetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue );
+  void SetProperty(Dali::Property::Index index, const Dali::Property::Value& propertyValue);
 
   /**
    * @copydoc Toolkit::Visual::Base::GetProperty
    */
-  Dali::Property::Value GetProperty( Dali::Property::Index index );
+  Dali::Property::Value GetProperty(Dali::Property::Index index);
 
   /**
    * Gets currently staged renderer, or an empty handle if not staged
@@ -194,13 +189,13 @@ public:
    * Sets the mix color ( including opacity )  of the visual.
    * @param[in] mixColor The new mix color
    */
-  void SetMixColor( const Vector4& color );
+  void SetMixColor(const Vector4& color);
 
   /**
    * Sets the mix color of the visual.
    * @param[in] mixColor The new mix color
    */
-  void SetMixColor( const Vector3& color );
+  void SetMixColor(const Vector3& color);
 
   /**
    * Animate the property if it exists in the visual or renderer.
@@ -217,24 +212,24 @@ public:
    * @param[in] transition The animation to create or attach to
    * @param[in] animator The animation parameters of the property.
    */
-  void AnimateProperty( Dali::Animation& transition,
-                        Internal::TransitionData::Animator& animator );
+  void AnimateProperty(Dali::Animation&                    transition,
+                       Internal::TransitionData::Animator& animator);
 
   /**
    * @brief Add an observer to watch for when the Visuals have events to notify
    * Currently only supports a single observer
    */
-  void AddEventObserver( Visual::EventObserver& observer );
+  void AddEventObserver(Visual::EventObserver& observer);
 
   /**
    * @brief Remove an observer
    */
-  void RemoveEventObserver( Visual::EventObserver& observer );
+  void RemoveEventObserver(Visual::EventObserver& observer);
 
   /**
    * @brief Called when the visuals resources are loaded / ready
    */
-  void ResourceReady( Toolkit::Visual::ResourceStatus resourceStatus );
+  void ResourceReady(Toolkit::Visual::ResourceStatus resourceStatus);
 
   /**
    * @brief Called when the visuals resources are loaded / ready
@@ -289,7 +284,7 @@ protected:
    * @param[in] fittingMode The value that determines how the visual should be fit to the view
    * @param[in] type The type of the this visual
    */
-  Base( VisualFactoryCache& factoryCache, FittingMode fittingMode, Toolkit::Visual::Type type );
+  Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, Toolkit::Visual::Type type);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -312,7 +307,7 @@ protected:
    *
    * @param[out] map The visual property map.
    */
-  virtual void DoCreatePropertyMap( Property::Map& map ) const = 0;
+  virtual void DoCreatePropertyMap(Property::Map& map) const = 0;
 
   /**
    * @brief Called by CreateInstancePropertyMap() allowing derived
@@ -321,14 +316,14 @@ protected:
    *
    * @param[out] map The visual property map
    */
-  virtual void DoCreateInstancePropertyMap( Property::Map& map ) const = 0;
+  virtual void DoCreateInstancePropertyMap(Property::Map& map) const = 0;
 
   /**
    * @brief Called by SetProperties() allowing sub classes to set their properties
    *
    * @param[in] propertyMap The properties for the requested Visual object.
    */
-  virtual void DoSetProperties( const Property::Map& propertyMap ) = 0;
+  virtual void DoSetProperties(const Property::Map& propertyMap) = 0;
 
   /**
    * @brief Called when transform or control size changes
@@ -343,14 +338,14 @@ protected:
    *
    * @param[in] actor The actor applying this visual.
    */
-  virtual void DoSetOnScene( Actor& actor ) = 0;
+  virtual void DoSetOnScene(Actor& actor) = 0;
 
   /**
    * @brief Called by SetOffScene() allowing sub classes to respond to the SetOffScene event
    *
    * @param[in] actor The actor applying this visual.
    */
-  virtual void DoSetOffScene( Actor& actor );
+  virtual void DoSetOffScene(Actor& actor);
 
   /**
    * @brief Called by DoAction() allowing sub classes to do the given action.
@@ -358,7 +353,7 @@ protected:
    * @param[in] actionId The action to perform
    * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
    */
-  virtual void OnDoAction( const Property::Index actionId, const Property::Value& attributes );
+  virtual void OnDoAction(const Property::Index actionId, const Property::Value& attributes);
 
   /**
    * @brief Update the shader when some properties are changed.
@@ -380,7 +375,6 @@ protected:
   }
 
 protected:
-
   /**
    * @brief Gets the on scene state for this Visual
    *
@@ -396,7 +390,6 @@ protected:
   bool IsRoundedCornerRequired() const;
 
 private:
-
   /**
    * Register the mix color uniform on the Renderer and store the property index.
    * Note, this is not used by Color or Primitive Visuals, which will use their
@@ -411,7 +404,7 @@ private:
    * @param[in] key The key to match.
    * @return the matching index, or INVALID_INDEX if it's not found
    */
-  Property::Index GetPropertyIndex( Property::Key key );
+  Property::Index GetPropertyIndex(Property::Key key);
 
   /**
    * Set up the transition. If no animation is required, then
@@ -423,11 +416,11 @@ private:
    * @param[in] initialValue The optional initial value
    * @param[in] targetValue The target value to use
    */
-  void SetupTransition( Dali::Animation& transition,
-                        Internal::TransitionData::Animator& animator,
-                        Property::Index index,
-                        Property::Value& initialValue,
-                        Property::Value& targetValue );
+  void SetupTransition(Dali::Animation&                    transition,
+                       Internal::TransitionData::Animator& animator,
+                       Property::Index                     index,
+                       Property::Value&                    initialValue,
+                       Property::Value&                    targetValue);
 
   /**
    * Animate the opacity property - Special handling to
@@ -438,8 +431,8 @@ private:
    * @param[in] transition The transition to use or set up.
    * @param[in] animator The animation data to use
    */
-  void AnimateOpacityProperty( Dali::Animation& transition,
-                               Internal::TransitionData::Animator& animator );
+  void AnimateOpacityProperty(Dali::Animation&                    transition,
+                              Internal::TransitionData::Animator& animator);
 
   /**
    * Animate the renderer property - no special handling
@@ -447,8 +440,8 @@ private:
    * @param[in] transition The transition to use or set up.
    * @param[in] animator The animation data to use
    */
-  void AnimateRendererProperty( Dali::Animation& transition,
-                                Internal::TransitionData::Animator& animator );
+  void AnimateRendererProperty(Dali::Animation&                    transition,
+                               Internal::TransitionData::Animator& animator);
 
   /**
    * Animate the mix color property.
@@ -461,30 +454,30 @@ private:
    * @param[in] transition The transition to use or set up.
    * @param[in] animator The animation data to use
    */
-  void AnimateMixColorProperty( Dali::Animation& transition,
-                                Internal::TransitionData::Animator& animator );
+  void AnimateMixColorProperty(Dali::Animation&                    transition,
+                               Internal::TransitionData::Animator& animator);
 
   // Undefined
-  Base( const Visual::Base& visual );
+  Base(const Visual::Base& visual);
 
   // Undefined
-  Base& operator=( const Visual::Base& visual );
+  Base& operator=(const Visual::Base& visual);
 
 protected:
   struct Impl;
-  Impl* mImpl;
+  Impl*               mImpl;
   VisualFactoryCache& mFactoryCache;
 };
 
 typedef IntrusivePtr<Base> BasePtr;
 
-} // namspace Visual
+} // namespace Visual
 
 } // namespace Internal
 
-inline const Internal::Visual::Base& GetImplementation(const Toolkit::Visual::Base& visualBase )
+inline const Internal::Visual::Base& GetImplementation(const Toolkit::Visual::Base& visualBase)
 {
-  DALI_ASSERT_ALWAYS( visualBase && "visual base handle is empty" );
+  DALI_ASSERT_ALWAYS(visualBase && "visual base handle is empty");
 
   const BaseObject& handle = visualBase.GetBaseObject();
 
@@ -493,7 +486,7 @@ inline const Internal::Visual::Base& GetImplementation(const Toolkit::Visual::Ba
 
 inline Internal::Visual::Base& GetImplementation(Toolkit::Visual::Base& visualBase)
 {
-  DALI_ASSERT_ALWAYS( visualBase && "visual base handle is empty" );
+  DALI_ASSERT_ALWAYS(visualBase && "visual base handle is empty");
 
   BaseObject& handle = visualBase.GetBaseObject();
 

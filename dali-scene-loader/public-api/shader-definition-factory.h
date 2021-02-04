@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_SHADER_DEFINITION_FACTORY_H_
 #define DALI_SCENE_LOADER_SHADER_DEFINITION_FACTORY_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
  */
 
 // INTERNAL INCLUDES
-#include "dali-scene-loader/public-api/index.h"
 #include "dali-scene-loader/public-api/api.h"
+#include "dali-scene-loader/public-api/index.h"
 
 // EXTERNAL INCLUDER
 #include <memory>
@@ -28,7 +28,6 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 struct NodeDefinition;
 class ResourceBundle;
 
@@ -57,7 +56,7 @@ private:
   const std::unique_ptr<Impl> mImpl;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_SHADER_DEFINITION_FACTORY_H_

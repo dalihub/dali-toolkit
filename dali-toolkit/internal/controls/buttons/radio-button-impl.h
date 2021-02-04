@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_RADIO_BUTTON_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/buttons/radio-button.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
+#include <dali-toolkit/public-api/controls/buttons/radio-button.h>
 #include "button-impl.h"
 
 namespace Dali
@@ -32,16 +32,14 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 /**
  * RadioButton implementation class.
  *
  * \sa Dali::Toolkit::RadioButton
  */
-class RadioButton: public Button
+class RadioButton : public Button
 {
 public:
-
   /**
    * Create a new RadioButton.
    *
@@ -50,7 +48,6 @@ public:
   static Dali::Toolkit::RadioButton New();
 
 private:
-
   /**
    * Construct a new RadioButton.
    */
@@ -62,7 +59,6 @@ private:
   virtual ~RadioButton();
 
 private: // From Button
-
   /**
    * @copydoc Toolkit::Internal::Button::OnInitialize
    */
@@ -71,7 +67,7 @@ private: // From Button
   /**
    * @copydoc Toolkit::Internal::Button::OnStateChange
    */
-  void OnStateChange( State newState ) override;
+  void OnStateChange(State newState) override;
 
   /**
    * @copydoc Toolkit::Internal::Button::OnToggleReleased
@@ -79,12 +75,11 @@ private: // From Button
   bool OnToggleReleased() override;
 
 private:
+  // Undefined
+  RadioButton(const RadioButton& origin);
 
   // Undefined
-  RadioButton( const RadioButton& origin );
-
-  // Undefined
-  RadioButton& operator=( const RadioButton& origin );
+  RadioButton& operator=(const RadioButton& origin);
 
 protected:
   struct AccessibleImpl : public Button::AccessibleImpl
@@ -105,7 +100,7 @@ inline Toolkit::Internal::RadioButton& GetImplementation(Toolkit::RadioButton& b
 
   Dali::RefObject& handle = button.GetImplementation();
 
-  return static_cast<Toolkit::Internal::RadioButton&> (handle);
+  return static_cast<Toolkit::Internal::RadioButton&>(handle);
 }
 
 inline const Toolkit::Internal::RadioButton& GetImplementation(const Toolkit::RadioButton& button)
@@ -114,7 +109,7 @@ inline const Toolkit::Internal::RadioButton& GetImplementation(const Toolkit::Ra
 
   const Dali::RefObject& handle = button.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::RadioButton&> (handle);
+  return static_cast<const Toolkit::Internal::RadioButton&>(handle);
 }
 
 } // namespace Toolkit

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CONTROL_RENDERERS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
-#include <dali/dali.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali/dali.h>
 
 namespace Dali
 {
@@ -26,7 +26,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 #define BASIC_VERTEX_SOURCE SHADER_CONTROL_RENDERERS_VERT
 #define BASIC_FRAGMENT_SOURCE SHADER_CONTROL_RENDERERS_FRAG
 
@@ -36,7 +35,7 @@ namespace Internal
  * @param[in] fragmentSrc The custom fragment shader.
  * @return A newly created renderer.
  */
-Dali::Renderer CreateRenderer( std::string_view vertexSrc, std::string_view fragmentSrc );
+Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragmentSrc);
 
 /**
  * Helper method for rendering an image with custom shader.
@@ -45,21 +44,21 @@ Dali::Renderer CreateRenderer( std::string_view vertexSrc, std::string_view frag
  * @param[in] gridSize The number of grid sub-divisions required.
  * @return A newly created renderer.
  */
-Dali::Renderer CreateRenderer( std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, Dali::Uint16Pair gridSize );
+Dali::Renderer CreateRenderer(std::string_view vertexSrc, std::string_view fragmentSrc, Dali::Shader::Hint::Value hints, Dali::Uint16Pair gridSize);
 
 /**
  * Helper method for setting the first texture passed to a renderer.
  * @param[in] renderer The renderer using the texture.
  * @param[in] texture The texture to set.
  */
-void SetRendererTexture( Dali::Renderer renderer, Dali::Texture texture );
+void SetRendererTexture(Dali::Renderer renderer, Dali::Texture texture);
 
 /**
  * Helper method for setting the first texture passed to a renderer.
  * @param[in] renderer The renderer using the texture.
  * @param[in] framebuffer A frame buffer color texture attached.
  */
-void SetRendererTexture( Dali::Renderer renderer, Dali::FrameBuffer frameBuffer );
+void SetRendererTexture(Dali::Renderer renderer, Dali::FrameBuffer frameBuffer);
 
 } // namespace Internal
 } // namespace Toolkit

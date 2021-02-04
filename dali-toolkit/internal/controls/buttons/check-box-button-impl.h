@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CHECK_BOX_BUTTON_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * CheckBoxButton implementation class.
  *
@@ -43,7 +40,6 @@ namespace Internal
 class CheckBoxButton : public Button
 {
 public:
-
   /**
    * Create a new CheckBoxButton.
    * @return A smart-pointer to the newly allocated CheckBoxButton.
@@ -51,7 +47,6 @@ public:
   static Dali::Toolkit::CheckBoxButton New();
 
 private:
-
   /**
    * Construct a new CheckBoxButton.
    */
@@ -63,20 +58,18 @@ private:
   virtual ~CheckBoxButton();
 
 private: // From Button
-
-
   /**
    * @copydoc Toolkit::Internal::Button::OnInitialize
    */
   void OnInitialize() override;
 
 private:
+  // Undefined
+  CheckBoxButton(const CheckBoxButton&);
 
   // Undefined
-  CheckBoxButton( const CheckBoxButton& );
+  CheckBoxButton& operator=(const CheckBoxButton&);
 
-  // Undefined
-  CheckBoxButton& operator=( const CheckBoxButton& );
 protected:
   struct AccessibleImpl : public Button::AccessibleImpl
   {
@@ -84,29 +77,29 @@ protected:
 
     Dali::Accessibility::States CalculateStates() override;
   };
-  void OnStateChange( State newState ) override;
+  void OnStateChange(State newState) override;
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::CheckBoxButton& GetImplementation( Toolkit::CheckBoxButton& button )
+inline Toolkit::Internal::CheckBoxButton& GetImplementation(Toolkit::CheckBoxButton& button)
 {
-  DALI_ASSERT_ALWAYS( button );
+  DALI_ASSERT_ALWAYS(button);
 
   Dali::RefObject& handle = button.GetImplementation();
 
-  return static_cast<Toolkit::Internal::CheckBoxButton&>( handle );
+  return static_cast<Toolkit::Internal::CheckBoxButton&>(handle);
 }
 
-inline const Toolkit::Internal::CheckBoxButton& GetImplementation( const Toolkit::CheckBoxButton& button )
+inline const Toolkit::Internal::CheckBoxButton& GetImplementation(const Toolkit::CheckBoxButton& button)
 {
-  DALI_ASSERT_ALWAYS( button );
+  DALI_ASSERT_ALWAYS(button);
 
   const Dali::RefObject& handle = button.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::CheckBoxButton&>( handle );
+  return static_cast<const Toolkit::Internal::CheckBoxButton&>(handle);
 }
 
 } // namespace Toolkit

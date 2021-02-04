@@ -22,8 +22,8 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
@@ -31,13 +31,11 @@ class Vector2;
 
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class Gradient;
 class GradientVisual;
-typedef IntrusivePtr< GradientVisual > GradientVisualPtr;
+typedef IntrusivePtr<GradientVisual> GradientVisualPtr;
 
 /**
  * The visual which renders smooth transition of colors to the control's quad.
@@ -71,10 +69,9 @@ typedef IntrusivePtr< GradientVisual > GradientVisualPtr;
  * Valid values for spreadMethod are 'pad', 'repeat' and 'reflect.'
  * If not provided, 'objectBoundingBox' is used as default gradient units, and 'pad' is used as default spread method.
  */
-class GradientVisual: public Visual::Base
+class GradientVisual : public Visual::Base
 {
 public:
-
   /**
    * Types of the gradient
    */
@@ -91,28 +88,26 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static GradientVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
+  static GradientVisualPtr New(VisualFactoryCache& factoryCache, const Property::Map& properties);
 
-public:  // from Visual
-
+public: // from Visual
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
 protected:
-
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  GradientVisual( VisualFactoryCache& factoryCache );
+  GradientVisual(VisualFactoryCache& factoryCache);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -127,7 +122,7 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
@@ -137,7 +132,7 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::UpdateShader
@@ -145,7 +140,6 @@ protected:
   void UpdateShader() override;
 
 private:
-
   /**
    * New a gradient object with the given property map.
    *
@@ -169,17 +163,16 @@ private:
   static void GetStopOffsets(const Property::Value* value, Vector<float>& stopOffsets);
 
   // Undefined
-  GradientVisual( const GradientVisual& gradientVisual );
+  GradientVisual(const GradientVisual& gradientVisual);
 
   // Undefined
-  GradientVisual& operator=( const GradientVisual& gradientVisual );
+  GradientVisual& operator=(const GradientVisual& gradientVisual);
 
 private:
-
-  Matrix3 mGradientTransform;
+  Matrix3                mGradientTransform;
   IntrusivePtr<Gradient> mGradient;
-  Type mGradientType;
-  bool mIsOpaque; ///< Set to false if any of the stop colors are not opaque
+  Type                   mGradientType;
+  bool                   mIsOpaque; ///< Set to false if any of the stop colors are not opaque
 };
 
 } // namespace Internal

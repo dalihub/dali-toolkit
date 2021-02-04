@@ -2,7 +2,7 @@
 #define DALI_TEXT_ABSTRACTION_TEXT_IO_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <iosfwd>
 #include <dali/public-api/common/dali-vector.h>
+#include <iosfwd>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/font-run.h>
@@ -30,13 +30,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Print a vector of characters.
  *
@@ -44,7 +41,7 @@ namespace Text
  * @param [in] text The text to print.
  * @return The output stream operator.
  */
-std::ostream& operator<< (std::ostream& o, const Vector<Character>& text);
+std::ostream& operator<<(std::ostream& o, const Vector<Character>& text);
 
 /**
  * @brief Print a vector of script runs.
@@ -53,7 +50,7 @@ std::ostream& operator<< (std::ostream& o, const Vector<Character>& text);
  * @param [in] scriptRuns The script runs to print.
  * @return The output stream operator.
  */
-std::ostream& operator<< (std::ostream& o, const Vector<ScriptRun>& scriptRuns);
+std::ostream& operator<<(std::ostream& o, const Vector<ScriptRun>& scriptRuns);
 
 /**
  * @brief Print a vector of font runs.
@@ -62,7 +59,7 @@ std::ostream& operator<< (std::ostream& o, const Vector<ScriptRun>& scriptRuns);
  * @param [in] fontRuns The font runs to print.
  * @return The output stream operator.
  */
-std::ostream& operator<< (std::ostream& o, const Vector<FontRun>& fontRuns);
+std::ostream& operator<<(std::ostream& o, const Vector<FontRun>& fontRuns);
 
 /**
  * @brief Print a vector of line runs.
@@ -71,7 +68,7 @@ std::ostream& operator<< (std::ostream& o, const Vector<FontRun>& fontRuns);
  * @param [in] lineRuns The line runs to print.
  * @return The output stream operator.
  */
-std::ostream& operator<< (std::ostream& o, const Vector<LineRun>& lineRuns);
+std::ostream& operator<<(std::ostream& o, const Vector<LineRun>& lineRuns);
 
 } // namespace Text
 

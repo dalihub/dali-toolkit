@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,20 +24,16 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief View provides an interface between the Text layout engine and rendering back-end.
  */
 class View : public ViewInterface
 {
 public:
-
   /**
    * @brief Create a new instance of a View.
    */
@@ -53,7 +49,7 @@ public:
    *
    * @param[in] visualModel The visual model used by the View.
    */
-  void SetVisualModel( VisualModelPtr visualModel );
+  void SetVisualModel(VisualModelPtr visualModel);
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetControlSize()
@@ -73,11 +69,11 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetGlyphs()
    */
-  virtual Length GetGlyphs( GlyphInfo* glyphs,
-                            Vector2* glyphPositions,
-                            float& minLineOffset,
-                            GlyphIndex glyphIndex,
-                            Length numberOfGlyphs ) const;
+  virtual Length GetGlyphs(GlyphInfo* glyphs,
+                           Vector2*   glyphPositions,
+                           float&     minLineOffset,
+                           GlyphIndex glyphIndex,
+                           Length     numberOfGlyphs) const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetColors()
@@ -137,9 +133,9 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineRuns()
    */
-  virtual void GetUnderlineRuns( GlyphRun* underlineRuns,
-                                 UnderlineRunIndex index,
-                                 Length numberOfRuns ) const;
+  virtual void GetUnderlineRuns(GlyphRun*         underlineRuns,
+                                UnderlineRunIndex index,
+                                Length            numberOfRuns) const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetOutlineColor()
@@ -152,15 +148,13 @@ public:
   uint16_t GetOutlineWidth() const override;
 
 private:
+  // Undefined
+  View(const View& handle);
 
   // Undefined
-  View( const View& handle );
-
-  // Undefined
-  View& operator=( const View& handle );
+  View& operator=(const View& handle);
 
 private:
-
   struct Impl;
   Impl* mImpl;
 };

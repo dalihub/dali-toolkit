@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CHARACTER_RUN_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,27 +23,26 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief A run of consecutive characters.
  */
 struct CharacterRun
 {
   CharacterRun()
-  : characterIndex{ 0u },
-    numberOfCharacters{ 0u }
-  {}
+  : characterIndex{0u},
+    numberOfCharacters{0u}
+  {
+  }
 
-  CharacterRun( CharacterIndex characterIndex, Length numberOfCharacters )
-  : characterIndex{ characterIndex },
-    numberOfCharacters{ numberOfCharacters }
-  {}
+  CharacterRun(CharacterIndex characterIndex, Length numberOfCharacters)
+  : characterIndex{characterIndex},
+    numberOfCharacters{numberOfCharacters}
+  {
+  }
 
   CharacterIndex characterIndex;     ///< Index to the first character.
   Length         numberOfCharacters; ///< Number of characters in the run.

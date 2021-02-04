@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_HELPER_FUNCTIONS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,16 +27,13 @@
 
 namespace Dali
 {
-
 struct Vector2;
 struct Vector4;
 
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Stores an attribute pair: name, value.
  */
@@ -44,20 +41,20 @@ struct Attribute
 {
   const char* nameBuffer;
   const char* valueBuffer;
-  Length nameLength;
-  Length valueLength;
+  Length      nameLength;
+  Length      valueLength;
 };
 
 /**
  * @brief Stores a tag and its attributes.
  */
- struct Tag
- {
-   Vector<Attribute> attributes;
-   const char* buffer;
-   Length length;
-   bool isEndTag;
- };
+struct Tag
+{
+  Vector<Attribute> attributes;
+  const char*       buffer;
+  Length            length;
+  bool              isEndTag;
+};
 
 /**
  * @brief Compare if two tokens are equal.
@@ -74,7 +71,7 @@ struct Attribute
  *
  * @return @e true if both strings are equal.
  */
-bool TokenComparison( const std::string& string1, const char* const stringBuffer2, Length length );
+bool TokenComparison(const std::string& string1, const char* const stringBuffer2, Length length);
 
 /**
  * @brief Skips any unnecessary white space.
@@ -82,8 +79,8 @@ bool TokenComparison( const std::string& string1, const char* const stringBuffer
  * @param[in,out] stringBuffer The string buffer. It's a const iterator pointing the current character.
  * @param[in] stringEndBuffer Pointer to one character after the end of the string buffer.
  */
-void SkipWhiteSpace( const char*& stringBuffer,
-                     const char* const stringEndBuffer );
+void SkipWhiteSpace(const char*&      stringBuffer,
+                    const char* const stringEndBuffer);
 
 /**
  * @Brief Jumps to the next white space.
@@ -91,8 +88,8 @@ void SkipWhiteSpace( const char*& stringBuffer,
  * @param[in,out] stringBuffer The string buffer. It's a const iterator pointing the current character.
  * @param[in] stringEndBuffer Pointer to one character after the end of the string buffer.
  */
-void JumpToWhiteSpace( const char*& stringBuffer,
-                       const char* const stringEndBuffer );
+void JumpToWhiteSpace(const char*&      stringBuffer,
+                      const char* const stringEndBuffer);
 
 /**
 * @brief Converts a string into an unsigned int.
@@ -101,7 +98,7 @@ void JumpToWhiteSpace( const char*& stringBuffer,
 *
 * @return The unsigned int value.
 */
-unsigned int StringToUint( const char* const uintStr );
+unsigned int StringToUint(const char* const uintStr);
 
 /**
  * @brief Converts a string into an hexadecimal unsigned int.
@@ -110,7 +107,7 @@ unsigned int StringToUint( const char* const uintStr );
  *
  * @return The hexadecimal value.
  */
-unsigned int StringToHex( const char* const uintStr );
+unsigned int StringToHex(const char* const uintStr);
 
 /**
  * @brief Converts a string into a float value.
@@ -119,7 +116,7 @@ unsigned int StringToHex( const char* const uintStr );
  *
  * @return The float value.
  */
-float StringToFloat( const char* const floatStr );
+float StringToFloat(const char* const floatStr);
 
 /**
  * @brief Converts a float into a string.
@@ -127,7 +124,7 @@ float StringToFloat( const char* const floatStr );
  * @param[in] value The float value.
  * @param[out] floatStr The string.
  */
-void FloatToString( float value, std::string& floatStr );
+void FloatToString(float value, std::string& floatStr);
 
 /**
  * @brief Converts an unsigned int into a string.
@@ -135,7 +132,7 @@ void FloatToString( float value, std::string& floatStr );
  * @param[in] value The unsigned int value.
  * @param[out] uIntStr The string.
  */
-void UintToString( unsigned int value, std::string& uIntStr );
+void UintToString(unsigned int value, std::string& uIntStr);
 
 /**
  * @brief Converts an ARGB color packed in 4 byte unsigned int into a Vector4 color used in Dali.
@@ -143,7 +140,7 @@ void UintToString( unsigned int value, std::string& uIntStr );
  * @param[in] color An ARGB color packed in an unsigned int.
  * @param[out] retColor A Vector4 with the converted color.
  */
-void UintColorToVector4( unsigned int color, Vector4& retColor );
+void UintColorToVector4(unsigned int color, Vector4& retColor);
 
 /**
  * @brief Converts a color packed inside a string into an ARGB Vector4 color.
@@ -155,7 +152,7 @@ void UintColorToVector4( unsigned int color, Vector4& retColor );
  * @param[in] length The length of the color string.
  * @param[out] retColor A color packed inside a Vector4.
  */
-void ColorStringToVector4( const char* const colorStr, Length length, Vector4& retColor );
+void ColorStringToVector4(const char* const colorStr, Length length, Vector4& retColor);
 
 /**
  * @brief Converts a color packed in a Vector4 into a string.
@@ -167,7 +164,7 @@ void ColorStringToVector4( const char* const colorStr, Length length, Vector4& r
  * @param[in] value The color value.
  * @param[out] colorStr The string.
  */
-void Vector4ToColorString( const Vector4& value, std::string& vector2Str );
+void Vector4ToColorString(const Vector4& value, std::string& vector2Str);
 
 /**
  * @brief Converts a two dimension vector packed inside a string into a Vector2.
@@ -176,7 +173,7 @@ void Vector4ToColorString( const Vector4& value, std::string& vector2Str );
  * @param[in] length The length of the string.
  * @param[out] vector2 The Vector2.
  */
-void StringToVector2( const char* const vectorStr, Length length, Vector2& vector2 );
+void StringToVector2(const char* const vectorStr, Length length, Vector2& vector2);
 
 /**
  * @brief Converts a Vector2 into a string.
@@ -184,7 +181,7 @@ void StringToVector2( const char* const vectorStr, Length length, Vector2& vecto
  * @param[in] value The vector2 value.
  * @param[out] vector2Str The string.
  */
-void Vector2ToString( const Vector2& value, std::string& vector2Str );
+void Vector2ToString(const Vector2& value, std::string& vector2Str);
 
 } // namespace Text
 

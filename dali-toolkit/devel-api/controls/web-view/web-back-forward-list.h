@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_BACK_FORWARD_LIST_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 namespace Dali
 {
-
 class WebEngineBackForwardList;
 
 namespace Toolkit
@@ -49,7 +48,7 @@ public:
   /**
    * @brief Creates a WebBackForwardList.
    */
-  WebBackForwardList( const Dali::WebEngineBackForwardList& list );
+  WebBackForwardList(const Dali::WebEngineBackForwardList& list);
 
   /**
    * @brief Destructor.
@@ -78,9 +77,8 @@ public:
   uint32_t GetItemCount() const;
 
 private:
-  const Dali::WebEngineBackForwardList&  mWebEngineBackForwardList;
+  const Dali::WebEngineBackForwardList& mWebEngineBackForwardList;
   Dali::Toolkit::WebBackForwardListItem mWebBackForwardListItem;
-
 };
 
 /**
