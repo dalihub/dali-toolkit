@@ -1,3 +1,6 @@
+#ifndef DALI_TOOLKIT_TEXT_ANCHOR_H
+#define DALI_TOOLKIT_TEXT_ANCHOR_H
+
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
@@ -16,37 +19,28 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
-#include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
+#include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-namespace DevelTextField
+namespace Text
 {
-InputMethodContext GetInputMethodContext(TextField textField)
+/**
+ * @brief An anchor within the text.
+ */
+struct Anchor
 {
-  return GetImpl(textField).GetInputMethodContext();
-}
+  CharacterIndex startIndex; ///< The character's start index of the anchor within the string.
+  CharacterIndex endIndex;   ///< The character's end index of the anchor within the string.
+  char*          href;       ///< The url path
+};
 
-AnchorClickedSignalType& AnchorClickedSignal(TextField textField)
-{
-  return GetImpl(textField).AnchorClickedSignal();
-}
-
-void SelectWholeText(TextField textField)
-{
-  GetImpl(textField).SelectWholeText();
-}
-
-void SelectNone(TextField textField)
-{
-  GetImpl(textField).SelectNone();
-}
-
-} // namespace DevelTextField
+} // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // DALI_TOOLKIT_TEXT_ANCHOR_H

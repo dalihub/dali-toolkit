@@ -134,6 +134,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/markup-processor.cpp
    ${toolkit_src_dir}/text/markup-processor-color.cpp
    ${toolkit_src_dir}/text/markup-processor-embedded-item.cpp
+   ${toolkit_src_dir}/text/markup-processor-anchor.cpp
    ${toolkit_src_dir}/text/markup-processor-font.cpp
    ${toolkit_src_dir}/text/markup-processor-helper-functions.cpp
    ${toolkit_src_dir}/text/multi-language-support.cpp

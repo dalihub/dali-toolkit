@@ -130,6 +130,8 @@ const char* HANDLE_RIGHT_SELECTION_FILE_NAME = TEST_RESOURCE_DIR "/selection_han
 
 const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 
+static bool gAnchorClickedCallBackCalled;
+static bool gAnchorClickedCallBackNotCalled;
 static bool gTextChangedCallBackCalled;
 static bool gInputStyleChangedCallbackCalled;
 static bool gMaxCharactersCallBackCalled;
@@ -148,6 +150,18 @@ struct CallbackFunctor
   }
   bool* mCallbackFlag;
 };
+
+static void TestAnchorClickedCallback(TextEditor control, const char* href, unsigned int hrefLength)
+{
+  tet_infoline(" TestAnchorClickedCallback");
+
+  gAnchorClickedCallBackNotCalled = false;
+
+  if (!strcmp(href, "https://www.tizen.org") && hrefLength == strlen(href))
+  {
+    gAnchorClickedCallBackCalled = true;
+  }
+}
 
 static void TestTextChangedCallback( TextEditor control )
 {
@@ -949,6 +963,52 @@ int utcDaliTextEditorAtlasRenderP(void)
   {
     tet_result(TET_FAIL);
   }
+  END_TEST;
+}
+
+// Positive test for the anchorClicked signal.
+int utcDaliTextEditorAnchorClickedP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorAnchorClickedP");
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  application.GetScene().Add(editor);
+
+  // connect to the anchor clicked signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextEditor::AnchorClickedSignal(editor).Connect(&TestAnchorClickedCallback);
+  bool anchorClickedSignal = false;
+  editor.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+
+  gAnchorClickedCallBackCalled = false;
+  editor.SetProperty(TextEditor::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.SendNotification();
+  application.Render();
+  editor.SetKeyInputFocus();
+
+  // Create a tap event to touch the text editor.
+  TestGenerateTap(application, 5.0f, 5.0f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+  DALI_TEST_CHECK(anchorClickedSignal);
+
+  gAnchorClickedCallBackNotCalled = true;
+  // Tap the outside of anchor, callback should not be called.
+  TestGenerateTap(application, 150.f, 100.f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackNotCalled);
+
   END_TEST;
 }
 

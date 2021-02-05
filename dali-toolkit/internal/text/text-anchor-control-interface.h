@@ -1,3 +1,6 @@
+#ifndef DALI_TOOLKIT_TEXT_ANCHOR_CONTROL_INTERFACE_H
+#define DALI_TOOLKIT_TEXT_ANCHOR_CONTROL_INTERFACE_H
+
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
@@ -15,38 +18,33 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
-#include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
-
 namespace Dali
 {
 namespace Toolkit
 {
-namespace DevelTextField
+namespace Text
 {
-InputMethodContext GetInputMethodContext(TextField textField)
+/**
+ * @brief An interface that the Text::Controller used for anchor functionality.
+ */
+class AnchorControlInterface
 {
-  return GetImpl(textField).GetInputMethodContext();
-}
+public:
+  /**
+   * @brief Virtual destructor.
+   */
+  virtual ~AnchorControlInterface() = default;
 
-AnchorClickedSignalType& AnchorClickedSignal(TextField textField)
-{
-  return GetImpl(textField).AnchorClickedSignal();
-}
+  /**
+   * @brief Called to signal that anchor has been clicked.
+   */
+  virtual void AnchorClicked(const std::string& href) = 0;
+};
 
-void SelectWholeText(TextField textField)
-{
-  GetImpl(textField).SelectWholeText();
-}
-
-void SelectNone(TextField textField)
-{
-  GetImpl(textField).SelectNone();
-}
-
-} // namespace DevelTextField
+} // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // DALI_TOOLKIT_TEXT_ANCHOR_CONTROL_INTERFACE_H

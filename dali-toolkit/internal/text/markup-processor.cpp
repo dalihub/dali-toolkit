@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali-toolkit/internal/text/markup-processor-anchor.h>
 #include <dali-toolkit/internal/text/markup-processor-color.h>
 #include <dali-toolkit/internal/text/markup-processor-embedded-item.h>
 #include <dali-toolkit/internal/text/markup-processor-font.h>
@@ -51,6 +52,7 @@ const std::string XHTML_SHADOW_TAG("shadow");
 const std::string XHTML_GLOW_TAG("glow");
 const std::string XHTML_OUTLINE_TAG("outline");
 const std::string XHTML_ITEM_TAG("item");
+const std::string XHTML_ANCHOR_TAG("a");
 
 const char LESS_THAN      = '<';
 const char GREATER_THAN   = '>';
@@ -580,6 +582,38 @@ void ProcessItemTag(
 }
 
 /**
+ * @brief Processes the anchor tag
+ *
+ * @param[in/out] markupProcessData The markup process data
+ * @param[in] tag The current tag
+ * @param[in/out] characterIndex The current character index
+ */
+void ProcessAnchorTag(
+  MarkupProcessData& markupProcessData,
+  const Tag          tag,
+  CharacterIndex&    characterIndex)
+{
+  if(!tag.isEndTag)
+  {
+    // Create an anchor instance.
+    Anchor anchor;
+    anchor.startIndex = characterIndex;
+    anchor.endIndex   = 0u;
+    ProcessAnchor(tag, anchor);
+    markupProcessData.anchors.PushBack(anchor);
+  }
+  else
+  {
+    // Update end index.
+    unsigned int count = markupProcessData.anchors.Count();
+    if(count > 0)
+    {
+      markupProcessData.anchors[count - 1].endIndex = characterIndex;
+    }
+  }
+}
+
+/**
  * @brief Resizes the model's vectors
  *
  * @param[in/out] markupProcessData The markup process data
@@ -763,6 +797,18 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
         ProcessTagForRun<FontDescriptionRun>(
           markupProcessData.fontRuns, styleStack, tag, characterIndex, fontRunIndex, fontTagReference, [](const Tag& tag, FontDescriptionRun& fontRun) { ProcessFontTag(tag, fontRun); });
       } // <font></font>
+      else if(TokenComparison(XHTML_ANCHOR_TAG, tag.buffer, tag.length))
+      {
+        /* Anchor */
+        ProcessAnchorTag(markupProcessData, tag, characterIndex);
+        /* Color */
+        ProcessTagForRun<ColorRun>(
+          markupProcessData.colorRuns, styleStack, tag, characterIndex, colorRunIndex, colorTagReference, [](const Tag& tag, ColorRun& run) {
+            run.color = Color::BLUE;
+            ProcessColorTag(tag, run);
+          });
+        /* TODO - underline */
+      } // <a href=https://www.tizen.org>tizen</a>
       else if(TokenComparison(XHTML_SHADOW_TAG, tag.buffer, tag.length))
       {
         // TODO: If !tag.isEndTag, then create a new shadow run.

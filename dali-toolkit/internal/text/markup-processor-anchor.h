@@ -1,3 +1,6 @@
+#ifndef DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_ANCHOR_H
+#define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_ANCHOR_H
+
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
@@ -15,38 +18,30 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
-#include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
-
 namespace Dali
 {
+
 namespace Toolkit
 {
-namespace DevelTextField
-{
-InputMethodContext GetInputMethodContext(TextField textField)
-{
-  return GetImpl(textField).GetInputMethodContext();
-}
 
-AnchorClickedSignalType& AnchorClickedSignal(TextField textField)
+namespace Text
 {
-  return GetImpl(textField).AnchorClickedSignal();
-}
 
-void SelectWholeText(TextField textField)
-{
-  GetImpl(textField).SelectWholeText();
-}
+struct Tag;
+struct Anchor;
 
-void SelectNone(TextField textField)
-{
-  GetImpl(textField).SelectNone();
-}
+/**
+ * @brief Retrieves the @e anchor from the @p tag.
+ *
+ * @param[in] tag The anchor tag and its attributes.
+ * @param[in,out] anchor The anchor.
+ */
+void ProcessAnchor( const Tag& tag, Anchor& anchor );
 
-} // namespace DevelTextField
+} // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_ANCHOR_H
