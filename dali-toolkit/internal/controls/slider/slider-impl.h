@@ -24,6 +24,7 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
@@ -747,10 +748,10 @@ private:
     mSnapToMarks : 1;  ///< Turn on or off snapping to marks
 
 protected:
-  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
+  struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Value
   {
-    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::AccessibleImpl::AccessibleImpl;
     double GetMinimum() override;
     double GetCurrent() override;
     double GetMaximum() override;

@@ -30,6 +30,7 @@
 #include <sstream>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/controls/shadow-view/shadow-view-impl.h>
@@ -257,7 +258,7 @@ void ShadowView::OnInitialize()
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new Control::Impl::AccessibleImpl(actor, Dali::Accessibility::Role::FILLER));
+      new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::FILLER));
   });
 }
 

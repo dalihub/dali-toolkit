@@ -29,6 +29,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
@@ -281,7 +282,7 @@ void Model3dView::OnInitialize()
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new Control::Impl::AccessibleImpl(actor, Dali::Accessibility::Role::IMAGE));
+      new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::IMAGE));
   });
 }
 

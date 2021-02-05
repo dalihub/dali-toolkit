@@ -2081,7 +2081,7 @@ Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
 {
   using namespace Dali::Accessibility;
 
-  auto states = Control::Impl::AccessibleImpl::CalculateStates();
+  auto states = DevelControl::AccessibleImpl::CalculateStates();
 
   states[State::EDITABLE]  = true;
   states[State::FOCUSABLE] = true;

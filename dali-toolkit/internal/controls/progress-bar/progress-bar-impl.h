@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/progress-bar/progress-bar-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
@@ -261,10 +262,10 @@ private:
   Property::Map           mSecondaryProgressVisualMap;    ///< To backup visual properties when switching determinate/indeterminate.
 
 protected:
-  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
+  struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Value
   {
-    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::AccessibleImpl::AccessibleImpl;
     double GetMinimum() override;
     double GetCurrent() override;
     double GetMaximum() override;

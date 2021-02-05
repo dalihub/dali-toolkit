@@ -34,6 +34,7 @@
 #include <sstream>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
@@ -296,7 +297,7 @@ void GaussianBlurView::OnInitialize()
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new Control::Impl::AccessibleImpl(actor, Dali::Accessibility::Role::FILLER));
+      new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::FILLER));
   });
 }
 
@@ -560,7 +561,7 @@ void GaussianBlurView::SetShaderConstants()
   uvOffsets[0].x            = 0.0f;
   uvOffsets[0].y            = 0.0f;
 
-  for(i = 0; i < mNumSamples >> 1; i++)
+  for(i = 0; i<mNumSamples >> 1; i++)
   {
     w                     = CalcGaussianWeight((float)(i + 1));
     weights[(i << 1) + 1] = w;

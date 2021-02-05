@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
@@ -358,11 +359,11 @@ private: // Data
   bool  mHasBeenStaged : 1;
 
 protected:
-  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
+  struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Text,
                           public virtual Dali::Accessibility::EditableText
   {
-    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::AccessibleImpl::AccessibleImpl;
 
     std::string           GetName() override;
     std::string           GetText(size_t startOffset, size_t endOffset) override;

@@ -28,6 +28,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -219,7 +220,7 @@ void Magnifier::Initialize()
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new Control::Impl::AccessibleImpl(actor, Dali::Accessibility::Role::FILLER));
+      new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::FILLER));
   });
 }
 
