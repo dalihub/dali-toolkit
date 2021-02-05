@@ -542,9 +542,9 @@ int UtcDaliImageVisualTextureReuse2(void)
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
   DALI_TEST_EQUALS( drawTrace.CountMethod("DrawArrays"), 2, TEST_LOCATION );
   TraceCallStack::NamedParams tex1;
-  tex1["texture"] = "1";
+  tex1["texture"] << 1;
   TraceCallStack::NamedParams tex2;
-  tex1["texture"] = "2";
+  tex2["texture"] << 2;
   DALI_TEST_EQUALS( textureTrace.FindMethodAndParams("BindTexture", tex1), true, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethodAndParams("BindTexture", tex2), true, TEST_LOCATION );
 

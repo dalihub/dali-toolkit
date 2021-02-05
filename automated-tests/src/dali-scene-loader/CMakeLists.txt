@@ -62,6 +62,7 @@ SET(TEST_HARNESS_SOURCES
   ${TEST_HARNESS_DIR}/test-graphics-controller.cpp
   ${TEST_HARNESS_DIR}/test-graphics-texture.cpp
   ${TEST_HARNESS_DIR}/test-graphics-sampler.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-pipeline.cpp
   ${TEST_HARNESS_DIR}/test-platform-abstraction.cpp
   ${TEST_HARNESS_DIR}/test-render-controller.cpp
   ${TEST_HARNESS_DIR}/test-trace-call-stack.cpp
