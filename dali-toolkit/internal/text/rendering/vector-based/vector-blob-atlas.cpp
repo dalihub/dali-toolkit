@@ -195,7 +195,7 @@ void VectorBlobAtlas::TexSubImage(unsigned int offsetX,
   size_t dataIndex = 0;
   for(size_t y = 0; y < height; y++)
   {
-    pos = y * mTextureWidth * 4;
+    pos = y * width * 4;
     for(size_t x = 0; x < width; x++)
     {
       pixbuf[pos + x * 4]     = 0xFF & blob[dataIndex].r;
