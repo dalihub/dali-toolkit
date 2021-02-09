@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_SKELETON_H
 #define DALI_SCENE_LOADER_SKELETON_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 /*
  * @brief A set of joints (stored as node indices), and an optional root node index.
  * @note The list of joints must not be empty and must not contain INVALID_INDEX.
@@ -39,17 +38,17 @@ struct DALI_SCENE_LOADER_API SkeletonDefinition
 {
   struct Joint
   {
-    Index mNodeIdx;
+    Index  mNodeIdx;
     Matrix mInverseBindMatrix;
   };
 
   using Vector = std::vector<SkeletonDefinition>;
 
-  Index mRootNodeIdx = INVALID_INDEX;
+  Index              mRootNodeIdx = INVALID_INDEX;
   std::vector<Joint> mJoints;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_SKELETON_H

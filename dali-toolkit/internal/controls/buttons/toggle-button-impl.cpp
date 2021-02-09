@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,50 +19,45 @@
 #include "toggle-button-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali/public-api/object/property-array.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/object/property-array.h>
+#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/public-api/align-enumerations.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 #if defined(DEBUG_ENABLED)
-  extern Debug::Filter* gLogButtonFilter;
+extern Debug::Filter* gLogButtonFilter;
 #endif
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 BaseHandle Create()
 {
   return Toolkit::ToggleButton::New();
 }
 
 // Properties
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ToggleButton, Toolkit::Button, Create )
+DALI_TYPE_REGISTRATION_BEGIN(Toolkit::ToggleButton, Toolkit::Button, Create)
 
-DALI_PROPERTY_REGISTRATION( Toolkit, ToggleButton, "stateVisuals",       ARRAY,     STATE_VISUALS        )
-DALI_PROPERTY_REGISTRATION( Toolkit, ToggleButton, "tooltips",           ARRAY,     TOOLTIPS             )
-DALI_PROPERTY_REGISTRATION( Toolkit, ToggleButton, "currentStateIndex",  INTEGER,   CURRENT_STATE_INDEX  )
+DALI_PROPERTY_REGISTRATION(Toolkit, ToggleButton, "stateVisuals", ARRAY, STATE_VISUALS)
+DALI_PROPERTY_REGISTRATION(Toolkit, ToggleButton, "tooltips", ARRAY, TOOLTIPS)
+DALI_PROPERTY_REGISTRATION(Toolkit, ToggleButton, "currentStateIndex", INTEGER, CURRENT_STATE_INDEX)
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -70,12 +65,12 @@ DALI_TYPE_REGISTRATION_END()
 
 Dali::Toolkit::ToggleButton ToggleButton::New()
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::New\n" );
+  DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::New\n");
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr< ToggleButton > internalToggleButton = new ToggleButton();
+  IntrusivePtr<ToggleButton> internalToggleButton = new ToggleButton();
 
   // Pass ownership to CustomActor
-  Dali::Toolkit::ToggleButton toggleButton( *internalToggleButton );
+  Dali::Toolkit::ToggleButton toggleButton(*internalToggleButton);
 
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
@@ -94,8 +89,8 @@ ToggleButton::ToggleButton()
   mToggleTooltips(),
   mCurrentToggleIndex(0)
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::Constructor\n" );
-  SetTogglableButton( false );
+  DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::Constructor\n");
+  SetTogglableButton(false);
 }
 
 ToggleButton::~ToggleButton()
@@ -104,37 +99,37 @@ ToggleButton::~ToggleButton()
 
 void ToggleButton::OnInitialize()
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::OnInitialize\n" );
+  DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::OnInitialize\n");
   Button::OnInitialize();
 
   // Toggle button requires the Leave event.
   Actor self = Self();
-  self.SetProperty( Actor::Property::LEAVE_REQUIRED, true );
+  self.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new AccessibleImpl( actor, Dali::Accessibility::Role::TOGGLE_BUTTON ) );
-  } );
+  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
+    return std::unique_ptr<Dali::Accessibility::Accessible>(
+      new AccessibleImpl(actor, Dali::Accessibility::Role::TOGGLE_BUTTON));
+  });
 }
 
-void ToggleButton::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
+void ToggleButton::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)
 {
-  Toolkit::ToggleButton toggleButton = Toolkit::ToggleButton::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::ToggleButton toggleButton = Toolkit::ToggleButton::DownCast(Dali::BaseHandle(object));
 
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "ToggleButton::SetProperty index[%d]\n", propertyIndex );
+  DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "ToggleButton::SetProperty index[%d]\n", propertyIndex);
 
-  if ( toggleButton )
+  if(toggleButton)
   {
-    ToggleButton& toggleButtonImpl( GetImplementation( toggleButton ) );
+    ToggleButton& toggleButtonImpl(GetImplementation(toggleButton));
 
-    switch ( propertyIndex )
+    switch(propertyIndex)
     {
       case Toolkit::ToggleButton::Property::STATE_VISUALS:
       {
         Property::Array stateArray;
-        if( value.Get( stateArray ) )
+        if(value.Get(stateArray))
         {
-          toggleButtonImpl.SetToggleStates( stateArray );
+          toggleButtonImpl.SetToggleStates(stateArray);
         }
 
         break;
@@ -142,20 +137,20 @@ void ToggleButton::SetProperty( BaseObject* object, Property::Index propertyInde
       case Toolkit::ToggleButton::Property::TOOLTIPS:
       {
         const Property::Array* tipArray = value.GetArray();
-        if( tipArray )
+        if(tipArray)
         {
           std::vector<std::string> tips;
-          size_t tipsCount = tipArray->Count();
-          tips.resize( tipsCount );
-          for( size_t i = 0; i != tipsCount; ++i )
+          size_t                   tipsCount = tipArray->Count();
+          tips.resize(tipsCount);
+          for(size_t i = 0; i != tipsCount; ++i)
           {
-            tipArray->GetElementAt( i ).Get( tips[i] );
+            tipArray->GetElementAt(i).Get(tips[i]);
           }
           toggleButtonImpl.SetToggleTooltips(tips);
         }
         break;
       }
-      default :
+      default:
       {
         break;
       }
@@ -163,38 +158,38 @@ void ToggleButton::SetProperty( BaseObject* object, Property::Index propertyInde
   }
 }
 
-Property::Value ToggleButton::GetProperty( BaseObject* object, Property::Index propertyIndex )
+Property::Value ToggleButton::GetProperty(BaseObject* object, Property::Index propertyIndex)
 {
   Property::Value value;
 
-  Toolkit::ToggleButton toggleButton = Toolkit::ToggleButton::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::ToggleButton toggleButton = Toolkit::ToggleButton::DownCast(Dali::BaseHandle(object));
 
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "ToggleButton::GetProperty index[%d]\n", propertyIndex );
+  DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "ToggleButton::GetProperty index[%d]\n", propertyIndex);
 
-  if ( toggleButton )
+  if(toggleButton)
   {
-    ToggleButton& toggleButtonImpl( GetImplementation( toggleButton ) );
+    ToggleButton& toggleButtonImpl(GetImplementation(toggleButton));
 
-    switch ( propertyIndex )
+    switch(propertyIndex)
     {
       case Toolkit::ToggleButton::Property::STATE_VISUALS:
       {
         Property::Array array = toggleButtonImpl.GetToggleStates();
-        value = Property::Value( array );
+        value                 = Property::Value(array);
         break;
       }
       case Toolkit::ToggleButton::Property::TOOLTIPS:
       {
-        Property::Value value1( Property::ARRAY );
+        Property::Value  value1(Property::ARRAY);
         Property::Array* tipArray = value1.GetArray();
 
-        if( tipArray )
+        if(tipArray)
         {
           std::vector<std::string> tips = toggleButtonImpl.GetToggleTooltips();
-          size_t tipsCount( tips.size() );
-          for( size_t i( 0 ); i != tipsCount; ++i )
+          size_t                   tipsCount(tips.size());
+          for(size_t i(0); i != tipsCount; ++i)
           {
-            tipArray->PushBack( tips[i] );
+            tipArray->PushBack(tips[i]);
           }
         }
         value = value1;
@@ -211,51 +206,51 @@ Property::Value ToggleButton::GetProperty( BaseObject* object, Property::Index p
   return value;
 }
 
-void ToggleButton::CreateVisualsForAllStates( const Property::Array& states, std::vector<Toolkit::Visual::Base>& visuals )
+void ToggleButton::CreateVisualsForAllStates(const Property::Array& states, std::vector<Toolkit::Visual::Base>& visuals)
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::CreateVisualsForAllStates\n" );
+  DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::CreateVisualsForAllStates\n");
 
   visuals.clear();
 
-  for ( unsigned int i = 0; i < states.Count(); i++ )
+  for(unsigned int i = 0; i < states.Count(); i++)
   {
-    Property::Value value(  states[i] );
+    Property::Value value(states[i]);
 
     Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
-    Toolkit::Visual::Base stateVisual;
+    Toolkit::Visual::Base  stateVisual;
 
-    if ( value.GetType() == Property::MAP )
+    if(value.GetType() == Property::MAP)
     {
-      Property::Map *map = value.GetMap();
-      if( map && !map->Empty() ) // Empty map results in current visual removal.
+      Property::Map* map = value.GetMap();
+      if(map && !map->Empty()) // Empty map results in current visual removal.
       {
-        DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "ToggleButton::CreateVisuals Using Map\n" );
-        stateVisual = visualFactory.CreateVisual( *map );
+        DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "ToggleButton::CreateVisuals Using Map\n");
+        stateVisual = visualFactory.CreateVisual(*map);
       }
     }
-    else if ( value.GetType() ==  Property::STRING )
+    else if(value.GetType() == Property::STRING)
     {
       std::string imageUrl = value.Get<std::string>();
-      DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "ToggleButton::CreateVisuals Using image URL\n" );
-      if ( !imageUrl.empty() )
+      DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "ToggleButton::CreateVisuals Using image URL\n");
+      if(!imageUrl.empty())
       {
-        stateVisual = visualFactory.CreateVisual( imageUrl, ImageDimensions() );
+        stateVisual = visualFactory.CreateVisual(imageUrl, ImageDimensions());
       }
     }
 
-    if ( stateVisual )
+    if(stateVisual)
     {
-      stateVisual.SetDepthIndex( DepthIndex::CONTENT );
-      visuals.push_back( stateVisual );
+      stateVisual.SetDepthIndex(DepthIndex::CONTENT);
+      visuals.push_back(stateVisual);
     }
   } // end of for
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "ToggleButton::CreateVisuals mToggleVisuals:%d\n", mToggleVisuals.size() );
+  DALI_LOG_INFO(gLogButtonFilter, Debug::Verbose, "ToggleButton::CreateVisuals mToggleVisuals:%d\n", mToggleVisuals.size());
 }
 
-void ToggleButton::SetToggleStates( const Property::Array& states )
+void ToggleButton::SetToggleStates(const Property::Array& states)
 { //this should really be generalized to be either string or maps so that any visual can be created.
-  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::SetToggleStates\n" );
-  if ( !states.Empty() )
+  DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::SetToggleStates\n");
+  if(!states.Empty())
   {
     mToggleStates.Clear();
     mToggleStates = states;
@@ -263,17 +258,17 @@ void ToggleButton::SetToggleStates( const Property::Array& states )
     mCurrentToggleIndex = 0;
 
     // Create all visuals, save to mToggleVisuals.
-    CreateVisualsForAllStates( states, mToggleVisuals );
-    CreateVisualsForAllStates( states, mToggleSelectedVisuals );
-    CreateVisualsForAllStates( states, mToggleDisabledVisuals );
-    CreateVisualsForAllStates( states, mToggleDisabledSelectedVisuals );
+    CreateVisualsForAllStates(states, mToggleVisuals);
+    CreateVisualsForAllStates(states, mToggleSelectedVisuals);
+    CreateVisualsForAllStates(states, mToggleDisabledVisuals);
+    CreateVisualsForAllStates(states, mToggleDisabledSelectedVisuals);
 
-    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::Began to register visual.\n" );
+    DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::Began to register visual.\n");
 
-    PrepareVisual( Toolkit::Button::Property::UNSELECTED_VISUAL, mToggleVisuals[mCurrentToggleIndex] );
-    PrepareVisual( Toolkit::Button::Property::SELECTED_VISUAL, mToggleSelectedVisuals[mCurrentToggleIndex] );
-    PrepareVisual( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, mToggleDisabledVisuals[mCurrentToggleIndex] );
-    PrepareVisual( Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, mToggleDisabledSelectedVisuals[mCurrentToggleIndex] );
+    PrepareVisual(Toolkit::Button::Property::UNSELECTED_VISUAL, mToggleVisuals[mCurrentToggleIndex]);
+    PrepareVisual(Toolkit::Button::Property::SELECTED_VISUAL, mToggleSelectedVisuals[mCurrentToggleIndex]);
+    PrepareVisual(Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, mToggleDisabledVisuals[mCurrentToggleIndex]);
+    PrepareVisual(Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, mToggleDisabledSelectedVisuals[mCurrentToggleIndex]);
 
     RelayoutRequest();
   }
@@ -284,18 +279,18 @@ Property::Array ToggleButton::GetToggleStates() const
   return mToggleStates;
 }
 
-void ToggleButton::SetToggleTooltips( std::vector<std::string>& tips )
+void ToggleButton::SetToggleTooltips(std::vector<std::string>& tips)
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::SetToggleTooltips\n" );
-  if ( !tips.empty() )
+  DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::SetToggleTooltips\n");
+  if(!tips.empty())
   {
     mToggleTooltips.clear();
-    mToggleTooltips.swap( tips );
+    mToggleTooltips.swap(tips);
   }
 
-  if ( !mToggleTooltips.empty() && ( mCurrentToggleIndex < mToggleTooltips.size() ) )
+  if(!mToggleTooltips.empty() && (mCurrentToggleIndex < mToggleTooltips.size()))
   {
-    Self().SetProperty( Toolkit::DevelControl::Property::TOOLTIP, mToggleTooltips[mCurrentToggleIndex] );
+    Self().SetProperty(Toolkit::DevelControl::Property::TOOLTIP, mToggleTooltips[mCurrentToggleIndex]);
   }
 
   RelayoutRequest();
@@ -311,67 +306,67 @@ void ToggleButton::PrepareVisual(Property::Index index, Toolkit::Visual::Base& v
   bool enabled = false; // Disabled by default
 
   // Unregister the visual with the given index if registered previously
-  if( DevelControl::GetVisual( *this, index ) )
+  if(DevelControl::GetVisual(*this, index))
   {
     // Check whether it was enabled to ensure we do the same with the new visual we're registering
-    enabled = DevelControl::IsVisualEnabled( *this, index );
-    DevelControl::UnregisterVisual( *this, index );
+    enabled = DevelControl::IsVisualEnabled(*this, index);
+    DevelControl::UnregisterVisual(*this, index);
   }
 
-  DevelControl::RegisterVisual( *this, index, visual, enabled );
+  DevelControl::RegisterVisual(*this, index, visual, enabled);
 }
 
-void ToggleButton::RelayoutVisual( Property::Index index, const Vector2& size )
+void ToggleButton::RelayoutVisual(Property::Index index, const Vector2& size)
 {
-  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, index );
-  if ( visual )
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(*this, index);
+  if(visual)
   {
-    Size visualSize = Size::ZERO;
+    Size    visualSize     = Size::ZERO;
     Vector2 visualPosition = Vector2::ZERO;
 
-    visual.GetNaturalSize( visualSize );
+    visual.GetNaturalSize(visualSize);
 
-    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::OnRelayout Setting visual size to(%f,%f)\n", visualSize.width, visualSize.height );
-    DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::OnRelayout Setting visual position to(%f,%f)\n", visualPosition.x, visualPosition.y );
+    DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::OnRelayout Setting visual size to(%f,%f)\n", visualSize.width, visualSize.height);
+    DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::OnRelayout Setting visual position to(%f,%f)\n", visualPosition.x, visualPosition.y);
 
     Property::Map visualTransform;
-    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, visualSize )
-                   .Add( Toolkit::Visual::Transform::Property::OFFSET, visualPosition )
-                   .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-                   .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER );
+    visualTransform.Add(Toolkit::Visual::Transform::Property::SIZE, visualSize)
+      .Add(Toolkit::Visual::Transform::Property::OFFSET, visualPosition)
+      .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
+      .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
+      .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::CENTER)
+      .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER);
 
-    visual.SetTransformAndSize( visualTransform, size );
+    visual.SetTransformAndSize(visualTransform, size);
   }
 }
 
-void ToggleButton::OnRelayout( const Vector2& size, RelayoutContainer& container )
+void ToggleButton::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::OnRelayout targetSize(%f,%f) ptr(%p)\n", size.width, size.height, this );
+  DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::OnRelayout targetSize(%f,%f) ptr(%p)\n", size.width, size.height, this);
 
-  RelayoutVisual( Toolkit::Button::Property::UNSELECTED_VISUAL, size );
-  RelayoutVisual( Toolkit::Button::Property::SELECTED_VISUAL, size );
-  RelayoutVisual( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, size );
-  RelayoutVisual( Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, size );
+  RelayoutVisual(Toolkit::Button::Property::UNSELECTED_VISUAL, size);
+  RelayoutVisual(Toolkit::Button::Property::SELECTED_VISUAL, size);
+  RelayoutVisual(Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, size);
+  RelayoutVisual(Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, size);
 }
 
 void ToggleButton::OnPressed()
 {
-  DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::OnPressed\n" );
+  DALI_LOG_INFO(gLogButtonFilter, Debug::General, "ToggleButton::OnPressed\n");
   // State index will add 1 only when button is pressed.
-  mCurrentToggleIndex = ( mCurrentToggleIndex + 1 ) % mToggleVisuals.size();
+  mCurrentToggleIndex = (mCurrentToggleIndex + 1) % mToggleVisuals.size();
 
   // Both create SelectedVisual and UnselectedVisual
-  PrepareVisual( Toolkit::Button::Property::UNSELECTED_VISUAL, mToggleVisuals[mCurrentToggleIndex] );
-  PrepareVisual( Toolkit::Button::Property::SELECTED_VISUAL, mToggleSelectedVisuals[mCurrentToggleIndex] );
-  PrepareVisual( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, mToggleDisabledVisuals[mCurrentToggleIndex] );
-  PrepareVisual( Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, mToggleDisabledSelectedVisuals[mCurrentToggleIndex] );
+  PrepareVisual(Toolkit::Button::Property::UNSELECTED_VISUAL, mToggleVisuals[mCurrentToggleIndex]);
+  PrepareVisual(Toolkit::Button::Property::SELECTED_VISUAL, mToggleSelectedVisuals[mCurrentToggleIndex]);
+  PrepareVisual(Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, mToggleDisabledVisuals[mCurrentToggleIndex]);
+  PrepareVisual(Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, mToggleDisabledSelectedVisuals[mCurrentToggleIndex]);
 
   //Need to check mCurrentToggleIndex, it must less than the size of mToggleTooltips.
-  if ( !mToggleTooltips.empty() && ( mCurrentToggleIndex < mToggleTooltips.size() ) )
+  if(!mToggleTooltips.empty() && (mCurrentToggleIndex < mToggleTooltips.size()))
   {
-    Self().SetProperty( Toolkit::DevelControl::Property::TOOLTIP, mToggleTooltips[mCurrentToggleIndex] );
+    Self().SetProperty(Toolkit::DevelControl::Property::TOOLTIP, mToggleTooltips[mCurrentToggleIndex]);
   }
 
   RelayoutRequest();
@@ -380,17 +375,17 @@ void ToggleButton::OnPressed()
 Dali::Accessibility::States ToggleButton::AccessibleImpl::CalculateStates()
 {
   auto states = Button::AccessibleImpl::CalculateStates();
-  auto button = Toolkit::ToggleButton::DownCast( self );
-  if( button.GetProperty<int>( Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX ) )
+  auto button = Toolkit::ToggleButton::DownCast(self);
+  if(button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX))
     states[Dali::Accessibility::State::CHECKED] = true;
   return states;
 }
 
 std::string ToggleButton::AccessibleImpl::GetDescriptionRaw()
 {
-  auto button = Toolkit::ToggleButton::DownCast( self );
-  auto index = button.GetProperty<int>( Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX );
-  auto tooltips = button.GetProperty<Property::Array>( Toolkit::ToggleButton::Property::TOOLTIPS );
+  auto button   = Toolkit::ToggleButton::DownCast(self);
+  auto index    = button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX);
+  auto tooltips = button.GetProperty<Property::Array>(Toolkit::ToggleButton::Property::TOOLTIPS);
 
   return tooltips[index].Get<std::string>();
 }
@@ -400,14 +395,13 @@ Property::Index ToggleButton::AccessibleImpl::GetDescriptionPropertyIndex()
   return Toolkit::ToggleButton::Property::TOOLTIPS;
 }
 
-void ToggleButton::OnStateChange( State newState )
+void ToggleButton::OnStateChange(State newState)
 {
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if (Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if(Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
     Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
-      Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0
-    );
+      Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
 
     if(Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
     {

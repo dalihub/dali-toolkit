@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FEEDBACK_STYLE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,22 @@
  */
 
 // EXTERNAL INCLUDES
-#include <map>
-#include <dali/public-api/object/base-handle.h>
 #include <dali/devel-api/adaptor-framework/feedback-player.h>
-#include <dali/public-api/signals/connection-tracker.h>
 #include <dali/public-api/adaptor-framework/style-change.h>
+#include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/signals/connection-tracker.h>
 #include <dali/public-api/signals/slot-delegate.h>
+#include <map>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/feedback/feedback-ids.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 struct FeedbackStyleInfo;
 struct SignalFeedbackInfo;
 
@@ -51,7 +48,6 @@ struct SignalFeedbackInfo;
 class FeedbackStyle : public ConnectionTracker
 {
 public:
-
   /**
    * Constructor.
    */
@@ -84,7 +80,7 @@ public:
    * Connects feedback to signals for the newly created object
    * @param [in] object Handle to the newly created object
    */
-  void ObjectCreated( BaseHandle object );
+  void ObjectCreated(BaseHandle object);
 
   /**
    * Style changed so reload the theme file
@@ -94,13 +90,12 @@ public:
   void StyleChanged(const std::string& userDefinedThemePath, StyleChange::Type styleChange);
 
 private:
-
   /**
    * Helper to retrieve styleInfo from mStyleInfoLut
    * @param type A string described a type of object
    * @return The style information for the given object
    */
-  const FeedbackStyleInfo& GetStyleInfo( const std::string& type) const;
+  const FeedbackStyleInfo& GetStyleInfo(const std::string& type) const;
 
   /**
    * Callback function for Dali::Toolkit::PushButton::SignalPressed signal
@@ -114,21 +109,21 @@ private:
    * @param [in] data A string represenation of the theme.
    * @param [in] format The string representation format ie JSON.
    */
-  void LoadFromString( const std::string& data );
+  void LoadFromString(const std::string& data);
 
   /**
    * Helper to store signal information.
    * @param [in] styleInfo The information will be stored here.
    * @param [in] signalInfo The information to add.
    */
-  void AddSignalInfo( FeedbackStyleInfo& styleInfo, SignalFeedbackInfo&& signalInfo );
+  void AddSignalInfo(FeedbackStyleInfo& styleInfo, SignalFeedbackInfo&& signalInfo);
 
   /**
    * Map a pattern string to feedback pattern ID.
    * @param [in] pattern The pattern string.
    * @return A feedback pattern ID.
    */
-  FeedbackPattern GetFeedbackPattern( const std::string& pattern );
+  FeedbackPattern GetFeedbackPattern(const std::string& pattern);
 
   /**
    * Plays a feedback effect
@@ -151,9 +146,9 @@ private:
   std::map<const std::string, FeedbackStyleInfo> mStyleInfoLut;       ///< Converts key strings into style information
 };
 
-} // namespace Toolkit
-
 } // namespace Internal
+
+} // namespace Toolkit
 
 } // namespace Dali
 

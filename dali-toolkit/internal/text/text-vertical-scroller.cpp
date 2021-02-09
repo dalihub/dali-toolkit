@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,29 +24,25 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace
 {
-
-const float DEFAULT_VERTICAL_SCROLL_DURATION(0.15f);     ///< Duration to complete scroll animation
+const float DEFAULT_VERTICAL_SCROLL_DURATION(0.15f); ///< Duration to complete scroll animation
 
 } // namespace
 
 namespace Text
 {
-
 TextVerticalScrollerPtr TextVerticalScroller::New()
 {
-  TextVerticalScrollerPtr textScroller( new TextVerticalScroller() );
+  TextVerticalScrollerPtr textScroller(new TextVerticalScroller());
   return textScroller;
 }
 
 TextVerticalScroller::TextVerticalScroller()
-: mDuration( DEFAULT_VERTICAL_SCROLL_DURATION ),
-  mScrollTo( 0.0f )
+: mDuration(DEFAULT_VERTICAL_SCROLL_DURATION),
+  mScrollTo(0.0f)
 {
 }
 
@@ -54,39 +50,39 @@ TextVerticalScroller::~TextVerticalScroller()
 {
 }
 
-void TextVerticalScroller::CheckStartAnimation( Actor& sourceActor, float x, float y, float scrollAmount )
+void TextVerticalScroller::CheckStartAnimation(Actor& sourceActor, float x, float y, float scrollAmount)
 {
-  if ( Equals( scrollAmount, 0.0f, Math::MACHINE_EPSILON_1 ) )
+  if(Equals(scrollAmount, 0.0f, Math::MACHINE_EPSILON_1))
   {
     // scroll animation isn't required, set position only
-    if( mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING )
+    if(mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING)
     {
       mScrollAnimation.Clear();
     }
-    sourceActor.SetProperty( Actor::Property::POSITION, Vector2( x, y ));
+    sourceActor.SetProperty(Actor::Property::POSITION, Vector2(x, y));
     return;
   }
   float toY = y + scrollAmount;
   // Either actor or scroll area is changed, so restart animation
-  if( mScrollAnimation )
+  if(mScrollAnimation)
   {
     mScrollAnimation.Clear();
   }
   else
   {
     // Create animation at first
-    mScrollAnimation = Animation::New( mDuration );
+    mScrollAnimation = Animation::New(mDuration);
   }
   mScrollingActor = sourceActor;
-  mScrollTo = toY;
+  mScrollTo       = toY;
 
   // Set animation attribute
-  sourceActor.SetProperty( Actor::Property::POSITION, Vector2( x, y ));
-  mScrollAnimation.AnimateTo( Property(sourceActor, Actor::Property::POSITION_Y), mScrollTo, AlphaFunction::EASE_OUT_SINE );
+  sourceActor.SetProperty(Actor::Property::POSITION, Vector2(x, y));
+  mScrollAnimation.AnimateTo(Property(sourceActor, Actor::Property::POSITION_Y), mScrollTo, AlphaFunction::EASE_OUT_SINE);
   mScrollAnimation.Play();
 }
 
-void TextVerticalScroller::SetDuration( float duration )
+void TextVerticalScroller::SetDuration(float duration)
 {
   mDuration = duration;
 }

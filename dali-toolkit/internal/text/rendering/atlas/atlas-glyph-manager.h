@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,48 +24,47 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
 class AtlasGlyphManager;
 }
 
-
 class AtlasGlyphManager : public BaseHandle
 {
 public:
-
   /**
    * Description of GlyphManager state
    */
   struct Metrics
   {
     Metrics()
-    : mGlyphCount( 0u )
-    {}
+    : mGlyphCount(0u)
+    {
+    }
 
     ~Metrics()
-    {}
+    {
+    }
 
-    uint32_t mGlyphCount;                   ///< number of glyphs being managed
-    std::string mVerboseGlyphCounts;        ///< a verbose list of the glyphs + ref counts
-    AtlasManager::Metrics mAtlasMetrics;    ///< metrics from the Atlas Manager
+    uint32_t              mGlyphCount;         ///< number of glyphs being managed
+    std::string           mVerboseGlyphCounts; ///< a verbose list of the glyphs + ref counts
+    AtlasManager::Metrics mAtlasMetrics;       ///< metrics from the Atlas Manager
   };
 
   struct GlyphStyle
   {
     GlyphStyle()
-    : outline{ 0u },
-      isItalic{ false },
-      isBold{ false }
-    {}
+    : outline{0u},
+      isItalic{false},
+      isBold{false}
+    {
+    }
 
-    uint16_t outline; ///< The outline width of this glyph
-    bool isItalic:1;  ///< Whether the glyph is italic.
-    bool isBold:1;    ///< Whether the glyph is bold.
+    uint16_t outline;      ///< The outline width of this glyph
+    bool     isItalic : 1; ///< Whether the glyph is italic.
+    bool     isBold : 1;   ///< Whether the glyph is bold.
   };
 
   /**
@@ -97,10 +96,10 @@ public:
    * @param[in] bitmap bitmap to use for glyph addition
    * @param[out] slot information returned by atlas manager for addition
    */
-  void Add( const Text::GlyphInfo& glyph,
-            const GlyphStyle& style,
-            const PixelData& bitmap,
-            AtlasManager::AtlasSlot& slot );
+  void Add(const Text::GlyphInfo&   glyph,
+           const GlyphStyle&        style,
+           const PixelData&         bitmap,
+           AtlasManager::AtlasSlot& slot);
 
   /**
    * @brief Generate mesh data for an image contained in an atlas
@@ -109,9 +108,9 @@ public:
    * @param[in] position top left of image
    * @param[out] meshData generated MeshData
    */
-  void GenerateMeshData( uint32_t imageId,
-                         const Vector2& position,
-                         Toolkit::AtlasManager::Mesh2D& mesh );
+  void GenerateMeshData(uint32_t                       imageId,
+                        const Vector2&                 position,
+                        Toolkit::AtlasManager::Mesh2D& mesh);
 
   /**
    * @brief Check to see if a glyph is being cached
@@ -123,10 +122,10 @@ public:
    *
    * @return Whether glyph is cached or not ?
    */
-  bool IsCached( Text::FontId fontId,
-                 Text::GlyphIndex index,
-                 const GlyphStyle& style,
-                 AtlasManager::AtlasSlot& slot );
+  bool IsCached(Text::FontId             fontId,
+                Text::GlyphIndex         index,
+                const GlyphStyle&        style,
+                AtlasManager::AtlasSlot& slot);
 
   /**
    * @brief Retrieve the size of an atlas
@@ -135,9 +134,9 @@ public:
    *
    * @return The pixel size of the atlas
    */
-  Vector2 GetAtlasSize( uint32_t atlasId );
+  Vector2 GetAtlasSize(uint32_t atlasId);
 
-   /**
+  /**
     * @brief Set the atlas size and block size for subsequent Atlas generation
     *
     * @param[in] width width of atlas in pixels
@@ -145,7 +144,7 @@ public:
     * @param[in] blockWidth width of a block in pixels
     * @param[in] blockHeight height of a block in pixels
     */
-  void SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight );
+  void SetNewAtlasSize(uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight);
 
   /**
    * @brief Get the Pixel Format used by an atlas
@@ -154,7 +153,7 @@ public:
    *
    * @return The pixel format of the atlas
    */
-  Pixel::Format GetPixelFormat( uint32_t atlasId );
+  Pixel::Format GetPixelFormat(uint32_t atlasId);
 
   /**
    * @brief Get the texture set used by an atlas
@@ -163,7 +162,7 @@ public:
    *
    * @return The texture set used by the atlas
    */
-  TextureSet GetTextures( uint32_t atlasId ) const;
+  TextureSet GetTextures(uint32_t atlasId) const;
 
   /**
    * @brief Get Glyph Manager metrics
@@ -180,12 +179,10 @@ public:
    * @param[in] style The style of this glyph
    * @param[in] delta The adjustment to make to the reference count
    */
-  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, const GlyphStyle& style, int32_t delta );
+  void AdjustReferenceCount(Text::FontId fontId, Text::GlyphIndex index, const GlyphStyle& style, int32_t delta);
 
 private:
-
-  explicit DALI_INTERNAL AtlasGlyphManager(Internal::AtlasGlyphManager *impl);
-
+  explicit DALI_INTERNAL AtlasGlyphManager(Internal::AtlasGlyphManager* impl);
 };
 
 } // namespace Toolkit

@@ -24,13 +24,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * Radial gradients change color circularly.
  * The color transition starts from the center of the circle and distribute outwardly.
@@ -38,13 +35,12 @@ namespace Internal
 class RadialGradient : public Gradient
 {
 public:
-
   /**
    * Contructor.
    * @param[in] center The center of the gradient circle onto which the 0% gradient stop is mapped.
    * @param[in] radius The radius of the outmost circle onto which the 100% gradient stop is mapped.
    */
-  RadialGradient( const Vector2& center, float radius );
+  RadialGradient(const Vector2& center, float radius);
 
   /**
    * Destructor.
@@ -56,7 +52,7 @@ public:
    * @param[in] center The center of the gradient circle onto which the 0% gradient stop is mapped.
    * @param[in] radius The radius of the outmost circle onto which the 100% gradient stop is mapped.
    */
-  void SetCenterAndRadius( const Vector2& center, float radius );
+  void SetCenterAndRadius(const Vector2& center, float radius);
 
   /**
    * Get the center of the gradient circle.
@@ -71,15 +67,13 @@ public:
   float GetRadius() const;
 
 private:
+  // Undefined
+  RadialGradient(const RadialGradient& gradient);
 
   // Undefined
-  RadialGradient( const RadialGradient& gradient );
-
-  // Undefined
-  RadialGradient& operator=( const RadialGradient& handle );
+  RadialGradient& operator=(const RadialGradient& handle);
 
 private:
-
   Vector2 mCenter;
   float   mRadius;
 };

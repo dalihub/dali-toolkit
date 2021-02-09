@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,52 +22,49 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/arc-visual-actions-devel.h>
-#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
-#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 // cap
-DALI_ENUM_TO_STRING_TABLE_BEGIN( CAP )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DevelArcVisual::Cap, BUTT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( DevelArcVisual::Cap, ROUND )
-DALI_ENUM_TO_STRING_TABLE_END( CAP )
+DALI_ENUM_TO_STRING_TABLE_BEGIN(CAP)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelArcVisual::Cap, BUTT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelArcVisual::Cap, ROUND)
+DALI_ENUM_TO_STRING_TABLE_END(CAP)
 
-}
+} // namespace
 
-ArcVisualPtr ArcVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
+ArcVisualPtr ArcVisual::New(VisualFactoryCache& factoryCache, const Property::Map& properties)
 {
-  ArcVisualPtr arcVisualPtr( new ArcVisual( factoryCache ) );
-  arcVisualPtr->SetProperties( properties );
+  ArcVisualPtr arcVisualPtr(new ArcVisual(factoryCache));
+  arcVisualPtr->SetProperties(properties);
+  arcVisualPtr->Initialize();
   return arcVisualPtr;
 }
 
-ArcVisual::ArcVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL, static_cast<Toolkit::Visual::Type>( Toolkit::DevelVisual::ARC ) ),
-  mThickness( 0.0f ),
-  mRadius( 0.0f ),
-  mStartAngle( 0.0f ),
-  mSweepAngle( 360.0f ),
-  mRadiusIndex( Property::INVALID_INDEX ),
-  mThicknessIndex( Property::INVALID_INDEX ),
-  mStartAngleIndex( Property::INVALID_INDEX ),
-  mSweepAngleIndex( Property::INVALID_INDEX ),
-  mCapType( DevelArcVisual::Cap::BUTT )
+ArcVisual::ArcVisual(VisualFactoryCache& factoryCache)
+: Visual::Base(factoryCache, Visual::FittingMode::FILL, static_cast<Toolkit::Visual::Type>(Toolkit::DevelVisual::ARC)),
+  mThickness(0.0f),
+  mRadius(0.0f),
+  mStartAngle(0.0f),
+  mSweepAngle(360.0f),
+  mRadiusIndex(Property::INVALID_INDEX),
+  mThicknessIndex(Property::INVALID_INDEX),
+  mStartAngleIndex(Property::INVALID_INDEX),
+  mSweepAngleIndex(Property::INVALID_INDEX),
+  mCapType(DevelArcVisual::Cap::BUTT)
 {
 }
 
@@ -75,20 +72,20 @@ ArcVisual::~ArcVisual()
 {
 }
 
-void ArcVisual::DoSetProperties( const Property::Map& propertyMap )
+void ArcVisual::DoSetProperties(const Property::Map& propertyMap)
 {
-  Property::Value* thicknessValue = propertyMap.Find( Toolkit::DevelArcVisual::Property::THICKNESS, THICKNESS_NAME );
-  if( thicknessValue )
+  Property::Value* thicknessValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::THICKNESS, THICKNESS_NAME);
+  if(thicknessValue)
   {
-    if( !thicknessValue->Get( mThickness ) )
+    if(!thicknessValue->Get(mThickness))
     {
-      DALI_LOG_ERROR( "ArcVisual:DoSetProperties:: THICKNESS property has incorrect type: %d\n", thicknessValue->GetType() );
+      DALI_LOG_ERROR("ArcVisual:DoSetProperties:: THICKNESS property has incorrect type: %d\n", thicknessValue->GetType());
     }
     else
     {
-      if( mImpl->mRenderer )
+      if(mImpl->mRenderer)
       {
-        mImpl->mRenderer.SetProperty( mThicknessIndex, mThickness );
+        mImpl->mRenderer.SetProperty(mThicknessIndex, mThickness);
 
         // Need to calculate radius again
         OnSetTransform();
@@ -96,76 +93,61 @@ void ArcVisual::DoSetProperties( const Property::Map& propertyMap )
     }
   }
 
-  Property::Value* startAngleValue = propertyMap.Find( Toolkit::DevelArcVisual::Property::START_ANGLE, START_ANGLE_NAME );
-  if( startAngleValue )
+  Property::Value* startAngleValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::START_ANGLE, START_ANGLE_NAME);
+  if(startAngleValue)
   {
-    if( !startAngleValue->Get( mStartAngle ) )
+    if(!startAngleValue->Get(mStartAngle))
     {
-      DALI_LOG_ERROR( "ArcVisual:DoSetProperties:: START_ANGLE property has incorrect type: %d\n", startAngleValue->GetType() );
+      DALI_LOG_ERROR("ArcVisual:DoSetProperties:: START_ANGLE property has incorrect type: %d\n", startAngleValue->GetType());
     }
     else
     {
-      if( mImpl->mRenderer )
+      if(mImpl->mRenderer)
       {
-        mImpl->mRenderer.SetProperty( mStartAngleIndex, mStartAngle );
+        mImpl->mRenderer.SetProperty(mStartAngleIndex, mStartAngle);
       }
     }
   }
 
-  Property::Value* sweepAngleValue = propertyMap.Find( Toolkit::DevelArcVisual::Property::SWEEP_ANGLE, SWEEP_ANGLE_NAME );
-  if( sweepAngleValue )
+  Property::Value* sweepAngleValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::SWEEP_ANGLE, SWEEP_ANGLE_NAME);
+  if(sweepAngleValue)
   {
-    if( !sweepAngleValue->Get( mSweepAngle ) )
+    if(!sweepAngleValue->Get(mSweepAngle))
     {
-      DALI_LOG_ERROR( "ArcVisual:DoSetProperties:: SWEEP_ANGLE property has incorrect type: %d\n", sweepAngleValue->GetType() );
+      DALI_LOG_ERROR("ArcVisual:DoSetProperties:: SWEEP_ANGLE property has incorrect type: %d\n", sweepAngleValue->GetType());
     }
     else
     {
-      if( mImpl->mRenderer )
+      if(mImpl->mRenderer)
       {
-        mImpl->mRenderer.SetProperty( mSweepAngleIndex, mSweepAngle );
+        mImpl->mRenderer.SetProperty(mSweepAngleIndex, mSweepAngle);
       }
     }
   }
 
-  Property::Value* capValue = propertyMap.Find( Toolkit::DevelArcVisual::Property::CAP, CAP_NAME );
-  if( capValue )
+  Property::Value* capValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::CAP, CAP_NAME);
+  if(capValue)
   {
     int capType = 0;
-    Scripting::GetEnumerationProperty( *capValue, CAP_TABLE, CAP_TABLE_COUNT, capType );
-    mCapType = Toolkit::DevelArcVisual::Cap::Type( capType );
+    Scripting::GetEnumerationProperty(*capValue, CAP_TABLE, CAP_TABLE_COUNT, capType);
+    mCapType = Toolkit::DevelArcVisual::Cap::Type(capType);
   }
 }
 
-void ArcVisual::DoSetOnScene( Actor& actor )
+void ArcVisual::DoSetOnScene(Actor& actor)
 {
-  InitializeRenderer();
-
-  actor.AddRenderer( mImpl->mRenderer );
+  actor.AddRenderer(mImpl->mRenderer);
 
   // Arc Visual generated and ready to display
-  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+  ResourceReady(Toolkit::Visual::ResourceStatus::READY);
 }
 
 void ArcVisual::DoSetOffScene(Actor& actor)
 {
-  if(mImpl->mRenderer)
-  {
-    // Update values from Renderer
-    mThickness  = mImpl->mRenderer.GetProperty<float>(mThicknessIndex);
-    mStartAngle = mImpl->mRenderer.GetProperty<float>(mStartAngleIndex);
-    mSweepAngle = mImpl->mRenderer.GetProperty<float>(mSweepAngleIndex);
-  }
-
   actor.RemoveRenderer(mImpl->mRenderer);
-  mImpl->mRenderer.Reset();
-
-  mThicknessIndex  = Property::INVALID_INDEX;
-  mStartAngleIndex = Property::INVALID_INDEX;
-  mSweepAngleIndex = Property::INVALID_INDEX;
 }
 
-void ArcVisual::DoCreatePropertyMap( Property::Map& map ) const
+void ArcVisual::DoCreatePropertyMap(Property::Map& map) const
 {
   float thickness, startAngle, sweepAngle;
   if(mImpl->mRenderer)
@@ -183,82 +165,82 @@ void ArcVisual::DoCreatePropertyMap( Property::Map& map ) const
   }
 
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::ARC );
+  map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::ARC);
   map.Insert(Toolkit::DevelArcVisual::Property::THICKNESS, thickness);
   map.Insert(Toolkit::DevelArcVisual::Property::START_ANGLE, startAngle);
   map.Insert(Toolkit::DevelArcVisual::Property::SWEEP_ANGLE, sweepAngle);
-  map.Insert( Toolkit::DevelArcVisual::Property::CAP, mCapType );
+  map.Insert(Toolkit::DevelArcVisual::Property::CAP, mCapType);
 }
 
-void ArcVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+void ArcVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 {
   // Do nothing
 }
 
 void ArcVisual::OnSetTransform()
 {
-  Vector2 visualSize = mImpl->mTransform.GetVisualSize( mImpl->mControlSize );
-  mRadius = ( std::min( visualSize.width, visualSize.height ) - mThickness ) / 2.0f;
+  Vector2 visualSize = mImpl->mTransform.GetVisualSize(mImpl->mControlSize);
+  mRadius            = (std::min(visualSize.width, visualSize.height) - mThickness) / 2.0f;
 
-  if( mImpl->mRenderer )
+  if(mImpl->mRenderer)
   {
-    mImpl->mRenderer.SetProperty( mRadiusIndex, mRadius );
+    mImpl->mRenderer.SetProperty(mRadiusIndex, mRadius);
   }
 }
 
-void ArcVisual::OnDoAction( const Property::Index actionId, const Property::Value& attributes )
+void ArcVisual::OnDoAction(const Property::Index actionId, const Property::Value& attributes)
 {
   // Check if action is valid for this visual type and perform action if possible
-  switch( actionId )
+  switch(actionId)
   {
     case DevelArcVisual::Action::UPDATE_PROPERTY:
     {
       const Property::Map* map = attributes.GetMap();
-      if( map )
+      if(map)
       {
-        DoSetProperties( *map );
+        DoSetProperties(*map);
       }
       break;
     }
   }
 }
 
-void ArcVisual::InitializeRenderer()
+void ArcVisual::OnInitialize()
 {
-  Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
+  Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
   Shader shader;
-  if( mCapType == DevelArcVisual::Cap::BUTT )
+  if(mCapType == DevelArcVisual::Cap::BUTT)
   {
-    shader = mFactoryCache.GetShader( VisualFactoryCache::ARC_BUTT_CAP_SHADER );
-    if( !shader )
+    shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER);
+    if(!shader)
     {
-      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_BUTT_CAP_SHADER_FRAG.data() );
-      mFactoryCache.SaveShader( VisualFactoryCache::ARC_BUTT_CAP_SHADER, shader );
+      shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_BUTT_CAP_SHADER_FRAG.data());
+      mFactoryCache.SaveShader(VisualFactoryCache::ARC_BUTT_CAP_SHADER, shader);
     }
   }
   else
   {
-    shader = mFactoryCache.GetShader( VisualFactoryCache::ARC_ROUND_CAP_SHADER );
-    if( !shader )
+    shader = mFactoryCache.GetShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER);
+    if(!shader)
     {
-      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_ROUND_CAP_SHADER_FRAG.data() );
-      mFactoryCache.SaveShader( VisualFactoryCache::ARC_ROUND_CAP_SHADER, shader );
+      shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_ARC_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_ARC_VISUAL_ROUND_CAP_SHADER_FRAG.data());
+      mFactoryCache.SaveShader(VisualFactoryCache::ARC_ROUND_CAP_SHADER, shader);
     }
   }
 
-  mImpl->mRenderer = Renderer::New( geometry, shader );
+  mImpl->mRenderer = Renderer::New(geometry, shader);
 
   mThicknessIndex  = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::THICKNESS, THICKNESS_NAME, mThickness);
   mStartAngleIndex = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::START_ANGLE, START_ANGLE_NAME, mStartAngle);
   mSweepAngleIndex = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::SWEEP_ANGLE, SWEEP_ANGLE_NAME, mSweepAngle);
 
-  mRadiusIndex = mImpl->mRenderer.RegisterProperty( RADIUS_NAME, mRadius );
+  mRadiusIndex = mImpl->mRenderer.RegisterProperty(RADIUS_NAME, mRadius);
 
-  mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+  mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
 
   // Register transform properties
-  mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 } // namespace Internal

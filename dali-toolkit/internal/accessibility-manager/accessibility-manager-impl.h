@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +19,19 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/object/base-object.h>
 #include <string>
 #include <vector>
-#include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/accessibility-manager/accessibility-manager.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class AccessibilityManager;
 
 /**
@@ -43,7 +40,6 @@ class AccessibilityManager;
 class AccessibilityManager : public Dali::BaseObject, public Dali::ConnectionTracker
 {
 public:
-
   typedef Dali::Toolkit::AccessibilityManager::AccessibilityActionSignalType       AccessibilityActionSignalType;
   typedef Dali::Toolkit::AccessibilityManager::AccessibilityActionScrollSignalType AccessibilityActionScrollSignalType;
 
@@ -173,7 +169,6 @@ public:
   Actor GetFocusIndicatorActor();
 
 public:
-
   /**
    * @copydoc Toolkit::AccessibilityManager::FocusChangedSignal()
    */
@@ -189,8 +184,7 @@ public:
    */
   Toolkit::AccessibilityManager::FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
 
-public:  // Signals
-
+public: // Signals
   /**
    * @copydoc Dali::Toolkit::AccessibilityManager::StatusChangedSignal
    */
@@ -400,25 +394,22 @@ public:  // Signals
   }
 
 protected:
-
   /**
    * Destructor
    */
   virtual ~AccessibilityManager();
 
 private:
-
   // Undefined
   AccessibilityManager(const AccessibilityManager&);
 
   AccessibilityManager& operator=(const AccessibilityManager& rhs);
 
 private:
-
   std::vector<Actor> mFocusOrder;
 
-  Toolkit::AccessibilityManager::FocusChangedSignalType mFocusChangedSignal; ///< The signal to notify the focus change
-  Toolkit::AccessibilityManager::FocusOvershotSignalType mFocusOvershotSignal; ///< The signal to notify the focus overshooted
+  Toolkit::AccessibilityManager::FocusChangedSignalType          mFocusChangedSignal;          ///< The signal to notify the focus change
+  Toolkit::AccessibilityManager::FocusOvershotSignalType         mFocusOvershotSignal;         ///< The signal to notify the focus overshooted
   Toolkit::AccessibilityManager::FocusedActorActivatedSignalType mFocusedActorActivatedSignal; ///< The signal to notify the activation of focused actor
 
   // Action signals.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #include "svg-rasterize-thread.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
+#include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 
@@ -29,23 +29,19 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
-RasterizingTask::RasterizingTask( SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height, bool loaded)
-: mSvgVisual( svgRenderer ),
-  mVectorRenderer( vectorRenderer ),
-  mUrl( url ),
-  mDpi( dpi ),
-  mWidth( width ),
-  mHeight( height ),
-  mLoaded( loaded )
+RasterizingTask::RasterizingTask(SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height)
+: mSvgVisual(svgRenderer),
+  mVectorRenderer(vectorRenderer),
+  mUrl(url),
+  mDpi(dpi),
+  mWidth(width),
+  mHeight(height),
+  mLoadSuccess(false)
 {
-
 }
 
 RasterizingTask::~RasterizingTask()
@@ -54,7 +50,7 @@ RasterizingTask::~RasterizingTask()
 
 void RasterizingTask::Load()
 {
-  if(!mLoaded && !mUrl.IsLocalResource())
+  if(!mUrl.IsLocalResource())
   {
     Dali::Vector<uint8_t> remoteBuffer;
     if(!Dali::FileLoader::DownloadFileSynchronously(mUrl.GetUrl(), remoteBuffer))
@@ -71,7 +67,11 @@ void RasterizingTask::Load()
       return;
     }
 
-    mLoaded = true;
+    mLoadSuccess = true;
+  }
+  else
+  {
+    mLoadSuccess = true;
   }
 }
 
@@ -108,7 +108,7 @@ VectorImageRenderer RasterizingTask::GetVectorRenderer() const
 
 bool RasterizingTask::IsLoaded() const
 {
-  return mLoaded;
+  return mLoadSuccess;
 }
 
 SvgVisual* RasterizingTask::GetSvgVisual() const
@@ -122,27 +122,27 @@ PixelData RasterizingTask::GetPixelData() const
 }
 
 SvgRasterizeThread::SvgRasterizeThread()
-: mTrigger( new EventThreadCallback( MakeCallback( this, &SvgRasterizeThread::ApplyRasterizedSVGToSampler ) ) ),
-  mLogFactory( Dali::Adaptor::Get().GetLogFactory() ),
-  mIsThreadWaiting( false ),
-  mProcessorRegistered( false )
+: mTrigger(new EventThreadCallback(MakeCallback(this, &SvgRasterizeThread::ApplyRasterizedSVGToSampler))),
+  mLogFactory(Dali::Adaptor::Get().GetLogFactory()),
+  mIsThreadWaiting(false),
+  mProcessorRegistered(false)
 {
 }
 
 SvgRasterizeThread::~SvgRasterizeThread()
 {
-  if( mProcessorRegistered )
+  if(mProcessorRegistered)
   {
-    Adaptor::Get().UnregisterProcessor( *this );
+    Adaptor::Get().UnregisterProcessor(*this);
   }
 }
 
-void SvgRasterizeThread::TerminateThread( SvgRasterizeThread*& thread )
+void SvgRasterizeThread::TerminateThread(SvgRasterizeThread*& thread)
 {
-  if( thread )
+  if(thread)
   {
     // add an empty task would stop the thread from conditional wait.
-    thread->AddTask( RasterizingTaskPtr() );
+    thread->AddTask(RasterizingTaskPtr());
     // stop the thread
     thread->Join();
     // delete the thread
@@ -151,37 +151,37 @@ void SvgRasterizeThread::TerminateThread( SvgRasterizeThread*& thread )
   }
 }
 
-void SvgRasterizeThread::AddTask( RasterizingTaskPtr task )
+void SvgRasterizeThread::AddTask(RasterizingTaskPtr task)
 {
   bool wasEmpty = false;
 
   {
     // Lock while adding task to the queue
-    ConditionalWait::ScopedLock lock( mConditionalWait );
+    ConditionalWait::ScopedLock lock(mConditionalWait);
     wasEmpty = mRasterizeTasks.empty();
-    if( !wasEmpty && task != NULL)
+    if(!wasEmpty && task != NULL)
     {
       // Remove the tasks with the same renderer.
       // Older task which waiting to rasterize and apply the svg to the same renderer is expired.
-      for( std::vector< RasterizingTaskPtr >::iterator it = mRasterizeTasks.begin(), endIt = mRasterizeTasks.end(); it != endIt; ++it )
+      for(std::vector<RasterizingTaskPtr>::iterator it = mRasterizeTasks.begin(), endIt = mRasterizeTasks.end(); it != endIt; ++it)
       {
-        if( (*it) && (*it)->GetSvgVisual() == task->GetSvgVisual() )
+        if((*it) && (*it)->GetSvgVisual() == task->GetSvgVisual())
         {
-          mRasterizeTasks.erase( it );
+          mRasterizeTasks.erase(it);
           break;
         }
       }
     }
-    mRasterizeTasks.push_back( task );
+    mRasterizeTasks.push_back(task);
 
-    if( !mProcessorRegistered )
+    if(!mProcessorRegistered)
     {
-      Adaptor::Get().RegisterProcessor( *this );
+      Adaptor::Get().RegisterProcessor(*this);
       mProcessorRegistered = true;
     }
   }
 
-  if( wasEmpty)
+  if(wasEmpty)
   {
     // wake up the image loading thread
     mConditionalWait.Notify();
@@ -191,31 +191,31 @@ void SvgRasterizeThread::AddTask( RasterizingTaskPtr task )
 RasterizingTaskPtr SvgRasterizeThread::NextCompletedTask()
 {
   // Lock while popping task out from the queue
-  Mutex::ScopedLock lock( mMutex );
+  Mutex::ScopedLock lock(mMutex);
 
-  if( mCompletedTasks.empty() )
+  if(mCompletedTasks.empty())
   {
     return RasterizingTaskPtr();
   }
 
-  std::vector< RasterizingTaskPtr >::iterator next = mCompletedTasks.begin();
-  RasterizingTaskPtr nextTask = *next;
-  mCompletedTasks.erase( next );
+  std::vector<RasterizingTaskPtr>::iterator next     = mCompletedTasks.begin();
+  RasterizingTaskPtr                        nextTask = *next;
+  mCompletedTasks.erase(next);
 
   return nextTask;
 }
 
-void SvgRasterizeThread::RemoveTask( SvgVisual* visual )
+void SvgRasterizeThread::RemoveTask(SvgVisual* visual)
 {
   // Lock while remove task from the queue
-  ConditionalWait::ScopedLock lock( mConditionalWait );
-  if( !mRasterizeTasks.empty() )
+  ConditionalWait::ScopedLock lock(mConditionalWait);
+  if(!mRasterizeTasks.empty())
   {
-    for( std::vector< RasterizingTaskPtr >::iterator it = mRasterizeTasks.begin(), endIt = mRasterizeTasks.end(); it != endIt; ++it )
+    for(std::vector<RasterizingTaskPtr>::iterator it = mRasterizeTasks.begin(), endIt = mRasterizeTasks.end(); it != endIt; ++it)
     {
-      if( (*it) &&  (*it)->GetSvgVisual() == visual )
+      if((*it) && (*it)->GetSvgVisual() == visual)
       {
-        mRasterizeTasks.erase( it );
+        mRasterizeTasks.erase(it);
         break;
       }
     }
@@ -224,53 +224,53 @@ void SvgRasterizeThread::RemoveTask( SvgVisual* visual )
   UnregisterProcessor();
 }
 
-void SvgRasterizeThread::DeleteImage( VectorImageRenderer vectorRenderer )
+void SvgRasterizeThread::DeleteImage(VectorImageRenderer vectorRenderer)
 {
   // Lock while adding image to the delete queue
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  ConditionalWait::ScopedLock lock(mConditionalWait);
 
-  if( mIsThreadWaiting ) // no rasterization is ongoing, save to delete
+  if(mIsThreadWaiting) // no rasterization is ongoing, save to delete
   {
     // TODO: what?
   }
   else // wait to delete until current rasterization completed.
   {
-    mDeleteSvg.PushBack( &vectorRenderer );
+    mDeleteSvg.PushBack(&vectorRenderer);
   }
 }
 
 RasterizingTaskPtr SvgRasterizeThread::NextTaskToProcess()
 {
   // Lock while popping task out from the queue
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  ConditionalWait::ScopedLock lock(mConditionalWait);
 
   // Delete the image here to make sure that it is not used in the nsvgRasterize()
-  if( !mDeleteSvg.Empty() )
+  if(!mDeleteSvg.Empty())
   {
     mDeleteSvg.Clear();
   }
 
   // conditional wait
-  while( mRasterizeTasks.empty() )
+  while(mRasterizeTasks.empty())
   {
     mIsThreadWaiting = true;
-    mConditionalWait.Wait( lock );
+    mConditionalWait.Wait(lock);
   }
   mIsThreadWaiting = false;
 
   // pop out the next task from the queue
-  std::vector< RasterizingTaskPtr >::iterator next = mRasterizeTasks.begin();
-  RasterizingTaskPtr nextTask = *next;
-  mRasterizeTasks.erase( next );
+  std::vector<RasterizingTaskPtr>::iterator next     = mRasterizeTasks.begin();
+  RasterizingTaskPtr                        nextTask = *next;
+  mRasterizeTasks.erase(next);
 
   return nextTask;
 }
 
-void SvgRasterizeThread::AddCompletedTask( RasterizingTaskPtr task )
+void SvgRasterizeThread::AddCompletedTask(RasterizingTaskPtr task)
 {
   // Lock while adding task to the queue
-  Mutex::ScopedLock lock( mMutex );
-  mCompletedTasks.push_back( task );
+  Mutex::ScopedLock lock(mMutex);
+  mCompletedTasks.push_back(task);
 
   // wake up the main thread
   mTrigger->Trigger();
@@ -278,20 +278,20 @@ void SvgRasterizeThread::AddCompletedTask( RasterizingTaskPtr task )
 
 void SvgRasterizeThread::Run()
 {
-  SetThreadName( "SVGThread" );
+  SetThreadName("SVGThread");
   mLogFactory.InstallLogFunction();
 
-  while( RasterizingTaskPtr task = NextTaskToProcess() )
+  while(RasterizingTaskPtr task = NextTaskToProcess())
   {
-    task->Load( );
-    task->Rasterize( );
-    AddCompletedTask( task );
+    task->Load();
+    task->Rasterize();
+    AddCompletedTask(task);
   }
 }
 
 void SvgRasterizeThread::ApplyRasterizedSVGToSampler()
 {
-  while( RasterizingTaskPtr task = NextCompletedTask() )
+  while(RasterizingTaskPtr task = NextCompletedTask())
   {
     task->GetSvgVisual()->ApplyRasterizedImage(task->GetVectorRenderer(), task->GetPixelData(), task->IsLoaded());
   }
@@ -306,16 +306,15 @@ void SvgRasterizeThread::Process()
 
 void SvgRasterizeThread::UnregisterProcessor()
 {
-  if ( mProcessorRegistered )
+  if(mProcessorRegistered)
   {
-    if( mRasterizeTasks.empty() && mCompletedTasks.empty() )
+    if(mRasterizeTasks.empty() && mCompletedTasks.empty())
     {
-      Adaptor::Get().UnregisterProcessor( *this );
+      Adaptor::Get().UnregisterProcessor(*this);
       mProcessorRegistered = false;
     }
   }
 }
-
 
 } // namespace Internal
 

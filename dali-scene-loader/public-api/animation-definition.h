@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_ANIMATION_DEFINITION_H
 #define DALI_SCENE_LOADER_ANIMATION_DEFINITION_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
  *
  */
 
-#include "dali-scene-loader/public-api/api.h"
 #include "dali-scene-loader/public-api/animated-property.h"
+#include "dali-scene-loader/public-api/api.h"
 #include "dali/public-api/common/vector-wrapper.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /**
  * @brief Animation handle + name + definition of properties.
  */
@@ -66,23 +65,23 @@ public: // METHODS
 public: // DATA
   std::string mName;
 
-  float mDuration = DEFAULT_DURATION_SECONDS;
-  int mLoopCount = 1;
+  float                mDuration         = DEFAULT_DURATION_SECONDS;
+  int                  mLoopCount        = 1;
   Animation::EndAction mDisconnectAction = Animation::BAKE_FINAL;
-  Animation::EndAction mEndAction = Animation::BAKE;
-  float mSpeedFactor = 1.f;
-  Vector2 mPlayRange = Vector2{ 0.f, 1.f };
+  Animation::EndAction mEndAction        = Animation::BAKE;
+  float                mSpeedFactor      = 1.f;
+  Vector2              mPlayRange        = Vector2{0.f, 1.f};
 
   std::vector<AnimatedProperty> mProperties;
 };
 
 struct AnimationGroupDefinition
 {
-  std::string mName;
+  std::string              mName;
   std::vector<std::string> mAnimations;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_ANIMATION_DEFINITION_H

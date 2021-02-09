@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,18 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 // global string variable to caching complate vertex shader
@@ -54,56 +50,56 @@ ImageVisualShaderFactory::~ImageVisualShaderFactory()
 {
 }
 
-Shader ImageVisualShaderFactory::GetShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping, bool roundedCorner )
+Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping, bool roundedCorner)
 {
   Shader shader;
-  if( atlasing )
+  if(atlasing)
   {
-    if( defaultTextureWrapping )
+    if(defaultTextureWrapping)
     {
-      shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP );
-      if( !shader )
+      shader = factoryCache.GetShader(VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP);
+      if(!shader)
       {
-        shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(),
-                              Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_ATLAS_CLAMP_SHADER_FRAG.data() );
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-        factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
+        shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(),
+                             Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_ATLAS_CLAMP_SHADER_FRAG.data());
+        shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+        factoryCache.SaveShader(VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader);
       }
     }
     else
     {
-      shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP );
-      if( !shader )
+      shader = factoryCache.GetShader(VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP);
+      if(!shader)
       {
-        shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(),
-                              Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_ATLAS_VARIOUS_WRAP_SHADER_FRAG.data() );
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-        factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP, shader );
+        shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(),
+                             Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_ATLAS_VARIOUS_WRAP_SHADER_FRAG.data());
+        shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+        factoryCache.SaveShader(VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP, shader);
       }
     }
   }
   else
   {
-    if( roundedCorner )
+    if(roundedCorner)
     {
-      shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER );
-      if( !shader )
+      shader = factoryCache.GetShader(VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER);
+      if(!shader)
       {
-        shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_ROUNDED_CORNER_SHADER_VERT.data(),
-                              Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_ROUNDED_CORNER_SHADER_FRAG.data() );
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-        factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER, shader );
+        shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_ROUNDED_CORNER_SHADER_VERT.data(),
+                             Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_ROUNDED_CORNER_SHADER_FRAG.data());
+        shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+        factoryCache.SaveShader(VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER, shader);
       }
     }
     else
     {
-      shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER );
-      if( !shader )
+      shader = factoryCache.GetShader(VisualFactoryCache::IMAGE_SHADER);
+      if(!shader)
       {
-        shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(),
-                              Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG.data() );
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-        factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER, shader );
+        shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(),
+                             Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG.data());
+        shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+        factoryCache.SaveShader(VisualFactoryCache::IMAGE_SHADER, shader);
       }
     }
   }

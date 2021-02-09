@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_RESOURCE_BUNDLE_H_
 #define DALI_SCENE_LOADER_RESOURCE_BUNDLE_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,23 @@
  */
 
 // INTERNAL
-#include "dali-scene-loader/public-api/mesh-definition.h"
-#include "dali-scene-loader/public-api/material-definition.h"
 #include "dali-scene-loader/public-api/environment-definition.h"
+#include "dali-scene-loader/public-api/material-definition.h"
+#include "dali-scene-loader/public-api/mesh-definition.h"
 #include "dali-scene-loader/public-api/shader-definition.h"
 #include "dali-scene-loader/public-api/skeleton-definition.h"
 
 // EXTERNAL
+#include <functional>
+#include <memory>
 #include "dali/public-api/common/vector-wrapper.h"
 #include "dali/public-api/rendering/shader.h"
 #include "dali/public-api/rendering/texture-set.h"
-#include <memory>
-#include <functional>
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /*
  * @brief The types of resources that .dli may define.
  */
@@ -73,9 +72,9 @@ public:
 
     enum Value : Type
     {
-      None = 0,
-      ForceReload = NthBit(0),  ///< Load resources [again] even if they were already loaded.
-      KeepUnused = NthBit(1)  ///<s Don't reset handles to resources that had a 0 reference count.
+      None        = 0,
+      ForceReload = NthBit(0), ///< Load resources [again] even if they were already loaded.
+      KeepUnused  = NthBit(1)  ///<s Don't reset handles to resources that had a 0 reference count.
     };
   };
 
@@ -111,19 +110,19 @@ public:
    *  UNLESS the KeepUnused option was specified.
    */
   void LoadResources(const ResourceRefCounts& refCounts,
-    PathProvider pathProvider,
-    Options::Type options = Options::None);
+                     PathProvider             pathProvider,
+                     Options::Type            options = Options::None);
 
 public: // DATA
   EnvironmentDefinition::Vector mEnvironmentMaps;
-  ShaderDefinition::Vector mShaders;
-  MeshDefinition::Vector mMeshes;
-  MaterialDefinition::Vector mMaterials;
+  ShaderDefinition::Vector      mShaders;
+  MeshDefinition::Vector        mMeshes;
+  MaterialDefinition::Vector    mMaterials;
 
   SkeletonDefinition::Vector mSkeletons;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_RESOURCE_BUNDLE_H_

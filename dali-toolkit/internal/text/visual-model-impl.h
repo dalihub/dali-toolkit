@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,15 @@
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
+#include <dali-toolkit/internal/text/line-run.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class VisualModel;
 typedef IntrusivePtr<VisualModel> VisualModelPtr;
 
@@ -51,7 +48,6 @@ typedef IntrusivePtr<VisualModel> VisualModelPtr;
 class VisualModel : public RefObject
 {
 public:
-
   /**
    * @brief Create a new instance of a VisualModel.
    *
@@ -70,9 +66,9 @@ public:
    * @param[in] startGlyphIndex The glyph from where the conversion table is created.
    * @param[in] numberOfCharacters The number of characters.
    */
-  void CreateCharacterToGlyphTable( CharacterIndex startIndex,
-                                    GlyphIndex startGlyphIndex,
-                                    Length numberOfCharacters );
+  void CreateCharacterToGlyphTable(CharacterIndex startIndex,
+                                   GlyphIndex     startGlyphIndex,
+                                   Length         numberOfCharacters);
 
   /**
    * @brief Creates an array containing the number of glyphs per character.
@@ -81,9 +77,9 @@ public:
    * @param[in] startGlyphIndex The glyph from where the conversion table is created.
    * @param[in] numberOfCharacters The number of characters.
    */
-  void CreateGlyphsPerCharacterTable( CharacterIndex startIndex,
-                                      GlyphIndex startGlyphIndex,
-                                      Length numberOfCharacters );
+  void CreateGlyphsPerCharacterTable(CharacterIndex startIndex,
+                                     GlyphIndex     startGlyphIndex,
+                                     Length         numberOfCharacters);
 
   /**
    * @brief Retrieves glyphs in the given buffer.
@@ -93,9 +89,9 @@ public:
    * @param[in] glyphIndex Index to the first glyph.
    * @param[in] numberOfGlyphs Number of glyphs to be copied.
    */
-  void GetGlyphs( GlyphInfo* glyphs,
-                  GlyphIndex glyphIndex,
-                  Length numberOfGlyphs ) const;
+  void GetGlyphs(GlyphInfo* glyphs,
+                 GlyphIndex glyphIndex,
+                 Length     numberOfGlyphs) const;
 
   // Position interface
 
@@ -107,9 +103,9 @@ public:
    * @param[in] glyphIndex Index to the first glyph position.
    * @param[in] numberOfGlyphs The number of positions to be copied.
    */
-  void GetGlyphPositions( Vector2* glyphPositions,
-                          GlyphIndex glyphIndex,
-                          Length numberOfGlyphs ) const;
+  void GetGlyphPositions(Vector2*   glyphPositions,
+                         GlyphIndex glyphIndex,
+                         Length     numberOfGlyphs) const;
 
   // Line interface.
 
@@ -121,10 +117,10 @@ public:
    * @param[out] firstLine Index to the line containing the glyph index.
    * @param[out] numberOfLines The number of lines.
    */
-  void GetNumberOfLines( GlyphIndex glyphIndex,
-                         Length numberOfGlyphs,
-                         LineIndex& firstLine,
-                         Length& numberOfLines ) const;
+  void GetNumberOfLines(GlyphIndex glyphIndex,
+                        Length     numberOfGlyphs,
+                        LineIndex& firstLine,
+                        Length&    numberOfLines) const;
 
   /**
    * @brief Retrieves the lines where the given range of glyphs is laid out.
@@ -135,9 +131,9 @@ public:
    * @param[in] glyphIndex Index to the first glyphs of the range.
    * @param[in] numberOfGlyphs Number of glyphs in the range.
    */
-  void GetLinesOfGlyphRange( LineRun* lines,
-                             GlyphIndex glyphIndex,
-                             Length numberOfGlyphs ) const;
+  void GetLinesOfGlyphRange(LineRun*   lines,
+                            GlyphIndex glyphIndex,
+                            Length     numberOfGlyphs) const;
 
   /**
    * @brief Retrieves the line index where the character is laid-out.
@@ -146,7 +142,7 @@ public:
    *
    * @return The line index.
    */
-  LineIndex GetLineOfCharacter( CharacterIndex characterIndex );
+  LineIndex GetLineOfCharacter(CharacterIndex characterIndex);
 
   // Underline runs
 
@@ -157,9 +153,9 @@ public:
    * @param[in] index Index of the first underline run to be copied.
    * @param[in] numberOfRuns Number of underline runs to be copied.
    */
-  void GetUnderlineRuns( GlyphRun* underlineRuns,
-                         UnderlineRunIndex index,
-                         Length numberOfRuns ) const;
+  void GetUnderlineRuns(GlyphRun*         underlineRuns,
+                        UnderlineRunIndex index,
+                        Length            numberOfRuns) const;
 
   // Size interface
 
@@ -168,7 +164,7 @@ public:
    *
    * @param[in] size The text's natural size.
    */
-  void SetNaturalSize( const Vector2& size  );
+  void SetNaturalSize(const Vector2& size);
 
   /**
    * @brief Retrieves the natural size.
@@ -182,7 +178,7 @@ public:
    *
    * @param[in] size The text's size.
    */
-  void SetLayoutSize( const Vector2& size );
+  void SetLayoutSize(const Vector2& size);
 
   /**
    * @brief Retrieves the text's layout size.
@@ -196,7 +192,7 @@ public:
    *
    * @param[in] textColor The text's color
    */
-  void SetTextColor( const Vector4& textColor );
+  void SetTextColor(const Vector4& textColor);
 
   /**
    * @brief Retrieve the text's color
@@ -210,7 +206,7 @@ public:
    *
    * @param[in] shadowOffset The shadow offset, 0,0 indicates no shadow.
    */
-  void SetShadowOffset( const Vector2& shadowOffset );
+  void SetShadowOffset(const Vector2& shadowOffset);
 
   /**
    * @brief Retrieves the text's shadow offset.
@@ -224,7 +220,7 @@ public:
    *
    * @param[in] shadowColor The shadow color.
    */
-  void SetShadowColor( const Vector4& shadowColor );
+  void SetShadowColor(const Vector4& shadowColor);
 
   /**
    * @brief Retrieves the text's shadow color.
@@ -238,7 +234,7 @@ public:
    *
    * @param[in] shadowBlurRadius The shadow blur radius, 0,0 indicates no blur.
    */
-  void SetShadowBlurRadius( const float& shadowBlurRadius );
+  void SetShadowBlurRadius(const float& shadowBlurRadius);
 
   /**
    * @brief Retrieve the shadow blur radius.
@@ -252,7 +248,7 @@ public:
    *
    * @param[in] color The text's underline color.
    */
-  void SetUnderlineColor( const Vector4& color );
+  void SetUnderlineColor(const Vector4& color);
 
   /**
    * @brief Retrieves the text's underline color.
@@ -266,7 +262,7 @@ public:
    *
    * @param[in] enabled true if underlined.
    */
-  void SetUnderlineEnabled( bool enabled );
+  void SetUnderlineEnabled(bool enabled);
 
   /**
    * @brief Returns whether the text is underlined or not.
@@ -285,7 +281,7 @@ public:
    *
    * @param[in] height The height in pixels of the underline
    */
-  void SetUnderlineHeight( float height );
+  void SetUnderlineHeight(float height);
 
   /**
    * @brief Retrieves the underline height override
@@ -306,7 +302,7 @@ public:
    *
    * @param[in] color color of outline.
    */
-  void SetOutlineColor( const Vector4& color );
+  void SetOutlineColor(const Vector4& color);
 
   /**
    * @brief Retrieve the outline color.
@@ -320,7 +316,7 @@ public:
    *
    * @param[in] width The width in pixels of the outline, 0 indicates no outline
    */
-  void SetOutlineWidth( uint16_t width );
+  void SetOutlineWidth(uint16_t width);
 
   /**
    * @brief Retrieves the width of an outline
@@ -334,7 +330,7 @@ public:
    *
    * @param[in] color The text's background color.
    */
-  void SetBackgroundColor( const Vector4& color );
+  void SetBackgroundColor(const Vector4& color);
 
   /**
    * @brief Retrieves the text's background color.
@@ -348,7 +344,7 @@ public:
    *
    * @param[in] enabled true if the text has a background.
    */
-  void SetBackgroundEnabled( bool enabled );
+  void SetBackgroundEnabled(bool enabled);
 
   /**
    * @brief Returns whether the text has a background or not.
@@ -358,64 +354,59 @@ public:
   bool IsBackgroundEnabled() const;
 
 protected:
-
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~VisualModel();
 
 private:
-
   /**
    * @brief Private constructor.
    */
   VisualModel();
 
   // Undefined
-  VisualModel( const VisualModel& handle );
+  VisualModel(const VisualModel& handle);
 
   // Undefined
-  VisualModel& operator=( const VisualModel& handle );
+  VisualModel& operator=(const VisualModel& handle);
 
 public:
-
-  Vector<GlyphInfo>      mGlyphs;               ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
-  Vector<CharacterIndex> mGlyphsToCharacters;   ///< For each glyph, the index of the first character.
-  Vector<GlyphIndex>     mCharactersToGlyph;    ///< For each character, the index of the first glyph.
-  Vector<Length>         mCharactersPerGlyph;   ///< For each glyph, the number of characters that form the glyph.
-  Vector<Length>         mGlyphsPerCharacter;   ///< For each character, the number of glyphs that are shaped.
-  Vector<Vector2>        mGlyphPositions;       ///< For each glyph, the position.
-  Vector<LineRun>        mLines;                ///< The laid out lines.
-  Vector<GlyphRun>       mUnderlineRuns;        ///< Runs of glyphs that are underlined.
-  Vector<Vector4>        mColors;               ///< Colors of the glyphs.
-  Vector<ColorIndex>     mColorIndices;         ///< Indices to the vector of colors for each glyphs.
-  Vector<Vector4>        mBackgroundColors;     ///< Background colors of the glyphs.
+  Vector<GlyphInfo>      mGlyphs;                 ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
+  Vector<CharacterIndex> mGlyphsToCharacters;     ///< For each glyph, the index of the first character.
+  Vector<GlyphIndex>     mCharactersToGlyph;      ///< For each character, the index of the first glyph.
+  Vector<Length>         mCharactersPerGlyph;     ///< For each glyph, the number of characters that form the glyph.
+  Vector<Length>         mGlyphsPerCharacter;     ///< For each character, the number of glyphs that are shaped.
+  Vector<Vector2>        mGlyphPositions;         ///< For each glyph, the position.
+  Vector<LineRun>        mLines;                  ///< The laid out lines.
+  Vector<GlyphRun>       mUnderlineRuns;          ///< Runs of glyphs that are underlined.
+  Vector<Vector4>        mColors;                 ///< Colors of the glyphs.
+  Vector<ColorIndex>     mColorIndices;           ///< Indices to the vector of colors for each glyphs.
+  Vector<Vector4>        mBackgroundColors;       ///< Background colors of the glyphs.
   Vector<ColorIndex>     mBackgroundColorIndices; ///< Indices to the vector of background colors for each glyphs.
 
-  Vector4                mTextColor;            ///< The text color
-  Vector4                mShadowColor;          ///< Color of drop shadow
-  Vector4                mUnderlineColor;       ///< Color of underline
-  Vector4                mOutlineColor;         ///< Color of outline
-  Vector4                mBackgroundColor;      ///< Color of text background
-  Size                   mControlSize;          ///< The size of the UI control.
-  Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
-  float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
-  float                  mShadowBlurRadius;     ///< Blur radius of shadow, 0 indicates no blur.
-  uint16_t               mOutlineWidth;         ///< Width of outline.
+  Vector4  mTextColor;        ///< The text color
+  Vector4  mShadowColor;      ///< Color of drop shadow
+  Vector4  mUnderlineColor;   ///< Color of underline
+  Vector4  mOutlineColor;     ///< Color of outline
+  Vector4  mBackgroundColor;  ///< Color of text background
+  Size     mControlSize;      ///< The size of the UI control.
+  Vector2  mShadowOffset;     ///< Offset for drop shadow, 0 indicates no shadow
+  float    mUnderlineHeight;  ///< Fixed height for underline to override font metrics.
+  float    mShadowBlurRadius; ///< Blur radius of shadow, 0 indicates no blur.
+  uint16_t mOutlineWidth;     ///< Width of outline.
 
 private:
-
-  Size                   mNaturalSize;        ///< Size of the text with no line wrapping.
-  Size                   mLayoutSize;         ///< Size of the laid-out text considering the layout properties set.
+  Size mNaturalSize; ///< Size of the text with no line wrapping.
+  Size mLayoutSize;  ///< Size of the laid-out text considering the layout properties set.
 
   // Caches to increase performance in some consecutive operations.
   LineIndex mCachedLineIndex; ///< Used to increase performance in consecutive calls to GetLineOfGlyph() or GetLineOfCharacter() with consecutive glyphs or characters.
 
 public:
-
-  bool                   mUnderlineEnabled:1;   ///< Underline enabled flag
-  bool                   mUnderlineColorSet:1;  ///< Has the underline color been explicitly set?
-  bool                   mBackgroundEnabled:1;   ///< Background enabled flag
+  bool mUnderlineEnabled : 1;  ///< Underline enabled flag
+  bool mUnderlineColorSet : 1; ///< Has the underline color been explicitly set?
+  bool mBackgroundEnabled : 1; ///< Background enabled flag
 };
 
 } // namespace Text

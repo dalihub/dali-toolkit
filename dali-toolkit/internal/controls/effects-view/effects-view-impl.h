@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_EFFECTS_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class GaussianBlurView;
 class ImageFilter;
 
@@ -63,9 +60,8 @@ public:
   virtual ~EffectsView();
 
 public:
-
   /// @copydoc Dali::Toolkit::EffectsView::SetType
-  void SetType( Toolkit::EffectsView::EffectType type );
+  void SetType(Toolkit::EffectsView::EffectType type);
 
   /// @copydoc Dali::Toolkit::EffectsView::GetType
   Toolkit::EffectsView::EffectType GetType() const;
@@ -74,13 +70,13 @@ public:
   void Refresh();
 
   /// @copydoc Dali::Toolkit::EffectsView::SetRefreshOnDemand
-  void SetRefreshOnDemand( bool onDemand );
+  void SetRefreshOnDemand(bool onDemand);
 
   /// @copydoc Dali::Toolkit::EffectsView::SetPixelFormat
-  void SetPixelFormat( Pixel::Format pixelFormat );
+  void SetPixelFormat(Pixel::Format pixelFormat);
 
   /// @copydoc Dali::Toolkit::EffectsView::SetBackgroundColor(const Vector4&)
-  void SetBackgroundColor( const Vector4& color );
+  void SetBackgroundColor(const Vector4& color);
 
   /// @copydoc Dali::Toolkit::GaussianBlurView::GetBackgroundColor
   Vector4 GetBackgroundColor() const;
@@ -89,7 +85,7 @@ public:
    * Set the effect size which decides the size of filter kernel.
    * @param[in] effectSize The effect size.
    */
-  void SetEffectSize( int effectSize );
+  void SetEffectSize(int effectSize);
 
   /**
    * Get the effect size.
@@ -104,8 +100,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
-
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -113,10 +108,9 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+  static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
 private: // From Control
-
   /**
    * @copydoc Toolkit::Internal::Control::OnInitialize()
    */
@@ -125,12 +119,12 @@ private: // From Control
   /**
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& targetSize )
    */
-  void OnSizeSet( const Vector3& targetSize ) override;
+  void OnSizeSet(const Vector3& targetSize) override;
 
   /**
    * @copydoc Toolkit::Internal::Control::OnSceneConnection
    */
-  void OnSceneConnection( int depth ) override;
+  void OnSceneConnection(int depth) override;
 
   /**
    * @copydoc Toolkit::Internal::Control::OnSceneDisconnection
@@ -140,15 +134,14 @@ private: // From Control
   /**
    * @copydoc Toolkit::Internal::Control::OnChildAdd
    */
-  void OnChildAdd( Actor& child ) override;
+  void OnChildAdd(Actor& child) override;
 
   /**
    * @copydoc Toolkit::Internal::Control::OnChildRemove
    */
-  void OnChildRemove( Actor& child ) override;
+  void OnChildRemove(Actor& child) override;
 
 private:
-
   /**
    * Enable the effect when the control is set on stage
    */
@@ -195,22 +188,20 @@ private:
   void RemoveFilters();
 
 private:
+  // Undefined
+  EffectsView(const EffectsView&);
 
   // Undefined
-  EffectsView( const EffectsView& );
-
-  // Undefined
-  EffectsView& operator = ( const EffectsView& );
+  EffectsView& operator=(const EffectsView&);
 
 private: // attributes/properties
-
   /////////////////////////////////////////////////////////////
   // for rendering all user added children to offscreen target
-  FrameBuffer           mFrameBufferForChildren;
-  Renderer              mRendererForChildren;
-  RenderTask            mRenderTaskForChildren;
-  CameraActor           mCameraForChildren;
-  Actor                 mChildrenRoot; // for creating a subtree for all user added child actors
+  FrameBuffer mFrameBufferForChildren;
+  Renderer    mRendererForChildren;
+  RenderTask  mRenderTaskForChildren;
+  CameraActor mCameraForChildren;
+  Actor       mChildrenRoot; // for creating a subtree for all user added child actors
 
   /////////////////////////////////////////////////////////////
   // background fill color
@@ -222,8 +213,8 @@ private: // attributes/properties
   Vector2 mLastSize;
   /////////////////////////////////////////////////////////////
   // post blur image
-  FrameBuffer           mFrameBufferPostFilter;
-  Renderer              mRendererPostFilter;
+  FrameBuffer mFrameBufferPostFilter;
+  Renderer    mRendererPostFilter;
 
   Vector<ImageFilter*> mFilters;
 
@@ -233,33 +224,32 @@ private: // attributes/properties
 
   /////////////////////////////////////////////////////////////
   Toolkit::EffectsView::EffectType mEffectType;
-  Pixel::Format mPixelFormat;     ///< pixel format used by render targets
+  Pixel::Format                    mPixelFormat; ///< pixel format used by render targets
 
-  bool mEnabled:1;
-  bool mRefreshOnDemand:1;
+  bool mEnabled : 1;
+  bool mRefreshOnDemand : 1;
 }; // class EffectsView
 
 } // namespace Internal
 
-
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::EffectsView& GetImpl( Toolkit::EffectsView& effectsView )
+inline Toolkit::Internal::EffectsView& GetImpl(Toolkit::EffectsView& effectsView)
 {
-  DALI_ASSERT_ALWAYS( effectsView );
+  DALI_ASSERT_ALWAYS(effectsView);
 
   Dali::RefObject& handle = effectsView.GetImplementation();
 
-  return static_cast<Toolkit::Internal::EffectsView&>( handle );
+  return static_cast<Toolkit::Internal::EffectsView&>(handle);
 }
 
-inline const Toolkit::Internal::EffectsView& GetImpl( const Toolkit::EffectsView& effectsView )
+inline const Toolkit::Internal::EffectsView& GetImpl(const Toolkit::EffectsView& effectsView)
 {
-  DALI_ASSERT_ALWAYS( effectsView );
+  DALI_ASSERT_ALWAYS(effectsView);
 
   const Dali::RefObject& handle = effectsView.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::EffectsView&>( handle );
+  return static_cast<const Toolkit::Internal::EffectsView&>(handle);
 }
 
 } // namespace Toolkit

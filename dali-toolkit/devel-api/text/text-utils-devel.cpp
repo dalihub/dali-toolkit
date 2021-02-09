@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1013,12 +1013,11 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
 
   // Set the layout parameters.
   Size textLayoutArea = Size(static_cast<float>(textParameters.textWidth),
-                                          static_cast<float>(textParameters.textHeight));
+                             static_cast<float>(textParameters.textHeight));
 
   // padding
-  Extents padding = textParameters.padding;
-  internalDataModel.textLayoutArea = Size(textLayoutArea.x - ( padding.start + padding.end ), textLayoutArea.y - ( padding.top + padding.bottom ) );
-
+  Extents padding                  = textParameters.padding;
+  internalDataModel.textLayoutArea = Size(textLayoutArea.x - (padding.start + padding.end), textLayoutArea.y - (padding.top + padding.bottom));
 
   if(isCircularTextLayout)
   {

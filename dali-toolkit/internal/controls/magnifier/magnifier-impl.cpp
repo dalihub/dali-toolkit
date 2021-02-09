@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,49 +19,46 @@
 #include <dali-toolkit/internal/controls/magnifier/magnifier-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/stage.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/devel-api/common/stage.h>
-#include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/border-visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/public-api/visuals/border-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace // unnamed namespace
 {
-
-
 Dali::BaseHandle Create()
 {
   return Toolkit::Magnifier::New();
 }
 
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Magnifier, Toolkit::Control, Create )
+// clang-format off
+DALI_TYPE_REGISTRATION_BEGIN(Toolkit::Magnifier, Toolkit::Control, Create)
 
-DALI_PROPERTY_REGISTRATION( Toolkit, Magnifier, "frameVisibility",      BOOLEAN, FRAME_VISIBILITY     )
-DALI_PROPERTY_REGISTRATION( Toolkit, Magnifier, "magnificationFactor",  FLOAT,   MAGNIFICATION_FACTOR )
+DALI_PROPERTY_REGISTRATION(Toolkit, Magnifier, "frameVisibility",      BOOLEAN, FRAME_VISIBILITY    )
+DALI_PROPERTY_REGISTRATION(Toolkit, Magnifier, "magnificationFactor",  FLOAT,   MAGNIFICATION_FACTOR)
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Magnifier, "sourcePosition",  VECTOR3, SOURCE_POSITION )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION(Toolkit, Magnifier, "sourcePosition",  VECTOR3, SOURCE_POSITION)
 
 DALI_TYPE_REGISTRATION_END()
+// clang-format on
 
-const float IMAGE_BORDER_INDENT = 5.0f;            ///< Indent of border in pixels.
+const float IMAGE_BORDER_INDENT = 5.0f; ///< Indent of border in pixels.
 
 struct CameraActorPositionConstraint
 {
@@ -71,7 +68,7 @@ struct CameraActorPositionConstraint
   {
   }
 
-  void operator()( Vector3& current, const PropertyInputContainer& inputs )
+  void operator()(Vector3& current, const PropertyInputContainer& inputs)
   {
     const Vector3& sourcePosition = inputs[0]->GetVector3();
 
@@ -81,8 +78,7 @@ struct CameraActorPositionConstraint
   }
 
   Vector2 mStageSize;
-  float mDefaultCameraDistance;
-
+  float   mDefaultCameraDistance;
 };
 
 struct RenderTaskViewportPositionConstraint
@@ -92,7 +88,7 @@ struct RenderTaskViewportPositionConstraint
   {
   }
 
-  void operator()( Vector2& current, const PropertyInputContainer& inputs )
+  void operator()(Vector2& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetVector3(); // World position?
 
@@ -102,8 +98,8 @@ struct RenderTaskViewportPositionConstraint
     Vector3 size = inputs[1]->GetVector3() * inputs[2]->GetVector3(); /* magnifier-size * magnifier-scale */
 
     // Reposition, and resize viewport to reflect the world bounds of this Magnifier actor.
-    current.x += ( mStageSize.width - size.width ) * 0.5f;
-    current.y += ( mStageSize.height - size.height ) * 0.5f;
+    current.x += (mStageSize.width - size.width) * 0.5f;
+    current.y += (mStageSize.height - size.height) * 0.5f;
   }
 
   Vector2 mStageSize;
@@ -115,7 +111,7 @@ struct RenderTaskViewportSizeConstraint
   {
   }
 
-  void operator()( Vector2& current, const PropertyInputContainer& inputs )
+  void operator()(Vector2& current, const PropertyInputContainer& inputs)
   {
     current = inputs[0]->GetVector3() * inputs[1]->GetVector3(); /* magnifier-size * magnifier-scale */
   }
@@ -143,7 +139,7 @@ Dali::Toolkit::Magnifier Magnifier::New()
 }
 
 Magnifier::Magnifier()
-: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mDefaultCameraDistance(1000.f),
   mActorSize(Vector3::ZERO),
   mMagnificationFactor(1.0f)
@@ -152,12 +148,12 @@ Magnifier::Magnifier()
 
 void Magnifier::SetSourceActor(Actor actor)
 {
-  mTask.SetSourceActor( actor );
+  mTask.SetSourceActor(actor);
 }
 
 void Magnifier::Initialize()
 {
-  Actor self = Self();
+  Actor   self = Self();
   Vector2 stageSize(Stage::GetCurrent().GetSize());
 
   // NOTE:
@@ -172,9 +168,9 @@ void Magnifier::Initialize()
   // and what is not.
   mSourceActor = Actor::New();
   Stage().GetCurrent().Add(mSourceActor);
-  mSourceActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
-  Constraint constraint = Constraint::New<Vector3>( mSourceActor, Actor::Property::POSITION, EqualToConstraint() );
-  constraint.AddSource( Source( self, Toolkit::Magnifier::Property::SOURCE_POSITION ) );
+  mSourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  Constraint constraint = Constraint::New<Vector3>(mSourceActor, Actor::Property::POSITION, EqualToConstraint());
+  constraint.AddSource(Source(self, Toolkit::Magnifier::Property::SOURCE_POSITION));
   constraint.Apply();
 
   // create the render task this will render content on top of everything
@@ -194,42 +190,41 @@ void Magnifier::Initialize()
   // But we can determine the initial position using the same formula:
   // distance = stage.height * 0.5 / tan(FOV * 0.5)
 
-  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-  RenderTask renderTask = taskList.GetTask(0u);
-  float fov = renderTask.GetCameraActor().GetFieldOfView();
-  mDefaultCameraDistance = (stageSize.height * 0.5f) / tanf(fov * 0.5f);
+  RenderTaskList taskList   = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask     renderTask = taskList.GetTask(0u);
+  float          fov        = renderTask.GetCameraActor().GetFieldOfView();
+  mDefaultCameraDistance    = (stageSize.height * 0.5f) / tanf(fov * 0.5f);
 
   // Use a 1 frame delayed source position to determine the camera actor's position.
   // This is necessary as the viewport is determined by the Magnifier's Actor's World position (which is computed
   // at the end of the update cycle i.e. after constraints have been applied.)
   //Property::Index propertySourcePositionDelayed = mCameraActor.RegisterProperty("delayedSourcePosition",   Vector3::ZERO);
 
-  constraint = Constraint::New<Vector3>( mCameraActor, Actor::Property::POSITION, CameraActorPositionConstraint(stageSize, mDefaultCameraDistance) );
-  constraint.AddSource( Source( mSourceActor, Actor::Property::WORLD_POSITION ) );
+  constraint = Constraint::New<Vector3>(mCameraActor, Actor::Property::POSITION, CameraActorPositionConstraint(stageSize, mDefaultCameraDistance));
+  constraint.AddSource(Source(mSourceActor, Actor::Property::WORLD_POSITION));
   constraint.Apply();
 
   // Apply constraint to render-task viewport position
-  constraint = Constraint::New<Vector2>( mTask, RenderTask::Property::VIEWPORT_POSITION, RenderTaskViewportPositionConstraint(stageSize) );
-  constraint.AddSource( Source( self, Actor::Property::WORLD_POSITION ) );
-  constraint.AddSource( Source( self, Actor::Property::SIZE ) );
-  constraint.AddSource( Source( self, Actor::Property::WORLD_SCALE ) );
+  constraint = Constraint::New<Vector2>(mTask, RenderTask::Property::VIEWPORT_POSITION, RenderTaskViewportPositionConstraint(stageSize));
+  constraint.AddSource(Source(self, Actor::Property::WORLD_POSITION));
+  constraint.AddSource(Source(self, Actor::Property::SIZE));
+  constraint.AddSource(Source(self, Actor::Property::WORLD_SCALE));
   constraint.Apply();
 
   // Apply constraint to render-task viewport position
-  constraint = Constraint::New<Vector2>( mTask, RenderTask::Property::VIEWPORT_SIZE, RenderTaskViewportSizeConstraint() );
-  constraint.AddSource( Source( self, Actor::Property::SIZE ) );
-  constraint.AddSource( Source( self, Actor::Property::WORLD_SCALE ) );
+  constraint = Constraint::New<Vector2>(mTask, RenderTask::Property::VIEWPORT_SIZE, RenderTaskViewportSizeConstraint());
+  constraint.AddSource(Source(self, Actor::Property::SIZE));
+  constraint.AddSource(Source(self, Actor::Property::WORLD_SCALE));
   constraint.Apply();
 
-  DevelControl::SetAccessibilityConstructor( self, []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
-  } );
+  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
+    return std::unique_ptr<Dali::Accessibility::Accessible>(
+      new Control::Impl::AccessibleImpl(actor, Dali::Accessibility::Role::FILLER));
+  });
 }
 
 Magnifier::~Magnifier()
 {
-
 }
 
 void Magnifier::InitializeRenderTask()
@@ -247,7 +242,7 @@ void Magnifier::InitializeRenderTask()
   mCameraActor.SetType(Camera::FREE_LOOK);
 
   stage.Add(mCameraActor);
-  mTask.SetCameraActor( mCameraActor );
+  mTask.SetCameraActor(mCameraActor);
 
   SetFrameVisibility(true);
 }
@@ -263,24 +258,24 @@ void Magnifier::SetFrameVisibility(bool visible)
   {
     Actor self(Self());
 
-    mFrame = Actor::New( );
-    mFrame.SetProperty( Actor::Property::INHERIT_POSITION, false );
-    mFrame.SetProperty( Actor::Property::INHERIT_SCALE, true );
-    mFrame.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
-    Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
-    mFrame.SetProperty( Actor::Property::SIZE_MODE_FACTOR, sizeOffset );
+    mFrame = Actor::New();
+    mFrame.SetProperty(Actor::Property::INHERIT_POSITION, false);
+    mFrame.SetProperty(Actor::Property::INHERIT_SCALE, true);
+    mFrame.SetResizePolicy(ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS);
+    Vector3 sizeOffset(IMAGE_BORDER_INDENT * 2.f - 2.f, IMAGE_BORDER_INDENT * 2.f - 2.f, 0.0f);
+    mFrame.SetProperty(Actor::Property::SIZE_MODE_FACTOR, sizeOffset);
 
     Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
 
     Property::Map map;
-    map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::BORDER;
-    map[ Toolkit::BorderVisual::Property::COLOR ] = Color::WHITE;
-    map[ Toolkit::BorderVisual::Property::SIZE   ] = IMAGE_BORDER_INDENT;
-    Toolkit::Visual::Base borderVisual = visualFactory.CreateVisual( map );
-    Toolkit::GetImplementation(borderVisual).SetOnScene( mFrame );
+    map[Toolkit::Visual::Property::TYPE]        = Toolkit::Visual::BORDER;
+    map[Toolkit::BorderVisual::Property::COLOR] = Color::WHITE;
+    map[Toolkit::BorderVisual::Property::SIZE]  = IMAGE_BORDER_INDENT;
+    Toolkit::Visual::Base borderVisual          = visualFactory.CreateVisual(map);
+    Toolkit::GetImplementation(borderVisual).SetOnScene(mFrame);
 
-    Constraint constraint = Constraint::New<Vector3>( mFrame, Actor::Property::POSITION, EqualToConstraint() );
-    constraint.AddSource( ParentSource( Actor::Property::WORLD_POSITION ) );
+    Constraint constraint = Constraint::New<Vector3>(mFrame, Actor::Property::POSITION, EqualToConstraint());
+    constraint.AddSource(ParentSource(Actor::Property::WORLD_POSITION));
     constraint.Apply();
 
     self.Add(mFrame);
@@ -301,7 +296,7 @@ void Magnifier::OnSizeSet(const Vector3& targetSize)
   mActorSize = targetSize;
   Update();
 
-  Control::OnSizeSet( targetSize );
+  Control::OnSizeSet(targetSize);
 }
 
 float Magnifier::GetMagnificationFactor() const
@@ -321,8 +316,8 @@ void Magnifier::Update()
 
   // should be updated when:
   // Magnifier's world size/scale changes.
-  Actor self(Self());
-  Vector3 worldSize = mActorSize * self.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_SCALE );
+  Actor   self(Self());
+  Vector3 worldSize = mActorSize * self.GetCurrentProperty<Vector3>(Actor::Property::WORLD_SCALE);
 
   // Adjust field of view to scale content
 
@@ -335,46 +330,46 @@ void Magnifier::Update()
   // |./
   // |/ <--- fov/2 radians.
   //
-  const float fov = atanf( 0.5f * worldSize.height / mDefaultCameraDistance / mMagnificationFactor) * 2.0f;
-  mCameraActor.SetFieldOfView( fov );
+  const float fov = atanf(0.5f * worldSize.height / mDefaultCameraDistance / mMagnificationFactor) * 2.0f;
+  mCameraActor.SetFieldOfView(fov);
 
   // Adjust aspect ratio to compensate for rectangular viewports.
-  mCameraActor.SetAspectRatio( worldSize.width / worldSize.height );
+  mCameraActor.SetAspectRatio(worldSize.width / worldSize.height);
 }
 
-void Magnifier::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+void Magnifier::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
-  Toolkit::Magnifier magnifier = Toolkit::Magnifier::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::Magnifier magnifier = Toolkit::Magnifier::DownCast(Dali::BaseHandle(object));
 
-  if( magnifier )
+  if(magnifier)
   {
-    Magnifier& magnifierImpl( GetImpl( magnifier ) );
-    switch( index )
+    Magnifier& magnifierImpl(GetImpl(magnifier));
+    switch(index)
     {
       case Toolkit::Magnifier::Property::FRAME_VISIBILITY:
       {
-        magnifierImpl.SetFrameVisibility( value.Get< bool >() );
+        magnifierImpl.SetFrameVisibility(value.Get<bool>());
         break;
       }
       case Toolkit::Magnifier::Property::MAGNIFICATION_FACTOR:
       {
-        magnifierImpl.SetMagnificationFactor( value.Get< float >() );
+        magnifierImpl.SetMagnificationFactor(value.Get<float>());
         break;
       }
     }
   }
 }
 
-Property::Value Magnifier::GetProperty( BaseObject* object, Property::Index index )
+Property::Value Magnifier::GetProperty(BaseObject* object, Property::Index index)
 {
   Property::Value value;
 
-  Toolkit::Magnifier magnifier = Toolkit::Magnifier::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::Magnifier magnifier = Toolkit::Magnifier::DownCast(Dali::BaseHandle(object));
 
-  if( magnifier )
+  if(magnifier)
   {
-    Magnifier& magnifierImpl( GetImpl( magnifier ) );
-    switch( index )
+    Magnifier& magnifierImpl(GetImpl(magnifier));
+    switch(index)
     {
       case Toolkit::Magnifier::Property::FRAME_VISIBILITY:
       {

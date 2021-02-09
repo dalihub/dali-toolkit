@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_COLOR_VISUAL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,12 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class ColorVisual;
-typedef IntrusivePtr< ColorVisual > ColorVisualPtr;
+typedef IntrusivePtr<ColorVisual> ColorVisualPtr;
 
 /**
  * The visual which renders a solid color to the control's quad
@@ -45,10 +42,9 @@ typedef IntrusivePtr< ColorVisual > ColorVisualPtr;
  * |-----------------|-------------|
  * | mixColor        | VECTOR4     |
  */
-class ColorVisual: public Visual::Base
+class ColorVisual : public Visual::Base
 {
 public:
-
   /**
    * @brief Create a new color visual.
    *
@@ -56,28 +52,26 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static ColorVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
+  static ColorVisualPtr New(VisualFactoryCache& factoryCache, const Property::Map& properties);
 
-public:  // from Visual
-
+public: // from Visual
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
 protected:
-
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  ColorVisual( VisualFactoryCache& factoryCache );
+  ColorVisual(VisualFactoryCache& factoryCache);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -85,14 +79,19 @@ protected:
   virtual ~ColorVisual();
 
   /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
+
+  /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::DoSetOffScene
@@ -107,7 +106,7 @@ protected:
   /**
    * @copydoc Visual::Base::OnDoAction
    */
-  void OnDoAction( const Property::Index actionId, const Property::Value& attributes ) override;
+  void OnDoAction(const Property::Index actionId, const Property::Value& attributes) override;
 
   /**
    * @copydoc Visual::Base::UpdateShader
@@ -121,23 +120,17 @@ protected:
 
 private:
   /**
-   * @brief Initialize the renderer with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
-   */
-  void InitializeRenderer();
-
-  /**
    * @brief Get a shader for the current properties.
    * @return The shader for the current properties.
    */
   Shader GetShader();
 
 private:
+  // Undefined
+  ColorVisual(const ColorVisual& colorRenderer);
 
   // Undefined
-  ColorVisual( const ColorVisual& colorRenderer );
-
-  // Undefined
-  ColorVisual& operator=( const ColorVisual& colorRenderer );
+  ColorVisual& operator=(const ColorVisual& colorRenderer);
 
 private:
   float           mBlurRadius;          ///< The blur radius

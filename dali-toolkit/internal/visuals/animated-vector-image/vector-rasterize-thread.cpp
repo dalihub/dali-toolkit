@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,25 +20,21 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <chrono>
 #include <thread>
-#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
+Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
 #endif
 
 } // unnamed namespace
@@ -47,9 +43,9 @@ VectorRasterizeThread::VectorRasterizeThread()
 : mRasterizeTasks(),
   mConditionalWait(),
   mCompletedCallback(),
-  mDestroyThread( false ),
-  mIsThreadStarted( false ),
-  mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
+  mDestroyThread(false),
+  mIsThreadStarted(false),
+  mLogFactory(Dali::Adaptor::Get().GetLogFactory())
 {
 }
 
@@ -57,49 +53,49 @@ VectorRasterizeThread::~VectorRasterizeThread()
 {
   // Stop the thread
   {
-    ConditionalWait::ScopedLock lock( mConditionalWait );
+    ConditionalWait::ScopedLock lock(mConditionalWait);
     mDestroyThread = true;
-    mConditionalWait.Notify( lock );
+    mConditionalWait.Notify(lock);
   }
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::~VectorRasterizeThread: Join [%p]\n", this );
+  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::~VectorRasterizeThread: Join [%p]\n", this);
 
   Join();
 }
 
-void VectorRasterizeThread::SetCompletedCallback( CallbackBase* callback )
+void VectorRasterizeThread::SetCompletedCallback(CallbackBase* callback)
 {
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  ConditionalWait::ScopedLock lock(mConditionalWait);
 
-  mCompletedCallback = std::unique_ptr< CallbackBase >( callback );
+  mCompletedCallback = std::unique_ptr<CallbackBase>(callback);
 }
 
-void VectorRasterizeThread::AddTask( VectorAnimationTaskPtr task )
+void VectorRasterizeThread::AddTask(VectorAnimationTaskPtr task)
 {
   // Lock while adding task to the queue
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  ConditionalWait::ScopedLock lock(mConditionalWait);
 
-  if( !mIsThreadStarted )
+  if(!mIsThreadStarted)
   {
     Start();
     mIsThreadStarted = true;
   }
 
-  if( mRasterizeTasks.end() == std::find( mRasterizeTasks.begin(), mRasterizeTasks.end(), task ) )
+  if(mRasterizeTasks.end() == std::find(mRasterizeTasks.begin(), mRasterizeTasks.end(), task))
   {
-    mRasterizeTasks.push_back( task );
+    mRasterizeTasks.push_back(task);
 
     // wake up the animation thread
-    mConditionalWait.Notify( lock );
+    mConditionalWait.Notify(lock);
   }
 }
 
 void VectorRasterizeThread::Run()
 {
-  SetThreadName( "VectorRasterizeThread" );
+  SetThreadName("VectorRasterizeThread");
   mLogFactory.InstallLogFunction();
 
-  while( !mDestroyThread )
+  while(!mDestroyThread)
   {
     Rasterize();
   }
@@ -110,30 +106,30 @@ void VectorRasterizeThread::Rasterize()
   VectorAnimationTaskPtr nextTask;
   {
     // Lock while popping task out from the queue
-    ConditionalWait::ScopedLock lock( mConditionalWait );
+    ConditionalWait::ScopedLock lock(mConditionalWait);
 
     // conditional wait
-    if( mRasterizeTasks.empty() )
+    if(mRasterizeTasks.empty())
     {
-      mConditionalWait.Wait( lock );
+      mConditionalWait.Wait(lock);
     }
 
     // pop out the next task from the queue
-    if( !mRasterizeTasks.empty() )
+    if(!mRasterizeTasks.empty())
     {
-      std::vector< VectorAnimationTaskPtr >::iterator next = mRasterizeTasks.begin();
-      nextTask = *next;
-      mRasterizeTasks.erase( next );
+      std::vector<VectorAnimationTaskPtr>::iterator next = mRasterizeTasks.begin();
+      nextTask                                           = *next;
+      mRasterizeTasks.erase(next);
     }
   }
 
-  if( nextTask )
+  if(nextTask)
   {
     bool keepAnimation = nextTask->Rasterize();
 
-    if( mCompletedCallback )
+    if(mCompletedCallback)
     {
-      CallbackBase::Execute( *mCompletedCallback, nextTask, keepAnimation );
+      CallbackBase::Execute(*mCompletedCallback, nextTask, keepAnimation);
     }
   }
 }

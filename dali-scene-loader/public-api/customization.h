@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_CUSTOMIZATION_STATE_H_
 #define DALI_SCENE_LOADER_CUSTOMIZATION_STATE_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,18 @@
  *
  */
 
- // INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include "dali-scene-loader/public-api/api.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/common/vector-wrapper.h"
-#include <string>
 #include <memory>
+#include <string>
+#include "dali/public-api/common/vector-wrapper.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /**
  * @brief Offers a description of an aspect of the scene that can be customized:
  *     the number of options, and the name of the nodes that are registered
@@ -37,7 +36,7 @@ namespace SceneLoader
  */
 struct DALI_SCENE_LOADER_API Customization
 {
-  using Tag = std::string;
+  using Tag        = std::string;
   using OptionType = uint32_t;
 
   /**
@@ -114,11 +113,11 @@ struct DALI_SCENE_LOADER_API Customization
 
   static const OptionType NONE = OptionType(-1);
 
-  OptionType numOptions = 0;
-  std::vector<std::string> nodes;  // to apply option to.
+  OptionType               numOptions = 0;
+  std::vector<std::string> nodes; // to apply option to.
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_CUSTOMIZATION_STATE_H_

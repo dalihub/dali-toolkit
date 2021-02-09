@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,21 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/type-info.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <cstring> // for strcmp
 #include <limits>
 #include <stack>
 #include <typeinfo>
-#include <dali/public-api/object/type-info.h>
-#include <dali/devel-api/common/stage.h>
-#include <dali/devel-api/actors/actor-devel.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
@@ -44,13 +45,11 @@
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/dali-toolkit.h>
 
 namespace Dali
 {
@@ -374,7 +373,7 @@ void Control::KeyboardEnter()
 
 bool Control::OnAccessibilityActivated()
 {
-  if( Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( Self() ) )
+  if(Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self()))
   {
     return OnKeyboardEnter();
   }
@@ -489,14 +488,14 @@ void Control::Initialize()
   }
 
   Dali::TypeInfo type;
-  Self().GetTypeInfo( type );
-  if (type)
+  Self().GetTypeInfo(type);
+  if(type)
   {
     auto typeName = type.GetName();
-    DevelControl::AppendAccessibilityAttribute( Self(), "t", typeName );
+    DevelControl::AppendAccessibilityAttribute(Self(), "t", typeName);
   }
 
-  if (Accessibility::IsUp())
+  if(Accessibility::IsUp())
     mImpl->AccessibilityRegister();
 }
 
@@ -546,14 +545,14 @@ void Control::EmitKeyInputFocusSignal(bool focusGained)
 {
   Dali::Toolkit::Control handle(GetOwner());
 
-  if( Accessibility::IsUp() )
+  if(Accessibility::IsUp())
   {
-    auto self = mImpl->GetAccessibilityObject( Self() );
-    self->EmitFocused( focusGained );
+    auto self = mImpl->GetAccessibilityObject(Self());
+    self->EmitFocused(focusGained);
     auto parent = self->GetParent();
-    if( parent && !self->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS] )
+    if(parent && !self->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS])
     {
-      parent->EmitActiveDescendantChanged( parent, self );
+      parent->EmitActiveDescendantChanged(parent, self);
     }
   }
 
@@ -596,7 +595,7 @@ void Control::OnSceneConnection(int depth)
 
   // Request to be laid out when the control is connected to the Scene.
   // Signal that a Relayout may be needed
-  if( Accessibility::IsUp() )
+  if(Accessibility::IsUp())
   {
     mImpl->AccessibilityRegister();
   }
@@ -604,7 +603,7 @@ void Control::OnSceneConnection(int depth)
 
 void Control::OnSceneDisconnection()
 {
-  if( Accessibility::IsUp() )
+  if(Accessibility::IsUp())
   {
     mImpl->AccessibilityDeregister();
   }
@@ -633,30 +632,30 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
 {
   // If the clipping mode has been set, we may need to create a renderer.
   // Only do this if we are already on-stage as the OnSceneConnection will handle the off-stage clipping controls.
-  switch( index )
+  switch(index)
   {
     case Actor::Property::CLIPPING_MODE:
     {
-      if( Self().GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ))
+      if(Self().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
       {
         // Note: This method will handle whether creation of the renderer is required.
-        CreateClippingRenderer( *this );
+        CreateClippingRenderer(*this);
       }
       break;
     }
     case Actor::Property::VISIBLE:
     {
-      if( Dali::Accessibility::IsUp() )
+      if(Dali::Accessibility::IsUp())
       {
-        Dali::Accessibility::Accessible::Get(Self())->EmitVisible( Self().GetProperty( Actor::Property::VISIBLE ).Get<bool>() );
+        Dali::Accessibility::Accessible::Get(Self())->EmitVisible(Self().GetProperty(Actor::Property::VISIBLE).Get<bool>());
       }
       break;
     }
     case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
     {
-      if( Dali::Accessibility::IsUp() )
+      if(Dali::Accessibility::IsUp())
       {
-        Dali::Accessibility::Accessible::Get(Self())->Emit( Dali::Accessibility::ObjectPropertyChangeEvent::ROLE );
+        Dali::Accessibility::Accessible::Get(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::ROLE);
       }
       break;
     }

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_PUSH_BUTTON_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * PushButton implementation class.
  *
@@ -42,7 +39,6 @@ namespace Internal
 class PushButton : public Button
 {
 public:
-
   /**
    * Create a new PushButton.
    * @return A smart-pointer to the newly allocated PushButton.
@@ -50,7 +46,6 @@ public:
   static Dali::Toolkit::PushButton New();
 
 protected:
-
   /**
    * Construct a new PushButton.
    */
@@ -62,7 +57,6 @@ protected:
   virtual ~PushButton();
 
 public:
-
   // Properties
 
   /**
@@ -83,7 +77,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * Called to retrieve a property of an object of this type.
@@ -91,23 +85,21 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+  static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
 private: // From Button
-
   /**
    * @copydoc Toolkit::Internal::Button::OnInitialize
    */
   void OnInitialize() override;
 
 private:
-
   /**
    * @brief Sets the alignment mode to use to align the icon to the label.
    *
    * @param[in] iconAlignment The alignment mode to use
    */
-  void SetIconAlignment( const PushButton::IconAlignment iconAlignment );
+  void SetIconAlignment(const PushButton::IconAlignment iconAlignment);
 
   /**
    * @brief Gets the alignment mode used to align the icon to the label.
@@ -117,16 +109,14 @@ private:
   const PushButton::IconAlignment GetIconAlignment() const;
 
 private:
+  // Undefined
+  PushButton(const PushButton&);
 
   // Undefined
-  PushButton( const PushButton& );
-
-  // Undefined
-  PushButton& operator=( const PushButton& );
+  PushButton& operator=(const PushButton&);
 
 private:
-
-  IconAlignment  mIconAlignment;                 ///< The alignment of the icon against the label.
+  IconAlignment mIconAlignment; ///< The alignment of the icon against the label.
 
 protected:
   struct AccessibleImpl : public Button::AccessibleImpl
@@ -135,29 +125,29 @@ protected:
 
     Dali::Accessibility::States CalculateStates() override;
   };
-  void OnStateChange( State newState ) override;
+  void OnStateChange(State newState) override;
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::PushButton& GetImplementation( Toolkit::PushButton& button )
+inline Toolkit::Internal::PushButton& GetImplementation(Toolkit::PushButton& button)
 {
-  DALI_ASSERT_ALWAYS( button );
+  DALI_ASSERT_ALWAYS(button);
 
   Dali::RefObject& handle = button.GetImplementation();
 
-  return static_cast<Toolkit::Internal::PushButton&>( handle );
+  return static_cast<Toolkit::Internal::PushButton&>(handle);
 }
 
-inline const Toolkit::Internal::PushButton& GetImplementation( const Toolkit::PushButton& button )
+inline const Toolkit::Internal::PushButton& GetImplementation(const Toolkit::PushButton& button)
 {
-  DALI_ASSERT_ALWAYS( button );
+  DALI_ASSERT_ALWAYS(button);
 
   const Dali::RefObject& handle = button.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::PushButton&>( handle );
+  return static_cast<const Toolkit::Internal::PushButton&>(handle);
 }
 
 } // namespace Toolkit

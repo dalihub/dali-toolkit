@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_MESH_GEOMETRY_H
 #define DALI_SCENE_LOADER_MESH_GEOMETRY_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,16 +28,15 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 struct DALI_SCENE_LOADER_API MeshGeometry
 {
-  Geometry geometry;                         ///< The array of vertices.
-  Texture blendShapeGeometry;                ///< The array of vertices of the different blend shapes encoded inside a texture with power of two dimensions.
+  Geometry      geometry;                    ///< The array of vertices.
+  Texture       blendShapeGeometry;          ///< The array of vertices of the different blend shapes encoded inside a texture with power of two dimensions.
   Vector<float> blendShapeUnnormalizeFactor; ///< Factor used to unnormalize the geometry of the blend shape.
-  unsigned int blendShapeBufferOffset;             ///< Offset used to calculate the start of each blend shape.
+  unsigned int  blendShapeBufferOffset;      ///< Offset used to calculate the start of each blend shape.
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif // DALI_SCENE_LOADER_MESH_GEOMETRY_H

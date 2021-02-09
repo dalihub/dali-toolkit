@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_WEB_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <memory>
 #include <dali/devel-api/adaptor-framework/web-engine.h>
 #include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/object/property-notification.h>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
@@ -31,10 +32,8 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class KeyEvent;
 class TouchEvent;
 class WebBackForwardList;
@@ -45,21 +44,18 @@ class WebView;
 
 namespace Internal
 {
-
 class WebView : public Control
 {
 protected:
-
   WebView();
 
-  WebView( const std::string& locale, const std::string& timezoneId );
+  WebView(const std::string& locale, const std::string& timezoneId);
 
-  WebView( int argc, char** argv );
+  WebView(int argc, char** argv);
 
   virtual ~WebView();
 
 public:
-
   /**
    * @copydoc Dali::Toolkit::WebView::New()
    */
@@ -68,7 +64,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::New( const std::string&, const std::string& )
    */
-  static Toolkit::WebView New( const std::string& locale, const std::string& timezoneId );
+  static Toolkit::WebView New(const std::string& locale, const std::string& timezoneId);
 
   /**
    * @brief Get settings of WebEngine.
@@ -93,7 +89,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::New( int, char** )
    */
-  static Toolkit::WebView New( int argc, char** argv );
+  static Toolkit::WebView New(int argc, char** argv);
 
   /**
    * @brief Get Favicon of web page.
@@ -105,12 +101,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::LoadUrl()
    */
-  void LoadUrl( const std::string& url );
+  void LoadUrl(const std::string& url);
 
   /**
    * @copydoc Dali::WebEngine::LoadHTMLString()
    */
-  void LoadHtmlString( const std::string& htmlString );
+  void LoadHtmlString(const std::string& htmlString);
 
   /**
    * @copydoc Dali::Toolkit::WebView::Reload()
@@ -135,7 +131,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::ScrollBy()
    */
-  void ScrollBy( int deltaX, int deltaY );
+  void ScrollBy(int deltaX, int deltaY);
 
   /**
    * @copydoc Dali::Toolkit::WebView::CanGoForward()
@@ -160,12 +156,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::EvaluateJavaScript()
    */
-  void EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler );
+  void EvaluateJavaScript(const std::string& script, std::function<void(const std::string&)> resultHandler);
 
   /**
    * @copydoc Dali::Toolkit::WebView::AddJavaScriptMessageHandler()
    */
-  void AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler );
+  void AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler);
 
   /**
    * @brief Clears all tiles resources of Web.
@@ -198,7 +194,6 @@ public:
   Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
 
 public: // Properties
-
   /**
    * @brief Called when a property of an object of this type is set.
    *
@@ -206,7 +201,7 @@ public: // Properties
    * @param[in] index The property index.
    * @param[in] value The new property value.
    */
-  static void SetProperty( Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value );
+  static void SetProperty(Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value);
 
   /**
    * @brief Called to retrieve a property of an object of this type.
@@ -215,7 +210,7 @@ public: // Properties
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Dali::Property::Value GetProperty( Dali::BaseObject* object, Dali::Property::Index propertyIndex );
+  static Dali::Property::Value GetProperty(Dali::BaseObject* object, Dali::Property::Index propertyIndex);
 
   /**
    * Connects a callback function with the object's signals.
@@ -226,10 +221,9 @@ public: // Properties
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the c
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 private: // From Control
-
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
@@ -241,22 +235,17 @@ private: // From Control
   Vector3 GetNaturalSize() override;
 
   /**
-   * @copydoc Toolkit::Control::OnRelayout()
-   */
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
-
-  /**
    * Signal occurs when the Web View has been touched.
    * @param[in] actor The Actor Touched
    * @param[in] touch The Touch Data.
    * @return Whether to consume event or not.
    */
-  bool OnTouchEvent( Actor actor, const Dali::TouchEvent& touch );
+  bool OnTouchEvent(Actor actor, const Dali::TouchEvent& touch);
 
   /**
    * @copydoc Toolkit::Control::OnKeyEvent()
    */
-  bool OnKeyEvent( const Dali::KeyEvent& event ) override;
+  bool OnKeyEvent(const Dali::KeyEvent& event) override;
 
   /**
    * @copydoc Toolkit::Control::OnKeyInputFocusGained()
@@ -268,19 +257,23 @@ private: // From Control
    */
   void OnKeyInputFocusLost() override;
 
+  /**
+   * @copydoc Toolkit::Control::OnSceneConnection()
+   */
+  void OnSceneConnection(int depth) override;
+
 private:
-
   // Undefined
-  WebView( const WebView& webView );
+  WebView(const WebView& webView);
 
-  WebView& operator=( const WebView& webView );
+  WebView& operator=(const WebView& webView);
 
   /**
    * @brief Sets an absolute scroll of the given view.
    * @param[in] x The coordinate x of scroll
    * @param[in] y The coordinate y of scroll
    */
-  void SetScrollPosition( int x, int y );
+  void SetScrollPosition(int x, int y);
 
   /**
    * @brief Gets the current scroll position of the given view.
@@ -320,66 +313,89 @@ private:
    * @brief Set user agent string.
    * @param[in] userAgent The string value of user agent
    */
-  void SetUserAgent( const std::string& userAgent );
+  void SetUserAgent(const std::string& userAgent);
+
+  /**
+   * @brief Updates display area of web view.
+   * @param[in] source The soource triggers Notification.
+   */
+  void UpdateDisplayArea(Dali::PropertyNotification& source);
+
+  /**
+   * @brief Enable/Disable video hole for video playing.
+   * @param[in] enabled True if video hole is enabled, false otherwise.
+   */
+  void EnableVideoHole(bool enabled);
+
+  /**
+   * @brief Enable blend mode.
+   * @param[in] blendEnabled True if turn on blend mode, false otherwise.
+   */
+  void EnableBlendMode(bool blendEnabled);
 
   /**
    * @brief Callback function to be called when page load started.
    * @param[in] url The url currently being loaded
    */
-  void OnPageLoadStarted( const std::string& url );
+  void OnPageLoadStarted(const std::string& url);
 
   /**
    * @brief Callback function to be called when page load finished.
    * @param[in] url The url currently being loaded
    */
-  void OnPageLoadFinished( const std::string& url );
+  void OnPageLoadFinished(const std::string& url);
 
   /**
    * @brief Callback function to be called when there is an error in page loading.
    * @param[in] url The url currently being loaded
    * @param[in] errorCode The error code
    */
-  void OnPageLoadError( const std::string& url, int errorCode );
+  void OnPageLoadError(const std::string& url, int errorCode);
 
   /**
    * @brief Callback function to be called when scroll edge is reached.
    * @param[in] e The scroll edge reached.
    */
-  void OnScrollEdgeReached( Dali::WebEnginePlugin::ScrollEdge edge );
+  void OnScrollEdgeReached(Dali::WebEnginePlugin::ScrollEdge edge);
 
 private:
+  std::string                 mUrl;
+  Dali::Toolkit::Visual::Base mVisual;
+  Dali::Size                  mWebViewSize;
+  Dali::WebEngine             mWebEngine;
 
-  std::string                                            mUrl;
-  Dali::Toolkit::Visual::Base                            mVisual;
-  Dali::Size                                             mWebViewSize;
-  Dali::WebEngine                                        mWebEngine;
-
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadStartedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadFinishedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType mPageLoadErrorSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadStartedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadFinishedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType     mPageLoadErrorSignal;
   Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
 
-  std::unique_ptr<Dali::Toolkit::WebContext>             mWebContext;
-  std::unique_ptr<Dali::Toolkit::WebCookieManager>       mWebCookieManager;
-  std::unique_ptr<Dali::Toolkit::WebSettings>            mWebSettings;
-  std::unique_ptr<Dali::Toolkit::WebBackForwardList>     mWebBackForwardList;
-  Dali::Toolkit::ImageView mFaviconView;
+  std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
+  std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
+  std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
+  std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
+  Dali::Toolkit::ImageView                           mFaviconView;
+
+  Dali::PropertyNotification mPositionUpdateNotification;
+  Dali::PropertyNotification mSizeUpdateNotification;
+  Dali::PropertyNotification mScaleUpdateNotification;
+  bool                       mVideoHoleEnabled;
+  Dali::Rect<int>            mWebViewArea;
 };
 
 } // namespace Internal
 
-inline Toolkit::Internal::WebView& GetImpl( Toolkit::WebView& handle )
+inline Toolkit::Internal::WebView& GetImpl(Toolkit::WebView& handle)
 {
-  DALI_ASSERT_ALWAYS( handle );
+  DALI_ASSERT_ALWAYS(handle);
   Dali::RefObject& impl = handle.GetImplementation();
-  return static_cast< Toolkit::Internal::WebView& >( impl );
+  return static_cast<Toolkit::Internal::WebView&>(impl);
 }
 
-inline const Toolkit::Internal::WebView& GetImpl( const Toolkit::WebView& handle )
+inline const Toolkit::Internal::WebView& GetImpl(const Toolkit::WebView& handle)
 {
-  DALI_ASSERT_ALWAYS( handle );
+  DALI_ASSERT_ALWAYS(handle);
   const Dali::RefObject& impl = handle.GetImplementation();
-  return static_cast< const Toolkit::Internal::WebView& >( impl );
+  return static_cast<const Toolkit::Internal::WebView&>(impl);
 }
 
 } // namespace Toolkit

@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_SCENE_DEFINITION_H_
 #define DALI_SCENE_LOADER_SCENE_DEFINITION_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,22 @@
 
 // INTERNAL INCLUDES
 #include "dali-scene-loader/public-api/customization.h"
-#include "dali-scene-loader/public-api/utils.h"
 #include "dali-scene-loader/public-api/node-definition.h"
 #include "dali-scene-loader/public-api/string-callback.h"
+#include "dali-scene-loader/public-api/utils.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/math/quaternion.h"
-#include "dali/public-api/math/matrix.h"
-#include "dali/public-api/math/vector4.h"
-#include "dali/public-api/actors/actor.h"
-#include <string>
 #include <memory>
+#include <string>
+#include "dali/public-api/actors/actor.h"
+#include "dali/public-api/math/matrix.h"
+#include "dali/public-api/math/quaternion.h"
+#include "dali/public-api/math/vector4.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 class MatrixStack;
 
 /*
@@ -44,9 +43,9 @@ class MatrixStack;
  */
 class DALI_SCENE_LOADER_API SceneDefinition
 {
-public:  // TYPES
-  using NodePredicate = std::function<bool(const NodeDefinition&)>;
-  using NodeConsumer = std::function<void(NodeDefinition&)>;
+public: // TYPES
+  using NodePredicate     = std::function<bool(const NodeDefinition&)>;
+  using NodeConsumer      = std::function<void(NodeDefinition&)>;
   using ConstNodeConsumer = std::function<void(const NodeDefinition&)>;
 
 public: // METHODS
@@ -112,8 +111,7 @@ public: // METHODS
    *  from node definitions.
    * @return Handle to the root actor.
    */
-  Actor CreateNodes(Index iNode, const Customization::Choices& choices,
-    NodeDefinition::CreateParams& params) const;
+  Actor CreateNodes(Index iNode, const Customization::Choices& choices, NodeDefinition::CreateParams& params) const;
 
   /*
    * @brief Creates / update a registry of mappings from customization tags to
@@ -123,8 +121,8 @@ public: // METHODS
    *  choice of 0.
    */
   void GetCustomizationOptions(const Customization::Choices& choices,
-    Customization::Map& outCustomizationOptions,
-    Customization::Choices* outMissingChoices) const;
+                               Customization::Map&           outCustomizationOptions,
+                               Customization::Choices*       outMissingChoices) const;
 
   /*
    * @brief Attempts to add @a nodeDef to the end of nodes, and its index to the end of
@@ -198,9 +196,9 @@ public: // METHODS
   /*
    * @brief Applies constraints from the given requests.
    */
-  void ApplyConstraints(Actor& root,
-    std::vector<ConstraintRequest>&& constrainables,
-    StringCallback onError = DefaultErrorCallback) const;
+  void ApplyConstraints(Actor&                           root,
+                        std::vector<ConstraintRequest>&& constrainables,
+                        StringCallback                   onError = DefaultErrorCallback) const;
 
   /*
    * @brief Sets up joint matrix properties and constraints on actors that are involved in skeletal
@@ -239,8 +237,9 @@ public: // METHODS
    *   of separate instances need to be declared in the .dli to avoid clashing uniform
    *   definitions and constraints.
    */
-  void ConfigureSkinningShaders(const ResourceBundle& resources,
-    Actor root, std::vector<SkinningShaderConfigurationRequest>&& requests) const;
+  void ConfigureSkinningShaders(const ResourceBundle&                             resources,
+                                Actor                                             root,
+                                std::vector<SkinningShaderConfigurationRequest>&& requests) const;
 
   /*
    * @brief Ensures there is no two meshes with blend shapes sharing the same shader.
@@ -258,21 +257,22 @@ public: // METHODS
    * @param[in] resources The resources bundle. Meshes need to be accessed to configure the blend shapes.
    * @param[in] onError The error callback.
    */
-  bool ConfigureBlendshapeShaders(const ResourceBundle& resources,
-    Actor root, std::vector<BlendshapeShaderConfigurationRequest>&& requests,
-    StringCallback onError = DefaultErrorCallback) const;
+  bool ConfigureBlendshapeShaders(const ResourceBundle&                               resources,
+                                  Actor                                               root,
+                                  std::vector<BlendshapeShaderConfigurationRequest>&& requests,
+                                  StringCallback                                      onError = DefaultErrorCallback) const;
 
   SceneDefinition& operator=(SceneDefinition&& other);
 
 private: // METHODS
   bool FindNode(const std::string& name, std::unique_ptr<NodeDefinition>** result);
 
-private: // DATA
-  std::vector<std::unique_ptr<NodeDefinition>> mNodes;  // size unknown up front (may discard nodes).
-  std::vector<Index> mRootNodeIds;
+private:                                               // DATA
+  std::vector<std::unique_ptr<NodeDefinition>> mNodes; // size unknown up front (may discard nodes).
+  std::vector<Index>                           mRootNodeIds;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_SCENE_DEFINITION_H_

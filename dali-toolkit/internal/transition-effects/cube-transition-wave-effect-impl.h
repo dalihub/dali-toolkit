@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_WAVE_EFFECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,29 +26,23 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class CubeTransitionWaveEffect;
 
 namespace Internal
 {
-
 class CubeTransitionEffect;
 
 class CubeTransitionWaveEffect : public CubeTransitionEffect
 {
-
 public:
-
   /**
    * @copydoc Toolkit::CubeTransitionWaveEffect::New
    */
-  static Toolkit::CubeTransitionWaveEffect New(unsigned int numRows, unsigned int numColumns );
+  static Toolkit::CubeTransitionWaveEffect New(unsigned int numRows, unsigned int numColumns);
 
 protected:
-
   /**
    * @copydoc Toolkit::Internal::CubeTransitionEffect::OnInitialize
    */
@@ -57,16 +51,15 @@ protected:
   /**
    * @copydoc Toolkit::Internal::CubeTransitionEffect::OnStartTransition
    */
-  void OnStartTransition( Vector2 panPosition, Vector2 panDisplacement ) override;
+  void OnStartTransition(Vector2 panPosition, Vector2 panDisplacement) override;
 
 private:
-
   /**
    * Construct a new CubeTransitionWaveEffect object
    * @param[in] numRows How many rows of cubes
    * @param[in] numColumns How many columns of cubes
    */
-  CubeTransitionWaveEffect( unsigned int numRows, unsigned int numColumns );
+  CubeTransitionWaveEffect(unsigned int numRows, unsigned int numColumns);
 
   /**
    * The Saddle surface (Hyperbolic paraboloid)function is used to calculate the delay of rotating animation for each cube
@@ -75,7 +68,7 @@ private:
    * @param[in] position The press down position of panGesture
    * @param[in] displacement The displacement vector of panGesture
    */
-  void CalculateSaddleSurfaceParameters( Vector2 position, Vector2 displacement);
+  void CalculateSaddleSurfaceParameters(Vector2 position, Vector2 displacement);
 
   /**
    * Calculate the delay of the animation for each cube
@@ -83,18 +76,17 @@ private:
    * @param[in] y The Y coordinate of the cube
    * @return The delay time of the animation
    */
-  float CalculateDelay( float x, float y, bool forward );
+  float CalculateDelay(float x, float y, bool forward);
 
 private:
-
   //saddle surface(Hyperbolic paraboloid)function, used to calculate the delay time of each cube
   //z = 1.0 + y*y/a/a - x*x/b/b
   //with our selection of parameters(a and b), this value for any cube is between 0.0 and 2.0
-  float                      mSaddleAA; //a*a
-  float                      mSaddleBB; //b*b
-  float                      mSaddleB;  //b
-  Vector2                    mTranslation;
-  Vector2                    mRotation;
+  float   mSaddleAA; //a*a
+  float   mSaddleBB; //b*b
+  float   mSaddleB;  //b
+  Vector2 mTranslation;
+  Vector2 mRotation;
 
 }; // class CubeTransitionWaveEffect
 
@@ -102,22 +94,22 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Internal::CubeTransitionWaveEffect& GetImpl( Dali::Toolkit::CubeTransitionWaveEffect& obj )
+inline Internal::CubeTransitionWaveEffect& GetImpl(Dali::Toolkit::CubeTransitionWaveEffect& obj)
 {
-  DALI_ASSERT_ALWAYS( obj );
+  DALI_ASSERT_ALWAYS(obj);
 
   Dali::RefObject& handle = obj.GetImplementation();
 
-  return static_cast< Internal::CubeTransitionWaveEffect& >( handle );
+  return static_cast<Internal::CubeTransitionWaveEffect&>(handle);
 }
 
-inline const Internal::CubeTransitionWaveEffect& GetImpl( const Dali::Toolkit::CubeTransitionWaveEffect& obj )
+inline const Internal::CubeTransitionWaveEffect& GetImpl(const Dali::Toolkit::CubeTransitionWaveEffect& obj)
 {
-  DALI_ASSERT_ALWAYS( obj );
+  DALI_ASSERT_ALWAYS(obj);
 
   const Dali::RefObject& handle = obj.GetImplementation();
 
-  return static_cast< const Internal::CubeTransitionWaveEffect& >( handle );
+  return static_cast<const Internal::CubeTransitionWaveEffect&>(handle);
 }
 
 } // namespace Toolkit

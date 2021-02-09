@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <functional>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/web-engine-plugin.h>
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali/devel-api/adaptor-framework/web-engine-plugin.h>
 
 namespace Dali
 {
@@ -56,7 +56,6 @@ class WebView;
 class DALI_TOOLKIT_API WebView : public Control
 {
 public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    */
@@ -81,34 +80,43 @@ public:
 
       /**
        * @brief The user agent string.
-       * @details Name "userAgent", type Property::STRING.
+       * @details name "userAgent", type Property::STRING.
        */
       USER_AGENT,
 
       /**
        * @brief The current position of scroll.
-       * @details Name "scrollPosition", type Property::VECTOR2.
+       * @details name "scrollPosition", type Property::VECTOR2.
        */
       SCROLL_POSITION,
 
       /**
-       * @brief The current position of scroll.
-       * @details Name "scrollSize", type Property::VECTOR2. Read-only.
+       * @brief The current size of scroll.
+       * @details name "scrollSize", type Property::VECTOR2.
+       * @note The value is read-only.
        */
       SCROLL_SIZE,
 
       /**
-       * @brief The current position of scroll.
-       * @details Name "contentSize", type Property::VECTOR2. Read-only.
+       * @brief The current size of content.
+       * @details name "contentSize", type Property::VECTOR2.
+       * @note The value is read-only.
        */
       CONTENT_SIZE,
 
       /**
        * @brief The title of web page.
-       * @details Name "title", type Property::STRING.
+       * @details name "title", type Property::STRING.
        * @note The value is read-only.
        */
       TITLE,
+
+      /**
+       * @brief Whether video hole is enabled or not.
+       * @details name "videoHoleEnabled", type Property::BOOLEAN.
+       * @note The value is read-only.
+       */
+      VIDEO_HOLE_ENABLED,
     };
   };
 
@@ -117,96 +125,37 @@ public:
    */
   enum class LoadErrorCode
   {
-    /**
-     * @brief Unknown.
-     */
-    UNKNOWN = 0,
-
-    /**
-     * @brief User canceled.
-     */
-    CANCELED,
-
-    /**
-     * @brief Can't show the page for this MIME type.
-     */
-    CANT_SUPPORT_MIMETYPE,
-
-    /**
-     * @brief File IO error.
-     */
-    FAILED_FILE_IO,
-
-    /**
-     * @brief Cannot connect to the network.
-     */
-    CANT_CONNECT,
-
-    /**
-     * @brief Fail to look up host from the DNS.
-     */
-    CANT_LOOKUP_HOST,
-
-    /**
-     * @brief Fail to SSL/TLS handshake.
-     */
-    FAILED_TLS_HANDSHAKE,
-
-    /**
-     * @brief Received certificate is invalid.
-     */
-    INVALID_CERTIFICATE,
-
-    /**
-     * @brief Connection timeout.
-     */
-    REQUEST_TIMEOUT,
-
-    /**
-     * @brief Too many redirects.
-     */
-    TOO_MANY_REDIRECTS,
-
-    /**
-     * @brief Too many requests during this load.
-     */
-    TOO_MANY_REQUESTS,
-
-    /**
-     * @brief Malformed URL.
-     */
-    BAD_URL,
-
-    /**
-     * @brief Unsupported scheme.
-     */
-    UNSUPPORTED_SCHEME,
-
-    /**
-     * @brief User authentication failed on the server.
-     */
-    AUTHENTICATION,
-
-    /**
-     * @brief Web server has an internal server error.
-     */
-    INTERNAL_SERVER
+    UNKNOWN = 0,           ///< Unknown.
+    CANCELED,              ///< User canceled.
+    CANT_SUPPORT_MIMETYPE, ///< Can't show the page for this MIME type.
+    FAILED_FILE_IO,        ///< File IO error.
+    CANT_CONNECT,          ///< Cannot connect to the network.
+    CANT_LOOKUP_HOST,      ///< Fail to look up host from the DNS.
+    FAILED_TLS_HANDSHAKE,  ///< Fail to SSL/TLS handshake.
+    INVALID_CERTIFICATE,   ///< Received certificate is invalid.
+    REQUEST_TIMEOUT,       ///< Connection timeout.
+    TOO_MANY_REDIRECTS,    ///< Too many redirects.
+    TOO_MANY_REQUESTS,     ///< Too many requests during this load.
+    BAD_URL,               ///< Malformed URL.
+    UNSUPPORTED_SCHEME,    ///< Unsupported scheme.
+    AUTHENTICATION,        ///< User authentication failed on the server.
+    INTERNAL_SERVER        ///< Web server has an internal server error.
   };
 
   /**
    * @brief WebView signal type related with page loading.
    */
-  using WebViewPageLoadSignalType = Signal< void( WebView, const std::string& ) >;
+  using WebViewPageLoadSignalType = Signal<void(WebView, const std::string&)>;
 
   /**
    * @brief WebView signal type related with page loading error.
    */
-  using WebViewPageLoadErrorSignalType = Signal< void( WebView, const std::string&, LoadErrorCode ) >;
+  using WebViewPageLoadErrorSignalType = Signal<void(WebView, const std::string&, LoadErrorCode)>;
 
   /**
    * @brief WebView signal type related with scroll edge reached.
    */
-  using WebViewScrollEdgeReachedSignalType = Signal< void( WebView, Dali::WebEnginePlugin::ScrollEdge ) >;
+  using WebViewScrollEdgeReachedSignalType = Signal<void(WebView, Dali::WebEnginePlugin::ScrollEdge)>;
 
 public:
   /**
@@ -231,7 +180,7 @@ public:
    * @param [in] argc The count of arguments of Applications
    * @param [in] argv The string array of arguments of Applications
    */
-  static WebView New( int argc, char** argv );
+  static WebView New(int argc, char** argv);
 
   /**
    * @brief Creates an uninitialized WebView.
@@ -337,7 +286,7 @@ public:
    * @param[in] deltaX The delta x of scroll
    * @param[in] deltaY The delta y of scroll
    */
-  void ScrollBy( int deltaX, int deltaY );
+  void ScrollBy(int deltaX, int deltaY);
 
   /**
    * @brief Returns whether forward is possible.

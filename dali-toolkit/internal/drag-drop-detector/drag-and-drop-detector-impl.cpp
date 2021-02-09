@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 Dali::Toolkit::DragAndDropDetector DragAndDropDetector::New()
 {
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector(new DragAndDropDetector());
@@ -51,11 +48,10 @@ void DragAndDropDetector::Attach(Dali::Toolkit::Control& control)
     }
     mControls.push_back(control);
     control.TouchedSignal().Connect(this, &DragAndDropDetector::OnDrag);
-    mFirstEnter.push_back(control.GetProperty< int >( Actor::Property::ID ));
+    mFirstEnter.push_back(control.GetProperty<int>(Actor::Property::ID));
     mPanGestureDetector.Attach(control);
     mPanGestureDetector.DetectedSignal().Connect(this, &DragAndDropDetector::OnPan);
   }
-
 }
 
 void DragAndDropDetector::Detach(Dali::Toolkit::Control& control)
@@ -73,7 +69,7 @@ void DragAndDropDetector::Detach(Dali::Toolkit::Control& control)
     {
       match->TouchedSignal().Disconnect(this, &DragAndDropDetector::OnDrag);
       mPanGestureDetector.Detach(*match);
-      mFirstEnter.erase(std::find(mFirstEnter.begin(), mFirstEnter.end(), control.GetProperty< int >( Actor::Property::ID )));
+      mFirstEnter.erase(std::find(mFirstEnter.begin(), mFirstEnter.end(), control.GetProperty<int>(Actor::Property::ID)));
       mControls.erase(match);
     }
   }
@@ -84,7 +80,7 @@ void DragAndDropDetector::DetachAll()
   if(!mControls.empty())
   {
     auto iter = mControls.begin();
-    for(;iter != mControls.end();)
+    for(; iter != mControls.end();)
     {
       iter->TouchedSignal().Disconnect(this, &DragAndDropDetector::OnDrag);
       mPanGestureDetector.Detach(*iter);
@@ -95,7 +91,7 @@ void DragAndDropDetector::DetachAll()
   if(!mFirstEnter.empty())
   {
     auto iter = mFirstEnter.begin();
-    for(;iter != mFirstEnter.end();)
+    for(; iter != mFirstEnter.end();)
     {
       iter = mFirstEnter.erase(iter);
     }
@@ -128,32 +124,32 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
   if(state == GestureState::STARTED)
   {
     mDragLocalPosition = gesture.GetPosition();
-    mPointDown = true;
-    mDragControl = control;
+    mPointDown         = true;
+    mDragControl       = control;
     mFirstEnter.clear();
-    for( auto&& control : mControls)
+    for(auto&& control : mControls)
     {
-      mFirstEnter.push_back(control.GetProperty< int >( Actor::Property::ID ));
+      mFirstEnter.push_back(control.GetProperty<int>(Actor::Property::ID));
     }
-    float width = control.GetProperty<float>(Dali::Actor::Property::SIZE_WIDTH);
-    float height = control.GetProperty<float>(Dali::Actor::Property::SIZE_HEIGHT);
+    float   width    = control.GetProperty<float>(Dali::Actor::Property::SIZE_WIDTH);
+    float   height   = control.GetProperty<float>(Dali::Actor::Property::SIZE_HEIGHT);
     Vector3 actorPos = control.GetProperty<Vector3>(Dali::Actor::Property::POSITION);
 
     mShadowControl = Dali::Toolkit::Control::New();
-    mShadowControl.SetProperty( Actor::Property::POSITION, actorPos );
-    mShadowControl.SetProperty( Actor::Property::SIZE, Vector2( width, height ) );
+    mShadowControl.SetProperty(Actor::Property::POSITION, actorPos);
+    mShadowControl.SetProperty(Actor::Property::SIZE, Vector2(width, height));
     mShadowControl.SetBackgroundColor(Vector4(0.3f, 0.3f, 0.3f, 0.7f));
-    mShadowControl.SetProperty( Actor::Property::PARENT_ORIGIN, control.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ) );
-    mShadowControl.SetProperty( Actor::Property::ANCHOR_POINT,control.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ));
+    mShadowControl.SetProperty(Actor::Property::PARENT_ORIGIN, control.GetCurrentProperty<Vector3>(Actor::Property::PARENT_ORIGIN));
+    mShadowControl.SetProperty(Actor::Property::ANCHOR_POINT, control.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT));
     control.GetParent().Add(mShadowControl);
     SetPosition(gesture.GetScreenPosition());
     EmitStartedSignal(control);
   }
   if(state == GestureState::CONTINUING)
   {
-      Vector2 screenPosition = gesture.GetScreenPosition();
-      control.GetParent().ScreenToLocal(mLocalPosition.x, mLocalPosition.y, screenPosition.x, screenPosition.y);
-      mShadowControl.SetProperty( Actor::Property::POSITION, Vector2(mLocalPosition.x - mDragLocalPosition.x, mLocalPosition.y - mDragLocalPosition.y));
+    Vector2 screenPosition = gesture.GetScreenPosition();
+    control.GetParent().ScreenToLocal(mLocalPosition.x, mLocalPosition.y, screenPosition.x, screenPosition.y);
+    mShadowControl.SetProperty(Actor::Property::POSITION, Vector2(mLocalPosition.x - mDragLocalPosition.x, mLocalPosition.y - mDragLocalPosition.y));
   }
   if(state == GestureState::FINISHED)
   {
@@ -165,13 +161,13 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
 bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchEvent& data)
 {
   Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
-  PointState::Type type = data.GetState(0);
+  PointState::Type       type    = data.GetState(0);
 
   if(type == PointState::MOTION)
   {
     if(mDragControl != control && mPointDown)
     {
-      auto found = std::find(mFirstEnter.begin(), mFirstEnter.end(), control.GetProperty< int >( Actor::Property::ID ));
+      auto found = std::find(mFirstEnter.begin(), mFirstEnter.end(), control.GetProperty<int>(Actor::Property::ID));
       if(mFirstEnter.end() != found)
       {
         SetPosition(data.GetScreenPosition(0));
@@ -190,7 +186,7 @@ bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchEvent& data
   {
     if(mDragControl != control && mPointDown)
     {
-      mFirstEnter.push_back(control.GetProperty< int >( Actor::Property::ID ));
+      mFirstEnter.push_back(control.GetProperty<int>(Actor::Property::ID));
       EmitExitedSignal(control);
     }
   }
@@ -201,13 +197,13 @@ bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchEvent& data
     {
       SetPosition(data.GetScreenPosition(0));
       ClearContent();
-      SetContent(mDragControl.GetProperty< std::string >( Dali::Actor::Property::NAME ));
+      SetContent(mDragControl.GetProperty<std::string>(Dali::Actor::Property::NAME));
       EmitDroppedSignal(control);
     }
 
     if(mShadowControl)
     {
-    control.GetParent().Remove(mShadowControl);
+      control.GetParent().Remove(mShadowControl);
     }
     mPointDown = false;
   }
@@ -224,7 +220,7 @@ const Vector2& DragAndDropDetector::GetCurrentScreenPosition() const
   return mScreenPosition;
 }
 
-void DragAndDropDetector::SetContent( const std::string& content )
+void DragAndDropDetector::SetContent(const std::string& content)
 {
   mContent = content;
 }
@@ -234,61 +230,61 @@ void DragAndDropDetector::ClearContent()
   mContent.clear();
 }
 
-void DragAndDropDetector::SetPosition( const Vector2& screenPosition )
+void DragAndDropDetector::SetPosition(const Vector2& screenPosition)
 {
   mScreenPosition = screenPosition;
 }
 
 void DragAndDropDetector::EmitStartedSignal(Dali::Toolkit::Control& control)
 {
-  if( !mStartedSignal.Empty() )
+  if(!mStartedSignal.Empty())
   {
-    Dali::Toolkit::DragAndDropDetector handle( this );
-    mStartedSignal.Emit( control, handle );
+    Dali::Toolkit::DragAndDropDetector handle(this);
+    mStartedSignal.Emit(control, handle);
   }
 }
 void DragAndDropDetector::EmitEnteredSignal(Dali::Toolkit::Control& control)
 {
-  if ( !mEnteredSignal.Empty() )
+  if(!mEnteredSignal.Empty())
   {
-    Dali::Toolkit::DragAndDropDetector handle( this );
-    mEnteredSignal.Emit( control, handle );
+    Dali::Toolkit::DragAndDropDetector handle(this);
+    mEnteredSignal.Emit(control, handle);
   }
 }
 
 void DragAndDropDetector::EmitExitedSignal(Dali::Toolkit::Control& control)
 {
-  if ( !mExitedSignal.Empty() )
+  if(!mExitedSignal.Empty())
   {
-    Dali::Toolkit::DragAndDropDetector handle( this );
-    mExitedSignal.Emit( control, handle );
+    Dali::Toolkit::DragAndDropDetector handle(this);
+    mExitedSignal.Emit(control, handle);
   }
 }
 
 void DragAndDropDetector::EmitMovedSignal(Dali::Toolkit::Control& control)
 {
-  if ( !mMovedSignal.Empty() )
+  if(!mMovedSignal.Empty())
   {
-    Dali::Toolkit::DragAndDropDetector handle( this );
-    mMovedSignal.Emit( control, handle );
+    Dali::Toolkit::DragAndDropDetector handle(this);
+    mMovedSignal.Emit(control, handle);
   }
 }
 
 void DragAndDropDetector::EmitDroppedSignal(Dali::Toolkit::Control& control)
 {
-  if ( !mDroppedSignal.Empty() )
+  if(!mDroppedSignal.Empty())
   {
-    Dali::Toolkit::DragAndDropDetector handle( this );
-    mDroppedSignal.Emit( control, handle );
+    Dali::Toolkit::DragAndDropDetector handle(this);
+    mDroppedSignal.Emit(control, handle);
   }
 }
 
 void DragAndDropDetector::EmitEndedSignal(Dali::Toolkit::Control& control)
 {
-  if( !mEndedSignal.Empty() )
+  if(!mEndedSignal.Empty())
   {
-    Dali::Toolkit::DragAndDropDetector handle( this );
-    mEndedSignal.Emit( control, handle );
+    Dali::Toolkit::DragAndDropDetector handle(this);
+    mEndedSignal.Emit(control, handle);
   }
 }
 
@@ -297,7 +293,7 @@ DragAndDropDetector::DragAndDropDetector()
   mScreenPosition()
 {
   mPanGestureDetector = Dali::PanGestureDetector::New();
-  mPointDown = false;
+  mPointDown          = false;
 }
 
 DragAndDropDetector::~DragAndDropDetector()

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SVG_RASTERIZE_THREAD_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,17 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
+#include <dali/devel-api/adaptor-framework/vector-image-renderer.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
-#include <dali/public-api/images/pixel-data.h>
-#include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/rendering/texture-set.h>
-#include <dali/devel-api/adaptor-framework/vector-image-renderer.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali/integration-api/processor-interface.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/images/pixel-data.h>
+#include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/rendering/texture-set.h>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -37,17 +37,14 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class SvgVisual;
-typedef IntrusivePtr< SvgVisual > SvgVisualPtr;
+typedef IntrusivePtr<SvgVisual> SvgVisualPtr;
 class RasterizingTask;
-typedef IntrusivePtr< RasterizingTask > RasterizingTaskPtr;
+typedef IntrusivePtr<RasterizingTask> RasterizingTaskPtr;
 
 /**
  * The svg rasterizing tasks to be processed in the worker thread.
@@ -67,9 +64,8 @@ public:
    * @param[in] url The URL to svg resource to use.
    * @param[in] width The rasterization width.
    * @param[in] height The rasterization height.
-   * @param[in] loaded The svg resource is loaded or not.
    */
-  RasterizingTask( SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height, bool loaded );
+  RasterizingTask(SvgVisual* svgRenderer, VectorImageRenderer vectorRenderer, const VisualUrl& url, float dpi, unsigned int width, unsigned int height);
 
   /**
    * Destructor.
@@ -110,20 +106,20 @@ public:
 
 private:
   // Undefined
-  RasterizingTask( const RasterizingTask& task );
+  RasterizingTask(const RasterizingTask& task);
 
   // Undefined
-  RasterizingTask& operator=( const RasterizingTask& task );
+  RasterizingTask& operator=(const RasterizingTask& task);
 
 private:
-  SvgVisualPtr    mSvgVisual;
+  SvgVisualPtr        mSvgVisual;
   VectorImageRenderer mVectorRenderer;
-  VisualUrl       mUrl;
-  PixelData       mPixelData;
-  float           mDpi;
-  unsigned int    mWidth;
-  unsigned int    mHeight;
-  bool            mLoaded;
+  VisualUrl           mUrl;
+  PixelData           mPixelData;
+  float               mDpi;
+  unsigned int        mWidth;
+  unsigned int        mHeight;
+  bool                mLoadSuccess;
 };
 
 /**
@@ -132,7 +128,6 @@ private:
 class SvgRasterizeThread : public Thread, Integration::Processor
 {
 public:
-
   /**
    * Constructor.
    *
@@ -143,14 +138,14 @@ public:
   /**
    * Terminate the svg rasterize thread, join and delete.
    */
-  static void TerminateThread( SvgRasterizeThread*& thread );
+  static void TerminateThread(SvgRasterizeThread*& thread);
 
   /**
    * Add a rasterization task into the waiting queue, called by main thread.
    *
    * @param[in] task The task added to the queue.
    */
-  void AddTask( RasterizingTaskPtr task );
+  void AddTask(RasterizingTaskPtr task);
 
   /**
    * Pop the next task out from the completed queue, called by main thread.
@@ -166,7 +161,7 @@ public:
    *
    * @param[in] visual The visual pointer.
    */
-  void RemoveTask( SvgVisual* visual );
+  void RemoveTask(SvgVisual* visual);
 
   /**
    * Delete the parsed SVG image, called by main thread.
@@ -175,15 +170,14 @@ public:
    *
    * @param[in] VectorImage The image to be deleted
    */
-  void DeleteImage( VectorImageRenderer vectorImage );
+  void DeleteImage(VectorImageRenderer vectorImage);
 
-    /**
+  /**
    * @copydoc Dali::Integration::Processor::Process()
    */
   void Process() override;
 
 private:
-
   /**
    * Pop the next task out from the queue.
    *
@@ -196,7 +190,7 @@ private:
    *
    * @param[in] task The task added to the queue.
    */
-  void AddCompletedTask( RasterizingTaskPtr task );
+  void AddCompletedTask(RasterizingTaskPtr task);
 
   /**
    * Applies the rasterized image to material
@@ -210,12 +204,10 @@ private:
   void UnregisterProcessor();
 
 protected:
-
   /**
    * Destructor.
    */
   ~SvgRasterizeThread() override;
-
 
   /**
    * The entry function of the worker thread.
@@ -224,25 +216,23 @@ protected:
   void Run() override;
 
 private:
+  // Undefined
+  SvgRasterizeThread(const SvgRasterizeThread& thread);
 
   // Undefined
-  SvgRasterizeThread( const SvgRasterizeThread& thread );
-
-  // Undefined
-  SvgRasterizeThread& operator=( const SvgRasterizeThread& thread );
+  SvgRasterizeThread& operator=(const SvgRasterizeThread& thread);
 
 private:
+  std::vector<RasterizingTaskPtr> mRasterizeTasks; //The queue of the tasks waiting to rasterize the SVG image
+  std::vector<RasterizingTaskPtr> mCompletedTasks; //The queue of the tasks with the SVG rasterization completed
+  Vector<VectorImageRenderer*>    mDeleteSvg;      //The images that the event thread requested to delete
 
-  std::vector<RasterizingTaskPtr>  mRasterizeTasks;     //The queue of the tasks waiting to rasterize the SVG image
-  std::vector <RasterizingTaskPtr> mCompletedTasks;     //The queue of the tasks with the SVG rasterization completed
-  Vector <VectorImageRenderer*>    mDeleteSvg;          //The images that the event thread requested to delete
-
-  ConditionalWait            mConditionalWait;
-  Dali::Mutex                mMutex;
-  std::unique_ptr< EventThreadCallback > mTrigger;
-  const Dali::LogFactoryInterface&       mLogFactory;
-  bool                       mIsThreadWaiting;
-  bool                       mProcessorRegistered;
+  ConditionalWait                      mConditionalWait;
+  Dali::Mutex                          mMutex;
+  std::unique_ptr<EventThreadCallback> mTrigger;
+  const Dali::LogFactoryInterface&     mLogFactory;
+  bool                                 mIsThreadWaiting;
+  bool                                 mProcessorRegistered;
 };
 
 } // namespace Internal

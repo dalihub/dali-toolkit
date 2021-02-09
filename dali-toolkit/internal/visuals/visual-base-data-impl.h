@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,24 +23,20 @@
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-event-observer.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace Visual
 {
-
 struct Base::Impl
 {
   /**
@@ -48,7 +44,7 @@ struct Base::Impl
    * @param [in] fittingMode that the derived class prefers
    * @param [in] type The type of the this visual
    */
-  Impl( FittingMode fittingMode, Toolkit::Visual::Type type );
+  Impl(FittingMode fittingMode, Toolkit::Visual::Type type);
 
   /**
    * Destructor
@@ -57,21 +53,21 @@ struct Base::Impl
 
   enum Flags
   {
-    IS_ON_SCENE = 1,
-    IS_ATLASING_APPLIED = 1<<1,
-    IS_PREMULTIPLIED_ALPHA = 1 << 2,
+    IS_ON_SCENE                     = 1,
+    IS_ATLASING_APPLIED             = 1 << 1,
+    IS_PREMULTIPLIED_ALPHA          = 1 << 2,
     IS_SYNCHRONOUS_RESOURCE_LOADING = 1 << 3
   };
 
   struct CustomShader
   {
-    CustomShader( const Property::Map& map );
-    void SetPropertyMap( const Property::Map& map );
-    void CreatePropertyMap( Property::Map& map ) const;
+    CustomShader(const Property::Map& map);
+    void SetPropertyMap(const Property::Map& map);
+    void CreatePropertyMap(Property::Map& map) const;
 
-    std::string mVertexShader;
-    std::string mFragmentShader;
-    Dali::ImageDimensions mGridSize;
+    std::string               mVertexShader;
+    std::string               mFragmentShader;
+    Dali::ImageDimensions     mGridSize;
     Dali::Shader::Hint::Value mHints; //(bitfield) values from enum Shader::Hint
   };
 
@@ -87,56 +83,56 @@ struct Base::Impl
      * attributes, and sets the remaining attributes to their default
      * values.
      */
-    void SetPropertyMap( const Property::Map& map );
+    void SetPropertyMap(const Property::Map& map);
 
     /**
      * Add the transform attributes to the map (using integer keys)
      */
-    void GetPropertyMap( Property::Map& map ) const;
+    void GetPropertyMap(Property::Map& map) const;
 
     /**
      * Update zero or more attributes from the property map.
      */
-    void UpdatePropertyMap( const Property::Map& map );
+    void UpdatePropertyMap(const Property::Map& map);
 
     /**
      * Register or set the uniform properties onto the renderer
      */
-    void RegisterUniforms( Renderer renderer, Toolkit::Direction::Type direction );
+    void RegisterUniforms(Renderer renderer, Toolkit::Direction::Type direction);
 
     /**
      * Convert the control size and the transform attributes into the actual
      * size of the visual.
      */
-    Vector2 GetVisualSize( const Vector2& controlSize );
+    Vector2 GetVisualSize(const Vector2& controlSize);
 
-    Vector2 mOffset;
-    Vector2 mSize;
-    Vector2 mExtraSize;
-    Vector4 mOffsetSizeMode;
+    Vector2              mOffset;
+    Vector2              mSize;
+    Vector2              mExtraSize;
+    Vector4              mOffsetSizeMode;
     Toolkit::Align::Type mOrigin;
     Toolkit::Align::Type mAnchorPoint;
     Property::Index      mOffsetIndex;
     Property::Index      mSizeIndex;
   };
 
-  Renderer        mRenderer;
-  CustomShader*   mCustomShader;
-  EventObserver*  mEventObserver;  ///< Allows controls to observe when the visual has events to notify
-  std::string     mName;
-  Transform       mTransform;
-  Vector4         mMixColor;
-  Size            mControlSize;
-  float           mCornerRadius;
-  float           mCornerRadiusPolicy;
-  int             mDepthIndex;
-  Property::Index mMixColorIndex;
-  Property::Index mCornerRadiusIndex;
-  FittingMode     mFittingMode;  //< How the contents should fit the view
-  int             mFlags;
-  Toolkit::Visual::ResourceStatus  mResourceStatus;
-  const Toolkit::Visual::Type      mType;
-  bool                             mNeedCornerRadius;
+  Renderer                        mRenderer;
+  CustomShader*                   mCustomShader;
+  EventObserver*                  mEventObserver; ///< Allows controls to observe when the visual has events to notify
+  std::string                     mName;
+  Transform                       mTransform;
+  Vector4                         mMixColor;
+  Size                            mControlSize;
+  float                           mCornerRadius;
+  float                           mCornerRadiusPolicy;
+  int                             mDepthIndex;
+  Property::Index                 mMixColorIndex;
+  Property::Index                 mCornerRadiusIndex;
+  FittingMode                     mFittingMode; //< How the contents should fit the view
+  int                             mFlags;
+  Toolkit::Visual::ResourceStatus mResourceStatus;
+  const Toolkit::Visual::Type     mType;
+  bool                            mNeedCornerRadius;
 };
 
 } // namespace Visual

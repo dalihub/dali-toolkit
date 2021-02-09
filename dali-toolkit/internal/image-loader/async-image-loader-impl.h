@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ASYNC_IMAGE_LOADER_IMPL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,23 +22,19 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 #include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali-toolkit/internal/image-loader/image-load-thread.h>
+#include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class AsyncImageLoader : public BaseObject
 {
 public:
-
   /**
    * Constructor
    */
@@ -52,18 +48,18 @@ public:
   /**
    * @copydoc Toolkit::AsyncImageLoader::LoadAnimatedImage( Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex )
    */
-  uint32_t LoadAnimatedImage( Dali::AnimatedImageLoading animatedImageLoading,
-                              uint32_t frameIndex );
+  uint32_t LoadAnimatedImage(Dali::AnimatedImageLoading animatedImageLoading,
+                             uint32_t                   frameIndex);
 
   /**
    * @copydoc Toolkit::AsyncImageLoader::Load( const std::string&, ImageDimensions, FittingMode::Type, SamplingMode::Type, bool , DevelAsyncImageLoader::PreMultiplyOnLoad )
    */
-  uint32_t Load( const VisualUrl& url,
-                 ImageDimensions dimensions,
-                 FittingMode::Type fittingMode,
-                 SamplingMode::Type samplingMode,
-                 bool orientationCorrection,
-                 DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
+  uint32_t Load(const VisualUrl&                         url,
+                ImageDimensions                          dimensions,
+                FittingMode::Type                        fittingMode,
+                SamplingMode::Type                       samplingMode,
+                bool                                     orientationCorrection,
+                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**
    * @brief Starts an mask applying task.
@@ -74,11 +70,11 @@ public:
    * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    * @return The loading task id
    */
-  uint32_t ApplyMask( Devel::PixelBuffer pixelBuffer,
-                      Devel::PixelBuffer maskPixelBuffer,
-                      float contentScale,
-                      bool cropToMask,
-                      DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
+  uint32_t ApplyMask(Devel::PixelBuffer                       pixelBuffer,
+                     Devel::PixelBuffer                       maskPixelBuffer,
+                     float                                    contentScale,
+                     bool                                     cropToMask,
+                     DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**
    * @copydoc Toolkit::AsyncImageLoader::ImageLoadedSignal
@@ -93,7 +89,7 @@ public:
   /**
    * @copydoc Toolkit::AsyncImageLoader::Cancel
    */
-  bool Cancel( uint32_t loadingTaskId );
+  bool Cancel(uint32_t loadingTaskId);
 
   /**
    * @copydoc Toolkit::AsyncImageLoader::CancelAll
@@ -106,14 +102,13 @@ public:
   void ProcessLoadedImage();
 
 protected:
-
   /**
    * Destructor
    */
   ~AsyncImageLoader() override;
 
 private:
-  Toolkit::AsyncImageLoader::ImageLoadedSignalType mLoadedSignal;
+  Toolkit::AsyncImageLoader::ImageLoadedSignalType            mLoadedSignal;
   Toolkit::DevelAsyncImageLoader::PixelBufferLoadedSignalType mPixelBufferLoadedSignal;
 
   ImageLoadThread mLoadThread;
@@ -123,22 +118,22 @@ private:
 
 } // namespace Internal
 
-inline const Internal::AsyncImageLoader& GetImplementation( const Toolkit::AsyncImageLoader& handle )
+inline const Internal::AsyncImageLoader& GetImplementation(const Toolkit::AsyncImageLoader& handle)
 {
-  DALI_ASSERT_ALWAYS( handle && "AsyncImageLoader handle is empty" );
+  DALI_ASSERT_ALWAYS(handle && "AsyncImageLoader handle is empty");
 
   const BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<const Internal::AsyncImageLoader&>( object );
+  return static_cast<const Internal::AsyncImageLoader&>(object);
 }
 
-inline Internal::AsyncImageLoader& GetImplementation( Toolkit::AsyncImageLoader& handle )
+inline Internal::AsyncImageLoader& GetImplementation(Toolkit::AsyncImageLoader& handle)
 {
-  DALI_ASSERT_ALWAYS( handle && "AsyncImageLoader handle is empty" );
+  DALI_ASSERT_ALWAYS(handle && "AsyncImageLoader handle is empty");
 
   BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<Internal::AsyncImageLoader&>( object );
+  return static_cast<Internal::AsyncImageLoader&>(object);
 }
 
 } // namespace Toolkit

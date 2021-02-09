@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_MATERIAL_DEFINITION_H
 #define DALI_SCENE_LOADER_MATERIAL_DEFINITION_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,14 @@
 #include "dali-scene-loader/public-api/utils.h"
 
 // EXTERNAL INCLUDES
-#include "dali/public-api/math/vector4.h"
-#include "dali/public-api/common/vector-wrapper.h"
 #include <cmath>
+#include "dali/public-api/common/vector-wrapper.h"
+#include "dali/public-api/math/vector4.h"
 
 namespace Dali
 {
 namespace SceneLoader
 {
-
 /**
  * @brief Helper enum for encoding and decoding sampler states.
  */
@@ -43,54 +42,53 @@ struct DALI_SCENE_LOADER_API SamplerFlags
   enum Values : Type
   {
     // Filter - 3 bits
-    FILTER_NEAREST = 0,
-    FILTER_LINEAR = NthBit(0),
+    FILTER_NEAREST        = 0,
+    FILTER_LINEAR         = NthBit(0),
     FILTER_MIPMAP_NEAREST = NthBit(1),
-    FILTER_MIPMAP_LINEAR = NthBit(2),
+    FILTER_MIPMAP_LINEAR  = NthBit(2),
 
     // Wrap - 2 bits
     WRAP_REPEAT = 0,
-    WRAP_CLAMP = NthBit(0),
+    WRAP_CLAMP  = NthBit(0),
     WRAP_MIRROR = NthBit(1),
 
     // Layout - apply shift, then mask
     FILTER_MIN_BITS = 3,
     FILTER_MIN_MASK = NthBit(FILTER_MIN_BITS) - 1,
 
-    FILTER_MAG_BITS = 1,
+    FILTER_MAG_BITS  = 1,
     FILTER_MAG_SHIFT = FILTER_MIN_BITS,
-    FILTER_MAG_MASK = NthBit(FILTER_MAG_BITS) - 1,
+    FILTER_MAG_MASK  = NthBit(FILTER_MAG_BITS) - 1,
 
-    WRAP_S_BITS = 2,
+    WRAP_S_BITS  = 2,
     WRAP_S_SHIFT = FILTER_MAG_SHIFT + FILTER_MAG_BITS,
-    WRAP_S_MASK = NthBit(WRAP_S_BITS) - 1,
+    WRAP_S_MASK  = NthBit(WRAP_S_BITS) - 1,
 
-    WRAP_T_BITS = 2,
+    WRAP_T_BITS  = 2,
     WRAP_T_SHIFT = WRAP_S_SHIFT + WRAP_S_BITS,
-    WRAP_T_MASK = NthBit(WRAP_T_BITS) - 1,
+    WRAP_T_MASK  = NthBit(WRAP_T_BITS) - 1,
 
     // Diagnostics
     MIPMAP_MASK = FILTER_MIPMAP_LINEAR | FILTER_MIPMAP_NEAREST,
 
     // Default
-    DEFAULT = FILTER_LINEAR | (FILTER_LINEAR << FILTER_MAG_SHIFT) | (WRAP_REPEAT << WRAP_S_SHIFT) | (WRAP_REPEAT << WRAP_T_SHIFT),  // LINEAR filters, REPEAT wraps
+    DEFAULT = FILTER_LINEAR | (FILTER_LINEAR << FILTER_MAG_SHIFT) | (WRAP_REPEAT << WRAP_S_SHIFT) | (WRAP_REPEAT << WRAP_T_SHIFT), // LINEAR filters, REPEAT wraps
   };
 
   /**
    * @return SamplerFlags bit pattern calculated from the given Dali Sampler settings.
    */
-  static Type Encode(FilterMode::Type minFilter, FilterMode::Type magFilter,
-    WrapMode::Type wrapS, WrapMode::Type wrapT);
+  static Type Encode(FilterMode::Type minFilter, FilterMode::Type magFilter, WrapMode::Type wrapS, WrapMode::Type wrapT);
 
   /**
    * @brief Decodes the minification filter patter of @a flags into the corresponding FilterMode.
    */
-  static FilterMode::Type  GetMinFilter(Type flags);
+  static FilterMode::Type GetMinFilter(Type flags);
 
   /**
    * @brief Decodes the magnification filter patter of @a flags into the corresponding FilterMode.
    */
-  static FilterMode::Type  GetMagFilter(Type flags);
+  static FilterMode::Type GetMagFilter(Type flags);
 
   /**
    * @brief Decodes the horizontal wrap pattern of @a flags into the corresponding WrapMode.
@@ -113,7 +111,7 @@ struct DALI_SCENE_LOADER_API SamplerFlags
  */
 struct DALI_SCENE_LOADER_API TextureDefinition
 {
-  std::string mImageUri;
+  std::string        mImageUri;
   SamplerFlags::Type mSamplerFlags;
 
   TextureDefinition(const std::string& imageUri = "", SamplerFlags::Type samplerFlags = SamplerFlags::DEFAULT);
@@ -130,22 +128,22 @@ struct DALI_SCENE_LOADER_API MaterialDefinition
   enum Flags : uint32_t
   {
     // Texture semantics
-    ALBEDO = NthBit(0),
-    METALLIC = NthBit(1),
-    ROUGHNESS = NthBit(2),
-    NORMAL = NthBit(3),
-    EMISSIVE = NthBit(4),  // TODO: support
-    OCCLUSION = NthBit(5),  // TODO: support
-    SUBSURFACE = NthBit(6),  // Note: dli-only
+    ALBEDO     = NthBit(0),
+    METALLIC   = NthBit(1),
+    ROUGHNESS  = NthBit(2),
+    NORMAL     = NthBit(3),
+    EMISSIVE   = NthBit(4), // TODO: support
+    OCCLUSION  = NthBit(5), // TODO: support
+    SUBSURFACE = NthBit(6), // Note: dli-only
 
     // Other binary options
-    TRANSPARENCY = NthBit(20),
-    GLTF_CHANNELS = NthBit(21),  // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#pbrmetallicroughnessmetallicroughnesstexture
+    TRANSPARENCY  = NthBit(20),
+    GLTF_CHANNELS = NthBit(21), // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#pbrmetallicroughnessmetallicroughnesstexture
 
     // Alpha cutoff - reserved from the 24th bit
-    ALPHA_CUTOFF_BITS = 8,
+    ALPHA_CUTOFF_BITS  = 8,
     ALPHA_CUTOFF_SHIFT = sizeof(uint32_t) * 8 - ALPHA_CUTOFF_BITS,
-    ALPHA_CUTOFF_MASK = (1 << ALPHA_CUTOFF_BITS) - 1,
+    ALPHA_CUTOFF_MASK  = (1 << ALPHA_CUTOFF_BITS) - 1,
   };
 
   /**
@@ -153,7 +151,7 @@ struct DALI_SCENE_LOADER_API MaterialDefinition
    */
   struct TextureStage
   {
-    uint32_t mSemantic;
+    uint32_t          mSemantic;
     TextureDefinition mTexture;
   };
 
@@ -163,7 +161,7 @@ struct DALI_SCENE_LOADER_API MaterialDefinition
   {
     struct TextureData
     {
-      PixelData mPixels;
+      PixelData          mPixels;
       SamplerFlags::Type mSamplerFlags;
     };
 
@@ -221,14 +219,14 @@ struct DALI_SCENE_LOADER_API MaterialDefinition
 public: // DATA
   uint32_t mFlags = 0x0;
 
-  Index mEnvironmentIdx = 0;
-  Vector4 mColor = Color::WHITE;
-  float mMetallic = 1.f;
-  float mRoughness = 1.f;
+  Index                     mEnvironmentIdx = 0;
+  Vector4                   mColor          = Color::WHITE;
+  float                     mMetallic       = 1.f;
+  float                     mRoughness      = 1.f;
   std::vector<TextureStage> mTextureStages;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_MATERIAL_DEFINITION_H

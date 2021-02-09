@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_EFFECT_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,23 +28,18 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class CubeTransitionEffect;
 
 namespace Internal
 {
-
 /**
  * CubeTransitionEffect implementation class
  */
 class CubeTransitionEffect : public Control
 {
-
 public:
-
   /**
    * Destructor
    */
@@ -53,7 +48,7 @@ public:
   /**
    * @copydoc Toolkit::CubeTransitionEffect::SetTransitionDuration
    */
-  void SetTransitionDuration( float duration );
+  void SetTransitionDuration(float duration);
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::GetTransitionDuration
@@ -63,7 +58,7 @@ public:
   /**
    * @copydoc Toolkit::CubeTransitionEffect::SetCubeDisplacement
    */
-  void SetCubeDisplacement( float displacement );
+  void SetCubeDisplacement(float displacement);
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::GetCubeDisplacement
@@ -78,22 +73,22 @@ public:
   /**
    * @copydoc Toolkit::CubeTransitionEffect::SetCurrentTexture
    */
-  void SetCurrentTexture( Texture texture );
+  void SetCurrentTexture(Texture texture);
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::SetTargetTexture
    */
-  void SetTargetTexture( Texture texture );
+  void SetTargetTexture(Texture texture);
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::StartTransition(bool)
    */
-  void StartTransition( bool toNextImage = true );
+  void StartTransition(bool toNextImage = true);
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::StartTransition(Vector2, Vector2)
    */
-  void StartTransition( Vector2 panPosition, Vector2 panDisplacement );
+  void StartTransition(Vector2 panPosition, Vector2 panDisplacement);
 
   /**
    * @copydoc Toolkit::CubeTransitionEffect::PauseTransition()
@@ -111,7 +106,6 @@ public:
   void StopTransition();
 
 public: //Signal
-
   /**
    * @copydoc Toolkit::CubeTransitionEffect::TransitionCompletedSignal()
    */
@@ -126,13 +120,13 @@ public: //Signal
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 protected:
   /**
    * @copydoc CustomActorImpl::OnSceneConnection()
    */
-  void OnSceneConnection( int depth ) override;
+  void OnSceneConnection(int depth) override;
 
   /**
    * @copydoc CustomActorImpl::OnSceneDisconnection()
@@ -140,14 +134,13 @@ protected:
   void OnSceneDisconnection() override;
 
 protected:
-
   /**
    * Construct a new CubeTransitionEffect object
    * Called in the constructor of subclasses
    * @param[in] numRows How many rows of cubes
    * @param[in] numColumns How many columns of cubes
    */
-  CubeTransitionEffect( unsigned int numRows, unsigned int numColumns );
+  CubeTransitionEffect(unsigned int numRows, unsigned int numColumns);
 
   /**
    * Initialization steps: creating a layer, two groups of tiles,
@@ -155,15 +148,13 @@ protected:
    */
   void Initialize();
 
-
 protected:
-  void SetTargetLeft( unsigned int idx );
-  void SetTargetRight( unsigned int idx );
-  void SetTargetTop( unsigned int idx );
-  void SetTargetBottom( unsigned int idx );
+  void SetTargetLeft(unsigned int idx);
+  void SetTargetRight(unsigned int idx);
+  void SetTargetTop(unsigned int idx);
+  void SetTargetBottom(unsigned int idx);
 
 private:
-
   /**
    * Callback function of transition animation finished
    * Hide transition layer, show current image, and set isAnimating flag to false
@@ -175,7 +166,9 @@ private:
    * This method is called after the CubeTransitionEffect has been initialized.  Derived classes should do
    * any second phase initialization by overriding this method.
    */
-  virtual void OnInitialize() { }
+  virtual void OnInitialize()
+  {
+  }
 
   /**
    * This method is called after the a new transition is activated.
@@ -183,57 +176,64 @@ private:
    * @param[in] panPosition The press down position of panGesture
    * @param[in] panDisplacement The displacement vector of panGesture
    */
-  virtual void OnStartTransition( Vector2 panPosition, Vector2 panDisplacement ) {}
+  virtual void OnStartTransition(Vector2 panPosition, Vector2 panDisplacement)
+  {
+  }
 
   /**
    * This method is called when the transition is forced stop in the middle of animation.
    * Derived classed should set the rotation status of the cubes to the same as the final state when the animation is finished completely.
    * So that the next transition would be started correctly.
    */
-  virtual void OnStopTransition() {}
+  virtual void OnStopTransition()
+  {
+  }
 
-  void OnRelayout( const Vector2& size, RelayoutContainer& container ) override;
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
   void ResetToInitialState();
 
-
 protected:
-  typedef std::vector< Actor > ActorArray;
-  enum FACE { TOP, BOTTOM, LEFT, RIGHT };
+  typedef std::vector<Actor> ActorArray;
+  enum FACE
+  {
+    TOP,
+    BOTTOM,
+    LEFT,
+    RIGHT
+  };
 
-  ActorArray                 mBoxes;
-  Vector< FACE >             mBoxType;
-  ActorArray                 mCurrentTiles;
-  ActorArray                 mTargetTiles;
+  ActorArray   mBoxes;
+  Vector<FACE> mBoxType;
+  ActorArray   mCurrentTiles;
+  ActorArray   mTargetTiles;
 
-  Actor                      mBoxRoot;
+  Actor mBoxRoot;
 
-  unsigned int               mRows;
-  unsigned int               mColumns;
+  unsigned int mRows;
+  unsigned int mColumns;
 
-  Renderer                   mCurrentRenderer;
-  Renderer                   mTargetRenderer;
+  Renderer mCurrentRenderer;
+  Renderer mTargetRenderer;
 
-  Texture                    mCurrentTexture;
-  Texture                    mTargetTexture;
+  Texture mCurrentTexture;
+  Texture mTargetTexture;
 
-  Animation                  mAnimation;
+  Animation mAnimation;
 
-  Vector2                    mTileSize;
+  Vector2 mTileSize;
 
-  bool                       mIsAnimating;
-  bool                       mIsPaused;
+  bool mIsAnimating;
+  bool mIsPaused;
 
-  float                      mAnimationDuration;
-  float                      mCubeDisplacement;
+  float mAnimationDuration;
+  float mCubeDisplacement;
 
-  static const Vector4       FULL_BRIGHTNESS;
-  static const Vector4       HALF_BRIGHTNESS;
+  static const Vector4 FULL_BRIGHTNESS;
+  static const Vector4 HALF_BRIGHTNESS;
 
 private:
-
   Toolkit::CubeTransitionEffect::TransitionCompletedSignalType mTransitionCompletedSignal;
-
 };
 
 } // namespace Internal

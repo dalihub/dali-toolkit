@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_WEB_CONTEXT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,16 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 /**
  * @addtogroup dali_toolkit_controls_web_view
  * @{
@@ -45,13 +43,12 @@ namespace Toolkit
 class DALI_TOOLKIT_API WebContext
 {
 public:
-
   /**
    * @brief Creates a WebContext.
    *
    * @param[in] context The context of web engine.
    */
-  WebContext( Dali::WebEngineContext& context );
+  WebContext(Dali::WebEngineContext& context);
 
   /**
    * @brief Destructor.
@@ -70,14 +67,14 @@ public:
    *
    * @param[in] cacheModel The cache model
    */
-  void SetCacheModel(Dali::WebEngineContext::CacheModel cacheModel );
+  void SetCacheModel(Dali::WebEngineContext::CacheModel cacheModel);
 
   /**
    * @brief Sets the given proxy URI to network backend of specific context.
    *
    * @param[in] uri The proxy URI to set
    */
-  void SetProxyUri( const std::string& uri );
+  void SetProxyUri(const std::string& uri);
 
   /**
    * Adds CA certificates to persistent NSS certificate database
@@ -89,7 +86,7 @@ public:
    *
    * @param[in] certificatePath path to a CA certificate file(s), see above for details
    */
-  void SetCertificateFilePath( const std::string& certificatePath );
+  void SetCertificateFilePath(const std::string& certificatePath);
 
   /**
    * Toggles the cache to be enabled or disabled
@@ -99,7 +96,7 @@ public:
    *
    * @param[in] cacheDisabled enable or disable cache
    */
-  void DisableCache( bool cacheDisabled );
+  void DisableCache(bool cacheDisabled);
 
   /**
    * @brief Sets a proxy auth credential to network backend of specific context.
@@ -107,7 +104,7 @@ public:
    * @param[in] username username to set
    * @param[in] password password to set
    */
-  void SetDefaultProxyAuth( const std::string& username, const std::string& password );
+  void SetDefaultProxyAuth(const std::string& username, const std::string& password);
 
   /**
    * Requests for deleting all web databases.
@@ -133,8 +130,7 @@ public:
   void ClearCache();
 
 private:
-
-  Dali::WebEngineContext&  mWebEngineContext;
+  Dali::WebEngineContext& mWebEngineContext;
 };
 
 /**

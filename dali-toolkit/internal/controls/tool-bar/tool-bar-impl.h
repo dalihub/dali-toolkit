@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TOOL_BAR_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,18 @@
 #include <dali/devel-api/common/map-wrapper.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/tool-bar/tool-bar.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class ToolBar;
 
 namespace Internal
 {
-
 /**
  * ToolBar is a control to create a tool bar.
  * @see Dali::Toolkit::ToolBar for more details.
@@ -44,7 +41,6 @@ namespace Internal
 class ToolBar : public Control
 {
 public:
-
   /**
    * Create an initialized ToolBar.
    * @return A handle to a newly allocated Dali resource.
@@ -54,15 +50,14 @@ public:
   /**
    * @copydoc Dali::Toolkit::ToolBar::AddControl()
    */
-  void AddControl( Dali::Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding );
+  void AddControl(Dali::Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding);
 
   /**
    * @copydoc Dali::Toolkit::ToolBar::RemoveControl()
    */
-  void RemoveControl( Dali::Actor control );
+  void RemoveControl(Dali::Actor control);
 
 private: // From Control
-
   /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
@@ -85,8 +80,8 @@ private:
     /**
      * Constructor, sets the lock boolean
      */
-    Lock( bool& lock )
-    : mLock( lock )
+    Lock(bool& lock)
+    : mLock(lock)
     {
       mLock = true;
     }
@@ -98,6 +93,7 @@ private:
     {
       mLock = false;
     }
+
   private:
     bool& mLock;
   };
@@ -125,30 +121,29 @@ private:
   float              mAccumulatedRelativeSpace; ///< Stores the total percentage space used by controls.
   bool               mInitializing;             ///< Allows the use of Actor's API to add controls.
 
-  std::map<Actor/*control*/,Toolkit::Alignment> mControls; ///< Stores a relationship between controls and their alignments used to place them inside the table view.
+  std::map<Actor /*control*/, Toolkit::Alignment> mControls; ///< Stores a relationship between controls and their alignments used to place them inside the table view.
 };
 
 } // namespace Internal
 
-
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::ToolBar& GetImpl( Toolkit::ToolBar& toolBar )
+inline Toolkit::Internal::ToolBar& GetImpl(Toolkit::ToolBar& toolBar)
 {
-  DALI_ASSERT_ALWAYS( toolBar );
+  DALI_ASSERT_ALWAYS(toolBar);
 
   Dali::RefObject& handle = toolBar.GetImplementation();
 
-  return static_cast<Toolkit::Internal::ToolBar&>( handle );
+  return static_cast<Toolkit::Internal::ToolBar&>(handle);
 }
 
-inline const Toolkit::Internal::ToolBar& GetImpl( const Toolkit::ToolBar& toolBar )
+inline const Toolkit::Internal::ToolBar& GetImpl(const Toolkit::ToolBar& toolBar)
 {
-  DALI_ASSERT_ALWAYS( toolBar );
+  DALI_ASSERT_ALWAYS(toolBar);
 
   const Dali::RefObject& handle = toolBar.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::ToolBar&>( handle );
+  return static_cast<const Toolkit::Internal::ToolBar&>(handle);
 }
 
 } // namespace Toolkit

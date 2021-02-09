@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MULTI_LANGUAGE_HELPER_FUNCTIONS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Merges font's descriptions to retrieve the combined font's description for a given character.
  *
@@ -45,13 +42,13 @@ namespace Text
  * @param[out] fontPointSize The font's point size for the character.
  * @param[out] isDefaultFont Whether the font is a default one.
  */
-void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
-                            const TextAbstraction::FontDescription& defaultFontDescription,
-                            TextAbstraction::PointSize26Dot6 defaultPointSize,
-                            CharacterIndex characterIndex,
-                            TextAbstraction::FontDescription& fontDescription,
-                            TextAbstraction::PointSize26Dot6& fontPointSize,
-                            bool& isDefaultFont );
+void MergeFontDescriptions(const Vector<FontDescriptionRun>&       fontDescriptions,
+                           const TextAbstraction::FontDescription& defaultFontDescription,
+                           TextAbstraction::PointSize26Dot6        defaultPointSize,
+                           CharacterIndex                          characterIndex,
+                           TextAbstraction::FontDescription&       fontDescription,
+                           TextAbstraction::PointSize26Dot6&       fontPointSize,
+                           bool&                                   isDefaultFont);
 
 /**
  * @brief Retrieves the script Id from the script run for a given character's @p index.
@@ -64,9 +61,9 @@ void MergeFontDescriptions( const Vector<FontDescriptionRun>& fontDescriptions,
  *
  * @return The script.
  */
-Script GetScript( Length index,
-                  Vector<ScriptRun>::ConstIterator& scriptRunIt,
-                  const Vector<ScriptRun>::ConstIterator& scriptRunEndIt );
+Script GetScript(Length                                  index,
+                 Vector<ScriptRun>::ConstIterator&       scriptRunIt,
+                 const Vector<ScriptRun>::ConstIterator& scriptRunEndIt);
 
 } // namespace Text
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_TYPESETTER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,20 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/images/pixel.h>
-#include <dali/public-api/images/pixel-data.h>
-#include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
-#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/images/pixel-data.h>
+#include <dali/public-api/images/pixel.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class ModelInterface;
 class ViewModel;
 class Typesetter;
@@ -48,16 +45,15 @@ typedef IntrusivePtr<Typesetter> TypesetterPtr;
 class Typesetter : public RefObject
 {
 public:
-
   /**
    * @brief Behaviours of how to render the text.
    */
   enum RenderBehaviour
   {
-    RENDER_TEXT_AND_STYLES,  ///< Render both the text and its styles
-    RENDER_NO_TEXT,          ///< Do not render the text itself
-    RENDER_NO_STYLES,        ///< Do not render any styles
-    RENDER_MASK              ///< Render an alpha mask (for color glyphs with no color animation, e.g. emoji)
+    RENDER_TEXT_AND_STYLES, ///< Render both the text and its styles
+    RENDER_NO_TEXT,         ///< Do not render the text itself
+    RENDER_NO_STYLES,       ///< Do not render any styles
+    RENDER_MASK             ///< Render an alpha mask (for color glyphs with no color animation, e.g. emoji)
   };
 
   /**
@@ -65,13 +61,13 @@ public:
    */
   enum Style
   {
-    STYLE_NONE,              ///< No style
-    STYLE_MASK,              ///< Alpha mask
-    STYLE_SHADOW,            ///< Hard shadow
-    STYLE_SOFT_SHADOW,       ///< Soft shadow
-    STYLE_UNDERLINE,         ///< Underline
-    STYLE_OUTLINE,           ///< Outline
-    STYLE_BACKGROUND         ///< Text background
+    STYLE_NONE,        ///< No style
+    STYLE_MASK,        ///< Alpha mask
+    STYLE_SHADOW,      ///< Hard shadow
+    STYLE_SOFT_SHADOW, ///< Soft shadow
+    STYLE_UNDERLINE,   ///< Underline
+    STYLE_OUTLINE,     ///< Outline
+    STYLE_BACKGROUND   ///< Text background
   };
 
 public: // Constructor.
@@ -83,7 +79,7 @@ public: // Constructor.
    *
    * @param[in] model Pointer to the text's data model.
    */
-  static TypesetterPtr New( const ModelInterface* const model );
+  static TypesetterPtr New(const ModelInterface* const model);
 
 public:
   /**
@@ -110,7 +106,7 @@ public:
    *
    * @return A pixel data with the text rendered.
    */
-  PixelData Render( const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888 );
+  PixelData Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888);
 
 private:
   /**
@@ -118,13 +114,13 @@ private:
    *
    * @param[in] model Pointer to the text's data model.
    */
-  Typesetter( const ModelInterface* const model );
+  Typesetter(const ModelInterface* const model);
 
   // Declared private and left undefined to avoid copies.
-  Typesetter( const Typesetter& handle );
+  Typesetter(const Typesetter& handle);
 
   // Declared private and left undefined to avoid copies.
-  Typesetter& operator=( const Typesetter& handle );
+  Typesetter& operator=(const Typesetter& handle);
 
   /**
    * @brief Create the image buffer for the given range of the glyphs in the given style.
@@ -146,7 +142,7 @@ private:
    *
    * @return An image buffer with the text.
    */
-  Devel::PixelBuffer CreateImageBuffer( const unsigned int bufferWidth, const unsigned int bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset, TextAbstraction::GlyphIndex fromGlyphIndex, TextAbstraction::GlyphIndex toGlyphIndex );
+  Devel::PixelBuffer CreateImageBuffer(const unsigned int bufferWidth, const unsigned int bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset, TextAbstraction::GlyphIndex fromGlyphIndex, TextAbstraction::GlyphIndex toGlyphIndex);
 
   /**
    * @brief Combine the two RGBA image buffers together.
@@ -165,10 +161,9 @@ private:
    * @return The combined image buffer with the text.
    *
    */
-  Devel::PixelBuffer CombineImageBuffer( Devel::PixelBuffer topPixelBuffer, Devel::PixelBuffer bottomPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeightbool );
+  Devel::PixelBuffer CombineImageBuffer(Devel::PixelBuffer topPixelBuffer, Devel::PixelBuffer bottomPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeightbool);
 
 protected:
-
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    *
@@ -177,8 +172,7 @@ protected:
   virtual ~Typesetter();
 
 private:
-
-   ViewModel* mModel;
+  ViewModel* mModel;
 };
 
 } // namespace Text

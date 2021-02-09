@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 Samsung Electronics Co., Ltd.
+* Copyright (c) 2021 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,28 +20,25 @@
 
 namespace json
 {
-
 int StrCmp(const json_string_s& js, const char* s)
 {
-  auto sSize = strlen(s);
+  auto sSize   = strlen(s);
   auto shorter = std::min(js.string_size, sSize);
-  auto base = strncmp(js.string, s, shorter);
-  return ((base != 0) || (sSize == js.string_size)) ? base : ((js.string_size < sSize) ?
-    -s[shorter] : js.string[shorter]);
+  auto base    = strncmp(js.string, s, shorter);
+  return ((base != 0) || (sSize == js.string_size)) ? base : ((js.string_size < sSize) ? -s[shorter] : js.string[shorter]);
 }
 
 int StrCmp(const json_string_s& js, const std::string& s)
 {
-  auto sSize = s.size();
+  auto sSize   = s.size();
   auto shorter = std::min(js.string_size, sSize);
-  auto base = strncmp(js.string, s.c_str(), shorter);
-  return ((base != 0) || (sSize == js.string_size)) ? base : ((js.string_size < sSize) ?
-    -s[shorter] : js.string[shorter]);
+  auto base    = strncmp(js.string, s.c_str(), shorter);
+  return ((base != 0) || (sSize == js.string_size)) ? base : ((js.string_size < sSize) ? -s[shorter] : js.string[shorter]);
 }
 
-void Validate(const json_value_s & jv, json_type_e type)
+void Validate(const json_value_s& jv, json_type_e type)
 {
-  if (jv.type != type)
+  if(jv.type != type)
   {
     throw std::runtime_error("Invalid type; expected: " + std::to_string(type) + ", got: " + std::to_string(jv.type));
   }
@@ -50,9 +47,9 @@ void Validate(const json_value_s & jv, json_type_e type)
 json_value_s* FindObjectChild(const std::string& key, json_object_s& obj)
 {
   auto i = obj.start;
-  while (i)
+  while(i)
   {
-    if (0 == StrCmp(*i->name, key))
+    if(0 == StrCmp(*i->name, key))
     {
       return i->value;
     }
@@ -61,4 +58,4 @@ json_value_s* FindObjectChild(const std::string& key, json_object_s& obj)
   return nullptr;
 }
 
-}
+} // namespace json

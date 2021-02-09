@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_WIREFRAME_VISUAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,23 +26,19 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class WireframeVisual;
-typedef IntrusivePtr< WireframeVisual > WireframeVisualPtr;
+typedef IntrusivePtr<WireframeVisual> WireframeVisualPtr;
 
 /**
  * @brief Renders a wireframe outline to the control's quad.
  */
-class WireframeVisual: public Visual::Base
+class WireframeVisual : public Visual::Base
 {
 public:
-
   /**
    * @brief Create a new wireframe visual.
    *
@@ -50,7 +46,7 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static WireframeVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
+  static WireframeVisualPtr New(VisualFactoryCache& factoryCache, const Property::Map& properties);
 
   /**
    * @brief Create a new wireframe visual with an encapsulated actual visual.
@@ -61,7 +57,7 @@ public:
    * @param[in] actualVisual The encapsulated actual visual.
    * @return A smart-pointer to the newly allocated visual.
    */
-  static WireframeVisualPtr New( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual );
+  static WireframeVisualPtr New(VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual);
 
   /**
    * @brief Create a new wireframe visual with an encapsulated actual visual.
@@ -73,18 +69,16 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static WireframeVisualPtr New( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual, const Property::Map& properties );
-
+  static WireframeVisualPtr New(VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual, const Property::Map& properties);
 
 protected:
-
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] actualVisual The encapsulated actual visual.
    */
-  WireframeVisual( VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual );
+  WireframeVisual(VisualFactoryCache& factoryCache, Visual::BasePtr actualVisual);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -92,36 +86,40 @@ protected:
   virtual ~WireframeVisual();
 
 protected: // from Visual::Base
+  /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
 
   /**
    * @copydoc Visual::Base::GetHeightForWidth()
    */
-  float GetHeightForWidth( float width ) override;
+  float GetHeightForWidth(float width) override;
 
   /**
    * @copydoc Visual::Base::GetNaturalSize()
    */
-  void GetNaturalSize( Vector2& naturalSize ) override;
+  void GetNaturalSize(Vector2& naturalSize) override;
 
   /**
    * @copydoc Visual::Base::CreatePropertyMap()
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::DoSetProperties()
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
@@ -142,21 +140,14 @@ private:
    */
   Geometry CreateQuadWireframeGeometry();
 
-  /**
-   * @brief Initialise the renderer from the cache, if not available, create and save to the cache for sharing.
-   */
-  void InitializeRenderer();
+  // Undefined
+  WireframeVisual(const WireframeVisual& visual);
 
   // Undefined
-  WireframeVisual( const WireframeVisual& visual);
-
-  // Undefined
-  WireframeVisual& operator=( const WireframeVisual& visual );
+  WireframeVisual& operator=(const WireframeVisual& visual);
 
 private:
-
   Visual::BasePtr mActualVisual;
-
 };
 
 } // namespace Internal

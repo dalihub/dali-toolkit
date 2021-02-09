@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_PRIMITIVE_VISUAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,20 +48,17 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class PrimitiveVisual;
-typedef IntrusivePtr< PrimitiveVisual > PrimitiveVisualPtr;
+typedef IntrusivePtr<PrimitiveVisual> PrimitiveVisualPtr;
 
 /**
  * The visual which renders a simple 3D shape to the control's quad
@@ -97,10 +94,9 @@ typedef IntrusivePtr< PrimitiveVisual > PrimitiveVisualPtr;
  * |-----------------|-------------|-----------------------------------------|
  * | lightPosition   | VECTOR3     | The position (on stage) of the light    |
  */
-class PrimitiveVisual: public Visual::Base
+class PrimitiveVisual : public Visual::Base
 {
 public:
-
   /**
    * @brief Create a new primitive visual.
    *
@@ -108,33 +104,31 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static PrimitiveVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
+  static PrimitiveVisualPtr New(VisualFactoryCache& factoryCache, const Property::Map& properties);
 
-public:  // from Visual
-
+public: // from Visual
   /**
    * @copydoc Visual::Base::GetNaturalSize
    */
-  void GetNaturalSize( Vector2& naturalSize ) override;
+  void GetNaturalSize(Vector2& naturalSize) override;
 
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
 protected:
-
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  PrimitiveVisual( VisualFactoryCache& factoryCache );
+  PrimitiveVisual(VisualFactoryCache& factoryCache);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -142,14 +136,19 @@ protected:
   virtual ~PrimitiveVisual();
 
   /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
+
+  /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
@@ -157,16 +156,18 @@ protected:
   void OnSetTransform() override;
 
 private:
-
   //Simple struct to store the position and normal of a single vertex.
   struct Vertex
   {
     Vertex()
-    {}
+    {
+    }
 
-    Vertex( const Vector3& position, const Vector3& normal, const Vector2& textureCoord )
-    : position( position ), normal( normal )
-    {}
+    Vertex(const Vector3& position, const Vector3& normal, const Vector2& textureCoord)
+    : position(position),
+      normal(normal)
+    {
+    }
 
     Vector3 position;
     Vector3 normal;
@@ -199,7 +200,7 @@ private:
    * @param[in] slices The number of slices as you go around the sphere. Affects the smoothness of the surface.
    * @param[in] stacks The number of stacks as you go down the sphere. Affects the smoothness of the surface.
    */
-  void CreateSphere( Vector<Vertex>& vertices, Vector<unsigned short>& indices, int slices, int stacks );
+  void CreateSphere(Vector<Vertex>& vertices, Vector<unsigned short>& indices, int slices, int stacks);
 
   /**
    * @brief Compute the vertices and the triangles for a conic shape.
@@ -210,8 +211,7 @@ private:
    * @param[in] scaleHeight The scale of the height of the object, compared to the other dimensions.
    * @param[in] slices The number of slices as you go around the conic shape. Affects the smoothness of the surface.
    */
-  void CreateConic( Vector<Vertex>& vertices, Vector<unsigned short>& indices, float scaleTopRadius,
-                           float scaleBottomRadius, float scaleHeight, int slices );
+  void CreateConic(Vector<Vertex>& vertices, Vector<unsigned short>& indices, float scaleTopRadius, float scaleBottomRadius, float scaleHeight, int slices);
 
   /**
    * @brief Compute the vertices and the triangles for a bevelled cube.
@@ -221,8 +221,7 @@ private:
    * @param[in] bevelPercentage The ratio of the outer face widths to the cube's width. Between 0.0 and 1.0.
    * @param[in] bevelSmoothness The smoothness of the bevelled edges. Between 0.0 and 1.0.
    */
-  void CreateBevelledCube( Vector<Vertex>& vertices, Vector<unsigned short>& indices, Vector3 dimensions,
-                           float bevelPercentage, float bevelSmoothness );
+  void CreateBevelledCube(Vector<Vertex>& vertices, Vector<unsigned short>& indices, Vector3 dimensions, float bevelPercentage, float bevelSmoothness);
 
   /**
    * @brief Computes look-up tables for sin and cos, over angle divisions of (2 * Pi) / divisions
@@ -231,7 +230,7 @@ private:
    * @param[in] divisions Determines the angle coverage of the table. E.g divisions of '4' will have the sin values 0 = sin(0), 1 = sin(Pi/2), 2 = sin(Pi), 3 = sin(3Pi/2)
    * @Param[in] halfCircle If true, go from 0 to Pi instead of 0 to 2Pi.
    */
-  void ComputeCircleTables( Vector<float>& sinTable, Vector<float>& cosTable, int divisions, bool halfCircle );
+  void ComputeCircleTables(Vector<float>& sinTable, Vector<float>& cosTable, int divisions, bool halfCircle);
 
   /**
    * @brief Compute the vertices for a sphere.
@@ -239,7 +238,7 @@ private:
    * @param[in] slices The number of slices as you go around the sphere. Affects the smoothness of the surface.
    * @param[in] stacks The number of stacks as you go down the sphere. Affects the smoothness of the surface.
    */
-  void ComputeSphereVertices( Vector<Vertex>& vertices, int slices, int stacks );
+  void ComputeSphereVertices(Vector<Vertex>& vertices, int slices, int stacks);
 
   /**
    * @brief Compute the triangles for a sphere.
@@ -247,7 +246,7 @@ private:
    * @param[in] slices The number of slices as you go around the sphere. Affects the smoothness of the surface.
    * @param[in] stacks The number of stacks as you go down the sphere. Affects the smoothness of the surface.
    */
-  void FormSphereTriangles( Vector<unsigned short>& indices, int slices, int stacks );
+  void FormSphereTriangles(Vector<unsigned short>& indices, int slices, int stacks);
 
   /**
    * @brief Compute the vertices for a conical.
@@ -257,8 +256,7 @@ private:
    * @param[in] scaleHeight The scale of the height of the object, compared to the other dimensions.
    * @param[in] slices The number of slices as you go around the conical. Affects the smoothness of the surface.
    */
-  void ComputeConicVertices( Vector<Vertex>& vertices, float scaleTopRadius, float scaleBottomRadius,
-                                    float scaleHeight, int slices );
+  void ComputeConicVertices(Vector<Vertex>& vertices, float scaleTopRadius, float scaleBottomRadius, float scaleHeight, int slices);
 
   /**
    * @brief Compute the triangles for a conic.
@@ -267,21 +265,20 @@ private:
    * @param[in] coneBottom True if the bottom circle has a radius of zero, i.e. the object is an inverted complete cone.
    * @param[in] slices The number of slices as you go around the conic. Affects the smoothness of the surface.
    */
-  void FormConicTriangles( Vector<unsigned short>& indices, float scaleTopRadius, float scaleBottomRadius,
-                                  int slices );
+  void FormConicTriangles(Vector<unsigned short>& indices, float scaleTopRadius, float scaleBottomRadius, int slices);
 
   /**
    * @brief Compute the vertices for a cube.
    * @param[in, out] vertices The vector of vertices.
    * @Param[in] dimensions The dimensions of the object.
    */
-  void ComputeCubeVertices( Vector<Vertex>& vertices, Vector3 dimensions );
+  void ComputeCubeVertices(Vector<Vertex>& vertices, Vector3 dimensions);
 
   /**
    * @brief Compute the triangles for a cube.
    * @param[in, out] indices The vector of triangles, consisting of groups of three vertex indices.
    */
-  void FormCubeTriangles( Vector<unsigned short>& indices );
+  void FormCubeTriangles(Vector<unsigned short>& indices);
 
   /**
    * @brief Compute the vertices for an octahedron (maximumly bevelled cube).
@@ -289,13 +286,13 @@ private:
    * @Param[in] dimensions The dimensions of the object.
    * @Param[in] smoothness Defines how rounded the edges appear under lighting. Between 0.0 and 1.0.
    */
-  void ComputeOctahedronVertices( Vector<Vertex>& vertices, Vector3 dimensions, float smoothness );
+  void ComputeOctahedronVertices(Vector<Vertex>& vertices, Vector3 dimensions, float smoothness);
 
   /**
    * @brief Compute the triangles for an octahedron.
    * @param[in, out] indices The vector of triangles, consisting of groups of three vertex indices.
    */
-  void FormOctahedronTriangles( Vector<unsigned short>& indices );
+  void FormOctahedronTriangles(Vector<unsigned short>& indices);
 
   /**
    * @brief Compute the vertices for a bevelled cube.
@@ -304,28 +301,26 @@ private:
    * @param[in] bevelPercentage The ratio of the outer face widths to the cube's width. Between 0.0 and 1.0.
    * @param[in] bevelSmoothness The smoothness of the bevelled edges. Between 0.0 and 1.0.
    */
-  void ComputeBevelledCubeVertices( Vector<Vertex>& vertices, Vector3 dimensions, float bevelPercentage,
-                                    float bevelSmoothness );
+  void ComputeBevelledCubeVertices(Vector<Vertex>& vertices, Vector3 dimensions, float bevelPercentage, float bevelSmoothness);
 
   /**
    * @brief Compute the triangles for a bevelled cube.
    * @param[in, out] indices The vector of triangles, consisting of groups of three vertex indices.
    */
-  void FormBevelledCubeTriangles( Vector<unsigned short>& indices );
+  void FormBevelledCubeTriangles(Vector<unsigned short>& indices);
 
 private:
+  // Undefined
+  PrimitiveVisual(const PrimitiveVisual& PrimitiveVisual);
 
   // Undefined
-  PrimitiveVisual( const PrimitiveVisual& PrimitiveVisual );
-
-  // Undefined
-  PrimitiveVisual& operator=( const PrimitiveVisual& PrimitiveVisual );
+  PrimitiveVisual& operator=(const PrimitiveVisual& PrimitiveVisual);
 
 private:
-  Shader mShader;
+  Shader   mShader;
   Geometry mGeometry;
 
-  Vector3 mObjectDimensions;     //Dimensions of shape, scaled to be between 0.0 and 1.0.
+  Vector3 mObjectDimensions; //Dimensions of shape, scaled to be between 0.0 and 1.0.
 
   Vector3 mSceneCenter;
   Vector3 mSceneSize;
@@ -334,17 +329,17 @@ private:
   Vector3 mLightPosition;
 
   //Shape properties.
-  Vector3 mScaleDimensions;      ///< Scale of dimensions of bevelled cube and sub-shapes.
-  float   mScaleTopRadius;       ///< Scale of radius of top circle, to use when creating certain objects.
-  float   mScaleBottomRadius;    ///< Scale of radius of bottom circle, to use when creating certain objects.
-  float   mScaleHeight;          ///< Scale of height, to use when creating certain objects.
-  float   mScaleRadius;          ///< Scale of radius, to use when creating certain objects.
-  float   mBevelPercentage;      ///< Used to determine bevel amount when creating certain objects.
-  float   mBevelSmoothness;      ///< Used to determine the smoothness of bevelled edges.
-  int     mSlices;               ///< Number of slices to use when creating certain objects.
-  int     mStacks;               ///< Number of stacks to use when creating certain objects.
+  Vector3 mScaleDimensions;   ///< Scale of dimensions of bevelled cube and sub-shapes.
+  float   mScaleTopRadius;    ///< Scale of radius of top circle, to use when creating certain objects.
+  float   mScaleBottomRadius; ///< Scale of radius of bottom circle, to use when creating certain objects.
+  float   mScaleHeight;       ///< Scale of height, to use when creating certain objects.
+  float   mScaleRadius;       ///< Scale of radius, to use when creating certain objects.
+  float   mBevelPercentage;   ///< Used to determine bevel amount when creating certain objects.
+  float   mBevelSmoothness;   ///< Used to determine the smoothness of bevelled edges.
+  int     mSlices;            ///< Number of slices to use when creating certain objects.
+  int     mStacks;            ///< Number of stacks to use when creating certain objects.
 
-  Toolkit::PrimitiveVisual::Shape::Type mPrimitiveType;  //Shape to render, as enum.
+  Toolkit::PrimitiveVisual::Shape::Type mPrimitiveType; //Shape to render, as enum.
 };
 
 } // namespace Internal

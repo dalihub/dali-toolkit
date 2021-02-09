@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,7 +162,7 @@ SizeTuple Node::MeasureNode(float width, int widthMode, float height, int height
   Toolkit::Flex::SizeTuple nodeSize{8, 8}; // Default size set to 8,8 to aid bug detection.
   if(mImpl->mMeasureCallback && mImpl->mActor.GetHandle())
   {
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "MeasureNode MeasureCallback executing on %s\n", mImpl->mActor.GetHandle().GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str());
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "MeasureNode MeasureCallback executing on %s\n", mImpl->mActor.GetHandle().GetProperty<std::string>(Dali::Actor::Property::NAME).c_str());
     mImpl->mMeasureCallback(mImpl->mActor.GetHandle(), width, widthMode, height, heightMode, &nodeSize);
   }
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "MeasureNode nodeSize width:%f height:%f\n", nodeSize.width, nodeSize.height);

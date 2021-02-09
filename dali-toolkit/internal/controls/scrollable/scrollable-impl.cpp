@@ -16,28 +16,24 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstring> // for strcmp
-#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry.h>
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 
 using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 BaseHandle Create()
 {
   // empty handle as we cannot create Scrollable (but type registered for scroll signal)
@@ -45,46 +41,46 @@ BaseHandle Create()
 }
 
 // Setup properties, signals and actions using the type-registry.
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Scrollable, Toolkit::Control, Create );
+DALI_TYPE_REGISTRATION_BEGIN(Toolkit::Scrollable, Toolkit::Control, Create);
 
-DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootEffectColor",      VECTOR4, OVERSHOOT_EFFECT_COLOR    )
-DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootAnimationSpeed",   FLOAT,   OVERSHOOT_ANIMATION_SPEED )
-DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootEnabled",          BOOLEAN, OVERSHOOT_ENABLED )
-DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshootSize",             VECTOR2, OVERSHOOT_SIZE )
-DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollToAlphaFunction",     INTEGER, SCROLL_TO_ALPHA_FUNCTION )
+DALI_PROPERTY_REGISTRATION(Toolkit, Scrollable, "overshootEffectColor", VECTOR4, OVERSHOOT_EFFECT_COLOR)
+DALI_PROPERTY_REGISTRATION(Toolkit, Scrollable, "overshootAnimationSpeed", FLOAT, OVERSHOOT_ANIMATION_SPEED)
+DALI_PROPERTY_REGISTRATION(Toolkit, Scrollable, "overshootEnabled", BOOLEAN, OVERSHOOT_ENABLED)
+DALI_PROPERTY_REGISTRATION(Toolkit, Scrollable, "overshootSize", VECTOR2, OVERSHOOT_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, Scrollable, "scrollToAlphaFunction", INTEGER, SCROLL_TO_ALPHA_FUNCTION)
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollRelativePosition",   VECTOR2, SCROLL_RELATIVE_POSITION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollPositionMin",        VECTOR2, SCROLL_POSITION_MIN)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scrollPositionMinX",    SCROLL_POSITION_MIN_X, SCROLL_POSITION_MIN, 0)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scrollPositionMinY",    SCROLL_POSITION_MIN_Y, SCROLL_POSITION_MIN, 1)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scrollPositionMax",        VECTOR2, SCROLL_POSITION_MAX)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scrollPositionMaxX",    SCROLL_POSITION_MAX_X, SCROLL_POSITION_MAX, 0)
-DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scrollPositionMaxY",    SCROLL_POSITION_MAX_Y, SCROLL_POSITION_MAX, 1)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "canScrollVertical",        BOOLEAN, CAN_SCROLL_VERTICAL)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "canScrollHorizontal",      BOOLEAN, CAN_SCROLL_HORIZONTAL)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION(Toolkit, Scrollable, "scrollRelativePosition", VECTOR2, SCROLL_RELATIVE_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION(Toolkit, Scrollable, "scrollPositionMin", VECTOR2, SCROLL_POSITION_MIN)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit, Scrollable, "scrollPositionMinX", SCROLL_POSITION_MIN_X, SCROLL_POSITION_MIN, 0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit, Scrollable, "scrollPositionMinY", SCROLL_POSITION_MIN_Y, SCROLL_POSITION_MIN, 1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION(Toolkit, Scrollable, "scrollPositionMax", VECTOR2, SCROLL_POSITION_MAX)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit, Scrollable, "scrollPositionMaxX", SCROLL_POSITION_MAX_X, SCROLL_POSITION_MAX, 0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit, Scrollable, "scrollPositionMaxY", SCROLL_POSITION_MAX_Y, SCROLL_POSITION_MAX, 1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION(Toolkit, Scrollable, "canScrollVertical", BOOLEAN, CAN_SCROLL_VERTICAL)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION(Toolkit, Scrollable, "canScrollHorizontal", BOOLEAN, CAN_SCROLL_HORIZONTAL)
 
-DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scrollStarted",                     SIGNAL_SCROLL_STARTED    )
-DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scrollCompleted",                   SIGNAL_SCROLL_COMPLETED  )
-DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scrollUpdated",                     SIGNAL_SCROLL_UPDATED    )
+DALI_SIGNAL_REGISTRATION(Toolkit, Scrollable, "scrollStarted", SIGNAL_SCROLL_STARTED)
+DALI_SIGNAL_REGISTRATION(Toolkit, Scrollable, "scrollCompleted", SIGNAL_SCROLL_COMPLETED)
+DALI_SIGNAL_REGISTRATION(Toolkit, Scrollable, "scrollUpdated", SIGNAL_SCROLL_UPDATED)
 
 DALI_TYPE_REGISTRATION_END()
 
 const Vector4 DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.25f);
-const float DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
-const Vector2 OVERSHOOT_DEFAULT_SIZE( 720.0f, 42.0f );
+const float   DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
+const Vector2 OVERSHOOT_DEFAULT_SIZE(720.0f, 42.0f);
 
-}
+} // namespace
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Scrollable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-Scrollable::Scrollable( ControlBehaviour behaviourFlags )
-: Control( ControlBehaviour( behaviourFlags ) ),
-  mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
-  mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
-  mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
-  mScrollToAlphaFunction( AlphaFunction::EASE_OUT ),
+Scrollable::Scrollable(ControlBehaviour behaviourFlags)
+: Control(ControlBehaviour(behaviourFlags)),
+  mOvershootEffectColor(DEFAULT_OVERSHOOT_COLOUR),
+  mOvershootAnimationSpeed(DEFAULT_OVERSHOOT_ANIMATION_SPEED),
+  mOvershootSize(OVERSHOOT_DEFAULT_SIZE),
+  mScrollToAlphaFunction(AlphaFunction::EASE_OUT),
   mScrollStartedSignal(),
   mScrollUpdatedSignal(),
   mScrollCompletedSignal(),
@@ -103,10 +99,10 @@ bool Scrollable::AccessibleImpl::IsScrollable()
 
 void Scrollable::OnInitialize()
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new AccessibleImpl( actor, Dali::Accessibility::Role::SCROLL_PANE ) );
-  } );
+  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
+    return std::unique_ptr<Dali::Accessibility::Accessible>(
+      new AccessibleImpl(actor, Dali::Accessibility::Role::SCROLL_PANE));
+  });
 }
 
 bool Scrollable::IsOvershootEnabled() const
@@ -125,7 +121,7 @@ Vector4 Scrollable::GetOvershootEffectColor() const
   return mOvershootEffectColor;
 };
 
-void Scrollable::SetOvershootAnimationSpeed( float pixelsPerSecond )
+void Scrollable::SetOvershootAnimationSpeed(float pixelsPerSecond)
 {
   mOvershootAnimationSpeed = pixelsPerSecond;
 }
@@ -155,24 +151,24 @@ Toolkit::Scrollable::ScrollCompletedSignalType& Scrollable::ScrollCompletedSigna
   return mScrollCompletedSignal;
 }
 
-bool Scrollable::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool Scrollable::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  Dali::BaseHandle handle( object );
+  Dali::BaseHandle handle(object);
 
-  bool connected( true );
-  Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast( handle );
+  bool                connected(true);
+  Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast(handle);
 
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_SCROLL_STARTED ) )
+  if(0 == strcmp(signalName.c_str(), SIGNAL_SCROLL_STARTED))
   {
-    scrollable.ScrollStartedSignal().Connect( tracker, functor );
+    scrollable.ScrollStartedSignal().Connect(tracker, functor);
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_SCROLL_UPDATED ) )
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_SCROLL_UPDATED))
   {
-    scrollable.ScrollUpdatedSignal().Connect( tracker, functor );
+    scrollable.ScrollUpdatedSignal().Connect(tracker, functor);
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_SCROLL_COMPLETED ) )
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_SCROLL_COMPLETED))
   {
-    scrollable.ScrollCompletedSignal().Connect( tracker, functor );
+    scrollable.ScrollCompletedSignal().Connect(tracker, functor);
   }
   else
   {
@@ -183,43 +179,43 @@ bool Scrollable::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   return connected;
 }
 
-void Scrollable::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+void Scrollable::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
-  Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast(Dali::BaseHandle(object));
 
-  if( scrollable )
+  if(scrollable)
   {
-    Scrollable& scrollableImpl( GetImpl( scrollable ) );
-    switch( index )
+    Scrollable& scrollableImpl(GetImpl(scrollable));
+    switch(index)
     {
       case Toolkit::Scrollable::Property::OVERSHOOT_EFFECT_COLOR:
       {
-        scrollableImpl.SetOvershootEffectColor( value.Get<Vector4>() );
+        scrollableImpl.SetOvershootEffectColor(value.Get<Vector4>());
         break;
       }
       case Toolkit::Scrollable::Property::OVERSHOOT_ANIMATION_SPEED:
       {
-        scrollableImpl.SetOvershootAnimationSpeed( value.Get<float>() );
+        scrollableImpl.SetOvershootAnimationSpeed(value.Get<float>());
         break;
       }
       case Toolkit::Scrollable::Property::OVERSHOOT_ENABLED:
       {
-        scrollableImpl.SetOvershootEnabled( value.Get<bool>() );
+        scrollableImpl.SetOvershootEnabled(value.Get<bool>());
         break;
       }
       case Toolkit::Scrollable::Property::OVERSHOOT_SIZE:
       {
-        scrollableImpl.SetOvershootSize( value.Get<Vector2>() );
+        scrollableImpl.SetOvershootSize(value.Get<Vector2>());
         break;
       }
       case Toolkit::Scrollable::Property::SCROLL_TO_ALPHA_FUNCTION:
       {
         int alphaFunction = value.Get<int>();
 
-        if( alphaFunction >= AlphaFunction::DEFAULT &&
-            alphaFunction <  AlphaFunction::COUNT )
+        if(alphaFunction >= AlphaFunction::DEFAULT &&
+           alphaFunction < AlphaFunction::COUNT)
         {
-          scrollableImpl.mScrollToAlphaFunction = static_cast< AlphaFunction::BuiltinFunction >( alphaFunction );
+          scrollableImpl.mScrollToAlphaFunction = static_cast<AlphaFunction::BuiltinFunction>(alphaFunction);
         }
         break;
       }
@@ -227,16 +223,16 @@ void Scrollable::SetProperty( BaseObject* object, Property::Index index, const P
   }
 }
 
-Property::Value Scrollable::GetProperty( BaseObject* object, Property::Index index )
+Property::Value Scrollable::GetProperty(BaseObject* object, Property::Index index)
 {
   Property::Value value;
 
-  Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast(Dali::BaseHandle(object));
 
-  if( scrollable )
+  if(scrollable)
   {
-    Scrollable& scrollableImpl( GetImpl( scrollable ) );
-    switch( index )
+    Scrollable& scrollableImpl(GetImpl(scrollable));
+    switch(index)
     {
       case Toolkit::Scrollable::Property::OVERSHOOT_EFFECT_COLOR:
       {
@@ -260,7 +256,7 @@ Property::Value Scrollable::GetProperty( BaseObject* object, Property::Index ind
       }
       case Toolkit::Scrollable::Property::SCROLL_TO_ALPHA_FUNCTION:
       {
-        value = static_cast<int>( scrollableImpl.mScrollToAlphaFunction );
+        value = static_cast<int>(scrollableImpl.mScrollToAlphaFunction);
         break;
       }
     }

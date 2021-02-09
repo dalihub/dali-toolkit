@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUILDER_STYLE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
  * limitations under the License.
  */
 
-#include <dali/public-api/object/ref-object.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/internal/builder/dictionary.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {
@@ -27,7 +27,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 class Style;
 typedef IntrusivePtr<Style> StylePtr;
 
@@ -57,8 +56,8 @@ public:
    * @param[in] handle The handle to apply the visuals to
    * @param[in] instancedProperties The maps from which to get instanced properties
    */
-  void ApplyVisualsAndPropertiesRecursively( Handle handle,
-                                             const Dictionary<Property::Map>& instancedProperties ) const;
+  void ApplyVisualsAndPropertiesRecursively(Handle                           handle,
+                                            const Dictionary<Property::Map>& instancedProperties) const;
 
   /**
    * Apply the visuals of the style to the control pointed at by
@@ -67,8 +66,8 @@ public:
    * @param[in] handle The handle to apply the visuals to
    * @param[in] instancedProperties The maps from which to get instanced properties
    */
-  void ApplyVisuals( Handle handle,
-                     const Dictionary<Property::Map>& instancedProperties ) const;
+  void ApplyVisuals(Handle                           handle,
+                    const Dictionary<Property::Map>& instancedProperties) const;
 
   /**
    * Apply the properties from the visualMaps and the instancedProperties
@@ -78,18 +77,18 @@ public:
    * @param[in] visualMaps The visual maps from which to get the styled properties
    * @param[in] instancedProperties The maps from which to get instanced properties
    */
-  static void ApplyVisuals( Handle handle,
-                            const Dictionary<Property::Map>& visualMaps,
-                            const Dictionary<Property::Map>& instancedProperties );
+  static void ApplyVisuals(Handle                           handle,
+                           const Dictionary<Property::Map>& visualMaps,
+                           const Dictionary<Property::Map>& instancedProperties);
 
   /**
    * Apply the properties from the visualMap and optional instancedProperties
    * to the control pointed at by handle.
    */
-  static void ApplyVisual( Handle handle,
-                           const std::string& visualName,
-                           const Property::Map& visualMap,
-                           const Property::Map* instancedProperties );
+  static void ApplyVisual(Handle               handle,
+                          const std::string&   visualName,
+                          const Property::Map& visualMap,
+                          const Property::Map* instancedProperties);
 
   /**
    * Apply the properties of the style to the control pointed at by
@@ -97,7 +96,7 @@ public:
    *
    * @param[in] handle The handle to apply the properties to
    */
-  void ApplyProperties( Handle handle ) const;
+  void ApplyProperties(Handle handle) const;
 
 protected:
   /**
@@ -112,24 +111,23 @@ protected:
 
 private:
   // Not implemented
-  DALI_INTERNAL Style( const Style& rhs );
+  DALI_INTERNAL Style(const Style& rhs);
 
   // Not implemented
   DALI_INTERNAL Style& operator=(const Style& rhs);
 
 public:
   // Everything must be shallow-copiable.
-  Dictionary<StylePtr> subStates; // Each named style maps to a state.
+  Dictionary<StylePtr>      subStates; // Each named style maps to a state.
   Dictionary<Property::Map> visuals;
-  Property::Map properties;
-  Property::Array transitions;
-  Toolkit::TransitionData entryTransition;
-  Toolkit::TransitionData exitTransition;
+  Property::Map             properties;
+  Property::Array           transitions;
+  Toolkit::TransitionData   entryTransition;
+  Toolkit::TransitionData   exitTransition;
 };
 
-} // Internal
-} // Toolkit
-} // Dali
-
+} // namespace Internal
+} // namespace Toolkit
+} // namespace Dali
 
 #endif //DALI_TOOLKIT_INTERNAL_BUILDER_STYLE_H

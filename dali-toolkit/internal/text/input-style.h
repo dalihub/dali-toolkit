@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_INPUT_STYLE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * The input text's style.
  */
@@ -55,71 +52,71 @@ struct InputStyle
   };
 
   InputStyle()
-  : textColor( Color::BLACK ),
+  : textColor(Color::BLACK),
     familyName(),
-    weight( TextAbstraction::FontWeight::NORMAL ),
-    width( TextAbstraction::FontWidth::NORMAL ),
-    slant( TextAbstraction::FontSlant::NORMAL ),
-    size( 0.f ),
-    lineSpacing( 0.f ),
+    weight(TextAbstraction::FontWeight::NORMAL),
+    width(TextAbstraction::FontWidth::NORMAL),
+    slant(TextAbstraction::FontSlant::NORMAL),
+    size(0.f),
+    lineSpacing(0.f),
     underlineProperties(),
     shadowProperties(),
     embossProperties(),
     outlineProperties(),
-    isDefaultColor( true ),
-    isFamilyDefined( false ),
-    isWeightDefined( false ),
-    isWidthDefined( false ),
-    isSlantDefined( false ),
-    isSizeDefined( false ),
-    isLineSpacingDefined( false ),
-    isUnderlineDefined( false ),
-    isShadowDefined( false ),
-    isEmbossDefined( false ),
-    isOutlineDefined( false )
-    {}
+    isDefaultColor(true),
+    isFamilyDefined(false),
+    isWeightDefined(false),
+    isWidthDefined(false),
+    isSlantDefined(false),
+    isSizeDefined(false),
+    isLineSpacingDefined(false),
+    isUnderlineDefined(false),
+    isShadowDefined(false),
+    isEmbossDefined(false),
+    isOutlineDefined(false)
+  {
+  }
 
-  ~InputStyle()
-  {};
+  ~InputStyle(){};
 
   /**
    * @brief
    *
    * Does not copy the font-style, underline, shadow, emboss and outline property strings.
    */
-  void Copy( const InputStyle& inputStyle )
+  void Copy(const InputStyle& inputStyle)
   {
     isDefaultColor = inputStyle.isDefaultColor;
-    textColor = inputStyle.textColor;
+    textColor      = inputStyle.textColor;
 
     isFamilyDefined = inputStyle.isFamilyDefined;
-    familyName = inputStyle.familyName;
+    familyName      = inputStyle.familyName;
 
     isWeightDefined = inputStyle.isWeightDefined;
-    weight = inputStyle.weight;
+    weight          = inputStyle.weight;
 
     isWidthDefined = inputStyle.isWidthDefined;
-    width = inputStyle.width;
+    width          = inputStyle.width;
 
     isSlantDefined = inputStyle.isSlantDefined;
-    slant = inputStyle.slant;
+    slant          = inputStyle.slant;
 
     isSizeDefined = inputStyle.isSizeDefined;
-    size = inputStyle.size;
+    size          = inputStyle.size;
 
     isLineSpacingDefined = inputStyle.isLineSpacingDefined;
-    lineSpacing = inputStyle.lineSpacing;
+    lineSpacing          = inputStyle.lineSpacing;
 
-    isUnderlineDefined = inputStyle.isUnderlineDefined;
+    isUnderlineDefined  = inputStyle.isUnderlineDefined;
     underlineProperties = inputStyle.underlineProperties;
 
-    isShadowDefined = inputStyle.isShadowDefined;
+    isShadowDefined  = inputStyle.isShadowDefined;
     shadowProperties = inputStyle.shadowProperties;
 
-    isEmbossDefined = inputStyle.isEmbossDefined;
+    isEmbossDefined  = inputStyle.isEmbossDefined;
     embossProperties = inputStyle.embossProperties;
 
-    isOutlineDefined = inputStyle.isOutlineDefined;
+    isOutlineDefined  = inputStyle.isOutlineDefined;
     outlineProperties = inputStyle.outlineProperties;
   }
 
@@ -128,30 +125,30 @@ struct InputStyle
    *
    * Does not compare the font-style, underline, shadow, emboss and outline property strings.
    */
-  bool Equal( const InputStyle& inputStyle ) const
+  bool Equal(const InputStyle& inputStyle) const
   {
-    if( ( isDefaultColor != inputStyle.isDefaultColor )             ||
-        ( isFamilyDefined != inputStyle.isFamilyDefined )           ||
-        ( isWeightDefined != inputStyle.isWeightDefined )           ||
-        ( isWidthDefined != inputStyle.isWidthDefined )             ||
-        ( isSlantDefined != inputStyle.isSlantDefined )             ||
-        ( isSizeDefined != inputStyle.isSizeDefined )               ||
-        ( isLineSpacingDefined != inputStyle.isLineSpacingDefined ) ||
-        ( isUnderlineDefined != inputStyle.isUnderlineDefined )     ||
-        ( isShadowDefined != inputStyle.isShadowDefined )           ||
-        ( isEmbossDefined != inputStyle.isEmbossDefined )           ||
-        ( isOutlineDefined != inputStyle.isOutlineDefined )         ||
-        ( textColor != inputStyle.textColor )                       ||
-        ( familyName != inputStyle.familyName )                     ||
-        ( weight != inputStyle.weight )                             ||
-        ( width != inputStyle.width )                               ||
-        ( slant != inputStyle.slant )                               ||
-        ( size != inputStyle.size )                                 ||
-        ( lineSpacing != inputStyle.lineSpacing )                   ||
-        ( underlineProperties != inputStyle.underlineProperties )   ||
-        ( shadowProperties != inputStyle.shadowProperties )         ||
-        ( embossProperties != inputStyle.embossProperties )         ||
-        ( outlineProperties != inputStyle.outlineProperties ) )
+    if((isDefaultColor != inputStyle.isDefaultColor) ||
+       (isFamilyDefined != inputStyle.isFamilyDefined) ||
+       (isWeightDefined != inputStyle.isWeightDefined) ||
+       (isWidthDefined != inputStyle.isWidthDefined) ||
+       (isSlantDefined != inputStyle.isSlantDefined) ||
+       (isSizeDefined != inputStyle.isSizeDefined) ||
+       (isLineSpacingDefined != inputStyle.isLineSpacingDefined) ||
+       (isUnderlineDefined != inputStyle.isUnderlineDefined) ||
+       (isShadowDefined != inputStyle.isShadowDefined) ||
+       (isEmbossDefined != inputStyle.isEmbossDefined) ||
+       (isOutlineDefined != inputStyle.isOutlineDefined) ||
+       (textColor != inputStyle.textColor) ||
+       (familyName != inputStyle.familyName) ||
+       (weight != inputStyle.weight) ||
+       (width != inputStyle.width) ||
+       (slant != inputStyle.slant) ||
+       (size != inputStyle.size) ||
+       (lineSpacing != inputStyle.lineSpacing) ||
+       (underlineProperties != inputStyle.underlineProperties) ||
+       (shadowProperties != inputStyle.shadowProperties) ||
+       (embossProperties != inputStyle.embossProperties) ||
+       (outlineProperties != inputStyle.outlineProperties))
     {
       return false;
     }
@@ -159,84 +156,84 @@ struct InputStyle
     return true;
   }
 
-  Mask GetInputStyleChangeMask( const InputStyle& inputStyle ) const
+  Mask GetInputStyleChangeMask(const InputStyle& inputStyle) const
   {
     Mask mask = NONE;
 
-    if( textColor != inputStyle.textColor )
+    if(textColor != inputStyle.textColor)
     {
-      mask = static_cast<Mask>( mask | INPUT_COLOR );
+      mask = static_cast<Mask>(mask | INPUT_COLOR);
     }
-    if( familyName != inputStyle.familyName )
+    if(familyName != inputStyle.familyName)
     {
-      mask = static_cast<Mask>( mask | INPUT_FONT_FAMILY );
+      mask = static_cast<Mask>(mask | INPUT_FONT_FAMILY);
     }
-    if( weight != inputStyle.weight )
+    if(weight != inputStyle.weight)
     {
-      mask = static_cast<Mask>( mask | INPUT_FONT_WEIGHT );
+      mask = static_cast<Mask>(mask | INPUT_FONT_WEIGHT);
     }
-    if( width != inputStyle.width )
+    if(width != inputStyle.width)
     {
-      mask = static_cast<Mask>( mask | INPUT_FONT_WIDTH );
+      mask = static_cast<Mask>(mask | INPUT_FONT_WIDTH);
     }
-    if( slant != inputStyle.slant )
+    if(slant != inputStyle.slant)
     {
-      mask = static_cast<Mask>( mask | INPUT_FONT_SLANT );
+      mask = static_cast<Mask>(mask | INPUT_FONT_SLANT);
     }
-    if( size != inputStyle.size )
+    if(size != inputStyle.size)
     {
-      mask = static_cast<Mask>( mask | INPUT_POINT_SIZE );
+      mask = static_cast<Mask>(mask | INPUT_POINT_SIZE);
     }
-    if( lineSpacing != inputStyle.lineSpacing )
+    if(lineSpacing != inputStyle.lineSpacing)
     {
-      mask = static_cast<Mask>( mask | INPUT_LINE_SPACING );
+      mask = static_cast<Mask>(mask | INPUT_LINE_SPACING);
     }
-    if( underlineProperties != inputStyle.underlineProperties )
+    if(underlineProperties != inputStyle.underlineProperties)
     {
-      mask = static_cast<Mask>( mask | INPUT_UNDERLINE );
+      mask = static_cast<Mask>(mask | INPUT_UNDERLINE);
     }
-    if( shadowProperties != inputStyle.shadowProperties )
+    if(shadowProperties != inputStyle.shadowProperties)
     {
-      mask = static_cast<Mask>( mask | INPUT_SHADOW );
+      mask = static_cast<Mask>(mask | INPUT_SHADOW);
     }
-    if( embossProperties != inputStyle.embossProperties )
+    if(embossProperties != inputStyle.embossProperties)
     {
-      mask = static_cast<Mask>( mask | INPUT_EMBOSS );
+      mask = static_cast<Mask>(mask | INPUT_EMBOSS);
     }
-    if( outlineProperties != inputStyle.outlineProperties )
+    if(outlineProperties != inputStyle.outlineProperties)
     {
-      mask = static_cast<Mask>( mask | INPUT_OUTLINE );
+      mask = static_cast<Mask>(mask | INPUT_OUTLINE);
     }
 
     return mask;
   }
 
-  Vector4     textColor;           ///< The text's color.
-  std::string familyName;          ///< The font's family name.
-  FontWeight  weight;              ///< The font's weight.
-  FontWidth   width;               ///< The font's width.
-  FontSlant   slant;               ///< The font's slant.
-  float       size;                ///< The font's size.
+  Vector4     textColor;  ///< The text's color.
+  std::string familyName; ///< The font's family name.
+  FontWeight  weight;     ///< The font's weight.
+  FontWidth   width;      ///< The font's width.
+  FontSlant   slant;      ///< The font's slant.
+  float       size;       ///< The font's size.
 
-  float       lineSpacing;         ///< The line's spacing.
+  float lineSpacing; ///< The line's spacing.
 
   std::string underlineProperties; ///< The underline properties string.
   std::string shadowProperties;    ///< The shadow properties string.
   std::string embossProperties;    ///< The emboss properties string.
   std::string outlineProperties;   ///< The outline properties string.
 
-  bool        isDefaultColor       : 1; ///< Whether the text's color is the default.
-  bool        isFamilyDefined      : 1; ///< Whether the font's family is defined.
-  bool        isWeightDefined      : 1; ///< Whether the font's weight is defined.
-  bool        isWidthDefined       : 1; ///< Whether the font's width is defined.
-  bool        isSlantDefined       : 1; ///< Whether the font's slant is defined.
-  bool        isSizeDefined        : 1; ///< Whether the font's size is defined.
+  bool isDefaultColor : 1;  ///< Whether the text's color is the default.
+  bool isFamilyDefined : 1; ///< Whether the font's family is defined.
+  bool isWeightDefined : 1; ///< Whether the font's weight is defined.
+  bool isWidthDefined : 1;  ///< Whether the font's width is defined.
+  bool isSlantDefined : 1;  ///< Whether the font's slant is defined.
+  bool isSizeDefined : 1;   ///< Whether the font's size is defined.
 
-  bool        isLineSpacingDefined : 1; ///< Whether the line spacing is defined.
-  bool        isUnderlineDefined   : 1; ///< Whether the underline parameters are defined.
-  bool        isShadowDefined      : 1; ///< Whether the shadow parameters are defined.
-  bool        isEmbossDefined      : 1; ///< Whether the emboss parameters are defined.
-  bool        isOutlineDefined     : 1; ///< Whether the outline parameters are defined.
+  bool isLineSpacingDefined : 1; ///< Whether the line spacing is defined.
+  bool isUnderlineDefined : 1;   ///< Whether the underline parameters are defined.
+  bool isShadowDefined : 1;      ///< Whether the shadow parameters are defined.
+  bool isEmbossDefined : 1;      ///< Whether the emboss parameters are defined.
+  bool isOutlineDefined : 1;     ///< Whether the outline parameters are defined.
 };
 
 } // namespace Text

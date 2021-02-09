@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_RELAYOUTER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * Contains all the relayouting related methods for Text::Controller
  */
@@ -94,7 +91,7 @@ struct Controller::Relayouter
    * @param[in/out] layoutSize The Layout size which can be updated depending on the result of the performed operations
    * @return
    */
-  static bool DoRelayout(Controller& controller, const Size& size, OperationsMask operationsRequired, Size& layoutSize );
+  static bool DoRelayout(Controller& controller, const Size& size, OperationsMask operationsRequired, Size& layoutSize);
 
   /**
    * @brief Called by the Controller to calculate the veritcal offset give the control size.

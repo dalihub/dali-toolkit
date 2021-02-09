@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_N_PATCH_VISUAL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,28 +21,26 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/shader.h>
-#include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
+class ImageVisualShaderFactory;
 class NPatchVisual;
-typedef IntrusivePtr< NPatchVisual > NPatchVisualPtr;
+typedef IntrusivePtr<NPatchVisual> NPatchVisualPtr;
 
 /**
  * The visual which renders an 9 patch image to the control's quad
@@ -57,21 +55,21 @@ typedef IntrusivePtr< NPatchVisual > NPatchVisualPtr;
  * | auxiliaryImage           | STRING           |
  * | auxiliaryImageAlpha      | FLOAT            |
  */
-class NPatchVisual: public Visual::Base, public TextureUploadObserver
+class NPatchVisual : public Visual::Base, public TextureUploadObserver
 {
 public:
-
   /**
    * @brief Create an N-patch visual using an image URL.
    *
    * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to 9 patch image resource to use
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties );
+  static NPatchVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties);
 
   /**
    * @brief Create an N-patch visual using an image URL.
@@ -79,36 +77,35 @@ public:
    * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to 9 patch image resource to use
    * @return A smart-pointer to the newly allocated visual.
    */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl );
+  static NPatchVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl);
 
-public:  // from Visual
-
+public: // from Visual
   /**
    * @copydoc Visual::Base::GetNaturalSize
    */
-  void GetNaturalSize( Vector2& naturalSize ) override;
+  void GetNaturalSize(Vector2& naturalSize) override;
 
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
 protected:
-
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache Reference to the VisualFactoryCache object
    */
-  NPatchVisual( VisualFactoryCache& factoryCache );
+  NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -116,19 +113,24 @@ protected:
   virtual ~NPatchVisual();
 
   /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
+
+  /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::DoSetOffScene
    */
-  void DoSetOffScene( Actor& actor ) override;
+  void DoSetOffScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
@@ -136,7 +138,6 @@ protected:
   void OnSetTransform() override;
 
 private:
-
   /**
    * Loads the NPatch image and the Auxiliary image if needed
    */
@@ -166,7 +167,7 @@ private:
    * @param subType to use
    * @return the geometry
    */
-  Geometry GetNinePatchGeometry( VisualFactoryCache::GeometryType subType );
+  Geometry GetNinePatchGeometry(VisualFactoryCache::GeometryType subType);
 
   /**
    * @brief Creates a geometry for the grid size to be used by this visuals' shaders
@@ -174,7 +175,7 @@ private:
    * @param[in] gridSize The grid size of the solid geometry to create
    * @return Returns the created geometry for the grid size
    */
-  Geometry CreateGridGeometry( Uint16Pair gridSize );
+  Geometry CreateGridGeometry(Uint16Pair gridSize);
 
   /**
    * @brief Creates a geometry with the border only for the grid size to be used by this visuals' shaders
@@ -197,7 +198,7 @@ private:
    * @param[in] gridSize The grid size of the solid geometry to create
    * @return Returns the created geometry for the grid size
    */
-  Geometry CreateBorderGeometry( Uint16Pair gridSize );
+  Geometry CreateBorderGeometry(Uint16Pair gridSize);
 
   /**
    * @brief Creates a renderer by using loaded resource.
@@ -205,14 +206,13 @@ private:
   void SetResource();
 
 private:
-
   /**
    * @copydoc TextureUploadObserver::UploadCompleted
    *
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied ) override;
+  void UploadComplete(bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied) override;
 
   /**
    * @copydoc TextureUploadObserver::LoadComplete
@@ -220,19 +220,20 @@ private:
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied ) override;
+  void LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied) override;
 
 private:
-  WeakHandle<Actor>        mPlacementActor;                 ///< Weakhandle to contain Actor during texture loading
-  NPatchLoader&            mLoader;                         ///< reference to N patch loader for fast access
-  VisualUrl                mImageUrl;                       ///< The url to the N patch to load
-  VisualUrl                mAuxiliaryUrl;                   ///< An auxiliary image that can be displayed on top of the N-Patch
-  NPatchData::NPatchDataId mId;                             ///< id of the N patch (from loader/cache)
-  Devel::PixelBuffer       mAuxiliaryPixelBuffer;           ///< pixel buffer of the auxiliary mask image
-  bool                     mBorderOnly;                     ///< if only border is desired
-  Rect<int>                mBorder;                         ///< The size of the border
-  float                    mAuxiliaryImageAlpha;            ///< The alpha value for the auxiliary image only
-  Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy; ///< The release policy to determine when an image should no longer be cached.
+  WeakHandle<Actor>                         mPlacementActor; ///< Weakhandle to contain Actor during texture loading
+  NPatchLoader&                             mLoader;         ///< reference to N patch loader for fast access
+  ImageVisualShaderFactory&                 mImageVisualShaderFactory;
+  VisualUrl                                 mImageUrl;             ///< The url to the N patch to load
+  VisualUrl                                 mAuxiliaryUrl;         ///< An auxiliary image that can be displayed on top of the N-Patch
+  NPatchData::NPatchDataId                  mId;                   ///< id of the N patch (from loader/cache)
+  Devel::PixelBuffer                        mAuxiliaryPixelBuffer; ///< pixel buffer of the auxiliary mask image
+  bool                                      mBorderOnly;           ///< if only border is desired
+  Rect<int>                                 mBorder;               ///< The size of the border
+  float                                     mAuxiliaryImageAlpha;  ///< The alpha value for the auxiliary image only
+  Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;        ///< The release policy to determine when an image should no longer be cached.
 };
 
 } // namespace Internal

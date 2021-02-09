@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #include "confirmation-popup-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-registry.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
@@ -28,16 +28,12 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 namespace
 {
-
 /*
  * This struct is used to define all details required about a dynamically created signal.
  */
@@ -48,15 +44,17 @@ struct ControlDetailType
   const char* connectSignalPropertyName;
 };
 
+// clang-format off
 /* A table of all control details. These details are kept in one place for maintainability.
  *  Name of the signal     | Name of the control  | Name of the property which lets the
  *  the app-developer      | which will provide   | app developer choose which signal
  *  can connect to.        | the signal.          | within the control to connect to.    */
 const ControlDetailType ControlDetails[] = {
-  { "controlSignalOk",       "controlOk",           "connectSignalOkSelected"     },
-  { "controlSignalCancel",   "controlCancel",       "connectSignalCancelSelected" },
+  {"controlSignalOk",       "controlOk",           "connectSignalOkSelected"    },
+  {"controlSignalCancel",   "controlCancel",       "connectSignalCancelSelected"},
 };
-const unsigned int ControlDetailsCount = sizeof( ControlDetails ) / sizeof( ControlDetails[0] );
+// clang-format on
+const unsigned int ControlDetailsCount = sizeof(ControlDetails) / sizeof(ControlDetails[0]);
 
 // To give sensible default behaviour to save the connect signal properties being set.
 const char* const DEFAULT_CONNECT_SIGNAL_NAME = "clicked";
@@ -66,15 +64,15 @@ BaseHandle Create()
   return Toolkit::ConfirmationPopup::New();
 }
 
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ConfirmationPopup, Toolkit::Popup, Create )
+DALI_TYPE_REGISTRATION_BEGIN(Toolkit::ConfirmationPopup, Toolkit::Popup, Create)
 
-DALI_PROPERTY_REGISTRATION( Toolkit, ConfirmationPopup, ControlDetails[0].connectSignalPropertyName, STRING, CONNECT_SIGNAL_OK_SELECTED     )
-DALI_PROPERTY_REGISTRATION( Toolkit, ConfirmationPopup, ControlDetails[1].connectSignalPropertyName, STRING, CONNECT_SIGNAL_CANCEL_SELECTED )
+DALI_PROPERTY_REGISTRATION(Toolkit, ConfirmationPopup, ControlDetails[0].connectSignalPropertyName, STRING, CONNECT_SIGNAL_OK_SELECTED)
+DALI_PROPERTY_REGISTRATION(Toolkit, ConfirmationPopup, ControlDetails[1].connectSignalPropertyName, STRING, CONNECT_SIGNAL_CANCEL_SELECTED)
 
 // Note: We do not use the macros for signal registration as we do not want to redefine the signal name strings.
 // We have predefined them for optimal signal name to control name lookup.
-SignalConnectorType signalConnector1( typeRegistration, ControlDetails[0].signalName, &Toolkit::Internal::ConfirmationPopup::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, ControlDetails[1].signalName, &Toolkit::Internal::ConfirmationPopup::DoConnectSignal );
+SignalConnectorType signalConnector1(typeRegistration, ControlDetails[0].signalName, &Toolkit::Internal::ConfirmationPopup::DoConnectSignal);
+SignalConnectorType signalConnector2(typeRegistration, ControlDetails[1].signalName, &Toolkit::Internal::ConfirmationPopup::DoConnectSignal);
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -83,10 +81,10 @@ DALI_TYPE_REGISTRATION_END()
 Dali::Toolkit::ConfirmationPopup ConfirmationPopup::New()
 {
   // Create the implementation, temporarily owned on stack.
-  IntrusivePtr< ConfirmationPopup > internalConfirmationPopup = new ConfirmationPopup();
+  IntrusivePtr<ConfirmationPopup> internalConfirmationPopup = new ConfirmationPopup();
 
   // Pass ownership to CustomActor
-  Dali::Toolkit::ConfirmationPopup confirmationPopup( *internalConfirmationPopup );
+  Dali::Toolkit::ConfirmationPopup confirmationPopup(*internalConfirmationPopup);
 
   // Second-phase initialisation of the implementation.
   // This can only be done after the CustomActor connection has been made...
@@ -98,64 +96,64 @@ Dali::Toolkit::ConfirmationPopup ConfirmationPopup::New()
 ConfirmationPopup::ConfirmationPopup()
 : Toolkit::Internal::Popup()
 {
-  mControlSignals.reserve( MAXIMUM_NUMBER_OF_CONTROLS );
-  mControlSignalNames[ Toolkit::ConfirmationPopup::CONTROL_OK ] = DEFAULT_CONNECT_SIGNAL_NAME;
-  mControlSignalNames[ Toolkit::ConfirmationPopup::CONTROL_CANCEL ] = DEFAULT_CONNECT_SIGNAL_NAME;
+  mControlSignals.reserve(MAXIMUM_NUMBER_OF_CONTROLS);
+  mControlSignalNames[Toolkit::ConfirmationPopup::CONTROL_OK]     = DEFAULT_CONNECT_SIGNAL_NAME;
+  mControlSignalNames[Toolkit::ConfirmationPopup::CONTROL_CANCEL] = DEFAULT_CONNECT_SIGNAL_NAME;
 }
 
 ConfirmationPopup::~ConfirmationPopup()
 {
-  for( SignalContainerType::iterator i = mControlSignals.begin(); i != mControlSignals.end(); ++i )
+  for(SignalContainerType::iterator i = mControlSignals.begin(); i != mControlSignals.end(); ++i)
   {
-    delete ( i->second );
+    delete(i->second);
   }
   mControlSignals.clear();
 }
 
-void ConfirmationPopup::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
+void ConfirmationPopup::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)
 {
-  Toolkit::ConfirmationPopup popup = Toolkit::ConfirmationPopup::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::ConfirmationPopup popup = Toolkit::ConfirmationPopup::DownCast(Dali::BaseHandle(object));
 
-  if ( popup )
+  if(popup)
   {
-    ConfirmationPopup& popupImpl( GetDerivedImplementation( popup ) );
+    ConfirmationPopup& popupImpl(GetDerivedImplementation(popup));
 
-    switch ( propertyIndex )
+    switch(propertyIndex)
     {
       case Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED:
       {
-        popupImpl.SetControlSignalName( Toolkit::ConfirmationPopup::CONTROL_OK, value.Get< std::string >() );
+        popupImpl.SetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_OK, value.Get<std::string>());
         break;
       }
       case Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED:
       {
-        popupImpl.SetControlSignalName( Toolkit::ConfirmationPopup::CONTROL_CANCEL, value.Get< std::string >() );
+        popupImpl.SetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_CANCEL, value.Get<std::string>());
         break;
       }
     }
   }
 }
 
-Property::Value ConfirmationPopup::GetProperty( BaseObject* object, Property::Index propertyIndex )
+Property::Value ConfirmationPopup::GetProperty(BaseObject* object, Property::Index propertyIndex)
 {
   Property::Value value;
 
-  Toolkit::ConfirmationPopup popup = Toolkit::ConfirmationPopup::DownCast( Dali::BaseHandle( object ) );
+  Toolkit::ConfirmationPopup popup = Toolkit::ConfirmationPopup::DownCast(Dali::BaseHandle(object));
 
-  if ( popup )
+  if(popup)
   {
-    ConfirmationPopup& popupImpl( GetDerivedImplementation( popup ) );
+    ConfirmationPopup& popupImpl(GetDerivedImplementation(popup));
 
-    switch ( propertyIndex )
+    switch(propertyIndex)
     {
       case Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED:
       {
-        value = popupImpl.GetControlSignalName( Toolkit::ConfirmationPopup::CONTROL_OK );
+        value = popupImpl.GetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_OK);
         break;
       }
       case Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED:
       {
-        value = popupImpl.GetControlSignalName( Toolkit::ConfirmationPopup::CONTROL_CANCEL );
+        value = popupImpl.GetControlSignalName(Toolkit::ConfirmationPopup::CONTROL_CANCEL);
         break;
       }
     }
@@ -164,38 +162,38 @@ Property::Value ConfirmationPopup::GetProperty( BaseObject* object, Property::In
   return value;
 }
 
-void ConfirmationPopup::SetControlSignalName( const unsigned int controlNumber, const std::string& signalName )
+void ConfirmationPopup::SetControlSignalName(const unsigned int controlNumber, const std::string& signalName)
 {
-  if( controlNumber < ControlDetailsCount )
+  if(controlNumber < ControlDetailsCount)
   {
-    mControlSignalNames[ controlNumber ] = signalName;
+    mControlSignalNames[controlNumber] = signalName;
   }
 }
 
-std::string ConfirmationPopup::GetControlSignalName( unsigned int controlNumber ) const
+std::string ConfirmationPopup::GetControlSignalName(unsigned int controlNumber) const
 {
-  if( controlNumber < ControlDetailsCount )
+  if(controlNumber < ControlDetailsCount)
   {
-    return mControlSignalNames[ controlNumber ];
+    return mControlSignalNames[controlNumber];
   }
 
   return "";
 }
 
-bool ConfirmationPopup::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool ConfirmationPopup::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
-  Dali::BaseHandle handle( object );
-  Toolkit::ConfirmationPopup popup = Toolkit::ConfirmationPopup::DownCast( handle );
+  Dali::BaseHandle           handle(object);
+  Toolkit::ConfirmationPopup popup = Toolkit::ConfirmationPopup::DownCast(handle);
 
   // Look up the requested signal, attempting to create it dynamically if it doesn't exist.
-  SignalDelegate* signalDelegate = Dali::Toolkit::GetDerivedImplementation( popup ).GetControlSignal( signalName );
-  if( signalDelegate )
+  SignalDelegate* signalDelegate = Dali::Toolkit::GetDerivedImplementation(popup).GetControlSignal(signalName);
+  if(signalDelegate)
   {
     // The signal delegate was created successfully, attempt to connect it to a callback if specified.
     // If none is specified, the creation is still successful as the signal delegate can connect at a later time.
-    if( functor )
+    if(functor)
     {
-      signalDelegate->Connect( tracker, functor );
+      signalDelegate->Connect(tracker, functor);
     }
     return true;
   }
@@ -204,14 +202,14 @@ bool ConfirmationPopup::DoConnectSignal( BaseObject* object, ConnectionTrackerIn
   return false;
 }
 
-SignalDelegate* ConfirmationPopup::GetControlSignal( const std::string& signalName )
+SignalDelegate* ConfirmationPopup::GetControlSignal(const std::string& signalName)
 {
   // Check if the specified signal name already exists.
   SignalContainerType::iterator end = mControlSignals.end();
-  for( SignalContainerType::iterator iter = mControlSignals.begin(); iter != end; ++iter )
+  for(SignalContainerType::iterator iter = mControlSignals.begin(); iter != end; ++iter)
   {
     // Find the first non-connected signal by matching signal name.
-    if( ( signalName == iter->first ) && ( !iter->second->IsConnected() ) )
+    if((signalName == iter->first) && (!iter->second->IsConnected()))
     {
       // The requested signal (delegate) already exists, just return it.
       return iter->second;
@@ -222,21 +220,21 @@ SignalDelegate* ConfirmationPopup::GetControlSignal( const std::string& signalNa
   // To make a new connection to an existing signal, we need a new delegate,
   // as delegates house a signal connection functor each.
   // Check the signal name is valid and if so create the signal dynamically.
-  for( unsigned int i = 0; i < ControlDetailsCount; ++i )
+  for(unsigned int i = 0; i < ControlDetailsCount; ++i)
   {
-    if( 0 == strcmp( signalName.c_str(), ControlDetails[ i ].signalName ) )
+    if(0 == strcmp(signalName.c_str(), ControlDetails[i].signalName))
     {
       // The signal name is valid, check the respective actor to connect to exists.
-      Actor connectActor = Self().FindChildByName( ControlDetails[ i ].controlName );
-      if( connectActor )
+      Actor connectActor = Self().FindChildByName(ControlDetails[i].controlName);
+      if(connectActor)
       {
         // The actor exists, set up a signal delegate that will allow the application developer
         // to connect the actor signal directly to their callback.
         // Note: We don't use the GetControlSignalName() here for speedup, as we know the array bound is capped.
-        SignalDelegate* signalDelegate = new SignalDelegate( connectActor, mControlSignalNames[ i ] );
+        SignalDelegate* signalDelegate = new SignalDelegate(connectActor, mControlSignalNames[i]);
 
         // Store the delegate with the signal name so we know what signals have been dynamically created so far.
-        mControlSignals.push_back( std::make_pair( signalName, signalDelegate ) );
+        mControlSignals.push_back(std::make_pair(signalName, signalDelegate));
 
         // Return the delegate to allow connection to the newly created signal.
         return signalDelegate;
@@ -250,7 +248,6 @@ SignalDelegate* ConfirmationPopup::GetControlSignal( const std::string& signalNa
   // Signal name was not found (invalid).
   return NULL;
 }
-
 
 } // namespace Internal
 

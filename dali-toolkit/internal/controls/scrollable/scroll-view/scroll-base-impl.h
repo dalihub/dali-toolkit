@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SCROLL_BASE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,27 +20,24 @@
 
 // EXTERNAL INCLUDES
 // TODO - Replace list with dali-vector.h
-#include <list>
 #include <dali/public-api/animation/constraint.h>
+#include <list>
 
 // INTERNAL INCLUDES
 
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class ScrollBase;
 
-typedef IntrusivePtr<Actor>         ActorPtr;
-typedef std::list<Constraint>               ConstraintStack;
+typedef IntrusivePtr<Actor>   ActorPtr;
+typedef std::list<Constraint> ConstraintStack;
 
 /**
  * ScrollBase represents a set of properties (time, position
@@ -49,7 +46,6 @@ typedef std::list<Constraint>               ConstraintStack;
 class ScrollBase : public Scrollable
 {
 public:
-
   struct ActorInfo : public Dali::RefObject
   {
     /**
@@ -78,9 +74,9 @@ public:
      */
     void ApplyConstraint(Constraint constraint)
     {
-      Constraint clone = constraint.Clone( mActor );
+      Constraint clone = constraint.Clone(mActor);
       clone.Apply();
-      mConstraints.push_back( clone );
+      mConstraints.push_back(clone);
     }
 
     /**
@@ -90,26 +86,25 @@ public:
      */
     void RemoveConstraints()
     {
-      std::vector<Constraint>::iterator it = mConstraints.begin();
+      std::vector<Constraint>::iterator it  = mConstraints.begin();
       std::vector<Constraint>::iterator end = mConstraints.end();
-      for(;it!=end;++it)
+      for(; it != end; ++it)
       {
         it->Remove();
       }
       mConstraints.clear();
     }
 
-    Actor mActor;                                     ///< The Actor that this ActorInfo represents.
-    std::vector<Constraint> mConstraints;       ///< A list keeping track of constraints applied to the actor via this delegate.
+    Actor                   mActor;       ///< The Actor that this ActorInfo represents.
+    std::vector<Constraint> mConstraints; ///< A list keeping track of constraints applied to the actor via this delegate.
   };
 
-  typedef IntrusivePtr<ActorInfo> ActorInfoPtr;
-  typedef std::vector<ActorInfoPtr> ActorInfoContainer;
-  typedef ActorInfoContainer::iterator ActorInfoIter;
+  typedef IntrusivePtr<ActorInfo>            ActorInfoPtr;
+  typedef std::vector<ActorInfoPtr>          ActorInfoContainer;
+  typedef ActorInfoContainer::iterator       ActorInfoIter;
   typedef ActorInfoContainer::const_iterator ActorInfoConstIter;
 
 public:
-
   /**
    * Sets the delay in seconds.
    * This delay affects the animation timing for all
@@ -133,13 +128,12 @@ public:
   }
 
 public:
-
   /**
    * Sets ScrollBase Parent
    *
    * @param[in] parent The parent that this ScrollBase belongs to.
    */
-  void SetParent(ScrollBase *parent);
+  void SetParent(ScrollBase* parent);
 
   /**
    * Bind Actor to this scroll view/group.
@@ -181,11 +175,9 @@ public:
   void RemoveConstraintsFromBoundActors();
 
 protected:
-
   static const char* const SCROLL_DOMAIN_OFFSET_PROPERTY_NAME;
 
 protected:
-
   /**
    * Removed default costructor.
    */
@@ -196,18 +188,15 @@ protected:
    *
    * @param[in] behaviourFlags Flags to enable
    */
-  ScrollBase( ControlBehaviour behaviourFlags );
+  ScrollBase(ControlBehaviour behaviourFlags);
 
 protected:
-
-  ScrollBase *mParent;                              ///< Pointer to ScrollBase parent, if exists.
+  ScrollBase* mParent; ///< Pointer to ScrollBase parent, if exists.
 
 private:
-
-  float mDelay;                             ///< delay in seconds.
-  ConstraintStack mConstraintStack;         ///< The list of constraints to apply to any actors
-  ActorInfoContainer mBoundActors;          ///< The list of actors that have been bound to this ScrollBase.
-
+  float              mDelay;           ///< delay in seconds.
+  ConstraintStack    mConstraintStack; ///< The list of constraints to apply to any actors
+  ActorInfoContainer mBoundActors;     ///< The list of actors that have been bound to this ScrollBase.
 };
 
 } // namespace Internal

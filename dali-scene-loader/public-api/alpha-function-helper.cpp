@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@ namespace SceneLoader
 {
 namespace
 {
-
+// clang-format off
 #define DALI_ALPHA_FUNCTION_ENTRY(x) { #x, AlphaFunction::x }
+// clang-format on
 
-std::unordered_map<std::string, AlphaFunction> sFunctions {
+std::unordered_map<std::string, AlphaFunction> sFunctions{
   DALI_ALPHA_FUNCTION_ENTRY(DEFAULT),
   DALI_ALPHA_FUNCTION_ENTRY(LINEAR),
   DALI_ALPHA_FUNCTION_ENTRY(REVERSE),
@@ -45,24 +46,24 @@ std::unordered_map<std::string, AlphaFunction> sFunctions {
 
 #undef DALI_ALPHA_FUNCTION_ENTRY
 
-} // nonamespace
+} // namespace
 
 AlphaFunction GetAlphaFunction(const std::string& name, bool* found)
 {
-  auto iFind = sFunctions.find(name);
+  auto iFind   = sFunctions.find(name);
   bool success = iFind != sFunctions.end();
-  if (found)
+  if(found)
   {
     *found = success;
   }
   return success ? iFind->second : AlphaFunction(AlphaFunction::DEFAULT);
 }
 
-void RegisterAlphaFunction(const std::string & name, AlphaFunction alphaFn)
+void RegisterAlphaFunction(const std::string& name, AlphaFunction alphaFn)
 {
-  DALI_ASSERT_ALWAYS(sFunctions.insert({ name, alphaFn }).second &&
-    "Function with given key already exists.");
+  DALI_ASSERT_ALWAYS(sFunctions.insert({name, alphaFn}).second &&
+                     "Function with given key already exists.");
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SCROLLER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,19 +25,16 @@
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/text-enumerations.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class TextScroller;
 class ScrollerInterface;
 
@@ -49,14 +46,13 @@ typedef IntrusivePtr<TextScroller> TextScrollerPtr;
 class TextScroller : public RefObject, public ConnectionTracker
 {
 public:
-
   /**
    * @brief Text Scrolling helper, used to automatically scroll text, SetParameters should be called before scrolling is needed.
    * CleanUp removes the Scrolling actors from stage whilst keeping the Scroller object alive and preserving Speed, Gap and Loop count.
    *
    * @param[in] scrollerInterface scroller interface
    */
-  static TextScrollerPtr New( ScrollerInterface& scrollerInterface );
+  static TextScrollerPtr New(ScrollerInterface& scrollerInterface);
 
   /**
    * @brief Set parameters relating to source required for scrolling
@@ -71,13 +67,13 @@ public:
    * @param[in] horizontalAlignment horizontal alignment of the text
    * @param[in] verticalAlignment vertical alignment of the text
    */
-  void SetParameters( Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment );
+  void SetParameters(Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment);
 
   /**
    * @brief Set the gap distance to elapse before the text wraps around
    * @param[in] gap distance to elapse
    */
-  void SetGap( int gap );
+  void SetGap(int gap);
 
   /**
    * @brief Get the distance before scrolling wraps
@@ -89,7 +85,7 @@ public:
    * @brief Set speed the text should scroll
    * @param[in] scrollSpeed pixels per second
    */
-  void SetSpeed( int scrollSpeed );
+  void SetSpeed(int scrollSpeed);
 
   /**
    * @brief Get the speed of text scrolling
@@ -101,7 +97,7 @@ public:
    * @brief Set the number of times the text scrolling should loop, can stop current scrolling by passing in 0;
    * @param[in] loopCount number of times the scrolled text should loop, 0 to stop scrolling
    */
-  void SetLoopCount( int loopCount );
+  void SetLoopCount(int loopCount);
 
   /**
    * @brief Get the number of loops
@@ -113,7 +109,7 @@ public:
    * @brief Set the delay time of scroll animation loop
    * @param[in] float delay time seconds of loops
    */
-  void SetLoopDelay( float delay );
+  void SetLoopDelay(float delay);
 
   /**
    * @brief Get the delay time of scroll
@@ -125,7 +121,7 @@ public:
    * @brief Set the mode of scrolling stop
    * @param[in] stopMode type when text scrolling is stoped.
    */
-  void SetStopMode( TextLabel::AutoScrollStopMode::Type stopMode );
+  void SetStopMode(TextLabel::AutoScrollStopMode::Type stopMode);
 
   /**
    * @brief Stop the auto scrolling.
@@ -139,11 +135,10 @@ public:
   TextLabel::AutoScrollStopMode::Type GetStopMode() const;
 
 private: // Implementation
-
   /**
    * Constructor
    */
-  TextScroller( ScrollerInterface& scrollerInterface );
+  TextScroller(ScrollerInterface& scrollerInterface);
 
   /**
    * Destructor
@@ -151,16 +146,16 @@ private: // Implementation
   ~TextScroller();
 
   // Undefined
-  TextScroller( const TextScroller& handle );
+  TextScroller(const TextScroller& handle);
 
   // Undefined
-  TextScroller& operator=( const TextScroller& handle );
+  TextScroller& operator=(const TextScroller& handle);
 
   /**
    * @brief Callback for end of animation
    * @param[in] animation Animation handle
    */
-  void AutoScrollAnimationFinished( Dali::Animation& animation );
+  void AutoScrollAnimationFinished(Dali::Animation& animation);
 
   /**
    * @brief variables required to set up scrolling animation
@@ -169,22 +164,21 @@ private: // Implementation
    * @param[in] scrollDuration duration of aninmation
    * @param[in] loopCount number of times to loop the scrolling text
    */
-  void StartScrolling( Actor scrollingTextActor, float scrollAmount, float scrollDuration, int loopCount );
+  void StartScrolling(Actor scrollingTextActor, float scrollAmount, float scrollDuration, int loopCount);
 
 private:
+  ScrollerInterface& mScrollerInterface; // Interface implemented by control that requires scrolling
+  Property::Index    mScrollDeltaIndex;  // Property used by shader to represent distance to scroll
+  Animation          mScrollAnimation;   // Animation used to update the mScrollDeltaIndex
+  Dali::Renderer     mRenderer;          // Renderer used to render the text
+  Shader             mShader;            // Shader originally used by the renderer while not scrolling
+  TextureSet         mTextureSet;        // Texture originally used by the renderer while not scrolling
 
-  ScrollerInterface& mScrollerInterface;        // Interface implemented by control that requires scrolling
-  Property::Index    mScrollDeltaIndex;         // Property used by shader to represent distance to scroll
-  Animation          mScrollAnimation;          // Animation used to update the mScrollDeltaIndex
-  Dali::Renderer     mRenderer;                 // Renderer used to render the text
-  Shader             mShader;                   // Shader originally used by the renderer while not scrolling
-  TextureSet         mTextureSet;               // Texture originally used by the renderer while not scrolling
-
-  int   mScrollSpeed;                                   ///< Speed which text should automatically scroll at
-  int   mLoopCount;                                     ///< Number of time the text should scroll
-  float mLoopDelay;                                     ///< Time delay of loop start
-  float mWrapGap;                                       ///< Gap before text wraps around when scrolling
-  TextLabel::AutoScrollStopMode::Type  mStopMode;       ///< Stop mode of scrolling text, when loop count is 0.
+  int                                 mScrollSpeed; ///< Speed which text should automatically scroll at
+  int                                 mLoopCount;   ///< Number of time the text should scroll
+  float                               mLoopDelay;   ///< Time delay of loop start
+  float                               mWrapGap;     ///< Gap before text wraps around when scrolling
+  TextLabel::AutoScrollStopMode::Type mStopMode;    ///< Stop mode of scrolling text, when loop count is 0.
 
 }; // TextScroller class
 
@@ -195,4 +189,3 @@ private:
 } // namespace Dali
 
 #endif // DALI_TOOLKIT_TEXT_SCROLLER_H
-

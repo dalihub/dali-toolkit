@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@
 #include "dali-scene-loader/public-api/utils.h"
 
 // EXTERNAL
-#include "dali/public-api/common/vector-wrapper.h"
-#include "dali/public-api/animation/constraints.h"
-#include <iostream>
-#include <fstream>
-#include <cstring>
 #include <stdarg.h>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include "dali/public-api/animation/constraints.h"
+#include "dali/public-api/common/vector-wrapper.h"
 
 namespace Dali
 {
@@ -46,10 +46,11 @@ ExceptionFlinger::Impl::~Impl() noexcept(false)
 }
 
 ExceptionFlinger::ExceptionFlinger(const char* location) noexcept(true)
-: mImpl{ location },
+: mImpl{location},
   mStreamBuffer(GetMessageBuffer(), MESSAGE_BUFFER_SIZE - 1),
   mStream(&mStreamBuffer)
-{}
+{
+}
 
 ExceptionFlinger::~ExceptionFlinger() noexcept(false)
 {
@@ -79,16 +80,16 @@ std::string FormatString(const char* format, ...)
   return result;
 }
 
-std::string LoadTextFile(const char * path, bool* fail)
+std::string LoadTextFile(const char* path, bool* fail)
 {
   std::ifstream inFile(path);
-  if (inFile)
+  if(inFile)
   {
     std::istreambuf_iterator<char> eos;
     std::istreambuf_iterator<char> i(inFile.rdbuf());
     return std::string(i, eos);
   }
-  else if (fail)
+  else if(fail)
   {
     *fail = true;
   }
@@ -102,32 +103,31 @@ Geometry MakeTexturedQuadGeometry(TexturedQuadOptions::Type options)
   properties.Insert("aTexCoord", Property::VECTOR2);
 
   std::vector<uint8_t> bytes;
-  size_t stride = 0;
-  size_t uvOffset = 0;
+  size_t               stride   = 0;
+  size_t               uvOffset = 0;
   struct
   {
     Vector3 aPosition;
     Vector2 aTexCoord;
   } vertices[] = {
-    { Vector3(-0.5f, 0.5f, 0.0f), Vector2(0.0f, .0f) },
-    { Vector3(0.5f, 0.5f, 0.0f), Vector2(1.0f, .0f) },
-    { Vector3(-0.5f, -0.5f, 0.0f), Vector2(0.0f, 1.0f) },
-    { Vector3(0.5f, -0.5f, 0.0f), Vector2(1.0f, 1.0f) }
-  };
+    {Vector3(-0.5f, 0.5f, 0.0f), Vector2(0.0f, .0f)},
+    {Vector3(0.5f, 0.5f, 0.0f), Vector2(1.0f, .0f)},
+    {Vector3(-0.5f, -0.5f, 0.0f), Vector2(0.0f, 1.0f)},
+    {Vector3(0.5f, -0.5f, 0.0f), Vector2(1.0f, 1.0f)}};
 
   bytes.resize(sizeof(vertices));
-  stride = sizeof(vertices[0]);
+  stride   = sizeof(vertices[0]);
   uvOffset = reinterpret_cast<const uint8_t*>(&vertices[0].aTexCoord) - reinterpret_cast<const uint8_t*>(&vertices[0]);
 
   std::memcpy(bytes.data(), vertices, sizeof(vertices));
 
-  if (MaskMatch(options, TexturedQuadOptions::FLIP_VERTICAL))
+  if(MaskMatch(options, TexturedQuadOptions::FLIP_VERTICAL))
   {
     Vector2* uv = reinterpret_cast<Vector2*>(reinterpret_cast<uint8_t*>(bytes.data()) + uvOffset);
-    for (int i = 0; i < 4; ++i)
+    for(int i = 0; i < 4; ++i)
     {
       uv->y = 1.0f - uv->y;
-      uv = reinterpret_cast<Vector2*>(reinterpret_cast<uint8_t*>(uv) + stride);
+      uv    = reinterpret_cast<Vector2*>(reinterpret_cast<uint8_t*>(uv) + stride);
     }
   }
 
@@ -145,5 +145,5 @@ void ToUnixFileSeparators(std::string& path)
   std::replace(path.begin(), path.end(), '\\', '/');
 }
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali

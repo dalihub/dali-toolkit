@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_INTERPRET_RENDERER_STATE_H
 #define DALI_SCENE_LOADER_INTERPRET_RENDERER_STATE_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ namespace SceneLoader
 {
 namespace RendererState
 {
-
 /*
  * @brief Attempts to interpret a string for renderer states, which can be a combination of the following
  *  (using '|' as a delimiter, if multiple specified):<br/>
@@ -42,8 +41,8 @@ namespace RendererState
  */
 DALI_SCENE_LOADER_API Type Parse(const char* string, size_t length = 0, StringCallback onError = DefaultErrorCallback);
 
-}
-}
-}
+} // namespace RendererState
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_INTERPRET_RENDERER_STATE_H

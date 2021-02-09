@@ -16,380 +16,373 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/layer.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/actors/layer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
+#include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/replacement.h>
 
 namespace // unnamed namespace
 {
-
 using namespace Dali;
 
-TimePeriod GetTimePeriod( const TreeNode& child, const Toolkit::Internal::Replacement& constant )
+TimePeriod GetTimePeriod(const TreeNode& child, const Toolkit::Internal::Replacement& constant)
 {
-  OptionalFloat delay      = constant.IsFloat( IsChild(child, "delay" ) );
-  OptionalFloat duration   = constant.IsFloat( IsChild(child, "duration" ) );
-  DALI_ASSERT_ALWAYS( duration && "Time period must have at least a duration" );
+  OptionalFloat delay    = constant.IsFloat(IsChild(child, "delay"));
+  OptionalFloat duration = constant.IsFloat(IsChild(child, "duration"));
+  DALI_ASSERT_ALWAYS(duration && "Time period must have at least a duration");
 
-  if( delay )
+  if(delay)
   {
-    return TimePeriod( *delay, *duration );
+    return TimePeriod(*delay, *duration);
   }
   else
   {
-    return TimePeriod( *duration );
+    return TimePeriod(*duration);
   }
 }
 
-Property::Value GetPropertyValue( const Property::Type& propType, const TreeNode& child )
+Property::Value GetPropertyValue(const Property::Type& propType, const TreeNode& child)
 {
-  switch ( propType )
+  switch(propType)
   {
     case Property::BOOLEAN:
     {
-      return Property::Value( GetBoolean( child ) );
+      return Property::Value(GetBoolean(child));
     }
 
     case Property::FLOAT:
     {
-      return Property::Value( GetFloat( child ) );
+      return Property::Value(GetFloat(child));
     }
 
     case Property::VECTOR2:
     {
-      return Property::Value( GetVector2( child ) );
+      return Property::Value(GetVector2(child));
     }
 
     case Property::VECTOR3:
     {
-      return Property::Value( GetVector3( child ) );
+      return Property::Value(GetVector3(child));
     }
 
     case Property::VECTOR4:
     {
-      return Property::Value( GetVector4( child ) );
+      return Property::Value(GetVector4(child));
     }
 
     case Property::ROTATION:
     {
-      if( 4 == child.Size() )
+      if(4 == child.Size())
       {
         Vector4 v(GetVector4(child));
         // angle, axis as per spec
-        return Property::Value( Quaternion(Radian(Degree(v[3])),
-                                           Vector3(v[0],v[1],v[2])) );
+        return Property::Value(Quaternion(Radian(Degree(v[3])),
+                                          Vector3(v[0], v[1], v[2])));
       }
       else
       {
         // degrees as per spec
-        Vector3 rotation = GetVector3( child );
-        return Property::Value( Quaternion(Radian(Degree(rotation.x)),
-                                           Radian(Degree(rotation.y)),
-                                           Radian(Degree(rotation.z))) );
+        Vector3 rotation = GetVector3(child);
+        return Property::Value(Quaternion(Radian(Degree(rotation.x)),
+                                          Radian(Degree(rotation.y)),
+                                          Radian(Degree(rotation.z))));
       }
     }
 
     case Property::NONE: // fall
     default:
     {
-      DALI_ASSERT_ALWAYS( !"Property type incorrect" );
+      DALI_ASSERT_ALWAYS(!"Property type incorrect");
     }
   }
 }
 
-AlphaFunction GetAlphaFunction( const std::string& alphaFunction )
+AlphaFunction GetAlphaFunction(const std::string& alphaFunction)
 {
-  typedef std::map< const std::string, Dali::AlphaFunction > AlphaFunctionLut;
-  static AlphaFunctionLut alphaFunctionLut;
+  typedef std::map<const std::string, Dali::AlphaFunction> AlphaFunctionLut;
+  static AlphaFunctionLut                                  alphaFunctionLut;
 
-  if( 0 == alphaFunctionLut.size() )
+  if(0 == alphaFunctionLut.size())
   {
     // coding convention is uppercase enums
-    alphaFunctionLut["DEFAULT"]                    = AlphaFunction(AlphaFunction::DEFAULT);
-    alphaFunctionLut["LINEAR"]                     = AlphaFunction(AlphaFunction::LINEAR);
-    alphaFunctionLut["REVERSE"]                    = AlphaFunction(AlphaFunction::REVERSE);
-    alphaFunctionLut["EASE_IN_SQUARE"]             = AlphaFunction(AlphaFunction::EASE_IN_SQUARE);
-    alphaFunctionLut["EASE_OUT_SQUARE"]            = AlphaFunction(AlphaFunction::EASE_OUT_SQUARE);
-    alphaFunctionLut["EASE_IN"]                    = AlphaFunction(AlphaFunction::EASE_IN);
-    alphaFunctionLut["EASE_OUT"]                   = AlphaFunction(AlphaFunction::EASE_OUT);
-    alphaFunctionLut["EASE_IN_OUT"]                = AlphaFunction(AlphaFunction::EASE_IN_OUT);
-    alphaFunctionLut["EASE_IN_SINE"]               = AlphaFunction(AlphaFunction::EASE_IN_SINE);
-    alphaFunctionLut["EASE_OUT_SINE"]              = AlphaFunction(AlphaFunction::EASE_OUT_SINE);
-    alphaFunctionLut["EASE_IN_OUT_SINE"]           = AlphaFunction(AlphaFunction::EASE_IN_OUT_SINE);
-    alphaFunctionLut["BOUNCE"]                     = AlphaFunction(AlphaFunction::BOUNCE);
-    alphaFunctionLut["SIN"]                        = AlphaFunction(AlphaFunction::SIN);
-    alphaFunctionLut["EASE_OUT_BACK"]              = AlphaFunction(AlphaFunction::EASE_OUT_BACK);
+    alphaFunctionLut["DEFAULT"]          = AlphaFunction(AlphaFunction::DEFAULT);
+    alphaFunctionLut["LINEAR"]           = AlphaFunction(AlphaFunction::LINEAR);
+    alphaFunctionLut["REVERSE"]          = AlphaFunction(AlphaFunction::REVERSE);
+    alphaFunctionLut["EASE_IN_SQUARE"]   = AlphaFunction(AlphaFunction::EASE_IN_SQUARE);
+    alphaFunctionLut["EASE_OUT_SQUARE"]  = AlphaFunction(AlphaFunction::EASE_OUT_SQUARE);
+    alphaFunctionLut["EASE_IN"]          = AlphaFunction(AlphaFunction::EASE_IN);
+    alphaFunctionLut["EASE_OUT"]         = AlphaFunction(AlphaFunction::EASE_OUT);
+    alphaFunctionLut["EASE_IN_OUT"]      = AlphaFunction(AlphaFunction::EASE_IN_OUT);
+    alphaFunctionLut["EASE_IN_SINE"]     = AlphaFunction(AlphaFunction::EASE_IN_SINE);
+    alphaFunctionLut["EASE_OUT_SINE"]    = AlphaFunction(AlphaFunction::EASE_OUT_SINE);
+    alphaFunctionLut["EASE_IN_OUT_SINE"] = AlphaFunction(AlphaFunction::EASE_IN_OUT_SINE);
+    alphaFunctionLut["BOUNCE"]           = AlphaFunction(AlphaFunction::BOUNCE);
+    alphaFunctionLut["SIN"]              = AlphaFunction(AlphaFunction::SIN);
+    alphaFunctionLut["EASE_OUT_BACK"]    = AlphaFunction(AlphaFunction::EASE_OUT_BACK);
   }
 
-  const AlphaFunctionLut::const_iterator iter( alphaFunctionLut.find( alphaFunction ) );
+  const AlphaFunctionLut::const_iterator iter(alphaFunctionLut.find(alphaFunction));
 
-  if( iter != alphaFunctionLut.end() )
+  if(iter != alphaFunctionLut.end())
   {
     return iter->second;
   }
   else
   {
-    DALI_ASSERT_ALWAYS( iter != alphaFunctionLut.end() && "Unknown Alpha Constant" );
+    DALI_ASSERT_ALWAYS(iter != alphaFunctionLut.end() && "Unknown Alpha Constant");
     return Dali::AlphaFunction::DEFAULT;
   }
 }
 
 } // unnamed namespace
 
-
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
-Animation CreateAnimation( const TreeNode& child, const Replacement& constant, Dali::Actor searchRoot, Builder* const builder )
+Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Dali::Actor searchRoot, Builder* const builder)
 {
   float durationSum = 0.f;
 
   Dali::Actor searchActor = searchRoot ? searchRoot : Dali::Stage::GetCurrent().GetRootLayer();
 
-  Animation animation( Animation::New( 0.f ) );
+  Animation animation(Animation::New(0.f));
 
   // duration needs to be set before AnimateTo calls for correct operation when AnimateTo has no "timePeriod".
-  OptionalFloat duration = constant.IsFloat( IsChild(child, "duration" ) );
+  OptionalFloat duration = constant.IsFloat(IsChild(child, "duration"));
 
-  if( duration )
+  if(duration)
   {
-    animation.SetDuration( *duration );
+    animation.SetDuration(*duration);
   }
 
-  if( OptionalBoolean looping = constant.IsBoolean(  IsChild(child, "loop" ) ) )
+  if(OptionalBoolean looping = constant.IsBoolean(IsChild(child, "loop")))
   {
-    animation.SetLooping( *looping );
+    animation.SetLooping(*looping);
   }
 
-  if( OptionalString endAction = constant.IsString(  IsChild(child, "endAction" ) ) )
-  {
-    if("BAKE" == *endAction)
-    {
-      animation.SetEndAction( Animation::BAKE );
-    }
-    else if("DISCARD" == *endAction)
-    {
-      animation.SetEndAction( Animation::DISCARD );
-    }
-    else if("BAKE_FINAL" == *endAction)
-    {
-      animation.SetEndAction( Animation::BAKE_FINAL );
-    }
-  }
-
-  if( OptionalString endAction = constant.IsString(  IsChild(child, "disconnectAction" ) ) )
+  if(OptionalString endAction = constant.IsString(IsChild(child, "endAction")))
   {
     if("BAKE" == *endAction)
     {
-      animation.SetDisconnectAction( Animation::BAKE );
+      animation.SetEndAction(Animation::BAKE);
     }
     else if("DISCARD" == *endAction)
     {
-      animation.SetDisconnectAction( Animation::DISCARD );
+      animation.SetEndAction(Animation::DISCARD);
     }
     else if("BAKE_FINAL" == *endAction)
     {
-      animation.SetDisconnectAction( Animation::BAKE_FINAL );
+      animation.SetEndAction(Animation::BAKE_FINAL);
     }
   }
 
-  OptionalChild propertiesNode = IsChild(child, "properties" );
+  if(OptionalString endAction = constant.IsString(IsChild(child, "disconnectAction")))
+  {
+    if("BAKE" == *endAction)
+    {
+      animation.SetDisconnectAction(Animation::BAKE);
+    }
+    else if("DISCARD" == *endAction)
+    {
+      animation.SetDisconnectAction(Animation::DISCARD);
+    }
+    else if("BAKE_FINAL" == *endAction)
+    {
+      animation.SetDisconnectAction(Animation::BAKE_FINAL);
+    }
+  }
+
+  OptionalChild propertiesNode = IsChild(child, "properties");
   if(propertiesNode)
   {
     const TreeNode::ConstIterator endIter = (*propertiesNode).CEnd();
-    for( TreeNode::ConstIterator iter = (*propertiesNode).CBegin(); endIter != iter; ++iter )
+    for(TreeNode::ConstIterator iter = (*propertiesNode).CBegin(); endIter != iter; ++iter)
     {
       const TreeNode::KeyNodePair& pKeyChild = *iter;
 
-      OptionalString actorName( constant.IsString( IsChild(pKeyChild.second, "actor" ) ) );
-      OptionalString property(  constant.IsString( IsChild(pKeyChild.second, "property" ) ) );
-      DALI_ASSERT_ALWAYS( actorName && "Animation must specify actor name" );
+      OptionalString actorName(constant.IsString(IsChild(pKeyChild.second, "actor")));
+      OptionalString property(constant.IsString(IsChild(pKeyChild.second, "property")));
+      DALI_ASSERT_ALWAYS(actorName && "Animation must specify actor name");
 
-      Handle targetHandle = searchActor.FindChildByName( *actorName );
-      DALI_ASSERT_ALWAYS( targetHandle && "Actor must exist for property" );
+      Handle targetHandle = searchActor.FindChildByName(*actorName);
+      DALI_ASSERT_ALWAYS(targetHandle && "Actor must exist for property");
 
       Property::Value propValue;
       Property::Index propIndex = Property::INVALID_INDEX;
-      if( property )
+      if(property)
       {
-        propIndex = targetHandle.GetPropertyIndex( *property );
+        propIndex = targetHandle.GetPropertyIndex(*property);
 
         // if the property is not found from the (actor) handle, try to downcast it to renderable actor
         // to allow animating shader uniforms
-        if( propIndex == Property::INVALID_INDEX )
+        if(propIndex == Property::INVALID_INDEX)
         {
-            DALI_SCRIPT_WARNING( "Cannot find property on object\n" );
-            continue;
+          DALI_SCRIPT_WARNING("Cannot find property on object\n");
+          continue;
         }
       }
 
       // these are the defaults
-      AlphaFunction alphaFunction( AlphaFunction::DEFAULT );
-      TimePeriod timePeriod( 0.f );
+      AlphaFunction alphaFunction(AlphaFunction::DEFAULT);
+      TimePeriod    timePeriod(0.f);
 
-      OptionalChild timeChild = IsChild( pKeyChild.second, "timePeriod" );
+      OptionalChild timeChild = IsChild(pKeyChild.second, "timePeriod");
 
-      if( timeChild )
+      if(timeChild)
       {
-        timePeriod = GetTimePeriod( *timeChild, constant );
+        timePeriod = GetTimePeriod(*timeChild, constant);
       }
 
-      durationSum = std::max( durationSum, timePeriod.delaySeconds + timePeriod.durationSeconds );
+      durationSum = std::max(durationSum, timePeriod.delaySeconds + timePeriod.durationSeconds);
 
-      if( OptionalString alphaChild = constant.IsString( IsChild(pKeyChild.second, "alphaFunction" ) ) )
+      if(OptionalString alphaChild = constant.IsString(IsChild(pKeyChild.second, "alphaFunction")))
       {
-        alphaFunction = GetAlphaFunction( *alphaChild );
+        alphaFunction = GetAlphaFunction(*alphaChild);
       }
 
-      if( OptionalChild keyFrameChild = IsChild(pKeyChild.second, "keyFrames") )
+      if(OptionalChild keyFrameChild = IsChild(pKeyChild.second, "keyFrames"))
       {
-        DALI_ASSERT_ALWAYS( property  && "Animation must specify a property name" );
-        Property prop = Property( targetHandle, propIndex );
+        DALI_ASSERT_ALWAYS(property && "Animation must specify a property name");
+        Property prop = Property(targetHandle, propIndex);
 
         KeyFrames keyframes = KeyFrames::New();
 
         const TreeNode::ConstIterator endIter = (*keyFrameChild).CEnd();
-        for( TreeNode::ConstIterator iter = (*keyFrameChild).CBegin(); endIter != iter; ++iter )
+        for(TreeNode::ConstIterator iter = (*keyFrameChild).CBegin(); endIter != iter; ++iter)
         {
           const TreeNode::KeyNodePair& kfKeyChild = *iter;
 
-          OptionalFloat kfProgress = constant.IsFloat( IsChild(kfKeyChild.second, "progress" ) );
-          DALI_ASSERT_ALWAYS( kfProgress && "Key frame entry must have 'progress'" );
+          OptionalFloat kfProgress = constant.IsFloat(IsChild(kfKeyChild.second, "progress"));
+          DALI_ASSERT_ALWAYS(kfProgress && "Key frame entry must have 'progress'");
 
-          OptionalChild kfValue = IsChild( kfKeyChild.second, "value" );
-          DALI_ASSERT_ALWAYS( kfValue && "Key frame entry must have 'value'" );
+          OptionalChild kfValue = IsChild(kfKeyChild.second, "value");
+          DALI_ASSERT_ALWAYS(kfValue && "Key frame entry must have 'value'");
 
           try
           {
-            propValue = GetPropertyValue( prop.object.GetPropertyType(prop.propertyIndex), *kfValue );
+            propValue = GetPropertyValue(prop.object.GetPropertyType(prop.propertyIndex), *kfValue);
           }
           catch(...)
           {
-            DALI_LOG_WARNING( "Property:'%s' type does not match value type '%s'\n",
-                              (*property).c_str(),
-                              PropertyTypes::GetName(prop.object.GetPropertyType(prop.propertyIndex)) );
+            DALI_LOG_WARNING("Property:'%s' type does not match value type '%s'\n",
+                             (*property).c_str(),
+                             PropertyTypes::GetName(prop.object.GetPropertyType(prop.propertyIndex)));
 
             throw;
           }
 
-          AlphaFunction kfAlphaFunction( AlphaFunction::DEFAULT );
-          if( OptionalString alphaFuncStr = constant.IsString( IsChild(pKeyChild.second, "alphaFunction") ) )
+          AlphaFunction kfAlphaFunction(AlphaFunction::DEFAULT);
+          if(OptionalString alphaFuncStr = constant.IsString(IsChild(pKeyChild.second, "alphaFunction")))
           {
-            kfAlphaFunction = GetAlphaFunction( *alphaFuncStr );
+            kfAlphaFunction = GetAlphaFunction(*alphaFuncStr);
           }
 
-          keyframes.Add( *kfProgress, propValue, kfAlphaFunction );
+          keyframes.Add(*kfProgress, propValue, kfAlphaFunction);
         }
 
-        if( timeChild )
+        if(timeChild)
         {
-          animation.AnimateBetween( prop, keyframes, alphaFunction, timePeriod );
+          animation.AnimateBetween(prop, keyframes, alphaFunction, timePeriod);
         }
         else
         {
-          animation.AnimateBetween( prop, keyframes, alphaFunction );
+          animation.AnimateBetween(prop, keyframes, alphaFunction);
         }
       }
-      else if( OptionalString pathChild = IsString(pKeyChild.second, "path") )
+      else if(OptionalString pathChild = IsString(pKeyChild.second, "path"))
       {
         //Get path
         Path path = builder->GetPath(*pathChild);
-        if( path )
+        if(path)
         {
           //Get forward vector if specified
-          Vector3 forward( 0.0f, 0.0f, 0.0f );
-          OptionalVector3 forwardProperty = constant.IsVector3( IsChild(pKeyChild.second, "forward" ) );
-          if( forwardProperty )
+          Vector3         forward(0.0f, 0.0f, 0.0f);
+          OptionalVector3 forwardProperty = constant.IsVector3(IsChild(pKeyChild.second, "forward"));
+          if(forwardProperty)
           {
             forward = *forwardProperty;
           }
 
-          Actor actor = Actor::DownCast( targetHandle );
-          if( actor )
+          Actor actor = Actor::DownCast(targetHandle);
+          if(actor)
           {
-            if( timeChild )
+            if(timeChild)
             {
-              animation.Animate( actor, path, forward, alphaFunction, timePeriod );
+              animation.Animate(actor, path, forward, alphaFunction, timePeriod);
             }
             else
             {
-              animation.Animate( actor, path, forward, alphaFunction );
+              animation.Animate(actor, path, forward, alphaFunction);
             }
-
           }
         }
         else
         {
           //Path not found
-          DALI_SCRIPT_WARNING( "Cannot find animation path '%s'\n", (*pathChild).c_str() );
+          DALI_SCRIPT_WARNING("Cannot find animation path '%s'\n", (*pathChild).c_str());
         }
       }
       else
       {
-        DALI_ASSERT_ALWAYS( property  && "Animation must specify a property name" );
+        DALI_ASSERT_ALWAYS(property && "Animation must specify a property name");
 
-        Property prop = Property( targetHandle, propIndex );
+        Property prop = Property(targetHandle, propIndex);
         try
         {
-          propValue = GetPropertyValue( prop.object.GetPropertyType(prop.propertyIndex), *IsChild(pKeyChild.second, "value") );
+          propValue = GetPropertyValue(prop.object.GetPropertyType(prop.propertyIndex), *IsChild(pKeyChild.second, "value"));
         }
         catch(...)
         {
-          DALI_LOG_WARNING( "Property:'%s' type does not match value type '%s'\n", (*property).c_str(),
-                            PropertyTypes::GetName( prop.object.GetPropertyType(prop.propertyIndex) ) );
+          DALI_LOG_WARNING("Property:'%s' type does not match value type '%s'\n", (*property).c_str(), PropertyTypes::GetName(prop.object.GetPropertyType(prop.propertyIndex)));
 
           throw;
         }
 
-        if( OptionalBoolean relative = constant.IsBoolean( IsChild(pKeyChild.second, "relative") ) )
+        if(OptionalBoolean relative = constant.IsBoolean(IsChild(pKeyChild.second, "relative")))
         {
-          if( timeChild )
+          if(timeChild)
           {
-            animation.AnimateBy( prop, propValue, alphaFunction, timePeriod );
+            animation.AnimateBy(prop, propValue, alphaFunction, timePeriod);
           }
           else
           {
-            animation.AnimateBy( prop, propValue, alphaFunction );
+            animation.AnimateBy(prop, propValue, alphaFunction);
           }
         }
         else
         {
-          if( timeChild )
+          if(timeChild)
           {
-            animation.AnimateTo( prop, propValue, alphaFunction, timePeriod );
+            animation.AnimateTo(prop, propValue, alphaFunction, timePeriod);
           }
           else
           {
-            animation.AnimateTo( prop, propValue, alphaFunction );
+            animation.AnimateTo(prop, propValue, alphaFunction);
           }
         }
       }
     }
   }
 
-  if( !duration )
+  if(!duration)
   {
-    animation.SetDuration( durationSum );
+    animation.SetDuration(durationSum);
   }
 
   return animation;
 }
 
-Animation CreateAnimation( const TreeNode& child, Builder* const builder )
+Animation CreateAnimation(const TreeNode& child, Builder* const builder)
 {
   Replacement replacement;
-  return CreateAnimation( child, replacement, Stage::GetCurrent().GetRootLayer(), builder );
+  return CreateAnimation(child, replacement, Stage::GetCurrent().GetRootLayer(), builder);
 }
 
 } // namespace Internal
@@ -397,4 +390,3 @@ Animation CreateAnimation( const TreeNode& child, Builder* const builder )
 } // namespace Toolkit
 
 } // namespace Dali
-

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BLOOM_VIEW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,26 @@
  */
 
 // EXTERNAL INCLUDES
-#include <sstream>
-#include <cmath>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/frame-buffer.h>
+#include <cmath>
+#include <sstream>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
+#include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 class BloomView;
 
 namespace Internal
 {
-
 /**
  * BloomEffect implementation class
  */
@@ -56,8 +53,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::BloomView::BloomView
    */
-  BloomView(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
-                   const float downsampleWidthScale, const float downsampleHeightScale);
+  BloomView(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale);
 
   /**
    * @copydoc Dali::Toolkit::BloomView::~BloomView
@@ -68,32 +64,48 @@ public:
    * @copydoc Dali::Toolkit::BloomView::New
    */
   static Dali::Toolkit::BloomView New();
-  static Dali::Toolkit::BloomView New( const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
-                                              const float downsampleWidthScale, const float downsampleHeightScale);
-  void Activate();
-  void Deactivate();
+  static Dali::Toolkit::BloomView New(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale);
+  void                            Activate();
+  void                            Deactivate();
 
-  Property::Index GetBloomThresholdPropertyIndex() const {return mBloomThresholdPropertyIndex;}
-  Property::Index GetBlurStrengthPropertyIndex() const {return mBlurStrengthPropertyIndex;}
-  Property::Index GetBloomIntensityPropertyIndex() const {return mBloomIntensityPropertyIndex;}
-  Property::Index GetBloomSaturationPropertyIndex() const {return mBloomSaturationPropertyIndex;}
-  Property::Index GetImageIntensityPropertyIndex() const {return mImageIntensityPropertyIndex;}
-  Property::Index GetImageSaturationPropertyIndex() const {return mImageSaturationPropertyIndex;}
+  Property::Index GetBloomThresholdPropertyIndex() const
+  {
+    return mBloomThresholdPropertyIndex;
+  }
+  Property::Index GetBlurStrengthPropertyIndex() const
+  {
+    return mBlurStrengthPropertyIndex;
+  }
+  Property::Index GetBloomIntensityPropertyIndex() const
+  {
+    return mBloomIntensityPropertyIndex;
+  }
+  Property::Index GetBloomSaturationPropertyIndex() const
+  {
+    return mBloomSaturationPropertyIndex;
+  }
+  Property::Index GetImageIntensityPropertyIndex() const
+  {
+    return mImageIntensityPropertyIndex;
+  }
+  Property::Index GetImageSaturationPropertyIndex() const
+  {
+    return mImageSaturationPropertyIndex;
+  }
 
 private:
-
   void OnInitialize() override;
   void OnSizeSet(const Vector3& targetSize) override;
 
   /**
    * @copydoc Control::OnChildAdd()
    */
-  void OnChildAdd( Actor& child ) override;
+  void OnChildAdd(Actor& child) override;
 
   /**
    * @copydoc Control::OnChildRemove()
    */
-  void OnChildRemove( Actor& child ) override;
+  void OnChildRemove(Actor& child) override;
 
   void AllocateResources();
   void CreateRenderTasks();
@@ -101,11 +113,10 @@ private:
 
   void SetupProperties();
 
-
   /////////////////////////////////////////////////////////////
-  unsigned int mBlurNumSamples;   // number of blur samples in each of horiz/vert directions
-  float mBlurBellCurveWidth;      // constant used when calculating the gaussian weights
-  Pixel::Format mPixelFormat;     // pixel format used by render targets
+  unsigned int  mBlurNumSamples;     // number of blur samples in each of horiz/vert directions
+  float         mBlurBellCurveWidth; // constant used when calculating the gaussian weights
+  Pixel::Format mPixelFormat;        // pixel format used by render targets
 
   /////////////////////////////////////////////////////////////
   // downsampling is used for the separated blur passes to get increased blur with the same number of samples and also to make rendering quicker
@@ -113,7 +124,6 @@ private:
   float mDownsampleHeightScale;
   float mDownsampledWidth;
   float mDownsampledHeight;
-
 
   /////////////////////////////////////////////////////////////
   // for checking if we need to reallocate render targets
@@ -134,13 +144,13 @@ private:
   /////////////////////////////////////////////////////////////
   // for rendering all user added children to offscreen target
   FrameBuffer mRenderTargetForRenderingChildren;
-  RenderTask mRenderChildrenTask;
+  RenderTask  mRenderChildrenTask;
 
   /////////////////////////////////////////////////////////////
   // for extracting bright parts of image to an offscreen target
   FrameBuffer mBloomExtractTarget; // for rendering bright parts of image into separate texture, also used as target for gaussian blur
-  RenderTask mBloomExtractTask;
-  Actor mBloomExtractActor;
+  RenderTask  mBloomExtractTask;
+  Actor       mBloomExtractActor;
 
   /////////////////////////////////////////////////////////////
   // for blurring extracted bloom
@@ -155,7 +165,7 @@ private:
   /////////////////////////////////////////////////////////////
   // for holding blurred result
   FrameBuffer mOutputRenderTarget;
-  Actor mTargetActor;
+  Actor       mTargetActor;
 
   /////////////////////////////////////////////////////////////
   // Properties for setting by user, e.g. by animations
@@ -166,28 +176,27 @@ private:
   Property::Index mImageIntensityPropertyIndex;
   Property::Index mImageSaturationPropertyIndex;
 
-  bool mActivated:1;
+  bool mActivated : 1;
 
 private:
-
   // Undefined copy constructor.
-  BloomView( const BloomView& );
+  BloomView(const BloomView&);
 
   // Undefined assignment operator.
-  BloomView& operator=( const BloomView& );
+  BloomView& operator=(const BloomView&);
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Toolkit::Internal::BloomView& GetImpl( Toolkit::BloomView& obj )
+inline Toolkit::Internal::BloomView& GetImpl(Toolkit::BloomView& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
   Dali::RefObject& handle = obj.GetImplementation();
   return static_cast<Toolkit::Internal::BloomView&>(handle);
 }
 
-inline const Toolkit::Internal::BloomView& GetImpl( const Toolkit::BloomView& obj )
+inline const Toolkit::Internal::BloomView& GetImpl(const Toolkit::BloomView& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
   const Dali::RefObject& handle = obj.GetImplementation();

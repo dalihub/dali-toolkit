@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DATA_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,18 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/property-notification.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/public-api/object/property-notification.h>
+#include <dali/public-api/object/type-registry.h>
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-event-observer.h>
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali/devel-api/common/owner-container.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/builder/dictionary.h>
 #include <dali-toolkit/internal/builder/style.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
+#include <dali-toolkit/internal/visuals/visual-event-observer.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali/devel-api/common/owner-container.h>
@@ -41,57 +39,54 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
- /**
+/**
   * Struct used to store Visual within the control, index is a unique key for each visual.
   */
 struct RegisteredVisual
 {
-  Property::Index index;
+  Property::Index       index;
   Toolkit::Visual::Base visual;
-  bool enabled : 1;
-  bool pending : 1;
+  bool                  enabled : 1;
+  bool                  pending : 1;
 
-  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, bool aEnabled, bool aPendingReplacement )
-  : index(aIndex), visual(aVisual), enabled(aEnabled), pending( aPendingReplacement )
+  RegisteredVisual(Property::Index aIndex, Toolkit::Visual::Base& aVisual, bool aEnabled, bool aPendingReplacement)
+  : index(aIndex),
+    visual(aVisual),
+    enabled(aEnabled),
+    pending(aPendingReplacement)
   {
   }
 };
 
-typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisualContainer;
-
+typedef Dali::OwnerContainer<RegisteredVisual*> RegisteredVisualContainer;
 
 /**
  * @brief Holds the Implementation for the internal control class
  */
 class Control::Impl : public ConnectionTracker, public Visual::EventObserver
 {
-
 public:
-
   /**
    * @brief Retrieves the implementation of the internal control class.
    * @param[in] internalControl A ref to the control whose internal implementation is required
    * @return The internal implementation
    */
-  static Control::Impl& Get( Internal::Control& internalControl );
+  static Control::Impl& Get(Internal::Control& internalControl);
 
   /**
    * @copydoc Get( Internal::Control& )
    */
-  static const Control::Impl& Get( const Internal::Control& internalControl );
+  static const Control::Impl& Get(const Internal::Control& internalControl);
 
   /**
    * @brief Constructor.
    * @param[in] controlImpl The control which owns this implementation
    */
-  Impl( Control& controlImpl );
+  Impl(Control& controlImpl);
 
   /**
    * @brief Destructor.
@@ -131,7 +126,7 @@ public:
    * @param[in] object The visual whose resources are ready
    * @note Overriding method in Visual::EventObserver.
    */
-  void ResourceReady( Visual::Base& object ) override;
+  void ResourceReady(Visual::Base& object) override;
 
   /**
    * @brief Called when an event occurs.
@@ -139,64 +134,64 @@ public:
    * @param[in] signalId The signal to emit. See Visual to find supported signals
    * @note Overriding method in Visual::EventObserver.
    */
-  void NotifyVisualEvent( Visual::Base& object, Property::Index signalId ) override;
+  void NotifyVisualEvent(Visual::Base& object, Property::Index signalId) override;
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual );
+  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
+  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, int depthIndex);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
+  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
+  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::UnregisterVisual()
    */
-  void UnregisterVisual( Property::Index index );
+  void UnregisterVisual(Property::Index index);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::GetVisual()
    */
-  Toolkit::Visual::Base GetVisual( Property::Index index ) const;
+  Toolkit::Visual::Base GetVisual(Property::Index index) const;
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::EnableVisual()
    */
-  void EnableVisual( Property::Index index, bool enable );
+  void EnableVisual(Property::Index index, bool enable);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::IsVisualEnabled()
    */
-  bool IsVisualEnabled( Property::Index index ) const;
+  bool IsVisualEnabled(Property::Index index) const;
 
   /**
    * @brief Stops observing the given visual.
    * @param[in] visual The visual to stop observing
    */
-  void StopObservingVisual( Toolkit::Visual::Base& visual );
+  void StopObservingVisual(Toolkit::Visual::Base& visual);
 
   /**
    * @brief Starts observing the given visual.
    * @param[in] visual The visual to start observing
    */
-  void StartObservingVisual( Toolkit::Visual::Base& visual);
+  void StartObservingVisual(Toolkit::Visual::Base& visual);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::GetVisualResourceStatus()
    */
-  Toolkit::Visual::ResourceStatus GetVisualResourceStatus( Property::Index index ) const;
+  Toolkit::Visual::ResourceStatus GetVisualResourceStatus(Property::Index index) const;
 
   /**
    * @param[in,out] animation Handle to existing animation, or an empty handle that
@@ -204,19 +199,19 @@ public:
    * @param[in] transitionData The transition data describing the animation
    * @param[in] createAnimation True if the animation should be created
    */
-  void AddTransitions( Dali::Animation& animation,
-                       const Toolkit::TransitionData& transitionData,
-                       bool createAnimation = false );
+  void AddTransitions(Dali::Animation&               animation,
+                      const Toolkit::TransitionData& transitionData,
+                      bool                           createAnimation = false);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::CreateTransition()
    */
-  Dali::Animation CreateTransition( const Toolkit::TransitionData& transitionData );
+  Dali::Animation CreateTransition(const Toolkit::TransitionData& transitionData);
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::DoAction()
    */
-  void DoAction( Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes );
+  void DoAction(Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes);
 
   /**
    * @brief Function used to set control properties.
@@ -224,7 +219,7 @@ public:
    * @param[in] index The index of the property to set
    * @param[in] value The value of the property to set
    */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+  static void SetProperty(BaseObject* object, Property::Index index, const Property::Value& value);
 
   /**
    * @brief Function used to retrieve the value of control properties.
@@ -232,21 +227,21 @@ public:
    * @param[in] index The index of the property to get
    * @return The value of the property
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+  static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
   /**
    * @brief Sets the state of the control.
    * @param[in] newState The state to set
    * @param[in] withTransitions Whether to show a transition when changing to the new state
    */
-  void SetState( DevelControl::State newState, bool withTransitions=true );
+  void SetState(DevelControl::State newState, bool withTransitions = true);
 
   /**
    * @brief Sets the sub-state of the control.
    * @param[in] newState The sub-state to set
    * @param[in] withTransitions Whether to show a transition when changing to the new sub-state
    */
-  void SetSubState( const std::string& subStateName, bool withTransitions=true );
+  void SetSubState(const std::string& subStateName, bool withTransitions = true);
 
   /**
    * @brief Replaces visuals and properties from the old state to the new state.
@@ -254,28 +249,28 @@ public:
    * @param[in] newState The new state
    * @param[in] subState The current sub state
    */
-  void ReplaceStateVisualsAndProperties( const StylePtr oldState, const StylePtr newState, const std::string& subState );
+  void ReplaceStateVisualsAndProperties(const StylePtr oldState, const StylePtr newState, const std::string& subState);
 
   /**
    * @brief Removes a visual from the control's container.
    * @param[in] visuals The container of visuals
    * @param[in] visualName The name of the visual to remove
    */
-  void RemoveVisual( RegisteredVisualContainer& visuals, const std::string& visualName );
+  void RemoveVisual(RegisteredVisualContainer& visuals, const std::string& visualName);
 
   /**
    * @brief Removes several visuals from the control's container.
    * @param[in] visuals The container of visuals
    * @param[in] removeVisuals The visuals to remove
    */
-  void RemoveVisuals( RegisteredVisualContainer& visuals, DictionaryKeys& removeVisuals );
+  void RemoveVisuals(RegisteredVisualContainer& visuals, DictionaryKeys& removeVisuals);
 
   /**
    * @brief Copies the visual properties that are specific to the control instance into the instancedProperties container.
    * @param[in] visuals The control's visual container
    * @param[out] instancedProperties The instanced properties are added to this container
    */
-  void CopyInstancedProperties( RegisteredVisualContainer& visuals, Dictionary<Property::Map>& instancedProperties );
+  void CopyInstancedProperties(RegisteredVisualContainer& visuals, Dictionary<Property::Map>& instancedProperties);
 
   /**
    * @brief On state change, ensures visuals are moved or created appropriately.
@@ -287,7 +282,7 @@ public:
    * @param[in] stateVisualsToChange The visuals to change
    * @param[in] instancedProperties The instanced properties @see CopyInstancedProperties
    */
-  void RecreateChangedVisuals( Dictionary<Property::Map>& stateVisualsToChange, Dictionary<Property::Map>& instancedProperties );
+  void RecreateChangedVisuals(Dictionary<Property::Map>& stateVisualsToChange, Dictionary<Property::Map>& instancedProperties);
 
   /**
    * @brief Whether the resource is ready
@@ -304,7 +299,7 @@ public:
    * @brief Sets the margin.
    * @param[in] margin Margin is a collections of extent ( start, end, top, bottom )
    */
-  void SetMargin( Extents margin );
+  void SetMargin(Extents margin);
 
   /**
    * @brief Returns the value of margin
@@ -316,7 +311,7 @@ public:
    * @brief Sets the padding.
    * @param[in] padding Padding is a collections of extent ( start, end, top, bottom ).
    */
-  void SetPadding( Extents padding );
+  void SetPadding(Extents padding);
 
   /**
    * @brief Returns the value of padding
@@ -328,14 +323,14 @@ public:
    * @brief Set the input method context.
    * @param[in] inputMethodContext The input method context.
    */
-  void SetInputMethodContext( InputMethodContext& inputMethodContext );
+  void SetInputMethodContext(InputMethodContext& inputMethodContext);
 
   /**
    * @brief Filter an key event.
    * @param[in] event The key to be filtered.
    * @return True if the key handled, otherwise false.
    */
-  bool FilterKeyEvent( const KeyEvent& event );
+  bool FilterKeyEvent(const KeyEvent& event);
 
   /**
    * @brief Adds accessibility attribute
@@ -345,8 +340,8 @@ public:
    * Attribute is added if not existed previously or updated
    * if existed.
    */
-  void AppendAccessibilityAttribute( const std::string& key,
-                                  const std::string value );
+  void AppendAccessibilityAttribute(const std::string& key,
+                                    const std::string  value);
 
   /**
    * @brief Removes accessibility attribute
@@ -354,7 +349,7 @@ public:
    *
    * Function does nothing if attribute doesn't exist.
    */
-  void RemoveAccessibilityAttribute( const std::string& key );
+  void RemoveAccessibilityAttribute(const std::string& key);
 
   /**
    * @brief Removes all accessibility attributes
@@ -368,7 +363,7 @@ public:
    * This function sets, which part of object will be read out
    * by screen-reader.
    */
-  void SetAccessibilityReadingInfoType( const Dali::Accessibility::ReadingInfoTypes types );
+  void SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types);
 
   /**
    * @brief Gets currently active reading info type attributes
@@ -397,7 +392,6 @@ public:
   Dali::Property GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey);
 
 private:
-
   /**
    * Used as an alternative to boolean so that it is obvious whether a visual is enabled/disabled.
    */
@@ -406,7 +400,7 @@ private:
     enum Type
     {
       DISABLED = 0, ///< Visual disabled.
-      ENABLED = 1   ///< Visual enabled.
+      ENABLED  = 1  ///< Visual enabled.
     };
   };
 
@@ -418,7 +412,7 @@ private:
     enum Type
     {
       NOT_SET = 0, ///< Visual depth value not set by caller.
-      SET = 1      ///< Visual depth value set by caller.
+      SET     = 1  ///< Visual depth value set by caller.
     };
   };
 
@@ -433,7 +427,7 @@ private:
    * @note Registering a visual with an index that already has a registered visual will replace it. The replacement will
    *       occur once the replacement visual is ready (loaded).
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex = 0 );
+  void RegisterVisual(Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex = 0);
 
   /**
    * @brief Emits the resource ready signal.
@@ -446,76 +440,74 @@ private:
   void OnIdleCallback();
 
 public:
-
-  Control& mControlImpl;
+  Control&            mControlImpl;
   DevelControl::State mState;
-  std::string mSubStateName;
-  Property::Map mAccessibilityAttributes;
+  std::string         mSubStateName;
+  Property::Map       mAccessibilityAttributes;
 
-  int mLeftFocusableActorId;       ///< Actor ID of Left focusable control.
-  int mRightFocusableActorId;      ///< Actor ID of Right focusable control.
-  int mUpFocusableActorId;         ///< Actor ID of Up focusable control.
-  int mDownFocusableActorId;       ///< Actor ID of Down focusable control.
+  int mLeftFocusableActorId;  ///< Actor ID of Left focusable control.
+  int mRightFocusableActorId; ///< Actor ID of Right focusable control.
+  int mUpFocusableActorId;    ///< Actor ID of Up focusable control.
+  int mDownFocusableActorId;  ///< Actor ID of Down focusable control.
 
-  RegisteredVisualContainer mVisuals;     ///< Stores visuals needed by the control, non trivial type so std::vector used.
-  std::string mStyleName;
-  Vector4 mBackgroundColor;               ///< The color of the background visual
-  Vector3* mStartingPinchScale;           ///< The scale when a pinch gesture starts, TODO: consider removing this
-  Extents mMargin;                        ///< The margin values
-  Extents mPadding;                       ///< The padding values
-  Toolkit::Control::KeyEventSignalType mKeyEventSignal;
-  Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
-  Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
-  Toolkit::Control::ResourceReadySignalType mResourceReadySignal;
-  DevelControl::VisualEventSignalType mVisualEventSignal;
-  Toolkit::DevelControl::AccessibilityActivateSignalType mAccessibilityActivateSignal;
-  Toolkit::DevelControl::AccessibilityReadingSkippedSignalType mAccessibilityReadingSkippedSignal;
-  Toolkit::DevelControl::AccessibilityReadingPausedSignalType mAccessibilityReadingPausedSignal;
-  Toolkit::DevelControl::AccessibilityReadingResumedSignalType mAccessibilityReadingResumedSignal;
+  RegisteredVisualContainer                                      mVisuals; ///< Stores visuals needed by the control, non trivial type so std::vector used.
+  std::string                                                    mStyleName;
+  Vector4                                                        mBackgroundColor;    ///< The color of the background visual
+  Vector3*                                                       mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
+  Extents                                                        mMargin;             ///< The margin values
+  Extents                                                        mPadding;            ///< The padding values
+  Toolkit::Control::KeyEventSignalType                           mKeyEventSignal;
+  Toolkit::Control::KeyInputFocusSignalType                      mKeyInputFocusGainedSignal;
+  Toolkit::Control::KeyInputFocusSignalType                      mKeyInputFocusLostSignal;
+  Toolkit::Control::ResourceReadySignalType                      mResourceReadySignal;
+  DevelControl::VisualEventSignalType                            mVisualEventSignal;
+  Toolkit::DevelControl::AccessibilityActivateSignalType         mAccessibilityActivateSignal;
+  Toolkit::DevelControl::AccessibilityReadingSkippedSignalType   mAccessibilityReadingSkippedSignal;
+  Toolkit::DevelControl::AccessibilityReadingPausedSignalType    mAccessibilityReadingPausedSignal;
+  Toolkit::DevelControl::AccessibilityReadingResumedSignalType   mAccessibilityReadingResumedSignal;
   Toolkit::DevelControl::AccessibilityReadingCancelledSignalType mAccessibilityReadingCancelledSignal;
-  Toolkit::DevelControl::AccessibilityReadingStoppedSignalType mAccessibilityReadingStoppedSignal;
+  Toolkit::DevelControl::AccessibilityReadingStoppedSignalType   mAccessibilityReadingStoppedSignal;
 
-  Toolkit::DevelControl::AccessibilityGetNameSignalType mAccessibilityGetNameSignal;
+  Toolkit::DevelControl::AccessibilityGetNameSignalType        mAccessibilityGetNameSignal;
   Toolkit::DevelControl::AccessibilityGetDescriptionSignalType mAccessibilityGetDescriptionSignal;
-  Toolkit::DevelControl::AccessibilityDoGestureSignalType mAccessibilityDoGestureSignal;
+  Toolkit::DevelControl::AccessibilityDoGestureSignalType      mAccessibilityDoGestureSignal;
 
   std::string mAccessibilityName;
-  bool mAccessibilityNameSet = false;
+  bool        mAccessibilityNameSet = false;
 
   std::string mAccessibilityDescription;
-  bool mAccessibilityDescriptionSet = false;
+  bool        mAccessibilityDescriptionSet = false;
 
   std::string mAccessibilityTranslationDomain;
-  bool mAccessibilityTranslationDomainSet = false;
+  bool        mAccessibilityTranslationDomainSet = false;
 
-  bool mAccessibilityHighlightable = false;
+  bool mAccessibilityHighlightable    = false;
   bool mAccessibilityHighlightableSet = false;
 
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
   std::vector<std::vector<Accessibility::Address>> mAccessibilityRelations;
-  bool mAccessibilityAnimated = false;
+  bool                                             mAccessibilityAnimated = false;
 
   // Gesture Detection
-  PinchGestureDetector mPinchGestureDetector;
-  PanGestureDetector mPanGestureDetector;
-  TapGestureDetector mTapGestureDetector;
+  PinchGestureDetector     mPinchGestureDetector;
+  PanGestureDetector       mPanGestureDetector;
+  TapGestureDetector       mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
 
   // Tooltip
   TooltipPtr mTooltip;
 
   InputMethodContext mInputMethodContext;
-  CallbackBase* mIdleCallback;             ///< The idle callback to emit the resource ready signal.
+  CallbackBase*      mIdleCallback; ///< The idle callback to emit the resource ready signal.
 
-  ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
-  bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
-  bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
-  bool mIsEmittingResourceReadySignal :1;  ///< True during ResourceReady().
-  bool mNeedToEmitResourceReady :1;        ///< True if need to emit the resource ready signal again.
+  ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT; ///< Flags passed in from constructor.
+  bool             mIsKeyboardNavigationSupported : 1;    ///< Stores whether keyboard navigation is supported by the control.
+  bool             mIsKeyboardFocusGroup : 1;             ///< Stores whether the control is a focus group.
+  bool             mIsEmittingResourceReadySignal : 1;    ///< True during ResourceReady().
+  bool             mNeedToEmitResourceReady : 1;          ///< True if need to emit the resource ready signal again.
 
-  RegisteredVisualContainer mRemoveVisuals;         ///< List of visuals that are being replaced by another visual once ready
-
+  RegisteredVisualContainer mRemoveVisuals; ///< List of visuals that are being replaced by another visual once ready
 
   // Properties - these need to be members of Internal::Control::Impl as they access private methods/data of Internal::Control and Internal::Control::Impl.
   static const PropertyRegistration PROPERTY_1;
@@ -546,8 +538,8 @@ public:
    * @param  actor Actor object
    * @return       handle to Accessible object
    */
-  static Dali::Accessibility::Accessible *GetAccessibilityObject(Dali::Actor actor);
-  Dali::Accessibility::Accessible *GetAccessibilityObject();
+  static Dali::Accessibility::Accessible* GetAccessibilityObject(Dali::Actor actor);
+  Dali::Accessibility::Accessible*        GetAccessibilityObject();
 
   void AccessibilityRegister();
   void AccessibilityDeregister();
@@ -558,54 +550,53 @@ public:
                           public virtual Dali::Accessibility::Action
   {
     Dali::Actor self;
-    bool modal = false, root = false;
+    bool        modal = false, root = false;
 
     AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
 
-    std::string GetName() override;
-    virtual std::string GetNameRaw();
-    std::string GetDescription() override;
-    virtual std::string GetDescriptionRaw();
-    Dali::Accessibility::Accessible* GetParent() override;
-    size_t GetChildCount() override;
-    Dali::Accessibility::Accessible* GetChildAtIndex( size_t index ) override;
-    size_t GetIndexInParent() override;
-    Dali::Accessibility::Role GetRole() override;
-    Dali::Accessibility::States GetStates() override;
-    Dali::Accessibility::Attributes GetAttributes() override;
-    Dali::Rect<> GetExtents( Dali::Accessibility::CoordType ctype ) override;
+    std::string                         GetName() override;
+    virtual std::string                 GetNameRaw();
+    std::string                         GetDescription() override;
+    virtual std::string                 GetDescriptionRaw();
+    Dali::Accessibility::Accessible*    GetParent() override;
+    size_t                              GetChildCount() override;
+    Dali::Accessibility::Accessible*    GetChildAtIndex(size_t index) override;
+    size_t                              GetIndexInParent() override;
+    Dali::Accessibility::Role           GetRole() override;
+    Dali::Accessibility::States         GetStates() override;
+    Dali::Accessibility::Attributes     GetAttributes() override;
+    Dali::Rect<>                        GetExtents(Dali::Accessibility::CoordType ctype) override;
     Dali::Accessibility::ComponentLayer GetLayer() override;
-    int16_t GetMdiZOrder() override;
-    bool GrabFocus() override;
-    double GetAlpha() override;
-    bool GrabHighlight() override;
-    bool ClearHighlight() override;
+    int16_t                             GetMdiZOrder() override;
+    bool                                GrabFocus() override;
+    double                              GetAlpha() override;
+    bool                                GrabHighlight() override;
+    bool                                ClearHighlight() override;
 
-    std::string GetActionName( size_t index ) override;
-    std::string GetLocalizedActionName( size_t index ) override;
-    std::string GetActionDescription( size_t index ) override;
-    size_t GetActionCount() override;
-    std::string GetActionKeyBinding(size_t index) override;
-    bool DoAction(size_t index) override;
-    bool DoAction(const std::string& name) override;
-    bool DoGesture(const Dali::Accessibility::GestureInfo &gestureInfo) override;
+    std::string                                GetActionName(size_t index) override;
+    std::string                                GetLocalizedActionName(size_t index) override;
+    std::string                                GetActionDescription(size_t index) override;
+    size_t                                     GetActionCount() override;
+    std::string                                GetActionKeyBinding(size_t index) override;
+    bool                                       DoAction(size_t index) override;
+    bool                                       DoAction(const std::string& name) override;
+    bool                                       DoGesture(const Dali::Accessibility::GestureInfo& gestureInfo) override;
     std::vector<Dali::Accessibility::Relation> GetRelationSet() override;
 
     virtual Dali::Accessibility::States CalculateStates();
-    virtual void EnsureChildVisible(Actor child);
-    virtual void EnsureSelfVisible();
-    virtual Property::Index GetNamePropertyIndex();
-    virtual Property::Index GetDescriptionPropertyIndex();
+    virtual void                        EnsureChildVisible(Actor child);
+    virtual void                        EnsureSelfVisible();
+    virtual Property::Index             GetNamePropertyIndex();
+    virtual Property::Index             GetDescriptionPropertyIndex();
   };
 
-  std::function< std::unique_ptr< Dali::Accessibility::Accessible >( Actor ) > accessibilityConstructor;
-  std::unique_ptr< Dali::Accessibility::Accessible > accessibilityObject;
-  Dali::PropertyNotification accessibilityNotificationPosition, accessibilityNotificationSize, accessibilityNotificationCulled;
-  bool accessibilityNotificationSet = false;
-  static void PositionOrSizeChangedCallback( PropertyNotification& );
-  static void CulledChangedCallback( PropertyNotification& );
+  std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)> accessibilityConstructor;
+  std::unique_ptr<Dali::Accessibility::Accessible>                       accessibilityObject;
+  Dali::PropertyNotification                                             accessibilityNotificationPosition, accessibilityNotificationSize, accessibilityNotificationCulled;
+  bool                                                                   accessibilityNotificationSet = false;
+  static void                                                            PositionOrSizeChangedCallback(PropertyNotification&);
+  static void                                                            CulledChangedCallback(PropertyNotification&);
 };
-
 
 } // namespace Internal
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_MESH_VISUAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,23 @@
  */
 
 // EXTERNAL INCLUDES
-#include <fstream>
-#include <string.h>
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <string.h>
+#include <fstream>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class MeshVisual;
-typedef IntrusivePtr< MeshVisual > MeshVisualPtr;
+typedef IntrusivePtr<MeshVisual> MeshVisualPtr;
 
 /**
  * The visual which renders a 3D object to the control's quad
@@ -55,10 +52,9 @@ typedef IntrusivePtr< MeshVisual > MeshVisualPtr;
  * | useSoftNormals  | BOOLEAN     | If true, average normals at points for smooth textures. Default true. |
  * | lightPosition   | VECTOR3     | The position (on stage) of the light                                  |
  */
-class MeshVisual: public Visual::Base
+class MeshVisual : public Visual::Base
 {
 public:
-
   /**
    * @brief Create a new mesh visual.
    *
@@ -66,28 +62,26 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static MeshVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
+  static MeshVisualPtr New(VisualFactoryCache& factoryCache, const Property::Map& properties);
 
-public:  // from Visual
-
+public: // from Visual
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
 protected:
-
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  MeshVisual( VisualFactoryCache& factoryCache );
+  MeshVisual(VisualFactoryCache& factoryCache);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -95,9 +89,14 @@ protected:
   virtual ~MeshVisual();
 
   /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
+
+  /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
@@ -107,20 +106,14 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
 private:
-
   /**
    * @brief Provide an empty geometry for the visual to use.
    * @details For use in error cases where the initialisation has failed for varying reasons.
    */
   void SupplyEmptyGeometry();
-
-  /**
-   * @brief Initialize the visual with the geometry and shader from the cache, if not available, create and save to the cache for sharing.
-   */
-  void InitializeRenderer();
 
   /**
    * @brief Create a shader for the object to use.
@@ -161,18 +154,16 @@ private:
    * @param[in] index The index key of the value
    * @param[in] value The value
    */
-  void DoSetProperty( Property::Index index, const Property::Value& value );
+  void DoSetProperty(Property::Index index, const Property::Value& value);
 
 private:
+  // Undefined
+  MeshVisual(const MeshVisual& meshVisual);
 
   // Undefined
-  MeshVisual( const MeshVisual& meshVisual );
-
-  // Undefined
-  MeshVisual& operator=( const MeshVisual& meshVisual );
+  MeshVisual& operator=(const MeshVisual& meshVisual);
 
 private:
-
   std::string mObjectUrl;
   std::string mMaterialUrl;
 
@@ -181,15 +172,15 @@ private:
   std::string mGlossTextureUrl;
   std::string mTexturesPath;
 
-  Shader mShader;
-  Geometry mGeometry;
+  Shader     mShader;
+  Geometry   mGeometry;
   TextureSet mTextureSet;
 
   ObjLoader mObjLoader;
-  Vector3 mSceneCenter;
-  Vector3 mSceneSize;
+  Vector3   mSceneCenter;
+  Vector3   mSceneSize;
 
-  Vector3 mLightPosition;
+  Vector3                                 mLightPosition;
   Toolkit::MeshVisual::ShadingMode::Value mShadingMode;
 
   bool mUseTexture;

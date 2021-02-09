@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ATLAS_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,37 +18,33 @@
  */
 
 // EXTERNAL INCLUDES
-#include <stdint.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/rendering/texture-set.h>
+#include <stdint.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal DALI_INTERNAL
 {
-
 class AtlasManager;
 
-} // namespace Internal
+} // namespace DALI_INTERNAL
 
 class AtlasManager : public BaseHandle
 {
 public:
-
   typedef uint32_t SizeType;
   typedef SizeType AtlasId;
   typedef SizeType ImageId;
 
   struct AtlasSize
   {
-    SizeType mWidth;              ///< width of the atlas in pixels
-    SizeType mHeight;             ///< height of the atlas in pixels
-    SizeType mBlockWidth;         ///< width of a block in pixels
-    SizeType mBlockHeight;        ///< height of a block in pixels
+    SizeType mWidth;       ///< width of the atlas in pixels
+    SizeType mHeight;      ///< height of the atlas in pixels
+    SizeType mBlockWidth;  ///< width of a block in pixels
+    SizeType mBlockHeight; ///< height of a block in pixels
   };
 
   /**
@@ -57,38 +53,40 @@ public:
    */
   struct AtlasMetricsEntry
   {
-    AtlasSize mSize;                 ///< size of atlas and blocks
-    SizeType mBlocksUsed;            ///< number of blocks used in the atlas
-    SizeType mTotalBlocks;           ///< total blocks used by atlas
-    Pixel::Format mPixelFormat;      ///< pixel format of the atlas
+    AtlasSize     mSize;        ///< size of atlas and blocks
+    SizeType      mBlocksUsed;  ///< number of blocks used in the atlas
+    SizeType      mTotalBlocks; ///< total blocks used by atlas
+    Pixel::Format mPixelFormat; ///< pixel format of the atlas
   };
 
   struct Metrics
   {
     Metrics()
-    : mAtlasCount( 0u ),
-      mTextureMemoryUsed( 0u )
-    {}
+    : mAtlasCount(0u),
+      mTextureMemoryUsed(0u)
+    {
+    }
 
     ~Metrics()
-    {}
+    {
+    }
 
-    SizeType mAtlasCount;                               ///< number of atlases
-    SizeType mTextureMemoryUsed;                        ///< texture memory used by atlases
-    Dali::Vector< AtlasMetricsEntry > mAtlasMetrics;    ///< container of atlas information
+    SizeType                        mAtlasCount;        ///< number of atlases
+    SizeType                        mTextureMemoryUsed; ///< texture memory used by atlases
+    Dali::Vector<AtlasMetricsEntry> mAtlasMetrics;      ///< container of atlas information
   };
 
   struct Vertex2D
   {
-    Vector2 mPosition;        ///< Vertex posiiton
-    Vector2 mTexCoords;       ///< Vertex texture co-ordinates
-    Vector4 mColor;           ///< Vertex color
+    Vector2 mPosition;  ///< Vertex posiiton
+    Vector2 mTexCoords; ///< Vertex texture co-ordinates
+    Vector4 mColor;     ///< Vertex color
   };
 
   struct Mesh2D
   {
-    Vector< Vertex2D > mVertices;       ///< container of vertices
-    Vector< unsigned short > mIndices;        ///< container of indices
+    Vector<Vertex2D>       mVertices; ///< container of vertices
+    Vector<unsigned short> mIndices;  ///< container of indices
   };
 
   /**
@@ -125,11 +123,11 @@ public:
    */
   struct AtlasSlot
   {
-    ImageId mImageId;                           ///< Id of stored Image
-    AtlasId mAtlasId;                           ///< Id of Atlas containing this slot
+    ImageId mImageId; ///< Id of stored Image
+    AtlasId mAtlasId; ///< Id of Atlas containing this slot
   };
 
-  typedef Dali::Vector< AtlasManager::AtlasSlot > slotContainer;
+  typedef Dali::Vector<AtlasManager::AtlasSlot> slotContainer;
 
   /**
    * @brief Create a blank atlas of specific dimensions and pixel format with a certain block size
@@ -139,14 +137,14 @@ public:
    *
    * @return atlas Id
    */
-  AtlasId CreateAtlas( const AtlasSize& size, Pixel::Format pixelformat = Pixel::RGBA8888 );
+  AtlasId CreateAtlas(const AtlasSize& size, Pixel::Format pixelformat = Pixel::RGBA8888);
 
   /**
    * @brief Set the policy on failure to add an image to an atlas
    *
    * @param policy policy to carry out if add fails
    */
-  void SetAddPolicy( AddFailPolicy policy );
+  void SetAddPolicy(AddFailPolicy policy);
 
   /**
    * @brief Attempts to add an image to the most suitable atlas
@@ -161,9 +159,9 @@ public:
    *
    * @return true if a new atlas was created
    */
-  bool Add( const PixelData& image,
-            AtlasSlot& slot,
-            AtlasId atlas = 0 );
+  bool Add(const PixelData& image,
+           AtlasSlot&       slot,
+           AtlasId          atlas = 0);
 
   /**
    * @brief Remove previously added bitmapimage from atlas
@@ -172,7 +170,7 @@ public:
    *
    * @return if true then image has been removed from the atlas
    */
-  bool Remove( ImageId id );
+  bool Remove(ImageId id);
 
   /**
    * @brief Generate mesh data for a previously added image
@@ -182,10 +180,10 @@ public:
    * @param[out] mesh Mesh Data Object to populate with mesh data
    * @param[in] addReference Whether to increase the internal reference count for image or not
    */
-  void GenerateMeshData( ImageId id,
-                         const Vector2& position,
-                         Mesh2D& mesh,
-                         bool addReference = true );
+  void GenerateMeshData(ImageId        id,
+                        const Vector2& position,
+                        Mesh2D&        mesh,
+                        bool           addReference = true);
 
   /**
    * @brief Get the Texture containing an atlas
@@ -194,7 +192,7 @@ public:
    *
    * @return Atlas Handle
    */
-  Dali::Texture GetAtlasContainer( AtlasId atlas ) const;
+  Dali::Texture GetAtlasContainer(AtlasId atlas) const;
 
   /**
    * @brief Get the Id of the atlas containing an image
@@ -203,7 +201,7 @@ public:
    *
    * @return Atlas Id
    */
-  AtlasId GetAtlas( ImageId id );
+  AtlasId GetAtlas(ImageId id);
   /**
    * @brief Get the current size of an atlas
    *
@@ -211,7 +209,7 @@ public:
    *
    * @return AtlasSize structure for the atlas
    */
-  const AtlasSize& GetAtlasSize( AtlasId atlas );
+  const AtlasSize& GetAtlasSize(AtlasId atlas);
 
   /**
    * @brief Get the number of blocks available in an atlas
@@ -220,7 +218,7 @@ public:
    *
    * @return Number of blocks free in this atlas
    */
-  SizeType GetFreeBlocks( AtlasId atlas );
+  SizeType GetFreeBlocks(AtlasId atlas);
 
   /**
    * @brief Sets the pixel area of any new atlas and also the individual block size
@@ -229,7 +227,7 @@ public:
    *
    * @param blockSize pixel area in atlas for a block
    */
-  void SetNewAtlasSize( const AtlasSize& size );
+  void SetNewAtlasSize(const AtlasSize& size);
 
   /**
    * @brief Get the number of atlases created
@@ -245,14 +243,14 @@ public:
    *
    * @return Pixel format used by this atlas
    */
-  Pixel::Format GetPixelFormat( AtlasId atlas ) const;
+  Pixel::Format GetPixelFormat(AtlasId atlas) const;
 
   /**
    * @brief Fill in a metrics structure showing current status of this Atlas Manager
    *
    * @param[in] metrics metrics structure to be filled
    */
-  void GetMetrics( Metrics& metrics );
+  void GetMetrics(Metrics& metrics);
 
   /**
    * @brief Get TextureSet used by atlas
@@ -261,7 +259,7 @@ public:
    *
    * @return TextureSet used by atlas
    */
-  TextureSet GetTextures( AtlasId atlas ) const;
+  TextureSet GetTextures(AtlasId atlas) const;
 
   /**
    * @brief Set the texture set used by an atlas
@@ -269,12 +267,10 @@ public:
    * @param[in] atlas AtlasId
    * @param[in] textureSet The texture set to assign
    */
-  void SetTextures( AtlasId atlas, TextureSet& textureSet );
+  void SetTextures(AtlasId atlas, TextureSet& textureSet);
 
 private:
-
-  explicit DALI_INTERNAL AtlasManager(Internal::AtlasManager *impl);
-
+  explicit DALI_INTERNAL AtlasManager(Internal::AtlasManager* impl);
 };
 
 } // namespace Toolkit

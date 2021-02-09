@@ -23,13 +23,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 MultilanguageSupport::MultilanguageSupport()
 {
 }
@@ -38,8 +35,8 @@ MultilanguageSupport::~MultilanguageSupport()
 {
 }
 
-MultilanguageSupport::MultilanguageSupport( Internal::MultilanguageSupport* implementation )
-: BaseHandle( implementation )
+MultilanguageSupport::MultilanguageSupport(Internal::MultilanguageSupport* implementation)
+: BaseHandle(implementation)
 {
 }
 
@@ -48,34 +45,34 @@ MultilanguageSupport MultilanguageSupport::Get()
   return Internal::MultilanguageSupport::Get();
 }
 
-void MultilanguageSupport::SetScripts( const Vector<Character>& text,
-                                       CharacterIndex startIndex,
-                                       Length numberOfCharacters,
-                                       Vector<ScriptRun>& scripts )
+void MultilanguageSupport::SetScripts(const Vector<Character>& text,
+                                      CharacterIndex           startIndex,
+                                      Length                   numberOfCharacters,
+                                      Vector<ScriptRun>&       scripts)
 {
-  GetImplementation( *this ).SetScripts( text,
-                                         startIndex,
-                                         numberOfCharacters,
-                                         scripts );
+  GetImplementation(*this).SetScripts(text,
+                                      startIndex,
+                                      numberOfCharacters,
+                                      scripts);
 }
 
-void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
-                                          const Vector<ScriptRun>& scripts,
-                                          const Vector<FontDescriptionRun>& fontDescriptions,
-                                          const TextAbstraction::FontDescription& defaultFontDescription,
-                                          TextAbstraction::PointSize26Dot6 defaultFontPointSize,
-                                          CharacterIndex startIndex,
-                                          Length numberOfCharacters,
-                                          Vector<FontRun>& fonts )
+void MultilanguageSupport::ValidateFonts(const Vector<Character>&                text,
+                                         const Vector<ScriptRun>&                scripts,
+                                         const Vector<FontDescriptionRun>&       fontDescriptions,
+                                         const TextAbstraction::FontDescription& defaultFontDescription,
+                                         TextAbstraction::PointSize26Dot6        defaultFontPointSize,
+                                         CharacterIndex                          startIndex,
+                                         Length                                  numberOfCharacters,
+                                         Vector<FontRun>&                        fonts)
 {
-  GetImplementation( *this ).ValidateFonts( text,
-                                            scripts,
-                                            fontDescriptions,
-                                            defaultFontDescription,
-                                            defaultFontPointSize,
-                                            startIndex,
-                                            numberOfCharacters,
-                                            fonts );
+  GetImplementation(*this).ValidateFonts(text,
+                                         scripts,
+                                         fontDescriptions,
+                                         defaultFontDescription,
+                                         defaultFontPointSize,
+                                         startIndex,
+                                         numberOfCharacters,
+                                         fonts);
 }
 
 } // namespace Text

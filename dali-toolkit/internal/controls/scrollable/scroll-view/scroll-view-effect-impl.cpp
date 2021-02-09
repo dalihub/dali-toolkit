@@ -23,13 +23,10 @@ using namespace Dali;
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 ScrollViewEffect::ScrollViewEffect()
 : mScrollViewImpl(NULL)
 {
@@ -41,7 +38,7 @@ ScrollViewEffect::~ScrollViewEffect()
 
 void ScrollViewEffect::Attach(Toolkit::ScrollView& scrollView)
 {
-  DALI_ASSERT_ALWAYS( (!mScrollViewImpl) && "Already attached to a ScrollView" );
+  DALI_ASSERT_ALWAYS((!mScrollViewImpl) && "Already attached to a ScrollView");
 
   mScrollViewImpl = &GetImpl(scrollView);
 
@@ -50,8 +47,8 @@ void ScrollViewEffect::Attach(Toolkit::ScrollView& scrollView)
 
 void ScrollViewEffect::Detach(Toolkit::ScrollView& scrollView)
 {
-  DALI_ASSERT_ALWAYS( (mScrollViewImpl) && "Already detached from ScrollView" );
-  DALI_ASSERT_ALWAYS( (&GetImpl(scrollView) == mScrollViewImpl) && "Effect attached to a different ScrollView");
+  DALI_ASSERT_ALWAYS((mScrollViewImpl) && "Already detached from ScrollView");
+  DALI_ASSERT_ALWAYS((&GetImpl(scrollView) == mScrollViewImpl) && "Effect attached to a different ScrollView");
 
   OnDetach(scrollView);
 
@@ -62,7 +59,7 @@ Toolkit::ScrollView ScrollViewEffect::GetScrollView()
 {
   DALI_ASSERT_ALWAYS(mScrollViewImpl);
 
-  return DownCast<Toolkit::ScrollView>( mScrollViewImpl->Self() );
+  return DownCast<Toolkit::ScrollView>(mScrollViewImpl->Self());
 }
 
 } // namespace Internal

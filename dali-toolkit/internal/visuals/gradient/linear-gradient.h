@@ -24,13 +24,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * Linear gradients change color evenly along a straight line.
  * The gradient is defined by an axis (the gradient line) at any specified angles.
@@ -38,13 +35,12 @@ namespace Internal
 class LinearGradient : public Gradient
 {
 public:
-
   /**
    * Constructor.
    * @param[in] startPosition The starting point onto which the 0% gradient stops are mapped.
    * @param[in] endPosition The ending point r onto which the 100% gradient stops are mapped.
    */
-  LinearGradient( const Vector2& startPosition, const Vector2& endPosition );
+  LinearGradient(const Vector2& startPosition, const Vector2& endPosition);
 
   /**
    * Destructor.
@@ -56,7 +52,7 @@ public:
    * @param[in] startPosition The starting point of the gradient vector.
    * @param[in] endPosition The ending point of the gradient vector.
    */
-  void SetStartAndEndPosition( const Vector2& startPosition, const Vector2& endPosition );
+  void SetStartAndEndPosition(const Vector2& startPosition, const Vector2& endPosition);
 
   /**
    * Get the stating point of the gradient vector.
@@ -71,15 +67,13 @@ public:
   const Vector2& GetEndPosition() const;
 
 private:
+  // Undefined
+  LinearGradient(const LinearGradient& gradient);
 
   // Undefined
-  LinearGradient( const LinearGradient& gradient );
-
-  // Undefined
-  LinearGradient& operator=( const LinearGradient& handle );
+  LinearGradient& operator=(const LinearGradient& handle);
 
 private:
-
   Vector2 mStartPosition;
   Vector2 mEndPosition;
 };

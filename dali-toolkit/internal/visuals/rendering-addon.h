@@ -2,7 +2,7 @@
 #define DALI_RENDERING_ADDON_H
 
 /*
-* Copyright (c) 2020 Samsung Electronics Co., Ltd.
+* Copyright (c) 2021 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 *
 */
 
-#include <dali/devel-api/common/addon-binder.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
+#include <dali/devel-api/common/addon-binder.h>
 
 namespace Dali
 {
@@ -27,45 +27,47 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 /**
  * Interface of Overdrawing AddOn
  */
 class RenderingAddOn : public Dali::AddOn::AddOnBinder
 {
   using TextureManager = Dali::Toolkit::Internal::TextureManager;
+
 public:
-  RenderingAddOn() : Dali::AddOn::AddOnBinder( "oo-rendering", 0u )
-  {}
+  RenderingAddOn()
+  : Dali::AddOn::AddOnBinder("oo-rendering", 0u)
+  {
+  }
 
   // Bind AddOn functions
   ADDON_BIND_FUNCTION(
     GetGeometry,
-    Dali::Geometry(TextureManager::TextureId, uint32_t&, uint32_t& ) );
+    Dali::Geometry(TextureManager::TextureId, uint32_t&, uint32_t&));
 
   ADDON_BIND_FUNCTION(
     CreateGeometry,
-    Dali::Geometry( TextureManager::TextureId, const Dali::Devel::PixelBuffer& pixelBuffer ) );
+    Dali::Geometry(TextureManager::TextureId, const Dali::Devel::PixelBuffer& pixelBuffer));
 
   ADDON_BIND_FUNCTION(
     Initialize,
-    void*() );
+    void*());
 
   ADDON_BIND_FUNCTION(
     CreateGeometryGrid,
-    Dali::Geometry( const void*, const Uint16Pair&, uint32_t*) );
+    Dali::Geometry(const void*, const Uint16Pair&, uint32_t*));
 
   ADDON_BIND_FUNCTION(
     SubmitRenderTask,
-    void( Renderer&, const void* ) );
+    void(Renderer&, const void*));
 
   ADDON_BIND_FUNCTION(
     BuildNPatch,
-    void*( const Devel::PixelBuffer&, void*) );
+    void*(const Devel::PixelBuffer&, void*));
 
   ADDON_BIND_FUNCTION(
     DestroyNPatch,
-    void( void* ) );
+    void(void*));
 
   /**
    * Single instance of the addon
@@ -74,7 +76,7 @@ public:
   static RenderingAddOn& Get()
   {
     static RenderingAddOn* addon = nullptr;
-    if( !addon )
+    if(!addon)
     {
       addon = new RenderingAddOn();
       if(addon->IsValid())
@@ -86,8 +88,8 @@ public:
   }
 };
 
-} // Internal
-} // Toolkit
-} // Dali
+} // namespace Internal
+} // namespace Toolkit
+} // namespace Dali
 
 #endif //DALI_CMAKE_RENDERING_ADDON_H

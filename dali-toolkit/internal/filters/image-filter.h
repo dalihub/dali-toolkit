@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_FILTER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +24,15 @@
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/effects-view/effects-view.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * An interface class that provides a interface for image filters that perform
  * a simple shader effect on an input texture, rendering the output to a FrameBuffer.
@@ -43,10 +40,9 @@ namespace Internal
 class ImageFilter
 {
 public:
-  typedef std::vector< Vector3 > FilterKernel;
+  typedef std::vector<Vector3> FilterKernel;
 
 public:
-
   /**
    * Default constructor
    */
@@ -75,37 +71,37 @@ public:
   /**
    * @copydoc Dali::Toolkit::EffectsView::SetRefreshOnDemand
    */
-  void SetRefreshOnDemand( bool onDemand );
+  void SetRefreshOnDemand(bool onDemand);
 
   /**
    * Set the input texture
    * @param[in] The input/original texture.
    */
-  void SetInputTexture( Texture texture );
+  void SetInputTexture(Texture texture);
 
   /**
    * Set the output frame buffer
    * @return The output frame buffer.
    */
-  void SetOutputFrameBuffer( FrameBuffer frameBuffer );
+  void SetOutputFrameBuffer(FrameBuffer frameBuffer);
 
   /**
    * Set size of ImageFilter. Used to create internal offscreen buffers
    * @param[in] size  THe size.
    */
-  virtual void SetSize( const Vector2& size );
+  virtual void SetSize(const Vector2& size);
 
   /**
    * Set the pixel format for internal offscreen buffers
    * @param[in] pixelFormat The pixel format.
    */
-  void SetPixelFormat( Pixel::Format pixelFormat );
+  void SetPixelFormat(Pixel::Format pixelFormat);
 
   /**
    * Set the filter kernel
    * @param[in] The filter kernel
    */
-  void SetKernel( const FilterKernel& kernel );
+  void SetKernel(const FilterKernel& kernel);
 
   /**
    * Get a const reference to the internal filter kernel
@@ -124,38 +120,37 @@ public:
    * @param[in] weights
    * @param[in] count
    */
-  void CreateKernel( const float* weights, size_t count);
+  void CreateKernel(const float* weights, size_t count);
 
   /**
    * Set the actor which acts as the root actor for all internal actors for connection to stage
    * @param[in] rootActor   An actor which acts as the root actor for any internal actors that need
    *                        to be created
    */
-  void SetRootActor( Actor rootActor );
+  void SetRootActor(Actor rootActor);
 
   /**
    * Set the background / clear color
    * @param[in] color The background / clear color
    */
-  void SetBackgroundColor( const Vector4& color );
+  void SetBackgroundColor(const Vector4& color);
 
 protected:
-
   /**
    * Setup position and parameters for camera
    */
   void SetupCamera();
 
 protected:
-  Texture          mInputTexture;
-  FrameBuffer      mOutputFrameBuffer;
-  FilterKernel     mKernel;
-  Actor            mRootActor;
-  CameraActor      mCameraActor;
-  Vector4          mBackgroundColor;
-  Vector2          mTargetSize;
-  Pixel::Format    mPixelFormat;
-  bool             mRefreshOnDemand;
+  Texture       mInputTexture;
+  FrameBuffer   mOutputFrameBuffer;
+  FilterKernel  mKernel;
+  Actor         mRootActor;
+  CameraActor   mCameraActor;
+  Vector4       mBackgroundColor;
+  Vector2       mTargetSize;
+  Pixel::Format mPixelFormat;
+  bool          mRefreshOnDemand;
 
 }; // class Imagefilter
 
@@ -166,4 +161,3 @@ protected:
 } // namespace Dali
 
 #endif // DALI_TOOLKIT_INTERNAL_IMAGE_FILTER_H
-

@@ -18,19 +18,17 @@
 #include <dali-toolkit/devel-api/shader-effects/distance-field-effect.h>
 
 // EXTERNAL INCLUDES
-#include <string.h>
 #include <dali/public-api/rendering/shader.h>
+#include <string.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 Dali::Property::Map CreateDistanceFieldEffect()
 {
   const char* fragmentShaderPrefix("#extension GL_OES_standard_derivatives : enable\n");

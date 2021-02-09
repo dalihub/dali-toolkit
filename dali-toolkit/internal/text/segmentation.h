@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_SEGMENTATION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class LogicalModel;
 
 /**
@@ -49,10 +46,10 @@ class LogicalModel;
  * @param[in] numberOfCharacters The number of characters.
  * @param[out] lineBreakInfo The line break info
  */
-void SetLineBreakInfo( const Vector<Character>& text,
-                       CharacterIndex startIndex,
-                       Length numberOfCharacters,
-                       Vector<LineBreakInfo>& lineBreakInfo );
+void SetLineBreakInfo(const Vector<Character>& text,
+                      CharacterIndex           startIndex,
+                      Length                   numberOfCharacters,
+                      Vector<LineBreakInfo>&   lineBreakInfo);
 
 /**
  * Sets word break info.
@@ -65,10 +62,10 @@ void SetLineBreakInfo( const Vector<Character>& text,
  * @param[in] numberOfCharacters The number of characters.
  * @param[out] wordBreakInfo The word break info.
  */
-void SetWordBreakInfo( const Vector<Character>& text,
-                       CharacterIndex startIndex,
-                       Length numberOfCharacters,
-                       Vector<WordBreakInfo>& wordBreakInfo );
+void SetWordBreakInfo(const Vector<Character>& text,
+                      CharacterIndex           startIndex,
+                      Length                   numberOfCharacters,
+                      Vector<WordBreakInfo>&   wordBreakInfo);
 
 } // namespace Text
 

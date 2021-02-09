@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXTURE_UPLOAD_OBSERVER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,15 @@
 #include <dali/public-api/signals/dali-signal.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
-
 class TextureSet;
 
 namespace Toolkit
 {
-
-
 /**
  * @brief Base class used to observe the upload status of a texture.
  *
@@ -44,8 +41,7 @@ namespace Toolkit
 class TextureUploadObserver
 {
 public:
-
-  typedef Signal< void ( TextureUploadObserver* ) > DestructionSignalType; ///< Signal prototype for the Destruction Signal.
+  typedef Signal<void(TextureUploadObserver*)> DestructionSignalType; ///< Signal prototype for the Destruction Signal.
 
   /**
    * @brief Constructor.
@@ -68,8 +64,7 @@ public:
    * @param[in] atlasRect   If using atlasing, this is the rectangle within the atlas to use.
    * @param[in] preMultiplied True if the image had pre-multiplied alpha applied
    */
-  virtual void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing,
-                               const Vector4& atlasRect, bool preMultiplied ) = 0;
+  virtual void UploadComplete(bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied) = 0;
 
   /**
    * The action to be taken once the async load has finished.
@@ -80,7 +75,7 @@ public:
    * @param[in] url           The url address of the loaded image.
    * @param[in] preMultiplied True if the image had pre-multiplied alpha applied
    */
-  virtual void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const Internal::VisualUrl& url, bool preMultiplied ) = 0;
+  virtual void LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const Internal::VisualUrl& url, bool preMultiplied) = 0;
 
   /**
    * @brief Returns the destruction signal.
@@ -90,11 +85,8 @@ public:
   DestructionSignalType& DestructionSignal();
 
 private:
-
   DestructionSignalType mDestructionSignal; ///< The destruction signal emitted when the observer is destroyed.
-
 };
-
 
 } // namespace Toolkit
 

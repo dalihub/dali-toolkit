@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_DLI_LOADER_H
 #define DALI_SCENE_LOADER_DLI_LOADER_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@
  *
  */
 
- // INTERNAL INCLUDES
-#include "dali-scene-loader/public-api/api.h"
+// INTERNAL INCLUDES
 #include "dali-scene-loader/public-api/animation-definition.h"
+#include "dali-scene-loader/public-api/api.h"
 #include "dali-scene-loader/public-api/customization.h"
-#include "dali-scene-loader/public-api/string-callback.h"
 #include "dali-scene-loader/public-api/index.h"
+#include "dali-scene-loader/public-api/string-callback.h"
 
 // EXTERNAL INCLUDES
 #include "dali/public-api/common/vector-wrapper.h"
@@ -46,17 +46,19 @@ class SceneDefinition;
 class DALI_SCENE_LOADER_API DliLoader
 {
 public:
-  using ConvertFontCode = void(*)(const std::string& code, std::string& fontFamily, std::string& slant, std::string& weight, float& size);
-  using ConvertColorCode = Vector4(*)(const std::string& code);
+  using ConvertFontCode  = void (*)(const std::string& code, std::string& fontFamily, std::string& slant, std::string& weight, float& size);
+  using ConvertColorCode = Vector4 (*)(const std::string& code);
 
-  using CategoryProcessor = std::function<void(Property::Array&& categoryData, StringCallback onError)>;
+  using CategoryProcessor       = std::function<void(Property::Array&& categoryData, StringCallback onError)>;
   using CategoryProcessorVector = std::vector<std::pair<std::string /*name*/, CategoryProcessor>>;
 
   using NodeProcessor = std::function<void(const NodeDefinition& nodeDef,
-    Property::Map&& nodeData, StringCallback onError)>;
+                                           Property::Map&&       nodeData,
+                                           StringCallback        onError)>;
 
   using AnimationProcessor = std::function<void(const AnimationDefinition& animDef,
-    Property::Map&& animData, StringCallback onError)>;
+                                                Property::Map&&            animData,
+                                                StringCallback             onError)>;
 
   struct InputParams
   {
@@ -105,7 +107,7 @@ public:
   struct LoadParams
   {
     InputParams const& input;
-    LoadResult& output;
+    LoadResult&        output;
   };
 
   DliLoader();
@@ -133,7 +135,7 @@ private:
   const std::unique_ptr<Impl> mImpl;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif // DALI_SCENE_LOADER_DLI_LOADER_H

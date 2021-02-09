@@ -27,29 +27,26 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 namespace
 {
 const std::string XHTML_VALUE_ATTRIBUTE("value");
 }
 
-void ProcessColorTag( const Tag& tag, ColorRun& colorRun )
+void ProcessColorTag(const Tag& tag, ColorRun& colorRun)
 {
-  for( Vector<Attribute>::ConstIterator it = tag.attributes.Begin(),
-         endIt = tag.attributes.End();
-       it != endIt;
-       ++it )
+  for(Vector<Attribute>::ConstIterator it    = tag.attributes.Begin(),
+                                       endIt = tag.attributes.End();
+      it != endIt;
+      ++it)
   {
-    const Attribute& attribute( *it );
-    if( TokenComparison( XHTML_VALUE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength ) )
+    const Attribute& attribute(*it);
+    if(TokenComparison(XHTML_VALUE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
     {
-      ColorStringToVector4( attribute.valueBuffer, attribute.valueLength, colorRun.color );
+      ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, colorRun.color);
     }
   }
 }

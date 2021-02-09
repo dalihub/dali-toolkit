@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,25 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/builder/replacement.h>
-#include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
+#include <dali-toolkit/internal/builder/builder-impl.h>
+#include <dali-toolkit/internal/builder/replacement.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
-namespace  // anon
+namespace // anon
 {
-
-Property::Value* FindReplacement( const std::string &str, const Property::Map& overrideMap, const Property::Map& defaultMap )
+Property::Value* FindReplacement(const std::string& str, const Property::Map& overrideMap, const Property::Map& defaultMap)
 {
-  Property::Value* ret  = overrideMap.Find( str );
+  Property::Value* ret = overrideMap.Find(str);
 
-  if ( !ret )
+  if(!ret)
   {
-    ret = defaultMap.Find( str );
+    ret = defaultMap.Find(str);
 
     // @ todo
     // try localized text ie dgettext. Look for colon  {DOMAIN:TEXT} {LC_MESSAGE:ID_XXXX}
@@ -47,17 +43,17 @@ Property::Value* FindReplacement( const std::string &str, const Property::Map& o
   return ret;
 }
 
-std::size_t FirstUnescapedChar(const std::string &initialValue, const std::size_t& startPos, const char c)
+std::size_t FirstUnescapedChar(const std::string& initialValue, const std::size_t& startPos, const char c)
 {
-  std::size_t pos = initialValue.find( c, startPos );
+  std::size_t pos = initialValue.find(c, startPos);
 
   if(pos > 0)
   {
-    while( pos != std::string::npos )
+    while(pos != std::string::npos)
     {
-      if( '\\' == initialValue.at( pos-1 ) )
+      if('\\' == initialValue.at(pos - 1))
       {
-        pos = initialValue.find( c, pos );
+        pos = initialValue.find(c, pos);
       }
       else
       {
@@ -69,11 +65,11 @@ std::size_t FirstUnescapedChar(const std::string &initialValue, const std::size_
   return pos;
 }
 
-bool GetSubstitutionPosition( const std::string &initialValue, std::size_t &startPos, std::size_t &size )
+bool GetSubstitutionPosition(const std::string& initialValue, std::size_t& startPos, std::size_t& size)
 {
   std::size_t pos = FirstUnescapedChar(initialValue, 0, '{');
 
-  if( std::string::npos == pos )
+  if(std::string::npos == pos)
   {
     startPos = std::string::npos;
     return false;
@@ -85,7 +81,7 @@ bool GetSubstitutionPosition( const std::string &initialValue, std::size_t &star
 
   pos = FirstUnescapedChar(initialValue, startPos, '}');
 
-  if( std::string::npos == pos )
+  if(std::string::npos == pos)
   {
     size = std::string::npos;
     return false;
@@ -98,11 +94,9 @@ bool GetSubstitutionPosition( const std::string &initialValue, std::size_t &star
   return true;
 }
 
-bool ResolvePartialReplacement( const std::string &initialValue, Property::Value &out,
-                                const Property::Map& overrideMap, const Property::Map& defaultMap )
+bool ResolvePartialReplacement(const std::string& initialValue, Property::Value& out, const Property::Map& overrideMap, const Property::Map& defaultMap)
 {
-
-  if( initialValue.size() >= 2 )
+  if(initialValue.size() >= 2)
   {
     // eg '{"constants": { "IMAGE_DIR": "/share/images" },
     //      ...
@@ -111,36 +105,37 @@ bool ResolvePartialReplacement( const std::string &initialValue, Property::Value
     std::size_t startPos = 0;
     std::size_t size     = std::string::npos;
 
-    if( !GetSubstitutionPosition( initialValue, startPos, size ) )
+    if(!GetSubstitutionPosition(initialValue, startPos, size))
     {
       out = initialValue;
       return true;
     }
     else
     {
-      const std::string str( initialValue.substr( startPos, size ) );
+      const std::string str(initialValue.substr(startPos, size));
 
-      Property::Value* value = FindReplacement( str, overrideMap, defaultMap );
+      Property::Value* value = FindReplacement(str, overrideMap, defaultMap);
 
-      if( !value )
+      if(!value)
       {
-        DALI_SCRIPT_WARNING( "Cannot find replacement for '%s'\n", str.c_str() );
+        DALI_SCRIPT_WARNING("Cannot find replacement for '%s'\n", str.c_str());
       }
       else
       {
-        if( Property::STRING != value->GetType() )
+        if(Property::STRING != value->GetType())
         {
-          DALI_SCRIPT_WARNING( "Cannot replace substring in non string property type='%s'. Initial value '%s'\n",
-                               PropertyTypes::GetName( out.GetType() ), initialValue.c_str() );
+          DALI_SCRIPT_WARNING("Cannot replace substring in non string property type='%s'. Initial value '%s'\n",
+                              PropertyTypes::GetName(out.GetType()),
+                              initialValue.c_str());
         }
         else
         {
-          std::string newString = \
+          std::string newString =
             initialValue.substr(0, startPos - 1) +
-            value->Get< std::string >() +
-            initialValue.substr( startPos + size + 1 );
+            value->Get<std::string>() +
+            initialValue.substr(startPos + size + 1);
 
-          return ResolvePartialReplacement( newString, out, overrideMap,  defaultMap );
+          return ResolvePartialReplacement(newString, out, overrideMap, defaultMap);
         }
       }
     }
@@ -150,13 +145,12 @@ bool ResolvePartialReplacement( const std::string &initialValue, Property::Value
   return false;
 }
 
-} // namespace anon
+} // namespace
 
-
-Replacement::Replacement( const Property::Map& overrideMap, const Property::Map& defaultMap )
-  : mOverrideMap( &overrideMap ), mDefaultMap( &defaultMap )
+Replacement::Replacement(const Property::Map& overrideMap, const Property::Map& defaultMap)
+: mOverrideMap(&overrideMap),
+  mDefaultMap(&defaultMap)
 {
-
 }
 
 namespace
@@ -164,46 +158,46 @@ namespace
 Property::Map noMap;
 }
 
-Replacement::Replacement( const Property::Map& defaultMap )
-  : mOverrideMap( &noMap ), mDefaultMap( &defaultMap )
+Replacement::Replacement(const Property::Map& defaultMap)
+: mOverrideMap(&noMap),
+  mDefaultMap(&defaultMap)
 {
-
 }
 
-Replacement::Replacement(  )
-  : mOverrideMap( &noMap ), mDefaultMap( &noMap )
+Replacement::Replacement()
+: mOverrideMap(&noMap),
+  mDefaultMap(&noMap)
 {
-
 }
 
-OptionalString Replacement::HasFullReplacement( const TreeNode & node ) const
+OptionalString Replacement::HasFullReplacement(const TreeNode& node) const
 {
   OptionalString ret;
 
-  if( node.HasSubstitution() && ((*mOverrideMap).Count() || (*mDefaultMap).Count()) )
+  if(node.HasSubstitution() && ((*mOverrideMap).Count() || (*mDefaultMap).Count()))
   {
-    OptionalString v = ::IsString( node );
-    if( v )
+    OptionalString v = ::IsString(node);
+    if(v)
     {
       const std::string& initialValue = *v;
-      if( (initialValue[ 0 ] == '{') && (initialValue[ initialValue.size() -1 ] == '}') )
+      if((initialValue[0] == '{') && (initialValue[initialValue.size() - 1] == '}'))
       {
-        ret = initialValue.substr( 1, initialValue.size() - 2 );
+        ret = initialValue.substr(1, initialValue.size() - 2);
       }
     }
   }
   return ret;
 }
 
-Property::Value Replacement::GetFullReplacement( const std::string& replacementString ) const
+Property::Value Replacement::GetFullReplacement(const std::string& replacementString) const
 {
   Property::Value out;
-  DALI_ASSERT_DEBUG( mOverrideMap && "missing map");
-  DALI_ASSERT_DEBUG( mDefaultMap && "missing map");
+  DALI_ASSERT_DEBUG(mOverrideMap && "missing map");
+  DALI_ASSERT_DEBUG(mDefaultMap && "missing map");
 
-  Property::Value* value = FindReplacement( replacementString, *mOverrideMap, *mDefaultMap );
+  Property::Value* value = FindReplacement(replacementString, *mOverrideMap, *mDefaultMap);
 
-  if( !value )
+  if(!value)
   {
     DALI_SCRIPT_WARNING("Cannot find replacement for '%s'\n", replacementString.c_str());
   }
@@ -213,36 +207,36 @@ Property::Value Replacement::GetFullReplacement( const std::string& replacementS
 #if defined(DEBUG_ENABLED)
     DALI_SCRIPT_VERBOSE("  Full replacement for '%s' => to Type '%s'\n",
                         replacementString.c_str(),
-                        PropertyTypes::GetName( out.GetType()) );
+                        PropertyTypes::GetName(out.GetType()));
 #endif
   }
 
   return out;
 }
 
-OptionalBoolean Replacement::IsBoolean( const TreeNode & node ) const
+OptionalBoolean Replacement::IsBoolean(const TreeNode& node) const
 {
   OptionalBoolean ret;
-  if( OptionalString replace = HasFullReplacement( node ) )
+  if(OptionalString replace = HasFullReplacement(node))
   {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::BOOLEAN == value.GetType() )
+    Property::Value value = GetFullReplacement(*replace);
+    if(Property::BOOLEAN == value.GetType())
     {
       ret = value.Get<bool>();
     }
   }
   else
   {
-    ret = ::IsBoolean( node );
+    ret = ::IsBoolean(node);
   }
   return ret;
 }
 
-OptionalBoolean Replacement::IsBoolean( OptionalChild child ) const
+OptionalBoolean Replacement::IsBoolean(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsBoolean( *child );
+    return IsBoolean(*child);
   }
   else
   {
@@ -250,39 +244,39 @@ OptionalBoolean Replacement::IsBoolean( OptionalChild child ) const
   }
 }
 
-OptionalFloat Replacement::IsFloat( const TreeNode & node ) const
+OptionalFloat Replacement::IsFloat(const TreeNode& node) const
 {
   OptionalFloat ret;
-  if( OptionalString replace = HasFullReplacement( node ) )
+  if(OptionalString replace = HasFullReplacement(node))
   {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::FLOAT == value.GetType() )
+    Property::Value value = GetFullReplacement(*replace);
+    if(Property::FLOAT == value.GetType())
     {
       ret = value.Get<float>();
     }
   }
   else
   {
-    ret = ::IsFloat( node );
+    ret = ::IsFloat(node);
   }
   return ret;
 }
 
-OptionalString Replacement::IsString( const TreeNode& node ) const
+OptionalString Replacement::IsString(const TreeNode& node) const
 {
   OptionalString ret;
 
-  DALI_ASSERT_DEBUG( mOverrideMap && "missing map");
-  DALI_ASSERT_DEBUG( mDefaultMap && "missing map");
+  DALI_ASSERT_DEBUG(mOverrideMap && "missing map");
+  DALI_ASSERT_DEBUG(mDefaultMap && "missing map");
 
-  if( node.HasSubstitution() && ((*mOverrideMap).Count() || (*mDefaultMap).Count()) )
+  if(node.HasSubstitution() && ((*mOverrideMap).Count() || (*mDefaultMap).Count()))
   {
-    if( OptionalString v = ::IsString( node ) )
+    if(OptionalString v = ::IsString(node))
     {
       Property::Value value;
-      if( ResolvePartialReplacement( *v, value, *mOverrideMap, *mDefaultMap ) )
+      if(ResolvePartialReplacement(*v, value, *mOverrideMap, *mDefaultMap))
       {
-        if( Property::STRING == value.GetType() )
+        if(Property::STRING == value.GetType())
         {
           ret = value.Get<std::string>();
 #if defined(DEBUG_ENABLED)
@@ -298,160 +292,160 @@ OptionalString Replacement::IsString( const TreeNode& node ) const
   }
   else
   {
-    ret = ::IsString( node );
+    ret = ::IsString(node);
   }
   return ret;
 }
 
-OptionalInteger Replacement::IsInteger( const TreeNode & node ) const
+OptionalInteger Replacement::IsInteger(const TreeNode& node) const
 {
   OptionalInteger ret;
-  if( OptionalString replace = HasFullReplacement( node ) )
+  if(OptionalString replace = HasFullReplacement(node))
   {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::INTEGER == value.GetType() )
+    Property::Value value = GetFullReplacement(*replace);
+    if(Property::INTEGER == value.GetType())
     {
       ret = value.Get<int>();
     }
   }
   else
   {
-    ret = ::IsInteger( node );
+    ret = ::IsInteger(node);
   }
   return ret;
 }
 
-OptionalVector2 Replacement::IsVector2( const TreeNode & node ) const
+OptionalVector2 Replacement::IsVector2(const TreeNode& node) const
 {
   OptionalVector2 ret;
-  if( OptionalString replace = HasFullReplacement( node ) )
+  if(OptionalString replace = HasFullReplacement(node))
   {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::VECTOR2 == value.GetType() )
+    Property::Value value = GetFullReplacement(*replace);
+    if(Property::VECTOR2 == value.GetType())
     {
       ret = value.Get<Vector2>();
     }
   }
   else
   {
-    ret = ::IsVector2( node );
+    ret = ::IsVector2(node);
   }
   return ret;
 }
 
-OptionalVector3 Replacement::IsVector3( const TreeNode & node ) const
+OptionalVector3 Replacement::IsVector3(const TreeNode& node) const
 {
   OptionalVector3 ret;
-  if( OptionalString replace = HasFullReplacement( node ) )
+  if(OptionalString replace = HasFullReplacement(node))
   {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::VECTOR3 == value.GetType() )
+    Property::Value value = GetFullReplacement(*replace);
+    if(Property::VECTOR3 == value.GetType())
     {
       ret = value.Get<Vector3>();
     }
   }
   else
   {
-    ret = ::IsVector3( node );
+    ret = ::IsVector3(node);
   }
   return ret;
 }
 
-OptionalVector4 Replacement::IsVector4( const TreeNode & node ) const
+OptionalVector4 Replacement::IsVector4(const TreeNode& node) const
 {
   OptionalVector4 ret;
-  if( OptionalString replace = HasFullReplacement( node ) )
+  if(OptionalString replace = HasFullReplacement(node))
   {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::VECTOR4 == value.GetType() )
+    Property::Value value = GetFullReplacement(*replace);
+    if(Property::VECTOR4 == value.GetType())
     {
       ret = value.Get<Vector4>();
     }
   }
   else
   {
-    ret = ::IsVector4( node );
+    ret = ::IsVector4(node);
   }
   return ret;
 }
 
-OptionalMatrix Replacement::IsMatrix( const TreeNode & node ) const
+OptionalMatrix Replacement::IsMatrix(const TreeNode& node) const
 {
   OptionalMatrix ret;
-  if( OptionalString replace = HasFullReplacement( node ) )
+  if(OptionalString replace = HasFullReplacement(node))
   {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::MATRIX == value.GetType() )
+    Property::Value value = GetFullReplacement(*replace);
+    if(Property::MATRIX == value.GetType())
     {
       ret = value.Get<Matrix>();
     }
   }
   else
   {
-    ret = ::IsMatrix( node );
+    ret = ::IsMatrix(node);
   }
   return ret;
 }
 
-OptionalMatrix3 Replacement::IsMatrix3( const TreeNode & node ) const
+OptionalMatrix3 Replacement::IsMatrix3(const TreeNode& node) const
 {
   OptionalMatrix3 ret;
-  if( OptionalString replace = HasFullReplacement( node ) )
+  if(OptionalString replace = HasFullReplacement(node))
   {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::MATRIX3 == value.GetType() )
+    Property::Value value = GetFullReplacement(*replace);
+    if(Property::MATRIX3 == value.GetType())
     {
       ret = value.Get<Matrix3>();
     }
   }
   else
   {
-    ret = ::IsMatrix3( node );
+    ret = ::IsMatrix3(node);
   }
   return ret;
 }
 
-OptionalRect Replacement::IsRect( const TreeNode & node ) const
+OptionalRect Replacement::IsRect(const TreeNode& node) const
 {
   OptionalRect ret;
-  if( OptionalString replace = HasFullReplacement( node ) )
+  if(OptionalString replace = HasFullReplacement(node))
   {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::RECTANGLE == value.GetType() )
+    Property::Value value = GetFullReplacement(*replace);
+    if(Property::RECTANGLE == value.GetType())
     {
       ret = value.Get<Rect<int> >();
     }
   }
   else
   {
-    ret = ::IsRect( node );
+    ret = ::IsRect(node);
   }
   return ret;
 }
 
-OptionalExtents Replacement::IsExtents( const TreeNode & node ) const
+OptionalExtents Replacement::IsExtents(const TreeNode& node) const
 {
   OptionalExtents extents;
-  if( OptionalString replace = HasFullReplacement( node ) )
+  if(OptionalString replace = HasFullReplacement(node))
   {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::EXTENTS == value.GetType() )
+    Property::Value value = GetFullReplacement(*replace);
+    if(Property::EXTENTS == value.GetType())
     {
       extents = value.Get<Extents>();
     }
   }
   else
   {
-    extents = ::IsExtents( node );
+    extents = ::IsExtents(node);
   }
   return extents;
 }
 
-OptionalFloat Replacement::IsFloat( OptionalChild child ) const
+OptionalFloat Replacement::IsFloat(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsFloat( *child );
+    return IsFloat(*child);
   }
   else
   {
@@ -459,12 +453,11 @@ OptionalFloat Replacement::IsFloat( OptionalChild child ) const
   }
 }
 
-
-OptionalString Replacement::IsString( OptionalChild child ) const
+OptionalString Replacement::IsString(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsString( *child );
+    return IsString(*child);
   }
   else
   {
@@ -472,11 +465,11 @@ OptionalString Replacement::IsString( OptionalChild child ) const
   }
 }
 
-OptionalInteger Replacement::IsInteger( OptionalChild child ) const
+OptionalInteger Replacement::IsInteger(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsInteger( *child );
+    return IsInteger(*child);
   }
   else
   {
@@ -484,11 +477,11 @@ OptionalInteger Replacement::IsInteger( OptionalChild child ) const
   }
 }
 
-OptionalVector2 Replacement::IsVector2( OptionalChild child ) const
+OptionalVector2 Replacement::IsVector2(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsVector2( *child );
+    return IsVector2(*child);
   }
   else
   {
@@ -496,11 +489,11 @@ OptionalVector2 Replacement::IsVector2( OptionalChild child ) const
   }
 }
 
-OptionalVector3 Replacement::IsVector3( OptionalChild child ) const
+OptionalVector3 Replacement::IsVector3(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsVector3( *child );
+    return IsVector3(*child);
   }
   else
   {
@@ -508,11 +501,11 @@ OptionalVector3 Replacement::IsVector3( OptionalChild child ) const
   }
 }
 
-OptionalVector4 Replacement::IsVector4( OptionalChild child ) const
+OptionalVector4 Replacement::IsVector4(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsVector4( *child );
+    return IsVector4(*child);
   }
   else
   {
@@ -520,11 +513,11 @@ OptionalVector4 Replacement::IsVector4( OptionalChild child ) const
   }
 }
 
-OptionalMatrix Replacement::IsMatrix( OptionalChild child ) const
+OptionalMatrix Replacement::IsMatrix(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsMatrix( *child );
+    return IsMatrix(*child);
   }
   else
   {
@@ -532,11 +525,11 @@ OptionalMatrix Replacement::IsMatrix( OptionalChild child ) const
   }
 }
 
-OptionalMatrix3 Replacement::IsMatrix3( OptionalChild child ) const
+OptionalMatrix3 Replacement::IsMatrix3(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsMatrix3( *child );
+    return IsMatrix3(*child);
   }
   else
   {
@@ -544,11 +537,11 @@ OptionalMatrix3 Replacement::IsMatrix3( OptionalChild child ) const
   }
 }
 
-OptionalRect Replacement::IsRect( OptionalChild child ) const
+OptionalRect Replacement::IsRect(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsRect( *child );
+    return IsRect(*child);
   }
   else
   {
@@ -556,16 +549,16 @@ OptionalRect Replacement::IsRect( OptionalChild child ) const
   }
 }
 
-bool Replacement::IsMap( OptionalChild child, Property::Value& out ) const
+bool Replacement::IsMap(OptionalChild child, Property::Value& out) const
 {
   bool ret = false;
 
-  if( child )
+  if(child)
   {
-    if( OptionalString replace = HasFullReplacement( *child ) )
+    if(OptionalString replace = HasFullReplacement(*child))
     {
-      out = GetFullReplacement( *replace );
-      if( Property::MAP == out.GetType() )
+      out = GetFullReplacement(*replace);
+      if(Property::MAP == out.GetType())
       {
         ret = true;
       }
@@ -575,16 +568,16 @@ bool Replacement::IsMap( OptionalChild child, Property::Value& out ) const
   return ret;
 }
 
-bool Replacement::IsArray( OptionalChild child, Property::Value& out ) const
+bool Replacement::IsArray(OptionalChild child, Property::Value& out) const
 {
   bool ret = false;
 
-  if( child )
+  if(child)
   {
-    if( OptionalString replace = HasFullReplacement( *child ) )
+    if(OptionalString replace = HasFullReplacement(*child))
     {
-      out = GetFullReplacement( *replace );
-      if( Property::ARRAY == out.GetType() )
+      out = GetFullReplacement(*replace);
+      if(Property::ARRAY == out.GetType())
       {
         ret = true;
       }
@@ -594,11 +587,11 @@ bool Replacement::IsArray( OptionalChild child, Property::Value& out ) const
   return ret;
 }
 
-OptionalExtents Replacement::IsExtents( OptionalChild child ) const
+OptionalExtents Replacement::IsExtents(OptionalChild child) const
 {
-  if( child )
+  if(child)
   {
-    return IsExtents( *child );
+    return IsExtents(*child);
   }
   else
   {

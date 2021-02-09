@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CURSOR_HELPER_FUNCTIONS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 struct CharacterHitTest
 {
   /**
@@ -49,16 +46,18 @@ struct CursorInfo
   CursorInfo()
   : primaryPosition(),
     secondaryPosition(),
-    lineOffset( 0.f ),
-    glyphOffset( 0.f ),
-    lineHeight( 0.f ),
-    primaryCursorHeight( 0.f ),
-    secondaryCursorHeight( 0.f ),
-    isSecondaryCursor( false )
-  {}
+    lineOffset(0.f),
+    glyphOffset(0.f),
+    lineHeight(0.f),
+    primaryCursorHeight(0.f),
+    secondaryCursorHeight(0.f),
+    isSecondaryCursor(false)
+  {
+  }
 
   ~CursorInfo()
-  {}
+  {
+  }
 
   Vector2 primaryPosition;       ///< The primary cursor's position (in text's coords).
   Vector2 secondaryPosition;     ///< The secondary cursor's position (in text's coords).
@@ -75,11 +74,11 @@ struct CursorInfo
  */
 struct GetCursorPositionParameters
 {
-  VisualModelPtr visualModel;    ///< The visual model.
-  LogicalModelPtr logicalModel;  ///< The logical model.
-  MetricsPtr metrics;            ///< A wrapper around FontClient used to get metrics.
-  CharacterIndex logical;        ///< The logical cursor position (in characters). 0 is just before the first character, a value equal to the number of characters is just after the last character.
-  bool isMultiline;              ///< Whether the text control is multi-line.
+  VisualModelPtr  visualModel;  ///< The visual model.
+  LogicalModelPtr logicalModel; ///< The logical model.
+  MetricsPtr      metrics;      ///< A wrapper around FontClient used to get metrics.
+  CharacterIndex  logical;      ///< The logical cursor position (in characters). 0 is just before the first character, a value equal to the number of characters is just after the last character.
+  bool            isMultiline;  ///< Whether the text control is multi-line.
 };
 
 /**
@@ -93,9 +92,9 @@ struct GetCursorPositionParameters
  *
  * @return A line index.
  */
-LineIndex GetClosestLine( VisualModelPtr visualModel,
-                          float visualY,
-                          bool& matchedLine );
+LineIndex GetClosestLine(VisualModelPtr visualModel,
+                         float          visualY,
+                         bool&          matchedLine);
 
 /**
  * @brief Calculates the vertical line's offset for a given line.
@@ -107,8 +106,8 @@ LineIndex GetClosestLine( VisualModelPtr visualModel,
  *
  * @return The vertical offset of the given line.
  */
-float CalculateLineOffset( const Vector<LineRun>& lines,
-                           LineIndex lineIndex );
+float CalculateLineOffset(const Vector<LineRun>& lines,
+                          LineIndex              lineIndex);
 
 /**
  * @brief Retrieves the cursor's logical position for a given touch point x,y
@@ -128,13 +127,13 @@ float CalculateLineOffset( const Vector<LineRun>& lines,
  *
  * @return The logical cursor position (in characters). 0 is just before the first character, a value equal to the number of characters is just after the last character.
  */
-CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
-                                      LogicalModelPtr logicalModel,
-                                      MetricsPtr metrics,
-                                      float visualX,
-                                      float visualY,
-                                      CharacterHitTest::Mode mode,
-                                      bool& matchedCharacter );
+CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
+                                     LogicalModelPtr        logicalModel,
+                                     MetricsPtr             metrics,
+                                     float                  visualX,
+                                     float                  visualY,
+                                     CharacterHitTest::Mode mode,
+                                     bool&                  matchedCharacter);
 
 /**
  * @brief Calculates the cursor's position for a given character index in the logical order.
@@ -145,8 +144,8 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
  * @param[in] parameters Parameters used to calculate the cursor's position.
  * @param[out] cursorInfo The line's height, the cursor's height, the cursor's position and whether there is an alternative cursor.
  */
-void GetCursorPosition( GetCursorPositionParameters& parameters,
-                        CursorInfo& cursorInfo );
+void GetCursorPosition(GetCursorPositionParameters& parameters,
+                       CursorInfo&                  cursorInfo);
 
 /**
  * @brief Find the indices to the first and last characters of a word for the given touch point.
@@ -162,14 +161,14 @@ void GetCursorPosition( GetCursorPositionParameters& parameters,
  *
  * @return @e true if the touch point hits a character.
  */
-bool FindSelectionIndices( VisualModelPtr visualModel,
-                           LogicalModelPtr logicalModel,
-                           MetricsPtr metrics,
-                           float visualX,
-                           float visualY,
-                           CharacterIndex& startIndex,
-                           CharacterIndex& endIndex,
-                           CharacterIndex& noTextHitIndex );
+bool FindSelectionIndices(VisualModelPtr  visualModel,
+                          LogicalModelPtr logicalModel,
+                          MetricsPtr      metrics,
+                          float           visualX,
+                          float           visualY,
+                          CharacterIndex& startIndex,
+                          CharacterIndex& endIndex,
+                          CharacterIndex& noTextHitIndex);
 
 } // namespace Text
 

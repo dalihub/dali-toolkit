@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_GRADIENT_VISUAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,24 @@
  */
 
 //EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/animated-gradient-visual-properties-devel.h>
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/devel-api/common/owner-container.h>
-#include <dali-toolkit/devel-api/visuals/animated-gradient-visual-properties-devel.h>
 
 //INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
 class AnimatedGradientVisual;
-typedef IntrusivePtr< AnimatedGradientVisual > AnimatedGradientVisualPtr;
+typedef IntrusivePtr<AnimatedGradientVisual> AnimatedGradientVisualPtr;
 
 /**
  * This visual which renders smooth transition of colors to the control's quad.
@@ -131,34 +129,32 @@ typedef IntrusivePtr< AnimatedGradientVisual > AnimatedGradientVisualPtr;
 class AnimatedGradientVisual : public Visual::Base
 {
 public:
-
   /**
    * Animation informations what this visual using
    */
   struct GradientAnimationData
   {
-   GradientAnimationData()
-    : index( Property::INVALID_INDEX ),
-      loop_count( 0 ),
-      delay( 0.0f ),
-      forward( false ),
-      auto_mirror( false )
+    GradientAnimationData()
+    : index(Property::INVALID_INDEX),
+      loop_count(0),
+      delay(0.0f),
+      forward(false),
+      auto_mirror(false)
     {
     }
 
     Toolkit::TransitionData transition;
-    Animation animation;
-    Property::Index index;
-    int loop_count;   ///< if < 0, loop unlimited. else, loop loop_count times.
-    float delay;      ///< delay time. if > 0, wait 'delay' seconds. else, play animation at '-delay' seconds.
-    bool forward;     ///< True if AnimationParameter::DirectionType::Type is FORWARD
-    bool auto_mirror; ///< True if AnimationParameter::LoopType::Type is MIRROR
+    Animation               animation;
+    Property::Index         index;
+    int                     loop_count;  ///< if < 0, loop unlimited. else, loop loop_count times.
+    float                   delay;       ///< delay time. if > 0, wait 'delay' seconds. else, play animation at '-delay' seconds.
+    bool                    forward;     ///< True if AnimationParameter::DirectionType::Type is FORWARD
+    bool                    auto_mirror; ///< True if AnimationParameter::LoopType::Type is MIRROR
   };
 
-  using GradientAnimationDataList =  Dali::OwnerContainer< GradientAnimationData* >;
+  using GradientAnimationDataList = Dali::OwnerContainer<GradientAnimationData*>;
 
 public:
-
   /**
    * @brief Create a new animated gradient visual.
    *
@@ -166,28 +162,26 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual
    */
-  static AnimatedGradientVisualPtr New( VisualFactoryCache& factoryCache, const Property::Map& properties );
+  static AnimatedGradientVisualPtr New(VisualFactoryCache& factoryCache, const Property::Map& properties);
 
 private: //from Visual
-
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  void DoCreatePropertyMap( Property::Map& map ) const override;
+  void DoCreatePropertyMap(Property::Map& map) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
+  void DoCreateInstancePropertyMap(Property::Map& map) const override;
 
 protected:
-
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  AnimatedGradientVisual( VisualFactoryCache& factoryCache );
+  AnimatedGradientVisual(VisualFactoryCache& factoryCache);
 
   /**
    * @brief A reference counted object may only be deleted by calling Unrefecence()
@@ -195,11 +189,15 @@ protected:
   virtual ~AnimatedGradientVisual();
 
 protected: //from Visual
+  /**
+   * @copydoc Visual::Base::OnInitialize
+   */
+  void OnInitialize() override;
 
   /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  void DoSetProperties( const Property::Map& propertyMap ) override;
+  void DoSetProperties(const Property::Map& propertyMap) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
@@ -209,24 +207,18 @@ protected: //from Visual
   /**
    * @copydoc Visual::Base::DoSetOnScene
    */
-  void DoSetOnScene( Actor& actor ) override;
+  void DoSetOnScene(Actor& actor) override;
 
   /**
    * @copydoc Visual::Base::DoSetOffScene
    */
-  void DoSetOffScene( Actor& actor ) override;
+  void DoSetOffScene(Actor& actor) override;
 
 private:
-
   /**
    * @brief Initialize the default value of properies.
    */
   void SetupDefaultValue();
-
-  /**
-   * @brief Initialize the rendere with the geometry from the cache, and shader which made by CreateShader()
-   */
-  void InitializeRenderer();
 
   /**
    * @brief Make animations with GradientAnimationData
@@ -248,7 +240,7 @@ private:
    *
    * param[in] propertyMap A Property::Map come from DoSetProperties
    */
-  void SetupGradientAnimationData( const Property::Map& propertyMap );
+  void SetupGradientAnimationData(const Property::Map& propertyMap);
 
   /**
    * @brief Create new shader
@@ -258,24 +250,24 @@ private:
   Shader CreateShader();
 
   // Undefined
-  AnimatedGradientVisual( const AnimatedGradientVisual& gradientRenderer );
+  AnimatedGradientVisual(const AnimatedGradientVisual& gradientRenderer);
 
   // Undefined
-  AnimatedGradientVisual& operator=( const AnimatedGradientVisual& gradientRenderer );
+  AnimatedGradientVisual& operator=(const AnimatedGradientVisual& gradientRenderer);
 
 private:
   GradientAnimationDataList mGradientAnimationDataList;
-  Property::Map mValueMap;
+  Property::Map             mValueMap;
 
   Dali::Toolkit::DevelAnimatedGradientVisual::GradientType::Type mGradientType;
-  Dali::Toolkit::DevelAnimatedGradientVisual::UnitType::Type mUnitType;
-  Dali::Toolkit::DevelAnimatedGradientVisual::SpreadType::Type mSpreadType;
+  Dali::Toolkit::DevelAnimatedGradientVisual::UnitType::Type     mUnitType;
+  Dali::Toolkit::DevelAnimatedGradientVisual::SpreadType::Type   mSpreadType;
 };
 
-}//namespace Internal
+} //namespace Internal
 
-}//namespace Toolkit
+} //namespace Toolkit
 
-}//namespace Dali
+} //namespace Dali
 
 #endif

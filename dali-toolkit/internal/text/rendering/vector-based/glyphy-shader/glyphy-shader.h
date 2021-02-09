@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_GLYPHY_SHADER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief A Shader based on GLyphy authored by Behdad Esfahbod & Maysum Panju.
  *
@@ -39,13 +36,12 @@ namespace Text
 class GlyphyShader : public Shader
 {
 public:
-
   /**
    * @brief Create the blob atlas.
    *
    * @param[in] atlasInfo The metrics of the texture atlas storing vector data.
    */
-  static GlyphyShader New( const Vector4& atlasInfo );
+  static GlyphyShader New(const Vector4& atlasInfo);
 
   /**
    * @brief Create an uninitialized GlyphyShader handle.
@@ -60,9 +56,7 @@ public:
   ~GlyphyShader();
 
 private: // Not intended for application developer
-
-  GlyphyShader( Shader handle );
-
+  GlyphyShader(Shader handle);
 };
 
 } // namespace Text

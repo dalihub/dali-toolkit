@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_CAMERA_PARAMETERS_H
 #define DALI_SCENE_LOADER_CAMERA_PARAMETERS_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
  *
  */
 
- // INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include "dali-scene-loader/public-api/api.h"
 #include "dali-scene-loader/public-api/view-projection.h"
 
@@ -27,20 +27,18 @@
 
 namespace Dali
 {
-
 class CameraActor;
 
 namespace SceneLoader
 {
-
 struct DALI_SCENE_LOADER_API CameraParameters
 {
-  Matrix matrix = Matrix::IDENTITY;
-  Vector4 orthographicSize = Vector4{ -1.f, 1.f, 1.f, -1.f };
-  float yFov = 60.f;
-  float zNear = 0.1f;
-  float zFar = 1000.f;
-  bool isPerspective = true;
+  Matrix  matrix           = Matrix::IDENTITY;
+  Vector4 orthographicSize = Vector4{-1.f, 1.f, 1.f, -1.f};
+  float   yFov             = 60.f;
+  float   zNear            = 0.1f;
+  float   zFar             = 1000.f;
+  bool    isPerspective    = true;
 
   /**
    * @return The view-projection matrix of the camera.
@@ -61,7 +59,7 @@ struct DALI_SCENE_LOADER_API CameraParameters
   void ConfigureCamera(CameraActor& camera) const;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif // DALI_SCENE_LOADER_CAMERA_PARAMETERS_H

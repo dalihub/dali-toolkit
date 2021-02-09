@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_IMPL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,21 +21,18 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
-#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class VisualFactoryCache;
 class ImageVisualShaderFactory;
 
@@ -45,13 +42,12 @@ class ImageVisualShaderFactory;
 class VisualFactory : public BaseObject
 {
 public:
-
   /**
    * @brief Constructor
    *
    * @param[in] debugEnabled If true, use debug renderer to replace all the concrete renderer.
    */
-  VisualFactory( bool debugEnabled );
+  VisualFactory(bool debugEnabled);
 
   /**
    * @brief StyleChanged callback
@@ -59,22 +55,22 @@ public:
    * @param[in] styleManager Handle for style manager.
    * @param[in] type Style change type.
    */
-  void OnStyleChangedSignal( Toolkit::StyleManager styleManager, StyleChange::Type type );
+  void OnStyleChangedSignal(Toolkit::StyleManager styleManager, StyleChange::Type type);
 
   /**
    * @copydoc Toolkit::VisualFactory::CreateVisual( const Property::Map& )
    */
-  Toolkit::Visual::Base CreateVisual( const Property::Map& propertyMap );
+  Toolkit::Visual::Base CreateVisual(const Property::Map& propertyMap);
 
   /**
    * @copydoc Toolkit::VisualFactory::CreateVisual( const std::string&, ImageDimensions )
    */
-  Toolkit::Visual::Base CreateVisual( const std::string& image, ImageDimensions size );
+  Toolkit::Visual::Base CreateVisual(const std::string& image, ImageDimensions size);
 
   /**
    * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
    */
-  void SetPreMultiplyOnLoad( bool preMultiply );
+  void SetPreMultiplyOnLoad(bool preMultiply);
 
   /**
    * @copydoc Toolkit::VisualFactory::GetPreMultiplyOnLoad()
@@ -87,7 +83,6 @@ public:
   Internal::TextureManager& GetTextureManager();
 
 protected:
-
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
@@ -109,11 +104,11 @@ private:
   VisualFactory& operator=(const VisualFactory& rhs) = delete;
 
 private:
-  std::unique_ptr< VisualFactoryCache >       mFactoryCache;
-  std::unique_ptr< ImageVisualShaderFactory > mImageVisualShaderFactory;
-  SlotDelegate< VisualFactory >               mSlotDelegate;
-  bool                                        mDebugEnabled:1;
-  bool                                        mPreMultiplyOnLoad:1; ///< Local store for this flag
+  std::unique_ptr<VisualFactoryCache>       mFactoryCache;
+  std::unique_ptr<ImageVisualShaderFactory> mImageVisualShaderFactory;
+  SlotDelegate<VisualFactory>               mSlotDelegate;
+  bool                                      mDebugEnabled : 1;
+  bool                                      mPreMultiplyOnLoad : 1; ///< Local store for this flag
 };
 
 /**
@@ -127,15 +122,15 @@ private:
  * @param[in] param0 First template based argument passed to the visual factory
  * @param[in] param1 Second template based argument passed to the visual factory
  */
-template< class ParameterType0, class ParameterType1 >
-void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterType0& param0, ParameterType1& param1 )
+template<class ParameterType0, class ParameterType1>
+void InitializeVisual(Actor& actor, Toolkit::Visual::Base& visual, ParameterType0& param0, ParameterType1& param1)
 {
-  if( actor )
+  if(actor)
   {
-    Toolkit::GetImplementation(visual).SetOffScene( actor );
+    Toolkit::GetImplementation(visual).SetOffScene(actor);
   }
-  visual = Toolkit::VisualFactory::Get().CreateVisual( param0, param1 );
-  if( visual && actor && actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
+  visual = Toolkit::VisualFactory::Get().CreateVisual(param0, param1);
+  if(visual && actor && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
     Toolkit::GetImplementation(visual).SetOnScene(actor);
   }
@@ -150,15 +145,15 @@ void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterTyp
  * @param[in,out] visual The visual to be replaced
  * @param[in] param Template based argument passed to the visual factory
  */
-template< class ParameterType >
-void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterType& param )
+template<class ParameterType>
+void InitializeVisual(Actor& actor, Toolkit::Visual::Base& visual, ParameterType& param)
 {
-  if( actor && visual )
+  if(actor && visual)
   {
-    Toolkit::GetImplementation(visual).SetOffScene( actor );
+    Toolkit::GetImplementation(visual).SetOffScene(actor);
   }
-  visual =  Toolkit::VisualFactory::Get().CreateVisual( param );
-  if( visual && actor && actor.GetProperty< bool >( Actor::Property::CONNECTED_TO_SCENE ) )
+  visual = Toolkit::VisualFactory::Get().CreateVisual(param);
+  if(visual && actor && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
     Toolkit::GetImplementation(visual).SetOnScene(actor);
   }
@@ -168,7 +163,7 @@ void InitializeVisual( Actor& actor, Toolkit::Visual::Base& visual, ParameterTyp
 
 inline const Internal::VisualFactory& GetImplementation(const Toolkit::VisualFactory& factory)
 {
-  DALI_ASSERT_ALWAYS( factory && "VisualFactory handle is empty" );
+  DALI_ASSERT_ALWAYS(factory && "VisualFactory handle is empty");
 
   const BaseObject& handle = factory.GetBaseObject();
 
@@ -177,7 +172,7 @@ inline const Internal::VisualFactory& GetImplementation(const Toolkit::VisualFac
 
 inline Internal::VisualFactory& GetImplementation(Toolkit::VisualFactory& factory)
 {
-  DALI_ASSERT_ALWAYS( factory && "VisualFactory handle is empty" );
+  DALI_ASSERT_ALWAYS(factory && "VisualFactory handle is empty");
 
   BaseObject& handle = factory.GetBaseObject();
 

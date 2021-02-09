@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOOLTIP_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,31 +19,28 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/signals/connection-tracker.h>
 #include <dali/public-api/object/weak-handle.h>
+#include <dali/public-api/signals/connection-tracker.h>
+#include <string>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
+#include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 class Tooltip;
-typedef IntrusivePtr< Tooltip > TooltipPtr;
+typedef IntrusivePtr<Tooltip> TooltipPtr;
 
 /**
  * @brief Handles all the required tooltip related functionality for a control.
@@ -54,12 +51,11 @@ typedef IntrusivePtr< Tooltip > TooltipPtr;
 class Tooltip : public RefObject, public ConnectionTracker
 {
 public:
-
   /**
    * @brief Creates an instance of the Tooltip class.
    * @param[in]  control  The control the tooltip should be shown on.
    */
-  static TooltipPtr New( Toolkit::Control control );
+  static TooltipPtr New(Toolkit::Control control);
 
   /**
    * @brief Sets the properties of the Tooltip.
@@ -69,29 +65,28 @@ public:
    *          If a Property::ARRAY of Visuals then all are displayed in one row.
    * @param[in]  value  This can either be a Property::STRING, Property::MAP or Property::ARRAY.
    */
-  void SetProperties( const Property::Value& value );
+  void SetProperties(const Property::Value& value);
 
   /**
    * @brief Creates a property map of the tooltip properties.
    * @param[out]  map  Filled with all the properties of the tooltip.
    * @note map should be empty.
    */
-  void CreatePropertyMap( Property::Map& map ) const;
+  void CreatePropertyMap(Property::Map& map) const;
 
 private:
-
   /**
    * @brief Private constructor.
    */
-  Tooltip( Toolkit::Control control );
+  Tooltip(Toolkit::Control control);
 
   /**
    * @brief Private destructor.
    */
   ~Tooltip();
 
-  Tooltip( const Tooltip& ); ///< Undefined
-  Tooltip& operator=( const Tooltip& ); ///< ///< Undefined
+  Tooltip(const Tooltip&);            ///< Undefined
+  Tooltip& operator=(const Tooltip&); ///< ///< Undefined
 
   /**
    * @brief Sets the content of the tooltip.
@@ -99,25 +94,25 @@ private:
    * @param[in]  control  Is used to connect to this control's signals.
    * @param[in]  value    The content property value.
    */
-  void SetContent( Toolkit::Control& control, const Property::Value& value );
+  void SetContent(Toolkit::Control& control, const Property::Value& value);
 
   /**
    * @brief Sets the background properties of the tooltip.
    * @param[in]  value  The background property value.
    */
-  void SetBackground( const Property::Value& value );
+  void SetBackground(const Property::Value& value);
 
   /**
    * @brief Sets the tail properties of the tooltip.
    * @param[in]  value  The tail property value.
    */
-  void SetTail( const Property::Value& value );
+  void SetTail(const Property::Value& value);
 
   /**
    * @brief Method used to connect to the control's Hovered signal.
    * @param[in]  hover  The hover event.
    */
-  bool OnHovered( Actor /* actor */, const HoverEvent& hover );
+  bool OnHovered(Actor /* actor */, const HoverEvent& hover);
 
   /**
    * @brief Method used to connect to the internal timer used by Tooltip.
@@ -130,23 +125,23 @@ private:
    * @details This is required so we can appropriately position it.
    * @param[in]  actor  The actor being laid out.
    */
-  void OnRelayout( Actor actor );
+  void OnRelayout(Actor actor);
 
   // Data
 
-  Toolkit::Popup mPopup; ///< The Popup class is used to display the actual tooltip.
-  Timer mTooltipTimer; ///< Timer used to wait a certain length of time before we display the tooltip.
+  Toolkit::Popup mPopup;        ///< The Popup class is used to display the actual tooltip.
+  Timer          mTooltipTimer; ///< Timer used to wait a certain length of time before we display the tooltip.
 
-  WeakHandle< Toolkit::Control > mControl; ///< A weak handle to the control we are setting the tooltip on.
+  WeakHandle<Toolkit::Control> mControl; ///< A weak handle to the control we are setting the tooltip on.
 
-  Property::Map mContentTextVisual; ///< If using just one visual, then this is set.
-  Property::Map mTailImages; ///< The different images used by the tail.
-  Property::Array mContentArray; ///< If using an array of visuals, then this is used.
+  Property::Map   mContentTextVisual; ///< If using just one visual, then this is set.
+  Property::Map   mTailImages;        ///< The different images used by the tail.
+  Property::Array mContentArray;      ///< If using an array of visuals, then this is used.
 
-  Rect< int > mBackgroundBorder; ///< The size of the background border in the order: left, right, bottom, top. @see Toolkit::Tooltip::Border::Property::BORDER
+  Rect<int> mBackgroundBorder; ///< The size of the background border in the order: left, right, bottom, top. @see Toolkit::Tooltip::Border::Property::BORDER
 
-  Vector2 mLayout; ///< The layout of the content if using an array.
-  Vector2 mHoverPoint; ///< The first point where hover starts.
+  Vector2 mLayout;           ///< The layout of the content if using an array.
+  Vector2 mHoverPoint;       ///< The first point where hover starts.
   Vector2 mHoverPointOffset; ///< The tooltip is displayed with this offset from hover point if using Toolkit::Tooltip::Position::HOVER_POINT.
 
   std::string mBackgroundImage; ///< The path to the background image used for the tooltip.
@@ -155,10 +150,10 @@ private:
 
   int mWaitTime; ///< Time in milliseconds to wait before we display the tooltip.
 
-  Toolkit::Tooltip::Position::Type mPositionType; ///< The position of the tooltip.
-  bool mTailVisibility; ///< Whether we are showing a tail or not.
-  bool mDisappearOnMovement; ///< Whether the tooltip is set to disappear on movement or when we go out of the bounds of mControl.
-  bool mSignalsConnected; ///< Whether any signals required for Tooltip functionality have been connected.
+  Toolkit::Tooltip::Position::Type mPositionType;        ///< The position of the tooltip.
+  bool                             mTailVisibility;      ///< Whether we are showing a tail or not.
+  bool                             mDisappearOnMovement; ///< Whether the tooltip is set to disappear on movement or when we go out of the bounds of mControl.
+  bool                             mSignalsConnected;    ///< Whether any signals required for Tooltip functionality have been connected.
 };
 
 } // namespace Internal

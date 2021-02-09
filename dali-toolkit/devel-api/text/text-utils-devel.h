@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_UTILS_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ struct DALI_TOOLKIT_API RendererParameters
                                    //
   float minLineSize;               ///< The line's minimum size (in points).
 
-  Extents padding;                 ///< The padding of the boundaries where the text is going to be laid-out.
+  Extents padding; ///< The padding of the boundaries where the text is going to be laid-out.
 };
 
 /**

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BOUNCING_EFFECT_ACTOR_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * @brief Creates a Dali::Actor to display the bouncing effect for overshoot
  *
@@ -57,13 +54,12 @@ namespace Internal
  * @param[out] bouncePropertyIndex The property index which controls the bouncing
  * @return The actor which displays the bouncing effect
  */
-Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex);
+Actor CreateBouncingEffectActor(Property::Index& bouncePropertyIndex);
 
 } // namespace Internal
 
 } // namespace Toolkit
 
 } // namespace Dali
-
 
 #endif // DALI_TOOLKIT_INTERNAL_BOUNCING_EFFECT_ACTOR_H

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_COLOR_SEGMENTATION_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 class LogicalModel;
 
 /**
@@ -47,14 +44,14 @@ class LogicalModel;
  * @param[out] colors The vector of colors.
  * @param[out] colorIndices Indices to the vector of colors.
  */
-void SetColorSegmentationInfo( const Vector<ColorRun>& colorRuns,
-                               const Vector<GlyphIndex>& charactersToGlyph,
-                               const Vector<Length>& glyphsPerCharacter,
-                               CharacterIndex startCharacterIndex,
-                               GlyphIndex startGlyphIndex,
-                               Length numberOfCharacters,
-                               Vector<Vector4>& colors,
-                               Vector<ColorIndex>& colorIndices );
+void SetColorSegmentationInfo(const Vector<ColorRun>&   colorRuns,
+                              const Vector<GlyphIndex>& charactersToGlyph,
+                              const Vector<Length>&     glyphsPerCharacter,
+                              CharacterIndex            startCharacterIndex,
+                              GlyphIndex                startGlyphIndex,
+                              Length                    numberOfCharacters,
+                              Vector<Vector4>&          colors,
+                              Vector<ColorIndex>&       colorIndices);
 
 } // namespace Text
 

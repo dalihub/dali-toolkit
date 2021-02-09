@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUBBLE_EFFECT_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,30 +19,27 @@
  */
 
 // EXTERNAL INCLUDES
-#include <sstream>
-#include <dali/public-api/rendering/shader.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali/public-api/rendering/shader.h>
+#include <sstream>
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Internal
 {
-
 /**
  * Create the shader to be used by the renderer
  * @param[in] numberOfBubble How many groups of uniforms are used to control the bubble movement.
  * @return A handle to the newly created shader.
  */
-inline Shader CreateBubbleShader( unsigned int numBubble )
+inline Shader CreateBubbleShader(unsigned int numBubble)
 {
   std::ostringstream vertexShaderStringStream;
-  vertexShaderStringStream << "#define NUMBER_OF_BUBBLE "<< numBubble << "\n"
+  vertexShaderStringStream << "#define NUMBER_OF_BUBBLE " << numBubble << "\n"
                            << SHADER_BUBBLE_EFFECT_VERT;
-  Shader shader = Shader::New( vertexShaderStringStream.str(), SHADER_BUBBLE_EFFECT_FRAG );
+  Shader shader = Shader::New(vertexShaderStringStream.str(), SHADER_BUBBLE_EFFECT_FRAG);
 
   return shader;
 }

@@ -1,7 +1,7 @@
 #ifndef DALI_SCENE_LOADER_VIEW_PROJECTION_H_
 #define DALI_SCENE_LOADER_VIEW_PROJECTION_H_
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ namespace Dali
 {
 namespace SceneLoader
 {
-
 /**
  * @brief Contains view and projection matrices, also caching the view-projection
  *      and inverse projection matrices.
@@ -35,18 +34,36 @@ namespace SceneLoader
 class ViewProjection
 {
 public:
-  Matrix& GetView() { return mView; }
-  Matrix& GetProjection() { return mProjection; }
+  Matrix& GetView()
+  {
+    return mView;
+  }
+  Matrix& GetProjection()
+  {
+    return mProjection;
+  }
 
   /*
    * @brief Updates the cached view projection and inverse projection matrices.
    */
   void Update();
 
-  const Matrix& GetView() const { return mView; }
-  const Matrix& GetProjection() const { return mProjection; }
-  const Matrix& GetInverseProjection() const { return mInvProjection; }
-  const Matrix& GetViewProjection() const { return mViewProjection; }
+  const Matrix& GetView() const
+  {
+    return mView;
+  }
+  const Matrix& GetProjection() const
+  {
+    return mProjection;
+  }
+  const Matrix& GetInverseProjection() const
+  {
+    return mInvProjection;
+  }
+  const Matrix& GetViewProjection() const
+  {
+    return mViewProjection;
+  }
 
 private:
   Matrix mView;
@@ -55,7 +72,7 @@ private:
   Matrix mViewProjection;
 };
 
-}
-}
+} // namespace SceneLoader
+} // namespace Dali
 
 #endif //DALI_SCENE_LOADER_VIEW_PROJECTION_H_
