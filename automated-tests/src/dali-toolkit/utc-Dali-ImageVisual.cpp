@@ -784,7 +784,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   glAbstraction.EnableEnableDisableCallTrace( true );
   TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
-  blendStr << GL_BLEND;
+  blendStr << std::hex << GL_BLEND;
 
   application.SendNotification();
   application.Render(0); // Ensure animation starts
@@ -795,7 +795,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>( "uColor", Vector4( 0.5f, 0.5f, 0.5f, 0.75f ) ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>( "mixColor", testColor ), true, TEST_LOCATION );
 
-  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
 
   glEnableStack.Reset();
 
@@ -808,7 +808,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   // GL_BLEND should not be changed: Keep enabled
   // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
 //  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str() ) );
 
   TestMixColor( visual, Visual::Property::MIX_COLOR, TARGET_MIX_COLOR );
 
@@ -845,12 +845,12 @@ int UtcDaliImageVisualAnimateOpacity(void)
   glAbstraction.EnableEnableDisableCallTrace( true );
   TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
-  blendStr << GL_BLEND;
+  blendStr << std::hex << GL_BLEND;
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str()) );
 
   {
     tet_infoline( "Test that the opacity can be increased to full via animation, and that the blend mode is set appropriately at the start and end of the animation." );
@@ -888,7 +888,7 @@ int UtcDaliImageVisualAnimateOpacity(void)
 
     // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
 //    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
+    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str() ) );
   }
 
 
@@ -920,7 +920,7 @@ int UtcDaliImageVisualAnimateOpacity(void)
     DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
     DALI_TEST_EQUALS( color.a, 0.55f, TEST_LOCATION );
 
-    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
 
     glEnableStack.Reset();
 
@@ -931,9 +931,10 @@ int UtcDaliImageVisualAnimateOpacity(void)
     DALI_TEST_EQUALS( color.a, 0.1f, TEST_LOCATION );
 
     // GL_BLEND should not be changed: Keep enabled
-    // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
-//    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
+// @todo
+// TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
+//    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
+    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str() ) );
   }
 
   END_TEST;
@@ -1006,14 +1007,14 @@ int UtcDaliImageVisualAnimateOpacity02(void)
   glAbstraction.EnableEnableDisableCallTrace( true );
   TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
-  blendStr << GL_BLEND;
+  blendStr << std::hex << GL_BLEND;
 
   application.SendNotification();
   application.Render(0);     // Ensure animation starts
   application.Render(2000u); // Halfway point through animation
   application.SendNotification(); // Handle any signals
 
-  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
 
   Vector4 color;
   DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
@@ -1027,7 +1028,7 @@ int UtcDaliImageVisualAnimateOpacity02(void)
   DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
   DALI_TEST_EQUALS( color.a, 1.0f, TEST_LOCATION );
 
-  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str() ) );
 
   END_TEST;
 }
@@ -2368,8 +2369,8 @@ int UtcDaliImageVisualCustomShader(void)
 
   TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
-  blendStr << GL_BLEND;
-  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  blendStr << std::hex << GL_BLEND;
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
 
   END_TEST;
 }

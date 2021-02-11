@@ -1972,7 +1972,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     glAbstraction.EnableEnableDisableCallTrace( true );
     TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
     std::ostringstream blendStr;
-    blendStr << GL_BLEND;
+    blendStr << std::hex << GL_BLEND;
 
     application.SendNotification();
     application.Render(0);
@@ -1983,7 +1983,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(0.5f, 0.5f, 0.5f, halfwayColor.a )), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(halfwayColor) ), true, TEST_LOCATION );
 
-    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
 
     glEnableStack.Reset();
 
@@ -1994,7 +1994,7 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4( 1.0f, 1.0f, 1.0f, TARGET_MIX_COLOR.a ) ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(TARGET_MIX_COLOR) ), true, TEST_LOCATION );
 
-    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
+    DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str() ) );
 
     actor.Unparent();
   }
