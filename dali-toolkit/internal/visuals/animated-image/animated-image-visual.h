@@ -228,6 +228,12 @@ private:
    */
   void InitializeAnimatedImage(const VisualUrl& imageUrl);
 
+  /**
+   * Set the state of loading fail of an image or a frame.
+   * Returns TextureSet of broken image.
+   */
+  TextureSet SetLoadingFailed();
+
   // Undefined
   AnimatedImageVisual(const AnimatedImageVisual& animatedImageVisual);
 
