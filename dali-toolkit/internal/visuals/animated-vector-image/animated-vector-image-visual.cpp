@@ -83,19 +83,25 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
 : Visual::Base(factoryCache, Visual::FittingMode::FILL, static_cast<Toolkit::Visual::Type>(Toolkit::DevelVisual::ANIMATED_VECTOR_IMAGE)),
   mUrl(imageUrl),
   mAnimationData(),
-  mVectorAnimationTask(new VectorAnimationTask(factoryCache, imageUrl.GetUrl())),
+  mVectorAnimationTask(new VectorAnimationTask(factoryCache)),
   mImageVisualShaderFactory(shaderFactory),
   mVisualSize(),
   mVisualScale(Vector2::ONE),
   mPlacementActor(),
   mPlayState(DevelImageVisual::PlayState::STOPPED),
   mEventCallback(nullptr),
+  mLoadFailed(false),
   mRendererAdded(false),
   mCoreShutdown(false),
   mRedrawInScalingDown(true)
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
+
+  if(!mVectorAnimationTask->Load(mUrl.GetUrl()))
+  {
+    mLoadFailed = true;
+  }
 
   mVectorAnimationTask->UploadCompletedSignal().Connect(this, &AnimatedVectorImageVisual::OnUploadCompleted);
   mVectorAnimationTask->SetAnimationFinishedCallback(new EventThreadCallback(MakeCallback(this, &AnimatedVectorImageVisual::OnAnimationFinished)));
@@ -310,21 +316,36 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
   // Hold the weak handle of the placement actor and delay the adding of renderer until the rasterization is finished.
   mPlacementActor = actor;
 
-  mVectorAnimationTask->SetRenderer(mImpl->mRenderer);
-
-  // Add property notification for scaling & size
-  mScaleNotification = actor.AddPropertyNotification(Actor::Property::WORLD_SCALE, StepCondition(0.1f, 1.0f));
-  mScaleNotification.NotifySignal().Connect(this, &AnimatedVectorImageVisual::OnScaleNotification);
-
-  mSizeNotification = actor.AddPropertyNotification(Actor::Property::SIZE, StepCondition(3.0f));
-  mSizeNotification.NotifySignal().Connect(this, &AnimatedVectorImageVisual::OnSizeNotification);
-
-  DevelActor::VisibilityChangedSignal(actor).Connect(this, &AnimatedVectorImageVisual::OnControlVisibilityChanged);
-
-  Window window = DevelWindow::Get(actor);
-  if(window)
+  if(mLoadFailed)
   {
-    DevelWindow::VisibilityChangedSignal(window).Connect(this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged);
+    TextureSet textureSet = TextureSet::New();
+    mImpl->mRenderer.SetTextures(textureSet);
+
+    Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
+    textureSet.SetTexture(0u, brokenImage);
+
+    actor.AddRenderer(mImpl->mRenderer);
+
+    ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+  }
+  else
+  {
+    mVectorAnimationTask->SetRenderer(mImpl->mRenderer);
+
+    // Add property notification for scaling & size
+    mScaleNotification = actor.AddPropertyNotification(Actor::Property::WORLD_SCALE, StepCondition(0.1f, 1.0f));
+    mScaleNotification.NotifySignal().Connect(this, &AnimatedVectorImageVisual::OnScaleNotification);
+
+    mSizeNotification = actor.AddPropertyNotification(Actor::Property::SIZE, StepCondition(3.0f));
+    mSizeNotification.NotifySignal().Connect(this, &AnimatedVectorImageVisual::OnSizeNotification);
+
+    DevelActor::VisibilityChangedSignal(actor).Connect(this, &AnimatedVectorImageVisual::OnControlVisibilityChanged);
+
+    Window window = DevelWindow::Get(actor);
+    if(window)
+    {
+      DevelWindow::VisibilityChangedSignal(window).Connect(this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged);
+    }
   }
 
   DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOnScene [%p]\n", this);
