@@ -108,9 +108,8 @@ public:
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @param[in] url The url of the vector animation file
    */
-  VectorAnimationTask(VisualFactoryCache& factoryCache, const std::string& url);
+  VectorAnimationTask(VisualFactoryCache& factoryCache);
 
   /**
    * @brief Destructor.
@@ -121,6 +120,14 @@ public:
    * @brief Finalizes the task.
    */
   void Finalize();
+
+  /**
+   * @brief Loads the animation file.
+   *
+   * @param[in] url The url of the vector animation file
+   * @return True if loading success, false otherwise.
+   */
+  bool Load(const std::string& url);
 
   /**
    * @brief Sets the renderer used to display the result image.
@@ -197,11 +204,6 @@ public:
   std::chrono::time_point<std::chrono::system_clock> GetNextFrameTime();
 
 private:
-  /**
-   * @brief Initializes the vector renderer.
-   */
-  void Initialize();
-
   /**
    * @brief Play the vector animation.
    */

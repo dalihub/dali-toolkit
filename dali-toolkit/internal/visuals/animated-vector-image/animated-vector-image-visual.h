@@ -225,6 +225,7 @@ private:
   WeakHandle<Actor>                  mPlacementActor;
   DevelImageVisual::PlayState::Type  mPlayState;
   CallbackBase*                      mEventCallback; // Not owned
+  bool                               mLoadFailed;
   bool                               mRendererAdded;
   bool                               mCoreShutdown;
   bool                               mRedrawInScalingDown;

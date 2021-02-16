@@ -35,8 +35,8 @@ class VectorAnimationRenderer: public Dali::BaseObject
 {
 public:
 
-  VectorAnimationRenderer( const std::string& url )
-  : mUrl( url ),
+  VectorAnimationRenderer()
+  : mUrl(),
     mRenderer(),
     mWidth( 0 ),
     mHeight( 0 ),
@@ -55,6 +55,16 @@ public:
   ~VectorAnimationRenderer()
   {
     mCount--;
+  }
+
+  bool Load(const std::string& url)
+  {
+    mUrl = url;
+    if(mUrl == "invalid.json")
+    {
+      return false;
+    }
+    return true;
   }
 
   void SetRenderer( Dali::Renderer renderer )
@@ -187,9 +197,9 @@ inline const VectorAnimationRenderer& GetImplementation( const Dali::VectorAnima
 /*********************************  PUBLIC CLASS  *******************************/
 /********************************************************************************/
 
-VectorAnimationRenderer VectorAnimationRenderer::New( const std::string& url )
+VectorAnimationRenderer VectorAnimationRenderer::New()
 {
-  Internal::Adaptor::VectorAnimationRenderer* animationRenderer = new Internal::Adaptor::VectorAnimationRenderer( url );
+  Internal::Adaptor::VectorAnimationRenderer* animationRenderer = new Internal::Adaptor::VectorAnimationRenderer();
 
   return VectorAnimationRenderer( animationRenderer );
 }
@@ -220,6 +230,11 @@ VectorAnimationRenderer& VectorAnimationRenderer::operator=( const VectorAnimati
 
 void VectorAnimationRenderer::Finalize()
 {
+}
+
+bool VectorAnimationRenderer::Load(const std::string& url)
+{
+  return Internal::Adaptor::GetImplementation( *this ).Load(url);
 }
 
 void VectorAnimationRenderer::SetRenderer( Renderer renderer )

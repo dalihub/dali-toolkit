@@ -50,6 +50,7 @@ namespace
 {
 
 const char* TEST_VECTOR_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/insta_camera.json";
+const char* TEST_VECTOR_IMAGE_INVALID_FILE_NAME =  "invalid.json";
 
 bool gAnimationFinishedSignalFired = false;
 
@@ -1488,6 +1489,44 @@ int UtcDaliAnimatedVectorImageVisualWindowVisibilityChanged(void)
 
   // Check rendering behavior again
   DALI_TEST_CHECK( renderer.GetProperty< int >( DevelRenderer::Property::RENDERING_BEHAVIOR ) == DevelRenderer::Rendering::IF_REQUIRED );
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualInvalidFile(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("Request loading with invalid file - should draw broken image");
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+             .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_INVALID_FILE_NAME);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl actor = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check resource status
+  Visual::ResourceStatus status = actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL);
+  DALI_TEST_EQUALS(status, Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+  // The broken image should be shown.
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
 
   END_TEST;
 }

@@ -45,9 +45,9 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, 
 
 } // unnamed namespace
 
-VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache, const std::string& url)
-: mUrl(url),
-  mVectorRenderer(),
+VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
+: mUrl(),
+  mVectorRenderer(VectorAnimationRenderer::New()),
   mAnimationData(),
   mVectorAnimationThread(factoryCache.GetVectorAnimationManager().GetVectorAnimationThread()),
   mConditionalWait(),
@@ -73,7 +73,6 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache, const
   mAnimationDataUpdated(false),
   mDestroyTask(false)
 {
-  Initialize();
 }
 
 VectorAnimationTask::~VectorAnimationTask()
@@ -94,6 +93,33 @@ void VectorAnimationTask::Finalize()
   mVectorRenderer.Finalize();
 
   mDestroyTask = true;
+}
+
+bool VectorAnimationTask::Load(const std::string& url)
+{
+  mUrl = url;
+
+  if(!mVectorRenderer.Load(mUrl))
+  {
+    DALI_LOG_ERROR("VectorAnimationTask::Load: Load failed [%s]\n", mUrl.c_str());
+    return false;
+  }
+
+  mTotalFrame = mVectorRenderer.GetTotalFrameNumber();
+
+  mEndFrame = mTotalFrame - 1;
+
+  mFrameRate                = mVectorRenderer.GetFrameRate();
+  mFrameDurationNanoSeconds = NANOSECONDS_PER_SECOND / mFrameRate;
+
+  uint32_t width, height;
+  mVectorRenderer.GetDefaultSize(width, height);
+
+  SetSize(width, height);
+
+  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Load: file = %s [%d frames, %f fps] [%p]\n", mUrl.c_str(), mTotalFrame, mFrameRate, this);
+
+  return true;
 }
 
 void VectorAnimationTask::SetRenderer(Renderer renderer)
@@ -341,25 +367,6 @@ void VectorAnimationTask::GetLayerInfo(Property::Map& map) const
 VectorAnimationTask::UploadCompletedSignalType& VectorAnimationTask::UploadCompletedSignal()
 {
   return mVectorRenderer.UploadCompletedSignal();
-}
-
-void VectorAnimationTask::Initialize()
-{
-  mVectorRenderer = VectorAnimationRenderer::New(mUrl);
-
-  mTotalFrame = mVectorRenderer.GetTotalFrameNumber();
-
-  mEndFrame = mTotalFrame - 1;
-
-  mFrameRate                = mVectorRenderer.GetFrameRate();
-  mFrameDurationNanoSeconds = NANOSECONDS_PER_SECOND / mFrameRate;
-
-  uint32_t width, height;
-  mVectorRenderer.GetDefaultSize(width, height);
-
-  SetSize(width, height);
-
-  DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Initialize: file = %s [%d frames, %f fps] [%p]\n", mUrl.c_str(), mTotalFrame, mFrameRate, this);
 }
 
 bool VectorAnimationTask::Rasterize()
