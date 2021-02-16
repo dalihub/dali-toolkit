@@ -21,12 +21,15 @@
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/devel-api/adaptor-framework/autofill-item.h>
+#include <dali/devel-api/adaptor-framework/autofill-manager.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/type-registry.h>
 #include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/devel-api/controls/text-controls/autofill-container.h>
 #include <dali-toolkit/internal/builder/dictionary.h>
 #include <dali-toolkit/internal/builder/style.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
@@ -387,6 +390,42 @@ public:
   void ClearShadow();
 
   /**
+   * @brief Sets whether the Autofill functionality is enabled.
+   * @param[in] autofillEnabled Set true when Autofill should be enabled.
+   */
+  void SetAutofillEnabled( bool autofillEnabled );
+
+  /**
+   * @brief Check if the Autofill framework is enabled.
+   * @return True if Autofill is enabled
+   */
+  bool IsAutofillEnabled();
+
+  /**
+   * @brief Sets AutofillItemHandle
+   * @param item AutofillItem handle
+   */
+  void SetAutofillItemHandle( Dali::AutofillItem item );
+
+  /**
+   * @brief Gets AutofillItemHandle
+   * @return AutofillItem handle
+   */
+  Dali::AutofillItem GetAutofillItemHandle();
+
+  /**
+   * @brief Sets AutofillContainer which this control belongs to.
+   * @param[in] container
+   */
+  void SetAutofillContainer( Toolkit::AutofillContainer container );
+
+  /**
+   * @brief Gets AutofillContainer that the control belongs to.
+   * @return AutofillContainer handle
+   */
+  Toolkit::AutofillContainer GetAutofillContainer();
+
+  /**
    * @copydoc DevelControl::GetVisualProperty()
    */
   Dali::Property GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey);
@@ -500,12 +539,15 @@ public:
 
   InputMethodContext mInputMethodContext;
   CallbackBase*      mIdleCallback; ///< The idle callback to emit the resource ready signal.
+  AutofillItem       mAutofillItem;
+  Toolkit::AutofillContainer mAutofillContainer;
 
   ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT; ///< Flags passed in from constructor.
   bool             mIsKeyboardNavigationSupported : 1;    ///< Stores whether keyboard navigation is supported by the control.
   bool             mIsKeyboardFocusGroup : 1;             ///< Stores whether the control is a focus group.
   bool             mIsEmittingResourceReadySignal : 1;    ///< True during ResourceReady().
   bool             mNeedToEmitResourceReady : 1;          ///< True if need to emit the resource ready signal again.
+  bool             mIsAutofillEnabled : 1;                ///< Stroes whether the Autofill functionality is enabled.
 
   RegisteredVisualContainer mRemoveVisuals; ///< List of visuals that are being replaced by another visual once ready
 
