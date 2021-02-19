@@ -115,6 +115,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/test-graphics-controller.cpp
   dali-toolkit-test-utils/test-graphics-texture.cpp
   dali-toolkit-test-utils/test-graphics-pipeline.cpp
+  dali-toolkit-test-utils/test-graphics-reflection.cpp
   dali-toolkit-test-utils/test-graphics-sampler.cpp
   dali-toolkit-test-utils/test-platform-abstraction.cpp
   dali-toolkit-test-utils/test-render-controller.cpp

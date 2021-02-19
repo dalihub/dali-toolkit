@@ -38,6 +38,7 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-texture.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-sampler.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-pipeline.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-graphics-reflection.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-platform-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-render-controller.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-trace-call-stack.cpp
