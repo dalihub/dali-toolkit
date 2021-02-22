@@ -94,6 +94,28 @@ enum Type
    *       If it it RELATIVE, the corner radius value is relative to the smaller of the visual width and visual height.
    */
   CORNER_RADIUS_POLICY = OPACITY + 3,
+
+  /**
+   * @brief The width for the borderline of the visual
+   * @details Name "borderlineWidth", type Property::FLOAT, animatable
+   * @note Optional. Default value is 0.0f.
+   */
+  BORDERLINE_WIDTH = OPACITY + 4,
+
+  /**
+   * @brief The color for the borderline of the visual
+   * @details Name "borderlineColor", type Property::VECTOR4, animatable
+   * @note Default value is Color::BLACK
+   */
+  BORDERLINE_COLOR = OPACITY + 5,
+
+  /**
+   * @brief The offset from the visual borderline (recommend [-1.0f to 1.0f]).
+   * @details Name "borderlineOffset", type Property::FLOAT, animatable
+   * @note Default value is 0.0f.
+   * @note This value will be clipped by [-1.0f to 1.0f].
+   */
+  BORDERLINE_OFFSET = OPACITY + 6,
 };
 
 } // namespace Property

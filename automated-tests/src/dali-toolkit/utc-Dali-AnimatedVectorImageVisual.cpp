@@ -145,7 +145,8 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual03(void)
              .Add( ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME  )
              .Add( DevelImageVisual::Property::LOOP_COUNT, 3  )
              .Add( DevelImageVisual::Property::PLAY_RANGE, playRange  )
-             .Add( DevelVisual::Property::CORNER_RADIUS, 50.0f );
+             .Add( DevelVisual::Property::CORNER_RADIUS, 50.0f )
+             .Add( DevelVisual::Property::BORDERLINE_WIDTH, 20.0f );
 
   Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
@@ -177,6 +178,9 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
 
   int startFrame = 1, endFrame = 3;
   float cornerRadius = 22.0f;
+  float borderlineWidth = 2.0f;
+  Vector4 borderlineColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+  float borderlineOffset = 0.1f;
   Property::Array playRange;
   playRange.PushBack( startFrame );
   playRange.PushBack( endFrame );
@@ -189,7 +193,10 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
              .Add( "stopBehavior", DevelImageVisual::StopBehavior::FIRST_FRAME )
              .Add( "loopingMode", DevelImageVisual::LoopingMode::AUTO_REVERSE )
              .Add( "redrawInScalingDown", false )
-             .Add( "cornerRadius", cornerRadius );
+             .Add( "cornerRadius", cornerRadius )
+             .Add( "borderlineWidth", borderlineWidth )
+             .Add( "borderlineColor", borderlineColor )
+             .Add( "borderlineOffset", borderlineOffset );
 
   Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
@@ -253,6 +260,18 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< int >() == Visual::Transform::Policy::ABSOLUTE );
 
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< float >(), borderlineWidth, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector4 >(), borderlineColor, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< float >(), borderlineOffset, TEST_LOCATION );
+
   actor.Unparent( );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
@@ -266,6 +285,9 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
 
   int startFrame = 1, endFrame = 3;
   Vector4 cornerRadius(50.0f, 22.0f, 0.0f, 3.0f);
+  float borderlineWidth = 2.3f;
+  Vector4 borderlineColor = Vector4(0.3f, 0.3f, 1.0f, 1.0f);
+  float borderlineOffset = 0.3f;
   Property::Array playRange;
   playRange.PushBack( startFrame );
   playRange.PushBack( endFrame );
@@ -276,7 +298,10 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
              .Add( DevelImageVisual::Property::LOOP_COUNT, 3 )
              .Add( DevelImageVisual::Property::PLAY_RANGE, playRange )
              .Add( DevelVisual::Property::CORNER_RADIUS, cornerRadius )
-             .Add( DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::RELATIVE);
+             .Add( DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::RELATIVE)
+             .Add( DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth )
+             .Add( DevelVisual::Property::BORDERLINE_COLOR, borderlineColor )
+             .Add( DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset );
 
   // request AnimatedVectorImageVisual with a property map
   VisualFactory factory = VisualFactory::Get();
@@ -343,6 +368,18 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS_POLICY, "cornerRadiusPolicy" );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< int >() == Visual::Transform::Policy::RELATIVE );
+
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_WIDTH, "borderlineWidth" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< float >(), borderlineWidth, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector4 >(), borderlineColor, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< float >(), borderlineOffset, TEST_LOCATION );
 
   // request AnimatedVectorImageVisual with an URL
   Visual::Base visual2 = factory.CreateVisual( TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions() );

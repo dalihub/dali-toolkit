@@ -123,16 +123,23 @@ struct Base::Impl
   Transform                       mTransform;
   Vector4                         mMixColor;
   Size                            mControlSize;
+  float                           mBorderlineWidth;
+  Vector4                         mBorderlineColor;
+  float                           mBorderlineOffset;
   Vector4                         mCornerRadius;
   float                           mCornerRadiusPolicy;
   int                             mDepthIndex;
   Property::Index                 mMixColorIndex;
+  Property::Index                 mBorderlineWidthIndex;
+  Property::Index                 mBorderlineColorIndex;
+  Property::Index                 mBorderlineOffsetIndex;
   Property::Index                 mCornerRadiusIndex;
   FittingMode                     mFittingMode; //< How the contents should fit the view
   int                             mFlags;
   Toolkit::Visual::ResourceStatus mResourceStatus;
   const Toolkit::Visual::Type     mType;
   bool                            mNeedCornerRadius;
+  bool                            mNeedBorderline;
 };
 
 } // namespace Visual

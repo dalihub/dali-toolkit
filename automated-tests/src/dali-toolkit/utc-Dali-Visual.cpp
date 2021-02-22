@@ -502,6 +502,9 @@ int UtcDaliVisualGetPropertyMap1(void)
   propertyMap.Insert(Visual::Property::MIX_COLOR,  Color::BLUE);
   propertyMap.Insert( DevelVisual::Property::CORNER_RADIUS, 10.0f );
   propertyMap.Insert( DevelVisual::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::RELATIVE );
+  propertyMap.Insert( DevelVisual::Property::BORDERLINE_WIDTH, 20.0f );
+  propertyMap.Insert( DevelVisual::Property::BORDERLINE_COLOR, Color::RED );
+  propertyMap.Insert( DevelVisual::Property::BORDERLINE_OFFSET, -1.0f );
   propertyMap.Insert( DevelColorVisual::Property::BLUR_RADIUS, 20.0f );
   Visual::Base colorVisual = factory.CreateVisual( propertyMap );
 
@@ -523,6 +526,18 @@ int UtcDaliVisualGetPropertyMap1(void)
   Property::Value* cornerRadiusPolicyValue = resultMap.Find( DevelVisual::Property::CORNER_RADIUS_POLICY, Property::INTEGER );
   DALI_TEST_CHECK( cornerRadiusPolicyValue );
   DALI_TEST_CHECK( cornerRadiusPolicyValue->Get< int >() == Toolkit::Visual::Transform::Policy::RELATIVE );
+
+  Property::Value* borderlineWidthValue = resultMap.Find( DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT );
+  DALI_TEST_CHECK( borderlineWidthValue );
+  DALI_TEST_CHECK( borderlineWidthValue->Get< float >() == 20.0f );
+
+  Property::Value* borderlineColorValue = resultMap.Find( DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4 );
+  DALI_TEST_CHECK( borderlineColorValue );
+  DALI_TEST_CHECK( borderlineColorValue->Get< Vector4 >() == Color::RED );
+
+  Property::Value* borderlineOffsetValue = resultMap.Find( DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT );
+  DALI_TEST_CHECK( borderlineOffsetValue );
+  DALI_TEST_CHECK( borderlineOffsetValue->Get< float >() == -1.0f );
 
   Property::Value* blurRadiusValue = resultMap.Find( DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT );
   DALI_TEST_CHECK( blurRadiusValue );
@@ -599,10 +614,23 @@ int UtcDaliVisualGetPropertyMap2(void)
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::CYAN );
 
-  colorValue = resultMap.Find( BorderVisual::Property::SIZE,  Property::FLOAT );
-  DALI_TEST_CHECK( colorValue );
-  DALI_TEST_CHECK( colorValue->Get<float>() == 10.f );
+  sizeValue = resultMap.Find( BorderVisual::Property::SIZE,  Property::FLOAT );
+  DALI_TEST_CHECK( sizeValue );
+  DALI_TEST_CHECK( sizeValue->Get<float>() == 10.f );
 
+  // Get default value of borderline values here
+
+  sizeValue = resultMap.Find( DevelVisual::Property::BORDERLINE_WIDTH,  Property::FLOAT );
+  DALI_TEST_CHECK( sizeValue );
+  DALI_TEST_CHECK( sizeValue->Get<float>() == 0.0f );
+
+  colorValue = resultMap.Find( DevelVisual::Property::BORDERLINE_COLOR,  Property::VECTOR4 );
+  DALI_TEST_CHECK( colorValue );
+  DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::BLACK );
+
+  sizeValue = resultMap.Find( DevelVisual::Property::BORDERLINE_OFFSET,  Property::FLOAT );
+  DALI_TEST_CHECK( sizeValue );
+  DALI_TEST_CHECK( sizeValue->Get<float>() == 0.0f );
 
   END_TEST;
 }
@@ -655,6 +683,11 @@ int UtcDaliVisualGetPropertyMap3(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert(GradientVisual::Property::STOP_COLOR,   stopColors);
 
+  float borderlineWidth = 4.0f;
+  Vector4 cornerRadius(7.0f, 10.0f, 13.0f, 16.0f);
+  propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH,  borderlineWidth);
+  propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS,  cornerRadius);
+
   Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
 
   Property::Map resultMap;
@@ -680,6 +713,14 @@ int UtcDaliVisualGetPropertyMap3(void)
   value = resultMap.Find( GradientVisual::Property::END_POSITION,   Property::VECTOR2 );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<Vector2>(), end , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_WIDTH,   Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), borderlineWidth , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS,   Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), cornerRadius , Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
   value = resultMap.Find( GradientVisual::Property::STOP_OFFSET,   Property::ARRAY );
   DALI_TEST_CHECK( value );
@@ -722,6 +763,11 @@ int UtcDaliVisualGetPropertyMap4(void)
   stopColors.PushBack( Color::GREEN );
   propertyMap.Insert(GradientVisual::Property::STOP_COLOR,   stopColors);
 
+  float borderlineWidth = 8.0f;
+  Vector4 cornerRadius(1.0f, 2.0f, 4.0f, 8.0f);
+  propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH,  borderlineWidth);
+  propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS,  cornerRadius);
+
   Visual::Base gradientVisual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( gradientVisual );
 
@@ -748,6 +794,14 @@ int UtcDaliVisualGetPropertyMap4(void)
   value = resultMap.Find( GradientVisual::Property::RADIUS,  Property::FLOAT );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<float>(), radius , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_WIDTH,   Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), borderlineWidth , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS,   Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), cornerRadius , Math::MACHINE_EPSILON_100, TEST_LOCATION );
 
   value = resultMap.Find( GradientVisual::Property::STOP_OFFSET,   Property::ARRAY );
   DALI_TEST_CHECK( value );
@@ -3910,6 +3964,361 @@ int UtcDaliVisualRoundedCorner(void)
   END_TEST;
 }
 
+int UtcDaliVisualBorderline(void)
+{
+#ifdef OLD_GRAPHICS_TEST
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualBorderline" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("cornerRadius", Property::Type::VECTOR4),
+    UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+    UniformData("borderlineWidth", Property::Type::FLOAT),
+    UniformData("borderlineColor", Property::Type::VECTOR4),
+    UniformData("borderlineOffset", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  // image visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float cornerRadius = 5.0f;
+    float borderlineWidth = 30.0f;
+    Vector4 borderlineColor(1.0f, 0.0f, 0.0f, 1.0f);
+    float borderlineOffset = 1.0f;
+
+    properties[Visual::Property::TYPE] = Visual::IMAGE;
+    properties[ImageVisual::Property::URL] = TEST_IMAGE_FILE_NAME;
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+    properties[DevelVisual::Property::BORDERLINE_WIDTH] = borderlineWidth;
+    properties[DevelVisual::Property::BORDERLINE_COLOR] = borderlineColor;
+    properties[DevelVisual::Property::BORDERLINE_OFFSET] = borderlineOffset;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius) ), true, TEST_LOCATION );
+    // Default corner radius policy is absolute.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", borderlineColor ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", borderlineOffset ), true, TEST_LOCATION );
+  }
+
+  // color visual 1
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    Vector4 cornerRadius(23.0f, 2.0f, 3.0f, 2.3f);
+    float borderlineWidth = 30.0f;
+    Vector4 borderlineColor(0.5f, 0.4f, 0.3f, 0.2f);
+    float borderlineOffset = -0.4f;
+
+    properties[Visual::Property::TYPE] = Visual::COLOR;
+    properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+    properties["cornerRadius"] = cornerRadius;
+    properties["borderlineWidth"] = borderlineWidth;
+    properties["borderlineColor"] = borderlineColor;
+    properties["borderlineOffset"] = borderlineOffset;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", borderlineColor ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", borderlineOffset ), true, TEST_LOCATION );
+  }
+
+  // color visual 2, default color, default offset
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float borderlineWidth = 30.0f;
+
+    properties[Visual::Property::TYPE] = Visual::COLOR;
+    properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+    properties[DevelVisual::Property::BORDERLINE_WIDTH] = borderlineWidth;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
+    // Default borderline color is BLACK.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", Color::BLACK ), true, TEST_LOCATION );
+    // Default borderline offset is 0.0f.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", 0.0f ), true, TEST_LOCATION );
+  }
+
+  // color visual 3, offset not [-1.0 ~ 1.0], but uniform value is same anyway
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float borderlineWidth = 30.0f;
+    Vector4 borderlineColor(0.5f, 0.4f, 0.3f, 0.2f);
+    float borderlineOffset = 37.4f;
+
+    properties[Visual::Property::TYPE] = Visual::COLOR;
+    properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+    properties["borderlineWidth"] = borderlineWidth;
+    properties["borderlineColor"] = borderlineColor;
+    properties["borderlineOffset"] = borderlineOffset;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", borderlineColor ), true, TEST_LOCATION );
+    // NOTE : borderlineOffset will clamp in fragment shader. not visual itself
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", borderlineOffset ), true, TEST_LOCATION );
+  }
+
+  // gradient visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float borderlineWidth = 30.0f;
+    float cornerRadius = 70.0f;
+
+    properties[Visual::Property::TYPE] = Visual::GRADIENT;
+    properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+    properties[DevelVisual::Property::BORDERLINE_WIDTH] = borderlineWidth;
+    properties[GradientVisual::Property::START_POSITION] = Vector2( 0.5f, 0.5f );
+    properties[GradientVisual::Property::END_POSITION] = Vector2( -0.5f, -0.5f );
+    properties[GradientVisual::Property::UNITS] = GradientVisual::Units::USER_SPACE;
+
+    Property::Array stopOffsets;
+    stopOffsets.PushBack( 0.0f );
+    stopOffsets.PushBack( 0.6f );
+    stopOffsets.PushBack( 1.0f );
+    properties[GradientVisual::Property::STOP_OFFSET] = stopOffsets;
+
+    Property::Array stopColors;
+    stopColors.PushBack( Color::RED );
+    stopColors.PushBack( Color::YELLOW );
+    stopColors.PushBack( Color::GREEN );
+    properties[GradientVisual::Property::STOP_COLOR] = stopColors;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius) ), true, TEST_LOCATION );
+    // Default corner radius policy is absolute.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
+    // Default borderline color is BLACK.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", Color::BLACK ), true, TEST_LOCATION );
+    // Default borderline offset is 0.0f.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", 0.0f ), true, TEST_LOCATION );
+  }
+
+  // animated image visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float borderlineWidth = 24.0f;
+    float borderlineOffset = -1.0f;
+
+    properties[Visual::Property::TYPE] = Visual::ANIMATED_IMAGE;
+    properties[ImageVisual::Property::URL] = TEST_GIF_FILE_NAME;
+    properties[DevelVisual::Property::BORDERLINE_WIDTH] = borderlineWidth + 10.0f; // Dummy Input
+    properties[DevelVisual::Property::BORDERLINE_WIDTH] = borderlineWidth;
+    properties["borderlineOffset"] = borderlineOffset;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
+    // Default borderline color is BLACK.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", Color::BLACK ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", borderlineOffset ), true, TEST_LOCATION );
+  }
+
+  // vector image visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    Vector4 cornerRadius(54.0f, 43.0f, 32.0f, 21.0f);
+    float borderlineWidth = 27.0f;
+    Vector4 borderlineColor(0.5f, 0.5f, 0.5f, 0.0f);
+
+    properties[Visual::Property::TYPE] = Visual::SVG;
+    properties[ImageVisual::Property::URL] = TEST_SVG_FILE_NAME;
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+    properties[DevelVisual::Property::BORDERLINE_WIDTH] = borderlineWidth;
+    properties[DevelVisual::Property::BORDERLINE_COLOR] = borderlineColor;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    // Default corner radius policy is absolute.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", borderlineColor ), true, TEST_LOCATION );
+    // Default borderline offset is 0.0.
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", 0.0f ), true, TEST_LOCATION );
+  }
+
+  // animated vector image visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    Vector4 cornerRadius(1.3f, 0.0f, 0.4f, 0.2f);
+    float borderlineWidth = 13.0f;
+    Vector4 borderlineColor(0.3f, 0.3f, 0.3f, 1.0f);
+    float borderlineOffset = 13.0f;
+
+    properties[Visual::Property::TYPE] = DevelVisual::ANIMATED_VECTOR_IMAGE;
+    properties[ImageVisual::Property::URL] = TEST_VECTOR_IMAGE_FILE_NAME;
+    properties["cornerRadius"] = cornerRadius;
+    properties[DevelVisual::Property::CORNER_RADIUS_POLICY] = Toolkit::Visual::Transform::Policy::RELATIVE;
+    properties[DevelVisual::Property::BORDERLINE_WIDTH] = borderlineWidth;
+    properties["borderlineColor"] = borderlineColor;
+    properties[DevelVisual::Property::BORDERLINE_OFFSET] = borderlineOffset;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+    dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    application.GetScene().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", borderlineColor ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", borderlineOffset ), true, TEST_LOCATION );
+  }
+#else
+  tet_result(TET_PASS);
+#endif
+
+  END_TEST;
+}
+
+
 int UtcDaliColorVisualBlurRadius(void)
 {
   ToolkitTestApplication application;
@@ -4101,6 +4510,9 @@ int UtcDaliVisualGetVisualProperty01(void)
     UniformData("size", Property::Type::VECTOR2),
     UniformData("cornerRadius", Property::Type::VECTOR4),
     UniformData("blurRadius", Property::Type::FLOAT),
+    UniformData("borderlineWidth", Property::Type::FLOAT),
+    UniformData("borderlineColor", Property::Type::VECTOR4),
+    UniformData("borderlineOffset", Property::Type::FLOAT),
   };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -4113,6 +4525,9 @@ int UtcDaliVisualGetVisualProperty01(void)
   propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, Vector4(10.0f, 0.0f, 2.0f, 4.0f));
   propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::RELATIVE);
   propertyMap.Insert(DevelColorVisual::Property::BLUR_RADIUS, 20.0f);
+  propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 20.0f);
+  propertyMap.Insert(DevelVisual::Property::BORDERLINE_COLOR, Color::RED);
+  propertyMap.Insert(DevelVisual::Property::BORDERLINE_OFFSET, 1.0f);
   Visual::Base colorVisual = factory.CreateVisual(propertyMap);
 
   DummyControl dummyControl = DummyControl::New(true);
@@ -4130,6 +4545,9 @@ int UtcDaliVisualGetVisualProperty01(void)
   float targetOpacity = 0.5f;
   Vector4 targetCornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
   float targetBlurRadius = 10.0f;
+  float targetBorderlineWidth = 25.0f;
+  Vector4 targetBorderlineColor(1.0f, 1.0f, 1.0f, 1.0f);
+  float targetBorderlineOffset = -1.0f;
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::MIX_COLOR), targetColor);
@@ -4138,6 +4556,9 @@ int UtcDaliVisualGetVisualProperty01(void)
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Transform::Property::SIZE), targetSize);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelColorVisual::Property::BLUR_RADIUS), targetBlurRadius);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), targetBorderlineOffset);
   animation.Play();
 
   application.SendNotification();
@@ -4172,12 +4593,27 @@ int UtcDaliVisualGetVisualProperty01(void)
   DALI_TEST_CHECK(blurRadiusValue);
   DALI_TEST_EQUALS(blurRadiusValue->Get< float >(), targetBlurRadius, TEST_LOCATION);
 
+  Property::Value* borderlineWidthValue = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineWidthValue);
+  DALI_TEST_EQUALS(borderlineWidthValue->Get< float >(), targetBorderlineWidth, TEST_LOCATION);
+
+  Property::Value* borderlineColorValue = resultMap.Find(DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(borderlineColorValue);
+  DALI_TEST_EQUALS(borderlineColorValue->Get< Vector4 >(), targetBorderlineColor, TEST_LOCATION);
+
+  Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineOffsetValue);
+  DALI_TEST_EQUALS(borderlineOffsetValue->Get< float >(), targetBorderlineOffset, TEST_LOCATION);
+
   // Test uniform values
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("blurRadius", targetBlurRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
 
   // Test not-supported property
   Property property1 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::PREMULTIPLIED_ALPHA);
@@ -4203,6 +4639,9 @@ int UtcDaliVisualGetVisualProperty02(void)
     UniformData("offset", Property::Type::VECTOR2),
     UniformData("size", Property::Type::VECTOR2),
     UniformData("cornerRadius", Property::Type::VECTOR4),
+    UniformData("borderlineWidth", Property::Type::FLOAT),
+    UniformData("borderlineCOlor", Property::Type::VECTOR4),
+    UniformData("borderlineOffset", Property::Type::FLOAT),
     UniformData("blurRadius", Property::Type::FLOAT),
   };
 
@@ -4228,6 +4667,9 @@ int UtcDaliVisualGetVisualProperty02(void)
   Vector2 targetSize(1.1f, 1.1f);
   float targetOpacity = 0.5f;
   Vector4 targetCornerRadius(20.0f, 0.0f, 20.0f, 0.0f);
+  float targetBorderlineWidth = 77.7f;
+  Vector4 targetBorderlineColor(0.4f, 0.2f, 0.3f, 0.9f);
+  float targetBorderlineOffset = 1.0f;
   float targetBlurRadius = 10.0f;
 
   // Should work when the properties are not set before
@@ -4237,6 +4679,9 @@ int UtcDaliVisualGetVisualProperty02(void)
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "offset"), targetOffset);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "size"), targetSize);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "cornerRadius"), targetCornerRadius);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "borderlineWidth"), targetBorderlineWidth);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "borderlineColor"), targetBorderlineColor);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "borderlineOffset"), targetBorderlineOffset);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, "blurRadius"), targetBlurRadius);
   animation.Play();
 
@@ -4268,6 +4713,18 @@ int UtcDaliVisualGetVisualProperty02(void)
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get< Vector4 >(), targetCornerRadius, TEST_LOCATION);
 
+  Property::Value* borderlineWidthValue = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineWidthValue);
+  DALI_TEST_EQUALS(borderlineWidthValue->Get< float >(), targetBorderlineWidth, TEST_LOCATION);
+
+  Property::Value* borderlineColorValue = resultMap.Find(DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(borderlineColorValue);
+  DALI_TEST_EQUALS(borderlineColorValue->Get< Vector4 >(), targetBorderlineColor, TEST_LOCATION);
+
+  Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineOffsetValue);
+  DALI_TEST_EQUALS(borderlineOffsetValue->Get< float >(), targetBorderlineOffset, TEST_LOCATION);
+
   Property::Value* blurRadiusValue = resultMap.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
   DALI_TEST_CHECK(blurRadiusValue);
   DALI_TEST_EQUALS(blurRadiusValue->Get< float >(), targetBlurRadius, TEST_LOCATION);
@@ -4288,11 +4745,14 @@ int UtcDaliVisualGetVisualProperty03(void)
 {
 #ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetVisualProperty01: Test animatable property, ImageVisual" );
+  tet_infoline( "UtcDaliVisualGetVisualProperty03: Test animatable property, ImageVisual" );
 
   static std::vector<UniformData> customUniforms =
   {
     UniformData("cornerRadius", Property::Type::VECTOR4),
+    UniformData("borderlineWidth", Property::Type::FLOAT),
+    UniformData("borderlineColor", Property::Type::VECTOR4),
+    UniformData("borderlineOffset", Property::Type::FLOAT),
   };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -4302,6 +4762,10 @@ int UtcDaliVisualGetVisualProperty03(void)
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
   propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
+  //We must set some value because application cannot notify shader changed
+  propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, 1.0f);
+  propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 1.0f);
+
   Visual::Base imageVisual = factory.CreateVisual(propertyMap);
 
   DummyControl dummyControl = DummyControl::New(true);
@@ -4318,10 +4782,16 @@ int UtcDaliVisualGetVisualProperty03(void)
 
   float targetOpacity = 0.5f;
   Vector4 targetCornerRadius(20.0f, 20.0f, 0.0f, 0.0f);
+  float targetBorderlineWidth = 10.0f;
+  Vector4 targetBorderlineColor(1.0f, 0.0f, 1.0f, 0.5f);
+  float targetBorderlineOffset = -1.5f;
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), targetBorderlineOffset);
   animation.Play();
 
   application.SendNotification();
@@ -4340,8 +4810,23 @@ int UtcDaliVisualGetVisualProperty03(void)
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get< Vector4 >(), targetCornerRadius, TEST_LOCATION);
 
+  Property::Value* borderlineWidthValue = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineWidthValue);
+  DALI_TEST_EQUALS(borderlineWidthValue->Get< float >(), targetBorderlineWidth, TEST_LOCATION);
+
+  Property::Value* borderlineColorValue = resultMap.Find(DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(borderlineColorValue);
+  DALI_TEST_EQUALS(borderlineColorValue->Get< Vector4 >(), targetBorderlineColor, TEST_LOCATION);
+
+  Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineOffsetValue);
+  DALI_TEST_EQUALS(borderlineOffsetValue->Get< float >(), targetBorderlineOffset, TEST_LOCATION);
+
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
 #else
   tet_result(TET_PASS);
 #endif

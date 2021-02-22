@@ -77,7 +77,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
     .Add( ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT )
     .Add( ImageVisual::Property::WRAP_MODE_V, WrapMode::DEFAULT )
     .Add( DevelVisual::Property::CORNER_RADIUS, 22.2f )
-    .Add( DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::ABSOLUTE ));
+    .Add( DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::ABSOLUTE )
+    .Add( DevelVisual::Property::BORDERLINE_WIDTH, 33.3f )
+    .Add( DevelVisual::Property::BORDERLINE_COLOR, Color::RED )
+    .Add( DevelVisual::Property::BORDERLINE_OFFSET, 0.3f ));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap( resultMap );
@@ -97,6 +100,18 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, Property::INTEGER );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == Visual::Transform::Policy::ABSOLUTE );
+
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 33.3f, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), Color::RED, TEST_LOCATION );
+
+  value = resultMap.Find( DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 0.3f, TEST_LOCATION );
 
   // request AnimatedImageVisual with an URL
   Visual::Base animatedImageVisual2 = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
@@ -137,7 +152,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
     .Add( "wrapModeU", WrapMode::REPEAT )
     .Add( "wrapModeV", WrapMode::DEFAULT )
     .Add( "cornerRadius", Vector4(50.0f, 25.0f, 12.5f, 33.0f) )
-    .Add( "cornerRadiusPolicy", Visual::Transform::Policy::RELATIVE ));
+    .Add( "cornerRadiusPolicy", Visual::Transform::Policy::RELATIVE )
+    .Add( "borderlineWidth", 20.0f )
+    .Add( "borderlineColor", Vector4() )
+    .Add( "borderlineOffset", -1.0f));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap( resultMap );
@@ -179,6 +197,18 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, "cornerRadiusPolicy" );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == Visual::Transform::Policy::RELATIVE );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, "borderlineWidth" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 20.0f, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::BORDERLINE_COLOR, "borderlineColor" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), Vector4::ZERO, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, "borderlineOffset" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), -1.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -248,6 +278,18 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<int>() == Visual::Transform::Policy::ABSOLUTE );
 
+  value = resultMap.Find( Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, "borderlineWidth" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 0.0f, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::BORDERLINE_COLOR, "borderlineColor" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), Color::BLACK, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, "borderlineOffset" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 0.0f, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -264,7 +306,8 @@ int UtcDaliAnimatedImageVisualGetPropertyMap04(void)
     .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME )
     .Add( ImageVisual::Property::BATCH_SIZE, 1 )
     .Add( ImageVisual::Property::CACHE_SIZE, 1 )
-    .Add( ImageVisual::Property::SYNCHRONOUS_LOADING, false ));
+    .Add( ImageVisual::Property::SYNCHRONOUS_LOADING, false )
+    .Add( DevelVisual::Property::BORDERLINE_WIDTH, 0.4f ));
 
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap( resultMap );
@@ -289,6 +332,18 @@ int UtcDaliAnimatedImageVisualGetPropertyMap04(void)
   value = resultMap.Find( Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, "totalFrameNumber" );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<int>(), 4, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, "borderlineWidth" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 0.4f, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::BORDERLINE_COLOR, "borderlineColor" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), Vector4(0.0f, 0.0f, 0.0f, 1.0f), TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, "borderlineOffset" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), 0.0f, TEST_LOCATION );
 
   END_TEST;
 }

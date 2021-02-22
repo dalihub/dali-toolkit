@@ -87,7 +87,13 @@ void SvgVisual::OnInitialize()
   Shader shader;
   if(!mImpl->mCustomShader)
   {
-    shader = mImageVisualShaderFactory.GetShader(mFactoryCache, mAttemptAtlasing, true, IsRoundedCornerRequired());
+    shader = mImageVisualShaderFactory.GetShader(
+      mFactoryCache,
+      mAttemptAtlasing ? TextureAtlas::ENABLED : TextureAtlas::DISABLED,
+      DefaultTextureWrapMode::APPLY,
+      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
+      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
+    );
   }
   else
   {
