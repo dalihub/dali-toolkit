@@ -344,6 +344,11 @@ WebView::WebViewRequestInterceptorSignalType& WebView::RequestInterceptorSignal(
   return Dali::Toolkit::GetImpl(*this).RequestInterceptorSignal();
 }
 
+WebView::WebViewConsoleMessageSignalType& WebView::ConsoleMessageSignal()
+{
+  return Dali::Toolkit::GetImpl(*this).ConsoleMessageSignal();
+}
+
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)
 {

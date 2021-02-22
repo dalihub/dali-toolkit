@@ -344,6 +344,11 @@ public:
    */
   Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType& RequestInterceptorSignal();
 
+  /**
+   * @copydoc Dali::Toolkit::WebView::ConsoleMessageSignal()
+   */
+  Dali::Toolkit::WebView::WebViewConsoleMessageSignalType& ConsoleMessageSignal();
+
 public: // Properties
   /**
    * @brief Called when a property of an object of this type is set.
@@ -412,7 +417,7 @@ private:
   WebView& operator=(const WebView& webView);
 
   /**
-   * @brief Sets an absolute scroll of the given view.
+   * @brief Set an absolute scroll of the given view.
    * @param[in] x The coordinate x of scroll
    * @param[in] y The coordinate y of scroll
    */
@@ -426,54 +431,54 @@ private:
   Dali::Vector2 GetScrollPosition() const;
 
   /**
-   * @brief Gets the possible scroll size of the given view.
+   * @brief Get the possible scroll size of the given view.
    * @param[out] width The width of scroll size
    * @param[out] height The height of scroll size
    */
   Dali::Vector2 GetScrollSize() const;
 
   /**
-   * @brief Gets the last known content's size.
+   * @brief Get the last known content's size.
    * @param[out] width The width of content's size
    * @param[out] height The height of content's size
    */
   Dali::Vector2 GetContentSize() const;
 
   /**
-   * @brief Returns the title of the Web.
+   * @brief Return the title of the Web.
    *
    * @return The title of web page
    */
   std::string GetTitle() const;
 
   /**
-   * @brief Sets the background color of web page.
+   * @brief Set the background color of web page.
    * @param[in] color The value of background color.
    */
   void SetDocumentBackgroundColor(Dali::Vector4 color);
 
   /**
-   * @brief Clears tiles when hidden.
+   * @brief Clear tiles when hidden.
    *
    * @param[in] cleared Whether tiles are cleared or not
    */
   void ClearTilesWhenHidden(bool cleared);
 
   /**
-   * @brief Sets multiplier of cover area of tile.
+   * @brief Set multiplier of cover area of tile.
    *
    * @param[in] multiplier The multiplier of cover area
    */
   void SetTileCoverAreaMultiplier(float multiplier);
 
   /**
-   * @brief Enables cursor by client.
+   * @brief Enable cursor by client.
    * @param[in] enabled Whether cursor is enabled or not.
    */
   void EnableCursorByClient(bool enabled);
 
   /**
-   * @brief Gets the selected text.
+   * @brief Get the selected text.
    * @return The selected text
    */
   std::string GetSelectedText() const;
@@ -491,31 +496,31 @@ private:
   void SetUserAgent(const std::string& userAgent);
 
   /**
-   * @brief Sets zoom factor of the current page.
+   * @brief Set zoom factor of the current page.
    * @param[in] zoomFactor a new factor to be set.
    */
   void SetPageZoomFactor(float zoomFactor);
 
   /**
-   * @brief Queries the current zoom factor of the page。
+   * @brief Query the current zoom factor of the page。
    * @return The current page zoom factor.
    */
   float GetPageZoomFactor() const;
 
   /**
-   * @brief Sets the current text zoom level。.
+   * @brief Set the current text zoom level。.
    * @param[in] zoomFactor a new factor to be set.
    */
   void SetTextZoomFactor(float zoomFactor);
 
   /**
-   * @brief Gets the current text zoom level.
+   * @brief Get the current text zoom level.
    * @return The current text zoom factor.
    */
   float GetTextZoomFactor() const;
 
   /**
-   * @brief Gets the current load progress of the page.
+   * @brief Get the current load progress of the page.
    * @return The load progress of the page.
    */
   float GetLoadProgressPercentage() const;
@@ -529,7 +534,7 @@ private:
   bool SetVisibility(bool visible);
 
   /**
-   * @brief Updates display area of web view.
+   * @brief Update display area of web view.
    * @param[in] source The soource triggers Notification.
    */
   void UpdateDisplayArea(Dali::PropertyNotification& source);
@@ -547,14 +552,14 @@ private:
   void EnableBlendMode(bool blendEnabled);
 
   /**
-   * @brief Enables/disables mouse events. The default is enabled.
+   * @brief Enable/disable mouse events. The default is enabled.
    *
    * @param[in] enabled True if mouse events are enabled, false otherwise
    */
   void EnableMouseEvents(bool enabled);
 
   /**
-   * @brief Enables/disables key events. The default is enabled.
+   * @brief Enable/disable key events. The default is enabled.
    *
    * @param[in] enabled True if key events enabled, false otherwise
    */
@@ -590,7 +595,7 @@ private:
    * @param[in] url The url currently being loaded
    * @param[in] errorCode The error code
    */
-  void OnPageLoadError(const std::string& url, int errorCode);
+  void OnPageLoadError(std::shared_ptr<Dali::WebEngineLoadError> error);
 
   /**
    * @brief Callback function to be called when scroll edge is reached.
@@ -659,6 +664,12 @@ private:
    */
   void OnInterceptRequest(std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor);
 
+  /**
+   * @brief Callback function to be called when console message will be logged.
+   * @param[in] message The message logged.
+   */
+  void OnConsoleMessage(std::shared_ptr<Dali::WebEngineConsoleMessage> message);
+
 private:
   std::string                 mUrl;
   Dali::Toolkit::Visual::Base mVisual;
@@ -674,6 +685,7 @@ private:
   Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType mFormRepostDecisionSignal;
   Dali::Toolkit::WebView::WebViewFrameRenderedSignalType      mFrameRenderedSignal;
   Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType mRequestInterceptorSignal;
+  Dali::Toolkit::WebView::WebViewConsoleMessageSignalType     mConsoleMessageSignal;
 
   std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
   std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
