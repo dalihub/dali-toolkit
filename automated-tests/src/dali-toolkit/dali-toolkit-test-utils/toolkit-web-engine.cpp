@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,27 +42,34 @@ class WebEngine;
 
 namespace
 {
-static WebEngine* gInstance = NULL;
+
+// Generally only one WebEngine instance exists.
+// If > 1, a new web engine has been created by CreateWindowSignal.
+static WebEngine* gInstance = 0;
 static int gInstanceCount = 0;
 
 bool OnGoBack();
 bool OnGoForward();
 bool OnLoadUrl();
 bool OnEvaluteJavaScript();
+bool OnJavaScriptAlert();
+bool OnJavaScriptConfirm();
+bool OnJavaScriptPrompt();
+bool OnScrollEdge();
 bool OnClearHistory();
 
-static void ConnectToGlobalSignal( bool (*func)() )
+static void ConnectToGlobalSignal( bool ( *func )() )
 {
   Dali::Timer timer = Dali::Timer::New( 0 );
   timer.TickSignal().Connect( func );
 }
 
-static void DisconnectFromGlobalSignal( bool (*func)() )
+static void DisconnectFromGlobalSignal( bool ( *func )() )
 {
   Dali::Timer timer = Dali::Timer::New( 0 );
   timer.TickSignal().Disconnect( func );
 }
-}
+} // namespace anonymous
 
 class MockWebEngineContext : public Dali::WebEngineContext
 {
@@ -290,6 +297,11 @@ class WebEngine: public Dali::BaseObject
 {
 public:
 
+  using JavaScriptEvaluatedResultCallback = std::function<void(const std::string&)>;
+  using JavaScriptAlertCallback = std::function<bool(const std::string&)>;
+  using JavaScriptConfirmCallback = std::function<bool(const std::string&)>;
+  using JavaScriptPromptCallback = std::function<bool(const std::string&, const std::string&)>;
+
   WebEngine()
     : mUrl()
     , mCurrentPlusOnePos( 0 )
@@ -300,7 +312,10 @@ public:
     , mContentSize( 500, 500 )
   {
     gInstanceCount++;
-    gInstance = this;
+    if ( gInstanceCount == 1 ) // only first web engine need be saved.
+    {
+      gInstance = this;
+    }
 
     mockWebEngineSettings = new MockWebEngineSettings();
     mockWebEngineContext = new MockWebEngineContext();
@@ -313,7 +328,7 @@ public:
     gInstanceCount--;
     if( !gInstanceCount )
     {
-      gInstance = NULL;
+      gInstance = 0;
     }
 
     delete mockWebEngineSettings;
@@ -416,6 +431,33 @@ public:
     }
   }
 
+  void RegisterJavaScriptAlertCallback( Dali::WebEnginePlugin::JavaScriptAlertCallback callback )
+  {
+    if ( callback )
+    {
+      ConnectToGlobalSignal( &OnJavaScriptAlert );
+      mJavaScriptAlertCallback = callback;
+    }
+  }
+
+  void RegisterJavaScriptConfirmCallback( Dali::WebEnginePlugin::JavaScriptConfirmCallback callback )
+  {
+    if ( callback )
+    {
+      ConnectToGlobalSignal( &OnJavaScriptConfirm );
+      mJavaScriptConfirmCallback = callback;
+    }
+  }
+
+  void RegisterJavaScriptPromptCallback( Dali::WebEnginePlugin::JavaScriptPromptCallback callback )
+  {
+    if ( callback )
+    {
+      ConnectToGlobalSignal( &OnJavaScriptPrompt );
+      mJavaScriptPromptCallback = callback;
+    }
+  }
+
   void ClearHistory()
   {
     ConnectToGlobalSignal( &OnClearHistory );
@@ -436,7 +478,7 @@ public:
     mScrollPosition += Dali::Vector2( dx, dy );
     if ( mScrollPosition.y + mScrollSize.height > mContentSize.height )
     {
-      gInstance->mScrollEdgeReachedSignal.Emit( Dali::WebEnginePlugin::ScrollEdge::BOTTOM );
+      ConnectToGlobalSignal( &OnScrollEdge );
     }
   }
 
@@ -466,6 +508,11 @@ public:
     return mPageLoadStartedSignal;
   }
 
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadInProgressSignal()
+  {
+    return mPageLoadInProgressSignal;
+  }
+
   Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadFinishedSignal()
   {
     return mPageLoadFinishedSignal;
@@ -481,14 +528,20 @@ public:
     return mScrollEdgeReachedSignal;
   }
 
+  Dali::WebEnginePlugin::WebEngineUrlChangedSignalType& UrlChangedSignal()
+  {
+    return mUrlChangedSignal;
+  }
+
   std::string                                                mUrl;
   std::vector< std::string >                                 mHistory;
   size_t                                                     mCurrentPlusOnePos;
   std::string                                                mUserAgent;
   Dali::WebEnginePlugin::WebEnginePageLoadSignalType         mPageLoadStartedSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType         mPageLoadInProgressSignal;
   Dali::WebEnginePlugin::WebEnginePageLoadSignalType         mPageLoadFinishedSignal;
   Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType    mPageLoadErrorSignal;
-  std::vector< std::function< void( const std::string& ) > > mResultCallbacks;
+  std::vector<JavaScriptEvaluatedResultCallback>             mResultCallbacks;
   bool                                                       mEvaluating;
 
   Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
@@ -499,21 +552,13 @@ public:
   WebEngineContext*                                           mockWebEngineContext;
   WebEngineCookieManager*                                     mockWebEngineCookieManager;
   WebEngineSettings*                                          mockWebEngineSettings;
+  Dali::WebEnginePlugin::WebEngineUrlChangedSignalType        mUrlChangedSignal;
+
+  JavaScriptAlertCallback                                     mJavaScriptAlertCallback;
+  JavaScriptConfirmCallback                                   mJavaScriptConfirmCallback;
+  JavaScriptPromptCallback                                    mJavaScriptPromptCallback;
 };
 
-inline WebEngine& GetImplementation( Dali::WebEngine& webEngine )
-{
-  DALI_ASSERT_ALWAYS( webEngine && "WebEngine handle is empty." );
-  BaseObject& handle = webEngine.GetBaseObject();
-  return static_cast< Internal::Adaptor::WebEngine& >( handle );
-}
-
-inline const WebEngine& GetImplementation( const Dali::WebEngine& webEngine )
-{
-  DALI_ASSERT_ALWAYS( webEngine && "WebEngine handle is empty." );
-  const BaseObject& handle = webEngine.GetBaseObject();
-  return static_cast< const Internal::Adaptor::WebEngine& >( handle );
-}
 
 namespace
 {
@@ -553,8 +598,22 @@ bool OnLoadUrl()
     gInstance->mHistory.push_back( gInstance->mUrl );
     gInstance->mCurrentPlusOnePos++;
     gInstance->mPageLoadStartedSignal.Emit( gInstance->mUrl );
+    gInstance->mPageLoadInProgressSignal.Emit( gInstance->mUrl );
     gInstance->mPageLoadFinishedSignal.Emit( gInstance->mUrl );
+    gInstance->mUrlChangedSignal.Emit( "http://new-test" );
   }
+  return false;
+}
+
+bool OnScrollEdge()
+{
+  DisconnectFromGlobalSignal( &OnScrollEdge );
+
+  if( gInstance )
+  {
+    gInstance->mScrollEdgeReachedSignal.Emit( Dali::WebEnginePlugin::ScrollEdge::BOTTOM );
+  }
+
   return false;
 }
 
@@ -573,11 +632,42 @@ bool OnEvaluteJavaScript()
   return false;
 }
 
+bool OnJavaScriptAlert()
+{
+  DisconnectFromGlobalSignal( &OnJavaScriptAlert );
+  if ( gInstance )
+  {
+    gInstance->mJavaScriptAlertCallback( "this is an alert popup." );
+  }
+  return false;
+}
+
+bool OnJavaScriptConfirm()
+{
+  DisconnectFromGlobalSignal( &OnJavaScriptConfirm );
+  if ( gInstance )
+  {
+    gInstance->mJavaScriptConfirmCallback( "this is a confirm popup." );
+  }
+  return false;
+}
+
+bool OnJavaScriptPrompt()
+{
+  DisconnectFromGlobalSignal( &OnJavaScriptPrompt );
+  if ( gInstance )
+  {
+    gInstance->mJavaScriptPromptCallback( "this is a prompt pompt.", "" );
+  }
+  return false;
+}
+
 bool OnClearHistory()
 {
   DisconnectFromGlobalSignal( &OnClearHistory );
 
-  if( gInstance && gInstance->mCurrentPlusOnePos ) {
+  if( gInstance && gInstance->mCurrentPlusOnePos )
+  {
     std::string url = gInstance->mHistory[ gInstance->mCurrentPlusOnePos - 1 ];
     std::vector< std::string >().swap( gInstance->mHistory );
     gInstance->mHistory.push_back( url );
@@ -585,12 +675,26 @@ bool OnClearHistory()
   }
   return false;
 }
+
 } // namespace
+
+inline WebEngine& GetImplementation( Dali::WebEngine& webEngine )
+{
+  DALI_ASSERT_ALWAYS( webEngine && "WebEngine handle is empty." );
+  BaseObject& handle = webEngine.GetBaseObject();
+  return static_cast< Internal::Adaptor::WebEngine& >( handle );
+}
+
+inline const WebEngine& GetImplementation( const Dali::WebEngine& webEngine )
+{
+  DALI_ASSERT_ALWAYS( webEngine && "WebEngine handle is empty." );
+  const BaseObject& handle = webEngine.GetBaseObject();
+  return static_cast< const Internal::Adaptor::WebEngine& >( handle );
+}
 
 } // namespace Adaptor
 
 } // namespace Internal
-
 
 // Dali::WebEngine Implementation
 WebEngine::WebEngine()
@@ -737,6 +841,33 @@ void WebEngine::AddJavaScriptMessageHandler( const std::string& exposedObjectNam
 {
 }
 
+void WebEngine::RegisterJavaScriptAlertCallback( Dali::WebEnginePlugin::JavaScriptAlertCallback callback )
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterJavaScriptAlertCallback( callback );
+}
+
+void WebEngine::JavaScriptAlertReply()
+{
+}
+
+void WebEngine::RegisterJavaScriptConfirmCallback( Dali::WebEnginePlugin::JavaScriptConfirmCallback callback )
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterJavaScriptConfirmCallback( callback );
+}
+
+void WebEngine::JavaScriptConfirmReply( bool confirmed )
+{
+}
+
+void WebEngine::RegisterJavaScriptPromptCallback( Dali::WebEnginePlugin::JavaScriptPromptCallback callback )
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterJavaScriptPromptCallback( callback );
+}
+
+void WebEngine::JavaScriptPromptReply( const std::string& result )
+{
+}
+
 void WebEngine::ClearAllTilesResources()
 {
 }
@@ -812,6 +943,11 @@ Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadStartedSi
   return Internal::Adaptor::GetImplementation( *this ).PageLoadStartedSignal();
 }
 
+Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadInProgressSignal()
+{
+  return Internal::Adaptor::GetImplementation( *this ).PageLoadInProgressSignal();
+}
+
 Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadFinishedSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).PageLoadFinishedSignal();
@@ -825,6 +961,11 @@ Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType& WebEngine::PageLoadErro
 Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType& WebEngine::ScrollEdgeReachedSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).ScrollEdgeReachedSignal();
+}
+
+Dali::WebEnginePlugin::WebEngineUrlChangedSignalType& WebEngine::UrlChangedSignal()
+{
+  return Internal::Adaptor::GetImplementation( *this ).UrlChangedSignal();
 }
 
 } // namespace Dali;

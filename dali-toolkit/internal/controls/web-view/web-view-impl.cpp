@@ -66,10 +66,12 @@ DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "contentSize",      VECTOR2, CONTEN
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "title",            STRING,  TITLE             )
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "videoHoleEnabled", BOOLEAN, VIDEO_HOLE_ENABLED)
 
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadStarted",   PAGE_LOAD_STARTED_SIGNAL  )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadFinished",  PAGE_LOAD_FINISHED_SIGNAL )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadError",     PAGE_LOAD_ERROR_SIGNAL    )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "scrollEdgeReached", SCROLL_EDGE_REACHED_SIGNAL)
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadStarted",    PAGE_LOAD_STARTED_SIGNAL    )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadInProgress", PAGE_LOAD_IN_PROGRESS_SIGNAL)
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadFinished",   PAGE_LOAD_FINISHED_SIGNAL   )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadError",      PAGE_LOAD_ERROR_SIGNAL      )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "scrollEdgeReached",  SCROLL_EDGE_REACHED_SIGNAL  )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "urlChanged",         URL_CHANGED_SIGNAL          )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -94,7 +96,8 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mPageLoadFinishedSignal(),
   mPageLoadErrorSignal(),
   mVideoHoleEnabled(true),
-  mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height)
+  mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
+  mUrlChangedSignal()
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -115,7 +118,8 @@ WebView::WebView(int argc, char** argv)
   mPageLoadFinishedSignal(),
   mPageLoadErrorSignal(),
   mVideoHoleEnabled(true),
-  mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height)
+  mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
+  mUrlChangedSignal()
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -182,10 +186,12 @@ void WebView::OnInitialize()
 
   if(mWebEngine)
   {
-    mWebEngine.PageLoadStartedSignal().Connect(this, &WebView::OnPageLoadStarted);
-    mWebEngine.PageLoadFinishedSignal().Connect(this, &WebView::OnPageLoadFinished);
-    mWebEngine.PageLoadErrorSignal().Connect(this, &WebView::OnPageLoadError);
-    mWebEngine.ScrollEdgeReachedSignal().Connect(this, &WebView::OnScrollEdgeReached);
+    mWebEngine.PageLoadStartedSignal().Connect( this, &WebView::OnPageLoadStarted );
+    mWebEngine.PageLoadInProgressSignal().Connect(this, &WebView::OnPageLoadInProgress);
+    mWebEngine.PageLoadFinishedSignal().Connect( this, &WebView::OnPageLoadFinished );
+    mWebEngine.PageLoadErrorSignal().Connect( this, &WebView::OnPageLoadError );
+    mWebEngine.ScrollEdgeReachedSignal().Connect( this, &WebView::OnScrollEdgeReached );
+    mWebEngine.UrlChangedSignal().Connect(this, &WebView::OnUrlChanged);
 
     mWebContext         = std::unique_ptr<Dali::Toolkit::WebContext>(new WebContext(mWebEngine.GetContext()));
     mWebCookieManager   = std::unique_ptr<Dali::Toolkit::WebCookieManager>(new WebCookieManager(mWebEngine.GetCookieManager()));
@@ -357,11 +363,51 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
   }
 }
 
-void WebView::ClearAllTilesResources()
+void WebView::RegisterJavaScriptAlertCallback( Dali::WebEnginePlugin::JavaScriptAlertCallback callback )
 {
   if(mWebEngine)
   {
-    mWebEngine.ClearAllTilesResources();
+    mWebEngine.RegisterJavaScriptAlertCallback( callback );
+  }
+}
+
+void WebView::JavaScriptAlertReply()
+{
+  if ( mWebEngine )
+  {
+    mWebEngine.JavaScriptAlertReply();
+  }
+}
+
+void WebView::RegisterJavaScriptConfirmCallback( Dali::WebEnginePlugin::JavaScriptConfirmCallback callback )
+{
+  if ( mWebEngine )
+  {
+    mWebEngine.RegisterJavaScriptConfirmCallback( callback );
+  }
+}
+
+void WebView::JavaScriptConfirmReply( bool confirmed )
+{
+  if ( mWebEngine )
+  {
+    mWebEngine.JavaScriptConfirmReply( confirmed );
+  }
+}
+
+void WebView::RegisterJavaScriptPromptCallback( Dali::WebEnginePlugin::JavaScriptPromptCallback callback )
+{
+  if ( mWebEngine )
+  {
+    mWebEngine.RegisterJavaScriptPromptCallback( callback );
+  }
+}
+
+void WebView::JavaScriptPromptReply( const std::string& result )
+{
+  if ( mWebEngine )
+  {
+    mWebEngine.JavaScriptPromptReply( result );
   }
 }
 
@@ -426,9 +472,22 @@ void WebView::EnableBlendMode(bool blendEnabled)
   }
 }
 
+void WebView::ClearAllTilesResources()
+{
+  if( mWebEngine )
+  {
+    mWebEngine.ClearAllTilesResources();
+  }
+}
+
 Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
 {
   return mPageLoadStartedSignal;
+}
+
+Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadInProgressSignal()
+{
+  return mPageLoadInProgressSignal;
 }
 
 Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadFinishedSignal()
@@ -446,7 +505,12 @@ Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeR
   return mScrollEdgeReachedSignal;
 }
 
-void WebView::OnPageLoadStarted(const std::string& url)
+Dali::Toolkit::WebView::WebViewUrlChangedSignalType& WebView::UrlChangedSignal()
+{
+  return mUrlChangedSignal;
+}
+
+void WebView::OnPageLoadStarted( const std::string& url )
 {
   if(!mPageLoadStartedSignal.Empty())
   {
@@ -455,7 +519,16 @@ void WebView::OnPageLoadStarted(const std::string& url)
   }
 }
 
-void WebView::OnPageLoadFinished(const std::string& url)
+void WebView::OnPageLoadInProgress( const std::string& url )
+{
+  if ( !mPageLoadInProgressSignal.Empty() )
+  {
+    Dali::Toolkit::WebView handle( GetOwner() );
+    mPageLoadInProgressSignal.Emit( handle, url );
+  }
+}
+
+void WebView::OnPageLoadFinished( const std::string& url )
 {
   if(!mPageLoadFinishedSignal.Empty())
   {
@@ -482,7 +555,16 @@ void WebView::OnScrollEdgeReached(Dali::WebEnginePlugin::ScrollEdge edge)
   }
 }
 
-bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+void WebView::OnUrlChanged(const std::string& url)
+{
+  if (!mUrlChangedSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mUrlChangedSignal.Emit(handle, url);
+  }
+}
+
+bool WebView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle(object);
 
@@ -492,6 +574,11 @@ bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tr
   if(0 == strcmp(signalName.c_str(), PAGE_LOAD_STARTED_SIGNAL))
   {
     webView.PageLoadStartedSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if (0 == strcmp(signalName.c_str(), PAGE_LOAD_IN_PROGRESS_SIGNAL))
+  {
+    webView.PageLoadInProgressSignal().Connect(tracker, functor);
     connected = true;
   }
   else if(0 == strcmp(signalName.c_str(), PAGE_LOAD_FINISHED_SIGNAL))
@@ -507,6 +594,11 @@ bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tr
   else if(0 == strcmp(signalName.c_str(), SCROLL_EDGE_REACHED_SIGNAL))
   {
     webView.ScrollEdgeReachedSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if (0 == strcmp(signalName.c_str(), URL_CHANGED_SIGNAL))
+  {
+    webView.UrlChangedSignal().Connect( tracker, functor );
     connected = true;
   }
 

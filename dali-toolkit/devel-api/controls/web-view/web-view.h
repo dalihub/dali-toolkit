@@ -157,6 +157,11 @@ public:
    */
   using WebViewScrollEdgeReachedSignalType = Signal<void(WebView, Dali::WebEnginePlugin::ScrollEdge)>;
 
+  /**
+   * @brief WebView signal type related with url changed.
+   */
+  using WebViewUrlChangedSignalType = Signal<void(WebView, const std::string&)>;
+
 public:
   /**
    * @brief Creates an initialized WebView.
@@ -354,9 +359,42 @@ public:
   void AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler);
 
   /**
-   * @brief Clears all tiles resources of Web.
+   * @brief Register alert callback for javascript.
+   *
+   * @param[in] callback The callback function to be called by the JavaScript runtime.
    */
-  void ClearAllTilesResources();
+  void RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback);
+
+  /**
+   * @brief Reply for JavaScript alert.
+   */
+  void JavaScriptAlertReply();
+
+  /**
+   * @brief Register confirm callback for javascript.
+   *
+   * @param[in] callback The callback function to be called by the JavaScript runtime.
+   */
+  void RegisterJavaScriptConfirmCallback(Dali::WebEnginePlugin::JavaScriptConfirmCallback callback);
+
+  /**
+   * @brief Reply for JavaScript confirm.
+   * @param[in] confirmed True if confirmed, false otherwise
+   */
+  void JavaScriptConfirmReply(bool confirmed);
+
+  /**
+   * @brief Register prompt callback for javascript.
+   *
+   * @param[in] callback The callback function to be called by the JavaScript runtime.
+   */
+  void RegisterJavaScriptPromptCallback(Dali::WebEnginePlugin::JavaScriptPromptCallback callback);
+
+  /**
+   * @brief Reply for JavaScript prompt.
+   * @param[in] result The result from input-field of prompt popup.
+   */
+  void JavaScriptPromptReply(const std::string& result);
 
   /**
    * @brief Clears the history of Web.
@@ -364,11 +402,23 @@ public:
   void ClearHistory();
 
   /**
+   * @brief Clears all tiles resources of Web.
+   */
+  void ClearAllTilesResources();
+
+  /**
    * @brief Connects to this signal to be notified when page loading is started.
    *
    * @return A signal object to connect with
    */
   WebViewPageLoadSignalType& PageLoadStartedSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when page loading is in progress.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewPageLoadSignalType& PageLoadInProgressSignal();
 
   /**
    * @brief Connects to this signal to be notified when page loading is finished.
@@ -390,6 +440,13 @@ public:
    * @return A signal object to connect with.
    */
   WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when url is changed.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewUrlChangedSignalType& UrlChangedSignal();
 
 public: // Not intended for application developers
   /// @cond internal

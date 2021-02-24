@@ -224,31 +224,10 @@ void SvgRasterizeThread::RemoveTask(SvgVisual* visual)
   UnregisterProcessor();
 }
 
-void SvgRasterizeThread::DeleteImage(VectorImageRenderer vectorRenderer)
-{
-  // Lock while adding image to the delete queue
-  ConditionalWait::ScopedLock lock(mConditionalWait);
-
-  if(mIsThreadWaiting) // no rasterization is ongoing, save to delete
-  {
-    // TODO: what?
-  }
-  else // wait to delete until current rasterization completed.
-  {
-    mDeleteSvg.PushBack(&vectorRenderer);
-  }
-}
-
 RasterizingTaskPtr SvgRasterizeThread::NextTaskToProcess()
 {
   // Lock while popping task out from the queue
   ConditionalWait::ScopedLock lock(mConditionalWait);
-
-  // Delete the image here to make sure that it is not used in the nsvgRasterize()
-  if(!mDeleteSvg.Empty())
-  {
-    mDeleteSvg.Clear();
-  }
 
   // conditional wait
   while(mRasterizeTasks.empty())
