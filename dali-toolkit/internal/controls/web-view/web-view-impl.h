@@ -199,7 +199,7 @@ public:
   void ClearHistory();
 
   /**
-   * @brief Clears all tiles resources of Web.
+   * @copydoc Dali::Toolkit::WebView::ClearAllTilesResources()
    */
   void ClearAllTilesResources();
 
@@ -232,6 +232,16 @@ public:
    * @copydoc Dali::Toolkit::WebView::UrlChangedSignal()
    */
   Dali::Toolkit::WebView::WebViewUrlChangedSignalType& UrlChangedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::FormRepostDecisionSignal()
+   */
+  Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType& FormRepostDecisionSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::FrameRenderedSignal()
+   */
+  Dali::Toolkit::WebView::WebViewFrameRenderedSignalType& FrameRenderedSignal();
 
 public: // Properties
   /**
@@ -472,6 +482,17 @@ private:
    */
   bool OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel);
 
+  /**
+   * @brief Callback function to be called when form repost decision need be checked.
+   * @param[in] decision The new decision for form repost
+   */
+  void OnFormRepostDecision(std::shared_ptr<Dali::WebEngineFormRepostDecision> decision);
+
+  /**
+   * @brief Callback function to be called when frame is rendered.
+   */
+  void OnFrameRendered();
+
 private:
   std::string                 mUrl;
   Dali::Toolkit::Visual::Base mVisual;
@@ -498,6 +519,9 @@ private:
   Dali::Rect<int>                                     mWebViewArea;
   bool                                                mMouseEventsEnabled;
   bool                                                mKeyEventsEnabled;
+
+  Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType mFormRepostDecisionSignal;
+  Dali::Toolkit::WebView::WebViewFrameRenderedSignalType      mFrameRenderedSignal;
 };
 
 } // namespace Internal

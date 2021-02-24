@@ -37,7 +37,7 @@ namespace Toolkit
  */
 
 /**
- * @brief WebCookieManager is a control for settings of WebView.
+ * @brief WebCookieManager is a control for cookie manager of WebView.
  *
  *
  * For working WebCookieManager, a WebView should be provided.

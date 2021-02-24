@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine-back-forward-list.h>
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
+#include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/enum-helper.h>
@@ -30,12 +31,14 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <cstring>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-context.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-form-repost-decision.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -79,6 +82,8 @@ DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadFinished",   PAGE_LOAD_FINIS
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadError",      PAGE_LOAD_ERROR_SIGNAL      )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "scrollEdgeReached",  SCROLL_EDGE_REACHED_SIGNAL  )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "urlChanged",         URL_CHANGED_SIGNAL          )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "formRepostDecision", FORM_REPOST_DECISION_SIGNAL )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "frameRendered",      FRAME_RENDERED_SIGNAL       )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -205,6 +210,8 @@ void WebView::OnInitialize()
     mWebEngine.PageLoadErrorSignal().Connect(this, &WebView::OnPageLoadError);
     mWebEngine.ScrollEdgeReachedSignal().Connect(this, &WebView::OnScrollEdgeReached);
     mWebEngine.UrlChangedSignal().Connect(this, &WebView::OnUrlChanged);
+    mWebEngine.FormRepostDecisionSignal().Connect(this, &WebView::OnFormRepostDecision);
+    mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnFrameRendered);
 
     mWebContext         = std::unique_ptr<Dali::Toolkit::WebContext>(new WebContext(mWebEngine.GetContext()));
     mWebCookieManager   = std::unique_ptr<Dali::Toolkit::WebCookieManager>(new WebCookieManager(mWebEngine.GetCookieManager()));
@@ -523,6 +530,16 @@ Dali::Toolkit::WebView::WebViewUrlChangedSignalType& WebView::UrlChangedSignal()
   return mUrlChangedSignal;
 }
 
+Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType& WebView::FormRepostDecisionSignal()
+{
+  return mFormRepostDecisionSignal;
+}
+
+Dali::Toolkit::WebView::WebViewFrameRenderedSignalType& WebView::FrameRenderedSignal()
+{
+  return mFrameRenderedSignal;
+}
+
 void WebView::OnPageLoadStarted(const std::string& url)
 {
   if(!mPageLoadStartedSignal.Empty())
@@ -577,6 +594,25 @@ void WebView::OnUrlChanged(const std::string& url)
   }
 }
 
+void WebView::OnFormRepostDecision(std::shared_ptr<Dali::WebEngineFormRepostDecision> decision)
+{
+  if(!mFormRepostDecisionSignal.Empty())
+  {
+    Dali::Toolkit::WebView                                handle(GetOwner());
+    std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> repostDecision(new Dali::Toolkit::WebFormRepostDecision(decision));
+    mFormRepostDecisionSignal.Emit(handle, std::move(repostDecision));
+  }
+}
+
+void WebView::OnFrameRendered()
+{
+  if(!mFrameRenderedSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mFrameRenderedSignal.Emit(handle);
+  }
+}
+
 bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
@@ -612,6 +648,16 @@ bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tr
   else if(0 == strcmp(signalName.c_str(), URL_CHANGED_SIGNAL))
   {
     webView.UrlChangedSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), FORM_REPOST_DECISION_SIGNAL))
+  {
+    webView.FormRepostDecisionSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), FRAME_RENDERED_SIGNAL))
+  {
+    webView.FrameRenderedSignal().Connect(tracker, functor);
     connected = true;
   }
 

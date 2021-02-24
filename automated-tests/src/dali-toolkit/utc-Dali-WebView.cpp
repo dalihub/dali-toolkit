@@ -33,6 +33,7 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list-item.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-context.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
+#include <dali-toolkit/devel-api/controls/web-view/web-form-repost-decision.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
 
@@ -57,6 +58,9 @@ static int gJavaScriptPromptCallbackCalled = 0;
 static bool gTouched = false;
 static bool gHovered = false;
 static bool gWheelEventHandled = false;
+static int gFormRepostDecisionCallbackCalled = 0;
+static std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> gFormRepostDecisionInstance;
+static int gFrameRenderedCallbackCalled = 0;
 
 struct CallbackFunctor
 {
@@ -140,6 +144,17 @@ static bool OnWheelEvent( Actor actor, const Dali::WheelEvent& wheel )
 {
   gWheelEventHandled = true;
   return true;
+}
+
+static void OnFormRepostDecision(WebView, std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> decision)
+{
+  gFormRepostDecisionCallbackCalled++;
+  gFormRepostDecisionInstance = decision;
+}
+
+static void OnFrameRendered(WebView)
+{
+  gFrameRenderedCallbackCalled++;
 }
 
 } // namespace
@@ -500,6 +515,46 @@ int UtcDaliWebViewHoverAndWheel(void)
 
   DALI_TEST_CHECK( gHovered );
   DALI_TEST_CHECK( gWheelEventHandled );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewFormRepostDecisionFrameRendering(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( view );
+
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  view.FormRepostDecisionSignal().Connect(&OnFormRepostDecision);
+  view.FrameRenderedSignal().Connect(&OnFrameRendered);
+  bool signal1 = false;
+  bool signal2 = false;
+  view.ConnectSignal( testTracker, "formRepostDecision", CallbackFunctor(&signal1) );
+  view.ConnectSignal( testTracker, "frameRendered", CallbackFunctor(&signal2) );
+  DALI_TEST_EQUALS( gFormRepostDecisionCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( gFrameRenderedCallbackCalled, 0, TEST_LOCATION );
+
+  view.LoadUrl( TEST_URL1 );
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gFormRepostDecisionCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gFrameRenderedCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_CHECK( signal1 & signal2);
+
+  // form repost decision.
+  DALI_TEST_CHECK(gFormRepostDecisionInstance);
+  gFormRepostDecisionInstance->Reply(true);
+
+  // reset
+  gFormRepostDecisionInstance = nullptr;
 
   END_TEST;
 }
