@@ -36,6 +36,7 @@ SET(TC_SOURCES
  utc-Dali-Visuals-internal.cpp
  utc-Dali-VisualModel.cpp
  utc-Dali-VisualUrl.cpp
+ utc-Dali-Text-Hyphen-Wrapping.cpp
 )
 
 IF(ELDBUS_AVAILABLE)

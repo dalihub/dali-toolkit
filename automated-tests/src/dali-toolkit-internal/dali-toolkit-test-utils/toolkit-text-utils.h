@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_UTILS_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,8 @@ void CreateTextModel( const std::string& text,
                       Size& layoutSize,
                       ModelPtr& textModel,
                       MetricsPtr& metrics,
-                      bool markupProcessorEnabled );
+                      bool markupProcessorEnabled,
+                      LineWrap::Mode wrapMode );
 
 /**
  * @brief Configures the text @p controller similarly to the one configured by the text-label.
