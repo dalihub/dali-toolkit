@@ -599,7 +599,8 @@ bool Controller::EventHandler::DeleteEvent(Controller& controller, int keyCode)
                                     1,
                                     UPDATE_INPUT_STYLE);
   }
-  else if(keyCode == Dali::DevelKey::DALI_KEY_DELETE)
+  else if((controller.mImpl->mEventData->mPrimaryCursorPosition < controller.mImpl->mModel->mLogicalModel->mText.Count()) &&
+          (keyCode == Dali::DevelKey::DALI_KEY_DELETE))
   {
     // Remove the character after the current cursor position
     removed = controller.RemoveText(0,
