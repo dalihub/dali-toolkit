@@ -354,6 +354,21 @@ WebView::WebViewPolicyDecisionSignalType& WebView::PolicyDecisionSignal()
   return Dali::Toolkit::GetImpl(*this).PolicyDecisionSignal();
 }
 
+WebView::WebViewCertificateSignalType& WebView::CertificateConfirmSignal()
+{
+  return Dali::Toolkit::GetImpl(*this).CertificateConfirmSignal();
+}
+
+WebView::WebViewCertificateSignalType& WebView::SslCertificateChangedSignal()
+{
+  return Dali::Toolkit::GetImpl(*this).SslCertificateChangedSignal();
+}
+
+WebView::WebViewHttpAuthHandlerSignalType& WebView::HttpAuthHandlerSignal()
+{
+  return Dali::Toolkit::GetImpl(*this).HttpAuthHandlerSignal();
+}
+
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)
 {

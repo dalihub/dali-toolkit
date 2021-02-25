@@ -22,11 +22,13 @@
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali.h>
+#include <dali/devel-api/adaptor-framework/web-engine-certificate.h>
+#include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
 #include <dali/devel-api/adaptor-framework/web-engine-frame.h>
+#include <dali/devel-api/adaptor-framework/web-engine-http-auth-handler.h>
+#include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
-#include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
-#include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -77,6 +79,12 @@ static int gConsoleMessageCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineConsoleMessage> gConsoleMessageInstance = nullptr;
 static int gPolicyDecisionCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEnginePolicyDecision> gPolicyDecisionInstance = nullptr;
+static int gCertificateConfirmCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEngineCertificate> gCertificateConfirmInstance = nullptr;
+static int gSslCertificateChangedCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEngineCertificate> gSslCertificateInstance = nullptr;
+static int gHttpAuthHandlerCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEngineHttpAuthHandler> gHttpAuthInstance = nullptr;
 
 struct CallbackFunctor
 {
@@ -207,6 +215,24 @@ static void OnConsoleMessage(WebView view, std::shared_ptr<Dali::WebEngineConsol
 {
   gConsoleMessageCallbackCalled++;
   gConsoleMessageInstance = std::move(message);
+}
+
+static void OnCertificateConfirm(WebView view, std::shared_ptr<Dali::WebEngineCertificate> certificate )
+{
+  gCertificateConfirmCallbackCalled++;
+  gCertificateConfirmInstance = std::move(certificate);
+}
+
+static void OnSslCertificateChanged(WebView view, std::shared_ptr<Dali::WebEngineCertificate> certificate )
+{
+  gSslCertificateChangedCallbackCalled++;
+  gSslCertificateInstance = std::move(certificate);
+}
+
+static void OnHttpAuthHandler( WebView view, std::shared_ptr<Dali::WebEngineHttpAuthHandler> hander )
+{
+  gHttpAuthHandlerCallbackCalled++;
+  gHttpAuthInstance = std::move(hander);
 }
 
 } // namespace
@@ -734,6 +760,65 @@ int UtcDaliWebViewFormRepostDecisionFrameRendering(void)
 
   // reset
   gFormRepostDecisionInstance = nullptr;
+
+  END_TEST;
+}
+
+int UtcDaliWebViewSslCertificateHttpAuthentication(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( view );
+
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  view.CertificateConfirmSignal().Connect(&OnCertificateConfirm);
+  view.SslCertificateChangedSignal().Connect(&OnSslCertificateChanged);
+  view.HttpAuthHandlerSignal().Connect(&OnHttpAuthHandler);
+  bool signal1 = false;
+  bool signal2 = false;
+  bool signal3 = false;
+  view.ConnectSignal( testTracker, "certificateConfirm", CallbackFunctor(&signal1) );
+  view.ConnectSignal( testTracker, "sslCertificateChanged", CallbackFunctor(&signal2) );
+  view.ConnectSignal( testTracker, "httpAuthRequest", CallbackFunctor(&signal3) );
+  DALI_TEST_EQUALS( gCertificateConfirmCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( gSslCertificateChangedCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( gHttpAuthHandlerCallbackCalled, 0, TEST_LOCATION );
+
+  view.LoadUrl( TEST_URL1 );
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gCertificateConfirmCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gSslCertificateChangedCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gHttpAuthHandlerCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_CHECK( signal1 & signal2 & signal3);
+
+  // certificate.
+  DALI_TEST_CHECK(gCertificateConfirmInstance);
+  gCertificateConfirmInstance->Allow(true);
+  DALI_TEST_CHECK(gCertificateConfirmInstance->IsFromMainFrame());
+
+  DALI_TEST_CHECK(gSslCertificateInstance);
+  DALI_TEST_EQUALS(gSslCertificateInstance->GetPem(), "abc", TEST_LOCATION);
+  DALI_TEST_CHECK(gSslCertificateInstance->IsContextSecure());
+
+  // http authentication.
+  DALI_TEST_CHECK(gHttpAuthInstance);
+  gHttpAuthInstance->Suspend();
+  gHttpAuthInstance->UseCredential("", "");
+  gHttpAuthInstance->CancelCredential();
+  DALI_TEST_EQUALS(gHttpAuthInstance->GetRealm(), "test", TEST_LOCATION);
+
+  // reset
+  gCertificateConfirmInstance = nullptr;
+  gSslCertificateInstance = nullptr;
+  gHttpAuthInstance = nullptr;
 
   END_TEST;
 }

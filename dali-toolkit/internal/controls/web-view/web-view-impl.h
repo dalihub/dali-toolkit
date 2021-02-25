@@ -354,6 +354,21 @@ public:
    */
   Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType& PolicyDecisionSignal();
 
+  /**
+   * @copydoc Dali::Toolkit::WebView::CertificateConfirmSignal()
+   */
+  Dali::Toolkit::WebView::WebViewCertificateSignalType& CertificateConfirmSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::SslCertificateChangedSignal()
+   */
+  Dali::Toolkit::WebView::WebViewCertificateSignalType& SslCertificateChangedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::HttpAuthHandlerSignal()
+   */
+  Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType& HttpAuthHandlerSignal();
+
 public: // Properties
   /**
    * @brief Called when a property of an object of this type is set.
@@ -681,6 +696,24 @@ private:
    */
   void OnPolicyDecisionRequest(std::shared_ptr<Dali::WebEnginePolicyDecision> decision);
 
+  /**
+   * @brief Callback function to be called when certificate need be confirmed.
+   * @param[in] certificate The certificate policy decision.
+   */
+  void OnCertificateConfirm(std::shared_ptr<Dali::WebEngineCertificate> certificate);
+
+  /**
+   * @brief Callback function to be called when ssl certificate is changed.
+   * @param[in] certificate The certificate information received.
+   */
+  void OnSslCertificateChanged(std::shared_ptr<Dali::WebEngineCertificate> certificate);
+
+  /**
+   * @brief Callback function to be called when http authentication need be confirmed.
+   * @param[in] handler The handler for http authentication
+   */
+  void OnHttpAuthenticationRequest(std::shared_ptr<Dali::WebEngineHttpAuthHandler> handler);
+
 private:
   std::string                 mUrl;
   Dali::Toolkit::Visual::Base mVisual;
@@ -698,6 +731,9 @@ private:
   Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType mRequestInterceptorSignal;
   Dali::Toolkit::WebView::WebViewConsoleMessageSignalType     mConsoleMessageSignal;
   Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType     mPolicyDecisionSignal;
+  Dali::Toolkit::WebView::WebViewCertificateSignalType        mCertificateConfirmSignal;
+  Dali::Toolkit::WebView::WebViewCertificateSignalType        mSslCertificateChangedSignal;
+  Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType    mHttpAuthHandlerSignal;
 
   std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
   std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;

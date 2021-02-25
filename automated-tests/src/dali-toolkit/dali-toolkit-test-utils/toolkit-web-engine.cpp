@@ -20,14 +20,16 @@
 #include <dali/devel-api/adaptor-framework/web-engine.h>
 #include <dali/devel-api/adaptor-framework/web-engine-back-forward-list.h>
 #include <dali/devel-api/adaptor-framework/web-engine-back-forward-list-item.h>
+#include <dali/devel-api/adaptor-framework/web-engine-certificate.h>
 #include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-frame.h>
+#include <dali/devel-api/adaptor-framework/web-engine-http-auth-handler.h>
+#include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
-#include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
@@ -223,7 +225,59 @@ public:
 
 private:
   MockWebEngineBackForwardListItem mockItem;
-  WebEngineBackForwardListItem* pMockItem;
+  WebEngineBackForwardListItem*    pMockItem;
+};
+
+class MockWebEngineCertificate : public Dali::WebEngineCertificate
+{
+public:
+  MockWebEngineCertificate()
+  {
+  }
+
+  void Allow(bool allowed) override
+  {
+  }
+
+  bool IsFromMainFrame() const override
+  {
+    return true;
+  }
+
+  std::string GetPem() const override
+  {
+    return "abc";
+  }
+
+  bool IsContextSecure() const override
+  {
+    return true;
+  }
+};
+
+class MockWebEngineHttpAuthHandler : public Dali::WebEngineHttpAuthHandler
+{
+public:
+  MockWebEngineHttpAuthHandler()
+  {
+  }
+
+  std::string GetRealm() const override
+  {
+    return "test";
+  }
+
+  void Suspend() override
+  {
+  }
+
+  void UseCredential(const std::string& user, const std::string& password) override
+  {
+  }
+
+  void CancelCredential() override
+  {
+  }
 };
 
 class MockWebEngineFormRepostDecision : public WebEngineFormRepostDecision
@@ -988,6 +1042,21 @@ public:
     return mPolicyDecisionSignal;
   }
 
+  Dali::WebEnginePlugin::WebEngineCertificateSignalType& CertificateConfirmSignal()
+  {
+    return mCertificateConfirmSignal;
+  }
+
+  Dali::WebEnginePlugin::WebEngineCertificateSignalType& SslCertificateChangedSignal()
+  {
+    return mSslCertificateChangedSignal;
+  }
+
+  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType& HttpAuthHandlerSignal()
+  {
+    return mHttpAuthHandlerSignal;
+  }
+
   std::string              mUrl;
   std::vector<std::string> mHistory;
   size_t                   mCurrentPlusOnePos;
@@ -1004,6 +1073,9 @@ public:
   Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType mRequestInterceptorSignal;
   Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType     mConsoleMessageSignal;
   Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType     mPolicyDecisionSignal;
+  Dali::WebEnginePlugin::WebEngineCertificateSignalType        mCertificateConfirmSignal;
+  Dali::WebEnginePlugin::WebEngineCertificateSignalType        mSslCertificateChangedSignal;
+  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType    mHttpAuthHandlerSignal;
 
   bool  mEvaluating;
   float mPageZoomFactor;
@@ -1082,6 +1154,13 @@ bool OnLoadUrl()
     gInstance->mConsoleMessageSignal.Emit(std::move(message));
     std::shared_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
     gInstance->mPolicyDecisionSignal.Emit(std::move(policyDecision));
+
+    std::shared_ptr<Dali::WebEngineCertificate> certificate(new MockWebEngineCertificate());
+    gInstance->mCertificateConfirmSignal.Emit(std::move(certificate));
+    std::shared_ptr<Dali::WebEngineCertificate> sslCertificate(new MockWebEngineCertificate());
+    gInstance->mSslCertificateChangedSignal.Emit(std::move(sslCertificate));
+    std::shared_ptr<Dali::WebEngineHttpAuthHandler> handler(new MockWebEngineHttpAuthHandler());
+    gInstance->mHttpAuthHandlerSignal.Emit(std::move(handler));
   }
   return false;
 }
@@ -1662,6 +1741,21 @@ Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType& WebEngine::ConsoleMess
 Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType& WebEngine::PolicyDecisionSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).PolicyDecisionSignal();
+}
+
+Dali::WebEnginePlugin::WebEngineCertificateSignalType& WebEngine::CertificateConfirmSignal()
+{
+  return Internal::Adaptor::GetImplementation(*this).CertificateConfirmSignal();
+}
+
+Dali::WebEnginePlugin::WebEngineCertificateSignalType& WebEngine::SslCertificateChangedSignal()
+{
+  return Internal::Adaptor::GetImplementation(*this).SslCertificateChangedSignal();
+}
+
+Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType& WebEngine::HttpAuthHandlerSignal()
+{
+  return Internal::Adaptor::GetImplementation(*this).HttpAuthHandlerSignal();
 }
 
 } // namespace Dali;

@@ -236,6 +236,16 @@ public:
    */
   using WebViewPolicyDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEnginePolicyDecision>)>;
 
+  /**
+   * @brief WebView signal type related with certificate changed.
+   */
+  using WebViewCertificateSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineCertificate>)>;
+
+  /**
+   * @brief WebView signal type related with http authentication.
+   */
+  using WebViewHttpAuthHandlerSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineHttpAuthHandler>)>;
+
 public:
   /**
    * @brief Creates an initialized WebView.
@@ -713,6 +723,27 @@ public:
    * @return A signal object to connect with.
    */
   WebViewPolicyDecisionSignalType& PolicyDecisionSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when certificate need be confirmed.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewCertificateSignalType& CertificateConfirmSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when ssl certificate is changed.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewCertificateSignalType& SslCertificateChangedSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when http authentication need be confirmed.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewHttpAuthHandlerSignalType& HttpAuthHandlerSignal();
 
 public: // Not intended for application developers
   /// @cond internal
