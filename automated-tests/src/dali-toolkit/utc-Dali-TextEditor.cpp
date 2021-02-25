@@ -28,6 +28,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -3638,6 +3639,54 @@ int UtcDaliTextEditorAtlasLimitationIsEnabledPerformanceCases(void)
     DALI_TEST_GREATER( lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION );
 
   }
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorHyphenWrapMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorHyphenWrapMode ");
+
+  int lineCount =0;
+  TextEditor textEditor = TextEditor::New();
+
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 150.0f, 300.f ) );
+
+  application.GetScene().Add( textEditor );
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Hi Experimen" );
+  textEditor.SetProperty(TextEditor::Property::LINE_WRAP_MODE, DevelText::LineWrap::HYPHENATION);
+  DALI_TEST_EQUALS( textEditor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( DevelText::LineWrap::HYPHENATION ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount = textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  /*
+    text will be :
+    Hi Exp-
+    erimen
+  */
+  DALI_TEST_EQUALS( lineCount, 2, TEST_LOCATION );
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Hi Experimen" );
+  textEditor.SetProperty(TextEditor::Property::LINE_WRAP_MODE, DevelText::LineWrap::MIXED);
+  DALI_TEST_EQUALS( textEditor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( DevelText::LineWrap::MIXED ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount = textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  /*
+    text will be :
+    Hi
+    Experi-
+    men
+  */
+  DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
 
   END_TEST;
 }

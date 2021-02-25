@@ -35,6 +35,13 @@ namespace Toolkit
 {
 namespace Text
 {
+struct HyphenInfo
+{
+  Vector<GlyphInfo> glyph;
+  Vector<Vector2>   position;
+  Vector<Length>    index;
+};
+
 class VisualModel;
 typedef IntrusivePtr<VisualModel> VisualModelPtr;
 
@@ -422,6 +429,7 @@ public:
   bool mUnderlineColorSet : 1; ///< Has the underline color been explicitly set?
   bool mBackgroundEnabled : 1; ///< Background enabled flag
   bool mMarkupProcessorEnabled : 1; ///< Markup-processor enabled flag
+  HyphenInfo mHyphen; ///< Contains hyphen glyph info & the character index to draw hyphen after.
 };
 
 } // namespace Text
