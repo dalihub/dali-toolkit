@@ -21,7 +21,6 @@
 #include "test-graphics-reflection.h"
 #include "test-graphics-sampler.h"
 #include "test-graphics-shader.h"
-#include "test-graphics-program.h"
 #include "test-graphics-texture.h"
 
 #include <dali/integration-api/gl-defines.h>
@@ -793,7 +792,8 @@ bool TestGraphicsController::PipelineEquals(const Graphics::Pipeline& pipeline0,
 bool TestGraphicsController::GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData )
 {
   mCallStack.PushCall("GetProgramParameter", "");
-  return false;
+  auto graphicsProgram = Uncast<TestGraphicsProgram>(&program);
+  return graphicsProgram->GetParameter(parameterId, outData);
 }
 
 } // namespace Dali
