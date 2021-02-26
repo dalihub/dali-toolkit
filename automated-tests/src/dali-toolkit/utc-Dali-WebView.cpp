@@ -22,6 +22,7 @@
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali.h>
+#include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -64,6 +65,8 @@ static bool gWheelEventHandled = false;
 static int gFormRepostDecisionCallbackCalled = 0;
 static std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> gFormRepostDecisionInstance;
 static int gFrameRenderedCallbackCalled = 0;
+static int gRequestInterceptorCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEngineRequestInterceptor> gRequestInterceptorInstance = nullptr;
 
 struct CallbackFunctor
 {
@@ -174,6 +177,12 @@ static void OnFormRepostDecision(WebView, std::shared_ptr<Dali::Toolkit::WebForm
 static void OnFrameRendered(WebView)
 {
   gFrameRenderedCallbackCalled++;
+}
+
+static void OnRequestInterceptor(WebView view, std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor)
+{
+  gRequestInterceptorCallbackCalled++;
+  gRequestInterceptorInstance = std::move(interceptor);
 }
 
 } // namespace
@@ -962,6 +971,40 @@ int UtcDaliWebViewVideoPlayingGeolocationPermission(void)
   view.RegisterGeolocationPermissionCallback(&OnGeolocationPermission);
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS( gGeolocationPermissionCallbackCalled, 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewHttpRequestInterceptor(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  // load url.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  view.RequestInterceptorSignal().Connect( &OnRequestInterceptor );
+  bool signal1 = false;
+  view.ConnectSignal( testTracker, "requestInterceptor", CallbackFunctor(&signal1) );
+  DALI_TEST_EQUALS( gRequestInterceptorCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_CHECK(gRequestInterceptorInstance == 0);
+
+  view.LoadUrl( TEST_URL1 );
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gRequestInterceptorCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_CHECK( signal1 );
+
+  // check request interceptor.
+  DALI_TEST_CHECK(gRequestInterceptorInstance != 0);
+  DALI_TEST_CHECK(gRequestInterceptorInstance->Ignore());
+  DALI_TEST_CHECK(gRequestInterceptorInstance->SetResponseStatus(400, "error"));
+  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseHeader("key", "value"));
+  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseBody("test", 4));
+  std::string testUrl("http://test.html");
+  DALI_TEST_EQUALS(gRequestInterceptorInstance->GetUrl(), testUrl, TEST_LOCATION);
+
+  gRequestInterceptorInstance = nullptr;
 
   END_TEST;
 }

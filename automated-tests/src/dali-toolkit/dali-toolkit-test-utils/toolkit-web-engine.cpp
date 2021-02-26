@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
+#include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
@@ -195,7 +196,7 @@ private:
 class MockWebEngineBackForwardList : public Dali::WebEngineBackForwardList
 {
 public:
-  MockWebEngineBackForwardList( )
+  MockWebEngineBackForwardList()
     : mockItem(),
       pMockItem( &mockItem )
   {
@@ -229,6 +230,39 @@ public:
   }
 
   void Reply(bool allowed) override {}
+};
+
+class MockWebEngineRequestInterceptor : public WebEngineRequestInterceptor
+{
+public:
+  MockWebEngineRequestInterceptor()
+  {
+  }
+
+  std::string GetUrl() const override
+  {
+    return "http://test.html";
+  }
+
+  bool Ignore() override
+  {
+    return true;
+  }
+
+  bool SetResponseStatus(int statusCode, const std::string &customedStatusText) override
+  {
+    return true;
+  }
+
+  bool AddResponseHeader(const std::string &fieldName, const std::string &fieldValue) override
+  {
+    return true;
+  }
+
+  bool AddResponseBody(const std::string &body, uint32_t length) override
+  {
+    return true;
+  }
 };
 
 class MockWebEngineSettings : public WebEngineSettings
@@ -796,32 +830,40 @@ public:
     return mFrameRenderedSignal;
   }
 
-  std::string                                                mUrl;
-  std::vector< std::string >                                 mHistory;
-  size_t                                                     mCurrentPlusOnePos;
-  std::string                                                mUserAgent;
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType         mPageLoadStartedSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType         mPageLoadInProgressSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType         mPageLoadFinishedSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType    mPageLoadErrorSignal;
-  std::vector<JavaScriptEvaluatedResultCallback>             mResultCallbacks;
-  bool                                                       mEvaluating;
-  float                                                      mPageZoomFactor;
-  float                                                      mTextZoomFactor;
-  float                                                      mScaleFactor;
+  Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType& RequestInterceptorSignal()
+  {
+    return mRequestInterceptorSignal;
+  }
 
+  std::string              mUrl;
+  std::vector<std::string> mHistory;
+  size_t                   mCurrentPlusOnePos;
+  std::string              mUserAgent;
+
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType           mPageLoadStartedSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType           mPageLoadInProgressSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType           mPageLoadFinishedSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType      mPageLoadErrorSignal;
   Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType  mScrollEdgeReachedSignal;
-  Dali::Vector2                                                mScrollPosition;
-  Dali::Vector2                                                mScrollSize;
-  Dali::Vector2                                                mContentSize;
-  WebEngineBackForwardList*                                    mockWebEngineBackForwardList;
-  WebEngineContext*                                            mockWebEngineContext;
-  WebEngineCookieManager*                                      mockWebEngineCookieManager;
-  WebEngineSettings*                                           mockWebEngineSettings;
   Dali::WebEnginePlugin::WebEngineUrlChangedSignalType         mUrlChangedSignal;
   Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType mFormRepostDecisionSignal;
   Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType      mFrameRenderedSignal;
+  Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType mRequestInterceptorSignal;
 
+  bool  mEvaluating;
+  float mPageZoomFactor;
+  float mTextZoomFactor;
+  float mScaleFactor;
+
+  Dali::Vector2             mScrollPosition;
+  Dali::Vector2             mScrollSize;
+  Dali::Vector2             mContentSize;
+  WebEngineBackForwardList* mockWebEngineBackForwardList;
+  WebEngineContext*         mockWebEngineContext;
+  WebEngineCookieManager*   mockWebEngineCookieManager;
+  WebEngineSettings*        mockWebEngineSettings;
+
+  std::vector<JavaScriptEvaluatedResultCallback>              mResultCallbacks;
   Dali::WebEnginePlugin::JavaScriptAlertCallback              mJavaScriptAlertCallback;
   Dali::WebEnginePlugin::JavaScriptConfirmCallback            mJavaScriptConfirmCallback;
   Dali::WebEnginePlugin::JavaScriptPromptCallback             mJavaScriptPromptCallback;
@@ -874,8 +916,10 @@ bool OnLoadUrl()
     gInstance->mUrlChangedSignal.Emit( "http://new-test" );
 
     std::shared_ptr<Dali::WebEngineFormRepostDecision> decision(new MockWebEngineFormRepostDecision());
-    gInstance->mFormRepostDecisionSignal.Emit(decision);
+    gInstance->mFormRepostDecisionSignal.Emit(std::move(decision));
     gInstance->mFrameRenderedSignal.Emit();
+    std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor(new MockWebEngineRequestInterceptor());
+    gInstance->mRequestInterceptorSignal.Emit(std::move(interceptor));
   }
   return false;
 }
@@ -1440,7 +1484,12 @@ Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType& WebEngine::FormRep
 
 Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType& WebEngine::FrameRenderedSignal()
 {
-  return Internal::Adaptor::GetImplementation( *this ).FrameRenderedSignal();
+  return Internal::Adaptor::GetImplementation(*this).FrameRenderedSignal();
+}
+
+Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType& WebEngine::RequestInterceptorSignal()
+{
+  return Internal::Adaptor::GetImplementation(*this).RequestInterceptorSignal();
 }
 
 } // namespace Dali;

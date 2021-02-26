@@ -339,6 +339,11 @@ WebView::WebViewFrameRenderedSignalType& WebView::FrameRenderedSignal()
   return Dali::Toolkit::GetImpl(*this).FrameRenderedSignal();
 }
 
+WebView::WebViewRequestInterceptorSignalType& WebView::RequestInterceptorSignal()
+{
+  return Dali::Toolkit::GetImpl(*this).RequestInterceptorSignal();
+}
+
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)
 {

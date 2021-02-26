@@ -23,6 +23,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
+#include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/enum-helper.h>
@@ -87,6 +88,7 @@ DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "scrollEdgeReached",  SCROLL_EDGE_REA
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "urlChanged",         URL_CHANGED_SIGNAL          )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "formRepostDecision", FORM_REPOST_DECISION_SIGNAL )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "frameRendered",      FRAME_RENDERED_SIGNAL       )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "requestInterceptor", REQUEST_INTERCEPTOR_SIGNAL  )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -216,6 +218,7 @@ void WebView::OnInitialize()
     mWebEngine.UrlChangedSignal().Connect(this, &WebView::OnUrlChanged);
     mWebEngine.FormRepostDecisionSignal().Connect(this, &WebView::OnFormRepostDecision);
     mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnFrameRendered);
+    mWebEngine.RequestInterceptorSignal().Connect(this, &WebView::OnInterceptRequest);
 
     mWebContext         = std::unique_ptr<Dali::Toolkit::WebContext>(new WebContext(mWebEngine.GetContext()));
     mWebCookieManager   = std::unique_ptr<Dali::Toolkit::WebCookieManager>(new WebCookieManager(mWebEngine.GetCookieManager()));
@@ -709,6 +712,11 @@ Dali::Toolkit::WebView::WebViewFrameRenderedSignalType& WebView::FrameRenderedSi
   return mFrameRenderedSignal;
 }
 
+Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType& WebView::RequestInterceptorSignal()
+{
+  return mRequestInterceptorSignal;
+}
+
 void WebView::OnPageLoadStarted(const std::string& url)
 {
   if(!mPageLoadStartedSignal.Empty())
@@ -799,6 +807,15 @@ void WebView::OnScreenshotCaptured(Dali::PixelData pixel)
   }
 }
 
+void WebView::OnInterceptRequest(std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor)
+{
+  if(!mRequestInterceptorSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mRequestInterceptorSignal.Emit(handle, std::move(interceptor));
+  }
+}
+
 bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
@@ -844,6 +861,11 @@ bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tr
   else if(0 == strcmp(signalName.c_str(), FRAME_RENDERED_SIGNAL))
   {
     webView.FrameRenderedSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), REQUEST_INTERCEPTOR_SIGNAL))
+  {
+    webView.RequestInterceptorSignal().Connect(tracker, functor);
     connected = true;
   }
 
