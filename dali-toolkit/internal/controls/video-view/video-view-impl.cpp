@@ -83,6 +83,8 @@ const char* const CUSTOM_FRAGMENT_SHADER("fragmentShader");
 const char* const DEFAULT_SAMPLER_TYPE_NAME("sampler2D");
 const char* const CUSTOM_SAMPLER_TYPE_NAME("samplerExternalOES");
 
+const char* const IS_VIDEO_VIEW_PROPERTY_NAME = "isVideoView";
+
 } // namespace
 
 VideoView::VideoView(Dali::VideoSyncMode syncMode)
@@ -91,7 +93,8 @@ VideoView::VideoView(Dali::VideoSyncMode syncMode)
   mFrameID(0),
   mIsPlay(false),
   mIsUnderlay(true),
-  mSyncMode(syncMode)
+  mSyncMode(syncMode),
+  mSiblingOrder(0)
 {
 }
 
@@ -111,12 +114,16 @@ Toolkit::VideoView VideoView::New(VideoSyncMode syncMode)
 
 void VideoView::OnInitialize()
 {
+  Actor self = Self();
   mVideoPlayer.FinishedSignal().Connect(this, &VideoView::EmitSignalFinish);
 
-  DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
+  DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
       new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::VIDEO));
   });
+
+  //update self property
+  self.RegisterProperty(IS_VIDEO_VIEW_PROPERTY_NAME, true, Property::READ_WRITE);
 }
 
 void VideoView::SetUrl(const std::string& url)
@@ -503,12 +510,15 @@ void VideoView::SetDepthIndex(int depthIndex)
 
 void VideoView::OnSceneConnection(int depth)
 {
-  Control::OnSceneConnection(depth);
-
+  Actor self = Self();
   if(mIsUnderlay)
   {
+    mSiblingOrder = self.GetProperty<int>(Dali::DevelActor::Property::SIBLING_ORDER);
+    DevelActor::ChildOrderChangedSignal(self.GetParent()).Connect(this, &VideoView::OnChildOrderChanged);
     SetWindowSurfaceTarget();
   }
+
+  Control::OnSceneConnection(depth);
 }
 
 void VideoView::OnSceneDisconnection()
@@ -524,6 +534,57 @@ void VideoView::OnSizeSet(const Vector3& targetSize)
     mVideoPlayer.StartSynchronization();
   }
   Control::OnSizeSet(targetSize);
+}
+
+void VideoView::OnChildOrderChanged(Actor actor)
+{
+  Actor self                = Self();
+  int   currentSiblingOrder = self.GetProperty<int>(Dali::DevelActor::Property::SIBLING_ORDER);
+  if(currentSiblingOrder != mSiblingOrder)
+  {
+    Actor parent = self.GetParent();
+    Actor child;
+    Actor upper;
+    Actor lower;
+
+    int numChildren = static_cast<int>(parent.GetChildCount());
+    for(int i = 0; i < numChildren; i++)
+    {
+      child = parent.GetChildAt(i);
+      if(!IsVideoView(child))
+      {
+        continue;
+      }
+
+      if(child == self)
+      {
+        continue;
+      }
+
+      if(i < currentSiblingOrder)
+      {
+        lower = child;
+      }
+      else if(i > currentSiblingOrder)
+      {
+        upper = child;
+        break;
+      }
+    }
+
+    if(lower)
+    {
+      Toolkit::VideoView lowerView = Toolkit::VideoView::DownCast(lower);
+      mVideoPlayer.RaiseAbove(GetImpl(lowerView).GetVideoPlayer());
+    }
+
+    if(upper)
+    {
+      Toolkit::VideoView upperView = Toolkit::VideoView::DownCast(upper);
+      mVideoPlayer.LowerBelow(GetImpl(upperView).GetVideoPlayer());
+    }
+    mSiblingOrder = currentSiblingOrder;
+  }
 }
 
 Vector3 VideoView::GetNaturalSize()
@@ -891,6 +952,28 @@ void VideoView::SetFrameRenderCallback()
   DevelWindow::AddFrameRenderedCallback(DevelWindow::Get(Self()),
                                         std::unique_ptr<CallbackBase>(MakeCallback(this, &VideoView::FrameRenderCallback)),
                                         mFrameID);
+}
+
+bool VideoView::IsVideoView(Actor actor) const
+{
+  // Check whether the actor is a VideoView
+  bool isVideoView = false;
+
+  if(actor)
+  {
+    Property::Index propertyIsVideoView = actor.GetPropertyIndex(IS_VIDEO_VIEW_PROPERTY_NAME);
+    if(propertyIsVideoView != Property::INVALID_INDEX)
+    {
+      isVideoView = actor.GetProperty<bool>(propertyIsVideoView);
+    }
+  }
+
+  return isVideoView;
+}
+
+VideoPlayer VideoView::GetVideoPlayer()
+{
+  return mVideoPlayer;
 }
 
 } // namespace Internal

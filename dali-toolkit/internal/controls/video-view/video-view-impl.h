@@ -263,6 +263,21 @@ public:
    */
   void PlayAnimation(Dali::Animation animation);
 
+  /**
+   * @brief Checks whether the actor is set as a video view or not.
+   *
+   * @param[in] actor The actor to be checked
+   * @return True if actor is video view.
+   */
+  bool IsVideoView(Actor actor) const;
+
+  /**
+   * @brief Gets the Video Player.
+   *
+   * @return The return of video player.
+   */
+  VideoPlayer GetVideoPlayer();
+
 private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -375,6 +390,13 @@ private:
    */
   void OnWindowResized(Dali::Window winHandle, Dali::Window::WindowSize size);
 
+  /**
+   * @brief This signal is emitted when an actor's children change their sibling order
+   *
+   * @param[in] actor parent actor.
+   */
+  void OnChildOrderChanged(Actor actor);
+
 private:
   Dali::VideoPlayer     mVideoPlayer;
   Dali::ImageDimensions mVideoSize;
@@ -402,6 +424,7 @@ private:
   bool mIsUnderlay;
 
   Dali::VideoSyncMode mSyncMode;
+  int                 mSiblingOrder;
 };
 
 } // namespace Internal
