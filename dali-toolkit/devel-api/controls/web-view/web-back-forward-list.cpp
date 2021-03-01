@@ -19,16 +19,14 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/web-engine-back-forward-list-item.h>
 #include <dali/devel-api/adaptor-framework/web-engine-back-forward-list.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-WebBackForwardList::WebBackForwardList(const Dali::WebEngineBackForwardList& list)
-: mWebEngineBackForwardList(list),
-  mWebBackForwardListItem(0)
+WebBackForwardList::WebBackForwardList(Dali::WebEngineBackForwardList& list)
+: mWebEngineBackForwardList(list)
 {
 }
 
@@ -36,21 +34,39 @@ WebBackForwardList::~WebBackForwardList()
 {
 }
 
-WebBackForwardListItem* WebBackForwardList::GetCurrentItem()
+std::unique_ptr<Dali::WebEngineBackForwardListItem> WebBackForwardList::GetCurrentItem()
 {
-  mWebBackForwardListItem = WebBackForwardListItem(&mWebEngineBackForwardList.GetCurrentItem());
-  return &mWebBackForwardListItem;
+  return mWebEngineBackForwardList.GetCurrentItem();
 }
 
-WebBackForwardListItem* WebBackForwardList::GetItemAtIndex(uint32_t index)
+std::unique_ptr<Dali::WebEngineBackForwardListItem> WebBackForwardList::GetPreviousItem()
 {
-  mWebBackForwardListItem = WebBackForwardListItem(&mWebEngineBackForwardList.GetItemAtIndex(index));
-  return &mWebBackForwardListItem;
+  return mWebEngineBackForwardList.GetPreviousItem();
+}
+
+std::unique_ptr<Dali::WebEngineBackForwardListItem> WebBackForwardList::GetNextItem()
+{
+  return mWebEngineBackForwardList.GetNextItem();
+}
+
+std::unique_ptr<Dali::WebEngineBackForwardListItem> WebBackForwardList::GetItemAtIndex(uint32_t index)
+{
+  return mWebEngineBackForwardList.GetItemAtIndex(index);
 }
 
 uint32_t WebBackForwardList::GetItemCount() const
 {
   return mWebEngineBackForwardList.GetItemCount();
+}
+
+std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> WebBackForwardList::GetBackwardItems(int limit)
+{
+  return mWebEngineBackForwardList.GetBackwardItems(limit);
+}
+
+std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> WebBackForwardList::GetForwardItems(int limit)
+{
+  return mWebEngineBackForwardList.GetForwardItems(limit);
 }
 
 } // namespace Toolkit

@@ -18,8 +18,12 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/web-engine-back-forward-list-item.h>
+#include <vector>
+#include <memory>
+
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list-item.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
@@ -48,7 +52,7 @@ public:
   /**
    * @brief Creates a WebBackForwardList.
    */
-  WebBackForwardList(const Dali::WebEngineBackForwardList& list);
+  WebBackForwardList(Dali::WebEngineBackForwardList& list);
 
   /**
    * @brief Destructor.
@@ -59,14 +63,26 @@ public:
    * @brief Returns the current item in the @a list.
    * @return The current item in list.
    */
-  WebBackForwardListItem* GetCurrentItem();
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetCurrentItem();
+
+  /**
+   * @brief Returns the previous item in the @a list.
+   * @return The previous item in list.
+   */
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetPreviousItem();
+
+  /**
+   * @brief Returns the next item in the @a list.
+   * @return The next item in list.
+   */
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetNextItem();
 
   /**
    * @brief Returns the item at a given @a index relative to the current item.
    * @param[in] index The index of the item
    * @return The current item in list.
    */
-  WebBackForwardListItem* GetItemAtIndex(uint32_t index);
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetItemAtIndex(uint32_t index);
 
   /**
    * @brief Returns the length of the back-forward list including the current
@@ -76,9 +92,38 @@ public:
    */
   uint32_t GetItemCount() const;
 
+  /**
+   * @brief Creates a list containing the items preceding the current item limited
+   *        by @a limit.
+   *
+   * @details The WebEngineBackForwardListItem elements are located in the result
+              list starting with the oldest one.\n
+   *          If @a limit is equal to @c -1 all the items preceding the current
+   *          item are returned.
+   *
+   * @param[in] limit The number of items to retrieve
+   *
+   * @return @c vector containing @c WebEngineBackForwardListItem elements,\n
+   */
+  std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> GetBackwardItems(int limit);
+
+  /**
+   * @brief Creates the list containing the items following the current item
+   *        limited by @a limit.
+   *
+   * @details The @c WebEngineBackForwardListItem elements are located in the result
+   *          list starting with the oldest one.\n
+   *          If @a limit is equal to @c -1 all the items preceding the current
+   *          item are returned.
+   *
+   * @param[in] limit The number of items to retrieve
+   *
+   * @return @c vector containing @c WebEngineBackForwardListItem elements,\n
+   */
+  std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> GetForwardItems(int limit);
+
 private:
-  const Dali::WebEngineBackForwardList& mWebEngineBackForwardList;
-  Dali::Toolkit::WebBackForwardListItem mWebBackForwardListItem;
+  Dali::WebEngineBackForwardList& mWebEngineBackForwardList;
 };
 
 /**

@@ -37,7 +37,6 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
-#include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list-item.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-context.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-form-repost-decision.h>
@@ -1358,8 +1357,14 @@ int UtcDaliWebBackForwardListCheckItem(void)
   unsigned int itemCount = bfList->GetItemCount();
   DALI_TEST_CHECK( itemCount == 1 )
 
-  Dali::Toolkit::WebBackForwardListItem* citem = bfList->GetCurrentItem();
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> citem = bfList->GetCurrentItem();
   DALI_TEST_CHECK( citem != 0 );
+
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> citemP = bfList->GetPreviousItem();
+  DALI_TEST_CHECK( citemP != 0 );
+
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> citemN = bfList->GetNextItem();
+  DALI_TEST_CHECK( citemN != 0 );
 
   const std::string kDefaultUrl( "http://url" );
   std::string testValue = citem->GetUrl();
@@ -1373,8 +1378,14 @@ int UtcDaliWebBackForwardListCheckItem(void)
   testValue = citem->GetOriginalUrl();
   DALI_TEST_EQUALS( testValue, kDefaultOriginalUrl, TEST_LOCATION );
 
-  Dali::Toolkit::WebBackForwardListItem* item = bfList->GetItemAtIndex( 0 );
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> item = bfList->GetItemAtIndex( 0 );
   DALI_TEST_CHECK( item != 0 );
+
+  std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> vecBack = bfList->GetBackwardItems(-1);
+  DALI_TEST_CHECK( vecBack.size() == 1 );
+
+  std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> vecForward = bfList->GetForwardItems(-1);
+  DALI_TEST_CHECK( vecForward.size() == 1 );
 
   END_TEST;
 }
