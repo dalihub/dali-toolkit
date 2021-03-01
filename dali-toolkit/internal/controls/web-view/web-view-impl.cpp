@@ -27,6 +27,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
+#include <dali/devel-api/adaptor-framework/web-engine-hit-test.h>
 #include <dali/devel-api/adaptor-framework/web-engine-http-auth-handler.h>
 #include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
@@ -46,7 +47,6 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-context.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
-#include <dali-toolkit/devel-api/controls/web-view/web-form-repost-decision.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -141,7 +141,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   }
 }
 
-WebView::WebView(int argc, char** argv)
+WebView::WebView(uint32_t argc, char** argv)
 : Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mUrl(),
   mVisual(),
@@ -196,7 +196,7 @@ Toolkit::WebView WebView::New(const std::string& locale, const std::string& time
   return handle;
 }
 
-Toolkit::WebView WebView::New(int argc, char** argv)
+Toolkit::WebView WebView::New(uint32_t argc, char** argv)
 {
   WebView*         impl   = new WebView(argc, argv);
   Toolkit::WebView handle = Toolkit::WebView(*impl);
@@ -449,7 +449,7 @@ bool WebView::StopInspectorServer()
   return mWebEngine ? mWebEngine.StopInspectorServer() : false;
 }
 
-void WebView::ScrollBy(int deltaX, int deltaY)
+void WebView::ScrollBy(int32_t deltaX, int32_t deltaY)
 {
   if(mWebEngine)
   {
@@ -457,7 +457,7 @@ void WebView::ScrollBy(int deltaX, int deltaY)
   }
 }
 
-bool WebView::ScrollEdgeBy(int deltaX, int deltaY)
+bool WebView::ScrollEdgeBy(int32_t deltaX, int32_t deltaY)
 {
   return mWebEngine ? mWebEngine.ScrollEdgeBy(deltaX, deltaY) : false;
 }
@@ -552,6 +552,27 @@ void WebView::JavaScriptPromptReply(const std::string& result)
   }
 }
 
+std::unique_ptr<Dali::WebEngineHitTest> WebView::CreateHitTest(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode)
+{
+  std::unique_ptr<Dali::WebEngineHitTest> webHitTest;
+  if(!mWebEngine)
+  {
+    return webHitTest;
+  }
+
+  return mWebEngine.CreateHitTest(x, y, mode);
+}
+
+bool WebView::CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback)
+{
+  bool result = false;
+  if(mWebEngine)
+  {
+    result = mWebEngine.CreateHitTestAsynchronously(x, y, mode, callback);
+  }
+  return result;
+}
+
 void WebView::ClearHistory()
 {
   if(mWebEngine)
@@ -602,7 +623,7 @@ void WebView::AddDynamicCertificatePath(const std::string& host, const std::stri
   }
 }
 
-Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor)
+Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
 {
   Dali::Toolkit::ImageView imageView;
   if(mWebEngine)
@@ -613,7 +634,7 @@ Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int> viewArea, float 
   return imageView;
 }
 
-bool WebView::GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
+bool WebView::GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
 {
   mScreenshotCapturedCallback = callback;
   return mWebEngine ? mWebEngine.GetScreenshotAsynchronously(viewArea, scaleFactor, std::bind(&WebView::OnScreenshotCaptured, this, std::placeholders::_1)) : false;
@@ -644,7 +665,7 @@ void WebView::UpdateDisplayArea(Dali::PropertyNotification& /*source*/)
   Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
   Vector2 screenPosition          = self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
 
-  Dali::Rect<int> displayArea;
+  Dali::Rect<int32_t> displayArea;
   displayArea.x      = screenPosition.x - anchorPointOffSet.x;
   displayArea.y      = screenPosition.y - anchorPointOffSet.y;
   displayArea.width  = actorSize.x;
@@ -831,9 +852,8 @@ void WebView::OnFormRepostDecision(std::shared_ptr<Dali::WebEngineFormRepostDeci
 {
   if(!mFormRepostDecisionSignal.Empty())
   {
-    Dali::Toolkit::WebView                                handle(GetOwner());
-    std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> repostDecision(new Dali::Toolkit::WebFormRepostDecision(decision));
-    mFormRepostDecisionSignal.Emit(handle, std::move(repostDecision));
+    Dali::Toolkit::WebView handle(GetOwner());
+    mFormRepostDecisionSignal.Emit(handle, std::move(decision));
   }
 }
 
@@ -1277,7 +1297,7 @@ bool WebView::OnKeyEvent(const Dali::KeyEvent& event)
 bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
 {
   bool result = false;
-  if(mWebEngine)
+  if(mWebEngine && mMouseEventsEnabled)
   {
     result = mWebEngine.SendHoverEvent(hover);
   }
@@ -1287,7 +1307,7 @@ bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
 bool WebView::OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel)
 {
   bool result = false;
-  if(mWebEngine)
+  if(mWebEngine && mMouseEventsEnabled)
   {
     result = mWebEngine.SendWheelEvent(wheel);
   }
@@ -1314,7 +1334,7 @@ void WebView::OnKeyInputFocusLost()
   EmitKeyInputFocusSignal(false); // Calls back into the Control hence done last.
 }
 
-void WebView::SetScrollPosition(int x, int y)
+void WebView::SetScrollPosition(int32_t x, int32_t y)
 {
   if(mWebEngine)
   {

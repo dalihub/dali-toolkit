@@ -59,7 +59,7 @@ WebView WebView::New(const std::string& locale, const std::string& timezoneId)
   return Internal::WebView::New(locale, timezoneId);
 }
 
-WebView WebView::New(int argc, char** argv)
+WebView WebView::New(uint32_t argc, char** argv)
 {
   return Internal::WebView::New(argc, argv);
 }
@@ -169,12 +169,12 @@ bool WebView::StopInspectorServer()
   return Dali::Toolkit::GetImpl(*this).StopInspectorServer();
 }
 
-void WebView::ScrollBy(int deltaX, int deltaY)
+void WebView::ScrollBy(int32_t deltaX, int32_t deltaY)
 {
   Dali::Toolkit::GetImpl(*this).ScrollBy(deltaX, deltaY);
 }
 
-bool WebView::ScrollEdgeBy(int deltaX, int deltaY)
+bool WebView::ScrollEdgeBy(int32_t deltaX, int32_t deltaY)
 {
   return Dali::Toolkit::GetImpl(*this).ScrollEdgeBy(deltaX, deltaY);
 }
@@ -244,6 +244,16 @@ void WebView::JavaScriptPromptReply(const std::string& result)
   Dali::Toolkit::GetImpl(*this).JavaScriptPromptReply(result);
 }
 
+std::unique_ptr<Dali::WebEngineHitTest> WebView::CreateHitTest(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode)
+{
+  return Dali::Toolkit::GetImpl(*this).CreateHitTest(x, y, mode);
+}
+
+bool WebView::CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback)
+{
+  return Dali::Toolkit::GetImpl(*this).CreateHitTestAsynchronously(x, y, mode, callback);
+}
+
 void WebView::ClearHistory()
 {
   Dali::Toolkit::GetImpl(*this).ClearHistory();
@@ -279,12 +289,12 @@ void WebView::AddDynamicCertificatePath(const std::string& host, const std::stri
   Dali::Toolkit::GetImpl(*this).AddDynamicCertificatePath(host, certPath);
 }
 
-Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor)
+Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
 {
   return Dali::Toolkit::GetImpl(*this).GetScreenshot(viewArea, scaleFactor);
 }
 
-bool WebView::GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
+bool WebView::GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
 {
   return Dali::Toolkit::GetImpl(*this).GetScreenshotAsynchronously(viewArea, scaleFactor, callback);
 }

@@ -26,7 +26,9 @@
 #include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
 #include <dali/devel-api/adaptor-framework/web-engine-context-menu.h>
 #include <dali/devel-api/adaptor-framework/web-engine-context-menu-item.h>
+#include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-frame.h>
+#include <dali/devel-api/adaptor-framework/web-engine-hit-test.h>
 #include <dali/devel-api/adaptor-framework/web-engine-http-auth-handler.h>
 #include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
@@ -43,7 +45,6 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-context.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
-#include <dali-toolkit/devel-api/controls/web-view/web-form-repost-decision.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-view.h>
 
@@ -74,7 +75,7 @@ static bool gTouched = false;
 static bool gHovered = false;
 static bool gWheelEventHandled = false;
 static int gFormRepostDecisionCallbackCalled = 0;
-static std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> gFormRepostDecisionInstance = nullptr;
+static std::shared_ptr<Dali::WebEngineFormRepostDecision> gFormRepostDecisionInstance = nullptr;
 static int gFrameRenderedCallbackCalled = 0;
 static int gRequestInterceptorCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineRequestInterceptor> gRequestInterceptorInstance = nullptr;
@@ -96,9 +97,10 @@ static int gMimeOverriddenCallbackCalled = 0;
 static std::vector<std::unique_ptr<Dali::WebEngineSecurityOrigin>> gSecurityOriginList;
 static std::vector<std::unique_ptr<Dali::WebEngineContext::PasswordData>> gPasswordDataList;
 static int gContextMenuCustomizedCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineContextMenu> gContextMenuInstance = 0;
+static std::shared_ptr<Dali::WebEngineContextMenu> gContextMenuInstance = nullptr;
 static int gContextMenuItemSelectedCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineContextMenuItem> gContextMenuItemInstance = 0;
+static std::shared_ptr<Dali::WebEngineContextMenuItem> gContextMenuItemInstance = nullptr;
+static int gHitTestCreatedCallbackCalled = 0;
 
 struct CallbackFunctor
 {
@@ -143,6 +145,12 @@ static void OnPolicyDecisionRequest(WebView view, std::shared_ptr<Dali::WebEngin
 static void OnUrlChanged( WebView view, const std::string& url )
 {
   gUrlChangedCallbackCalled++;
+}
+
+static bool OnHitTestCreated(std::unique_ptr<Dali::WebEngineHitTest> test)
+{
+  gHitTestCreatedCallbackCalled++;
+  return true;
 }
 
 static void OnPageLoadError(WebView view, std::shared_ptr<Dali::WebEngineLoadError> error)
@@ -208,7 +216,7 @@ static bool OnWheelEvent( Actor actor, const Dali::WheelEvent& wheel )
   return true;
 }
 
-static void OnFormRepostDecision(WebView, std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> decision)
+static void OnFormRepostDecision(WebView, std::shared_ptr<Dali::WebEngineFormRepostDecision> decision)
 {
   gFormRepostDecisionCallbackCalled++;
   gFormRepostDecisionInstance = std::move(decision);
@@ -1331,6 +1339,50 @@ int UtcDaliWebViewPolicyDecisionRequest(void)
   DALI_TEST_CHECK(webFrame->IsMainFrame());
 
   gPolicyDecisionInstance = nullptr;
+
+  END_TEST;
+}
+
+int UtcDaliWebViewHitTest(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  // load url.
+  view.LoadUrl( TEST_URL1 );
+
+  // sync hit test.
+  std::unique_ptr<Dali::WebEngineHitTest> hitTest = view.CreateHitTest(100, 100, Dali::WebEngineHitTest::HitTestMode::DEFAULT);
+  DALI_TEST_CHECK(hitTest != 0);
+  DALI_TEST_EQUALS(hitTest->GetResultContext(), Dali::WebEngineHitTest::ResultContext::DOCUMENT, TEST_LOCATION);
+  std::string testLinkUri("http://test.html");
+  DALI_TEST_EQUALS(hitTest->GetLinkUri(), testLinkUri, TEST_LOCATION);
+  std::string testLinkTitle("test");
+  DALI_TEST_EQUALS(hitTest->GetLinkTitle(), testLinkTitle, TEST_LOCATION);
+  std::string testLinkLabel("label");
+  DALI_TEST_EQUALS(hitTest->GetLinkLabel(), testLinkLabel, TEST_LOCATION);
+  std::string testImageUri("http://test.jpg");
+  DALI_TEST_EQUALS(hitTest->GetImageUri(), testImageUri, TEST_LOCATION);
+  std::string testMediaUri("http://test.mp4");
+  DALI_TEST_EQUALS(hitTest->GetMediaUri(), testMediaUri, TEST_LOCATION);
+  std::string testTagName("img");
+  DALI_TEST_EQUALS(hitTest->GetTagName(), testTagName, TEST_LOCATION);
+  std::string testNodeValue("test");
+  DALI_TEST_EQUALS(hitTest->GetNodeValue(), testNodeValue, TEST_LOCATION);
+  Dali::Property::Map* testMap = &hitTest->GetAttributes();
+  DALI_TEST_CHECK(testMap);
+  std::string testImageFileNameExtension("jpg");
+  DALI_TEST_EQUALS(hitTest->GetImageFileNameExtension(), testImageFileNameExtension, TEST_LOCATION);
+  Dali::PixelData testImageBuffer = hitTest->GetImageBuffer();
+  DALI_TEST_CHECK((int)testImageBuffer.GetWidth() == 2 && (int)testImageBuffer.GetHeight() == 2);
+
+  // async...
+  bool result = view.CreateHitTestAsynchronously(100, 100, Dali::WebEngineHitTest::HitTestMode::DEFAULT, &OnHitTestCreated);
+  DALI_TEST_CHECK(result);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gHitTestCreatedCallbackCalled, 1, TEST_LOCATION );
 
   END_TEST;
 }
