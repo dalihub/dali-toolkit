@@ -44,9 +44,14 @@ const char* const TEST_URL1( "http://www.somewhere.valid1.com" );
 const char* const TEST_URL2( "http://www.somewhere.valid2.com" );
 
 static int gPageLoadStartedCallbackCalled = 0;
+static int gPageLoadInProgressCallbackCalled = 0;
 static int gPageLoadFinishedCallbackCalled = 0;
 static int gScrollEdgeReachedCallbackCalled = 0;
+static int gUrlChangedCallbackCalled = 0;
 static int gEvaluateJavaScriptCallbackCalled = 0;
+static int gJavaScriptAlertCallbackCalled = 0;
+static int gJavaScriptConfirmCallbackCalled = 0;
+static int gJavaScriptPromptCallbackCalled = 0;
 static bool gTouched = false;
 
 struct CallbackFunctor
@@ -68,6 +73,11 @@ static void OnPageLoadStarted( WebView view, const std::string& url )
   gPageLoadStartedCallbackCalled++;
 }
 
+static void OnPageLoadInProgress( WebView view, const std::string& url )
+{
+  gPageLoadInProgressCallbackCalled++;
+}
+
 static void OnPageLoadFinished( WebView view, const std::string& url )
 {
   gPageLoadFinishedCallbackCalled++;
@@ -78,6 +88,11 @@ static void OnScrollEdgeReached( WebView view, Dali::WebEnginePlugin::ScrollEdge
   gScrollEdgeReachedCallbackCalled++;
 }
 
+static void OnUrlChanged( WebView view, const std::string& url )
+{
+  gUrlChangedCallbackCalled++;
+}
+
 static void OnPageLoadError( WebView view, const std::string& url, WebView::LoadErrorCode errorCode )
 {
 }
@@ -85,6 +100,24 @@ static void OnPageLoadError( WebView view, const std::string& url, WebView::Load
 static void OnEvaluateJavaScript( const std::string& result )
 {
   gEvaluateJavaScriptCallbackCalled++;
+}
+
+static bool OnJavaScriptAlert( const std::string& result )
+{
+  gJavaScriptAlertCallbackCalled++;
+  return true;
+}
+
+static bool OnJavaScriptConfirm( const std::string& result )
+{
+  gJavaScriptConfirmCallbackCalled++;
+  return true;
+}
+
+static bool OnJavaScriptPrompt( const std::string& meesage1, const std::string& message2 )
+{
+  gJavaScriptPromptCallbackCalled++;
+  return true;
 }
 
 static bool OnTouched( Actor actor, const Dali::TouchEvent& touch )
@@ -167,26 +200,35 @@ int UtcDaliWebViewPageNavigation(void)
 
   ConnectionTracker* testTracker = new ConnectionTracker();
   view.PageLoadStartedSignal().Connect( &OnPageLoadStarted );
+  view.PageLoadInProgressSignal().Connect( &OnPageLoadInProgress );
   view.PageLoadFinishedSignal().Connect( &OnPageLoadFinished );
   view.PageLoadErrorSignal().Connect( &OnPageLoadError );
+  view.UrlChangedSignal().Connect( &OnUrlChanged );
   bool signal1 = false;
   bool signal2 = false;
   bool signal3 = false;
+  bool signal4 = false;
+  bool signal5 = false;
   view.ConnectSignal( testTracker, "pageLoadStarted", CallbackFunctor(&signal1) );
-  view.ConnectSignal( testTracker, "pageLoadFinished", CallbackFunctor(&signal2) );
-  view.ConnectSignal( testTracker, "invalidname", CallbackFunctor(&signal3) );
+  view.ConnectSignal( testTracker, "pageLoadInProgress", CallbackFunctor(&signal2) );
+  view.ConnectSignal( testTracker, "pageLoadFinished", CallbackFunctor(&signal3) );
+  view.ConnectSignal( testTracker, "urlChanged", CallbackFunctor(&signal4) );
+  view.ConnectSignal( testTracker, "invalidname", CallbackFunctor(&signal5) );
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( gPageLoadInProgressCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 0, TEST_LOCATION );
-
+  DALI_TEST_EQUALS( gUrlChangedCallbackCalled, 0, TEST_LOCATION );
 
   view.LoadUrl( TEST_URL1 );
   view.GetNaturalSize();
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS( view.CanGoBack(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gPageLoadInProgressCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 & signal2 );
-  DALI_TEST_CHECK( !signal3 );
+  DALI_TEST_EQUALS( gUrlChangedCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_CHECK( signal1 & signal2 & signal3 & signal4 );
+  DALI_TEST_CHECK( !signal5 );
 
   view.LoadUrl( TEST_URL2 );
   view.Suspend();
@@ -198,7 +240,9 @@ int UtcDaliWebViewPageNavigation(void)
   DALI_TEST_EQUALS( view.CanGoBack(), true, TEST_LOCATION );
   DALI_TEST_EQUALS( view.CanGoForward(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( gPageLoadInProgressCallbackCalled, 2, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( gUrlChangedCallbackCalled, 2, TEST_LOCATION );
 
   view.GoBack();
   Test::EmitGlobalTimerSignal();
@@ -518,6 +562,8 @@ int UtcDaliWebViewScrollBy(void)
 
   // scroll by and trigger scrollEdgeReached event.
   view.ScrollBy( 50, 50 );
+  Test::EmitGlobalTimerSignal();
+
   view.GetProperty( WebView::Property::SCROLL_POSITION ).Get( output );
   DALI_TEST_CHECK( output.x == 150 && output.y == 150 );
   DALI_TEST_EQUALS( gScrollEdgeReachedCallbackCalled, 1, TEST_LOCATION );
@@ -538,6 +584,33 @@ int UtcDaliWebViewEvaluteJavaScript(void)
   Test::EmitGlobalTimerSignal();
 
   DALI_TEST_EQUALS( gEvaluateJavaScriptCallbackCalled, 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewJavaScriptAlertConfirmPrompt(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New( "ko-KR", "Asia/Seoul" );
+
+  view.RegisterJavaScriptAlertCallback( &OnJavaScriptAlert );
+  view.LoadHtmlString( "<head><script type='text/javascript'>alert('this is an alert popup.');</script></head><body>Hello World!</body>" );
+  view.JavaScriptAlertReply();
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gJavaScriptAlertCallbackCalled, 1, TEST_LOCATION );
+
+  view.RegisterJavaScriptConfirmCallback( &OnJavaScriptConfirm );
+  view.LoadHtmlString( "<head><script type='text/javascript'>confirm('this is a confirm popup.');</script></head><body>Hello World!</body>" );
+  view.JavaScriptConfirmReply( true );
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gJavaScriptConfirmCallbackCalled, 1, TEST_LOCATION );
+
+  view.RegisterJavaScriptPromptCallback( &OnJavaScriptPrompt );
+  view.LoadHtmlString( "<head><script type='text/javascript'>prompt('this is a prompt popup.');</script></head><body>Hello World!</body>" );
+  view.JavaScriptPromptReply( "it is a prompt." );
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gJavaScriptPromptCallbackCalled, 1, TEST_LOCATION );
 
   END_TEST;
 }

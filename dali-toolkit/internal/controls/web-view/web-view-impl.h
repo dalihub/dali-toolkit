@@ -164,9 +164,34 @@ public:
   void AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler);
 
   /**
-   * @brief Clears all tiles resources of Web.
+   * @copydoc Dali::Toolkit::WebView::RegisterJavaScriptAlertCallback()
    */
-  void ClearAllTilesResources();
+  void RegisterJavaScriptAlertCallback( Dali::WebEnginePlugin::JavaScriptAlertCallback callback );
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::JavaScriptAlertReply()
+   */
+  void JavaScriptAlertReply();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterJavaScriptConfirmCallback()
+   */
+  void RegisterJavaScriptConfirmCallback( Dali::WebEnginePlugin::JavaScriptConfirmCallback callback );
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::JavaScriptConfirmReply()
+   */
+  void JavaScriptConfirmReply( bool confirmed );
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterJavaScriptPromptCallback()
+   */
+  void RegisterJavaScriptPromptCallback( Dali::WebEnginePlugin::JavaScriptPromptCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::JavaScriptPromptReply()
+   */
+  void JavaScriptPromptReply( const std::string& result );
 
   /**
    * @copydoc Dali::Toolkit::WebView::ClearHistory()
@@ -174,9 +199,19 @@ public:
   void ClearHistory();
 
   /**
+   * @brief Clears all tiles resources of Web.
+   */
+  void ClearAllTilesResources();
+
+  /**
    * @copydoc Dali::Toolkit::WebView::PageLoadStartedSignal()
    */
   Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadStartedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::PageLoadInProgressSignal()
+   */
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadInProgressSignal();
 
   /**
    * @copydoc Dali::Toolkit::WebView::PageLoadFinishedSignal()
@@ -192,6 +227,11 @@ public:
    * @copydoc Dali::Toolkit::WebView::ScrollEdgeReachedSignal()
    */
   Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::UrlChangedSignal()
+   */
+  Dali::Toolkit::WebView::WebViewUrlChangedSignalType& UrlChangedSignal();
 
 public: // Properties
   /**
@@ -340,6 +380,12 @@ private:
   void OnPageLoadStarted(const std::string& url);
 
   /**
+   * @brief Callback function to be called when page is loading in progress.
+   * @param[in] url The url currently being loaded
+   */
+  void OnPageLoadInProgress( const std::string& url );
+
+  /**
    * @brief Callback function to be called when page load finished.
    * @param[in] url The url currently being loaded
    */
@@ -358,28 +404,36 @@ private:
    */
   void OnScrollEdgeReached(Dali::WebEnginePlugin::ScrollEdge edge);
 
-private:
-  std::string                 mUrl;
-  Dali::Toolkit::Visual::Base mVisual;
-  Dali::Size                  mWebViewSize;
-  Dali::WebEngine             mWebEngine;
+  /**
+   * @brief Callback function to be called when url is changed.
+   * @param[in] url The url currently being loaded
+   */
+  void OnUrlChanged( const std::string& url );
 
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadStartedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadFinishedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType     mPageLoadErrorSignal;
+private:
+  std::string                                            mUrl;
+  Dali::Toolkit::Visual::Base                            mVisual;
+  Dali::Size                                             mWebViewSize;
+  Dali::WebEngine                                        mWebEngine;
+
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadStartedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadInProgressSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadFinishedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType mPageLoadErrorSignal;
   Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
 
-  std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
-  std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
-  std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
-  std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
-  Dali::Toolkit::ImageView                           mFaviconView;
+  std::unique_ptr<Dali::Toolkit::WebContext>             mWebContext;
+  std::unique_ptr<Dali::Toolkit::WebCookieManager>       mWebCookieManager;
+  std::unique_ptr<Dali::Toolkit::WebSettings>            mWebSettings;
+  std::unique_ptr<Dali::Toolkit::WebBackForwardList>     mWebBackForwardList;
+  Dali::Toolkit::ImageView mFaviconView;
 
-  Dali::PropertyNotification mPositionUpdateNotification;
-  Dali::PropertyNotification mSizeUpdateNotification;
-  Dali::PropertyNotification mScaleUpdateNotification;
-  bool                       mVideoHoleEnabled;
-  Dali::Rect<int>            mWebViewArea;
+  Dali::PropertyNotification                             mPositionUpdateNotification;
+  Dali::PropertyNotification                             mSizeUpdateNotification;
+  Dali::PropertyNotification                             mScaleUpdateNotification;
+  bool                                                   mVideoHoleEnabled;
+  Dali::Rect< int >                                      mWebViewArea;
+  Dali::Toolkit::WebView::WebViewUrlChangedSignalType    mUrlChangedSignal;
 };
 
 } // namespace Internal

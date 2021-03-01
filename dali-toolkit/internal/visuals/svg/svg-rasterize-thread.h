@@ -164,15 +164,6 @@ public:
   void RemoveTask(SvgVisual* visual);
 
   /**
-   * Delete the parsed SVG image, called by main thread.
-   *
-   * The parsed svg should be deleted in worker thread, as the main thread does not know whether a rasterization of this svg is ongoing.
-   *
-   * @param[in] VectorImage The image to be deleted
-   */
-  void DeleteImage(VectorImageRenderer vectorImage);
-
-  /**
    * @copydoc Dali::Integration::Processor::Process()
    */
   void Process() override;
@@ -225,7 +216,6 @@ private:
 private:
   std::vector<RasterizingTaskPtr> mRasterizeTasks; //The queue of the tasks waiting to rasterize the SVG image
   std::vector<RasterizingTaskPtr> mCompletedTasks; //The queue of the tasks with the SVG rasterization completed
-  Vector<VectorImageRenderer*>    mDeleteSvg;      //The images that the event thread requested to delete
 
   ConditionalWait                      mConditionalWait;
   Dali::Mutex                          mMutex;

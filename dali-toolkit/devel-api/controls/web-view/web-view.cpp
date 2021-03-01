@@ -164,9 +164,34 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
   Dali::Toolkit::GetImpl(*this).AddJavaScriptMessageHandler(exposedObjectName, handler);
 }
 
-void WebView::ClearAllTilesResources()
+void WebView::RegisterJavaScriptAlertCallback( Dali::WebEnginePlugin::JavaScriptAlertCallback callback )
 {
-  Dali::Toolkit::GetImpl(*this).ClearAllTilesResources();
+  Dali::Toolkit::GetImpl( *this ).RegisterJavaScriptAlertCallback( callback );
+}
+
+void WebView::JavaScriptAlertReply()
+{
+  Dali::Toolkit::GetImpl( *this ).JavaScriptAlertReply();
+}
+
+void WebView::RegisterJavaScriptConfirmCallback( Dali::WebEnginePlugin::JavaScriptConfirmCallback callback )
+{
+  Dali::Toolkit::GetImpl( *this ).RegisterJavaScriptConfirmCallback( callback );
+}
+
+void WebView::JavaScriptConfirmReply( bool confirmed )
+{
+  Dali::Toolkit::GetImpl( *this ).JavaScriptConfirmReply( confirmed );
+}
+
+void WebView::RegisterJavaScriptPromptCallback( Dali::WebEnginePlugin::JavaScriptPromptCallback callback )
+{
+  Dali::Toolkit::GetImpl( *this ).RegisterJavaScriptPromptCallback( callback );
+}
+
+void WebView::JavaScriptPromptReply( const std::string& result )
+{
+  Dali::Toolkit::GetImpl( *this ).JavaScriptPromptReply( result );
 }
 
 void WebView::ClearHistory()
@@ -174,9 +199,19 @@ void WebView::ClearHistory()
   Dali::Toolkit::GetImpl(*this).ClearHistory();
 }
 
+void WebView::ClearAllTilesResources()
+{
+  Dali::Toolkit::GetImpl( *this ).ClearAllTilesResources();
+}
+
 WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
 {
   return Dali::Toolkit::GetImpl(*this).PageLoadStartedSignal();
+}
+
+WebView::WebViewPageLoadSignalType& WebView::PageLoadInProgressSignal()
+{
+  return Dali::Toolkit::GetImpl( *this ).PageLoadInProgressSignal();
 }
 
 WebView::WebViewPageLoadSignalType& WebView::PageLoadFinishedSignal()
@@ -192,6 +227,11 @@ WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSignal()
 WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
 {
   return Dali::Toolkit::GetImpl(*this).ScrollEdgeReachedSignal();
+}
+
+WebView::WebViewUrlChangedSignalType& WebView::UrlChangedSignal()
+{
+  return Dali::Toolkit::GetImpl( *this ).UrlChangedSignal();
 }
 
 WebView::WebView(Internal::WebView& implementation)
