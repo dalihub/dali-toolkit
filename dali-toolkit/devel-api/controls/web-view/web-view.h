@@ -33,6 +33,8 @@ namespace Toolkit
 class ImageView;
 class WebBackForwardList;
 class WebContext;
+class WebContextMenu;
+class WebContextMenuItem;
 class WebCookieManager;
 class WebFormRepostDecision;
 class WebSettings;
@@ -245,6 +247,16 @@ public:
    * @brief WebView signal type related with http authentication.
    */
   using WebViewHttpAuthHandlerSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineHttpAuthHandler>)>;
+
+  /**
+   * @brief WebView signal type related with context menu customized.
+   */
+  using WebViewContextMenuCustomizedSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineContextMenu>)>;
+
+  /**
+   * @brief WebView signal type related with context menu item selected.
+   */
+  using WebViewContextMenuItemSelectedSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineContextMenuItem>)>;
 
 public:
   /**
@@ -641,109 +653,123 @@ public:
   bool CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback);
 
   /**
-   * @brief Sets callback which will be called upon geolocation permission request.
+   * @brief Set callback which will be called upon geolocation permission request.
    *
    * @param[in] callback The callback for requesting geolocation permission
    */
   void RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback);
 
   /**
-   * @brief Connects to this signal to be notified when page loading is started.
+   * @brief Connect to this signal to be notified when page loading is started.
    *
    * @return A signal object to connect with
    */
   WebViewPageLoadSignalType& PageLoadStartedSignal();
 
   /**
-   * @brief Connects to this signal to be notified when page loading is in progress.
+   * @brief Connect to this signal to be notified when page loading is in progress.
    *
    * @return A signal object to connect with
    */
   WebViewPageLoadSignalType& PageLoadInProgressSignal();
 
   /**
-   * @brief Connects to this signal to be notified when page loading is finished.
+   * @brief Connect to this signal to be notified when page loading is finished.
    *
    * @return A signal object to connect with
    */
   WebViewPageLoadSignalType& PageLoadFinishedSignal();
 
   /**
-   * @brief Connects to this signal to be notified when an error occurs in page loading.
+   * @brief Connect to this signal to be notified when an error occurs in page loading.
    *
    * @return A signal object to connect with
    */
   WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
 
   /**
-   * @brief Connects to this signal to be notified when scroll edge is reached.
+   * @brief Connect to this signal to be notified when scroll edge is reached.
    *
    * @return A signal object to connect with
    */
   WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
 
   /**
-   * @brief Connects to this signal to be notified when url is changed.
+   * @brief Connect to this signal to be notified when url is changed.
    *
    * @return A signal object to connect with
    */
   WebViewUrlChangedSignalType& UrlChangedSignal();
 
   /**
-   * @brief Connects to this signal to be notified when form repost decision is requested.
+   * @brief Connect to this signal to be notified when form repost decision is requested.
    *
    * @return A signal object to connect with.
    */
   WebViewFormRepostDecisionSignalType& FormRepostDecisionSignal();
 
   /**
-   * @brief Connects to this signal to be notified when frame is rendered.
+   * @brief Connect to this signal to be notified when frame is rendered.
    *
    * @return A signal object to connect with.
    */
   WebViewFrameRenderedSignalType& FrameRenderedSignal();
 
   /**
-   * @brief Connects to this signal to be notified when http request need be intercepted.
+   * @brief Connect to this signal to be notified when http request need be intercepted.
    *
    * @return A signal object to connect with.
    */
   WebViewRequestInterceptorSignalType& RequestInterceptorSignal();
 
   /**
-   * @brief Connects to this signal to be notified when console message will be logged.
+   * @brief Connect to this signal to be notified when console message will be logged.
    *
    * @return A signal object to connect with.
    */
   WebViewConsoleMessageSignalType& ConsoleMessageSignal();
 
   /**
-   * @brief Connects to this signal to be notified when new policy would be decided.
+   * @brief Connect to this signal to be notified when new policy would be decided.
    *
    * @return A signal object to connect with.
    */
   WebViewPolicyDecisionSignalType& PolicyDecisionSignal();
 
   /**
-   * @brief Connects to this signal to be notified when certificate need be confirmed.
+   * @brief Connect to this signal to be notified when certificate need be confirmed.
    *
    * @return A signal object to connect with.
    */
   WebViewCertificateSignalType& CertificateConfirmSignal();
 
   /**
-   * @brief Connects to this signal to be notified when ssl certificate is changed.
+   * @brief Connect to this signal to be notified when ssl certificate is changed.
    *
    * @return A signal object to connect with.
    */
   WebViewCertificateSignalType& SslCertificateChangedSignal();
 
   /**
-   * @brief Connects to this signal to be notified when http authentication need be confirmed.
+   * @brief Connect to this signal to be notified when http authentication need be confirmed.
    *
    * @return A signal object to connect with.
    */
   WebViewHttpAuthHandlerSignalType& HttpAuthHandlerSignal();
+
+  /**
+   * @brief Connect to this signal to be notified when context menu would be customized.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewContextMenuCustomizedSignalType& ContextMenuCustomizedSignal();
+
+  /**
+   * @brief Connect to this signal to be notified when context menu item is selected.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewContextMenuItemSelectedSignalType& ContextMenuItemSelectedSignal();
 
 public: // Not intended for application developers
   /// @cond internal

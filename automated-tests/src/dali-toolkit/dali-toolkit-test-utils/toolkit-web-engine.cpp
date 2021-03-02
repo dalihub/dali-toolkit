@@ -23,6 +23,8 @@
 #include <dali/devel-api/adaptor-framework/web-engine-certificate.h>
 #include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
+#include <dali/devel-api/adaptor-framework/web-engine-context-menu.h>
+#include <dali/devel-api/adaptor-framework/web-engine-context-menu-item.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-frame.h>
@@ -571,6 +573,107 @@ public:
 
 private:
   std::string mockUrl;
+};
+
+class MockWebEngineContextMenuItem : public Dali::WebEngineContextMenuItem
+{
+public:
+  MockWebEngineContextMenuItem()
+  {
+  }
+
+  ItemTag GetTag() const override
+  {
+    return ItemTag::NO_ACTION;
+  }
+
+  ItemType GetType() const override
+  {
+    return ItemType::ACTION;
+  }
+
+  bool IsEnabled() const override
+  {
+    return true;
+  }
+
+  std::string GetLinkUrl() const override
+  {
+    return "http://test.html";
+  }
+
+  std::string GetImageUrl() const override
+  {
+    return "http://test.jpg";
+  }
+
+  std::string GetTitle() const override
+  {
+    return "title";
+  }
+
+  std::unique_ptr<Dali::WebEngineContextMenu> GetParentMenu() const override
+  {
+    std::unique_ptr<Dali::WebEngineContextMenu> result;
+    return result;
+  }
+};
+
+class MockWebEngineContextMenu : public Dali::WebEngineContextMenu
+{
+public:
+  MockWebEngineContextMenu()
+  {
+  }
+
+  uint32_t GetItemCount() const override
+  {
+    return 1;
+  }
+
+  std::unique_ptr<Dali::WebEngineContextMenuItem> GetItemAt(uint32_t index) const override
+  {
+    std::unique_ptr<Dali::WebEngineContextMenuItem> webitem(new MockWebEngineContextMenuItem());
+    return webitem;
+  }
+
+  std::vector<std::unique_ptr<WebEngineContextMenuItem>> GetItemList() const override
+  {
+    std::vector<std::unique_ptr<WebEngineContextMenuItem>> result;
+    std::unique_ptr<Dali::WebEngineContextMenuItem> webitem(new MockWebEngineContextMenuItem());
+    result.push_back(std::move(webitem));
+    return result;
+  }
+
+  Dali::Vector2 GetPosition() const override
+  {
+    return Dali::Vector2(100, 100);
+  }
+
+  bool RemoveItem(WebEngineContextMenuItem& item) override
+  {
+    return true;
+  }
+
+  bool AppendItemAsAction(WebEngineContextMenuItem::ItemTag tag, const std::string& title, bool enabled) override
+  {
+    return true;
+  }
+
+  bool AppendItem(WebEngineContextMenuItem::ItemTag tag, const std::string& title, const std::string& iconFile, bool enabled) override
+  {
+    return true;
+  }
+
+  bool SelectItem(WebEngineContextMenuItem& item) override
+  {
+    return true;
+  }
+
+  bool Hide() override
+  {
+    return true;
+  }
 };
 
 class MockWebEngineSettings : public WebEngineSettings
@@ -1174,25 +1277,37 @@ public:
     return mHttpAuthHandlerSignal;
   }
 
+  Dali::WebEnginePlugin::WebEngineContextMenuCustomizedSignalType& ContextMenuCustomizedSignal()
+  {
+    return mContextMenuCustomizedSignal;
+  }
+
+  Dali::WebEnginePlugin::WebEngineContextMenuItemSelectedSignalType& ContextMenuItemSelectedSignal()
+  {
+    return mContextMenuItemSelectedSignal;
+  }
+
   std::string              mUrl;
   std::vector<std::string> mHistory;
   size_t                   mCurrentPlusOnePos;
   std::string              mUserAgent;
 
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType           mPageLoadStartedSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType           mPageLoadInProgressSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType           mPageLoadFinishedSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType      mPageLoadErrorSignal;
-  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType  mScrollEdgeReachedSignal;
-  Dali::WebEnginePlugin::WebEngineUrlChangedSignalType         mUrlChangedSignal;
-  Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType mFormRepostDecisionSignal;
-  Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType      mFrameRenderedSignal;
-  Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType mRequestInterceptorSignal;
-  Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType     mConsoleMessageSignal;
-  Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType     mPolicyDecisionSignal;
-  Dali::WebEnginePlugin::WebEngineCertificateSignalType        mCertificateConfirmSignal;
-  Dali::WebEnginePlugin::WebEngineCertificateSignalType        mSslCertificateChangedSignal;
-  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType    mHttpAuthHandlerSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType                mPageLoadStartedSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType                mPageLoadInProgressSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType                mPageLoadFinishedSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType           mPageLoadErrorSignal;
+  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType       mScrollEdgeReachedSignal;
+  Dali::WebEnginePlugin::WebEngineUrlChangedSignalType              mUrlChangedSignal;
+  Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType      mFormRepostDecisionSignal;
+  Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType           mFrameRenderedSignal;
+  Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType      mRequestInterceptorSignal;
+  Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType          mConsoleMessageSignal;
+  Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType          mPolicyDecisionSignal;
+  Dali::WebEnginePlugin::WebEngineCertificateSignalType             mCertificateConfirmSignal;
+  Dali::WebEnginePlugin::WebEngineCertificateSignalType             mSslCertificateChangedSignal;
+  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType         mHttpAuthHandlerSignal;
+  Dali::WebEnginePlugin::WebEngineContextMenuCustomizedSignalType   mContextMenuCustomizedSignal;
+  Dali::WebEnginePlugin::WebEngineContextMenuItemSelectedSignalType mContextMenuItemSelectedSignal;
 
   bool  mEvaluating;
   float mPageZoomFactor;
@@ -1278,6 +1393,11 @@ bool OnLoadUrl()
     gInstance->mSslCertificateChangedSignal.Emit(std::move(sslCertificate));
     std::shared_ptr<Dali::WebEngineHttpAuthHandler> handler(new MockWebEngineHttpAuthHandler());
     gInstance->mHttpAuthHandlerSignal.Emit(std::move(handler));
+
+    std::shared_ptr<Dali::WebEngineContextMenu> menu(new MockWebEngineContextMenu());
+    gInstance->mContextMenuCustomizedSignal.Emit(std::move(menu));
+    std::shared_ptr<Dali::WebEngineContextMenuItem> item(new MockWebEngineContextMenuItem());
+    gInstance->mContextMenuItemSelectedSignal.Emit(std::move(item));
   }
   return false;
 }
@@ -1932,6 +2052,16 @@ Dali::WebEnginePlugin::WebEngineCertificateSignalType& WebEngine::SslCertificate
 Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType& WebEngine::HttpAuthHandlerSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).HttpAuthHandlerSignal();
+}
+
+Dali::WebEnginePlugin::WebEngineContextMenuCustomizedSignalType& WebEngine::ContextMenuCustomizedSignal()
+{
+  return Internal::Adaptor::GetImplementation( *this ).ContextMenuCustomizedSignal();
+}
+
+Dali::WebEnginePlugin::WebEngineContextMenuItemSelectedSignalType& WebEngine::ContextMenuItemSelectedSignal()
+{
+  return Internal::Adaptor::GetImplementation( *this ).ContextMenuItemSelectedSignal();
 }
 
 } // namespace Dali;

@@ -24,6 +24,8 @@
 #include <dali.h>
 #include <dali/devel-api/adaptor-framework/web-engine-certificate.h>
 #include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
+#include <dali/devel-api/adaptor-framework/web-engine-context-menu.h>
+#include <dali/devel-api/adaptor-framework/web-engine-context-menu-item.h>
 #include <dali/devel-api/adaptor-framework/web-engine-frame.h>
 #include <dali/devel-api/adaptor-framework/web-engine-http-auth-handler.h>
 #include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
@@ -94,6 +96,10 @@ static int gDownloadStartedCallbackCalled = 0;
 static int gMimeOverriddenCallbackCalled = 0;
 static std::vector<std::unique_ptr<Dali::WebEngineSecurityOrigin>> gSecurityOriginList;
 static std::vector<std::unique_ptr<Dali::WebEngineContext::PasswordData>> gPasswordDataList;
+static int gContextMenuCustomizedCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEngineContextMenu> gContextMenuInstance = 0;
+static int gContextMenuItemSelectedCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEngineContextMenuItem> gContextMenuItemInstance = 0;
 
 struct CallbackFunctor
 {
@@ -272,6 +278,18 @@ static bool OnMimeOverridden(const std::string&, const std::string&, std::string
 {
   gMimeOverriddenCallbackCalled++;
   return false;
+}
+
+static void OnContextMenuCustomized(WebView view, std::shared_ptr<Dali::WebEngineContextMenu> menu)
+{
+  gContextMenuCustomizedCallbackCalled++;
+  gContextMenuInstance = std::move(menu);
+}
+
+static void OnContextMenuItemSelected(WebView view, std::shared_ptr<Dali::WebEngineContextMenuItem> item)
+{
+  gContextMenuItemSelectedCallbackCalled++;
+  gContextMenuItemInstance = std::move(item);
 }
 
 } // namespace
@@ -1033,6 +1051,67 @@ int UtcDaliWebViewPropertyTitleFavicon(void)
   DALI_TEST_CHECK( favicon );
   Dali::Vector3 iconsize = favicon->GetProperty< Vector3 >( Dali::Actor::Property::SIZE );
   DALI_TEST_CHECK( ( int )iconsize.width == 2 && ( int )iconsize.height == 2 );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewContextMenuCustomizedAndItemSelected(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  // load url.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  view.ContextMenuCustomizedSignal().Connect( &OnContextMenuCustomized );
+  view.ContextMenuItemSelectedSignal().Connect( &OnContextMenuItemSelected );
+  bool signal1 = false;
+  bool signal2 = false;
+  view.ConnectSignal( testTracker, "contextMenuCustomized", CallbackFunctor(&signal1) );
+  view.ConnectSignal( testTracker, "contextMenuItemSelected", CallbackFunctor(&signal2) );
+  DALI_TEST_EQUALS( gContextMenuCustomizedCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( gContextMenuItemSelectedCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_CHECK(gContextMenuInstance == 0);
+  DALI_TEST_CHECK(gContextMenuItemInstance == 0);
+
+  view.LoadUrl( TEST_URL1 );
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gContextMenuCustomizedCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gContextMenuItemSelectedCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_CHECK( signal1 );
+  DALI_TEST_CHECK( signal2 );
+
+  // check context meun & its items.
+  DALI_TEST_CHECK(gContextMenuInstance != 0);
+  std::unique_ptr<Dali::WebEngineContextMenuItem> item = gContextMenuInstance->GetItemAt(0);
+  DALI_TEST_CHECK(item.get() != 0);
+  std::vector<std::unique_ptr<Dali::WebEngineContextMenuItem>> itemList = gContextMenuInstance->GetItemList();
+  DALI_TEST_CHECK(itemList.size() == 1);
+  Dali::Vector2 testPosition = Dali::Vector2(100, 100);
+  DALI_TEST_EQUALS(gContextMenuInstance->GetPosition(), testPosition, TEST_LOCATION);
+  DALI_TEST_CHECK(gContextMenuInstance->RemoveItem(*(item.get())));
+  DALI_TEST_CHECK(gContextMenuInstance->AppendItemAsAction(WebEngineContextMenuItem::ItemTag::NO_ACTION, "", false));
+  DALI_TEST_CHECK(gContextMenuInstance->AppendItem(WebEngineContextMenuItem::ItemTag::NO_ACTION, "", "", false));
+  DALI_TEST_CHECK(gContextMenuInstance->SelectItem(*(item.get())));
+  DALI_TEST_CHECK(gContextMenuInstance->Hide());
+
+  DALI_TEST_CHECK(gContextMenuItemInstance != 0);
+  Dali::WebEngineContextMenuItem::ItemTag testItemTag = Dali::WebEngineContextMenuItem::ItemTag::NO_ACTION;
+  DALI_TEST_EQUALS(gContextMenuItemInstance->GetTag(), testItemTag, TEST_LOCATION);
+  Dali::WebEngineContextMenuItem::ItemType testItemType = Dali::WebEngineContextMenuItem::ItemType::ACTION;
+  DALI_TEST_EQUALS(gContextMenuItemInstance->GetType(), testItemType, TEST_LOCATION);
+  DALI_TEST_CHECK(gContextMenuItemInstance->IsEnabled());
+  std::string testLinkUrl("http://test.html");
+  DALI_TEST_EQUALS(gContextMenuItemInstance->GetLinkUrl(), testLinkUrl, TEST_LOCATION);
+  std::string testImageUrl("http://test.jpg");
+  DALI_TEST_EQUALS(gContextMenuItemInstance->GetImageUrl(), testImageUrl, TEST_LOCATION);
+  std::string testTitle("title");
+  DALI_TEST_EQUALS(gContextMenuItemInstance->GetTitle(), testTitle, TEST_LOCATION);
+  DALI_TEST_CHECK(gContextMenuItemInstance->GetParentMenu().get() == 0);
+
+  gContextMenuInstance = nullptr;
+  gContextMenuItemInstance = nullptr;
 
   END_TEST;
 }

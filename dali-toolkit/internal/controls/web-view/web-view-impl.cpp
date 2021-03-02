@@ -22,6 +22,8 @@
 #include <dali/devel-api/adaptor-framework/web-engine-back-forward-list.h>
 #include <dali/devel-api/adaptor-framework/web-engine-certificate.h>
 #include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
+#include <dali/devel-api/adaptor-framework/web-engine-context-menu-item.h>
+#include <dali/devel-api/adaptor-framework/web-engine-context-menu.h>
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
@@ -85,20 +87,22 @@ DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "pageZoomFactor",          FLOAT,  
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "textZoomFactor",          FLOAT,   TEXT_ZOOM_FACTOR          )
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "loadProgressPercentage",  FLOAT,   LOAD_PROGRESS_PERCENTAGE  )
 
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadStarted",       PAGE_LOAD_STARTED_SIGNAL      )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadInProgress",    PAGE_LOAD_IN_PROGRESS_SIGNAL  )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadFinished",      PAGE_LOAD_FINISHED_SIGNAL     )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadError",         PAGE_LOAD_ERROR_SIGNAL        )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "scrollEdgeReached",     SCROLL_EDGE_REACHED_SIGNAL    )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "urlChanged",            URL_CHANGED_SIGNAL            )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "formRepostDecision",    FORM_REPOST_DECISION_SIGNAL   )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "frameRendered",         FRAME_RENDERED_SIGNAL         )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "requestInterceptor",    REQUEST_INTERCEPTOR_SIGNAL    )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "consoleMessage",        CONSOLE_MESSAGE_SIGNAL        )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "policyDecision",        POLICY_DECISION               )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "certificateConfirm",    CERTIFICATE_CONFIRM_SIGNAL    )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "sslCertificateChanged", SSL_CERTIFICATE_CHANGED_SIGNAL)
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "httpAuthRequest",       HTTP_AUTH_REQUEST_SIGNAL      )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadStarted",         PAGE_LOAD_STARTED_SIGNAL         )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadInProgress",      PAGE_LOAD_IN_PROGRESS_SIGNAL     )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadFinished",        PAGE_LOAD_FINISHED_SIGNAL        )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadError",           PAGE_LOAD_ERROR_SIGNAL           )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "scrollEdgeReached",       SCROLL_EDGE_REACHED_SIGNAL       )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "urlChanged",              URL_CHANGED_SIGNAL               )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "formRepostDecision",      FORM_REPOST_DECISION_SIGNAL      )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "frameRendered",           FRAME_RENDERED_SIGNAL            )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "requestInterceptor",      REQUEST_INTERCEPTOR_SIGNAL       )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "consoleMessage",          CONSOLE_MESSAGE_SIGNAL           )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "policyDecision",          POLICY_DECISION                  )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "certificateConfirm",      CERTIFICATE_CONFIRM_SIGNAL       )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "sslCertificateChanged",   SSL_CERTIFICATE_CHANGED_SIGNAL   )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "httpAuthRequest",         HTTP_AUTH_REQUEST_SIGNAL         )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "contextMenuCustomized",   CONTEXT_MENU_CUSTOMIZED_SIGNAL   )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "contextMenuItemSelected", CONTEXT_MENU_ITEM_SELECTED_SIGNAL)
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -234,6 +238,8 @@ void WebView::OnInitialize()
     mWebEngine.CertificateConfirmSignal().Connect(this, &WebView::OnCertificateConfirm);
     mWebEngine.SslCertificateChangedSignal().Connect(this, &WebView::OnSslCertificateChanged);
     mWebEngine.HttpAuthHandlerSignal().Connect(this, &WebView::OnHttpAuthenticationRequest);
+    mWebEngine.ContextMenuCustomizedSignal().Connect(this, &WebView::OnContextMenuCustomized);
+    mWebEngine.ContextMenuItemSelectedSignal().Connect(this, &WebView::OnContextMenuItemSelected);
 
     mWebContext         = std::unique_ptr<Dali::Toolkit::WebContext>(new WebContext(mWebEngine.GetContext()));
     mWebCookieManager   = std::unique_ptr<Dali::Toolkit::WebCookieManager>(new WebCookieManager(mWebEngine.GetCookieManager()));
@@ -757,6 +763,16 @@ Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType& WebView::HttpAuthHandl
   return mHttpAuthHandlerSignal;
 }
 
+Dali::Toolkit::WebView::WebViewContextMenuCustomizedSignalType& WebView::ContextMenuCustomizedSignal()
+{
+  return mContextMenuCustomizedSignal;
+}
+
+Dali::Toolkit::WebView::WebViewContextMenuItemSelectedSignalType& WebView::ContextMenuItemSelectedSignal()
+{
+  return mContextMenuItemSelectedSignal;
+}
+
 void WebView::OnPageLoadStarted(const std::string& url)
 {
   if(!mPageLoadStartedSignal.Empty())
@@ -901,6 +917,24 @@ void WebView::OnHttpAuthenticationRequest(std::shared_ptr<Dali::WebEngineHttpAut
   }
 }
 
+void WebView::OnContextMenuCustomized(std::shared_ptr<Dali::WebEngineContextMenu> menu)
+{
+  if(!mContextMenuCustomizedSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mContextMenuCustomizedSignal.Emit(handle, std::move(menu));
+  }
+}
+
+void WebView::OnContextMenuItemSelected(std::shared_ptr<Dali::WebEngineContextMenuItem> item)
+{
+  if(!mContextMenuItemSelectedSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mContextMenuItemSelectedSignal.Emit(handle, std::move(item));
+  }
+}
+
 bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
@@ -976,6 +1010,16 @@ bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tr
   else if(0 == strcmp(signalName.c_str(), HTTP_AUTH_REQUEST_SIGNAL))
   {
     webView.HttpAuthHandlerSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), CONTEXT_MENU_CUSTOMIZED_SIGNAL))
+  {
+    webView.ContextMenuCustomizedSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), CONTEXT_MENU_ITEM_SELECTED_SIGNAL))
+  {
+    webView.ContextMenuItemSelectedSignal().Connect(tracker, functor);
     connected = true;
   }
 

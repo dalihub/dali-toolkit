@@ -369,6 +369,16 @@ WebView::WebViewHttpAuthHandlerSignalType& WebView::HttpAuthHandlerSignal()
   return Dali::Toolkit::GetImpl(*this).HttpAuthHandlerSignal();
 }
 
+WebView::WebViewContextMenuCustomizedSignalType& WebView::ContextMenuCustomizedSignal()
+{
+  return Dali::Toolkit::GetImpl(*this).ContextMenuCustomizedSignal();
+}
+
+WebView::WebViewContextMenuItemSelectedSignalType& WebView::ContextMenuItemSelectedSignal()
+{
+  return Dali::Toolkit::GetImpl(*this).ContextMenuItemSelectedSignal();
+}
+
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)
 {

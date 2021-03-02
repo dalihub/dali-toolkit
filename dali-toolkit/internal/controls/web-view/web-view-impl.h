@@ -369,6 +369,16 @@ public:
    */
   Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType& HttpAuthHandlerSignal();
 
+  /**
+   * @copydoc Dali::Toolkit::WebView::ContextMenuCustomizedSignal()
+   */
+  Dali::Toolkit::WebView::WebViewContextMenuCustomizedSignalType& ContextMenuCustomizedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::ContextMenuItemSelectedSignal()
+   */
+  Dali::Toolkit::WebView::WebViewContextMenuItemSelectedSignalType& ContextMenuItemSelectedSignal();
+
 public: // Properties
   /**
    * @brief Called when a property of an object of this type is set.
@@ -714,26 +724,40 @@ private:
    */
   void OnHttpAuthenticationRequest(std::shared_ptr<Dali::WebEngineHttpAuthHandler> handler);
 
+  /**
+   * @brief Callback function to be called when context menu would be customized.
+   * @param[in] e The scroll edge reached.
+   */
+  void OnContextMenuCustomized(std::shared_ptr<Dali::WebEngineContextMenu> menu);
+
+  /**
+   * @brief Callback function to be called when context menu item is selected.
+   * @param[in] url The url currently being loaded
+   */
+  void OnContextMenuItemSelected(std::shared_ptr<Dali::WebEngineContextMenuItem> item);
+
 private:
   std::string                 mUrl;
   Dali::Toolkit::Visual::Base mVisual;
   Dali::Size                  mWebViewSize;
   Dali::WebEngine             mWebEngine;
 
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType           mPageLoadStartedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType           mPageLoadInProgressSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType           mPageLoadFinishedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType      mPageLoadErrorSignal;
-  Dali::Toolkit::WebView::WebViewUrlChangedSignalType         mUrlChangedSignal;
-  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType  mScrollEdgeReachedSignal;
-  Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType mFormRepostDecisionSignal;
-  Dali::Toolkit::WebView::WebViewFrameRenderedSignalType      mFrameRenderedSignal;
-  Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType mRequestInterceptorSignal;
-  Dali::Toolkit::WebView::WebViewConsoleMessageSignalType     mConsoleMessageSignal;
-  Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType     mPolicyDecisionSignal;
-  Dali::Toolkit::WebView::WebViewCertificateSignalType        mCertificateConfirmSignal;
-  Dali::Toolkit::WebView::WebViewCertificateSignalType        mSslCertificateChangedSignal;
-  Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType    mHttpAuthHandlerSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType                mPageLoadStartedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType                mPageLoadInProgressSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType                mPageLoadFinishedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType           mPageLoadErrorSignal;
+  Dali::Toolkit::WebView::WebViewUrlChangedSignalType              mUrlChangedSignal;
+  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType       mScrollEdgeReachedSignal;
+  Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType      mFormRepostDecisionSignal;
+  Dali::Toolkit::WebView::WebViewFrameRenderedSignalType           mFrameRenderedSignal;
+  Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType      mRequestInterceptorSignal;
+  Dali::Toolkit::WebView::WebViewConsoleMessageSignalType          mConsoleMessageSignal;
+  Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType          mPolicyDecisionSignal;
+  Dali::Toolkit::WebView::WebViewCertificateSignalType             mCertificateConfirmSignal;
+  Dali::Toolkit::WebView::WebViewCertificateSignalType             mSslCertificateChangedSignal;
+  Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType         mHttpAuthHandlerSignal;
+  Dali::Toolkit::WebView::WebViewContextMenuCustomizedSignalType   mContextMenuCustomizedSignal;
+  Dali::Toolkit::WebView::WebViewContextMenuItemSelectedSignalType mContextMenuItemSelectedSignal;
 
   std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
   std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
