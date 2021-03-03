@@ -515,6 +515,11 @@ IF( ENABLE_COVERAGE )
   ENDIF( LCOV_BIN )
 ENDIF()
 
+IF ( BUILD_SCENE_LOADER )
+  ADD_SUBDIRECTORY( ${CMAKE_CURRENT_SOURCE_DIR}/dali-scene-loader )
+ENDIF()
+
+
 # Build documentation if doxygen tool is available
 SET( doxygenEnabled OFF )
 IF( DOXYGEN_FOUND )
@@ -527,14 +532,29 @@ IF( DOXYGEN_FOUND )
   SET( DOXYGEN_INTERNAL_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/docs-internal )
   CONFIGURE_FILE( ${DOXYGEN_SRC_DIR}/dali.doxy.in ${DOXYGEN_SRC_DIR}/dali.doxy @ONLY )
   CONFIGURE_FILE( ${DOXYGEN_INTERNAL_SRC_DIR}/dali-internal.doxy.in ${DOXYGEN_INTERNAL_SRC_DIR}/dali-internal.doxy @ONLY )
-  ADD_CUSTOM_TARGET( doc_doxygen ALL
-                     DEPENDS ${name}
-                     COMMAND ${DOXYGEN_EXECUTABLE} -u ${DOXYGEN_SRC_DIR}/dali.doxy
-                     COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_SRC_DIR}/dali.doxy
-                     COMMAND ${CMAKE_COMMAND} -P ${DOXYGEN_SRC_DIR}/check_for_errors.cmake
-                     COMMENT "Generating API documentation with Doxygen"
-                     WORKING_DIRECTORY ${DOXYGEN_SRC_DIR}
-                     VERBATIM )
+
+  IF ( BUILD_SCENE_LOADER )
+    ADD_CUSTOM_TARGET( doc_doxygen ALL
+      DEPENDS ${name} dali2-scene-loader
+      COMMAND ${DOXYGEN_EXECUTABLE} -u ${DOXYGEN_SRC_DIR}/dali.doxy
+      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_SRC_DIR}/dali.doxy
+      COMMAND ${CMAKE_COMMAND} -P ${DOXYGEN_SRC_DIR}/check_for_errors.cmake
+      COMMENT "Generating API documentation with Doxygen"
+      WORKING_DIRECTORY ${DOXYGEN_SRC_DIR}
+      VERBATIM )
+  ELSE()
+    ADD_CUSTOM_TARGET( doc_doxygen ALL
+      DEPENDS ${name}
+      COMMAND ${DOXYGEN_EXECUTABLE} -u ${DOXYGEN_SRC_DIR}/dali.doxy
+      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_SRC_DIR}/dali.doxy
+      COMMAND ${CMAKE_COMMAND} -P ${DOXYGEN_SRC_DIR}/check_for_errors.cmake
+      COMMENT "Generating API documentation with Doxygen"
+      WORKING_DIRECTORY ${DOXYGEN_SRC_DIR}
+      VERBATIM )
+  ENDIF()
+
+  # Following target is optional - it doesn't run by default
+  # Build using "make doc_doxygen_internal".
   ADD_CUSTOM_TARGET( doc_doxygen_internal
                      COMMAND ${DOXYGEN_EXECUTABLE} -u ${DOXYGEN_INTERNAL_SRC_DIR}/dali-internal.doxy
                      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_INTERNAL_SRC_DIR}/dali-internal.doxy
@@ -549,9 +569,6 @@ IF( CONFIGURE_AUTOMATED_TESTS )
                   ${ROOT_SRC_DIR}/automated-tests/CMakeLists.txt @ONLY )
 ENDIF()
 
-IF ( BUILD_SCENE_LOADER )
-  ADD_SUBDIRECTORY( ${CMAKE_CURRENT_SOURCE_DIR}/dali-scene-loader )
-ENDIF()
 
 # Configuration Messages
 MESSAGE( STATUS "Configuration:\n" )
