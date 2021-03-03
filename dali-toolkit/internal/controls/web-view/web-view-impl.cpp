@@ -58,15 +58,20 @@ BaseHandle Create()
 // clang-format off
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::WebView, Toolkit::Control, Create)
 
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "url",                STRING,  URL                 )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "userAgent",          STRING,  USER_AGENT          )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "scrollPosition",     VECTOR2, SCROLL_POSITION     )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "scrollSize",         VECTOR2, SCROLL_SIZE         )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "contentSize",        VECTOR2, CONTENT_SIZE        )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "title",              STRING,  TITLE               )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "videoHoleEnabled",   BOOLEAN, VIDEO_HOLE_ENABLED  )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "mouseEventsEnabled", BOOLEAN, MOUSE_EVENTS_ENABLED)
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "keyEventsEnabled",   BOOLEAN, KEY_EVENTS_ENABLED  )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "url",                     STRING,  URL                       )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "userAgent",               STRING,  USER_AGENT                )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "scrollPosition",          VECTOR2, SCROLL_POSITION           )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "scrollSize",              VECTOR2, SCROLL_SIZE               )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "contentSize",             VECTOR2, CONTENT_SIZE              )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "title",                   STRING,  TITLE                     )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "videoHoleEnabled",        BOOLEAN, VIDEO_HOLE_ENABLED        )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "mouseEventsEnabled",      BOOLEAN, MOUSE_EVENTS_ENABLED      )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "keyEventsEnabled",        BOOLEAN, KEY_EVENTS_ENABLED        )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "documentBackgroundColor", VECTOR4, DOCUMENT_BACKGROUND_COLOR )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "tilesClearedWhenHidden",  BOOLEAN, TILES_CLEARED_WHEN_HIDDEN )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "tileCoverAreaMultiplier", FLOAT,   TILE_COVER_AREA_MULTIPLIER)
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "cursorEnabledByClient",   BOOLEAN, CURSOR_ENABLED_BY_CLIENT  )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "selectedText",            STRING,  SELECTED_TEXT             )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadStarted",    PAGE_LOAD_STARTED_SIGNAL    )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadInProgress", PAGE_LOAD_IN_PROGRESS_SIGNAL)
@@ -97,9 +102,9 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mPageLoadStartedSignal(),
   mPageLoadFinishedSignal(),
   mPageLoadErrorSignal(),
+  mUrlChangedSignal(),
   mVideoHoleEnabled(true),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
-  mUrlChangedSignal(),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true)
 {
@@ -121,9 +126,9 @@ WebView::WebView(int argc, char** argv)
   mPageLoadStartedSignal(),
   mPageLoadFinishedSignal(),
   mPageLoadErrorSignal(),
+  mUrlChangedSignal(),
   mVideoHoleEnabled(true),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
-  mUrlChangedSignal(),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true)
 {
@@ -695,6 +700,42 @@ void WebView::SetProperty(BaseObject* object, Property::Index index, const Prope
         }
         break;
       }
+      case Toolkit::WebView::Property::DOCUMENT_BACKGROUND_COLOR:
+      {
+        Vector4 input;
+        if(value.Get(input))
+        {
+          impl.SetDocumentBackgroundColor(input);
+        }
+        break;
+      }
+      case Toolkit::WebView::Property::TILES_CLEARED_WHEN_HIDDEN:
+      {
+        bool input;
+        if(value.Get(input))
+        {
+          impl.ClearTilesWhenHidden(input);
+        }
+        break;
+      }
+      case Toolkit::WebView::Property::TILE_COVER_AREA_MULTIPLIER:
+      {
+        float input;
+        if(value.Get(input))
+        {
+          impl.SetTileCoverAreaMultiplier(input);
+        }
+        break;
+      }
+      case Toolkit::WebView::Property::CURSOR_ENABLED_BY_CLIENT:
+      {
+        bool input;
+        if(value.Get(input))
+        {
+          impl.EnableCursorByClient(input);
+        }
+        break;
+      }
     }
   }
 }
@@ -753,6 +794,11 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
       case Toolkit::WebView::Property::KEY_EVENTS_ENABLED:
       {
         value = impl.mKeyEventsEnabled;
+        break;
+      }
+      case Toolkit::WebView::Property::SELECTED_TEXT:
+      {
+        value = impl.GetSelectedText();
         break;
       }
       default:
@@ -851,6 +897,43 @@ Dali::Vector2 WebView::GetContentSize() const
 std::string WebView::GetTitle() const
 {
   return mWebEngine ? mWebEngine.GetTitle() : kEmptyString;
+}
+
+void WebView::SetDocumentBackgroundColor(Dali::Vector4 color)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SetDocumentBackgroundColor(color);
+  }
+}
+
+void WebView::ClearTilesWhenHidden(bool cleared)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.ClearTilesWhenHidden(cleared);
+  }
+}
+
+void WebView::SetTileCoverAreaMultiplier(float multiplier)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SetTileCoverAreaMultiplier(multiplier);
+  }
+}
+
+void WebView::EnableCursorByClient(bool enabled)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.EnableCursorByClient(enabled);
+  }
+}
+
+std::string WebView::GetSelectedText() const
+{
+  return mWebEngine ? mWebEngine.GetSelectedText() : kEmptyString;
 }
 
 const std::string& WebView::GetUserAgent() const

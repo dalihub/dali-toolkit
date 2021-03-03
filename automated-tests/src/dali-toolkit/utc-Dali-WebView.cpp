@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -631,9 +631,30 @@ int UtcDaliWebViewProperty9(void)
   END_TEST;
 }
 
+int UtcDaliWebViewPropertyBackgroundColorSelectedTextEtc(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Vector4 testValue = Dali::Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+  view.SetProperty(WebView::Property::DOCUMENT_BACKGROUND_COLOR, testValue);
+  view.SetProperty(WebView::Property::TILES_CLEARED_WHEN_HIDDEN, true);
+  view.SetProperty(WebView::Property::TILE_COVER_AREA_MULTIPLIER, 1.0f);
+  view.SetProperty(WebView::Property::CURSOR_ENABLED_BY_CLIENT, true);
+
+  // Check default value
+  std::string testText("test");
+  std::string output;
+  view.GetProperty(WebView::Property::SELECTED_TEXT).Get(output);
+  DALI_TEST_EQUALS(output, testText, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliWebViewPropertyTitleFavicon(void)
 {
-  // SCROLL_POSITION
   ToolkitTestApplication application;
 
   char argv[] = "--test";

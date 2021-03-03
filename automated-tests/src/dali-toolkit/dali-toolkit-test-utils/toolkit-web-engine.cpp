@@ -1072,6 +1072,27 @@ void WebEngine::SetSize( int width, int height )
 {
 }
 
+void WebEngine::SetDocumentBackgroundColor(Dali::Vector4 color)
+{
+}
+
+void WebEngine::ClearTilesWhenHidden(bool cleared)
+{
+}
+
+void WebEngine::SetTileCoverAreaMultiplier(float multiplier)
+{
+}
+
+void WebEngine::EnableCursorByClient(bool enabled)
+{
+}
+
+std::string WebEngine::GetSelectedText() const
+{
+  return "test";
+}
+
 bool WebEngine::SendTouchEvent( const TouchEvent& touch )
 {
   return true;
