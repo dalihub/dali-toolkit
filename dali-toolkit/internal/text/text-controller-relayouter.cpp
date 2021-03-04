@@ -651,7 +651,9 @@ void Controller::Relayouter::CalculateVerticalOffset(Controller& controller, con
     layoutSize.height = defaultFontLineHeight;
   }
 
-  if (layoutSize.height != defaultFontLineHeight)
+  // Whether the text control is editable
+  const bool isEditable = NULL != impl.mEventData;
+  if (isEditable && layoutSize.height != defaultFontLineHeight)
   {
     // This code prevents the wrong positioning of cursor when the layout size is bigger/smaller than defaultFontLineHeight.
     // This situation occurs when the size of placeholder text is different from the default text.
