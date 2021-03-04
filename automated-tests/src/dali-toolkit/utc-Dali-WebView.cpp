@@ -55,6 +55,9 @@ static int gEvaluateJavaScriptCallbackCalled = 0;
 static int gJavaScriptAlertCallbackCalled = 0;
 static int gJavaScriptConfirmCallbackCalled = 0;
 static int gJavaScriptPromptCallbackCalled = 0;
+static int gScreenshotCapturedCallbackCalled = 0;
+static int gVideoPlayingCallbackCalled = 0;
+static int gGeolocationPermissionCallbackCalled = 0;
 static bool gTouched = false;
 static bool gHovered = false;
 static bool gWheelEventHandled = false;
@@ -125,6 +128,22 @@ static bool OnJavaScriptConfirm( const std::string& result )
 static bool OnJavaScriptPrompt( const std::string& meesage1, const std::string& message2 )
 {
   gJavaScriptPromptCallbackCalled++;
+  return true;
+}
+
+static void OnScreenshotCaptured(Dali::Toolkit::ImageView)
+{
+  gScreenshotCapturedCallbackCalled++;
+}
+
+static void OnVideoPlaying(bool isPlaying)
+{
+  gVideoPlayingCallbackCalled++;
+}
+
+static bool OnGeolocationPermission(const std::string&, const std::string&)
+{
+  gGeolocationPermissionCallbackCalled++;
   return true;
 }
 
@@ -361,6 +380,82 @@ int UtcDaliWebViewFocusGainedAndLost(void)
   // reset
   view.ClearKeyInputFocus();
   DALI_TEST_CHECK( !view.HasKeyInputFocus() );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewPropertyPageZoomFactor(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+
+  view.SetProperty( WebView::Property::PAGE_ZOOM_FACTOR, 1.5f);
+  float zoomFactor = view.GetProperty<float>( WebView::Property::PAGE_ZOOM_FACTOR );
+  DALI_TEST_EQUALS( zoomFactor, 1.5f, TEST_LOCATION );
+
+  view.SetProperty( WebView::Property::PAGE_ZOOM_FACTOR, 1.0f);
+  zoomFactor = view.GetProperty<float>( WebView::Property::PAGE_ZOOM_FACTOR );
+  DALI_TEST_EQUALS( zoomFactor, 1.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewPropertyTextZoomFactor(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+
+  view.SetProperty( WebView::Property::TEXT_ZOOM_FACTOR, 1.5f);
+  float zoomFactor = view.GetProperty<float>( WebView::Property::TEXT_ZOOM_FACTOR );
+  DALI_TEST_EQUALS( zoomFactor, 1.5f, TEST_LOCATION );
+
+  view.SetProperty( WebView::Property::TEXT_ZOOM_FACTOR, 1.0f);
+  zoomFactor = view.GetProperty<float>( WebView::Property::TEXT_ZOOM_FACTOR );
+  DALI_TEST_EQUALS( zoomFactor, 1.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewPropertyLoadProgressPercentage(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+
+  float percentage = view.GetProperty<float>( WebView::Property::LOAD_PROGRESS_PERCENTAGE );
+  DALI_TEST_EQUALS( percentage, 0.5f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -767,6 +862,107 @@ int UtcDaliWebViewScrollBy(void)
   DALI_TEST_EQUALS( gScrollEdgeReachedCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_CHECK( signal1 );
 
+  // scroll by and trigger scrollEdgeReached event.
+  bool result = view.ScrollEdgeBy( 50, 50 );
+  DALI_TEST_CHECK( result );
+  Test::EmitGlobalTimerSignal();
+
+  view.GetProperty( WebView::Property::SCROLL_POSITION ).Get( output );
+  DALI_TEST_CHECK( output.x == 200 && output.y == 200 );
+  DALI_TEST_EQUALS( gScrollEdgeReachedCallbackCalled, 2, TEST_LOCATION );
+  DALI_TEST_CHECK( signal1 );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewSetGetScaleFactorActivateAccessibility(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+
+  view.ActivateAccessibility(true);
+  view.AddDynamicCertificatePath("host", "test/to/path");
+  bool found = view.HighlightText("test", Dali::WebEnginePlugin::FindOption::CASE_INSENSITIVE, 2);
+  DALI_TEST_CHECK( found );
+
+  view.SetScaleFactor(1.5f, Dali::Vector2(0.0f, 0.0f));
+  float result = view.GetScaleFactor();
+  DALI_TEST_EQUALS( result, 1.5f, TEST_LOCATION );
+
+  view.SetScaleFactor(1.0f, Dali::Vector2(0.0f, 0.0f));
+  result = view.GetScaleFactor();
+  DALI_TEST_EQUALS( result, 1.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewGetScreenshotSyncAndAsync(void)
+{
+  // SCROLL_POSITION
+  ToolkitTestApplication application;
+
+  char argv[] = "--test";
+  WebView view = WebView::New( 1, (char**)&argv );
+  DALI_TEST_CHECK( view );
+
+  // Check GetScreenshot
+  Dali::Rect<int> viewArea;
+  viewArea.x = 100;
+  viewArea.y = 100;
+  viewArea.width = 10;
+  viewArea.height = 10;
+  Dali::Toolkit::ImageView screenshot = view.GetScreenshot(viewArea, 1.0f);
+  DALI_TEST_CHECK( screenshot );
+  Dali::Vector3 shotsize = screenshot.GetProperty< Vector3 >( Dali::Actor::Property::SIZE );
+  DALI_TEST_CHECK( ( int )shotsize.width == viewArea.width && ( int )shotsize.height == viewArea.height );
+
+  // Check GetScreenshotAsynchronously
+  viewArea.x = 100;
+  viewArea.y = 100;
+  viewArea.width = 100;
+  viewArea.height = 100;
+  bool result = view.GetScreenshotAsynchronously(viewArea, 1.0f, &OnScreenshotCaptured);
+  DALI_TEST_CHECK( result );
+
+  Test::EmitGlobalTimerSignal();
+
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gScreenshotCapturedCallbackCalled, 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewVideoPlayingGeolocationPermission(void)
+{
+  // SCROLL_POSITION
+  ToolkitTestApplication application;
+
+  char argv[] = "--test";
+  WebView view = WebView::New( 1, (char**)&argv );
+  DALI_TEST_CHECK( view );
+
+  // Check CheckVideoPlayingAsynchronously
+  bool result = view.CheckVideoPlayingAsynchronously(&OnVideoPlaying);
+  DALI_TEST_CHECK( result );
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gVideoPlayingCallbackCalled, 1, TEST_LOCATION );
+
+  // Check RegisterGeolocationPermissionCallback
+  view.RegisterGeolocationPermissionCallback(&OnGeolocationPermission);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gGeolocationPermissionCallbackCalled, 1, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -809,6 +1005,71 @@ int UtcDaliWebViewJavaScriptAlertConfirmPrompt(void)
   view.JavaScriptPromptReply( "it is a prompt." );
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS( gJavaScriptPromptCallbackCalled, 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewLoadHtmlStringOverrideCurrentEntryAndContents(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New( "ko-KR", "Asia/Seoul" );
+  DALI_TEST_CHECK( view );
+
+  std::string html("<body>Hello World!</body>");
+  std::string basicUri("http://basicurl");
+  std::string unreachableUrl("http://unreachableurl");
+  bool result = view.LoadHtmlStringOverrideCurrentEntry( html, basicUri, unreachableUrl );
+  DALI_TEST_CHECK( result );
+
+  application.SendNotification();
+  application.Render();
+  Test::EmitGlobalTimerSignal();
+
+  result = view.LoadContents( html, html.length(), "html/text", "utf-8", basicUri );
+  DALI_TEST_CHECK( result );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewReloadSuspendResumeNetworkLoadingCustomHeader(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( view );
+
+  view.LoadUrl( "http://test.html" );
+  bool result = view.AddCustomHeader("key", "value");
+  DALI_TEST_CHECK( result );
+
+  result = view.ReloadWithoutCache();
+  DALI_TEST_CHECK( result );
+
+  uint32_t portNumber = view.StartInspectorServer(5000);
+  DALI_TEST_EQUALS( portNumber, 5000, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+  Test::EmitGlobalTimerSignal();
+
+  result = view.StopInspectorServer();
+  DALI_TEST_CHECK( result );
+
+  view.SuspendNetworkLoading();
+
+  result = view.RemoveCustomHeader("key");
+  DALI_TEST_CHECK( result );
+
+  view.ResumeNetworkLoading();
 
   END_TEST;
 }

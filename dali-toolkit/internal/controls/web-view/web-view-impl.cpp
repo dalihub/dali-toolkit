@@ -75,6 +75,9 @@ DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "tilesClearedWhenHidden",  BOOLEAN,
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "tileCoverAreaMultiplier", FLOAT,   TILE_COVER_AREA_MULTIPLIER)
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "cursorEnabledByClient",   BOOLEAN, CURSOR_ENABLED_BY_CLIENT  )
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "selectedText",            STRING,  SELECTED_TEXT             )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "pageZoomFactor",          FLOAT,   PAGE_ZOOM_FACTOR          )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "textZoomFactor",          FLOAT,   TEXT_ZOOM_FACTOR          )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "loadProgressPercentage",  FLOAT,   LOAD_PROGRESS_PERCENTAGE  )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadStarted",    PAGE_LOAD_STARTED_SIGNAL    )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadInProgress", PAGE_LOAD_IN_PROGRESS_SIGNAL)
@@ -194,6 +197,7 @@ void WebView::OnInitialize()
   self.TouchedSignal().Connect(this, &WebView::OnTouchEvent);
   self.HoveredSignal().Connect(this, &WebView::OnHoverEvent);
   self.WheelEventSignal().Connect(this, &WebView::OnWheelEvent);
+  Dali::DevelActor::VisibilityChangedSignal(self).Connect(this, &WebView::OnVisibilityChanged);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mSizeUpdateNotification     = self.AddPropertyNotification(Actor::Property::SIZE, StepCondition(1.0f, 1.0f));
@@ -245,10 +249,7 @@ Dali::Toolkit::ImageView& WebView::GetFavicon()
   if(mWebEngine)
   {
     Dali::PixelData pixelData = mWebEngine.GetFavicon();
-    std::string     url       = Dali::Toolkit::Image::GenerateUrl(pixelData);
-    mFaviconView              = Dali::Toolkit::ImageView::New(url);
-    mFaviconView.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
-    mFaviconView.SetProperty(Dali::Actor::Property::SIZE, Vector2(pixelData.GetWidth(), pixelData.GetHeight()));
+    mFaviconView              = CreateImageView(pixelData);
   }
   return mFaviconView;
 }
@@ -301,12 +302,67 @@ void WebView::LoadHtmlString(const std::string& htmlString)
   }
 }
 
+bool WebView::LoadHtmlStringOverrideCurrentEntry(const std::string& html, const std::string& basicUri, const std::string& unreachableUrl)
+{
+  if(!mWebEngine)
+    return false;
+
+  Texture           texture        = Dali::Texture::New(*mWebEngine.GetNativeImageSource());
+  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
+  mVisual                          = Toolkit::VisualFactory::Get().CreateVisual(
+    {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
+     {Toolkit::ImageVisual::Property::URL, nativeImageUrl}});
+
+  bool result = false;
+  if(mVisual)
+  {
+    DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
+    result = mWebEngine.LoadHtmlStringOverrideCurrentEntry(html, basicUri, unreachableUrl);
+  }
+
+  if(mVideoHoleEnabled)
+  {
+    EnableBlendMode(false);
+  }
+  return result;
+}
+
+bool WebView::LoadContents(const std::string& contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri)
+{
+  if(!mWebEngine)
+    return false;
+
+  Texture           texture        = Dali::Texture::New(*mWebEngine.GetNativeImageSource());
+  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
+  mVisual                          = Toolkit::VisualFactory::Get().CreateVisual(
+    {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
+     {Toolkit::ImageVisual::Property::URL, nativeImageUrl}});
+
+  bool result = false;
+  if(mVisual)
+  {
+    DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
+    result = mWebEngine.LoadContents(contents, contentSize, mimeType, encoding, baseUri);
+  }
+
+  if(mVideoHoleEnabled)
+  {
+    EnableBlendMode(false);
+  }
+  return result;
+}
+
 void WebView::Reload()
 {
   if(mWebEngine)
   {
     mWebEngine.Reload();
   }
+}
+
+bool WebView::ReloadWithoutCache()
+{
+  return mWebEngine ? mWebEngine.ReloadWithoutCache() : false;
 }
 
 void WebView::StopLoading()
@@ -333,12 +389,53 @@ void WebView::Resume()
   }
 }
 
+void WebView::SuspendNetworkLoading()
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SuspendNetworkLoading();
+  }
+}
+
+void WebView::ResumeNetworkLoading()
+{
+  if(mWebEngine)
+  {
+    mWebEngine.ResumeNetworkLoading();
+  }
+}
+
+bool WebView::AddCustomHeader(const std::string& name, const std::string& value)
+{
+  return mWebEngine ? mWebEngine.AddCustomHeader(name, value) : false;
+}
+
+bool WebView::RemoveCustomHeader(const std::string& name)
+{
+  return mWebEngine ? mWebEngine.RemoveCustomHeader(name) : false;
+}
+
+uint32_t WebView::StartInspectorServer(uint32_t port)
+{
+  return mWebEngine ? mWebEngine.StartInspectorServer(port) : false;
+}
+
+bool WebView::StopInspectorServer()
+{
+  return mWebEngine ? mWebEngine.StopInspectorServer() : false;
+}
+
 void WebView::ScrollBy(int deltaX, int deltaY)
 {
   if(mWebEngine)
   {
     mWebEngine.ScrollBy(deltaX, deltaY);
   }
+}
+
+bool WebView::ScrollEdgeBy(int deltaX, int deltaY)
+{
+  return mWebEngine ? mWebEngine.ScrollEdgeBy(deltaX, deltaY) : false;
 }
 
 bool WebView::CanGoForward()
@@ -439,6 +536,78 @@ void WebView::ClearHistory()
   }
 }
 
+void WebView::ClearAllTilesResources()
+{
+  if(mWebEngine)
+  {
+    mWebEngine.ClearAllTilesResources();
+  }
+}
+
+void WebView::SetScaleFactor(float scaleFactor, Dali::Vector2 point)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SetScaleFactor(scaleFactor, point);
+  }
+}
+
+float WebView::GetScaleFactor() const
+{
+  return mWebEngine ? mWebEngine.GetScaleFactor() : 0.0f;
+}
+
+void WebView::ActivateAccessibility(bool activated)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.ActivateAccessibility(activated);
+  }
+}
+
+bool WebView::HighlightText(const std::string& text, Dali::WebEnginePlugin::FindOption options, uint32_t maxMatchCount)
+{
+  return mWebEngine ? mWebEngine.HighlightText(text, options, maxMatchCount) : false;
+}
+
+void WebView::AddDynamicCertificatePath(const std::string& host, const std::string& certPath)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.AddDynamicCertificatePath(host, certPath);
+  }
+}
+
+Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor)
+{
+  Dali::Toolkit::ImageView imageView;
+  if(mWebEngine)
+  {
+    Dali::PixelData pixelData = mWebEngine.GetScreenshot(viewArea, scaleFactor);
+    imageView                 = CreateImageView(pixelData);
+  }
+  return imageView;
+}
+
+bool WebView::GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
+{
+  mScreenshotCapturedCallback = callback;
+  return mWebEngine ? mWebEngine.GetScreenshotAsynchronously(viewArea, scaleFactor, std::bind(&WebView::OnScreenshotCaptured, this, std::placeholders::_1)) : false;
+}
+
+bool WebView::CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback)
+{
+  return mWebEngine ? mWebEngine.CheckVideoPlayingAsynchronously(callback) : false;
+}
+
+void WebView::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterGeolocationPermissionCallback(callback);
+  }
+}
+
 void WebView::UpdateDisplayArea(Dali::PropertyNotification& /*source*/)
 {
   if(!mWebEngine)
@@ -492,12 +661,12 @@ void WebView::EnableBlendMode(bool blendEnabled)
   }
 }
 
-void WebView::ClearAllTilesResources()
+Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel)
 {
-  if(mWebEngine)
-  {
-    mWebEngine.ClearAllTilesResources();
-  }
+  std::string              url       = Dali::Toolkit::Image::GenerateUrl(pixel);
+  Dali::Toolkit::ImageView imageView = Dali::Toolkit::ImageView::New(url);
+  imageView.SetProperty(Dali::Actor::Property::SIZE, Vector2(pixel.GetWidth(), pixel.GetHeight()));
+  return imageView;
 }
 
 Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
@@ -610,6 +779,23 @@ void WebView::OnFrameRendered()
   {
     Dali::Toolkit::WebView handle(GetOwner());
     mFrameRenderedSignal.Emit(handle);
+  }
+}
+
+void WebView::OnVisibilityChanged(Actor actor, bool isVisible, Dali::DevelActor::VisibilityChange::Type type)
+{
+  if(type == Dali::DevelActor::VisibilityChange::Type::SELF)
+  {
+    SetVisibility(isVisible);
+  }
+}
+
+void WebView::OnScreenshotCaptured(Dali::PixelData pixel)
+{
+  if(mScreenshotCapturedCallback)
+  {
+    Dali::Toolkit::ImageView imageView = CreateImageView(pixel);
+    mScreenshotCapturedCallback(imageView);
   }
 }
 
@@ -782,6 +968,26 @@ void WebView::SetProperty(BaseObject* object, Property::Index index, const Prope
         }
         break;
       }
+      case Toolkit::WebView::Property::PAGE_ZOOM_FACTOR:
+      {
+        float input;
+        if(value.Get(input))
+        {
+          impl.SetPageZoomFactor(input);
+        }
+        break;
+      }
+      case Toolkit::WebView::Property::TEXT_ZOOM_FACTOR:
+      {
+        float input;
+        if(value.Get(input))
+        {
+          impl.SetTextZoomFactor(input);
+        }
+        break;
+      }
+      default:
+        break;
     }
   }
 }
@@ -845,6 +1051,21 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
       case Toolkit::WebView::Property::SELECTED_TEXT:
       {
         value = impl.GetSelectedText();
+        break;
+      }
+      case Toolkit::WebView::Property::PAGE_ZOOM_FACTOR:
+      {
+        value = impl.GetPageZoomFactor();
+        break;
+      }
+      case Toolkit::WebView::Property::TEXT_ZOOM_FACTOR:
+      {
+        value = impl.GetTextZoomFactor();
+        break;
+      }
+      case Toolkit::WebView::Property::LOAD_PROGRESS_PERCENTAGE:
+      {
+        value = impl.GetLoadProgressPercentage();
         break;
       }
       default:
@@ -1011,6 +1232,42 @@ void WebView::EnableKeyEvents(bool enabled)
     mKeyEventsEnabled = enabled;
     mWebEngine.EnableKeyEvents(enabled);
   }
+}
+
+void WebView::SetPageZoomFactor(float zoomFactor)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SetPageZoomFactor(zoomFactor);
+  }
+}
+
+float WebView::GetPageZoomFactor() const
+{
+  return mWebEngine ? mWebEngine.GetPageZoomFactor() : 0.0f;
+}
+
+void WebView::SetTextZoomFactor(float zoomFactor)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SetTextZoomFactor(zoomFactor);
+  }
+}
+
+float WebView::GetTextZoomFactor() const
+{
+  return mWebEngine ? mWebEngine.GetTextZoomFactor() : 0.0f;
+}
+
+float WebView::GetLoadProgressPercentage() const
+{
+  return mWebEngine ? mWebEngine.GetLoadProgressPercentage() : 0.0f;
+}
+
+bool WebView::SetVisibility(bool visible)
+{
+  return mWebEngine ? mWebEngine.SetVisibility(visible) : false;
 }
 
 #undef GET_ENUM_STRING

@@ -29,6 +29,7 @@
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-object.h>
 #include <memory>
+#include <string.h>
 #include <toolkit-application.h>
 
 namespace Dali
@@ -58,6 +59,9 @@ bool OnJavaScriptAlert();
 bool OnJavaScriptConfirm();
 bool OnJavaScriptPrompt();
 bool OnScrollEdge();
+bool OnScreenshotCaptured();
+bool OnVideoPlaying();
+bool OnGeolocationPermission();
 bool OnClearHistory();
 
 static void ConnectToGlobalSignal( bool ( *func )() )
@@ -466,9 +470,6 @@ class WebEngine: public Dali::BaseObject
 public:
 
   using JavaScriptEvaluatedResultCallback = std::function<void(const std::string&)>;
-  using JavaScriptAlertCallback = std::function<bool(const std::string&)>;
-  using JavaScriptConfirmCallback = std::function<bool(const std::string&)>;
-  using JavaScriptPromptCallback = std::function<bool(const std::string&, const std::string&)>;
 
   WebEngine()
     : mUrl()
@@ -650,6 +651,16 @@ public:
     }
   }
 
+  bool ScrollEdgeBy( int dx, int dy )
+  {
+    mScrollPosition += Dali::Vector2( dx, dy );
+    if ( mScrollPosition.y + mScrollSize.height > mContentSize.height )
+    {
+      ConnectToGlobalSignal( &OnScrollEdge );
+    }
+    return true;
+  }
+
   void SetScrollPosition( int x, int y )
   {
     mScrollPosition.x = x;
@@ -668,7 +679,81 @@ public:
 
   Dali::Vector2 GetContentSize() const
   {
-    return  mContentSize;
+    return mContentSize;
+  }
+
+  void SetPageZoomFactor(float zoomFactor)
+  {
+    mPageZoomFactor = zoomFactor;
+  }
+
+  float GetPageZoomFactor() const
+  {
+    return mPageZoomFactor;
+  }
+
+  void SetTextZoomFactor(float zoomFactor)
+  {
+    mTextZoomFactor = zoomFactor;
+  }
+
+  float GetTextZoomFactor() const
+  {
+    return mTextZoomFactor;
+  }
+
+  float GetLoadProgressPercentage() const
+  {
+    return 0.5f;
+  }
+
+  void SetScaleFactor(float scaleFactor, Dali::Vector2 point)
+  {
+    mScaleFactor = scaleFactor;
+  }
+
+  float GetScaleFactor() const
+  {
+    return mScaleFactor;
+  }
+
+  Dali::PixelData GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor)
+  {
+    uint32_t bufferSize = viewArea.width * viewArea.height * 4 ;
+    uint8_t* pixel = new uint8_t[ bufferSize ];
+    memset(pixel, 0xff, bufferSize);
+    return Dali::PixelData::New( pixel, bufferSize, viewArea.width, viewArea.height,
+                                 Dali::Pixel::Format::RGBA8888,
+                                 Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
+  }
+
+  bool GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
+  {
+    if ( callback )
+    {
+      ConnectToGlobalSignal( &OnScreenshotCaptured );
+      mScreenshotCapturedCallback = callback;
+    }
+    return true;
+  }
+
+  bool CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback)
+  {
+    if ( callback )
+    {
+      ConnectToGlobalSignal( &OnVideoPlaying );
+      mVideoPlayingCallback = callback;
+    }
+    return true;
+  }
+
+  void RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback)
+  {
+    if ( callback )
+    {
+      ConnectToGlobalSignal( &OnGeolocationPermission );
+      mGeolocationPermissionCallback = callback;
+    }
   }
 
   Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadStartedSignal()
@@ -721,6 +806,9 @@ public:
   Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType    mPageLoadErrorSignal;
   std::vector<JavaScriptEvaluatedResultCallback>             mResultCallbacks;
   bool                                                       mEvaluating;
+  float                                                      mPageZoomFactor;
+  float                                                      mTextZoomFactor;
+  float                                                      mScaleFactor;
 
   Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType  mScrollEdgeReachedSignal;
   Dali::Vector2                                                mScrollPosition;
@@ -734,9 +822,12 @@ public:
   Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType mFormRepostDecisionSignal;
   Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType      mFrameRenderedSignal;
 
-  JavaScriptAlertCallback                                     mJavaScriptAlertCallback;
-  JavaScriptConfirmCallback                                   mJavaScriptConfirmCallback;
-  JavaScriptPromptCallback                                    mJavaScriptPromptCallback;
+  Dali::WebEnginePlugin::JavaScriptAlertCallback              mJavaScriptAlertCallback;
+  Dali::WebEnginePlugin::JavaScriptConfirmCallback            mJavaScriptConfirmCallback;
+  Dali::WebEnginePlugin::JavaScriptPromptCallback             mJavaScriptPromptCallback;
+  Dali::WebEnginePlugin::ScreenshotCapturedCallback           mScreenshotCapturedCallback;
+  Dali::WebEnginePlugin::VideoPlayingCallback                 mVideoPlayingCallback;
+  Dali::WebEnginePlugin::GeolocationPermissionCallback        mGeolocationPermissionCallback;
 };
 
 
@@ -842,6 +933,41 @@ bool OnJavaScriptPrompt()
   if ( gInstance )
   {
     gInstance->mJavaScriptPromptCallback( "this is a prompt pompt.", "" );
+  }
+  return false;
+}
+
+bool OnScreenshotCaptured()
+{
+  DisconnectFromGlobalSignal( &OnScreenshotCaptured );
+  if ( gInstance )
+  {
+    uint8_t* pixel = new uint8_t[ 2 * 2 * 4 ];
+    memset(pixel, 0xff, 2 * 2 * 4);
+    Dali::PixelData data = Dali::PixelData::New( pixel, 2 * 2 * 4, 2, 2,
+                                 Dali::Pixel::Format::RGBA8888,
+                                 Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
+    gInstance->mScreenshotCapturedCallback( data );
+  }
+  return false;
+}
+
+bool OnVideoPlaying()
+{
+  DisconnectFromGlobalSignal( &OnVideoPlaying );
+  if ( gInstance )
+  {
+    gInstance->mVideoPlayingCallback( true );
+  }
+  return false;
+}
+
+bool OnGeolocationPermission()
+{
+  DisconnectFromGlobalSignal( &OnGeolocationPermission );
+  if ( gInstance )
+  {
+    gInstance->mGeolocationPermissionCallback( "", "" );
   }
   return false;
 }
@@ -980,8 +1106,23 @@ void WebEngine::LoadHtmlString( const std::string& htmlString )
 {
 }
 
+bool WebEngine::LoadHtmlStringOverrideCurrentEntry(const std::string& html, const std::string& basicUri, const std::string& unreachableUrl)
+{
+  return true;
+}
+
+bool WebEngine::LoadContents(const std::string& contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri)
+{
+  return true;
+}
+
 void WebEngine::Reload()
 {
+}
+
+bool WebEngine::ReloadWithoutCache()
+{
+  return true;
 }
 
 void WebEngine::StopLoading()
@@ -994,6 +1135,34 @@ void WebEngine::Suspend()
 
 void WebEngine::Resume()
 {
+}
+
+void WebEngine::SuspendNetworkLoading()
+{
+}
+
+void WebEngine::ResumeNetworkLoading()
+{
+}
+
+bool WebEngine::AddCustomHeader(const std::string& name, const std::string& value)
+{
+  return true;
+}
+
+bool WebEngine::RemoveCustomHeader(const std::string& name)
+{
+  return true;
+}
+
+uint32_t WebEngine::StartInspectorServer(uint32_t port)
+{
+  return port;
+}
+
+bool WebEngine::StopInspectorServer()
+{
+  return true;
 }
 
 bool WebEngine::CanGoForward()
@@ -1061,6 +1230,49 @@ void WebEngine::ClearHistory()
   Internal::Adaptor::GetImplementation( *this ).ClearHistory();
 }
 
+void WebEngine::SetScaleFactor(float scaleFactor, Dali::Vector2 point)
+{
+  Internal::Adaptor::GetImplementation( *this ).SetScaleFactor(scaleFactor, point);
+}
+
+float WebEngine::GetScaleFactor() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetScaleFactor();
+}
+
+void WebEngine::ActivateAccessibility(bool activated)
+{
+}
+
+bool WebEngine::HighlightText(const std::string& text, Dali::WebEnginePlugin::FindOption options, uint32_t maxMatchCount)
+{
+  return true;
+}
+
+void WebEngine::AddDynamicCertificatePath(const std::string& host, const std::string& certPath)
+{
+}
+
+Dali::PixelData WebEngine::GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor)
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetScreenshot(viewArea, scaleFactor);
+}
+
+bool WebEngine::GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetScreenshotAsynchronously(viewArea, scaleFactor, callback);
+}
+
+bool WebEngine::CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback)
+{
+  return Internal::Adaptor::GetImplementation( *this ).CheckVideoPlayingAsynchronously(callback);
+}
+
+void WebEngine::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback)
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterGeolocationPermissionCallback(callback);
+}
+
 const std::string& WebEngine::GetUserAgent() const
 {
   return Internal::Adaptor::GetImplementation( *this ).GetUserAgent();
@@ -1074,6 +1286,11 @@ void WebEngine::SetUserAgent( const std::string& userAgent )
 void WebEngine::ScrollBy( int dx, int dy )
 {
   Internal::Adaptor::GetImplementation( *this ).ScrollBy( dx, dy );
+}
+
+bool WebEngine::ScrollEdgeBy( int dx, int dy )
+{
+  return Internal::Adaptor::GetImplementation( *this ).ScrollEdgeBy( dx, dy );
 }
 
 void WebEngine::SetScrollPosition( int x, int y )
@@ -1143,6 +1360,31 @@ bool WebEngine::SendWheelEvent( const WheelEvent& event )
 
 void WebEngine::SetFocus( bool focused )
 {
+}
+
+void WebEngine::SetPageZoomFactor(float zoomFactor)
+{
+  Internal::Adaptor::GetImplementation( *this ).SetPageZoomFactor(zoomFactor);
+}
+
+float WebEngine::GetPageZoomFactor() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetPageZoomFactor();
+}
+
+void WebEngine::SetTextZoomFactor(float zoomFactor)
+{
+  Internal::Adaptor::GetImplementation( *this ).SetTextZoomFactor(zoomFactor);
+}
+
+float WebEngine::GetTextZoomFactor() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetTextZoomFactor();
+}
+
+float WebEngine::GetLoadProgressPercentage() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetLoadProgressPercentage();
 }
 
 void WebEngine::UpdateDisplayArea( Dali::Rect< int > displayArea )
