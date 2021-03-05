@@ -2838,12 +2838,28 @@ bool Controller::DoRelayout( const Size& size,
 
 void Controller::CalculateVerticalOffset( const Size& controlSize )
 {
-  Size layoutSize = mImpl->mModel->mVisualModel->GetLayoutSize();
+  ModelPtr&       model         = mImpl->mModel;
+  VisualModelPtr& visualModel   = model->mVisualModel;
+  Size            layoutSize    = mImpl->mModel->mVisualModel->GetLayoutSize();
+  Size            oldLayoutSize = layoutSize;
+  float           offsetY       = 0.f;
+  bool            needRecalc    = false;
+  float           defaultFontLineHeight = mImpl->GetDefaultFontLineHeight();
 
   if( fabsf( layoutSize.height ) < Math::MACHINE_EPSILON_1000 )
   {
     // Get the line height of the default font.
-    layoutSize.height = mImpl->GetDefaultFontLineHeight();
+    layoutSize.height = defaultFontLineHeight;
+  }
+
+  // Whether the text control is editable
+  const bool isEditable = NULL != mImpl->mEventData;
+  if ( isEditable && layoutSize.height != defaultFontLineHeight )
+  {
+    // This code prevents the wrong positioning of cursor when the layout size is bigger/smaller than defaultFontLineHeight.
+    // This situation occurs when the size of placeholder text is different from the default text.
+    layoutSize.height = defaultFontLineHeight;
+    needRecalc = true;
   }
 
   switch( mImpl->mModel->mVerticalAlignment )
@@ -2851,17 +2867,31 @@ void Controller::CalculateVerticalOffset( const Size& controlSize )
     case VerticalAlignment::TOP:
     {
       mImpl->mModel->mScrollPosition.y = 0.f;
+      offsetY = 0.f;
       break;
     }
     case VerticalAlignment::CENTER:
     {
       mImpl->mModel->mScrollPosition.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
+      if ( needRecalc ) offsetY        = floorf( 0.5f * ( layoutSize.height - oldLayoutSize.height ) );
       break;
     }
     case VerticalAlignment::BOTTOM:
     {
       mImpl->mModel->mScrollPosition.y = controlSize.height - layoutSize.height;
+      if ( needRecalc ) offsetY        = layoutSize.height - oldLayoutSize.height;
       break;
+    }
+  }
+
+  if ( needRecalc )
+  {
+    // Update glyphPositions according to recalculation.
+    const Length positionCount = visualModel->mGlyphPositions.Count();
+    Vector<Vector2>& glyphPositions = visualModel->mGlyphPositions;
+    for( Length index = 0u; index < positionCount; index++ )
+    {
+      glyphPositions[index].y += offsetY;
     }
   }
 }
