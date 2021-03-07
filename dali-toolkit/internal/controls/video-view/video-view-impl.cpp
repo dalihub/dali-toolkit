@@ -577,6 +577,9 @@ void VideoView::SetWindowSurfaceTarget()
     return;
   }
 
+  Dali::Window window = DevelWindow::Get(self);
+  window.ResizeSignal().Connect(this, &VideoView::OnWindowResized);
+
   int curPos = mVideoPlayer.GetPlayPosition();
 
   if(mIsPlay)
@@ -780,6 +783,17 @@ void VideoView::OnAnimationFinished(Animation& animation)
 {
   // send desync
   SetFrameRenderCallback();
+}
+
+void VideoView::OnWindowResized(Dali::Window winHandle, Dali::Window::WindowSize size)
+{
+  Dali::VideoPlayerPlugin::DisplayRotation videoAngle  = mVideoPlayer.GetDisplayRotation();
+  int                                      windowAngle = (DevelWindow::GetPhysicalOrientation(winHandle) / 90);
+
+  if(windowAngle != videoAngle)
+  {
+    mVideoPlayer.SetDisplayRotation(static_cast<Dali::VideoPlayerPlugin::DisplayRotation>(windowAngle));
+  }
 }
 
 void VideoView::PlayAnimation(Dali::Animation animation)
