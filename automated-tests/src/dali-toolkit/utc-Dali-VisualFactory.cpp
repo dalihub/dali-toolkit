@@ -181,6 +181,14 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualFactoryGetColorVisual1:  Request color visual with a Property::Map" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("mixColor", Property::Type::VECTOR3),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
@@ -210,6 +218,14 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualFactoryGetColorVisual2: Request color visual with a Vector4" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("mixColor", Property::Type::VECTOR3),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -242,6 +258,15 @@ int UtcDaliVisualFactoryGetBorderVisual1(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualFactoryGetBorderVisual1:  Request border visual with a Property::Map" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("borderColor", Property::Type::VECTOR4),
+    UniformData("borderSize", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -290,6 +315,15 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualFactoryGetBorderVisual2:  Request border visual with a borderSize and a borderColor" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("borderColor", Property::Type::VECTOR4),
+    UniformData("borderSize", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -353,6 +387,14 @@ int UtcDaliVisualFactoryGetLinearGradientVisual(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryGetRadialGradientVisual");
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uAlignmentMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
@@ -389,6 +431,14 @@ int UtcDaliVisualFactoryGetRadialGradientVisual(void)
 {
   ToolkitTestApplication application;
   tet_infoline("UtcDaliVisualFactoryGetRadialGradientVisual");
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uAlignmentMatrix", Property::Type::MATRIX3),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -1420,6 +1470,13 @@ int UtcDaliVisualFactoryGetMeshVisual1(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetMeshVisual1:  Request mesh visual with a valid object file only" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1441,6 +1498,14 @@ int UtcDaliVisualFactoryGetMeshVisual2(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetMeshVisual2:  Request mesh visual with blank material file and images directory" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
@@ -1461,6 +1526,14 @@ int UtcDaliVisualFactoryGetMeshVisual3b(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetMeshVisual3:  Request mesh visual with all parameters correct" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1486,6 +1559,14 @@ int UtcDaliVisualFactoryGetMeshVisual3(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetMeshVisual3:  Request mesh visual with all parameters correct" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
@@ -1510,6 +1591,13 @@ int UtcDaliVisualFactoryGetMeshVisual4(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetMeshVisual4:  Request mesh visual with diffuse texture but not normal or gloss." );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1531,6 +1619,14 @@ int UtcDaliVisualFactoryGetMeshVisual5(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetMeshVisual5:  Request mesh visual and make it only use diffuse textures." );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1558,6 +1654,14 @@ int UtcDaliVisualFactoryGetMeshVisual6(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetMeshVisual6:  Request mesh visual and make it not use any textures." );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
@@ -1577,8 +1681,15 @@ int UtcDaliVisualFactoryGetMeshVisual7(void)
   //Set up test application first, so everything else can be handled.
   ToolkitTestApplication application;
 
-
   tet_infoline( "UtcDaliVisualFactoryGetMeshVisual7:  Request mesh visual with custom light position." );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1602,6 +1713,14 @@ int UtcDaliVisualFactoryGetMeshVisual8(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetMeshVisual5:  Request mesh visual with normal-less object file." );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1727,6 +1846,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual1(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual1:  Request primitive visual with a shape only" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
@@ -1745,6 +1872,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual2(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual2:  Request primitive visual with everything" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1775,6 +1910,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual3(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual3:  Request primitive visual to display a sphere" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
@@ -1796,6 +1939,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual4(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual4:  Request primitive visual to display a conic section" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1821,6 +1972,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual5(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual5:  Request primitive visual to display a bevelled cube" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
@@ -1842,6 +2001,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual6(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual6:  Request primitive visual to display an octahedron" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
@@ -1861,6 +2028,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual7(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual7:  Request primitive visual to display a cone" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1885,6 +2060,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual8(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual8:  Request primitive visual with set light position" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
@@ -1906,6 +2089,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual9(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual9:  Request primitive visual with above-cap slices." );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
@@ -1925,6 +2116,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual10(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual10:  Request primitive visual with too few slices." );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1946,6 +2145,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual11(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual11:  Request primitive visual with too many stacks." );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
@@ -1965,6 +2172,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual12(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual12:  Request primitive visual with too few stacks." );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -1986,6 +2201,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual13(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual13:  Request primitive visual with invalid scale dimensions." );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
@@ -2005,6 +2228,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual14(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual14:  Request primitive visual with too low a bevel percentage." );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -2026,6 +2257,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual15(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual15:  Request primitive visual with too high a bevel percentage." );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
@@ -2045,6 +2284,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual16(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual16:  Request primitive visual with too low a bevel smoothness." );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -2066,6 +2313,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual17(void)
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual17:  Request primitive visual with too high a bevel smoothness." );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   //Set up visual properties.
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
@@ -2085,6 +2340,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisual18(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual18:  Request primitive visual to display a conic section" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties.
   Property::Map propertyMap;
@@ -2109,6 +2372,14 @@ int UtcDaliVisualFactoryGetPrimitiveVisualN1(void)
   ToolkitTestApplication application;
 
   tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisualN1:  Request primitive visual without shape" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uObjectMatrix", Property::Type::MATRIX),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   //Set up visual properties, without supplying shape.
   Property::Map propertyMap;
@@ -2203,6 +2474,15 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual2(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualFactoryGetAnimatedImageVisual2: Request animated image visual with a Property::Map, test custom wrap mode and pixel area" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("pixelArea", Property::Type::VECTOR4),
+    UniformData("wrapMode", Property::Type::VECTOR2),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
   Property::Map propertyMap;

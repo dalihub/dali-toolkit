@@ -193,6 +193,14 @@ int UtcDaliBubbleEmitterSetBubbleScale(void)
   ToolkitTestApplication application;
   tet_infoline( " UtcDaliBubbleEmitterSetBubbleScale " );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uDynamicScale", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 150, Vector2( 5.f, 10.f ));
   DALI_TEST_CHECK(emitter);
@@ -313,8 +321,18 @@ int UtcDaliBubbleEmitterEmitBubble(void)
 
 int UtcDaliBubbleEmitterRestore(void)
 {
+#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
   tet_infoline( " UtcDaliBubbleEmitterRestore " );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("uPercentage[0]", Property::Type::FLOAT),
+    UniformData("uStartEndPosition[0]", Property::Type::VECTOR4),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   Vector2 movementArea(50.f,50.f);
   Texture shapeImage = CreateSolidColorTexture( application, Color::GREEN, 5, 5 );
@@ -365,6 +383,9 @@ int UtcDaliBubbleEmitterRestore(void)
 
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uStartEndPosition[0]", startEndPosValue ) );
   DALI_TEST_EQUALS( startEndPosValue,  Vector4::ZERO, TEST_LOCATION );
+#else
+  tet_result(TET_PASS);
+#endif
 
   END_TEST;
 }

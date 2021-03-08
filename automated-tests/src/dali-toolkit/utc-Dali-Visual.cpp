@@ -1745,6 +1745,15 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliAnimateBorderVisual Color" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("borderColor", Property::Type::VECTOR4),
+    UniformData("mixColor", Property::Type::VECTOR3),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE,  Visual::BORDER);
@@ -1826,6 +1835,14 @@ int UtcDaliVisualAnimateBorderVisual02(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliAnimateBorderVisual Size" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("borderSize", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE,  Visual::BORDER);
@@ -1870,6 +1887,14 @@ int UtcDaliVisualAnimateColorVisual(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliAnimateColorVisual mixColor" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("mixColor", Property::Type::VECTOR3),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
@@ -1923,6 +1948,14 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliAnimatePrimitiveVisual color" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("mixColor", Property::Type::VECTOR3),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   {
     VisualFactory factory = VisualFactory::Get();
@@ -2007,6 +2040,20 @@ int UtcDaliVisualAnimatedGradientVisual01(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliAnimatedGradientVisual with default" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("start_point", Property::Type::VECTOR2),
+    UniformData("end_point", Property::Type::VECTOR2),
+    UniformData("start_color", Property::Type::VECTOR4),
+    UniformData("end_color", Property::Type::VECTOR4),
+    UniformData("rotate_center", Property::Type::VECTOR2),
+    UniformData("rotate_angle", Property::Type::FLOAT),
+    UniformData("gradient_offset", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   {
     VisualFactory factory = VisualFactory::Get();
     Property::Map propertyMap;
@@ -2063,6 +2110,20 @@ int UtcDaliVisualAnimatedGradientVisual02(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliAnimatedGradientVisual with full-option" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("start_point", Property::Type::VECTOR2),
+    UniformData("end_point", Property::Type::VECTOR2),
+    UniformData("start_color", Property::Type::VECTOR4),
+    UniformData("end_color", Property::Type::VECTOR4),
+    UniformData("rotate_center", Property::Type::VECTOR2),
+    UniformData("rotate_angle", Property::Type::FLOAT),
+    UniformData("gradient_offset", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   {
     float _delay[4] = {0.0f, -1.35f, 0.15f, -0.4f}; // fract(_delay) must NOT be 1/4, 2/4, 3/4. cause we don't know progress is 1.0f or 0.0f
@@ -2341,6 +2402,20 @@ int UtcDaliVisualAnimatedGradientVisual03(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliAnimatedGradientVisual with full-option use string key" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("start_point", Property::Type::VECTOR2),
+    UniformData("end_point", Property::Type::VECTOR2),
+    UniformData("start_color", Property::Type::VECTOR4),
+    UniformData("end_color", Property::Type::VECTOR4),
+    UniformData("rotate_center", Property::Type::VECTOR2),
+    UniformData("rotate_angle", Property::Type::FLOAT),
+    UniformData("gradient_offset", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   {
     float _delay[4] = {0.0f, -1.35f, 0.15f, -0.4f}; // fract(_delay) must NOT be 1/4, 2/4, 3/4. cause we don't know progress is 1.0f or 0.0f
@@ -3584,8 +3659,18 @@ int UtcDaliSvgVisualCustomShader(void)
 
 int UtcDaliVisualRoundedCorner(void)
 {
+#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualRoundedCorner" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("cornerRadius", Property::Type::FLOAT),
+    UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   // image visual
   {
@@ -3867,7 +3952,9 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE ), true, TEST_LOCATION );
   }
-
+#else
+  tet_result(TET_PASS);
+#endif
 
   END_TEST;
 }
@@ -3876,6 +3963,14 @@ int UtcDaliColorVisualBlurRadius(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliColorVisualBlurRadius" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("blurRadius", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map properties;
@@ -4048,6 +4143,18 @@ int UtcDaliVisualGetVisualProperty01(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualGetVisualProperty01: Test animatable property, Visual::Base, ColorVisual" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("mixColor", Property::Type::VECTOR3),
+    UniformData("offset", Property::Type::VECTOR2),
+    UniformData("size", Property::Type::VECTOR2),
+    UniformData("cornerRadius", Property::Type::FLOAT),
+    UniformData("blurRadius", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
@@ -4141,8 +4248,21 @@ int UtcDaliVisualGetVisualProperty01(void)
 
 int UtcDaliVisualGetVisualProperty02(void)
 {
+#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualGetVisualProperty02: Test animatable property" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("mixColor", Property::Type::VECTOR3),
+    UniformData("offset", Property::Type::VECTOR2),
+    UniformData("size", Property::Type::VECTOR2),
+    UniformData("cornerRadius", Property::Type::FLOAT),
+    UniformData("blurRadius", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
@@ -4213,14 +4333,26 @@ int UtcDaliVisualGetVisualProperty02(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("blurRadius", targetBlurRadius), true, TEST_LOCATION);
+#else
+  tet_result(TET_PASS);
+#endif
 
   END_TEST;
 }
 
 int UtcDaliVisualGetVisualProperty03(void)
 {
+#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualGetVisualProperty01: Test animatable property, ImageVisual" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("cornerRadius", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
@@ -4266,14 +4398,26 @@ int UtcDaliVisualGetVisualProperty03(void)
 
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+#else
+  tet_result(TET_PASS);
+#endif
 
   END_TEST;
 }
 
 int UtcDaliVisualGetVisualProperty04(void)
 {
+#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualGetVisualProperty01: Test animatable property, GradientVisual" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("cornerRadius", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   Vector2 start(-1.f, -1.f);
   Vector2 end(1.f, 1.f);
@@ -4326,6 +4470,9 @@ int UtcDaliVisualGetVisualProperty04(void)
 
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+#else
+  tet_result(TET_PASS);
+#endif
 
   END_TEST;
 }

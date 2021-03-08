@@ -446,6 +446,14 @@ int UtcDaliImageViewPixelArea(void)
   // Test pixel area property
   ToolkitTestApplication application;
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("pixelArea", Property::Type::VECTOR4),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   // Gif image, use AnimatedImageVisual internally
   // Atlasing is applied to pack multiple frames, use custom wrap mode
   ImageView gifView = ImageView::New();

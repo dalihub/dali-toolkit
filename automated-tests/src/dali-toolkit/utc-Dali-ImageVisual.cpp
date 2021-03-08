@@ -575,6 +575,15 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   ToolkitTestApplication application;
   tet_infoline( "Request image visual with a Property::Map, test custom wrap mode and pixel area with atlasing" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("pixelArea", Property::Type::VECTOR4),
+    UniformData("wrapMode", Property::Type::VECTOR2),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
@@ -654,6 +663,14 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
   ToolkitTestApplication application;
   tet_infoline( "Request image visual with a Property::Map, test custom wrap mode and pixel area without atlasing" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("pixelArea", Property::Type::VECTOR4),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
@@ -730,6 +747,14 @@ int UtcDaliImageVisualAnimateMixColor(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "Animate mix color" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("mixColor", Property::Type::VECTOR3),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   application.GetPlatform().SetClosestImageSize( Vector2(100, 100) );
 
@@ -1039,6 +1064,14 @@ int UtcDaliImageVisualAnimatePixelArea(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "ImageVisual animate pixel area" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("pixelArea", Property::Type::VECTOR4),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
 
   application.GetPlatform().SetClosestImageSize( Vector2(100, 100) );
 

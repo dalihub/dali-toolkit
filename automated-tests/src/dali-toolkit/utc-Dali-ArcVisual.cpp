@@ -249,6 +249,16 @@ int UtcDaliArcVisualUpdateProperty(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliArcVisualUpdateProperty" );
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("thickness", Property::Type::FLOAT),
+    UniformData("startAngle", Property::Type::FLOAT),
+    UniformData("sweepAngle", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
   float thickness = 20.0f;
