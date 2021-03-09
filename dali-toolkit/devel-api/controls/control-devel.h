@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/accessible-impl.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/controls/control.h>
 

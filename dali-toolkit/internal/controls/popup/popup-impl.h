@@ -25,6 +25,7 @@
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
@@ -240,9 +241,9 @@ public:
   static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
 protected:
-  struct AccessibleImpl : public Control::Impl::AccessibleImpl
+  struct AccessibleImpl : public DevelControl::AccessibleImpl
   {
-    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::AccessibleImpl::AccessibleImpl;
 
     std::string                 GetNameRaw() override;
     Dali::Accessibility::States CalculateStates() override;

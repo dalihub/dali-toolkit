@@ -236,7 +236,7 @@ void EffectsView::OnInitialize()
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new Control::Impl::AccessibleImpl(actor, Dali::Accessibility::Role::FILLER));
+      new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::FILLER));
   });
 }
 

@@ -36,6 +36,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -1381,6 +1382,14 @@ float TextEditor::GetHeightForWidth(float width)
   return mController->GetHeightForWidth(width) + padding.top + padding.bottom;
 }
 
+void TextEditor::ResizeActor(Actor& actor, const Vector2& size)
+{
+  if (actor.GetProperty<Vector3>(Dali::Actor::Property::SIZE).GetVectorXY() != size)
+  {
+    actor.SetProperty(Actor::Property::SIZE, size);
+  }
+}
+
 void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextEditor OnRelayout\n");
@@ -1410,10 +1419,12 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
   if(mStencil)
   {
     mStencil.SetProperty(Actor::Property::POSITION, Vector2(padding.start, padding.top));
+    ResizeActor(mStencil, contentSize);
   }
   if(mActiveLayer)
   {
     mActiveLayer.SetProperty(Actor::Property::POSITION, Vector2(padding.start, padding.top));
+    ResizeActor(mActiveLayer, contentSize);
   }
 
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
@@ -1426,7 +1437,7 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     if(mDecorator &&
        (Text::Controller::NONE_UPDATED != (Text::Controller::DECORATOR_UPDATED & updateTextType)))
     {
-      mDecorator->Relayout(size);
+      mDecorator->Relayout(contentSize);
     }
 
     if(!mRenderer)
@@ -2189,7 +2200,7 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
 {
   using namespace Dali::Accessibility;
 
-  auto states              = Control::Impl::AccessibleImpl::CalculateStates();
+  auto states              = DevelControl::AccessibleImpl::CalculateStates();
   states[State::EDITABLE]  = true;
   states[State::FOCUSABLE] = true;
 

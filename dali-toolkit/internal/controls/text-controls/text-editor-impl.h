@@ -25,6 +25,7 @@
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
@@ -356,6 +357,14 @@ private: // Implementation
   TextEditor& operator=(const TextEditor& rhs);
 
   /**
+   * @brief Resize actor to the given size.
+   *
+   * @param[in] actor The actor to be resized.
+   * @param[in] size Size to change.
+   */
+  void ResizeActor( Actor& actor, const Vector2& size );
+
+  /**
    * @brief Render view, create and attach actor(s) to this text editor.
    */
   void RenderText(Text::Controller::UpdateTextType updateTextType);
@@ -394,11 +403,11 @@ private: // Data
   bool  mScrollBarEnabled : 1;
   bool  mScrollStarted : 1;
 
-  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
+  struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Text,
                           public virtual Dali::Accessibility::EditableText
   {
-    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::AccessibleImpl::AccessibleImpl;
 
     std::string           GetName() override;
     std::string           GetText(size_t startOffset, size_t endOffset) override;

@@ -36,6 +36,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -2025,7 +2026,7 @@ std::string Popup::AccessibleImpl::GetNameRaw()
 
 Dali::Accessibility::States Popup::AccessibleImpl::CalculateStates()
 {
-  auto states       = Control::Impl::AccessibleImpl::CalculateStates();
+  auto states       = DevelControl::AccessibleImpl::CalculateStates();
   auto popup        = Toolkit::Popup::DownCast(self);
   auto displayState = popup.GetProperty<std::string>(Toolkit::Popup::Property::DISPLAY_STATE);
 

@@ -22,6 +22,7 @@
 #include <dali/public-api/animation/alpha-function.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
@@ -116,9 +117,9 @@ public:
   virtual void SetOvershootSize(const Vector2& size) = 0;
 
 protected: // From Control
-  struct AccessibleImpl : public Control::Impl::AccessibleImpl
+  struct AccessibleImpl : public DevelControl::AccessibleImpl
   {
-    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::AccessibleImpl::AccessibleImpl;
 
     bool IsScrollable() override;
   };
