@@ -759,7 +759,11 @@ Graphics::UniquePtr<Graphics::Program> TestGraphicsController::CreateProgram(con
     for(auto& shader : *(programCreateInfo.shaderState))
     {
       auto graphicsShader = Uncast<TestGraphicsShader>(shader.shader);
-      if(memcmp(cacheEntry.shaders[shader.pipelineStage], graphicsShader->mCreateInfo.sourceData, graphicsShader->mCreateInfo.sourceSize))
+      std::vector<uint8_t> source;
+      source.resize(graphicsShader->mCreateInfo.sourceSize);
+      memcpy(&source[0], graphicsShader->mCreateInfo.sourceData, graphicsShader->mCreateInfo.sourceSize);
+
+      if(!std::equal(source.begin(), source.end(), cacheEntry.shaders[shader.pipelineStage].begin()))
       {
         found = false;
         break;
@@ -776,7 +780,8 @@ Graphics::UniquePtr<Graphics::Program> TestGraphicsController::CreateProgram(con
   for(auto& shader : *(programCreateInfo.shaderState))
   {
     auto graphicsShader                                = Uncast<TestGraphicsShader>(shader.shader);
-    mProgramCache.back().shaders[shader.pipelineStage] = graphicsShader->mCreateInfo.sourceData;
+    mProgramCache.back().shaders[shader.pipelineStage].resize( graphicsShader->mCreateInfo.sourceSize );
+    memcpy(&mProgramCache.back().shaders[shader.pipelineStage][0], graphicsShader->mCreateInfo.sourceData, graphicsShader->mCreateInfo.sourceSize);
   }
   return Graphics::MakeUnique<TestGraphicsProgram>(mProgramCache.back().programImpl);
 }

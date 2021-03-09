@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1150,6 +1150,7 @@ int UtcDaliNPatchVisualAuxiliaryImage01(void)
   Renderer renderer = dummy.GetRendererAt( 0 );
   auto textures = renderer.GetTextures();
   DALI_TEST_EQUALS( textures.GetTextureCount(), 2, TEST_LOCATION );
+  UnparentAndReset(dummy);
 
   END_TEST;
 }
@@ -1204,10 +1205,13 @@ int UtcDaliVisualFactoryGetNPatchVisualN1(void)
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  DummyControl actor = DummyControl::New(true);
-  TestVisualAsynchronousRender( application, actor, visual );
+  {
+    DummyControl actor = DummyControl::New(true);
+    TestVisualAsynchronousRender( application, actor, visual );
 
-  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+    UnparentAndReset(actor);
+  }
 
   END_TEST;
 }
