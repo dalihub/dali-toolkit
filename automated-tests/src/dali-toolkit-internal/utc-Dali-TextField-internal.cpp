@@ -21,6 +21,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 
+#include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
@@ -190,4 +191,62 @@ int UtcDaliTextFieldMarkupUnderline(void)
 
   END_TEST;
 
+int UtcDaliTextFieldFontPointSizeLargerThanAtlas(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldFontPointSizeLargerThanAtlas ");
+
+  // Create a Text field
+  TextField textField = TextField::New();
+  //Set size to avoid automatic eliding
+  textField.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  //Set very large font-size using point-size
+  textField.SetProperty( TextField::Property::POINT_SIZE, 1000) ;
+  //Specify font-family
+  textField.SetProperty( TextField::Property::FONT_FAMILY, "DejaVu Sans");
+  //Set text to check if appear or not
+  textField.SetProperty( TextField::Property::TEXT, "A");
+
+  application.GetScene().Add( textField );
+
+  application.SendNotification();
+  application.Render();
+
+  //Check if Glyph is added to AtlasGlyphManger or not
+  int countAtlas = AtlasGlyphManager::Get().GetMetrics().mAtlasMetrics.mAtlasCount;
+  DALI_TEST_EQUALS( countAtlas, 1, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldFontPointSizeLargerThanAtlasPlaceholderCase(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldFontPointSizeLargerThanAtlasPlaceholderCase ");
+
+  //Set Map of placeholder: text, font-family and point-size
+  Property::Map placeholderMapSet;
+  placeholderMapSet["text"] = "A";
+  placeholderMapSet["fontFamily"] = "DejaVu Sans";
+  placeholderMapSet["pixelSize"] = 1000.0f;
+
+  // Create a text editor
+  TextField textField = TextField::New();
+  //Set size to avoid automatic eliding
+  textField.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  //Set placeholder
+  textField.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet) ;
+
+  application.GetScene().Add( textField );
+
+  application.SendNotification();
+  application.Render();
+
+  //Check if Glyph is added to AtlasGlyphManger or not
+  int countAtlas = AtlasGlyphManager::Get().GetMetrics().mAtlasMetrics.mAtlasCount;
+  DALI_TEST_EQUALS( countAtlas, 1, TEST_LOCATION );
+
+
+  END_TEST;
 }

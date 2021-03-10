@@ -46,10 +46,6 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 const float    ZERO(0.0f);
 const float    HALF(0.5f);
 const float    ONE(1.0f);
-const uint32_t DEFAULT_ATLAS_WIDTH  = 512u;
-const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
-const uint32_t MAX_ATLAS_WIDTH  = 1024u;
-const uint32_t MAX_ATLAS_HEIGHT = 1024u;
 const uint32_t DOUBLE_PIXEL_PADDING = 4u;//Padding will be added twice to Atlas
 const uint16_t NO_OUTLINE           = 0u;
 } // namespace
@@ -177,6 +173,9 @@ struct AtlasRenderer::Impl
 
   void CacheGlyph(const GlyphInfo& glyph, FontId lastFontId, const AtlasGlyphManager::GlyphStyle& style, AtlasManager::AtlasSlot& slot)
   {
+    const Size& defaultTextAtlasSize = mFontClient.GetDefaultTextAtlasSize(); //Retrieve default size of text-atlas-block from font-client.
+    const Size& maximumTextAtlasSize = mFontClient.GetMaximumTextAtlasSize(); //Retrieve maximum size of text-atlas-block from font-client.
+
     const bool glyphNotCached = !mGlyphManager.IsCached(glyph.fontId, glyph.index, style, slot); // Check FontGlyphRecord vector for entry with glyph index and fontId
 
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "AddGlyphs fontID[%u] glyphIndex[%u] [%s]\n", glyph.fontId, glyph.index, (glyphNotCached) ? "not cached" : "cached");
@@ -250,15 +249,15 @@ struct AtlasRenderer::Impl
           // If CheckAtlas in AtlasManager::Add can't fit the bitmap in the current atlas it will create a new atlas
 
           // Setting the block size and size of new atlas does not mean a new one will be created. An existing atlas may still surffice.
-          uint32_t default_width = DEFAULT_ATLAS_WIDTH;
-          uint32_t default_height = DEFAULT_ATLAS_HEIGHT;
+          uint32_t default_width = defaultTextAtlasSize.width;
+          uint32_t default_height = defaultTextAtlasSize.height;
 
           while (
             (blockSize.mNeededBlockWidth >= (default_width - (DOUBLE_PIXEL_PADDING + 1u)) ||
              blockSize.mNeededBlockHeight >= (default_height - (DOUBLE_PIXEL_PADDING + 1u)))
             &&
-            (default_width < MAX_ATLAS_WIDTH &&
-             default_height < MAX_ATLAS_HEIGHT))
+            (default_width < maximumTextAtlasSize.width &&
+             default_height < maximumTextAtlasSize.height))
           {
             default_width <<= 1u;
             default_height <<= 1u;

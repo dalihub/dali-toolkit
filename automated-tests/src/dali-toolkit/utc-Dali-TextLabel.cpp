@@ -1802,3 +1802,38 @@ int UtcDaliToolkitTextlabelAnchorClicked(void)
 
   END_TEST;
 }
+
+int UtcDaliTextLabelAtlasLimitationIsEnabledForLargeFontPointSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelAtlasLimitationIsEnabledForLargeFontPointSize ");
+
+  //TextLabel is not using Atlas but this is to unify font-size on text-controllers
+
+  // +2: First one to handle the equal case. Second one to handle odd to even case of GetNaturalSize
+  const uint32_t lessThanWidth = TextAbstraction::FontClient::MAX_TEXT_ATLAS_WIDTH - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+  const uint32_t lessThanHeight = TextAbstraction::FontClient::MAX_TEXT_ATLAS_HEIGHT - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+
+  // Create a text editor
+  TextLabel textLabel = TextLabel::New();
+  //Set size to avoid automatic eliding
+  textLabel.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  //Set very large font-size using point-size
+  textLabel.SetProperty( TextLabel::Property::POINT_SIZE, 1000);
+  //Specify font-family
+  textLabel.SetProperty( TextLabel::Property::FONT_FAMILY, "DejaVu Sans");
+  //Set text to check if appear or not
+  textLabel.SetProperty( TextLabel::Property::TEXT, "A");
+
+  application.GetScene().Add( textLabel );
+
+  application.SendNotification();
+  application.Render();
+  //Use GetNaturalSize to verify that size of block does not exceed Atlas size
+  Vector3 naturalSize = textLabel.GetNaturalSize();
+
+  DALI_TEST_GREATER( lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION );
+  DALI_TEST_GREATER( lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION );
+
+  END_TEST;
+}
