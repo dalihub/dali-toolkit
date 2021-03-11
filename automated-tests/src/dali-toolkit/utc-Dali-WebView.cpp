@@ -750,6 +750,9 @@ int UtcDaliWebSettingsGetSetDefaultFontSize(void)
   settings->AllowMixedContents( false );
   settings->EnableSpatialNavigation( false );
   settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
   settings->AllowFileAccessFromExternalUrl( false );
   settings->AllowScriptsOpenWindows( false );
 
@@ -779,6 +782,9 @@ int UtcDaliWebSettingsCheckEnableJavaScript(void)
   settings->AllowMixedContents( false );
   settings->EnableSpatialNavigation( false );
   settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
   settings->AllowFileAccessFromExternalUrl( false );
   settings->AllowScriptsOpenWindows( false );
 
@@ -789,6 +795,384 @@ int UtcDaliWebSettingsCheckEnableJavaScript(void)
   // Check Set/GetProperty
   settings->EnableJavaScript( false );
   value = settings->IsJavaScriptEnabled();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnableAutoFitting(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsAutoFittingEnabled();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->EnableAutoFitting( false );
+  value = settings->IsAutoFittingEnabled();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnablePlugins(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->ArePluginsEnabled();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->EnablePlugins( false );
+  value = settings->ArePluginsEnabled();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnablePrivateBrowsing(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsPrivateBrowsingEnabled();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->EnablePrivateBrowsing( false );
+  value = settings->IsPrivateBrowsingEnabled();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnableLinkMagnifier(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsLinkMagnifierEnabled();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->EnableLinkMagnifier( false );
+  value = settings->IsLinkMagnifierEnabled();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckUseKeypadWithoutUserAction(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsKeypadWithoutUserActionUsed();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->UseKeypadWithoutUserAction( false );
+  value = settings->IsKeypadWithoutUserActionUsed();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnableAutofillPasswordForm(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsAutofillPasswordFormEnabled();
+  DALI_TEST_CHECK( value );
+  settings->EnableAutofillPasswordForm( false );
+  value = settings->IsAutofillPasswordFormEnabled();
+  DALI_TEST_CHECK( !value );
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnableFormCandidateData(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 );
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsFormCandidateDataEnabled();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->EnableFormCandidateData( false );
+  value = settings->IsFormCandidateDataEnabled();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnableTextSelection(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 );
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsTextSelectionEnabled();
+  DALI_TEST_CHECK( value );
+
+  //Check Set/GetProperty
+  settings->EnableTextSelection(false);
+  value = settings->IsTextSelectionEnabled();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnableTextAutosizing(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 );
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsTextAutosizingEnabled();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->EnableTextAutosizing(false);
+  value = settings->IsTextAutosizingEnabled();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnableArrowScroll(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 );
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsArrowScrollEnabled();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->EnableArrowScroll(false);
+  value = settings->IsArrowScrollEnabled();
+  DALI_TEST_CHECK( !value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnableClipboard(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 );
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsClipboardEnabled();
+  DALI_TEST_CHECK( value );
+  settings->EnableClipboard(false);
+  value = settings->IsClipboardEnabled();
+  DALI_TEST_CHECK( !value );
+  END_TEST;
+}
+
+int UtcDaliWebSettingsCheckEnableImePanel(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 );
+
+  // Reset something
+  settings->AllowMixedContents( false );
+  settings->EnableSpatialNavigation( false );
+  settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
+  settings->AllowFileAccessFromExternalUrl( false );
+  settings->AllowScriptsOpenWindows( false );
+
+  // Check default value is true or not
+  bool value = settings->IsImePanelEnabled();
+  DALI_TEST_CHECK( value );
+
+  // Check Set/GetProperty
+  settings->EnableImePanel(false);
+  value = settings->IsImePanelEnabled();
   DALI_TEST_CHECK( !value );
 
   END_TEST;
@@ -808,6 +1192,9 @@ int UtcDaliWebSettingsCheckAllowImagesLoadAutomatically(void)
   settings->AllowMixedContents( false );
   settings->EnableSpatialNavigation( false );
   settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
   settings->AllowFileAccessFromExternalUrl( false );
   settings->AllowScriptsOpenWindows( false );
 
@@ -840,6 +1227,9 @@ int UtcDaliWebSettingsGetSetDefaultTextEncodingName(void)
   settings->AllowMixedContents( false );
   settings->EnableSpatialNavigation( false );
   settings->EnableWebSecurity( false );
+  settings->EnableCacheBuilder( false );
+  settings->EnableDoNotTrack( false );
+  settings->UseScrollbarThumbFocusNotifications( false );
   settings->AllowFileAccessFromExternalUrl( false );
   settings->AllowScriptsOpenWindows( false );
 

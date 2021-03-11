@@ -221,6 +221,18 @@ public:
   MockWebEngineSettings()
     : mockDefaultFontSize( 16 ),
       mockJavaScriptEnabled( true ),
+      mockAutoFittingEnabled ( true ),
+      mockPluginsEnabled ( true ),
+      mockPrivateBrowsingEnabled( true ),
+      mockLinkMagnifierEnabled( true ),
+      mockKeypadWithoutUserActionUsed( true ),
+      mockAutofillPasswordFormEnabled( true ),
+      mockFormCandidateDataEnabled( true ),
+      mockTextSelectionEnabled( true ),
+      mockTextAutosizingEnable( true ),
+      mockArrowScrollEnable( true ),
+      mockClipboardEnabled( true ),
+      mockImePanelEnabled( true ),
       mockImageLoadedAutomatically( true ),
       mockDefaultTextEncodingName()
   {
@@ -244,6 +256,126 @@ public:
   void EnableJavaScript( bool enabled ) override
   {
     mockJavaScriptEnabled = enabled;
+  }
+
+  bool IsAutoFittingEnabled() const override
+  {
+    return mockAutoFittingEnabled;
+  }
+
+  void EnableAutoFitting( bool enabled ) override
+  {
+    mockAutoFittingEnabled = enabled;
+  }
+
+  bool ArePluginsEnabled() const override
+  {
+    return mockPluginsEnabled;
+  }
+
+  void EnablePlugins( bool enabled ) override
+  {
+    mockPluginsEnabled = enabled;
+  }
+
+  bool IsPrivateBrowsingEnabled() const override
+  {
+    return mockPrivateBrowsingEnabled;
+  }
+
+  void EnablePrivateBrowsing( bool enabled ) override
+  {
+    mockPrivateBrowsingEnabled = enabled;
+  }
+
+  bool IsLinkMagnifierEnabled() const override
+  {
+    return mockLinkMagnifierEnabled;
+  }
+
+  void EnableLinkMagnifier( bool enabled ) override
+  {
+    mockLinkMagnifierEnabled = enabled;
+  }
+
+  bool IsKeypadWithoutUserActionUsed() const override
+  {
+    return mockKeypadWithoutUserActionUsed;
+  }
+
+  void UseKeypadWithoutUserAction( bool used ) override
+  {
+    mockKeypadWithoutUserActionUsed = used;
+  }
+
+  bool IsAutofillPasswordFormEnabled() const override
+  {
+    return mockAutofillPasswordFormEnabled;
+  }
+
+  void EnableAutofillPasswordForm( bool enabled ) override
+  {
+    mockAutofillPasswordFormEnabled = enabled;
+  }
+
+  bool IsFormCandidateDataEnabled() const override
+  {
+    return mockFormCandidateDataEnabled;
+  }
+
+  void EnableFormCandidateData( bool enabled ) override
+  {
+    mockFormCandidateDataEnabled = enabled;
+  }
+
+  bool IsTextSelectionEnabled() const override
+  {
+    return mockTextSelectionEnabled;
+  }
+
+  void EnableTextSelection( bool enabled ) override
+  {
+    mockTextSelectionEnabled = enabled;
+  }
+
+  bool IsTextAutosizingEnabled() const override
+  {
+    return mockTextAutosizingEnable;
+  }
+
+  void EnableTextAutosizing( bool enabled ) override
+  {
+    mockTextAutosizingEnable = enabled;
+  }
+
+  bool IsArrowScrollEnabled() const override
+  {
+    return mockArrowScrollEnable;
+  }
+
+  void EnableArrowScroll( bool enabled ) override
+  {
+    mockArrowScrollEnable = enabled;
+  }
+
+  bool IsClipboardEnabled() const override
+  {
+    return mockClipboardEnabled;
+  }
+
+  void EnableClipboard( bool enabled ) override
+  {
+    mockClipboardEnabled = enabled;
+  }
+
+  bool IsImePanelEnabled() const override
+  {
+    return mockImePanelEnabled;
+  }
+
+  void EnableImePanel( bool enabled ) override
+  {
+    mockImePanelEnabled = enabled;
   }
 
   bool AreImagesLoadedAutomatically() const override
@@ -278,6 +410,18 @@ public:
   {
   }
 
+  void EnableCacheBuilder( bool enabled ) override
+  {
+  }
+
+  void UseScrollbarThumbFocusNotifications( bool used ) override
+  {
+  }
+
+  void EnableDoNotTrack( bool enabled ) override
+  {
+  }
+
   void AllowFileAccessFromExternalUrl( bool allowed ) override
   {
   }
@@ -289,6 +433,18 @@ public:
 private:
   int mockDefaultFontSize;
   bool mockJavaScriptEnabled;
+  bool mockAutoFittingEnabled;
+  bool mockPluginsEnabled;
+  bool mockPrivateBrowsingEnabled;
+  bool mockLinkMagnifierEnabled;
+  bool mockKeypadWithoutUserActionUsed;
+  bool mockAutofillPasswordFormEnabled;
+  bool mockFormCandidateDataEnabled;
+  bool mockTextSelectionEnabled;
+  bool mockTextAutosizingEnable;
+  bool mockArrowScrollEnable;
+  bool mockClipboardEnabled;
+  bool mockImePanelEnabled;
   bool mockImageLoadedAutomatically;
   std::string mockDefaultTextEncodingName;
 };

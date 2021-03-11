@@ -96,6 +96,29 @@ public:
   void EnableWebSecurity(bool enabled);
 
   /**
+   * @brief Enables/disables cache builder.
+   *
+   * @param[in] enabled if true, to enable the cache builder
+   *       otherwise to disable
+   */
+  void EnableCacheBuilder( bool enabled );
+
+  /**
+   * @brief Used/Unused uses scrollbar thumb focus notifications. The default is used.
+   *
+   * @param[in] used True if uses scrollbar thumb focus notifications, false otherwise
+   */
+  void UseScrollbarThumbFocusNotifications ( bool used );
+
+  /**
+   * @brief Enable/disables do not track executing.
+   *
+   * @param[in] enabled if true, to enable do not track
+   *        otherwise to disable
+   */
+  void EnableDoNotTrack( bool enabled );
+
+  /**
    * @brief Allow/Disallow file access from external url
    *
    * @param[in] allowed if true, to allow file access from external url
@@ -116,6 +139,174 @@ public:
    * @param[in] enabled True if JavaScript executing is enabled, false otherwise
    */
   void EnableJavaScript(bool enabled);
+
+  /**
+   * @brief Returns whether auto fitting can be executable. The default is true.
+   *
+   * @return true if auto fitting executing is enabled, false otherwise
+   */
+  bool IsAutoFittingEnabled() const;
+
+   /**
+   * @brief Enables/disables auto fitting executing. The default is enabled.
+   *
+   * @param[in] enabled True if auto fitting executing is enabled, false otherwise
+   */
+  void EnableAutoFitting( bool enabled );
+
+  /**
+   * @brief Returns whether plugins can be executable. The default is true.
+   *
+   * @return true if plugins executing is enabled, false otherwise
+   */
+  bool ArePluginsEnabled() const;
+
+   /**
+   * @brief Enables/disables Plugins executing. The default is enabled.
+   *
+   * @param[in] enabled True if Plugins executing is enabled, false otherwise
+   */
+  void EnablePlugins( bool enabled );
+
+  /**
+   * @brief Returns whether private browsing can be executable. The default is true.
+   *
+   * @return true if private browsing executing is enabled, false otherwise
+   */
+  bool IsPrivateBrowsingEnabled() const;
+
+  /**
+   * @brief Enables/disables private browsing executing. The default is enabled.
+   *
+   * @param[in] enabled True if private browsing executing is enabled, false otherwise
+   */
+  void EnablePrivateBrowsing( bool enabled );
+
+  /**
+   * @brief Returns whether link magnifier can be executable. The default is true.
+   *
+   * @return true if link magnifier executing is enabled, false otherwise
+   */
+  bool IsLinkMagnifierEnabled() const;
+
+  /**
+   * @brief Enables/disables link magnifier executing. The default is enabled.
+   *
+   * @param[in] enabled True if link magnifier executing is enabled, false otherwise
+   */
+  void EnableLinkMagnifier( bool enabled );
+
+  /**
+   * @brief Returns whether uses keypad without user action can be executable. The default is true.
+   *
+   * @return true if keypad without user action executing is used, false otherwise
+   */
+  bool IsKeypadWithoutUserActionUsed() const;
+
+  /**
+   * @brief Uses/Unused keypad without user action executing. The default is used.
+   *
+   * @param[in] used True if keypad without user action executing is used, false otherwise
+   */
+  void UseKeypadWithoutUserAction( bool used );
+
+  /**
+   * @brief Returns whether autofill password form can be executable. The default is true.
+   *
+   * @return true if autofill password form executing is enabled, false otherwise
+   */
+  bool IsAutofillPasswordFormEnabled() const;
+
+  /**
+   * @brief Enables/disables autofill password form executing. The default is enabled.
+   *
+   * @param[in] enabled True if autofill password form executing is enabled, false otherwise
+   */
+  void EnableAutofillPasswordForm( bool enabled );
+
+  /**
+   * @brief Returns whether form candidate data can be executable. The default is true.
+   *
+   * @return true if form candidate data executing is enabled, false otherwise
+   */
+  bool IsFormCandidateDataEnabled() const;
+
+  /**
+   * @brief Enables/disables form candidate data executing. The default is enabled.
+   *
+   * @param[in] enabled True if form candidate data executing is enabled, false otherwise
+   */
+  void EnableFormCandidateData( bool enabled );
+
+  /**
+   * @brief Returns whether text selection can be executable. The default is true.
+   *
+   * @return true if text selection executing is enabled, false otherwise
+   */
+  bool IsTextSelectionEnabled() const;
+
+  /**
+   * brief Enables/disables text selection executing. The default is enabled.
+   *
+   * @param[in] enabled True if text selection executing is enabled, false otherwise
+   */
+  void EnableTextSelection( bool enabled );
+
+  /**
+   * @brief Returns whether text autosizing can be executable. The default is true.
+   *
+   * @return true if text autosizing executing is enabled, false otherwise
+   */
+  bool IsTextAutosizingEnabled() const;
+
+  /**
+   * @brief Enables/disables text autosizing executing. The default is enabled.
+   *
+   * @param[in] enabled True if text autosizing executing is enabled, false otherwise
+   */
+  void EnableTextAutosizing( bool enabled );
+
+  /**
+   * @brief Returns whether arrow scroll can be executable. The default is true.
+   *
+   * @return true if arrow scroll executing is enabled, false otherwise
+   */
+  bool IsArrowScrollEnabled() const;
+
+  /**
+   * @brief Enables/disables arrow scroll executing. The default is enabled.
+   *
+   * @param[in] enabled True if arrow scroll executing is enabled, false otherwise
+   */
+  void EnableArrowScroll( bool enabled );
+
+  /**
+   * @brief Returns whether clipboard can be executable. The default is true.
+   *
+   * @return true if clipboard executing is enabled, false otherwise
+   */
+  bool IsClipboardEnabled() const;
+
+  /**
+   * @brief Enables/disables clipboard executing. The default is enabled.
+   *
+   * @param[in] enabled True if clipboard is enabled, false otherwise
+   */
+  void EnableClipboard( bool enabled );
+
+  /**
+   * @brief Returns whether ime panel can be executable. The default is true.
+   *
+   * @return true if ime panel executing is enabled, false otherwise
+   */
+  bool IsImePanelEnabled() const;
+
+  /**
+   * @brief Enables/disables ime panel executing. The default is enabled.
+   *
+   * @param[in] enabled True if ime panel executing is enabled, false otherwise
+   */
+  void EnableImePanel( bool enabled );
 
   /**
    * @brief Allow if the scripts can open new windows.
