@@ -31,6 +31,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 

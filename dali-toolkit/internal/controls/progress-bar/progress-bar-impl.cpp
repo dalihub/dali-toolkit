@@ -23,6 +23,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/arc-visual-properties-devel.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/public-api/align-enumerations.h>

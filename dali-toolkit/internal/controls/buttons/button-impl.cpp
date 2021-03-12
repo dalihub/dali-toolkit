@@ -1331,7 +1331,7 @@ Property::Index Button::AccessibleImpl::GetNamePropertyIndex()
 
 Dali::Accessibility::States Button::AccessibleImpl::CalculateStates()
 {
-  auto tmp                                    = Control::Impl::AccessibleImpl::CalculateStates();
+  auto tmp                                    = DevelControl::AccessibleImpl::CalculateStates();
   tmp[Dali::Accessibility::State::SELECTABLE] = true;
   auto slf                                    = Toolkit::Button::DownCast(self);
   tmp[Dali::Accessibility::State::ENABLED]    = !slf.GetProperty<bool>(Toolkit::Button::Property::DISABLED);

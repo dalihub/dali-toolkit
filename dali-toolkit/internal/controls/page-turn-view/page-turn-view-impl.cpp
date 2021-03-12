@@ -27,6 +27,7 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-book-spine-effect.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
@@ -415,7 +416,7 @@ void PageTurnView::OnInitialize()
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new Control::Impl::AccessibleImpl(actor, Dali::Accessibility::Role::PAGE_TAB_LIST));
+      new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::PAGE_TAB_LIST));
   });
 }
 

@@ -95,7 +95,7 @@ void ImageView::OnInitialize()
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new Control::Impl::AccessibleImpl(actor, Dali::Accessibility::Role::IMAGE));
+      new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::IMAGE));
   });
 
   //Enable highightability

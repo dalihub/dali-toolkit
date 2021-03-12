@@ -69,6 +69,8 @@ typedef Dali::OwnerContainer<RegisteredVisual*> RegisteredVisualContainer;
  */
 class Control::Impl : public ConnectionTracker, public Visual::EventObserver
 {
+  friend class Toolkit::DevelControl::AccessibleImpl;
+
 public:
   /**
    * @brief Retrieves the implementation of the internal control class.
@@ -543,52 +545,6 @@ public:
 
   void AccessibilityRegister();
   void AccessibilityDeregister();
-
-  struct AccessibleImpl : public virtual Dali::Accessibility::Accessible,
-                          public virtual Dali::Accessibility::Component,
-                          public virtual Dali::Accessibility::Collection,
-                          public virtual Dali::Accessibility::Action
-  {
-    Dali::Actor self;
-    bool        modal = false, root = false;
-
-    AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
-
-    std::string                         GetName() override;
-    virtual std::string                 GetNameRaw();
-    std::string                         GetDescription() override;
-    virtual std::string                 GetDescriptionRaw();
-    Dali::Accessibility::Accessible*    GetParent() override;
-    size_t                              GetChildCount() override;
-    Dali::Accessibility::Accessible*    GetChildAtIndex(size_t index) override;
-    size_t                              GetIndexInParent() override;
-    Dali::Accessibility::Role           GetRole() override;
-    Dali::Accessibility::States         GetStates() override;
-    Dali::Accessibility::Attributes     GetAttributes() override;
-    Dali::Rect<>                        GetExtents(Dali::Accessibility::CoordType ctype) override;
-    Dali::Accessibility::ComponentLayer GetLayer() override;
-    int16_t                             GetMdiZOrder() override;
-    bool                                GrabFocus() override;
-    double                              GetAlpha() override;
-    bool                                GrabHighlight() override;
-    bool                                ClearHighlight() override;
-
-    std::string                                GetActionName(size_t index) override;
-    std::string                                GetLocalizedActionName(size_t index) override;
-    std::string                                GetActionDescription(size_t index) override;
-    size_t                                     GetActionCount() override;
-    std::string                                GetActionKeyBinding(size_t index) override;
-    bool                                       DoAction(size_t index) override;
-    bool                                       DoAction(const std::string& name) override;
-    bool                                       DoGesture(const Dali::Accessibility::GestureInfo& gestureInfo) override;
-    std::vector<Dali::Accessibility::Relation> GetRelationSet() override;
-
-    virtual Dali::Accessibility::States CalculateStates();
-    virtual void                        EnsureChildVisible(Actor child);
-    virtual void                        EnsureSelfVisible();
-    virtual Property::Index             GetNamePropertyIndex();
-    virtual Property::Index             GetDescriptionPropertyIndex();
-  };
 
   std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)> accessibilityConstructor;
   std::unique_ptr<Dali::Accessibility::Accessible>                       accessibilityObject;

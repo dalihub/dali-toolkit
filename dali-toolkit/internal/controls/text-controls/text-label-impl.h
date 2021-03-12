@@ -159,10 +159,10 @@ private: // Data
   bool mTextUpdateNeeded : 1;
 
 protected:
-  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
+  struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Text
   {
-    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::AccessibleImpl::AccessibleImpl;
 
     std::string          GetText(size_t startOffset, size_t endOffset) override;
     size_t               GetCharacterCount() override;

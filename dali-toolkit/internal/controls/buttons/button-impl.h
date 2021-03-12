@@ -24,8 +24,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
@@ -535,9 +535,9 @@ private:
   bool mClickActionPerforming; ///< Used to manage signal emissions during action
 
 protected:
-  struct AccessibleImpl : public Control::Impl::AccessibleImpl
+  struct AccessibleImpl : public DevelControl::AccessibleImpl
   {
-    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::AccessibleImpl::AccessibleImpl;
 
     Dali::Accessibility::States CalculateStates() override;
     std::string                 GetNameRaw() override;
