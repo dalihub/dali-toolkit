@@ -38,14 +38,15 @@
 
 namespace Dali
 {
-
 struct UniformData
 {
-  std::string     name;
-  Property::Type  type;
-  UniformData( const std::string& name, Property::Type type = Property::Type::NONE)
-  : name(name), type(type)
-  {}
+  std::string    name;
+  Property::Type type;
+  UniformData(const std::string& name, Property::Type type = Property::Type::NONE)
+  : name(name),
+    type(type)
+  {
+  }
 };
 
 class DALI_CORE_API TestGlAbstraction : public Dali::Integration::GlAbstraction
@@ -1006,7 +1007,7 @@ public:
     GetUniformLocation(program, "uLightCameraProjectionMatrix");
     GetUniformLocation(program, "uLightCameraViewMatrix");
 
-    for( const auto& uniform : mCustomUniformData )
+    for(const auto& uniform : mCustomUniformData)
     {
       GetUniformLocation(program, uniform.name.c_str());
     }
@@ -1217,16 +1218,10 @@ public:
     out << std::hex << target << ", " << pname << ", " << param;
     std::string params = out.str();
 
-    out.str("");
-    out << std::hex << target;
     TraceCallStack::NamedParams namedParams;
-    namedParams["target"] << out.str();
-    out.str("");
-    out << std::hex << pname;
-    namedParams["pname"] << out.str();
-    out.str("");
-    out << std::hex << param;
-    namedParams["param"] << out.str();
+    namedParams["target"] << std::hex << target;
+    namedParams["pname"] << std::hex << pname;
+    namedParams["param"] << param;
     mTexParameterTrace.PushCall("TexParameteri", params, namedParams);
   }
 
@@ -2553,7 +2548,7 @@ private:
   typedef std::map<GLuint, UniformIDMap> ProgramUniformMap;
   ProgramUniformMap                      mUniforms;
 
-  std::vector<UniformData>               mCustomUniformData{};
+  std::vector<UniformData> mCustomUniformData{};
 
   template<typename T>
   struct ProgramUniformValue : public std::map<GLuint, std::map<GLint, T> >
