@@ -1335,7 +1335,7 @@ float TextField::GetHeightForWidth(float width)
 
 void TextField::ResizeActor(Actor& actor, const Vector2& size)
 {
-  if (actor.GetProperty<Vector3>(Dali::Actor::Property::SIZE).GetVectorXY() != size)
+  if(actor.GetProperty<Vector3>(Dali::Actor::Property::SIZE).GetVectorXY() != size)
   {
     actor.SetProperty(Actor::Property::SIZE, size);
   }
@@ -1397,6 +1397,14 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
 
     RenderText(updateTextType);
+
+    // If there is text changed, callback is called.
+    if(mTextChanged)
+    {
+      Dali::Toolkit::TextField handle(GetOwner());
+      mTextChangedSignal.Emit(handle);
+      mTextChanged = false;
+    }
   }
 
   // The text-field emits signals when the input style changes. These changes of style are
@@ -1689,8 +1697,7 @@ void TextField::CaretMoved(unsigned int position)
 
 void TextField::TextChanged()
 {
-  Dali::Toolkit::TextField handle(GetOwner());
-  mTextChangedSignal.Emit(handle);
+  mTextChanged = true;
 }
 
 void TextField::MaxLengthReached()
@@ -1867,7 +1874,8 @@ TextField::TextField()
   mAlignmentOffset(0.f),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mExceedPolicy(Dali::Toolkit::TextField::EXCEED_POLICY_CLIP),
-  mHasBeenStaged(false)
+  mHasBeenStaged(false),
+  mTextChanged(false)
 {
 }
 

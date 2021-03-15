@@ -318,7 +318,7 @@ private: // Implementation
    * @param[in] actor The actor to be resized.
    * @param[in] size Size to change.
    */
-  void ResizeActor( Actor& actor, const Vector2& size );
+  void ResizeActor(Actor& actor, const Vector2& size);
 
   /**
    * @brief Render view, create and attach actor(s) to this Text Field.
@@ -357,6 +357,7 @@ private: // Data
   int   mRenderingBackend;
   int   mExceedPolicy;
   bool  mHasBeenStaged : 1;
+  bool  mTextChanged : 1;
 
 protected:
   struct AccessibleImpl : public DevelControl::AccessibleImpl,

@@ -1384,7 +1384,7 @@ float TextEditor::GetHeightForWidth(float width)
 
 void TextEditor::ResizeActor(Actor& actor, const Vector2& size)
 {
-  if (actor.GetProperty<Vector3>(Dali::Actor::Property::SIZE).GetVectorXY() != size)
+  if(actor.GetProperty<Vector3>(Dali::Actor::Property::SIZE).GetVectorXY() != size)
   {
     actor.SetProperty(Actor::Property::SIZE, size);
   }
@@ -1446,6 +1446,14 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
 
     RenderText(updateTextType);
+
+    // If there is text changed, callback is called.
+    if(mTextChanged)
+    {
+      Dali::Toolkit::TextEditor handle(GetOwner());
+      mTextChangedSignal.Emit(handle);
+      mTextChanged = false;
+    }
   }
 
   // The text-editor emits signals when the input style changes. These changes of style are
@@ -1661,8 +1669,7 @@ void TextEditor::CaretMoved(unsigned int position)
 
 void TextEditor::TextChanged()
 {
-  Dali::Toolkit::TextEditor handle(GetOwner());
-  mTextChangedSignal.Emit(handle);
+  mTextChanged = true;
 }
 
 void TextEditor::MaxLengthReached()
@@ -1984,7 +1991,8 @@ TextEditor::TextEditor()
   mHasBeenStaged(false),
   mScrollAnimationEnabled(false),
   mScrollBarEnabled(false),
-  mScrollStarted(false)
+  mScrollStarted(false),
+  mTextChanged(false)
 {
 }
 
