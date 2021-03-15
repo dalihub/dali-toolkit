@@ -2207,3 +2207,78 @@ int UtcDaliWebSettingsGetSetDefaultTextEncodingName(void)
   END_TEST;
 }
 
+int UtcDaliWebSettingsSetViewportMetaTag(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Check the value is true or not
+  bool value = settings->SetViewportMetaTag(true);
+  DALI_TEST_CHECK( value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsSetForceZoom(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Check the value is true or not
+  bool value = settings->SetForceZoom(true);
+  DALI_TEST_CHECK( value );
+
+  value = settings->IsZoomForced();
+  DALI_TEST_CHECK( value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsSetTextZoomEnabled(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Check the value is true or not
+  bool value = settings->SetTextZoomEnabled(true);
+  DALI_TEST_CHECK( value );
+
+  value = settings->IsTextZoomEnabled();
+  DALI_TEST_CHECK( value );
+
+  END_TEST;
+}
+
+int UtcDaliWebSettingsSetExtraFeature(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebSettings* settings = view.GetSettings();
+  DALI_TEST_CHECK( settings != 0 )
+
+  // Check the value is true or not
+  settings->SetExtraFeature("test", true);
+  bool value = settings->IsExtraFeatureEnabled("test");
+  DALI_TEST_CHECK( value );
+
+  END_TEST;
+}
+
