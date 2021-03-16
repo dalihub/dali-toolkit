@@ -59,6 +59,21 @@ void WebSettings::EnableWebSecurity(bool enabled)
   mWebEngineSettings.EnableWebSecurity(enabled);
 }
 
+void WebSettings::EnableCacheBuilder(bool enabled)
+{
+  mWebEngineSettings.EnableCacheBuilder(enabled);
+}
+
+void WebSettings::UseScrollbarThumbFocusNotifications(bool used)
+{
+  mWebEngineSettings.UseScrollbarThumbFocusNotifications(used);
+}
+
+void WebSettings::EnableDoNotTrack( bool enabled )
+{
+  mWebEngineSettings.EnableDoNotTrack(enabled);
+}
+
 void WebSettings::AllowFileAccessFromExternalUrl(bool allowed)
 {
   mWebEngineSettings.AllowFileAccessFromExternalUrl(allowed);
@@ -72,6 +87,126 @@ bool WebSettings::IsJavaScriptEnabled() const
 void WebSettings::EnableJavaScript(bool enabled)
 {
   mWebEngineSettings.EnableJavaScript(enabled);
+}
+
+bool WebSettings::IsAutoFittingEnabled() const
+{
+  return mWebEngineSettings.IsAutoFittingEnabled();
+}
+
+void WebSettings::EnableAutoFitting(bool enabled)
+{
+  mWebEngineSettings.EnableAutoFitting(enabled);
+}
+
+bool WebSettings::ArePluginsEnabled() const
+{
+  return mWebEngineSettings.ArePluginsEnabled();
+}
+
+void WebSettings::EnablePlugins(bool enabled)
+{
+  mWebEngineSettings.EnablePlugins(enabled);
+}
+
+bool WebSettings::IsPrivateBrowsingEnabled() const
+{
+  return mWebEngineSettings.IsPrivateBrowsingEnabled();
+}
+
+void WebSettings::EnablePrivateBrowsing(bool enabled)
+{
+  mWebEngineSettings.EnablePrivateBrowsing(enabled);
+}
+
+bool WebSettings::IsLinkMagnifierEnabled() const
+{
+  return mWebEngineSettings.IsLinkMagnifierEnabled();
+}
+
+void WebSettings::EnableLinkMagnifier(bool enabled)
+{
+  mWebEngineSettings.EnableLinkMagnifier(enabled);
+}
+
+bool WebSettings::IsKeypadWithoutUserActionUsed() const
+{
+  return mWebEngineSettings.IsKeypadWithoutUserActionUsed();
+}
+
+void WebSettings::UseKeypadWithoutUserAction(bool used)
+{
+  mWebEngineSettings.UseKeypadWithoutUserAction(used);
+}
+
+bool WebSettings::IsAutofillPasswordFormEnabled() const
+{
+  return mWebEngineSettings.IsAutofillPasswordFormEnabled();
+}
+
+void WebSettings::EnableAutofillPasswordForm(bool enabled)
+{
+  mWebEngineSettings.EnableAutofillPasswordForm(enabled);
+}
+
+bool WebSettings::IsFormCandidateDataEnabled() const
+{
+  return mWebEngineSettings.IsFormCandidateDataEnabled();
+}
+
+void WebSettings::EnableFormCandidateData( bool enabled )
+{
+  mWebEngineSettings.EnableFormCandidateData(enabled);
+}
+
+bool WebSettings::IsTextSelectionEnabled() const
+{
+  return mWebEngineSettings.IsTextSelectionEnabled();
+}
+
+void WebSettings::EnableTextSelection( bool enabled )
+{
+  return mWebEngineSettings.EnableTextSelection(enabled);
+}
+
+bool WebSettings::IsTextAutosizingEnabled() const
+{
+  return mWebEngineSettings.IsTextAutosizingEnabled();
+}
+
+void WebSettings::EnableTextAutosizing( bool enabled )
+{
+  return mWebEngineSettings.EnableTextAutosizing(enabled);
+}
+
+bool WebSettings::IsArrowScrollEnabled() const
+{
+  return mWebEngineSettings.IsArrowScrollEnabled();
+}
+
+void WebSettings::EnableArrowScroll( bool enabled )
+{
+  return mWebEngineSettings.EnableArrowScroll(enabled);
+}
+
+bool WebSettings::IsClipboardEnabled() const
+{
+  return mWebEngineSettings.IsClipboardEnabled();
+}
+
+void WebSettings::EnableClipboard( bool enabled )
+{
+  return mWebEngineSettings.EnableClipboard(enabled);
+}
+
+bool WebSettings::IsImePanelEnabled() const
+{
+  return mWebEngineSettings.IsImePanelEnabled();
+}
+
+void WebSettings::EnableImePanel( bool enabled )
+{
+  return mWebEngineSettings.EnableImePanel(enabled);
 }
 
 void WebSettings::AllowScriptsOpenWindows(bool allowed)
