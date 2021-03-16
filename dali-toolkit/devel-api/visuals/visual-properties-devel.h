@@ -73,8 +73,16 @@ enum Type
 
   /**
    * @brief The radius for the rounded corners of the visual
-   * @details Name "cornerRadius", type Property::FLOAT, animatable
-   * @note Optional.
+   * @details Name "cornerRadius", type Property::FLOAT or Prooperty::VECTOR4, animatable
+   * @note By default, it is Vector::ZERO.
+   * @note Only Property::Vector4 can be animated.
+   * @note Radius value are used in clockwise order from top-left-corner to bottom-left-corner.
+   *       When radius is Vector4(x, y, z, w)
+   *       x    y
+   *        +--+
+   *        |  |
+   *        +--+
+   *       w    z
    */
   CORNER_RADIUS = OPACITY + 2,
 

@@ -516,9 +516,9 @@ int UtcDaliVisualGetPropertyMap1(void)
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::BLUE );
 
-  Property::Value* cornerRadiusValue = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
+  Property::Value* cornerRadiusValue = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4 );
   DALI_TEST_CHECK( cornerRadiusValue );
-  DALI_TEST_CHECK( cornerRadiusValue->Get< float >() == 10.0f );
+  DALI_TEST_CHECK( cornerRadiusValue->Get< Vector4 >() == Vector4(10.0f, 10.0f, 10.0f, 10.0f) );
 
   Property::Value* cornerRadiusPolicyValue = resultMap.Find( DevelVisual::Property::CORNER_RADIUS_POLICY, Property::INTEGER );
   DALI_TEST_CHECK( cornerRadiusPolicyValue );
@@ -3665,7 +3665,7 @@ int UtcDaliVisualRoundedCorner(void)
 
   static std::vector<UniformData> customUniforms =
   {
-    UniformData("cornerRadius", Property::Type::FLOAT),
+    UniformData("cornerRadius", Property::Type::VECTOR4),
     UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
   };
 
@@ -3701,7 +3701,7 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius) ), true, TEST_LOCATION );
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
   }
@@ -3734,7 +3734,7 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius) ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
   }
 
@@ -3742,7 +3742,7 @@ int UtcDaliVisualRoundedCorner(void)
   {
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
-    float cornerRadius = 0.5f;
+    Vector4 cornerRadius(0.5f, 0.5f, 0.5f, 0.3f);
 
     properties[Visual::Property::TYPE] = Visual::COLOR;
     properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
@@ -3766,7 +3766,7 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE ), true, TEST_LOCATION );
   }
 
@@ -3774,7 +3774,7 @@ int UtcDaliVisualRoundedCorner(void)
   {
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
-    float cornerRadius = 30.0f;
+    Vector4 cornerRadius(30.0f, 30.0f, 30.0f, 20.0f);
 
     properties[Visual::Property::TYPE] = Visual::COLOR;
     properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
@@ -3798,7 +3798,7 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
   }
@@ -3845,7 +3845,7 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius) ), true, TEST_LOCATION );
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
   }
@@ -3854,11 +3854,11 @@ int UtcDaliVisualRoundedCorner(void)
   {
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
-    float cornerRadius = 24.0f;
+    Vector4 cornerRadius(24.0f, 23.0f, 22.0f, 21.0f);
 
     properties[Visual::Property::TYPE] = Visual::ANIMATED_IMAGE;
     properties[ImageVisual::Property::URL] = TEST_GIF_FILE_NAME;
-    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius + 10.0f; // Dummy Input
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius.x + 10.0f; // Dummy Input
     properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
     properties["cornerRadiusPolicy"] = Toolkit::Visual::Transform::Policy::ABSOLUTE;
 
@@ -3881,7 +3881,7 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
   }
 
@@ -3889,7 +3889,7 @@ int UtcDaliVisualRoundedCorner(void)
   {
     VisualFactory factory = VisualFactory::Get();
     Property::Map properties;
-    float cornerRadius = 27.0f;
+    Vector4 cornerRadius(27.0f, 72.0f, 11.0f, 500.5f);
 
     properties[Visual::Property::TYPE] = Visual::SVG;
     properties[ImageVisual::Property::URL] = TEST_SVG_FILE_NAME;
@@ -3914,7 +3914,7 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
   }
@@ -3927,6 +3927,7 @@ int UtcDaliVisualRoundedCorner(void)
 
     properties[Visual::Property::TYPE] = DevelVisual::ANIMATED_VECTOR_IMAGE;
     properties[ImageVisual::Property::URL] = TEST_VECTOR_IMAGE_FILE_NAME;
+    properties["cornerRadius"] = Vector4(1.0f, 100.0f, 10.0f, 0.1f); // Dummy Input
     properties["cornerRadius"] = cornerRadius;
     properties[DevelVisual::Property::CORNER_RADIUS_POLICY] = Toolkit::Visual::Transform::Policy::RELATIVE;
 
@@ -3949,7 +3950,7 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius) ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE ), true, TEST_LOCATION );
   }
 #else
@@ -4148,7 +4149,7 @@ int UtcDaliVisualGetVisualProperty01(void)
     UniformData("mixColor", Property::Type::VECTOR3),
     UniformData("offset", Property::Type::VECTOR2),
     UniformData("size", Property::Type::VECTOR2),
-    UniformData("cornerRadius", Property::Type::FLOAT),
+    UniformData("cornerRadius", Property::Type::VECTOR4),
     UniformData("blurRadius", Property::Type::FLOAT),
   };
 
@@ -4159,7 +4160,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
   propertyMap.Insert(Visual::Property::MIX_COLOR, Color::BLUE);
-  propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, 10.0f);
+  propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, Vector4(10.0f, 0.0f, 2.0f, 4.0f));
   propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS_POLICY, Toolkit::Visual::Transform::Policy::RELATIVE);
   propertyMap.Insert(DevelColorVisual::Property::BLUR_RADIUS, 20.0f);
   Visual::Base colorVisual = factory.CreateVisual(propertyMap);
@@ -4177,7 +4178,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   Vector2 targetOffset(0.05f, 0.05f);
   Vector2 targetSize(1.1f, 1.1f);
   float targetOpacity = 0.5f;
-  float targetCornerRadius = 20.0f;
+  Vector4 targetCornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
   float targetBlurRadius = 10.0f;
 
   Animation animation = Animation::New(1.0f);
@@ -4213,9 +4214,9 @@ int UtcDaliVisualGetVisualProperty01(void)
   DALI_TEST_CHECK(sizeValue);
   DALI_TEST_EQUALS(sizeValue->Get<Vector2>(), targetSize, TEST_LOCATION);
 
-  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::FLOAT);
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
   DALI_TEST_CHECK(cornerRadiusValue);
-  DALI_TEST_EQUALS(cornerRadiusValue->Get< float >(), targetCornerRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< Vector4 >(), targetCornerRadius, TEST_LOCATION);
 
   Property::Value* blurRadiusValue = resultMap.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
   DALI_TEST_CHECK(blurRadiusValue);
@@ -4225,7 +4226,7 @@ int UtcDaliVisualGetVisualProperty01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("blurRadius", targetBlurRadius), true, TEST_LOCATION);
 
   // Test not-supported property
@@ -4248,7 +4249,6 @@ int UtcDaliVisualGetVisualProperty01(void)
 
 int UtcDaliVisualGetVisualProperty02(void)
 {
-#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualGetVisualProperty02: Test animatable property" );
 
@@ -4257,7 +4257,7 @@ int UtcDaliVisualGetVisualProperty02(void)
     UniformData("mixColor", Property::Type::VECTOR3),
     UniformData("offset", Property::Type::VECTOR2),
     UniformData("size", Property::Type::VECTOR2),
-    UniformData("cornerRadius", Property::Type::FLOAT),
+    UniformData("cornerRadius", Property::Type::VECTOR4),
     UniformData("blurRadius", Property::Type::FLOAT),
   };
 
@@ -4282,7 +4282,7 @@ int UtcDaliVisualGetVisualProperty02(void)
   Vector2 targetOffset(0.05f, 0.05f);
   Vector2 targetSize(1.1f, 1.1f);
   float targetOpacity = 0.5f;
-  float targetCornerRadius = 20.0f;
+  Vector4 targetCornerRadius(20.0f, 0.0f, 20.0f, 0.0f);
   float targetBlurRadius = 10.0f;
 
   // Should work when the properties are not set before
@@ -4319,22 +4319,21 @@ int UtcDaliVisualGetVisualProperty02(void)
   DALI_TEST_CHECK(sizeValue);
   DALI_TEST_EQUALS(sizeValue->Get<Vector2>(), targetSize, TEST_LOCATION);
 
-  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::FLOAT);
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
   DALI_TEST_CHECK(cornerRadiusValue);
-  DALI_TEST_EQUALS(cornerRadiusValue->Get< float >(), targetCornerRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< Vector4 >(), targetCornerRadius, TEST_LOCATION);
 
   Property::Value* blurRadiusValue = resultMap.Find(DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT);
   DALI_TEST_CHECK(blurRadiusValue);
   DALI_TEST_EQUALS(blurRadiusValue->Get< float >(), targetBlurRadius, TEST_LOCATION);
 
+#ifdef OLD_GRAPHICS_TEST
   // Test uniform values
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("size", targetSize), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("blurRadius", targetBlurRadius), true, TEST_LOCATION);
-#else
-  tet_result(TET_PASS);
 #endif
 
   END_TEST;
@@ -4348,7 +4347,7 @@ int UtcDaliVisualGetVisualProperty03(void)
 
   static std::vector<UniformData> customUniforms =
   {
-    UniformData("cornerRadius", Property::Type::FLOAT),
+    UniformData("cornerRadius", Property::Type::VECTOR4),
   };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -4373,7 +4372,7 @@ int UtcDaliVisualGetVisualProperty03(void)
   application.Render();
 
   float targetOpacity = 0.5f;
-  float targetCornerRadius = 20.0f;
+  Vector4 targetCornerRadius(20.0f, 20.0f, 0.0f, 0.0f);
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
@@ -4392,12 +4391,12 @@ int UtcDaliVisualGetVisualProperty03(void)
   DALI_TEST_CHECK(colorValue);
   DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(1.0f, 1.0f, 1.0f, targetOpacity), TEST_LOCATION);
 
-  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::FLOAT);
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
   DALI_TEST_CHECK(cornerRadiusValue);
-  DALI_TEST_EQUALS(cornerRadiusValue->Get< float >(), targetCornerRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< Vector4 >(), targetCornerRadius, TEST_LOCATION);
 
   // Test uniform value
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
 #else
   tet_result(TET_PASS);
 #endif
@@ -4413,7 +4412,7 @@ int UtcDaliVisualGetVisualProperty04(void)
 
   static std::vector<UniformData> customUniforms =
   {
-    UniformData("cornerRadius", Property::Type::FLOAT),
+    UniformData("cornerRadius", Property::Type::VECTOR4),
   };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -4445,7 +4444,7 @@ int UtcDaliVisualGetVisualProperty04(void)
   application.Render();
 
   float targetOpacity = 0.5f;
-  float targetCornerRadius = 20.0f;
+  Vector4 targetCornerRadius(20.0f, 30.0f, 10.0f, 20.0f);
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
@@ -4464,12 +4463,12 @@ int UtcDaliVisualGetVisualProperty04(void)
   DALI_TEST_CHECK(colorValue);
   DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(1.0f, 1.0f, 1.0f, targetOpacity), TEST_LOCATION);
 
-  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::FLOAT);
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
   DALI_TEST_CHECK(cornerRadiusValue);
-  DALI_TEST_EQUALS(cornerRadiusValue->Get< float >(), targetCornerRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< Vector4 >(), targetCornerRadius, TEST_LOCATION);
 
   // Test uniform value
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
 #else
   tet_result(TET_PASS);
 #endif
