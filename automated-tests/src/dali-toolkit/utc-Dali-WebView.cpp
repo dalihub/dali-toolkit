@@ -101,6 +101,7 @@ static std::shared_ptr<Dali::WebEngineContextMenu> gContextMenuInstance = nullpt
 static int gContextMenuItemSelectedCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineContextMenuItem> gContextMenuItemInstance = nullptr;
 static int gHitTestCreatedCallbackCalled = 0;
+static int gCookieManagerChangsWatchCallbackCalled = 0;
 
 struct CallbackFunctor
 {
@@ -202,6 +203,11 @@ static bool OnTouched( Actor actor, const Dali::TouchEvent& touch )
 {
   gTouched = true;
   return true;
+}
+
+static void OnChangesWatch()
+{
+  gCookieManagerChangsWatchCallbackCalled++;
 }
 
 static bool OnHovered( Actor actor, const Dali::HoverEvent& hover )
@@ -1692,6 +1698,23 @@ int UtcDaliWebCookieManagerGetSetCookieAcceptPolicy(void)
   cookieManager->SetCookieAcceptPolicy( Dali::WebEngineCookieManager::CookieAcceptPolicy::ALWAYS );
   value = cookieManager->GetCookieAcceptPolicy();
   DALI_TEST_CHECK( value == Dali::WebEngineCookieManager::CookieAcceptPolicy::ALWAYS );
+
+  END_TEST;
+}
+
+int UtcDaliWebCookieManagerChangesWatch(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebCookieManager* cookieManager = view.GetCookieManager();
+  DALI_TEST_CHECK( cookieManager != 0 )
+
+  cookieManager->ChangesWatch(&OnChangesWatch);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gCookieManagerChangsWatchCallbackCalled, 1, TEST_LOCATION );
 
   END_TEST;
 }

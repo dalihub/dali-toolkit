@@ -83,6 +83,7 @@ bool OnStorageUsageAcquired();
 bool OnFormPasswordAcquired();
 bool OnDownloadStarted();
 bool OnMimeOverridden();
+bool OnChangesWatch();
 
 static void ConnectToGlobalSignal( bool ( *func )() )
 {
@@ -255,6 +256,18 @@ public:
   void SetPersistentStorage( const std::string& path, Dali::WebEngineCookieManager::CookiePersistentStorage storage ) override
   {
   }
+
+  void ChangesWatch( Dali::WebEngineCookieManager::WebEngineCookieManagerChangesWatchCallback callback ) override
+  {
+    if ( callback )
+    {
+      ConnectToGlobalSignal( &OnChangesWatch );
+      mChangesWatchCallback = callback;
+    }
+  }
+
+public:
+  Dali::WebEngineCookieManager::WebEngineCookieManagerChangesWatchCallback mChangesWatchCallback;
 
 private:
   Dali::WebEngineCookieManager::CookieAcceptPolicy mockCookieAcceptPolicy;
@@ -1724,6 +1737,22 @@ bool OnMimeOverridden()
     std::string newMime;
     gWebEngineContextInstance->mMimeOverriddenCallback("http://test.html", "txt/xml", newMime);
   }
+  return false;
+}
+
+bool OnChangesWatch()
+{
+  DisconnectFromGlobalSignal( &OnChangesWatch );
+
+  if ( gInstance )
+  {
+    MockWebEngineCookieManager* temp = (MockWebEngineCookieManager *)(&(gInstance->GetCookieManager()));
+    if ( temp )
+    {
+      temp->mChangesWatchCallback();
+    }
+  }
+
   return false;
 }
 

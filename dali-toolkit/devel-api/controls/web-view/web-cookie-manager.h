@@ -93,6 +93,13 @@ public:
    */
   void SetPersistentStorage(const std::string& path, Dali::WebEngineCookieManager::CookiePersistentStorage storage);
 
+  /**
+   * @brief Watch for cookies' changes in @a manager.
+   *
+   * @param[in] callback cookies are added, removed or modified.
+   */
+  void ChangesWatch(Dali::WebEngineCookieManager::WebEngineCookieManagerChangesWatchCallback callback);
+
 private:
   Dali::WebEngineCookieManager& mWebEngineCookieManager;
 };

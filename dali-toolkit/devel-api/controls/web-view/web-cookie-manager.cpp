@@ -51,6 +51,11 @@ void WebCookieManager::SetPersistentStorage(const std::string& path, Dali::WebEn
   mWebEngineCookieManager.SetPersistentStorage(path, storage);
 }
 
+void WebCookieManager::ChangesWatch(Dali::WebEngineCookieManager::WebEngineCookieManagerChangesWatchCallback callback)
+{
+  mWebEngineCookieManager.ChangesWatch(callback);
+}
+
 } // namespace Toolkit
 
 } // namespace Dali
