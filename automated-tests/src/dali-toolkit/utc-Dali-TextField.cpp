@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1028,19 +1028,22 @@ int utcDaliTextFieldTextChangedP(void)
 
   gTextChangedCallBackCalled = false;
   field.SetProperty( TextField::Property::TEXT, "ABC" );
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
   DALI_TEST_CHECK( textChangedSignal );
-
-  application.SendNotification();
 
   field.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   END_TEST;
 }
+
 
 // Negative test for the textChanged signal.
 int utcDaliTextFieldTextChangedN(void)
@@ -1060,6 +1063,8 @@ int utcDaliTextFieldTextChangedN(void)
 
   gTextChangedCallBackCalled = false;
   field.SetProperty( TextField::Property::PLACEHOLDER_TEXT, "ABC" ); // Setting placeholder, not TEXT
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
   DALI_TEST_CHECK( !textChangedSignal );
 
