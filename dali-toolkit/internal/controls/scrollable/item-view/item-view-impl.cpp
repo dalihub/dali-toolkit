@@ -1345,11 +1345,11 @@ void ItemView::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
   }
 }
 
-void ItemView::AccessibleImpl::EnsureChildVisible(Actor child)
+bool ItemView::AccessibleImpl::ScrollToChild(Actor child)
 {
-  EnsureSelfVisible();
   auto itemView = Dali::Toolkit::ItemView::DownCast(Self());
   Toolkit::GetImpl(itemView).OnKeyboardFocusChangeCommitted(child);
+  return true;
 }
 
 Animation ItemView::DoAnchoring()

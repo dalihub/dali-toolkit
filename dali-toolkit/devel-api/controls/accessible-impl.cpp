@@ -266,6 +266,23 @@ static Dali::Actor CreateHighlightIndicatorActor()
   return actor;
 }
 
+void AccessibleImpl::ScrollToSelf()
+{
+  auto* child = this;
+  auto* parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(child->GetParent());
+
+  while (parent)
+  {
+    if (parent->IsScrollable())
+    {
+      parent->ScrollToChild(child->Self());
+    }
+
+    child = parent;
+    parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(parent->GetParent());
+  }
+}
+
 bool AccessibleImpl::GrabHighlight()
 {
   Dali::Actor self = Self();
@@ -295,7 +312,7 @@ bool AccessibleImpl::GrabHighlight()
   // Remember the highlight actor, so that when the default is changed with
   // SetHighlightActor(), the currently displayed highlight can still be cleared.
   currentHighlightActor = highlight;
-  EnsureSelfVisible();
+  ScrollToSelf();
   self.Add(highlight);
   SetCurrentlyHighlightedActor(self);
   EmitHighlighted(true);
@@ -402,17 +419,9 @@ std::vector<Dali::Accessibility::Relation> AccessibleImpl::GetRelationSet()
   return ret;
 }
 
-void AccessibleImpl::EnsureChildVisible(Actor child)
+bool AccessibleImpl::ScrollToChild(Actor child)
 {
-}
-
-void AccessibleImpl::EnsureSelfVisible()
-{
-  auto parent = dynamic_cast<AccessibleImpl*>(GetParent());
-  if(parent)
-  {
-    parent->EnsureChildVisible(Self());
-  }
+  return false;
 }
 
 Dali::Property::Index AccessibleImpl::GetNamePropertyIndex()

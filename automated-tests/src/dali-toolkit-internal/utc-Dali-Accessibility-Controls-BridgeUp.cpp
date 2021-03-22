@@ -937,3 +937,117 @@ int UtcDaliAccessibilitySignals(void)
 
   END_TEST;
 }
+
+static void Wait(ToolkitTestApplication& application)
+{
+  application.SendNotification();
+  application.Render(16);
+}
+
+int UtcDaliAccessibilityScrollToChildScrollView(void)
+{
+  ToolkitTestApplication application;
+  Dali::Accessibility::TestEnableSC( true );
+
+  ScrollView scrollView = ScrollView::New();
+  application.GetScene().Add( scrollView );
+
+  PushButton actorA = PushButton::New();
+  const Dali::Vector3 positionA = Vector3(100.0f, 400.0f, 0.0f);
+  actorA.SetProperty( Dali::Actor::Property::POSITION, positionA );
+  scrollView.Add(actorA);
+
+  PushButton actorB = PushButton::New();
+  const Dali::Vector3 positionB = Vector3(500.0f, 200.0f, 0.0f);
+  actorB.SetProperty( Dali::Actor::Property::POSITION, positionB );
+  scrollView.Add(actorB);
+
+  Wait(application);
+
+  auto* accessibleParent = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(scrollView));
+  DALI_TEST_CHECK(accessibleParent);
+  auto* accessibleA = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(actorA));
+  DALI_TEST_CHECK(accessibleA);
+  auto* accessibleB = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(actorB));
+  DALI_TEST_CHECK(accessibleB);
+
+  accessibleA->GrabHighlight(); // == scrollView.ScrollTo(actorA)
+  Wait(application);
+  accessibleB->GrabHighlight(); // == scrollView.ScrollTo(actorB)
+  Wait(application);
+
+  Dali::Accessibility::TestEnableSC( false );
+  END_TEST;
+}
+
+namespace {
+  class TestItemFactory : public ItemFactory
+  {
+  public:
+    TestItemFactory()
+    {
+    }
+
+    unsigned int GetNumberOfItems() override
+    {
+      return 2;
+    }
+
+    Dali::Actor NewItem(unsigned int itemId) override
+    {
+      return TextLabel::New(std::to_string(itemId));
+    }
+  };
+}
+
+int UtcDaliAccessibilityScrollToChildItemView(void)
+{
+  ToolkitTestApplication application;
+  Dali::Accessibility::TestEnableSC( true );
+
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+  Dali::Vector3 vec(480.0f, 800.0f, 0.0f);
+  ItemLayoutPtr layout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+
+  view.AddLayout(*layout);
+  view.SetProperty( Actor::Property::SIZE, vec );
+
+  application.GetScene().Add(view);
+  layout->SetOrientation(ControlOrientation::Down);
+  view.ActivateLayout(0, vec, 0.0f);
+
+  Wait(application);
+
+  auto* accessibleParent = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(view));
+  DALI_TEST_CHECK(accessibleParent);
+  auto* accessibleA = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(view.GetItem(0)));
+  DALI_TEST_CHECK(accessibleA);
+  auto* accessibleB = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(view.GetItem(1)));
+  DALI_TEST_CHECK(accessibleB);
+
+  accessibleA->GrabHighlight(); // == view.ScrollToItem(view.GetItemId(actorA))
+  Wait(application);
+  accessibleB->GrabHighlight(); // == view.ScrollToItem(view.GetItemId(actorB))
+  Wait(application);
+
+  Dali::Accessibility::TestEnableSC( false );
+  END_TEST;
+}
+
+int UtcDaliAccessibilityScrollToChildNonScrollable(void)
+{
+  ToolkitTestApplication application;
+  Dali::Accessibility::TestEnableSC( true );
+
+  TextLabel label = TextLabel::New("123");
+
+  auto* accessible = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(label));
+  DALI_TEST_CHECK(accessible);
+
+  DALI_TEST_EQUALS(accessible->IsScrollable(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(accessible->ScrollToChild({}), false, TEST_LOCATION);
+
+  Dali::Accessibility::TestEnableSC( false );
+  END_TEST;
+}

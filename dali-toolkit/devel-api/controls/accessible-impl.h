@@ -62,6 +62,8 @@ protected:
     return handle;
   }
 
+  void ScrollToSelf();
+
 public:
   AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
 
@@ -207,14 +209,9 @@ public:
 
   /**
    * @brief Makes sure that a given child of this container (e.g. ItemView) is visible
+   * @return false if scrolling is not supported or child is already visible
    */
-  virtual void EnsureChildVisible(Actor child);
-
-  /**
-   * @brief Makes sure this actor is visible (when moving the highlight frame to an
-   * actor that is scrolled out of the viewport)
-   */
-  virtual void EnsureSelfVisible();
+  virtual bool ScrollToChild(Actor child);
 
   /**
    * @brief Returns the index of the property that represents this actor's name

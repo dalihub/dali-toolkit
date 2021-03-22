@@ -790,7 +790,7 @@ protected:
   {
     using Scrollable::AccessibleImpl::AccessibleImpl;
 
-    void EnsureChildVisible(Actor child) override;
+    bool ScrollToChild(Actor child) override;
   };
 
   /**
