@@ -132,9 +132,7 @@ Actor AccessibilityManager::GetActorByFocusOrder(const unsigned int order)
 
 bool AccessibilityManager::SetCurrentFocusActor(Actor actor)
 {
-  Dali::Accessibility::Accessible::SetCurrentlyHighlightedActor(actor);
-
-  return true;
+  return Toolkit::DevelControl::GrabAccessibilityHighlight(actor);
 }
 
 Actor AccessibilityManager::GetCurrentFocusActor()
