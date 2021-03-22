@@ -45,6 +45,7 @@ SET(TC_SOURCES
   utc-Dali-Tooltip.cpp
   utc-Dali-TransitionData.cpp
   utc-Dali-Button.cpp
+  utc-Dali-CameraView.cpp
   utc-Dali-Control.cpp
   utc-Dali-ControlImpl.cpp
   utc-Dali-ItemLayout.cpp
