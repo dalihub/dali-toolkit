@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/common/stage.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
@@ -364,7 +365,7 @@ NPatchVisual::NPatchVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFa
 
 NPatchVisual::~NPatchVisual()
 {
-  if((mId != NPatchData::INVALID_NPATCH_DATA_ID) && (mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER))
+  if(Stage::IsInstalled() && (mId != NPatchData::INVALID_NPATCH_DATA_ID) && (mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER))
   {
     mLoader.Remove(mId, this);
     mId = NPatchData::INVALID_NPATCH_DATA_ID;
