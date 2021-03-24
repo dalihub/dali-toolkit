@@ -33,7 +33,7 @@ struct DALI_SCENE_LOADER_API MeshGeometry
   Geometry      geometry;                    ///< The array of vertices.
   Texture       blendShapeGeometry;          ///< The array of vertices of the different blend shapes encoded inside a texture with power of two dimensions.
   Vector<float> blendShapeUnnormalizeFactor; ///< Factor used to unnormalize the geometry of the blend shape.
-  unsigned int  blendShapeBufferOffset;      ///< Offset used to calculate the start of each blend shape.
+  unsigned int  blendShapeBufferOffset{0};   ///< Offset used to calculate the start of each blend shape.
 };
 
 } // namespace SceneLoader

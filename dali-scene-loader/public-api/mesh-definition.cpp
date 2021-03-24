@@ -470,6 +470,11 @@ void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std:
                                                    value = std::min(std::max(min[i], value), max[i]);
                                                  });
 
+  if(!clampFn)
+  {
+    return;
+  }
+
   auto end = values + count * numComponents;
   while(values != end)
   {
