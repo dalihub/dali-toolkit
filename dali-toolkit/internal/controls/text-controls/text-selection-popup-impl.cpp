@@ -107,6 +107,7 @@ DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupMinSize", VECTOR2,
 DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionMaxSize", VECTOR2, OPTION_MAX_SIZE)
 DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionMinSize", VECTOR2, OPTION_MIN_SIZE)
 DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionDividerSize", VECTOR2, OPTION_DIVIDER_SIZE)
+DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "optionDividerPadding", VECTOR4, OPTION_DIVIDER_PADDING)
 DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupClipboardButtonImage", STRING, POPUP_CLIPBOARD_BUTTON_ICON_IMAGE)
 DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupCutButtonImage", STRING, POPUP_CUT_BUTTON_ICON_IMAGE)
 DALI_PROPERTY_REGISTRATION(Toolkit, TextSelectionPopup, "popupCopyButtonImage", STRING, POPUP_COPY_BUTTON_ICON_IMAGE)
@@ -170,6 +171,12 @@ void TextSelectionPopup::SetProperty(BaseObject* object, Property::Index index, 
       case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_SIZE:
       {
         impl.SetDimensionToCustomise(OPTION_DIVIDER_SIZE, value.Get<Vector2>());
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_PADDING:
+      {
+        Vector4 padding(value.Get<Vector4>());
+        impl.SetOptionDividerPadding(Padding(padding.x, padding.y, padding.z, padding.w));
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
@@ -272,6 +279,12 @@ Property::Value TextSelectionPopup::GetProperty(BaseObject* object, Property::In
       case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_SIZE:
       {
         value = impl.GetDimensionToCustomise(OPTION_DIVIDER_SIZE);
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_PADDING:
+      {
+        Padding padding = impl.GetOptionDividerPadding();
+        value           = Vector4(padding.x, padding.y, padding.top, padding.bottom);
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
@@ -628,6 +641,17 @@ std::string TextSelectionPopup::GetPressedImage() const
   return mPressedImage;
 }
 
+void TextSelectionPopup::SetOptionDividerPadding(const Padding& padding)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextSelectionPopup::SetOptionDividerPadding padding(%f,%f,%f,%f)\n", padding.left, padding.right, padding.bottom, padding.top);
+  mOptionDividerPadding = Padding(padding.left, padding.right, padding.bottom, padding.top);
+}
+
+Padding TextSelectionPopup::GetOptionDividerPadding() const
+{
+  return mOptionDividerPadding;
+}
+
 void TextSelectionPopup::CreateOrderedListOfPopupOptions()
 {
   mOrderListOfButtons.clear();
@@ -734,7 +758,8 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
   // 6. Add the divider
   if(showDivider)
   {
-    const Size size(mOptionDividerSize.width, 0.0f); // Height FILL_TO_PARENT
+    const Size    size(mOptionDividerSize.width, 0.0f); // Height FILL_TO_PARENT
+    const Padding padding(mOptionDividerPadding);
 
     Toolkit::Control divider = Toolkit::Control::New();
 #ifdef DECORATOR_DEBUG
@@ -742,6 +767,7 @@ void TextSelectionPopup::AddOption(const ButtonRequirement& button, bool showDiv
 #endif
     divider.SetProperty(Actor::Property::SIZE, size);
     divider.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT);
+    divider.SetProperty(Actor::Property::PADDING, padding);
     divider.SetBackgroundColor(mDividerColor);
     mToolbar.AddDivider(divider);
   }
@@ -843,6 +869,7 @@ TextSelectionPopup::TextSelectionPopup(TextSelectionPopupCallbackInterface* call
   mOptionMaxSize(),
   mOptionMinSize(),
   mOptionDividerSize(),
+  mOptionDividerPadding(),
   mEnabledButtons(Toolkit::TextSelectionPopup::NONE),
   mCallbackInterface(callbackInterface),
   mPressedColor(DEFAULT_OPTION_PRESSED_COLOR),

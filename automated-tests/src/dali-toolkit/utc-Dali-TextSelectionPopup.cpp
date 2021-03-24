@@ -260,15 +260,18 @@ int UtcDaliToolkitTextSelectionPopupSizeProperties(void)
   const Vector2 optionMaxSize(50.0f, 100.0f);
   const Vector2 optionMinSize(10.0f, 10.0f);
   const Vector2 optionDividerSize(5.0f, 5.0f);
+  const Vector4 optionDividerPadding(20.0f, 20.0f, 10.0f, 10.0f);
   popup.SetProperty(TextSelectionPopup::Property::POPUP_MAX_SIZE, popupMaxSize);
   popup.SetProperty(TextSelectionPopup::Property::OPTION_MAX_SIZE, optionMaxSize);
   popup.SetProperty(TextSelectionPopup::Property::OPTION_MIN_SIZE, optionMinSize);
   popup.SetProperty(TextSelectionPopup::Property::OPTION_DIVIDER_SIZE, optionDividerSize);
+  popup.SetProperty(TextSelectionPopup::Property::OPTION_DIVIDER_PADDING, optionDividerPadding);
 
   DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::POPUP_MAX_SIZE).Get<Vector2>(), popupMaxSize, TEST_LOCATION);
   DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::OPTION_MAX_SIZE).Get<Vector2>(), optionMaxSize, TEST_LOCATION);
   DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::OPTION_MIN_SIZE).Get<Vector2>(), optionMinSize, TEST_LOCATION);
   DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::OPTION_DIVIDER_SIZE).Get<Vector2>(), optionDividerSize, TEST_LOCATION);
+  DALI_TEST_EQUALS( popup.GetProperty(TextSelectionPopup::Property::OPTION_DIVIDER_PADDING).Get<Vector4>(), optionDividerPadding, TEST_LOCATION);
 
   END_TEST;
 }
