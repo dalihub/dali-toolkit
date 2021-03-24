@@ -103,6 +103,7 @@ const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGr
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
 const char* const PROPERTY_NAME_MAX_LENGTH                           = "maxLength";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
+const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
 
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
@@ -495,6 +496,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MAX_LENGTH ) == DevelTextEditor::Property::MAX_LENGTH );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_COLOR ) == DevelTextEditor::Property::GRAB_HANDLE_COLOR );
 
 
   END_TEST;
@@ -909,6 +911,10 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   editor.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
   DALI_TEST_EQUALS( editor.GetProperty<int>( Actor::Property::LAYOUT_DIRECTION ), static_cast<int>( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+
+  // Check handle color
+  editor.SetProperty( DevelTextEditor::Property::GRAB_HANDLE_COLOR, Color::GREEN );
+  DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::GRAB_HANDLE_COLOR ), Color::GREEN, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
