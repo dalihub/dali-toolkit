@@ -153,7 +153,7 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
   // Do this last since it provides callbacks into application code.
   if(NULL != impl.mEditableControlInterface)
   {
-    impl.mEditableControlInterface->TextChanged();
+    impl.mEditableControlInterface->TextChanged(true);
   }
 }
 
@@ -433,7 +433,7 @@ void Controller::TextUpdater::PasteText(Controller& controller, const std::strin
   if(NULL != impl.mEditableControlInterface)
   {
     // Do this last since it provides callbacks into application code
-    impl.mEditableControlInterface->TextChanged();
+    impl.mEditableControlInterface->TextChanged(true);
   }
 }
 
