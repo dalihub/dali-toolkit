@@ -1332,9 +1332,7 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     // If there is text changed, callback is called.
     if(mTextChanged)
     {
-      Dali::Toolkit::TextEditor handle(GetOwner());
-      mTextChangedSignal.Emit(handle);
-      mTextChanged = false;
+      EmitTextChangedSignal();
     }
   }
 
@@ -1516,9 +1514,23 @@ void TextEditor::RequestTextRelayout()
   RelayoutRequest();
 }
 
-void TextEditor::TextChanged()
+void TextEditor::TextChanged(bool immediate)
 {
-  mTextChanged = true;
+  if(immediate) // Emits TextChangedSignal immediately
+  {
+    EmitTextChangedSignal();
+  }
+  else
+  {
+    mTextChanged = true;
+  }
+}
+
+void TextEditor::EmitTextChangedSignal()
+{
+  Dali::Toolkit::TextEditor handle(GetOwner());
+  mTextChangedSignal.Emit(handle);
+  mTextChanged = false;
 }
 
 void TextEditor::MaxLengthReached()

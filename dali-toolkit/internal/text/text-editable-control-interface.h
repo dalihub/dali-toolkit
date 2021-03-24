@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_EDITABLE_CONTROL_INTERFACE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,32 +23,31 @@
 
 namespace Dali
 {
-
 class Actor;
 
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief An interface that the Text::Controller uses to notify about text changes and add decoration to the text control.
  */
 class EditableControlInterface
 {
 public:
-
   /**
    * @brief Virtual destructor.
    */
   virtual ~EditableControlInterface()
-  {}
+  {
+  }
 
   /**
    * @brief Called to signal that text has been inserted or deleted.
+   *
+   * @param[in] immediate If true, it immediately emits the signal, if false, only emits once the signal when OnRelayout() is called next time.
    */
-  virtual void TextChanged() = 0;
+  virtual void TextChanged(bool immediate) = 0;
 
   /**
    * @brief Called when the number of characters to be inserted exceeds the maximum limit
@@ -60,7 +59,7 @@ public:
    *
    * @param[in] inputStyleMask Mask with the bits of the input style that has changed.
    */
-  virtual void InputStyleChanged( InputStyle::Mask inputStyleMask ) = 0;
+  virtual void InputStyleChanged(InputStyle::Mask inputStyleMask) = 0;
 
   /**
    * @brief Add a decoration.
@@ -68,7 +67,7 @@ public:
    * @param[in] decoration The actor displaying a decoration.
    * @param[in] needsClipping Whether the actor needs clipping.
    */
-  virtual void AddDecoration( Actor& actor, bool needsClipping ) = 0;
+  virtual void AddDecoration(Actor& actor, bool needsClipping) = 0;
 
   /**
    * @brief Editable status (on/off).
@@ -82,7 +81,7 @@ public:
    *
    * @param[in] editable The editable status.
    */
-  virtual void SetEditable( bool editable ) = 0;
+  virtual void SetEditable(bool editable) = 0;
 };
 
 } // namespace Text

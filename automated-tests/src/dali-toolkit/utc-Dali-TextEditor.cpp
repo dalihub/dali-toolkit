@@ -957,17 +957,14 @@ int utcDaliTextEditorTextChangedP(void)
 
   gTextChangedCallBackCalled = false;
   editor.SetProperty( TextEditor::Property::TEXT, "ABC" );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
   DALI_TEST_CHECK( textChangedSignal );
 
+  application.SendNotification();
   editor.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   END_TEST;

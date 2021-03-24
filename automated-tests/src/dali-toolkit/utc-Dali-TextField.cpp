@@ -1028,18 +1028,86 @@ int utcDaliTextFieldTextChangedP(void)
 
   gTextChangedCallBackCalled = false;
   field.SetProperty( TextField::Property::TEXT, "ABC" );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
   DALI_TEST_CHECK( textChangedSignal );
 
+  application.SendNotification();
   field.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  DALI_TEST_CHECK( gTextChangedCallBackCalled );
+
+  END_TEST;
+}
+
+int utcDaliTextFieldTextChangedWithInputMethodContext(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldTextChangedWithInputMethodContext");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+
+  application.GetScene().Add( field );
+
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  field.TextChangedSignal().Connect(&TestTextChangedCallback);
+  bool textChangedSignal = false;
+  field.ConnectSignal( testTracker, "textChanged",   CallbackFunctor(&textChangedSignal) );
+
+
+  // get InputMethodContext
+  std::string text;
+  InputMethodContext::EventData imfEvent;
+  InputMethodContext inputMethodContext = DevelTextField::GetInputMethodContext( field );
+
+  field.SetKeyInputFocus();
+  field.SetProperty( DevelTextField::Property::ENABLE_EDITING, true );
+
+  // input text
+  gTextChangedCallBackCalled = false;
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "ㅎ", 0, 1 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string("ㅎ"), TEST_LOCATION );
+
+  gTextChangedCallBackCalled = false;
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "호", 0, 1 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( gTextChangedCallBackCalled );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string("호"), TEST_LOCATION );
+
+  gTextChangedCallBackCalled = false;
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "혿", 0, 1 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( gTextChangedCallBackCalled );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string("혿"), TEST_LOCATION );
+
+  gTextChangedCallBackCalled = false;
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "", 0, 1 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  DALI_TEST_CHECK( !gTextChangedCallBackCalled );
+
+  imfEvent = InputMethodContext::EventData( InputMethodContext::COMMIT, "호", 0, 1 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  DALI_TEST_CHECK( !gTextChangedCallBackCalled );
+
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "두", 1, 2 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  DALI_TEST_CHECK( !gTextChangedCallBackCalled );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( gTextChangedCallBackCalled );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string("호두"), TEST_LOCATION );
 
   END_TEST;
 }
