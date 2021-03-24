@@ -46,6 +46,8 @@ namespace Adaptor
 Window::Window( const PositionSize& positionSize )
 : SceneHolder( positionSize ),
   mFocusChangeSignal(),
+  mResizeSignal(),
+  mRotationAngle(90), // dummy angle for test coverage
   mVisibilityChangedSignal()
 {
 }
@@ -160,6 +162,11 @@ FocusChangeSignalType& Window::FocusChangeSignal()
   return GetImplementation( *this ).mFocusChangeSignal;
 }
 
+ResizeSignalType& Window::ResizeSignal()
+{
+  return GetImplementation( *this ).mResizeSignal;
+}
+
 Window::KeyEventSignalType& Window::KeyEventSignal()
 {
   return GetImplementation( *this ).KeyEventSignal();
@@ -193,6 +200,17 @@ Window DownCast( BaseHandle handle )
     windowImpl = dynamic_cast<Dali::Internal::Adaptor::Window*>( handle.GetObjectPtr());
   }
   return Dali::Window( windowImpl );
+}
+
+void SetPositionSize(Window window, PositionSize positionSize)
+{
+  Uint16Pair newSize(positionSize.width, positionSize.height);
+  GetImplementation( window ).mResizeSignal.Emit(window,newSize);
+}
+
+int GetPhysicalOrientation(Window window)
+{
+  return GetImplementation( window ).mRotationAngle;
 }
 
 void AddFrameRenderedCallback( Window window, std::unique_ptr< CallbackBase > callback, int32_t frameId )

@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/video-player.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/integration-api/adaptor-framework/trigger-event-factory.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-map.h>
@@ -364,6 +365,15 @@ private:
    *
    */
   void OnAnimationFinished(Dali::Animation& animation);
+
+  /*
+   * @brief window's resize callback function
+   * This function is called when window is resized.
+   *
+   * @param[in] winHandle The resized window's handle.
+   * @param[in] size The window's new size.
+   */
+  void OnWindowResized(Dali::Window winHandle, Dali::Window::WindowSize size);
 
 private:
   Dali::VideoPlayer     mVideoPlayer;
