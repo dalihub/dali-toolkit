@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -241,30 +241,32 @@ int UtcDaliImageAtlasUploadP(void)
   DALI_TEST_EQUALS( pixelArea1.height, 34, TEST_LOCATION );
 
   TraceCallStack::NamedParams params;
-  params["width"] = ToString(pixelArea1.width);
-  params["height"] = ToString(pixelArea1.height);
-  params["xoffset"] = ToString(pixelArea1.x);
-  params["yoffset"] = ToString(pixelArea1.y);
+  params["width"] <<pixelArea1.width;
+  params["height"] <<pixelArea1.height;
+  params["xoffset"] <<pixelArea1.x;
+  params["yoffset"] <<pixelArea1.y;
   DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", params ));
 
   Rect<int> pixelArea2 = TextureCoordinateToPixelArea(textureRect2, size);
   DALI_TEST_EQUALS( pixelArea2.width, 50, TEST_LOCATION );
   DALI_TEST_EQUALS( pixelArea2.height, 50, TEST_LOCATION );
 
-  params["width"] = ToString(pixelArea2.width);
-  params["height"] = ToString(pixelArea2.height);
-  params["xoffset"] = ToString(pixelArea2.x);
-  params["yoffset"] = ToString(pixelArea2.y);
+  params.mParams.clear();
+  params["width"] <<pixelArea2.width;
+  params["height"] <<pixelArea2.height;
+  params["xoffset"] <<pixelArea2.x;
+  params["yoffset"] <<pixelArea2.y;
   DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", params ) );
 
   Rect<int> pixelArea3 = TextureCoordinateToPixelArea(textureRect3, size);
   DALI_TEST_EQUALS( pixelArea3.width, 128, TEST_LOCATION );
   DALI_TEST_EQUALS( pixelArea3.height, 128, TEST_LOCATION );
 
-  params["width"] = ToString(pixelArea3.width);
-  params["height"] = ToString(pixelArea3.height);
-  params["xoffset"] = ToString(pixelArea3.x);
-  params["yoffset"] = ToString(pixelArea3.y);
+  params.mParams.clear();
+  params["width"] <<pixelArea3.width;
+  params["height"] <<pixelArea3.height;
+  params["xoffset"] <<pixelArea3.x;
+  params["yoffset"] <<pixelArea3.y;
   DALI_TEST_CHECK( callStack.FindMethodAndParams("TexSubImage2D", params ) );
 
   DALI_TEST_CHECK( ! IsOverlap(pixelArea1, pixelArea2) );
@@ -430,16 +432,16 @@ int UtcDaliImageAtlasImageView(void)
   callStack.Enable(false);
 
   TraceCallStack::NamedParams params1;
-  params1["width"] = "34";
-  params1["height"] = "34";
-  params1["xoffset"] = "0";
-  params1["yoffset"] = "0";
+  params1["width"] << 34;
+  params1["height"] << 34;
+  params1["xoffset"] << 0;
+  params1["yoffset"] << 0;
 
   TraceCallStack::NamedParams params2;
-  params2["width"] = "50";
-  params2["height"] = "50";
-  params2["xoffset"] = "0";
-  params2["yoffset"] = "34";
+  params2["width"] << 50;
+  params2["height"] << 50;
+  params2["xoffset"] << 0;
+  params2["yoffset"] << 34;
 
   DALI_TEST_EQUALS(  callStack.FindMethodAndParams("TexSubImage2D", params1 ), true, TEST_LOCATION );
   DALI_TEST_EQUALS(  callStack.FindMethodAndParams("TexSubImage2D", params2 ), true, TEST_LOCATION );
@@ -473,10 +475,10 @@ int UtcDaliImageAtlasImageView(void)
   callStack.Enable(false);
 
   TraceCallStack::NamedParams params3;
-  params3["width"] = "100";
-  params3["height"] = "100";
-  params3["xoffset"] = "0";
-  params3["yoffset"] = "34";
+  params3["width"] << 100;
+  params3["height"] << 100;
+  params3["xoffset"] << 0;
+  params3["yoffset"] << 34;
 
   DALI_TEST_EQUALS(  callStack.FindMethodAndParams("TexSubImage2D", params3 ), true, TEST_LOCATION );
 

@@ -12,33 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-#include "test-application.h"
-
-#include "test-native-image.h"
+#include "test-graphics-shader.h"
 
 namespace Dali
 {
-TestNativeImagePointer TestNativeImage::New(uint32_t width, uint32_t height)
-{
-  return new TestNativeImage(width, height);
-}
-
-TestNativeImage::TestNativeImage(uint32_t width, uint32_t height)
-: mWidth(width),
-  mHeight(height),
-  mExtensionCreateCalls(0),
-  mExtensionDestroyCalls(0),
-  mTargetTextureCalls(0),
-  createResult(true),
-  mCallStack(true, "NativeImage::")
-{
-  mCallStack.EnableLogging(true);
-}
-
-TestNativeImage::~TestNativeImage()
+TestGraphicsShader::TestGraphicsShader(TestGlAbstraction& gl, const Graphics::ShaderCreateInfo& createInfo)
+: mGl(gl),
+  mCreateInfo(createInfo)
 {
 }
 

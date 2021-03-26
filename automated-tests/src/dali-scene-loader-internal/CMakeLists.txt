@@ -43,6 +43,15 @@ SET(TEST_HARNESS_SOURCES
   ${TEST_HARNESS_DIR}/test-gesture-generator.cpp
   ${TEST_HARNESS_DIR}/test-gl-abstraction.cpp
   ${TEST_HARNESS_DIR}/test-gl-sync-abstraction.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-buffer.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-command-buffer.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-controller.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-texture.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-sampler.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-pipeline.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-program.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-shader.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-reflection.cpp
   ${TEST_HARNESS_DIR}/test-platform-abstraction.cpp
   ${TEST_HARNESS_DIR}/test-render-controller.cpp
   ${TEST_HARNESS_DIR}/test-trace-call-stack.cpp
