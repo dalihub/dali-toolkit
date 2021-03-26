@@ -117,6 +117,20 @@ public:
        * @note The value is read-only.
        */
       VIDEO_HOLE_ENABLED,
+
+      /**
+       * @brief Whether mouse event is enabled.
+       * @details name "mouseEventsEnabled", type Property::BOOLEAN.
+       * @note Default is true.
+       */
+      MOUSE_EVENTS_ENABLED,
+
+      /**
+       * @brief Whether key event is enabled.
+       * @details name "keyEventsEnabled", type Property::BOOLEAN.
+       * @note Default is true.
+       */
+      KEY_EVENTS_ENABLED,
     };
   };
 

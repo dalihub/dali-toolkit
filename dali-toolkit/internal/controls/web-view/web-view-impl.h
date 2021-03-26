@@ -166,7 +166,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::RegisterJavaScriptAlertCallback()
    */
-  void RegisterJavaScriptAlertCallback( Dali::WebEnginePlugin::JavaScriptAlertCallback callback );
+  void RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::JavaScriptAlertReply()
@@ -176,22 +176,22 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::RegisterJavaScriptConfirmCallback()
    */
-  void RegisterJavaScriptConfirmCallback( Dali::WebEnginePlugin::JavaScriptConfirmCallback callback );
+  void RegisterJavaScriptConfirmCallback(Dali::WebEnginePlugin::JavaScriptConfirmCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::JavaScriptConfirmReply()
    */
-  void JavaScriptConfirmReply( bool confirmed );
+  void JavaScriptConfirmReply(bool confirmed);
 
   /**
    * @copydoc Dali::Toolkit::WebView::RegisterJavaScriptPromptCallback()
    */
-  void RegisterJavaScriptPromptCallback( Dali::WebEnginePlugin::JavaScriptPromptCallback callback);
+  void RegisterJavaScriptPromptCallback(Dali::WebEnginePlugin::JavaScriptPromptCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::JavaScriptPromptReply()
    */
-  void JavaScriptPromptReply( const std::string& result );
+  void JavaScriptPromptReply(const std::string& result);
 
   /**
    * @copydoc Dali::Toolkit::WebView::ClearHistory()
@@ -273,14 +273,6 @@ private: // From Control
    * @copydoc Toolkit::Control::GetNaturalSize
    */
   Vector3 GetNaturalSize() override;
-
-  /**
-   * Signal occurs when the Web View has been touched.
-   * @param[in] actor The Actor Touched
-   * @param[in] touch The Touch Data.
-   * @return Whether to consume event or not.
-   */
-  bool OnTouchEvent(Actor actor, const Dali::TouchEvent& touch);
 
   /**
    * @copydoc Toolkit::Control::OnKeyEvent()
@@ -374,6 +366,20 @@ private:
   void EnableBlendMode(bool blendEnabled);
 
   /**
+   * @brief Enables/disables mouse events. The default is enabled.
+   *
+   * @param[in] enabled True if mouse events are enabled, false otherwise
+   */
+  void EnableMouseEvents(bool enabled);
+
+  /**
+   * @brief Enables/disables key events. The default is enabled.
+   *
+   * @param[in] enabled True if key events enabled, false otherwise
+   */
+  void EnableKeyEvents(bool enabled);
+
+  /**
    * @brief Callback function to be called when page load started.
    * @param[in] url The url currently being loaded
    */
@@ -383,7 +389,7 @@ private:
    * @brief Callback function to be called when page is loading in progress.
    * @param[in] url The url currently being loaded
    */
-  void OnPageLoadInProgress( const std::string& url );
+  void OnPageLoadInProgress(const std::string& url);
 
   /**
    * @brief Callback function to be called when page load finished.
@@ -408,32 +414,58 @@ private:
    * @brief Callback function to be called when url is changed.
    * @param[in] url The url currently being loaded
    */
-  void OnUrlChanged( const std::string& url );
+  void OnUrlChanged(const std::string& url);
+
+  /**
+   * Signal occurs when the Web View has been touched.
+   * @param[in] actor The Actor Touched
+   * @param[in] touch The Touch Data.
+   * @return Whether to consume event or not.
+   */
+  bool OnTouchEvent(Actor actor, const Dali::TouchEvent& touch);
+
+  /**
+   * Signal occurs when the Web View has been hovered.
+   * @param[in] actor The Actor Hovered
+   * @param[in] hover The Hover Data.
+   * @return Whether to consume event or not.
+   */
+  bool OnHoverEvent(Actor actor, const Dali::HoverEvent& hover);
+
+  /**
+   * Signal occurs when the Web View receives wheel event.
+   * @param[in] actor The Actor that receives Wheel event.
+   * @param[in] wheel The Wheel Data.
+   * @return Whether to consume event or not.
+   */
+  bool OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel);
 
 private:
-  std::string                                            mUrl;
-  Dali::Toolkit::Visual::Base                            mVisual;
-  Dali::Size                                             mWebViewSize;
-  Dali::WebEngine                                        mWebEngine;
+  std::string                 mUrl;
+  Dali::Toolkit::Visual::Base mVisual;
+  Dali::Size                  mWebViewSize;
+  Dali::WebEngine             mWebEngine;
 
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadStartedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadInProgressSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadFinishedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType mPageLoadErrorSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadStartedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadInProgressSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadFinishedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType     mPageLoadErrorSignal;
   Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
 
-  std::unique_ptr<Dali::Toolkit::WebContext>             mWebContext;
-  std::unique_ptr<Dali::Toolkit::WebCookieManager>       mWebCookieManager;
-  std::unique_ptr<Dali::Toolkit::WebSettings>            mWebSettings;
-  std::unique_ptr<Dali::Toolkit::WebBackForwardList>     mWebBackForwardList;
-  Dali::Toolkit::ImageView mFaviconView;
+  std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
+  std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
+  std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
+  std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
+  Dali::Toolkit::ImageView                           mFaviconView;
 
-  Dali::PropertyNotification                             mPositionUpdateNotification;
-  Dali::PropertyNotification                             mSizeUpdateNotification;
-  Dali::PropertyNotification                             mScaleUpdateNotification;
-  bool                                                   mVideoHoleEnabled;
-  Dali::Rect< int >                                      mWebViewArea;
-  Dali::Toolkit::WebView::WebViewUrlChangedSignalType    mUrlChangedSignal;
+  Dali::PropertyNotification                          mPositionUpdateNotification;
+  Dali::PropertyNotification                          mSizeUpdateNotification;
+  Dali::PropertyNotification                          mScaleUpdateNotification;
+  bool                                                mVideoHoleEnabled;
+  Dali::Rect<int>                                     mWebViewArea;
+  Dali::Toolkit::WebView::WebViewUrlChangedSignalType mUrlChangedSignal;
+  bool                                                mMouseEventsEnabled;
+  bool                                                mKeyEventsEnabled;
 };
 
 } // namespace Internal

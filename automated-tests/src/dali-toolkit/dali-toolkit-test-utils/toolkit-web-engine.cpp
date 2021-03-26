@@ -1082,6 +1082,16 @@ bool WebEngine::SendKeyEvent( const KeyEvent& event )
   return true;
 }
 
+bool WebEngine::SendHoverEvent( const HoverEvent& event )
+{
+  return true;
+}
+
+bool WebEngine::SendWheelEvent( const WheelEvent& event )
+{
+  return true;
+}
+
 void WebEngine::SetFocus( bool focused )
 {
 }
@@ -1091,6 +1101,14 @@ void WebEngine::UpdateDisplayArea( Dali::Rect< int > displayArea )
 }
 
 void WebEngine::EnableVideoHole( bool enabled )
+{
+}
+
+void WebEngine::EnableMouseEvents( bool enabled )
+{
+}
+
+void WebEngine::EnableKeyEvents( bool enabled )
 {
 }
 
