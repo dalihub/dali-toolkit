@@ -22,8 +22,10 @@
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
@@ -53,6 +55,8 @@ static int gJavaScriptAlertCallbackCalled = 0;
 static int gJavaScriptConfirmCallbackCalled = 0;
 static int gJavaScriptPromptCallbackCalled = 0;
 static bool gTouched = false;
+static bool gHovered = false;
+static bool gWheelEventHandled = false;
 
 struct CallbackFunctor
 {
@@ -123,6 +127,18 @@ static bool OnJavaScriptPrompt( const std::string& meesage1, const std::string& 
 static bool OnTouched( Actor actor, const Dali::TouchEvent& touch )
 {
   gTouched = true;
+  return true;
+}
+
+static bool OnHovered( Actor actor, const Dali::HoverEvent& hover )
+{
+  gHovered = true;
+  return true;
+}
+
+static bool OnWheelEvent( Actor actor, const Dali::WheelEvent& wheel )
+{
+  gWheelEventHandled = true;
   return true;
 }
 
@@ -357,7 +373,7 @@ int UtcDaliWebViewMove(void)
   END_TEST;
 }
 
-int UtcDaliWebViewPropertyVideoHole(void)
+int UtcDaliWebViewPropertyVideoHoleEnabled(void)
 {
   ToolkitTestApplication application;
 
@@ -378,6 +394,112 @@ int UtcDaliWebViewPropertyVideoHole(void)
   value = view.GetProperty( WebView::Property::VIDEO_HOLE_ENABLED );
   DALI_TEST_CHECK( value.Get( output ) );
   DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewPropertyMouseEventsEnabled(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  const bool kDefaultValue = true;
+  const bool kTestValue = false;
+
+  // Check default value
+  bool output;
+  Property::Value value = view.GetProperty( WebView::Property::MOUSE_EVENTS_ENABLED );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  view.SetProperty( WebView::Property::MOUSE_EVENTS_ENABLED, kTestValue );
+  value = view.GetProperty( WebView::Property::MOUSE_EVENTS_ENABLED );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewPropertyKeyEventsEnabled(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  const bool kDefaultValue = true;
+  const bool kTestValue = false;
+
+  // Check default value
+  bool output;
+  Property::Value value = view.GetProperty( WebView::Property::KEY_EVENTS_ENABLED );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  view.SetProperty( WebView::Property::KEY_EVENTS_ENABLED, kTestValue );
+  value = view.GetProperty( WebView::Property::KEY_EVENTS_ENABLED );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewHoverAndWheel(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+
+  view.GetNaturalSize();
+  view.HoveredSignal().Connect( &OnHovered );
+  view.WheelEventSignal().Connect( &OnWheelEvent );
+
+  // Hover event
+  Dali::Integration::HoverEvent event = Dali::Integration::HoverEvent();
+  Dali::Integration::Point pointDown;
+  pointDown.SetState( PointState::DOWN );
+  pointDown.SetScreenPosition( Vector2( 10, 10 ) );
+  event.AddPoint( pointDown );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::HoverEvent();
+  Dali::Integration::Point pointUp;
+  pointUp.SetState( PointState::UP );
+  pointUp.SetScreenPosition( Vector2( 10, 10 ) );
+  event.AddPoint( pointUp );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::HoverEvent();
+  Dali::Integration::Point pointMotion;
+  pointUp.SetState( PointState::MOTION );
+  pointUp.SetScreenPosition( Vector2( 10, 10 ) );
+  event.AddPoint( pointMotion );
+  application.ProcessEvent( event );
+
+  // Wheel event
+  Dali::Integration::WheelEvent wheelEvent;
+  wheelEvent.type = Dali::Integration::WheelEvent::Type::MOUSE_WHEEL;
+  wheelEvent.direction = 0;
+  wheelEvent.point = Vector2( 20, 20 );
+  wheelEvent.delta = 10;
+  application.ProcessEvent( wheelEvent );
+  application.SendNotification();
+
+  DALI_TEST_CHECK( gHovered );
+  DALI_TEST_CHECK( gWheelEventHandled );
 
   END_TEST;
 }

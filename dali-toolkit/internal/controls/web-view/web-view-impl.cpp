@@ -58,13 +58,15 @@ BaseHandle Create()
 // clang-format off
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::WebView, Toolkit::Control, Create)
 
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "url",              STRING,  URL               )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "userAgent",        STRING,  USER_AGENT        )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "scrollPosition",   VECTOR2, SCROLL_POSITION   )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "scrollSize",       VECTOR2, SCROLL_SIZE       )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "contentSize",      VECTOR2, CONTENT_SIZE      )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "title",            STRING,  TITLE             )
-DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "videoHoleEnabled", BOOLEAN, VIDEO_HOLE_ENABLED)
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "url",                STRING,  URL                 )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "userAgent",          STRING,  USER_AGENT          )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "scrollPosition",     VECTOR2, SCROLL_POSITION     )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "scrollSize",         VECTOR2, SCROLL_SIZE         )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "contentSize",        VECTOR2, CONTENT_SIZE        )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "title",              STRING,  TITLE               )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "videoHoleEnabled",   BOOLEAN, VIDEO_HOLE_ENABLED  )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "mouseEventsEnabled", BOOLEAN, MOUSE_EVENTS_ENABLED)
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "keyEventsEnabled",   BOOLEAN, KEY_EVENTS_ENABLED  )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadStarted",    PAGE_LOAD_STARTED_SIGNAL    )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadInProgress", PAGE_LOAD_IN_PROGRESS_SIGNAL)
@@ -97,7 +99,9 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mPageLoadErrorSignal(),
   mVideoHoleEnabled(true),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
-  mUrlChangedSignal()
+  mUrlChangedSignal(),
+  mMouseEventsEnabled(true),
+  mKeyEventsEnabled(true)
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -119,7 +123,9 @@ WebView::WebView(int argc, char** argv)
   mPageLoadErrorSignal(),
   mVideoHoleEnabled(true),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
-  mUrlChangedSignal()
+  mUrlChangedSignal(),
+  mMouseEventsEnabled(true),
+  mKeyEventsEnabled(true)
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -176,6 +182,8 @@ void WebView::OnInitialize()
 
   self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
   self.TouchedSignal().Connect(this, &WebView::OnTouchEvent);
+  self.HoveredSignal().Connect(this, &WebView::OnHoverEvent);
+  self.WheelEventSignal().Connect(this, &WebView::OnWheelEvent);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mSizeUpdateNotification     = self.AddPropertyNotification(Actor::Property::SIZE, StepCondition(1.0f, 1.0f));
@@ -186,11 +194,11 @@ void WebView::OnInitialize()
 
   if(mWebEngine)
   {
-    mWebEngine.PageLoadStartedSignal().Connect( this, &WebView::OnPageLoadStarted );
+    mWebEngine.PageLoadStartedSignal().Connect(this, &WebView::OnPageLoadStarted);
     mWebEngine.PageLoadInProgressSignal().Connect(this, &WebView::OnPageLoadInProgress);
-    mWebEngine.PageLoadFinishedSignal().Connect( this, &WebView::OnPageLoadFinished );
-    mWebEngine.PageLoadErrorSignal().Connect( this, &WebView::OnPageLoadError );
-    mWebEngine.ScrollEdgeReachedSignal().Connect( this, &WebView::OnScrollEdgeReached );
+    mWebEngine.PageLoadFinishedSignal().Connect(this, &WebView::OnPageLoadFinished);
+    mWebEngine.PageLoadErrorSignal().Connect(this, &WebView::OnPageLoadError);
+    mWebEngine.ScrollEdgeReachedSignal().Connect(this, &WebView::OnScrollEdgeReached);
     mWebEngine.UrlChangedSignal().Connect(this, &WebView::OnUrlChanged);
 
     mWebContext         = std::unique_ptr<Dali::Toolkit::WebContext>(new WebContext(mWebEngine.GetContext()));
@@ -363,51 +371,51 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
   }
 }
 
-void WebView::RegisterJavaScriptAlertCallback( Dali::WebEnginePlugin::JavaScriptAlertCallback callback )
+void WebView::RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback)
 {
   if(mWebEngine)
   {
-    mWebEngine.RegisterJavaScriptAlertCallback( callback );
+    mWebEngine.RegisterJavaScriptAlertCallback(callback);
   }
 }
 
 void WebView::JavaScriptAlertReply()
 {
-  if ( mWebEngine )
+  if(mWebEngine)
   {
     mWebEngine.JavaScriptAlertReply();
   }
 }
 
-void WebView::RegisterJavaScriptConfirmCallback( Dali::WebEnginePlugin::JavaScriptConfirmCallback callback )
+void WebView::RegisterJavaScriptConfirmCallback(Dali::WebEnginePlugin::JavaScriptConfirmCallback callback)
 {
-  if ( mWebEngine )
+  if(mWebEngine)
   {
-    mWebEngine.RegisterJavaScriptConfirmCallback( callback );
+    mWebEngine.RegisterJavaScriptConfirmCallback(callback);
   }
 }
 
-void WebView::JavaScriptConfirmReply( bool confirmed )
+void WebView::JavaScriptConfirmReply(bool confirmed)
 {
-  if ( mWebEngine )
+  if(mWebEngine)
   {
-    mWebEngine.JavaScriptConfirmReply( confirmed );
+    mWebEngine.JavaScriptConfirmReply(confirmed);
   }
 }
 
-void WebView::RegisterJavaScriptPromptCallback( Dali::WebEnginePlugin::JavaScriptPromptCallback callback )
+void WebView::RegisterJavaScriptPromptCallback(Dali::WebEnginePlugin::JavaScriptPromptCallback callback)
 {
-  if ( mWebEngine )
+  if(mWebEngine)
   {
-    mWebEngine.RegisterJavaScriptPromptCallback( callback );
+    mWebEngine.RegisterJavaScriptPromptCallback(callback);
   }
 }
 
-void WebView::JavaScriptPromptReply( const std::string& result )
+void WebView::JavaScriptPromptReply(const std::string& result)
 {
-  if ( mWebEngine )
+  if(mWebEngine)
   {
-    mWebEngine.JavaScriptPromptReply( result );
+    mWebEngine.JavaScriptPromptReply(result);
   }
 }
 
@@ -474,7 +482,7 @@ void WebView::EnableBlendMode(bool blendEnabled)
 
 void WebView::ClearAllTilesResources()
 {
-  if( mWebEngine )
+  if(mWebEngine)
   {
     mWebEngine.ClearAllTilesResources();
   }
@@ -510,7 +518,7 @@ Dali::Toolkit::WebView::WebViewUrlChangedSignalType& WebView::UrlChangedSignal()
   return mUrlChangedSignal;
 }
 
-void WebView::OnPageLoadStarted( const std::string& url )
+void WebView::OnPageLoadStarted(const std::string& url)
 {
   if(!mPageLoadStartedSignal.Empty())
   {
@@ -519,16 +527,16 @@ void WebView::OnPageLoadStarted( const std::string& url )
   }
 }
 
-void WebView::OnPageLoadInProgress( const std::string& url )
+void WebView::OnPageLoadInProgress(const std::string& url)
 {
-  if ( !mPageLoadInProgressSignal.Empty() )
+  if(!mPageLoadInProgressSignal.Empty())
   {
-    Dali::Toolkit::WebView handle( GetOwner() );
-    mPageLoadInProgressSignal.Emit( handle, url );
+    Dali::Toolkit::WebView handle(GetOwner());
+    mPageLoadInProgressSignal.Emit(handle, url);
   }
 }
 
-void WebView::OnPageLoadFinished( const std::string& url )
+void WebView::OnPageLoadFinished(const std::string& url)
 {
   if(!mPageLoadFinishedSignal.Empty())
   {
@@ -557,14 +565,14 @@ void WebView::OnScrollEdgeReached(Dali::WebEnginePlugin::ScrollEdge edge)
 
 void WebView::OnUrlChanged(const std::string& url)
 {
-  if (!mUrlChangedSignal.Empty())
+  if(!mUrlChangedSignal.Empty())
   {
     Dali::Toolkit::WebView handle(GetOwner());
     mUrlChangedSignal.Emit(handle, url);
   }
 }
 
-bool WebView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
 {
   Dali::BaseHandle handle(object);
 
@@ -576,7 +584,7 @@ bool WebView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
     webView.PageLoadStartedSignal().Connect(tracker, functor);
     connected = true;
   }
-  else if (0 == strcmp(signalName.c_str(), PAGE_LOAD_IN_PROGRESS_SIGNAL))
+  else if(0 == strcmp(signalName.c_str(), PAGE_LOAD_IN_PROGRESS_SIGNAL))
   {
     webView.PageLoadInProgressSignal().Connect(tracker, functor);
     connected = true;
@@ -596,9 +604,9 @@ bool WebView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
     webView.ScrollEdgeReachedSignal().Connect(tracker, functor);
     connected = true;
   }
-  else if (0 == strcmp(signalName.c_str(), URL_CHANGED_SIGNAL))
+  else if(0 == strcmp(signalName.c_str(), URL_CHANGED_SIGNAL))
   {
-    webView.UrlChangedSignal().Connect( tracker, functor );
+    webView.UrlChangedSignal().Connect(tracker, functor);
     connected = true;
   }
 
@@ -669,6 +677,24 @@ void WebView::SetProperty(BaseObject* object, Property::Index index, const Prope
         }
         break;
       }
+      case Toolkit::WebView::Property::MOUSE_EVENTS_ENABLED:
+      {
+        bool input;
+        if(value.Get(input))
+        {
+          impl.EnableMouseEvents(input);
+        }
+        break;
+      }
+      case Toolkit::WebView::Property::KEY_EVENTS_ENABLED:
+      {
+        bool input;
+        if(value.Get(input))
+        {
+          impl.EnableKeyEvents(input);
+        }
+        break;
+      }
     }
   }
 }
@@ -719,6 +745,16 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
         value = impl.mVideoHoleEnabled;
         break;
       }
+      case Toolkit::WebView::Property::MOUSE_EVENTS_ENABLED:
+      {
+        value = impl.mMouseEventsEnabled;
+        break;
+      }
+      case Toolkit::WebView::Property::KEY_EVENTS_ENABLED:
+      {
+        value = impl.mKeyEventsEnabled;
+        break;
+      }
       default:
         break;
     }
@@ -745,6 +781,26 @@ bool WebView::OnKeyEvent(const Dali::KeyEvent& event)
   if(mWebEngine)
   {
     result = mWebEngine.SendKeyEvent(event);
+  }
+  return result;
+}
+
+bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
+{
+  bool result = false;
+  if(mWebEngine)
+  {
+    result = mWebEngine.SendHoverEvent(hover);
+  }
+  return result;
+}
+
+bool WebView::OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel)
+{
+  bool result = false;
+  if(mWebEngine)
+  {
+    result = mWebEngine.SendWheelEvent(wheel);
   }
   return result;
 }
@@ -807,6 +863,24 @@ void WebView::SetUserAgent(const std::string& userAgent)
   if(mWebEngine)
   {
     mWebEngine.SetUserAgent(userAgent);
+  }
+}
+
+void WebView::EnableMouseEvents(bool enabled)
+{
+  if(mWebEngine)
+  {
+    mMouseEventsEnabled = enabled;
+    mWebEngine.EnableMouseEvents(enabled);
+  }
+}
+
+void WebView::EnableKeyEvents(bool enabled)
+{
+  if(mWebEngine)
+  {
+    mKeyEventsEnabled = enabled;
+    mWebEngine.EnableKeyEvents(enabled);
   }
 }
 

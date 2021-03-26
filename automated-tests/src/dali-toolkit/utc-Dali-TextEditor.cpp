@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,7 @@ const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGr
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
 const char* const PROPERTY_NAME_MAX_LENGTH                           = "maxLength";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
+const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
 
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
@@ -495,6 +496,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MAX_LENGTH ) == DevelTextEditor::Property::MAX_LENGTH );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_COLOR ) == DevelTextEditor::Property::GRAB_HANDLE_COLOR );
 
 
   END_TEST;
@@ -910,6 +912,10 @@ int UtcDaliTextEditorSetPropertyP(void)
   editor.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
   DALI_TEST_EQUALS( editor.GetProperty<int>( Actor::Property::LAYOUT_DIRECTION ), static_cast<int>( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
 
+  // Check handle color
+  editor.SetProperty( DevelTextEditor::Property::GRAB_HANDLE_COLOR, Color::GREEN );
+  DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::GRAB_HANDLE_COLOR ), Color::GREEN, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
 
@@ -964,32 +970,112 @@ int utcDaliTextEditorTextChangedP(void)
 
   gTextChangedCallBackCalled = false;
   editor.SetProperty( TextEditor::Property::TEXT, "ABC" );
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
   DALI_TEST_CHECK( textChangedSignal );
-
-  application.SendNotification();
 
   editor.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   // Remove all text
   editor.SetProperty( TextField::Property::TEXT, "" );
+  application.SendNotification();
+  application.Render();
 
   // Pressing backspace key: TextChangedCallback should not be called when there is no text in texteditor.
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
 
   // Pressing delete key: TextChangedCallback should not be called when there is no text in texteditor.
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
 
   END_TEST;
 }
+
+int utcDaliTextEditorTextChangedWithInputMethodContext(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorTextChangedWithInputMethodContext");
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+
+  application.GetScene().Add( editor );
+
+  // connect to the text changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  editor.TextChangedSignal().Connect(&TestTextChangedCallback);
+  bool textChangedSignal = false;
+  editor.ConnectSignal( testTracker, "textChanged",   CallbackFunctor(&textChangedSignal) );
+
+
+  // get InputMethodContext
+  std::string text;
+  InputMethodContext::EventData imfEvent;
+  InputMethodContext inputMethodContext = DevelTextEditor::GetInputMethodContext( editor );
+
+  editor.SetKeyInputFocus();
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_EDITING, true );
+
+  // input text
+  gTextChangedCallBackCalled = false;
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "ㅎ", 0, 1 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( gTextChangedCallBackCalled );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::TEXT ), std::string("ㅎ"), TEST_LOCATION );
+
+  gTextChangedCallBackCalled = false;
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "호", 0, 1 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( gTextChangedCallBackCalled );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::TEXT ), std::string("호"), TEST_LOCATION );
+
+  gTextChangedCallBackCalled = false;
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "혿", 0, 1 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( gTextChangedCallBackCalled );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::TEXT ), std::string("혿"), TEST_LOCATION );
+
+  gTextChangedCallBackCalled = false;
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "", 0, 1 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  DALI_TEST_CHECK( !gTextChangedCallBackCalled );
+
+  imfEvent = InputMethodContext::EventData( InputMethodContext::COMMIT, "호", 0, 1 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  DALI_TEST_CHECK( !gTextChangedCallBackCalled );
+
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "두", 1, 2 );
+  inputMethodContext.EventReceivedSignal().Emit(inputMethodContext, imfEvent);
+  DALI_TEST_CHECK( !gTextChangedCallBackCalled );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( gTextChangedCallBackCalled );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::TEXT ), std::string("호두"), TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int utcDaliTextEditorInputStyleChanged01(void)
 {

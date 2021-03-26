@@ -137,6 +137,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "selectedTextEnd"
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "enableEditing",                    BOOLEAN,   ENABLE_EDITING                      )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "fontSizeScale",                    FLOAT,     FONT_SIZE_SCALE                     )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "primaryCursorPosition",            INTEGER,   PRIMARY_CURSOR_POSITION             )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "grabHandleColor",                  VECTOR4,   GRAB_HANDLE_COLOR                   )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",       SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",  SIGNAL_MAX_LENGTH_REACHED )
@@ -754,6 +755,15 @@ void TextField::SetProperty(BaseObject* object, Property::Index index, const Pro
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::GRAB_HANDLE_COLOR:
+      {
+        const Vector4 color = value.Get<Vector4>();
+        DALI_LOG_INFO(gLogFilter, Debug::General, "TextField %p GRAB_HANDLE_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a);
+
+        impl.mDecorator->SetHandleColor(color);
+        impl.RequestTextRelayout();
+        break;
+      }
     } // switch
   }   // textfield
 }
@@ -1104,6 +1114,11 @@ Property::Value TextField::GetProperty(BaseObject* object, Property::Index index
         value = static_cast<int>(impl.mController->GetPrimaryCursorPosition());
         break;
       }
+      case Toolkit::DevelTextField::Property::GRAB_HANDLE_COLOR:
+      {
+        value = impl.mDecorator->GetHandleColor();
+        break;
+      }
     } //switch
   }
 
@@ -1335,7 +1350,7 @@ float TextField::GetHeightForWidth(float width)
 
 void TextField::ResizeActor(Actor& actor, const Vector2& size)
 {
-  if (actor.GetProperty<Vector3>(Dali::Actor::Property::SIZE).GetVectorXY() != size)
+  if(actor.GetProperty<Vector3>(Dali::Actor::Property::SIZE).GetVectorXY() != size)
   {
     actor.SetProperty(Actor::Property::SIZE, size);
   }
@@ -1397,6 +1412,14 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
 
     RenderText(updateTextType);
+
+    // If there is text changed, callback is called.
+    if(mTextChanged)
+    {
+      Dali::Toolkit::TextField handle(GetOwner());
+      mTextChangedSignal.Emit(handle);
+      mTextChanged = false;
+    }
   }
 
   // The text-field emits signals when the input style changes. These changes of style are
@@ -1689,8 +1712,7 @@ void TextField::CaretMoved(unsigned int position)
 
 void TextField::TextChanged()
 {
-  Dali::Toolkit::TextField handle(GetOwner());
-  mTextChangedSignal.Emit(handle);
+  mTextChanged = true;
 }
 
 void TextField::MaxLengthReached()
@@ -1867,7 +1889,8 @@ TextField::TextField()
   mAlignmentOffset(0.f),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mExceedPolicy(Dali::Toolkit::TextField::EXCEED_POLICY_CLIP),
-  mHasBeenStaged(false)
+  mHasBeenStaged(false),
+  mTextChanged(false)
 {
 }
 

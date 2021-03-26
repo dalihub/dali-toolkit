@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -293,6 +293,52 @@ int UtcDaliAnimatedImageVisualGetPropertyMap04(void)
   END_TEST;
 }
 
+int UtcDaliAnimatedImageVisualImageLoadingFail01(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert( Visual::Property::TYPE, Visual::ANIMATED_IMAGE );
+    propertyMap.Insert( ImageVisual::Property::URL, "dummy.gif" );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 2 );
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 2 );
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 20 );
+    propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true );
+    propertyMap.Insert( DevelVisual::Property::CORNER_RADIUS, 0.23f );
+    propertyMap.Insert( DevelVisual::Property::CORNER_RADIUS_POLICY, Visual::Transform::Policy::ABSOLUTE );
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+
+    DummyControl dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    application.GetScene().Add( dummyControl );
+
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 1, TEST_LOCATION );
+
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::JUMP_TO, 6 );
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 1, TEST_LOCATION );
+
+    dummyControl.Unparent();
+  }
+
+  END_TEST;
+}
 
 int UtcDaliAnimatedImageVisualSynchronousLoading(void)
 {

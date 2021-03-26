@@ -21,6 +21,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali-toolkit/devel-api/controls/video-view/video-view-devel.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 
 using namespace Dali;
@@ -559,6 +560,65 @@ int UtcDaliVideoViewNew2(void)
   END_TEST;
 }
 
+int UtcDaliVideoViewRaiseAboveLowerBelow(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewRaiseAboveLowerBelow");
+
+  VideoView view = VideoView::New( true );
+  DALI_TEST_CHECK( view );
+
+  application.GetScene().Add( view );
+  view.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  VideoView view2 = VideoView::New( "", false );
+  DALI_TEST_CHECK( view2 );
+
+  application.GetScene().Add( view2 );
+  view2.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  view.RaiseAbove(view2);
+  view.LowerBelow(view2);
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewRaiseTopLowerBottom(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewRaiseTopLowerBottom");
+
+  VideoView view = VideoView::New( true );
+  DALI_TEST_CHECK( view );
+
+  application.GetScene().Add( view );
+  view.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  VideoView view2 = VideoView::New( "", false );
+  DALI_TEST_CHECK( view2 );
+
+  application.GetScene().Add( view2 );
+  view2.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  view.RaiseToTop();
+  view.LowerToBottom();
+
+  END_TEST;
+}
+
+
 int UtcDaliVideoViewPropertyDisplayMode(void)
 {
   ToolkitTestApplication application;
@@ -784,6 +844,30 @@ int UtcDaliVideoViewResizeWithSynchronization(void)
   application.Render();
 
   DALI_TEST_CHECK(vector == videoView.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
+
+  END_TEST;
+}
+
+// For coverage.
+int UtcDaliVideoViewSynchronizationForWindowRotation(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewSynchronizationForWindowRotation");
+
+  Window window = Window::New(PositionSize(0,0,100,100) ,"", false);
+  DALI_TEST_CHECK( window );
+
+  VideoView view = VideoView::New( true );
+  DALI_TEST_CHECK( view );
+
+  window.Add( view );
+
+  view.Play();
+
+  DevelWindow::SetPositionSize(window,PositionSize(0,0,480, 240));
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

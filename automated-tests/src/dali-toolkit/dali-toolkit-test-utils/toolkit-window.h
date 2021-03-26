@@ -47,12 +47,16 @@ class Window;
 
 class Window;
 typedef Signal< void (Window,bool) > FocusChangeSignalType;
+typedef Signal< void (Window,Uint16Pair) > ResizeSignalType;
 
 class Window : public BaseHandle
 {
 public:
+  using WindowSize     = Uint16Pair;
+
   using KeyEventSignalType = Signal< void (const KeyEvent&) >;
   using TouchEventSignalType = Signal< void (const TouchEvent&) >;
+  using ResizeSignalType      = Signal<void(Window, WindowSize)>;
 
   static Window New(PositionSize windowPosition, const std::string& name, bool isTransparent = false);
   static Window New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent = false);
@@ -76,6 +80,7 @@ public:
   FocusChangeSignalType& FocusChangeSignal();
   KeyEventSignalType& KeyEventSignal();
   TouchEventSignalType& TouchedSignal();
+  ResizeSignalType& ResizeSignal();
 
 public:
   explicit Window( Internal::Adaptor::Window* window );
@@ -93,6 +98,8 @@ typedef Signal< void ( Window, bool ) > VisibilityChangedSignalType;
 
 Dali::Window Get( Actor actor );
 Dali::Window DownCast(  BaseHandle handle );
+void SetPositionSize(Window window, PositionSize positionSize);
+int GetPhysicalOrientation(Window window);
 void AddFrameRenderedCallback( Window window, std::unique_ptr< CallbackBase > callback, int32_t frameId );
 void AddFramePresentedCallback( Window window, std::unique_ptr< CallbackBase > callback, int32_t frameId );
 
