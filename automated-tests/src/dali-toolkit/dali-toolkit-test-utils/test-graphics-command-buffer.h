@@ -174,50 +174,50 @@ struct Command
     {
       case CommandType::BIND_VERTEX_BUFFERS:
       {
-        bindVertexBuffers = rhs.bindVertexBuffers;
+        data.bindVertexBuffers = rhs.data.bindVertexBuffers;
         break;
       }
       case CommandType::BIND_INDEX_BUFFER:
       {
-        bindIndexBuffer = rhs.bindIndexBuffer;
+        data.bindIndexBuffer = rhs.data.bindIndexBuffer;
         break;
       }
       case CommandType::BIND_SAMPLERS:
       {
-        bindSamplers = rhs.bindSamplers;
+        data.bindSamplers = rhs.data.bindSamplers;
         break;
       }
       case CommandType::BIND_TEXTURES:
       {
-        bindTextures = rhs.bindTextures;
+        data.bindTextures = rhs.data.bindTextures;
         break;
       }
       case CommandType::BIND_PIPELINE:
       {
-        bindPipeline = rhs.bindPipeline;
+        data.bindPipeline = rhs.data.bindPipeline;
         break;
       }
       case CommandType::BIND_UNIFORM_BUFFER:
       {
-        bindUniformBuffers = rhs.bindUniformBuffers;
+        data.bindUniformBuffers = rhs.data.bindUniformBuffers;
         break;
       }
       case CommandType::DRAW:
       {
-        draw.type = rhs.draw.type;
-        draw.draw = rhs.draw.draw;
+        data.draw.type = rhs.data.draw.type;
+        data.draw.draw = rhs.data.draw.draw;
         break;
       }
       case CommandType::DRAW_INDEXED:
       {
-        draw.type        = rhs.draw.type;
-        draw.drawIndexed = rhs.draw.drawIndexed;
+        data.draw.type        = rhs.data.draw.type;
+        data.draw.drawIndexed = rhs.data.draw.drawIndexed;
         break;
       }
       case CommandType::DRAW_INDEXED_INDIRECT:
       {
-        draw.type                = rhs.draw.type;
-        draw.drawIndexedIndirect = rhs.draw.drawIndexedIndirect;
+        data.draw.type                = rhs.data.draw.type;
+        data.draw.drawIndexedIndirect = rhs.data.draw.drawIndexedIndirect;
         break;
       }
       case CommandType::FLUSH:
@@ -227,22 +227,22 @@ struct Command
       }
       case CommandType::SET_SCISSOR:
       {
-        scissor.region = rhs.scissor.region;
+        data.scissor.region = rhs.data.scissor.region;
         break;
       }
       case CommandType::SET_SCISSOR_TEST:
       {
-        scissorTest.enable = rhs.scissorTest.enable;
+        data.scissorTest.enable = rhs.data.scissorTest.enable;
         break;
       }
       case CommandType::SET_VIEWPORT:
       {
-        viewport.region = rhs.viewport.region;
+        data.viewport.region = rhs.data.viewport.region;
         break;
       }
       case CommandType::SET_VIEWPORT_TEST:
       {
-        viewportTest.enable = rhs.viewportTest.enable;
+        data.viewportTest.enable = rhs.data.viewportTest.enable;
         break;
       }
     }
@@ -259,50 +259,50 @@ struct Command
     {
       case CommandType::BIND_VERTEX_BUFFERS:
       {
-        bindVertexBuffers = std::move(rhs.bindVertexBuffers);
+        data.bindVertexBuffers = std::move(rhs.data.bindVertexBuffers);
         break;
       }
       case CommandType::BIND_INDEX_BUFFER:
       {
-        bindIndexBuffer = rhs.bindIndexBuffer;
+        data.bindIndexBuffer = rhs.data.bindIndexBuffer;
         break;
       }
       case CommandType::BIND_UNIFORM_BUFFER:
       {
-        bindUniformBuffers = std::move(rhs.bindUniformBuffers);
+        data.bindUniformBuffers = std::move(rhs.data.bindUniformBuffers);
         break;
       }
       case CommandType::BIND_SAMPLERS:
       {
-        bindSamplers = std::move(rhs.bindSamplers);
+        data.bindSamplers = std::move(rhs.data.bindSamplers);
         break;
       }
       case CommandType::BIND_TEXTURES:
       {
-        bindTextures = std::move(rhs.bindTextures);
+        data.bindTextures = std::move(rhs.data.bindTextures);
         break;
       }
       case CommandType::BIND_PIPELINE:
       {
-        bindPipeline = rhs.bindPipeline;
+        data.bindPipeline = rhs.data.bindPipeline;
         break;
       }
       case CommandType::DRAW:
       {
-        draw.type = rhs.draw.type;
-        draw.draw = rhs.draw.draw;
+        data.draw.type = rhs.data.draw.type;
+        data.draw.draw = rhs.data.draw.draw;
         break;
       }
       case CommandType::DRAW_INDEXED:
       {
-        draw.type        = rhs.draw.type;
-        draw.drawIndexed = rhs.draw.drawIndexed;
+        data.draw.type        = rhs.data.draw.type;
+        data.draw.drawIndexed = rhs.data.draw.drawIndexed;
         break;
       }
       case CommandType::DRAW_INDEXED_INDIRECT:
       {
-        draw.type                = rhs.draw.type;
-        draw.drawIndexedIndirect = rhs.draw.drawIndexedIndirect;
+        data.draw.type                = rhs.data.draw.type;
+        data.draw.drawIndexedIndirect = rhs.data.draw.drawIndexedIndirect;
         break;
       }
       case CommandType::FLUSH:
@@ -312,22 +312,22 @@ struct Command
       }
       case CommandType::SET_SCISSOR:
       {
-        scissor.region = rhs.scissor.region;
+        data.scissor.region = rhs.data.scissor.region;
         break;
       }
       case CommandType::SET_SCISSOR_TEST:
       {
-        scissorTest.enable = rhs.scissorTest.enable;
+        data.scissorTest.enable = rhs.data.scissorTest.enable;
         break;
       }
       case CommandType::SET_VIEWPORT:
       {
-        viewport.region = rhs.viewport.region;
+        data.viewport.region = rhs.data.viewport.region;
         break;
       }
       case CommandType::SET_VIEWPORT_TEST:
       {
-        viewportTest.enable = rhs.viewportTest.enable;
+        data.viewportTest.enable = rhs.data.viewportTest.enable;
         break;
       }
     }
@@ -336,8 +336,16 @@ struct Command
 
   CommandType type{CommandType::FLUSH}; ///< Type of command
 
-  union
+  union CommandData
   {
+    CommandData()
+    {
+    }
+
+    ~CommandData()
+    {
+    } // do nothing
+
     struct
     {
       std::vector<Graphics::TextureBinding> textureBindings;
@@ -390,7 +398,7 @@ struct Command
     {
       bool enable;
     } viewportTest;
-  };
+  } data;
 };
 
 class TestGraphicsCommandBuffer : public Graphics::CommandBuffer
@@ -407,7 +415,7 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type = CommandType::BIND_VERTEX_BUFFERS;
-    auto& bindings        = mCommands.back().bindVertexBuffers.vertexBufferBindings;
+    auto& bindings        = mCommands.back().data.bindVertexBuffers.vertexBufferBindings;
     if(bindings.size() < firstBinding + buffers.size())
     {
       bindings.resize(firstBinding + buffers.size());
@@ -427,7 +435,7 @@ public:
     mCommands.emplace_back();
     auto& cmd     = mCommands.back();
     cmd.type      = CommandType::BIND_UNIFORM_BUFFER;
-    auto& bindCmd = cmd.bindUniformBuffers;
+    auto& bindCmd = cmd.data.bindUniformBuffers;
     for(const auto& binding : bindings)
     {
       if(binding.buffer)
@@ -461,23 +469,23 @@ public:
   void BindPipeline(const Graphics::Pipeline& pipeline) override
   {
     mCommands.emplace_back();
-    mCommands.back().type                  = CommandType::BIND_PIPELINE;
-    mCommands.back().bindPipeline.pipeline = static_cast<const TestGraphicsPipeline*>(&pipeline);
+    mCommands.back().type                       = CommandType::BIND_PIPELINE;
+    mCommands.back().data.bindPipeline.pipeline = static_cast<const TestGraphicsPipeline*>(&pipeline);
     mCallStack.PushCall("BindPipeline", "");
   }
 
   void BindTextures(std::vector<Graphics::TextureBinding>& textureBindings) override
   {
     mCommands.emplace_back();
-    mCommands.back().type                         = CommandType::BIND_TEXTURES;
-    mCommands.back().bindTextures.textureBindings = std::move(textureBindings);
+    mCommands.back().type                              = CommandType::BIND_TEXTURES;
+    mCommands.back().data.bindTextures.textureBindings = std::move(textureBindings);
     mCallStack.PushCall("BindTextures", "");
   }
 
   void BindSamplers(std::vector<Graphics::SamplerBinding>& samplerBindings) override
   {
     mCommands.emplace_back();
-    mCommands.back().bindSamplers.samplerBindings = std::move(samplerBindings);
+    mCommands.back().data.bindSamplers.samplerBindings = std::move(samplerBindings);
     mCallStack.PushCall("BindSamplers", "");
   }
 
@@ -493,10 +501,10 @@ public:
                        Graphics::Format        format) override
   {
     mCommands.emplace_back();
-    mCommands.back().type                   = CommandType::BIND_INDEX_BUFFER;
-    mCommands.back().bindIndexBuffer.buffer = static_cast<const TestGraphicsBuffer*>(&buffer);
-    mCommands.back().bindIndexBuffer.offset = offset;
-    mCommands.back().bindIndexBuffer.format = format;
+    mCommands.back().type                        = CommandType::BIND_INDEX_BUFFER;
+    mCommands.back().data.bindIndexBuffer.buffer = static_cast<const TestGraphicsBuffer*>(&buffer);
+    mCommands.back().data.bindIndexBuffer.offset = offset;
+    mCommands.back().data.bindIndexBuffer.format = format;
     mCallStack.PushCall("BindIndexBuffer", "");
   }
 
@@ -531,7 +539,7 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type  = CommandType::DRAW;
-    auto& cmd              = mCommands.back().draw;
+    auto& cmd              = mCommands.back().data.draw;
     cmd.type               = DrawCallDescriptor::Type::DRAW;
     cmd.draw.vertexCount   = vertexCount;
     cmd.draw.instanceCount = instanceCount;
@@ -549,7 +557,7 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type         = CommandType::DRAW_INDEXED;
-    auto& cmd                     = mCommands.back().draw;
+    auto& cmd                     = mCommands.back().data.draw;
     cmd.type                      = DrawCallDescriptor::Type::DRAW_INDEXED;
     cmd.drawIndexed.firstIndex    = firstIndex;
     cmd.drawIndexed.firstInstance = firstInstance;
@@ -567,7 +575,7 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type             = CommandType::DRAW_INDEXED_INDIRECT;
-    auto& cmd                         = mCommands.back().draw;
+    auto& cmd                         = mCommands.back().data.draw;
     cmd.type                          = DrawCallDescriptor::Type::DRAW_INDEXED_INDIRECT;
     cmd.drawIndexedIndirect.buffer    = static_cast<const TestGraphicsBuffer*>(&buffer);
     cmd.drawIndexedIndirect.offset    = offset;
@@ -592,8 +600,8 @@ public:
     mCallStack.PushCall("SetScissor", params.str(), params);
 
     mCommands.emplace_back();
-    mCommands.back().type           = CommandType::SET_SCISSOR;
-    mCommands.back().scissor.region = value;
+    mCommands.back().type                = CommandType::SET_SCISSOR;
+    mCommands.back().data.scissor.region = value;
   }
 
   void SetScissorTestEnable(bool value) override
@@ -603,8 +611,8 @@ public:
     mCallStack.PushCall("SetScissorTestEnable", params.str(), params);
 
     mCommands.emplace_back();
-    mCommands.back().type               = CommandType::SET_SCISSOR_TEST;
-    mCommands.back().scissorTest.enable = value;
+    mCommands.back().type                    = CommandType::SET_SCISSOR_TEST;
+    mCommands.back().data.scissorTest.enable = value;
   }
 
   void SetViewport(Graphics::Viewport value) override
@@ -619,8 +627,8 @@ public:
     mCallStack.PushCall("SetViewport", params.str(), params);
 
     mCommands.emplace_back();
-    mCommands.back().type            = CommandType::SET_VIEWPORT;
-    mCommands.back().viewport.region = value;
+    mCommands.back().type                 = CommandType::SET_VIEWPORT;
+    mCommands.back().data.viewport.region = value;
   }
 
   void SetViewportEnable(bool value) override
@@ -630,8 +638,8 @@ public:
     mCallStack.PushCall("SetViewportEnable", params.str(), params);
 
     mCommands.emplace_back();
-    mCommands.back().type                = CommandType::SET_VIEWPORT_TEST;
-    mCommands.back().viewportTest.enable = value;
+    mCommands.back().type                     = CommandType::SET_VIEWPORT_TEST;
+    mCommands.back().data.viewportTest.enable = value;
   }
 
   [[nodiscard]] const std::vector<Command>& GetCommands() const
