@@ -265,8 +265,13 @@ void AnimatedImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 
 void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes)
 {
-  // Check if action is valid for this visual type and perform action if possible
+  // Make not set any action when the resource status is already failed.
+  if(mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED)
+  {
+    return;
+  }
 
+  // Check if action is valid for this visual type and perform action if possible
   switch(actionId)
   {
     case DevelAnimatedImageVisual::Action::PAUSE:
@@ -322,7 +327,6 @@ void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const
 void AnimatedImageVisual::DoSetProperties(const Property::Map& propertyMap)
 {
   // url[s] already passed in from constructor
-
   for(Property::Map::SizeType iter = 0; iter < propertyMap.Count(); ++iter)
   {
     KeyValuePair keyValue = propertyMap.GetKeyValue(iter);
@@ -491,6 +495,13 @@ void AnimatedImageVisual::DoSetOnScene(Actor& actor)
   mPlacementActor       = actor;
   TextureSet textureSet = PrepareTextureSet();
 
+  // Loading animated image file is failed.
+  if(!mImageCache ||
+     (mAnimatedImageLoading && !mAnimatedImageLoading.HasLoadingSucceeded()))
+  {
+    textureSet = SetLoadingFailed();
+  }
+
   if(textureSet) // if the image loading is successful
   {
     StartFirstFrame(textureSet);
@@ -632,8 +643,12 @@ void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet)
     mFrameDelayTimer.TickSignal().Connect(this, &AnimatedImageVisual::DisplayNextFrame);
     mFrameDelayTimer.Start();
   }
-  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::READY)\n");
-  ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+
+  if(mImpl->mResourceStatus != Toolkit::Visual::ResourceStatus::FAILED)
+  {
+    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::READY)\n");
+    ResourceReady(Toolkit::Visual::ResourceStatus::READY);
+  }
 }
 
 TextureSet AnimatedImageVisual::PrepareTextureSet()
@@ -667,32 +682,31 @@ void AnimatedImageVisual::SetImageSize(TextureSet& textureSet)
 
 void AnimatedImageVisual::FrameReady(TextureSet textureSet)
 {
-  if(textureSet)
+  // When image visual requested to load new frame to mImageCache and it is failed.
+  if(!textureSet)
   {
-    SetImageSize(textureSet);
+    textureSet = SetLoadingFailed();
+  }
 
-    if(mStartFirstFrame)
-    {
-      StartFirstFrame(textureSet);
-    }
-    else
-    {
-      if(mImpl->mRenderer)
-      {
-        mImpl->mRenderer.SetTextures(textureSet);
-      }
-    }
+  SetImageSize(textureSet);
+
+  if(mStartFirstFrame)
+  {
+    StartFirstFrame(textureSet);
   }
   else
   {
-    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::FAILED)\n");
-    ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+    if(mImpl->mRenderer)
+    {
+      mImpl->mRenderer.SetTextures(textureSet);
+    }
   }
 }
 
 bool AnimatedImageVisual::DisplayNextFrame()
 {
-  bool continueTimer = false;
+  TextureSet textureSet;
+  bool       continueTimer = false;
 
   if(mImageCache)
   {
@@ -756,7 +770,6 @@ bool AnimatedImageVisual::DisplayNextFrame()
 
     DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::DisplayNextFrame(this:%p) CurrentFrameIndex:%d\n", this, frameIndex);
 
-    TextureSet textureSet;
     if(nextFrame)
     {
       textureSet = mImageCache->NextFrame();
@@ -766,19 +779,39 @@ bool AnimatedImageVisual::DisplayNextFrame()
       textureSet = mImageCache->Frame(frameIndex);
     }
 
-    if(textureSet)
-    {
-      SetImageSize(textureSet);
-      if(mImpl->mRenderer)
-      {
-        mImpl->mRenderer.SetTextures(textureSet);
-      }
-    }
-
     continueTimer = (mActionStatus == DevelAnimatedImageVisual::Action::PLAY) ? true : false;
   }
 
+  if(textureSet)
+  {
+    SetImageSize(textureSet);
+    if(mImpl->mRenderer)
+    {
+      mImpl->mRenderer.SetTextures(textureSet);
+    }
+  }
+
   return continueTimer;
+}
+
+TextureSet AnimatedImageVisual::SetLoadingFailed()
+{
+  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::FAILED)\n");
+  ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+
+  TextureSet textureSet  = TextureSet::New();
+  Texture    brokenImage = mFactoryCache.GetBrokenVisualImage();
+  textureSet.SetTexture(0u, brokenImage);
+
+  if(mFrameDelayTimer)
+  {
+    mFrameDelayTimer.Stop();
+    mFrameDelayTimer.Reset();
+  }
+
+  SetImageSize(textureSet);
+
+  return textureSet;
 }
 
 } // namespace Internal
