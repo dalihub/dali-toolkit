@@ -229,6 +229,18 @@ private: // Implementation
    */
   std::string GetPressedImage() const;
 
+  /**
+   * Set option divider padding
+   * @param[in] padding BEGIN END BOTTOM TOP
+   */
+  void SetOptionDividerPadding(const Padding& padding);
+
+  /**
+   * Get option divider padding
+   * @return Padding
+   */
+  Padding GetOptionDividerPadding() const;
+
   void CreateOrderedListOfPopupOptions();
 
   void AddOption(const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption);
@@ -272,10 +284,11 @@ private: // Data
   std::string mSelectIconImage;
   std::string mSelectAllIconImage;
 
-  Size mPopupMaxSize;      // Maximum size of the Popup
-  Size mOptionMaxSize;     // Maximum size of an Option button
-  Size mOptionMinSize;     // Minimum size of an Option button
-  Size mOptionDividerSize; // Size of divider line
+  Size    mPopupMaxSize;         // Maximum size of the Popup
+  Size    mOptionMaxSize;        // Maximum size of an Option button
+  Size    mOptionMinSize;        // Minimum size of an Option button
+  Size    mOptionDividerSize;    // Size of divider line
+  Padding mOptionDividerPadding; // Padding of divider line
 
   std::vector<ButtonRequirement> mOrderListOfButtons; // List of buttons in the order to be displayed and a flag to indicate if needed.
 
