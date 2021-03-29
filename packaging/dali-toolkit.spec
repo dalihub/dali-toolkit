@@ -88,7 +88,7 @@ Summary:    DLI scene loading library
 Group:      System/Libraries
 License:    Apache-2.0
 
-Requires:  dali2-toolkit
+BuildRequires:  pkgconfig(dali2-toolkit)
 
 %description -n %{dali2_scene_loader}
 Provides functionality for loading and displaying DLI format scenes. See README.md for more details.
