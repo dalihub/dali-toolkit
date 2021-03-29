@@ -970,36 +970,27 @@ int utcDaliTextEditorTextChangedP(void)
 
   gTextChangedCallBackCalled = false;
   editor.SetProperty( TextEditor::Property::TEXT, "ABC" );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
   DALI_TEST_CHECK( textChangedSignal );
 
+  application.SendNotification();
   editor.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   // Remove all text
   editor.SetProperty( TextField::Property::TEXT, "" );
-  application.SendNotification();
-  application.Render();
 
   // Pressing backspace key: TextChangedCallback should not be called when there is no text in texteditor.
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
 
   // Pressing delete key: TextChangedCallback should not be called when there is no text in texteditor.
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
 
   END_TEST;

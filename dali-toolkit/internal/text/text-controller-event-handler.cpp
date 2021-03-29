@@ -287,7 +287,7 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
      (NULL != controller.mImpl->mEditableControlInterface))
   {
     // Do this last since it provides callbacks into application code
-    controller.mImpl->mEditableControlInterface->TextChanged();
+    controller.mImpl->mEditableControlInterface->TextChanged(false);
   }
 
   return true;
@@ -742,7 +742,7 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
      (NULL != controller.mImpl->mEditableControlInterface))
   {
     // Do this last since it provides callbacks into application code
-    controller.mImpl->mEditableControlInterface->TextChanged();
+    controller.mImpl->mEditableControlInterface->TextChanged(false);
   }
 
   return callbackData;
@@ -852,7 +852,7 @@ void Controller::EventHandler::TextPopupButtonTouched(Controller& controller, Da
 
       if(NULL != controller.mImpl->mEditableControlInterface)
       {
-        controller.mImpl->mEditableControlInterface->TextChanged();
+        controller.mImpl->mEditableControlInterface->TextChanged(true);
       }
       break;
     }
