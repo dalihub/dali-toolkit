@@ -22,11 +22,13 @@
 #include <dali/devel-api/adaptor-framework/web-engine-back-forward-list-item.h>
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
+#include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-object.h>
+#include <memory>
 #include <toolkit-application.h>
 
 namespace Dali
@@ -213,6 +215,16 @@ public:
 private:
   MockWebEngineBackForwardListItem mockItem;
   WebEngineBackForwardListItem* pMockItem;
+};
+
+class MockWebEngineFormRepostDecision : public WebEngineFormRepostDecision
+{
+public:
+  MockWebEngineFormRepostDecision()
+  {
+  }
+
+  void Reply(bool allowed) override {}
 };
 
 class MockWebEngineSettings : public WebEngineSettings
@@ -689,6 +701,16 @@ public:
     return mUrlChangedSignal;
   }
 
+  Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType& FormRepostDecisionSignal()
+  {
+    return mFormRepostDecisionSignal;
+  }
+
+  Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType& FrameRenderedSignal()
+  {
+    return mFrameRenderedSignal;
+  }
+
   std::string                                                mUrl;
   std::vector< std::string >                                 mHistory;
   size_t                                                     mCurrentPlusOnePos;
@@ -700,15 +722,17 @@ public:
   std::vector<JavaScriptEvaluatedResultCallback>             mResultCallbacks;
   bool                                                       mEvaluating;
 
-  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
-  Dali::Vector2                                               mScrollPosition;
-  Dali::Vector2                                               mScrollSize;
-  Dali::Vector2                                               mContentSize;
-  WebEngineBackForwardList*                                   mockWebEngineBackForwardList;
-  WebEngineContext*                                           mockWebEngineContext;
-  WebEngineCookieManager*                                     mockWebEngineCookieManager;
-  WebEngineSettings*                                          mockWebEngineSettings;
-  Dali::WebEnginePlugin::WebEngineUrlChangedSignalType        mUrlChangedSignal;
+  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType  mScrollEdgeReachedSignal;
+  Dali::Vector2                                                mScrollPosition;
+  Dali::Vector2                                                mScrollSize;
+  Dali::Vector2                                                mContentSize;
+  WebEngineBackForwardList*                                    mockWebEngineBackForwardList;
+  WebEngineContext*                                            mockWebEngineContext;
+  WebEngineCookieManager*                                      mockWebEngineCookieManager;
+  WebEngineSettings*                                           mockWebEngineSettings;
+  Dali::WebEnginePlugin::WebEngineUrlChangedSignalType         mUrlChangedSignal;
+  Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType mFormRepostDecisionSignal;
+  Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType      mFrameRenderedSignal;
 
   JavaScriptAlertCallback                                     mJavaScriptAlertCallback;
   JavaScriptConfirmCallback                                   mJavaScriptConfirmCallback;
@@ -757,6 +781,10 @@ bool OnLoadUrl()
     gInstance->mPageLoadInProgressSignal.Emit( gInstance->mUrl );
     gInstance->mPageLoadFinishedSignal.Emit( gInstance->mUrl );
     gInstance->mUrlChangedSignal.Emit( "http://new-test" );
+
+    std::shared_ptr<Dali::WebEngineFormRepostDecision> decision(new MockWebEngineFormRepostDecision());
+    gInstance->mFormRepostDecisionSignal.Emit(decision);
+    gInstance->mFrameRenderedSignal.Emit();
   }
   return false;
 }
@@ -1161,6 +1189,16 @@ Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType& WebEngine::ScrollEd
 Dali::WebEnginePlugin::WebEngineUrlChangedSignalType& WebEngine::UrlChangedSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).UrlChangedSignal();
+}
+
+Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType& WebEngine::FormRepostDecisionSignal()
+{
+  return Internal::Adaptor::GetImplementation( *this ).FormRepostDecisionSignal();
+}
+
+Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType& WebEngine::FrameRenderedSignal()
+{
+  return Internal::Adaptor::GetImplementation( *this ).FrameRenderedSignal();
 }
 
 } // namespace Dali;

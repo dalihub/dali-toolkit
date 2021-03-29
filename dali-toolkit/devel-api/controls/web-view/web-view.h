@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <functional>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -33,6 +34,7 @@ class ImageView;
 class WebBackForwardList;
 class WebContext;
 class WebCookieManager;
+class WebFormRepostDecision;
 class WebSettings;
 
 namespace Internal DALI_INTERNAL
@@ -206,6 +208,16 @@ public:
    * @brief WebView signal type related with url changed.
    */
   using WebViewUrlChangedSignalType = Signal<void(WebView, const std::string&)>;
+
+  /**
+   * @brief WebView signal type related with form repost decision.
+   */
+  using WebViewFormRepostDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::Toolkit::WebFormRepostDecision>)>;
+
+  /**
+   * @brief WebView signal type related with frame rendered.
+   */
+  using WebViewFrameRenderedSignalType = Signal<void(WebView)>;
 
 public:
   /**
@@ -492,6 +504,20 @@ public:
    * @return A signal object to connect with.
    */
   WebViewUrlChangedSignalType& UrlChangedSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when form repost decision is requested.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewFormRepostDecisionSignalType& FormRepostDecisionSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when frame is rendered.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewFrameRenderedSignalType& FrameRenderedSignal();
 
 public: // Not intended for application developers
   /// @cond internal
