@@ -336,6 +336,38 @@ private:
   std::string GetTitle() const;
 
   /**
+   * @brief Sets the background color of web page.
+   * @param[in] color The value of background color.
+   */
+  void SetDocumentBackgroundColor(Dali::Vector4 color);
+
+  /**
+   * @brief Clears tiles when hidden.
+   *
+   * @param[in] cleared Whether tiles are cleared or not
+   */
+  void ClearTilesWhenHidden(bool cleared);
+
+  /**
+   * @brief Sets multiplier of cover area of tile.
+   *
+   * @param[in] multiplier The multiplier of cover area
+   */
+  void SetTileCoverAreaMultiplier(float multiplier);
+
+  /**
+   * @brief Enables cursor by client.
+   * @param[in] enabled Whether cursor is enabled or not.
+   */
+  void EnableCursorByClient(bool enabled);
+
+  /**
+   * @brief Gets the selected text.
+   * @return The selected text
+   */
+  std::string GetSelectedText() const;
+
+  /**
    * @brief Get user agent string.
    * @return The string value of user agent
    */
@@ -450,6 +482,7 @@ private:
   Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadInProgressSignal;
   Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadFinishedSignal;
   Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType     mPageLoadErrorSignal;
+  Dali::Toolkit::WebView::WebViewUrlChangedSignalType        mUrlChangedSignal;
   Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
 
   std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
@@ -463,7 +496,6 @@ private:
   Dali::PropertyNotification                          mScaleUpdateNotification;
   bool                                                mVideoHoleEnabled;
   Dali::Rect<int>                                     mWebViewArea;
-  Dali::Toolkit::WebView::WebViewUrlChangedSignalType mUrlChangedSignal;
   bool                                                mMouseEventsEnabled;
   bool                                                mKeyEventsEnabled;
 };
