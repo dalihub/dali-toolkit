@@ -1403,7 +1403,9 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     // If there is text changed, callback is called.
     if(mTextChanged)
     {
-      EmitTextChangedSignal();
+      Dali::Toolkit::TextField handle(GetOwner());
+      mTextChangedSignal.Emit(handle);
+      mTextChanged = false;
     }
   }
 
@@ -1712,23 +1714,9 @@ void TextField::CaretMoved(unsigned int position)
   }
 }
 
-void TextField::TextChanged(bool immediate)
+void TextField::TextChanged()
 {
-  if(immediate) // Emits TextChangedSignal immediately
-  {
-    EmitTextChangedSignal();
-  }
-  else
-  {
-    mTextChanged = true;
-  }
-}
-
-void TextField::EmitTextChangedSignal()
-{
-  Dali::Toolkit::TextField handle(GetOwner());
-  mTextChangedSignal.Emit(handle);
-  mTextChanged = false;
+  mTextChanged = true;
 }
 
 void TextField::MaxLengthReached()

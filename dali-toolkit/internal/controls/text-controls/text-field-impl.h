@@ -198,7 +198,7 @@ private: // From Control
   /**
    * @copydoc Text::EditableControlInterface::TextChanged()
    */
-  void TextChanged(bool immediate) override;
+  void TextChanged() override;
 
   /**
    * @copydoc Text::EditableControlInterface::MaxLengthReached()
@@ -300,11 +300,6 @@ private: // Implementation
   void OnIdleSignal();
 
   /**
-   * @brief Emits TextChanged signal.
-   */
-  void EmitTextChangedSignal();
-
-  /**
    * Construct a new TextField.
    */
   TextField();
@@ -364,7 +359,7 @@ private: // Data
   int   mRenderingBackend;
   int   mExceedPolicy;
   bool  mHasBeenStaged : 1;
-  bool  mTextChanged : 1; ///< If true, emits TextChangedSignal in next OnRelayout().
+  bool  mTextChanged : 1;
 
 protected:
   struct AccessibleImpl : public DevelControl::AccessibleImpl,

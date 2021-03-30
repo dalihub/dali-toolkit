@@ -59,10 +59,8 @@ public:
 
   /**
    * @brief Called to signal that text has been inserted or deleted.
-   * 
-   * @param[in] immediate If true, it immediately emits the signal, if false, only emits once the signal when OnRelayout() is called next time.
    */
-  virtual void TextChanged(bool immediate) = 0;
+  virtual void TextChanged() = 0;
 
   /**
    * @brief Called when the number of characters to be inserted exceeds the maximum limit
