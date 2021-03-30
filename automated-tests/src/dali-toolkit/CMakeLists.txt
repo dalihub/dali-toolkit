@@ -14,6 +14,7 @@ SET(TC_SOURCES
   utc-Dali-BloomView.cpp
   utc-Dali-BubbleEmitter.cpp
   utc-Dali-Builder.cpp
+  utc-Dali-CanvasView.cpp
   utc-Dali-CheckBoxButton.cpp
   utc-Dali-ConfirmationPopup.cpp
   utc-Dali-CubeTransitionEffect.cpp
@@ -78,6 +79,7 @@ SET(TC_SOURCES
 SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/toolkit-adaptor.cpp
   dali-toolkit-test-utils/toolkit-application.cpp
+  dali-toolkit-test-utils/toolkit-canvas-renderer.cpp
   dali-toolkit-test-utils/toolkit-clipboard.cpp
   dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
   dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
