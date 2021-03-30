@@ -37,6 +37,8 @@
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/text-controls/autofill-container-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
@@ -1570,6 +1572,23 @@ void TextField::OnKeyInputFocusGained()
     notifier.ContentSelectedSignal().Connect(this, &TextField::OnClipboardTextSelected);
   }
 
+  Toolkit::Control control = Toolkit::Control::DownCast( Self() );
+  Internal::Control& controlImpl = GetImplementation( control );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
+  bool enableAutofill = controlDataImpl.IsAutofillEnabled();
+  if( enableAutofill )
+  {
+    Toolkit::AutofillContainer container = controlDataImpl.GetAutofillContainer();
+    container.SetFocusedControl( control );
+
+    Internal::AutofillContainer& containerImpl = GetImpl( container );
+    Dali::AutofillGroup containerGroup = containerImpl.GetAutofillGroup();
+    if( containerGroup != nullptr )
+    {
+      containerGroup.RequestAuthentication();
+    }
+
+  }
   mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
 
   EmitKeyInputFocusSignal(true); // Calls back into the Control hence done last.

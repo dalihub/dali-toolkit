@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
+#include <dali/devel-api/adaptor-framework/autofill-item.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -352,6 +353,7 @@ private: // Data
   Toolkit::Control         mStencil;                  ///< For EXCEED_POLICY_CLIP
   std::vector<Actor>       mClippingDecorationActors; ///< Decoration actors which need clipping.
   Dali::InputMethodOptions mInputMethodOptions;
+  Dali::AutofillItem mAutofillItem;
 
   Actor         mRenderableActor;
   Actor         mActiveLayer;
