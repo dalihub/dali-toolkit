@@ -104,7 +104,8 @@ void RadioButton::OnStateChange(State newState)
     }
   }
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if(Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if(Dali::Accessibility::IsUp() && (Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self())
+     && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
     Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
       Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);

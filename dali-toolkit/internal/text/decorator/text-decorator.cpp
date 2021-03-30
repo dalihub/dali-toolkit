@@ -971,10 +971,7 @@ struct Decorator::Impl : public ConnectionTracker
     // The SetGrabHandleImage() method will change the orientation.
     const float yLocalPosition = grabHandle.verticallyFlipped ? grabHandle.position.y : grabHandle.position.y + grabHandle.lineHeight;
 
-    if(grabHandle.actor)
-    {
-      grabHandle.actor.SetProperty(Actor::Property::POSITION, Vector2(grabHandle.position.x + floor(0.5f * mCursorWidth) + (mSmoothHandlePanEnabled ? grabHandle.grabDisplacementX : 0.f), yLocalPosition + (mSmoothHandlePanEnabled ? grabHandle.grabDisplacementY : 0.f)));
-    }
+    ApplyDisplacement(grabHandle, yLocalPosition);
   }
 
   void SetSelectionHandlePosition(HandleType type)
@@ -1063,10 +1060,47 @@ struct Decorator::Impl : public ConnectionTracker
     // The SetHandleImage() method will change the orientation.
     const float yLocalPosition = handle.verticallyFlipped ? handle.position.y : handle.position.y + handle.lineHeight;
 
-    if(handle.actor)
+    ApplyDisplacement(handle, yLocalPosition);
+  }
+
+  void ApplyDisplacement(HandleImpl& handle, float yLocalPosition)
+  {
+    if( handle.actor )
     {
-      handle.actor.SetProperty(Actor::Property::POSITION, Vector2(handle.position.x + (mSmoothHandlePanEnabled ? handle.grabDisplacementX : 0.f), yLocalPosition + (mSmoothHandlePanEnabled ? handle.grabDisplacementY : 0.f)));
+      float adjustedDisplacementX = 0.0f;
+      float adjustedDisplacementY = 0.0f;
+      if (mSmoothHandlePanEnabled)
+      {
+        adjustedDisplacementX = CalculateAdjustedDisplacement(handle.position.x, handle.grabDisplacementX, mControlSize.x);
+        adjustedDisplacementY = CalculateAdjustedDisplacement(handle.position.y, handle.grabDisplacementY, (mControlSize.y - handle.lineHeight));
+      }
+      handle.actor.SetProperty(Actor::Property::POSITION,
+                               Vector2(handle.position.x + floor(0.5f * mCursorWidth) + adjustedDisplacementX,
+                                       yLocalPosition + adjustedDisplacementY));
     }
+  }
+
+  float CalculateAdjustedDisplacement(float position, float displacement, float edge)
+  {
+    //Apply the displacement (on the X-axis & the Y-axis)
+    //as long as it does not exceed the control's edge.
+    float adjustedDisplacement = 0.0f;
+    if(position + displacement < 0.0f)
+    {
+      // -position to cancel it out and relocate to 0.
+      adjustedDisplacement = -position;
+    }
+    else if(position + displacement > edge)
+    {
+      // move in a displacement which is sufficient to reach the edge.
+      adjustedDisplacement = edge - position;
+    }
+    else
+    {
+      // move normally in the displacement.
+      adjustedDisplacement = displacement;
+    }
+    return adjustedDisplacement;
   }
 
   void SetHandleImage(HandleType type)

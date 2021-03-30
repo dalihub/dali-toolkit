@@ -592,7 +592,7 @@ int UtcDaliTransitionDataMap5P(void)
   glAbstraction.EnableEnableDisableCallTrace( true );
   TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
-  blendStr << GL_BLEND;
+  blendStr << std::hex << GL_BLEND;
 
   Renderer renderer = actor.GetRendererAt(0);
   Property::Index mixColorIndex = renderer.GetPropertyIndex( ColorVisual::Property::MIX_COLOR );
@@ -606,8 +606,8 @@ int UtcDaliTransitionDataMap5P(void)
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 0.0f, 0.001f, TEST_LOCATION );
 
   // The Renderer is transparent. So rendering is skipped. The state should not be changed.
-  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str() ) );
 
   anim.Play();
 
@@ -621,7 +621,7 @@ int UtcDaliTransitionDataMap5P(void)
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 0.5f, 0.001f, TEST_LOCATION );
 
   // Should not be changed
-  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
 
   glEnableStack.Reset();
 
@@ -631,7 +631,7 @@ int UtcDaliTransitionDataMap5P(void)
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION );
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 1.0f, 0.001f, TEST_LOCATION );
 
-  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Disable", blendStr.str() ) );
 
   END_TEST;
 }
@@ -682,7 +682,7 @@ int UtcDaliTransitionDataMap6P(void)
   glAbstraction.EnableEnableDisableCallTrace( true );
   TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
   std::ostringstream blendStr;
-  blendStr << GL_BLEND;
+  blendStr << std::hex << GL_BLEND;
 
   application.SendNotification();
   application.Render(0);
@@ -693,7 +693,7 @@ int UtcDaliTransitionDataMap6P(void)
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 1.0f, 0.001f, TEST_LOCATION );
 
   // Default state is disabled. So test if "Enabled" is not called.
-  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
 
   anim.Play();
 
@@ -707,7 +707,7 @@ int UtcDaliTransitionDataMap6P(void)
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION);
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 0.5f, 0.001f, TEST_LOCATION );
 
-  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
 
   glEnableStack.Reset();
 
@@ -718,7 +718,7 @@ int UtcDaliTransitionDataMap6P(void)
   DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( DevelRenderer::Property::OPACITY ), 0.0f, 0.001f, TEST_LOCATION );
 
   // GL_BLEND should not be changed: Keep enabled
-  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str().c_str() ) );
+  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Disable", blendStr.str() ) );
 
   END_TEST;
 }

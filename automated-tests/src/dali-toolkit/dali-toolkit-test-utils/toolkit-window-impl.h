@@ -44,6 +44,8 @@ public:
   virtual ~Window() = default;
   static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent);
   FocusChangeSignalType mFocusChangeSignal;
+  ResizeSignalType      mResizeSignal;
+  int                   mRotationAngle;
   DevelWindow::VisibilityChangedSignalType mVisibilityChangedSignal;
 };
 

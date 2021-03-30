@@ -109,6 +109,26 @@ public:
 
   }
 
+  void RaiseAbove(Dali::VideoPlayer target)
+  {
+
+  }
+
+  void LowerBelow(Dali::VideoPlayer target)
+  {
+
+  }
+
+  void RaiseToTop()
+  {
+
+  }
+
+  void LowerToBottom()
+  {
+
+  }
+
 public:
 
   std::string mUrl;
@@ -323,6 +343,26 @@ void VideoPlayer::StartSynchronization()
 void VideoPlayer::FinishSynchronization()
 {
   Internal::Adaptor::GetImplementation( *this ).FinishSynchronization();
+}
+
+void VideoPlayer::RaiseAbove(Dali::VideoPlayer target)
+{
+  Internal::Adaptor::GetImplementation( *this ).RaiseAbove(target);
+}
+
+void VideoPlayer::LowerBelow(Dali::VideoPlayer target)
+{
+  Internal::Adaptor::GetImplementation( *this ).LowerBelow(target);
+}
+
+void VideoPlayer::RaiseToTop()
+{
+  Internal::Adaptor::GetImplementation( *this ).RaiseToTop();
+}
+
+void VideoPlayer::LowerToBottom()
+{
+  Internal::Adaptor::GetImplementation( *this ).LowerToBottom();
 }
 
 } // namespace Dali;

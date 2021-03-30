@@ -2,6 +2,7 @@
 .project
 .settings
 .directory
+.idea/
 Makefile.in
 Makefile
 CMakeCache.txt

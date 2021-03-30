@@ -41,6 +41,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/web-view/web-back-forward-list-item.cpp
   ${devel_api_src_dir}/controls/web-view/web-context.cpp
   ${devel_api_src_dir}/controls/web-view/web-cookie-manager.cpp
+  ${devel_api_src_dir}/controls/web-view/web-form-repost-decision.cpp
   ${devel_api_src_dir}/controls/web-view/web-settings.cpp
   ${devel_api_src_dir}/controls/web-view/web-view.cpp
   ${devel_api_src_dir}/focus-manager/keyinput-focus-manager.cpp
@@ -256,6 +257,7 @@ SET( devel_api_web_view_header_files
   ${devel_api_src_dir}/controls/web-view/web-back-forward-list-item.h
   ${devel_api_src_dir}/controls/web-view/web-context.h
   ${devel_api_src_dir}/controls/web-view/web-cookie-manager.h
+  ${devel_api_src_dir}/controls/web-view/web-form-repost-decision.h
   ${devel_api_src_dir}/controls/web-view/web-settings.h
   ${devel_api_src_dir}/controls/web-view/web-view.h
 )

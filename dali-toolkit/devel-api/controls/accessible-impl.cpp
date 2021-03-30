@@ -291,6 +291,9 @@ bool AccessibleImpl::GrabHighlight()
   highlight.SetProperty(Actor::Property::POSITION_Z, 1.0f);
   highlight.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
 
+  // Remember the highlight actor, so that when the default is changed with
+  // SetHighlightActor(), the currently displayed highlight can still be cleared.
+  currentHighlightActor = highlight;
   EnsureSelfVisible();
   self.Add(highlight);
   SetCurrentlyHighlightedActor(self);
@@ -305,7 +308,8 @@ bool AccessibleImpl::ClearHighlight()
     return false;
   if(GetCurrentlyHighlightedActor() == self)
   {
-    self.Remove(GetHighlightActor());
+    self.Remove(currentHighlightActor.GetHandle());
+    currentHighlightActor = {};
     SetCurrentlyHighlightedActor({});
     EmitHighlighted(false);
     return true;

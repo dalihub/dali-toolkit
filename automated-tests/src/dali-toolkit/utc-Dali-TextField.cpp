@@ -105,6 +105,7 @@ const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSys
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
 const char* const PROPERTY_NAME_BACKGROUND                           = "textBackground";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
+const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
@@ -510,6 +511,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP ) == DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_BACKGROUND ) == DevelTextField::Property::BACKGROUND );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_COLOR ) == DevelTextField::Property::GRAB_HANDLE_COLOR );
 
   END_TEST;
 }
@@ -980,6 +982,10 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty( DevelTextField::Property::BACKGROUND, Color::RED );
   DALI_TEST_EQUALS( field.GetProperty<Vector4>( DevelTextField::Property::BACKGROUND ), Color::RED, TEST_LOCATION );
 
+  //Check handle color
+  field.SetProperty( DevelTextField::Property::GRAB_HANDLE_COLOR, Color::GREEN );
+  DALI_TEST_EQUALS( field.GetProperty<Vector4>( DevelTextField::Property::GRAB_HANDLE_COLOR ), Color::GREEN, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
 
@@ -1034,36 +1040,27 @@ int utcDaliTextFieldTextChangedP(void)
 
   gTextChangedCallBackCalled = false;
   field.SetProperty( TextField::Property::TEXT, "ABC" );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
   DALI_TEST_CHECK( textChangedSignal );
 
+  application.SendNotification();
   field.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   // Remove all text
   field.SetProperty( TextField::Property::TEXT, "" );
-  application.SendNotification();
-  application.Render();
 
   // Pressing backspace key: TextChangedCallback should not be called when there is no text in textfield.
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
 
   // Pressing delete key: TextChangedCallback should not be called when there is no text in textfield.
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
 
   END_TEST;

@@ -146,6 +146,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableEditing",
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextEditor, "selectedText",                         STRING,    SELECTED_TEXT                       )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "fontSizeScale",                        FLOAT,     FONT_SIZE_SCALE                     )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "primaryCursorPosition",                INTEGER,   PRIMARY_CURSOR_POSITION             )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "grabHandleColor",                      VECTOR4,   GRAB_HANDLE_COLOR                   )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
@@ -764,6 +765,15 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::GRAB_HANDLE_COLOR:
+      {
+        const Vector4 color = value.Get<Vector4>();
+        DALI_LOG_INFO(gLogFilter, Debug::General, "TextEditor %p GRAB_HANDLE_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a);
+
+        impl.mDecorator->SetHandleColor(color);
+        impl.RequestTextRelayout();
+        break;
+      }
     } // switch
   }   // texteditor
 }
@@ -1120,6 +1130,11 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
         value = static_cast<int>(impl.mController->GetPrimaryCursorPosition());
         break;
       }
+      case Toolkit::DevelTextEditor::Property::GRAB_HANDLE_COLOR:
+      {
+        value = impl.mDecorator->GetHandleColor();
+        break;
+      }
     } //switch
   }
 
@@ -1450,9 +1465,7 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     // If there is text changed, callback is called.
     if(mTextChanged)
     {
-      Dali::Toolkit::TextEditor handle(GetOwner());
-      mTextChangedSignal.Emit(handle);
-      mTextChanged = false;
+      EmitTextChangedSignal();
     }
   }
 
@@ -1667,9 +1680,23 @@ void TextEditor::CaretMoved(unsigned int position)
   }
 }
 
-void TextEditor::TextChanged()
+void TextEditor::TextChanged(bool immediate)
 {
-  mTextChanged = true;
+  if(immediate) // Emits TextChangedSignal immediately
+  {
+    EmitTextChangedSignal();
+  }
+  else
+  {
+    mTextChanged = true;
+  }
+}
+
+void TextEditor::EmitTextChangedSignal()
+{
+  Dali::Toolkit::TextEditor handle(GetOwner());
+  mTextChangedSignal.Emit(handle);
+  mTextChanged = false;
 }
 
 void TextEditor::MaxLengthReached()

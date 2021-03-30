@@ -398,15 +398,12 @@ Property::Index ToggleButton::AccessibleImpl::GetDescriptionPropertyIndex()
 void ToggleButton::OnStateChange(State newState)
 {
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
-  if(Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  if(Dali::Accessibility::IsUp() && (Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+     && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
     Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
       Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
-
-    if(Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
-    {
       Dali::Accessibility::Accessible::Get(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
-    }
   }
 }
 

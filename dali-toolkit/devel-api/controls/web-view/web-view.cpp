@@ -164,34 +164,34 @@ void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, 
   Dali::Toolkit::GetImpl(*this).AddJavaScriptMessageHandler(exposedObjectName, handler);
 }
 
-void WebView::RegisterJavaScriptAlertCallback( Dali::WebEnginePlugin::JavaScriptAlertCallback callback )
+void WebView::RegisterJavaScriptAlertCallback(Dali::WebEnginePlugin::JavaScriptAlertCallback callback)
 {
-  Dali::Toolkit::GetImpl( *this ).RegisterJavaScriptAlertCallback( callback );
+  Dali::Toolkit::GetImpl(*this).RegisterJavaScriptAlertCallback(callback);
 }
 
 void WebView::JavaScriptAlertReply()
 {
-  Dali::Toolkit::GetImpl( *this ).JavaScriptAlertReply();
+  Dali::Toolkit::GetImpl(*this).JavaScriptAlertReply();
 }
 
-void WebView::RegisterJavaScriptConfirmCallback( Dali::WebEnginePlugin::JavaScriptConfirmCallback callback )
+void WebView::RegisterJavaScriptConfirmCallback(Dali::WebEnginePlugin::JavaScriptConfirmCallback callback)
 {
-  Dali::Toolkit::GetImpl( *this ).RegisterJavaScriptConfirmCallback( callback );
+  Dali::Toolkit::GetImpl(*this).RegisterJavaScriptConfirmCallback(callback);
 }
 
-void WebView::JavaScriptConfirmReply( bool confirmed )
+void WebView::JavaScriptConfirmReply(bool confirmed)
 {
-  Dali::Toolkit::GetImpl( *this ).JavaScriptConfirmReply( confirmed );
+  Dali::Toolkit::GetImpl(*this).JavaScriptConfirmReply(confirmed);
 }
 
-void WebView::RegisterJavaScriptPromptCallback( Dali::WebEnginePlugin::JavaScriptPromptCallback callback )
+void WebView::RegisterJavaScriptPromptCallback(Dali::WebEnginePlugin::JavaScriptPromptCallback callback)
 {
-  Dali::Toolkit::GetImpl( *this ).RegisterJavaScriptPromptCallback( callback );
+  Dali::Toolkit::GetImpl(*this).RegisterJavaScriptPromptCallback(callback);
 }
 
-void WebView::JavaScriptPromptReply( const std::string& result )
+void WebView::JavaScriptPromptReply(const std::string& result)
 {
-  Dali::Toolkit::GetImpl( *this ).JavaScriptPromptReply( result );
+  Dali::Toolkit::GetImpl(*this).JavaScriptPromptReply(result);
 }
 
 void WebView::ClearHistory()
@@ -201,7 +201,7 @@ void WebView::ClearHistory()
 
 void WebView::ClearAllTilesResources()
 {
-  Dali::Toolkit::GetImpl( *this ).ClearAllTilesResources();
+  Dali::Toolkit::GetImpl(*this).ClearAllTilesResources();
 }
 
 WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
@@ -211,7 +211,7 @@ WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
 
 WebView::WebViewPageLoadSignalType& WebView::PageLoadInProgressSignal()
 {
-  return Dali::Toolkit::GetImpl( *this ).PageLoadInProgressSignal();
+  return Dali::Toolkit::GetImpl(*this).PageLoadInProgressSignal();
 }
 
 WebView::WebViewPageLoadSignalType& WebView::PageLoadFinishedSignal()
@@ -231,7 +231,17 @@ WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
 
 WebView::WebViewUrlChangedSignalType& WebView::UrlChangedSignal()
 {
-  return Dali::Toolkit::GetImpl( *this ).UrlChangedSignal();
+  return Dali::Toolkit::GetImpl(*this).UrlChangedSignal();
+}
+
+WebView::WebViewFormRepostDecisionSignalType& WebView::FormRepostDecisionSignal()
+{
+  return Dali::Toolkit::GetImpl(*this).FormRepostDecisionSignal();
+}
+
+WebView::WebViewFrameRenderedSignalType& WebView::FrameRenderedSignal()
+{
+  return Dali::Toolkit::GetImpl(*this).FrameRenderedSignal();
 }
 
 WebView::WebView(Internal::WebView& implementation)

@@ -205,7 +205,7 @@ private: // From Control
   /**
    * @copydoc Text::EditableControlInterface::TextChanged()
    */
-  void TextChanged() override;
+  void TextChanged(bool immediate) override;
 
   /**
    * @copydoc Text::EditableControlInterface::MaxLengthReached()
@@ -329,6 +329,11 @@ private: // Implementation
   void OnIdleSignal();
 
   /**
+   * @brief Emits TextChanged signal.
+   */
+  void EmitTextChangedSignal();
+
+  /**
    * @brief set RenderActor's position with new scrollPosition
    *
    * Apply updated scroll position or start scroll animation if VerticalScrollAnimation is enabled
@@ -402,7 +407,7 @@ private: // Data
   bool  mScrollAnimationEnabled : 1;
   bool  mScrollBarEnabled : 1;
   bool  mScrollStarted : 1;
-  bool  mTextChanged : 1;
+  bool  mTextChanged : 1; ///< If true, emits TextChangedSignal in next OnRelayout().
 
   struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Text,

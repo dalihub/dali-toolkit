@@ -19,6 +19,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/accessibility-impl.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -46,6 +47,7 @@ struct DALI_TOOLKIT_API AccessibleImpl : public virtual Dali::Accessibility::Acc
                                          public virtual Dali::Accessibility::Action
 {
   Dali::Actor self;
+  Dali::WeakHandle<Dali::Actor> currentHighlightActor;
   bool        modal = false, root = false;
 
   AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);

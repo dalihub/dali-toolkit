@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/video-player.h>
 #include <dali/devel-api/adaptor-framework/video-sync-mode.h>
 #include <dali/integration-api/adaptor-framework/trigger-event-factory.h>
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-map.h>
@@ -262,6 +263,21 @@ public:
    */
   void PlayAnimation(Dali::Animation animation);
 
+  /**
+   * @brief Checks whether the actor is set as a video view or not.
+   *
+   * @param[in] actor The actor to be checked
+   * @return True if actor is video view.
+   */
+  bool IsVideoView(Actor actor) const;
+
+  /**
+   * @brief Gets the Video Player.
+   *
+   * @return The return of video player.
+   */
+  VideoPlayer GetVideoPlayer();
+
 private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -365,6 +381,22 @@ private:
    */
   void OnAnimationFinished(Dali::Animation& animation);
 
+  /*
+   * @brief window's resize callback function
+   * This function is called when window is resized.
+   *
+   * @param[in] winHandle The resized window's handle.
+   * @param[in] size The window's new size.
+   */
+  void OnWindowResized(Dali::Window winHandle, Dali::Window::WindowSize size);
+
+  /**
+   * @brief This signal is emitted when an actor's children change their sibling order
+   *
+   * @param[in] actor parent actor.
+   */
+  void OnChildOrderChanged(Actor actor);
+
 private:
   Dali::VideoPlayer     mVideoPlayer;
   Dali::ImageDimensions mVideoSize;
@@ -392,6 +424,7 @@ private:
   bool mIsUnderlay;
 
   Dali::VideoSyncMode mSyncMode;
+  int                 mSiblingOrder;
 };
 
 } // namespace Internal

@@ -137,6 +137,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "selectedTextEnd"
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "enableEditing",                    BOOLEAN,   ENABLE_EDITING                      )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "fontSizeScale",                    FLOAT,     FONT_SIZE_SCALE                     )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "primaryCursorPosition",            INTEGER,   PRIMARY_CURSOR_POSITION             )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "grabHandleColor",                  VECTOR4,   GRAB_HANDLE_COLOR                   )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",       SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",  SIGNAL_MAX_LENGTH_REACHED )
@@ -754,6 +755,15 @@ void TextField::SetProperty(BaseObject* object, Property::Index index, const Pro
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::GRAB_HANDLE_COLOR:
+      {
+        const Vector4 color = value.Get<Vector4>();
+        DALI_LOG_INFO(gLogFilter, Debug::General, "TextField %p GRAB_HANDLE_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a);
+
+        impl.mDecorator->SetHandleColor(color);
+        impl.RequestTextRelayout();
+        break;
+      }
     } // switch
   }   // textfield
 }
@@ -1104,6 +1114,11 @@ Property::Value TextField::GetProperty(BaseObject* object, Property::Index index
         value = static_cast<int>(impl.mController->GetPrimaryCursorPosition());
         break;
       }
+      case Toolkit::DevelTextField::Property::GRAB_HANDLE_COLOR:
+      {
+        value = impl.mDecorator->GetHandleColor();
+        break;
+      }
     } //switch
   }
 
@@ -1401,9 +1416,7 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     // If there is text changed, callback is called.
     if(mTextChanged)
     {
-      Dali::Toolkit::TextField handle(GetOwner());
-      mTextChangedSignal.Emit(handle);
-      mTextChanged = false;
+      EmitTextChangedSignal();
     }
   }
 
@@ -1695,9 +1708,23 @@ void TextField::CaretMoved(unsigned int position)
   }
 }
 
-void TextField::TextChanged()
+void TextField::TextChanged(bool immediate)
 {
-  mTextChanged = true;
+  if(immediate) // Emits TextChangedSignal immediately
+  {
+    EmitTextChangedSignal();
+  }
+  else
+  {
+    mTextChanged = true;
+  }
+}
+
+void TextField::EmitTextChangedSignal()
+{
+  Dali::Toolkit::TextField handle(GetOwner());
+  mTextChangedSignal.Emit(handle);
+  mTextChanged = false;
 }
 
 void TextField::MaxLengthReached()

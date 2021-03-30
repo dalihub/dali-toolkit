@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <functional>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -33,6 +34,7 @@ class ImageView;
 class WebBackForwardList;
 class WebContext;
 class WebCookieManager;
+class WebFormRepostDecision;
 class WebSettings;
 
 namespace Internal DALI_INTERNAL
@@ -117,6 +119,51 @@ public:
        * @note The value is read-only.
        */
       VIDEO_HOLE_ENABLED,
+
+      /**
+       * @brief Whether mouse event is enabled.
+       * @details name "mouseEventsEnabled", type Property::BOOLEAN.
+       * @note Default is true.
+       */
+      MOUSE_EVENTS_ENABLED,
+
+      /**
+       * @brief Whether key event is enabled.
+       * @details name "keyEventsEnabled", type Property::BOOLEAN.
+       * @note Default is true.
+       */
+      KEY_EVENTS_ENABLED,
+
+      /**
+       * @brief The background color of web page.
+       * @details name "documentBackgroundColor", type Property::VECTOR4.
+       */
+      DOCUMENT_BACKGROUND_COLOR,
+
+      /**
+       * @brief Whether tiles can be cleared or not when hidden.
+       * @details name "tilesClearedWhenHidden", type BOOLEAN.
+       */
+      TILES_CLEARED_WHEN_HIDDEN,
+
+      /**
+       * @brief The multiplier of cover area of tile when rendering web page.
+       * @details name "tileCoverAreaMultiplier", type FLOAT.
+       */
+      TILE_COVER_AREA_MULTIPLIER,
+
+      /**
+       * @brief Whether cursor is enabled or not by client.
+       * @details name "cursorEnabledByClient", type BOOLEAN.
+       */
+      CURSOR_ENABLED_BY_CLIENT,
+
+      /**
+       * @brief The selected text of web page.
+       * @details name "selectedText", type Property::STRING.
+       * @note The value is read-only.
+       */
+      SELECTED_TEXT,
     };
   };
 
@@ -161,6 +208,16 @@ public:
    * @brief WebView signal type related with url changed.
    */
   using WebViewUrlChangedSignalType = Signal<void(WebView, const std::string&)>;
+
+  /**
+   * @brief WebView signal type related with form repost decision.
+   */
+  using WebViewFormRepostDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::Toolkit::WebFormRepostDecision>)>;
+
+  /**
+   * @brief WebView signal type related with frame rendered.
+   */
+  using WebViewFrameRenderedSignalType = Signal<void(WebView)>;
 
 public:
   /**
@@ -447,6 +504,20 @@ public:
    * @return A signal object to connect with.
    */
   WebViewUrlChangedSignalType& UrlChangedSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when form repost decision is requested.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewFormRepostDecisionSignalType& FormRepostDecisionSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when frame is rendered.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewFrameRenderedSignalType& FrameRenderedSignal();
 
 public: // Not intended for application developers
   /// @cond internal

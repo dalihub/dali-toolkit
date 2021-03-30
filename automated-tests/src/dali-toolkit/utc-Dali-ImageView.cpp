@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -446,6 +446,14 @@ int UtcDaliImageViewPixelArea(void)
   // Test pixel area property
   ToolkitTestApplication application;
 
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("pixelArea", Property::Type::VECTOR4),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
   // Gif image, use AnimatedImageVisual internally
   // Atlasing is applied to pack multiple frames, use custom wrap mode
   ImageView gifView = ImageView::New();
@@ -575,9 +583,9 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   callStack.Enable(false);
 
   TraceCallStack::NamedParams params;
-  params["width"] = ToString(34);
-  params["height"] = ToString(34);
-  DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ), true, TEST_LOCATION );
+  params["width"] << 34;
+  params["height"] << 34;
+DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -616,8 +624,8 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing02(void)
   callStack.Enable(false);
 
   TraceCallStack::NamedParams params;
-  params["width"] = ToString(34);
-  params["height"] = ToString(34);
+  params["width"] << 34;
+  params["height"] << 34;
   DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ), true, TEST_LOCATION );
 
   END_TEST;
@@ -661,8 +669,8 @@ int UtcDaliImageViewSyncLoading(void)
     application.Render(16);
 
     TraceCallStack::NamedParams params;
-    params["width"] = ToString(34);
-    params["height"] = ToString(34);
+    params["width"] << 34;
+    params["height"] << 34;
     DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
                       true, TEST_LOCATION );
   }
@@ -697,8 +705,8 @@ int UtcDaliImageViewSyncLoading02(void)
     application.Render(16);
 
     TraceCallStack::NamedParams params;
-    params["width"] = ToString(34);
-    params["height"] = ToString(34);
+    params["width"] << 34;
+    params["height"] << 34;
     DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
                       true, TEST_LOCATION );
   }
