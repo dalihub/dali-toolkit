@@ -104,9 +104,24 @@ void WebView::LoadHtmlString(const std::string& htmlString)
   Dali::Toolkit::GetImpl(*this).LoadHtmlString(htmlString);
 }
 
+bool WebView::LoadHtmlStringOverrideCurrentEntry(const std::string& html, const std::string& basicUri, const std::string& unreachableUrl)
+{
+  return Dali::Toolkit::GetImpl(*this).LoadHtmlStringOverrideCurrentEntry(html, basicUri, unreachableUrl);
+}
+
+bool WebView::LoadContents(const std::string& contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri)
+{
+  return Dali::Toolkit::GetImpl(*this).LoadContents(contents, contentSize, mimeType, encoding, baseUri);
+}
+
 void WebView::Reload()
 {
   Dali::Toolkit::GetImpl(*this).Reload();
+}
+
+bool WebView::ReloadWithoutCache()
+{
+  return Dali::Toolkit::GetImpl(*this).ReloadWithoutCache();
 }
 
 void WebView::StopLoading()
@@ -124,9 +139,44 @@ void WebView::Resume()
   Dali::Toolkit::GetImpl(*this).Resume();
 }
 
+void WebView::SuspendNetworkLoading()
+{
+  Dali::Toolkit::GetImpl(*this).SuspendNetworkLoading();
+}
+
+void WebView::ResumeNetworkLoading()
+{
+  Dali::Toolkit::GetImpl(*this).ResumeNetworkLoading();
+}
+
+bool WebView::AddCustomHeader(const std::string& name, const std::string& value)
+{
+  return Dali::Toolkit::GetImpl(*this).AddCustomHeader(name, value);
+}
+
+bool WebView::RemoveCustomHeader(const std::string& name)
+{
+  return Dali::Toolkit::GetImpl(*this).RemoveCustomHeader(name);
+}
+
+uint32_t WebView::StartInspectorServer(uint32_t port)
+{
+  return Dali::Toolkit::GetImpl(*this).StartInspectorServer(port);
+}
+
+bool WebView::StopInspectorServer()
+{
+  return Dali::Toolkit::GetImpl(*this).StopInspectorServer();
+}
+
 void WebView::ScrollBy(int deltaX, int deltaY)
 {
   Dali::Toolkit::GetImpl(*this).ScrollBy(deltaX, deltaY);
+}
+
+bool WebView::ScrollEdgeBy(int deltaX, int deltaY)
+{
+  return Dali::Toolkit::GetImpl(*this).ScrollEdgeBy(deltaX, deltaY);
 }
 
 bool WebView::CanGoForward()
@@ -202,6 +252,51 @@ void WebView::ClearHistory()
 void WebView::ClearAllTilesResources()
 {
   Dali::Toolkit::GetImpl(*this).ClearAllTilesResources();
+}
+
+void WebView::SetScaleFactor(float scaleFactor, Dali::Vector2 point)
+{
+  Dali::Toolkit::GetImpl(*this).SetScaleFactor(scaleFactor, point);
+}
+
+float WebView::GetScaleFactor() const
+{
+  return Dali::Toolkit::GetImpl(*this).GetScaleFactor();
+}
+
+void WebView::ActivateAccessibility(bool activated)
+{
+  Dali::Toolkit::GetImpl(*this).ActivateAccessibility(activated);
+}
+
+bool WebView::HighlightText(const std::string& text, Dali::WebEnginePlugin::FindOption options, uint32_t maxMatchCount)
+{
+  return Dali::Toolkit::GetImpl(*this).HighlightText(text, options, maxMatchCount);
+}
+
+void WebView::AddDynamicCertificatePath(const std::string& host, const std::string& certPath)
+{
+  Dali::Toolkit::GetImpl(*this).AddDynamicCertificatePath(host, certPath);
+}
+
+Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor)
+{
+  return Dali::Toolkit::GetImpl(*this).GetScreenshot(viewArea, scaleFactor);
+}
+
+bool WebView::GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
+{
+  return Dali::Toolkit::GetImpl(*this).GetScreenshotAsynchronously(viewArea, scaleFactor, callback);
+}
+
+bool WebView::CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback)
+{
+  return Dali::Toolkit::GetImpl(*this).CheckVideoPlayingAsynchronously(callback);
+}
+
+void WebView::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterGeolocationPermissionCallback(callback);
 }
 
 WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
