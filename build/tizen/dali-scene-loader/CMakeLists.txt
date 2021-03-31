@@ -68,63 +68,6 @@ if (ENABLE_PKG_CONFIGURE)
 	configure_file(${CMAKE_CURRENT_LIST_DIR}/${core_pkg_cfg_file}.in ${core_pkg_cfg_file} @ONLY)
 endif()
 
-if (ENABLE_COVERAGE)
-	find_program(lcov_bin "lcov")
-	if (${lcov_bin})
-		set(cov_dir ".cov")
-		set(cov_output_dir "doc/coverage")
-
-		execute_process(COMMAND bash -c "${lcov_bin} --version | cut -d' ' -f4" OUTPUT_VARIABLE lcov_version)
-		string(REPLACE "." ";" lcov_vlist ${lcov_version})
-		if (NOT $<VERSION_LESS:${lcov_version},"1.10"> )
-			set(lcov_opts --rc lcov_branch_coverage=1)
-		endif()
-
-		add_custom_target(${prefix}rename_cov_data ./rename-cov-data)
-
-		add_custom_target(${prefix}cov_data
-			${lcov_bin} ${lcov_opts} --base-directory . --directory . -c -o dali.info
-			COMMAND ${lcov_bin} ${lcov_opts} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" \"/usr/local/include/*\" \"*/dali-env/*\" \"*/dali-scene-loader/third-party/*\" -o dali.info
-		)
-
-		add_custom_target(${prefix}coverage genhtml ${lcov_opts} -o ${cov_output_dir} dali.info)
-
-		add_custom_target(${prefix}reset_coverage @${lcov_bin} -\ --direwctory `pwd`)
-
-		add_custom_target(${prefix}distclean @echo cleaning for source distribution)
-		add_custom_command(
-			DEPENDS ${prefix}clean
-			COMMENT "distribution clean"
-			COMMAND find
-			ARGS .
-			-not -name config.cmake -and \(
-			-name tester.c -or
-			-name Testing -or
-			-name CMakeFiles -or
-			-name doc -or
-			-name cmake.depends -or
-			-name cmake.check_depends -or
-			-name CMakeCache.txt -or
-			-name cmake.check_cache -or
-			-name *.cmake -or
-			-name Makefile -or
-			-name core -or
-			-name core.* -or
-			-name gmon.out -or
-			-name install_manifest.txt -or
-			-name *.pc -or
-			-name *.gcov -or
-			-name *.gcno -or
-			-name *.gcda -or
-			-name *~ -or
-			-name libdali*.so* \)
-			| grep -v TC | xargs rm -rf
-			TARGET  ${DALI_TOOLKIT_PREFIX}distclean
-			VERBATIM
-		)
-	endif()
-endif()
-
 set(scene_loader_src_files "")
 include("${scene_loader_dir}/internal/file.list")
 include("${scene_loader_dir}/public-api/file.list")
