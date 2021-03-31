@@ -61,6 +61,8 @@ void RasterizingTask::Load()
 
     remoteBuffer.PushBack('\0');
 
+    DALI_LOG_RELEASE_INFO("RasterizingTask::Load: Try load data! [%s]\n", mUrl.GetUrl().c_str());
+
     if(!mVectorRenderer.Load(remoteBuffer, mDpi))
     {
       DALI_LOG_ERROR("RasterizingTask::Load:Failed to load data! [%s]\n", mUrl.GetUrl().c_str());

@@ -230,6 +230,8 @@ void SvgVisual::Load()
 
       Vector2 dpi     = Stage::GetCurrent().GetDpi();
       float   meanDpi = (dpi.height + dpi.width) * 0.5f;
+      DALI_LOG_RELEASE_INFO("SvgVisual::Load: Try load file! [%s]\n", mImageUrl.GetUrl().c_str());
+
       if(!mVectorRenderer.Load(buffer, meanDpi))
       {
         mLoadFailed = true;
