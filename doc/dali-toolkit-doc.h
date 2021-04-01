@@ -174,6 +174,9 @@
  *     @defgroup dali_toolkit_controls_buttons Buttons
  *     @brief Button is a small object on UI that you can press.
 
+ *     @defgroup dali_toolkit_controls_canvas_view CanvasView
+ *     @brief CanvasView is a class for displaying an vector primitives.
+ *
  *     @defgroup dali_toolkit_controls_gaussian_blur_view Gaussian Blur View
  *     @brief GaussianBlurView provides a render process that blurs an image.
 
