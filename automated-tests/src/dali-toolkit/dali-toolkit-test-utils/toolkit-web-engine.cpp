@@ -30,6 +30,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
+#include <dali/devel-api/adaptor-framework/web-engine-security-origin.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/images/pixel-data.h>
@@ -49,14 +50,16 @@ namespace Adaptor
 {
 
 class WebEngine;
+class MockWebEngineContext;
 
 namespace
 {
 
 // Generally only one WebEngine instance exists.
 // If > 1, a new web engine has been created by CreateWindowSignal.
-static WebEngine* gInstance = 0;
+static WebEngine* gInstance = nullptr;
 static int gInstanceCount = 0;
+static MockWebEngineContext* gWebEngineContextInstance = nullptr;
 
 bool OnGoBack();
 bool OnGoForward();
@@ -70,6 +73,11 @@ bool OnScreenshotCaptured();
 bool OnVideoPlaying();
 bool OnGeolocationPermission();
 bool OnClearHistory();
+bool OnSecurityOriginAcquired();
+bool OnStorageUsageAcquired();
+bool OnFormPasswordAcquired();
+bool OnDownloadStarted();
+bool OnMimeOverridden();
 
 static void ConnectToGlobalSignal( bool ( *func )() )
 {
@@ -114,12 +122,52 @@ public:
   {
   }
 
-  void DeleteWebDatabase() override
+  void DeleteAllWebDatabase() override
   {
   }
 
-  void DeleteWebStorage() override
+  bool GetWebDatabaseOrigins(Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback callback)
   {
+    if (callback)
+    {
+      ConnectToGlobalSignal(&OnSecurityOriginAcquired);
+      mSecurityOriginAcquiredCallback = callback;
+    }
+    return true;
+  }
+
+  bool DeleteWebDatabase(Dali::WebEngineSecurityOrigin& origin)
+  {
+    return true;
+  }
+
+  bool GetWebStorageOrigins(Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback callback)
+  {
+    if (callback)
+    {
+      ConnectToGlobalSignal(&OnSecurityOriginAcquired);
+      mSecurityOriginAcquiredCallback = callback;
+    }
+    return true;
+  }
+
+  bool GetWebStorageUsageForOrigin(Dali::WebEngineSecurityOrigin& origin, Dali::WebEngineContext::WebEngineStorageUsageAcquiredCallback callback) 
+  {
+    if (callback)
+    {
+      ConnectToGlobalSignal(&OnStorageUsageAcquired);
+      mStorageUsageAcquiredCallback = callback;
+    }
+    return true;
+  }
+
+  void DeleteAllWebStorage() override
+  {
+  }
+
+  bool DeleteWebStorageOrigin(Dali::WebEngineSecurityOrigin& origin)
+  {
+    return true;
   }
 
   void DeleteLocalFileSystem() override
@@ -134,8 +182,71 @@ public:
   {
   }
 
+  bool DeleteApplicationCache(Dali::WebEngineSecurityOrigin& origin)
+  {
+    return true;
+  }
+
+  void GetFormPasswordList(Dali::WebEngineContext::WebEngineFormPasswordAcquiredCallback callback)
+  {
+    if (callback)
+    {
+      ConnectToGlobalSignal(&OnFormPasswordAcquired);
+      mFormPasswordAcquiredCallback = callback;
+    }
+  }
+
+  void RegisterDownloadStartedCallback(Dali::WebEngineContext::WebEngineDownloadStartedCallback callback)
+  {
+    if (callback)
+    {
+      ConnectToGlobalSignal(&OnDownloadStarted);
+      mDownloadStartedCallback = callback;
+    }
+  }
+
+  void RegisterMimeOverriddenCallback(Dali::WebEngineContext::WebEngineMimeOverriddenCallback callback)
+  {
+    if (callback)
+    {
+      ConnectToGlobalSignal(&OnMimeOverridden);
+      mMimeOverriddenCallback = callback;
+    }
+  }
+
+public:
+  Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback mSecurityOriginAcquiredCallback;
+  Dali::WebEngineContext::WebEngineStorageUsageAcquiredCallback mStorageUsageAcquiredCallback;
+  Dali::WebEngineContext::WebEngineFormPasswordAcquiredCallback mFormPasswordAcquiredCallback;
+  Dali::WebEngineContext::WebEngineDownloadStartedCallback mDownloadStartedCallback;
+  Dali::WebEngineContext::WebEngineMimeOverriddenCallback mMimeOverriddenCallback;
+
 private:
   Dali::WebEngineContext::CacheModel mockModel;
+};
+
+class MockWebEngineSecurityOrigin : public Dali::WebEngineSecurityOrigin
+{
+public:
+  MockWebEngineSecurityOrigin()
+    : mockUrl("https://test.html")
+    , mockPotocol("https")
+  {
+  }
+
+  std::string GetHost() const
+  {
+    return mockUrl;
+  }
+
+  std::string GetProtocol() const
+  {
+    return mockPotocol;
+  }
+
+private:
+  std::string mockUrl;
+  std::string mockPotocol;
 };
 
 class MockWebEngineCookieManager : public Dali::WebEngineCookieManager
@@ -718,7 +829,12 @@ public:
     }
 
     mockWebEngineSettings = new MockWebEngineSettings();
-    mockWebEngineContext = new MockWebEngineContext();
+    MockWebEngineContext* engineContext = new MockWebEngineContext();
+    mockWebEngineContext = engineContext;
+    if ( gInstanceCount == 1 )
+    {
+      gWebEngineContextInstance = engineContext;
+    }
     mockWebEngineCookieManager = new MockWebEngineCookieManager();
     mockWebEngineBackForwardList = new MockWebEngineBackForwardList();
   }
@@ -729,6 +845,7 @@ public:
     if( !gInstanceCount )
     {
       gInstance = 0;
+      gWebEngineContextInstance = 0;
     }
 
     delete mockWebEngineSettings;
@@ -1267,6 +1384,65 @@ bool OnClearHistory()
     std::vector< std::string >().swap( gInstance->mHistory );
     gInstance->mHistory.push_back( url );
     gInstance->mCurrentPlusOnePos = 1;
+  }
+  return false;
+}
+
+bool OnSecurityOriginAcquired()
+{
+  DisconnectFromGlobalSignal(&OnSecurityOriginAcquired);
+  if (gWebEngineContextInstance)
+  {
+    std::vector<std::unique_ptr<Dali::WebEngineSecurityOrigin>> securityOriginList;
+    std::unique_ptr<Dali::WebEngineSecurityOrigin> origin(new MockWebEngineSecurityOrigin());
+    securityOriginList.push_back(std::move(origin));
+    gWebEngineContextInstance->mSecurityOriginAcquiredCallback(securityOriginList);
+  }
+  return false;
+}
+
+bool OnStorageUsageAcquired()
+{
+  DisconnectFromGlobalSignal(&OnStorageUsageAcquired);
+  if (gWebEngineContextInstance)
+  {
+    gWebEngineContextInstance->mStorageUsageAcquiredCallback(0);
+  }
+  return false;
+}
+
+bool OnFormPasswordAcquired()
+{
+  DisconnectFromGlobalSignal(&OnFormPasswordAcquired);
+  if (gWebEngineContextInstance)
+  {
+    std::vector<std::unique_ptr<Dali::WebEngineContext::PasswordData>> formPasswordList;
+    std::unique_ptr<Dali::WebEngineContext::PasswordData> data(new Dali::WebEngineContext::PasswordData());
+    data->url = "http://test.html";
+    data->useFingerprint = false;
+    formPasswordList.push_back(std::move(data));
+    gWebEngineContextInstance->mFormPasswordAcquiredCallback(formPasswordList);
+  }
+  return false;
+}
+
+bool OnDownloadStarted()
+{
+  DisconnectFromGlobalSignal(&OnDownloadStarted);
+  if (gWebEngineContextInstance)
+  {
+    gWebEngineContextInstance->mDownloadStartedCallback("http://test.html");
+  }
+  return false;
+}
+
+bool OnMimeOverridden()
+{
+  DisconnectFromGlobalSignal(&OnMimeOverridden);
+  if (gWebEngineContextInstance)
+  {
+    std::string newMime;
+    gWebEngineContextInstance->mMimeOverriddenCallback("http://test.html", "txt/xml", newMime);
   }
   return false;
 }

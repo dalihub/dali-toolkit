@@ -29,6 +29,8 @@
 #include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
+#include <dali/devel-api/adaptor-framework/web-engine-context.h>
+#include <dali/devel-api/adaptor-framework/web-engine-security-origin.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -85,6 +87,13 @@ static int gSslCertificateChangedCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineCertificate> gSslCertificateInstance = nullptr;
 static int gHttpAuthHandlerCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineHttpAuthHandler> gHttpAuthInstance = nullptr;
+static int gSecurityOriginsAcquiredCallbackCalled = 0;
+static int gStorageUsageAcquiredCallbackCalled = 0;
+static int gFormPasswordsAcquiredCallbackCalled = 0;
+static int gDownloadStartedCallbackCalled = 0;
+static int gMimeOverriddenCallbackCalled = 0;
+static std::vector<std::unique_ptr<Dali::WebEngineSecurityOrigin>> gSecurityOriginList;
+static std::vector<std::unique_ptr<Dali::WebEngineContext::PasswordData>> gPasswordDataList;
 
 struct CallbackFunctor
 {
@@ -233,6 +242,36 @@ static void OnHttpAuthHandler( WebView view, std::shared_ptr<Dali::WebEngineHttp
 {
   gHttpAuthHandlerCallbackCalled++;
   gHttpAuthInstance = std::move(hander);
+}
+
+static void OnSecurityOriginsAcquired(std::vector<std::unique_ptr<Dali::WebEngineSecurityOrigin>>& origins)
+{
+  gSecurityOriginsAcquiredCallbackCalled++;
+  gSecurityOriginList.clear();
+  gSecurityOriginList.swap(origins);
+}
+
+static void OnStorageUsageAcquired(uint64_t usage)
+{
+  gStorageUsageAcquiredCallbackCalled++;
+}
+
+static void OnFormPasswordsAcquired(std::vector<std::unique_ptr<Dali::WebEngineContext::PasswordData>>& passwords)
+{
+  gFormPasswordsAcquiredCallbackCalled++;
+  gPasswordDataList.clear();
+  gPasswordDataList.swap(passwords);
+}
+
+static void OnDownloadStarted(const std::string& url)
+{
+  gDownloadStartedCallbackCalled++;
+}
+
+static bool OnMimeOverridden(const std::string&, const std::string&, std::string&)
+{
+  gMimeOverriddenCallbackCalled++;
+  return false;
 }
 
 } // namespace
@@ -1398,8 +1437,8 @@ int UtcDaliWebContextGetSetCacheModel(void)
   context->SetCertificateFilePath( kDefaultValue );
   context->DisableCache( false );
   context->SetDefaultProxyAuth( kDefaultValue, kDefaultValue );
-  context->DeleteWebDatabase();
-  context->DeleteWebStorage();
+  context->DeleteAllWebDatabase();
+  context->DeleteAllWebStorage();
   context->DeleteLocalFileSystem();
   context->ClearCache();
 
@@ -1411,6 +1450,76 @@ int UtcDaliWebContextGetSetCacheModel(void)
   context->SetCacheModel( Dali::WebEngineContext::CacheModel::DOCUMENT_BROWSER );
   value = context->GetCacheModel();
   DALI_TEST_CHECK( value == Dali::WebEngineContext::CacheModel::DOCUMENT_BROWSER );
+
+  END_TEST;
+}
+
+int UtcDaliWebContextGetWebDatabaseStorageOrigins(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebContext* context = view.GetContext();
+  DALI_TEST_CHECK( context != 0 )
+
+  std::string kDefaultValue;
+
+  // get origins of web database
+  bool result = context->GetWebDatabaseOrigins(&OnSecurityOriginsAcquired);
+  DALI_TEST_CHECK( result );
+
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gSecurityOriginsAcquiredCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_CHECK(gSecurityOriginList.size() == 1);
+
+  Dali::WebEngineSecurityOrigin* origin = gSecurityOriginList[0].get();
+  DALI_TEST_CHECK( origin );
+
+  result = context->DeleteWebDatabase(*origin);
+  DALI_TEST_CHECK( result );
+
+  // get origins of web storage
+  result = context->GetWebStorageOrigins(&OnSecurityOriginsAcquired);
+  DALI_TEST_CHECK( result );
+
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gSecurityOriginsAcquiredCallbackCalled, 2, TEST_LOCATION );
+  DALI_TEST_CHECK(gSecurityOriginList.size() == 1);
+
+  origin = gSecurityOriginList[0].get();
+  DALI_TEST_CHECK( origin );
+
+  result = context->GetWebStorageUsageForOrigin(*origin, &OnStorageUsageAcquired);
+  DALI_TEST_CHECK( result );
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gStorageUsageAcquiredCallbackCalled, 1, TEST_LOCATION );
+
+  result = context->DeleteWebStorageOrigin(*origin);
+  DALI_TEST_CHECK( result );
+
+  result = context->DeleteApplicationCache(*origin);
+  DALI_TEST_CHECK( result );
+
+  // form passwords, download state, mime type.
+  context->GetFormPasswordList(&OnFormPasswordsAcquired);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gFormPasswordsAcquiredCallbackCalled, 1, TEST_LOCATION);
+  DALI_TEST_CHECK(gPasswordDataList.size() == 1);
+  DALI_TEST_EQUALS(gPasswordDataList[0]->url, "http://test.html", TEST_LOCATION);
+  DALI_TEST_CHECK(gPasswordDataList[0]->useFingerprint == false);
+
+  context->RegisterDownloadStartedCallback(&OnDownloadStarted);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gDownloadStartedCallbackCalled, 1, TEST_LOCATION);
+
+  context->RegisterMimeOverriddenCallback(&OnMimeOverridden);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gMimeOverriddenCallbackCalled, 1, TEST_LOCATION);
+
+  gSecurityOriginList.clear();
+  gPasswordDataList.clear();
 
   END_TEST;
 }
