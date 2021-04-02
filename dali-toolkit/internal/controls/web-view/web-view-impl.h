@@ -339,6 +339,11 @@ public:
    */
   Dali::Toolkit::WebView::WebViewFrameRenderedSignalType& FrameRenderedSignal();
 
+  /**
+   * @copydoc Dali::Toolkit::WebView::RequestInterceptorSignal()
+   */
+  Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType& RequestInterceptorSignal();
+
 public: // Properties
   /**
    * @brief Called when a property of an object of this type is set.
@@ -648,6 +653,12 @@ private:
    */
   void OnScreenshotCaptured(Dali::PixelData pixel);
 
+  /**
+   * @brief Callback function to be called when http request need be intercepted.
+   * @param [in] request The http request interceptor.
+   */
+  void OnInterceptRequest(std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor);
+
 private:
   std::string                 mUrl;
   Dali::Toolkit::Visual::Base mVisual;
@@ -662,12 +673,14 @@ private:
   Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType  mScrollEdgeReachedSignal;
   Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType mFormRepostDecisionSignal;
   Dali::Toolkit::WebView::WebViewFrameRenderedSignalType      mFrameRenderedSignal;
+  Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType mRequestInterceptorSignal;
 
   std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
   std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
   std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
-  Dali::Toolkit::ImageView                           mFaviconView;
+
+  Dali::Toolkit::ImageView mFaviconView;
 
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;
