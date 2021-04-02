@@ -103,10 +103,12 @@ VisualUrl::Type ResolveType(const std::string& url)
     char         GIF[4]    = {'f', 'i', 'g', '.'};
     char         WEBP[5]   = {'p', 'b', 'e', 'w', '.'};
     char         JSON[5]   = {'n', 'o', 's', 'j', '.'};
+    char         RIVE[4]   = {'v', 'i', 'r', '.'};
     unsigned int svgScore  = 0;
     unsigned int gifScore  = 0;
     unsigned int webpScore = 0;
     unsigned int jsonScore = 0;
+    unsigned int riveScore = 0;
     int          index     = count;
     while(--index >= 0)
     {
@@ -142,6 +144,14 @@ VisualUrl::Type ResolveType(const std::string& url)
         if(++jsonScore == sizeof(JSON))
         {
           return VisualUrl::JSON;
+        }
+      }
+      if((offsetFromEnd < sizeof(RIVE)) && (currentChar == RIVE[offsetFromEnd]))
+      {
+        // early out if RIVE as can't be used in N patch for now
+        if(++riveScore == sizeof(RIVE))
+        {
+          return VisualUrl::RIVE;
         }
       }
       switch(state)

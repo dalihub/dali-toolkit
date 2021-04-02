@@ -166,6 +166,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
                 break;
               }
               case VisualUrl::JSON:
+              case VisualUrl::RIVE:
               {
                 visualPtr = AnimatedVectorImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap);
                 break;
@@ -330,6 +331,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageD
         break;
       }
       case VisualUrl::JSON:
+      case VisualUrl::RIVE:
       {
         visualPtr = AnimatedVectorImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl);
         break;
