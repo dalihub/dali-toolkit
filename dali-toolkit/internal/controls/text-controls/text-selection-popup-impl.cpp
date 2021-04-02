@@ -284,7 +284,7 @@ Property::Value TextSelectionPopup::GetProperty(BaseObject* object, Property::In
       case Toolkit::TextSelectionPopup::Property::OPTION_DIVIDER_PADDING:
       {
         Padding padding = impl.GetOptionDividerPadding();
-        value           = Vector4(padding.x, padding.y, padding.top, padding.bottom);
+        value           = Vector4(padding.left, padding.right, padding.top, padding.bottom);
         break;
       }
       case Toolkit::TextSelectionPopup::Property::POPUP_CLIPBOARD_BUTTON_ICON_IMAGE:
@@ -643,8 +643,8 @@ std::string TextSelectionPopup::GetPressedImage() const
 
 void TextSelectionPopup::SetOptionDividerPadding(const Padding& padding)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextSelectionPopup::SetOptionDividerPadding padding(%f,%f,%f,%f)\n", padding.left, padding.right, padding.bottom, padding.top);
-  mOptionDividerPadding = Padding(padding.left, padding.right, padding.bottom, padding.top);
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextSelectionPopup::SetOptionDividerPadding padding(%f,%f,%f,%f)\n", padding.left, padding.right, padding.top, padding.bottom);
+  mOptionDividerPadding = Padding(padding.left, padding.right, padding.top, padding.bottom);
 }
 
 Padding TextSelectionPopup::GetOptionDividerPadding() const
