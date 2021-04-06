@@ -23,6 +23,8 @@
 
 #include <dali.h>
 #include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
+#include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
+#include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -50,6 +52,8 @@ const char* const TEST_URL2( "http://www.somewhere.valid2.com" );
 static int gPageLoadStartedCallbackCalled = 0;
 static int gPageLoadInProgressCallbackCalled = 0;
 static int gPageLoadFinishedCallbackCalled = 0;
+static int gPageLoadErrorCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEngineLoadError> gPageLoadErrorInstance = nullptr;
 static int gScrollEdgeReachedCallbackCalled = 0;
 static int gUrlChangedCallbackCalled = 0;
 static int gEvaluateJavaScriptCallbackCalled = 0;
@@ -67,6 +71,8 @@ static std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> gFormRepostDecision
 static int gFrameRenderedCallbackCalled = 0;
 static int gRequestInterceptorCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineRequestInterceptor> gRequestInterceptorInstance = nullptr;
+static int gConsoleMessageCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEngineConsoleMessage> gConsoleMessageInstance = nullptr;
 
 struct CallbackFunctor
 {
@@ -107,8 +113,10 @@ static void OnUrlChanged( WebView view, const std::string& url )
   gUrlChangedCallbackCalled++;
 }
 
-static void OnPageLoadError( WebView view, const std::string& url, WebView::LoadErrorCode errorCode )
+static void OnPageLoadError(WebView view, std::shared_ptr<Dali::WebEngineLoadError> error)
 {
+  gPageLoadErrorCallbackCalled++;
+  gPageLoadErrorInstance = std::move(error);
 }
 
 static void OnEvaluateJavaScript( const std::string& result )
@@ -183,6 +191,12 @@ static void OnRequestInterceptor(WebView view, std::shared_ptr<Dali::WebEngineRe
 {
   gRequestInterceptorCallbackCalled++;
   gRequestInterceptorInstance = std::move(interceptor);
+}
+
+static void OnConsoleMessage(WebView view, std::shared_ptr<Dali::WebEngineConsoleMessage> message)
+{
+  gConsoleMessageCallbackCalled++;
+  gConsoleMessageInstance = std::move(message);
 }
 
 } // namespace
@@ -261,7 +275,6 @@ int UtcDaliWebViewPageNavigation(void)
   view.PageLoadStartedSignal().Connect( &OnPageLoadStarted );
   view.PageLoadInProgressSignal().Connect( &OnPageLoadInProgress );
   view.PageLoadFinishedSignal().Connect( &OnPageLoadFinished );
-  view.PageLoadErrorSignal().Connect( &OnPageLoadError );
   view.UrlChangedSignal().Connect( &OnUrlChanged );
   bool signal1 = false;
   bool signal2 = false;
@@ -319,6 +332,60 @@ int UtcDaliWebViewPageNavigation(void)
   Test::EmitGlobalTimerSignal();
   DALI_TEST_CHECK( !view.CanGoBack() );
   DALI_TEST_CHECK( !view.CanGoForward() );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewPageLoadErrorConsoleMessage(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::POSITION, Vector2( 0, 0 ));
+  view.SetProperty( Actor::Property::SIZE, Vector2( 800, 600 ) );
+  application.GetScene().Add( view );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( view );
+
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  view.PageLoadErrorSignal().Connect( &OnPageLoadError );
+  view.ConsoleMessageSignal().Connect( &OnConsoleMessage );
+  bool signal1 = false;
+  bool signal2 = false;
+  view.ConnectSignal( testTracker, "pageLoadError", CallbackFunctor(&signal1) );
+  view.ConnectSignal( testTracker, "consoleMessage", CallbackFunctor(&signal2) );
+  DALI_TEST_EQUALS( gPageLoadErrorCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( gConsoleMessageCallbackCalled, 0, TEST_LOCATION );
+
+  view.LoadUrl( TEST_URL1 );
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gPageLoadErrorCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gConsoleMessageCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_CHECK( signal1 & signal2);
+
+  // error code.
+  DALI_TEST_CHECK(gPageLoadErrorInstance);
+  DALI_TEST_EQUALS(gPageLoadErrorInstance->GetUrl(), TEST_URL1, TEST_LOCATION);
+  DALI_TEST_EQUALS(gPageLoadErrorInstance->GetCode(), Dali::WebEngineLoadError::ErrorCode::UNKNOWN, TEST_LOCATION);
+  std::string testErrorDescription("This is an error.");
+  DALI_TEST_EQUALS(gPageLoadErrorInstance->GetDescription(), testErrorDescription, TEST_LOCATION);
+  DALI_TEST_EQUALS(gPageLoadErrorInstance->GetType(), Dali::WebEngineLoadError::ErrorType::NONE, TEST_LOCATION);
+
+  // console message.
+  DALI_TEST_CHECK(gConsoleMessageInstance);
+  std::string testConsoleSource("source");
+  DALI_TEST_EQUALS(gConsoleMessageInstance->GetSource(), testConsoleSource, TEST_LOCATION);
+  DALI_TEST_EQUALS(gConsoleMessageInstance->GetLine(), 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(gConsoleMessageInstance->GetSeverityLevel(), Dali::WebEngineConsoleMessage::SeverityLevel::EMPTY, TEST_LOCATION);
+  std::string testConsoleText("This is a text.");
+  DALI_TEST_EQUALS(gConsoleMessageInstance->GetText(), testConsoleText, TEST_LOCATION);
+
+  // reset
+  gPageLoadErrorInstance = nullptr;
+  gConsoleMessageInstance = nullptr;
 
   END_TEST;
 }

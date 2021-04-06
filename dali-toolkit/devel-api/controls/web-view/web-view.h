@@ -187,28 +187,6 @@ public:
   };
 
   /**
-   * @brief Enumeration for indicating error code of page loading.
-   */
-  enum class LoadErrorCode
-  {
-    UNKNOWN = 0,           ///< Unknown.
-    CANCELED,              ///< User canceled.
-    CANT_SUPPORT_MIMETYPE, ///< Can't show the page for this MIME type.
-    FAILED_FILE_IO,        ///< File IO error.
-    CANT_CONNECT,          ///< Cannot connect to the network.
-    CANT_LOOKUP_HOST,      ///< Fail to look up host from the DNS.
-    FAILED_TLS_HANDSHAKE,  ///< Fail to SSL/TLS handshake.
-    INVALID_CERTIFICATE,   ///< Received certificate is invalid.
-    REQUEST_TIMEOUT,       ///< Connection timeout.
-    TOO_MANY_REDIRECTS,    ///< Too many redirects.
-    TOO_MANY_REQUESTS,     ///< Too many requests during this load.
-    BAD_URL,               ///< Malformed URL.
-    UNSUPPORTED_SCHEME,    ///< Unsupported scheme.
-    AUTHENTICATION,        ///< User authentication failed on the server.
-    INTERNAL_SERVER        ///< Web server has an internal server error.
-  };
-
-  /**
    * @brief WebView callback related with screen-shot captured.
    */
   using WebViewScreenshotCapturedCallback = std::function<void(Dali::Toolkit::ImageView)>;
@@ -221,7 +199,7 @@ public:
   /**
    * @brief WebView signal type related with page loading error.
    */
-  using WebViewPageLoadErrorSignalType = Signal<void(WebView, const std::string&, LoadErrorCode)>;
+  using WebViewPageLoadErrorSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineLoadError>)>;
 
   /**
    * @brief WebView signal type related with scroll edge reached.
@@ -247,6 +225,11 @@ public:
    * @brief WebView signal type related with http request interceptor.
    */
   using WebViewRequestInterceptorSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineRequestInterceptor>)>;
+
+  /**
+   * @brief WebView signal type related with console message.
+   */
+  using WebViewConsoleMessageSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineConsoleMessage>)>;
 
 public:
   /**
@@ -711,6 +694,13 @@ public:
    * @return A signal object to connect with.
    */
   WebViewRequestInterceptorSignalType& RequestInterceptorSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when console message will be logged.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewConsoleMessageSignalType& ConsoleMessageSignal();
 
 public: // Not intended for application developers
   /// @cond internal
