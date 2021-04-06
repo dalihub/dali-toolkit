@@ -1003,7 +1003,7 @@ TextLabel::~TextLabel()
 
 std::string TextLabel::AccessibleImpl::GetNameRaw()
 {
-  auto slf = Toolkit::TextLabel::DownCast(self);
+  auto slf = Toolkit::TextLabel::DownCast(Self());
   return slf.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
 }
 
@@ -1018,7 +1018,7 @@ std::string TextLabel::AccessibleImpl::GetText(size_t startOffset,
   if(endOffset <= startOffset)
     return {};
 
-  auto slf = Toolkit::TextLabel::DownCast(self);
+  auto slf = Toolkit::TextLabel::DownCast(Self());
   auto txt =
     slf.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
 
@@ -1030,7 +1030,7 @@ std::string TextLabel::AccessibleImpl::GetText(size_t startOffset,
 
 size_t TextLabel::AccessibleImpl::GetCharacterCount()
 {
-  auto slf = Toolkit::TextLabel::DownCast(self);
+  auto slf = Toolkit::TextLabel::DownCast(Self());
   auto txt =
     slf.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
 
@@ -1050,7 +1050,7 @@ bool TextLabel::AccessibleImpl::SetCaretOffset(size_t offset)
 Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(
   size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto slf      = Toolkit::TextLabel::DownCast(self);
+  auto slf      = Toolkit::TextLabel::DownCast(Self());
   auto txt      = slf.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
   auto txt_size = txt.size();
 
@@ -1130,7 +1130,7 @@ TextLabel::AccessibleImpl::GetSelection(size_t selectionNum)
   if(selectionNum > 0)
     return {};
 
-  auto        slf  = Toolkit::TextLabel::DownCast(self);
+  auto        slf  = Toolkit::TextLabel::DownCast(Self());
   auto        ctrl = Dali::Toolkit::GetImpl(slf).getController();
   std::string ret;
   ctrl->RetrieveSelection(ret);
@@ -1145,7 +1145,7 @@ bool TextLabel::AccessibleImpl::RemoveSelection(size_t selectionNum)
   if(selectionNum > 0)
     return false;
 
-  auto slf = Toolkit::TextLabel::DownCast(self);
+  auto slf = Toolkit::TextLabel::DownCast(Self());
   Dali::Toolkit::GetImpl(slf).getController()->SetSelection(0, 0);
   return true;
 }
@@ -1158,7 +1158,7 @@ bool TextLabel::AccessibleImpl::SetSelection(size_t selectionNum,
   if(selectionNum > 0)
     return false;
 
-  auto slf = Toolkit::TextLabel::DownCast(self);
+  auto slf = Toolkit::TextLabel::DownCast(Self());
   Dali::Toolkit::GetImpl(slf).getController()->SetSelection(startOffset,
                                                             endOffset);
   return true;

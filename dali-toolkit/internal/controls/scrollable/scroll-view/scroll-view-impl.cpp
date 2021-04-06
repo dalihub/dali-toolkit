@@ -1825,7 +1825,7 @@ Toolkit::ScrollView::SnapStartedSignalType& ScrollView::SnapStartedSignal()
 
 void ScrollView::AccessibleImpl::EnsureChildVisible(Actor child)
 {
-  auto scrollView = Dali::Toolkit::ScrollView::DownCast(self);
+  auto scrollView = Dali::Toolkit::ScrollView::DownCast(Self());
   scrollView.ScrollTo(child);
 }
 

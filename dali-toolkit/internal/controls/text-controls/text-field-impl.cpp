@@ -1918,7 +1918,7 @@ TextField::~TextField()
 
 std::string TextField::AccessibleImpl::GetName()
 {
-  auto slf = Toolkit::TextField::DownCast(self);
+  auto slf = Toolkit::TextField::DownCast(Self());
   return slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
 }
 
@@ -1928,7 +1928,7 @@ std::string TextField::AccessibleImpl::GetText(size_t startOffset,
   if(endOffset <= startOffset)
     return {};
 
-  auto slf = Toolkit::TextField::DownCast(self);
+  auto slf = Toolkit::TextField::DownCast(Self());
   auto txt =
     slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
 
@@ -1940,7 +1940,7 @@ std::string TextField::AccessibleImpl::GetText(size_t startOffset,
 
 size_t TextField::AccessibleImpl::GetCharacterCount()
 {
-  auto slf = Toolkit::TextField::DownCast(self);
+  auto slf = Toolkit::TextField::DownCast(Self());
   auto txt =
     slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
 
@@ -1949,13 +1949,13 @@ size_t TextField::AccessibleImpl::GetCharacterCount()
 
 size_t TextField::AccessibleImpl::GetCaretOffset()
 {
-  auto slf = Toolkit::TextField::DownCast(self);
+  auto slf = Toolkit::TextField::DownCast(Self());
   return Dali::Toolkit::GetImpl(slf).getController()->GetCursorPosition();
 }
 
 bool TextField::AccessibleImpl::SetCaretOffset(size_t offset)
 {
-  auto slf = Toolkit::TextField::DownCast(self);
+  auto slf = Toolkit::TextField::DownCast(Self());
   auto txt = slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
   if(offset > txt.size())
     return false;
@@ -1969,7 +1969,7 @@ bool TextField::AccessibleImpl::SetCaretOffset(size_t offset)
 Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
   size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto slf      = Toolkit::TextField::DownCast(self);
+  auto slf      = Toolkit::TextField::DownCast(Self());
   auto txt      = slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
   auto txt_size = txt.size();
 
@@ -2049,7 +2049,7 @@ TextField::AccessibleImpl::GetSelection(size_t selectionNum)
   if(selectionNum > 0)
     return {};
 
-  auto        slf  = Toolkit::TextField::DownCast(self);
+  auto        slf  = Toolkit::TextField::DownCast(Self());
   auto        ctrl = Dali::Toolkit::GetImpl(slf).getController();
   std::string ret;
   ctrl->RetrieveSelection(ret);
@@ -2064,7 +2064,7 @@ bool TextField::AccessibleImpl::RemoveSelection(size_t selectionNum)
   if(selectionNum > 0)
     return false;
 
-  auto slf = Toolkit::TextField::DownCast(self);
+  auto slf = Toolkit::TextField::DownCast(Self());
   Dali::Toolkit::GetImpl(slf).getController()->SetSelection(0, 0);
   return true;
 }
@@ -2077,7 +2077,7 @@ bool TextField::AccessibleImpl::SetSelection(size_t selectionNum,
   if(selectionNum > 0)
     return false;
 
-  auto slf = Toolkit::TextField::DownCast(self);
+  auto slf = Toolkit::TextField::DownCast(Self());
   Dali::Toolkit::GetImpl(slf).getController()->SetSelection(startOffset,
                                                             endOffset);
   return true;
@@ -2089,7 +2089,7 @@ bool TextField::AccessibleImpl::CopyText(size_t startPosition,
   if(endPosition <= startPosition)
     return false;
 
-  auto slf = Toolkit::TextField::DownCast(self);
+  auto slf = Toolkit::TextField::DownCast(Self());
   auto txt = slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
   Dali::Toolkit::GetImpl(slf).getController()->CopyStringToClipboard(txt.substr(startPosition, endPosition - startPosition));
 
@@ -2102,7 +2102,7 @@ bool TextField::AccessibleImpl::CutText(size_t startPosition,
   if(endPosition <= startPosition)
     return false;
 
-  auto slf = Toolkit::TextField::DownCast(self);
+  auto slf = Toolkit::TextField::DownCast(Self());
   auto txt = slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
   Dali::Toolkit::GetImpl(slf).getController()->CopyStringToClipboard(txt.substr(startPosition, endPosition - startPosition));
 

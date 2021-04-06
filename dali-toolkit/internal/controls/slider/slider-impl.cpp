@@ -1413,19 +1413,19 @@ Property::Value Slider::GetProperty(BaseObject* object, Property::Index property
 
 double Slider::AccessibleImpl::GetMinimum()
 {
-  auto p = Toolkit::Slider::DownCast(self);
+  auto p = Toolkit::Slider::DownCast(Self());
   return p.GetProperty(Toolkit::Slider::Property::LOWER_BOUND).Get<float>();
 }
 
 double Slider::AccessibleImpl::GetCurrent()
 {
-  auto p = Toolkit::Slider::DownCast(self);
+  auto p = Toolkit::Slider::DownCast(Self());
   return p.GetProperty(Toolkit::Slider::Property::VALUE).Get<float>();
 }
 
 double Slider::AccessibleImpl::GetMaximum()
 {
-  auto p = Toolkit::Slider::DownCast(self);
+  auto p = Toolkit::Slider::DownCast(Self());
   return p.GetProperty(Toolkit::Slider::Property::UPPER_BOUND).Get<float>();
 }
 
@@ -1434,7 +1434,7 @@ bool Slider::AccessibleImpl::SetCurrent(double current)
   if(current < GetMinimum() || current > GetMaximum())
     return false;
 
-  auto  p    = Toolkit::Slider::DownCast(self);
+  auto  p    = Toolkit::Slider::DownCast(Self());
   auto& impl = Toolkit::GetImpl(p);
 
   const float prev = p.GetProperty<float>(Toolkit::Slider::Property::VALUE);
@@ -1477,7 +1477,7 @@ bool Slider::AccessibleImpl::SetCurrent(double current)
 
 double Slider::AccessibleImpl::GetMinimumIncrement()
 {
-  auto p = Toolkit::Slider::DownCast(self);
+  auto p = Toolkit::Slider::DownCast(Self());
 
   bool  hasMarks  = !p.GetProperty<Property::Array>(Toolkit::Slider::Property::MARKS).Empty();
   float tolerance = p.GetProperty<float>(Toolkit::Slider::Property::MARK_TOLERANCE);

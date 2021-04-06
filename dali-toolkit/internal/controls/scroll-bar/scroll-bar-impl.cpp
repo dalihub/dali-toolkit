@@ -863,21 +863,21 @@ Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
 
 double ScrollBar::AccessibleImpl::GetMinimum()
 {
-  auto   p                = Toolkit::ScrollBar::DownCast(self);
+  auto   p                = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(p).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(p).mPropertyMinScrollPosition) : 0.0f;
 }
 
 double ScrollBar::AccessibleImpl::GetCurrent()
 {
-  auto   p                = Toolkit::ScrollBar::DownCast(self);
+  auto   p                = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(p).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(p).mPropertyScrollPosition) : 0.0f;
 }
 
 double ScrollBar::AccessibleImpl::GetMaximum()
 {
-  auto   p                = Toolkit::ScrollBar::DownCast(self);
+  auto   p                = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(p).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(p).mPropertyMaxScrollPosition) : 1.0f;
 }
@@ -889,7 +889,7 @@ bool ScrollBar::AccessibleImpl::SetCurrent(double current)
 
   auto value_before = GetCurrent();
 
-  auto   p                = Toolkit::ScrollBar::DownCast(self);
+  auto   p                = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(p).mScrollableObject.GetHandle();
   if(!scrollableHandle)
     return false;

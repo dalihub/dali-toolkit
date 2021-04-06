@@ -375,7 +375,7 @@ void ToggleButton::OnPressed()
 Dali::Accessibility::States ToggleButton::AccessibleImpl::CalculateStates()
 {
   auto states = Button::AccessibleImpl::CalculateStates();
-  auto button = Toolkit::ToggleButton::DownCast(self);
+  auto button = Toolkit::ToggleButton::DownCast(Self());
   if(button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX))
     states[Dali::Accessibility::State::CHECKED] = true;
   return states;
@@ -383,7 +383,7 @@ Dali::Accessibility::States ToggleButton::AccessibleImpl::CalculateStates()
 
 std::string ToggleButton::AccessibleImpl::GetDescriptionRaw()
 {
-  auto button   = Toolkit::ToggleButton::DownCast(self);
+  auto button   = Toolkit::ToggleButton::DownCast(Self());
   auto index    = button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX);
   auto tooltips = button.GetProperty<Property::Array>(Toolkit::ToggleButton::Property::TOOLTIPS);
 
