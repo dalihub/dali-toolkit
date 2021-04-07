@@ -86,7 +86,7 @@ void CheckBoxButton::OnInitialize()
 Dali::Accessibility::States CheckBoxButton::AccessibleImpl::CalculateStates()
 {
   auto tmp = Button::AccessibleImpl::CalculateStates();
-  auto slf = Toolkit::Button::DownCast(self);
+  auto slf = Toolkit::Button::DownCast(Self());
   if(slf.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
     tmp[Dali::Accessibility::State::CHECKED] = true;
   return tmp;
