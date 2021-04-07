@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,35 @@ const char* const PROPERTY_NAME_FONT_SIZE_SCALE = "fontSizeScale";
 
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
+
+static bool gAnchorClickedCallBackCalled;
+static bool gAnchorClickedCallBackNotCalled;
+
+struct CallbackFunctor
+{
+  CallbackFunctor(bool* callbackFlag)
+  : mCallbackFlag( callbackFlag )
+  {
+  }
+
+  void operator()()
+  {
+    *mCallbackFlag = true;
+  }
+  bool* mCallbackFlag;
+};
+
+static void TestAnchorClickedCallback(TextLabel control, const char* href, unsigned int hrefLength)
+{
+  tet_infoline(" TestAnchorClickedCallback");
+
+  gAnchorClickedCallBackNotCalled = false;
+
+  if (!strcmp(href, "https://www.tizen.org") && hrefLength == strlen(href))
+  {
+    gAnchorClickedCallBackCalled = true;
+  }
+}
 
 bool DaliTestCheckMaps( const Property::Map& mapGet, const Property::Map& mapSet, const std::vector<std::string>& indexConversionTable = std::vector<std::string>() )
 {
@@ -1724,6 +1753,52 @@ int UtcDaliToolkitTextlabelFontSizeScale(void)
   scaledSize = labelScaled.GetNaturalSize();
 
   DALI_TEST_EQUALS( nonScaledSize, scaledSize, TEST_LOCATION );
+
+  END_TEST;
+}
+
+// Positive test for the anchorClicked signal.
+int UtcDaliToolkitTextlabelAnchorClicked(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelAnchorClicked");
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK(label);
+
+  application.GetScene().Add(label);
+
+  // connect to the anchor clicked signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::AnchorClickedSignal(label).Connect(&TestAnchorClickedCallback);
+  bool anchorClickedSignal = false;
+  label.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+
+  gAnchorClickedCallBackCalled = false;
+  label.SetProperty(TextLabel::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event to touch the text label.
+  TestGenerateTap(application, 5.0f, 25.0f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+  DALI_TEST_CHECK(anchorClickedSignal);
+
+
+  gAnchorClickedCallBackNotCalled = true;
+  // Tap the outside of anchor, callback should not be called.
+  TestGenerateTap(application, 150.f, 100.f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackNotCalled);
 
   END_TEST;
 }

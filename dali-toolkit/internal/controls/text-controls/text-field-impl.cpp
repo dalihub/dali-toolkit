@@ -142,6 +142,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "grabHandleColor"
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",       SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",  SIGNAL_MAX_LENGTH_REACHED )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "inputStyleChanged", SIGNAL_INPUT_STYLE_CHANGED)
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "anchorClicked",     SIGNAL_ANCHOR_CLICKED     )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -1195,6 +1196,14 @@ bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
   {
     field.InputStyleChangedSignal().Connect(tracker, functor);
   }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_ANCHOR_CLICKED))
+  {
+    if(field)
+    {
+      Internal::TextField& fieldImpl(GetImpl(field));
+      fieldImpl.AnchorClickedSignal().Connect(tracker, functor);
+    }
+  }
   else
   {
     // signalName does not match any signal
@@ -1219,11 +1228,16 @@ Toolkit::TextField::InputStyleChangedSignalType& TextField::InputStyleChangedSig
   return mInputStyleChangedSignal;
 }
 
+DevelTextField::AnchorClickedSignalType& TextField::AnchorClickedSignal()
+{
+  return mAnchorClickedSignal;
+}
+
 void TextField::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New(this, this, this);
+  mController = Text::Controller::New(this, this, this, this);
 
   // When using the vector-based rendering, the size of the GLyphs are different
   TextAbstraction::GlyphType glyphType = (DevelText::RENDERING_VECTOR_BASED == mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
@@ -1619,6 +1633,7 @@ void TextField::OnTap(const TapGesture& gesture)
   padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
   const Vector2& localPoint = gesture.GetLocalPoint();
   mController->TapEvent(gesture.GetNumberOfTaps(), localPoint.x - padding.start, localPoint.y - padding.top);
+  mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 
   SetKeyInputFocus();
 }
@@ -1781,6 +1796,12 @@ void TextField::InputStyleChanged(Text::InputStyle::Mask inputStyleMask)
   }
 
   mInputStyleChangedSignal.Emit(handle, fieldInputStyleMask);
+}
+
+void TextField::AnchorClicked(const std::string& href)
+{
+  Dali::Toolkit::TextField handle(GetOwner());
+  mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
 }
 
 void TextField::AddDecoration(Actor& actor, bool needsClipping)

@@ -139,6 +139,9 @@ DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColo
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1)
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorBlue",  TEXT_COLOR_BLUE,  TEXT_COLOR, 2)
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorAlpha", TEXT_COLOR_ALPHA, TEXT_COLOR, 3)
+
+DALI_SIGNAL_REGISTRATION(Toolkit, TextLabel, "anchorClicked", SIGNAL_ANCHOR_CLICKED)
+
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
 
@@ -720,6 +723,35 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
   return value;
 }
 
+bool TextLabel::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+{
+  Dali::BaseHandle handle(object);
+
+  bool               connected(true);
+  Toolkit::TextLabel label = Toolkit::TextLabel::DownCast(handle);
+
+  if(0 == strcmp(signalName.c_str(), SIGNAL_ANCHOR_CLICKED))
+  {
+    if(label)
+    {
+      Internal::TextLabel& labelImpl(GetImpl(label));
+      labelImpl.AnchorClickedSignal().Connect(tracker, functor);
+    }
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
+  }
+
+  return connected;
+}
+
+DevelTextLabel::AnchorClickedSignalType& TextLabel::AnchorClickedSignal()
+{
+  return mAnchorClickedSignal;
+}
+
 void TextLabel::OnInitialize()
 {
   Actor self = Self();
@@ -736,6 +768,7 @@ void TextLabel::OnInitialize()
   DALI_ASSERT_DEBUG(mController && "Invalid Text Controller")
 
   mController->SetControlInterface(this);
+  mController->SetAnchorControlInterface(this);
 
   // Use height-for-width negotiation by default
   self.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH);
@@ -751,6 +784,10 @@ void TextLabel::OnInitialize()
   Dali::Stage                 stage           = Dali::Stage::GetCurrent();
   Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(stage.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
   mController->SetLayoutDirection(layoutDirection);
+
+  // Forward input events to controller
+  EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+  GetTapGestureDetector().SetMaximumTapsRequired(1);
 
   Layout::Engine& engine = mController->GetLayoutEngine();
   engine.SetCursorWidth(0u); // Do not layout space for the cursor.
@@ -791,6 +828,23 @@ void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::T
 
   // Up call to Control
   Control::OnStyleChange(styleManager, change);
+}
+
+void TextLabel::OnTap(const TapGesture& gesture)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextLabel::OnTap %p\n", mController.Get());
+
+  // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
+  Extents padding;
+  padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  const Vector2& localPoint = gesture.GetLocalPoint();
+  mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
+}
+
+void TextLabel::AnchorClicked(const std::string& href)
+{
+  Dali::Toolkit::TextLabel handle(GetOwner());
+  mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
 }
 
 Vector3 TextLabel::GetNaturalSize()

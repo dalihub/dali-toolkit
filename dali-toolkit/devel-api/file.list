@@ -34,6 +34,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/table-view/table-view.cpp
   ${devel_api_src_dir}/controls/text-controls/text-editor-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-field-devel.cpp
+  ${devel_api_src_dir}/controls/text-controls/text-label-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-popup.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-toolbar.cpp
   ${devel_api_src_dir}/controls/tool-bar/tool-bar.cpp

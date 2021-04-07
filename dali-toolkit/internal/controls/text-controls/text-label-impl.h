@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
+#include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
@@ -41,7 +42,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextLabel : public Control, public Text::ControlInterface, public Text::ScrollerInterface
+class TextLabel : public Control, public Text::ControlInterface, public Text::ScrollerInterface, public Text::AnchorControlInterface
 {
 public:
   /**
@@ -69,6 +70,22 @@ public:
    */
   static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
+  /**
+   * @copydoc Dali::Toollkit::TextLabel::AnchorClickedSignal()
+   */
+  DevelTextLabel::AnchorClickedSignalType& AnchorClickedSignal();
+
+  /**
+   * Connects a callback function with the object's signals.
+   * @param[in] object The object providing the signal.
+   * @param[in] tracker Used to disconnect the signal.
+   * @param[in] signalName The signal to connect to.
+   * @param[in] functor A newly allocated FunctorDelegate.
+   * @return True if the signal was connected.
+   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
+   */
+  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
+
   Text::ControllerPtr getController();
 
 private: // From Control
@@ -86,6 +103,11 @@ private: // From Control
    * @copydoc Control::OnRelayout()
    */
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
+
+  /**
+   * @copydoc Control::OnTap()
+   */
+  void OnTap(const TapGesture& tap) override;
 
   /**
    * @copydoc Control::GetNaturalSize()
@@ -114,6 +136,12 @@ private: // from TextScroller
    * @copydoc Text::ScrollerInterface::ScrollingFinished()
    */
   void ScrollingFinished() override;
+
+public: // From AnchorControlInterface
+  /**
+   * @copydoc Text::AnchorControlInterface::AnchorClicked()
+   */
+  void AnchorClicked(const std::string& href) override;
 
 private: // Implementation
   /**
@@ -154,6 +182,9 @@ private: // Data
   Text::TextScrollerPtr mTextScroller;
 
   Toolkit::Visual::Base mVisual;
+
+  // Signals
+  Toolkit::DevelTextLabel::AnchorClickedSignalType mAnchorClickedSignal;
 
   int  mRenderingBackend;
   bool mTextUpdateNeeded : 1;

@@ -16,36 +16,21 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
-#include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-namespace DevelTextField
+namespace DevelTextLabel
 {
-InputMethodContext GetInputMethodContext(TextField textField)
+AnchorClickedSignalType& AnchorClickedSignal(TextLabel textLabel)
 {
-  return GetImpl(textField).GetInputMethodContext();
+  return GetImpl(textLabel).AnchorClickedSignal();
 }
 
-AnchorClickedSignalType& AnchorClickedSignal(TextField textField)
-{
-  return GetImpl(textField).AnchorClickedSignal();
-}
-
-void SelectWholeText(TextField textField)
-{
-  GetImpl(textField).SelectWholeText();
-}
-
-void SelectNone(TextField textField)
-{
-  GetImpl(textField).SelectNone();
-}
-
-} // namespace DevelTextField
+} // namespace DevelTextLabel
 
 } // namespace Toolkit
 

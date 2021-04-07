@@ -151,6 +151,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "grabHandleColor
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "anchorClicked",      SIGNAL_ANCHOR_CLICKED     )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -1204,6 +1205,11 @@ DevelTextEditor::MaxLengthReachedSignalType& TextEditor::MaxLengthReachedSignal(
   return mMaxLengthReachedSignal;
 }
 
+DevelTextEditor::AnchorClickedSignalType& TextEditor::AnchorClickedSignal()
+{
+  return mAnchorClickedSignal;
+}
+
 Text::ControllerPtr TextEditor::getController()
 {
   return mController;
@@ -1230,6 +1236,14 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
     {
       Internal::TextEditor& editorImpl(GetImpl(editor));
       editorImpl.MaxLengthReachedSignal().Connect(tracker, functor);
+    }
+  }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_ANCHOR_CLICKED))
+  {
+    if(editor)
+    {
+      Internal::TextEditor& editorImpl(GetImpl(editor));
+      editorImpl.AnchorClickedSignal().Connect(tracker, functor);
     }
   }
   else
@@ -1260,7 +1274,7 @@ void TextEditor::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New(this, this, this);
+  mController = Text::Controller::New(this, this, this, this);
 
   mDecorator = Text::Decorator::New(*mController,
                                     *mController);
@@ -1610,6 +1624,7 @@ void TextEditor::OnTap(const TapGesture& gesture)
   padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
   const Vector2& localPoint = gesture.GetLocalPoint();
   mController->TapEvent(gesture.GetNumberOfTaps(), localPoint.x - padding.start, localPoint.y - padding.top);
+  mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 
   SetKeyInputFocus();
 }
@@ -1757,6 +1772,12 @@ void TextEditor::InputStyleChanged(Text::InputStyle::Mask inputStyleMask)
   }
 
   mInputStyleChangedSignal.Emit(handle, editorInputStyleMask);
+}
+
+void TextEditor::AnchorClicked(const std::string& href)
+{
+  Dali::Toolkit::TextEditor handle(GetOwner());
+  mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
 }
 
 void TextEditor::AddDecoration(Actor& actor, bool needsClipping)
