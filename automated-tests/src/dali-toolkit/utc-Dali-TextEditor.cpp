@@ -3353,3 +3353,36 @@ int UtcDaliTextEditorPrimaryCursorPosition(void)
 
   END_TEST;
 }
+
+int UtcDaliTextEditorLineCountAfterGetNaturalSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorLineCountAfterGetNaturalSize ");
+
+  TextEditor textEditor = TextEditor::New();
+  textEditor.SetProperty(TextEditor::Property::TEXT, "A\nB\nC\nD\nE\nF\n");
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textEditor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textEditor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  application.GetScene().Add( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+  int lineCount = 0;
+  lineCount =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 7, TEST_LOCATION );
+
+  textEditor.GetNaturalSize();
+
+  // Create a tap event to touch the text editor.
+  TestGenerateTap( application, 18.0f, 25.0f );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 7, TEST_LOCATION );
+
+  END_TEST;
+}
