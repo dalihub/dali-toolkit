@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/devel-api/controls/web-view/web-context.h>
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/web-engine-security-origin.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -61,14 +64,39 @@ void WebContext::SetDefaultProxyAuth(const std::string& username, const std::str
   mWebEngineContext.SetDefaultProxyAuth(username, password);
 }
 
-void WebContext::DeleteWebDatabase()
+void WebContext::DeleteAllWebDatabase()
 {
-  mWebEngineContext.DeleteWebDatabase();
+  mWebEngineContext.DeleteAllWebDatabase();
 }
 
-void WebContext::DeleteWebStorage()
+bool WebContext::GetWebDatabaseOrigins(Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback callback)
 {
-  mWebEngineContext.DeleteWebStorage();
+  return mWebEngineContext.GetWebDatabaseOrigins(callback);
+}
+
+bool WebContext::DeleteWebDatabase(Dali::WebEngineSecurityOrigin& origin)
+{
+  return mWebEngineContext.DeleteWebDatabase(origin);
+}
+
+bool WebContext::GetWebStorageOrigins(Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback callback)
+{
+  return mWebEngineContext.GetWebStorageOrigins(callback);
+}
+
+bool WebContext::GetWebStorageUsageForOrigin(Dali::WebEngineSecurityOrigin& origin, Dali::WebEngineContext::WebEngineStorageUsageAcquiredCallback callback)
+{
+  return mWebEngineContext.GetWebStorageUsageForOrigin(origin, callback);
+}
+
+void WebContext::DeleteAllWebStorage()
+{
+  mWebEngineContext.DeleteAllWebStorage();
+}
+
+bool WebContext::DeleteWebStorageOrigin(Dali::WebEngineSecurityOrigin& origin)
+{
+  return mWebEngineContext.DeleteWebStorageOrigin(origin);
 }
 
 void WebContext::DeleteLocalFileSystem()
@@ -81,6 +109,25 @@ void WebContext::ClearCache()
   mWebEngineContext.ClearCache();
 }
 
-} // namespace Toolkit
+bool WebContext::DeleteApplicationCache(Dali::WebEngineSecurityOrigin& origin)
+{
+  return mWebEngineContext.DeleteApplicationCache(origin);
+}
 
+void WebContext::GetFormPasswordList(Dali::WebEngineContext::WebEngineFormPasswordAcquiredCallback callback)
+{
+  mWebEngineContext.GetFormPasswordList(callback);
+}
+
+void WebContext::RegisterDownloadStartedCallback(Dali::WebEngineContext::WebEngineDownloadStartedCallback callback)
+{
+  mWebEngineContext.RegisterDownloadStartedCallback(callback);
+}
+
+void WebContext::RegisterMimeOverriddenCallback(Dali::WebEngineContext::WebEngineMimeOverriddenCallback callback)
+{
+  mWebEngineContext.RegisterMimeOverriddenCallback(callback);
+}
+
+} // namespace Toolkit
 } // namespace Dali
