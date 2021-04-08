@@ -60,6 +60,7 @@ SET(TEST_HARNESS_SOURCES
   ${TEST_HARNESS_DIR}/test-gl-sync-abstraction.cpp
   ${TEST_HARNESS_DIR}/test-graphics-buffer.cpp
   ${TEST_HARNESS_DIR}/test-graphics-command-buffer.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-framebuffer.cpp
   ${TEST_HARNESS_DIR}/test-graphics-controller.cpp
   ${TEST_HARNESS_DIR}/test-graphics-texture.cpp
   ${TEST_HARNESS_DIR}/test-graphics-sampler.cpp

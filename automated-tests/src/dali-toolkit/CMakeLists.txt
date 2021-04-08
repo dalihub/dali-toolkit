@@ -116,6 +116,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/test-graphics-buffer.cpp
   dali-toolkit-test-utils/test-graphics-command-buffer.cpp
   dali-toolkit-test-utils/test-graphics-controller.cpp
+  dali-toolkit-test-utils/test-graphics-framebuffer.cpp
   dali-toolkit-test-utils/test-graphics-texture.cpp
   dali-toolkit-test-utils/test-graphics-pipeline.cpp
   dali-toolkit-test-utils/test-graphics-program.cpp

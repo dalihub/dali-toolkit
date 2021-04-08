@@ -21,6 +21,7 @@
 #include "test-gl-abstraction.h"
 #include "test-gl-context-helper-abstraction.h"
 #include "test-gl-sync-abstraction.h"
+#include "test-graphics-command-buffer.h"
 #include "test-graphics-program.h"
 #include "test-graphics-reflection.h"
 
@@ -35,6 +36,54 @@ std::ostream& operator<<(std::ostream& o, Graphics::SamplerAddressMode addressMo
 std::ostream& operator<<(std::ostream& o, Graphics::SamplerFilter filterMode);
 std::ostream& operator<<(std::ostream& o, Graphics::SamplerMipmapMode mipmapMode);
 std::ostream& operator<<(std::ostream& o, const Graphics::SamplerCreateInfo& createInfo);
+
+template<typename T>
+T* Uncast(const Graphics::CommandBuffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Texture* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Sampler* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Buffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Shader* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Framebuffer* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::Pipeline* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
+
+template<typename T>
+T* Uncast(const Graphics::RenderTarget* object)
+{
+  return const_cast<T*>(static_cast<const T*>(object));
+}
 
 class TestGraphicsController : public Dali::Graphics::Controller
 {
@@ -331,9 +380,14 @@ public: // Test Functions
    */
   bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData) override;
 
+  void ProcessCommandBuffer(TestGraphicsCommandBuffer& commandBuffer);
+
+  void BindPipeline(TestGraphicsPipeline* pipeline);
+
 public:
   mutable TraceCallStack                    mCallStack;
   mutable TraceCallStack                    mCommandBufferCallStack;
+  mutable TraceCallStack                    mFrameBufferCallStack;
   mutable std::vector<Graphics::SubmitInfo> mSubmitStack;
 
   TestGlAbstraction              mGl;
