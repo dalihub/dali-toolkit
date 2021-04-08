@@ -544,7 +544,7 @@ public:
   Dali::Accessibility::Accessible*        GetAccessibilityObject();
 
   void AccessibilityRegister();
-  void AccessibilityDeregister();
+  void AccessibilityDeregister(bool remove);
 
   std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)> accessibilityConstructor;
   std::unique_ptr<Dali::Accessibility::Accessible>                       accessibilityObject;
