@@ -24,9 +24,11 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
+#include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
@@ -43,7 +45,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextField : public Control, public Text::ControlInterface, public Text::EditableControlInterface, public Text::SelectableControlInterface
+class TextField : public Control, public Text::ControlInterface, public Text::EditableControlInterface, public Text::SelectableControlInterface, public Text::AnchorControlInterface
 {
 public:
   /**
@@ -101,6 +103,11 @@ public:
    * @copydoc TextField::TextChangedSignal()
    */
   Toolkit::TextField::InputStyleChangedSignalType& InputStyleChangedSignal();
+
+  /**
+   * @copydoc TextField::AnchorClickedSignal()
+   */
+  DevelTextField::AnchorClickedSignalType& AnchorClickedSignal();
 
   Text::ControllerPtr getController();
 
@@ -197,7 +204,7 @@ private: // From Control
   /**
    * @copydoc Text::EditableControlInterface::TextChanged()
    */
-  void TextChanged() override;
+  void TextChanged(bool immediate) override;
 
   /**
    * @copydoc Text::EditableControlInterface::MaxLengthReached()
@@ -251,6 +258,13 @@ public:
    */
   void SetEditable(bool editable) override;
 
+  // From AnchorControlInterface
+
+  /**
+   * @copydoc Text::AnchorControlInterface::AnchorClicked()
+   */
+  void AnchorClicked(const std::string& href) override;
+
 private: // Implementation
   /**
    * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
@@ -299,6 +313,11 @@ private: // Implementation
   void OnIdleSignal();
 
   /**
+   * @brief Emits TextChanged signal.
+   */
+  void EmitTextChangedSignal();
+
+  /**
    * Construct a new TextField.
    */
   TextField();
@@ -336,9 +355,10 @@ public: // For UTC only
 
 private: // Data
   // Signals
-  Toolkit::TextField::TextChangedSignalType       mTextChangedSignal;
-  Toolkit::TextField::MaxLengthReachedSignalType  mMaxLengthReachedSignal;
-  Toolkit::TextField::InputStyleChangedSignalType mInputStyleChangedSignal;
+  Toolkit::TextField::TextChangedSignalType        mTextChangedSignal;
+  Toolkit::TextField::MaxLengthReachedSignalType   mMaxLengthReachedSignal;
+  Toolkit::TextField::InputStyleChangedSignalType  mInputStyleChangedSignal;
+  Toolkit::DevelTextField::AnchorClickedSignalType mAnchorClickedSignal;
 
   InputMethodContext       mInputMethodContext;
   Text::ControllerPtr      mController;
@@ -357,7 +377,7 @@ private: // Data
   int   mRenderingBackend;
   int   mExceedPolicy;
   bool  mHasBeenStaged : 1;
-  bool  mTextChanged : 1;
+  bool  mTextChanged : 1; ///< If true, emits TextChangedSignal in next OnRelayout().
 
 protected:
   struct AccessibleImpl : public DevelControl::AccessibleImpl,

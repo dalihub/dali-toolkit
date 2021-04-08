@@ -217,6 +217,27 @@ using MaxLengthReachedSignalType = Signal<void(TextEditor)>;
 DALI_TOOLKIT_API MaxLengthReachedSignalType& MaxLengthReachedSignal(TextEditor textEditor);
 
 /**
+ * @brief Anchor clicked signal type.
+ *
+ * @note Signal
+ *  - const char* : href of clicked anchor.
+ *  - uint32_t    : length of href.
+ */
+using AnchorClickedSignalType = Signal<void(TextEditor, const char*, uint32_t)>;
+
+/**
+ * @brief This signal is emitted when the anchor is clicked.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName(TextEditor textEditor, const char* href, uint32_t hrefLength);
+ * @endcode
+ * @param[in] textEditor The instance of TextEditor.
+ * @return The signal to connect to.
+ */
+DALI_TOOLKIT_API AnchorClickedSignalType& AnchorClickedSignal(TextEditor textEditor);
+
+/**
  * @brief Select the whole text of TextEditor.
  *
  * @param[in] textEditor The instance of TextEditor.

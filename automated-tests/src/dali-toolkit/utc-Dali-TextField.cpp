@@ -121,6 +121,8 @@ const int KEY_D_CODE = 40;
 
 const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 
+static bool gAnchorClickedCallBackCalled;
+static bool gAnchorClickedCallBackNotCalled;
 static bool gTextChangedCallBackCalled;
 static bool gMaxCharactersCallBackCalled;
 static bool gInputStyleChangedCallbackCalled;
@@ -205,6 +207,18 @@ struct CallbackFunctor
   }
   bool* mCallbackFlag;
 };
+
+static void TestAnchorClickedCallback(TextField control, const char* href, unsigned int hrefLength)
+{
+  tet_infoline(" TestAnchorClickedCallback");
+
+  gAnchorClickedCallBackNotCalled = false;
+
+  if (!strcmp(href, "https://www.tizen.org") && hrefLength == strlen(href))
+  {
+    gAnchorClickedCallBackCalled = true;
+  }
+}
 
 static void TestTextChangedCallback( TextField control )
 {
@@ -1022,6 +1036,303 @@ int utcDaliTextFieldAtlasRenderP(void)
   END_TEST;
 }
 
+// Positive test for the anchorClicked signal.
+int utcDaliTextFieldAnchorClicked01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldAnchorClicked01");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+
+  // connect to the anchor clicked signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::AnchorClickedSignal(field).Connect(&TestAnchorClickedCallback);
+  bool anchorClickedSignal = false;
+  field.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+
+  gAnchorClickedCallBackCalled = false;
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
+  field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.SendNotification();
+  application.Render();
+  field.SetKeyInputFocus();
+
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 5.0f, 25.0f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+  DALI_TEST_CHECK(anchorClickedSignal);
+
+  gAnchorClickedCallBackNotCalled = true;
+  // Tap the outside of anchor, callback should not be called.
+  TestGenerateTap(application, 150.f, 100.f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackNotCalled);
+
+  END_TEST;
+}
+
+// Positive test for the anchorClicked signal.
+int utcDaliTextFieldAnchorClicked02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldAnchorClicked02");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+
+  // connect to the anchor clicked signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::AnchorClickedSignal(field).Connect(&TestAnchorClickedCallback);
+  bool anchorClickedSignal = false;
+  field.ConnectSignal(testTracker, "anchorClicked", CallbackFunctor(&anchorClickedSignal));
+
+  gAnchorClickedCallBackCalled = false;
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty(TextField::Property::ENABLE_MARKUP, true);
+  field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.SendNotification();
+  application.Render();
+  field.SetKeyInputFocus();
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+  DALI_TEST_CHECK(anchorClickedSignal);
+
+
+  // For coverage InsertTextAnchor, RemoveTextAnchor
+  // first index insert
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 0);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
+
+  gAnchorClickedCallBackCalled = false;
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+  application.SendNotification();
+  field.SetKeyInputFocus();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+
+  // last index insert
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 5);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
+
+  gAnchorClickedCallBackCalled = false;
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+  application.SendNotification();
+  field.SetKeyInputFocus();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+
+  // mid index insert
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 2);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
+
+  gAnchorClickedCallBackCalled = false;
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+  application.SendNotification();
+  field.SetKeyInputFocus();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+
+  // first index remove
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 0);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+
+  gAnchorClickedCallBackCalled = false;
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+  application.SendNotification();
+  field.SetKeyInputFocus();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+
+  // last index remove
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 5);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+
+  gAnchorClickedCallBackCalled = false;
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+
+  // middle index
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 2);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+
+  gAnchorClickedCallBackCalled = false;
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+
+  // 0 ~ 1 index remove
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty( DevelTextField::Property::SELECTED_TEXT_START, 0);
+  field.SetProperty( DevelTextField::Property::SELECTED_TEXT_END, 1);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+
+  gAnchorClickedCallBackCalled = false;
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+
+  // 1 ~ 3 index remove
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty( DevelTextField::Property::SELECTED_TEXT_START, 1);
+  field.SetProperty( DevelTextField::Property::SELECTED_TEXT_END, 3);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+
+  gAnchorClickedCallBackCalled = false;
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+
+  // 3 ~ 4 index remove
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty( DevelTextField::Property::SELECTED_TEXT_START, 3);
+  field.SetProperty( DevelTextField::Property::SELECTED_TEXT_END, 4);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+
+  gAnchorClickedCallBackCalled = false;
+  // Create a tap event to touch the text field.
+  TestGenerateTap(application, 30.0f, 25.0f);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+
+  // Remove front of anchor
+  field.SetProperty(TextField::Property::TEXT, "TIZEN<a href='https://www.tizen.org'>TIZEN</a>");
+  field.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 3);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+
+  // Remove whole text
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  DevelTextField::SelectWholeText(field);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+
+  // Remove all with backspace
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>T</a>");
+  field.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 1);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+
+  // Remove all with delete
+  field.SetProperty(TextField::Property::TEXT, "<a href='https://www.tizen.org'>T</a>");
+  field.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 0);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(GenerateKey("Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
 // Positive test for the textChanged signal.
 int utcDaliTextFieldTextChangedP(void)
 {
@@ -1040,36 +1351,27 @@ int utcDaliTextFieldTextChangedP(void)
 
   gTextChangedCallBackCalled = false;
   field.SetProperty( TextField::Property::TEXT, "ABC" );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
   DALI_TEST_CHECK( textChangedSignal );
 
+  application.SendNotification();
   field.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   // Remove all text
   field.SetProperty( TextField::Property::TEXT, "" );
-  application.SendNotification();
-  application.Render();
 
   // Pressing backspace key: TextChangedCallback should not be called when there is no text in textfield.
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
 
   // Pressing delete key: TextChangedCallback should not be called when there is no text in textfield.
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_CHECK( !gTextChangedCallBackCalled );
 
   END_TEST;

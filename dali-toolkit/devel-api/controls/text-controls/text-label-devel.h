@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LABEL_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,6 +157,27 @@ enum Type
 };
 
 } // namespace Property
+
+/**
+ * @brief Anchor clicked signal type.
+ *
+ * @note Signal
+ *  - const char* : href of clicked anchor.
+ *  - uint32_t    : length of href.
+ */
+using AnchorClickedSignalType = Signal<void(TextLabel, const char*, uint32_t)>;
+
+/**
+ * @brief This signal is emitted when the anchor is clicked.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName(TextLabel textLabel, const char* href, uint32_t hrefLength);
+ * @endcode
+ * @param[in] textLabel The instance of TextLabel.
+ * @return The signal to connect to.
+ */
+DALI_TOOLKIT_API AnchorClickedSignalType& AnchorClickedSignal(TextLabel textLabel);
 
 } // namespace DevelTextLabel
 

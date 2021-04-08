@@ -61,6 +61,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/buttons/push-button-impl.cpp
    ${toolkit_src_dir}/controls/buttons/radio-button-impl.cpp
    ${toolkit_src_dir}/controls/buttons/toggle-button-impl.cpp
+   ${toolkit_src_dir}/controls/canvas-view/canvas-view-impl.cpp
    ${toolkit_src_dir}/controls/control/control-data-impl.cpp
    ${toolkit_src_dir}/controls/control/control-debug.cpp
    ${toolkit_src_dir}/controls/control/control-renderers.cpp
@@ -133,6 +134,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/markup-processor.cpp
    ${toolkit_src_dir}/text/markup-processor-color.cpp
    ${toolkit_src_dir}/text/markup-processor-embedded-item.cpp
+   ${toolkit_src_dir}/text/markup-processor-anchor.cpp
    ${toolkit_src_dir}/text/markup-processor-font.cpp
    ${toolkit_src_dir}/text/markup-processor-helper-functions.cpp
    ${toolkit_src_dir}/text/multi-language-support.cpp

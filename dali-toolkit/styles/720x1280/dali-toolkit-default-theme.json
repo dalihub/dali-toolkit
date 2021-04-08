@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * This file is part of Dali Toolkit
  *
@@ -98,29 +98,36 @@
     },
     "TextSelectionPopup":
     {
-      "popupMaxSize":[656,72],
-      "optionDividerSize":[2,0],
-      "popupDividerColor":[0.23,0.72,0.8,0.11],
+      "popupMaxSize":[656,36],
+      "optionDividerSize":[1,0],
+      "optionDividerPadding":[0.0,0.0,6.0,6.0],
+      "popupDividerColor":[1.0,1.0,1.0,1.0],
       "popupIconColor":[1.0,1.0,1.0,1.0],
       "popupPressedColor":[0.24,0.72,0.8,0.11],
       "background": {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}selection-popup-background.9.png"
+        "url": "{DALI_IMAGE_DIR}IoT-selection-popup-background.9.png",
+        "mixColor":[0.0,0.05,0.17,0.9]
         },
       "backgroundBorder": {
         "visualType": "IMAGE",
         "url": "{DALI_IMAGE_DIR}selection-popup-border.9.png",
-        "mixColor":[0.24,0.72,0.8,1.0]
+        "mixColor":[0.0,0.0,0.0,0.0]
         },
       "popupFadeInDuration":0.25,
       "popupFadeOutDuration":0.25
     },
     "TextSelectionPopupButton":
     {
+      "minimumSize":[0,36],
+      "labelPadding":[0.0,0.0,0.0,0.0],
       "label":
       {
         "visualType":"TEXT",
-        "pointSize":8
+        "pointSize":18,
+        "textColor":[1.0,1.0,1.0,1.0],
+        "fontFamily":"BreezeSans",
+        "fontStyle" : {"weight":"light"}
       },
       "unselectedBackgroundVisual":
       {
@@ -136,7 +143,7 @@
     "TextSelectionToolbar":
     {
       "enableOvershoot":true,
-      "enableScrollBar":true,
+      "enableScrollBar":false,
       "scrollView":
       {
         "overshootAnimationSpeed":360.0,

@@ -177,7 +177,7 @@ struct DALI_SCENE_LOADER_API MeshDefinition
     std::vector<uint16_t> mIndices;
     std::vector<Attrib>   mAttribs;
 
-    unsigned int        mBlendShapeBufferOffset;
+    unsigned int        mBlendShapeBufferOffset{0};
     Dali::Vector<float> mBlendShapeUnnormalizeFactor;
     PixelData           mBlendShapeData;
   };

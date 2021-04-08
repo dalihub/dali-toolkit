@@ -35,15 +35,15 @@ AccessibleImpl::AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role,
 : self(self),
   modal(modal)
 {
-  auto control = Dali::Toolkit::Control::DownCast(self);
+  auto control = Dali::Toolkit::Control::DownCast(Self());
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
   if(controlImpl.mAccessibilityRole == Dali::Accessibility::Role::UNKNOWN)
     controlImpl.mAccessibilityRole = role;
 
-  self.PropertySetSignal().Connect(&controlImpl, [this, &controlImpl](Dali::Handle& handle, Dali::Property::Index index, Dali::Property::Value value) {
-    if(this->self != Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
+  Self().PropertySetSignal().Connect(&controlImpl, [this, &controlImpl](Dali::Handle& handle, Dali::Property::Index index, Dali::Property::Value value) {
+    if(this->Self() != Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
     {
       return;
     }
@@ -68,7 +68,7 @@ AccessibleImpl::AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role,
 
 std::string AccessibleImpl::GetName()
 {
-  auto control = Dali::Toolkit::Control::DownCast(self);
+  auto control = Dali::Toolkit::Control::DownCast(Self());
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
@@ -86,7 +86,7 @@ std::string AccessibleImpl::GetName()
   if(auto raw = GetNameRaw(); !raw.empty())
     return raw;
 
-  return self.GetProperty<std::string>(Actor::Property::NAME);
+  return Self().GetProperty<std::string>(Actor::Property::NAME);
 }
 
 std::string AccessibleImpl::GetNameRaw()
@@ -96,7 +96,7 @@ std::string AccessibleImpl::GetNameRaw()
 
 std::string AccessibleImpl::GetDescription()
 {
-  auto control = Dali::Toolkit::Control::DownCast(self);
+  auto control = Dali::Toolkit::Control::DownCast(Self());
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
@@ -121,22 +121,22 @@ std::string AccessibleImpl::GetDescriptionRaw()
 
 Dali::Accessibility::Accessible* AccessibleImpl::GetParent()
 {
-  return Dali::Accessibility::Accessible::Get(self.GetParent());
+  return Dali::Accessibility::Accessible::Get(Self().GetParent());
 }
 
 size_t AccessibleImpl::GetChildCount()
 {
-  return self.GetChildCount();
+  return Self().GetChildCount();
 }
 
 Dali::Accessibility::Accessible* AccessibleImpl::GetChildAtIndex(size_t index)
 {
-  return Dali::Accessibility::Accessible::Get(self.GetChildAt(static_cast<unsigned int>(index)));
+  return Dali::Accessibility::Accessible::Get(Self().GetChildAt(static_cast<unsigned int>(index)));
 }
 
 size_t AccessibleImpl::GetIndexInParent()
 {
-  auto s      = self;
+  auto s      = Self();
   auto parent = s.GetParent();
   DALI_ASSERT_ALWAYS(parent && "can't call GetIndexInParent on object without parent");
   auto count = parent.GetChildCount();
@@ -152,11 +152,12 @@ size_t AccessibleImpl::GetIndexInParent()
 
 Dali::Accessibility::Role AccessibleImpl::GetRole()
 {
-  return self.GetProperty<Dali::Accessibility::Role>(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE);
+  return Self().GetProperty<Dali::Accessibility::Role>(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE);
 }
 
 Dali::Accessibility::States AccessibleImpl::CalculateStates()
 {
+  Dali::Actor self = Self();
   Dali::Accessibility::States s;
   s[Dali::Accessibility::State::FOCUSABLE] = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
   s[Dali::Accessibility::State::FOCUSED]   = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
@@ -187,7 +188,7 @@ Dali::Accessibility::States AccessibleImpl::GetStates()
 Dali::Accessibility::Attributes AccessibleImpl::GetAttributes()
 {
   std::unordered_map<std::string, std::string> attribute_map;
-  auto                                         q = Dali::Toolkit::Control::DownCast(self);
+  auto                                         q = Dali::Toolkit::Control::DownCast(Self());
   auto                                         w =
     q.GetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
   auto z = w.GetMap();
@@ -221,6 +222,7 @@ Dali::Accessibility::ComponentLayer AccessibleImpl::GetLayer()
 
 Dali::Rect<> AccessibleImpl::GetExtents(Dali::Accessibility::CoordType ctype)
 {
+  Dali::Actor self = Self();
   Vector2 screenPosition =
     self.GetProperty(Dali::DevelActor::Property::SCREEN_POSITION)
       .Get<Vector2>();
@@ -248,7 +250,7 @@ double AccessibleImpl::GetAlpha()
 
 bool AccessibleImpl::GrabFocus()
 {
-  return Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(self);
+  return Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self());
 }
 
 static Dali::Actor CreateHighlightIndicatorActor()
@@ -268,6 +270,7 @@ static Dali::Actor CreateHighlightIndicatorActor()
 
 bool AccessibleImpl::GrabHighlight()
 {
+  Dali::Actor self = Self();
   auto old = GetCurrentlyHighlightedActor();
 
   if(!Dali::Accessibility::IsUp())
@@ -304,6 +307,8 @@ bool AccessibleImpl::GrabHighlight()
 
 bool AccessibleImpl::ClearHighlight()
 {
+  Dali::Actor self = Self();
+
   if(!Dali::Accessibility::IsUp())
     return false;
   if(GetCurrentlyHighlightedActor() == self)
@@ -321,7 +326,7 @@ std::string AccessibleImpl::GetActionName(size_t index)
 {
   if(index >= GetActionCount()) return "";
   Dali::TypeInfo type;
-  self.GetTypeInfo(type);
+  Self().GetTypeInfo(type);
   DALI_ASSERT_ALWAYS(type && "no TypeInfo object");
   return type.GetActionName(index);
 }
@@ -340,7 +345,7 @@ std::string AccessibleImpl::GetActionDescription(size_t index)
 size_t AccessibleImpl::GetActionCount()
 {
   Dali::TypeInfo type;
-  self.GetTypeInfo(type);
+  Self().GetTypeInfo(type);
   DALI_ASSERT_ALWAYS(type && "no TypeInfo object");
   return type.GetActionCount();
 }
@@ -353,17 +358,17 @@ std::string AccessibleImpl::GetActionKeyBinding(size_t index)
 bool AccessibleImpl::DoAction(size_t index)
 {
   std::string actionName = GetActionName(index);
-  return self.DoAction(actionName, {});
+  return Self().DoAction(actionName, {});
 }
 
 bool AccessibleImpl::DoAction(const std::string& name)
 {
-  return self.DoAction(name, {});
+  return Self().DoAction(name, {});
 }
 
 bool AccessibleImpl::DoGesture(const Dali::Accessibility::GestureInfo& gestureInfo)
 {
-  auto control = Dali::Toolkit::Control::DownCast(self);
+  auto control = Dali::Toolkit::Control::DownCast(Self());
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
@@ -380,7 +385,7 @@ bool AccessibleImpl::DoGesture(const Dali::Accessibility::GestureInfo& gestureIn
 
 std::vector<Dali::Accessibility::Relation> AccessibleImpl::GetRelationSet()
 {
-  auto control = Dali::Toolkit::Control::DownCast(self);
+  auto control = Dali::Toolkit::Control::DownCast(Self());
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
@@ -408,7 +413,7 @@ void AccessibleImpl::EnsureSelfVisible()
   auto parent = dynamic_cast<AccessibleImpl*>(GetParent());
   if(parent)
   {
-    parent->EnsureChildVisible(self);
+    parent->EnsureChildVisible(Self());
   }
 }
 

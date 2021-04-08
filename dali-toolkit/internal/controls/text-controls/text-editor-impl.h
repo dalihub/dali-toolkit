@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
+#include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
@@ -48,7 +49,7 @@ namespace Internal
 /**
  * @brief A control which renders a long text string with styles.
  */
-class TextEditor : public Control, public Text::ControlInterface, public Text::EditableControlInterface, public Text::SelectableControlInterface
+class TextEditor : public Control, public Text::ControlInterface, public Text::EditableControlInterface, public Text::SelectableControlInterface, public Text::AnchorControlInterface
 {
 public:
   /**
@@ -85,6 +86,11 @@ public:
    * @copydoc Dali::Toollkit::TextEditor::MaxLengthReachedSignal()
    */
   DevelTextEditor::MaxLengthReachedSignalType& MaxLengthReachedSignal();
+
+  /**
+   * @copydoc Dali::Toollkit::TextEditor::AnchorClickedSignal()
+   */
+  DevelTextEditor::AnchorClickedSignalType& AnchorClickedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -205,7 +211,7 @@ private: // From Control
   /**
    * @copydoc Text::EditableControlInterface::TextChanged()
    */
-  void TextChanged() override;
+  void TextChanged(bool immediate) override;
 
   /**
    * @copydoc Text::EditableControlInterface::MaxLengthReached()
@@ -276,7 +282,15 @@ public:
   /**
    * @copydoc Text::EditableControlInterface::SetEditable()
    */
-  void                SetEditable(bool editable) override;
+  void SetEditable(bool editable) override;
+
+  // From AnchorControlInterface
+
+  /**
+   * @copydoc Text::AnchorControlInterface::AnchorClicked()
+   */
+  void AnchorClicked(const std::string& href) override;
+
   Text::ControllerPtr getController();
 
 private: // Implementation
@@ -329,6 +343,11 @@ private: // Implementation
   void OnIdleSignal();
 
   /**
+   * @brief Emits TextChanged signal.
+   */
+  void EmitTextChangedSignal();
+
+  /**
    * @brief set RenderActor's position with new scrollPosition
    *
    * Apply updated scroll position or start scroll animation if VerticalScrollAnimation is enabled
@@ -378,6 +397,7 @@ private: // Data
   Toolkit::TextEditor::InputStyleChangedSignalType     mInputStyleChangedSignal;
   Toolkit::TextEditor::ScrollStateChangedSignalType    mScrollStateChangedSignal;
   Toolkit::DevelTextEditor::MaxLengthReachedSignalType mMaxLengthReachedSignal;
+  Toolkit::DevelTextEditor::AnchorClickedSignalType    mAnchorClickedSignal;
 
   InputMethodContext            mInputMethodContext;
   Text::ControllerPtr           mController;
@@ -402,7 +422,7 @@ private: // Data
   bool  mScrollAnimationEnabled : 1;
   bool  mScrollBarEnabled : 1;
   bool  mScrollStarted : 1;
-  bool  mTextChanged : 1;
+  bool  mTextChanged : 1; ///< If true, emits TextChangedSignal in next OnRelayout().
 
   struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Text,

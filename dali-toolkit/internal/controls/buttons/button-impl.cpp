@@ -1306,7 +1306,7 @@ Padding Button::GetForegroundPadding()
 std::string Button::AccessibleImpl::GetNameRaw()
 {
   std::string   labelText;
-  auto          slf      = Toolkit::Button::DownCast(self);
+  auto          slf      = Toolkit::Button::DownCast(Self());
   Property::Map labelMap = slf.GetProperty<Property::Map>(Toolkit::Button::Property::LABEL);
 
   Property::Value* textPropertyPtr = labelMap.Find(Toolkit::TextVisual::Property::TEXT);
@@ -1321,7 +1321,7 @@ std::string Button::AccessibleImpl::GetNameRaw()
 Property::Index Button::AccessibleImpl::GetNamePropertyIndex()
 {
   Property::Index label    = Toolkit::Button::Property::LABEL;
-  Property::Map   labelMap = self.GetProperty<Property::Map>(label);
+  Property::Map   labelMap = Self().GetProperty<Property::Map>(label);
 
   if(MapContainsTextString(labelMap))
     return label;
@@ -1333,7 +1333,7 @@ Dali::Accessibility::States Button::AccessibleImpl::CalculateStates()
 {
   auto tmp                                    = DevelControl::AccessibleImpl::CalculateStates();
   tmp[Dali::Accessibility::State::SELECTABLE] = true;
-  auto slf                                    = Toolkit::Button::DownCast(self);
+  auto slf                                    = Toolkit::Button::DownCast(Self());
   tmp[Dali::Accessibility::State::ENABLED]    = !slf.GetProperty<bool>(Toolkit::Button::Property::DISABLED);
   tmp[Dali::Accessibility::State::CHECKED]    = slf.GetProperty<bool>(Toolkit::Button::Property::SELECTED);
   return tmp;

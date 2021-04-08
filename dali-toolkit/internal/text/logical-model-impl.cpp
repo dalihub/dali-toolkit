@@ -55,6 +55,16 @@ void FreeEmbeddedItems(Vector<EmbeddedItem>& embeddedItem)
   embeddedItem.Clear();
 }
 
+void FreeAnchors(Vector<Anchor>& anchors)
+{
+  for(auto&& anchor : anchors)
+  {
+    delete[] anchor.href;
+  }
+
+  anchors.Clear();
+}
+
 LogicalModelPtr LogicalModel::New()
 {
   return LogicalModelPtr(new LogicalModel());
@@ -571,6 +581,11 @@ void LogicalModel::FindParagraphs(CharacterIndex             index,
 void LogicalModel::ClearEmbeddedImages()
 {
   FreeEmbeddedItems(mEmbeddedItems);
+}
+
+void LogicalModel::ClearAnchors()
+{
+  FreeAnchors(mAnchors);
 }
 
 LogicalModel::~LogicalModel()

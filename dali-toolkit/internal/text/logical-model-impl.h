@@ -24,6 +24,7 @@
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/anchor.h>
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
 #include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
@@ -181,6 +182,11 @@ public:
    */
   void ClearEmbeddedImages();
 
+  /**
+   * @brief Clears the anchors.
+   */
+  void ClearAnchors();
+
 protected:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -212,6 +218,7 @@ public:
   Vector<CharacterDirection>            mCharacterDirections; ///< For each character, whether is right to left. ( @e flase is left to right, @e true right to left ).
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
   Vector<EmbeddedItem>                  mEmbeddedItems;
+  Vector<Anchor>                        mAnchors;
 
   BidirectionalLineRunIndex mBidirectionalLineIndex; ///< The last fetched bidirectional line info.
 };

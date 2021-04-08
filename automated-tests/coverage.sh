@@ -29,7 +29,7 @@ for i in `find . -name "*.dir"` ; do
         if [[ $? -eq 0 ]]
         then
             lcov $LCOV_OPTS --directory . -c -o dali.info
-            lcov $LCOV_OPTS --remove dali.info "/usr/include/*" "*/automated-tests/*" "*/dali-env/*" -o dali.info
+            lcov $LCOV_OPTS --remove dali.info "/usr/include/*" "/usr/local/include/*" "*/automated-tests/*" "*/dali-env/*" "*/third-party/*" -o dali.info
             if [ ! -s dali.info ]
             then
               rm -f dali.info
@@ -41,7 +41,7 @@ done
 (
     if [ $opt_genhtml == true ] ; then
         cd .. ;
-        genhtml $LCOV_OPTS -o build/$BUILD_DIR_NAME/doc/coverage `find . -name dali.info`
+        genhtml -p `pwd` $LCOV_OPTS -o build/$BUILD_DIR_NAME/doc/coverage `find . -name dali.info`
         echo "Coverage output: ../build/$BUILD_DIR_NAME/doc/coverage/index.html"
     fi
 )

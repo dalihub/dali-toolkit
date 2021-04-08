@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/web-engine.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/property-notification.h>
@@ -67,6 +68,11 @@ public:
   static Toolkit::WebView New(const std::string& locale, const std::string& timezoneId);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::New( int, char** )
+   */
+  static Toolkit::WebView New(int argc, char** argv);
+
+  /**
    * @brief Get settings of WebEngine.
    */
   Dali::Toolkit::WebSettings* GetSettings() const;
@@ -87,11 +93,6 @@ public:
   Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
 
   /**
-   * @copydoc Dali::Toolkit::WebView::New( int, char** )
-   */
-  static Toolkit::WebView New(int argc, char** argv);
-
-  /**
    * @brief Get Favicon of web page.
    *
    * @return Handle to a fav icon
@@ -109,9 +110,24 @@ public:
   void LoadHtmlString(const std::string& htmlString);
 
   /**
+   * @copydoc Dali::WebEngine::LoadHtmlStringOverrideCurrentEntry()
+   */
+  bool LoadHtmlStringOverrideCurrentEntry(const std::string& html, const std::string& basicUri, const std::string& unreachableUrl);
+
+  /**
+   * @copydoc Dali::WebEngine::LoadContents()
+   */
+  bool LoadContents(const std::string& contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::Reload()
    */
   void Reload();
+
+  /**
+   * @copydoc Dali::WebEngine::ReloadWithoutCache()
+   */
+  bool ReloadWithoutCache();
 
   /**
    * @copydoc Dali::Toolkit::WebView::StopLoading()
@@ -129,9 +145,44 @@ public:
   void Resume();
 
   /**
+   * @copydoc Dali::WebEngine::SuspendNetworkLoading()
+   */
+  void SuspendNetworkLoading();
+
+  /**
+   * @copydoc Dali::WebEngine::ResumeNetworkLoading()
+   */
+  void ResumeNetworkLoading();
+
+  /**
+   * @copydoc Dali::WebEngine::AddCustomHeader()
+   */
+  bool AddCustomHeader(const std::string& name, const std::string& value);
+
+  /**
+   * @copydoc Dali::WebEngine::RemoveCustomHeader()
+   */
+  bool RemoveCustomHeader(const std::string& name);
+
+  /**
+   * @copydoc Dali::WebEngine::StartInspectorServer()
+   */
+  uint32_t StartInspectorServer(uint32_t port);
+
+  /**
+   * @copydoc Dali::WebEngine::StopInspectorServer()
+   */
+  bool StopInspectorServer();
+
+  /**
    * @copydoc Dali::Toolkit::WebView::ScrollBy()
    */
   void ScrollBy(int deltaX, int deltaY);
+
+  /**
+   * @copydoc Dali::WebEngine::ScrollEdgeBy()
+   */
+  bool ScrollEdgeBy(int deltaX, int deltaY);
 
   /**
    * @copydoc Dali::Toolkit::WebView::CanGoForward()
@@ -199,9 +250,54 @@ public:
   void ClearHistory();
 
   /**
-   * @brief Clears all tiles resources of Web.
+   * @copydoc Dali::Toolkit::WebView::ClearAllTilesResources()
    */
   void ClearAllTilesResources();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::SetScaleFactor()
+   */
+  void SetScaleFactor(float scaleFactor, Dali::Vector2 point);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::GetScaleFactor()
+   */
+  float GetScaleFactor() const;
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::ActivateAccessibility()
+   */
+  void ActivateAccessibility(bool activated);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::HighlightText()
+   */
+  bool HighlightText(const std::string& text, Dali::WebEnginePlugin::FindOption options, uint32_t maxMatchCount);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::AddDynamicCertificatePath()
+   */
+  void AddDynamicCertificatePath(const std::string& host, const std::string& certPath);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::GetScreenshot()
+   */
+  Dali::Toolkit::ImageView GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::GetScreenshotAsynchronously()
+   */
+  bool GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::CheckVideoPlayingAsynchronously()
+   */
+  bool CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RegisterGeolocationPermissionCallback()
+   */
+  void RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::PageLoadStartedSignal()
@@ -232,6 +328,56 @@ public:
    * @copydoc Dali::Toolkit::WebView::UrlChangedSignal()
    */
   Dali::Toolkit::WebView::WebViewUrlChangedSignalType& UrlChangedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::FormRepostDecisionSignal()
+   */
+  Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType& FormRepostDecisionSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::FrameRenderedSignal()
+   */
+  Dali::Toolkit::WebView::WebViewFrameRenderedSignalType& FrameRenderedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::RequestInterceptorSignal()
+   */
+  Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType& RequestInterceptorSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::ConsoleMessageSignal()
+   */
+  Dali::Toolkit::WebView::WebViewConsoleMessageSignalType& ConsoleMessageSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::PolicyDecisionSignal()
+   */
+  Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType& PolicyDecisionSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::CertificateConfirmSignal()
+   */
+  Dali::Toolkit::WebView::WebViewCertificateSignalType& CertificateConfirmSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::SslCertificateChangedSignal()
+   */
+  Dali::Toolkit::WebView::WebViewCertificateSignalType& SslCertificateChangedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::HttpAuthHandlerSignal()
+   */
+  Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType& HttpAuthHandlerSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::ContextMenuCustomizedSignal()
+   */
+  Dali::Toolkit::WebView::WebViewContextMenuCustomizedSignalType& ContextMenuCustomizedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::ContextMenuItemSelectedSignal()
+   */
+  Dali::Toolkit::WebView::WebViewContextMenuItemSelectedSignalType& ContextMenuItemSelectedSignal();
 
 public: // Properties
   /**
@@ -301,7 +447,7 @@ private:
   WebView& operator=(const WebView& webView);
 
   /**
-   * @brief Sets an absolute scroll of the given view.
+   * @brief Set an absolute scroll of the given view.
    * @param[in] x The coordinate x of scroll
    * @param[in] y The coordinate y of scroll
    */
@@ -315,25 +461,57 @@ private:
   Dali::Vector2 GetScrollPosition() const;
 
   /**
-   * @brief Gets the possible scroll size of the given view.
+   * @brief Get the possible scroll size of the given view.
    * @param[out] width The width of scroll size
    * @param[out] height The height of scroll size
    */
   Dali::Vector2 GetScrollSize() const;
 
   /**
-   * @brief Gets the last known content's size.
+   * @brief Get the last known content's size.
    * @param[out] width The width of content's size
    * @param[out] height The height of content's size
    */
   Dali::Vector2 GetContentSize() const;
 
   /**
-   * @brief Returns the title of the Web.
+   * @brief Return the title of the Web.
    *
    * @return The title of web page
    */
   std::string GetTitle() const;
+
+  /**
+   * @brief Set the background color of web page.
+   * @param[in] color The value of background color.
+   */
+  void SetDocumentBackgroundColor(Dali::Vector4 color);
+
+  /**
+   * @brief Clear tiles when hidden.
+   *
+   * @param[in] cleared Whether tiles are cleared or not
+   */
+  void ClearTilesWhenHidden(bool cleared);
+
+  /**
+   * @brief Set multiplier of cover area of tile.
+   *
+   * @param[in] multiplier The multiplier of cover area
+   */
+  void SetTileCoverAreaMultiplier(float multiplier);
+
+  /**
+   * @brief Enable cursor by client.
+   * @param[in] enabled Whether cursor is enabled or not.
+   */
+  void EnableCursorByClient(bool enabled);
+
+  /**
+   * @brief Get the selected text.
+   * @return The selected text
+   */
+  std::string GetSelectedText() const;
 
   /**
    * @brief Get user agent string.
@@ -348,7 +526,45 @@ private:
   void SetUserAgent(const std::string& userAgent);
 
   /**
-   * @brief Updates display area of web view.
+   * @brief Set zoom factor of the current page.
+   * @param[in] zoomFactor a new factor to be set.
+   */
+  void SetPageZoomFactor(float zoomFactor);
+
+  /**
+   * @brief Query the current zoom factor of the page。
+   * @return The current page zoom factor.
+   */
+  float GetPageZoomFactor() const;
+
+  /**
+   * @brief Set the current text zoom level。.
+   * @param[in] zoomFactor a new factor to be set.
+   */
+  void SetTextZoomFactor(float zoomFactor);
+
+  /**
+   * @brief Get the current text zoom level.
+   * @return The current text zoom factor.
+   */
+  float GetTextZoomFactor() const;
+
+  /**
+   * @brief Get the current load progress of the page.
+   * @return The load progress of the page.
+   */
+  float GetLoadProgressPercentage() const;
+
+  /**
+   * @brief Request to set the current page's visibility.
+   * @param[in] visible Visible or not.
+   *
+   * @return true if succeeded, false otherwise
+   */
+  bool SetVisibility(bool visible);
+
+  /**
+   * @brief Update display area of web view.
    * @param[in] source The soource triggers Notification.
    */
   void UpdateDisplayArea(Dali::PropertyNotification& source);
@@ -366,18 +582,25 @@ private:
   void EnableBlendMode(bool blendEnabled);
 
   /**
-   * @brief Enables/disables mouse events. The default is enabled.
+   * @brief Enable/disable mouse events. The default is enabled.
    *
    * @param[in] enabled True if mouse events are enabled, false otherwise
    */
   void EnableMouseEvents(bool enabled);
 
   /**
-   * @brief Enables/disables key events. The default is enabled.
+   * @brief Enable/disable key events. The default is enabled.
    *
    * @param[in] enabled True if key events enabled, false otherwise
    */
   void EnableKeyEvents(bool enabled);
+
+  /**
+   * @brief Create image view by pixel data.
+   * @param[in] pixel Pixel data
+   * @return The new image view
+   */
+  Dali::Toolkit::ImageView CreateImageView(Dali::PixelData pixel);
 
   /**
    * @brief Callback function to be called when page load started.
@@ -402,11 +625,11 @@ private:
    * @param[in] url The url currently being loaded
    * @param[in] errorCode The error code
    */
-  void OnPageLoadError(const std::string& url, int errorCode);
+  void OnPageLoadError(std::shared_ptr<Dali::WebEngineLoadError> error);
 
   /**
    * @brief Callback function to be called when scroll edge is reached.
-   * @param[in] e The scroll edge reached.
+   * @param[in] edge The scroll edge reached.
    */
   void OnScrollEdgeReached(Dali::WebEnginePlugin::ScrollEdge edge);
 
@@ -440,32 +663,118 @@ private:
    */
   bool OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel);
 
+  /**
+   * @brief Callback function to be called when form repost decision need be checked.
+   * @param[in] decision The new decision for form repost
+   */
+  void OnFormRepostDecision(std::shared_ptr<Dali::WebEngineFormRepostDecision> decision);
+
+  /**
+   * @brief Callback function to be called when frame is rendered.
+   */
+  void OnFrameRendered();
+
+  /**
+   * @brief Callback function to be called when visibility is changed.
+   * @param[in] actor The actor, or child of actor, whose visibility has changed
+   * @param[in] isVisible Whether the actor is now visible or not
+   * @param[in] type, Whether the actor's visible property has changed or a parent's
+   */
+  void OnVisibilityChanged(Actor actor, bool isVisible, Dali::DevelActor::VisibilityChange::Type type);
+
+  /**
+   * @brief callback for screen shot captured.
+   * @param[in] pixel Pixel data of screen shot.
+   */
+  void OnScreenshotCaptured(Dali::PixelData pixel);
+
+  /**
+   * @brief Callback function to be called when http request need be intercepted.
+   * @param [in] request The http request interceptor.
+   */
+  void OnInterceptRequest(std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor);
+
+  /**
+   * @brief Callback function to be called when console message will be logged.
+   * @param[in] message The message logged.
+   */
+  void OnConsoleMessage(std::shared_ptr<Dali::WebEngineConsoleMessage> message);
+
+  /**
+   * @brief Callback function to be called when policy need be decided.
+   * @param[in] decision The policy decided.
+   */
+  void OnPolicyDecisionRequest(std::shared_ptr<Dali::WebEnginePolicyDecision> decision);
+
+  /**
+   * @brief Callback function to be called when certificate need be confirmed.
+   * @param[in] certificate The certificate policy decision.
+   */
+  void OnCertificateConfirm(std::shared_ptr<Dali::WebEngineCertificate> certificate);
+
+  /**
+   * @brief Callback function to be called when ssl certificate is changed.
+   * @param[in] certificate The certificate information received.
+   */
+  void OnSslCertificateChanged(std::shared_ptr<Dali::WebEngineCertificate> certificate);
+
+  /**
+   * @brief Callback function to be called when http authentication need be confirmed.
+   * @param[in] handler The handler for http authentication
+   */
+  void OnHttpAuthenticationRequest(std::shared_ptr<Dali::WebEngineHttpAuthHandler> handler);
+
+  /**
+   * @brief Callback function to be called when context menu would be customized.
+   * @param[in] e The scroll edge reached.
+   */
+  void OnContextMenuCustomized(std::shared_ptr<Dali::WebEngineContextMenu> menu);
+
+  /**
+   * @brief Callback function to be called when context menu item is selected.
+   * @param[in] url The url currently being loaded
+   */
+  void OnContextMenuItemSelected(std::shared_ptr<Dali::WebEngineContextMenuItem> item);
+
 private:
   std::string                 mUrl;
   Dali::Toolkit::Visual::Base mVisual;
   Dali::Size                  mWebViewSize;
   Dali::WebEngine             mWebEngine;
 
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadStartedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadInProgressSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType          mPageLoadFinishedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType     mPageLoadErrorSignal;
-  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType mScrollEdgeReachedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType                mPageLoadStartedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType                mPageLoadInProgressSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType                mPageLoadFinishedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType           mPageLoadErrorSignal;
+  Dali::Toolkit::WebView::WebViewUrlChangedSignalType              mUrlChangedSignal;
+  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType       mScrollEdgeReachedSignal;
+  Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType      mFormRepostDecisionSignal;
+  Dali::Toolkit::WebView::WebViewFrameRenderedSignalType           mFrameRenderedSignal;
+  Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType      mRequestInterceptorSignal;
+  Dali::Toolkit::WebView::WebViewConsoleMessageSignalType          mConsoleMessageSignal;
+  Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType          mPolicyDecisionSignal;
+  Dali::Toolkit::WebView::WebViewCertificateSignalType             mCertificateConfirmSignal;
+  Dali::Toolkit::WebView::WebViewCertificateSignalType             mSslCertificateChangedSignal;
+  Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType         mHttpAuthHandlerSignal;
+  Dali::Toolkit::WebView::WebViewContextMenuCustomizedSignalType   mContextMenuCustomizedSignal;
+  Dali::Toolkit::WebView::WebViewContextMenuItemSelectedSignalType mContextMenuItemSelectedSignal;
 
   std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
   std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
   std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
-  Dali::Toolkit::ImageView                           mFaviconView;
 
-  Dali::PropertyNotification                          mPositionUpdateNotification;
-  Dali::PropertyNotification                          mSizeUpdateNotification;
-  Dali::PropertyNotification                          mScaleUpdateNotification;
-  bool                                                mVideoHoleEnabled;
-  Dali::Rect<int>                                     mWebViewArea;
-  Dali::Toolkit::WebView::WebViewUrlChangedSignalType mUrlChangedSignal;
-  bool                                                mMouseEventsEnabled;
-  bool                                                mKeyEventsEnabled;
+  Dali::Toolkit::ImageView mFaviconView;
+
+  Dali::PropertyNotification mPositionUpdateNotification;
+  Dali::PropertyNotification mSizeUpdateNotification;
+  Dali::PropertyNotification mScaleUpdateNotification;
+  Dali::Rect<int>            mWebViewArea;
+  bool                       mVideoHoleEnabled;
+  bool                       mMouseEventsEnabled;
+  bool                       mKeyEventsEnabled;
+
+  Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback mScreenshotCapturedCallback;
 };
 
 } // namespace Internal
