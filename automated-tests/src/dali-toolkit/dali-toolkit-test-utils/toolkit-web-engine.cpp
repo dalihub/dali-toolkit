@@ -989,6 +989,40 @@ public:
   {
   }
 
+  bool SetViewportMetaTag(bool enable) override
+  {
+    return true;
+  }
+
+  bool SetForceZoom(bool enable) override
+  {
+    return true;
+  }
+
+  bool IsZoomForced() const override
+  {
+    return true;
+  }
+
+  bool SetTextZoomEnabled(bool enable) override
+  {
+    return true;
+  }
+
+  bool IsTextZoomEnabled() const override
+  {
+    return true;
+  }
+
+  void SetExtraFeature(const std::string& feature, bool enable) override
+  {
+  }
+
+  bool IsExtraFeatureEnabled(const std::string& feature) const override
+  {
+    return  true;
+  }
+
 private:
   int mockDefaultFontSize;
   bool mockJavaScriptEnabled;
