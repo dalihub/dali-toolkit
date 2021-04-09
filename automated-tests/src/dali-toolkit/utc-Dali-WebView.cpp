@@ -1583,12 +1583,19 @@ int UtcDaliWebContextGetSetCacheModel(void)
   // Reset something
   context->SetProxyUri( kDefaultValue );
   context->SetCertificateFilePath( kDefaultValue );
-  context->DisableCache( false );
+  context->EnableCache( true );
   context->SetDefaultProxyAuth( kDefaultValue, kDefaultValue );
   context->DeleteAllWebDatabase();
   context->DeleteAllWebStorage();
   context->DeleteLocalFileSystem();
   context->ClearCache();
+  context->SetContextAppId( "id" );
+  context->SetContextApplicationType( Dali::WebEngineContext::ApplicationType::OTHER );
+  context->SetContextTimeOffset( 0 );
+  context->SetContextTimeZoneOffset( 0, 0 );
+  context->SetDefaultZoomFactor( 0 );
+  context->DeleteAllFormPasswordData();
+  context->DeleteAllFormCandidateData();
 
   // Check default value
   Dali::WebEngineContext::CacheModel value = context->GetCacheModel();
@@ -1598,6 +1605,37 @@ int UtcDaliWebContextGetSetCacheModel(void)
   context->SetCacheModel( Dali::WebEngineContext::CacheModel::DOCUMENT_BROWSER );
   value = context->GetCacheModel();
   DALI_TEST_CHECK( value == Dali::WebEngineContext::CacheModel::DOCUMENT_BROWSER );
+
+  // Get cache enabled
+  DALI_TEST_CHECK( context->IsCacheEnabled() );
+
+  // Get certificate
+  std::string str = context->GetContextCertificateFile();
+  DALI_TEST_EQUALS( str, "test", TEST_LOCATION );
+
+  // Set version
+  DALI_TEST_CHECK( context->SetContextAppVersion( "test" ) );
+
+  // Register
+  std::vector<std::string> temp;
+  context->RegisterUrlSchemesAsCorsEnabled( temp );
+  context->RegisterJsPluginMimeTypes( temp );
+  context->DeleteFormPasswordDataList( temp );
+
+  // Get zoom
+  DALI_TEST_EQUALS( context->GetContextDefaultZoomFactor(), float( 0 ), TEST_LOCATION );
+
+  // Delete cache and database
+  DALI_TEST_CHECK( context->DeleteAllApplicationCache() );
+  DALI_TEST_CHECK( context->DeleteAllWebIndexedDatabase() );
+
+  // Get contextProxy
+  context->SetContextProxy("", "");
+  DALI_TEST_EQUALS( context->GetContextProxy(), "test", TEST_LOCATION );
+  DALI_TEST_EQUALS( context->GetProxyBypassRule(), "test", TEST_LOCATION );
+
+  //Notify low memory
+  DALI_TEST_CHECK( context->FreeUnusedMemory() );
 
   END_TEST;
 }
@@ -1644,7 +1682,7 @@ int UtcDaliWebContextGetWebDatabaseStorageOrigins(void)
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS( gStorageUsageAcquiredCallbackCalled, 1, TEST_LOCATION );
 
-  result = context->DeleteWebStorageOrigin(*origin);
+  result = context->DeleteWebStorage(*origin);
   DALI_TEST_CHECK( result );
 
   result = context->DeleteApplicationCache(*origin);

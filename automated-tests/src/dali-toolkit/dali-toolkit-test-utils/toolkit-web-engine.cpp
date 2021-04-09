@@ -171,16 +171,12 @@ public:
   {
   }
 
-  bool DeleteWebStorageOrigin(Dali::WebEngineSecurityOrigin& origin)
+  bool DeleteWebStorage(Dali::WebEngineSecurityOrigin& origin)
   {
     return true;
   }
 
   void DeleteLocalFileSystem() override
-  {
-  }
-
-  void DisableCache( bool cacheDisabled ) override
   {
   }
 
@@ -218,6 +214,99 @@ public:
       ConnectToGlobalSignal(&OnMimeOverridden);
       mMimeOverriddenCallback = callback;
     }
+  }
+
+  void EnableCache( bool cacheEnabled ) override
+  {
+  }
+
+  bool IsCacheEnabled() const override
+  {
+    return true;
+  }
+
+  std::string GetContextCertificateFile() const override
+  {
+    return "test";
+  }
+
+  void SetContextAppId(const std::string& appID) override
+  {
+  }
+
+  bool SetContextAppVersion(const std::string& appVersion) override
+  {
+    return true;
+  }
+
+  void SetContextApplicationType(const Dali::WebEngineContext::ApplicationType applicationType) override
+  {
+  }
+
+  void SetContextTimeOffset(float timeOffset) override
+  {
+  }
+
+  void SetContextTimeZoneOffset(float timeZoneOffset, float daylightSavingTime) override
+  {
+  }
+
+  void RegisterUrlSchemesAsCorsEnabled(const std::vector<std::string>& schemes) override
+  {
+  }
+
+  void RegisterJsPluginMimeTypes(const std::vector<std::string>& mimeTypes) override
+  {
+  }
+
+  void SetDefaultZoomFactor(float zoomFactor) override
+  {
+  }
+
+  float GetContextDefaultZoomFactor() const override
+  {
+    return 0;
+  }
+
+  bool DeleteAllApplicationCache() override
+  {
+    return true;
+  }
+
+  bool DeleteAllWebIndexedDatabase() override
+  {
+    return true;
+  }
+
+  void DeleteFormPasswordDataList(const std::vector<std::string>& list) override
+  {
+  }
+
+  void DeleteAllFormPasswordData() override
+  {
+  }
+
+  void DeleteAllFormCandidateData() override
+  {
+  }
+
+  std::string GetContextProxy() const override
+  {
+    return "test";
+  }
+
+  void SetContextProxy(const std::string& proxy, const std::string& bypass) override
+  {
+  }
+
+  std::string GetProxyBypassRule() const override
+  {
+    return "test";
+  }
+
+  bool FreeUnusedMemory() override
+  {
+    return true;
   }
 
 public:
