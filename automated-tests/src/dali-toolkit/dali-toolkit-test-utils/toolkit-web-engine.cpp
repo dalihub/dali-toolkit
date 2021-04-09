@@ -316,19 +316,31 @@ class MockWebEngineBackForwardList : public Dali::WebEngineBackForwardList
 {
 public:
   MockWebEngineBackForwardList()
-    : mockItem(),
-      pMockItem( &mockItem )
   {
   }
 
-  Dali::WebEngineBackForwardListItem& GetCurrentItem() const override
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetCurrentItem() const override
   {
-    return *pMockItem;
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> ret(new MockWebEngineBackForwardListItem());
+    return ret;
   }
 
-  Dali::WebEngineBackForwardListItem& GetItemAtIndex( uint32_t index ) const override
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetPreviousItem() const override
   {
-    return *pMockItem;
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> ret(new MockWebEngineBackForwardListItem());
+    return ret;
+  }
+
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetNextItem() const override
+  {
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> ret(new MockWebEngineBackForwardListItem());
+    return ret;
+  }
+
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetItemAtIndex( uint32_t index ) const override
+  {
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> ret(new MockWebEngineBackForwardListItem());
+    return ret;
   }
 
   uint32_t GetItemCount() const override
@@ -336,10 +348,23 @@ public:
     return 1;
   }
 
-private:
-  MockWebEngineBackForwardListItem mockItem;
-  WebEngineBackForwardListItem*    pMockItem;
+  std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> GetBackwardItems(int limit) override
+  {
+    std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> ret;
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> item(new MockWebEngineBackForwardListItem());
+    ret.push_back(std::move(item));
+    return ret;
+  }
+
+  std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> GetForwardItems(int limit) override
+  {
+    std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> ret;
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> item(new MockWebEngineBackForwardListItem());
+    ret.push_back(std::move(item));
+    return ret;
+  }
 };
+
 
 class MockWebEngineCertificate : public Dali::WebEngineCertificate
 {
