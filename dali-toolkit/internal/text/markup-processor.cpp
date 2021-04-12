@@ -156,6 +156,17 @@ void Initialize(ColorRun& colorRun)
 }
 
 /**
+ * @brief Initializes a underlined character run to its defaults.
+ *
+ * @param[in,out] underlinedCharacterRun The underelined character run to initialize.
+ */
+void Initialize(UnderlinedCharacterRun& underlinedCharacterRun)
+{
+  underlinedCharacterRun.characterRun.characterIndex     = 0u;
+  underlinedCharacterRun.characterRun.numberOfCharacters = 0u;
+}
+
+/**
  * @brief Splits the tag string into the tag name and its attributes.
  *
  * The attributes are stored in a vector in the tag.
@@ -498,9 +509,9 @@ bool XHTMLNumericEntityToUtf8(const char* markupText, char* utf8)
 }
 
 /**
- * @brief Processes a particular tag for the required run (color-run or font-run).
+ * @brief Processes a particular tag for the required run (color-run, font-run or underlined-character-run).
  *
- * @tparam RunType Whether ColorRun or FontDescriptionRun
+ * @tparam RunType Whether ColorRun , FontDescriptionRun or UnderlinedCharacterRun
  *
  * @param[in/out] runsContainer The container containing all the runs
  * @param[in/out] styleStack The style stack
@@ -619,11 +630,13 @@ void ProcessAnchorTag(
  * @param[in/out] markupProcessData The markup process data
  * @param[in] fontRunIndex The font run index
  * @param[in] colorRunIndex The color run index
+ * @param[in] underlinedCharacterRunIndex The underlined character run index
  */
-void ResizeModelVectors(MarkupProcessData& markupProcessData, const StyleStack::RunIndex fontRunIndex, const StyleStack::RunIndex colorRunIndex)
+void ResizeModelVectors(MarkupProcessData& markupProcessData, const StyleStack::RunIndex fontRunIndex, const StyleStack::RunIndex colorRunIndex, const StyleStack::RunIndex underlinedCharacterRunIndex)
 {
   markupProcessData.fontRuns.Resize(fontRunIndex);
   markupProcessData.colorRuns.Resize(colorRunIndex);
+  markupProcessData.underlinedCharacterRuns.Resize(underlinedCharacterRunIndex);
 
 #ifdef DEBUG_ENABLED
   for(unsigned int i = 0; i < colorRunIndex; ++i)
@@ -740,18 +753,21 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   StyleStack styleStack;
 
   // Points the next free position in the vector of runs.
-  StyleStack::RunIndex colorRunIndex = 0u;
-  StyleStack::RunIndex fontRunIndex  = 0u;
+  StyleStack::RunIndex colorRunIndex                = 0u;
+  StyleStack::RunIndex fontRunIndex                 = 0u;
+  StyleStack::RunIndex underlinedCharacterRunIndex  = 0u;
 
   // check tag reference
   int colorTagReference = 0u;
   int fontTagReference  = 0u;
   int iTagReference     = 0u;
   int bTagReference     = 0u;
+  int uTagReference     = 0u;
 
   // Give an initial default value to the model's vectors.
   markupProcessData.colorRuns.Reserve(DEFAULT_VECTOR_SIZE);
   markupProcessData.fontRuns.Reserve(DEFAULT_VECTOR_SIZE);
+  markupProcessData.underlinedCharacterRuns.Reserve(DEFAULT_VECTOR_SIZE);
 
   // Get the mark-up string buffer.
   const char*       markupStringBuffer    = markupString.c_str();
@@ -781,9 +797,9 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       } // <i></i>
       else if(TokenComparison(XHTML_U_TAG, tag.buffer, tag.length))
       {
-        // TODO: If !tag.isEndTag, then create a new underline run.
-        //       else Pop the top of the stack and set the number of characters of the run.
-      } // <u></u>
+        ProcessTagForRun<UnderlinedCharacterRun>(
+          markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& tag, UnderlinedCharacterRun& run) {  });
+      }  // <u></u>
       else if(TokenComparison(XHTML_B_TAG, tag.buffer, tag.length))
       {
         ProcessTagForRun<FontDescriptionRun>(
@@ -836,7 +852,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   }
 
   // Resize the model's vectors.
-  ResizeModelVectors(markupProcessData, fontRunIndex, colorRunIndex);
+  ResizeModelVectors(markupProcessData, fontRunIndex, colorRunIndex, underlinedCharacterRunIndex);
 }
 
 } // namespace Text

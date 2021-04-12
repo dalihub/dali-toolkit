@@ -595,6 +595,11 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
       // Combine the two buffers
       imageBuffer = CombineImageBuffer(imageBuffer, backgroundImageBuffer, bufferWidth, bufferHeight);
     }
+
+    // Markup-Processor
+
+    imageBuffer = ApplyMarkupProcessorOnPixelBuffer(imageBuffer, bufferWidth, bufferHeight, ignoreHorizontalAlignment, pixelFormat, penX, penY);
+
   }
 
   // Create the final PixelData for the combined image buffer
@@ -904,6 +909,48 @@ Devel::PixelBuffer Typesetter::CombineImageBuffer(Devel::PixelBuffer topPixelBuf
   }
 
   return combinedPixelBuffer;
+}
+
+Devel::PixelBuffer Typesetter::ApplyMarkupProcessorOnPixelBuffer(Devel::PixelBuffer topPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset)
+{
+    // Apply the markup-Processor if enabled
+    const bool markupProcessorEnabled = mModel->IsMarkupProcessorEnabled();
+    if(markupProcessorEnabled)
+    {
+      // Underline-tags (this is for Markup case)
+      // Get the underline runs.
+      const Length     numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
+      Vector<GlyphRun> underlineRuns;
+      underlineRuns.Resize(numberOfUnderlineRuns);
+      mModel->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+
+      // Iterate on the consecutive underlined glyph run and connect them into one chunk of underlined characters.
+      Vector<GlyphRun>::ConstIterator itGlyphRun       = underlineRuns.Begin();
+      Vector<GlyphRun>::ConstIterator endItGlyphRun    = underlineRuns.End();
+      GlyphIndex startGlyphIndex, endGlyphIndex;
+
+      //The outer loop to iterate on the separated chunks of underlined glyph runs
+      while(itGlyphRun != endItGlyphRun)
+      {
+        startGlyphIndex = itGlyphRun->glyphIndex;
+        endGlyphIndex = startGlyphIndex;
+        //The inner loop to make a connected underline for the consecutive characters
+        do
+        {
+          endGlyphIndex += itGlyphRun->numberOfGlyphs;
+          itGlyphRun++;
+        } while(itGlyphRun != endItGlyphRun && itGlyphRun->glyphIndex == endGlyphIndex);
+
+        endGlyphIndex--;
+
+        // Create the image buffer for underline
+        Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset, startGlyphIndex, endGlyphIndex);
+        // Combine the two buffers
+        topPixelBuffer = CombineImageBuffer(topPixelBuffer, underlineImageBuffer, bufferWidth, bufferHeight);
+      }
+    }
+
+    return topPixelBuffer;
 }
 
 Typesetter::Typesetter(const ModelInterface* const model)

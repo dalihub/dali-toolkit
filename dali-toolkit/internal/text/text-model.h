@@ -207,6 +207,11 @@ public:
    */
   bool IsBackgroundEnabled() const override;
 
+  /**
+   * @copydoc ModelInterface::IsMarkupProcessorEnabled()
+   */
+  bool IsMarkupProcessorEnabled() const override;
+
 private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
