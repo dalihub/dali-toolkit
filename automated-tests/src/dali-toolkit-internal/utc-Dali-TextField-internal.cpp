@@ -152,3 +152,42 @@ int UtcDaliTextFieldSelectText(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldMarkupUnderline(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldMarkupUnderline ");
+
+  TextField textField = TextField::New();
+
+  application.GetScene().Add( textField );
+
+  textField.SetProperty( TextField::Property::TEXT, "<u>ABC</u>EF<u>GH</u>" );
+  textField.SetProperty( TextField ::Property::ENABLE_MARKUP,  true );
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t expectedNumberOfUnderlinedGlyphs = 5u;
+
+  Toolkit::Internal::TextField& textFieldImpl = GetImpl( textField );
+  const Text::Length numberOfUnderlineRuns = textFieldImpl.getController()->GetTextModel()->GetNumberOfUnderlineRuns();
+
+  DALI_TEST_EQUALS( numberOfUnderlineRuns, expectedNumberOfUnderlinedGlyphs, TEST_LOCATION );
+
+  Vector<GlyphRun> underlineRuns;
+  underlineRuns.Resize(numberOfUnderlineRuns);
+  textFieldImpl.getController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+
+  //ABC are underlined
+  DALI_TEST_EQUALS( underlineRuns[0u].glyphIndex, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( underlineRuns[1u].glyphIndex, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS( underlineRuns[2u].glyphIndex, 2u, TEST_LOCATION);
+
+  //GH are underlined
+  DALI_TEST_EQUALS( underlineRuns[3u].glyphIndex, 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS( underlineRuns[4u].glyphIndex, 6u, TEST_LOCATION);
+
+  END_TEST;
+
+}
