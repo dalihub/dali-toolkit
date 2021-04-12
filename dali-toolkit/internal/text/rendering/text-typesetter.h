@@ -163,6 +163,27 @@ private:
    */
   Devel::PixelBuffer CombineImageBuffer(Devel::PixelBuffer topPixelBuffer, Devel::PixelBuffer bottomPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeightbool);
 
+  /**
+   * @brief Apply behaviour of tags if the markup-processor is enabled.
+   *
+   * The properties on TextLabel override the behavior of Markup.
+   * Because the markup will be the bottom layer buffer
+   *  - i.e: If you set property UNDERLINE to enabled and blue.
+   *    And the TEXT is "<color value='green'>Hello</color> <u>World</u> <i>Hello</i> <b>World</b>".
+   *    Then the output of the whole text is underlined by blue line.
+   *
+   * @param[in] topPixelBuffer The top layer buffer.
+   * @param[in] bufferWidth The width of the image buffer.
+   * @param[in] bufferHeight The height of the image buffer.
+   * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment, not ignored by default.
+   * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
+   * @param[in] horizontalOffset The horizontal offset to be added to the glyph's position.
+   * @param[in] verticalOffset The vertical offset to be added to the glyph's position.
+   *
+   * @return The image buffer with the markup.
+   */
+  Devel::PixelBuffer ApplyMarkupProcessorOnPixelBuffer(Devel::PixelBuffer topPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset);
+
 protected:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().

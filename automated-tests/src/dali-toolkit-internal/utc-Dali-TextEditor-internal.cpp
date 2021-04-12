@@ -70,3 +70,42 @@ int UtcDaliTextEditorSelectText(void)
 
   END_TEST;
 }
+
+int UtcDaliTextEditorMarkupUnderline(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMarkupUnderline ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add( textEditor );
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "<u>ABC</u>EF<u>GH</u>" );
+  textEditor.SetProperty( TextEditor ::Property::ENABLE_MARKUP,  true );
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t expectedNumberOfUnderlinedGlyphs = 5u;
+
+  Toolkit::Internal::TextEditor& textEditorImpl = GetImpl( textEditor );
+  const Text::Length numberOfUnderlineRuns = textEditorImpl.getController()->GetTextModel()->GetNumberOfUnderlineRuns();
+
+  DALI_TEST_EQUALS( numberOfUnderlineRuns, expectedNumberOfUnderlinedGlyphs, TEST_LOCATION );
+
+  Vector<GlyphRun> underlineRuns;
+  underlineRuns.Resize(numberOfUnderlineRuns);
+  textEditorImpl.getController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+
+  //ABC are underlined
+  DALI_TEST_EQUALS( underlineRuns[0u].glyphIndex, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( underlineRuns[1u].glyphIndex, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS( underlineRuns[2u].glyphIndex, 2u, TEST_LOCATION);
+
+  //GH are underlined
+  DALI_TEST_EQUALS( underlineRuns[3u].glyphIndex, 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS( underlineRuns[4u].glyphIndex, 6u, TEST_LOCATION);
+
+  END_TEST;
+
+}

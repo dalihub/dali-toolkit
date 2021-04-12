@@ -33,6 +33,7 @@
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/paragraph-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
+#include <dali-toolkit/internal/text/underlined-character-run.h>
 
 namespace Dali
 {
@@ -219,6 +220,7 @@ public:
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
   Vector<EmbeddedItem>                  mEmbeddedItems;
   Vector<Anchor>                        mAnchors;
+  Vector<UnderlinedCharacterRun>        mUnderlinedCharacterRuns; ///< The underlined character run from markup-processor
 
   BidirectionalLineRunIndex mBidirectionalLineIndex; ///< The last fetched bidirectional line info.
 };
