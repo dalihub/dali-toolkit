@@ -28,6 +28,7 @@
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
 #include <dali/devel-api/adaptor-framework/web-engine-frame.h>
+#include <dali/devel-api/adaptor-framework/web-engine-hit-test.h>
 #include <dali/devel-api/adaptor-framework/web-engine-http-auth-handler.h>
 #include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
@@ -38,6 +39,7 @@
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/property-map.h>
 #include <memory>
 #include <string.h>
 #include <toolkit-application.h>
@@ -70,6 +72,7 @@ bool OnEvaluteJavaScript();
 bool OnJavaScriptAlert();
 bool OnJavaScriptConfirm();
 bool OnJavaScriptPrompt();
+bool OnHitTestCreated();
 bool OnScrollEdge();
 bool OnScreenshotCaptured();
 bool OnVideoPlaying();
@@ -227,30 +230,6 @@ private:
   Dali::WebEngineContext::CacheModel mockModel;
 };
 
-class MockWebEngineSecurityOrigin : public Dali::WebEngineSecurityOrigin
-{
-public:
-  MockWebEngineSecurityOrigin()
-    : mockUrl("https://test.html")
-    , mockPotocol("https")
-  {
-  }
-
-  std::string GetHost() const
-  {
-    return mockUrl;
-  }
-
-  std::string GetProtocol() const
-  {
-    return mockPotocol;
-  }
-
-private:
-  std::string mockUrl;
-  std::string mockPotocol;
-};
-
 class MockWebEngineCookieManager : public Dali::WebEngineCookieManager
 {
 public:
@@ -316,19 +295,31 @@ class MockWebEngineBackForwardList : public Dali::WebEngineBackForwardList
 {
 public:
   MockWebEngineBackForwardList()
-    : mockItem(),
-      pMockItem( &mockItem )
   {
   }
 
-  Dali::WebEngineBackForwardListItem& GetCurrentItem() const override
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetCurrentItem() const override
   {
-    return *pMockItem;
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> ret(new MockWebEngineBackForwardListItem());
+    return ret;
   }
 
-  Dali::WebEngineBackForwardListItem& GetItemAtIndex( uint32_t index ) const override
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetPreviousItem() const override
   {
-    return *pMockItem;
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> ret(new MockWebEngineBackForwardListItem());
+    return ret;
+  }
+
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetNextItem() const override
+  {
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> ret(new MockWebEngineBackForwardListItem());
+    return ret;
+  }
+
+  std::unique_ptr<Dali::WebEngineBackForwardListItem> GetItemAtIndex( uint32_t index ) const override
+  {
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> ret(new MockWebEngineBackForwardListItem());
+    return ret;
   }
 
   uint32_t GetItemCount() const override
@@ -336,10 +327,23 @@ public:
     return 1;
   }
 
-private:
-  MockWebEngineBackForwardListItem mockItem;
-  WebEngineBackForwardListItem*    pMockItem;
+  std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> GetBackwardItems(int limit) override
+  {
+    std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> ret;
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> item(new MockWebEngineBackForwardListItem());
+    ret.push_back(std::move(item));
+    return ret;
+  }
+
+  std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> GetForwardItems(int limit) override
+  {
+    std::vector<std::unique_ptr<Dali::WebEngineBackForwardListItem>> ret;
+    std::unique_ptr<Dali::WebEngineBackForwardListItem> item(new MockWebEngineBackForwardListItem());
+    ret.push_back(std::move(item));
+    return ret;
+  }
 };
+
 
 class MockWebEngineCertificate : public Dali::WebEngineCertificate
 {
@@ -676,6 +680,100 @@ public:
   }
 };
 
+class MockWebEngineHitTest : public Dali::WebEngineHitTest
+{
+public:
+  MockWebEngineHitTest()
+  {
+  }
+
+  ResultContext GetResultContext() const override
+  {
+    return ResultContext::DOCUMENT;
+  }
+
+  std::string GetLinkUri() const override
+  {
+    return "http://test.html";
+  }
+
+  std::string GetLinkTitle() const override
+  {
+    return "test";
+  }
+
+  std::string GetLinkLabel() const override
+  {
+    return "label";
+  }
+
+  std::string GetImageUri() const override
+  {
+    return "http://test.jpg";
+  }
+
+  std::string GetMediaUri() const override
+  {
+    return "http://test.mp4";
+  }
+
+  std::string GetTagName() const override
+  {
+    return "img";
+  }
+
+  std::string GetNodeValue() const override
+  {
+    return "test";
+  }
+
+  Dali::Property::Map& GetAttributes() const override
+  {
+    return mockAttributesMap;
+  }
+
+  std::string GetImageFileNameExtension() const override
+  {
+    return "jpg";
+  }
+
+  Dali::PixelData GetImageBuffer() override
+  {
+    uint8_t* faviconData = new uint8_t[ 16 ];
+    memset(faviconData, 0xff, 16);
+    return Dali::PixelData::New( faviconData, 16, 2, 2,
+                                 Dali::Pixel::Format::RGBA8888,
+                                 Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
+  }
+
+private:
+  mutable Dali::Property::Map mockAttributesMap;
+};
+
+class MockWebEngineSecurityOrigin : public Dali::WebEngineSecurityOrigin
+{
+public:
+  MockWebEngineSecurityOrigin()
+    : mockUrl("https://test.html")
+    , mockPotocol("https")
+  {
+  }
+
+  std::string GetHost() const
+  {
+    return mockUrl;
+  }
+
+  std::string GetProtocol() const
+  {
+    return mockPotocol;
+  }
+
+private:
+  std::string mockUrl;
+  std::string mockPotocol;
+};
+
 class MockWebEngineSettings : public WebEngineSettings
 {
 public:
@@ -891,6 +989,40 @@ public:
   {
   }
 
+  bool SetViewportMetaTag(bool enable) override
+  {
+    return true;
+  }
+
+  bool SetForceZoom(bool enable) override
+  {
+    return true;
+  }
+
+  bool IsZoomForced() const override
+  {
+    return true;
+  }
+
+  bool SetTextZoomEnabled(bool enable) override
+  {
+    return true;
+  }
+
+  bool IsTextZoomEnabled() const override
+  {
+    return true;
+  }
+
+  void SetExtraFeature(const std::string& feature, bool enable) override
+  {
+  }
+
+  bool IsExtraFeatureEnabled(const std::string& feature) const override
+  {
+    return  true;
+  }
+
 private:
   int mockDefaultFontSize;
   bool mockJavaScriptEnabled;
@@ -1078,6 +1210,22 @@ public:
     }
   }
 
+  std::unique_ptr<Dali::WebEngineHitTest> CreateHitTest(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode)
+  {
+    std::unique_ptr<Dali::WebEngineHitTest> hitTest(new MockWebEngineHitTest());
+    return hitTest;
+  }
+
+  bool CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback)
+  {
+    if (callback)
+    {
+      ConnectToGlobalSignal( &OnHitTestCreated );
+      mHitTestCreatedCallback = callback;
+    }
+    return true;
+  }
+
   void ClearHistory()
   {
     ConnectToGlobalSignal( &OnClearHistory );
@@ -1093,7 +1241,7 @@ public:
     mUserAgent = userAgent;
   }
 
-  void ScrollBy( int dx, int dy )
+  void ScrollBy( int32_t dx, int32_t dy )
   {
     mScrollPosition += Dali::Vector2( dx, dy );
     if ( mScrollPosition.y + mScrollSize.height > mContentSize.height )
@@ -1102,7 +1250,7 @@ public:
     }
   }
 
-  bool ScrollEdgeBy( int dx, int dy )
+  bool ScrollEdgeBy( int32_t dx, int32_t dy )
   {
     mScrollPosition += Dali::Vector2( dx, dy );
     if ( mScrollPosition.y + mScrollSize.height > mContentSize.height )
@@ -1112,7 +1260,7 @@ public:
     return true;
   }
 
-  void SetScrollPosition( int x, int y )
+  void SetScrollPosition( int32_t x, int32_t y )
   {
     mScrollPosition.x = x;
     mScrollPosition.y = y;
@@ -1168,7 +1316,7 @@ public:
     return mScaleFactor;
   }
 
-  Dali::PixelData GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor)
+  Dali::PixelData GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
   {
     uint32_t bufferSize = viewArea.width * viewArea.height * 4 ;
     uint8_t* pixel = new uint8_t[ bufferSize ];
@@ -1178,7 +1326,7 @@ public:
                                  Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
   }
 
-  bool GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
+  bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
   {
     if ( callback )
     {
@@ -1322,13 +1470,14 @@ public:
   WebEngineCookieManager*   mockWebEngineCookieManager;
   WebEngineSettings*        mockWebEngineSettings;
 
-  std::vector<JavaScriptEvaluatedResultCallback>       mResultCallbacks;
-  Dali::WebEnginePlugin::JavaScriptAlertCallback       mJavaScriptAlertCallback;
-  Dali::WebEnginePlugin::JavaScriptConfirmCallback     mJavaScriptConfirmCallback;
-  Dali::WebEnginePlugin::JavaScriptPromptCallback      mJavaScriptPromptCallback;
-  Dali::WebEnginePlugin::ScreenshotCapturedCallback    mScreenshotCapturedCallback;
-  Dali::WebEnginePlugin::VideoPlayingCallback          mVideoPlayingCallback;
-  Dali::WebEnginePlugin::GeolocationPermissionCallback mGeolocationPermissionCallback;
+  std::vector<JavaScriptEvaluatedResultCallback>         mResultCallbacks;
+  Dali::WebEnginePlugin::JavaScriptAlertCallback         mJavaScriptAlertCallback;
+  Dali::WebEnginePlugin::JavaScriptConfirmCallback       mJavaScriptConfirmCallback;
+  Dali::WebEnginePlugin::JavaScriptPromptCallback        mJavaScriptPromptCallback;
+  Dali::WebEnginePlugin::ScreenshotCapturedCallback      mScreenshotCapturedCallback;
+  Dali::WebEnginePlugin::VideoPlayingCallback            mVideoPlayingCallback;
+  Dali::WebEnginePlugin::GeolocationPermissionCallback   mGeolocationPermissionCallback;
+  Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback mHitTestCreatedCallback;
 };
 
 
@@ -1494,6 +1643,17 @@ bool OnGeolocationPermission()
   return false;
 }
 
+bool OnHitTestCreated()
+{
+  DisconnectFromGlobalSignal(&OnHitTestCreated);
+  if (gInstance)
+  {
+    std::unique_ptr<Dali::WebEngineHitTest> test(new MockWebEngineHitTest());
+    gInstance->mHitTestCreatedCallback(std::move(test));
+  }
+  return false;
+}
+
 bool OnClearHistory()
 {
   DisconnectFromGlobalSignal( &OnClearHistory );
@@ -1624,11 +1784,11 @@ WebEngine WebEngine::DownCast( BaseHandle handle )
   return WebEngine( dynamic_cast< Internal::Adaptor::WebEngine* >( handle.GetObjectPtr() ) );
 }
 
-void WebEngine::Create( int width, int height, const std::string& locale, const std::string& timezoneId )
+void WebEngine::Create( uint32_t width, uint32_t height, const std::string& locale, const std::string& timezoneId )
 {
 }
 
-void WebEngine::Create( int width, int height, int argc, char** argv )
+void WebEngine::Create( uint32_t width, uint32_t height, uint32_t argc, char** argv )
 {
 }
 
@@ -1802,6 +1962,16 @@ void WebEngine::JavaScriptPromptReply( const std::string& result )
 {
 }
 
+std::unique_ptr<Dali::WebEngineHitTest> WebEngine::CreateHitTest(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode)
+{
+  return Internal::Adaptor::GetImplementation(*this).CreateHitTest(x, y, mode);
+}
+
+bool WebEngine::CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback)
+{
+  return Internal::Adaptor::GetImplementation(*this).CreateHitTestAsynchronously(x, y, mode, callback);
+}
+
 void WebEngine::ClearAllTilesResources()
 {
 }
@@ -1834,12 +2004,12 @@ void WebEngine::AddDynamicCertificatePath(const std::string& host, const std::st
 {
 }
 
-Dali::PixelData WebEngine::GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor)
+Dali::PixelData WebEngine::GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
 {
   return Internal::Adaptor::GetImplementation( *this ).GetScreenshot(viewArea, scaleFactor);
 }
 
-bool WebEngine::GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
+bool WebEngine::GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::WebEnginePlugin::ScreenshotCapturedCallback callback)
 {
   return Internal::Adaptor::GetImplementation( *this ).GetScreenshotAsynchronously(viewArea, scaleFactor, callback);
 }
@@ -1864,17 +2034,17 @@ void WebEngine::SetUserAgent( const std::string& userAgent )
   Internal::Adaptor::GetImplementation( *this ).SetUserAgent( userAgent );
 }
 
-void WebEngine::ScrollBy( int dx, int dy )
+void WebEngine::ScrollBy( int32_t dx, int32_t dy )
 {
   Internal::Adaptor::GetImplementation( *this ).ScrollBy( dx, dy );
 }
 
-bool WebEngine::ScrollEdgeBy( int dx, int dy )
+bool WebEngine::ScrollEdgeBy( int32_t dx, int32_t dy )
 {
   return Internal::Adaptor::GetImplementation( *this ).ScrollEdgeBy( dx, dy );
 }
 
-void WebEngine::SetScrollPosition( int x, int y )
+void WebEngine::SetScrollPosition( int32_t x, int32_t y )
 {
   Internal::Adaptor::GetImplementation( *this ).SetScrollPosition( x, y );
 }
@@ -1894,7 +2064,7 @@ Dali::Vector2 WebEngine::GetContentSize() const
   return Internal::Adaptor::GetImplementation( *this ).GetContentSize();
 }
 
-void WebEngine::SetSize( int width, int height )
+void WebEngine::SetSize( uint32_t width, uint32_t height )
 {
 }
 
@@ -1968,7 +2138,7 @@ float WebEngine::GetLoadProgressPercentage() const
   return Internal::Adaptor::GetImplementation( *this ).GetLoadProgressPercentage();
 }
 
-void WebEngine::UpdateDisplayArea( Dali::Rect< int > displayArea )
+void WebEngine::UpdateDisplayArea( Dali::Rect< int32_t > displayArea )
 {
 }
 

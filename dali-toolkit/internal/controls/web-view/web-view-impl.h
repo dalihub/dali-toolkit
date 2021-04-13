@@ -52,7 +52,7 @@ protected:
 
   WebView(const std::string& locale, const std::string& timezoneId);
 
-  WebView(int argc, char** argv);
+  WebView(uint32_t argc, char** argv);
 
   virtual ~WebView();
 
@@ -68,34 +68,32 @@ public:
   static Toolkit::WebView New(const std::string& locale, const std::string& timezoneId);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::New( int, char** )
+   * @copydoc Dali::Toolkit::WebView::New( uint32_t, char** )
    */
-  static Toolkit::WebView New(int argc, char** argv);
+  static Toolkit::WebView New(uint32_t argc, char** argv);
 
   /**
-   * @brief Get settings of WebEngine.
+   * @copydoc Dali::Toolkit::WebView::GetSettings()
    */
   Dali::Toolkit::WebSettings* GetSettings() const;
 
   /**
-   * @brief Get context of WebEngine.
+   * @copydoc Dali::Toolkit::WebView::GetContext()
    */
   Dali::Toolkit::WebContext* GetContext() const;
 
   /**
-   * @brief Get cookie manager of WebEngine.
+   * @copydoc Dali::Toolkit::WebView::GetCookieManager()
    */
   Dali::Toolkit::WebCookieManager* GetCookieManager() const;
 
   /**
-   * @brief Get WebBackForwardList of WebEngine.
+   * @copydoc Dali::Toolkit::WebView::GetBackForwardList()
    */
   Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
 
   /**
-   * @brief Get Favicon of web page.
-   *
-   * @return Handle to a fav icon
+   * @copydoc Dali::Toolkit::WebView::GetFavicon()
    */
   Dali::Toolkit::ImageView& GetFavicon();
 
@@ -177,12 +175,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::ScrollBy()
    */
-  void ScrollBy(int deltaX, int deltaY);
+  void ScrollBy(int32_t deltaX, int32_t deltaY);
 
   /**
    * @copydoc Dali::WebEngine::ScrollEdgeBy()
    */
-  bool ScrollEdgeBy(int deltaX, int deltaY);
+  bool ScrollEdgeBy(int32_t deltaX, int32_t deltaY);
 
   /**
    * @copydoc Dali::Toolkit::WebView::CanGoForward()
@@ -245,6 +243,16 @@ public:
   void JavaScriptPromptReply(const std::string& result);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::CreateHitTest()
+   */
+  std::unique_ptr<Dali::WebEngineHitTest> CreateHitTest(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode);
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::CreateHitTestAsynchronously()
+   */
+  bool CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::ClearHistory()
    */
   void ClearHistory();
@@ -282,12 +290,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::GetScreenshot()
    */
-  Dali::Toolkit::ImageView GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor);
+  Dali::Toolkit::ImageView GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor);
 
   /**
    * @copydoc Dali::Toolkit::WebView::GetScreenshotAsynchronously()
    */
-  bool GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback);
+  bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback);
 
   /**
    * @copydoc Dali::Toolkit::WebView::CheckVideoPlayingAsynchronously()
@@ -451,10 +459,10 @@ private:
    * @param[in] x The coordinate x of scroll
    * @param[in] y The coordinate y of scroll
    */
-  void SetScrollPosition(int x, int y);
+  void SetScrollPosition(int32_t x, int32_t y);
 
   /**
-   * @brief Gets the current scroll position of the given view.
+   * @brief Get the current scroll position of the given view.
    * @param[out] x The coordinate x of scroll
    * @param[out] y The coordinate y of scroll
    */
@@ -640,7 +648,7 @@ private:
   void OnUrlChanged(const std::string& url);
 
   /**
-   * Signal occurs when the Web View has been touched.
+   * @brief Signal occurs when the Web View has been touched.
    * @param[in] actor The Actor Touched
    * @param[in] touch The Touch Data.
    * @return Whether to consume event or not.
@@ -648,7 +656,7 @@ private:
   bool OnTouchEvent(Actor actor, const Dali::TouchEvent& touch);
 
   /**
-   * Signal occurs when the Web View has been hovered.
+   * @brief Signal occurs when the Web View has been hovered.
    * @param[in] actor The Actor Hovered
    * @param[in] hover The Hover Data.
    * @return Whether to consume event or not.
@@ -656,7 +664,7 @@ private:
   bool OnHoverEvent(Actor actor, const Dali::HoverEvent& hover);
 
   /**
-   * Signal occurs when the Web View receives wheel event.
+   * @brief Signal occurs when the Web View receives wheel event.
    * @param[in] actor The Actor that receives Wheel event.
    * @param[in] wheel The Wheel Data.
    * @return Whether to consume event or not.
@@ -769,7 +777,7 @@ private:
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;
   Dali::PropertyNotification mScaleUpdateNotification;
-  Dali::Rect<int>            mWebViewArea;
+  Dali::Rect<int32_t>        mWebViewArea;
   bool                       mVideoHoleEnabled;
   bool                       mMouseEventsEnabled;
   bool                       mKeyEventsEnabled;

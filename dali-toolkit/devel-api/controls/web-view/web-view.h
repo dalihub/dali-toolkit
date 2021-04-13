@@ -216,7 +216,7 @@ public:
   /**
    * @brief WebView signal type related with form repost decision.
    */
-  using WebViewFormRepostDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::Toolkit::WebFormRepostDecision>)>;
+  using WebViewFormRepostDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineFormRepostDecision>)>;
 
   /**
    * @brief WebView signal type related with frame rendered.
@@ -260,7 +260,7 @@ public:
 
 public:
   /**
-   * @brief Creates an initialized WebView.
+   * @brief Create an initialized WebView.
    * @return A handle to a newly allocated Dali WebView
    *
    * @note WebView will not display anything
@@ -268,7 +268,7 @@ public:
   static WebView New();
 
   /**
-   * @brief Creates an initialized WebView.
+   * @brief Create an initialized WebView.
    *
    * @param [in] locale The locale of Web
    * @param [in] timezoneId The timezoneId of Web
@@ -276,15 +276,15 @@ public:
   static WebView New(const std::string& locale, const std::string& timezoneId);
 
   /**
-   * @brief Creates an initialized WebView.
+   * @brief Create an initialized WebView.
    *
    * @param [in] argc The count of arguments of Applications
    * @param [in] argv The string array of arguments of Applications
    */
-  static WebView New(int argc, char** argv);
+  static WebView New(uint32_t argc, char** argv);
 
   /**
-   * @brief Creates an uninitialized WebView.
+   * @brief Create an uninitialized WebView.
    */
   WebView();
 
@@ -311,7 +311,7 @@ public:
   WebView& operator=(const WebView& WebView);
 
   /**
-   * @brief Downcasts a handle to WebView handle.
+   * @brief Downcast a handle to WebView handle.
    *
    * If handle points to a WebView, the downcast produces valid handle.
    * If not, the returned handle is left uninitialized.
@@ -349,14 +349,14 @@ public:
   Dali::Toolkit::ImageView& GetFavicon();
 
   /**
-   * @brief Loads a web page based on a given URL.
+   * @brief Load a web page based on a given URL.
    *
    * @param [in] url The URL of the resource to load
    */
   void LoadUrl(const std::string& url);
 
   /**
-   * @brief Loads a given string as web contents.
+   * @brief Load a given string as web contents.
    *
    * @param [in] htmlString The string to use as the contents of the web page
    */
@@ -374,7 +374,7 @@ public:
   bool LoadHtmlStringOverrideCurrentEntry(const std::string& html, const std::string& basicUri, const std::string& unreachableUrl);
 
   /**
-   * @brief Requests loading the given contents by MIME type into the view object
+   * @brief Request loading the given contents by MIME type into the view object
    *
    * @param[in] contents The content to load
    * @param[in] contentSize The size of contents (in bytes)
@@ -387,27 +387,27 @@ public:
   bool LoadContents(const std::string& contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri);
 
   /**
-   * @brief Reloads the Web.
+   * @brief Reload the Web.
    */
   void Reload();
 
   /**
-   * @brief Reloads the current page's document without cache
+   * @brief Reload the current page's document without cache
    */
   bool ReloadWithoutCache();
 
   /**
-   * @brief Stops loading web contents on the current page.
+   * @brief Stop loading web contents on the current page.
    */
   void StopLoading();
 
   /**
-   * @brief Suspends the operation associated with the view.
+   * @brief Suspend the operation associated with the view.
    */
   void Suspend();
 
   /**
-   * @brief Resumes the operation associated with the view object after calling Suspend().
+   * @brief Resume the operation associated with the view object after calling Suspend().
    */
   void Resume();
 
@@ -457,48 +457,48 @@ public:
   bool StopInspectorServer();
 
   /**
-   * @brief Scrolls web page of view by deltaX and deltaY.
+   * @brief Scroll web page of view by deltaX and deltaY.
    * @param[in] deltaX The delta x of scroll
    * @param[in] deltaY The delta y of scroll
    */
-  void ScrollBy(int deltaX, int deltaY);
+  void ScrollBy(int32_t deltaX, int32_t deltaY);
 
   /**
-   * @brief Scrolls edge of view by deltaX and deltaY.
+   * @brief Scroll edge of view by deltaX and deltaY.
    *
    * @param[in] deltaX horizontal offset to scroll
    * @param[in] deltaY vertical offset to scroll
    *
    * @return true if succeeded, false otherwise
    */
-  bool ScrollEdgeBy(int deltaX, int deltaY);
+  bool ScrollEdgeBy(int32_t deltaX, int32_t deltaY);
 
   /**
-   * @brief Returns whether forward is possible.
+   * @brief Return whether forward is possible.
    *
    * @return True if forward is possible, false otherwise
    */
   bool CanGoForward();
 
   /**
-   * @brief Goes forward in the navigation history.
+   * @brief Go forward in the navigation history.
    */
   void GoForward();
 
   /**
-   * @brief Returns whether backward is possible.
+   * @brief Return whether backward is possible.
    *
    * @return True if backward is possible, false otherwise
    */
   bool CanGoBack();
 
   /**
-   * @brief Goes back in the navigation history.
+   * @brief Go back in the navigation history.
    */
   void GoBack();
 
   /**
-   * @brief Evaluates JavaScript code represented as a string.
+   * @brief Evaluate JavaScript code represented as a string.
    *
    * @param[in] script The JavaScript code
    * @param[in] resultHandler The callback function to be called by the JavaScript runtime. This carries evaluation result
@@ -506,7 +506,7 @@ public:
   void EvaluateJavaScript(const std::string& script, std::function<void(const std::string&)> resultHandler);
 
   /**
-   * @brief Evaluates JavaScript code represented as a string.
+   * @brief Evaluate JavaScript code represented as a string.
    *
    * @param[in] script The JavaScript code
    */
@@ -577,24 +577,47 @@ public:
   void JavaScriptPromptReply(const std::string& result);
 
   /**
-   * @brief Clears the history of Web.
+   * @brief Create a new hit test.
+   *
+   * @param[in] x the horizontal position to query
+   * @param[in] y the vertical position to query
+   * @param[in] mode the mode of hit test
+   *
+   * @return a new hit test object.
+   */
+  std::unique_ptr<Dali::WebEngineHitTest> CreateHitTest(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode);
+
+  /**
+   * @brief Create a hit test asynchronously.
+   *
+   * @param[in] x the horizontal position to query
+   * @param[in] y the vertical position to query
+   * @param[in] mode the mode of hit test
+   * @param[in] callback The callback function
+   *
+   * @return true if succeeded, false otherwise.
+   */
+  bool CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback);
+
+  /**
+   * @brief Clear the history of Web.
    */
   void ClearHistory();
 
   /**
-   * @brief Clears all tiles resources of Web.
+   * @brief Clear all tiles resources of Web.
    */
   void ClearAllTilesResources();
 
   /**
-   * @brief Scales the current page, centered at the given point.
+   * @brief Scale the current page, centered at the given point.
    * @param[in] scaleFactor a new factor to be scaled.
    * @param[in] point a center coordinate.
    */
   void SetScaleFactor(float scaleFactor, Dali::Vector2 point);
 
   /**
-   * @brief Gets the current scale factor of the page.
+   * @brief Get the current scale factor of the page.
    * @return The current scale factor.
    */
   float GetScaleFactor() const;
@@ -606,7 +629,7 @@ public:
   void ActivateAccessibility(bool activated);
 
   /**
-   * @brief Searches and highlights the given string in the document.
+   * @brief Search and highlights the given string in the document.
    * @param[in] text The text to find
    * @param[in] options The options to find
    * @param[in] maxMatchCount The maximum match count to find
@@ -630,7 +653,7 @@ public:
    *
    * @return image view of screen shot
    */
-  Dali::Toolkit::ImageView GetScreenshot(Dali::Rect<int> viewArea, float scaleFactor);
+  Dali::Toolkit::ImageView GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor);
 
   /**
    * @brief Request to get snapshot of the specified viewArea of page asynchronously.
@@ -641,7 +664,7 @@ public:
    *
    * @return true if requested successfully, false otherwise
    */
-  bool GetScreenshotAsynchronously(Dali::Rect<int> viewArea, float scaleFactor, WebViewScreenshotCapturedCallback callback);
+  bool GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, WebViewScreenshotCapturedCallback callback);
 
   /**
    * @brief Asynchronous request to check if there is a video playing in the given view.
@@ -774,14 +797,14 @@ public:
 public: // Not intended for application developers
   /// @cond internal
   /**
-   * @brief Creates a handle using the Toolkit::Internal implementation.
+   * @brief Create a handle using the Toolkit::Internal implementation.
    *
    * @param[in] implementation The WebView implementation
    */
   DALI_INTERNAL WebView(Internal::WebView& implementation);
 
   /**
-   * @brief Allows the creation of this WebView from an Internal::CustomActor pointer.
+   * @brief Allow the creation of this WebView from an Internal::CustomActor pointer.
    *
    * @param[in] internal A pointer to the internal CustomActor
    */

@@ -1,6 +1,7 @@
 INPUT mediump vec2 vPosition;
 INPUT mediump vec2 vRectSize;
-INPUT mediump float vCornerRadius;
+INPUT mediump vec2 vOptRectSize;
+INPUT mediump vec4 vCornerRadius;
 
 uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
@@ -9,20 +10,31 @@ uniform mediump float blurRadius;
 void main()
 {
   OUT_COLOR = vec4(mixColor, 1.0) * uColor;
+  if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
+  {
+    return;
+  }
 
-  mediump vec2 v = abs(vPosition) - vRectSize;
-  mediump float cy = vCornerRadius + blurRadius;
-  mediump float cr = vCornerRadius + blurRadius;
+  mediump float radius =
+  mix(
+    mix(vCornerRadius.x, vCornerRadius.y, sign(vPosition.x) * 0.5 + 0.5),
+    mix(vCornerRadius.w, vCornerRadius.z, sign(vPosition.x) * 0.5 + 0.5),
+    sign(vPosition.y) * 0.5 + 0.5
+  );
 
-  cy = min(cy, min(vRectSize.x, vRectSize.y));
+  mediump vec2 v = abs(vPosition) - vRectSize + radius;
+  mediump float cy = radius + blurRadius;
+  mediump float cr = radius + blurRadius;
+
+  cy = min(cy, min(vRectSize.x, vRectSize.y) - radius);
   v = vec2(min(v.x, v.y), max(v.x, v.y));
   v = v + cy;
 
   mediump float blur = 1.0;
   mediump float potential = 0.0;
-  mediump float alias = min(vCornerRadius, 1.0);
-  mediump float potentialMin = cy + vCornerRadius - blurRadius - alias;
-  mediump float potentialMax = cy + vCornerRadius + blurRadius + alias;
+  mediump float alias = min(radius, 1.0);
+  mediump float potentialMin = cy + radius - blurRadius - alias;
+  mediump float potentialMax = cy + radius + blurRadius + alias;
 
   // move center of circles for reduce defact
   mediump float cyDiff = min(cy, 0.2 * blurRadius);
