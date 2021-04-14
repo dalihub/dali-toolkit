@@ -45,6 +45,12 @@ ToolkitTestApplication::ToolkitTestApplication( size_t surfaceWidth, size_t surf
   mScene = AdaptorImpl::GetScene( *mMainWindow );
   mScene.SetDpi( Vector2( horizontalDpi, verticalDpi ) );
 
+  // Create render target for the scene
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent( {mSurfaceWidth, mSurfaceHeight });
+  mRenderTarget = mGraphicsController.CreateRenderTarget( rtInfo, nullptr );
+  mScene.SetSurfaceRenderTarget( mRenderTarget.get() );
+
   // Core needs to be initialized next before we start the adaptor
   InitializeCore();
   Accessibility::Accessible::SetObjectRegistry(mCore->GetObjectRegistry());
