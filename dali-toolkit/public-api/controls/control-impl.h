@@ -264,16 +264,6 @@ public:
    */
   virtual void CreateTransitions(Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod timePeriod);
 
-  /**
-   * @brief Set this Control is transparent or not without any affection on the child Actors.
-   */
-  void SetTransparent(bool transparent) override;
-
-  /**
-   * @brief Get this Control is transparent or not.
-   */
-  bool GetTransparent() const override;
-
   // Signals
 
   /**

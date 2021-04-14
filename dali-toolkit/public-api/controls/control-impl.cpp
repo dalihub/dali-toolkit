@@ -767,16 +767,6 @@ void Control::CreateTransitions(Dali::Animation& animation, Dali::Toolkit::Contr
   }
 }
 
-void Control::SetTransparent(bool transparent)
-{
-  CustomActorImpl::SetTransparent(transparent);
-}
-
-bool Control::GetTransparent() const
-{
-  return CustomActorImpl::GetTransparent();
-}
-
 void Control::MakeVisualTransition(Dali::Animation& animation, Dali::Toolkit::Control source, Dali::Property::Index index, AlphaFunction alphaFunction, TimePeriod timePeriod)
 {
   Dali::Toolkit::Control sourceHandle      = Dali::Toolkit::Control::DownCast(source);
