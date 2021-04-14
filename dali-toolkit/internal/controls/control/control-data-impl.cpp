@@ -1471,6 +1471,15 @@ Dali::Accessibility::ReadingInfoTypes Control::Impl::GetAccessibilityReadingInfo
   {
     place->Get(value);
   }
+  else
+  {
+    Dali::Accessibility::ReadingInfoTypes types;
+    types[Dali::Accessibility::ReadingInfoType::NAME] = true;
+    types[Dali::Accessibility::ReadingInfoType::ROLE] = true;
+    types[Dali::Accessibility::ReadingInfoType::DESCRIPTION] = true;
+    types[Dali::Accessibility::ReadingInfoType::STATE] = true;
+    return types;
+  }
 
   if(value.empty())
   {
