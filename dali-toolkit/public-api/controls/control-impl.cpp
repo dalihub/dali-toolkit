@@ -605,7 +605,7 @@ void Control::OnSceneDisconnection()
 {
   if(Accessibility::IsUp())
   {
-    mImpl->AccessibilityDeregister();
+    mImpl->AccessibilityDeregister(true);
   }
   mImpl->OnSceneDisconnection();
 }

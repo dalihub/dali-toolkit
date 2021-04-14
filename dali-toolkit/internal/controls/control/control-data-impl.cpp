@@ -487,7 +487,7 @@ Control::Impl::~Impl()
     StopObservingVisual(iter->visual);
   }
 
-  AccessibilityDeregister();
+  AccessibilityDeregister(false);
   // All gesture detectors will be destroyed so no need to disconnect.
   delete mStartingPinchScale;
 
@@ -1942,12 +1942,32 @@ void Control::Impl::AccessibilityRegister()
   }
 }
 
-void Control::Impl::AccessibilityDeregister()
+void Control::Impl::AccessibilityDeregister(bool remove)
 {
   if(accessibilityNotificationSet)
   {
+    accessibilityNotificationPosition.NotifySignal().Disconnect(&Control::Impl::PositionOrSizeChangedCallback);
+    if(remove)
+    {
+      mControlImpl.Self().RemovePropertyNotification(accessibilityNotificationPosition);
+    }
+    accessibilityNotificationPosition.Reset();
     accessibilityNotificationPosition = {};
+
+    accessibilityNotificationSize.NotifySignal().Disconnect(&Control::Impl::PositionOrSizeChangedCallback);
+    if(remove)
+    {
+      mControlImpl.Self().RemovePropertyNotification(accessibilityNotificationSize);
+    }
+    accessibilityNotificationSize.Reset();
     accessibilityNotificationSize     = {};
+
+    accessibilityNotificationCulled.NotifySignal().Disconnect(&Control::Impl::CulledChangedCallback);
+    if(remove)
+    {
+      mControlImpl.Self().RemovePropertyNotification(accessibilityNotificationCulled);
+    }
+    accessibilityNotificationCulled.Reset();
     accessibilityNotificationCulled   = {};
     accessibilityNotificationSet      = false;
   }
