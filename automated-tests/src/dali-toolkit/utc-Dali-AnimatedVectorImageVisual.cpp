@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ namespace
 {
 
 const char* TEST_VECTOR_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/insta_camera.json";
+const char* TEST_VECTOR_IMAGE_FILE_NAME_FRAME_DROP = "framedrop.json";
 const char* TEST_VECTOR_IMAGE_INVALID_FILE_NAME =  "invalid.json";
 
 bool gAnimationFinishedSignalFired = false;
@@ -1527,6 +1528,51 @@ int UtcDaliAnimatedVectorImageVisualInvalidFile(void)
   // The broken image should be shown.
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedVectorImageVisualFrameDrops");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE)
+             .Add(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME_FRAME_DROP);
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(propertyMap);
+  DALI_TEST_CHECK(visual);
+
+  DummyControl actor = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  Vector2 controlSize(20.f, 30.f);
+  actor.SetProperty(Actor::Property::SIZE, controlSize);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map attributes;
+  DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 1 - render the first frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  // Make delay to drop frames
+  Test::VectorAnimationRenderer::DelayRendering(170); // longer than 16.6 * 10frames
+
+  // Check dropped frame
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  uint32_t frames = Test::VectorAnimationRenderer::GetDroppedFrames();
+  DALI_TEST_CHECK(frames >= 9);
 
   END_TEST;
 }
