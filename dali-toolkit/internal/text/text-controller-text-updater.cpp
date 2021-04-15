@@ -254,7 +254,8 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
     const Length numberOfCharactersInModel = logicalModel->mText.Count();
 
     // Restrict new text to fit within Maximum characters setting.
-    Length maxSizeOfNewText = std::min((impl.mMaximumNumberOfCharacters - numberOfCharactersInModel), characterCount);
+    Length temp_length      = (impl.mMaximumNumberOfCharacters > numberOfCharactersInModel ? impl.mMaximumNumberOfCharacters - numberOfCharactersInModel : 0);
+    Length maxSizeOfNewText = std::min(temp_length, characterCount);
     maxLengthReached        = (characterCount > maxSizeOfNewText);
 
     // The cursor position.
