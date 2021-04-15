@@ -559,6 +559,13 @@ int UtcDaliAccessibilityTextField(void)
   DALI_TEST_EQUALS( text->SetSelection( 1, 0, 1 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( text->RemoveSelection( 1 ), false, TEST_LOCATION );
 
+  DALI_TEST_EQUALS(editabletext->SetTextContents("adef"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(editabletext->InsertText(1, "bc"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(text->GetText(0, 6), "abcdef", TEST_LOCATION);
+  DALI_TEST_EQUALS(editabletext->DeleteText(5, 1), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(editabletext->DeleteText(1, 5), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(text->GetText(0, 2), "af", TEST_LOCATION);
+
   Dali::Accessibility::TestEnableSC( false );
 
   END_TEST;
@@ -607,6 +614,13 @@ int UtcDaliAccessibilityTextEditor(void)
   DALI_TEST_EQUALS( range.content, "", TEST_LOCATION );
   DALI_TEST_EQUALS( text->SetSelection( 1, 0, 1 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( text->RemoveSelection( 1 ), false, TEST_LOCATION );
+
+  DALI_TEST_EQUALS(editabletext->SetTextContents("adef"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(editabletext->InsertText(1, "bc"), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(text->GetText(0, 6), "abcdef", TEST_LOCATION);
+  DALI_TEST_EQUALS(editabletext->DeleteText(5, 1), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(editabletext->DeleteText(1, 5), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(text->GetText(0, 2), "af", TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC( false );
 

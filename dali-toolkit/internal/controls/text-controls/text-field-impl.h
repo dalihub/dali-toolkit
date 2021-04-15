@@ -398,6 +398,9 @@ protected:
     bool                  CopyText(size_t startPosition, size_t endPosition) override;
     bool                  CutText(size_t startPosition, size_t endPosition) override;
     Accessibility::States CalculateStates() override;
+    bool                  InsertText(size_t startPosition, std::string text) override;
+    bool                  SetTextContents(std::string newContents) override;
+    bool                  DeleteText(size_t startPosition, size_t endPosition) override;
   };
 };
 
