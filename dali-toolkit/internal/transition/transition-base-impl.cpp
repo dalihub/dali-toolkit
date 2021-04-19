@@ -54,8 +54,7 @@ TransitionBase::TransitionBase()
 : mAlphaFunction(DEFAULT_ALPHA_FUNCTION),
   mDurationSeconds(0.0f),
   mDelaySeconds(0.0f),
-  mTransitionWithChild(false),
-  mMoveTargetChildren(false)
+  mTransitionWithChild(false)
 {
 }
 
