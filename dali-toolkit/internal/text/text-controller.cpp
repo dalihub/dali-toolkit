@@ -75,11 +75,13 @@ ControllerPtr Controller::New(ControlInterface* controlInterface)
 
 ControllerPtr Controller::New(ControlInterface*           controlInterface,
                               EditableControlInterface*   editableControlInterface,
-                              SelectableControlInterface* selectableControlInterface)
+                              SelectableControlInterface* selectableControlInterface,
+                              AnchorControlInterface*     anchorControlInterface)
 {
   return ControllerPtr(new Controller(controlInterface,
                                       editableControlInterface,
-                                      selectableControlInterface));
+                                      selectableControlInterface,
+                                      anchorControlInterface));
 }
 
 // public : Configure the text controller.
@@ -1722,6 +1724,11 @@ bool Controller::KeyEvent(const Dali::KeyEvent& keyEvent)
   return EventHandler::KeyEvent(*this, keyEvent);
 }
 
+void Controller::AnchorEvent(float x, float y)
+{
+  EventHandler::AnchorEvent(*this, x, y);
+}
+
 void Controller::TapEvent(unsigned int tapCount, float x, float y)
 {
   EventHandler::TapEvent(*this, tapCount, x, y);
@@ -1936,6 +1943,19 @@ bool Controller::RemoveSelectedText()
   return TextUpdater::RemoveSelectedText(*this);
 }
 
+void Controller::InsertTextAnchor(int            numberOfCharacters,
+                                  CharacterIndex previousCursorIndex)
+{
+  TextUpdater::InsertTextAnchor(*this, numberOfCharacters, previousCursorIndex);
+}
+
+void Controller::RemoveTextAnchor(int            cursorOffset,
+                                  int            numberOfCharacters,
+                                  CharacterIndex previousCursorIndex)
+{
+  TextUpdater::RemoveTextAnchor(*this, cursorOffset, numberOfCharacters, previousCursorIndex);
+}
+
 // private : Relayout.
 
 bool Controller::DoRelayout(const Size&    size,
@@ -2060,6 +2080,11 @@ void Controller::SetControlInterface(ControlInterface* controlInterface)
   mImpl->mControlInterface = controlInterface;
 }
 
+void Controller::SetAnchorControlInterface(AnchorControlInterface* anchorControlInterface)
+{
+  mImpl->mAnchorControlInterface = anchorControlInterface;
+}
+
 bool Controller::ShouldClearFocusOnEscape() const
 {
   return mImpl->mShouldClearFocusOnEscape;
@@ -2073,19 +2098,20 @@ Actor Controller::CreateBackgroundActor()
 // private : Private contructors & copy operator.
 
 Controller::Controller()
-: Controller(nullptr, nullptr, nullptr)
+: Controller(nullptr, nullptr, nullptr, nullptr)
 {
 }
 
 Controller::Controller(ControlInterface* controlInterface)
-: Controller(controlInterface, nullptr, nullptr)
+: Controller(controlInterface, nullptr, nullptr, nullptr)
 {
 }
 
 Controller::Controller(ControlInterface*           controlInterface,
                        EditableControlInterface*   editableControlInterface,
-                       SelectableControlInterface* selectableControlInterface)
-: mImpl(new Controller::Impl(controlInterface, editableControlInterface, selectableControlInterface))
+                       SelectableControlInterface* selectableControlInterface,
+                       AnchorControlInterface*     anchorControlInterface)
+: mImpl(new Controller::Impl(controlInterface, editableControlInterface, selectableControlInterface, anchorControlInterface))
 {
 }
 

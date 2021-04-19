@@ -49,6 +49,7 @@ struct ControllerImplEventHandler;
 struct SelectionHandleController;
 
 class SelectableControlInterface;
+class AnchorControlInterface;
 
 struct Event
 {
@@ -314,10 +315,12 @@ struct Controller::Impl
 {
   Impl(ControlInterface*           controlInterface,
        EditableControlInterface*   editableControlInterface,
-       SelectableControlInterface* selectableControlInterface)
+       SelectableControlInterface* selectableControlInterface,
+       AnchorControlInterface*     anchorControlInterface)
   : mControlInterface(controlInterface),
     mEditableControlInterface(editableControlInterface),
     mSelectableControlInterface(selectableControlInterface),
+    mAnchorControlInterface(anchorControlInterface),
     mModel(),
     mFontDefaults(NULL),
     mUnderlineDefaults(NULL),
@@ -786,6 +789,7 @@ public:
   ControlInterface*           mControlInterface;           ///< Reference to the text controller.
   EditableControlInterface*   mEditableControlInterface;   ///< Reference to the editable text controller.
   SelectableControlInterface* mSelectableControlInterface; ///< Reference to the selectable text controller.
+  AnchorControlInterface*     mAnchorControlInterface;     ///< Reference to the anchor controller.
   ModelPtr                    mModel;                      ///< Pointer to the text's model.
   FontDefaults*               mFontDefaults;               ///< Avoid allocating this when the user does not specify a font.
   UnderlineDefaults*          mUnderlineDefaults;          ///< Avoid allocating this when the user does not specify underline parameters.

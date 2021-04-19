@@ -20,9 +20,18 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/web-engine-back-forward-list.h>
+#include <dali/devel-api/adaptor-framework/web-engine-certificate.h>
+#include <dali/devel-api/adaptor-framework/web-engine-console-message.h>
+#include <dali/devel-api/adaptor-framework/web-engine-context-menu-item.h>
+#include <dali/devel-api/adaptor-framework/web-engine-context-menu.h>
 #include <dali/devel-api/adaptor-framework/web-engine-context.h>
 #include <dali/devel-api/adaptor-framework/web-engine-cookie-manager.h>
 #include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
+#include <dali/devel-api/adaptor-framework/web-engine-hit-test.h>
+#include <dali/devel-api/adaptor-framework/web-engine-http-auth-handler.h>
+#include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
+#include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
+#include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/enum-helper.h>
@@ -38,7 +47,6 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-back-forward-list.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-context.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
-#include <dali-toolkit/devel-api/controls/web-view/web-form-repost-decision.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -75,15 +83,26 @@ DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "tilesClearedWhenHidden",  BOOLEAN,
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "tileCoverAreaMultiplier", FLOAT,   TILE_COVER_AREA_MULTIPLIER)
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "cursorEnabledByClient",   BOOLEAN, CURSOR_ENABLED_BY_CLIENT  )
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "selectedText",            STRING,  SELECTED_TEXT             )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "pageZoomFactor",          FLOAT,   PAGE_ZOOM_FACTOR          )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "textZoomFactor",          FLOAT,   TEXT_ZOOM_FACTOR          )
+DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "loadProgressPercentage",  FLOAT,   LOAD_PROGRESS_PERCENTAGE  )
 
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadStarted",    PAGE_LOAD_STARTED_SIGNAL    )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadInProgress", PAGE_LOAD_IN_PROGRESS_SIGNAL)
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadFinished",   PAGE_LOAD_FINISHED_SIGNAL   )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadError",      PAGE_LOAD_ERROR_SIGNAL      )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "scrollEdgeReached",  SCROLL_EDGE_REACHED_SIGNAL  )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "urlChanged",         URL_CHANGED_SIGNAL          )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "formRepostDecision", FORM_REPOST_DECISION_SIGNAL )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "frameRendered",      FRAME_RENDERED_SIGNAL       )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadStarted",         PAGE_LOAD_STARTED_SIGNAL         )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadInProgress",      PAGE_LOAD_IN_PROGRESS_SIGNAL     )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadFinished",        PAGE_LOAD_FINISHED_SIGNAL        )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadError",           PAGE_LOAD_ERROR_SIGNAL           )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "scrollEdgeReached",       SCROLL_EDGE_REACHED_SIGNAL       )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "urlChanged",              URL_CHANGED_SIGNAL               )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "formRepostDecision",      FORM_REPOST_DECISION_SIGNAL      )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "frameRendered",           FRAME_RENDERED_SIGNAL            )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "requestInterceptor",      REQUEST_INTERCEPTOR_SIGNAL       )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "consoleMessage",          CONSOLE_MESSAGE_SIGNAL           )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "policyDecision",          POLICY_DECISION                  )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "certificateConfirm",      CERTIFICATE_CONFIRM_SIGNAL       )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "sslCertificateChanged",   SSL_CERTIFICATE_CHANGED_SIGNAL   )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "httpAuthRequest",         HTTP_AUTH_REQUEST_SIGNAL         )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "contextMenuCustomized",   CONTEXT_MENU_CUSTOMIZED_SIGNAL   )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "contextMenuItemSelected", CONTEXT_MENU_ITEM_SELECTED_SIGNAL)
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -108,8 +127,8 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mPageLoadFinishedSignal(),
   mPageLoadErrorSignal(),
   mUrlChangedSignal(),
-  mVideoHoleEnabled(true),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
+  mVideoHoleEnabled(true),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true)
 {
@@ -122,7 +141,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   }
 }
 
-WebView::WebView(int argc, char** argv)
+WebView::WebView(uint32_t argc, char** argv)
 : Control(ControlBehaviour(ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS)),
   mUrl(),
   mVisual(),
@@ -132,8 +151,8 @@ WebView::WebView(int argc, char** argv)
   mPageLoadFinishedSignal(),
   mPageLoadErrorSignal(),
   mUrlChangedSignal(),
-  mVideoHoleEnabled(true),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
+  mVideoHoleEnabled(true),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true)
 {
@@ -177,7 +196,7 @@ Toolkit::WebView WebView::New(const std::string& locale, const std::string& time
   return handle;
 }
 
-Toolkit::WebView WebView::New(int argc, char** argv)
+Toolkit::WebView WebView::New(uint32_t argc, char** argv)
 {
   WebView*         impl   = new WebView(argc, argv);
   Toolkit::WebView handle = Toolkit::WebView(*impl);
@@ -194,6 +213,7 @@ void WebView::OnInitialize()
   self.TouchedSignal().Connect(this, &WebView::OnTouchEvent);
   self.HoveredSignal().Connect(this, &WebView::OnHoverEvent);
   self.WheelEventSignal().Connect(this, &WebView::OnWheelEvent);
+  Dali::DevelActor::VisibilityChangedSignal(self).Connect(this, &WebView::OnVisibilityChanged);
 
   mPositionUpdateNotification = self.AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mSizeUpdateNotification     = self.AddPropertyNotification(Actor::Property::SIZE, StepCondition(1.0f, 1.0f));
@@ -212,6 +232,14 @@ void WebView::OnInitialize()
     mWebEngine.UrlChangedSignal().Connect(this, &WebView::OnUrlChanged);
     mWebEngine.FormRepostDecisionSignal().Connect(this, &WebView::OnFormRepostDecision);
     mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnFrameRendered);
+    mWebEngine.RequestInterceptorSignal().Connect(this, &WebView::OnInterceptRequest);
+    mWebEngine.ConsoleMessageSignal().Connect(this, &WebView::OnConsoleMessage);
+    mWebEngine.PolicyDecisionSignal().Connect(this, &WebView::OnPolicyDecisionRequest);
+    mWebEngine.CertificateConfirmSignal().Connect(this, &WebView::OnCertificateConfirm);
+    mWebEngine.SslCertificateChangedSignal().Connect(this, &WebView::OnSslCertificateChanged);
+    mWebEngine.HttpAuthHandlerSignal().Connect(this, &WebView::OnHttpAuthenticationRequest);
+    mWebEngine.ContextMenuCustomizedSignal().Connect(this, &WebView::OnContextMenuCustomized);
+    mWebEngine.ContextMenuItemSelectedSignal().Connect(this, &WebView::OnContextMenuItemSelected);
 
     mWebContext         = std::unique_ptr<Dali::Toolkit::WebContext>(new WebContext(mWebEngine.GetContext()));
     mWebCookieManager   = std::unique_ptr<Dali::Toolkit::WebCookieManager>(new WebCookieManager(mWebEngine.GetCookieManager()));
@@ -245,10 +273,7 @@ Dali::Toolkit::ImageView& WebView::GetFavicon()
   if(mWebEngine)
   {
     Dali::PixelData pixelData = mWebEngine.GetFavicon();
-    std::string     url       = Dali::Toolkit::Image::GenerateUrl(pixelData);
-    mFaviconView              = Dali::Toolkit::ImageView::New(url);
-    mFaviconView.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
-    mFaviconView.SetProperty(Dali::Actor::Property::SIZE, Vector2(pixelData.GetWidth(), pixelData.GetHeight()));
+    mFaviconView              = CreateImageView(pixelData);
   }
   return mFaviconView;
 }
@@ -301,12 +326,67 @@ void WebView::LoadHtmlString(const std::string& htmlString)
   }
 }
 
+bool WebView::LoadHtmlStringOverrideCurrentEntry(const std::string& html, const std::string& basicUri, const std::string& unreachableUrl)
+{
+  if(!mWebEngine)
+    return false;
+
+  Texture           texture        = Dali::Texture::New(*mWebEngine.GetNativeImageSource());
+  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
+  mVisual                          = Toolkit::VisualFactory::Get().CreateVisual(
+    {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
+     {Toolkit::ImageVisual::Property::URL, nativeImageUrl}});
+
+  bool result = false;
+  if(mVisual)
+  {
+    DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
+    result = mWebEngine.LoadHtmlStringOverrideCurrentEntry(html, basicUri, unreachableUrl);
+  }
+
+  if(mVideoHoleEnabled)
+  {
+    EnableBlendMode(false);
+  }
+  return result;
+}
+
+bool WebView::LoadContents(const std::string& contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri)
+{
+  if(!mWebEngine)
+    return false;
+
+  Texture           texture        = Dali::Texture::New(*mWebEngine.GetNativeImageSource());
+  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
+  mVisual                          = Toolkit::VisualFactory::Get().CreateVisual(
+    {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
+     {Toolkit::ImageVisual::Property::URL, nativeImageUrl}});
+
+  bool result = false;
+  if(mVisual)
+  {
+    DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
+    result = mWebEngine.LoadContents(contents, contentSize, mimeType, encoding, baseUri);
+  }
+
+  if(mVideoHoleEnabled)
+  {
+    EnableBlendMode(false);
+  }
+  return result;
+}
+
 void WebView::Reload()
 {
   if(mWebEngine)
   {
     mWebEngine.Reload();
   }
+}
+
+bool WebView::ReloadWithoutCache()
+{
+  return mWebEngine ? mWebEngine.ReloadWithoutCache() : false;
 }
 
 void WebView::StopLoading()
@@ -333,12 +413,53 @@ void WebView::Resume()
   }
 }
 
-void WebView::ScrollBy(int deltaX, int deltaY)
+void WebView::SuspendNetworkLoading()
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SuspendNetworkLoading();
+  }
+}
+
+void WebView::ResumeNetworkLoading()
+{
+  if(mWebEngine)
+  {
+    mWebEngine.ResumeNetworkLoading();
+  }
+}
+
+bool WebView::AddCustomHeader(const std::string& name, const std::string& value)
+{
+  return mWebEngine ? mWebEngine.AddCustomHeader(name, value) : false;
+}
+
+bool WebView::RemoveCustomHeader(const std::string& name)
+{
+  return mWebEngine ? mWebEngine.RemoveCustomHeader(name) : false;
+}
+
+uint32_t WebView::StartInspectorServer(uint32_t port)
+{
+  return mWebEngine ? mWebEngine.StartInspectorServer(port) : false;
+}
+
+bool WebView::StopInspectorServer()
+{
+  return mWebEngine ? mWebEngine.StopInspectorServer() : false;
+}
+
+void WebView::ScrollBy(int32_t deltaX, int32_t deltaY)
 {
   if(mWebEngine)
   {
     mWebEngine.ScrollBy(deltaX, deltaY);
   }
+}
+
+bool WebView::ScrollEdgeBy(int32_t deltaX, int32_t deltaY)
+{
+  return mWebEngine ? mWebEngine.ScrollEdgeBy(deltaX, deltaY) : false;
 }
 
 bool WebView::CanGoForward()
@@ -431,11 +552,104 @@ void WebView::JavaScriptPromptReply(const std::string& result)
   }
 }
 
+std::unique_ptr<Dali::WebEngineHitTest> WebView::CreateHitTest(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode)
+{
+  std::unique_ptr<Dali::WebEngineHitTest> webHitTest;
+  if(!mWebEngine)
+  {
+    return webHitTest;
+  }
+
+  return mWebEngine.CreateHitTest(x, y, mode);
+}
+
+bool WebView::CreateHitTestAsynchronously(int32_t x, int32_t y, Dali::WebEngineHitTest::HitTestMode mode, Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback callback)
+{
+  bool result = false;
+  if(mWebEngine)
+  {
+    result = mWebEngine.CreateHitTestAsynchronously(x, y, mode, callback);
+  }
+  return result;
+}
+
 void WebView::ClearHistory()
 {
   if(mWebEngine)
   {
     mWebEngine.ClearHistory();
+  }
+}
+
+void WebView::ClearAllTilesResources()
+{
+  if(mWebEngine)
+  {
+    mWebEngine.ClearAllTilesResources();
+  }
+}
+
+void WebView::SetScaleFactor(float scaleFactor, Dali::Vector2 point)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SetScaleFactor(scaleFactor, point);
+  }
+}
+
+float WebView::GetScaleFactor() const
+{
+  return mWebEngine ? mWebEngine.GetScaleFactor() : 0.0f;
+}
+
+void WebView::ActivateAccessibility(bool activated)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.ActivateAccessibility(activated);
+  }
+}
+
+bool WebView::HighlightText(const std::string& text, Dali::WebEnginePlugin::FindOption options, uint32_t maxMatchCount)
+{
+  return mWebEngine ? mWebEngine.HighlightText(text, options, maxMatchCount) : false;
+}
+
+void WebView::AddDynamicCertificatePath(const std::string& host, const std::string& certPath)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.AddDynamicCertificatePath(host, certPath);
+  }
+}
+
+Dali::Toolkit::ImageView WebView::GetScreenshot(Dali::Rect<int32_t> viewArea, float scaleFactor)
+{
+  Dali::Toolkit::ImageView imageView;
+  if(mWebEngine)
+  {
+    Dali::PixelData pixelData = mWebEngine.GetScreenshot(viewArea, scaleFactor);
+    imageView                 = CreateImageView(pixelData);
+  }
+  return imageView;
+}
+
+bool WebView::GetScreenshotAsynchronously(Dali::Rect<int32_t> viewArea, float scaleFactor, Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback callback)
+{
+  mScreenshotCapturedCallback = callback;
+  return mWebEngine ? mWebEngine.GetScreenshotAsynchronously(viewArea, scaleFactor, std::bind(&WebView::OnScreenshotCaptured, this, std::placeholders::_1)) : false;
+}
+
+bool WebView::CheckVideoPlayingAsynchronously(Dali::WebEnginePlugin::VideoPlayingCallback callback)
+{
+  return mWebEngine ? mWebEngine.CheckVideoPlayingAsynchronously(callback) : false;
+}
+
+void WebView::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterGeolocationPermissionCallback(callback);
   }
 }
 
@@ -451,7 +665,7 @@ void WebView::UpdateDisplayArea(Dali::PropertyNotification& /*source*/)
   Vector3 anchorPointOffSet       = actorSize * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
   Vector2 screenPosition          = self.GetProperty<Vector2>(Actor::Property::SCREEN_POSITION);
 
-  Dali::Rect<int> displayArea;
+  Dali::Rect<int32_t> displayArea;
   displayArea.x      = screenPosition.x - anchorPointOffSet.x;
   displayArea.y      = screenPosition.y - anchorPointOffSet.y;
   displayArea.width  = actorSize.x;
@@ -492,12 +706,12 @@ void WebView::EnableBlendMode(bool blendEnabled)
   }
 }
 
-void WebView::ClearAllTilesResources()
+Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel)
 {
-  if(mWebEngine)
-  {
-    mWebEngine.ClearAllTilesResources();
-  }
+  std::string              url       = Dali::Toolkit::Image::GenerateUrl(pixel);
+  Dali::Toolkit::ImageView imageView = Dali::Toolkit::ImageView::New(url);
+  imageView.SetProperty(Dali::Actor::Property::SIZE, Vector2(pixel.GetWidth(), pixel.GetHeight()));
+  return imageView;
 }
 
 Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
@@ -540,6 +754,46 @@ Dali::Toolkit::WebView::WebViewFrameRenderedSignalType& WebView::FrameRenderedSi
   return mFrameRenderedSignal;
 }
 
+Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType& WebView::RequestInterceptorSignal()
+{
+  return mRequestInterceptorSignal;
+}
+
+Dali::Toolkit::WebView::WebViewConsoleMessageSignalType& WebView::ConsoleMessageSignal()
+{
+  return mConsoleMessageSignal;
+}
+
+Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType& WebView::PolicyDecisionSignal()
+{
+  return mPolicyDecisionSignal;
+}
+
+Dali::Toolkit::WebView::WebViewCertificateSignalType& WebView::CertificateConfirmSignal()
+{
+  return mCertificateConfirmSignal;
+}
+
+Dali::Toolkit::WebView::WebViewCertificateSignalType& WebView::SslCertificateChangedSignal()
+{
+  return mSslCertificateChangedSignal;
+}
+
+Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType& WebView::HttpAuthHandlerSignal()
+{
+  return mHttpAuthHandlerSignal;
+}
+
+Dali::Toolkit::WebView::WebViewContextMenuCustomizedSignalType& WebView::ContextMenuCustomizedSignal()
+{
+  return mContextMenuCustomizedSignal;
+}
+
+Dali::Toolkit::WebView::WebViewContextMenuItemSelectedSignalType& WebView::ContextMenuItemSelectedSignal()
+{
+  return mContextMenuItemSelectedSignal;
+}
+
 void WebView::OnPageLoadStarted(const std::string& url)
 {
   if(!mPageLoadStartedSignal.Empty())
@@ -567,12 +821,12 @@ void WebView::OnPageLoadFinished(const std::string& url)
   }
 }
 
-void WebView::OnPageLoadError(const std::string& url, int errorCode)
+void WebView::OnPageLoadError(std::shared_ptr<Dali::WebEngineLoadError> error)
 {
   if(!mPageLoadErrorSignal.Empty())
   {
     Dali::Toolkit::WebView handle(GetOwner());
-    mPageLoadErrorSignal.Emit(handle, url, static_cast<Toolkit::WebView::LoadErrorCode>(errorCode));
+    mPageLoadErrorSignal.Emit(handle, std::move(error));
   }
 }
 
@@ -598,9 +852,8 @@ void WebView::OnFormRepostDecision(std::shared_ptr<Dali::WebEngineFormRepostDeci
 {
   if(!mFormRepostDecisionSignal.Empty())
   {
-    Dali::Toolkit::WebView                                handle(GetOwner());
-    std::shared_ptr<Dali::Toolkit::WebFormRepostDecision> repostDecision(new Dali::Toolkit::WebFormRepostDecision(decision));
-    mFormRepostDecisionSignal.Emit(handle, std::move(repostDecision));
+    Dali::Toolkit::WebView handle(GetOwner());
+    mFormRepostDecisionSignal.Emit(handle, std::move(decision));
   }
 }
 
@@ -610,6 +863,95 @@ void WebView::OnFrameRendered()
   {
     Dali::Toolkit::WebView handle(GetOwner());
     mFrameRenderedSignal.Emit(handle);
+  }
+}
+
+void WebView::OnVisibilityChanged(Actor actor, bool isVisible, Dali::DevelActor::VisibilityChange::Type type)
+{
+  if(type == Dali::DevelActor::VisibilityChange::Type::SELF)
+  {
+    SetVisibility(isVisible);
+  }
+}
+
+void WebView::OnScreenshotCaptured(Dali::PixelData pixel)
+{
+  if(mScreenshotCapturedCallback)
+  {
+    Dali::Toolkit::ImageView imageView = CreateImageView(pixel);
+    mScreenshotCapturedCallback(imageView);
+  }
+}
+
+void WebView::OnInterceptRequest(std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor)
+{
+  if(!mRequestInterceptorSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mRequestInterceptorSignal.Emit(handle, std::move(interceptor));
+  }
+}
+
+void WebView::OnConsoleMessage(std::shared_ptr<Dali::WebEngineConsoleMessage> message)
+{
+  if(!mConsoleMessageSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mConsoleMessageSignal.Emit(handle, std::move(message));
+  }
+}
+
+void WebView::OnPolicyDecisionRequest(std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
+{
+  if(!mPolicyDecisionSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mPolicyDecisionSignal.Emit(handle, std::move(decision));
+  }
+}
+
+void WebView::OnCertificateConfirm(std::shared_ptr<Dali::WebEngineCertificate> certificate)
+{
+  if(!mCertificateConfirmSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mCertificateConfirmSignal.Emit(handle, std::move(certificate));
+  }
+}
+
+void WebView::OnSslCertificateChanged(std::shared_ptr<Dali::WebEngineCertificate> certificate)
+{
+  if(!mSslCertificateChangedSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mSslCertificateChangedSignal.Emit(handle, std::move(certificate));
+  }
+}
+
+void WebView::OnHttpAuthenticationRequest(std::shared_ptr<Dali::WebEngineHttpAuthHandler> handler)
+{
+  if(!mHttpAuthHandlerSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mHttpAuthHandlerSignal.Emit(handle, std::move(handler));
+  }
+}
+
+void WebView::OnContextMenuCustomized(std::shared_ptr<Dali::WebEngineContextMenu> menu)
+{
+  if(!mContextMenuCustomizedSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mContextMenuCustomizedSignal.Emit(handle, std::move(menu));
+  }
+}
+
+void WebView::OnContextMenuItemSelected(std::shared_ptr<Dali::WebEngineContextMenuItem> item)
+{
+  if(!mContextMenuItemSelectedSignal.Empty())
+  {
+    Dali::Toolkit::WebView handle(GetOwner());
+    mContextMenuItemSelectedSignal.Emit(handle, std::move(item));
   }
 }
 
@@ -658,6 +1000,46 @@ bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tr
   else if(0 == strcmp(signalName.c_str(), FRAME_RENDERED_SIGNAL))
   {
     webView.FrameRenderedSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), REQUEST_INTERCEPTOR_SIGNAL))
+  {
+    webView.RequestInterceptorSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), CONSOLE_MESSAGE_SIGNAL))
+  {
+    webView.ConsoleMessageSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), POLICY_DECISION))
+  {
+    webView.PolicyDecisionSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), CERTIFICATE_CONFIRM_SIGNAL))
+  {
+    webView.CertificateConfirmSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), SSL_CERTIFICATE_CHANGED_SIGNAL))
+  {
+    webView.SslCertificateChangedSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), HTTP_AUTH_REQUEST_SIGNAL))
+  {
+    webView.HttpAuthHandlerSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), CONTEXT_MENU_CUSTOMIZED_SIGNAL))
+  {
+    webView.ContextMenuCustomizedSignal().Connect(tracker, functor);
+    connected = true;
+  }
+  else if(0 == strcmp(signalName.c_str(), CONTEXT_MENU_ITEM_SELECTED_SIGNAL))
+  {
+    webView.ContextMenuItemSelectedSignal().Connect(tracker, functor);
     connected = true;
   }
 
@@ -782,6 +1164,26 @@ void WebView::SetProperty(BaseObject* object, Property::Index index, const Prope
         }
         break;
       }
+      case Toolkit::WebView::Property::PAGE_ZOOM_FACTOR:
+      {
+        float input;
+        if(value.Get(input))
+        {
+          impl.SetPageZoomFactor(input);
+        }
+        break;
+      }
+      case Toolkit::WebView::Property::TEXT_ZOOM_FACTOR:
+      {
+        float input;
+        if(value.Get(input))
+        {
+          impl.SetTextZoomFactor(input);
+        }
+        break;
+      }
+      default:
+        break;
     }
   }
 }
@@ -847,6 +1249,21 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
         value = impl.GetSelectedText();
         break;
       }
+      case Toolkit::WebView::Property::PAGE_ZOOM_FACTOR:
+      {
+        value = impl.GetPageZoomFactor();
+        break;
+      }
+      case Toolkit::WebView::Property::TEXT_ZOOM_FACTOR:
+      {
+        value = impl.GetTextZoomFactor();
+        break;
+      }
+      case Toolkit::WebView::Property::LOAD_PROGRESS_PERCENTAGE:
+      {
+        value = impl.GetLoadProgressPercentage();
+        break;
+      }
       default:
         break;
     }
@@ -880,7 +1297,7 @@ bool WebView::OnKeyEvent(const Dali::KeyEvent& event)
 bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
 {
   bool result = false;
-  if(mWebEngine)
+  if(mWebEngine && mMouseEventsEnabled)
   {
     result = mWebEngine.SendHoverEvent(hover);
   }
@@ -890,7 +1307,7 @@ bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
 bool WebView::OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel)
 {
   bool result = false;
-  if(mWebEngine)
+  if(mWebEngine && mMouseEventsEnabled)
   {
     result = mWebEngine.SendWheelEvent(wheel);
   }
@@ -917,7 +1334,7 @@ void WebView::OnKeyInputFocusLost()
   EmitKeyInputFocusSignal(false); // Calls back into the Control hence done last.
 }
 
-void WebView::SetScrollPosition(int x, int y)
+void WebView::SetScrollPosition(int32_t x, int32_t y)
 {
   if(mWebEngine)
   {
@@ -1011,6 +1428,42 @@ void WebView::EnableKeyEvents(bool enabled)
     mKeyEventsEnabled = enabled;
     mWebEngine.EnableKeyEvents(enabled);
   }
+}
+
+void WebView::SetPageZoomFactor(float zoomFactor)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SetPageZoomFactor(zoomFactor);
+  }
+}
+
+float WebView::GetPageZoomFactor() const
+{
+  return mWebEngine ? mWebEngine.GetPageZoomFactor() : 0.0f;
+}
+
+void WebView::SetTextZoomFactor(float zoomFactor)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.SetTextZoomFactor(zoomFactor);
+  }
+}
+
+float WebView::GetTextZoomFactor() const
+{
+  return mWebEngine ? mWebEngine.GetTextZoomFactor() : 0.0f;
+}
+
+float WebView::GetLoadProgressPercentage() const
+{
+  return mWebEngine ? mWebEngine.GetLoadProgressPercentage() : 0.0f;
+}
+
+bool WebView::SetVisibility(bool visible)
+{
+  return mWebEngine ? mWebEngine.SetVisibility(visible) : false;
 }
 
 #undef GET_ENUM_STRING

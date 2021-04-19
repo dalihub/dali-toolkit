@@ -40,6 +40,7 @@ struct Controller::EventHandler
   static void KeyboardFocusGainEvent(Controller& controller);
   static void KeyboardFocusLostEvent(Controller& controller);
   static bool KeyEvent(Controller& controller, const Dali::KeyEvent& keyEvent);
+  static void AnchorEvent(Controller& controller, float x, float y);
   static void TapEvent(Controller& controller, unsigned int tapCount, float x, float y);
   static void PanEvent(Controller& controller, GestureState state, const Vector2& displacement);
   static void LongPressEvent(Controller& controller, GestureState state, float x, float y);

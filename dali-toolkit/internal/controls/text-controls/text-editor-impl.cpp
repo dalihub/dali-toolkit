@@ -151,6 +151,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "grabHandleColor
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "anchorClicked",      SIGNAL_ANCHOR_CLICKED     )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -1204,6 +1205,11 @@ DevelTextEditor::MaxLengthReachedSignalType& TextEditor::MaxLengthReachedSignal(
   return mMaxLengthReachedSignal;
 }
 
+DevelTextEditor::AnchorClickedSignalType& TextEditor::AnchorClickedSignal()
+{
+  return mAnchorClickedSignal;
+}
+
 Text::ControllerPtr TextEditor::getController()
 {
   return mController;
@@ -1230,6 +1236,14 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
     {
       Internal::TextEditor& editorImpl(GetImpl(editor));
       editorImpl.MaxLengthReachedSignal().Connect(tracker, functor);
+    }
+  }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_ANCHOR_CLICKED))
+  {
+    if(editor)
+    {
+      Internal::TextEditor& editorImpl(GetImpl(editor));
+      editorImpl.AnchorClickedSignal().Connect(tracker, functor);
     }
   }
   else
@@ -1260,7 +1274,7 @@ void TextEditor::OnInitialize()
 {
   Actor self = Self();
 
-  mController = Text::Controller::New(this, this, this);
+  mController = Text::Controller::New(this, this, this, this);
 
   mDecorator = Text::Decorator::New(*mController,
                                     *mController);
@@ -1610,6 +1624,7 @@ void TextEditor::OnTap(const TapGesture& gesture)
   padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
   const Vector2& localPoint = gesture.GetLocalPoint();
   mController->TapEvent(gesture.GetNumberOfTaps(), localPoint.x - padding.start, localPoint.y - padding.top);
+  mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 
   SetKeyInputFocus();
 }
@@ -1757,6 +1772,12 @@ void TextEditor::InputStyleChanged(Text::InputStyle::Mask inputStyleMask)
   }
 
   mInputStyleChangedSignal.Emit(handle, editorInputStyleMask);
+}
+
+void TextEditor::AnchorClicked(const std::string& href)
+{
+  Dali::Toolkit::TextEditor handle(GetOwner());
+  mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
 }
 
 void TextEditor::AddDecoration(Actor& actor, bool needsClipping)
@@ -2036,7 +2057,7 @@ TextEditor::~TextEditor()
 
 std::string TextEditor::AccessibleImpl::GetName()
 {
-  auto slf = Toolkit::TextEditor::DownCast(self);
+  auto slf = Toolkit::TextEditor::DownCast(Self());
   return slf.GetProperty(Toolkit::TextEditor::Property::TEXT)
     .Get<std::string>();
 }
@@ -2047,7 +2068,7 @@ std::string TextEditor::AccessibleImpl::GetText(size_t startOffset,
   if(endOffset <= startOffset)
     return {};
 
-  auto slf = Toolkit::TextEditor::DownCast(self);
+  auto slf = Toolkit::TextEditor::DownCast(Self());
   auto txt =
     slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
 
@@ -2059,7 +2080,7 @@ std::string TextEditor::AccessibleImpl::GetText(size_t startOffset,
 
 size_t TextEditor::AccessibleImpl::GetCharacterCount()
 {
-  auto slf = Toolkit::TextEditor::DownCast(self);
+  auto slf = Toolkit::TextEditor::DownCast(Self());
   auto txt =
     slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
 
@@ -2068,13 +2089,13 @@ size_t TextEditor::AccessibleImpl::GetCharacterCount()
 
 size_t TextEditor::AccessibleImpl::GetCaretOffset()
 {
-  auto slf = Toolkit::TextEditor::DownCast(self);
+  auto slf = Toolkit::TextEditor::DownCast(Self());
   return Dali::Toolkit::GetImpl(slf).getController()->GetCursorPosition();
 }
 
 bool TextEditor::AccessibleImpl::SetCaretOffset(size_t offset)
 {
-  auto slf = Toolkit::TextEditor::DownCast(self);
+  auto slf = Toolkit::TextEditor::DownCast(Self());
   auto txt = slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
   if(offset > txt.size())
     return false;
@@ -2088,7 +2109,7 @@ bool TextEditor::AccessibleImpl::SetCaretOffset(size_t offset)
 Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(
   size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto slf      = Toolkit::TextEditor::DownCast(self);
+  auto slf      = Toolkit::TextEditor::DownCast(Self());
   auto txt      = slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
   auto txt_size = txt.size();
 
@@ -2168,7 +2189,7 @@ TextEditor::AccessibleImpl::GetSelection(size_t selectionNum)
   if(selectionNum > 0)
     return {};
 
-  auto        slf  = Toolkit::TextEditor::DownCast(self);
+  auto        slf  = Toolkit::TextEditor::DownCast(Self());
   auto        ctrl = Dali::Toolkit::GetImpl(slf).getController();
   std::string ret;
   ctrl->RetrieveSelection(ret);
@@ -2183,7 +2204,7 @@ bool TextEditor::AccessibleImpl::RemoveSelection(size_t selectionNum)
   if(selectionNum > 0)
     return false;
 
-  auto slf = Toolkit::TextEditor::DownCast(self);
+  auto slf = Toolkit::TextEditor::DownCast(Self());
   Dali::Toolkit::GetImpl(slf).getController()->SetSelection(0, 0);
   return true;
 }
@@ -2196,7 +2217,7 @@ bool TextEditor::AccessibleImpl::SetSelection(size_t selectionNum,
   if(selectionNum > 0)
     return false;
 
-  auto slf = Toolkit::TextEditor::DownCast(self);
+  auto slf = Toolkit::TextEditor::DownCast(Self());
   Dali::Toolkit::GetImpl(slf).getController()->SetSelection(startOffset,
                                                             endOffset);
   return true;
@@ -2208,7 +2229,7 @@ bool TextEditor::AccessibleImpl::CopyText(size_t startPosition,
   if(endPosition <= startPosition)
     return false;
 
-  auto slf = Toolkit::TextEditor::DownCast(self);
+  auto slf = Toolkit::TextEditor::DownCast(Self());
   auto txt = slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
   Dali::Toolkit::GetImpl(slf).getController()->CopyStringToClipboard(txt.substr(startPosition, endPosition - startPosition));
 
@@ -2221,7 +2242,7 @@ bool TextEditor::AccessibleImpl::CutText(size_t startPosition,
   if(endPosition <= startPosition)
     return false;
 
-  auto slf = Toolkit::TextEditor::DownCast(self);
+  auto slf = Toolkit::TextEditor::DownCast(Self());
   auto txt = slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
   Dali::Toolkit::GetImpl(slf).getController()->CopyStringToClipboard(txt.substr(startPosition, endPosition - startPosition));
 

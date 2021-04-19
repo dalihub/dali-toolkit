@@ -81,7 +81,8 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
 
     MarkupProcessData markupProcessData(logicalModel->mColorRuns,
                                         logicalModel->mFontDescriptionRuns,
-                                        logicalModel->mEmbeddedItems);
+                                        logicalModel->mEmbeddedItems,
+                                        logicalModel->mAnchors);
 
     Length         textSize = 0u;
     const uint8_t* utf8     = NULL;
@@ -253,7 +254,8 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
     const Length numberOfCharactersInModel = logicalModel->mText.Count();
 
     // Restrict new text to fit within Maximum characters setting.
-    Length maxSizeOfNewText = std::min((impl.mMaximumNumberOfCharacters - numberOfCharactersInModel), characterCount);
+    Length temp_length      = (impl.mMaximumNumberOfCharacters > numberOfCharactersInModel ? impl.mMaximumNumberOfCharacters - numberOfCharactersInModel : 0);
+    Length maxSizeOfNewText = std::min(temp_length, characterCount);
     maxLengthReached        = (characterCount > maxSizeOfNewText);
 
     // The cursor position.
@@ -377,6 +379,11 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
       textUpdateInfo.mNumberOfCharactersToAdd += maxSizeOfNewText;
     }
 
+    if(impl.mMarkupProcessorEnabled)
+    {
+      InsertTextAnchor(controller, maxSizeOfNewText, cursorIndex);
+    }
+
     // Update the cursor index.
     cursorIndex += maxSizeOfNewText;
 
@@ -461,8 +468,8 @@ bool Controller::TextUpdater::RemoveText(
   if(!impl.IsShowingPlaceholderText())
   {
     // Delete at current cursor position
-    Vector<Character>& currentText    = logicalModel->mText;
-    CharacterIndex&    oldCursorIndex = eventData->mPrimaryCursorPosition;
+    Vector<Character>& currentText         = logicalModel->mText;
+    CharacterIndex&    previousCursorIndex = eventData->mPrimaryCursorPosition;
 
     CharacterIndex cursorIndex = 0;
 
@@ -547,8 +554,13 @@ bool Controller::TextUpdater::RemoveText(
 
       currentText.Erase(first, last);
 
+      if(impl.mMarkupProcessorEnabled)
+      {
+        RemoveTextAnchor(controller, cursorOffset, numberOfCharacters, previousCursorIndex);
+      }
+
       // Cursor position retreat
-      oldCursorIndex = cursorIndex;
+      previousCursorIndex = cursorIndex;
 
       eventData->mScrollAfterDelete = true;
 
@@ -580,6 +592,16 @@ bool Controller::TextUpdater::RemoveSelectedText(Controller& controller)
     {
       textRemoved = true;
       impl.ChangeState(EventData::EDITING);
+
+      if(impl.mMarkupProcessorEnabled)
+      {
+        int             cursorOffset        = -1;
+        int             numberOfCharacters  = removedString.length();
+        CharacterIndex& cursorIndex         = impl.mEventData->mPrimaryCursorPosition;
+        CharacterIndex  previousCursorIndex = cursorIndex + numberOfCharacters;
+
+        RemoveTextAnchor(controller, cursorOffset, numberOfCharacters, previousCursorIndex);
+      }
     }
   }
 
@@ -596,6 +618,9 @@ void Controller::TextUpdater::ResetText(Controller& controller)
 
   // Reset the embedded images buffer.
   logicalModel->ClearEmbeddedImages();
+
+  // Reset the anchors buffer.
+  logicalModel->ClearAnchors();
 
   // We have cleared everything including the placeholder-text
   impl.PlaceholderCleared();
@@ -615,6 +640,128 @@ void Controller::TextUpdater::ResetText(Controller& controller)
 
   // Apply modifications to the model
   impl.mOperationsPending = ALL_OPERATIONS;
+}
+
+void Controller::TextUpdater::InsertTextAnchor(Controller& controller, int numberOfCharacters, CharacterIndex previousCursorIndex)
+{
+  Controller::Impl& impl         = *controller.mImpl;
+  ModelPtr&         model        = impl.mModel;
+  LogicalModelPtr&  logicalModel = model->mLogicalModel;
+
+  for(auto& anchor : logicalModel->mAnchors)
+  {
+    if(anchor.endIndex < previousCursorIndex) //      [anchor]  CUR
+    {
+      continue;
+    }
+    if(anchor.startIndex < previousCursorIndex) //      [anCURr]
+    {
+      anchor.endIndex += numberOfCharacters;
+    }
+    else // CUR  [anchor]
+    {
+      anchor.startIndex += numberOfCharacters;
+      anchor.endIndex += numberOfCharacters;
+    }
+    DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::InsertTextAnchor[%p] Anchor[%s] start[%d] end[%d]\n", &controller, anchor.href, anchor.startIndex, anchor.endIndex);
+  }
+}
+
+void Controller::TextUpdater::RemoveTextAnchor(Controller& controller, int cursorOffset, int numberOfCharacters, CharacterIndex previousCursorIndex)
+{
+  Controller::Impl&        impl         = *controller.mImpl;
+  ModelPtr&                model        = impl.mModel;
+  LogicalModelPtr&         logicalModel = model->mLogicalModel;
+  Vector<Anchor>::Iterator it           = logicalModel->mAnchors.Begin();
+
+  while(it != logicalModel->mAnchors.End())
+  {
+    Anchor& anchor = *it;
+
+    if(anchor.endIndex <= previousCursorIndex && cursorOffset == 0) // [anchor]    CUR >>
+    {
+      // Nothing happens.
+    }
+    else if(anchor.endIndex <= previousCursorIndex && cursorOffset == -1) // [anchor] << CUR
+    {
+      int endIndex = anchor.endIndex;
+      int offset   = previousCursorIndex - endIndex;
+      int index    = endIndex - (numberOfCharacters - offset);
+
+      if(index < endIndex)
+      {
+        endIndex = index;
+      }
+
+      if((int)anchor.startIndex >= endIndex)
+      {
+        if(anchor.href)
+        {
+          delete[] anchor.href;
+        }
+        it = logicalModel->mAnchors.Erase(it);
+        continue;
+      }
+      else
+      {
+        anchor.endIndex = endIndex;
+      }
+    }
+    else if(anchor.startIndex >= previousCursorIndex && cursorOffset == -1) // << CUR    [anchor]
+    {
+      anchor.startIndex -= numberOfCharacters;
+      anchor.endIndex -= numberOfCharacters;
+    }
+    else if(anchor.startIndex >= previousCursorIndex && cursorOffset == 0) //    CUR >> [anchor]
+    {
+      int startIndex = anchor.startIndex;
+      int endIndex   = anchor.endIndex;
+      int index      = previousCursorIndex + numberOfCharacters - 1;
+
+      if(startIndex > index)
+      {
+        anchor.startIndex -= numberOfCharacters;
+        anchor.endIndex -= numberOfCharacters;
+      }
+      else if(endIndex > index + 1)
+      {
+        anchor.endIndex -= numberOfCharacters;
+      }
+      else
+      {
+        if(anchor.href)
+        {
+          delete[] anchor.href;
+        }
+        it = logicalModel->mAnchors.Erase(it);
+        continue;
+      }
+    }
+    else if(cursorOffset == -1) // [<< CUR]
+    {
+      int startIndex = anchor.startIndex;
+      int index      = previousCursorIndex - numberOfCharacters;
+
+      if(startIndex >= index)
+      {
+        anchor.startIndex = index;
+      }
+      anchor.endIndex -= numberOfCharacters;
+    }
+    else if(cursorOffset == 0) // [CUR >>]
+    {
+      anchor.endIndex -= numberOfCharacters;
+    }
+    else
+    {
+      // When this condition is reached, someting is wrong.
+      DALI_LOG_ERROR("Controller::RemoveTextAnchor[%p] Invaild state cursorOffset[%d]\n", &controller, cursorOffset);
+    }
+
+    DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::RemoveTextAnchor[%p] Anchor[%s] start[%d] end[%d]\n", &controller, anchor.href, anchor.startIndex, anchor.endIndex);
+
+    it++;
+  }
 }
 
 } // namespace Text

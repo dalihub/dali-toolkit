@@ -184,7 +184,8 @@ namespace
     Vector<ColorRun> colorRuns;
     Vector<FontDescriptionRun> fontRuns;
     Vector<EmbeddedItem> items;
-    MarkupProcessData markupProcessData( colorRuns, fontRuns, items );
+    Vector<Anchor> anchors;
+    MarkupProcessData markupProcessData( colorRuns, fontRuns, items, anchors );
     ProcessMarkupString( data.xHTMLEntityString, markupProcessData );
 
     for( Vector<EmbeddedItem>::Iterator it = items.Begin(),

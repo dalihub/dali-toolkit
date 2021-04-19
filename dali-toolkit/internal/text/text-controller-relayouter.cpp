@@ -61,6 +61,9 @@ Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
   VisualModelPtr&   visualModel = model->mVisualModel;
   if(impl.mRecalculateNaturalSize)
   {
+    // Store the pending operations mask so that it can be restored later on with no modifications made on it
+    // while getting the natural size were reflected on the original mask.
+    OperationsMask operationsPendingBackUp = static_cast<OperationsMask>(impl.mOperationsPending);
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>(CONVERT_TO_UTF32 |
                                                                           GET_SCRIPTS |
@@ -93,15 +96,6 @@ Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
                                            LAYOUT | REORDER),
                naturalSize.GetVectorXY());
 
-    // Do not do again the only once operations.
-    operationsPending = static_cast<OperationsMask>(operationsPending & ~onlyOnceOperations);
-
-    // Do the size related operations again.
-    const OperationsMask sizeOperations = static_cast<OperationsMask>(LAYOUT |
-                                                                      ALIGN |
-                                                                      REORDER);
-    operationsPending                   = static_cast<OperationsMask>(operationsPending | sizeOperations);
-
     // Stores the natural size to avoid recalculate it again
     // unless the text/style changes.
     visualModel->SetNaturalSize(naturalSize.GetVectorXY());
@@ -114,7 +108,8 @@ Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
 
     // Restore the actual control's size.
     visualModel->mControlSize = actualControlSize;
-
+    // Restore the previously backed-up pending operations' mask without the only once operations.
+    impl.mOperationsPending = static_cast<OperationsMask>(operationsPendingBackUp & ~onlyOnceOperations);
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize calculated %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z);
   }
   else
@@ -244,6 +239,9 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
      textUpdateInfo.mFullRelayoutNeeded ||
      textUpdateInfo.mClearAll)
   {
+    // Store the pending operations mask so that it can be restored later on with no modifications made on it
+    // while getting the natural size were reflected on the original mask.
+    OperationsMask operationsPendingBackUp = static_cast<OperationsMask>(impl.mOperationsPending);
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>(CONVERT_TO_UTF32 |
                                                                           GET_SCRIPTS |
@@ -275,23 +273,14 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
                                            LAYOUT),
                layoutSize);
 
-    // Do not do again the only once operations.
-    operationsPending = static_cast<OperationsMask>(operationsPending & ~onlyOnceOperations);
-
-    // Do the size related operations again.
-    const OperationsMask sizeOperations = static_cast<OperationsMask>(LAYOUT |
-                                                                      ALIGN |
-                                                                      REORDER);
-
-    operationsPending = static_cast<OperationsMask>(operationsPending | sizeOperations);
-
     // Clear the update info. This info will be set the next time the text is updated.
     textUpdateInfo.Clear();
     textUpdateInfo.mClearAll = true;
 
     // Restore the actual control's width.
     visualModel->mControlSize.width = actualControlWidth;
-
+    // Restore the previously backed-up pending operations' mask without the only once operations.
+    impl.mOperationsPending = static_cast<OperationsMask>(operationsPendingBackUp & ~onlyOnceOperations);
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth calculated %f\n", layoutSize.height);
   }
   else

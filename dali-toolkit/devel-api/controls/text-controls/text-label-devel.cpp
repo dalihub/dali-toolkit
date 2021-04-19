@@ -15,32 +15,22 @@
  *
  */
 
-// CLASS HEADER
-#include <dali-toolkit/devel-api/controls/web-view/web-form-repost-decision.h>
-
-// EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/web-engine-form-repost-decision.h>
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-WebFormRepostDecision::WebFormRepostDecision(std::shared_ptr<Dali::WebEngineFormRepostDecision> decision)
-: mFormRepostDecision(std::move(decision))
+namespace DevelTextLabel
 {
+AnchorClickedSignalType& AnchorClickedSignal(TextLabel textLabel)
+{
+  return GetImpl(textLabel).AnchorClickedSignal();
 }
 
-WebFormRepostDecision::~WebFormRepostDecision()
-{
-}
-
-void WebFormRepostDecision::Reply(bool allowed)
-{
-  if(mFormRepostDecision)
-  {
-    mFormRepostDecision->Reply(allowed);
-  }
-}
+} // namespace DevelTextLabel
 
 } // namespace Toolkit
 

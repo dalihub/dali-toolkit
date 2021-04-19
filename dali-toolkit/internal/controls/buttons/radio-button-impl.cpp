@@ -115,7 +115,7 @@ void RadioButton::OnStateChange(State newState)
 Dali::Accessibility::States RadioButton::AccessibleImpl::CalculateStates()
 {
   auto tmp = Button::AccessibleImpl::CalculateStates();
-  auto slf = Toolkit::Button::DownCast(self);
+  auto slf = Toolkit::Button::DownCast(Self());
   if(slf.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
     tmp[Dali::Accessibility::State::CHECKED] = true;
   tmp[Dali::Accessibility::State::SELECTABLE] = true;

@@ -98,6 +98,9 @@ int UtcDaliAccessibilityPushButtonStates(void)
 
   Dali::Accessibility::TestEnableSC( true );
 
+  /* add to scene and remove from scene to touch AccessibilityDeregister */
+  application.GetScene().Add( pushbutton );
+
   auto states = accessible->GetStates();
   DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::PRESSED ] ), false, TEST_LOCATION );
 
@@ -107,6 +110,9 @@ int UtcDaliAccessibilityPushButtonStates(void)
 
   states = accessible->GetStates();
   DALI_TEST_EQUALS( static_cast< unsigned int >( states[ Accessibility::State::PRESSED ] ), true, TEST_LOCATION );
+
+  /* add to scene and remove from scene to touch AccessibilityDeregister */
+  application.GetScene().Remove( pushbutton );
 
   Dali::Accessibility::TestEnableSC( false );
 

@@ -48,6 +48,9 @@ const float    HALF(0.5f);
 const float    ONE(1.0f);
 const uint32_t DEFAULT_ATLAS_WIDTH  = 512u;
 const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
+const uint32_t MAX_ATLAS_WIDTH  = 1024u;
+const uint32_t MAX_ATLAS_HEIGHT = 1024u;
+const uint32_t DOUBLE_PIXEL_PADDING = 4u;//Padding will be added twice to Atlas
 const uint16_t NO_OUTLINE           = 0u;
 } // namespace
 
@@ -245,8 +248,21 @@ struct AtlasRenderer::Impl
           // If CheckAtlas in AtlasManager::Add can't fit the bitmap in the current atlas it will create a new atlas
 
           // Setting the block size and size of new atlas does not mean a new one will be created. An existing atlas may still surffice.
-          mGlyphManager.SetNewAtlasSize(DEFAULT_ATLAS_WIDTH,
-                                        DEFAULT_ATLAS_HEIGHT,
+          uint32_t default_width = DEFAULT_ATLAS_WIDTH;
+          uint32_t default_height = DEFAULT_ATLAS_HEIGHT;
+
+          while (
+            (blockSize.mNeededBlockWidth >= (default_width - (DOUBLE_PIXEL_PADDING + 1u)) ||
+             blockSize.mNeededBlockHeight >= (default_height - (DOUBLE_PIXEL_PADDING + 1u)))
+            &&
+            (default_width < MAX_ATLAS_WIDTH &&
+             default_height < MAX_ATLAS_HEIGHT))
+          {
+            default_width <<= 1u;
+            default_height <<= 1u;
+          }
+          mGlyphManager.SetNewAtlasSize(default_width,
+                                        default_height,
                                         blockSize.mNeededBlockWidth,
                                         blockSize.mNeededBlockHeight);
 

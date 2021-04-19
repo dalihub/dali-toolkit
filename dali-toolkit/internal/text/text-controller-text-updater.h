@@ -58,6 +58,14 @@ struct Controller::TextUpdater
   /// @copydoc Text::Contoller::ResetText
   /// @param[in] controller The controller
   static void ResetText(Controller& controller);
+
+  /// @copydoc Text::Contoller::InsertTextAnchor
+  /// @param[in] controller The controller
+  static void InsertTextAnchor(Controller& controller, int numberOfCharacters, CharacterIndex previousCursorIndex);
+
+  /// @copydoc Text::Contoller::RemoveTextAnchor
+  /// @param[in] controller The controller
+  static void RemoveTextAnchor(Controller& controller, int cursorOffset, int numberOfCharacters, CharacterIndex previousCursorIndex);
 };
 
 } // namespace Text

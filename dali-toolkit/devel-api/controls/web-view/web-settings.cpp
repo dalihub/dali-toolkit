@@ -234,6 +234,42 @@ void WebSettings::SetDefaultTextEncodingName(const std::string& defaultTextEncod
   mWebEngineSettings.SetDefaultTextEncodingName(defaultTextEncodingName);
 }
 
+bool WebSettings::SetViewportMetaTag(bool enable)
+{
+  return mWebEngineSettings.SetViewportMetaTag(enable);
+}
+
+bool WebSettings::SetForceZoom(bool enable)
+{
+  return mWebEngineSettings.SetForceZoom(enable);
+}
+
+bool WebSettings::IsZoomForced() const
+{
+  return mWebEngineSettings.IsZoomForced();
+}
+
+bool WebSettings::SetTextZoomEnabled(bool enable)
+{
+  return mWebEngineSettings.SetTextZoomEnabled(enable);
+}
+
+bool WebSettings::IsTextZoomEnabled() const
+{
+  return mWebEngineSettings.IsTextZoomEnabled();
+}
+
+void WebSettings::SetExtraFeature(const std::string& feature, bool enable)
+{
+  mWebEngineSettings.SetExtraFeature(feature, enable);
+}
+
+bool WebSettings::IsExtraFeatureEnabled(const std::string& feature) const
+{
+  return mWebEngineSettings.IsExtraFeatureEnabled(feature);
+}
+
+
 } // namespace Toolkit
 
 } // namespace Dali

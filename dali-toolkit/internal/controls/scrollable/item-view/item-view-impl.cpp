@@ -1348,7 +1348,7 @@ void ItemView::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
 void ItemView::AccessibleImpl::EnsureChildVisible(Actor child)
 {
   EnsureSelfVisible();
-  auto itemView = Dali::Toolkit::ItemView::DownCast(self);
+  auto itemView = Dali::Toolkit::ItemView::DownCast(Self());
   Toolkit::GetImpl(itemView).OnKeyboardFocusChangeCommitted(child);
 }
 

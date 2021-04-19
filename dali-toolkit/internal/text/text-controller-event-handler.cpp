@@ -24,6 +24,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
@@ -291,6 +292,46 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
   }
 
   return true;
+}
+
+void Controller::EventHandler::AnchorEvent(Controller& controller, float x, float y)
+{
+  if(!controller.mImpl->mMarkupProcessorEnabled ||
+     !controller.mImpl->mModel->mLogicalModel->mAnchors.Count() ||
+     !controller.mImpl->IsShowingRealText())
+  {
+    return;
+  }
+
+  CharacterIndex cursorPosition = 0u;
+
+  // Convert from control's coords to text's coords.
+  const float xPosition = x - controller.mImpl->mModel->mScrollPosition.x;
+  const float yPosition = y - controller.mImpl->mModel->mScrollPosition.y;
+
+  // Whether to touch point hits on a glyph.
+  bool matchedCharacter = false;
+  cursorPosition        = Text::GetClosestCursorIndex(controller.mImpl->mModel->mVisualModel,
+                                               controller.mImpl->mModel->mLogicalModel,
+                                               controller.mImpl->mMetrics,
+                                               xPosition,
+                                               yPosition,
+                                               CharacterHitTest::TAP,
+                                               matchedCharacter);
+
+  for(const auto& anchor : controller.mImpl->mModel->mLogicalModel->mAnchors)
+  {
+    // Anchor clicked if the calculated cursor position is within the range of anchor.
+    if(cursorPosition >= anchor.startIndex && cursorPosition < anchor.endIndex)
+    {
+      if(controller.mImpl->mAnchorControlInterface && anchor.href)
+      {
+        std::string href(anchor.href);
+        controller.mImpl->mAnchorControlInterface->AnchorClicked(href);
+        break;
+      }
+    }
+  }
 }
 
 void Controller::EventHandler::TapEvent(Controller& controller, unsigned int tapCount, float x, float y)

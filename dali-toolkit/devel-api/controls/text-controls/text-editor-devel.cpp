@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,11 @@ InputMethodContext GetInputMethodContext(TextEditor textEditor)
 MaxLengthReachedSignalType& MaxLengthReachedSignal(TextEditor textEditor)
 {
   return GetImpl(textEditor).MaxLengthReachedSignal();
+}
+
+AnchorClickedSignalType& AnchorClickedSignal(TextEditor textEditor)
+{
+  return GetImpl(textEditor).AnchorClickedSignal();
 }
 
 void SelectWholeText(TextEditor textEditor)

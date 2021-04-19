@@ -10,6 +10,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/builder/json-parser.cpp
   ${devel_api_src_dir}/builder/tree-node.cpp
   ${devel_api_src_dir}/controls/accessible-impl.cpp
+  ${devel_api_src_dir}/controls/canvas-view/canvas-view.cpp
   ${devel_api_src_dir}/controls/control-devel.cpp
   ${devel_api_src_dir}/controls/control-wrapper.cpp
   ${devel_api_src_dir}/controls/control-wrapper-impl.cpp
@@ -33,15 +34,14 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/table-view/table-view.cpp
   ${devel_api_src_dir}/controls/text-controls/text-editor-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-field-devel.cpp
+  ${devel_api_src_dir}/controls/text-controls/text-label-devel.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-popup.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-toolbar.cpp
   ${devel_api_src_dir}/controls/tool-bar/tool-bar.cpp
   ${devel_api_src_dir}/controls/video-view/video-view-devel.cpp
   ${devel_api_src_dir}/controls/web-view/web-back-forward-list.cpp
-  ${devel_api_src_dir}/controls/web-view/web-back-forward-list-item.cpp
   ${devel_api_src_dir}/controls/web-view/web-context.cpp
   ${devel_api_src_dir}/controls/web-view/web-cookie-manager.cpp
-  ${devel_api_src_dir}/controls/web-view/web-form-repost-decision.cpp
   ${devel_api_src_dir}/controls/web-view/web-settings.cpp
   ${devel_api_src_dir}/controls/web-view/web-view.cpp
   ${devel_api_src_dir}/focus-manager/keyinput-focus-manager.cpp
@@ -84,6 +84,7 @@ SET( devel_api_accessibility-manager_header_files
 
 SET( devel_api_controls_header_files
   ${devel_api_src_dir}/controls/accessible-impl.h
+  ${devel_api_src_dir}/controls/canvas-view/canvas-view.h
   ${devel_api_src_dir}/controls/control-depth-index-ranges.h
   ${devel_api_src_dir}/controls/control-devel.h
   ${devel_api_src_dir}/controls/control-wrapper.h
@@ -254,10 +255,8 @@ SET( devel_api_video_view_header_files
 
 SET( devel_api_web_view_header_files
   ${devel_api_src_dir}/controls/web-view/web-back-forward-list.h
-  ${devel_api_src_dir}/controls/web-view/web-back-forward-list-item.h
   ${devel_api_src_dir}/controls/web-view/web-context.h
   ${devel_api_src_dir}/controls/web-view/web-cookie-manager.h
-  ${devel_api_src_dir}/controls/web-view/web-form-repost-decision.h
   ${devel_api_src_dir}/controls/web-view/web-settings.h
   ${devel_api_src_dir}/controls/web-view/web-view.h
 )

@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
+#include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 #include <dali-toolkit/internal/text/text-selectable-control-interface.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
@@ -184,12 +185,14 @@ public: // Constructor.
    * @param[in] controlInterface The control's interface.
    * @param[in] editableControlInterface The editable control's interface.
    * @param[in] selectableControlInterface The selectable control's interface.
+   * @param[in] anchorControlInterface The anchor control's interface.
    *
    * @return A pointer to a new Controller.
    */
   static ControllerPtr New(ControlInterface*           controlInterface,
                            EditableControlInterface*   editableControlInterface,
-                           SelectableControlInterface* selectableControlInterface);
+                           SelectableControlInterface* selectableControlInterface,
+                           AnchorControlInterface*     anchorControlInterface);
 
 public: // Configure the text controller.
   /**
@@ -1295,6 +1298,13 @@ public: // Default style & Input style
    */
   void SetControlInterface(ControlInterface* controlInterface);
 
+  /**
+   * @brief Set the anchor control's interface.
+   *
+   * @param[in] anchorControlInterface The control's interface.
+   */
+  void SetAnchorControlInterface(AnchorControlInterface* anchorControlInterface);
+
 public: // Queries & retrieves.
   /**
    * @brief Return the layout engine.
@@ -1492,6 +1502,13 @@ public: // Text-input Event Queuing.
    * @param[in] type Used to distinguish between regular key events and InputMethodContext events.
    */
   bool KeyEvent(const Dali::KeyEvent& event);
+
+  /**
+   * @brief Called by anchor when a tap gesture occurs.
+   * @param[in] x The x position relative to the top-left of the parent control.
+   * @param[in] y The y position relative to the top-left of the parent control.
+   */
+  void AnchorEvent(float x, float y);
 
   /**
    * @brief Called by editable UI controls when a tap gesture occurs.
@@ -1700,6 +1717,26 @@ private: // Update.
    */
   bool RemoveSelectedText();
 
+  /**
+   * @brief Update anchor position from given number of inserted characters.
+   *
+   * @param[in] numberOfCharacters The number of inserted characters.
+   * @param[in] previousCursorIndex A cursor position before event occurs.
+   */
+  void InsertTextAnchor(int            numberOfCharacters,
+                        CharacterIndex previousCursorIndex);
+
+  /**
+   * @brief Update anchor position from given number of removed characters.
+   *
+   * @param[in] cursorOffset Start position from the current cursor position to start deleting characters.
+   * @param[in] numberOfCharacters The number of removed characters.
+   * @param[in] previousCursorIndex A cursor position before event occurs.
+   */
+  void RemoveTextAnchor(int            cursorOffset,
+                        int            numberOfCharacters,
+                        CharacterIndex previousCursorIndex);
+
 private: // Relayout.
   /**
    * @brief Lays-out the text.
@@ -1792,7 +1829,8 @@ private: // Private contructors & copy operator.
    */
   Controller(ControlInterface*           controlInterface,
              EditableControlInterface*   editableControlInterface,
-             SelectableControlInterface* selectableControlInterface);
+             SelectableControlInterface* selectableControlInterface,
+             AnchorControlInterface*     anchorControlInterface);
 
   // Undefined
   Controller(const Controller& handle);
