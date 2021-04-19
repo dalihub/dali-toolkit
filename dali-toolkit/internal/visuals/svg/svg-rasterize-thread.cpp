@@ -280,7 +280,7 @@ void SvgRasterizeThread::ApplyRasterizedSVGToSampler()
   UnregisterProcessor();
 }
 
-void SvgRasterizeThread::Process()
+void SvgRasterizeThread::Process(bool postProcessor)
 {
   ApplyRasterizedSVGToSampler();
 }
