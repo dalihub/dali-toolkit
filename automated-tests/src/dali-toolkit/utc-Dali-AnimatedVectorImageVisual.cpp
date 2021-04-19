@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,7 +172,7 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   tet_infoline( "UtcDaliVisualFactoryGetAnimatedVectorImageVisual04: Request animated vector image visual with a Property::Map" );
 
   int startFrame = 1, endFrame = 3;
-  float cornerRadius = 22.0f;
+  float cornerRadius = 50.0f;
   Property::Array playRange;
   playRange.PushBack( startFrame );
   playRange.PushBack( endFrame );
@@ -241,9 +241,9 @@ int UtcDaliVisualFactoryGetAnimatedVectorImageVisual04(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< bool >() == false );
 
-  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4 );
+  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get< Vector4 >(), Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius), TEST_LOCATION );
+  DALI_TEST_EQUALS( value->Get< float >(), cornerRadius, TEST_LOCATION );
 
   value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS_POLICY, "cornerRadiusPolicy" );
   DALI_TEST_CHECK( value );
@@ -261,7 +261,7 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   tet_infoline( "UtcDaliAnimatedVectorImageVisualGetPropertyMap01" );
 
   int startFrame = 1, endFrame = 3;
-  Vector4 cornerRadius(50.0f, 22.0f, 0.0f, 3.0f);
+  float cornerRadius = 50.0f;
   Property::Array playRange;
   playRange.PushBack( startFrame );
   playRange.PushBack( endFrame );
@@ -332,9 +332,9 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< bool >() == true );    // Check default value
 
-  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4 );
+  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get< Vector4 >(), cornerRadius, TEST_LOCATION );
+  DALI_TEST_EQUALS( value->Get< float >(), cornerRadius, TEST_LOCATION );
 
   value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS_POLICY, "cornerRadiusPolicy" );
   DALI_TEST_CHECK( value );

@@ -90,9 +90,9 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
 
-  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4 );
+  value = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<Vector4>(), Vector4(22.2f, 22.2f, 22.2f, 22.2f), TEST_LOCATION );
+  DALI_TEST_EQUALS( value->Get<float>(), 22.2f, TEST_LOCATION );
 
   value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, Property::INTEGER );
   DALI_TEST_CHECK( value );
@@ -136,7 +136,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
     .Add( "pixelArea", Vector4() )
     .Add( "wrapModeU", WrapMode::REPEAT )
     .Add( "wrapModeV", WrapMode::DEFAULT )
-    .Add( "cornerRadius", Vector4(50.0f, 25.0f, 12.5f, 33.0f) )
+    .Add( "cornerRadius", 50.0f )
     .Add( "cornerRadiusPolicy", Visual::Transform::Policy::RELATIVE ));
 
   Property::Map resultMap;
@@ -174,7 +174,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
 
   value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS, "cornerRadius" );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<Vector4>(), Vector4(50.0f, 25.0f, 12.5f, 33.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( value->Get<float>(), 50.0f, TEST_LOCATION );
 
   value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, "cornerRadiusPolicy" );
   DALI_TEST_CHECK( value );
@@ -242,7 +242,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
 
   value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS, "cornerRadius" );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<Vector4>(), Vector4(50.5f, 50.5f, 50.5f, 50.5f), TEST_LOCATION );
+  DALI_TEST_EQUALS( value->Get<float>(), 50.5f, TEST_LOCATION );
 
   value = resultMap.Find( Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, "cornerRadiusPolicy" );
   DALI_TEST_CHECK( value );

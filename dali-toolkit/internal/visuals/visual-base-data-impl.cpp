@@ -119,7 +119,7 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
   mTransform(),
   mMixColor(Color::WHITE),
   mControlSize(Vector2::ZERO),
-  mCornerRadius(Vector4::ZERO),
+  mCornerRadius(0.0f),
   mCornerRadiusPolicy(1.0f),
   mDepthIndex(0.0f),
   mMixColorIndex(Property::INVALID_INDEX),

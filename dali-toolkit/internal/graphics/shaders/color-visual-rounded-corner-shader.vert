@@ -1,8 +1,7 @@
 INPUT mediump vec2 aPosition;
 OUTPUT mediump vec2 vPosition;
 OUTPUT mediump vec2 vRectSize;
-OUTPUT mediump vec2 vOptRectSize;
-OUTPUT mediump vec4 vCornerRadius;
+OUTPUT mediump float vCornerRadius;
 
 uniform highp mat4 uMvpMatrix;
 uniform highp vec3 uSize;
@@ -14,7 +13,7 @@ uniform mediump vec2 extraSize;
 uniform mediump vec4 offsetSizeMode;
 uniform mediump vec2 origin;
 uniform mediump vec2 anchorPoint;
-uniform mediump vec4 cornerRadius;
+uniform mediump float cornerRadius;
 uniform mediump float cornerRadiusPolicy;
 
 vec4 ComputeVertexPosition()
@@ -24,10 +23,8 @@ vec4 ComputeVertexPosition()
   mediump float minSize = min( visualSize.x, visualSize.y );
   vCornerRadius = mix( cornerRadius * minSize, cornerRadius, cornerRadiusPolicy);
   vCornerRadius = min( vCornerRadius, minSize * 0.5 );
-  vRectSize = visualSize / 2.0;
-  // optimize fragment shader
-  mediump float maxRadius = max(max(vCornerRadius.x, vCornerRadius.y), max(vCornerRadius.z, vCornerRadius.w));
-  vOptRectSize = vRectSize - 0.2929 * maxRadius - 1.0;
+  vRectSize = visualSize / 2.0 - vCornerRadius;
+  vCornerRadius = max( vCornerRadius, 1.0 );
   vPosition = aPosition* visualSize;
   return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );
 }

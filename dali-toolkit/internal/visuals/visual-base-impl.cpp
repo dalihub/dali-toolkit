@@ -219,26 +219,10 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
       }
       case Toolkit::DevelVisual::Property::CORNER_RADIUS:
       {
-        if(value.GetType() == Property::VECTOR4)
+        float radius;
+        if(value.Get(radius))
         {
-          // If CORNER_RADIUS Property is Vector4,
-          // Each values mean the radius of
-          // (top-left, top-right, bottom-right, bottom-left)
-          Vector4 radius;
-          if(value.Get(radius))
-          {
-            mImpl->mCornerRadius = radius;
-          }
-        }
-        else
-        {
-          // If CORNER_RADIUS Property is float,
-          // Every corner radius have same value
-          float radius;
-          if(value.Get(radius))
-          {
-            mImpl->mCornerRadius = Vector4(radius, radius, radius, radius);
-          }
+          mImpl->mCornerRadius = radius;
         }
         break;
       }
@@ -386,7 +370,7 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
     }
     if(mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
     {
-      mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<Vector4>(mImpl->mCornerRadiusIndex);
+      mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<float>(mImpl->mCornerRadiusIndex);
     }
   }
 
@@ -465,9 +449,9 @@ bool Visual::Base::IsRoundedCornerRequired() const
   if(mImpl->mRenderer && mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
   {
     // Update values from Renderer
-    mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<Vector4>(mImpl->mCornerRadiusIndex);
+    mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<float>(mImpl->mCornerRadiusIndex);
   }
-  return !(mImpl->mCornerRadius == Vector4::ZERO) || mImpl->mNeedCornerRadius;
+  return !EqualsZero(mImpl->mCornerRadius) || mImpl->mNeedCornerRadius;
 }
 
 void Visual::Base::OnDoAction(const Property::Index actionId, const Property::Value& attributes)

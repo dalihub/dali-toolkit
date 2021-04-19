@@ -1,8 +1,7 @@
 INPUT mediump vec2 vTexCoord;
 INPUT mediump vec2 vPosition;
 INPUT mediump vec2 vRectSize;
-INPUT mediump vec2 vOptRectSize;
-INPUT mediump vec4 vCornerRadius;
+INPUT mediump float vCornerRadius;
 
 uniform sampler2D sTexture;
 uniform lowp vec4 uColor;
@@ -11,35 +10,23 @@ uniform lowp float preMultipliedAlpha;
 
 void main()
 {
-  if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
-  {
-    OUT_COLOR = TEXTURE(sTexture, vTexCoord) * uColor * vec4(mixColor, 1.0);
-    return;
-  }
-  mediump float radius =
-  mix(
-    mix(vCornerRadius.x, vCornerRadius.y, sign(vPosition.x) * 0.5 + 0.5),
-    mix(vCornerRadius.w, vCornerRadius.z, sign(vPosition.x) * 0.5 + 0.5),
-    sign(vPosition.y) * 0.5 + 0.5
-  );
-
-  mediump vec2 diff = abs(vPosition) - vRectSize + radius;
-  mediump float dist = length(max(diff, vec2(0.0))) - radius;
+  mediump vec2 diff = abs( vPosition ) - vRectSize;
+  mediump float dist = length( max( diff, vec2( 0.0 ) ) ) - vCornerRadius;
   mediump float opacity = 1.0;
-  if(dist > 1.0)
+  if( dist > 1.0 )
   {
     opacity = 0.0;
   }
-  else if(dist > -1.0)
+  else if( dist > -1.0 )
   {
-    if(min(diff.x, diff.y) < 0.0)
+    if( min( diff.x, diff.y ) < 0.0 )
     {
-      dist += min(diff.x, diff.y) / max(radius, 1.0);
+      dist += min( diff.x, diff.y ) / vCornerRadius;
     }
-    opacity = 1.0 - smoothstep(-1.0, 1.0, dist);
+    opacity = 1.0 - smoothstep( -1.0, 1.0, dist );
   }
 
-  OUT_COLOR = TEXTURE(sTexture, vTexCoord) * uColor * vec4(mixColor, 1.0);
+  OUT_COLOR = TEXTURE( sTexture, vTexCoord ) * uColor * vec4( mixColor, 1.0 );
   OUT_COLOR.a *= opacity;
-  OUT_COLOR.rgb *= mix(1.0, opacity, preMultipliedAlpha);
+  OUT_COLOR.rgb *= mix( 1.0, opacity, preMultipliedAlpha );
 }
