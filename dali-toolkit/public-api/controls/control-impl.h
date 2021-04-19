@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/style-change.h>
-#include <dali/public-api/animation/alpha-function.h>
-#include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/events/long-press-gesture.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture.h>
@@ -253,27 +251,6 @@ public:
   DALI_INTERNAL void KeyboardEnter();
   /// @endcond
 
-  /**
-   * @brief Retrieve visual property animations.
-   * This Control is a destination.
-   *
-   * @param[in] animation generated animation
-   * @param[in] source source control of the animation.
-   * @param[in] alphaFunction AlphaFunction of the animation
-   * @param[in] timePeriod TimePeriod of the animation
-   */
-  virtual void CreateTransitions(Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod timePeriod);
-
-  /**
-   * @brief Set this Control is transparent or not without any affection on the child Actors.
-   */
-  void SetTransparent(bool transparent) override;
-
-  /**
-   * @brief Get this Control is transparent or not.
-   */
-  bool GetTransparent() const override;
-
   // Signals
 
   /**
@@ -301,9 +278,6 @@ public:
    */
   DALI_INTERNAL bool EmitKeyEventSignal(const KeyEvent& event);
   /// @endcond
-
-private: // For utility method
-  void MakeVisualTransition(Dali::Animation& animation, Dali::Toolkit::Control source, Dali::Property::Index index, AlphaFunction alphaFunction, TimePeriod timePeriod);
 
 protected: // For derived classes to call
   /**

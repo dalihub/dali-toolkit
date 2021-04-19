@@ -247,65 +247,6 @@ float ImageView::GetWidthForHeight(float height)
   }
 }
 
-void ImageView::CreateTransitions(Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod period)
-{
-  Control::CreateTransitions(animation, source, alphaFunction, period);
-
-  Dali::Toolkit::ImageView destinationHandle = Toolkit::ImageView(GetOwner());
-  Toolkit::Visual::Base    destinationVisual = DevelControl::GetVisual(GetImplementation(destinationHandle), Toolkit::ImageView::Property::IMAGE);
-  Property::Map            destinationMap;
-
-  if(!destinationVisual)
-  {
-    return;
-  }
-
-  destinationVisual.CreatePropertyMap(destinationMap);
-
-  Vector4 sourceMixColor(0.0f, 0.0f, 0.0f, 0.0f);
-  Vector4 sourceCornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
-  Vector4 destinationMixColor     = destinationMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
-  Vector4 destinationCornerRadius = destinationMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
-
-  Dali::Toolkit::ImageView sourceHandle = Dali::Toolkit::ImageView::DownCast(source);
-  Toolkit::Visual::Base    sourceVisual;
-  Property::Map            sourceMap;
-
-  if(sourceHandle)
-  {
-    sourceVisual = DevelControl::GetVisual(GetImplementation(sourceHandle), Toolkit::ImageView::Property::IMAGE);
-  }
-
-  if(sourceVisual)
-  {
-    sourceVisual.CreatePropertyMap(sourceMap);
-    sourceMixColor     = sourceMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
-    sourceCornerRadius = sourceMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
-  }
-
-  if(Vector3(sourceMixColor) != Vector3(destinationMixColor))
-  {
-    Dali::KeyFrames keyframes = Dali::KeyFrames::New();
-    keyframes.Add(0.0f, Vector3(sourceMixColor));
-    keyframes.Add(1.0f, Vector3(destinationMixColor));
-    animation.AnimateBetween(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::MIX_COLOR), keyframes, alphaFunction, period);
-  }
-  if(std::abs(sourceMixColor.a - destinationMixColor.a) > Math::MACHINE_EPSILON_1)
-  {
-    Dali::KeyFrames keyframes = Dali::KeyFrames::New();
-    keyframes.Add(0.0f, sourceMixColor.a);
-    keyframes.Add(1.0f, destinationMixColor.a);
-    animation.AnimateBetween(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY), keyframes, alphaFunction, period);
-  }
-  if(sourceCornerRadius != destinationCornerRadius)
-  {
-    Dali::KeyFrames keyframes = Dali::KeyFrames::New();
-    keyframes.Add(0.0f, sourceCornerRadius);
-    keyframes.Add(1.0f, destinationCornerRadius);
-    animation.AnimateBetween(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::DevelVisual::Property::CORNER_RADIUS), keyframes, alphaFunction, period);
-  }
-}
-
 void ImageView::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   Control::OnRelayout(size, container);
