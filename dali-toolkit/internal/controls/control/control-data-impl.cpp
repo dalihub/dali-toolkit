@@ -487,7 +487,6 @@ Control::Impl::~Impl()
     StopObservingVisual(iter->visual);
   }
 
-  AccessibilityDeregister(false);
   // All gesture detectors will be destroyed so no need to disconnect.
   delete mStartingPinchScale;
 
