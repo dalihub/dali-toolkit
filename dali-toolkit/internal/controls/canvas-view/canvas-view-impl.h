@@ -82,7 +82,7 @@ protected: // Implementation of Processor
   /**
    * @copydoc Dali::Integration::Processor::Process()
    */
-  void Process() override;
+  void Process(bool postProcessor) override;
 
 private:
   /**
