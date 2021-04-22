@@ -77,6 +77,22 @@ include_directories(${repo_root_dir}
 	${prefix_include_dir}
 )
 
+# Generate source files for shaders
+SET(SHADER_SOURCE_DIR "${scene_loader_dir}/internal/graphics/shaders/")
+SET(SHADER_GENERATED_DIR "${scene_loader_dir}/internal/graphics/generated")
+
+SET(GENERATED_SHADER_DIR ${scene_loader_dir}/internal/graphics/)
+SET_PROPERTY(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
+             "${GENERATED_SHADER_DIR}/generated/"
+             "${GENERATED_SHADER_DIR}/builtin-shader-extern-gen.h")
+
+SET( BUILT_IN_SHADER_GEN_CPP "${GENERATED_SHADER_DIR}/generated/builtin-shader-gen.cpp")
+ADD_CUSTOM_COMMAND(OUTPUT ${BUILT_IN_SHADER_GEN_CPP}
+                   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/../${SHADER_GENERATOR_NAME}
+                   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/../${SHADER_GENERATOR_NAME} ${SHADER_SOURCE_DIR} ${SHADER_GENERATED_DIR})
+
+SET( scene_loader_src_files ${scene_loader_src_files} ${BUILT_IN_SHADER_GEN_CPP} )
+
 add_library(${name} SHARED ${scene_loader_src_files})
 
 target_link_libraries(${name} ${DALICORE_LDFLAGS} ${DALIADAPTOR_LDFLAGS}
@@ -86,16 +102,6 @@ target_link_libraries(${name} ${DALICORE_LDFLAGS} ${DALIADAPTOR_LDFLAGS}
 if( ANDROID )
 	target_link_libraries(${name} log)
 endif()
-
-# Generate source files for shaders
-SET(SHADER_SOURCE_DIR "${scene_loader_dir}/internal/graphics/shaders/")
-SET(SHADER_GENERATED_DIR "${scene_loader_dir}/internal/graphics/generated")
-EXECUTE_PROCESS( COMMAND bash -c "${repo_root_dir}/build/tizen/shader-generator.sh ${SHADER_SOURCE_DIR} ${SHADER_GENERATED_DIR}" )
-
-SET(GENERATED_SHADER_DIR ${scene_loader_dir}/internal/graphics/)
-SET_PROPERTY(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
-             "${GENERATED_SHADER_DIR}/generated/"
-             "${GENERATED_SHADER_DIR}/builtin-shader-extern-gen.h")
 
 IF( INSTALL_CMAKE_MODULES )
 	SET_TARGET_PROPERTIES( ${name}

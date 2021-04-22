@@ -379,6 +379,7 @@ esac
 %defattr(-,root,root,-)
 %{dev_include_path}/dali-toolkit/*
 %{_libdir}/pkgconfig/dali2-toolkit.pc
+%{_bindir}/dali-shader-generator
 
 %files resources_360x360
 %manifest dali-toolkit-resources.manifest
