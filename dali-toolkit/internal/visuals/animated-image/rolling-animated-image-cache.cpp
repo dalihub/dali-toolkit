@@ -18,6 +18,7 @@
 #include "rolling-animated-image-cache.h"
 
 // EXTERNAL HEADERS
+#include <dali/devel-api/rendering/texture-devel.h>
 
 // INTERNAL HEADERS
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
@@ -89,6 +90,15 @@ RollingAnimatedImageCache::~RollingAnimatedImageCache()
 
 TextureSet RollingAnimatedImageCache::Frame( uint32_t frameIndex )
 {
+  if(mQueue.IsFull() && IsFrontReady() == true)
+  {
+    TextureSet textureSet = GetFrontTextureSet();
+    if(!Dali::DevelTexture::IsUploaded(textureSet.GetTexture(0)))
+    {
+      return textureSet;
+    }
+  }
+
   bool popExist = false;
   while( !mQueue.IsEmpty() && mQueue.Front().mFrameNumber != frameIndex )
   {
