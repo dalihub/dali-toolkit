@@ -3386,3 +3386,188 @@ int UtcDaliTextEditorLineCountAfterGetNaturalSize(void)
 
   END_TEST;
 }
+
+
+int utcDaliTextEditorGetHeightForWidthDoesNotChangeLineCountScrollingCase(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" utcDaliTextEditorGetHeightForWidthDoesNotChangeLineCountScrollingCase ");
+
+  int lineCountBefore =0 ;
+  int lineCountAfter =0 ;
+
+  // Create a text editor
+  TextEditor textEditor = TextEditor::New();
+  //Set very large font-size using point-size
+  textEditor.SetProperty( TextEditor::Property::POINT_SIZE, 10) ;
+  //Specify font-family
+  textEditor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
+  //Specify size
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  //Set text longer than width of textEditor
+  textEditor.SetProperty( TextEditor::Property::TEXT, "TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST ");
+
+  application.GetScene().Add( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+  //Failed case is the GetHeightForWidth change LineCount then the scrollor will not arrive to latest line
+  //GetHeightForWidth is a retrieval method which should not modify object
+  lineCountBefore =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  textEditor.GetHeightForWidth(200.f);
+
+  //This is to simulate focus into text editor after calling GetHeightForWidth
+  //Create a tap event to touch the text editor.
+  TestGenerateTap( application, 18.0f, 25.0f );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCountAfter =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+
+  //The LineCount must not be changed when calling GetHeightForWidth.
+  DALI_TEST_EQUALS( lineCountAfter , lineCountBefore, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorGetHeightForWidthDoesNotChangeLineCountLineWrapCharCase(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" utcDaliTextEditorGetHeightForWidthDoesNotChangeLineCountLineWrapCharCase ");
+
+  int lineCountBefore =0 ;
+  int lineCountAfter =0 ;
+
+  // Create a text editor
+  TextEditor textEditor = TextEditor::New();
+  //Set very large font-size using point-size
+  textEditor.SetProperty( TextEditor::Property::POINT_SIZE, 10) ;
+  //Specify font-family
+  textEditor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
+  //Specify size
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 50.f, 100.f ) );
+  //Set text longer than width of textEditor
+  textEditor.SetProperty( TextEditor::Property::TEXT, "qwertyuiopasdfghjklzxcvbnm\n");
+  //Set line wrap mode Character
+  textEditor.SetProperty(TextEditor::Property::LINE_WRAP_MODE, "CHARACTER");
+
+  application.GetScene().Add( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+  //Failed case is the GetHeightForWidth change LineCount which make position of cursor invalid in TextEditor
+  //GetHeightForWidth is a retrieval method which should not modify object
+  lineCountBefore =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  textEditor.GetHeightForWidth(200.f);
+
+  //This is to simulate focus into text editor after calling GetHeightForWidth
+  //Create a tap event to touch the text editor.
+  TestGenerateTap( application, 18.0f, 25.0f );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCountAfter =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+
+  //The LineCount must not be changed when calling GetHeightForWidth.
+  DALI_TEST_EQUALS( lineCountAfter , lineCountBefore, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorGetNaturalSizeDoesNotChangeLineCountScrollingCase(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" utcDaliTextEditorGetNaturalSizeDoesNotChangeLineCountScrollingCase ");
+
+  int lineCountBefore =0 ;
+  int lineCountAfter =0 ;
+
+  // Create a text editor
+  TextEditor textEditor = TextEditor::New();
+  //Set very large font-size using point-size
+  textEditor.SetProperty( TextEditor::Property::POINT_SIZE, 10) ;
+  //Specify font-family
+  textEditor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
+  //Specify size
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  //Set text longer than width of textEditor
+  textEditor.SetProperty( TextEditor::Property::TEXT, "TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST ");
+
+  application.GetScene().Add( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+  //Failed case is the GetNaturalSize change LineCount then the scrollor will not arrive to latest line
+  //GetNaturalSize is a retrieval method which should not modify object
+  lineCountBefore =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  textEditor.GetNaturalSize();
+
+  //This is to simulate focus into text editor after calling GetNaturalSize
+  //Create a tap event to touch the text editor.
+  TestGenerateTap( application, 18.0f, 25.0f );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCountAfter =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+
+  //The LineCount must not be changed when calling GetNaturalSize.
+  DALI_TEST_EQUALS( lineCountAfter , lineCountBefore, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorGetNaturalSizeDoesNotChangeLineCountLineWrapCharCase(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" utcDaliTextEditorGetNaturalSizeDoesNotChangeLineCountLineWrapCharCase ");
+
+  int lineCountBefore =0 ;
+  int lineCountAfter =0 ;
+
+  // Create a text editor
+  TextEditor textEditor = TextEditor::New();
+  //Set very large font-size using point-size
+  textEditor.SetProperty( TextEditor::Property::POINT_SIZE, 10) ;
+  //Specify font-family
+  textEditor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
+  //Specify size
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 50.f, 100.f ) );
+  //Set text longer than width of textEditor
+  textEditor.SetProperty( TextEditor::Property::TEXT, "qwertyuiopasdfghjklzxcvbnm\n");
+  //Set line wrap mode Character
+  textEditor.SetProperty(TextEditor::Property::LINE_WRAP_MODE, "CHARACTER");
+
+  application.GetScene().Add( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+  //Failed case is the GetNaturalSize change LineCount which make position of cursor invalid in TextEditor
+  //GetNaturalSize is a retrieval method which should not modify object
+  lineCountBefore =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  textEditor.GetNaturalSize( );
+
+  //This is to simulate focus into text editor after calling GetNaturalSize
+  //Create a tap event to touch the text editor.
+  TestGenerateTap( application, 18.0f, 25.0f );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCountAfter =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+
+  //The LineCount must not be changed when calling GetNaturalSize.
+  DALI_TEST_EQUALS( lineCountAfter , lineCountBefore, TEST_LOCATION );
+
+  END_TEST;
+}
