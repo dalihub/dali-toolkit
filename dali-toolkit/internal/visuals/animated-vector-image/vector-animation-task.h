@@ -47,6 +47,8 @@ class VectorAnimationTask : public RefObject
 public:
   using UploadCompletedSignalType = Dali::VectorAnimationRenderer::UploadCompletedSignalType;
 
+  using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
+
   /**
    * Flags for re-sending data to the vector animation thread
    */
@@ -195,13 +197,13 @@ public:
    * @brief Calculates the time for the next frame rasterization.
    * @return The time for the next frame rasterization.
    */
-  std::chrono::time_point<std::chrono::system_clock> CalculateNextFrameTime(bool renderNow);
+  TimePoint CalculateNextFrameTime(bool renderNow);
 
   /**
    * @brief Gets the time for the next frame rasterization.
    * @return The time for the next frame rasterization.
    */
-  std::chrono::time_point<std::chrono::system_clock> GetNextFrameTime();
+  TimePoint GetNextFrameTime();
 
 private:
   /**
@@ -284,32 +286,33 @@ private:
     PAUSED    ///< The animation is paused
   };
 
-  std::string                                        mUrl;
-  VectorAnimationRenderer                            mVectorRenderer;
-  AnimationData                                      mAnimationData[2];
-  VectorAnimationThread&                             mVectorAnimationThread;
-  ConditionalWait                                    mConditionalWait;
-  std::unique_ptr<EventThreadCallback>               mAnimationFinishedTrigger;
-  PlayState                                          mPlayState;
-  DevelImageVisual::StopBehavior::Type               mStopBehavior;
-  DevelImageVisual::LoopingMode::Type                mLoopingMode;
-  std::chrono::time_point<std::chrono::system_clock> mNextFrameStartTime;
-  int64_t                                            mFrameDurationNanoSeconds;
-  float                                              mFrameRate;
-  uint32_t                                           mCurrentFrame;
-  uint32_t                                           mTotalFrame;
-  uint32_t                                           mStartFrame;
-  uint32_t                                           mEndFrame;
-  uint32_t                                           mWidth;
-  uint32_t                                           mHeight;
-  uint32_t                                           mAnimationDataIndex;
-  int32_t                                            mLoopCount;
-  int32_t                                            mCurrentLoop;
-  bool                                               mForward;
-  bool                                               mUpdateFrameNumber;
-  bool                                               mNeedAnimationFinishedTrigger;
-  bool                                               mAnimationDataUpdated;
-  bool                                               mDestroyTask;
+  std::string                          mUrl;
+  VectorAnimationRenderer              mVectorRenderer;
+  AnimationData                        mAnimationData[2];
+  VectorAnimationThread&               mVectorAnimationThread;
+  ConditionalWait                      mConditionalWait;
+  std::unique_ptr<EventThreadCallback> mAnimationFinishedTrigger;
+  PlayState                            mPlayState;
+  DevelImageVisual::StopBehavior::Type mStopBehavior;
+  DevelImageVisual::LoopingMode::Type  mLoopingMode;
+  TimePoint                            mNextFrameStartTime;
+  int64_t                              mFrameDurationMicroSeconds;
+  float                                mFrameRate;
+  uint32_t                             mCurrentFrame;
+  uint32_t                             mTotalFrame;
+  uint32_t                             mStartFrame;
+  uint32_t                             mEndFrame;
+  uint32_t                             mDroppedFrames;
+  uint32_t                             mWidth;
+  uint32_t                             mHeight;
+  uint32_t                             mAnimationDataIndex;
+  int32_t                              mLoopCount;
+  int32_t                              mCurrentLoop;
+  bool                                 mForward;
+  bool                                 mUpdateFrameNumber;
+  bool                                 mNeedAnimationFinishedTrigger;
+  bool                                 mAnimationDataUpdated;
+  bool                                 mDestroyTask;
 };
 
 } // namespace Internal
