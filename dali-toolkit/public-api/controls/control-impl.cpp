@@ -758,6 +758,68 @@ float Control::GetWidthForHeight(float height)
   return GetWidthForHeightBase(height);
 }
 
+void Control::CreateTransitions(Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod timePeriod)
+{
+  if(animation)
+  {
+    MakeVisualTransition(animation, source, Toolkit::Control::Property::BACKGROUND, alphaFunction, timePeriod);
+    MakeVisualTransition(animation, source, Toolkit::DevelControl::Property::SHADOW, alphaFunction, timePeriod);
+  }
+}
+
+void Control::MakeVisualTransition(Dali::Animation& animation, Dali::Toolkit::Control source, Dali::Property::Index index, AlphaFunction alphaFunction, TimePeriod timePeriod)
+{
+  Dali::Toolkit::Control sourceHandle      = Dali::Toolkit::Control::DownCast(source);
+  Property::Map          sourceMap         = sourceHandle.GetProperty<Property::Map>(index);
+  Dali::Toolkit::Control destinationHandle = Toolkit::Control(GetOwner());
+  Property::Map          destinationMap    = destinationHandle.GetProperty<Property::Map>(index);
+
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(*this);
+  Vector4                  mixColor(1.0f, 1.0f, 1.0f, 1.0f);
+  Vector4                  cornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
+
+  if(!destinationMap.Empty())
+  {
+    mixColor     = destinationMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
+    cornerRadius = destinationMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+
+    if(sourceMap.Empty())
+    {
+      sourceMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+      sourceMap.Insert(Dali::Toolkit::Visual::Property::MIX_COLOR, Color::TRANSPARENT);
+      sourceMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
+    }
+
+    Vector4 sourceMixColor     = sourceMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
+    Vector4 sourceCornerRadius = sourceMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+
+    if(Vector3(sourceMixColor) != Vector3(mixColor))
+    {
+      Dali::KeyFrames keyframes = Dali::KeyFrames::New();
+      keyframes.Add(0.0f, Vector3(sourceMixColor));
+      keyframes.Add(1.0f, Vector3(mixColor));
+      animation.AnimateBetween(controlDataImpl.GetVisualProperty(index, Dali::Toolkit::Visual::Property::MIX_COLOR), keyframes, alphaFunction, timePeriod);
+    }
+
+    if(std::abs(sourceMixColor.a - mixColor.a) > Math::MACHINE_EPSILON_1)
+    {
+      Dali::KeyFrames keyframes = Dali::KeyFrames::New();
+      keyframes.Add(0.0f, sourceMixColor.a);
+      keyframes.Add(1.0f, mixColor.a);
+      animation.AnimateBetween(controlDataImpl.GetVisualProperty(index, Dali::Toolkit::Visual::Property::OPACITY), keyframes, alphaFunction, timePeriod);
+    }
+
+    if(sourceCornerRadius != cornerRadius)
+    {
+      Dali::KeyFrames keyframes = Dali::KeyFrames::New();
+      keyframes.Add(0.0f, sourceCornerRadius);
+      keyframes.Add(1.0f, cornerRadius);
+      // TODO: check corner radius policy
+      animation.AnimateBetween(controlDataImpl.GetVisualProperty(index, Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS), keyframes, alphaFunction, timePeriod);
+    }
+  }
+}
+
 bool Control::RelayoutDependentOnChildren(Dimension::Type dimension)
 {
   return RelayoutDependentOnChildrenBase(dimension);
