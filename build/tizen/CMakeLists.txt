@@ -297,11 +297,11 @@ SET(SHADER_GENERATOR_SOURCES ${ROOT_SRC_DIR}/dali-toolkit/shader-generator/shade
 
 IF(NOT ANDROID)
   ADD_EXECUTABLE(${SHADER_GENERATOR_NAME} ${SHADER_GENERATOR_SOURCES})
-  INSTALL(TARGETS ${SHADER_GENERATOR_NAME} DESTINATION ${BINDIR})
+  INSTALL(TARGETS ${SHADER_GENERATOR_NAME} RUNTIME DESTINATION bin)
 ELSE()
   # Need to build dali-shader-generator using the host compiler, not the android cross-compiler so
   # that it can be run on the host machine
-  OPTION(ANDROID_HOST_COMPILER "Provide the host compiler used by Android (Mandatory for Android")
+  OPTION(ANDROID_HOST_COMPILER "Provide the host compiler used by Android (Mandatory)")
   IF(${ANDROID_HOST_COMPILER} STREQUAL "OFF")
     MESSAGE(FATAL_ERROR "-DANDROID_HOST_COMPILER=\"Compiler\" must be set")
   ENDIF()
