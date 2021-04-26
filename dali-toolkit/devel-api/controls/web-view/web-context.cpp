@@ -54,11 +54,6 @@ void WebContext::SetCertificateFilePath(const std::string& certificatePath)
   mWebEngineContext.SetCertificateFilePath(certificatePath);
 }
 
-void WebContext::DisableCache(bool cacheDisabled)
-{
-  mWebEngineContext.DisableCache(cacheDisabled);
-}
-
 void WebContext::SetDefaultProxyAuth(const std::string& username, const std::string& password)
 {
   mWebEngineContext.SetDefaultProxyAuth(username, password);
@@ -94,9 +89,9 @@ void WebContext::DeleteAllWebStorage()
   mWebEngineContext.DeleteAllWebStorage();
 }
 
-bool WebContext::DeleteWebStorageOrigin(Dali::WebEngineSecurityOrigin& origin)
+bool WebContext::DeleteWebStorage(Dali::WebEngineSecurityOrigin& origin)
 {
-  return mWebEngineContext.DeleteWebStorageOrigin(origin);
+  return mWebEngineContext.DeleteWebStorage(origin);
 }
 
 void WebContext::DeleteLocalFileSystem()
@@ -127,6 +122,111 @@ void WebContext::RegisterDownloadStartedCallback(Dali::WebEngineContext::WebEngi
 void WebContext::RegisterMimeOverriddenCallback(Dali::WebEngineContext::WebEngineMimeOverriddenCallback callback)
 {
   mWebEngineContext.RegisterMimeOverriddenCallback(callback);
+}
+
+void WebContext::EnableCache(bool cacheEnabled)
+{
+  mWebEngineContext.EnableCache(cacheEnabled);
+}
+
+bool WebContext::IsCacheEnabled() const
+{
+  return mWebEngineContext.IsCacheEnabled();
+}
+
+std::string WebContext::GetContextCertificateFile() const
+{
+  return mWebEngineContext.GetContextCertificateFile();
+}
+
+void WebContext::SetContextAppId(const std::string& appID)
+{
+  mWebEngineContext.SetContextAppId(appID);
+}
+
+bool WebContext::SetContextAppVersion(const std::string& appVersion)
+{
+  return mWebEngineContext.SetContextAppVersion(appVersion);
+}
+
+void WebContext::SetContextApplicationType(const Dali::WebEngineContext::ApplicationType applicationType)
+{
+  mWebEngineContext.SetContextApplicationType(applicationType);
+}
+
+void WebContext::SetContextTimeOffset(float timeOffset)
+{
+  mWebEngineContext.SetContextTimeOffset(timeOffset);
+}
+
+void WebContext::SetContextTimeZoneOffset(float timeZoneOffset, float daylightSavingTime)
+{
+  mWebEngineContext.SetContextTimeZoneOffset(timeZoneOffset, daylightSavingTime);
+}
+
+void WebContext::RegisterUrlSchemesAsCorsEnabled(const std::vector<std::string>& schemes)
+{
+  mWebEngineContext.RegisterUrlSchemesAsCorsEnabled(schemes);
+}
+
+void WebContext::RegisterJsPluginMimeTypes(const std::vector<std::string>& mimeTypes)
+{
+  mWebEngineContext.RegisterJsPluginMimeTypes(mimeTypes);
+}
+
+void WebContext::SetDefaultZoomFactor(float zoomFactor)
+{
+  mWebEngineContext.SetDefaultZoomFactor(zoomFactor);
+}
+
+float WebContext::GetContextDefaultZoomFactor() const
+{
+  return mWebEngineContext.GetContextDefaultZoomFactor();
+}
+
+bool WebContext::DeleteAllApplicationCache()
+{
+  return mWebEngineContext.DeleteAllApplicationCache();
+}
+
+bool WebContext::DeleteAllWebIndexedDatabase()
+{
+  return mWebEngineContext.DeleteAllWebIndexedDatabase();
+}
+
+void WebContext::DeleteFormPasswordDataList(const std::vector<std::string>& list)
+{
+  mWebEngineContext.DeleteFormPasswordDataList(list);
+}
+
+void WebContext::DeleteAllFormPasswordData()
+{
+  mWebEngineContext.DeleteAllFormPasswordData();
+}
+
+void WebContext::DeleteAllFormCandidateData()
+{
+  mWebEngineContext.DeleteAllFormCandidateData();
+}
+
+std::string WebContext::GetContextProxy() const
+{
+  return mWebEngineContext.GetContextProxy();
+}
+
+void WebContext::SetContextProxy(const std::string& proxy, const std::string& bypass)
+{
+  mWebEngineContext.SetContextProxy(proxy, bypass);
+}
+
+std::string WebContext::GetProxyBypassRule() const
+{
+  return mWebEngineContext.GetProxyBypassRule();
+}
+
+bool WebContext::FreeUnusedMemory()
+{
+  return mWebEngineContext.FreeUnusedMemory();
 }
 
 } // namespace Toolkit
