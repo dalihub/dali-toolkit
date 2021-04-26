@@ -161,11 +161,6 @@ protected:
    */
   Vector4 GetWorldColor(Dali::Actor actor);
 
-  bool IsTransitionWithChild()
-  {
-    return mTransitionWithChild;
-  }
-
 protected:
   /**
    * Construct a new TransitionBase.

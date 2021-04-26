@@ -129,14 +129,7 @@ void Transition::OnPlay()
   SetFinishPropertyMap(finishPropertyMap);
 
   // source View becomes transparent during transition.
-  if(IsTransitionWithChild())
-  {
-    mSourceView[Dali::Actor::Property::VISIBLE] = false;
-  }
-  else
-  {
-    GetImplementation(mSourceView).SetTransparent(true);
-  }
+  GetImplementation(mSourceView).SetTransparent(true);
 
   Dali::Animation animation = GetAnimation();
   if(!animation)
@@ -151,14 +144,7 @@ void Transition::OnFinished()
 {
   if(mShowSourceAfterFinished)
   {
-    if(IsTransitionWithChild())
-    {
-      mSourceView[Dali::Actor::Property::VISIBLE] = true;
-    }
-    else
-    {
-      GetImplementation(mSourceView).SetTransparent(false);
-    }
+    GetImplementation(mSourceView).SetTransparent(false);
   }
 }
 
