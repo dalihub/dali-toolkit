@@ -120,7 +120,7 @@ void VectorAnimationManager::UnregisterEventCallback(CallbackBase* callback)
   }
 }
 
-void VectorAnimationManager::Process()
+void VectorAnimationManager::Process(bool postProcessor)
 {
   for(auto&& iter : mEventCallbacks)
   {
