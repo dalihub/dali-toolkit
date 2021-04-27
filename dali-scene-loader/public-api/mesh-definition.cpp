@@ -466,9 +466,9 @@ void MeshDefinition::Blob::ApplyMinMax(const std::vector<float>& min, const std:
                                 : (max.empty() ? [](const float* min, const float* max, uint32_t i, float& value) {
                                     value = std::max(min[i], value);
                                   }
-                                               : [](const float* min, const float* max, uint32_t i, float& value) {
+                                               : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value) {
                                                    value = std::min(std::max(min[i], value), max[i]);
-                                                 });
+                                                 }));
 
   if(!clampFn)
   {
