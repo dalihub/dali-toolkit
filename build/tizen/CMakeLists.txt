@@ -295,6 +295,12 @@ SET_PROPERTY(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
 SET(SHADER_GENERATOR_NAME dali-shader-generator)
 SET(SHADER_GENERATOR_SOURCES ${ROOT_SRC_DIR}/dali-toolkit/shader-generator/shader-generator.cpp)
 
+IF(WIN32)
+  # Allows execution of the shader generator executable as if it's in the cmake build directory rather
+  # than a Debug or Release subdirectory
+  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+ENDIF()
+
 IF(NOT ANDROID)
   ADD_EXECUTABLE(${SHADER_GENERATOR_NAME} ${SHADER_GENERATOR_SOURCES})
   INSTALL(TARGETS ${SHADER_GENERATOR_NAME} RUNTIME DESTINATION bin)
