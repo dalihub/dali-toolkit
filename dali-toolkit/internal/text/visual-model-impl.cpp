@@ -384,6 +384,11 @@ void VisualModel::SetBackgroundEnabled(bool enabled)
   mBackgroundEnabled = enabled;
 }
 
+void VisualModel::SetMarkupProcessorEnabled(bool enabled)
+{
+  mMarkupProcessorEnabled = enabled;
+}
+
 const Vector4& VisualModel::GetTextColor() const
 {
   return mTextColor;
@@ -439,6 +444,11 @@ bool VisualModel::IsBackgroundEnabled() const
   return mBackgroundEnabled;
 }
 
+bool VisualModel::IsMarkupProcessorEnabled() const
+{
+  return mMarkupProcessorEnabled;
+}
+
 Length VisualModel::GetNumberOfUnderlineRuns() const
 {
   return mUnderlineRuns.Count();
@@ -476,7 +486,8 @@ VisualModel::VisualModel()
   mCachedLineIndex(0u),
   mUnderlineEnabled(false),
   mUnderlineColorSet(false),
-  mBackgroundEnabled(false)
+  mBackgroundEnabled(false),
+  mMarkupProcessorEnabled(false)
 {
 }
 
