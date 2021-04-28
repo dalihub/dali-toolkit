@@ -28,6 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/line-run.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 
 // DEVEL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
@@ -301,11 +302,53 @@ public:
   void SetUnderlineHeight(float height);
 
   /**
+   * @brief Set the override used for underline type.
+   *
+   * @param[in] underlineType The type of the underline.
+   */
+  void SetUnderlineType(Text::Underline::Type type);
+
+  /**
+   * @brief Set the override used for the width of the dashes of the dashed underline.
+   *
+   * @param[in] width width of the dashes.
+   */
+  void SetDashedUnderlineWidth(float width);
+
+  /**
+   * @brief Set the override used for the gap between the dashes of the dashed underline.
+   *
+   * @param[in] gap gap between the dashes.
+   */
+  void SetDashedUnderlineGap(float gap);
+
+  /**
    * @brief Retrieves the underline height override
    *
    * @return Returns the override height for an underline, 0 indicates that font metrics will determine the height
    */
   float GetUnderlineHeight() const;
+
+  /**
+   * @brief Retrieves the underline type override.
+   *
+   * @return Returns the override type for the underline.
+   */
+  Text::Underline::Type GetUnderlineType() const;
+
+  /**
+   * @brief Retrieves the dashed underline width.
+   *
+   * @return Returns the override width for the dashed underline.
+   */
+  float GetDashedUnderlineWidth() const;
+
+  /**
+   * @brief Retrieves the dashed underline gap.
+   *
+   * @return Returns the override gap for the dashed underline.
+   */
+  float GetDashedUnderlineGap() const;
 
   /**
    * @brief Retrieves the number of underline runs.
@@ -540,19 +583,21 @@ public:
   Vector<ColorIndex>     mColorIndices;           ///< Indices to the vector of colors for each glyphs.
   Vector<Vector4>        mBackgroundColors;       ///< Background colors of the glyphs.
   Vector<ColorIndex>     mBackgroundColorIndices; ///< Indices to the vector of background colors for each glyphs.
-
-  Vector4  mTextColor;           ///< The text color
-  Vector4  mShadowColor;         ///< Color of drop shadow
-  Vector4  mUnderlineColor;      ///< Color of underline
-  Vector4  mOutlineColor;        ///< Color of outline
-  Vector4  mBackgroundColor;     ///< Color of text background
-  Vector4  mStrikethroughColor;  ///< Color of text background
-  Size     mControlSize;         ///< The size of the UI control.
-  Vector2  mShadowOffset;        ///< Offset for drop shadow, 0 indicates no shadow
-  float    mUnderlineHeight;     ///< Fixed height for underline to override font metrics.
-  float    mStrikethroughHeight; ///< Fixed height for strikethrough to override font metrics.
-  float    mShadowBlurRadius;    ///< Blur radius of shadow, 0 indicates no blur.
-  uint16_t mOutlineWidth;        ///< Width of outline.
+  Vector4                mTextColor;              ///< The text color
+  Vector4                mShadowColor;            ///< Color of drop shadow
+  Vector4                mUnderlineColor;         ///< Color of underline
+  Vector4                mOutlineColor;           ///< Color of outline
+  Vector4                mBackgroundColor;        ///< Color of text background
+  Vector4                mStrikethroughColor;     ///< Color of text background
+  Size                   mControlSize;            ///< The size of the UI control.
+  Vector2                mShadowOffset;           ///< Offset for drop shadow, 0 indicates no shadow
+  float                  mUnderlineHeight;        ///< Fixed height for underline to override font metrics.
+  float                  mStrikethroughHeight;    ///< Fixed height for strikethrough to override font metrics.
+  Text::Underline::Type  mUnderlineType;          ///< The type of the underline.
+  float                  mDashedUnderlineWidth;   ///< The width of the dashes of the dashed underline.
+  float                  mDashedUnderlineGap;     ///< The gap between the dashes of the dashed underline.
+  float                  mShadowBlurRadius;       ///< Blur radius of shadow, 0 indicates no blur.
+  uint16_t               mOutlineWidth;           ///< Width of outline.
 
 private:
   Size mNaturalSize; ///< Size of the text with no line wrapping.

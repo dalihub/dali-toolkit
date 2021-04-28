@@ -625,6 +625,36 @@ float View::GetUnderlineHeight() const
   return 0.0f;
 }
 
+Text::Underline::Type View::GetUnderlineType() const
+{
+  Text::Underline::Type type = Text::Underline::Type::SOLID;
+  if(mImpl->mVisualModel)
+  {
+    type = mImpl->mVisualModel->GetUnderlineType();
+  }
+  return type;
+}
+
+float View::GetDashedUnderlineWidth() const
+{
+  float width = 0.0f;
+  if(mImpl->mVisualModel)
+  {
+    width = mImpl->mVisualModel->GetDashedUnderlineWidth();
+  }
+  return width;
+}
+
+float View::GetDashedUnderlineGap() const
+{
+  float gap = 0.0f;
+  if(mImpl->mVisualModel)
+  {
+    gap = mImpl->mVisualModel->GetDashedUnderlineGap();
+  }
+  return gap;
+}
+
 Length View::GetNumberOfUnderlineRuns() const
 {
   if(mImpl->mVisualModel)

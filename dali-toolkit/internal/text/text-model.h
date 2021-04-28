@@ -208,6 +208,21 @@ public:
   float GetUnderlineHeight() const override;
 
   /**
+   * @copydoc ModelInterface::GetUnderlineType()
+   */
+  Text::Underline::Type GetUnderlineType() const override;
+
+  /**
+   * @copydoc ModelInterface::GetDashedUnderlineWidth()
+   */
+  float GetDashedUnderlineWidth() const override;
+
+  /**
+   * @copydoc ModelInterface::GetDashedUnderlineGap()
+   */
+  float GetDashedUnderlineGap() const override;
+
+  /**
    * @copydoc ModelInterface::GetNumberOfUnderlineRuns()
    */
   Length GetNumberOfUnderlineRuns() const override;

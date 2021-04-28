@@ -192,6 +192,21 @@ float Model::GetUnderlineHeight() const
   return mVisualModel->GetUnderlineHeight();
 }
 
+Text::Underline::Type Model::GetUnderlineType() const
+{
+  return mVisualModel->GetUnderlineType();
+}
+
+float Model::GetDashedUnderlineWidth() const
+{
+  return mVisualModel->GetDashedUnderlineWidth();
+}
+
+float Model::GetDashedUnderlineGap() const
+{
+  return mVisualModel->GetDashedUnderlineGap();
+}
+
 Length Model::GetNumberOfUnderlineRuns() const
 {
   return mVisualModel->GetNumberOfUnderlineRuns();

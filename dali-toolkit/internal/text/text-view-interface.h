@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
 {
@@ -192,6 +193,27 @@ public:
    * @return Returns the override height for an underline, 0 indicates that adaptor will determine the height
    */
   virtual float GetUnderlineHeight() const = 0;
+
+  /**
+   * @brief Retrieves the underline type override
+   *
+   * @return Returns the override type for an underline.
+   */
+  virtual Text::Underline::Type GetUnderlineType() const = 0;
+
+  /**
+   * @brief Retrieves the dashed underline width override.
+   *
+   * @return Returns the override width for the dashed underline.
+   */
+  virtual float GetDashedUnderlineWidth() const = 0;
+
+  /**
+   * @brief Retrieves the dashed underline gap override.
+   *
+   * @return Returns the override gap for the dashed underline.
+   */
+  virtual float GetDashedUnderlineGap() const = 0;
 
   /**
    * @brief Retrieves the number of underline runs.

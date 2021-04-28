@@ -90,7 +90,29 @@ enum
    * @details Name "height", type Property::STRING or Property::FLOAT. i.e. "1.0" or 1.f
    * @note Optional. If not provided then the default height is used (1 pixel).
    */
-  HEIGHT
+  HEIGHT,
+
+  /**
+   * @brief The type of the underline.
+   * @details Name "type", type Property::STRING or type Text::Underline::Type. i.e "dashed" or Text::Underline::DASHED
+   *          Values "SOLID", "DASHED", "DOUBLE" , default SOLID.
+   * @note Optional. If not provided then the default type is used (solid underline).
+   */
+  TYPE,
+
+  /**
+   * @brief The width in pixels of the dashes of the dashed underline. Only valid when "DASHED" underline type is used.
+   * @details Name "dashWidth", type Property::STRING or Property::FLOAT. e.g. "1.0" or 1.f
+   * @note Optional. If not provided then the default width is used (1 pixel).
+   */
+  DASH_WIDTH,
+
+  /**
+   * @brief The gap in pixels between the dashes of the dashed underline. Only valid when "DASHED" underline type is used.
+   * @details Name "dashGap", type Property::STRING or Property::FLOAT. e.g. "1.0" or 1.f
+   * @note Optional. If not provided then the default gap is used (1 pixel).
+   */
+  DASH_GAP
 };
 
 } // namespace Property

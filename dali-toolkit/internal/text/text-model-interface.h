@@ -265,6 +265,27 @@ public:
   virtual float GetUnderlineHeight() const = 0;
 
   /**
+   * @brief Retrieves the underline type override.
+   *
+   * @return Returns the override type for an underline.
+   */
+  virtual Text::Underline::Type GetUnderlineType() const = 0;
+
+  /**
+   * @brief Retrieves the dashed underline width override
+   *
+   * @return Returns the override width for the dashed underline.
+   */
+  virtual float GetDashedUnderlineWidth() const = 0;
+
+  /**
+   * @brief Retrieves the dashed underline gap override
+   *
+   * @return Returns the override gap for the dashed underline.
+   */
+  virtual float GetDashedUnderlineGap() const = 0;
+
+  /**
    * @brief Retrieves the number of underline runs.
    *
    * @return The number of underline runs.

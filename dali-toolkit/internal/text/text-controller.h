@@ -1102,6 +1102,46 @@ public: // Default style & Input style
   float GetUnderlineHeight() const;
 
   /**
+   * @brief Sets the underline type.
+   * @param[in] type The underline type.
+   */
+  void SetUnderlineType(Text::Underline::Type type);
+
+  /**
+   * @brief Retrieve underline type.
+   * @return The underline type.
+   */
+  Text::Underline::Type GetUnderlineType() const;
+
+  /**
+   * @brief Set the width of the dashes of the dashed underline.
+   *
+   * @param[in] width The width in pixels of the dashes of the dashed underline.
+   */
+  void SetDashedUnderlineWidth(float width);
+
+  /**
+   * @brief Retrieves the width of the dashes of the dashed underline.
+   *
+   * @return The width of the dashes of the dashed underline.
+   */
+  float GetDashedUnderlineWidth() const;
+
+  /**
+   * @brief Set the gap between the dashes of the dashed underline.
+   *
+   * @param[in] gap The gap between the dashes of the dashed underline.
+   */
+  void SetDashedUnderlineGap(float gap);
+
+  /**
+   * @brief Retrieves the gap between the dashes of the dashed underline.
+   *
+   * @return The The gap between the dashes of the dashed underline.
+   */
+  float GetDashedUnderlineGap() const;
+
+  /**
    * @brief Set the outline color.
    *
    * @param[in] color color of outline.

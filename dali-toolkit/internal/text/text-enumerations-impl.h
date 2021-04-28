@@ -78,6 +78,13 @@ const char* GetVerticalAlignmentString(const Toolkit::Text::VerticalAlignment::T
  */
 bool GetEllipsisPositionTypeEnumeration(const Property::Value& propertyValue, Toolkit::DevelText::EllipsisPosition::Type& ellipsisPositionType);
 
+/**
+ * @brief Converts the underline type to string format.
+ * @param[in] type the Toolkit::Text::Underline::Type enum source
+ * @return the string equivalent
+ */
+const char* GetUnderlineTypeToString(const Toolkit::Text::Underline::Type& type);
+
 } // namespace Text
 
 } // namespace Toolkit
