@@ -27,6 +27,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/rendering/texture-devel.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
@@ -869,7 +870,7 @@ void VideoView::PlayAnimation(Dali::Animation animation)
 
 Dali::Shader VideoView::CreateShader()
 {
-  std::string fragmentShader = "#extension GL_OES_EGL_image_external:require\n";
+  std::string fragmentShader;
   std::string vertexShader;
   std::string customFragmentShader;
   bool        checkShader = false;
@@ -900,13 +901,15 @@ Dali::Shader VideoView::CreateShader()
 
     if(!fragmentShaderValue || !checkShader)
     {
-      fragmentShader += SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
+      fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
+      DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader);
     }
   }
   else
   {
-    vertexShader = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
-    fragmentShader += SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
+    vertexShader   = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
+    fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
+    DevelTexture::ApplyNativeFragmentShader(mNativeTexture, fragmentShader);
   }
 
   return Dali::Shader::New(vertexShader, fragmentShader);
