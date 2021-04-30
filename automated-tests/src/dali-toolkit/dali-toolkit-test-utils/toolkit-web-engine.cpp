@@ -1507,9 +1507,9 @@ public:
     return mConsoleMessageSignal;
   }
 
-  Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType& PolicyDecisionSignal()
+  Dali::WebEnginePlugin::WebEngineResponsePolicyDecisionSignalType& ResponsePolicyDecisionSignal()
   {
-    return mPolicyDecisionSignal;
+    return mResponsePolicyDecisionSignal;
   }
 
   Dali::WebEnginePlugin::WebEngineCertificateSignalType& CertificateConfirmSignal()
@@ -1552,7 +1552,7 @@ public:
   Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType           mFrameRenderedSignal;
   Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType      mRequestInterceptorSignal;
   Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType          mConsoleMessageSignal;
-  Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType          mPolicyDecisionSignal;
+  Dali::WebEnginePlugin::WebEngineResponsePolicyDecisionSignalType  mResponsePolicyDecisionSignal;
   Dali::WebEnginePlugin::WebEngineCertificateSignalType             mCertificateConfirmSignal;
   Dali::WebEnginePlugin::WebEngineCertificateSignalType             mSslCertificateChangedSignal;
   Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType         mHttpAuthHandlerSignal;
@@ -1636,7 +1636,7 @@ bool OnLoadUrl()
     std::shared_ptr<Dali::WebEngineConsoleMessage> message(new MockWebEngineConsoleMessage());
     gInstance->mConsoleMessageSignal.Emit(std::move(message));
     std::shared_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
-    gInstance->mPolicyDecisionSignal.Emit(std::move(policyDecision));
+    gInstance->mResponsePolicyDecisionSignal.Emit(std::move(policyDecision));
 
     std::shared_ptr<Dali::WebEngineCertificate> certificate(new MockWebEngineCertificate());
     gInstance->mCertificateConfirmSignal.Emit(std::move(certificate));
@@ -2322,9 +2322,9 @@ Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType& WebEngine::ConsoleMess
   return Internal::Adaptor::GetImplementation(*this).ConsoleMessageSignal();
 }
 
-Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType& WebEngine::PolicyDecisionSignal()
+Dali::WebEnginePlugin::WebEngineResponsePolicyDecisionSignalType& WebEngine::ResponsePolicyDecisionSignal()
 {
-  return Internal::Adaptor::GetImplementation(*this).PolicyDecisionSignal();
+  return Internal::Adaptor::GetImplementation(*this).ResponsePolicyDecisionSignal();
 }
 
 Dali::WebEnginePlugin::WebEngineCertificateSignalType& WebEngine::CertificateConfirmSignal()

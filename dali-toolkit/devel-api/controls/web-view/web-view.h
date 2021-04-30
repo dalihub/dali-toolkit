@@ -234,9 +234,9 @@ public:
   using WebViewConsoleMessageSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineConsoleMessage>)>;
 
   /**
-   * @brief WebView signal type related with policy decision.
+   * @brief WebView signal type related with response policy decision.
    */
-  using WebViewPolicyDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEnginePolicyDecision>)>;
+  using WebViewResponsePolicyDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEnginePolicyDecision>)>;
 
   /**
    * @brief WebView signal type related with certificate changed.
@@ -753,11 +753,11 @@ public:
   WebViewConsoleMessageSignalType& ConsoleMessageSignal();
 
   /**
-   * @brief Connect to this signal to be notified when new policy would be decided.
+   * @brief Connect to this signal to be notified when response policy would be decided.
    *
    * @return A signal object to connect with.
    */
-  WebViewPolicyDecisionSignalType& PolicyDecisionSignal();
+  WebViewResponsePolicyDecisionSignalType& ResponsePolicyDecisionSignal();
 
   /**
    * @brief Connect to this signal to be notified when certificate need be confirmed.
