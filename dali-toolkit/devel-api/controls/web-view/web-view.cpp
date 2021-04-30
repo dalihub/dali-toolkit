@@ -359,9 +359,9 @@ WebView::WebViewConsoleMessageSignalType& WebView::ConsoleMessageSignal()
   return Dali::Toolkit::GetImpl(*this).ConsoleMessageSignal();
 }
 
-WebView::WebViewPolicyDecisionSignalType& WebView::PolicyDecisionSignal()
+WebView::WebViewResponsePolicyDecisionSignalType& WebView::ResponsePolicyDecisionSignal()
 {
-  return Dali::Toolkit::GetImpl(*this).PolicyDecisionSignal();
+  return Dali::Toolkit::GetImpl(*this).ResponsePolicyDecisionSignal();
 }
 
 WebView::WebViewCertificateSignalType& WebView::CertificateConfirmSignal()
