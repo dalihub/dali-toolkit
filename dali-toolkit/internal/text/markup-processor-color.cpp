@@ -36,6 +36,11 @@ namespace
 const std::string XHTML_VALUE_ATTRIBUTE("value");
 }
 
+void ProcessColor(const Attribute& attribute, ColorRun& colorRun)
+{
+  ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, colorRun.color);
+}
+
 void ProcessColorTag(const Tag& tag, ColorRun& colorRun)
 {
   for(Vector<Attribute>::ConstIterator it    = tag.attributes.Begin(),
@@ -46,7 +51,7 @@ void ProcessColorTag(const Tag& tag, ColorRun& colorRun)
     const Attribute& attribute(*it);
     if(TokenComparison(XHTML_VALUE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
     {
-      ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, colorRun.color);
+      ProcessColor(attribute, colorRun);
     }
   }
 }

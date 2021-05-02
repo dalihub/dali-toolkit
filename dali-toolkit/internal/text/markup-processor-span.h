@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_COLOR_H
-#define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_COLOR_H
+#ifndef DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_SPAN_H
+#define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_SPAN_H
 
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
@@ -25,24 +25,18 @@ namespace Toolkit
 namespace Text
 {
 struct Tag;
-struct Attribute;
-struct ColorRun;
+struct MarkupProcessData;
 
 /**
- * @brief Retrieves the color value from the tag and sets it to the color run.
+ * @brief process the span from the tag and process all styles in it.
  *
- * @param[in] attribute the color attribute.
- * @param[in,out] colorRun The color run.
+ * @param[in] tag The span tag and its attributes.
+ * @param[out] colorRun the color run to be filled.
+ * @param[out] fontRun the font run to be filled.
+ * @param[out] isColorDefined if the span has color defined.
+ * @param[out] isFontDefined if the span has font defined.
  */
-void ProcessColor(const Attribute& attribute, ColorRun& colorRun);
-
-/**
- * @brief Retrieves the color value from the tag and sets it to the color run.
- *
- * @param[in] tag The color tag and its attributes.
- * @param[in,out] colorRun The color run.
- */
-void ProcessColorTag(const Tag& tag, ColorRun& colorRun);
+void ProcessSpanTag(const Tag& tag, ColorRun& colorRun, FontDescriptionRun& fontRun, bool& isColorDefined, bool& isFontDefined);
 
 } // namespace Text
 
@@ -50,4 +44,4 @@ void ProcessColorTag(const Tag& tag, ColorRun& colorRun);
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_COLOR_H
+#endif // DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_SPAN_H

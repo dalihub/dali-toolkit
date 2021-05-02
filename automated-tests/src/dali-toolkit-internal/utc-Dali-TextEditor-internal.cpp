@@ -199,3 +199,67 @@ int UtcDaliTextEditorBackgroundTag(void)
 
   END_TEST;
 }
+
+int UtcDaliTextEditorTextWithSpan(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorTextWithSpan\n");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  editor.SetProperty( TextEditor ::Property::ENABLE_MARKUP,  true );
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello Span" );
+  application.GetScene().Add( editor );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 originalSize = editor.GetNaturalSize();
+  editor.SetProperty( TextEditor::Property::TEXT, "H<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ello</span> Span" );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 spanSize = editor.GetNaturalSize();
+
+  DALI_TEST_GREATER(spanSize.width, originalSize.width, TEST_LOCATION);
+
+  Toolkit::Internal::TextEditor& editorImpl = GetImpl( editor );
+  const ColorIndex* const colorIndicesBuffer1 = editorImpl.getController()->GetTextModel()->GetColorIndices();
+
+  DALI_TEST_CHECK( colorIndicesBuffer1 );
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer1[0], 0u, TEST_LOCATION);
+
+  //span color
+  DALI_TEST_EQUALS( colorIndicesBuffer1[1], 1u, TEST_LOCATION);
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer1[6], 0u, TEST_LOCATION);
+
+
+  editor.SetProperty( TextEditor::Property::TEXT, "<span font-size='45'>H</span>ello <span text-color='red'>S</span>pan" );
+
+  application.SendNotification();
+  application.Render();
+
+  const ColorIndex* const colorIndicesBuffer2 = editorImpl.getController()->GetTextModel()->GetColorIndices();
+
+  DALI_TEST_CHECK( colorIndicesBuffer2 );
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[0], 0u, TEST_LOCATION);
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[1], 0u, TEST_LOCATION);
+
+  //span color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[6], 1u, TEST_LOCATION);
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[7], 0u, TEST_LOCATION);
+
+  END_TEST;
+}
