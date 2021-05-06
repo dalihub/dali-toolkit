@@ -81,8 +81,8 @@ static int gRequestInterceptorCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineRequestInterceptor> gRequestInterceptorInstance = nullptr;
 static int gConsoleMessageCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineConsoleMessage> gConsoleMessageInstance = nullptr;
-static int gPolicyDecisionCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEnginePolicyDecision> gPolicyDecisionInstance = nullptr;
+static int gResponsePolicyDecidedCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEnginePolicyDecision> gResponsePolicyDecisionInstance = nullptr;
 static int gCertificateConfirmCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineCertificate> gCertificateConfirmInstance = nullptr;
 static int gSslCertificateChangedCallbackCalled = 0;
@@ -137,10 +137,10 @@ static void OnScrollEdgeReached( WebView view, Dali::WebEnginePlugin::ScrollEdge
   gScrollEdgeReachedCallbackCalled++;
 }
 
-static void OnPolicyDecisionRequest(WebView view, std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
+static void OnResponsePolicyDecided(WebView view, std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
 {
-  gPolicyDecisionCallbackCalled++;
-  gPolicyDecisionInstance = std::move(decision);
+  gResponsePolicyDecidedCallbackCalled++;
+  gResponsePolicyDecisionInstance = std::move(decision);
 }
 
 static void OnUrlChanged( WebView view, const std::string& url )
@@ -1300,7 +1300,7 @@ int UtcDaliWebViewHttpRequestInterceptor(void)
   END_TEST;
 }
 
-int UtcDaliWebViewPolicyDecisionRequest(void)
+int UtcDaliWebViewResponsePolicyDecisionRequest(void)
 {
   ToolkitTestApplication application;
 
@@ -1309,42 +1309,42 @@ int UtcDaliWebViewPolicyDecisionRequest(void)
 
   // load url.
   ConnectionTracker* testTracker = new ConnectionTracker();
-  view.PolicyDecisionSignal().Connect( &OnPolicyDecisionRequest );
+  view.ResponsePolicyDecisionSignal().Connect( &OnResponsePolicyDecided );
   bool signal1 = false;
-  view.ConnectSignal( testTracker, "policyDecision", CallbackFunctor(&signal1) );
-  DALI_TEST_EQUALS( gPolicyDecisionCallbackCalled, 0, TEST_LOCATION );
-  DALI_TEST_CHECK(gPolicyDecisionInstance == 0);
+  view.ConnectSignal( testTracker, "responsePolicyDecided", CallbackFunctor(&signal1) );
+  DALI_TEST_EQUALS( gResponsePolicyDecidedCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_CHECK(gResponsePolicyDecisionInstance == 0);
 
   view.LoadUrl( TEST_URL1 );
   Test::EmitGlobalTimerSignal();
-  DALI_TEST_EQUALS( gPolicyDecisionCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gResponsePolicyDecidedCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_CHECK( signal1 );
 
-  // check policy decision & its frame.
-  DALI_TEST_CHECK(gPolicyDecisionInstance != 0);
+  // check response policy decision & its frame.
+  DALI_TEST_CHECK(gResponsePolicyDecisionInstance != 0);
   std::string testUrl("http://test.html");
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetUrl(), testUrl, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetUrl(), testUrl, TEST_LOCATION);
   std::string testCookie("test:abc");
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetCookie(), testCookie, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetCookie(), testCookie, TEST_LOCATION);
   Dali::WebEnginePolicyDecision::DecisionType testDecisionType = Dali::WebEnginePolicyDecision::DecisionType::USE;
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetDecisionType(), testDecisionType, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetDecisionType(), testDecisionType, TEST_LOCATION);
   std::string testResponseMime("txt/xml");
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetResponseMime(), testResponseMime, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetResponseMime(), testResponseMime, TEST_LOCATION);
   int32_t ResponseStatusCode = 500;
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetResponseStatusCode(), ResponseStatusCode, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetResponseStatusCode(), ResponseStatusCode, TEST_LOCATION);
   Dali::WebEnginePolicyDecision::NavigationType testNavigationType = Dali::WebEnginePolicyDecision::NavigationType::LINK_CLICKED;
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetNavigationType(), testNavigationType, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetNavigationType(), testNavigationType, TEST_LOCATION);
   std::string testScheme("test");
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetScheme(), testScheme, TEST_LOCATION);
-  DALI_TEST_CHECK(gPolicyDecisionInstance->Use());
-  DALI_TEST_CHECK(gPolicyDecisionInstance->Ignore());
-  DALI_TEST_CHECK(gPolicyDecisionInstance->Suspend());
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetScheme(), testScheme, TEST_LOCATION);
+  DALI_TEST_CHECK(gResponsePolicyDecisionInstance->Use());
+  DALI_TEST_CHECK(gResponsePolicyDecisionInstance->Ignore());
+  DALI_TEST_CHECK(gResponsePolicyDecisionInstance->Suspend());
 
-  Dali::WebEngineFrame* webFrame = &(gPolicyDecisionInstance->GetFrame());
+  Dali::WebEngineFrame* webFrame = &(gResponsePolicyDecisionInstance->GetFrame());
   DALI_TEST_CHECK(webFrame);
   DALI_TEST_CHECK(webFrame->IsMainFrame());
 
-  gPolicyDecisionInstance = nullptr;
+  gResponsePolicyDecisionInstance = nullptr;
 
   END_TEST;
 }
