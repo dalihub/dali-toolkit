@@ -52,7 +52,7 @@ namespace
 const char* TEST_VECTOR_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/insta_camera.json";
 const char* TEST_VECTOR_IMAGE_INVALID_FILE_NAME =  "invalid.json";
 
-const char* TEST_VECTOR_IMAGE_RIVE_FILE_NAME =  TEST_RESOURCE_DIR  "/juice.riv";
+const char* TEST_VECTOR_IMAGE_RIVE_FILE_NAME =  TEST_RESOURCE_DIR  "/shape.riv";
 const char* TEST_VECTOR_IMAGE_INVALID_RIVE_FILE_NAME = "invalid.riv";
 
 bool gAnimationFinishedSignalFired = false;
