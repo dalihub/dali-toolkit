@@ -342,11 +342,11 @@ public:
   Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
 
   /**
-   * @brief Get Favicon of web page.
+   * @brief Get favicon of web page.
    *
-   * @return Handle to a fav icon
+   * @return Handle to a favicon
    */
-  Dali::Toolkit::ImageView& GetFavicon();
+  Dali::Toolkit::ImageView GetFavicon() const;
 
   /**
    * @brief Load a web page based on a given URL.

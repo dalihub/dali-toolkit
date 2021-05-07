@@ -95,7 +95,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::GetFavicon()
    */
-  Dali::Toolkit::ImageView& GetFavicon();
+  Dali::Toolkit::ImageView GetFavicon() const;
 
   /**
    * @copydoc Dali::Toolkit::WebView::LoadUrl()
@@ -608,7 +608,7 @@ private:
    * @param[in] pixel Pixel data
    * @return The new image view
    */
-  Dali::Toolkit::ImageView CreateImageView(Dali::PixelData pixel);
+  Dali::Toolkit::ImageView CreateImageView(Dali::PixelData pixel) const;
 
   /**
    * @brief Callback function to be called when page load started.
@@ -771,8 +771,6 @@ private:
   std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
   std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
-
-  Dali::Toolkit::ImageView mFaviconView;
 
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;
