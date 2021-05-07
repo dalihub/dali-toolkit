@@ -268,14 +268,15 @@ Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
   return mWebBackForwardList.get();
 }
 
-Dali::Toolkit::ImageView& WebView::GetFavicon()
+Dali::Toolkit::ImageView WebView::GetFavicon() const
 {
+  Dali::Toolkit::ImageView faviconView;
   if(mWebEngine)
   {
     Dali::PixelData pixelData = mWebEngine.GetFavicon();
-    mFaviconView              = CreateImageView(pixelData);
+    faviconView               = CreateImageView(pixelData);
   }
-  return mFaviconView;
+  return faviconView;
 }
 
 void WebView::LoadUrl(const std::string& url)
@@ -706,8 +707,13 @@ void WebView::EnableBlendMode(bool blendEnabled)
   }
 }
 
-Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel)
+Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel) const
 {
+  if(!pixel)
+  {
+    return Dali::Toolkit::ImageView();
+  }
+
   std::string              url       = Dali::Toolkit::Image::GenerateUrl(pixel);
   Dali::Toolkit::ImageView imageView = Dali::Toolkit::ImageView::New(url);
   imageView.SetProperty(Dali::Actor::Property::SIZE, Vector2(pixel.GetWidth(), pixel.GetHeight()));
