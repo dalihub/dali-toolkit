@@ -600,7 +600,7 @@ int UtcDaliTextLayoutSmallTextArea02(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun );
   Size textArea(1.f, 1.f);
-  Size layoutSize(81.f, 19.f);
+  Size layoutSize(81.f, 20.f);
   float positions[] = { 0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f };
   struct LineRun line =
   {
@@ -608,7 +608,7 @@ int UtcDaliTextLayoutSmallTextArea02(void)
     { 0u, 11u },
     81.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -685,14 +685,14 @@ int UtcDaliTextLayoutMultilineText01(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun1 );
   fontDescriptionRuns.PushBack( fontDescriptionRun2 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(97.f, 95.f);
+  Size layoutSize(98.f, 97.f);
   float positions[] =
   {
     0.f, -12.f, 10.f,  -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f,  -0.f, 40.f, -9.f, 52.f,  -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,
     0.f, -13.f,  9.f,  -9.f, 19.f,  -9.f, 32.f,  -9.f, 41.f, -2.f, 45.f, -12.f,
-    0.f, -12.f,  9.f,  -9.f, 18.f,  -9.f, 28.f,  -9.f, 38.f, -9.f, 47.f, -11.f, 53.f, -0.f,
-    0.f, -12.f, 10.f, -12.f, 15.f, -12.f, 26.f,  -9.f, 35.f, -9.f, 42.f,  -9.f, 52.f, -9.f, 61.f, -11.f, 67.f, -0.f,
-    0.f, -12.f,  4.f, -12.f,  9.f,  -9.f, 19.f,  -9.f, 29.f, -9.f, 36.f,  -0.f, 42.f, -9.f, 52.f, -12.f, 57.f, -0.f, 62.f, -11.f, 69.f,  -9.f, 79.f, -9.f, 87.f, -11.f, 95.f, -2.f
+    0.f, -12.f,  8.f,  -9.f, 18.f,  -9.f, 27.f,  -9.f, 38.f, -9.f, 47.f, -11.f, 53.f, -0.f,
+    0.f, -12.f, 11.f, -12.f, 15.f, -12.f, 26.f,  -9.f, 36.f, -9.f, 42.f,  -9.f, 53.f, -9.f, 62.f, -11.f, 68.f, -0.f,
+    0.f, -12.f,  4.f, -12.f,  9.f,  -9.f, 18.f,  -9.f, 28.f, -9.f, 36.f,  -0.f, 41.f, -9.f, 51.f, -12.f, 57.f, -0.f, 62.f, -11.f, 68.f,  -9.f, 78.f, -9.f, 87.f, -11.f, 94.f, -2.f
   };
   struct LineRun line0 =
   {
@@ -700,7 +700,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     { 0u, 12u },
     81.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -713,7 +713,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     { 12u, 6u },
     44.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -724,7 +724,7 @@ int UtcDaliTextLayoutMultilineText01(void)
   {
     { 18u, 7u },
     { 18u, 7u },
-    53.f,
+    54.f,
     15.f,
     -4.f,
     6.f,
@@ -737,7 +737,7 @@ int UtcDaliTextLayoutMultilineText01(void)
   {
     { 25u, 9u },
     { 25u, 10u },
-    66.f,
+    68.f,
     15.f,
     -4.f,
     6.f,
@@ -750,7 +750,7 @@ int UtcDaliTextLayoutMultilineText01(void)
   {
     { 34u, 14u },
     { 35u, 14u },
-    97.f,
+    98.f,
     15.f,
     -4.f,
     0.f,
@@ -885,15 +885,15 @@ int UtcDaliTextLayoutMultilineText02(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun4 );
   fontDescriptionRuns.PushBack( fontDescriptionRun5 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(81.f, 114.f);
+  Size layoutSize(81.f, 120.f);
   float positions[] =
   {
-    0.f, -12.f, 10.f,  -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f,  -0.f, 40.f,  -9.f, 52.f,  -9.f, 62.f,  -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,  //  0 .. 11
-    0.f, -13.f,  9.f,  -9.f, 19.f,  -9.f, 32.f,  -9.f, 41.f, -0.f, 69.f, -10.f, 60.f, -13.f, 54.f, -10.f, 46.f, -10.f, 79.f,  -0.f,                           // 12 .. 21
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 31.f, -2.f, 35.f, -12.f,                                                                                // 22 .. 27
-    63.f, -10.f, 54.f, -13.f, 49.f, -10.f, 41.f, -10.f, 35.f, -0.f, 27.f, -10.f, 22.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f,  -0.f,                            // 28 .. 37
-    4.f, -13.f,  12.f,  -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f,  -0.f, 42.f,  -9.f, 54.f,  -9.f, 64.f,  -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,  // 38 .. 49
-    4.f, -13.f,  13.f,  -9.f, 23.f,  -9.f, 36.f,  -9.f, 0.f, -2.f,                                                                                            // 50 .. 54
+    0.f, -12.f, 10.f,  -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f,  -0.f, 40.f,  -9.f, 52.f,  -9.f, 62.f,  -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f, //  0 .. 11
+    0.f, -13.f,  9.f,  -9.f, 19.f,  -9.f, 32.f,  -9.f, 41.f, -0.f, 68.f, -10.f, 59.f, -13.f, 54.f, -10.f, 45.f, -10.f, 79.f,  -0.f,                          // 12 .. 21
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 32.f, -2.f, 36.f, -12.f,                                                                              // 22 .. 27
+    63.f, -10.f, 54.f, -13.f, 50.f, -10.f, 41.f, -10.f, 36.f, -0.f, 27.f, -10.f, 23.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f,  -0.f,                           // 28 .. 37
+    4.f, -13.f,  12.f,  -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f,  -0.f, 42.f,  -9.f, 54.f,  -9.f, 64.f,  -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f, // 38 .. 49
+    4.f, -13.f,  13.f,  -9.f, 23.f,  -9.f, 36.f,  -9.f, 0.f, -2.f,                                                                                           // 50 .. 54
   };
   struct LineRun line0 =
   {
@@ -901,7 +901,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     { 0u, 12u },
     81.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -914,7 +914,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     { 12u, 10u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -925,9 +925,9 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    34.f,
+    35.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -938,9 +938,9 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 28u, 10u },
     { 28u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -953,7 +953,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     { 38u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -966,7 +966,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     { 50u, 5u },
     45.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1036,7 +1036,7 @@ int UtcDaliTextLayoutMultilineText03(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun );
   Size textArea(100.f, 300.f);
-  Size layoutSize(98.f, 57.f);
+  Size layoutSize(98.f, 60.f);
   float positions[] =
   {
     0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f,  -9.f, 36.f,  -9.f, 48.f, -9.f, 58.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -13.f, 86.f,  -9.f,
@@ -1049,7 +1049,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     { 0u, 12u },
     95.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1062,7 +1062,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     { 12u, 12u },
     98.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1075,7 +1075,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     { 24u, 5u },
     44.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1141,7 +1141,7 @@ int UtcDaliTextLayoutMultilineText04(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun );
   Size textArea(100.f, 300.f);
-  Size layoutSize(84.f, 38.f);
+  Size layoutSize(84.f, 40.f);
   float positions[] =
   {
     0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -2.f, 85.f, -12.f
@@ -1152,7 +1152,7 @@ int UtcDaliTextLayoutMultilineText04(void)
     { 0u, 13u },
     84.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     false,
@@ -1164,7 +1164,7 @@ int UtcDaliTextLayoutMultilineText04(void)
     { 13u, 0u },
     0.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1256,10 +1256,10 @@ int UtcDaliTextLayoutMultilineText05(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun2 );
   fontDescriptionRuns.PushBack( fontDescriptionRun3 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(89.f, 51.f);
+  Size layoutSize(89.f, 53.f);
   float positions[] =
   {
-    0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -14.f, 60.f, -9.f, 71.f, -9.f, 77.f, -13.f, 80.f, -13.f, 89.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -14.f, 60.f, -9.f, 70.f, -9.f, 76.f, -13.f, 80.f, -13.f, 89.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 19.f,  -9.f, 32.f,  -9.f, 41.f, -2.f
   };
   struct LineRun line0 =
@@ -1268,7 +1268,7 @@ int UtcDaliTextLayoutMultilineText05(void)
     { 0u, 12u },
     89.f,
     25.f,
-    -7.f,
+    -8.f,
     4.f,
     0.f,
     0.f,
@@ -1281,7 +1281,7 @@ int UtcDaliTextLayoutMultilineText05(void)
     { 12u, 5u },
     44.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1345,11 +1345,11 @@ int UtcDaliTextLayoutMultilineText06(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun );
 
   Size textArea(64.f, 100.f);
-  Size layoutSize(33.f, 38.f);
+  Size layoutSize(34.f, 40.f);
   float positions[] =
   {
-    28.f, -13.f, 18.f, -10.f, 9.f, -10.f, 4.f, -10.f, 0.f, -0.f,
-    23.f, -10.f, 18.f, -10.f, 12.f, -10.f, 4.f, -10.f, 0.f, -10.f
+    27.f, -13.f, 18.f, -10.f, 9.f, -10.f, 4.f, -10.f, 0.f, -0.f,
+    22.f, -10.f, 17.f, -10.f, 12.f, -10.f, 4.f, -10.f, 0.f, -10.f
   };
   struct LineRun line0 =
   {
@@ -1357,7 +1357,7 @@ int UtcDaliTextLayoutMultilineText06(void)
     { 0u, 5u },
     32.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -1368,9 +1368,9 @@ int UtcDaliTextLayoutMultilineText06(void)
   {
     { 5u, 5u },
     { 5u, 5u },
-    33.f,
+    34.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1434,20 +1434,20 @@ int UtcDaliTextLayoutMultilineText07(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun );
 
   Size textArea(26.f, 100.f);
-  Size layoutSize(23.f, 57.f);
+  Size layoutSize(24.f, 60.f);
   float positions[] =
   {
-    11.f, -10.f, 5.f, -10.f, 0.f, -10.f,
-    12.f, -10.f, 8.f, -10.f, 0.f, -13.f,
+    10.f, -10.f, 4.f, -10.f, 0.f, -10.f,
+    13.f, -10.f, 9.f, -10.f, 0.f, -13.f,
     14.f, -10.f, 4.f, -10.f, 0.f, -10.f
   };
   struct LineRun line0 =
   {
     { 0u, 3u },
     { 0u, 3u },
-    20.f,
+    21.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1460,7 +1460,7 @@ int UtcDaliTextLayoutMultilineText07(void)
     { 3u, 3u },
     22.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1471,9 +1471,9 @@ int UtcDaliTextLayoutMultilineText07(void)
   {
     { 6u, 3u },
     { 6u, 3u },
-    23.f,
+    24.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1765,27 +1765,27 @@ int UtcDaliTextUpdateLayout01(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(100.f, 361.f);
+  Size layoutSize(100.f, 380.f);
   float positions[] =
   {
-    0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,                                                                                                     //   0 ..  11
-    0.f, -13.f,  9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 69.f, -10.f, 60.f, -13.f, 54.f, -10.f, 46.f, -10.f, 79.f, -0.f,                                                                                                                             //  12 ..  21
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 31.f, -2.f, 35.f, -12.f,                                                                                                                                                                              //  22 ..  27
-    58.f, -8.f, 52.f, -6.f, 45.f, -8.f, 41.f, -7.f, 39.f, -11.f, 34.f, -0.f, 30.f, -7.f, 28.f, -11.f, 23.f, -11.f, 16.f, -8.f, 15.f, -11.f, 9.f, -11.f, 4.f, -8.f, 0.f, -0.f, 4.f, -13.f, 12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f,   //  28 ..  47
-    42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f, 59.f, -10.f, 50.f, -13.f, 45.f, -10.f, 36.f, -10.f, 31.f, -0.f,                                                                                                                 //  48 ..  58
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 0.f, -0.f,                                                                                                                                                                                            //  59 ..  63
-    63.f, -10.f, 54.f, -13.f, 49.f, -10.f, 41.f, -10.f, 35.f, -0.f, 27.f, -10.f, 22.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           //  64 ..  73
-    4.f, -13.f,  12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, 42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,                                                                                                     //  74 ..  85
-    4.f, -13.f,  13.f, -9.f, 23.f, -9.f, 36.f, -9.f, 0.f, -2.f, 0.f, -12.f,                                                                                                                                                                                 //  86 ..  91
-    0.f, -13.f,  8.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 79.f, -0.f,                                                                                                     //  92 .. 103
-    91.f, -8.f, 85.f, -6.f, 78.f, -8.f, 74.f, -7.f, 72.f, -11.f, 67.f, -0.f, 63.f, -7.f, 61.f, -11.f, 56.f, -11.f, 49.f, -8.f, 48.f, -11.f, 42.f, -11.f, 37.f, -8.f, 33.f, -0.f, 23.f, -10.f, 14.f, -13.f, 9.f, -10.f, 0.f, -10.f, 98.f, -0.f,              // 104 .. 122
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 31.f, -0.f,                                                                                                                                                                                           // 123 .. 127
-    0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,                                                                                                     // 128 .. 139
-    0.f, -13.f,  9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 69.f, -10.f, 60.f, -13.f, 54.f, -10.f, 46.f, -10.f, 79.f, -0.f,                                                                                                                             // 140 .. 149
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 31.f, -2.f, 35.f, -12.f,                                                                                                                                                                              // 150 .. 155
-    63.f, -10.f, 54.f, -13.f, 49.f, -10.f, 41.f, -10.f, 35.f, -0.f, 27.f, -10.f, 22.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           // 156 .. 165
-    4.f, -13.f,  12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, 42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,                                                                                                     // 166 .. 177
-    54.f, -8.f, 49.f, -6.f, 41.f, -8.f, 37.f, -7.f, 35.f, -11.f, 31.f, -0.f, 26.f, -7.f, 24.f, -11.f, 19.f, -11.f, 12.f, -8.f, 11.f, -11.f, 5.f, -11.f, 0.f, -8.f, 0.f, -0.f,                                                                               // 178 .. 191
+    0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,                                                                                                 //   0 ..  11
+    0.f, -13.f,  9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 68.f, -10.f, 59.f, -13.f, 54.f, -10.f, 45.f, -10.f, 79.f, -0.f,                                                                                                                         //  12 ..  21
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 32.f, -2.f, 36.f, -12.f,                                                                                                                                                                         //  22 ..  27
+    58.f, -8.f, 52.f, -6.f, 45.f, -8.f, 41.f, -7.f, 39.f, -11.f, 34.f, -0.f, 30.f, -7.f, 28.f, -11.f, 23.f, -11.f, 16.f, -8.f, 15.f, -11.f, 9.f, -11.f, 4.f, -8.f, 0.f, -0.f, 4.f, -13.f, 12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, //  28 ..  47
+    42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f, 59.f, -10.f, 50.f, -13.f, 46.f, -10.f, 36.f, -10.f, 32.f, -0.f,                                                                                                            //  48 ..  58
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 0.f, -0.f,                                                                                                                                                                                       //  59 ..  63
+    63.f, -10.f, 54.f, -13.f, 50.f, -10.f, 41.f, -10.f, 36.f, -0.f, 27.f, -10.f, 23.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                       //  64 ..  73
+    4.f, -13.f,  12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, 42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,                                                                                                 //  74 ..  85
+    4.f, -13.f,  13.f, -9.f, 23.f, -9.f, 36.f, -9.f, 0.f, -2.f, 0.f, -12.f,                                                                                                                                                                             //  86 ..  91
+    0.f, -13.f,  8.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 79.f, -0.f,                                                                                                 //  92 .. 103
+    92.f, -8.f, 86.f, -6.f, 79.f, -8.f, 75.f, -7.f, 73.f, -11.f, 68.f, -0.f, 64.f, -7.f, 62.f, -11.f, 57.f, -11.f, 50.f, -8.f, 49.f, -11.f, 43.f, -11.f, 38.f, -8.f, 34.f, -0.f, 23.f, -10.f, 14.f, -13.f, 10.f, -10.f, 0.f, -10.f, 99.f, -0.f,         // 104 .. 122
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 32.f, -0.f,                                                                                                                                                                                      // 123 .. 127
+    0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,                                                                                                 // 128 .. 139
+    0.f, -13.f,  9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 68.f, -10.f, 59.f, -13.f, 54.f, -10.f, 45.f, -10.f, 79.f, -0.f,                                                                                                                         // 140 .. 149
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 32.f, -2.f, 36.f, -12.f,                                                                                                                                                                         // 150 .. 155
+    63.f, -10.f, 54.f, -13.f, 50.f, -10.f, 41.f, -10.f, 36.f, -0.f, 27.f, -10.f, 23.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                       // 156 .. 165
+    4.f, -13.f,  12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, 42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,                                                                                                 // 166 .. 177
+    54.f, -8.f, 49.f, -6.f, 41.f, -8.f, 37.f, -7.f, 35.f, -11.f, 31.f, -0.f, 26.f, -7.f, 24.f, -11.f, 19.f, -11.f, 12.f, -8.f, 11.f, -11.f, 5.f, -11.f, 0.f, -8.f, 0.f, -0.f,                                                                           // 178 .. 191
   };
 
   struct LineRun line01 =
@@ -1794,7 +1794,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 0u, 12u },
     81.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -1807,7 +1807,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 12u, 10u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -1818,9 +1818,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    34.f,
+    35.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1833,7 +1833,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 28u, 14u },
     63.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -1846,7 +1846,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 42, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -1857,9 +1857,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 54u, 10u },
     { 54u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1870,9 +1870,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 64u, 10u },
     { 64u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -1885,7 +1885,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 74u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -1898,7 +1898,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 86u, 6u },
     45.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1911,7 +1911,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 92u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -1924,7 +1924,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 104u, 19u },
     100.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -1935,9 +1935,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 123u, 5u },
     { 123u, 5u },
-    31.f,
+    32.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1950,7 +1950,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 128u, 12u },
     81.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -1963,7 +1963,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 140u, 10u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -1974,9 +1974,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 150u, 6u },
     { 150u, 6u },
-    34.f,
+    35.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -1987,9 +1987,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 156u, 10u },
     { 156u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -2002,7 +2002,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 166u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -2015,7 +2015,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 178u, 14u },
     63.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -2028,7 +2028,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 192u, 0u },
     0.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -2341,27 +2341,27 @@ int UtcDaliTextUpdateLayout02(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(100.f, 361.f);
+  Size layoutSize(100.f, 380.f);
   float positions[] =
   {
-    0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,                                                                                                     //   0 ..  11
-    0.f, -13.f,  9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 69.f, -10.f, 60.f, -13.f, 54.f, -10.f, 46.f, -10.f, 79.f, -0.f,                                                                                                                             //  12 ..  21
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 31.f, -2.f, 35.f, -12.f,                                                                                                                                                                              //  22 ..  27
+    0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,                                                                                                   //   0 ..  11
+    0.f, -13.f,  9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 68.f, -10.f, 59.f, -13.f, 54.f, -10.f, 45.f, -10.f, 79.f, -0.f,                                                                                                                           //  12 ..  21
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 32.f, -2.f, 36.f, -12.f,                                                                                                                                                                           //  22 ..  27
     58.f, -8.f, 52.f, -6.f, 45.f, -8.f, 41.f, -7.f, 39.f, -11.f, 34.f, -0.f, 30.f, -7.f, 28.f, -11.f, 23.f, -11.f, 16.f, -8.f, 15.f, -11.f, 9.f, -11.f, 4.f, -8.f, 0.f, -0.f, 4.f, -13.f, 12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f,   //  28 ..  47
-    42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f, 59.f, -10.f, 50.f, -13.f, 45.f, -10.f, 36.f, -10.f, 31.f, -0.f,                                                                                                                 //  48 ..  58
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 0.f, -0.f,                                                                                                                                                                                            //  59 ..  63
-    63.f, -10.f, 54.f, -13.f, 49.f, -10.f, 41.f, -10.f, 35.f, -0.f, 27.f, -10.f, 22.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           //  64 ..  73
-    4.f, -13.f,  12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, 42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,                                                                                                     //  74 ..  85
-    4.f, -13.f,  13.f, -9.f, 23.f, -9.f, 36.f, -9.f, 0.f, -2.f, 0.f, -12.f,                                                                                                                                                                                 //  86 ..  91
-    0.f, -13.f,  8.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 79.f, -0.f,                                                                                                     //  92 .. 103
-    91.f, -8.f, 85.f, -6.f, 78.f, -8.f, 74.f, -7.f, 72.f, -11.f, 67.f, -0.f, 63.f, -7.f, 61.f, -11.f, 56.f, -11.f, 49.f, -8.f, 48.f, -11.f, 42.f, -11.f, 37.f, -8.f, 33.f, -0.f, 23.f, -10.f, 14.f, -13.f, 9.f, -10.f, 0.f, -10.f, 98.f, -0.f,             // 104 .. 122
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 31.f, -0.f,                                                                                                                                                                                           // 123 .. 127
-    0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,                                                                                                     // 128 .. 139
-    0.f, -13.f, 9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 69.f, -10.f, 60.f, -13.f, 54.f, -10.f, 46.f, -10.f, 79.f, -0.f,                                                                                                                             // 140 .. 149
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 31.f, -2.f, 35.f, -12.f,                                                                                                                                                                              // 150 .. 155
-    63.f, -10.f, 54.f, -13.f, 49.f, -10.f, 41.f, -10.f, 35.f, -0.f, 27.f, -10.f, 22.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           // 156 .. 165
-    4.f, -13.f, 12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, 42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,                                                                                                     // 166 .. 177
-    54.f, -8.f, 49.f, -6.f, 41.f, -8.f, 37.f, -7.f, 35.f, -11.f, 31.f, -0.f, 26.f, -7.f, 24.f, -11.f, 19.f, -11.f, 12.f, -8.f, 11.f, -11.f, 5.f, -11.f, 0.f, -8.f, 0.f, -0.f,                                                                               // 178 .. 191
+    42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f, 59.f, -10.f, 50.f, -13.f, 46.f, -10.f, 36.f, -10.f, 32.f, -0.f,                                                                                                              //  48 ..  58
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 0.f, -0.f,                                                                                                                                                                                         //  59 ..  63
+    63.f, -10.f, 54.f, -13.f, 50.f, -10.f, 41.f, -10.f, 36.f, -0.f, 27.f, -10.f, 23.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                         //  64 ..  73
+    4.f, -13.f,  12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, 42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,                                                                                                   //  74 ..  85
+    4.f, -13.f,  13.f, -9.f, 23.f, -9.f, 36.f, -9.f, 0.f, -2.f, 0.f, -12.f,                                                                                                                                                                               //  86 ..  91
+    0.f, -13.f,  8.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 79.f, -0.f,                                                                                                   //  92 .. 103
+    92.f, -8.f, 86.f, -6.f, 79.f, -8.f, 75.f, -7.f, 73.f, -11.f, 68.f, -0.f, 64.f, -7.f, 62.f, -11.f, 57.f, -11.f, 50.f, -8.f, 49.f, -11.f, 43.f, -11.f, 38.f, -8.f, 34.f, -0.f, 23.f, -10.f, 14.f, -13.f, 10.f, -10.f, 0.f, -10.f, 99.f, -0.f,           // 104 .. 122
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 32.f, -0.f,                                                                                                                                                                                        // 123 .. 127
+    0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,                                                                                                   // 128 .. 139
+    0.f, -13.f, 9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 68.f, -10.f, 59.f, -13.f, 54.f, -10.f, 45.f, -10.f, 79.f, -0.f,                                                                                                                            // 140 .. 149
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 32.f, -2.f, 36.f, -12.f,                                                                                                                                                                           // 150 .. 155
+    63.f, -10.f, 54.f, -13.f, 50.f, -10.f, 41.f, -10.f, 36.f, -0.f, 27.f, -10.f, 23.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                         // 156 .. 165
+    4.f, -13.f, 12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, 42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,                                                                                                    // 166 .. 177
+    54.f, -8.f, 49.f, -6.f, 41.f, -8.f, 37.f, -7.f, 35.f, -11.f, 31.f, -0.f, 26.f, -7.f, 24.f, -11.f, 19.f, -11.f, 12.f, -8.f, 11.f, -11.f, 5.f, -11.f, 0.f, -8.f, 0.f, -0.f,                                                                             // 178 .. 191
   };
 
   struct LineRun line01 =
@@ -2370,7 +2370,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 0u, 12u },
     81.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -2383,7 +2383,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 12u, 10u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -2394,9 +2394,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    34.f,
+    35.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -2409,7 +2409,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 28u, 14u },
     63.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -2422,7 +2422,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 42u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -2433,9 +2433,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 54u, 10u },
     { 54u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -2446,9 +2446,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 64u, 10u },
     { 64u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -2461,7 +2461,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 74u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     1.f,
     0.f,
@@ -2474,7 +2474,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 86u, 6u },
     45.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -2487,7 +2487,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 92u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -2500,7 +2500,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 104u, 19u },
     100.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -2511,9 +2511,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 123u, 5u },
     { 123u, 5u },
-    31.f,
+    32.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -2526,7 +2526,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 128u, 12u },
     81.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -2539,7 +2539,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 140u, 10u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -2550,9 +2550,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 150u, 6u },
     { 150u, 6u },
-    34.f,
+    35.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -2563,9 +2563,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 156u, 10u },
     { 156u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -2578,7 +2578,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 166u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -2591,7 +2591,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 178u, 14u },
     63.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -2604,7 +2604,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 192u, 0u },
     0.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -2917,25 +2917,25 @@ int UtcDaliTextUpdateLayout03(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(100.f, 361.f);
+  Size layoutSize(100.f, 380.f);
   float positions[] =
   {
     0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,                                                                                                     //   0 ..  11
-    0.f, -13.f, 9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 69.f, -10.f, 60.f, -13.f, 54.f, -10.f, 46.f, -10.f, 79.f, -0.f,                                                                                                                              //  12 ..  21
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 31.f, -2.f, 35.f, -12.f,                                                                                                                                                                             //  22 ..  27
+    0.f, -13.f, 9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 68.f, -10.f, 59.f, -13.f, 54.f, -10.f, 45.f, -10.f, 79.f, -0.f,                                                                                                                              //  12 ..  21
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 32.f, -2.f, 36.f, -12.f,                                                                                                                                                                             //  22 ..  27
     58.f, -8.f, 52.f, -6.f, 45.f, -8.f, 41.f, -7.f, 39.f, -11.f, 34.f, -0.f, 30.f, -7.f, 28.f, -11.f, 23.f, -11.f, 16.f, -8.f, 15.f, -11.f, 9.f, -11.f, 4.f, -8.f, 0.f, -0.f, 4.f, -13.f, 12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f,     //  28 ..  47
-    42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f, 59.f, -10.f, 50.f, -13.f, 45.f, -10.f, 36.f, -10.f, 31.f, -0.f,                                                                                                                //  48 ..  58
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 0.f, -0.f,                                                                                                                                                                                           //  59 ..  63
-    63.f, -10.f, 54.f, -13.f, 49.f, -10.f, 41.f, -10.f, 35.f, -0.f, 27.f, -10.f, 22.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           //  64 ..  73
+    42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f, 59.f, -10.f, 50.f, -13.f, 46.f, -10.f, 36.f, -10.f, 32.f, -0.f,                                                                                                                //  48 ..  58
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 0.f, -0.f,                                                                                                                                                                                           //  59 ..  63
+    63.f, -10.f, 54.f, -13.f, 50.f, -10.f, 41.f, -10.f, 36.f, -0.f, 27.f, -10.f, 23.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           //  64 ..  73
     4.f, -13.f, 12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, 42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,                                                                                                      //  74 ..  85
     4.f, -13.f, 13.f, -9.f, 23.f, -9.f, 36.f, -9.f, 0.f, -2.f, 0.f, -12.f,                                                                                                                                                                                  //  86 ..  91
     0.f, -13.f, 8.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 79.f, -0.f,                                                                                                      //  92 .. 103
-    91.f, -8.f, 85.f, -6.f, 78.f, -8.f, 74.f, -7.f, 72.f, -11.f, 67.f, -0.f, 63.f, -7.f, 61.f, -11.f, 56.f, -11.f, 49.f, -8.f, 48.f, -11.f, 42.f, -11.f, 37.f, -8.f, 33.f, -0.f, 23.f, -10.f, 14.f, -13.f, 9.f, -10.f, 0.f, -10.f, 98.f, -0.f,              // 104 .. 122
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 31.f, -0.f,                                                                                                                                                                                          // 123 .. 127
+    92.f, -8.f, 86.f, -6.f, 79.f, -8.f, 75.f, -7.f, 73.f, -11.f, 68.f, -0.f, 64.f, -7.f, 62.f, -11.f, 57.f, -11.f, 50.f, -8.f, 49.f, -11.f, 43.f, -11.f, 38.f, -8.f, 34.f, -0.f, 23.f, -10.f, 14.f, -13.f, 10.f, -10.f, 0.f, -10.f, 99.f, -0.f,             // 104 .. 122
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 32.f, -0.f,                                                                                                                                                                                          // 123 .. 127
     0.f, -12.f, 10.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 52.f, -9.f, 62.f, -9.f, 69.f, -13.f, 72.f, -13.f, 81.f, -0.f,                                                                                                     // 128 .. 139
-    0.f, -13.f, 9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 69.f, -10.f, 60.f, -13.f, 54.f, -10.f, 46.f, -10.f, 79.f, -0.f,                                                                                                                              // 140 .. 149
-    23.f, -10.f, 18.f, -10.f, 10.f, -13.f, 0.f, -10.f, 31.f, -2.f, 35.f, -12.f,                                                                                                                                                                             // 150 .. 155
-    63.f, -10.f, 54.f, -13.f, 49.f, -10.f, 41.f, -10.f, 35.f, -0.f, 27.f, -10.f, 22.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           // 156 .. 165
+    0.f, -13.f, 9.f, -9.f, 19.f, -9.f, 32.f, -9.f, 41.f, -0.f, 68.f, -10.f, 59.f, -13.f, 54.f, -10.f, 45.f, -10.f, 79.f, -0.f,                                                                                                                              // 140 .. 149
+    23.f, -10.f, 19.f, -10.f, 10.f, -13.f, 0.f, -10.f, 32.f, -2.f, 36.f, -12.f,                                                                                                                                                                             // 150 .. 155
+    63.f, -10.f, 54.f, -13.f, 50.f, -10.f, 41.f, -10.f, 36.f, -0.f, 27.f, -10.f, 23.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           // 156 .. 165
     4.f, -13.f, 12.f, -9.f, 22.f, -13.f, 26.f, -13.f, 29.f, -9.f, 38.f, -0.f, 42.f, -9.f, 54.f, -9.f, 64.f, -9.f, 70.f, -13.f, 73.f, -13.f, 0.f, -0.f,                                                                                                      // 166 .. 177
     54.f, -8.f, 49.f, -6.f, 41.f, -8.f, 37.f, -7.f, 35.f, -11.f, 31.f, -0.f, 26.f, -7.f, 24.f, -11.f, 19.f, -11.f, 12.f, -8.f, 11.f, -11.f, 5.f, -11.f, 0.f, -8.f, 0.f, -0.f,                                                                               // 178 .. 191
   };
@@ -2946,7 +2946,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 0u, 12u },
     81.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -2959,7 +2959,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 12u, 10u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -2970,9 +2970,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    34.f,
+    35.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -2985,7 +2985,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 28u, 14u },
     63.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -2998,7 +2998,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 42u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -3009,9 +3009,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 54u, 10u },
     { 54u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -3022,9 +3022,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 64u, 10u },
     { 64u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -3037,7 +3037,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 74u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     1.f,
     0.f,
@@ -3050,7 +3050,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 86u, 6u },
     45.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -3063,7 +3063,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 92u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -3076,7 +3076,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 104u, 19u },
     100.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -3087,9 +3087,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 123u, 5u },
     { 123u, 5u },
-    31.f,
+    32.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -3102,7 +3102,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 128u, 12u },
     81.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -3115,7 +3115,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 140u, 10u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -3126,9 +3126,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 150u, 6u },
     { 150u, 6u },
-    34.f,
+    35.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -3139,9 +3139,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 156u, 10u },
     { 156u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -3154,7 +3154,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 166u, 12u },
     79.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -3167,7 +3167,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 178u, 14u },
     63.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -3180,7 +3180,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 192u, 0u },
     0.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -3273,7 +3273,7 @@ int UtcDaliTextLayoutEllipsis01(void)
     { 0u, 13u },
     93.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -3289,7 +3289,7 @@ int UtcDaliTextLayoutEllipsis01(void)
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 19.f );
+  Size layoutSize( 100.f, 20.f );
 
   LayoutTextData data =
   {
@@ -3351,7 +3351,7 @@ int UtcDaliTextLayoutEllipsis02(void)
     { 0u, 12u },
     81.f,
     15.f,
-    -4.f,
+    -5.f,
     4.f,
     0.f,
     0.f,
@@ -3364,7 +3364,7 @@ int UtcDaliTextLayoutEllipsis02(void)
     { 12u, 12u },
     95.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -3382,7 +3382,7 @@ int UtcDaliTextLayoutEllipsis02(void)
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 38.f );
+  Size layoutSize( 100.f, 40.f );
 
   LayoutTextData data =
   {
@@ -3508,9 +3508,9 @@ int UtcDaliTextLayoutEllipsis03(void)
   {
     { 0u, 14u },
     { 0u, 14u },
-    97.f,
+    98.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -3522,11 +3522,11 @@ int UtcDaliTextLayoutEllipsis03(void)
 
   float positions[] =
   {
-    88.f, -10.f, 80.f, -13.f, 74.f, -10.f, 66.f, -10.f, 60.f, -0.f, 52.f, -10.f, 47.f, -10.f, 39.f, -13.f, 30.f, -10.f, 24.f, -0.f, 17.f, -8.f, 12.f, -6.f, 4.f, -8.f, 0.f, -7.f, 77.f, -11.f, 72.f, -0.f,
+    87.f, -10.f, 79.f, -13.f, 74.f, -10.f, 65.f, -10.f, 60.f, -0.f, 51.f, -10.f, 47.f, -10.f, 38.f, -13.f, 29.f, -10.f, 24.f, -0.f, 17.f, -8.f, 12.f, -6.f, 4.f, -8.f, 0.f, -7.f, 78.f, -11.f, 73.f, -0.f,
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 19.f );
+  Size layoutSize( 100.f, 20.f );
 
   LayoutTextData data =
   {
@@ -3652,9 +3652,9 @@ int UtcDaliTextLayoutEllipsis04(void)
   {
     { 0u, 10u },
     { 0u, 10u },
-    69.f,
+    70.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -3667,7 +3667,7 @@ int UtcDaliTextLayoutEllipsis04(void)
     { 10u, 19u },
     99.f,
     15.f,
-    -4.f,
+    -5.f,
     5.f,
     0.f,
     0.f,
@@ -3680,12 +3680,12 @@ int UtcDaliTextLayoutEllipsis04(void)
 
   float positions[] =
   {
-    63.f, -10.f, 54.f, -13.f, 49.f, -10.f, 41.f, -10.f, 35.f, -0.f, 27.f, -10.f, 22.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f, 95.f, -8.f, 90.f, -6.f, 82.f, -8.f, 78.f, -7.f, 77.f, -11.f, 72.f, -0.f,
-    67.f, -7.f, 66.f, -11.f, 60.f, -11.f, 54.f, -8.f, 52.f, -11.f, 46.f, -11.f, 41.f, -8.f, 37.f, -0.f, 27.f, -10.f, 18.f, -13.f, 13.f, -10.f, 4.f, -10.f, 0.f, -0.f, 93.f, -10.f, 88.f, -10.f, 80.f, -13.f, 71.f, -10.f, 65.f, -0.f,
+    63.f, -10.f, 54.f, -13.f, 50.f, -10.f, 41.f, -10.f, 36.f, -0.f, 27.f, -10.f, 23.f, -10.f, 14.f, -13.f, 4.f, -10.f, 0.f, -0.f, 96.f, -8.f, 91.f, -6.f, 83.f, -8.f, 79.f, -7.f, 78.f, -11.f, 73.f, -0.f,
+    68.f, -7.f, 67.f, -11.f, 61.f, -11.f, 55.f, -8.f, 53.f, -11.f, 47.f, -11.f, 42.f, -8.f, 38.f, -0.f, 27.f, -10.f, 18.f, -13.f, 14.f, -10.f, 4.f, -10.f, 0.f, -0.f, 92.f, -10.f, 88.f, -10.f, 79.f, -13.f, 70.f, -10.f, 65.f, -0.f,
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 38.f );
+  Size layoutSize( 100.f, 40.f );
 
   LayoutTextData data =
   {
@@ -3743,14 +3743,14 @@ int UtcDaliTextLayoutEllipsis05(void)
   {
     { 0u, 11u },
     { 0u, 11u },
-    81.f,
+    80.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
     false,
-    false
+    true
   };
   Vector<LineRun> lines;
   lines.PushBack( line01 );
@@ -3761,7 +3761,7 @@ int UtcDaliTextLayoutEllipsis05(void)
   };
 
   Size textArea( 100.f, 19.f );
-  Size layoutSize( 81.f, 19.f );
+  Size layoutSize( 100.f, 20.f );
 
   LayoutTextData data =
   {
@@ -4489,7 +4489,7 @@ int UtcDaliTextAlign06(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 0.f, 0.f, 0.f, 0.f, 9.f, 17.f };
+  float positions[] = { 0.f, 0.f, 0.f, 0.f, 9.f, 16.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -4610,7 +4610,7 @@ int UtcDaliTextAlign07(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 19.f, 31.f, 0.f, 0.f, 0.f, 0.f };
+  float positions[] = { 19.f, 30.f, 0.f, 0.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -4852,7 +4852,7 @@ int UtcDaliTextAlign09(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 0.f, 0.f, 0.f, 0.f, 19.f, 34.f };
+  float positions[] = { 0.f, 0.f, 0.f, 0.f, 19.f, 33.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -5094,7 +5094,7 @@ int UtcDaliTextAlign11(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 19.f, 31.f, 33.f, 0.f, 0.f, 0.f };
+  float positions[] = { 19.f, 30.f, 33.f, 0.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -5328,7 +5328,7 @@ int UtcDaliTextLayoutGetGlyphMetrics(void)
     { 0u, 1u },
     11.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -5338,7 +5338,7 @@ int UtcDaliTextLayoutGetGlyphMetrics(void)
   Vector<LineRun> lines01;
   lines01.PushBack( line01 );
 
-  Size layoutSize01 = Vector2(11.f, 19.f);
+  Size layoutSize01 = Vector2(11.f, 20.f);
 
   // Group: second glyph doesn't exceed the width of the first glyph
   float positions02[] = { 0.f, -11.f, 7.f, -15.f, };
@@ -5349,7 +5349,7 @@ int UtcDaliTextLayoutGetGlyphMetrics(void)
     { 0u, 2u },
     16.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -5359,7 +5359,7 @@ int UtcDaliTextLayoutGetGlyphMetrics(void)
   Vector<LineRun> lines02;
   lines02.PushBack( line02 );
 
-  Size layoutSize02 = Vector2(16.f, 19.f);
+  Size layoutSize02 = Vector2(16.f, 20.f);
 
   // Group: second glyph doesn't exceed the width of the first glyph
   float positions03[] = { 0.f, -11.f , 2.f, -15.f };
@@ -5370,7 +5370,7 @@ int UtcDaliTextLayoutGetGlyphMetrics(void)
     { 0u, 2u },
     11.f,
     15.f,
-    -4.f,
+    -5.f,
     0.f,
     0.f,
     0.f,
@@ -5380,7 +5380,7 @@ int UtcDaliTextLayoutGetGlyphMetrics(void)
   Vector<LineRun> lines03;
   lines03.PushBack( line03 );
 
-  Size layoutSize03 = Vector2(11.f, 19.f);
+  Size layoutSize03 = Vector2(11.f, 20.f);
 
  /////////////////////////////
 
