@@ -223,6 +223,9 @@ void TextVisual::DoCreatePropertyMap(Property::Map& map) const
 
   GetBackgroundProperties(mController, value, Text::EffectStyle::DEFAULT);
   map.Insert(Toolkit::DevelTextVisual::Property::BACKGROUND, value);
+
+  GetStrikethroughProperties(mController, value, Text::EffectStyle::DEFAULT);
+  map.Insert(Toolkit::DevelTextVisual::Property::STRIKETHROUGH, value);
 }
 
 void TextVisual::DoCreateInstancePropertyMap(Property::Map& map) const
@@ -460,6 +463,11 @@ void TextVisual::DoSetProperty(Dali::Property::Index index, const Dali::Property
       SetBackgroundProperties(mController, propertyValue, Text::EffectStyle::DEFAULT);
       break;
     }
+    case Toolkit::DevelTextVisual::Property::STRIKETHROUGH:
+    {
+      SetStrikethroughProperties(mController, propertyValue, Text::EffectStyle::DEFAULT);
+      break;
+    }
   }
 }
 
@@ -545,10 +553,12 @@ void TextVisual::UpdateRenderer()
       const bool outlineEnabled         = (mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1);
       const bool backgroundEnabled      = mController->GetTextModel()->IsBackgroundEnabled();
       const bool markupProcessorEnabled = mController->IsMarkupProcessorEnabled();
+      const bool strikethroughEnabled   = mController->GetTextModel()->IsStrikethroughEnabled();
 
-      const bool styleEnabled = (shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled);
+      const bool styleEnabled = (shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled || strikethroughEnabled);
+      const bool isOverlayStyle = underlineEnabled || strikethroughEnabled;
 
-      AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled);
+      AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
 
       // Text rendered and ready to display
       ResourceReady(Toolkit::Visual::ResourceStatus::READY);
@@ -583,12 +593,13 @@ PixelData TextVisual::ConvertToPixelData(unsigned char* buffer, int width, int h
   return pixelData;
 }
 
-void TextVisual::CreateTextureSet(TilingInfo& info, Renderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled)
+void TextVisual::CreateTextureSet(TilingInfo& info, Renderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle)
 {
   TextureSet   textureSet      = TextureSet::New();
   unsigned int textureSetIndex = 0u;
 
   // Convert the buffer to pixel data to make it a texture.
+
   if(info.textBuffer)
   {
     PixelData data = ConvertToPixelData(info.textBuffer, info.width, info.height, info.offsetPosition, info.textPixelFormat);
@@ -600,6 +611,13 @@ void TextVisual::CreateTextureSet(TilingInfo& info, Renderer& renderer, Sampler&
   {
     PixelData styleData = ConvertToPixelData(info.styleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888);
     AddTexture(textureSet, styleData, sampler, textureSetIndex);
+    ++textureSetIndex;
+  }
+
+  if(styleEnabled && isOverlayStyle)
+  {
+    PixelData overlayStyleData = ConvertToPixelData(info.styleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888);
+    AddTexture(textureSet, overlayStyleData, sampler, textureSetIndex);
     ++textureSetIndex;
   }
 
@@ -627,7 +645,7 @@ void TextVisual::CreateTextureSet(TilingInfo& info, Renderer& renderer, Sampler&
   mRendererList.push_back(renderer);
 }
 
-void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled)
+void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle)
 {
   Shader shader = GetTextShader(mFactoryCache, hasMultipleTextColors, containsColorGlyph, styleEnabled);
   mImpl->mRenderer.SetShader(shader);
@@ -638,7 +656,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
   // No tiling required. Use the default renderer.
   if(size.height < maxTextureSize)
   {
-    TextureSet textureSet = GetTextTexture(size, hasMultipleTextColors, containsColorGlyph, styleEnabled);
+    TextureSet textureSet = GetTextTexture(size, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
 
     mImpl->mRenderer.SetTextures(textureSet);
     //Register transform properties
@@ -700,7 +718,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
     }
 
     // Create a textureset in the default renderer.
-    CreateTextureSet(info, mImpl->mRenderer, sampler, hasMultipleTextColors, containsColorGlyph, styleEnabled);
+    CreateTextureSet(info, mImpl->mRenderer, sampler, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
 
     verifiedHeight -= maxTextureSize;
 
@@ -719,7 +737,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
       // New offset for tiling.
       info.offSet.y += maxTextureSize;
       // Create a textureset int the new tiling renderer.
-      CreateTextureSet(info, tilingRenderer, sampler, hasMultipleTextColors, containsColorGlyph, styleEnabled);
+      CreateTextureSet(info, tilingRenderer, sampler, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
 
       verifiedHeight -= maxTextureSize;
     }
@@ -737,7 +755,7 @@ void TextVisual::AddRenderer(Actor& actor, const Vector2& size, bool hasMultiple
   }
 }
 
-TextureSet TextVisual::GetTextTexture(const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled)
+TextureSet TextVisual::GetTextTexture(const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle)
 {
   // Filter mode needs to be set to linear to produce better quality while scaling.
   Sampler sampler = Sampler::New();
@@ -757,16 +775,18 @@ TextureSet TextVisual::GetTextTexture(const Vector2& size, bool hasMultipleTextC
   // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
   // In that case, create a texture. TODO: should tile the text.
   unsigned int textureSetIndex = 0u;
-
   AddTexture(textureSet, data, sampler, textureSetIndex);
   ++textureSetIndex;
 
   if(styleEnabled)
   {
-    // Create RGBA texture for all the text styles (without the text itself)
+    // Create RGBA texture for all the text styles that render in the background (without the text itself)
     PixelData styleData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888);
-
     AddTexture(textureSet, styleData, sampler, textureSetIndex);
+    ++textureSetIndex;
+    // Create RGBA texture for overlay styles such as underline and strikethrough (without the text itself)
+    PixelData overlayStyleData = mTypesetter->Render(size, textDirection, Text::Typesetter::RENDER_OVERLAY_STYLE, false, Pixel::RGBA8888);
+    AddTexture(textureSet, overlayStyleData, sampler, textureSetIndex);
     ++textureSetIndex;
   }
 

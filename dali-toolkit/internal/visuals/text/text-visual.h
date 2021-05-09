@@ -269,8 +269,9 @@ private:
    * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
    * @param[in] containsColorGlyph Whether the text contains color glyph.
    * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
+   * @param[in] isOverlayStyle Whether the style needs to overlay on the text (e.g. strikethrough, underline, etc.).
    */
-  void CreateTextureSet(TilingInfo& info, Renderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled);
+  void CreateTextureSet(TilingInfo& info, Renderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle);
 
   /**
    * Create renderer of the text for rendering.
@@ -279,8 +280,9 @@ private:
    * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
    * @param[in] containsColorGlyph Whether the text contains color glyph.
    * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
+   * @param[in] isOverlayStyle Whether the style needs to overlay on the text (e.g. strikethrough, underline, etc.).
    */
-  void AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled);
+  void AddRenderer(Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle);
 
   /**
    * Get the texture of the text for rendering.
@@ -288,8 +290,9 @@ private:
    * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
    * @param[in] containsColorGlyph Whether the text contains color glyph.
    * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
+   * @param[in] isOverlayStyle Whether the style needs to overlay on the text (e.g. strikethrough, underline, etc.).
    */
-  TextureSet GetTextTexture(const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled);
+  TextureSet GetTextTexture(const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle);
 
   /**
    * Get the text rendering shader.

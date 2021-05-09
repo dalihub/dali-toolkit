@@ -154,6 +154,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputFilter",  
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsis",                             BOOLEAN,   ELLIPSIS                            )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsisPosition",                     INTEGER,   ELLIPSIS_POSITION                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "minLineSize",                          FLOAT,     MIN_LINE_SIZE                       )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "strikethrough",                        MAP,       STRIKETHROUGH                       )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputStrikethrough",                   MAP,       INPUT_STRIKETHROUGH                 )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )
@@ -215,6 +217,11 @@ Toolkit::TextEditor::InputStyle::Mask ConvertInputStyle(Text::InputStyle::Mask i
   {
     editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::OUTLINE);
   }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_STRIKETHROUGH))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::STRIKETHROUGH);
+  }
+
   return editorInputStyleMask;
 }
 

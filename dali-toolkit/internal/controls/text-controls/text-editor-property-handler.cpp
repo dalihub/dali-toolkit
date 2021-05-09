@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/internal/controls/text-controls/text-editor-property-handler.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
+#include <dali-toolkit/internal/controls/text-controls/text-editor-property-handler.h>
 
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 
@@ -689,6 +689,24 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       impl.mRenderer.Reset();
       break;
     }
+    case Toolkit::DevelTextEditor::Property::STRIKETHROUGH:
+    {
+      const bool update = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
+      if(update)
+      {
+        impl.mRenderer.Reset();
+      }
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::INPUT_STRIKETHROUGH:
+    {
+      const bool update = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::INPUT);
+      if(update)
+      {
+        impl.mRenderer.Reset();
+      }
+      break;
+    }
   }
 }
 
@@ -973,6 +991,16 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     case Toolkit::TextEditor::Property::LINE_WRAP_MODE:
     {
       value = impl.mController->GetLineWrapMode();
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::STRIKETHROUGH:
+    {
+      GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::INPUT_STRIKETHROUGH:
+    {
+      GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::INPUT);
       break;
     }
     case Toolkit::DevelTextEditor::Property::ENABLE_SHIFT_SELECTION:

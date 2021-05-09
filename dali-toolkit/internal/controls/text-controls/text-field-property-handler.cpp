@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/internal/controls/text-controls/text-field-property-handler.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
+#include <dali-toolkit/internal/controls/text-controls/text-field-property-handler.h>
 
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
@@ -665,6 +665,24 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       }
       break;
     }
+    case Toolkit::DevelTextField::Property::STRIKETHROUGH:
+    {
+      const bool update = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
+      if(update)
+      {
+        impl.mRenderer.Reset();
+      }
+      break;
+    }
+    case Toolkit::DevelTextField::Property::INPUT_STRIKETHROUGH:
+    {
+      const bool update = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::INPUT);
+      if(update)
+      {
+        impl.mRenderer.Reset();
+      }
+      break;
+    }
   }
 }
 
@@ -1023,6 +1041,16 @@ Property::Value TextField::PropertyHandler::GetProperty(Toolkit::TextField textF
     case Toolkit::DevelTextField::Property::ELLIPSIS_POSITION:
     {
       value = impl.mController->GetEllipsisPosition();
+      break;
+    }
+    case Toolkit::DevelTextField::Property::STRIKETHROUGH:
+    {
+      GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
+      break;
+    }
+    case Toolkit::DevelTextField::Property::INPUT_STRIKETHROUGH:
+    {
+      GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::INPUT);
       break;
     }
   } //switch

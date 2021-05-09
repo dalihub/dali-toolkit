@@ -274,6 +274,18 @@ enum Type
    * @note If the font size is larger than the line size, it works with the font size.
    */
   MIN_LINE_SIZE,
+
+  /**
+   * @brief A horizontal line through the text center.
+   * @details Name "strikethrough", type Property::MAP.
+   */
+  STRIKETHROUGH,
+
+  /**
+   * @brief The strikethrough parameters of the new input text.
+   * @details Name "inputStrikethrough", type Property::MAP.
+   */
+  INPUT_STRIKETHROUGH,
 };
 
 } // namespace Property

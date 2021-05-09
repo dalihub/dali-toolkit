@@ -95,6 +95,8 @@ const char* const PROPERTY_NAME_EMBOSS                               = "emboss";
 const char* const PROPERTY_NAME_INPUT_EMBOSS                         = "inputEmboss";
 const char* const PROPERTY_NAME_OUTLINE                              = "outline";
 const char* const PROPERTY_NAME_INPUT_OUTLINE                        = "inputOutline";
+const char* const PROPERTY_NAME_STRIKETHROUGH                        = "strikethrough";
+const char* const PROPERTY_NAME_INPUT_STRIKETHROUGH                  = "inputStrikethrough";
 
 const char* const PROPERTY_NAME_HIDDEN_INPUT_SETTINGS                = "hiddenInputSettings";
 const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSize";
@@ -577,6 +579,8 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_BACKGROUND ) == DevelTextField::Property::BACKGROUND );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_COLOR ) == DevelTextField::Property::GRAB_HANDLE_COLOR );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_FILTER ) == DevelTextField::Property::INPUT_FILTER );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_STRIKETHROUGH ) == DevelTextField::Property::STRIKETHROUGH );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_STRIKETHROUGH ) == DevelTextField::Property::INPUT_STRIKETHROUGH );
 
   END_TEST;
 }
@@ -847,6 +851,24 @@ int UtcDaliTextFieldSetPropertyP(void)
   fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::INPUT_FONT_STYLE );
   DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  Property::Map strikethroughMapSet;
+  Property::Map strikethroughMapGet;
+
+  strikethroughMapSet.Insert( "enable", true );
+  strikethroughMapSet.Insert( "color", Color::RED );
+  strikethroughMapSet.Insert( "height", 2.0f );
+
+  // Check the strikethrough property
+  field.SetProperty( DevelTextField::Property::STRIKETHROUGH, strikethroughMapSet );
+
+  strikethroughMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::STRIKETHROUGH );
+  DALI_TEST_EQUALS( strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( strikethroughMapGet, strikethroughMapSet ), true, TEST_LOCATION );
+
+  // Check the input strikethrough property
+  field.SetProperty( DevelTextField::Property::INPUT_STRIKETHROUGH, "Strikethrough input properties" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( DevelTextField::Property::INPUT_STRIKETHROUGH ), std::string("Strikethrough input properties"), TEST_LOCATION );
 
   Property::Map underlineMapSet;
   Property::Map underlineMapGet;
@@ -2114,6 +2136,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
   field.SetProperty( TextField::Property::INPUT_SHADOW, "shadow" );
   field.SetProperty( TextField::Property::INPUT_EMBOSS, "emboss" );
   field.SetProperty( TextField::Property::INPUT_OUTLINE, "outline" );
+  field.SetProperty( DevelTextField::Property::INPUT_STRIKETHROUGH, "strikethrough" );
 
   // Render and notify
   application.SendNotification();
@@ -4832,6 +4855,74 @@ int utcDaliTextFieldSelectionChangedSignal(void)
   DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
   DALI_TEST_EQUALS(oldSelectionStart, 0, TEST_LOCATION);
   DALI_TEST_EQUALS(oldSelectionEnd, 23, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextFieldStrikethroughGeneration(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldStrikethroughGeneration");
+
+  TextField textField = TextField::New();
+  textField.SetProperty( TextField::Property::TEXT, "Test" );
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 100.f ) );
+  textField.SetProperty( TextField::Property::POINT_SIZE, 10) ;
+  textField.SetProperty( TextField::Property::FONT_FAMILY, "DejaVu Sans");
+
+  application.GetScene().Add( textField );
+  application.SendNotification();
+  application.Render();
+
+  Property::Map strikethroughMapSet;
+  Property::Map strikethroughMapGet;
+
+  strikethroughMapSet.Insert( "enable", true );
+  strikethroughMapSet.Insert( "color", Color::RED );
+  strikethroughMapSet.Insert( "height", 2.0f );
+
+  // Check the strikethrough property
+  textField.SetProperty( DevelTextField::Property::STRIKETHROUGH, strikethroughMapSet );
+  strikethroughMapGet = textField.GetProperty<Property::Map>( DevelTextField::Property::STRIKETHROUGH );
+  textField.SetProperty( TextField::Property::TEXT, "Test1" );
+  DALI_TEST_EQUALS( strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( strikethroughMapGet, strikethroughMapSet ), true, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  strikethroughMapSet.Clear();
+  strikethroughMapGet.Clear();
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextFieldInputStrikethroughGeneration(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldInputStrikethroughGeneration");
+
+  TextField textField = TextField::New();
+  textField.SetProperty( TextField::Property::TEXT, "Test" );
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 100.f ) );
+  textField.SetProperty( TextField::Property::POINT_SIZE, 10) ;
+  textField.SetProperty( TextField::Property::FONT_FAMILY, "DejaVu Sans");
+
+  application.GetScene().Add( textField );
+  application.SendNotification();
+  application.Render();
+
+  std::string strikethroughSettings1( "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"2\"}" );
+
+  // Check the strikethrough property
+  textField.SetProperty( DevelTextField::Property::INPUT_STRIKETHROUGH, strikethroughSettings1 );
+  textField.SetProperty( TextField::Property::TEXT, "Test1" );
+  DALI_TEST_EQUALS( textField.GetProperty<std::string>( DevelTextField::Property::INPUT_STRIKETHROUGH ), strikethroughSettings1, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

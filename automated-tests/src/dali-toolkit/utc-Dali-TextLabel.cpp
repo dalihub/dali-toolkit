@@ -69,6 +69,7 @@ const char* const PROPERTY_NAME_SHADOW = "shadow";
 const char* const PROPERTY_NAME_EMBOSS = "emboss";
 const char* const PROPERTY_NAME_OUTLINE = "outline";
 const char* const PROPERTY_NAME_BACKGROUND = "textBackground";
+const char* const PROPERTY_NAME_STRIKETHROUGH = "strikethrough";
 
 const char* const PROPERTY_NAME_PIXEL_SIZE = "pixelSize";
 const char* const PROPERTY_NAME_ELLIPSIS = "ellipsis";
@@ -353,6 +354,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY ) == TextLabel::Property::AUTO_SCROLL_LOOP_DELAY );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_FONT_SIZE_SCALE ) == DevelTextLabel::Property::FONT_SIZE_SCALE );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS_POSITION ) == DevelTextLabel::Property::ELLIPSIS_POSITION );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_STRIKETHROUGH ) == DevelTextLabel::Property::STRIKETHROUGH );
 
   END_TEST;
 }
@@ -457,6 +459,19 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::BLUE );
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ), Color::BLUE, TEST_LOCATION );
 
+  Property::Map strikethroughMapSet;
+  Property::Map strikethroughMapGet;
+
+  strikethroughMapSet.Insert( "enable", false );
+  strikethroughMapSet.Insert( "color", Color::BLUE );
+  strikethroughMapSet.Insert( "height", 2.0f );
+
+  label.SetProperty( DevelTextLabel::Property::STRIKETHROUGH, strikethroughMapSet );
+
+  strikethroughMapGet = label.GetProperty<Property::Map>( DevelTextLabel::Property::STRIKETHROUGH );
+  DALI_TEST_EQUALS( strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( strikethroughMapGet, strikethroughMapSet ), true, TEST_LOCATION );
+
   Property::Map underlineMapSet;
   Property::Map underlineMapGet;
 
@@ -560,6 +575,52 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   label.SetProperty( TextLabel::Property::LINE_SPACING, 10.f );
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 10.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check the strikethrough property
+  strikethroughMapSet.Clear();
+  strikethroughMapSet.Insert( "enable", true );
+  strikethroughMapSet.Insert( "color", Color::RED );
+  strikethroughMapSet.Insert( "height", 2.0f );
+
+  label.SetProperty( DevelTextLabel::Property::STRIKETHROUGH, strikethroughMapSet );
+
+  application.SendNotification();
+  application.Render();
+
+  strikethroughMapGet = label.GetProperty<Property::Map>( DevelTextLabel::Property::STRIKETHROUGH );
+  DALI_TEST_EQUALS( strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( strikethroughMapGet, strikethroughMapSet ), true, TEST_LOCATION );
+
+  strikethroughMapSet.Clear();
+  strikethroughMapSet.Insert( Toolkit::DevelText::Strikethrough::Property::ENABLE, true );
+  strikethroughMapSet.Insert( Toolkit::DevelText::Strikethrough::Property::COLOR, Color::RED );
+  strikethroughMapSet.Insert( Toolkit::DevelText::Strikethrough::Property::HEIGHT, 2.0f );
+
+  label.SetProperty( DevelTextLabel::Property::STRIKETHROUGH, strikethroughMapSet );
+
+  application.SendNotification();
+  application.Render();
+
+  strikethroughMapGet = label.GetProperty<Property::Map>( DevelTextLabel::Property::STRIKETHROUGH );
+  DALI_TEST_EQUALS( strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION );
+  std::vector<std::string> strikethroughIndicesConversionTable = { "enable", "color","height"};
+  DALI_TEST_EQUALS( DaliTestCheckMaps( strikethroughMapGet, strikethroughMapSet, strikethroughIndicesConversionTable ), true, TEST_LOCATION );
+
+  strikethroughMapSet.Clear();
+
+  Property::Map strikethroughDisabledMapGet;
+  strikethroughDisabledMapGet.Insert( "enable", false );
+  strikethroughDisabledMapGet.Insert( "color", Color::RED );
+  strikethroughDisabledMapGet.Insert( "height", 2.0f );
+
+  label.SetProperty( DevelTextLabel::Property::STRIKETHROUGH, strikethroughMapSet );
+
+  application.SendNotification();
+  application.Render();
+
+  strikethroughMapGet = label.GetProperty<Property::Map>( DevelTextLabel::Property::STRIKETHROUGH );
+  DALI_TEST_EQUALS( strikethroughMapGet.Count(), strikethroughDisabledMapGet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( strikethroughMapGet, strikethroughDisabledMapGet ), true, TEST_LOCATION );
 
   // Check the underline property
   underlineMapSet.Clear();
@@ -757,6 +818,12 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   shadowMap.Insert( "color", Color::BLUE );
   shadowMap.Insert( "offset", Vector2( 1.0f, 1.0f ) );
   label.SetProperty( TextLabel::Property::SHADOW, shadowMap );
+
+  Property::Map strikethroughMap;
+  strikethroughMap.Insert( "enable", true );
+  strikethroughMap.Insert( "color", Color::GREEN );
+  strikethroughMap.Insert( "height", 2.0f );
+  label.SetProperty( DevelTextLabel::Property::STRIKETHROUGH, strikethroughMap );
 
   try
   {
@@ -1749,6 +1816,14 @@ int UtcDaliToolkitTextlabelMaxTextureSet(void)
   label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
   label.SetProperty( Toolkit::TextLabel::Property::TEXT_COLOR, Color::BLUE );
 
+  Property::Map strikethroughMapSet;
+  strikethroughMapSet.Clear();
+  strikethroughMapSet.Insert( "enable", true );
+  strikethroughMapSet.Insert( "color", Color::RED );
+  strikethroughMapSet.Insert( "height", 2.0f );
+  label.SetProperty( DevelTextLabel::Property::STRIKETHROUGH, strikethroughMapSet );
+  label.SetProperty( Toolkit::TextLabel::Property::TEXT_COLOR, Color::BLUE );
+
   application.GetScene().Add( label );
 
   application.SendNotification();
@@ -1760,6 +1835,68 @@ int UtcDaliToolkitTextlabelMaxTextureSet(void)
 
   // Check if the number of renderers is greater than 1.
   DALI_TEST_CHECK( label.GetRendererCount() > 1u );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelStrikethroughExceedsWidthAndHeight(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelStrikethroughExceedsWidthAndHeight");
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty( TextLabel::Property::TEXT, "Test" );
+  label.SetProperty( TextLabel::Property::FONT_FAMILY, "DejaVu Sans");
+
+  //Exeeding BufferWidth
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 400.0f));
+  label.SetProperty(TextLabel::Property::HORIZONTAL_ALIGNMENT, HorizontalAlignment::RIGHT);
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 200.f);
+
+  application.GetScene().Add( label );
+  application.SendNotification();
+  application.Render();
+
+  Property::Map strikethroughMapSet;
+  strikethroughMapSet.Clear();
+  strikethroughMapSet.Insert( "enable", true );
+  strikethroughMapSet.Insert( "color", Color::BLUE);
+  strikethroughMapSet.Insert( "height", 2.0f);
+  label.SetProperty( TextLabel::Property::TEXT, "Test1" );
+  label.SetProperty( DevelTextLabel::Property::STRIKETHROUGH, strikethroughMapSet );
+  label.SetProperty( Toolkit::TextLabel::Property::TEXT_COLOR, Color::BLUE );
+  application.GetScene().Add( label );
+  application.SendNotification();
+  application.Render();
+  // Check if the number of renderers is 1.
+  DALI_TEST_EQUALS( 1, label.GetRendererCount(), TEST_LOCATION);
+
+
+  label = TextLabel::New();
+  label.SetProperty( TextLabel::Property::TEXT, "Test" );
+  label.SetProperty( TextLabel::Property::FONT_FAMILY, "DejaVu Sans");
+
+  //Exeeding BufferHeight
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.0f));
+  label.SetProperty(TextLabel::Property::HORIZONTAL_ALIGNMENT, HorizontalAlignment::RIGHT);
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 200.f);
+
+  application.GetScene().Add( label );
+  application.SendNotification();
+  application.Render();
+
+  strikethroughMapSet.Clear();
+  strikethroughMapSet.Insert( "enable", true );
+  strikethroughMapSet.Insert( "color", Color::BLUE);
+  strikethroughMapSet.Insert( "height", 2.0f);
+  label.SetProperty( TextLabel::Property::TEXT, "Test2" );
+  label.SetProperty( DevelTextLabel::Property::STRIKETHROUGH, strikethroughMapSet );
+  label.SetProperty( Toolkit::TextLabel::Property::TEXT_COLOR, Color::BLUE );
+  application.GetScene().Add( label );
+  application.SendNotification();
+  application.Render();
+  // Check if the number of renderers is 1.
+  DALI_TEST_EQUALS( 1, label.GetRendererCount(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -1974,7 +2111,6 @@ int UtcDaliTextLabelHyphenWrapMode(void)
   END_TEST;
 }
 
-
 int utcDaliTextLabelGetHeightForWidthChangeLineCountWhenTextChanged(void)
 {
   ToolkitTestApplication application;
@@ -2175,6 +2311,45 @@ int UtcDaliToolkitTextlabelEllipsisPositionProperty(void)
   textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, "end");
   DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
 
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelStrikethroughGeneration(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelStrikethroughGeneration");
+
+  TextLabel textLabel = TextLabel::New();
+  textLabel.SetProperty( TextLabel::Property::TEXT, "Test" );
+  textLabel.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 100.f ) );
+  textLabel.SetProperty( TextLabel::Property::POINT_SIZE, 10) ;
+  textLabel.SetProperty( TextLabel::Property::FONT_FAMILY, "DejaVu Sans");
+
+  application.GetScene().Add( textLabel );
+  application.SendNotification();
+  application.Render();
+
+  Property::Map strikethroughMapSet;
+  Property::Map strikethroughMapGet;
+
+  strikethroughMapSet.Insert( "enable", true );
+  strikethroughMapSet.Insert( "color", Color::RED );
+  strikethroughMapSet.Insert( "height", 2.0f );
+
+  // Check the strikethrough property
+  textLabel.SetProperty( DevelTextLabel::Property::STRIKETHROUGH, strikethroughMapSet );
+  strikethroughMapGet = textLabel.GetProperty<Property::Map>( DevelTextLabel::Property::STRIKETHROUGH );
+  textLabel.SetProperty( TextLabel::Property::TEXT, "Test1" );
+  DALI_TEST_EQUALS( strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( strikethroughMapGet, strikethroughMapSet ), true, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  strikethroughMapSet.Clear();
+  strikethroughMapGet.Clear();
 
   END_TEST;
 }

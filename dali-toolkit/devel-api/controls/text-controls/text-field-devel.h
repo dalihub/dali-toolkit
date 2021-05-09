@@ -213,6 +213,18 @@ enum
   * @see DevelText::EllipsisPosition
   */
   ELLIPSIS_POSITION,
+
+  /**
+   * @brief A horizontal line through the text center.
+   * @details Name "strikethrough", type Property::MAP.
+   */
+  STRIKETHROUGH,
+
+  /**
+   * @brief The strikethrough parameters of the new input text.
+   * @details Name "inputStrikethrough", type Property::MAP.
+   */
+  INPUT_STRIKETHROUGH,
 };
 
 } // namespace Property

@@ -137,6 +137,7 @@ const char* const SHADOW_PROPERTY("shadow");
 const char* const UNDERLINE_PROPERTY("underline");
 const char* const OUTLINE_PROPERTY("outline");
 const char* const BACKGROUND_PROPERTY("textBackground");
+const char* const STRIKETHROUGH_PROPERTY("strikethrough");
 
 //NPatch visual
 const char* const BORDER_ONLY("borderOnly");

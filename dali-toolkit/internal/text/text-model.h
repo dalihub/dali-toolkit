@@ -257,6 +257,12 @@ public:
   */
   Length GetHyphensCount() const override;
 
+  float GetStrikethroughHeight() const override;
+
+  const Vector4& GetStrikethroughColor() const override;
+
+  bool IsStrikethroughEnabled() const override;
+
 private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
