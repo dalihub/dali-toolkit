@@ -458,6 +458,36 @@ int UtcDaliVideoViewMethodsForCoverage2(void)
   END_TEST;
 }
 
+int UtcDaliVideoViewCustomShaderForCoverage3(void)
+{
+  ToolkitTestApplication application;
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK( videoView );
+
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+
+  videoView.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
+  bool isUnderlay = videoView.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( !isUnderlay );
+
+  application.GetScene().Add( videoView );
+  videoView.SetProperty( VideoView::Property::VIDEO, "testvideo" );
+
+  Property::Map customShader;
+  customShader.Insert( "vertexShader", VERTEX_SHADER );
+
+  Property::Map map;
+  map.Insert( "shader", customShader );
+
+  videoView.SetProperty( VideoView::Property::VIDEO, map );
+
+  Property::Map map2;
+  Property::Value value = videoView.GetProperty( VideoView::Property::VIDEO );
+
+  DALI_TEST_CHECK( !value.Get( map2 ) );
+  END_TEST;
+}
+
 int UtcDaliVideoViewPropertyUnderlay(void)
 {
   ToolkitTestApplication application;
