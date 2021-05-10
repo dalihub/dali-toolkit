@@ -1837,3 +1837,51 @@ int UtcDaliTextLabelAtlasLimitationIsEnabledForLargeFontPointSize(void)
 
   END_TEST;
 }
+
+int UtcDaliTextLabelHyphenWrapMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelHyphenWrapMode ");
+
+  int lineCount =0;
+  TextLabel label = TextLabel::New();
+  label.SetProperty( Actor::Property::SIZE, Vector2( 150.0f, 300.f ));
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 12.f );
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true);
+  application.GetScene().Add( label );
+  application.SendNotification();
+  application.Render();
+
+  label.SetProperty( TextLabel::Property::TEXT, "Hi Experimen" );
+  label.SetProperty(TextLabel::Property::LINE_WRAP_MODE,DevelText::LineWrap::HYPHENATION);
+  DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( DevelText::LineWrap::HYPHENATION ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount = label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+  /*
+    text will be :
+    Hi Exp-
+    erimen
+  */
+  DALI_TEST_EQUALS( lineCount, 2, TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::TEXT, "Hi Experimen" );
+  label.SetProperty(TextLabel::Property::LINE_WRAP_MODE,DevelText::LineWrap::MIXED);
+  DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( DevelText::LineWrap::MIXED ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount = label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+  /*
+    text will be :
+    Hi
+    Experi-
+    men
+  */
+  DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
+
+  END_TEST;
+}
