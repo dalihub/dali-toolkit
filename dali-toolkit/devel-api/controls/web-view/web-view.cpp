@@ -89,7 +89,7 @@ Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
   return Dali::Toolkit::GetImpl( *this ).GetBackForwardList();
 }
 
-Dali::Toolkit::ImageView& WebView::GetFavicon()
+Dali::Toolkit::ImageView WebView::GetFavicon() const
 {
   return Dali::Toolkit::GetImpl( *this ).GetFavicon();
 }

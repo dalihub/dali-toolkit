@@ -261,17 +261,20 @@ Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
   return mWebBackForwardList.get();
 }
 
-Dali::Toolkit::ImageView& WebView::GetFavicon()
+Dali::Toolkit::ImageView WebView::GetFavicon() const
 {
-  if ( mWebEngine )
+  Dali::Toolkit::ImageView faviconView;
+  if(mWebEngine)
   {
     Dali::PixelData pixelData = mWebEngine.GetFavicon();
-    std::string url = Dali::Toolkit::Image::GenerateUrl( pixelData );
-    mFaviconView = Dali::Toolkit::ImageView::New( url );
-    mFaviconView.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-    mFaviconView.SetProperty( Dali::Actor::Property::SIZE, Vector2( pixelData.GetWidth(), pixelData.GetHeight() ) );
+    if(pixelData)
+    {
+      std::string url = Dali::Toolkit::Image::GenerateUrl(pixelData);
+      faviconView     = Dali::Toolkit::ImageView::New(url);
+      faviconView.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+    }
   }
-  return mFaviconView;
+  return faviconView;
 }
 
 void WebView::LoadUrl( const std::string& url )

@@ -97,11 +97,11 @@ public:
   static Toolkit::WebView New( int argc, char** argv );
 
   /**
-   * @brief Get Favicon of web page.
+   * @brief Get favicon of web page.
    *
-   * @return Handle to a fav icon
+   * @return Handle to a favicon
    */
-  Dali::Toolkit::ImageView& GetFavicon();
+  Dali::Toolkit::ImageView GetFavicon() const;
 
   /**
    * @copydoc Dali::Toolkit::WebView::LoadUrl()
@@ -382,7 +382,6 @@ private:
   std::unique_ptr<Dali::Toolkit::WebCookieManager>       mWebCookieManager;
   std::unique_ptr<Dali::Toolkit::WebSettings>            mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList>     mWebBackForwardList;
-  Dali::Toolkit::ImageView mFaviconView;
 
   Dali::PropertyNotification                             mPositionUpdateNotification;
   Dali::PropertyNotification                             mSizeUpdateNotification;
