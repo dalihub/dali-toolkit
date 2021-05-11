@@ -841,11 +841,11 @@ public:
 
   Dali::PixelData GetImageBuffer() override
   {
-    uint8_t* faviconData = new uint8_t[ 16 ];
-    memset(faviconData, 0xff, 16);
-    return Dali::PixelData::New( faviconData, 16, 2, 2,
-                                 Dali::Pixel::Format::RGBA8888,
-                                 Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
+    uint8_t* imageData = new uint8_t[16];
+    memset(imageData, 0xff, 16);
+    return Dali::PixelData::New(imageData, 16, 2, 2,
+                                Dali::Pixel::Format::RGBA8888,
+                                Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
   }
 
 private:
@@ -1229,28 +1229,20 @@ public:
 
   Dali::PixelData GetFavicon() const
   {
-    uint8_t* faviconData = new uint8_t[ 16 ];
-
-    faviconData[ 0 ] = 0xff;
-    faviconData[ 1 ] = 0x00;
-    faviconData[ 2 ] = 0x00;
-    faviconData[ 3 ] = 0xff;
-    faviconData[ 4 ] = 0xff;
-    faviconData[ 5 ] = 0x00;
-    faviconData[ 6 ] = 0x00;
-    faviconData[ 7 ] = 0xff;
-    faviconData[ 8 ] = 0xff;
-    faviconData[ 9 ] = 0x00;
-    faviconData[ 10 ] = 0x00;
-    faviconData[ 11 ] = 0xff;
-    faviconData[ 12 ] = 0xff;
-    faviconData[ 13 ] = 0x00;
-    faviconData[ 14 ] = 0x00;
-    faviconData[ 15 ] = 0xff;
-
-    return Dali::PixelData::New( faviconData, 16, 2, 2,
-                                 Dali::Pixel::Format::RGBA8888,
-                                 Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
+    static int testGetFaviconCount = 0;
+    if (testGetFaviconCount == 0)
+    {
+      testGetFaviconCount++;
+      uint8_t* faviconData = new uint8_t[16];
+      memset(faviconData, 0xff, 16);
+      return Dali::PixelData::New(faviconData, 16, 2, 2,
+                                  Dali::Pixel::Format::RGBA8888,
+                                  Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
+    }
+    else
+    {
+      return Dali::PixelData();
+    }
   }
 
   bool CanGoForward() const

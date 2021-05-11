@@ -1059,11 +1059,15 @@ int UtcDaliWebViewPropertyTitleFavicon(void)
   view.GetProperty( WebView::Property::TITLE ).Get( output );
   DALI_TEST_EQUALS( output, testValue, TEST_LOCATION );
 
-  // Check default value of favicon
-  Dali::Toolkit::ImageView* favicon = &view.GetFavicon();
+  // Check the case that favicon is not null.
+  Dali::Toolkit::ImageView favicon = view.GetFavicon();
   DALI_TEST_CHECK( favicon );
-  Dali::Vector3 iconsize = favicon->GetProperty< Vector3 >( Dali::Actor::Property::SIZE );
+  Dali::Vector3 iconsize = favicon.GetProperty< Vector3 >( Dali::Actor::Property::SIZE );
   DALI_TEST_CHECK( ( int )iconsize.width == 2 && ( int )iconsize.height == 2 );
+
+  // Check the case that favicon is null.
+  favicon = view.GetFavicon();
+  DALI_TEST_CHECK( !favicon );
 
   END_TEST;
 }
