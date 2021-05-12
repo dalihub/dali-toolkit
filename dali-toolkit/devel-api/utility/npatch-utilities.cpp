@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020 Samsung Electronics Co., Ltd.
+* Copyright (c) 2021 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -175,6 +175,7 @@ void GetRedOffsetAndMask(Dali::Pixel::Format pixelFormat, int32_t& byteOffset, i
     case Dali::Pixel::DEPTH_UNSIGNED_INT:
     case Dali::Pixel::DEPTH_FLOAT:
     case Dali::Pixel::DEPTH_STENCIL:
+    case Dali::Pixel::R11G11B10F:
     {
       DALI_LOG_ERROR("Pixel format not compatible.\n");
       byteOffset = 0;
