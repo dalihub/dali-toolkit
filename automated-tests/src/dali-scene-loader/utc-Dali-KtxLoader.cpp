@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,4 +145,21 @@ int UtcDaliKtxLoaderCubeDataCreateTexture2(void)
   DALI_TEST_EQUAL(64u, texture.GetHeight());
 
   END_TEST;
+}
+
+int UtcDaliKtxLoaderCubeDataCreateTexture3(void)
+{
+  CubeData cubeData;
+  auto path = TEST_RESOURCE_DIR "/papermill_E_diffuse-64.ktx";
+  DALI_TEST_CHECK(LoadCubeMapData(path, cubeData));
+
+  TestApplication app;
+  auto texture = cubeData.CreateTexture();
+
+  DALI_TEST_CHECK(texture);
+  DALI_TEST_EQUAL(64u, texture.GetWidth());
+  DALI_TEST_EQUAL(64u, texture.GetHeight());
+
+  END_TEST;
+
 }

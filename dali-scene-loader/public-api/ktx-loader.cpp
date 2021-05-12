@@ -161,7 +161,7 @@ bool ConvertPixelFormat(const uint32_t ktxPixelFormat, Pixel::Format& format)
     }
     case 0x8C3A: // GL_R11F_G11F_B10F
     {
-      format = Pixel::RGB32F;
+      format = Pixel::R11G11B10F;
       break;
     }
     case 0x8D7C: // GL_RGBA8UI
