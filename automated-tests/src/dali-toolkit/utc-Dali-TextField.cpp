@@ -3524,3 +3524,108 @@ int UtcDaliTextFieldPrimaryCursorPosition(void)
 
   END_TEST;
 }
+
+// test max length when set after setting long text
+int utcDaliTextFieldMaxCharactersReachedAfterSetText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldMaxCharactersReachedAfterSetText");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  application.GetScene().Add( field );
+
+  field.SetProperty(TextField::Property::TEXT, "123456789");
+
+  const int maxNumberOfCharacters = 3;
+  field.SetProperty( TextField::Property::MAX_LENGTH, maxNumberOfCharacters );
+
+  field.SetKeyInputFocus();
+
+  // connect to the text max lengh reached signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  bool maxLengthReachedSignal = false;
+  field.ConnectSignal( testTracker, "maxLengthReached",   CallbackFunctor(&maxLengthReachedSignal) );
+
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  DALI_TEST_CHECK( maxLengthReachedSignal );
+
+  DALI_TEST_EQUALS( field.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "123456789", TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+
+int UtcDaliTextFieldAtlasLimitationIsEnabledForLargeFontPointSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldAtlasLimitationIsEnabledForLargeFontPointSize ");
+
+  // +2: First one to handle the equal case. Second one to handle odd to even case of GetNaturalSize
+  const uint32_t lessThanWidth = TextAbstraction::FontClient::MAX_TEXT_ATLAS_WIDTH - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+  const uint32_t lessThanHeight = TextAbstraction::FontClient::MAX_TEXT_ATLAS_HEIGHT - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+
+  // Create a text field
+  TextField textField = TextField::New();
+
+  //Set size to avoid automatic eliding
+  textField.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  //Set very large font-size using point-size
+  textField.SetProperty( TextField::Property::POINT_SIZE, 1000) ;
+  //Specify font-family
+  textField.SetProperty( TextField::Property::FONT_FAMILY, "DejaVu Sans");
+  //Set text to check if appear or not
+  textField.SetProperty( TextField::Property::TEXT, "A");
+
+  application.GetScene().Add( textField );
+
+  application.SendNotification();
+  application.Render();
+  //Use GetNaturalSize to verify that size of block does not exceed Atlas size
+  Vector3 naturalSize = textField.GetNaturalSize();
+
+  DALI_TEST_GREATER( lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION );
+  DALI_TEST_GREATER( lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldAtlasLimitationIsEnabledPerformanceCases(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldAtlasLimitationIsEnabledPerformanceCases ");
+
+  // +2: First one to handle the equal case. Second one to handle odd to even case of GetNaturalSize
+  const uint32_t lessThanWidth = TextAbstraction::FontClient::MAX_TEXT_ATLAS_WIDTH - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+  const uint32_t lessThanHeight = TextAbstraction::FontClient::MAX_TEXT_ATLAS_HEIGHT - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+
+  Vector3 naturalSize; //Use GetNaturalSize to verify that size of block does not exceed Atlas size
+  // Create a text editor
+  TextField textField = TextField::New();
+
+  //Set size to avoid automatic eliding
+  textField.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  textField.SetProperty( TextField::Property::FONT_FAMILY, "DejaVu Sans");
+  textField.SetProperty( TextField::Property::TEXT, "A");
+
+  const int numberOfCases = 6;
+  int arrayCases[numberOfCases] = {323, 326, 330, 600, 1630, 2500};
+
+  for (int index=0; index < numberOfCases; index++)
+  {
+    tet_printf(" UtcDaliTextFieldAtlasLimitationIsEnabledPerformanceCases point-size= %d \n", arrayCases[index]);
+    textField.SetProperty( TextField::Property::POINT_SIZE, arrayCases[index]) ;
+    application.GetScene().Add( textField );
+    application.SendNotification();
+    application.Render();
+    naturalSize = textField.GetNaturalSize();
+    DALI_TEST_GREATER( lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION );
+    DALI_TEST_GREATER( lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION );
+
+  }
+
+  END_TEST;
+}

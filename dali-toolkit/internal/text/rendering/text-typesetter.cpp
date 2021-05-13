@@ -595,6 +595,10 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
       // Combine the two buffers
       imageBuffer = CombineImageBuffer(imageBuffer, backgroundImageBuffer, bufferWidth, bufferHeight);
     }
+
+    // Markup-Processor
+
+    imageBuffer = ApplyMarkupProcessorOnPixelBuffer(imageBuffer, bufferWidth, bufferHeight, ignoreHorizontalAlignment, pixelFormat, penX, penY);
   }
 
   // Create the final PixelData for the combined image buffer
@@ -613,6 +617,9 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
   const Vector2* const    positionBuffer     = mModel->GetLayout();
   const Vector4* const    colorsBuffer       = mModel->GetColors();
   const ColorIndex* const colorIndexBuffer   = mModel->GetColorIndices();
+  const GlyphInfo*        hyphens            = mModel->GetHyphens();
+  const Length*           hyphenIndices      = mModel->GetHyphenIndices();
+  const Length            hyphensCount       = mModel->GetHyphensCount();
 
   // Whether to use the default color.
   const bool     useDefaultColor = (NULL == colorsBuffer);
@@ -638,7 +645,8 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
   }
 
   // Get a handle of the font client. Used to retrieve the bitmaps of the glyphs.
-  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  TextAbstraction::FontClient fontClient  = TextAbstraction::FontClient::Get();
+  Length                      hyphenIndex = 0;
 
   // Traverses the lines of the text.
   for(LineIndex lineIndex = 0u; lineIndex < modelNumberOfLines; ++lineIndex)
@@ -703,6 +711,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     float lineExtentLeft  = bufferWidth;
     float lineExtentRight = 0.0f;
     float baseline        = 0.0f;
+    bool  addHyphen       = false;
 
     // Traverses the glyphs of the line.
     const GlyphIndex endGlyphIndex = std::min(numberOfGlyphs, line.glyphRun.glyphIndex + line.glyphRun.numberOfGlyphs);
@@ -715,7 +724,17 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       }
 
       // Retrieve the glyph's info.
-      const GlyphInfo* const glyphInfo = glyphsBuffer + glyphIndex;
+      const GlyphInfo* glyphInfo;
+
+      if(addHyphen && hyphens)
+      {
+        glyphInfo = hyphens + hyphenIndex;
+        hyphenIndex++;
+      }
+      else
+      {
+        glyphInfo = glyphsBuffer + glyphIndex;
+      }
 
       if((glyphInfo->width < Math::MACHINE_EPSILON_1000) ||
          (glyphInfo->height < Math::MACHINE_EPSILON_1000))
@@ -735,21 +754,29 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       } // underline
 
       // Retrieves the glyph's position.
-      const Vector2* const position = positionBuffer + glyphIndex;
-      if(baseline < position->y + glyphInfo->yBearing)
+      Vector2 position = *(positionBuffer + glyphIndex);
+
+      if(addHyphen)
       {
-        baseline = position->y + glyphInfo->yBearing;
+        GlyphInfo tempInfo = *(glyphsBuffer + glyphIndex);
+        position.x         = position.x + tempInfo.advance - tempInfo.xBearing + glyphInfo->xBearing;
+        position.y         = -glyphInfo->yBearing;
+      }
+
+      if(baseline < position.y + glyphInfo->yBearing)
+      {
+        baseline = position.y + glyphInfo->yBearing;
       }
 
       // Calculate the positions of leftmost and rightmost glyphs in the current line
-      if(position->x < lineExtentLeft)
+      if(position.x < lineExtentLeft)
       {
-        lineExtentLeft = position->x;
+        lineExtentLeft = position.x;
       }
 
-      if(position->x + glyphInfo->width > lineExtentRight)
+      if(position.x + glyphInfo->width > lineExtentRight)
       {
-        lineExtentRight = position->x + glyphInfo->width;
+        lineExtentRight = position.x + glyphInfo->width;
       }
 
       // Retrieves the glyph's color.
@@ -807,7 +834,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
 
         // Set the buffer of the glyph's bitmap into the final bitmap's buffer
         TypesetGlyph(glyphData,
-                     position,
+                     &position,
                      &color,
                      style,
                      pixelFormat);
@@ -822,6 +849,20 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
         // delete the glyphBitmap.buffer as it is now copied into glyphData.bitmapBuffer
         delete[] glyphData.glyphBitmap.buffer;
         glyphData.glyphBitmap.buffer = NULL;
+      }
+
+      if(hyphenIndices)
+      {
+        while((hyphenIndex < hyphensCount) && (glyphIndex > hyphenIndices[hyphenIndex]))
+        {
+          hyphenIndex++;
+        }
+
+        addHyphen = ((hyphenIndex < hyphensCount) && ((glyphIndex + 1) == hyphenIndices[hyphenIndex]));
+        if(addHyphen)
+        {
+          glyphIndex--;
+        }
       }
     }
 
@@ -904,6 +945,48 @@ Devel::PixelBuffer Typesetter::CombineImageBuffer(Devel::PixelBuffer topPixelBuf
   }
 
   return combinedPixelBuffer;
+}
+
+Devel::PixelBuffer Typesetter::ApplyMarkupProcessorOnPixelBuffer(Devel::PixelBuffer topPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset)
+{
+  // Apply the markup-Processor if enabled
+  const bool markupProcessorEnabled = mModel->IsMarkupProcessorEnabled();
+  if(markupProcessorEnabled)
+  {
+    // Underline-tags (this is for Markup case)
+    // Get the underline runs.
+    const Length     numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
+    Vector<GlyphRun> underlineRuns;
+    underlineRuns.Resize(numberOfUnderlineRuns);
+    mModel->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+
+    // Iterate on the consecutive underlined glyph run and connect them into one chunk of underlined characters.
+    Vector<GlyphRun>::ConstIterator itGlyphRun    = underlineRuns.Begin();
+    Vector<GlyphRun>::ConstIterator endItGlyphRun = underlineRuns.End();
+    GlyphIndex                      startGlyphIndex, endGlyphIndex;
+
+    //The outer loop to iterate on the separated chunks of underlined glyph runs
+    while(itGlyphRun != endItGlyphRun)
+    {
+      startGlyphIndex = itGlyphRun->glyphIndex;
+      endGlyphIndex   = startGlyphIndex;
+      //The inner loop to make a connected underline for the consecutive characters
+      do
+      {
+        endGlyphIndex += itGlyphRun->numberOfGlyphs;
+        itGlyphRun++;
+      } while(itGlyphRun != endItGlyphRun && itGlyphRun->glyphIndex == endGlyphIndex);
+
+      endGlyphIndex--;
+
+      // Create the image buffer for underline
+      Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset, startGlyphIndex, endGlyphIndex);
+      // Combine the two buffers
+      topPixelBuffer = CombineImageBuffer(topPixelBuffer, underlineImageBuffer, bufferWidth, bufferHeight);
+    }
+  }
+
+  return topPixelBuffer;
 }
 
 Typesetter::Typesetter(const ModelInterface* const model)

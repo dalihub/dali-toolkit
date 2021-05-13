@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include <toolkit-vector-animation-renderer.h>
 #include <toolkit-event-thread-callback.h>
 #include <memory>
+#include <thread>
+#include <chrono>
 
 namespace Dali
 {
@@ -31,6 +33,11 @@ namespace Internal
 namespace Adaptor
 {
 
+namespace
+{
+Dali::Internal::Adaptor::VectorAnimationRenderer* gVectorAnimationRenderer = nullptr;
+}
+
 class VectorAnimationRenderer: public Dali::BaseObject
 {
 public:
@@ -40,8 +47,12 @@ public:
     mRenderer(),
     mWidth( 0 ),
     mHeight( 0 ),
+    mTotalFrameNumber(VECTOR_ANIMATION_TOTAL_FRAME_NUMBER),
     mPreviousFrame( 0 ),
+    mDelayTime(0),
+    mDroppedFrames(0),
     mFrameRate( 60.0f ),
+    mNeedDroppedFrames(false),
     mEventThreadCallback( new EventThreadCallback( MakeCallback( this, &VectorAnimationRenderer::OnTriggered ) ) )
   {
     mCount++;
@@ -60,9 +71,14 @@ public:
   bool Load(const std::string& url)
   {
     mUrl = url;
-    if(mUrl == "invalid.json")
+    if(mUrl == "invalid.json" || mUrl == "invalid.riv")
     {
       return false;
+    }
+    else if(mUrl == "framedrop.json")
+    {
+      // Change total frame number for test
+      mTotalFrameNumber = 200;
     }
     return true;
   }
@@ -96,6 +112,19 @@ public:
 
   bool Render( uint32_t frameNumber )
   {
+    if(mDelayTime != 0)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int32_t>(mDelayTime)));
+      mDelayTime = 0;
+      mNeedDroppedFrames = true;
+    }
+    else if(mNeedDroppedFrames)
+    {
+      mDroppedFrames = (frameNumber > mPreviousFrame) ? frameNumber - mPreviousFrame - 1: frameNumber + (mTotalFrameNumber - mPreviousFrame) - 1;
+      mNeedTrigger = true;
+      mNeedDroppedFrames = false;
+    }
+
     if( mNeedTrigger )
     {
       mEventThreadCallback->Trigger();
@@ -114,7 +143,7 @@ public:
 
   uint32_t GetTotalFrameNumber() const
   {
-    return VECTOR_ANIMATION_TOTAL_FRAME_NUMBER;
+    return mTotalFrameNumber;
   }
 
   float GetFrameRate() const
@@ -165,8 +194,12 @@ public:
   Dali::Renderer mRenderer;
   uint32_t mWidth;
   uint32_t mHeight;
+  uint32_t mTotalFrameNumber;
   uint32_t mPreviousFrame;
+  uint32_t mDelayTime;
+  uint32_t mDroppedFrames;
   float mFrameRate;
+  bool mNeedDroppedFrames;
   Dali::VectorAnimationRenderer::UploadCompletedSignalType mUploadCompletedSignal;
   std::unique_ptr< EventThreadCallback > mEventThreadCallback;
 };
@@ -200,6 +233,8 @@ inline const VectorAnimationRenderer& GetImplementation( const Dali::VectorAnima
 VectorAnimationRenderer VectorAnimationRenderer::New()
 {
   Internal::Adaptor::VectorAnimationRenderer* animationRenderer = new Internal::Adaptor::VectorAnimationRenderer();
+
+  Internal::Adaptor::gVectorAnimationRenderer = animationRenderer;
 
   return VectorAnimationRenderer( animationRenderer );
 }
@@ -291,6 +326,16 @@ namespace VectorAnimationRenderer
 void RequestTrigger()
 {
   Dali::Internal::Adaptor::VectorAnimationRenderer::mNeedTrigger = true;
+}
+
+void DelayRendering(uint32_t delay)
+{
+  Dali::Internal::Adaptor::gVectorAnimationRenderer->mDelayTime = delay;
+}
+
+uint32_t GetDroppedFrames()
+{
+  return Dali::Internal::Adaptor::gVectorAnimationRenderer->mDroppedFrames;
 }
 
 } // VectorAnimationRenderer

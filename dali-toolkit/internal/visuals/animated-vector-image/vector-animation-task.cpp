@@ -37,7 +37,7 @@ namespace Internal
 namespace
 {
 constexpr auto LOOP_FOREVER = -1;
-constexpr auto NANOSECONDS_PER_SECOND(1e+9);
+constexpr auto MICROSECONDS_PER_SECOND(1e+6);
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
@@ -56,12 +56,13 @@ VectorAnimationTask::VectorAnimationTask(VisualFactoryCache& factoryCache)
   mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mLoopingMode(DevelImageVisual::LoopingMode::RESTART),
   mNextFrameStartTime(),
-  mFrameDurationNanoSeconds(0),
+  mFrameDurationMicroSeconds(MICROSECONDS_PER_SECOND / 60.0f),
   mFrameRate(60.0f),
   mCurrentFrame(0),
   mTotalFrame(0),
   mStartFrame(0),
   mEndFrame(0),
+  mDroppedFrames(0),
   mWidth(0),
   mHeight(0),
   mAnimationDataIndex(0),
@@ -109,8 +110,8 @@ bool VectorAnimationTask::Load(const std::string& url)
 
   mEndFrame = mTotalFrame - 1;
 
-  mFrameRate                = mVectorRenderer.GetFrameRate();
-  mFrameDurationNanoSeconds = NANOSECONDS_PER_SECOND / mFrameRate;
+  mFrameRate                 = mVectorRenderer.GetFrameRate();
+  mFrameDurationMicroSeconds = MICROSECONDS_PER_SECOND / mFrameRate;
 
   uint32_t width, height;
   mVectorRenderer.GetDefaultSize(width, height);
@@ -372,7 +373,7 @@ VectorAnimationTask::UploadCompletedSignalType& VectorAnimationTask::UploadCompl
 bool VectorAnimationTask::Rasterize()
 {
   bool     stopped = false;
-  uint32_t currentFrame;
+  uint32_t currentFrame, droppedFrames = 0;
 
   {
     ConditionalWait::ScopedLock lock(mConditionalWait);
@@ -381,13 +382,14 @@ bool VectorAnimationTask::Rasterize()
       // The task will be destroyed. We don't need rasterization.
       return false;
     }
+    droppedFrames = mDroppedFrames;
   }
 
   ApplyAnimationData();
 
   if(mPlayState == PlayState::PLAYING && mUpdateFrameNumber)
   {
-    mCurrentFrame = mForward ? mCurrentFrame + 1 : mCurrentFrame - 1;
+    mCurrentFrame = mForward ? mCurrentFrame + droppedFrames + 1 : mCurrentFrame - droppedFrames - 1;
     Dali::ClampInPlace(mCurrentFrame, mStartFrame, mEndFrame);
   }
 
@@ -521,22 +523,39 @@ uint32_t VectorAnimationTask::GetStoppedFrame(uint32_t startFrame, uint32_t endF
   return frame;
 }
 
-std::chrono::time_point<std::chrono::system_clock> VectorAnimationTask::CalculateNextFrameTime(bool renderNow)
+VectorAnimationTask::TimePoint VectorAnimationTask::CalculateNextFrameTime(bool renderNow)
 {
+  uint32_t droppedFrames = 0;
+
   // std::chrono::time_point template has second parameter duration which defaults to the std::chrono::system_clock supported
   // duration. In some C++11 implementations it is a milliseconds duration, so it fails to compile unless mNextFrameStartTime
   // is casted to use the default duration.
-  mNextFrameStartTime = std::chrono::time_point_cast<std::chrono::time_point<std::chrono::system_clock>::duration>(
-    mNextFrameStartTime + std::chrono::nanoseconds(mFrameDurationNanoSeconds));
-  auto current = std::chrono::system_clock::now();
-  if(renderNow || mNextFrameStartTime < current)
+  mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds));
+  auto current        = std::chrono::system_clock::now();
+  if(renderNow)
   {
     mNextFrameStartTime = current;
   }
+  else if(mNextFrameStartTime < current)
+  {
+    while(current > std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds)))
+    {
+      droppedFrames++;
+      mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds));
+    }
+
+    {
+      ConditionalWait::ScopedLock lock(mConditionalWait);
+      mDroppedFrames = droppedFrames;
+    }
+
+    mNextFrameStartTime = current;
+  }
+
   return mNextFrameStartTime;
 }
 
-std::chrono::time_point<std::chrono::system_clock> VectorAnimationTask::GetNextFrameTime()
+VectorAnimationTask::TimePoint VectorAnimationTask::GetNextFrameTime()
 {
   return mNextFrameStartTime;
 }

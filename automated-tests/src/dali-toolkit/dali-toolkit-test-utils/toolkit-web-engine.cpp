@@ -83,6 +83,7 @@ bool OnStorageUsageAcquired();
 bool OnFormPasswordAcquired();
 bool OnDownloadStarted();
 bool OnMimeOverridden();
+bool OnChangesWatch();
 
 static void ConnectToGlobalSignal( bool ( *func )() )
 {
@@ -170,16 +171,12 @@ public:
   {
   }
 
-  bool DeleteWebStorageOrigin(Dali::WebEngineSecurityOrigin& origin)
+  bool DeleteWebStorage(Dali::WebEngineSecurityOrigin& origin)
   {
     return true;
   }
 
   void DeleteLocalFileSystem() override
-  {
-  }
-
-  void DisableCache( bool cacheDisabled ) override
   {
   }
 
@@ -219,6 +216,99 @@ public:
     }
   }
 
+  void EnableCache( bool cacheEnabled ) override
+  {
+  }
+
+  bool IsCacheEnabled() const override
+  {
+    return true;
+  }
+
+  std::string GetContextCertificateFile() const override
+  {
+    return "test";
+  }
+
+  void SetContextAppId(const std::string& appID) override
+  {
+  }
+
+  bool SetContextAppVersion(const std::string& appVersion) override
+  {
+    return true;
+  }
+
+  void SetContextApplicationType(const Dali::WebEngineContext::ApplicationType applicationType) override
+  {
+  }
+
+  void SetContextTimeOffset(float timeOffset) override
+  {
+  }
+
+  void SetContextTimeZoneOffset(float timeZoneOffset, float daylightSavingTime) override
+  {
+  }
+
+  void RegisterUrlSchemesAsCorsEnabled(const std::vector<std::string>& schemes) override
+  {
+  }
+
+  void RegisterJsPluginMimeTypes(const std::vector<std::string>& mimeTypes) override
+  {
+  }
+
+  void SetDefaultZoomFactor(float zoomFactor) override
+  {
+  }
+
+  float GetContextDefaultZoomFactor() const override
+  {
+    return 0;
+  }
+
+  bool DeleteAllApplicationCache() override
+  {
+    return true;
+  }
+
+  bool DeleteAllWebIndexedDatabase() override
+  {
+    return true;
+  }
+
+  void DeleteFormPasswordDataList(const std::vector<std::string>& list) override
+  {
+  }
+
+  void DeleteAllFormPasswordData() override
+  {
+  }
+
+  void DeleteAllFormCandidateData() override
+  {
+  }
+
+  std::string GetContextProxy() const override
+  {
+    return "test";
+  }
+
+  void SetContextProxy(const std::string& proxy, const std::string& bypass) override
+  {
+  }
+
+  std::string GetProxyBypassRule() const override
+  {
+    return "test";
+  }
+
+  bool FreeUnusedMemory() override
+  {
+    return true;
+  }
+
 public:
   Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback mSecurityOriginAcquiredCallback;
   Dali::WebEngineContext::WebEngineStorageUsageAcquiredCallback mStorageUsageAcquiredCallback;
@@ -255,6 +345,18 @@ public:
   void SetPersistentStorage( const std::string& path, Dali::WebEngineCookieManager::CookiePersistentStorage storage ) override
   {
   }
+
+  void ChangesWatch( Dali::WebEngineCookieManager::WebEngineCookieManagerChangesWatchCallback callback ) override
+  {
+    if ( callback )
+    {
+      ConnectToGlobalSignal( &OnChangesWatch );
+      mChangesWatchCallback = callback;
+    }
+  }
+
+public:
+  Dali::WebEngineCookieManager::WebEngineCookieManagerChangesWatchCallback mChangesWatchCallback;
 
 private:
   Dali::WebEngineCookieManager::CookieAcceptPolicy mockCookieAcceptPolicy;
@@ -739,11 +841,11 @@ public:
 
   Dali::PixelData GetImageBuffer() override
   {
-    uint8_t* faviconData = new uint8_t[ 16 ];
-    memset(faviconData, 0xff, 16);
-    return Dali::PixelData::New( faviconData, 16, 2, 2,
-                                 Dali::Pixel::Format::RGBA8888,
-                                 Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
+    uint8_t* imageData = new uint8_t[16];
+    memset(imageData, 0xff, 16);
+    return Dali::PixelData::New(imageData, 16, 2, 2,
+                                Dali::Pixel::Format::RGBA8888,
+                                Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
   }
 
 private:
@@ -1127,28 +1229,20 @@ public:
 
   Dali::PixelData GetFavicon() const
   {
-    uint8_t* faviconData = new uint8_t[ 16 ];
-
-    faviconData[ 0 ] = 0xff;
-    faviconData[ 1 ] = 0x00;
-    faviconData[ 2 ] = 0x00;
-    faviconData[ 3 ] = 0xff;
-    faviconData[ 4 ] = 0xff;
-    faviconData[ 5 ] = 0x00;
-    faviconData[ 6 ] = 0x00;
-    faviconData[ 7 ] = 0xff;
-    faviconData[ 8 ] = 0xff;
-    faviconData[ 9 ] = 0x00;
-    faviconData[ 10 ] = 0x00;
-    faviconData[ 11 ] = 0xff;
-    faviconData[ 12 ] = 0xff;
-    faviconData[ 13 ] = 0x00;
-    faviconData[ 14 ] = 0x00;
-    faviconData[ 15 ] = 0xff;
-
-    return Dali::PixelData::New( faviconData, 16, 2, 2,
-                                 Dali::Pixel::Format::RGBA8888,
-                                 Dali::PixelData::ReleaseFunction::DELETE_ARRAY );
+    static int testGetFaviconCount = 0;
+    if (testGetFaviconCount == 0)
+    {
+      testGetFaviconCount++;
+      uint8_t* faviconData = new uint8_t[16];
+      memset(faviconData, 0xff, 16);
+      return Dali::PixelData::New(faviconData, 16, 2, 2,
+                                  Dali::Pixel::Format::RGBA8888,
+                                  Dali::PixelData::ReleaseFunction::DELETE_ARRAY);
+    }
+    else
+    {
+      return Dali::PixelData();
+    }
   }
 
   bool CanGoForward() const
@@ -1405,9 +1499,9 @@ public:
     return mConsoleMessageSignal;
   }
 
-  Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType& PolicyDecisionSignal()
+  Dali::WebEnginePlugin::WebEngineResponsePolicyDecisionSignalType& ResponsePolicyDecisionSignal()
   {
-    return mPolicyDecisionSignal;
+    return mResponsePolicyDecisionSignal;
   }
 
   Dali::WebEnginePlugin::WebEngineCertificateSignalType& CertificateConfirmSignal()
@@ -1450,7 +1544,7 @@ public:
   Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType           mFrameRenderedSignal;
   Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType      mRequestInterceptorSignal;
   Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType          mConsoleMessageSignal;
-  Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType          mPolicyDecisionSignal;
+  Dali::WebEnginePlugin::WebEngineResponsePolicyDecisionSignalType  mResponsePolicyDecisionSignal;
   Dali::WebEnginePlugin::WebEngineCertificateSignalType             mCertificateConfirmSignal;
   Dali::WebEnginePlugin::WebEngineCertificateSignalType             mSslCertificateChangedSignal;
   Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType         mHttpAuthHandlerSignal;
@@ -1534,7 +1628,7 @@ bool OnLoadUrl()
     std::shared_ptr<Dali::WebEngineConsoleMessage> message(new MockWebEngineConsoleMessage());
     gInstance->mConsoleMessageSignal.Emit(std::move(message));
     std::shared_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
-    gInstance->mPolicyDecisionSignal.Emit(std::move(policyDecision));
+    gInstance->mResponsePolicyDecisionSignal.Emit(std::move(policyDecision));
 
     std::shared_ptr<Dali::WebEngineCertificate> certificate(new MockWebEngineCertificate());
     gInstance->mCertificateConfirmSignal.Emit(std::move(certificate));
@@ -1724,6 +1818,22 @@ bool OnMimeOverridden()
     std::string newMime;
     gWebEngineContextInstance->mMimeOverriddenCallback("http://test.html", "txt/xml", newMime);
   }
+  return false;
+}
+
+bool OnChangesWatch()
+{
+  DisconnectFromGlobalSignal( &OnChangesWatch );
+
+  if ( gInstance )
+  {
+    MockWebEngineCookieManager* temp = (MockWebEngineCookieManager *)(&(gInstance->GetCookieManager()));
+    if ( temp )
+    {
+      temp->mChangesWatchCallback();
+    }
+  }
+
   return false;
 }
 
@@ -2204,9 +2314,9 @@ Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType& WebEngine::ConsoleMess
   return Internal::Adaptor::GetImplementation(*this).ConsoleMessageSignal();
 }
 
-Dali::WebEnginePlugin::WebEnginePolicyDecisionSignalType& WebEngine::PolicyDecisionSignal()
+Dali::WebEnginePlugin::WebEngineResponsePolicyDecisionSignalType& WebEngine::ResponsePolicyDecisionSignal()
 {
-  return Internal::Adaptor::GetImplementation(*this).PolicyDecisionSignal();
+  return Internal::Adaptor::GetImplementation(*this).ResponsePolicyDecisionSignal();
 }
 
 Dali::WebEnginePlugin::WebEngineCertificateSignalType& WebEngine::CertificateConfirmSignal()

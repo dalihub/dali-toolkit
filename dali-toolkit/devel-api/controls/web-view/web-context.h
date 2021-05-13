@@ -91,16 +91,6 @@ public:
   void SetCertificateFilePath(const std::string& certificatePath);
 
   /**
-   * @brief Toggle the cache to be enabled or disabled
-   *
-   * Function works asynchronously.
-   * By default the cache is disabled resulting in not storing network data on disk.
-   *
-   * @param[in] cacheDisabled enable or disable cache
-   */
-  void DisableCache(bool cacheDisabled);
-
-  /**
    * @brief Set a proxy auth credential to network backend of specific context.
    *
    * @param[in] username username to set
@@ -159,13 +149,13 @@ public:
   void DeleteAllWebStorage();
 
   /**
-   * @brief Delete origin that is stored in web storage db.
+   * @brief Delete web storage db.
    *
    * @param[in] origin origin of db
    *
    * @return true if succeeded, false otherwise
    */
-  bool DeleteWebStorageOrigin(Dali::WebEngineSecurityOrigin& origin);
+  bool DeleteWebStorage(Dali::WebEngineSecurityOrigin& origin);
 
   /**
    * @brief Request for deleting all local file systems.
@@ -206,6 +196,160 @@ public:
    * @param[in] callback callback for mime overridden
    */
   void RegisterMimeOverriddenCallback(Dali::WebEngineContext::WebEngineMimeOverriddenCallback callback);
+
+  /**
+   * @brief Toggle the cache to be enabled or disabled
+   *
+   * @param[in] cacheEnabled enable or disable cache
+   */
+  void EnableCache(bool cacheEnabled);
+
+  /**
+   * @brief Query if the cache is enabled
+   *
+   * @return @c true is cache is enabled or @c false otherwise
+   */
+  bool IsCacheEnabled() const;
+
+  /**
+   * @brief Get CA certifcate file path
+   *
+   * It returns an internal string and should not be modified.
+   *
+   * @return @c certificate_file is path which is set during ewk_context_certificate_file_set or @c null string otherwise
+   */
+  std::string GetContextCertificateFile() const;
+
+  /**
+   * @brief Set application id for @a context.
+   *
+   * @param[in] appID application id
+   */
+  void SetContextAppId(const std::string& appID);
+
+  /**
+   * @brief Set application version for @a context.
+   *
+   * @param[in] appVersion application version
+   *
+   * @return @c true if successful, @c false otherwise
+   */
+  bool SetContextAppVersion(const std::string& appVersion);
+
+  /**
+   * @brief To declare application type
+   *
+   * @param[in] applicationType The Application_Type enum
+   *
+   */
+  void SetContextApplicationType(const Dali::WebEngineContext::ApplicationType applicationType);
+
+  /**
+   * @brief Set time offset
+   *
+   * @param[in] timeOffset The value will be added to system time as offset
+   */
+  void SetContextTimeOffset(float timeOffset);
+
+  /**
+   * @brief Set timezone offset
+   *
+   * @param[in] timeZoneOffset offset for time zone.
+   * @param[in] daylightSavingTime The value is for daylight saving time use.
+   */
+  void SetContextTimeZoneOffset(float timeZoneOffset, float daylightSavingTime);
+
+  /**
+   * @brief Register url schemes as CORS enabled
+   *
+   * @param[in] schemes The URL schemes list which will be added to web security policy
+   *
+   */
+  void RegisterUrlSchemesAsCorsEnabled(const std::vector<std::string>& schemes);
+
+  /**
+   * @brief Register JS plugin mime types.
+   *
+   * @param[in] mimeTypes The MIME types will be checked by the renderer frame loader
+   * to skip creating default frame for the object tags with the registered MIME type.
+   */
+  void RegisterJsPluginMimeTypes(const std::vector<std::string>& mimeTypes);
+
+  /**
+   * @brief Set default zoom factor
+   *
+   * @param[in] zoomFactor default zoom factor
+   */
+  void SetDefaultZoomFactor(float zoomFactor);
+
+  /**
+   * @brief Get default zoom factor
+   *
+   * Gets default zoom factor for all pages opened with this context.
+   *
+   * @return @c default zoom factor or negative value on error
+   */
+  float GetContextDefaultZoomFactor() const;
+
+  /**
+   * @brief Request for deleting all web application caches.
+   *
+   * @return @c true on success, otherwise @c false
+   */
+  bool DeleteAllApplicationCache();
+
+  /**
+   * @brief Request for deleting all web indexed databases.
+   *
+   * @return @c true on success, otherwise @c false
+   */
+  bool DeleteAllWebIndexedDatabase();
+
+  /**
+   * @brief Delete a given password data list
+   *
+   * @param[in] list List with Ewk_Password_Data
+   */
+  void DeleteFormPasswordDataList(const std::vector<std::string>& list);
+
+  /**
+   * @brief Delete whole password data from DB
+   */
+  void DeleteAllFormPasswordData();
+
+  /**
+   * @brief Delete all candidate form data from DB
+   */
+  void DeleteAllFormCandidateData();
+
+  /**
+   * @brief Get the proxy URI from the network backend of specific context.
+   *
+   * @return current proxy URI or @c null string if it's not set
+   */
+  std::string GetContextProxy() const;
+
+  /**
+   * @brief Set the given proxy to network backend of specific context.
+   *
+   * @param[in] proxy URI to set
+   * @param[in] bypass rule to set
+   */
+  void SetContextProxy(const std::string& proxy, const std::string& bypass);
+
+  /**
+   * @brief Get the proxy bypass rule from the network backend of specific context.
+   *
+   * @return current proxy bypass rule or @c null string if it's not set
+   */
+  std::string GetProxyBypassRule() const;
+
+  /**
+   * @brief Notify low memory to free unused memory.
+   *
+   * @return @c true on success or @c false otherwise.
+   */
+  bool FreeUnusedMemory();
 
 private:
   Dali::WebEngineContext& mWebEngineContext;

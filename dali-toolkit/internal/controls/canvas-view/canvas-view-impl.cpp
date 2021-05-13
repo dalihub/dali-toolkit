@@ -120,7 +120,7 @@ void CanvasView::OnSizeSet(const Vector3& targetSize)
   mChanged = true;
 }
 
-void CanvasView::Process()
+void CanvasView::Process(bool postProcessor)
 {
   if(!mCanvasRenderer)
   {

@@ -81,8 +81,8 @@ static int gRequestInterceptorCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineRequestInterceptor> gRequestInterceptorInstance = nullptr;
 static int gConsoleMessageCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineConsoleMessage> gConsoleMessageInstance = nullptr;
-static int gPolicyDecisionCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEnginePolicyDecision> gPolicyDecisionInstance = nullptr;
+static int gResponsePolicyDecidedCallbackCalled = 0;
+static std::shared_ptr<Dali::WebEnginePolicyDecision> gResponsePolicyDecisionInstance = nullptr;
 static int gCertificateConfirmCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineCertificate> gCertificateConfirmInstance = nullptr;
 static int gSslCertificateChangedCallbackCalled = 0;
@@ -101,6 +101,7 @@ static std::shared_ptr<Dali::WebEngineContextMenu> gContextMenuInstance = nullpt
 static int gContextMenuItemSelectedCallbackCalled = 0;
 static std::shared_ptr<Dali::WebEngineContextMenuItem> gContextMenuItemInstance = nullptr;
 static int gHitTestCreatedCallbackCalled = 0;
+static int gCookieManagerChangsWatchCallbackCalled = 0;
 
 struct CallbackFunctor
 {
@@ -136,10 +137,10 @@ static void OnScrollEdgeReached( WebView view, Dali::WebEnginePlugin::ScrollEdge
   gScrollEdgeReachedCallbackCalled++;
 }
 
-static void OnPolicyDecisionRequest(WebView view, std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
+static void OnResponsePolicyDecided(WebView view, std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
 {
-  gPolicyDecisionCallbackCalled++;
-  gPolicyDecisionInstance = std::move(decision);
+  gResponsePolicyDecidedCallbackCalled++;
+  gResponsePolicyDecisionInstance = std::move(decision);
 }
 
 static void OnUrlChanged( WebView view, const std::string& url )
@@ -202,6 +203,11 @@ static bool OnTouched( Actor actor, const Dali::TouchEvent& touch )
 {
   gTouched = true;
   return true;
+}
+
+static void OnChangesWatch()
+{
+  gCookieManagerChangsWatchCallbackCalled++;
 }
 
 static bool OnHovered( Actor actor, const Dali::HoverEvent& hover )
@@ -1053,11 +1059,15 @@ int UtcDaliWebViewPropertyTitleFavicon(void)
   view.GetProperty( WebView::Property::TITLE ).Get( output );
   DALI_TEST_EQUALS( output, testValue, TEST_LOCATION );
 
-  // Check default value of favicon
-  Dali::Toolkit::ImageView* favicon = &view.GetFavicon();
+  // Check the case that favicon is not null.
+  Dali::Toolkit::ImageView favicon = view.GetFavicon();
   DALI_TEST_CHECK( favicon );
-  Dali::Vector3 iconsize = favicon->GetProperty< Vector3 >( Dali::Actor::Property::SIZE );
+  Dali::Vector3 iconsize = favicon.GetProperty< Vector3 >( Dali::Actor::Property::SIZE );
   DALI_TEST_CHECK( ( int )iconsize.width == 2 && ( int )iconsize.height == 2 );
+
+  // Check the case that favicon is null.
+  favicon = view.GetFavicon();
+  DALI_TEST_CHECK( !favicon );
 
   END_TEST;
 }
@@ -1294,7 +1304,7 @@ int UtcDaliWebViewHttpRequestInterceptor(void)
   END_TEST;
 }
 
-int UtcDaliWebViewPolicyDecisionRequest(void)
+int UtcDaliWebViewResponsePolicyDecisionRequest(void)
 {
   ToolkitTestApplication application;
 
@@ -1303,42 +1313,42 @@ int UtcDaliWebViewPolicyDecisionRequest(void)
 
   // load url.
   ConnectionTracker* testTracker = new ConnectionTracker();
-  view.PolicyDecisionSignal().Connect( &OnPolicyDecisionRequest );
+  view.ResponsePolicyDecisionSignal().Connect( &OnResponsePolicyDecided );
   bool signal1 = false;
-  view.ConnectSignal( testTracker, "policyDecision", CallbackFunctor(&signal1) );
-  DALI_TEST_EQUALS( gPolicyDecisionCallbackCalled, 0, TEST_LOCATION );
-  DALI_TEST_CHECK(gPolicyDecisionInstance == 0);
+  view.ConnectSignal( testTracker, "responsePolicyDecided", CallbackFunctor(&signal1) );
+  DALI_TEST_EQUALS( gResponsePolicyDecidedCallbackCalled, 0, TEST_LOCATION );
+  DALI_TEST_CHECK(gResponsePolicyDecisionInstance == 0);
 
   view.LoadUrl( TEST_URL1 );
   Test::EmitGlobalTimerSignal();
-  DALI_TEST_EQUALS( gPolicyDecisionCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gResponsePolicyDecidedCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_CHECK( signal1 );
 
-  // check policy decision & its frame.
-  DALI_TEST_CHECK(gPolicyDecisionInstance != 0);
+  // check response policy decision & its frame.
+  DALI_TEST_CHECK(gResponsePolicyDecisionInstance != 0);
   std::string testUrl("http://test.html");
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetUrl(), testUrl, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetUrl(), testUrl, TEST_LOCATION);
   std::string testCookie("test:abc");
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetCookie(), testCookie, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetCookie(), testCookie, TEST_LOCATION);
   Dali::WebEnginePolicyDecision::DecisionType testDecisionType = Dali::WebEnginePolicyDecision::DecisionType::USE;
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetDecisionType(), testDecisionType, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetDecisionType(), testDecisionType, TEST_LOCATION);
   std::string testResponseMime("txt/xml");
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetResponseMime(), testResponseMime, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetResponseMime(), testResponseMime, TEST_LOCATION);
   int32_t ResponseStatusCode = 500;
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetResponseStatusCode(), ResponseStatusCode, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetResponseStatusCode(), ResponseStatusCode, TEST_LOCATION);
   Dali::WebEnginePolicyDecision::NavigationType testNavigationType = Dali::WebEnginePolicyDecision::NavigationType::LINK_CLICKED;
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetNavigationType(), testNavigationType, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetNavigationType(), testNavigationType, TEST_LOCATION);
   std::string testScheme("test");
-  DALI_TEST_EQUALS(gPolicyDecisionInstance->GetScheme(), testScheme, TEST_LOCATION);
-  DALI_TEST_CHECK(gPolicyDecisionInstance->Use());
-  DALI_TEST_CHECK(gPolicyDecisionInstance->Ignore());
-  DALI_TEST_CHECK(gPolicyDecisionInstance->Suspend());
+  DALI_TEST_EQUALS(gResponsePolicyDecisionInstance->GetScheme(), testScheme, TEST_LOCATION);
+  DALI_TEST_CHECK(gResponsePolicyDecisionInstance->Use());
+  DALI_TEST_CHECK(gResponsePolicyDecisionInstance->Ignore());
+  DALI_TEST_CHECK(gResponsePolicyDecisionInstance->Suspend());
 
-  Dali::WebEngineFrame* webFrame = &(gPolicyDecisionInstance->GetFrame());
+  Dali::WebEngineFrame* webFrame = &(gResponsePolicyDecisionInstance->GetFrame());
   DALI_TEST_CHECK(webFrame);
   DALI_TEST_CHECK(webFrame->IsMainFrame());
 
-  gPolicyDecisionInstance = nullptr;
+  gResponsePolicyDecisionInstance = nullptr;
 
   END_TEST;
 }
@@ -1577,12 +1587,19 @@ int UtcDaliWebContextGetSetCacheModel(void)
   // Reset something
   context->SetProxyUri( kDefaultValue );
   context->SetCertificateFilePath( kDefaultValue );
-  context->DisableCache( false );
+  context->EnableCache( true );
   context->SetDefaultProxyAuth( kDefaultValue, kDefaultValue );
   context->DeleteAllWebDatabase();
   context->DeleteAllWebStorage();
   context->DeleteLocalFileSystem();
   context->ClearCache();
+  context->SetContextAppId( "id" );
+  context->SetContextApplicationType( Dali::WebEngineContext::ApplicationType::OTHER );
+  context->SetContextTimeOffset( 0 );
+  context->SetContextTimeZoneOffset( 0, 0 );
+  context->SetDefaultZoomFactor( 0 );
+  context->DeleteAllFormPasswordData();
+  context->DeleteAllFormCandidateData();
 
   // Check default value
   Dali::WebEngineContext::CacheModel value = context->GetCacheModel();
@@ -1592,6 +1609,37 @@ int UtcDaliWebContextGetSetCacheModel(void)
   context->SetCacheModel( Dali::WebEngineContext::CacheModel::DOCUMENT_BROWSER );
   value = context->GetCacheModel();
   DALI_TEST_CHECK( value == Dali::WebEngineContext::CacheModel::DOCUMENT_BROWSER );
+
+  // Get cache enabled
+  DALI_TEST_CHECK( context->IsCacheEnabled() );
+
+  // Get certificate
+  std::string str = context->GetContextCertificateFile();
+  DALI_TEST_EQUALS( str, "test", TEST_LOCATION );
+
+  // Set version
+  DALI_TEST_CHECK( context->SetContextAppVersion( "test" ) );
+
+  // Register
+  std::vector<std::string> temp;
+  context->RegisterUrlSchemesAsCorsEnabled( temp );
+  context->RegisterJsPluginMimeTypes( temp );
+  context->DeleteFormPasswordDataList( temp );
+
+  // Get zoom
+  DALI_TEST_EQUALS( context->GetContextDefaultZoomFactor(), float( 0 ), TEST_LOCATION );
+
+  // Delete cache and database
+  DALI_TEST_CHECK( context->DeleteAllApplicationCache() );
+  DALI_TEST_CHECK( context->DeleteAllWebIndexedDatabase() );
+
+  // Get contextProxy
+  context->SetContextProxy("", "");
+  DALI_TEST_EQUALS( context->GetContextProxy(), "test", TEST_LOCATION );
+  DALI_TEST_EQUALS( context->GetProxyBypassRule(), "test", TEST_LOCATION );
+
+  //Notify low memory
+  DALI_TEST_CHECK( context->FreeUnusedMemory() );
 
   END_TEST;
 }
@@ -1638,7 +1686,7 @@ int UtcDaliWebContextGetWebDatabaseStorageOrigins(void)
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS( gStorageUsageAcquiredCallbackCalled, 1, TEST_LOCATION );
 
-  result = context->DeleteWebStorageOrigin(*origin);
+  result = context->DeleteWebStorage(*origin);
   DALI_TEST_CHECK( result );
 
   result = context->DeleteApplicationCache(*origin);
@@ -1692,6 +1740,23 @@ int UtcDaliWebCookieManagerGetSetCookieAcceptPolicy(void)
   cookieManager->SetCookieAcceptPolicy( Dali::WebEngineCookieManager::CookieAcceptPolicy::ALWAYS );
   value = cookieManager->GetCookieAcceptPolicy();
   DALI_TEST_CHECK( value == Dali::WebEngineCookieManager::CookieAcceptPolicy::ALWAYS );
+
+  END_TEST;
+}
+
+int UtcDaliWebCookieManagerChangesWatch(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebCookieManager* cookieManager = view.GetCookieManager();
+  DALI_TEST_CHECK( cookieManager != 0 )
+
+  cookieManager->ChangesWatch(&OnChangesWatch);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gCookieManagerChangsWatchCallbackCalled, 1, TEST_LOCATION );
 
   END_TEST;
 }

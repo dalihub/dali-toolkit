@@ -95,7 +95,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::GetFavicon()
    */
-  Dali::Toolkit::ImageView& GetFavicon();
+  Dali::Toolkit::ImageView GetFavicon() const;
 
   /**
    * @copydoc Dali::Toolkit::WebView::LoadUrl()
@@ -358,9 +358,9 @@ public:
   Dali::Toolkit::WebView::WebViewConsoleMessageSignalType& ConsoleMessageSignal();
 
   /**
-   * @copydoc Dali::Toolkit::WebView::PolicyDecisionSignal()
+   * @copydoc Dali::Toolkit::WebView::ResponsePolicyDecisionSignal()
    */
-  Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType& PolicyDecisionSignal();
+  Dali::Toolkit::WebView::WebViewResponsePolicyDecisionSignalType& ResponsePolicyDecisionSignal();
 
   /**
    * @copydoc Dali::Toolkit::WebView::CertificateConfirmSignal()
@@ -608,7 +608,7 @@ private:
    * @param[in] pixel Pixel data
    * @return The new image view
    */
-  Dali::Toolkit::ImageView CreateImageView(Dali::PixelData pixel);
+  Dali::Toolkit::ImageView CreateImageView(Dali::PixelData pixel) const;
 
   /**
    * @brief Callback function to be called when page load started.
@@ -709,10 +709,10 @@ private:
   void OnConsoleMessage(std::shared_ptr<Dali::WebEngineConsoleMessage> message);
 
   /**
-   * @brief Callback function to be called when policy need be decided.
+   * @brief Callback function to be called when response policy need be decided.
    * @param[in] decision The policy decided.
    */
-  void OnPolicyDecisionRequest(std::shared_ptr<Dali::WebEnginePolicyDecision> decision);
+  void OnResponsePolicyDecided(std::shared_ptr<Dali::WebEnginePolicyDecision> decision);
 
   /**
    * @brief Callback function to be called when certificate need be confirmed.
@@ -760,7 +760,7 @@ private:
   Dali::Toolkit::WebView::WebViewFrameRenderedSignalType           mFrameRenderedSignal;
   Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType      mRequestInterceptorSignal;
   Dali::Toolkit::WebView::WebViewConsoleMessageSignalType          mConsoleMessageSignal;
-  Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType          mPolicyDecisionSignal;
+  Dali::Toolkit::WebView::WebViewResponsePolicyDecisionSignalType  mResponsePolicyDecisionSignal;
   Dali::Toolkit::WebView::WebViewCertificateSignalType             mCertificateConfirmSignal;
   Dali::Toolkit::WebView::WebViewCertificateSignalType             mSslCertificateChangedSignal;
   Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType         mHttpAuthHandlerSignal;
@@ -771,8 +771,6 @@ private:
   std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
   std::unique_ptr<Dali::Toolkit::WebSettings>        mWebSettings;
   std::unique_ptr<Dali::Toolkit::WebBackForwardList> mWebBackForwardList;
-
-  Dali::Toolkit::ImageView mFaviconView;
 
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;

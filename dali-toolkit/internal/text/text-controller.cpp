@@ -25,6 +25,7 @@
 #include <limits>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/text-controller-event-handler.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 #include <dali-toolkit/internal/text/text-controller-input-font-handler.h>
@@ -124,6 +125,8 @@ void Controller::SetMarkupProcessorEnabled(bool enable)
     GetText(text);
     SetText(text);
   }
+
+  mImpl->mModel->mVisualModel->SetMarkupProcessorEnabled(enable);
 }
 
 bool Controller::IsMarkupProcessorEnabled() const
@@ -403,15 +406,22 @@ void Controller::SetLineWrapMode(Text::LineWrap::Mode lineWrapMode)
 {
   if(lineWrapMode != mImpl->mModel->mLineWrapMode)
   {
-    // Set the text wrap mode.
-    mImpl->mModel->mLineWrapMode = lineWrapMode;
-
     // Update Text layout for applying wrap mode
-    mImpl->mOperationsPending                          = static_cast<OperationsMask>(mImpl->mOperationsPending |
+    mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending |
                                                             ALIGN |
                                                             LAYOUT |
                                                             UPDATE_LAYOUT_SIZE |
                                                             REORDER);
+
+    if((mImpl->mModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) || (lineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
+       (mImpl->mModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::MIXED) || (lineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::MIXED)) // hyphen is treated as line break
+    {
+      mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | GET_LINE_BREAKS);
+    }
+
+    // Set the text wrap mode.
+    mImpl->mModel->mLineWrapMode = lineWrapMode;
+
     mImpl->mTextUpdateInfo.mCharacterIndex             = 0u;
     mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
     mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = mImpl->mModel->mLogicalModel->mText.Count();

@@ -184,6 +184,26 @@ bool Model::IsBackgroundEnabled() const
   return mVisualModel->IsBackgroundEnabled();
 }
 
+bool Model::IsMarkupProcessorEnabled() const
+{
+  return mVisualModel->IsMarkupProcessorEnabled();
+}
+
+const GlyphInfo* Model::GetHyphens() const
+{
+  return mVisualModel->mHyphen.glyph.Begin();
+}
+
+const Length* Model::GetHyphenIndices() const
+{
+  return mVisualModel->mHyphen.index.Begin();
+}
+
+Length Model::GetHyphensCount() const
+{
+  return mVisualModel->mHyphen.glyph.Size();
+}
+
 Model::Model()
 : mLogicalModel(),
   mVisualModel(),

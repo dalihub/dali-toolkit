@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,16 +172,16 @@ void Adaptor::RemoveWindow( Internal::Adaptor::SceneHolder* window )
   }
 }
 
-void Adaptor::RegisterProcessor( Integration::Processor& processor )
+void Adaptor::RegisterProcessor( Integration::Processor& processor, bool postProcessor )
 {
   Integration::Core& core = mTestApplication->GetCore();
-  core.RegisterProcessor( processor );
+  core.RegisterProcessor( processor, postProcessor );
 }
 
-void Adaptor::UnregisterProcessor( Integration::Processor& processor )
+void Adaptor::UnregisterProcessor( Integration::Processor& processor, bool postProcessor )
 {
   Integration::Core& core = mTestApplication->GetCore();
-  core.UnregisterProcessor( processor );
+  core.UnregisterProcessor( processor, postProcessor );
 }
 
 void Adaptor::SetApplication( Dali::TestApplication& testApplication )
@@ -368,14 +368,14 @@ const LogFactoryInterface& Adaptor::GetLogFactory()
   return *gLogFactory;
 }
 
-void Adaptor::RegisterProcessor( Integration::Processor& processor )
+void Adaptor::RegisterProcessor( Integration::Processor& processor, bool postProcessor)
 {
-  mImpl->RegisterProcessor( processor );
+  mImpl->RegisterProcessor( processor, postProcessor );
 }
 
-void Adaptor::UnregisterProcessor( Integration::Processor& processor )
+void Adaptor::UnregisterProcessor( Integration::Processor& processor, bool postProcessor)
 {
-  mImpl->UnregisterProcessor( processor );
+  mImpl->UnregisterProcessor( processor, postProcessor );
 }
 
 } // namespace Dali

@@ -487,7 +487,6 @@ Control::Impl::~Impl()
     StopObservingVisual(iter->visual);
   }
 
-  AccessibilityDeregister();
   // All gesture detectors will be destroyed so no need to disconnect.
   delete mStartingPinchScale;
 
@@ -1471,6 +1470,15 @@ Dali::Accessibility::ReadingInfoTypes Control::Impl::GetAccessibilityReadingInfo
   {
     place->Get(value);
   }
+  else
+  {
+    Dali::Accessibility::ReadingInfoTypes types;
+    types[Dali::Accessibility::ReadingInfoType::NAME] = true;
+    types[Dali::Accessibility::ReadingInfoType::ROLE] = true;
+    types[Dali::Accessibility::ReadingInfoType::DESCRIPTION] = true;
+    types[Dali::Accessibility::ReadingInfoType::STATE] = true;
+    return types;
+  }
 
   if(value.empty())
   {
@@ -1942,12 +1950,32 @@ void Control::Impl::AccessibilityRegister()
   }
 }
 
-void Control::Impl::AccessibilityDeregister()
+void Control::Impl::AccessibilityDeregister(bool remove)
 {
   if(accessibilityNotificationSet)
   {
+    accessibilityNotificationPosition.NotifySignal().Disconnect(&Control::Impl::PositionOrSizeChangedCallback);
+    if(remove)
+    {
+      mControlImpl.Self().RemovePropertyNotification(accessibilityNotificationPosition);
+    }
+    accessibilityNotificationPosition.Reset();
     accessibilityNotificationPosition = {};
+
+    accessibilityNotificationSize.NotifySignal().Disconnect(&Control::Impl::PositionOrSizeChangedCallback);
+    if(remove)
+    {
+      mControlImpl.Self().RemovePropertyNotification(accessibilityNotificationSize);
+    }
+    accessibilityNotificationSize.Reset();
     accessibilityNotificationSize     = {};
+
+    accessibilityNotificationCulled.NotifySignal().Disconnect(&Control::Impl::CulledChangedCallback);
+    if(remove)
+    {
+      mControlImpl.Self().RemovePropertyNotification(accessibilityNotificationCulled);
+    }
+    accessibilityNotificationCulled.Reset();
     accessibilityNotificationCulled   = {};
     accessibilityNotificationSet      = false;
   }

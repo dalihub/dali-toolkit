@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,8 @@ bool SetBidirectionalInfoTest( const SetBidirectionalInfoData& data )
                    layoutSize,
                    textModel,
                    metrics,
-                   false );
+                   false,
+                   LineWrap::WORD );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -196,7 +197,8 @@ bool GetMirroredTextTest( const GetMirroredTextData& data )
                    layoutSize,
                    textModel,
                    metrics,
-                   false );
+                   false,
+                   LineWrap::WORD );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -272,7 +274,8 @@ bool GetCharactersDirectionTest( const GetCharactersDirectionData& data )
                    layoutSize,
                    textModel,
                    metrics,
-                   data.markupProcessorEnabled );
+                   data.markupProcessorEnabled,
+                   LineWrap::WORD );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;

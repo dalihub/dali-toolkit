@@ -1802,3 +1802,86 @@ int UtcDaliToolkitTextlabelAnchorClicked(void)
 
   END_TEST;
 }
+
+int UtcDaliTextLabelAtlasLimitationIsEnabledForLargeFontPointSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelAtlasLimitationIsEnabledForLargeFontPointSize ");
+
+  //TextLabel is not using Atlas but this is to unify font-size on text-controllers
+
+  // +2: First one to handle the equal case. Second one to handle odd to even case of GetNaturalSize
+  const uint32_t lessThanWidth = TextAbstraction::FontClient::MAX_TEXT_ATLAS_WIDTH - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+  const uint32_t lessThanHeight = TextAbstraction::FontClient::MAX_TEXT_ATLAS_HEIGHT - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+
+  // Create a text editor
+  TextLabel textLabel = TextLabel::New();
+  //Set size to avoid automatic eliding
+  textLabel.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  //Set very large font-size using point-size
+  textLabel.SetProperty( TextLabel::Property::POINT_SIZE, 1000);
+  //Specify font-family
+  textLabel.SetProperty( TextLabel::Property::FONT_FAMILY, "DejaVu Sans");
+  //Set text to check if appear or not
+  textLabel.SetProperty( TextLabel::Property::TEXT, "A");
+
+  application.GetScene().Add( textLabel );
+
+  application.SendNotification();
+  application.Render();
+  //Use GetNaturalSize to verify that size of block does not exceed Atlas size
+  Vector3 naturalSize = textLabel.GetNaturalSize();
+
+  DALI_TEST_GREATER( lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION );
+  DALI_TEST_GREATER( lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextLabelHyphenWrapMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelHyphenWrapMode ");
+
+  int lineCount =0;
+  TextLabel label = TextLabel::New();
+  label.SetProperty( Actor::Property::SIZE, Vector2( 150.0f, 300.f ));
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 12.f );
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true);
+  application.GetScene().Add( label );
+  application.SendNotification();
+  application.Render();
+
+  label.SetProperty( TextLabel::Property::TEXT, "Hi Experimen" );
+  label.SetProperty(TextLabel::Property::LINE_WRAP_MODE,DevelText::LineWrap::HYPHENATION);
+  DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( DevelText::LineWrap::HYPHENATION ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount = label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+  /*
+    text will be :
+    Hi Exp-
+    erimen
+  */
+  DALI_TEST_EQUALS( lineCount, 2, TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::TEXT, "Hi Experimen" );
+  label.SetProperty(TextLabel::Property::LINE_WRAP_MODE,DevelText::LineWrap::MIXED);
+  DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( DevelText::LineWrap::MIXED ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount = label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+  /*
+    text will be :
+    Hi
+    Experi-
+    men
+  */
+  DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
+
+  END_TEST;
+}

@@ -626,6 +626,10 @@ void ImageVisual::InitializeRenderer()
   if(mTextures)
   {
     mImpl->mRenderer.SetTextures(mTextures);
+    if(DevelTexture::IsNative(mTextures.GetTexture(0)))
+    {
+      UpdateShader();
+    }
     mTextures.Reset(); // Visual should not keep a handle to the texture after this point.
   }
 

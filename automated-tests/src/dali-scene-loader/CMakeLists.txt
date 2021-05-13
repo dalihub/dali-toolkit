@@ -16,6 +16,7 @@ SET(TC_SOURCES
   utc-Dali-Gltf2Loader.cpp
   utc-Dali-KtxLoader.cpp
   utc-Dali-MatrixStack.cpp
+  utc-Dali-MeshDefinition.cpp
   utc-Dali-NodeDefinition.cpp
   utc-Dali-RendererState.cpp
   utc-Dali-ResourceBundle.cpp

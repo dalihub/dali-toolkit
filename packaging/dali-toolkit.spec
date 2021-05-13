@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.0.21
+Version:    2.0.25
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -379,6 +379,7 @@ esac
 %defattr(-,root,root,-)
 %{dev_include_path}/dali-toolkit/*
 %{_libdir}/pkgconfig/dali2-toolkit.pc
+%{_bindir}/dali-shader-generator
 
 %files resources_360x360
 %manifest dali-toolkit-resources.manifest

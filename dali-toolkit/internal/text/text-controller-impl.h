@@ -785,6 +785,13 @@ private:
   // Declared private and left undefined to avoid copies.
   Impl& operator=(const Impl&);
 
+  /**
+   * @brief Copy Underlined-Character-Runs from Logical-Model to Underlined-Glyph-Runs in Visual-Model
+   *
+   * @param shouldClearPreUnderlineRuns Whether should clear the existing Underlined-Glyph-Runs in Visual-Model
+   */
+  void CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns);
+
 public:
   ControlInterface*           mControlInterface;           ///< Reference to the text controller.
   EditableControlInterface*   mEditableControlInterface;   ///< Reference to the editable text controller.

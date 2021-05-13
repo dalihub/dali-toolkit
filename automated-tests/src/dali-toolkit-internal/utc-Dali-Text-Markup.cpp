@@ -185,7 +185,8 @@ namespace
     Vector<FontDescriptionRun> fontRuns;
     Vector<EmbeddedItem> items;
     Vector<Anchor> anchors;
-    MarkupProcessData markupProcessData( colorRuns, fontRuns, items, anchors );
+    Vector<UnderlinedCharacterRun> underlinedCharacterRuns;
+    MarkupProcessData markupProcessData( colorRuns, fontRuns, items, anchors, underlinedCharacterRuns );
     ProcessMarkupString( data.xHTMLEntityString, markupProcessData );
 
     for( Vector<EmbeddedItem>::Iterator it = items.Begin(),

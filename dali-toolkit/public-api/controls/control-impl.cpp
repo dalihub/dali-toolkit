@@ -492,11 +492,8 @@ void Control::Initialize()
   if(type)
   {
     auto typeName = type.GetName();
-    DevelControl::AppendAccessibilityAttribute(Self(), "t", typeName);
+    DevelControl::AppendAccessibilityAttribute(Self(), "class", typeName);
   }
-
-  if(Accessibility::IsUp())
-    mImpl->AccessibilityRegister();
 }
 
 void Control::OnInitialize()
@@ -593,20 +590,12 @@ void Control::OnSceneConnection(int depth)
   // The clipping renderer is only created if required.
   CreateClippingRenderer(*this);
 
-  // Request to be laid out when the control is connected to the Scene.
-  // Signal that a Relayout may be needed
-  if(Accessibility::IsUp())
-  {
-    mImpl->AccessibilityRegister();
-  }
+  mImpl->AccessibilityRegister();
 }
 
 void Control::OnSceneDisconnection()
 {
-  if(Accessibility::IsUp())
-  {
-    mImpl->AccessibilityDeregister();
-  }
+  mImpl->AccessibilityDeregister(true);
   mImpl->OnSceneDisconnection();
 }
 

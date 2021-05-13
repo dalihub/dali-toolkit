@@ -14,6 +14,8 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 	add_definitions("-DDEBUG_ENABLED")
 endif()
 
+ADD_DEFINITIONS( "-DBUILDING_DALI_SCENE_LOADER" )
+
 foreach(flag ${PKGS_CFLAGS})
 	set(extra_flags "${extra_flags} ${flag}")
 endforeach(flag)
@@ -77,6 +79,33 @@ include_directories(${repo_root_dir}
 	${prefix_include_dir}
 )
 
+# Generate source files for shaders
+SET(SHADER_SOURCE_DIR "${scene_loader_dir}/internal/graphics/shaders/")
+SET(SHADER_GENERATED_DIR "${scene_loader_dir}/internal/graphics/generated")
+
+SET(GENERATED_SHADER_DIR ${scene_loader_dir}/internal/graphics/)
+SET_PROPERTY(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
+             "${GENERATED_SHADER_DIR}/generated/"
+             "${GENERATED_SHADER_DIR}/builtin-shader-extern-gen.h")
+
+IF( WIN32)
+  # When Using VCPKG, the default is always set to Debug if CMAKE_BUILD_TYPE is not set
+  IF( NOT CMAKE_BUILD_TYPE )
+    SET(SHADER_GENERATOR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/../Debug/${SHADER_GENERATOR_NAME})
+  ELSE()
+    SET(SHADER_GENERATOR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/../${CMAKE_BUILD_TYPE}/${SHADER_GENERATOR_NAME})
+  ENDIF()
+ELSE()
+  SET(SHADER_GENERATOR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/../${SHADER_GENERATOR_NAME})
+ENDIF()
+
+SET( BUILT_IN_SHADER_GEN_CPP "${GENERATED_SHADER_DIR}/generated/builtin-shader-gen.cpp")
+ADD_CUSTOM_COMMAND(OUTPUT ${BUILT_IN_SHADER_GEN_CPP}
+                   DEPENDS ${SHADER_GENERATOR_BINARY}
+                   COMMAND ${SHADER_GENERATOR_BINARY} ${SHADER_SOURCE_DIR} ${SHADER_GENERATED_DIR})
+
+SET( scene_loader_src_files ${scene_loader_src_files} ${BUILT_IN_SHADER_GEN_CPP} )
+
 add_library(${name} SHARED ${scene_loader_src_files})
 
 target_link_libraries(${name} ${DALICORE_LDFLAGS} ${DALIADAPTOR_LDFLAGS}
@@ -86,16 +115,6 @@ target_link_libraries(${name} ${DALICORE_LDFLAGS} ${DALIADAPTOR_LDFLAGS}
 if( ANDROID )
 	target_link_libraries(${name} log)
 endif()
-
-# Generate source files for shaders
-SET(SHADER_SOURCE_DIR "${scene_loader_dir}/internal/graphics/shaders/")
-SET(SHADER_GENERATED_DIR "${scene_loader_dir}/internal/graphics/generated")
-EXECUTE_PROCESS( COMMAND bash -c "${repo_root_dir}/build/tizen/shader-generator.sh ${SHADER_SOURCE_DIR} ${SHADER_GENERATED_DIR}" )
-
-SET(GENERATED_SHADER_DIR ${scene_loader_dir}/internal/graphics/)
-SET_PROPERTY(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
-             "${GENERATED_SHADER_DIR}/generated/"
-             "${GENERATED_SHADER_DIR}/builtin-shader-extern-gen.h")
 
 IF( INSTALL_CMAKE_MODULES )
 	SET_TARGET_PROPERTIES( ${name}

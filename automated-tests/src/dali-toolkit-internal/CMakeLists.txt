@@ -30,11 +30,13 @@ SET(TC_SOURCES
  utc-Dali-Text-ViewModel.cpp
  utc-Dali-TextField-internal.cpp
  utc-Dali-TextEditor-internal.cpp
+ utc-Dali-TextLabel-internal.cpp
  utc-Dali-TextSelectionPopup-internal.cpp
  utc-Dali-TextureManager.cpp
  utc-Dali-Visuals-internal.cpp
  utc-Dali-VisualModel.cpp
  utc-Dali-VisualUrl.cpp
+ utc-Dali-Text-Hyphen-Wrapping.cpp
 )
 
 IF(ELDBUS_AVAILABLE)
