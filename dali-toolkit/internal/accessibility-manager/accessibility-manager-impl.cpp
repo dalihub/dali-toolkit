@@ -363,7 +363,7 @@ bool AccessibilityManager::DoSetCurrentFocusActor(const unsigned int actorID)
       // Send Focused actor information
       Vector2 windowSize = rootActor.GetCurrentProperty<Vector2>(Actor::Property::SIZE);
       AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
-      adaptor.SetFocusActorPosition( Vector2((actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION).x + (windowSize.width / 2)),
+      adaptor.SetFocusedActorPosition( Vector2((actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION).x + (windowSize.width / 2)),
                                              (actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION).y + (windowSize.height / 2))) );
 
       // Send notification for the change of focus actor
