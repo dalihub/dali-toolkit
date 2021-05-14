@@ -21,6 +21,7 @@
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/text-controls/input-filter-properties.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
 
 namespace Dali
@@ -220,6 +221,38 @@ enum Type
    * @endcode
    */
   INPUT_METHOD_SETTINGS,
+
+  /**
+   * @brief The input filter
+   * @details Name "inputFilter", type Property::MAP.
+   *
+   * The inputFilter map contains the following keys:
+   *
+   * | %Property Name       | Type     | Required | Description                                                                                                         |
+   * |----------------------|----------|----------|---------------------------------------------------------------------------------------------------------------------|
+   * | accepted             | STRING   | No       | A regular expression in the set of characters to be accepted by the inputFilter (the default value is empty string) |
+   * | rejected             | STRING   | No       | A regular expression in the set of characters to be rejected by the inputFilter (the default value is empty string) |
+   *
+   * @note Optional.
+   * The character set must follow the regular expression rules.
+   * Behaviour can not be guaranteed for incorrect grammars.
+   * Refer the link below for detailed rules.
+   * The functions in std::regex library use the ECMAScript grammar:
+   * http://cplusplus.com/reference/regex/ECMAScript/
+   *
+   * You can use enums instead of "accepted" and "rejected" strings.
+   * @see Dali::Toolkit::InputFilter::Property::Type
+   *
+   * Example Usage:
+   * @code
+   *   Property::Map filter;
+   *   filter[InputFilter::Property::ACCEPTED] = "[\\d]"; // accept whole digits
+   *   filter[InputFilter::Property::REJECTED] = "[0-5]"; // reject 0, 1, 2, 3, 4, 5
+   *
+   *   editor.SetProperty(DevelTextEditor::Property::INPUT_FILTER, filter); // acceptable inputs are 6, 7, 8, 9
+   * @endcode
+   */
+  INPUT_FILTER,
 };
 
 } // namespace Property
@@ -269,6 +302,37 @@ using AnchorClickedSignalType = Signal<void(TextEditor, const char*, uint32_t)>;
  * @return The signal to connect to.
  */
 DALI_TOOLKIT_API AnchorClickedSignalType& AnchorClickedSignal(TextEditor textEditor);
+
+/**
+ * @brief Input filtered signal type.
+ */
+using InputFilteredSignalType = Signal<void(TextEditor, Toolkit::InputFilter::Property::Type)>;
+
+/**
+ * @brief This signal is emitted when the character to be inserted is filtered by the input filter.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName(TextEditor textEditor, Toolkit::InputFilter::Property::Type type);
+ *
+ *   DevelTextEditor::InputFilteredSignal(textEditor).Connect(this, &OnInputFiltered);
+ *
+ *   void OnInputFiltered(TextEditor textEditor, InputFilter::Property::Type type)
+ *   {
+ *     if (type == InputFilter::Property::ACCEPTED)
+ *     {
+ *       // If the input has been filtered with an accepted filter, the type is ACCEPTED.
+ *     }
+ *     else if (type == InputFilter::Property::REJECTED)
+ *     {
+ *       // If the input has been filtered with an rejected filter, the type is REJECTED.
+ *     }
+ *   }
+ * @endcode
+ * @param[in] textEditor The instance of TextEditor.
+ * @return The signal to connect to.
+ */
+DALI_TOOLKIT_API InputFilteredSignalType& InputFilteredSignal(TextEditor textEditor);
 
 /**
  * @brief Select the whole text of TextEditor.

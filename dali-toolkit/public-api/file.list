@@ -114,6 +114,7 @@ SET( public_api_styling_header_files
 
 SET( public_api_text_controls_header_files
   ${public_api_src_dir}/controls/text-controls/hidden-input-properties.h
+  ${public_api_src_dir}/controls/text-controls/input-filter-properties.h
   ${public_api_src_dir}/controls/text-controls/placeholder-properties.h
   ${public_api_src_dir}/controls/text-controls/text-editor.h
   ${public_api_src_dir}/controls/text-controls/text-label.h

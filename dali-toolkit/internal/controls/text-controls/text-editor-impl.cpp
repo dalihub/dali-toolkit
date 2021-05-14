@@ -149,11 +149,14 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "primaryCursorPo
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "grabHandleColor",                      VECTOR4,   GRAB_HANDLE_COLOR                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableGrabHandlePopup",                BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP            )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputMethodSettings",                  MAP,       INPUT_METHOD_SETTINGS               )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputFilter",                          MAP,       INPUT_FILTER                        )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "anchorClicked",      SIGNAL_ANCHOR_CLICKED     )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputFiltered",      SIGNAL_INPUT_FILTERED     )
+
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -801,6 +804,15 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::INPUT_FILTER:
+      {
+        const Property::Map* map = value.GetMap();
+        if(map)
+        {
+          impl.mController->SetInputFilterOption(*map);
+        }
+        break;
+      }
     } // switch
   }   // texteditor
 }
@@ -1174,6 +1186,13 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
         value = map;
         break;
       }
+      case Toolkit::DevelTextEditor::Property::INPUT_FILTER:
+      {
+        Property::Map map;
+        impl.mController->GetInputFilterOption(map);
+        value = map;
+        break;
+      }
     } //switch
   }
 
@@ -1248,6 +1267,11 @@ DevelTextEditor::AnchorClickedSignalType& TextEditor::AnchorClickedSignal()
   return mAnchorClickedSignal;
 }
 
+DevelTextEditor::InputFilteredSignalType& TextEditor::InputFilteredSignal()
+{
+  return mInputFilteredSignal;
+}
+
 Text::ControllerPtr TextEditor::getController()
 {
   return mController;
@@ -1282,6 +1306,14 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
     {
       Internal::TextEditor& editorImpl(GetImpl(editor));
       editorImpl.AnchorClickedSignal().Connect(tracker, functor);
+    }
+  }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_INPUT_FILTERED))
+  {
+    if(editor)
+    {
+      Internal::TextEditor& editorImpl(GetImpl(editor));
+      editorImpl.InputFilteredSignal().Connect(tracker, functor);
     }
   }
   else
@@ -1872,6 +1904,12 @@ void TextEditor::AnchorClicked(const std::string& href)
 {
   Dali::Toolkit::TextEditor handle(GetOwner());
   mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
+}
+
+void TextEditor::InputFiltered(Toolkit::InputFilter::Property::Type type)
+{
+  Dali::Toolkit::TextEditor handle(GetOwner());
+  mInputFilteredSignal.Emit(handle, type);
 }
 
 void TextEditor::AddDecoration(Actor& actor, bool needsClipping)

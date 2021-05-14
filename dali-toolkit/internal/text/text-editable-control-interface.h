@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/input-style.h>
+#include <dali-toolkit/public-api/controls/text-controls/input-filter-properties.h>
 
 namespace Dali
 {
@@ -75,6 +76,13 @@ public:
    * @param[in] inputStyleMask Mask with the bits of the input style that has changed.
    */
   virtual void InputStyleChanged(InputStyle::Mask inputStyleMask) = 0;
+
+  /**
+   * @brief Called when the character to be inserted is filtered by the input filter.
+   *
+   * @param[in] type The filter type is ACCEPTED or REJECTED.
+   */
+  virtual void InputFiltered(Toolkit::InputFilter::Property::Type type) = 0;
 
   /**
    * @brief Add a decoration.

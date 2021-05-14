@@ -28,6 +28,7 @@
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
+#include <dali-toolkit/internal/text/input-filter.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/text-anchor-control-interface.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
@@ -1384,6 +1385,16 @@ public: // Queries & retrieves.
    * @brief Used to get the hidden input option
    */
   void GetHiddenInputOption(Property::Map& options);
+
+  /**
+   * @brief Used to set the input filter option
+   */
+  void SetInputFilterOption(const Property::Map& options);
+
+  /**
+   * @brief Used to get the input filter option
+   */
+  void GetInputFilterOption(Property::Map& options);
 
   /**
    * @brief Sets the Placeholder Properties.

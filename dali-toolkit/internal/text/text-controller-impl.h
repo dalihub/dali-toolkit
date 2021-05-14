@@ -338,6 +338,7 @@ struct Controller::Impl
     mOperationsPending(NO_OPERATION),
     mMaximumNumberOfCharacters(50u),
     mHiddenInput(NULL),
+    mInputFilter(nullptr),
     mRecalculateNaturalSize(true),
     mMarkupProcessorEnabled(false),
     mClipboardHideEnabled(true),
@@ -386,7 +387,6 @@ struct Controller::Impl
   ~Impl()
   {
     delete mHiddenInput;
-
     delete mFontDefaults;
     delete mUnderlineDefaults;
     delete mShadowDefaults;
@@ -793,29 +793,30 @@ private:
   void CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns);
 
 public:
-  ControlInterface*           mControlInterface;           ///< Reference to the text controller.
-  EditableControlInterface*   mEditableControlInterface;   ///< Reference to the editable text controller.
-  SelectableControlInterface* mSelectableControlInterface; ///< Reference to the selectable text controller.
-  AnchorControlInterface*     mAnchorControlInterface;     ///< Reference to the anchor controller.
-  ModelPtr                    mModel;                      ///< Pointer to the text's model.
-  FontDefaults*               mFontDefaults;               ///< Avoid allocating this when the user does not specify a font.
-  UnderlineDefaults*          mUnderlineDefaults;          ///< Avoid allocating this when the user does not specify underline parameters.
-  ShadowDefaults*             mShadowDefaults;             ///< Avoid allocating this when the user does not specify shadow parameters.
-  EmbossDefaults*             mEmbossDefaults;             ///< Avoid allocating this when the user does not specify emboss parameters.
-  OutlineDefaults*            mOutlineDefaults;            ///< Avoid allocating this when the user does not specify outline parameters.
-  EventData*                  mEventData;                  ///< Avoid allocating everything for text input until EnableTextInput().
-  TextAbstraction::FontClient mFontClient;                 ///< Handle to the font client.
-  Clipboard                   mClipboard;                  ///< Handle to the system clipboard
-  View                        mView;                       ///< The view interface to the rendering back-end.
-  MetricsPtr                  mMetrics;                    ///< A wrapper around FontClient used to get metrics & potentially down-scaled Emoji metrics.
-  Layout::Engine              mLayoutEngine;               ///< The layout engine.
-  Vector<ModifyEvent>         mModifyEvents;               ///< Temporary stores the text set until the next relayout.
-  Vector4                     mTextColor;                  ///< The regular text color
-  TextUpdateInfo              mTextUpdateInfo;             ///< Info of the characters updated.
-  OperationsMask              mOperationsPending;          ///< Operations pending to be done to layout the text.
-  Length                      mMaximumNumberOfCharacters;  ///< Maximum number of characters that can be inserted.
-  HiddenText*                 mHiddenInput;                ///< Avoid allocating this when the user does not specify hidden input mode.
-  Vector2                     mTextFitContentSize;         ///< Size of Text fit content
+  ControlInterface*            mControlInterface;           ///< Reference to the text controller.
+  EditableControlInterface*    mEditableControlInterface;   ///< Reference to the editable text controller.
+  SelectableControlInterface*  mSelectableControlInterface; ///< Reference to the selectable text controller.
+  AnchorControlInterface*      mAnchorControlInterface;     ///< Reference to the anchor controller.
+  ModelPtr                     mModel;                      ///< Pointer to the text's model.
+  FontDefaults*                mFontDefaults;               ///< Avoid allocating this when the user does not specify a font.
+  UnderlineDefaults*           mUnderlineDefaults;          ///< Avoid allocating this when the user does not specify underline parameters.
+  ShadowDefaults*              mShadowDefaults;             ///< Avoid allocating this when the user does not specify shadow parameters.
+  EmbossDefaults*              mEmbossDefaults;             ///< Avoid allocating this when the user does not specify emboss parameters.
+  OutlineDefaults*             mOutlineDefaults;            ///< Avoid allocating this when the user does not specify outline parameters.
+  EventData*                   mEventData;                  ///< Avoid allocating everything for text input until EnableTextInput().
+  TextAbstraction::FontClient  mFontClient;                 ///< Handle to the font client.
+  Clipboard                    mClipboard;                  ///< Handle to the system clipboard
+  View                         mView;                       ///< The view interface to the rendering back-end.
+  MetricsPtr                   mMetrics;                    ///< A wrapper around FontClient used to get metrics & potentially down-scaled Emoji metrics.
+  Layout::Engine               mLayoutEngine;               ///< The layout engine.
+  Vector<ModifyEvent>          mModifyEvents;               ///< Temporary stores the text set until the next relayout.
+  Vector4                      mTextColor;                  ///< The regular text color
+  TextUpdateInfo               mTextUpdateInfo;             ///< Info of the characters updated.
+  OperationsMask               mOperationsPending;          ///< Operations pending to be done to layout the text.
+  Length                       mMaximumNumberOfCharacters;  ///< Maximum number of characters that can be inserted.
+  HiddenText*                  mHiddenInput;                ///< Avoid allocating this when the user does not specify hidden input mode.
+  std::unique_ptr<InputFilter> mInputFilter;                ///< Avoid allocating this when the user does not specify input filter mode.
+  Vector2                      mTextFitContentSize;         ///< Size of Text fit content
 
   bool               mRecalculateNaturalSize : 1; ///< Whether the natural size needs to be recalculated.
   bool               mMarkupProcessorEnabled : 1; ///< Whether the mark-up procesor is enabled.
