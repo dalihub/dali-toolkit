@@ -1113,7 +1113,7 @@ int utcDaliTextFieldAnchorClicked02(void)
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 100);
   application.SendNotification();
   application.Render();
 
@@ -1134,7 +1134,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 700);
   application.SendNotification();
   field.SetKeyInputFocus();
 
@@ -1152,7 +1152,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 1300);
   application.SendNotification();
   field.SetKeyInputFocus();
 
@@ -1170,7 +1170,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 1900);
   application.SendNotification();
   field.SetKeyInputFocus();
 
@@ -1189,7 +1189,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 2500);
   application.SendNotification();
   field.SetKeyInputFocus();
 
@@ -1208,7 +1208,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 3100);
   application.SendNotification();
   application.Render();
 
@@ -1227,7 +1227,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 3700);
   application.SendNotification();
   application.Render();
 
@@ -1246,7 +1246,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 4300);
   application.SendNotification();
   application.Render();
 
@@ -1265,7 +1265,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 4900);
   application.SendNotification();
   application.Render();
 
@@ -1284,7 +1284,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 5500);
   application.SendNotification();
   application.Render();
 
@@ -1931,7 +1931,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
   DALI_TEST_CHECK( !inputStyleChangedSignal );
 
   // Create a tap event to touch the text field.
-  TestGenerateTap( application, 63.0f, 25.0f, 300 );
+  TestGenerateTap( application, 63.0f, 25.0f, 700 );
 
   // Render and notify
   application.SendNotification();
