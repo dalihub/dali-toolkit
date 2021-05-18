@@ -1595,7 +1595,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
   DALI_TEST_CHECK( !inputStyleChangedSignal );
 
   // Create a tap event to touch the text field.
-  TestGenerateTap( application, 63.0f, 25.0f, 300 );
+  TestGenerateTap( application, 63.0f, 25.0f, 700 );
 
   // Render and notify
   application.SendNotification();
