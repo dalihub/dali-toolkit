@@ -112,7 +112,8 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/test-harness.cpp
   dali-toolkit-test-utils/test-gesture-generator.cpp
   dali-toolkit-test-utils/test-gl-abstraction.cpp
-  dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
+  dali-toolkit-test-utils/test-graphics-sync-impl.cpp
+  dali-toolkit-test-utils/test-graphics-sync-object.cpp
   dali-toolkit-test-utils/test-graphics-buffer.cpp
   dali-toolkit-test-utils/test-graphics-command-buffer.cpp
   dali-toolkit-test-utils/test-graphics-controller.cpp

@@ -57,7 +57,8 @@ SET(TEST_HARNESS_SOURCES
   ${TEST_HARNESS_DIR}/test-harness.cpp
   ${TEST_HARNESS_DIR}/test-gesture-generator.cpp
   ${TEST_HARNESS_DIR}/test-gl-abstraction.cpp
-  ${TEST_HARNESS_DIR}/test-gl-sync-abstraction.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-sync-impl.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-sync-object.cpp
   ${TEST_HARNESS_DIR}/test-graphics-buffer.cpp
   ${TEST_HARNESS_DIR}/test-graphics-command-buffer.cpp
   ${TEST_HARNESS_DIR}/test-graphics-framebuffer.cpp
