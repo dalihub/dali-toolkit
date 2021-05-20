@@ -1407,6 +1407,12 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     ResizeActor(mActiveLayer, contentSize);
   }
 
+  // If there is text changed, callback is called.
+  if(mTextChanged)
+  {
+    EmitTextChangedSignal();
+  }
+
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
 
   if((Text::Controller::NONE_UPDATED != updateTextType) ||
@@ -1426,12 +1432,6 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
 
     RenderText(updateTextType);
-
-    // If there is text changed, callback is called.
-    if(mTextChanged)
-    {
-      EmitTextChangedSignal();
-    }
   }
 
   // The text-field emits signals when the input style changes. These changes of style are
