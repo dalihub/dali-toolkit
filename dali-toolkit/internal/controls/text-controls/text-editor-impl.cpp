@@ -1309,6 +1309,12 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     mActiveLayer.SetProperty(Actor::Property::POSITION, Vector2(padding.start, padding.top));
   }
 
+  // If there is text changed, callback is called.
+  if(mTextChanged)
+  {
+    EmitTextChangedSignal();
+  }
+
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
 
   if((Text::Controller::NONE_UPDATED != updateTextType) ||
@@ -1328,12 +1334,6 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
 
     RenderText(updateTextType);
-
-    // If there is text changed, callback is called.
-    if(mTextChanged)
-    {
-      EmitTextChangedSignal();
-    }
   }
 
   // The text-editor emits signals when the input style changes. These changes of style are
