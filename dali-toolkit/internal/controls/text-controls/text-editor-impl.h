@@ -409,6 +409,7 @@ private: // Data
   Dali::Animation               mAnimation; ///< Scroll indicator Show/Hide Animation.
   Dali::TimePeriod              mAnimationPeriod;
   std::vector<Actor>            mClippingDecorationActors; ///< Decoration actors which need clipping.
+  Dali::InputMethodOptions      mInputMethodOptions;
 
   Actor         mRenderableActor;
   Actor         mActiveLayer;

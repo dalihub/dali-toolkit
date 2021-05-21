@@ -106,6 +106,7 @@ const char* const PROPERTY_NAME_MAX_LENGTH                           = "maxLengt
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
+const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "inputMethodSettings";
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
@@ -513,6 +514,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MAX_LENGTH ) == DevelTextEditor::Property::MAX_LENGTH );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_COLOR ) == DevelTextEditor::Property::GRAB_HANDLE_COLOR );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_METHOD_SETTINGS ) == DevelTextEditor::Property::INPUT_METHOD_SETTINGS );
 
   END_TEST;
 }
@@ -934,6 +936,38 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Test the ENABLE_GRAB_HANDLE_POPUP property
   editor.SetProperty( DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP, false );
   DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP ), false, TEST_LOCATION);
+
+  // Check the input method setting
+  Property::Map propertyMap;
+  InputMethod::PanelLayout::Type panelLayout = InputMethod::PanelLayout::NUMBER;
+  InputMethod::AutoCapital::Type autoCapital = InputMethod::AutoCapital::WORD;
+  InputMethod::ButtonAction::Type buttonAction = InputMethod::ButtonAction::GO;
+  int inputVariation = 1;
+  propertyMap["PANEL_LAYOUT"] = panelLayout;
+  propertyMap["AUTO_CAPITALIZE"] = autoCapital;
+  propertyMap["BUTTON_ACTION"] = buttonAction;
+  propertyMap["VARIATION"] = inputVariation;
+  editor.SetProperty( DevelTextEditor::Property::INPUT_METHOD_SETTINGS, propertyMap );
+
+  Property::Value value = editor.GetProperty( DevelTextEditor::Property::INPUT_METHOD_SETTINGS );
+  Property::Map map;
+  DALI_TEST_CHECK( value.Get( map ) );
+
+  int layout = 0;
+  DALI_TEST_CHECK( map[ "PANEL_LAYOUT" ].Get( layout ) );
+  DALI_TEST_EQUALS( static_cast<int>(panelLayout), layout, TEST_LOCATION );
+
+  int capital = 0;
+  DALI_TEST_CHECK( map[ "AUTO_CAPITALIZE" ].Get( capital ) );
+  DALI_TEST_EQUALS( static_cast<int>(autoCapital), capital, TEST_LOCATION );
+
+  int action = 0;
+  DALI_TEST_CHECK( map[ "BUTTON_ACTION" ].Get( action ) );
+  DALI_TEST_EQUALS( static_cast<int>(buttonAction), action, TEST_LOCATION );
+
+  int variation = 0;
+  DALI_TEST_CHECK( map[ "VARIATION" ].Get( variation ) );
+  DALI_TEST_EQUALS( inputVariation, variation, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
