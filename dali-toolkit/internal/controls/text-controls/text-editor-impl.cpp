@@ -148,6 +148,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "fontSizeScale",
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "primaryCursorPosition",                INTEGER,   PRIMARY_CURSOR_POSITION             )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "grabHandleColor",                      VECTOR4,   GRAB_HANDLE_COLOR                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableGrabHandlePopup",                BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP            )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputMethodSettings",                  MAP,       INPUT_METHOD_SETTINGS               )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
@@ -784,6 +785,22 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
         impl.mController->SetGrabHandlePopupEnabled(grabHandlePopupEnabled);
         break;
       }
+      case Toolkit::DevelTextEditor::Property::INPUT_METHOD_SETTINGS:
+      {
+        const Property::Map* map = value.GetMap();
+        if(map)
+        {
+          impl.mInputMethodOptions.ApplyProperty(*map);
+        }
+        impl.mController->SetInputModePassword(impl.mInputMethodOptions.IsPassword());
+
+        Toolkit::Control control = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
+        if(control == textEditor)
+        {
+          impl.mInputMethodContext.ApplyOptions(impl.mInputMethodOptions);
+        }
+        break;
+      }
     } // switch
   }   // texteditor
 }
@@ -1148,6 +1165,13 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
       case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP:
       {
         value = impl.mController->IsGrabHandlePopupEnabled();
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::INPUT_METHOD_SETTINGS:
+      {
+        Property::Map map;
+        impl.mInputMethodOptions.RetrieveProperty(map);
+        value = map;
         break;
       }
     } //switch
@@ -1569,6 +1593,7 @@ void TextEditor::OnKeyInputFocusGained()
   if(mInputMethodContext && IsEditable())
   {
     // All input panel properties, such as layout, return key type, and input hint, should be set before input panel activates (or shows).
+    mInputMethodContext.ApplyOptions(mInputMethodOptions);
     mInputMethodContext.NotifyTextInputMultiLine(true);
 
     mInputMethodContext.StatusChangedSignal().Connect(this, &TextEditor::KeyboardStatusChanged);
