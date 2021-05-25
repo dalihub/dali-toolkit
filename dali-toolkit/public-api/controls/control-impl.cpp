@@ -64,27 +64,6 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_CON
 #endif
 
 /**
- * @brief Replace the background visual if it's a color visual with the renderIfTransparent property set as required.
- * @param[in] controlImpl The control implementation
- * @param[in] renderIfTransaparent Whether we should render if the color is transparent
- */
-void ChangeBackgroundColorVisual(Control& controlImpl, bool renderIfTransparent)
-{
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlImpl);
-
-  Toolkit::Visual::Base backgroundVisual = controlDataImpl.GetVisual(Toolkit::Control::Property::BACKGROUND);
-  if(backgroundVisual && backgroundVisual.GetType() == Toolkit::Visual::COLOR)
-  {
-    Property::Map map;
-    backgroundVisual.CreatePropertyMap(map);
-
-    // Only change it if it's a color visual
-    map[Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT] = renderIfTransparent;
-    controlImpl.SetBackground(map);
-  }
-}
-
-/**
  * @brief Creates a clipping renderer if required.
  * (EG. If no renders exist and clipping is enabled).
  * @param[in] controlImpl The control implementation.
@@ -96,34 +75,11 @@ void CreateClippingRenderer(Control& controlImpl)
   int   clippingMode = ClippingMode::DISABLED;
   if(self.GetProperty(Actor::Property::CLIPPING_MODE).Get(clippingMode))
   {
-    switch(clippingMode)
-    {
-      case ClippingMode::CLIP_CHILDREN:
-      {
-        if(self.GetRendererCount() == 0u)
-        {
-          Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlImpl);
-          if(controlDataImpl.mVisuals.Empty())
-          {
-            controlImpl.SetBackgroundColor(Color::TRANSPARENT);
-          }
-          else
-          {
-            // We have visuals, check if we've set the background and re-create it to
-            // render even if transparent (only if it's a color visual)
-            ChangeBackgroundColorVisual(controlImpl, true);
-          }
-        }
-        break;
-      }
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(controlImpl);
 
-      case ClippingMode::DISABLED:
-      case ClippingMode::CLIP_TO_BOUNDING_BOX:
-      {
-        // If we have a background visual, check if it's a color visual and remove the render if transparent flag
-        ChangeBackgroundColorVisual(controlImpl, false);
-        break;
-      }
+    if(clippingMode == ClippingMode::CLIP_CHILDREN && controlDataImpl.mVisuals.Empty() && self.GetRendererCount() == 0u)
+    {
+      controlImpl.SetBackgroundColor(Color::TRANSPARENT);
     }
   }
 }
@@ -173,33 +129,12 @@ void Control::SetBackgroundColor(const Vector4& color)
   map[Toolkit::Visual::Property::TYPE]           = Toolkit::Visual::COLOR;
   map[Toolkit::ColorVisual::Property::MIX_COLOR] = color;
 
-  bool renderIfTransparent = false;
-  int  clippingMode        = ClippingMode::DISABLED;
-  if((Self().GetProperty(Actor::Property::CLIPPING_MODE).Get(clippingMode)) &&
-     (clippingMode == ClippingMode::CLIP_CHILDREN))
-  {
-    // If clipping-mode is set to CLIP_CHILDREN, then force visual to add the render even if transparent
-    map[Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT] = true;
-    renderIfTransparent                                             = true;
-  }
-
   Toolkit::Visual::Base visual = mImpl->GetVisual(Toolkit::Control::Property::BACKGROUND);
   if(visual && visual.GetType() == Toolkit::Visual::COLOR)
   {
-    Property::Map visualMap;
-    visual.CreatePropertyMap(visualMap);
-
-    Property::Value* renderValue = visualMap.Find(Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT);
-    Property::Value* colorValue  = visualMap.Find(Toolkit::ColorVisual::Property::MIX_COLOR);
-    if(renderValue && colorValue)
-    {
-      if((renderValue->Get<bool>() == true || colorValue->Get<Vector4>().a > 0.0f) && (renderIfTransparent || color.a > 0.0f))
-      {
-        // Update background color only
-        mImpl->DoAction(Toolkit::Control::Property::BACKGROUND, DevelColorVisual::Action::UPDATE_PROPERTY, map);
-        return;
-      }
-    }
+    // Update background color only
+    mImpl->DoAction(Toolkit::Control::Property::BACKGROUND, DevelColorVisual::Action::UPDATE_PROPERTY, map);
+    return;
   }
 
   SetBackground(map);

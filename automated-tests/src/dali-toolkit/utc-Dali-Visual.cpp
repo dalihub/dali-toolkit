@@ -3559,56 +3559,6 @@ int UtcDaliRegisterVisualWithDepthIndex(void)
   END_TEST;
 }
 
-int UtcDaliColorVisualRenderIfTransparentProperty(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "Test the renderIfTransparent property of ColorVisual" );
-
-  VisualFactory factory = VisualFactory::Get();
-  Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::COLOR );
-  propertyMap.Insert( ColorVisual::Property::MIX_COLOR, Color::BLUE );
-
-  tet_infoline( "Check default value" );
-  {
-    Visual::Base testVisual = factory.CreateVisual( propertyMap );
-    Property::Map returnedMap;
-    testVisual.CreatePropertyMap( returnedMap );
-
-    Property::Value* renderIfTransparentProperty = returnedMap.Find( DevelColorVisual::Property::RENDER_IF_TRANSPARENT );
-    DALI_TEST_CHECK( renderIfTransparentProperty );
-    DALI_TEST_EQUALS( renderIfTransparentProperty->Get< bool >(), false, TEST_LOCATION );
-  }
-
-  propertyMap.Insert( DevelColorVisual::Property::RENDER_IF_TRANSPARENT, true );
-
-  tet_infoline( "Ensure set to value required" );
-  {
-    Visual::Base testVisual = factory.CreateVisual( propertyMap );
-    Property::Map returnedMap;
-    testVisual.CreatePropertyMap( returnedMap );
-
-    Property::Value* renderIfTransparentProperty = returnedMap.Find( DevelColorVisual::Property::RENDER_IF_TRANSPARENT );
-    DALI_TEST_CHECK( renderIfTransparentProperty );
-    DALI_TEST_EQUALS( renderIfTransparentProperty->Get< bool >(), true, TEST_LOCATION );
-  }
-
-  propertyMap[ DevelColorVisual::Property::RENDER_IF_TRANSPARENT ] = Color::BLUE;
-
-  tet_infoline( "Ensure it returns default value if set to wrong type" );
-  {
-    Visual::Base testVisual = factory.CreateVisual( propertyMap );
-    Property::Map returnedMap;
-    testVisual.CreatePropertyMap( returnedMap );
-
-    Property::Value* renderIfTransparentProperty = returnedMap.Find( DevelColorVisual::Property::RENDER_IF_TRANSPARENT );
-    DALI_TEST_CHECK( renderIfTransparentProperty );
-    DALI_TEST_EQUALS( renderIfTransparentProperty->Get< bool >(), false, TEST_LOCATION );
-  }
-
-  END_TEST;
-}
-
 int UtcDaliSvgVisualCustomShader(void)
 {
   ToolkitTestApplication application;
@@ -4233,11 +4183,6 @@ int UtcDaliVisualGetVisualProperty01(void)
   Property property1 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::PREMULTIPLIED_ALPHA);
   DALI_TEST_CHECK(!property1.object);
   DALI_TEST_CHECK(property1.propertyIndex == Property::INVALID_INDEX);
-
-  // Test not-supported property
-  Property property2 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelColorVisual::Property::RENDER_IF_TRANSPARENT);
-  DALI_TEST_CHECK(!property2.object);
-  DALI_TEST_CHECK(property2.propertyIndex == Property::INVALID_INDEX);
 
   // Test unregistered visual
   Property property3 = DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL2, Visual::Property::MIX_COLOR);
