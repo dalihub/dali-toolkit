@@ -568,7 +568,8 @@ void TextureManager::Remove(const TextureManager::TextureId textureId, TextureUp
       {
         if(element.mObserver == observer)
         {
-          mLoadQueue.Erase(&element);
+          // Do not erase the item. We will clear it later in ProcessQueuedTextures().
+          element.mObserver = nullptr;
           break;
         }
       }

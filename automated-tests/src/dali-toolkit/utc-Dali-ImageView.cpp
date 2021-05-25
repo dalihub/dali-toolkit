@@ -2743,7 +2743,7 @@ namespace
 
 static int gResourceReadySignalCounter = 0;
 
-void OnResourceReadySignal( Control control )
+void OnResourceReadySignal01( Control control )
 {
   gResourceReadySignalCounter++;
 
@@ -2764,7 +2764,7 @@ void OnResourceReadySignal( Control control )
   }
 }
 
-void OnResourceReadySignal01( Control control )
+void OnResourceReadySignal02( Control control )
 {
   if(++gResourceReadySignalCounter == 1)
   {
@@ -2774,6 +2774,34 @@ void OnResourceReadySignal01( Control control )
                                                          .Add(ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::NEVER);
     control[ImageView::Property::IMAGE] = TEST_IMAGE_1;
   }
+}
+
+ImageView gImageView1;
+ImageView gImageView2;
+ImageView gImageView3;
+
+void OnResourceReadySignal03( Control control )
+{
+  if(gResourceReadySignalCounter == 0)
+  {
+    // Queue loading
+    // 1. Use cached image, then UploadComplete will be called right after OnResourceReadySignal03.
+    gImageView2[ImageView::Property::IMAGE] = gImage_34_RGBA;
+
+    // 2. Load a new image
+    gImageView3[ImageView::Property::IMAGE] = TEST_IMAGE_1;
+
+    // 3. Use the new image again
+    gImageView1[ImageView::Property::IMAGE] = TEST_IMAGE_1;
+    gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal03);
+  }
+  else if(gResourceReadySignalCounter == 1)
+  {
+    // This is called from TextureManager::ProcessQueuedTextures().
+    gImageView1.Unparent();
+    gImageView1.Reset();
+  }
+  gResourceReadySignalCounter++;
 }
 
 }
@@ -2787,7 +2815,7 @@ int UtcDaliImageViewSetImageOnResourceReadySignal01(void)
   gResourceReadySignalCounter = 0;
 
   ImageView imageView = ImageView::New( gImage_34_RGBA );
-  imageView.ResourceReadySignal().Connect( &OnResourceReadySignal );
+  imageView.ResourceReadySignal().Connect( &OnResourceReadySignal01 );
 
   application.GetScene().Add( imageView );
 
@@ -2829,7 +2857,7 @@ int UtcDaliImageViewSetImageOnResourceReadySignal02(void)
   gResourceReadySignalCounter = 0;
 
   ImageView imageView = ImageView::New( gImage_34_RGBA );
-  imageView.ResourceReadySignal().Connect( &OnResourceReadySignal01 );
+  imageView.ResourceReadySignal().Connect( &OnResourceReadySignal02 );
 
   application.GetScene().Add( imageView );
 
@@ -2844,6 +2872,35 @@ int UtcDaliImageViewSetImageOnResourceReadySignal02(void)
   DALI_TEST_EQUALS( gResourceReadySignalCounter, 2, TEST_LOCATION );
 
   DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewSetImageOnResourceReadySignal03(void)
+{
+  tet_infoline("Test setting image from within signal handler.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  gImageView1 = ImageView::New(gImage_34_RGBA);
+  application.GetScene().Add(gImageView1);
+
+  // Wait for loading
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  gImageView2 = ImageView::New(gImage_600_RGB);
+  gImageView2.ResourceReadySignal().Connect(&OnResourceReadySignal03);
+  application.GetScene().Add(gImageView2);
+
+  gImageView3 = ImageView::New();
+  application.GetScene().Add(gImageView3);
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
