@@ -64,7 +64,6 @@ extern const char* const CORNER_RADIUS;
 extern const char* const CORNER_RADIUS_POLICY;
 
 // Color visual
-extern const char* const RENDER_IF_TRANSPARENT_NAME;
 extern const char* const BLUR_RADIUS_NAME;
 
 // Image visual

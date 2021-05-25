@@ -51,7 +51,6 @@ ColorVisual::ColorVisual(VisualFactoryCache& factoryCache)
 : Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::COLOR),
   mBlurRadius(0.0f),
   mBlurRadiusIndex(Property::INVALID_INDEX),
-  mRenderIfTransparent(false),
   mNeedBlurRadius(false)
 {
 }
@@ -87,15 +86,6 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* renderIfTransparentValue = propertyMap.Find(Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT, RENDER_IF_TRANSPARENT_NAME);
-  if(renderIfTransparentValue)
-  {
-    if(!renderIfTransparentValue->Get(mRenderIfTransparent))
-    {
-      DALI_LOG_ERROR("ColorVisual: renderIfTransparent property has incorrect type: %d\n", renderIfTransparentValue->GetType());
-    }
-  }
-
   Property::Value* blurRadiusValue = propertyMap.Find(Toolkit::DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME);
   if(blurRadiusValue)
   {
@@ -108,12 +98,7 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
 
 void ColorVisual::DoSetOnScene(Actor& actor)
 {
-  // Only add the renderer if it's not fully transparent
-  // We cannot avoid creating a renderer as it's used in the base class
-  if(mRenderIfTransparent || mImpl->mMixColor.a > 0.0f)
-  {
-    actor.AddRenderer(mImpl->mRenderer);
-  }
+  actor.AddRenderer(mImpl->mRenderer);
 
   // Color Visual generated and ready to display
   ResourceReady(Toolkit::Visual::ResourceStatus::READY);
@@ -129,7 +114,6 @@ void ColorVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Clear();
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
   map.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, mImpl->mMixColor);
-  map.Insert(Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT, mRenderIfTransparent);
 
   if(mImpl->mRenderer && mBlurRadiusIndex != Property::INVALID_INDEX)
   {

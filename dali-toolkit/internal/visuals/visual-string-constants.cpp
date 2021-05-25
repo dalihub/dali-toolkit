@@ -80,7 +80,6 @@ const char* const CORNER_RADIUS("cornerRadius");
 const char* const CORNER_RADIUS_POLICY("cornerRadiusPolicy");
 
 // Color visual
-const char* const RENDER_IF_TRANSPARENT_NAME("renderIfTransparent");
 const char* const BLUR_RADIUS_NAME("blurRadius");
 
 // Image visual
