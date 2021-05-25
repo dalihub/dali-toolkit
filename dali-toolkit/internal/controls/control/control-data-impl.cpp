@@ -420,7 +420,6 @@ const PropertyRegistration Control::Impl::PROPERTY_18(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_19(typeRegistration, "accessibilityTranslationDomain", Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN, Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_20(typeRegistration, "accessibilityRole",              Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE,               Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_21(typeRegistration, "accessibilityHighlightable",     Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE,      Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_22(typeRegistration, "accessibilityAnimated",          Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED,           Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 // clang-format on
 
 Control::Impl::Impl(Control& controlImpl)
@@ -1234,16 +1233,6 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         }
         break;
       }
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED:
-      {
-        bool animated;
-        if(value.Get(animated))
-        {
-          controlImpl.mImpl->mAccessibilityAnimated = animated;
-        }
-        break;
-      }
     }
   }
 }
@@ -1402,12 +1391,6 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
       {
         value = controlImpl.mImpl->mAccessibilityAttributes;
-        break;
-      }
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED:
-      {
-        value = controlImpl.mImpl->mAccessibilityAnimated;
         break;
       }
     }
@@ -1911,16 +1894,6 @@ Dali::Accessibility::Accessible* Control::Impl::GetAccessibilityObject(Dali::Act
   return nullptr;
 }
 
-void Control::Impl::PositionOrSizeChangedCallback(PropertyNotification& p)
-{
-  auto self = Dali::Actor::DownCast(p.GetTarget());
-  if(Dali::Accessibility::IsUp() && !self.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED).Get<bool>())
-  {
-    auto extents = DevelActor::CalculateScreenExtents(self);
-    Dali::Accessibility::Accessible::Get(self)->EmitBoundsChanged(extents);
-  }
-}
-
 void Control::Impl::CulledChangedCallback(PropertyNotification& p)
 {
   if(Dali::Accessibility::IsUp())
@@ -1934,14 +1907,6 @@ void Control::Impl::AccessibilityRegister()
 {
   if(!accessibilityNotificationSet)
   {
-    accessibilityNotificationPosition = mControlImpl.Self().AddPropertyNotification(Actor::Property::POSITION, StepCondition(0.01f));
-    accessibilityNotificationPosition.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
-    accessibilityNotificationPosition.NotifySignal().Connect(&Control::Impl::PositionOrSizeChangedCallback);
-
-    accessibilityNotificationSize = mControlImpl.Self().AddPropertyNotification(Actor::Property::SIZE, StepCondition(0.01f));
-    accessibilityNotificationSize.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
-    accessibilityNotificationSize.NotifySignal().Connect(&Control::Impl::PositionOrSizeChangedCallback);
-
     accessibilityNotificationCulled = mControlImpl.Self().AddPropertyNotification(DevelActor::Property::CULLED, LessThanCondition(0.5f));
     accessibilityNotificationCulled.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
     accessibilityNotificationCulled.NotifySignal().Connect(&Control::Impl::CulledChangedCallback);
@@ -1954,22 +1919,6 @@ void Control::Impl::AccessibilityDeregister(bool remove)
 {
   if(accessibilityNotificationSet)
   {
-    accessibilityNotificationPosition.NotifySignal().Disconnect(&Control::Impl::PositionOrSizeChangedCallback);
-    if(remove)
-    {
-      mControlImpl.Self().RemovePropertyNotification(accessibilityNotificationPosition);
-    }
-    accessibilityNotificationPosition.Reset();
-    accessibilityNotificationPosition = {};
-
-    accessibilityNotificationSize.NotifySignal().Disconnect(&Control::Impl::PositionOrSizeChangedCallback);
-    if(remove)
-    {
-      mControlImpl.Self().RemovePropertyNotification(accessibilityNotificationSize);
-    }
-    accessibilityNotificationSize.Reset();
-    accessibilityNotificationSize     = {};
-
     accessibilityNotificationCulled.NotifySignal().Disconnect(&Control::Impl::CulledChangedCallback);
     if(remove)
     {

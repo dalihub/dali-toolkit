@@ -168,7 +168,6 @@ Dali::Accessibility::States AccessibleImpl::CalculateStates()
   s[Dali::Accessibility::State::HIGHLIGHTED] = GetCurrentlyHighlightedActor() == self;
   s[Dali::Accessibility::State::ENABLED]     = true;
   s[Dali::Accessibility::State::SENSITIVE]   = true;
-  s[Dali::Accessibility::State::ANIMATED]    = self.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED).Get<bool>();
   s[Dali::Accessibility::State::VISIBLE]     = true;
   if(modal)
   {
@@ -262,7 +261,6 @@ static Dali::Actor CreateHighlightIndicatorActor()
   auto actor = Toolkit::ImageView::New(focusBorderImagePath);
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   DevelControl::AppendAccessibilityAttribute(actor, "highlight", "");
-  actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_ANIMATED, true);
   actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
 
   return actor;
