@@ -44,10 +44,12 @@ SET(TEST_HARNESS_SOURCES
   ${TEST_HARNESS_DIR}/test-harness.cpp
   ${TEST_HARNESS_DIR}/test-gesture-generator.cpp
   ${TEST_HARNESS_DIR}/test-gl-abstraction.cpp
-  ${TEST_HARNESS_DIR}/test-gl-sync-abstraction.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-sync-impl.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-sync-object.cpp
   ${TEST_HARNESS_DIR}/test-graphics-buffer.cpp
   ${TEST_HARNESS_DIR}/test-graphics-command-buffer.cpp
   ${TEST_HARNESS_DIR}/test-graphics-controller.cpp
+  ${TEST_HARNESS_DIR}/test-graphics-framebuffer.cpp
   ${TEST_HARNESS_DIR}/test-graphics-texture.cpp
   ${TEST_HARNESS_DIR}/test-graphics-sampler.cpp
   ${TEST_HARNESS_DIR}/test-graphics-program.cpp
@@ -129,4 +131,3 @@ ADD_CUSTOM_TARGET(
   ALL
   COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER} | grep "SHADER_SHADER_DEFINE_DEF" | grep "shader-define-def.h" > /dev/null 2>&1 && echo "test_def_correct Succeeded"
   VERBATIM)
-

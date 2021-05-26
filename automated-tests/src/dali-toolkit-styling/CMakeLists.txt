@@ -45,10 +45,12 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-platform-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-gl-abstraction.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-graphics-sync-impl.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-graphics-sync-object.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-buffer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-command-buffer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-controller.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-graphics-framebuffer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-texture.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-pipeline.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-program.cpp
