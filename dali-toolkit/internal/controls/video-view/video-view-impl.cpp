@@ -21,13 +21,13 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/devel-api/rendering/texture-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/rendering/texture-devel.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
@@ -122,6 +122,9 @@ void VideoView::OnInitialize()
     return std::unique_ptr<Dali::Accessibility::Accessible>(
       new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::VIDEO));
   });
+
+  //Enable highightability
+  Self().SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
 
   //update self property
   self.RegisterProperty(IS_VIDEO_VIEW_PROPERTY_NAME, true, Property::READ_WRITE);
