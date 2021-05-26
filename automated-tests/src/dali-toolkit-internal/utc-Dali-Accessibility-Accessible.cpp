@@ -64,3 +64,69 @@ int utcDaliAccessibilityCheckLabelText(void)
 
   END_TEST;
 }
+
+int UtcDaliAccessibilityCheckShowingState(void)
+{
+  ToolkitTestApplication application;
+
+  auto parentButton = Toolkit::PushButton::New();
+  parentButton.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  parentButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  parentButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentButton.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
+  parentButton.SetProperty(Actor::Property::SIZE, Dali::Vector2(200.0f, 200.0f));
+  application.GetScene().Add( parentButton );
+
+  // Toatally inside of parent
+  auto buttonA = Toolkit::PushButton::New();
+  buttonA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  buttonA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonA.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
+  buttonA.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f));
+  parentButton.Add(buttonA);
+
+  // Toatally outside of parent
+  auto buttonB = Toolkit::PushButton::New();
+  buttonB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  buttonB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonB.SetProperty(Actor::Property::POSITION, Dali::Vector2(300.0f, 300.0f));
+  buttonB.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f));
+  parentButton.Add(buttonB);
+
+  // Partially inside of parent
+  auto buttonC = Toolkit::PushButton::New();
+  buttonC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  buttonC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonC.SetProperty(Actor::Property::POSITION, Dali::Vector2(100.0f,100.0f));
+  buttonC.SetProperty(Actor::Property::SIZE, Dali::Vector2(200.0f, 200.0f));
+  parentButton.Add(buttonC);
+
+  application.SendNotification();
+  application.Render(16);
+
+  auto q = Dali::Accessibility::Accessible::Get(buttonA);
+  DALI_TEST_CHECK(q);
+  auto states = q->GetStates();
+  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) true, TEST_LOCATION);
+
+  q = Dali::Accessibility::Accessible::Get(buttonB);
+  DALI_TEST_CHECK(q);
+  states = q->GetStates();
+  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) false, TEST_LOCATION);
+
+  q = Dali::Accessibility::Accessible::Get(buttonC);
+  DALI_TEST_CHECK(q);
+  states = q->GetStates();
+  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) true, TEST_LOCATION);
+
+  // Make SHOWING object invisible
+  buttonC.SetProperty(Actor::Property::VISIBLE, false);
+
+  application.SendNotification();
+  application.Render(16);
+
+  states = q->GetStates();
+  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) false, TEST_LOCATION);
+
+  END_TEST;
+}

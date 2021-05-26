@@ -76,6 +76,12 @@ protected:
    */
   void UnregisterPositionPropertyNotification();
 
+  /**
+   * @brief Check if the actor is showing
+   * @return True if the actor is showing
+   */
+  bool IsShowing();
+
 public:
   AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
 

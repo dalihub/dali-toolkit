@@ -199,6 +199,37 @@ std::string AccessibleImpl::GetLocalizedRoleName()
   return GetLocaleText(GetRoleName());
 }
 
+bool AccessibleImpl::IsShowing()
+{
+  Dali::Actor self = Self();
+  if(self.GetProperty(Dali::DevelActor::Property::CULLED).Get<bool>() || !self.GetCurrentProperty<bool>(Actor::Property::VISIBLE))
+  {
+    return false;
+  }
+
+  auto* child  = this;
+  auto* parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(child->GetParent());
+  if(!parent)
+  {
+    return true;
+  }
+
+  auto childExtent = child->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
+  while(parent)
+  {
+    auto control      = Dali::Toolkit::Control::DownCast(parent->Self());
+    auto clipMode     = control.GetProperty(Actor::Property::CLIPPING_MODE).Get<bool>();
+    auto parentExtent = parent->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
+    if ((clipMode != ClippingMode::DISABLED) && !parentExtent.Intersects(childExtent))
+    {
+      return false;
+    }
+    parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(parent->GetParent());
+  }
+
+  return true;
+}
+
 Dali::Accessibility::States AccessibleImpl::CalculateStates()
 {
   Dali::Actor self = Self();
@@ -224,8 +255,7 @@ Dali::Accessibility::States AccessibleImpl::CalculateStates()
   {
     state[Dali::Accessibility::State::MODAL] = true;
   }
-  state[Dali::Accessibility::State::SHOWING] = !self.GetProperty(Dali::DevelActor::Property::CULLED).Get<bool>() && self.GetCurrentProperty<bool>(Actor::Property::VISIBLE);
-
+  state[Dali::Accessibility::State::SHOWING] = IsShowing();
   state[Dali::Accessibility::State::DEFUNCT] = !self.GetProperty(Dali::DevelActor::Property::CONNECTED_TO_SCENE).Get<bool>();
   return state;
 }
