@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
@@ -839,6 +840,9 @@ void TextLabel::OnTap(const TapGesture& gesture)
   padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
   const Vector2& localPoint = gesture.GetLocalPoint();
   mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
+
+  // parents can also listen for tap gesture events
+  Dali::DevelActor::SetNeedGesturePropagation(Self(), true);
 }
 
 void TextLabel::AnchorClicked(const std::string& href)
