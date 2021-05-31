@@ -524,13 +524,10 @@ void Control::OnSceneConnection(int depth)
 
   // The clipping renderer is only created if required.
   CreateClippingRenderer(*this);
-
-  mImpl->AccessibilityRegister();
 }
 
 void Control::OnSceneDisconnection()
 {
-  mImpl->AccessibilityDeregister(true);
   mImpl->OnSceneDisconnection();
 }
 
