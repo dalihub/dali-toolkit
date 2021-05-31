@@ -1894,42 +1894,6 @@ Dali::Accessibility::Accessible* Control::Impl::GetAccessibilityObject(Dali::Act
   return nullptr;
 }
 
-void Control::Impl::CulledChangedCallback(PropertyNotification& p)
-{
-  if(Dali::Accessibility::IsUp())
-  {
-    auto self = Dali::Actor::DownCast(p.GetTarget());
-    Dali::Accessibility::Accessible::Get(self)->EmitShowing(!self.GetProperty(DevelActor::Property::CULLED).Get<bool>());
-  }
-}
-
-void Control::Impl::AccessibilityRegister()
-{
-  if(!accessibilityNotificationSet)
-  {
-    accessibilityNotificationCulled = mControlImpl.Self().AddPropertyNotification(DevelActor::Property::CULLED, LessThanCondition(0.5f));
-    accessibilityNotificationCulled.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
-    accessibilityNotificationCulled.NotifySignal().Connect(&Control::Impl::CulledChangedCallback);
-
-    accessibilityNotificationSet = true;
-  }
-}
-
-void Control::Impl::AccessibilityDeregister(bool remove)
-{
-  if(accessibilityNotificationSet)
-  {
-    accessibilityNotificationCulled.NotifySignal().Disconnect(&Control::Impl::CulledChangedCallback);
-    if(remove)
-    {
-      mControlImpl.Self().RemovePropertyNotification(accessibilityNotificationCulled);
-    }
-    accessibilityNotificationCulled.Reset();
-    accessibilityNotificationCulled   = {};
-    accessibilityNotificationSet      = false;
-  }
-}
-
 } // namespace Internal
 
 } // namespace Toolkit
