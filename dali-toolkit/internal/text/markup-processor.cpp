@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/markup-processor-anchor.h>
+#include <dali-toolkit/internal/text/markup-processor-background.h>
 #include <dali-toolkit/internal/text/markup-processor-color.h>
 #include <dali-toolkit/internal/text/markup-processor-embedded-item.h>
 #include <dali-toolkit/internal/text/markup-processor-font.h>
@@ -53,6 +54,7 @@ const std::string XHTML_GLOW_TAG("glow");
 const std::string XHTML_OUTLINE_TAG("outline");
 const std::string XHTML_ITEM_TAG("item");
 const std::string XHTML_ANCHOR_TAG("a");
+const std::string XHTML_BACKGROUND_TAG("background");
 
 const char LESS_THAN      = '<';
 const char GREATER_THAN   = '>';
@@ -631,12 +633,14 @@ void ProcessAnchorTag(
  * @param[in] fontRunIndex The font run index
  * @param[in] colorRunIndex The color run index
  * @param[in] underlinedCharacterRunIndex The underlined character run index
+ * @param[in] backgroundRunIndex The background run index
  */
-void ResizeModelVectors(MarkupProcessData& markupProcessData, const StyleStack::RunIndex fontRunIndex, const StyleStack::RunIndex colorRunIndex, const StyleStack::RunIndex underlinedCharacterRunIndex)
+void ResizeModelVectors(MarkupProcessData& markupProcessData, const StyleStack::RunIndex fontRunIndex, const StyleStack::RunIndex colorRunIndex, const StyleStack::RunIndex underlinedCharacterRunIndex, const StyleStack::RunIndex backgroundRunIndex)
 {
   markupProcessData.fontRuns.Resize(fontRunIndex);
   markupProcessData.colorRuns.Resize(colorRunIndex);
   markupProcessData.underlinedCharacterRuns.Resize(underlinedCharacterRunIndex);
+  markupProcessData.backgroundColorRuns.Resize(backgroundRunIndex);
 
 #ifdef DEBUG_ENABLED
   for(unsigned int i = 0; i < colorRunIndex; ++i)
@@ -753,21 +757,24 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   StyleStack styleStack;
 
   // Points the next free position in the vector of runs.
-  StyleStack::RunIndex colorRunIndex                = 0u;
-  StyleStack::RunIndex fontRunIndex                 = 0u;
-  StyleStack::RunIndex underlinedCharacterRunIndex  = 0u;
+  StyleStack::RunIndex colorRunIndex               = 0u;
+  StyleStack::RunIndex fontRunIndex                = 0u;
+  StyleStack::RunIndex underlinedCharacterRunIndex = 0u;
+  StyleStack::RunIndex backgroundRunIndex          = 0u;
 
   // check tag reference
-  int colorTagReference = 0u;
-  int fontTagReference  = 0u;
-  int iTagReference     = 0u;
-  int bTagReference     = 0u;
-  int uTagReference     = 0u;
+  int colorTagReference      = 0u;
+  int fontTagReference       = 0u;
+  int iTagReference          = 0u;
+  int bTagReference          = 0u;
+  int uTagReference          = 0u;
+  int backgroundTagReference = 0u;
 
   // Give an initial default value to the model's vectors.
   markupProcessData.colorRuns.Reserve(DEFAULT_VECTOR_SIZE);
   markupProcessData.fontRuns.Reserve(DEFAULT_VECTOR_SIZE);
   markupProcessData.underlinedCharacterRuns.Reserve(DEFAULT_VECTOR_SIZE);
+  markupProcessData.backgroundColorRuns.Reserve(DEFAULT_VECTOR_SIZE);
 
   // Get the mark-up string buffer.
   const char*       markupStringBuffer    = markupString.c_str();
@@ -798,8 +805,8 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       else if(TokenComparison(XHTML_U_TAG, tag.buffer, tag.length))
       {
         ProcessTagForRun<UnderlinedCharacterRun>(
-          markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& tag, UnderlinedCharacterRun& run) {  });
-      }  // <u></u>
+          markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& tag, UnderlinedCharacterRun& run) {});
+      } // <u></u>
       else if(TokenComparison(XHTML_B_TAG, tag.buffer, tag.length))
       {
         ProcessTagForRun<FontDescriptionRun>(
@@ -844,6 +851,11 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       {
         ProcessItemTag(markupProcessData, tag, characterIndex);
       }
+      else if(TokenComparison(XHTML_BACKGROUND_TAG, tag.buffer, tag.length))
+      {
+        ProcessTagForRun<ColorRun>(
+          markupProcessData.backgroundColorRuns, styleStack, tag, characterIndex, backgroundRunIndex, backgroundTagReference, [](const Tag& tag, ColorRun& run) { ProcessBackground(tag, run); });
+      }
     } // end if( IsTag() )
     else if(markupStringBuffer < markupStringEndBuffer)
     {
@@ -852,7 +864,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   }
 
   // Resize the model's vectors.
-  ResizeModelVectors(markupProcessData, fontRunIndex, colorRunIndex, underlinedCharacterRunIndex);
+  ResizeModelVectors(markupProcessData, fontRunIndex, colorRunIndex, underlinedCharacterRunIndex, backgroundRunIndex);
 }
 
 } // namespace Text

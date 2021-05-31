@@ -96,6 +96,11 @@ public:
   const ColorIndex* const GetBackgroundColorIndices() const override;
 
   /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::IsMarkupBackgroundColorSet()
+   */
+  bool const IsMarkupBackgroundColorSet() const;
+
+  /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetTextColor()
    */
   const Vector4& GetTextColor() const override;

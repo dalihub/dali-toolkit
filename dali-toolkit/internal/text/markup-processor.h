@@ -40,16 +40,18 @@ namespace Text
  */
 struct MarkupProcessData
 {
-  MarkupProcessData(Vector<ColorRun>&           colorRuns,
-                    Vector<FontDescriptionRun>& fontRuns,
-                    Vector<EmbeddedItem>&       items,
-                    Vector<Anchor>&             anchors,
-                    Vector<UnderlinedCharacterRun>& underlinedCharacterRuns)
+  MarkupProcessData(Vector<ColorRun>&               colorRuns,
+                    Vector<FontDescriptionRun>&     fontRuns,
+                    Vector<EmbeddedItem>&           items,
+                    Vector<Anchor>&                 anchors,
+                    Vector<UnderlinedCharacterRun>& underlinedCharacterRuns,
+                    Vector<ColorRun>&               backgroundColorRuns)
   : colorRuns(colorRuns),
     fontRuns(fontRuns),
     items(items),
     anchors(anchors),
     underlinedCharacterRuns(underlinedCharacterRuns),
+    backgroundColorRuns(backgroundColorRuns),
     markupProcessedText()
   {
   }
@@ -59,6 +61,7 @@ struct MarkupProcessData
   Vector<EmbeddedItem>&           items;                   ///< The embedded items.
   Vector<Anchor>&                 anchors;                 ///< The anchors.
   Vector<UnderlinedCharacterRun>& underlinedCharacterRuns; ///< The underlined character runs.
+  Vector<ColorRun>&               backgroundColorRuns;     ///< The background color runs.
   std::string                     markupProcessedText;     ///< The mark-up string.
 };
 

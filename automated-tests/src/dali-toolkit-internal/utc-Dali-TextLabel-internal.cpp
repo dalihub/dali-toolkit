@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,4 +66,35 @@ int UtcDaliTextLabelMarkupUnderline(void)
 
   END_TEST;
 
+}
+
+int UtcDaliTextLabelBackgroundTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextLabelBackgroundTag\n");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK( label );
+
+  label.SetProperty( TextLabel ::Property::ENABLE_MARKUP,  true );
+  label.SetProperty( TextLabel::Property::TEXT, "H<background color='red'>e</background> Worl<background color='yellow'>d</background>" );
+  application.GetScene().Add( label );
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextLabel& labelImpl = GetImpl( label );
+  const ColorIndex* const backgroundColorIndicesBuffer = labelImpl.getController()->GetTextModel()->GetBackgroundColorIndices();
+
+  DALI_TEST_CHECK( backgroundColorIndicesBuffer );
+
+  //default color
+  DALI_TEST_EQUALS( backgroundColorIndicesBuffer[0], 0u, TEST_LOCATION);
+
+  //red color
+  DALI_TEST_EQUALS( backgroundColorIndicesBuffer[1], 1u, TEST_LOCATION);
+
+  //yellow color
+  DALI_TEST_EQUALS( backgroundColorIndicesBuffer[7], 2u, TEST_LOCATION);
+
+  END_TEST;
 }

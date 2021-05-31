@@ -343,6 +343,16 @@ const ColorIndex* const View::GetBackgroundColorIndices() const
   return nullptr;
 }
 
+bool const View::IsMarkupBackgroundColorSet() const
+{
+  if(mImpl->mVisualModel)
+  {
+    return (mImpl->mVisualModel->mBackgroundColorIndices.Count() > 0);
+  }
+
+  return false;
+}
+
 const Vector4& View::GetTextColor() const
 {
   if(mImpl->mVisualModel)

@@ -143,6 +143,11 @@ public:
   const ColorIndex* const GetBackgroundColorIndices() const override;
 
   /**
+   * @copydoc ModelInterface::IsMarkupBackgroundColorSet()
+   */
+  bool const IsMarkupBackgroundColorSet() const override;
+
+  /**
    * @copydoc ModelInterface::GetDefaultColor()
    */
   const Vector4& GetDefaultColor() const override;

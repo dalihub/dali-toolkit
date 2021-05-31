@@ -847,7 +847,7 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
     mModel->mVisualModel->CreateGlyphsPerCharacterTable(startIndex, mTextUpdateInfo.mStartGlyphIndex, requestedNumberOfCharacters);
     mModel->mVisualModel->CreateCharacterToGlyphTable(startIndex, mTextUpdateInfo.mStartGlyphIndex, requestedNumberOfCharacters);
 
-   updated = true;
+    updated = true;
   }
 
   const Length numberOfGlyphs = glyphs.Count() - currentNumberOfGlyphs;
@@ -1056,9 +1056,9 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
   }
 
   if((NO_OPERATION != (SHAPE_TEXT & operations)) &&
-      ! ((nullptr != mEventData) &&
-         mEventData->mPreEditFlag &&
-         (0u != mModel->mVisualModel->mCharactersToGlyph.Count())))
+     !((nullptr != mEventData) &&
+       mEventData->mPreEditFlag &&
+       (0u != mModel->mVisualModel->mCharactersToGlyph.Count())))
   {
     //Mark-up processor case
     if(mModel->mVisualModel->IsMarkupProcessorEnabled())
@@ -1068,7 +1068,6 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
 
     updated = true;
   }
-
 
   // The estimated number of lines. Used to avoid reallocations when layouting.
   mTextUpdateInfo.mEstimatedNumberOfLines = std::max(mModel->mVisualModel->mLines.Count(), mModel->mLogicalModel->mParagraphInfo.Count());
@@ -2018,8 +2017,7 @@ void Controller::Impl::RequestRelayout()
 
 Actor Controller::Impl::CreateBackgroundActor()
 {
-  // NOTE: Currently we only support background color for one line left-to-right text,
-  //       so the following calculation is based on one line left-to-right text only!
+  // NOTE: Currently we only support background color for left-to-right text.
 
   Actor actor;
 
@@ -2060,8 +2058,12 @@ Actor Controller::Impl::CreateBackgroundActor()
     const ColorIndex* const backgroundColorIndicesBuffer = mView.GetBackgroundColorIndices();
     const Vector4&          defaultBackgroundColor       = mModel->mVisualModel->IsBackgroundEnabled() ? mModel->mVisualModel->GetBackgroundColor() : Color::TRANSPARENT;
 
-    Vector4  quad;
-    uint32_t numberOfQuads = 0u;
+    Vector4   quad;
+    uint32_t  numberOfQuads = 0u;
+    Length    yLineOffset   = 0;
+    Length    prevLineIndex = 0;
+    LineIndex lineIndex;
+    Length    numberOfLines;
 
     for(uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i)
     {
@@ -2072,6 +2074,14 @@ Actor Controller::Impl::CreateBackgroundActor()
       const ColorIndex backgroundColorIndex = (nullptr == backgroundColorsBuffer) ? 0u : *(backgroundColorIndicesBuffer + i);
       const Vector4&   backgroundColor      = (0u == backgroundColorIndex) ? defaultBackgroundColor : *(backgroundColorsBuffer + backgroundColorIndex - 1u);
 
+      mModel->mVisualModel->GetNumberOfLines(i, 1, lineIndex, numberOfLines);
+      Length lineHeight = lineRun[lineIndex].ascender + -(lineRun[lineIndex].descender) + lineRun[lineIndex].lineSpacing;
+
+      if(lineIndex != prevLineIndex)
+      {
+        yLineOffset += lineHeight;
+      }
+
       // Only create quads for glyphs with a background color
       if(backgroundColor != Color::TRANSPARENT)
       {
@@ -2080,30 +2090,30 @@ Actor Controller::Impl::CreateBackgroundActor()
         if(i == 0u && glyphSize == 1u) // Only one glyph in the whole text
         {
           quad.x = position.x;
-          quad.y = 0.0f;
+          quad.y = yLineOffset;
           quad.z = quad.x + std::max(glyph.advance, glyph.xBearing + glyph.width);
-          quad.w = textSize.height;
+          quad.w = lineHeight;
         }
-        else if(i == 0u) // The first glyph in the whole text
+        else if((lineIndex != prevLineIndex) || (i == 0u)) // The first glyph in the line
         {
           quad.x = position.x;
-          quad.y = 0.0f;
+          quad.y = yLineOffset;
           quad.z = quad.x - glyph.xBearing + glyph.advance;
-          quad.w = textSize.height;
+          quad.w = quad.y + lineHeight;
         }
         else if(i == glyphSize - 1u) // The last glyph in the whole text
         {
           quad.x = position.x - glyph.xBearing;
-          quad.y = 0.0f;
+          quad.y = yLineOffset;
           quad.z = quad.x + std::max(glyph.advance, glyph.xBearing + glyph.width);
-          quad.w = textSize.height;
+          quad.w = quad.y + lineHeight;
         }
         else // The glyph in the middle of the text
         {
           quad.x = position.x - glyph.xBearing;
-          quad.y = 0.0f;
+          quad.y = yLineOffset;
           quad.z = quad.x + glyph.advance;
-          quad.w = textSize.height;
+          quad.w = quad.y + lineHeight;
         }
 
         BackgroundVertex vertex;
@@ -2141,6 +2151,11 @@ Actor Controller::Impl::CreateBackgroundActor()
         mesh.mIndices.PushBack(1u + 4 * numberOfQuads);
 
         numberOfQuads++;
+      }
+
+      if(lineIndex != prevLineIndex)
+      {
+        prevLineIndex = lineIndex;
       }
     }
 
@@ -2182,28 +2197,28 @@ Actor Controller::Impl::CreateBackgroundActor()
 
 void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns)
 {
-    //Underlined character runs for markup-processor
-    const Vector<UnderlinedCharacterRun>& underlinedCharacterRuns = mModel->mLogicalModel->mUnderlinedCharacterRuns;
-    const Vector<GlyphIndex>&             charactersToGlyph       = mModel->mVisualModel->mCharactersToGlyph;
-    const Vector<Length>&                 glyphsPerCharacter      = mModel->mVisualModel->mGlyphsPerCharacter;
+  //Underlined character runs for markup-processor
+  const Vector<UnderlinedCharacterRun>& underlinedCharacterRuns = mModel->mLogicalModel->mUnderlinedCharacterRuns;
+  const Vector<GlyphIndex>&             charactersToGlyph       = mModel->mVisualModel->mCharactersToGlyph;
+  const Vector<Length>&                 glyphsPerCharacter      = mModel->mVisualModel->mGlyphsPerCharacter;
 
-    if(shouldClearPreUnderlineRuns)
-    {
-        mModel->mVisualModel->mUnderlineRuns.Clear();
-    }
+  if(shouldClearPreUnderlineRuns)
+  {
+    mModel->mVisualModel->mUnderlineRuns.Clear();
+  }
 
-    for(Vector<UnderlinedCharacterRun>::ConstIterator it = underlinedCharacterRuns.Begin(), endIt = underlinedCharacterRuns.End(); it != endIt; ++it)
+  for(Vector<UnderlinedCharacterRun>::ConstIterator it = underlinedCharacterRuns.Begin(), endIt = underlinedCharacterRuns.End(); it != endIt; ++it)
+  {
+    CharacterIndex characterIndex     = it->characterRun.characterIndex;
+    Length         numberOfCharacters = it->characterRun.numberOfCharacters;
+    for(Length index = 0u; index < numberOfCharacters; index++)
     {
-        CharacterIndex characterIndex = it->characterRun.characterIndex;
-        Length numberOfCharacters = it->characterRun.numberOfCharacters;
-        for(Length index=0u; index<numberOfCharacters; index++)
-        {
-          GlyphRun underlineGlyphRun;
-          underlineGlyphRun.glyphIndex     = charactersToGlyph[characterIndex + index];
-          underlineGlyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex + index];
-          mModel->mVisualModel->mUnderlineRuns.PushBack(underlineGlyphRun);
-        }
+      GlyphRun underlineGlyphRun;
+      underlineGlyphRun.glyphIndex     = charactersToGlyph[characterIndex + index];
+      underlineGlyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex + index];
+      mModel->mVisualModel->mUnderlineRuns.PushBack(underlineGlyphRun);
     }
+  }
 }
 
 } // namespace Text

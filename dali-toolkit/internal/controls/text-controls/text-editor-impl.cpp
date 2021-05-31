@@ -1560,15 +1560,49 @@ void TextEditor::RenderText(Text::Controller::UpdateTextType updateTextType)
 
     if(renderableActor != mRenderableActor)
     {
+      UnparentAndReset(mBackgroundActor);
       UnparentAndReset(mRenderableActor);
       mRenderableActor = renderableActor;
+
+      if(mRenderableActor)
+      {
+        mBackgroundActor = mController->CreateBackgroundActor();
+      }
     }
   }
 
   if(mRenderableActor)
   {
+    const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
+
+    float renderableActorPositionX, renderableActorPositionY;
+
+    if(mStencil)
+    {
+      renderableActorPositionX = scrollOffset.x + mAlignmentOffset;
+      renderableActorPositionY = scrollOffset.y;
+    }
+    else
+    {
+      Extents padding;
+      padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+
+      // Support Right-To-Left of padding
+      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+      if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
+      {
+        std::swap(padding.start, padding.end);
+      }
+
+      renderableActorPositionX = scrollOffset.x + mAlignmentOffset + padding.start;
+      renderableActorPositionY = scrollOffset.y + padding.top;
+    }
+
+    mRenderableActor.SetProperty(Actor::Property::POSITION, Vector2(renderableActorPositionX, renderableActorPositionY));
     // Make sure the actors are parented correctly with/without clipping
     Actor self = mStencil ? mStencil : Self();
+
+    Actor highlightActor;
 
     for(std::vector<Actor>::iterator it    = mClippingDecorationActors.begin(),
                                      endIt = mClippingDecorationActors.end();
@@ -1577,10 +1611,31 @@ void TextEditor::RenderText(Text::Controller::UpdateTextType updateTextType)
     {
       self.Add(*it);
       it->LowerToBottom();
+
+      if(it->GetProperty<std::string>(Dali::Actor::Property::NAME) == "HighlightActor")
+      {
+        highlightActor = *it;
+      }
     }
     mClippingDecorationActors.clear();
 
     self.Add(mRenderableActor);
+
+    if(mBackgroundActor)
+    {
+      if(mDecorator && mDecorator->IsHighlightVisible())
+      {
+        self.Add(mBackgroundActor);
+        mBackgroundActor.SetProperty(Actor::Property::POSITION, Vector2(renderableActorPositionX, renderableActorPositionY)); // In text field's coords.
+        mBackgroundActor.LowerBelow(highlightActor);
+      }
+      else
+      {
+        mRenderableActor.Add(mBackgroundActor);
+        mBackgroundActor.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f)); // In renderable actor's coords.
+        mBackgroundActor.LowerToBottom();
+      }
+    }
 
     ApplyScrollPosition();
   }
@@ -2323,7 +2378,7 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
   return states;
 }
 
-bool TextEditor::AccessibleImpl::InsertText(size_t startPosition,
+bool TextEditor::AccessibleImpl::InsertText(size_t      startPosition,
                                             std::string text)
 {
   auto slf = Toolkit::TextEditor::DownCast(Self());
