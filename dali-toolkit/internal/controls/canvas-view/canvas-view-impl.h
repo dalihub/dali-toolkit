@@ -33,10 +33,11 @@ namespace Dali
 {
 namespace Toolkit
 {
-class CanvasView;
-
 namespace Internal
 {
+class CanvasView;
+class CanvasViewRasterizeThread;
+
 class CanvasView : public Control, public Integration::Processor
 {
 public:
@@ -78,27 +79,37 @@ private: // From Control
    */
   void OnInitialize() override;
 
-protected: // Implementation of Processor
+  /**
+   * @bried Rasterize the canvas, and add it to the view.
+   *
+   * @param[in] size The target size of the canvas view rasterization.
+   */
+  void AddRasterizationTask();
+
+protected:
   /**
    * @copydoc Dali::Integration::Processor::Process()
    */
   void Process(bool postProcessor) override;
 
-private:
+public:
   /**
-   * @brief Draw drawables added to CanvasView on inner canvas.
-   * Then make that buffer into a texture and add it to renderer.
+   * @bried Apply the rasterized image to the canvas view
+   *
+   * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
    */
-  void Commit();
+  void ApplyRasterizedImage(PixelData rasterizedPixelData);
 
 private:
   CanvasView(const CanvasView&) = delete;
   CanvasView& operator=(const CanvasView&) = delete;
 
 private:
-  CanvasRenderer mCanvasRenderer;
-  Dali::Texture  mTexture;
-  bool           mChanged;
+  CanvasRenderer             mCanvasRenderer;
+  Dali::Texture              mTexture;
+  TextureSet                 mTextureSet;
+  Vector2                    mSize;
+  CanvasViewRasterizeThread* mCanvasViewRasterizeThread;
 };
 
 } // namespace Internal

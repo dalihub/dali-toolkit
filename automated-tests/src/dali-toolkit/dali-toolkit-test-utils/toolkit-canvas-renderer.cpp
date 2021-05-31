@@ -52,6 +52,16 @@ public:
      return true;
   }
 
+  bool IsCanvasChanged() const
+  {
+     return true;
+  }
+
+  bool Rasterize()
+  {
+     return true;
+  }
+
   bool AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
   {
     if (!drawable)
@@ -136,6 +146,16 @@ CanvasRenderer::CanvasRenderer( Internal::Adaptor::CanvasRenderer* internal )
 bool CanvasRenderer::Commit()
 {
   return Internal::Adaptor::GetImplementation(*this).Commit();
+}
+
+bool CanvasRenderer::IsCanvasChanged() const
+{
+  return Internal::Adaptor::GetImplementation(*this).IsCanvasChanged();
+}
+
+bool CanvasRenderer::Rasterize()
+{
+  return Internal::Adaptor::GetImplementation(*this).Rasterize();
 }
 
 Devel::PixelBuffer CanvasRenderer::GetPixelBuffer()
