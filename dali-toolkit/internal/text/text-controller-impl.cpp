@@ -697,16 +697,13 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
       TextAbstraction::FontDescription defaultFontDescription;
       TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE * mFontSizeScale;
 
-      //Get the number of points per one unit of point-size
-      uint32_t numberOfPointsPerOneUnitOfPointSize = mFontClient.GetNumberOfPointsPerOneUnitOfPointSize();
-
       if(IsShowingPlaceholderText() && mEventData && (nullptr != mEventData->mPlaceholderFont))
       {
         // If the placeholder font is set specifically, only placeholder font is changed.
         defaultFontDescription = mEventData->mPlaceholderFont->mFontDescription;
         if(mEventData->mPlaceholderFont->sizeDefined)
         {
-          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * mFontSizeScale * numberOfPointsPerOneUnitOfPointSize;
+          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * mFontSizeScale * 64u;
         }
       }
       else if(nullptr != mFontDefaults)
@@ -716,11 +713,11 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
 
         if(mTextFitEnabled)
         {
-          defaultPointSize = mFontDefaults->mFitPointSize * numberOfPointsPerOneUnitOfPointSize;
+          defaultPointSize = mFontDefaults->mFitPointSize * 64u;
         }
         else
         {
-          defaultPointSize = mFontDefaults->mDefaultPointSize * mFontSizeScale * numberOfPointsPerOneUnitOfPointSize;
+          defaultPointSize = mFontDefaults->mDefaultPointSize * mFontSizeScale * 64u;
         }
       }
 
