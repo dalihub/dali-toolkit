@@ -107,17 +107,6 @@ public:
    */
   void SetDepthIndex(int depthIndex);
 
-  /**
-   * @brief Retrieve visual property animations.
-   * This ImageView is a destination.
-   *
-   * @param[in] animation generated animation
-   * @param[in] source source control of the animation.
-   * @param[in] alphaFunction AlphaFunction of the animation
-   * @param[in] TimePeriod TimePeriod of the animation
-   */
-  void CreateTransitions(Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod period) override;
-
 private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize
