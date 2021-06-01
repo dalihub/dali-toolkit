@@ -2286,7 +2286,22 @@ bool TextEditor::AccessibleImpl::CutText(size_t startPosition,
   Dali::Toolkit::GetImpl(slf).getController()->CopyStringToClipboard(txt.substr(startPosition, endPosition - startPosition));
 
   slf.SetProperty(Toolkit::TextEditor::Property::TEXT,
-                  txt.substr(0, startPosition) + txt.substr(endPosition - startPosition, txt.size()));
+                  txt.substr(0, startPosition) + txt.substr(endPosition));
+
+  return true;
+}
+
+bool TextEditor::AccessibleImpl::DeleteText(size_t startPosition,
+                                            size_t endPosition)
+{
+  if(endPosition <= startPosition)
+    return false;
+
+  auto slf = Toolkit::TextEditor::DownCast(Self());
+  auto txt = slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
+
+  slf.SetProperty(Toolkit::TextEditor::Property::TEXT,
+                  txt.substr(0, startPosition) + txt.substr(endPosition));
 
   return true;
 }
@@ -2306,6 +2321,26 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
   }
 
   return states;
+}
+
+bool TextEditor::AccessibleImpl::InsertText(size_t startPosition,
+                                            std::string text)
+{
+  auto slf = Toolkit::TextEditor::DownCast(Self());
+  auto txt = slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
+
+  txt.insert(startPosition, text);
+
+  slf.SetProperty(Toolkit::TextEditor::Property::TEXT, std::move(txt));
+
+  return true;
+}
+
+bool TextEditor::AccessibleImpl::SetTextContents(std::string newContents)
+{
+  auto slf = Toolkit::TextEditor::DownCast(Self());
+  slf.SetProperty(Toolkit::TextEditor::Property::TEXT, std::move(newContents));
+  return true;
 }
 
 } // namespace Internal
