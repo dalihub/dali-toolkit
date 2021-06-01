@@ -265,13 +265,6 @@ public:
    * @return The background state.
    */
   virtual bool IsBackgroundEnabled() const = 0;
-
-  /**
-   * @brief Returns whether markup-processor is enabled or not.
-   *
-   * @return The markup-processor state.
-   */
-  virtual bool IsMarkupProcessorEnabled() const = 0;
 };
 
 } // namespace Text

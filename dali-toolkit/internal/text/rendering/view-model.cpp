@@ -225,11 +225,6 @@ bool ViewModel::IsBackgroundEnabled() const
   return mModel->IsBackgroundEnabled();
 }
 
-bool ViewModel::IsMarkupProcessorEnabled() const
-{
-  return mModel->IsMarkupProcessorEnabled();
-}
-
 void ViewModel::ElideGlyphs()
 {
   mIsTextElided = false;

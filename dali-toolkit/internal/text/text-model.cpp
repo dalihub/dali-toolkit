@@ -184,11 +184,6 @@ bool Model::IsBackgroundEnabled() const
   return mVisualModel->IsBackgroundEnabled();
 }
 
-bool Model::IsMarkupProcessorEnabled() const
-{
-  return mVisualModel->IsMarkupProcessorEnabled();
-}
-
 Model::Model()
 : mLogicalModel(),
   mVisualModel(),

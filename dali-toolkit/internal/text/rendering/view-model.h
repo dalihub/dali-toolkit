@@ -211,11 +211,6 @@ public:
   bool IsBackgroundEnabled() const override;
 
   /**
-   * @copydoc ModelInterface::IsMarkupProcessorEnabled()
-   */
-  bool IsMarkupProcessorEnabled() const override;
-
-  /**
    * @brief Does the text elide.
    *
    * It stores a copy of the visible glyphs and removes as many glyphs as needed

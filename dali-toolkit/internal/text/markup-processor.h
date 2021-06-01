@@ -27,7 +27,6 @@
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/embedded-item.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
-#include <dali-toolkit/internal/text/underlined-character-run.h>
 
 namespace Dali
 {
@@ -43,23 +42,20 @@ struct MarkupProcessData
   MarkupProcessData(Vector<ColorRun>&           colorRuns,
                     Vector<FontDescriptionRun>& fontRuns,
                     Vector<EmbeddedItem>&       items,
-                    Vector<Anchor>&             anchors,
-                    Vector<UnderlinedCharacterRun>& underlinedCharacterRuns)
+                    Vector<Anchor>&             anchors)
   : colorRuns(colorRuns),
     fontRuns(fontRuns),
     items(items),
     anchors(anchors),
-    underlinedCharacterRuns(underlinedCharacterRuns),
     markupProcessedText()
   {
   }
 
-  Vector<ColorRun>&               colorRuns;               ///< The color runs.
-  Vector<FontDescriptionRun>&     fontRuns;                ///< The font description runs.
-  Vector<EmbeddedItem>&           items;                   ///< The embedded items.
-  Vector<Anchor>&                 anchors;                 ///< The anchors.
-  Vector<UnderlinedCharacterRun>& underlinedCharacterRuns; ///< The underlined character runs.
-  std::string                     markupProcessedText;     ///< The mark-up string.
+  Vector<ColorRun>&           colorRuns;           ///< The color runs.
+  Vector<FontDescriptionRun>& fontRuns;            ///< The font description runs.
+  Vector<EmbeddedItem>&       items;               ///< The embedded items.
+  Vector<Anchor>&             anchors;             ///< The anchors.
+  std::string                 markupProcessedText; ///< The mark-up string.
 };
 
 /**

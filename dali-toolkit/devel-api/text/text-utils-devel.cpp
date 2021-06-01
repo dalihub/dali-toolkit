@@ -173,8 +173,7 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
   MarkupProcessData markupProcessData(colorRuns,
                                       fontDescriptionRuns,
                                       textModel->mLogicalModel->mEmbeddedItems,
-                                      textModel->mLogicalModel->mAnchors,
-                                      textModel->mLogicalModel->mUnderlinedCharacterRuns);
+                                      textModel->mLogicalModel->mAnchors);
 
   if(textParameters.markupEnabled)
   {

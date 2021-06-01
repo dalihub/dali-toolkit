@@ -82,8 +82,7 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
     MarkupProcessData markupProcessData(logicalModel->mColorRuns,
                                         logicalModel->mFontDescriptionRuns,
                                         logicalModel->mEmbeddedItems,
-                                        logicalModel->mAnchors,
-                                        logicalModel->mUnderlinedCharacterRuns);
+                                        logicalModel->mAnchors);
 
     Length         textSize = 0u;
     const uint8_t* utf8     = NULL;

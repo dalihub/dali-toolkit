@@ -85,8 +85,7 @@ struct AtlasRenderer::Impl
       mRight(0.0f),
       mUnderlinePosition(0.0f),
       mUnderlineThickness(0.0f),
-      mMeshRecordIndex(0u),
-      mUnderlineChunkId(0u)
+      mMeshRecordIndex(0u)
     {
     }
 
@@ -96,7 +95,6 @@ struct AtlasRenderer::Impl
     float    mUnderlinePosition;
     float    mUnderlineThickness;
     uint32_t mMeshRecordIndex;
-    uint32_t mUnderlineChunkId;
   };
 
   struct MaxBlockSize
@@ -290,8 +288,7 @@ struct AtlasRenderer::Impl
                     float                    currentUnderlineThickness,
                     std::vector<MeshRecord>& meshContainer,
                     Vector<TextCacheEntry>&  newTextCache,
-                    Vector<Extent>&          extents,
-                    uint32_t                 underlineChunkId)
+                    Vector<Extent>&          extents)
   {
     // Generate mesh data for this quad, plugging in our supplied position
     AtlasManager::Mesh2D newMesh;
@@ -327,8 +324,7 @@ struct AtlasRenderer::Impl
                    underlineGlyph,
                    currentUnderlinePosition,
                    currentUnderlineThickness,
-                   slot,
-                   underlineChunkId);
+                   slot);
   }
 
   void CreateActors(const std::vector<MeshRecord>& meshContainer,
@@ -462,10 +458,6 @@ struct AtlasRenderer::Impl
     const Vector2* const   positionsBuffer = positions.Begin();
     const Vector2          lineOffsetPosition(minLineOffset, 0.f);
 
-    //For septated underlined chunks. (this is for Markup case)
-    uint32_t underlineChunkId = 0u; // give id for each chunk.
-    bool     isPreUnderlined = false; // status of underlined for previous glyph.
-
     for(uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i)
     {
       const GlyphInfo& glyph             = *(glyphsBuffer + i);
@@ -512,7 +504,6 @@ struct AtlasRenderer::Impl
           }
 
           lastUnderlinedFontId = glyph.fontId;
-
         } // underline
 
         AtlasGlyphManager::GlyphStyle style;
@@ -557,8 +548,7 @@ struct AtlasRenderer::Impl
                        currentUnderlineThickness,
                        meshContainer,
                        newTextCache,
-                       extents,
-                       underlineChunkId);
+                       extents);
 
           lastFontId = glyph.fontId; // Prevents searching for existing blocksizes when string of the same fontId.
         }
@@ -575,19 +565,8 @@ struct AtlasRenderer::Impl
                        currentUnderlineThickness,
                        meshContainerOutline,
                        newTextCache,
-                       extents,
-                       0u);
+                       extents);
         }
-
-
-        //The new underlined chunk. Add new id if they are not consecutive indices (this is for Markup case)
-        // Examples: "Hello <u>World</u> Hello <u>World</u>", "<u>World</u> Hello <u>World</u>", "<u>   World</u> Hello <u>World</u>"
-        if( isPreUnderlined && (isPreUnderlined != isGlyphUnderlined))
-        {
-          underlineChunkId++;
-        }
-        //Keep status of underlined for previous glyph to check consecutive indices
-        isPreUnderlined = isGlyphUnderlined;
       }
     } // glyphs
 
@@ -738,8 +717,7 @@ struct AtlasRenderer::Impl
                       bool                     underlineGlyph,
                       float                    underlinePosition,
                       float                    underlineThickness,
-                      AtlasManager::AtlasSlot& slot,
-                      uint32_t                 underlineChunkId)
+                      AtlasManager::AtlasSlot& slot)
   {
     if(slot.mImageId)
     {
@@ -767,8 +745,7 @@ struct AtlasRenderer::Impl
                           right,
                           baseLine,
                           underlinePosition,
-                          underlineThickness,
-                          underlineChunkId);
+                          underlineThickness);
           }
 
           return;
@@ -791,8 +768,7 @@ struct AtlasRenderer::Impl
                       right,
                       baseLine,
                       underlinePosition,
-                      underlineThickness,
-                      underlineChunkId);
+                      underlineThickness);
       }
     }
   }
@@ -804,8 +780,7 @@ struct AtlasRenderer::Impl
                      float                    right,
                      float                    baseLine,
                      float                    underlinePosition,
-                     float                    underlineThickness,
-                     uint32_t                 underlineChunkId)
+                     float                    underlineThickness)
   {
     bool foundExtent = false;
     for(Vector<Extent>::Iterator eIt    = extents.Begin(),
@@ -813,7 +788,7 @@ struct AtlasRenderer::Impl
         eIt != eEndIt;
         ++eIt)
     {
-      if(Equals(baseLine, eIt->mBaseLine) && underlineChunkId == eIt->mUnderlineChunkId)
+      if(Equals(baseLine, eIt->mBaseLine))
       {
         foundExtent = true;
         if(left < eIt->mLeft)
@@ -844,7 +819,6 @@ struct AtlasRenderer::Impl
       extent.mUnderlinePosition  = underlinePosition;
       extent.mUnderlineThickness = underlineThickness;
       extent.mMeshRecordIndex    = index;
-      extent.mUnderlineChunkId = underlineChunkId;
       extents.PushBack(extent);
     }
   }

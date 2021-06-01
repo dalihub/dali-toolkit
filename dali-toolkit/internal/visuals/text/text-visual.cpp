@@ -528,12 +528,12 @@ void TextVisual::UpdateRenderer()
         shadowEnabled = true;
       }
 
-      const bool underlineEnabled       = mController->GetTextModel()->IsUnderlineEnabled();
-      const bool outlineEnabled         = (mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1);
-      const bool backgroundEnabled      = mController->GetTextModel()->IsBackgroundEnabled();
-      const bool markupProcessorEnabled = mController->IsMarkupProcessorEnabled();
+      const bool underlineEnabled  = mController->GetTextModel()->IsUnderlineEnabled();
+      const bool outlineEnabled    = (mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1);
+      const bool backgroundEnabled = mController->GetTextModel()->IsBackgroundEnabled();
+      ;
 
-      const bool styleEnabled = (shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled);
+      const bool styleEnabled = (shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled);
 
       AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled);
 

@@ -124,8 +124,6 @@ void Controller::SetMarkupProcessorEnabled(bool enable)
     GetText(text);
     SetText(text);
   }
-
-  mImpl->mModel->mVisualModel->SetMarkupProcessorEnabled(enable);
 }
 
 bool Controller::IsMarkupProcessorEnabled() const

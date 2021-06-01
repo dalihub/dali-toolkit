@@ -296,15 +296,6 @@ void LogicalModel::UpdateTextStyleRuns(CharacterIndex index, int numberOfCharact
                                 mColorRuns,
                                 removedColorRuns);
 
-  // This is needed until now for underline tag in mark-up processor
-  // Process the underlined runs.
-  Vector<UnderlinedCharacterRun> removedUnderlinedCharacterRuns;
-  UpdateCharacterRuns<UnderlinedCharacterRun>(index,
-                                numberOfCharacters,
-                                totalNumberOfCharacters,
-                                mUnderlinedCharacterRuns,
-                                removedUnderlinedCharacterRuns);
-
   // Process the background color runs.
   Vector<ColorRun> removedBackgroundColorRuns;
   UpdateCharacterRuns<ColorRun>(index,
