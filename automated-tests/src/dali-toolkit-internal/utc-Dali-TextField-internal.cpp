@@ -191,8 +191,6 @@ int UtcDaliTextFieldMarkupUnderline(void)
 
   END_TEST;
 
-}
-
 int UtcDaliTextFieldFontPointSizeLargerThanAtlas(void)
 {
   ToolkitTestApplication application;

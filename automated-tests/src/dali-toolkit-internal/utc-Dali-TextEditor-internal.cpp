@@ -108,7 +108,6 @@ int UtcDaliTextEditorMarkupUnderline(void)
   DALI_TEST_EQUALS( underlineRuns[4u].glyphIndex, 6u, TEST_LOCATION);
 
   END_TEST;
-}
 
 int UtcDaliTextEditorFontPointSizeLargerThanAtlas(void)
 {
