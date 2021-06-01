@@ -460,22 +460,6 @@ int UtcDaliControlReadingInfoType(void)
   auto control = Control::New();
 
   auto reading_info_type = DevelControl::GetAccessibilityReadingInfoType(control);
-
-  for ( auto i = 0u; i < 4; ++i)
-    DALI_TEST_CHECK ( reading_info_type[ static_cast< Dali::Accessibility::ReadingInfoType >( i ) ]);
-
-  reading_info_type[Dali::Accessibility::ReadingInfoType::DESCRIPTION] = false;
-  reading_info_type[Dali::Accessibility::ReadingInfoType::STATE] = false;
-  reading_info_type[Dali::Accessibility::ReadingInfoType::NAME] = false;
-  reading_info_type[Dali::Accessibility::ReadingInfoType::ROLE] = false;
-
-  DevelControl::SetAccessibilityReadingInfoType(control, reading_info_type);
-
-  reading_info_type = DevelControl::GetAccessibilityReadingInfoType(control);
-
-  for ( auto i = 0u; i < 4; ++i)
-    DALI_TEST_CHECK ( false == reading_info_type[ static_cast< Dali::Accessibility::ReadingInfoType >( i ) ]);
-
   reading_info_type[Dali::Accessibility::ReadingInfoType::DESCRIPTION] = true;
   reading_info_type[Dali::Accessibility::ReadingInfoType::STATE] = true;
   reading_info_type[Dali::Accessibility::ReadingInfoType::NAME] = true;
