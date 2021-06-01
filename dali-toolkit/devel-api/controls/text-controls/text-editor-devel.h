@@ -187,13 +187,6 @@ enum Type
    * @details Name "grabHandleColor", type Property::VECTOR4.
    */
   GRAB_HANDLE_COLOR,
-
-  /**
-   * @brief Enables the grab handle popup for text selection.
-   * @details Name "enableGrabHandlePopup", type Property::BOOLEAN.
-   * @note The default value is true, which means the grab handle popup is enabled by default.
-   */
-  ENABLE_GRAB_HANDLE_POPUP,
 };
 
 } // namespace Property

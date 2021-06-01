@@ -147,7 +147,6 @@ DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextEditor, "selectedText", 
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "fontSizeScale",                        FLOAT,     FONT_SIZE_SCALE                     )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "primaryCursorPosition",                INTEGER,   PRIMARY_CURSOR_POSITION             )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "grabHandleColor",                      VECTOR4,   GRAB_HANDLE_COLOR                   )
-DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableGrabHandlePopup",                BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP            )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
@@ -776,14 +775,6 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
         impl.RequestTextRelayout();
         break;
       }
-      case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP:
-      {
-        const bool grabHandlePopupEnabled = value.Get<bool>();
-        DALI_LOG_INFO(gLogFilter, Debug::General, "TextEditor %p ENABLE_GRAB_HANDLE_POPUP %d\n", impl.mController.Get(), grabHandlePopupEnabled);
-
-        impl.mController->SetGrabHandlePopupEnabled(grabHandlePopupEnabled);
-        break;
-      }
     } // switch
   }   // texteditor
 }
@@ -1143,11 +1134,6 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
       case Toolkit::DevelTextEditor::Property::GRAB_HANDLE_COLOR:
       {
         value = impl.mDecorator->GetHandleColor();
-        break;
-      }
-      case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP:
-      {
-        value = impl.mController->IsGrabHandlePopupEnabled();
         break;
       }
     } //switch

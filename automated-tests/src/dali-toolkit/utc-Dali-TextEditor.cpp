@@ -105,7 +105,7 @@ const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSys
 const char* const PROPERTY_NAME_MAX_LENGTH                           = "maxLength";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
-const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
+
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
@@ -512,7 +512,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MAX_LENGTH ) == DevelTextEditor::Property::MAX_LENGTH );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_COLOR ) == DevelTextEditor::Property::GRAB_HANDLE_COLOR );
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP );
+
 
   END_TEST;
 }
@@ -930,10 +930,6 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check handle color
   editor.SetProperty( DevelTextEditor::Property::GRAB_HANDLE_COLOR, Color::GREEN );
   DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::GRAB_HANDLE_COLOR ), Color::GREEN, TEST_LOCATION );
-
-  // Test the ENABLE_GRAB_HANDLE_POPUP property
-  editor.SetProperty( DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP, false );
-  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP ), false, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
