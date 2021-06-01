@@ -234,9 +234,9 @@ public:
   using WebViewConsoleMessageSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineConsoleMessage>)>;
 
   /**
-   * @brief WebView signal type related with response policy decision.
+   * @brief WebView signal type related with policy decision.
    */
-  using WebViewResponsePolicyDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEnginePolicyDecision>)>;
+  using WebViewPolicyDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEnginePolicyDecision>)>;
 
   /**
    * @brief WebView signal type related with certificate changed.
@@ -342,11 +342,11 @@ public:
   Dali::Toolkit::WebBackForwardList* GetBackForwardList() const;
 
   /**
-   * @brief Get favicon of web page.
+   * @brief Get Favicon of web page.
    *
-   * @return Handle to a favicon
+   * @return Handle to a fav icon
    */
-  Dali::Toolkit::ImageView GetFavicon() const;
+  Dali::Toolkit::ImageView& GetFavicon();
 
   /**
    * @brief Load a web page based on a given URL.
@@ -753,11 +753,11 @@ public:
   WebViewConsoleMessageSignalType& ConsoleMessageSignal();
 
   /**
-   * @brief Connect to this signal to be notified when response policy would be decided.
+   * @brief Connect to this signal to be notified when new policy would be decided.
    *
    * @return A signal object to connect with.
    */
-  WebViewResponsePolicyDecisionSignalType& ResponsePolicyDecisionSignal();
+  WebViewPolicyDecisionSignalType& PolicyDecisionSignal();
 
   /**
    * @brief Connect to this signal to be notified when certificate need be confirmed.

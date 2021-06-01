@@ -97,7 +97,7 @@ DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "formRepostDecision",      FORM_REPOS
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "frameRendered",           FRAME_RENDERED_SIGNAL            )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "requestInterceptor",      REQUEST_INTERCEPTOR_SIGNAL       )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "consoleMessage",          CONSOLE_MESSAGE_SIGNAL           )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "responsePolicyDecided",   POLICY_DECISION                  )
+DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "policyDecision",          POLICY_DECISION                  )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "certificateConfirm",      CERTIFICATE_CONFIRM_SIGNAL       )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "sslCertificateChanged",   SSL_CERTIFICATE_CHANGED_SIGNAL   )
 DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "httpAuthRequest",         HTTP_AUTH_REQUEST_SIGNAL         )
@@ -279,7 +279,7 @@ void WebView::OnInitialize()
     mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnFrameRendered);
     mWebEngine.RequestInterceptorSignal().Connect(this, &WebView::OnInterceptRequest);
     mWebEngine.ConsoleMessageSignal().Connect(this, &WebView::OnConsoleMessage);
-    mWebEngine.ResponsePolicyDecisionSignal().Connect(this, &WebView::OnResponsePolicyDecided);
+    mWebEngine.PolicyDecisionSignal().Connect(this, &WebView::OnPolicyDecisionRequest);
     mWebEngine.CertificateConfirmSignal().Connect(this, &WebView::OnCertificateConfirm);
     mWebEngine.SslCertificateChangedSignal().Connect(this, &WebView::OnSslCertificateChanged);
     mWebEngine.HttpAuthHandlerSignal().Connect(this, &WebView::OnHttpAuthenticationRequest);
@@ -313,15 +313,14 @@ Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
   return mWebBackForwardList.get();
 }
 
-Dali::Toolkit::ImageView WebView::GetFavicon() const
+Dali::Toolkit::ImageView& WebView::GetFavicon()
 {
-  Dali::Toolkit::ImageView faviconView;
   if(mWebEngine)
   {
     Dali::PixelData pixelData = mWebEngine.GetFavicon();
-    faviconView               = CreateImageView(pixelData);
+    mFaviconView              = CreateImageView(pixelData);
   }
-  return faviconView;
+  return mFaviconView;
 }
 
 void WebView::LoadUrl(const std::string& url)
@@ -744,13 +743,8 @@ void WebView::EnableBlendMode(bool blendEnabled)
   }
 }
 
-Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel) const
+Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel)
 {
-  if(!pixel)
-  {
-    return Dali::Toolkit::ImageView();
-  }
-
   std::string              url       = Dali::Toolkit::Image::GenerateUrl(pixel);
   Dali::Toolkit::ImageView imageView = Dali::Toolkit::ImageView::New(url);
   imageView.SetProperty(Dali::Actor::Property::SIZE, Vector2(pixel.GetWidth(), pixel.GetHeight()));
@@ -807,9 +801,9 @@ Dali::Toolkit::WebView::WebViewConsoleMessageSignalType& WebView::ConsoleMessage
   return mConsoleMessageSignal;
 }
 
-Dali::Toolkit::WebView::WebViewResponsePolicyDecisionSignalType& WebView::ResponsePolicyDecisionSignal()
+Dali::Toolkit::WebView::WebViewPolicyDecisionSignalType& WebView::PolicyDecisionSignal()
 {
-  return mResponsePolicyDecisionSignal;
+  return mPolicyDecisionSignal;
 }
 
 Dali::Toolkit::WebView::WebViewCertificateSignalType& WebView::CertificateConfirmSignal()
@@ -944,12 +938,12 @@ void WebView::OnConsoleMessage(std::shared_ptr<Dali::WebEngineConsoleMessage> me
   }
 }
 
-void WebView::OnResponsePolicyDecided(std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
+void WebView::OnPolicyDecisionRequest(std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
 {
-  if(!mResponsePolicyDecisionSignal.Empty())
+  if(!mPolicyDecisionSignal.Empty())
   {
     Dali::Toolkit::WebView handle(GetOwner());
-    mResponsePolicyDecisionSignal.Emit(handle, std::move(decision));
+    mPolicyDecisionSignal.Emit(handle, std::move(decision));
   }
 }
 
@@ -1057,7 +1051,7 @@ bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tr
   }
   else if(0 == strcmp(signalName.c_str(), POLICY_DECISION))
   {
-    webView.ResponsePolicyDecisionSignal().Connect(tracker, functor);
+    webView.PolicyDecisionSignal().Connect(tracker, functor);
     connected = true;
   }
   else if(0 == strcmp(signalName.c_str(), CERTIFICATE_CONFIRM_SIGNAL))

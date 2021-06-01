@@ -89,7 +89,7 @@ Dali::Toolkit::WebBackForwardList* WebView::GetBackForwardList() const
   return Dali::Toolkit::GetImpl(*this).GetBackForwardList();
 }
 
-Dali::Toolkit::ImageView WebView::GetFavicon() const
+Dali::Toolkit::ImageView& WebView::GetFavicon()
 {
   return Dali::Toolkit::GetImpl(*this).GetFavicon();
 }
@@ -359,9 +359,9 @@ WebView::WebViewConsoleMessageSignalType& WebView::ConsoleMessageSignal()
   return Dali::Toolkit::GetImpl(*this).ConsoleMessageSignal();
 }
 
-WebView::WebViewResponsePolicyDecisionSignalType& WebView::ResponsePolicyDecisionSignal()
+WebView::WebViewPolicyDecisionSignalType& WebView::PolicyDecisionSignal()
 {
-  return Dali::Toolkit::GetImpl(*this).ResponsePolicyDecisionSignal();
+  return Dali::Toolkit::GetImpl(*this).PolicyDecisionSignal();
 }
 
 WebView::WebViewCertificateSignalType& WebView::CertificateConfirmSignal()
