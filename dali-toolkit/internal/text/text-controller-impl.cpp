@@ -29,7 +29,6 @@
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/color-segmentation.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
-#include <dali-toolkit/internal/text/hyphenator.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
@@ -37,8 +36,6 @@
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 #include <dali-toolkit/internal/text/text-selection-handle-controller.h>
-
-#include <dali-toolkit/internal/text/text-enumerations-impl.h>
 
 using namespace Dali;
 
@@ -663,39 +660,6 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
                      startIndex,
                      requestedNumberOfCharacters,
                      lineBreakInfo);
-
-    if(mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
-       mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::MIXED))
-    {
-      CharacterIndex end                 = startIndex + requestedNumberOfCharacters;
-      LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
-
-      for(CharacterIndex index = startIndex; index < end; index++)
-      {
-        CharacterIndex wordEnd = index;
-        while((*(lineBreakInfoBuffer + wordEnd) != TextAbstraction::LINE_ALLOW_BREAK) && (*(lineBreakInfoBuffer + wordEnd) != TextAbstraction::LINE_MUST_BREAK))
-        {
-          wordEnd++;
-        }
-
-        if((wordEnd + 1) == end) // add last char
-        {
-          wordEnd++;
-        }
-
-        Vector<bool> hyphens = GetWordHyphens(utf32Characters.Begin() + index, wordEnd - index, nullptr);
-
-        for(CharacterIndex i = 0; i < (wordEnd - index); i++)
-        {
-          if(hyphens[i])
-          {
-            *(lineBreakInfoBuffer + index + i) = TextAbstraction::LINE_HYPHENATION_BREAK;
-          }
-        }
-
-        index = wordEnd;
-      }
-    }
 
     // Create the paragraph info.
     mModel->mLogicalModel->CreateParagraphInfo(startIndex,

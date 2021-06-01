@@ -216,21 +216,6 @@ public:
   bool IsMarkupProcessorEnabled() const override;
 
   /**
-  * @copydoc ModelInterface::GetHyphens()
-  */
-  const GlyphInfo* GetHyphens() const override;
-
-  /**
-  * @copydoc ModelInterface::GetHyphens()
-  */
-  const Length* GetHyphenIndices() const override;
-
-  /**
-  * @copydoc ModelInterface::GetHyphens()
-  */
-  Length GetHyphensCount() const override;
-
-  /**
    * @brief Does the text elide.
    *
    * It stores a copy of the visible glyphs and removes as many glyphs as needed

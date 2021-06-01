@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@
 #include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
-#include <dali-toolkit/internal/text/hyphenator.h>
 
 namespace Dali
 {
@@ -101,8 +100,7 @@ void CreateTextModel( const std::string& text,
                       Size& layoutSize,
                       ModelPtr& textModel,
                       MetricsPtr& metrics,
-                      bool markupProcessorEnabled,
-                      LineWrap::Mode wrapMode )
+                      bool markupProcessorEnabled )
 {
   textModel = Model::New(); ///< Pointer to the text's model.
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
@@ -154,41 +152,6 @@ void CreateTextModel( const std::string& text,
   {
     // Nothing else to do if the number of characters is zero.
     return;
-  }
-
-  textModel->mLineWrapMode = wrapMode;
-
-  if(textModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
-       textModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::MIXED))
-  {
-    CharacterIndex end                 = characterCount;
-    LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
-
-    for(CharacterIndex index = 0; index < end; index++)
-    {
-      CharacterIndex wordEnd = index;
-      while((*(lineBreakInfoBuffer + wordEnd) != TextAbstraction::LINE_ALLOW_BREAK) && (*(lineBreakInfoBuffer + wordEnd) != TextAbstraction::LINE_MUST_BREAK))
-      {
-        wordEnd++;
-      }
-
-      if((wordEnd + 1) == end) // add last char
-      {
-        wordEnd++;
-      }
-
-      Vector<bool> hyphens = GetWordHyphens(utf32Characters.Begin() + index, wordEnd - index, nullptr);
-
-      for(CharacterIndex i = 0; i < (wordEnd - index); i++)
-      {
-        if(hyphens[i])
-        {
-          *(lineBreakInfoBuffer + index + i) = TextAbstraction::LINE_HYPHENATION_BREAK;
-        }
-      }
-
-      index = wordEnd;
-    }
   }
 
   // 3) Set the script info.
@@ -321,6 +284,7 @@ void CreateTextModel( const std::string& text,
 
   // Set the layout parameters.
   textModel->mHorizontalAlignment = Text::HorizontalAlignment::BEGIN;
+  textModel->mLineWrapMode = LineWrap::WORD;
   textModel->mIgnoreSpacesAfterText = true;
   textModel->mMatchSystemLanguageDirection = false;
   Layout::Parameters layoutParameters( textArea,

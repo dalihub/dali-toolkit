@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,8 +111,7 @@ bool GetClosestLineTest( const GetClosestLineData& data )
                    layoutSize,
                    textModel,
                    metrics,
-                   false,
-                   LineWrap::WORD );
+                   false );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -158,8 +157,7 @@ bool GetClosestCursorIndexTest( const GetClosestCursorIndexData& data )
                    layoutSize,
                    textModel,
                    metrics,
-                   false,
-                   LineWrap::WORD );
+                   false );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -209,8 +207,7 @@ bool GetCursorPositionTest( const GetCursorPositionData& data )
                    layoutSize,
                    textModel,
                    metrics,
-                   false,
-                   LineWrap::WORD );
+                   false );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -263,8 +260,7 @@ bool FindSelectionIndicesTest( const FindSelectionIndicesData& data )
                    layoutSize,
                    textModel,
                    metrics,
-                   false,
-                   LineWrap::WORD );
+                   false );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;

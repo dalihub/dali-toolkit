@@ -230,21 +230,6 @@ bool ViewModel::IsMarkupProcessorEnabled() const
   return mModel->IsMarkupProcessorEnabled();
 }
 
-const GlyphInfo* ViewModel::GetHyphens() const
-{
-  return mModel->GetHyphens();
-}
-
-const Length* ViewModel::GetHyphenIndices() const
-{
-  return mModel->GetHyphenIndices();
-}
-
-Length ViewModel::GetHyphensCount() const
-{
-  return mModel->GetHyphensCount();
-}
-
 void ViewModel::ElideGlyphs()
 {
   mIsTextElided = false;

@@ -121,21 +121,6 @@ public:
   bool IsUnderlineEnabled() const override;
 
   /**
-  * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
-  */
-  const GlyphInfo* GetHyphens() const override;
-
-  /**
-  * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
-  */
-  const Length* GetHyphenIndices() const override;
-
-  /**
-  * @copydoc Dali::Toolkit::Text::ViewInterface::GetHyphens()
-  */
-  Length GetHyphensCount() const override;
-
-  /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineHeight()
    */
   float GetUnderlineHeight() const override;

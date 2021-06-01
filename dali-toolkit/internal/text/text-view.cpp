@@ -388,35 +388,6 @@ bool View::IsUnderlineEnabled() const
   return false;
 }
 
-const GlyphInfo* View::GetHyphens() const
-{
-  if(mImpl->mVisualModel)
-  {
-    return mImpl->mVisualModel->mHyphen.glyph.Begin();
-  }
-
-  return nullptr;
-}
-
-const Length* View::GetHyphenIndices() const
-{
-  if(mImpl->mVisualModel)
-  {
-    return mImpl->mVisualModel->mHyphen.index.Begin();
-  }
-
-  return nullptr;
-}
-
-Length View::GetHyphensCount() const
-{
-  if(mImpl->mVisualModel)
-  {
-    return mImpl->mVisualModel->mHyphen.glyph.Size();
-  }
-
-  return 0;
-}
 float View::GetUnderlineHeight() const
 {
   if(mImpl->mVisualModel)

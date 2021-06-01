@@ -44,12 +44,11 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_LAYOUT");
 #endif
 
-const float              MAX_FLOAT      = std::numeric_limits<float>::max();
-const CharacterDirection LTR            = false;
-const CharacterDirection RTL            = !LTR;
-const float              LINE_SPACING   = 0.f;
-const float              MIN_LINE_SIZE  = 0.f;
-const Character          HYPHEN_UNICODE = 0x002D;
+const float              MAX_FLOAT     = std::numeric_limits<float>::max();
+const CharacterDirection LTR           = false;
+const CharacterDirection RTL           = !LTR;
+const float              LINE_SPACING  = 0.f;
+const float              MIN_LINE_SIZE = 0.f;
 
 inline bool isEmptyLineAtLast(const Vector<LineRun>& lines, const Vector<LineRun>::Iterator& line)
 {
@@ -449,11 +448,7 @@ struct Engine::Impl
     const Length totalNumberOfGlyphs = parameters.textModel->mVisualModel->mGlyphs.Count();
 
     const bool isMultiline   = mLayout == MULTI_LINE_BOX;
-    const bool isWordLaidOut = parameters.textModel->mLineWrapMode == Text::LineWrap::WORD ||
-                               (parameters.textModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
-                               (parameters.textModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::MIXED);
-    const bool isHyphenMode = parameters.textModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION;
-    const bool isMixedMode  = parameters.textModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::MIXED;
+    const bool isWordLaidOut = parameters.textModel->mLineWrapMode == Text::LineWrap::WORD;
 
     // The last glyph to be laid-out.
     const GlyphIndex lastGlyphOfParagraphPlusOne = parameters.startGlyphIndex + parameters.numberOfGlyphs;
@@ -491,10 +486,7 @@ struct Engine::Impl
     FontId lastFontId = glyphMetrics.fontId;
     UpdateLineHeight(glyphMetrics, tmpLineLayout);
 
-    bool       oneWordLaidOut   = false;
-    bool       oneHyphenLaidOut = false;
-    GlyphIndex hyphenIndex      = 0;
-    GlyphInfo  hyphenGlyph;
+    bool oneWordLaidOut = false;
 
     for(GlyphIndex glyphIndex = lineLayout.glyphIndex;
         glyphIndex < lastGlyphOfParagraphPlusOne;)
@@ -573,15 +565,7 @@ struct Engine::Impl
          (tmpLineLayout.length > parameters.boundingBox.width))
       {
         // Current word does not fit in the box's width.
-        if(((oneHyphenLaidOut && isHyphenMode) ||
-            (!oneWordLaidOut && isMixedMode && oneHyphenLaidOut)) &&
-           !completelyFill)
-        {
-          parameters.textModel->mVisualModel->mHyphen.glyph.PushBack(hyphenGlyph);
-          parameters.textModel->mVisualModel->mHyphen.index.PushBack(hyphenIndex + 1);
-        }
-
-        if((!oneWordLaidOut && !oneHyphenLaidOut) || completelyFill)
+        if(!oneWordLaidOut || completelyFill)
         {
           DALI_LOG_INFO(gLogFilter, Debug::Verbose, "  Break the word by character\n");
 
@@ -624,7 +608,7 @@ struct Engine::Impl
          (TextAbstraction::LINE_MUST_BREAK == lineBreakInfo))
       {
         LineLayout currentLineLayout = lineLayout;
-        oneHyphenLaidOut             = false;
+
         // Must break the line. Update the line layout and return.
         MergeLineLayout(lineLayout, tmpLineLayout);
 
@@ -647,8 +631,7 @@ struct Engine::Impl
       if(isMultiline &&
          (TextAbstraction::LINE_ALLOW_BREAK == lineBreakInfo))
       {
-        oneHyphenLaidOut = false;
-        oneWordLaidOut   = isWordLaidOut;
+        oneWordLaidOut = isWordLaidOut;
         DALI_LOG_INFO(gLogFilter, Debug::Verbose, "  One word laid-out\n");
 
         // Current glyph is the last one of the current word.
@@ -656,33 +639,6 @@ struct Engine::Impl
         MergeLineLayout(lineLayout, tmpLineLayout);
 
         tmpLineLayout.Clear();
-      }
-
-      if(isMultiline &&
-         ((isHyphenMode || (!oneWordLaidOut && isMixedMode))) &&
-         (TextAbstraction::LINE_HYPHENATION_BREAK == lineBreakInfo))
-      {
-        hyphenGlyph        = GlyphInfo();
-        hyphenGlyph.fontId = glyphsBuffer[glyphIndex].fontId;
-
-        TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-        hyphenGlyph.index                      = fontClient.GetGlyphIndex(hyphenGlyph.fontId, HYPHEN_UNICODE);
-
-        mMetrics->GetGlyphMetrics(&hyphenGlyph, 1);
-
-        if((tmpLineLayout.length + hyphenGlyph.width) <= parameters.boundingBox.width)
-        {
-          hyphenIndex      = glyphIndex;
-          oneHyphenLaidOut = true;
-
-          DALI_LOG_INFO(gLogFilter, Debug::Verbose, "  One hyphen laid-out\n");
-
-          // Current glyph is the last one of the current word hyphen.
-          // Add the temporal layout to the current one.
-          MergeLineLayout(lineLayout, tmpLineLayout);
-
-          tmpLineLayout.Clear();
-        }
       }
 
       glyphIndex += numberOfGLyphsInGroup;
@@ -1103,9 +1059,6 @@ struct Engine::Impl
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->LayoutText\n");
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "  box size %f, %f\n", layoutParameters.boundingBox.width, layoutParameters.boundingBox.height);
 
-    layoutParameters.textModel->mVisualModel->mHyphen.glyph.Clear();
-    layoutParameters.textModel->mVisualModel->mHyphen.index.Clear();
-
     Vector<LineRun>& lines = layoutParameters.textModel->mVisualModel->mLines;
 
     if(0u == layoutParameters.numberOfGlyphs)
@@ -1318,17 +1271,6 @@ struct Engine::Impl
 
       if(ellipsis)
       {
-        //clear hyphen from ellipsis line
-        const Length* hyphenIndices = layoutParameters.textModel->mVisualModel->mHyphen.index.Begin();
-        Length        hyphensCount  = layoutParameters.textModel->mVisualModel->mHyphen.glyph.Size();
-
-        while(hyphenIndices && hyphensCount > 0 && hyphenIndices[hyphensCount - 1] >= layout.glyphIndex)
-        {
-          layoutParameters.textModel->mVisualModel->mHyphen.index.Remove(layoutParameters.textModel->mVisualModel->mHyphen.index.Begin() + hyphensCount - 1);
-          layoutParameters.textModel->mVisualModel->mHyphen.glyph.Remove(layoutParameters.textModel->mVisualModel->mHyphen.glyph.Begin() + hyphensCount - 1);
-          hyphensCount--;
-        }
-
         // No more lines to layout.
         break;
       }

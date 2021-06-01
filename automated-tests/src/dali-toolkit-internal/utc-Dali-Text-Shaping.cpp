@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,8 +140,7 @@ bool ShapeInfoTest( const ShapeInfoData& data )
                    layoutSize,
                    textModel,
                    metrics,
-                   false,
-                   LineWrap::WORD );
+                   false );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;

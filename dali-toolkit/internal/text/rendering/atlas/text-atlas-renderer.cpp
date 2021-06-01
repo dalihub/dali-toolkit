@@ -419,19 +419,16 @@ struct AtlasRenderer::Impl
     Vector<Extent>          extents;
     mDepth = depth;
 
-    const Vector2&   textSize(view.GetLayoutSize());
-    const Vector2    halfTextSize(textSize * 0.5f);
-    const Vector2&   shadowOffset(view.GetShadowOffset());
-    const Vector4&   shadowColor(view.GetShadowColor());
-    const bool       underlineEnabled = view.IsUnderlineEnabled();
-    const Vector4&   underlineColor(view.GetUnderlineColor());
-    const float      underlineHeight = view.GetUnderlineHeight();
-    const uint16_t   outlineWidth    = view.GetOutlineWidth();
-    const Vector4&   outlineColor(view.GetOutlineColor());
-    const bool       isOutline     = 0u != outlineWidth;
-    const GlyphInfo* hyphens       = view.GetHyphens();
-    const Length*    hyphenIndices = view.GetHyphenIndices();
-    const Length     hyphensCount  = view.GetHyphensCount();
+    const Vector2& textSize(view.GetLayoutSize());
+    const Vector2  halfTextSize(textSize * 0.5f);
+    const Vector2& shadowOffset(view.GetShadowOffset());
+    const Vector4& shadowColor(view.GetShadowColor());
+    const bool     underlineEnabled = view.IsUnderlineEnabled();
+    const Vector4& underlineColor(view.GetUnderlineColor());
+    const float    underlineHeight = view.GetUnderlineHeight();
+    const uint16_t outlineWidth    = view.GetOutlineWidth();
+    const Vector4& outlineColor(view.GetOutlineColor());
+    const bool     isOutline = 0u != outlineWidth;
 
     const bool useDefaultColor = (NULL == colorsBuffer);
 
@@ -463,7 +460,6 @@ struct AtlasRenderer::Impl
     const GlyphInfo* const glyphsBuffer    = glyphs.Begin();
     const Vector2* const   positionsBuffer = positions.Begin();
     const Vector2          lineOffsetPosition(minLineOffset, 0.f);
-    uint32_t               hyphenIndex = 0;
 
     //For septated underlined chunks. (this is for Markup case)
     uint32_t underlineChunkId = 0u; // give id for each chunk.
@@ -471,20 +467,9 @@ struct AtlasRenderer::Impl
 
     for(uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i)
     {
-      GlyphInfo glyph;
-      bool      addHyphen = ((hyphenIndex < hyphensCount) && hyphenIndices && (i == hyphenIndices[hyphenIndex]));
-      if(addHyphen && hyphens)
-      {
-        glyph = hyphens[hyphenIndex];
-        i--;
-      }
-      else
-      {
-        glyph = *(glyphsBuffer + i);
-      }
-
-      const bool isGlyphUnderlined = underlineEnabled || IsGlyphUnderlined(i, underlineRuns);
-      thereAreUnderlinedGlyphs     = thereAreUnderlinedGlyphs || isGlyphUnderlined;
+      const GlyphInfo& glyph             = *(glyphsBuffer + i);
+      const bool       isGlyphUnderlined = underlineEnabled || IsGlyphUnderlined(i, underlineRuns);
+      thereAreUnderlinedGlyphs           = thereAreUnderlinedGlyphs || isGlyphUnderlined;
 
       // No operation for white space
       if(glyph.width && glyph.height)
@@ -544,16 +529,8 @@ struct AtlasRenderer::Impl
         }
 
         // Move the origin (0,0) of the mesh to the center of the actor
-        Vector2 position = *(positionsBuffer + i);
-
-        if(addHyphen)
-        {
-          GlyphInfo tempInfo = *(glyphsBuffer + i);
-          position.x         = position.x + tempInfo.advance - tempInfo.xBearing + glyph.xBearing;
-          position.y += tempInfo.yBearing - glyph.yBearing;
-        }
-
-        position = Vector2(roundf(position.x), position.y) - halfTextSize - lineOffsetPosition; // roundf() avoids pixel alignment issues.
+        const Vector2& temp     = *(positionsBuffer + i);
+        const Vector2  position = Vector2(roundf(temp.x), temp.y) - halfTextSize - lineOffsetPosition; // roundf() avoids pixel alignment issues.
 
         if(0u != slot.mImageId) // invalid slot id, glyph has failed to be added to atlas
         {
@@ -610,11 +587,6 @@ struct AtlasRenderer::Impl
         }
         //Keep status of underlined for previous glyph to check consecutive indices
         isPreUnderlined = isGlyphUnderlined;
-      }
-
-      if(addHyphen)
-      {
-        hyphenIndex++;
       }
     } // glyphs
 
