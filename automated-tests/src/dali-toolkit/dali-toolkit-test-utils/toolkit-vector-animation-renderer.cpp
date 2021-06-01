@@ -60,7 +60,7 @@ public:
   bool Load(const std::string& url)
   {
     mUrl = url;
-    if(mUrl == "invalid.json" || mUrl == "invalid.riv")
+    if(mUrl == "invalid.json")
     {
       return false;
     }
