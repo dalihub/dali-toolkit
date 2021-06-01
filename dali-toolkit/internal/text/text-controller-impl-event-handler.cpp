@@ -155,7 +155,10 @@ bool ControllerImplEventHandler::ProcessInputEvents(Controller::Impl& impl)
     eventData->mUpdateCursorPosition     = false;
     eventData->mUpdateGrabHandlePosition = false;
   }
-  else
+
+  if(eventData->mUpdateHighlightBox ||
+     eventData->mUpdateLeftSelectionPosition ||
+     eventData->mUpdateRightSelectionPosition)
   {
     CursorInfo leftHandleInfo;
     CursorInfo rightHandleInfo;
