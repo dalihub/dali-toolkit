@@ -115,7 +115,8 @@ The possible values for this property are:
 | JUSTIFY_CENTER          | Items are positioned at the center of the container                        |
 | JUSTIFY_FLEX_END        | Items are positioned at the end of the container                           |
 | JUSTIFY_SPACE_BETWEEN   | Items are positioned with equal space between the lines                    |
-| JUSTIFY_SPACE_AROUND    | Items are positioned with equal space before, between, and after the lines |
+| JUSTIFY_SPACE_AROUND    | Items are positioned with equal space before, and after the lines          |
+| JUSTIFY_SPACE_EVENLY    | Items are positioned with equal space before, between, and after the lines |
  
 ### Usage
 

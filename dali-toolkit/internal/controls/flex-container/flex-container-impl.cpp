@@ -127,7 +127,8 @@ const Scripting::StringEnum JUSTIFY_CONTENT_STRING_TABLE[] =
     {"center", Toolkit::FlexContainer::JUSTIFY_CENTER},
     {"flexEnd", Toolkit::FlexContainer::JUSTIFY_FLEX_END},
     {"spaceBetween", Toolkit::FlexContainer::JUSTIFY_SPACE_BETWEEN},
-    {"spaceAround", Toolkit::FlexContainer::JUSTIFY_SPACE_AROUND}};
+    {"spaceAround", Toolkit::FlexContainer::JUSTIFY_SPACE_AROUND},
+    {"spaceEvenly", Toolkit::FlexContainer::JUSTIFY_SPACE_EVENLY}};
 const unsigned int JUSTIFY_CONTENT_STRING_TABLE_COUNT = sizeof(JUSTIFY_CONTENT_STRING_TABLE) / sizeof(JUSTIFY_CONTENT_STRING_TABLE[0]);
 
 const Scripting::StringEnum ALIGN_ITEMS_STRING_TABLE[] =
