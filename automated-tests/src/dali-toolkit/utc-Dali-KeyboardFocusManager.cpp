@@ -20,10 +20,11 @@
 
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
-#include <dali-toolkit-test-suite-utils.h>
-
-#include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/events/key-event-integ.h>
+#include <dali/integration-api/events/touch-event-integ.h>
+#include <dali-toolkit-test-suite-utils.h>
+#include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
@@ -1816,3 +1817,88 @@ int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
   END_TEST;
 }
 
+
+int UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActorInTouchMode(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActorInTouchMode");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  // Create the first actor and add it to the stage
+  Actor first = Actor::New();
+  first.SetProperty(Actor::Property::SIZE, Vector2( 50, 50 ));
+  first.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  first.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  first.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE,true);
+  first.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE,true);
+  application.GetScene().Add(first);
+
+  // Create the second actor and add it to the stage
+  Actor second = Actor::New();
+  second.SetProperty(Actor::Property::SIZE, Vector2( 50, 50 ));
+  second.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
+  second.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  second.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE,true);
+  application.GetScene().Add(second);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check that no actor is being focused yet.
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  // Check that it will fail to set focus on an invalid actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(Actor()) == false);
+
+
+  Dali::Integration::TouchEvent event1 = Dali::Integration::TouchEvent();
+  Dali::Integration::Point pointDown1;
+  pointDown1.SetState( PointState::DOWN );
+  pointDown1.SetDeviceId(1);
+  // touch first actor
+  pointDown1.SetScreenPosition( Vector2( 10.0f, 10.0f ) );
+  event1.AddPoint(pointDown1);
+  application.ProcessEvent( event1 );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check that the focus is successfully to the first actor
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+
+  Dali::Integration::TouchEvent event2 = Dali::Integration::TouchEvent();
+  Dali::Integration::Point pointDown2;
+  pointDown2.SetState( PointState::DOWN );
+  pointDown2.SetDeviceId(1);
+  // touch second actor
+  pointDown2.SetScreenPosition( Vector2( 110.0f, 10.0f ) );
+  event2.AddPoint(pointDown2);
+  application.ProcessEvent( event2 );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check that the focus is successfully to clear
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  // Make the second actor focusableInTouchMode
+  second.SetProperty( DevelActor::Property::TOUCH_FOCUSABLE,true);
+
+  // touch second actor
+  application.ProcessEvent( event2 );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check that the focus is successfully to the second actor
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+
+  END_TEST;
+}
