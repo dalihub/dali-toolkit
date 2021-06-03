@@ -138,7 +138,8 @@ public:
     JUSTIFY_CENTER,        ///< Items are positioned at the center of the container @SINCE_1_1.35
     JUSTIFY_FLEX_END,      ///< Items are positioned at the end of the container @SINCE_1_1.35
     JUSTIFY_SPACE_BETWEEN, ///< Items are positioned with equal space between the lines @SINCE_1_1.35
-    JUSTIFY_SPACE_AROUND   ///< Items are positioned with equal space before, between, and after the lines @SINCE_1_1.35
+    JUSTIFY_SPACE_AROUND,  ///< Items are positioned with equal space before, and after the lines @SINCE_1_1.35
+    JUSTIFY_SPACE_EVENLY   ///< Items are positioned with equal space before, between, and after the lines @SINCE_1_9.37
   };
 
   /**
