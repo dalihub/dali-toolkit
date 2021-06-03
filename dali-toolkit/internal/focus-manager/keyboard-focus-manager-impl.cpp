@@ -19,6 +19,7 @@
 #include "keyboard-focus-manager-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -965,10 +966,20 @@ void KeyboardFocusManager::OnTouch(const TouchEvent& touch)
 
   // Clear the focus when user touch the screen.
   // We only do this on a Down event, otherwise the clear action may override a manually focused actor.
-  // If mClearFocusOnTouch is false, do not clear the focus even if user touch the screen.
-  if(((touch.GetPointCount() < 1) || (touch.GetState(0) == PointState::DOWN)) && mClearFocusOnTouch)
+  if(((touch.GetPointCount() < 1) || (touch.GetState(0) == PointState::DOWN)))
   {
-    ClearFocus();
+    // If mClearFocusOnTouch is false, do not clear the focus even if user touch the screen.
+    if(mClearFocusOnTouch)
+    {
+      ClearFocus();
+    }
+
+    // If KEYBOARD_FOCUSABLE and TOUCH_FOCUSABLE is true, set focus actor
+    Actor hitActor = touch.GetHitActor(0);
+    if(hitActor && hitActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && hitActor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE))
+    {
+      SetCurrentFocusActor(hitActor);
+    }
   }
 }
 
