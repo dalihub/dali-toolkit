@@ -16,3 +16,8 @@ msgstr "Vložiť"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Schránka"
 
+msgid "icon"
+msgstr "Ikona"
+
+msgid "slider"
+msgstr "Posuvný ovládač"

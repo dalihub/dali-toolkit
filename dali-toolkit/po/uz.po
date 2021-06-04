@@ -16,3 +16,8 @@ msgstr "Qo‘shib qo‘yish"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Bufer"
 
+msgid "icon"
+msgstr "Ikoncha"
+
+msgid "slider"
+msgstr "Slider"

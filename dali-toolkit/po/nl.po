@@ -16,3 +16,5 @@ msgstr "Plakken"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Klembord"
 
+msgid "slider"
+msgstr ""

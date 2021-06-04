@@ -16,3 +16,8 @@ msgstr "Kleebi"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Lõikelaud"
 
+msgid "icon"
+msgstr "Ikoon"
+
+msgid "slider"
+msgstr "Liugur"

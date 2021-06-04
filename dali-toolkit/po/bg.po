@@ -16,3 +16,8 @@ msgstr "Поставяне"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Системен буфер"
 
+msgid "icon"
+msgstr "Икона"
+
+msgid "slider"
+msgstr "Плъзгач"

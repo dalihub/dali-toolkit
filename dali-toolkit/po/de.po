@@ -16,3 +16,5 @@ msgstr "Einfügen"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Zwischenablage"
 
+msgid "slider"
+msgstr ""

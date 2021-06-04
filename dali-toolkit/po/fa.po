@@ -20,3 +20,5 @@ msgstr "الحاق"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "کلیپ بورد"
 
+msgid "slider"
+msgstr ""

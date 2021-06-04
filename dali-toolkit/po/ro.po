@@ -16,3 +16,8 @@ msgstr "Lipire"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Clipboard"
 
+msgid "icon"
+msgstr "Pictogr."
+
+msgid "slider"
+msgstr "Cursor"

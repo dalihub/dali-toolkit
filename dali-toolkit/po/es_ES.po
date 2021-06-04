@@ -16,3 +16,8 @@ msgstr "Pegar"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Portapapeles"
 
+msgid "icon"
+msgstr "Icono"
+
+msgid "slider"
+msgstr "Controlador deslizante"

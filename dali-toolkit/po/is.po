@@ -16,3 +16,8 @@ msgstr "Líma"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Klippiborð"
 
+msgid "icon"
+msgstr "Tákn"
+
+msgid "slider"
+msgstr "Skyggna"

@@ -16,3 +16,8 @@ msgstr "Επικόλληση"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Πρόχειρο"
 
+msgid "icon"
+msgstr "Εικονίδιο"
+
+msgid "slider"
+msgstr "Ρυθμιστικό"

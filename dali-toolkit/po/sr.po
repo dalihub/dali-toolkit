@@ -16,3 +16,5 @@ msgstr "Zalepi"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Privremena memorija"
 
+msgid "slider"
+msgstr "клизач"

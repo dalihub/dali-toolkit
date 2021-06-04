@@ -20,3 +20,5 @@ msgstr "لصق"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "الحافظة"
 
+msgid "slider"
+msgstr ""

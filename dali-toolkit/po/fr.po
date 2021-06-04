@@ -16,3 +16,5 @@ msgstr "Coller"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Presse-papier"
 
+msgid "slider"
+msgstr "curseur"

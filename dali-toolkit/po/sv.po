@@ -16,3 +16,8 @@ msgstr "Klistra in"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Urklipp"
 
+msgid "icon"
+msgstr "Ikon"
+
+msgid "slider"
+msgstr "Slider"

@@ -16,3 +16,5 @@ msgstr "Dán"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Bộ nhớ tạm"
 
+msgid "slider"
+msgstr "Thanh Trượt"

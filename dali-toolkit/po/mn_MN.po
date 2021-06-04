@@ -16,3 +16,8 @@ msgstr "Буулгах"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Түр санах ой"
 
+msgid "icon"
+msgstr "Дүрс"
+
+msgid "slider"
+msgstr "Slider"

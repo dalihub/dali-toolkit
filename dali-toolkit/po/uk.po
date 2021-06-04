@@ -16,3 +16,8 @@ msgstr "Вставити"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Буфер обміну"
 
+msgid "icon"
+msgstr "Значок"
+
+msgid "slider"
+msgstr "Слайдер"

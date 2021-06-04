@@ -16,3 +16,8 @@ msgstr "Ielīmēt"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Starpliktuve"
 
+msgid "icon"
+msgstr "Ikona"
+
+msgid "slider"
+msgstr "Slīdnis"

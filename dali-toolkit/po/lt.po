@@ -16,3 +16,5 @@ msgstr "Įklijuoti"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Iškarpinė"
 
+msgid "slider"
+msgstr "šliaužiklis"
