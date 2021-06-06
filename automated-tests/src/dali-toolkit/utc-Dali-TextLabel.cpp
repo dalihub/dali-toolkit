@@ -1885,3 +1885,47 @@ int UtcDaliTextLabelHyphenWrapMode(void)
 
   END_TEST;
 }
+
+
+int utcDaliTextLabelGetHeightForWidthChangeLineCountWhenTextChanged(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" utcDaliTextLabelGetHeightForWidthChangeLineCountWhenTextChanged ");
+
+  int lineCountBefore =0 ;
+  int lineCountAfter =0 ;
+
+  // Create a text editor
+  TextLabel textLabel = TextLabel::New();
+  //Set very large font-size using point-size
+  textLabel.SetProperty( TextLabel::Property::POINT_SIZE, 10) ;
+  //Specify font-family
+  textLabel.SetProperty( TextLabel::Property::FONT_FAMILY, "DejaVu Sans");
+  //Specify size
+  textLabel.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 100.f ) );
+  //Set text longer than width of textLabel
+  textLabel.SetProperty( TextLabel::Property::TEXT, "Short text");
+  //Set line wrap mode Character
+  textLabel.SetProperty(TextLabel::Property::LINE_WRAP_MODE, "CHARACTER");
+  textLabel.SetProperty(TextLabel::Property::MULTI_LINE, true);
+
+  application.GetScene().Add( textLabel );
+
+  application.SendNotification();
+  application.Render();
+
+
+  lineCountBefore =  textLabel.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+
+  textLabel.SetProperty( TextLabel::Property::TEXT, "This is very loooooooooooooooooooooooooooooooooooong text for test");
+  lineCountAfter =  textLabel.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+
+  // When the text changed, the Line-count should be updated according to new text.
+  // Because the GetHeightForWidth is called in Controller::GetLineCount(float width)
+  DALI_TEST_EQUALS( lineCountBefore ,1, TEST_LOCATION );
+  DALI_TEST_GREATER( lineCountAfter,1, TEST_LOCATION );
+
+
+  END_TEST;
+}

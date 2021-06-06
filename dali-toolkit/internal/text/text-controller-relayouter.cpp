@@ -291,7 +291,10 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
     // The implementation of Get LineCount property depends on calling GetHeightForWidth then read mLines.Count() from visualModel direct.
     // If the LineCount property is requested before rendering and layouting then the value will be zero, which is incorrect.
     // So we will not restore the previously backed-up mLines and mGlyphPositions from visualModel in such case.
-    bool restoreLinesAndGlyphPositions = visualModel->mControlSize.width>0 && visualModel->mControlSize.height>0;
+    // Another case to skip restore is when the requested width equals the Control's width which means the caller need to update the old values.
+    // For example, when the text is changed.
+    bool restoreLinesAndGlyphPositions = (visualModel->mControlSize.width>0 && visualModel->mControlSize.height>0)
+                                          && (visualModel->mControlSize.width != width);
 
     layoutSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeRequestedWidthAndMaxHeight, requestedOperationsMask, restoreLinesAndGlyphPositions);
 

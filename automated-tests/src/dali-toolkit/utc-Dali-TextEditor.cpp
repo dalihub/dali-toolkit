@@ -3519,6 +3519,49 @@ int utcDaliTextEditorGetHeightForWidthDoesNotChangeLineCountLineWrapCharCase(voi
   END_TEST;
 }
 
+int utcDaliTextEditorGetHeightForWidthChangeLineCountWhenTextChanged(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" utcDaliTextEditorGetHeightForWidthChangeLineCountWhenTextChanged ");
+
+  int lineCountBefore =0 ;
+  int lineCountAfter =0 ;
+
+  // Create a text editor
+  TextEditor textEditor = TextEditor::New();
+  //Set very large font-size using point-size
+  textEditor.SetProperty( TextEditor::Property::POINT_SIZE, 10) ;
+  //Specify font-family
+  textEditor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
+  //Specify size
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 100.f ) );
+  //Set text longer than width of textEditor
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Short text");
+  //Set line wrap mode Character
+  textEditor.SetProperty(TextEditor::Property::LINE_WRAP_MODE, "CHARACTER");
+
+  application.GetScene().Add( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+
+  lineCountBefore =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "This is very loooooooooooooooooooooooooooooooooooong text for test");
+  lineCountAfter =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+
+  // When the text changed, the Line-count should be updated according to new text.
+  // Because the GetHeightForWidth is called in Controller::GetLineCount(float width)
+  DALI_TEST_EQUALS( lineCountBefore ,1, TEST_LOCATION );
+  DALI_TEST_GREATER( lineCountAfter,1, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+
 int utcDaliTextEditorGetNaturalSizeDoesNotChangeLineCountScrollingCase(void)
 {
   ToolkitTestApplication application;
