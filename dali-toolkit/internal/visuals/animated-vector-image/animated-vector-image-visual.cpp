@@ -295,7 +295,13 @@ void AnimatedVectorImageVisual::OnInitialize(void)
   }
   else
   {
-    shader = mImageVisualShaderFactory.GetShader(mFactoryCache, false, true, IsRoundedCornerRequired());
+    shader = mImageVisualShaderFactory.GetShader(
+      mFactoryCache,
+      TextureAtlas::DISABLED,
+      DefaultTextureWrapMode::APPLY,
+      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
+      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
+    );
   }
 
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);

@@ -75,6 +75,11 @@ const char* const OPACITY("opacity");
 // Fitting mode
 const char* const VISUAL_FITTING_MODE("visualFittingMode");
 
+// Border line
+const char* const BORDERLINE_WIDTH("borderlineWidth");
+const char* const BORDERLINE_COLOR("borderlineColor");
+const char* const BORDERLINE_OFFSET("borderlineOffset");
+
 // Corner radius
 const char* const CORNER_RADIUS("cornerRadius");
 const char* const CORNER_RADIUS_POLICY("cornerRadiusPolicy");

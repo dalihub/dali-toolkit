@@ -4,6 +4,9 @@
 #ifndef IS_REQUIRED_BORDERLINE
 #define IS_REQUIRED_BORDERLINE 0
 #endif
+#ifndef USER_SPACE
+#define USER_SPACE 0
+#endif
 
 INPUT mediump vec2 aPosition;
 OUTPUT mediump vec2 vTexCoord;
@@ -18,7 +21,7 @@ OUTPUT mediump vec4 vCornerRadius;
 
 uniform highp mat4 uMvpMatrix;
 uniform highp vec3 uSize;
-uniform mediump vec4 pixelArea;
+uniform mediump mat3 uAlignmentMatrix;
 
 //Visual size and offset
 uniform mediump vec2 offset;
@@ -34,12 +37,11 @@ uniform mediump float borderlineOffset;
 uniform mediump vec4 cornerRadius;
 uniform mediump float cornerRadiusPolicy;
 #endif
-uniform mediump vec2 extraSize;
 
 vec4 ComputeVertexPosition()
 {
-  vec2 visualSize = mix(uSize.xy * size, size, offsetSizeMode.zw) + extraSize;
-  vec2 visualOffset = mix(offset, offset/uSize.xy, offsetSizeMode.xy);
+  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );
+  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);
 
 #if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
   vRectSize = visualSize * 0.5;
@@ -68,11 +70,15 @@ vec4 ComputeVertexPosition()
   mediump vec2 vPosition = aPosition * visualSize;
 #endif
 
-  vTexCoord = pixelArea.xy + pixelArea.zw * (vPosition.xy / max(vec2(1.0), visualSize) + vec2(0.5));
   return vec4(vPosition + anchorPoint * visualSize + (visualOffset + origin) * uSize.xy, 0.0, 1.0);
 }
 
 void main()
 {
+  mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
   gl_Position = uMvpMatrix * ComputeVertexPosition();
+#if USER_SPACE
+  vertexPosition.xyz *= uSize;
+#endif
+  vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;
 }

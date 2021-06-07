@@ -30,11 +30,48 @@ namespace Toolkit
 namespace Internal
 {
 /**
+ * @brief Whether use texture with atlas, or not
+ */
+enum class TextureAtlas
+{
+  DISABLED = 0, ///< Image visual use ATLAS
+  ENABLED       ///< Image visual doesn't use ATLAS
+};
+
+/**
+ * @brief Whether apply to texture wraping in default, or not
+ */
+enum class DefaultTextureWrapMode
+{
+  DO_NOT_APPLY = 0, ///< Image visual doesn't apply to wraping texture in default
+  APPLY             ///< Image visual apply to wraping texture in default
+};
+
+/**
+ * @brief Whether use rounded corner, or not
+ */
+enum class RoundedCorner
+{
+  DISABLED = 0, ///< Image visual doesn't use rounded corner
+  ENABLED       ///< Image visual use rounded corner
+};
+
+/**
+ * @brief Whether use borderline, or not
+ */
+enum class Borderline
+{
+  DISABLED = 0, ///< Image visual doesn't use borderline
+  ENABLED       ///< Image visual use borderline
+};
+
+/**
  * ImageVisualShaderFactory is an object that provides and shares shaders between image visuals
  */
 class ImageVisualShaderFactory
 {
 public:
+
   /**
    * @brief Constructor
    */
@@ -51,8 +88,9 @@ public:
    * @param[in] atlasing Whether texture atlasing is applied.
    * @param[in] defaultTextureWrapping Whether the default texture wrap mode is applied.
    * @param[in] roundedCorner Whether the rounded corder is applied.
+   * @param[in] borderline Whether the borderline of visual is applied.
    */
-  Shader GetShader(VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping, bool roundedCorner);
+  Shader GetShader(VisualFactoryCache& factoryCache, TextureAtlas atlasing, DefaultTextureWrapMode defaultTextureWrapping, RoundedCorner roundedCorner, Borderline borderline);
 
   /**
    * Request the default vertex shader source.

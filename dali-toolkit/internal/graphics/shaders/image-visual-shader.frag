@@ -4,11 +4,15 @@
 #ifndef IS_REQUIRED_BORDERLINE
 #define IS_REQUIRED_BORDERLINE 0
 #endif
-#ifndef IS_REQUIRED_BLUR
-#define IS_REQUIRED_BLUR 0
+#ifndef ATLAS_DEFAULT_WARP
+#define ATLAS_DEFAULT_WARP 0
+#endif
+#ifndef ATLAS_CUSTOM_WARP
+#define ATLAS_CUSTOM_WARP 0
 #endif
 
-#if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE || IS_REQUIRED_BLUR
+INPUT mediump vec2 vTexCoord;
+#if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
 INPUT mediump vec2 vPosition;
 INPUT mediump vec2 vRectSize;
 INPUT mediump vec2 vOptRectSize;
@@ -17,19 +21,36 @@ INPUT mediump vec4 vCornerRadius;
 #endif
 #endif
 
+uniform sampler2D sTexture;
+#if ATLAS_DEFAULT_WARP
+uniform mediump vec4 uAtlasRect;
+#elif ATLAS_CUSTOM_WARP
+// WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
+uniform lowp vec2 wrapMode;
+#endif
+
 uniform lowp vec4 uColor;
 uniform lowp vec3 mixColor;
-#if !IS_REQUIRED_BLUR && IS_REQUIRED_BORDERLINE
+uniform lowp float preMultipliedAlpha;
+#if IS_REQUIRED_BORDERLINE
 uniform mediump float borderlineWidth;
 uniform mediump float borderlineOffset;
 uniform lowp vec4 borderlineColor;
 #endif
-#if IS_REQUIRED_BLUR
-uniform mediump float blurRadius;
+
+#if ATLAS_CUSTOM_WARP
+mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp float wrap )
+{
+  mediump float coord;
+  if( wrap > 1.5 ) /* REFLECT */
+    coord = 1.0 - abs(fract(coordinate*0.5)*2.0 - 1.0);
+  else /* warp is 0 or 1 */
+    coord = mix(coordinate, fract(coordinate), wrap);
+  return clamp(mix(range.x, range.y, coord), range.x, range.y);
+}
 #endif
 
-
-#if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE || IS_REQUIRED_BLUR
+#if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
 // Global values both rounded corner and borderline use
 
 // radius of rounded corner on this quadrant
@@ -67,7 +88,7 @@ void calculatePosition()
 {
   gFragmentPosition = abs(vPosition) - vRectSize;
   gCenterPosition = -gRadius;
-#if !IS_REQUIRED_BLUR && IS_REQUIRED_BORDERLINE
+#if IS_REQUIRED_BORDERLINE
   gCenterPosition += borderlineWidth * (clamp(borderlineOffset, -1.0, 1.0) + 1.0) * 0.5;
 #endif
   gDiff = gFragmentPosition - gCenterPosition;
@@ -85,7 +106,7 @@ void setupMinMaxPotential()
   gMaxOutlinePotential = gRadius + gPotentialRange;
   gMinOutlinePotential = gRadius - gPotentialRange;
 
-#if !IS_REQUIRED_BLUR && IS_REQUIRED_BORDERLINE
+#if IS_REQUIRED_BORDERLINE
   gMaxInlinePotential = gMaxOutlinePotential - borderlineWidth;
   gMinInlinePotential = gMinOutlinePotential - borderlineWidth;
 #else
@@ -108,7 +129,7 @@ void PreprocessPotential()
 }
 #endif
 
-#if !IS_REQUIRED_BLUR && IS_REQUIRED_BORDERLINE
+#if IS_REQUIRED_BORDERLINE
 lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 {
   mediump float potential = gPotential;
@@ -145,7 +166,7 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
 }
 #endif
 
-#if !IS_REQUIRED_BLUR && IS_REQUIRED_ROUNDED_CORNER
+#if IS_REQUIRED_ROUNDED_CORNER
 mediump float calculateCornerOpacity()
 {
   mediump float potential = gPotential;
@@ -167,99 +188,37 @@ mediump float calculateCornerOpacity()
 }
 #endif
 
-#if IS_REQUIRED_BLUR
-mediump float calculateBlurOpacity()
-{
-// Don't use borderline!
-  mediump vec2 v = gDiff;
-  mediump float cy = gRadius + blurRadius;
-  mediump float cr = gRadius + blurRadius;
-
-#if IS_REQUIRED_ROUNDED_CORNER
-  // This routine make perfect circle. If corner radius is not exist, we don't consider prefect circle.
-  cy = min(cy, min(vRectSize.x, vRectSize.y) - gRadius);
-#endif
-  v = vec2(min(v.x, v.y), max(v.x, v.y));
-  v = v + cy;
-
-  mediump float potential = 0.0;
-  mediump float alias = min(gRadius, 1.0);
-  mediump float potentialMin = cy + gRadius - blurRadius - alias;
-  mediump float potentialMax = cy + gRadius + blurRadius + alias;
-
-  // move center of circles for reduce defact
-  mediump float cyDiff = min(cy, 0.2 * blurRadius);
-  cy -= cyDiff;
-  cr += cyDiff;
-
-  mediump float diffFromBaseline = cy * v.y - (cy + cr) * v.x;
-
-  if(diffFromBaseline > 0.0)
-  {
-    // out of calculation bound.
-    potential = v.y;
-
-    // for anti-alias when blurRaidus = 0.0
-    mediump float heuristicBaselineScale = max(1.0 , cr * (cr + cy));
-    mediump float potentialDiff = min(alias, diffFromBaseline / heuristicBaselineScale);
-    potentialMin += potentialDiff;
-    potentialMax -= potentialDiff;
-  }
-  else
-  {
-    // get some circle centered (x, x) and radius (r = cr / cy * x)
-    // s.t. point v is on that circle
-    // highest point of that circle is (x, x + r) and potential is x + r
-
-    // solve (v.x - x)^2 + (v.y - x)^2 = (cr / cy * x)^2
-#if IS_REQUIRED_ROUNDED_CORNER
-    // NOTE : lowspec HW cannot calculate here. need to reduce numeric error
-    mediump float A = (cr * cr - 2.0 * cy * cy);
-    mediump float B = cy * (v.x + v.y);
-    mediump float V = dot(v,v);
-    mediump float D = B * B + A * V;
-    potential = V * (cr + cy) / (sqrt(D) + B);
-#else
-    // We can simplify this value cause cy = 0.8 * blurRadius, cr = 1.2 * blurRadius
-    // potential = 5.0*(sqrt(4.0*(v.x+v.y)^2 + dot(v,v)) - 2.0*(v.x+v.y));
-    //           = 10.0*(v.x+v.y) * (sqrt(1.0 + (length(v) / (2.0*(v.x+v.y)))^2) - 1.0);
-    //           = 10.0*(v.x+v.y) * (sqrt(1.25 - x + x^2) - 1.0);
-    //          ~= 10.0*(v.x+v.y) * (0.11803399 - 0.44721360x + 0.35777088x^2 - 0.14310x^3 + O(x^4)) (Taylor series)
-    //          ~= -1.0557281 * (v.x + v.y) + 2.236068 * length(v) - ~~~ (here, x <= 0.5 * (1.0 - sqrt(0.5)) < 0.1464467)
-    // Note : This simplify need cause we should use it on lowspec HW.
-    mediump float x = 0.5 * (1.0 - length(v) / (v.x + v.y));
-    potential = -1.0557281 * (v.x + v.y) + 2.236068 * length(v) + 10.0 * (v.x + v.y) * (0.35777088 - 0.14310 * x) * x * x;
-#endif
-  }
-
-  return 1.0 - smoothstep(potentialMin, potentialMax, potential);
-}
-#endif
-
 void main()
 {
-  lowp vec4 targetColor = vec4(mixColor, 1.0) * uColor;
+#if ATLAS_DEFAULT_WARP
+  mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );
+#elif ATLAS_CUSTOM_WARP
+  mediump vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
+                                wrapCoordinate( uAtlasRect.yw, vTexCoord.y, wrapMode.y ) );
+#else
+  mediump vec2 texCoord = vTexCoord;
+#endif
 
-#if IS_REQUIRED_BLUR || IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
+  lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * uColor * vec4( mixColor, 1.0 );
+
+#if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = targetColor;
+    OUT_COLOR = textureColor;
     return;
   }
   PreprocessPotential();
 #endif
 
-#if !IS_REQUIRED_BLUR && IS_REQUIRED_BORDERLINE
-  targetColor = convertBorderlineColor(targetColor);
+#if IS_REQUIRED_BORDERLINE
+  textureColor = convertBorderlineColor(textureColor);
 #endif
-  OUT_COLOR = targetColor;
+  OUT_COLOR = textureColor;
 
-#if IS_REQUIRED_BLUR
-  mediump float opacity = calculateBlurOpacity();
-  OUT_COLOR.a *= opacity;
-#elif IS_REQUIRED_ROUNDED_CORNER
+#if IS_REQUIRED_ROUNDED_CORNER
   mediump float opacity = calculateCornerOpacity();
   OUT_COLOR.a *= opacity;
+  OUT_COLOR.rgb *= mix(1.0, opacity, preMultipliedAlpha);
 #endif
 }

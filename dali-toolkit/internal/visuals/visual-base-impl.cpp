@@ -89,6 +89,14 @@ void Visual::Base::Initialize()
 
       mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
     }
+    if(IsBorderlineRequired())
+    {
+      mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_WIDTH,  BORDERLINE_WIDTH,  mImpl->mBorderlineWidth);
+      mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_COLOR,  BORDERLINE_COLOR,  mImpl->mBorderlineColor);
+      mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
+
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+    }
   }
 }
 
@@ -141,6 +149,18 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
       else if(matchKey == VISUAL_FITTING_MODE)
       {
         matchKey = Property::Key(Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE);
+      }
+      else if(matchKey == BORDERLINE_WIDTH)
+      {
+        matchKey = Property::Key(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH);
+      }
+      else if(matchKey == BORDERLINE_COLOR)
+      {
+        matchKey = Property::Key(Toolkit::DevelVisual::Property::BORDERLINE_COLOR);
+      }
+      else if(matchKey == BORDERLINE_OFFSET)
+      {
+        matchKey = Property::Key(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET);
       }
       else if(matchKey == CORNER_RADIUS)
       {
@@ -215,6 +235,33 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
       {
         Scripting::GetEnumerationProperty<Visual::FittingMode>(
           value, VISUAL_FITTING_MODE_TABLE, VISUAL_FITTING_MODE_TABLE_COUNT, mImpl->mFittingMode);
+        break;
+      }
+      case Toolkit::DevelVisual::Property::BORDERLINE_WIDTH:
+      {
+        float width;
+        if(value.Get(width))
+        {
+          mImpl->mBorderlineWidth = width;
+        }
+        break;
+      }
+      case Toolkit::DevelVisual::Property::BORDERLINE_COLOR:
+      {
+        Vector4 color;
+        if(value.Get(color))
+        {
+          mImpl->mBorderlineColor = color;
+        }
+        break;
+      }
+      case Toolkit::DevelVisual::Property::BORDERLINE_OFFSET:
+      {
+        float offset;
+        if(value.Get(offset))
+        {
+          mImpl->mBorderlineOffset = offset;
+        }
         break;
       }
       case Toolkit::DevelVisual::Property::CORNER_RADIUS:
@@ -388,6 +435,18 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
     {
       mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<Vector4>(mImpl->mCornerRadiusIndex);
     }
+    if(mImpl->mBorderlineWidthIndex != Property::INVALID_INDEX)
+    {
+      mImpl->mBorderlineWidth = mImpl->mRenderer.GetProperty<float>(mImpl->mBorderlineWidthIndex);
+    }
+    if(mImpl->mBorderlineColorIndex != Property::INVALID_INDEX)
+    {
+      mImpl->mBorderlineColor = mImpl->mRenderer.GetProperty<Vector4>(mImpl->mBorderlineColorIndex);
+    }
+    if(mImpl->mBorderlineOffsetIndex != Property::INVALID_INDEX)
+    {
+      mImpl->mBorderlineOffset = mImpl->mRenderer.GetProperty<float>(mImpl->mBorderlineOffsetIndex);
+    }
   }
 
   DoCreatePropertyMap(map);
@@ -412,6 +471,10 @@ void Visual::Base::CreatePropertyMap(Property::Map& map) const
   auto fittingModeString = Scripting::GetLinearEnumerationName<FittingMode>(
     mImpl->mFittingMode, VISUAL_FITTING_MODE_TABLE, VISUAL_FITTING_MODE_TABLE_COUNT);
   map.Insert(Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE, fittingModeString);
+
+  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
+  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, mImpl->mBorderlineColor);
+  map.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
 
   map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, mImpl->mCornerRadius);
   map.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY, static_cast<int>(mImpl->mCornerRadiusPolicy));
@@ -468,6 +531,16 @@ bool Visual::Base::IsRoundedCornerRequired() const
     mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<Vector4>(mImpl->mCornerRadiusIndex);
   }
   return !(mImpl->mCornerRadius == Vector4::ZERO) || mImpl->mNeedCornerRadius;
+}
+
+bool Visual::Base::IsBorderlineRequired() const
+{
+  if(mImpl->mRenderer && mImpl->mBorderlineWidthIndex != Property::INVALID_INDEX)
+  {
+    // Update values from Renderer
+    mImpl->mBorderlineWidth = mImpl->mRenderer.GetProperty<float>(mImpl->mBorderlineWidthIndex);
+  }
+  return !EqualsZero(mImpl->mBorderlineWidth) || mImpl->mNeedBorderline;
 }
 
 void Visual::Base::OnDoAction(const Property::Index actionId, const Property::Value& attributes)
@@ -824,7 +897,24 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
   Property::Index index = GetPropertyIndex(key);
   if(index == Property::INVALID_INDEX)
   {
-    if((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::CORNER_RADIUS) || (key.type == Property::Key::STRING && key.stringKey == CORNER_RADIUS))
+    if((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_WIDTH)  || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_WIDTH) ||
+       (key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_COLOR)  || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_COLOR) ||
+       (key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_OFFSET) || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_OFFSET))
+    {
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+
+      // Register borderline properties
+      mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_WIDTH, BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
+      mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_COLOR, BORDERLINE_COLOR, mImpl->mBorderlineColor);
+      mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
+      mImpl->mNeedBorderline        = true;
+
+      index = mImpl->mRenderer.GetPropertyIndex(key);
+
+      // Change shader
+      UpdateShader();
+    }
+    else if((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::CORNER_RADIUS) || (key.type == Property::Key::STRING && key.stringKey == CORNER_RADIUS))
     {
       // Register CORNER_RADIUS property
       mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);

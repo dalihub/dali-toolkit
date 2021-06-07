@@ -978,9 +978,11 @@ Shader ImageVisual::GetShader()
     // Create and cache the standard shader
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
-      mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
-      mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE,
-      IsRoundedCornerRequired());
+      mImpl->mFlags & Impl::IS_ATLASING_APPLIED ? TextureAtlas::ENABLED : TextureAtlas::DISABLED,
+      mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE ? DefaultTextureWrapMode::APPLY : DefaultTextureWrapMode::DO_NOT_APPLY,
+      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
+      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
+    );
   }
   else if(mImpl->mCustomShader)
   {
