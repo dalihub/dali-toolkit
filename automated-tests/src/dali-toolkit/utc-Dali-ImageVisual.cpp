@@ -25,6 +25,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
+#include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include "dummy-control.h"
 
@@ -424,7 +425,8 @@ int UtcDaliImageVisualWithNativeImage(void)
   tet_infoline( "Use Native Image as url" );
 
   NativeImageSourcePtr nativeImageSource = NativeImageSource::New(500, 500, NativeImageSource::COLOR_DEPTH_DEFAULT);
-  std::string url = Dali::Toolkit::Image::GenerateUrl(nativeImageSource);
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImageSource);
+  std::string url = imageUrl.GetUrl();
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -458,6 +460,62 @@ int UtcDaliImageVisualWithNativeImage(void)
   size_t pos = fragmentShader.find(fragmentPrefix);
 
   DALI_TEST_EQUALS( pos != std::string::npos, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualWithNativeImageRemoved(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Use Native Image as url" );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  NativeImageSourcePtr nativeImageSource = NativeImageSource::New(500, 500, NativeImageSource::COLOR_DEPTH_DEFAULT);
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImageSource);
+  std::string url = imageUrl.GetUrl();
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  url );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(  DummyControl::Property::TEST_VISUAL, visual );
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  application.GetScene().Add( actor );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+
+  tet_infoline( "No delete texture because reference count is not zero" );
+  imageUrl.Reset();
+  application.GetScene().Remove( actor );
+  dummyImpl.UnregisterVisual( DummyControl::Property::TEST_VISUAL );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+
+  tet_infoline( "Delete texture because reference count is zero" );
+  visual.Reset();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 1, TEST_LOCATION );
 
   END_TEST;
 }

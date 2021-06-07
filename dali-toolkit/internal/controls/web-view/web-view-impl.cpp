@@ -52,6 +52,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/public-api/image-loader/image-url.h>
 
 namespace Dali
 {
@@ -634,8 +635,8 @@ Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel) const
     return Dali::Toolkit::ImageView();
   }
 
-  std::string              url       = Dali::Toolkit::Image::GenerateUrl(pixel);
-  Dali::Toolkit::ImageView imageView = Dali::Toolkit::ImageView::New(url);
+  Dali::Toolkit::ImageUrl url       = Dali::Toolkit::Image::GenerateUrl(pixel);
+  Dali::Toolkit::ImageView imageView = Dali::Toolkit::ImageView::New(url.GetUrl());
   imageView.SetProperty(Dali::Actor::Property::SIZE, Vector2(pixel.GetWidth(), pixel.GetHeight()));
   return imageView;
 }
