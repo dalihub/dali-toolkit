@@ -28,14 +28,7 @@
 #include <typeinfo>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/graphics/generated/gradient-visual-bounding-box-rounded-corner-shader-vert.h>
-#include <dali-toolkit/internal/graphics/generated/gradient-visual-bounding-box-shader-vert.h>
-#include <dali-toolkit/internal/graphics/generated/gradient-visual-linear-rounded-corner-shader-frag.h>
-#include <dali-toolkit/internal/graphics/generated/gradient-visual-linear-shader-frag.h>
-#include <dali-toolkit/internal/graphics/generated/gradient-visual-radial-rounded-corner-shader-frag.h>
-#include <dali-toolkit/internal/graphics/generated/gradient-visual-radial-shader-frag.h>
-#include <dali-toolkit/internal/graphics/generated/gradient-visual-user-space-rounded-corner-shader-vert.h>
-#include <dali-toolkit/internal/graphics/generated/gradient-visual-user-space-shader-vert.h>
+#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/gradient/linear-gradient.h>
 #include <dali-toolkit/internal/visuals/gradient/radial-gradient.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -71,44 +64,35 @@ const char* const UNIFORM_ALIGNMENT_MATRIX_NAME("uAlignmentMatrix");
 const unsigned int DEFAULT_OFFSET_MINIMUM = 0.0f;
 const unsigned int DEFAULT_OFFSET_MAXIMUM = 1.0f;
 
-VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[][4] =
-  {
-    {VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE,
-     VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX,
-     VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_CORNER,
-     VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_CORNER},
-    {VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE,
-     VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX,
-     VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_CORNER,
-     VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_CORNER}};
+VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[16] =
+{
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_CORNER,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_BORDERLINE,
+  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_BORDERLINE,
+};
 
-const std::string_view VERTEX_SHADER[] =
-  {
-    // vertex shader for gradient units as OBJECT_BOUNDING_BOX
-    SHADER_GRADIENT_VISUAL_BOUNDING_BOX_SHADER_VERT,
-
-    // vertex shader for gradient units as USER_SPACE
-    SHADER_GRADIENT_VISUAL_USER_SPACE_SHADER_VERT,
-
-    // vertex shader for gradient units as OBJECT_BOUNDING_BOX with corner radius
-    SHADER_GRADIENT_VISUAL_BOUNDING_BOX_ROUNDED_CORNER_SHADER_VERT,
-
-    // vertex shader for gradient units as USER_SPACE with corner radius
-    SHADER_GRADIENT_VISUAL_USER_SPACE_ROUNDED_CORNER_SHADER_VERT};
-
-const std::string_view FRAGMENT_SHADER[] =
-  {
-    // fragment shader for linear gradient
-    SHADER_GRADIENT_VISUAL_LINEAR_SHADER_FRAG,
-
-    // fragment shader for radial gradient
-    SHADER_GRADIENT_VISUAL_RADIAL_SHADER_FRAG,
-
-    // fragment shader for linear gradient with corner radius
-    SHADER_GRADIENT_VISUAL_LINEAR_ROUNDED_CORNER_SHADER_FRAG,
-
-    // fragment shader for radial gradient with corner radius
-    SHADER_GRADIENT_VISUAL_RADIAL_ROUNDED_CORNER_SHADER_FRAG};
+// enum of required list when we select shader
+enum GradientVisualRequireFlag
+{
+  DEFAULT        = 0,
+  ROUNDED_CORNER = 1 << 0,
+  BORDERLINE     = 1 << 1,
+  USER_SPACE     = 1 << 2,
+  RADIAL         = 1 << 3,
+};
 
 Dali::WrapMode::Type GetWrapMode(Toolkit::GradientVisual::SpreadMethod::Type spread)
 {
@@ -162,10 +146,10 @@ void GradientVisual::DoSetProperties(const Property::Map& propertyMap)
     Scripting::GetEnumerationProperty(*unitsValue, UNITS_TABLE, UNITS_TABLE_COUNT, gradientUnits);
   }
 
-  mGradientType = LINEAR;
+  mGradientType = Type::LINEAR;
   if(propertyMap.Find(Toolkit::GradientVisual::Property::RADIUS, RADIUS_NAME))
   {
-    mGradientType = RADIAL;
+    mGradientType = Type::RADIAL;
   }
 
   if(NewGradient(mGradientType, propertyMap))
@@ -283,7 +267,7 @@ void GradientVisual::OnInitialize()
 
 bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propertyMap)
 {
-  if(gradientType == LINEAR)
+  if(gradientType == Type::LINEAR)
   {
     Property::Value* startPositionValue = propertyMap.Find(Toolkit::GradientVisual::Property::START_POSITION, START_POSITION_NAME);
     Property::Value* endPositionValue   = propertyMap.Find(Toolkit::GradientVisual::Property::END_POSITION, END_POSITION_NAME);
@@ -299,7 +283,7 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
       return false;
     }
   }
-  else // type==RADIAL
+  else // type==Type::RADIAL
   {
     Property::Value* centerValue = propertyMap.Find(Toolkit::GradientVisual::Property::CENTER, CENTER_NAME);
     Property::Value* radiusValue = propertyMap.Find(Toolkit::GradientVisual::Property::RADIUS, RADIUS_NAME);
@@ -363,13 +347,57 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
 
 Shader GradientVisual::GetShader()
 {
-  Toolkit::GradientVisual::Units::Type gradientUnits = mGradient->GetGradientUnits();
-  int                                  roundedCorner = IsRoundedCornerRequired() ? 1 : 0;
-  VisualFactoryCache::ShaderType       shaderType    = SHADER_TYPE_TABLE[mGradientType][gradientUnits + roundedCorner * 2];
-  Shader                               shader        = mFactoryCache.GetShader(shaderType);
+  bool userspaceUnit  = (mGradient->GetGradientUnits() == Toolkit::GradientVisual::Units::USER_SPACE);
+  bool roundedCorner  = IsRoundedCornerRequired();
+  bool borderline     = IsBorderlineRequired();
+  bool radialGradient = (mGradientType == Type::RADIAL);
+
+  int  shaderTypeFlag = GradientVisualRequireFlag::DEFAULT;
+  if(roundedCorner)
+  {
+    shaderTypeFlag |= GradientVisualRequireFlag::ROUNDED_CORNER;
+  }
+  if(borderline)
+  {
+    shaderTypeFlag |= GradientVisualRequireFlag::BORDERLINE;
+  }
+  if(userspaceUnit)
+  {
+    shaderTypeFlag |= GradientVisualRequireFlag::USER_SPACE;
+  }
+  if(radialGradient)
+  {
+    shaderTypeFlag |= GradientVisualRequireFlag::RADIAL;
+  }
+
+  VisualFactoryCache::ShaderType shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
+  Shader                         shader     = mFactoryCache.GetShader(shaderType);
   if(!shader)
   {
-    shader = Shader::New(VERTEX_SHADER[gradientUnits + roundedCorner * 2], FRAGMENT_SHADER[mGradientType + roundedCorner * 2]);
+    std::string vertexShaderPrefixList;
+    std::string fragmentShaderPrefixList;
+
+    if(roundedCorner)
+    {
+      vertexShaderPrefixList   += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+    }
+    if(borderline)
+    {
+      vertexShaderPrefixList   += "#define IS_REQUIRED_BORDERLINE 1\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
+    }
+    if(radialGradient)
+    {
+      fragmentShaderPrefixList += "#define RADIAL 1\n";
+    }
+    if(userspaceUnit)
+    {
+      vertexShaderPrefixList   += "#define USER_SPACE 1\n";
+    }
+
+    shader = Shader::New(Dali::Shader::GetVertexShaderPrefix()   + vertexShaderPrefixList   + SHADER_GRADIENT_VISUAL_SHADER_VERT.data(),
+                         Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_FRAG.data());
     mFactoryCache.SaveShader(shaderType, shader);
   }
 

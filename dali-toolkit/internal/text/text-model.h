@@ -207,6 +207,26 @@ public:
    */
   bool IsBackgroundEnabled() const override;
 
+  /**
+   * @copydoc ModelInterface::IsMarkupProcessorEnabled()
+   */
+  bool IsMarkupProcessorEnabled() const override;
+
+  /**
+  * @copydoc ModelInterface::GetHyphens()
+  */
+  const GlyphInfo* GetHyphens() const override;
+
+  /**
+  * @copydoc ModelInterface::GetHyphens()
+  */
+  const Length* GetHyphenIndices() const override;
+
+  /**
+  * @copydoc ModelInterface::GetHyphens()
+  */
+  Length GetHyphensCount() const override;
+
 private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.

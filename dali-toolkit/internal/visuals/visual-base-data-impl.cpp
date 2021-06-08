@@ -119,16 +119,23 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
   mTransform(),
   mMixColor(Color::WHITE),
   mControlSize(Vector2::ZERO),
+  mBorderlineWidth(0.0f),
+  mBorderlineColor(Color::BLACK),
+  mBorderlineOffset(0.0f),
   mCornerRadius(Vector4::ZERO),
   mCornerRadiusPolicy(1.0f),
   mDepthIndex(0.0f),
   mMixColorIndex(Property::INVALID_INDEX),
+  mBorderlineWidthIndex(Property::INVALID_INDEX),
+  mBorderlineColorIndex(Property::INVALID_INDEX),
+  mBorderlineOffsetIndex(Property::INVALID_INDEX),
   mCornerRadiusIndex(Property::INVALID_INDEX),
   mFittingMode(fittingMode),
   mFlags(0),
   mResourceStatus(Toolkit::Visual::ResourceStatus::PREPARING),
   mType(type),
-  mNeedCornerRadius(false)
+  mNeedCornerRadius(false),
+  mNeedBorderline(false)
 {
 }
 

@@ -489,7 +489,6 @@ public:
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
   std::vector<std::vector<Accessibility::Address>> mAccessibilityRelations;
-  bool                                             mAccessibilityAnimated = false;
 
   // Gesture Detection
   PinchGestureDetector     mPinchGestureDetector;
@@ -543,15 +542,8 @@ public:
   static Dali::Accessibility::Accessible* GetAccessibilityObject(Dali::Actor actor);
   Dali::Accessibility::Accessible*        GetAccessibilityObject();
 
-  void AccessibilityRegister();
-  void AccessibilityDeregister(bool remove);
-
   std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)> accessibilityConstructor;
   std::unique_ptr<Dali::Accessibility::Accessible>                       accessibilityObject;
-  Dali::PropertyNotification                                             accessibilityNotificationPosition, accessibilityNotificationSize, accessibilityNotificationCulled;
-  bool                                                                   accessibilityNotificationSet = false;
-  static void                                                            PositionOrSizeChangedCallback(PropertyNotification&);
-  static void                                                            CulledChangedCallback(PropertyNotification&);
 };
 
 } // namespace Internal

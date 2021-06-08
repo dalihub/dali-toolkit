@@ -182,14 +182,7 @@ enum
    * @brief Set of accessibility attributes describing object in accessibility hierarchy
    * @details Name "accessibilityAttributes", type Property::MAP
    */
-  ACCESSIBILITY_ATTRIBUTES,
-
-  /**
-   * @brief Boolean flag describing object as animated
-   * @details Name "accessibilityAnimated", type Property::BOOLEAN
-   * @note Flag set to true will prevent BoundChanged accessibility signal from emiting
-   */
-  ACCESSIBILITY_ANIMATED
+  ACCESSIBILITY_ATTRIBUTES
 };
 
 } // namespace Property

@@ -35,6 +35,13 @@ namespace Toolkit
 {
 namespace Text
 {
+struct HyphenInfo
+{
+  Vector<GlyphInfo> glyph;
+  Vector<Vector2>   position;
+  Vector<Length>    index;
+};
+
 class VisualModel;
 typedef IntrusivePtr<VisualModel> VisualModelPtr;
 
@@ -353,6 +360,20 @@ public:
    */
   bool IsBackgroundEnabled() const;
 
+  /**
+   * @brief Sets whether the text has a markup-processor or not.
+   *
+   * @param[in] enabled true if the text has a markup-processor.
+   */
+  void SetMarkupProcessorEnabled(bool enabled);
+
+  /**
+   * @brief Returns whether the text has a markup-processor or not.
+   *
+   * @return whether the text has a markup-processor or not.
+   */
+  bool IsMarkupProcessorEnabled() const;
+
 protected:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -407,6 +428,8 @@ public:
   bool mUnderlineEnabled : 1;  ///< Underline enabled flag
   bool mUnderlineColorSet : 1; ///< Has the underline color been explicitly set?
   bool mBackgroundEnabled : 1; ///< Background enabled flag
+  bool mMarkupProcessorEnabled : 1; ///< Markup-processor enabled flag
+  HyphenInfo mHyphen; ///< Contains hyphen glyph info & the character index to draw hyphen after.
 };
 
 } // namespace Text

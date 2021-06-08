@@ -187,6 +187,39 @@ enum Type
    * @details Name "grabHandleColor", type Property::VECTOR4.
    */
   GRAB_HANDLE_COLOR,
+
+  /**
+   * @brief Enables the grab handle popup for text selection.
+   * @details Name "enableGrabHandlePopup", type Property::BOOLEAN.
+   * @note The default value is true, which means the grab handle popup is enabled by default.
+   */
+  ENABLE_GRAB_HANDLE_POPUP,
+
+  /**
+   * @brief The settings to relating to the System's Input Method, Key and Value.
+   * @details Name "inputMethodSettings", type Property::MAP.
+   *
+   * @note VARIATION key can be changed depending on PANEL_LAYOUT.
+   * For example, when PANEL_LAYOUT key is InputMethod::PanelLayout::NORMAL,
+   * then VARIATION would be among NORMAL, WITH_FILENAME, and WITH_PERSON_NAME in Dali::InputMethod::NormalLayout.
+   * For more information, see Dali::InputMethod::Category.
+   *
+   * Example Usage:
+   * @code
+   *   Property::Map propertyMap;
+   *   InputMethod::PanelLayout::Type panelLayout = InputMethod::PanelLayout::NUMBER;
+   *   InputMethod::AutoCapital::Type autoCapital = InputMethod::AutoCapital::WORD;
+   *   InputMethod::ButtonAction::Type buttonAction = InputMethod::ButtonAction::GO;
+   *   int inputVariation = 1;
+   *   propertyMap["PANEL_LAYOUT"] = panelLayout;
+   *   propertyMap["AUTO_CAPITALIZE"] = autoCapital;
+   *   propertyMap["BUTTON_ACTION"] = buttonAction;
+   *   propertyMap["VARIATION"] = inputVariation;
+   *
+   *   editor.SetProperty(DevelTextEditor::Property::INPUT_METHOD_SETTINGS, propertyMap);
+   * @endcode
+   */
+  INPUT_METHOD_SETTINGS,
 };
 
 } // namespace Property

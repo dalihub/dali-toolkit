@@ -36,6 +36,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/focus-manager/focus-finder.h>
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
@@ -494,6 +495,11 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
         mIsWaitingKeyboardFocusChangeCommit = true;
         nextFocusableActor                  = mPreFocusChangeSignal.Emit(currentFocusActor, Actor(), direction);
         mIsWaitingKeyboardFocusChangeCommit = false;
+      }
+      else
+      {
+        // We should find it among the actors nearby.
+        nextFocusableActor = Toolkit::FocusFinder::Get().GetNearestFocusableActor(currentFocusActor, direction);
       }
     }
 

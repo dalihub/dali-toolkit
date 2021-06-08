@@ -1407,6 +1407,12 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     ResizeActor(mActiveLayer, contentSize);
   }
 
+  // If there is text changed, callback is called.
+  if(mTextChanged)
+  {
+    EmitTextChangedSignal();
+  }
+
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
 
   if((Text::Controller::NONE_UPDATED != updateTextType) ||
@@ -1426,12 +1432,6 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
 
     RenderText(updateTextType);
-
-    // If there is text changed, callback is called.
-    if(mTextChanged)
-    {
-      EmitTextChangedSignal();
-    }
   }
 
   // The text-field emits signals when the input style changes. These changes of style are
@@ -2128,7 +2128,22 @@ bool TextField::AccessibleImpl::CutText(size_t startPosition,
   Dali::Toolkit::GetImpl(slf).getController()->CopyStringToClipboard(txt.substr(startPosition, endPosition - startPosition));
 
   slf.SetProperty(Toolkit::TextField::Property::TEXT,
-                  txt.substr(0, startPosition) + txt.substr(endPosition - startPosition, txt.size()));
+                  txt.substr(0, startPosition) + txt.substr(endPosition));
+
+  return true;
+}
+
+bool TextField::AccessibleImpl::DeleteText(size_t startPosition,
+                                           size_t endPosition)
+{
+  if(endPosition <= startPosition)
+    return false;
+
+  auto slf = Toolkit::TextField::DownCast(Self());
+  auto txt = slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
+
+  slf.SetProperty(Toolkit::TextField::Property::TEXT,
+                  txt.substr(0, startPosition) + txt.substr(endPosition));
 
   return true;
 }
@@ -2149,6 +2164,26 @@ Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
   }
 
   return states;
+}
+
+bool TextField::AccessibleImpl::InsertText(size_t startPosition,
+                                            std::string text)
+{
+  auto slf = Toolkit::TextField::DownCast(Self());
+  auto txt = slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
+
+  txt.insert(startPosition, text);
+
+  slf.SetProperty(Toolkit::TextField::Property::TEXT, std::move(txt));
+
+  return true;
+}
+
+bool TextField::AccessibleImpl::SetTextContents(std::string newContents)
+{
+  auto slf = Toolkit::TextField::DownCast(Self());
+  slf.SetProperty(Toolkit::TextField::Property::TEXT, std::move(newContents));
+  return true;
 }
 
 } // namespace Internal

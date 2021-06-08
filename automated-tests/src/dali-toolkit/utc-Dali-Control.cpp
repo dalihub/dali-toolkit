@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -525,21 +525,8 @@ int UtcDaliControlBackgroundColorRendererCount(void)
 
   ToolkitTestApplication application;
   Control control = Control::New();
+  control[Actor::Property::SIZE] = Vector2(100.0f, 100.0f);
   application.GetScene().Add( control );
-
-  tet_infoline( "Set transparent, no renderers should be created" );
-  control.SetBackgroundColor( Color::TRANSPARENT );
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
-
-  tet_infoline( "Set transparent alpha with positive RGB values, no renderers should be created, but returned color should reflect what we set" );
-  const Vector4 alphaZero( 1.0f, 0.5f, 0.25f, 0.0f );
-  control.SetBackgroundColor( alphaZero );
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
-  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), alphaZero, TEST_LOCATION );
 
   tet_infoline( "Set semi transparent alpha with positive RGB values, 1 renderer should be created, but returned color should reflect what we set" );
   const Vector4 semiTransparent( 1.0f, 0.75f, 0.5f, 0.5f );
@@ -561,19 +548,29 @@ int UtcDaliControlBackgroundColorRendererCount(void)
   DALI_TEST_EQUALS( GetControlBackgroundColor( control ), newColor, TEST_LOCATION );
   DALI_TEST_EQUALS( renderer, control.GetRendererAt( 0 ), TEST_LOCATION );
 
-  tet_infoline( "Set transparent, ensure no renderers are created" );
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  tet_infoline( "Set transparent, 1 renderer should be created, but ensure nothing is drawn" );
   control.SetBackgroundColor( Color::TRANSPARENT );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION);
+
+  drawTrace.Reset();
 
   tet_infoline( "Set control to clip its children, a renderer should be created which will be transparent" );
   control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
   application.SendNotification();
   application.Render();
+
   DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION);
 
   tet_infoline( "Set a color, only 1 renderer should exist" );
   control.SetBackgroundColor( Color::RED );
@@ -595,12 +592,15 @@ int UtcDaliControlBackgroundColorRendererCount(void)
   DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
 
-  tet_infoline( "Disable clipping, no renderers" );
+  drawTrace.Reset();
+
+  tet_infoline( "Disable clipping, render nothing" );
   control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED );
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+
   DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_EQUALS(drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION);
 
   END_TEST;
 }

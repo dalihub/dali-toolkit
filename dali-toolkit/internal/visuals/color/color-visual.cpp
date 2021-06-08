@@ -39,6 +39,27 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace
+{
+VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[6] =
+{
+  VisualFactoryCache::COLOR_SHADER,
+  VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER,
+  VisualFactoryCache::COLOR_SHADER_BORDERLINE,
+  VisualFactoryCache::COLOR_SHADER_ROUNDED_BORDERLINE,
+  VisualFactoryCache::COLOR_SHADER_BLUR_EDGE,
+  VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE,
+};
+
+// enum of required list when we select shader
+enum ColorVisualRequireFlag
+{
+  DEFAULT        = 0,
+  ROUNDED_CORNER = 1 << 0,
+  BORDERLINE     = 1 << 1,
+  BLUR           = 1 << 2,
+};
+} // unnamed namespace
 ColorVisualPtr ColorVisual::New(VisualFactoryCache& factoryCache, const Property::Map& properties)
 {
   ColorVisualPtr colorVisualPtr(new ColorVisual(factoryCache));
@@ -51,7 +72,6 @@ ColorVisual::ColorVisual(VisualFactoryCache& factoryCache)
 : Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::COLOR),
   mBlurRadius(0.0f),
   mBlurRadiusIndex(Property::INVALID_INDEX),
-  mRenderIfTransparent(false),
   mNeedBlurRadius(false)
 {
 }
@@ -87,15 +107,6 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* renderIfTransparentValue = propertyMap.Find(Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT, RENDER_IF_TRANSPARENT_NAME);
-  if(renderIfTransparentValue)
-  {
-    if(!renderIfTransparentValue->Get(mRenderIfTransparent))
-    {
-      DALI_LOG_ERROR("ColorVisual: renderIfTransparent property has incorrect type: %d\n", renderIfTransparentValue->GetType());
-    }
-  }
-
   Property::Value* blurRadiusValue = propertyMap.Find(Toolkit::DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME);
   if(blurRadiusValue)
   {
@@ -108,12 +119,7 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
 
 void ColorVisual::DoSetOnScene(Actor& actor)
 {
-  // Only add the renderer if it's not fully transparent
-  // We cannot avoid creating a renderer as it's used in the base class
-  if(mRenderIfTransparent || mImpl->mMixColor.a > 0.0f)
-  {
-    actor.AddRenderer(mImpl->mRenderer);
-  }
+  actor.AddRenderer(mImpl->mRenderer);
 
   // Color Visual generated and ready to display
   ResourceReady(Toolkit::Visual::ResourceStatus::READY);
@@ -129,7 +135,6 @@ void ColorVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Clear();
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
   map.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, mImpl->mMixColor);
-  map.Insert(Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT, mRenderIfTransparent);
 
   if(mImpl->mRenderer && mBlurRadiusIndex != Property::INVALID_INDEX)
   {
@@ -208,32 +213,52 @@ void ColorVisual::OnInitialize()
 Shader ColorVisual::GetShader()
 {
   Shader shader;
-  if(!EqualsZero(mBlurRadius) || mNeedBlurRadius)
+  VisualFactoryCache::ShaderType shaderType;
+
+  bool roundedCorner = IsRoundedCornerRequired();
+  bool borderline    = IsBorderlineRequired();
+  bool blur          = !EqualsZero(mBlurRadius) || mNeedBlurRadius;
+  int shaderTypeFlag = ColorVisualRequireFlag::DEFAULT;
+
+  if(roundedCorner)
   {
-    shader = mFactoryCache.GetShader(VisualFactoryCache::COLOR_SHADER_BLUR_EDGE);
-    if(!shader)
-    {
-      shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_COLOR_VISUAL_BLUR_EDGE_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_COLOR_VISUAL_BLUR_EDGE_SHADER_FRAG.data());
-      mFactoryCache.SaveShader(VisualFactoryCache::COLOR_SHADER_BLUR_EDGE, shader);
-    }
+    shaderTypeFlag |= ColorVisualRequireFlag::ROUNDED_CORNER;
   }
-  else if(!IsRoundedCornerRequired())
+  if(blur)
   {
-    shader = mFactoryCache.GetShader(VisualFactoryCache::COLOR_SHADER);
-    if(!shader)
-    {
-      shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_COLOR_VISUAL_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
-      mFactoryCache.SaveShader(VisualFactoryCache::COLOR_SHADER, shader);
-    }
+    // If we use blur, just ignore borderline
+    borderline = false;
+    shaderTypeFlag |= ColorVisualRequireFlag::BLUR;
   }
-  else
+  if(borderline)
   {
-    shader = mFactoryCache.GetShader(VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER);
-    if(!shader)
+    shaderTypeFlag |= ColorVisualRequireFlag::BORDERLINE;
+  }
+
+  shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
+  shader = mFactoryCache.GetShader(shaderType);
+  if(!shader)
+  {
+    std::string vertexShaderPrefixList;
+    std::string fragmentShaderPrefixList;
+    if(roundedCorner)
     {
-      shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_COLOR_VISUAL_ROUNDED_CORNER_SHADER_VERT.data(), Dali::Shader::GetFragmentShaderPrefix() + SHADER_COLOR_VISUAL_ROUNDED_CORNER_SHADER_FRAG.data());
-      mFactoryCache.SaveShader(VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER, shader);
+      vertexShaderPrefixList   += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
     }
+    if(blur)
+    {
+      vertexShaderPrefixList   += "#define IS_REQUIRED_BLUR 1\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_BLUR 1\n";
+    }
+    if(borderline)
+    {
+      vertexShaderPrefixList   += "#define IS_REQUIRED_BORDERLINE 1\n";
+      fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
+    }
+    shader = Shader::New(Dali::Shader::GetVertexShaderPrefix()   + vertexShaderPrefixList   + SHADER_COLOR_VISUAL_SHADER_VERT.data(),
+                         Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
+    mFactoryCache.SaveShader(shaderType, shader);
   }
 
   return shader;

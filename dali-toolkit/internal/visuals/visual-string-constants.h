@@ -59,12 +59,16 @@ extern const char* const OPACITY;
 // Fitting mode
 extern const char* const VISUAL_FITTING_MODE;
 
+// Border line
+extern const char* const BORDERLINE_WIDTH;
+extern const char* const BORDERLINE_COLOR;
+extern const char* const BORDERLINE_OFFSET;
+
 // Corner radius
 extern const char* const CORNER_RADIUS;
 extern const char* const CORNER_RADIUS_POLICY;
 
 // Color visual
-extern const char* const RENDER_IF_TRANSPARENT_NAME;
 extern const char* const BLUR_RADIUS_NAME;
 
 // Image visual

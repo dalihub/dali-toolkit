@@ -147,6 +147,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextEditor, "selectedText", 
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "fontSizeScale",                        FLOAT,     FONT_SIZE_SCALE                     )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "primaryCursorPosition",                INTEGER,   PRIMARY_CURSOR_POSITION             )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "grabHandleColor",                      VECTOR4,   GRAB_HANDLE_COLOR                   )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableGrabHandlePopup",                BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP            )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputMethodSettings",                  MAP,       INPUT_METHOD_SETTINGS               )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
@@ -775,6 +777,30 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
         impl.RequestTextRelayout();
         break;
       }
+      case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP:
+      {
+        const bool grabHandlePopupEnabled = value.Get<bool>();
+        DALI_LOG_INFO(gLogFilter, Debug::General, "TextEditor %p ENABLE_GRAB_HANDLE_POPUP %d\n", impl.mController.Get(), grabHandlePopupEnabled);
+
+        impl.mController->SetGrabHandlePopupEnabled(grabHandlePopupEnabled);
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::INPUT_METHOD_SETTINGS:
+      {
+        const Property::Map* map = value.GetMap();
+        if(map)
+        {
+          impl.mInputMethodOptions.ApplyProperty(*map);
+        }
+        impl.mController->SetInputModePassword(impl.mInputMethodOptions.IsPassword());
+
+        Toolkit::Control control = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
+        if(control == textEditor)
+        {
+          impl.mInputMethodContext.ApplyOptions(impl.mInputMethodOptions);
+        }
+        break;
+      }
     } // switch
   }   // texteditor
 }
@@ -1136,6 +1162,18 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
         value = impl.mDecorator->GetHandleColor();
         break;
       }
+      case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP:
+      {
+        value = impl.mController->IsGrabHandlePopupEnabled();
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::INPUT_METHOD_SETTINGS:
+      {
+        Property::Map map;
+        impl.mInputMethodOptions.RetrieveProperty(map);
+        value = map;
+        break;
+      }
     } //switch
   }
 
@@ -1456,6 +1494,12 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     ResizeActor(mActiveLayer, contentSize);
   }
 
+  // If there is text changed, callback is called.
+  if(mTextChanged)
+  {
+    EmitTextChangedSignal();
+  }
+
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
 
   if((Text::Controller::NONE_UPDATED != updateTextType) ||
@@ -1475,12 +1519,6 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
 
     RenderText(updateTextType);
-
-    // If there is text changed, callback is called.
-    if(mTextChanged)
-    {
-      EmitTextChangedSignal();
-    }
   }
 
   // The text-editor emits signals when the input style changes. These changes of style are
@@ -1555,6 +1593,7 @@ void TextEditor::OnKeyInputFocusGained()
   if(mInputMethodContext && IsEditable())
   {
     // All input panel properties, such as layout, return key type, and input hint, should be set before input panel activates (or shows).
+    mInputMethodContext.ApplyOptions(mInputMethodOptions);
     mInputMethodContext.NotifyTextInputMultiLine(true);
 
     mInputMethodContext.StatusChangedSignal().Connect(this, &TextEditor::KeyboardStatusChanged);
@@ -2247,7 +2286,22 @@ bool TextEditor::AccessibleImpl::CutText(size_t startPosition,
   Dali::Toolkit::GetImpl(slf).getController()->CopyStringToClipboard(txt.substr(startPosition, endPosition - startPosition));
 
   slf.SetProperty(Toolkit::TextEditor::Property::TEXT,
-                  txt.substr(0, startPosition) + txt.substr(endPosition - startPosition, txt.size()));
+                  txt.substr(0, startPosition) + txt.substr(endPosition));
+
+  return true;
+}
+
+bool TextEditor::AccessibleImpl::DeleteText(size_t startPosition,
+                                            size_t endPosition)
+{
+  if(endPosition <= startPosition)
+    return false;
+
+  auto slf = Toolkit::TextEditor::DownCast(Self());
+  auto txt = slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
+
+  slf.SetProperty(Toolkit::TextEditor::Property::TEXT,
+                  txt.substr(0, startPosition) + txt.substr(endPosition));
 
   return true;
 }
@@ -2267,6 +2321,26 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
   }
 
   return states;
+}
+
+bool TextEditor::AccessibleImpl::InsertText(size_t startPosition,
+                                            std::string text)
+{
+  auto slf = Toolkit::TextEditor::DownCast(Self());
+  auto txt = slf.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
+
+  txt.insert(startPosition, text);
+
+  slf.SetProperty(Toolkit::TextEditor::Property::TEXT, std::move(txt));
+
+  return true;
+}
+
+bool TextEditor::AccessibleImpl::SetTextContents(std::string newContents)
+{
+  auto slf = Toolkit::TextEditor::DownCast(Self());
+  slf.SetProperty(Toolkit::TextEditor::Property::TEXT, std::move(newContents));
+  return true;
 }
 
 } // namespace Internal

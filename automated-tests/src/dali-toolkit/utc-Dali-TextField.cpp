@@ -1113,7 +1113,7 @@ int utcDaliTextFieldAnchorClicked02(void)
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
 
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 100);
   application.SendNotification();
   application.Render();
 
@@ -1134,7 +1134,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 700);
   application.SendNotification();
   field.SetKeyInputFocus();
 
@@ -1152,7 +1152,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 1300);
   application.SendNotification();
   field.SetKeyInputFocus();
 
@@ -1170,7 +1170,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 1900);
   application.SendNotification();
   field.SetKeyInputFocus();
 
@@ -1189,7 +1189,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 2500);
   application.SendNotification();
   field.SetKeyInputFocus();
 
@@ -1208,7 +1208,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 3100);
   application.SendNotification();
   application.Render();
 
@@ -1227,7 +1227,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 3700);
   application.SendNotification();
   application.Render();
 
@@ -1246,7 +1246,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 4300);
   application.SendNotification();
   application.Render();
 
@@ -1265,7 +1265,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 4900);
   application.SendNotification();
   application.Render();
 
@@ -1284,7 +1284,7 @@ int utcDaliTextFieldAnchorClicked02(void)
 
   gAnchorClickedCallBackCalled = false;
   // Create a tap event to touch the text field.
-  TestGenerateTap(application, 30.0f, 25.0f);
+  TestGenerateTap(application, 30.0f, 25.0f, 5500);
   application.SendNotification();
   application.Render();
 
@@ -1931,7 +1931,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
   DALI_TEST_CHECK( !inputStyleChangedSignal );
 
   // Create a tap event to touch the text field.
-  TestGenerateTap( application, 63.0f, 25.0f, 300 );
+  TestGenerateTap( application, 63.0f, 25.0f, 700 );
 
   // Render and notify
   application.SendNotification();
@@ -3553,6 +3553,79 @@ int utcDaliTextFieldMaxCharactersReachedAfterSetText(void)
   DALI_TEST_CHECK( maxLengthReachedSignal );
 
   DALI_TEST_EQUALS( field.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "123456789", TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+
+int UtcDaliTextFieldAtlasLimitationIsEnabledForLargeFontPointSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldAtlasLimitationIsEnabledForLargeFontPointSize ");
+
+  // +2: First one to handle the equal case. Second one to handle odd to even case of GetNaturalSize
+  const uint32_t lessThanWidth = TextAbstraction::FontClient::MAX_TEXT_ATLAS_WIDTH - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+  const uint32_t lessThanHeight = TextAbstraction::FontClient::MAX_TEXT_ATLAS_HEIGHT - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+
+  // Create a text field
+  TextField textField = TextField::New();
+
+  //Set size to avoid automatic eliding
+  textField.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  //Set very large font-size using point-size
+  textField.SetProperty( TextField::Property::POINT_SIZE, 1000) ;
+  //Specify font-family
+  textField.SetProperty( TextField::Property::FONT_FAMILY, "DejaVu Sans");
+  //Set text to check if appear or not
+  textField.SetProperty( TextField::Property::TEXT, "A");
+
+  application.GetScene().Add( textField );
+
+  application.SendNotification();
+  application.Render();
+  //Use GetNaturalSize to verify that size of block does not exceed Atlas size
+  Vector3 naturalSize = textField.GetNaturalSize();
+
+  DALI_TEST_GREATER( lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION );
+  DALI_TEST_GREATER( lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldAtlasLimitationIsEnabledPerformanceCases(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldAtlasLimitationIsEnabledPerformanceCases ");
+
+  // +2: First one to handle the equal case. Second one to handle odd to even case of GetNaturalSize
+  const uint32_t lessThanWidth = TextAbstraction::FontClient::MAX_TEXT_ATLAS_WIDTH - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+  const uint32_t lessThanHeight = TextAbstraction::FontClient::MAX_TEXT_ATLAS_HEIGHT - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+
+  Vector3 naturalSize; //Use GetNaturalSize to verify that size of block does not exceed Atlas size
+  // Create a text editor
+  TextField textField = TextField::New();
+
+  //Set size to avoid automatic eliding
+  textField.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  textField.SetProperty( TextField::Property::FONT_FAMILY, "DejaVu Sans");
+  textField.SetProperty( TextField::Property::TEXT, "A");
+
+  const int numberOfCases = 6;
+  int arrayCases[numberOfCases] = {323, 326, 330, 600, 1630, 2500};
+
+  for (int index=0; index < numberOfCases; index++)
+  {
+    tet_printf(" UtcDaliTextFieldAtlasLimitationIsEnabledPerformanceCases point-size= %d \n", arrayCases[index]);
+    textField.SetProperty( TextField::Property::POINT_SIZE, arrayCases[index]) ;
+    application.GetScene().Add( textField );
+    application.SendNotification();
+    application.Render();
+    naturalSize = textField.GetNaturalSize();
+    DALI_TEST_GREATER( lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION );
+    DALI_TEST_GREATER( lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION );
+
+  }
 
   END_TEST;
 }

@@ -30,11 +30,13 @@ SET(TC_SOURCES
  utc-Dali-Text-ViewModel.cpp
  utc-Dali-TextField-internal.cpp
  utc-Dali-TextEditor-internal.cpp
+ utc-Dali-TextLabel-internal.cpp
  utc-Dali-TextSelectionPopup-internal.cpp
  utc-Dali-TextureManager.cpp
  utc-Dali-Visuals-internal.cpp
  utc-Dali-VisualModel.cpp
  utc-Dali-VisualUrl.cpp
+ utc-Dali-Text-Hyphen-Wrapping.cpp
 )
 
 IF(ELDBUS_AVAILABLE)
@@ -79,10 +81,12 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-button.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-harness.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-gl-abstraction.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-graphics-sync-impl.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-graphics-sync-object.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-buffer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-command-buffer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-controller.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-graphics-framebuffer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-texture.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-program.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-pipeline.cpp

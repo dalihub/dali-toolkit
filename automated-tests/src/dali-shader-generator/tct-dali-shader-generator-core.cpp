@@ -1,6 +1,7 @@
-#include <iostream>
+#include <test-harness.h>
+#include "tct-dali-shader-generator-core.h"
+
 int main(int argc, char * const argv[])
 {
-  std::cout << "All tests run as part of Cmake build." << std::endl;
-  return 0;
+  return TestHarness::RunTests(argc, argv, tc_array);
 }

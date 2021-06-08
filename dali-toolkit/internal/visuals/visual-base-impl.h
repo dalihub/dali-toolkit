@@ -389,6 +389,13 @@ protected:
    */
   bool IsRoundedCornerRequired() const;
 
+  /**
+   * @brief Query whether the borderline of the visual requires to be rendered.
+   *
+   * @return Returns true if the outline is required, false otherwise.
+   */
+  bool IsBorderlineRequired() const;
+
 private:
   /**
    * Register the mix color uniform on the Renderer and store the property index.

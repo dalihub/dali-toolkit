@@ -28,6 +28,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -104,7 +105,8 @@ const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSys
 const char* const PROPERTY_NAME_MAX_LENGTH                           = "maxLength";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
-
+const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
+const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "inputMethodSettings";
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
@@ -511,7 +513,8 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MAX_LENGTH ) == DevelTextEditor::Property::MAX_LENGTH );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_COLOR ) == DevelTextEditor::Property::GRAB_HANDLE_COLOR );
-
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_METHOD_SETTINGS ) == DevelTextEditor::Property::INPUT_METHOD_SETTINGS );
 
   END_TEST;
 }
@@ -929,6 +932,42 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check handle color
   editor.SetProperty( DevelTextEditor::Property::GRAB_HANDLE_COLOR, Color::GREEN );
   DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::GRAB_HANDLE_COLOR ), Color::GREEN, TEST_LOCATION );
+
+  // Test the ENABLE_GRAB_HANDLE_POPUP property
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP, false );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP ), false, TEST_LOCATION);
+
+  // Check the input method setting
+  Property::Map propertyMap;
+  InputMethod::PanelLayout::Type panelLayout = InputMethod::PanelLayout::NUMBER;
+  InputMethod::AutoCapital::Type autoCapital = InputMethod::AutoCapital::WORD;
+  InputMethod::ButtonAction::Type buttonAction = InputMethod::ButtonAction::GO;
+  int inputVariation = 1;
+  propertyMap["PANEL_LAYOUT"] = panelLayout;
+  propertyMap["AUTO_CAPITALIZE"] = autoCapital;
+  propertyMap["BUTTON_ACTION"] = buttonAction;
+  propertyMap["VARIATION"] = inputVariation;
+  editor.SetProperty( DevelTextEditor::Property::INPUT_METHOD_SETTINGS, propertyMap );
+
+  Property::Value value = editor.GetProperty( DevelTextEditor::Property::INPUT_METHOD_SETTINGS );
+  Property::Map map;
+  DALI_TEST_CHECK( value.Get( map ) );
+
+  int layout = 0;
+  DALI_TEST_CHECK( map[ "PANEL_LAYOUT" ].Get( layout ) );
+  DALI_TEST_EQUALS( static_cast<int>(panelLayout), layout, TEST_LOCATION );
+
+  int capital = 0;
+  DALI_TEST_CHECK( map[ "AUTO_CAPITALIZE" ].Get( capital ) );
+  DALI_TEST_EQUALS( static_cast<int>(autoCapital), capital, TEST_LOCATION );
+
+  int action = 0;
+  DALI_TEST_CHECK( map[ "BUTTON_ACTION" ].Get( action ) );
+  DALI_TEST_EQUALS( static_cast<int>(buttonAction), action, TEST_LOCATION );
+
+  int variation = 0;
+  DALI_TEST_CHECK( map[ "VARIATION" ].Get( variation ) );
+  DALI_TEST_EQUALS( inputVariation, variation, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -3480,6 +3519,49 @@ int utcDaliTextEditorGetHeightForWidthDoesNotChangeLineCountLineWrapCharCase(voi
   END_TEST;
 }
 
+int utcDaliTextEditorGetHeightForWidthChangeLineCountWhenTextChanged(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" utcDaliTextEditorGetHeightForWidthChangeLineCountWhenTextChanged ");
+
+  int lineCountBefore =0 ;
+  int lineCountAfter =0 ;
+
+  // Create a text editor
+  TextEditor textEditor = TextEditor::New();
+  //Set very large font-size using point-size
+  textEditor.SetProperty( TextEditor::Property::POINT_SIZE, 10) ;
+  //Specify font-family
+  textEditor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
+  //Specify size
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 100.f ) );
+  //Set text longer than width of textEditor
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Short text");
+  //Set line wrap mode Character
+  textEditor.SetProperty(TextEditor::Property::LINE_WRAP_MODE, "CHARACTER");
+
+  application.GetScene().Add( textEditor );
+
+  application.SendNotification();
+  application.Render();
+
+
+  lineCountBefore =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "This is very loooooooooooooooooooooooooooooooooooong text for test");
+  lineCountAfter =  textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+
+  // When the text changed, the Line-count should be updated according to new text.
+  // Because the GetHeightForWidth is called in Controller::GetLineCount(float width)
+  DALI_TEST_EQUALS( lineCountBefore ,1, TEST_LOCATION );
+  DALI_TEST_GREATER( lineCountAfter,1, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+
 int utcDaliTextEditorGetNaturalSizeDoesNotChangeLineCountScrollingCase(void)
 {
   ToolkitTestApplication application;
@@ -3568,6 +3650,124 @@ int utcDaliTextEditorGetNaturalSizeDoesNotChangeLineCountLineWrapCharCase(void)
 
   //The LineCount must not be changed when calling GetNaturalSize.
   DALI_TEST_EQUALS( lineCountAfter , lineCountBefore, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorAtlasLimitationIsEnabledForLargeFontPointSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorAtlasLimitationIsEnabledForLargeFontPointSize ");
+
+  // +2: First one to handle the equal case. Second one to handle odd to even case of GetNaturalSize
+  const uint32_t lessThanWidth = TextAbstraction::FontClient::MAX_TEXT_ATLAS_WIDTH - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+  const uint32_t lessThanHeight = TextAbstraction::FontClient::MAX_TEXT_ATLAS_HEIGHT - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+
+  // Create a text editor
+  TextEditor textEditor = TextEditor::New();
+
+  //Set size to avoid automatic eliding
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  //Set very large font-size using point-size
+  textEditor.SetProperty( TextEditor::Property::POINT_SIZE, 1000) ;
+  //Specify font-family
+  textEditor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
+  //Set text to check if appear or not
+  textEditor.SetProperty( TextEditor::Property::TEXT, "A");
+
+  application.GetScene().Add( textEditor );
+
+  application.SendNotification();
+  application.Render();
+  //Use GetNaturalSize to verify that size of block does not exceed Atlas size
+  Vector3 naturalSize = textEditor.GetNaturalSize();
+
+  DALI_TEST_GREATER( lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION );
+  DALI_TEST_GREATER( lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorAtlasLimitationIsEnabledPerformanceCases(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorAtlasLimitationIsEnabledPerformanceCases ");
+
+  // +2: First one to handle the equal case. Second one to handle odd to even case of GetNaturalSize
+  const uint32_t lessThanWidth = TextAbstraction::FontClient::MAX_TEXT_ATLAS_WIDTH - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+  const uint32_t lessThanHeight = TextAbstraction::FontClient::MAX_TEXT_ATLAS_HEIGHT - TextAbstraction::FontClient::PADDING_TEXT_ATLAS_BLOCK + 2;
+
+  Vector3 naturalSize; //Use GetNaturalSize to verify that size of block does not exceed Atlas size
+  // Create a text editor
+  TextEditor textEditor = TextEditor::New();
+  //Set size to avoid automatic eliding
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  textEditor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
+  textEditor.SetProperty( TextEditor::Property::TEXT, "A");
+
+  const int numberOfCases = 6;
+  int arrayCases[numberOfCases] = {323, 326, 330, 600, 1630, 2500};
+
+  for (int index=0; index < numberOfCases; index++)
+  {
+    tet_printf(" UtcDaliTextEditorAtlasLimitationIsEnabledPerformanceCases point-size= %d \n", arrayCases[index]);
+    textEditor.SetProperty( TextEditor::Property::POINT_SIZE, arrayCases[index]) ;
+    application.GetScene().Add( textEditor );
+    application.SendNotification();
+    application.Render();
+    naturalSize = textEditor.GetNaturalSize();
+    DALI_TEST_GREATER( lessThanWidth, static_cast<uint32_t>(naturalSize.width), TEST_LOCATION );
+    DALI_TEST_GREATER( lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION );
+
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorHyphenWrapMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorHyphenWrapMode ");
+
+  int lineCount =0;
+  TextEditor textEditor = TextEditor::New();
+
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 150.0f, 300.f ) );
+
+  application.GetScene().Add( textEditor );
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Hi Experimen" );
+  textEditor.SetProperty(TextEditor::Property::LINE_WRAP_MODE, DevelText::LineWrap::HYPHENATION);
+  DALI_TEST_EQUALS( textEditor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( DevelText::LineWrap::HYPHENATION ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount = textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  /*
+    text will be :
+    Hi Exp-
+    erimen
+  */
+  DALI_TEST_EQUALS( lineCount, 2, TEST_LOCATION );
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Hi Experimen" );
+  textEditor.SetProperty(TextEditor::Property::LINE_WRAP_MODE, DevelText::LineWrap::MIXED);
+  DALI_TEST_EQUALS( textEditor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( DevelText::LineWrap::MIXED ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount = textEditor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  /*
+    text will be :
+    Hi
+    Experi-
+    men
+  */
+  DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
 
   END_TEST;
 }

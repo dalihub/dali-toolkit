@@ -55,7 +55,8 @@ enum class Justification
   CENTER,        ///< Items are positioned at the center of the container
   FLEX_END,      ///< Items are positioned at the end of the container
   SPACE_BETWEEN, ///< Items are positioned with equal space between the items
-  SPACE_AROUND   ///< Items are positioned with equal space before, between, and after the items
+  SPACE_AROUND,  ///< Items are positioned with equal space before, and after the items
+  SPACE_EVENLY   ///< Items are positioned with equal space before, between, and after the items
 };
 
 /**

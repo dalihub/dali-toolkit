@@ -114,6 +114,7 @@ SET( toolkit_src_files
 
    ${toolkit_src_dir}/focus-manager/keyboard-focus-manager-impl.cpp
    ${toolkit_src_dir}/focus-manager/keyinput-focus-manager-impl.cpp
+   ${toolkit_src_dir}/focus-manager/focus-finder-impl.cpp
    ${toolkit_src_dir}/helpers/color-conversion.cpp
    ${toolkit_src_dir}/helpers/property-helper.cpp
    ${toolkit_src_dir}/filters/blur-two-pass-filter.cpp
@@ -142,6 +143,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/property-string-parser.cpp
    ${toolkit_src_dir}/text/segmentation.cpp
    ${toolkit_src_dir}/text/shaper.cpp
+   ${toolkit_src_dir}/text/hyphenator.cpp
    ${toolkit_src_dir}/text/text-enumerations-impl.cpp
    ${toolkit_src_dir}/text/text-controller.cpp
    ${toolkit_src_dir}/text/text-controller-event-handler.cpp

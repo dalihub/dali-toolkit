@@ -265,6 +265,34 @@ public:
    * @return The background state.
    */
   virtual bool IsBackgroundEnabled() const = 0;
+
+  /**
+   * @brief Returns whether markup-processor is enabled or not.
+   *
+   * @return The markup-processor state.
+   */
+  virtual bool IsMarkupProcessorEnabled() const = 0;
+
+  /**
+   * @brief Returns the hyphens glyph info.
+   *
+   * @return hyphens glyph info.
+   */
+  virtual const GlyphInfo* GetHyphens() const = 0;
+
+  /**
+   * @brief Returns the indices of the hyphen in the text.
+   *
+   * @return the hyphen indices.
+   */
+  virtual const Length* GetHyphenIndices() const = 0;
+
+  /**
+   * @brief Returns number of hyphens to add in text.
+   *
+   * @return number of hyphens.
+   */
+  virtual Length GetHyphensCount() const = 0;
 };
 
 } // namespace Text

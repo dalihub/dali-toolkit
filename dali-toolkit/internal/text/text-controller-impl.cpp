@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/color-segmentation.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
+#include <dali-toolkit/internal/text/hyphenator.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
@@ -36,6 +37,8 @@
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 #include <dali-toolkit/internal/text/text-selection-handle-controller.h>
+
+#include <dali-toolkit/internal/text/text-enumerations-impl.h>
 
 using namespace Dali;
 
@@ -587,7 +590,7 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
   Vector<Character>& srcCharacters = mModel->mLogicalModel->mText;
   Vector<Character>  displayCharacters;
   bool               useHiddenText = false;
-  if(mHiddenInput && mEventData != NULL && !mEventData->mIsShowingPlaceholderText)
+  if(mHiddenInput && mEventData != nullptr && !mEventData->mIsShowingPlaceholderText)
   {
     mHiddenInput->Substitute(srcCharacters, displayCharacters);
     useHiddenText = true;
@@ -661,6 +664,39 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
                      requestedNumberOfCharacters,
                      lineBreakInfo);
 
+    if(mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
+       mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::MIXED))
+    {
+      CharacterIndex end                 = startIndex + requestedNumberOfCharacters;
+      LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
+
+      for(CharacterIndex index = startIndex; index < end; index++)
+      {
+        CharacterIndex wordEnd = index;
+        while((*(lineBreakInfoBuffer + wordEnd) != TextAbstraction::LINE_ALLOW_BREAK) && (*(lineBreakInfoBuffer + wordEnd) != TextAbstraction::LINE_MUST_BREAK))
+        {
+          wordEnd++;
+        }
+
+        if((wordEnd + 1) == end) // add last char
+        {
+          wordEnd++;
+        }
+
+        Vector<bool> hyphens = GetWordHyphens(utf32Characters.Begin() + index, wordEnd - index, nullptr);
+
+        for(CharacterIndex i = 0; i < (wordEnd - index); i++)
+        {
+          if(hyphens[i])
+          {
+            *(lineBreakInfoBuffer + index + i) = TextAbstraction::LINE_HYPHENATION_BREAK;
+          }
+        }
+
+        index = wordEnd;
+      }
+    }
+
     // Create the paragraph info.
     mModel->mLogicalModel->CreateParagraphInfo(startIndex,
                                                requestedNumberOfCharacters);
@@ -697,27 +733,30 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
       TextAbstraction::FontDescription defaultFontDescription;
       TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE * mFontSizeScale;
 
-      if(IsShowingPlaceholderText() && mEventData && (NULL != mEventData->mPlaceholderFont))
+      //Get the number of points per one unit of point-size
+      uint32_t numberOfPointsPerOneUnitOfPointSize = mFontClient.GetNumberOfPointsPerOneUnitOfPointSize();
+
+      if(IsShowingPlaceholderText() && mEventData && (nullptr != mEventData->mPlaceholderFont))
       {
         // If the placeholder font is set specifically, only placeholder font is changed.
         defaultFontDescription = mEventData->mPlaceholderFont->mFontDescription;
         if(mEventData->mPlaceholderFont->sizeDefined)
         {
-          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * mFontSizeScale * 64u;
+          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * mFontSizeScale * numberOfPointsPerOneUnitOfPointSize;
         }
       }
-      else if(NULL != mFontDefaults)
+      else if(nullptr != mFontDefaults)
       {
         // Set the normal font and the placeholder font.
         defaultFontDescription = mFontDefaults->mFontDescription;
 
         if(mTextFitEnabled)
         {
-          defaultPointSize = mFontDefaults->mFitPointSize * 64u;
+          defaultPointSize = mFontDefaults->mFitPointSize * numberOfPointsPerOneUnitOfPointSize;
         }
         else
         {
-          defaultPointSize = mFontDefaults->mDefaultPointSize * mFontSizeScale * 64u;
+          defaultPointSize = mFontDefaults->mDefaultPointSize * mFontSizeScale * numberOfPointsPerOneUnitOfPointSize;
         }
       }
 
@@ -807,7 +846,8 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
     // Create the 'number of glyphs' per character and the glyph to character conversion tables.
     mModel->mVisualModel->CreateGlyphsPerCharacterTable(startIndex, mTextUpdateInfo.mStartGlyphIndex, requestedNumberOfCharacters);
     mModel->mVisualModel->CreateCharacterToGlyphTable(startIndex, mTextUpdateInfo.mStartGlyphIndex, requestedNumberOfCharacters);
-    updated = true;
+
+   updated = true;
   }
 
   const Length numberOfGlyphs = glyphs.Count() - currentNumberOfGlyphs;
@@ -830,7 +870,7 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
     updated = true;
   }
 
-  if((NULL != mEventData) &&
+  if((nullptr != mEventData) &&
      mEventData->mPreEditFlag &&
      (0u != mModel->mVisualModel->mCharactersToGlyph.Count()))
   {
@@ -858,6 +898,12 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
           underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
           underlineRun.numberOfGlyphs = numberOfIndices;
           mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
+
+          //Mark-up processor case
+          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
+          {
+            CopyUnderlinedFromLogicalToVisualModels(false);
+          }
           break;
         }
         case Dali::InputMethodContext::PreeditStyle::REVERSE:
@@ -902,6 +948,12 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
           underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
           underlineRun.numberOfGlyphs = numberOfIndices;
           mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
+
+          //Mark-up processor case
+          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
+          {
+            CopyUnderlinedFromLogicalToVisualModels(false);
+          }
           break;
         }
         case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_2:
@@ -917,6 +969,12 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
           underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
           underlineRun.numberOfGlyphs = numberOfIndices;
           mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
+
+          //Mark-up processor case
+          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
+          {
+            CopyUnderlinedFromLogicalToVisualModels(false);
+          }
           break;
         }
         case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_3:
@@ -932,6 +990,12 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
           underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
           underlineRun.numberOfGlyphs = numberOfIndices;
           mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
+
+          //Mark-up processor case
+          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
+          {
+            CopyUnderlinedFromLogicalToVisualModels(false);
+          }
           break;
         }
         case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_4:
@@ -947,6 +1011,12 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
           underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
           underlineRun.numberOfGlyphs = numberOfIndices;
           mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
+
+          //Mark-up processor case
+          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
+          {
+            CopyUnderlinedFromLogicalToVisualModels(false);
+          }
           break;
         }
         case Dali::InputMethodContext::PreeditStyle::NONE:
@@ -984,6 +1054,21 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
 
     updated = true;
   }
+
+  if((NO_OPERATION != (SHAPE_TEXT & operations)) &&
+      ! ((nullptr != mEventData) &&
+         mEventData->mPreEditFlag &&
+         (0u != mModel->mVisualModel->mCharactersToGlyph.Count())))
+  {
+    //Mark-up processor case
+    if(mModel->mVisualModel->IsMarkupProcessorEnabled())
+    {
+      CopyUnderlinedFromLogicalToVisualModels(true);
+    }
+
+    updated = true;
+  }
+
 
   // The estimated number of lines. Used to avoid reallocations when layouting.
   mTextUpdateInfo.mEstimatedNumberOfLines = std::max(mModel->mVisualModel->mLines.Count(), mModel->mLogicalModel->mParagraphInfo.Count());
@@ -1064,7 +1149,7 @@ void Controller::Impl::RetrieveDefaultInputStyle(InputStyle& inputStyle)
 float Controller::Impl::GetDefaultFontLineHeight()
 {
   FontId defaultFontId = 0u;
-  if(NULL == mFontDefaults)
+  if(nullptr == mFontDefaults)
   {
     TextAbstraction::FontDescription fontDescription;
     defaultFontId = mFontClient.GetFontId(fontDescription, TextAbstraction::FontClient::DEFAULT_POINT_SIZE * mFontSizeScale);
@@ -1384,7 +1469,7 @@ void Controller::Impl::SetPopupButtons()
 
 void Controller::Impl::ChangeState(EventData::State newState)
 {
-  if(NULL == mEventData)
+  if(nullptr == mEventData)
   {
     // Nothing to do if there is no text input.
     return;
@@ -1700,7 +1785,7 @@ void Controller::Impl::GetCursorPosition(CharacterIndex logical,
 
 CharacterIndex Controller::Impl::CalculateNewCursorIndex(CharacterIndex index) const
 {
-  if(NULL == mEventData)
+  if(nullptr == mEventData)
   {
     // Nothing to do if there is no text input.
     return 0u;
@@ -1750,7 +1835,7 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex(CharacterIndex index) c
 void Controller::Impl::UpdateCursorPosition(const CursorInfo& cursorInfo)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::UpdateCursorPosition %p\n", this);
-  if(NULL == mEventData)
+  if(nullptr == mEventData)
   {
     // Nothing to do if there is no text input.
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::UpdateCursorPosition no event data\n");
@@ -1925,7 +2010,7 @@ void Controller::Impl::ScrollTextToMatchCursor()
 
 void Controller::Impl::RequestRelayout()
 {
-  if(NULL != mControlInterface)
+  if(nullptr != mControlInterface)
   {
     mControlInterface->RequestTextRelayout();
   }
@@ -2093,6 +2178,32 @@ Actor Controller::Impl::CreateBackgroundActor()
   }
 
   return actor;
+}
+
+void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns)
+{
+    //Underlined character runs for markup-processor
+    const Vector<UnderlinedCharacterRun>& underlinedCharacterRuns = mModel->mLogicalModel->mUnderlinedCharacterRuns;
+    const Vector<GlyphIndex>&             charactersToGlyph       = mModel->mVisualModel->mCharactersToGlyph;
+    const Vector<Length>&                 glyphsPerCharacter      = mModel->mVisualModel->mGlyphsPerCharacter;
+
+    if(shouldClearPreUnderlineRuns)
+    {
+        mModel->mVisualModel->mUnderlineRuns.Clear();
+    }
+
+    for(Vector<UnderlinedCharacterRun>::ConstIterator it = underlinedCharacterRuns.Begin(), endIt = underlinedCharacterRuns.End(); it != endIt; ++it)
+    {
+        CharacterIndex characterIndex = it->characterRun.characterIndex;
+        Length numberOfCharacters = it->characterRun.numberOfCharacters;
+        for(Length index=0u; index<numberOfCharacters; index++)
+        {
+          GlyphRun underlineGlyphRun;
+          underlineGlyphRun.glyphIndex     = charactersToGlyph[characterIndex + index];
+          underlineGlyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex + index];
+          mModel->mVisualModel->mUnderlineRuns.PushBack(underlineGlyphRun);
+        }
+    }
 }
 
 } // namespace Text

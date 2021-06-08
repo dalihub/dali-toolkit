@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_ENUMERATIONS_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,17 @@ enum Type
 };
 
 } // namespace VerticalLineAlignment
+namespace LineWrap
+{
+enum Mode
+{
+  WORD,
+  CHARACTER,
+  HYPHENATION, // HYPHENATION mode will add hyphen and move part of the word to the next line.
+  MIXED        // MIXEd mode will apply WORD mode, if failed try HYPHENATION mode, if failed try CHARACTER.
+};
+
+} // namespace LineWrap
 
 } // namespace DevelText
 

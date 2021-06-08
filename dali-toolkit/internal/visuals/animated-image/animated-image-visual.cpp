@@ -539,7 +539,13 @@ void AnimatedImageVisual::OnInitialize()
 {
   bool   defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
   bool   atlasing        = false;
-  Shader shader          = mImageVisualShaderFactory.GetShader(mFactoryCache, atlasing, defaultWrapMode, IsRoundedCornerRequired());
+  Shader shader          = mImageVisualShaderFactory.GetShader(
+    mFactoryCache,
+    atlasing ? TextureAtlas::ENABLED : TextureAtlas::DISABLED,
+    defaultWrapMode ? DefaultTextureWrapMode::APPLY : DefaultTextureWrapMode::DO_NOT_APPLY,
+    IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
+    IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
+  );
 
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 

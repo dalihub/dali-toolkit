@@ -50,58 +50,77 @@ ImageVisualShaderFactory::~ImageVisualShaderFactory()
 {
 }
 
-Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping, bool roundedCorner)
+Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, TextureAtlas atlasing, DefaultTextureWrapMode defaultTextureWrapping, RoundedCorner roundedCorner, Borderline borderline)
 {
   Shader shader;
-  if(atlasing)
+  VisualFactoryCache::ShaderType shaderType = VisualFactoryCache::IMAGE_SHADER;
+  if(atlasing == TextureAtlas::ENABLED)
   {
-    if(defaultTextureWrapping)
+    if(defaultTextureWrapping == DefaultTextureWrapMode::APPLY)
     {
-      shader = factoryCache.GetShader(VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP);
-      if(!shader)
-      {
-        shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(),
-                             Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_ATLAS_CLAMP_SHADER_FRAG.data());
-        shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-        factoryCache.SaveShader(VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader);
-      }
+      shaderType = VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP;
     }
     else
     {
-      shader = factoryCache.GetShader(VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP);
-      if(!shader)
-      {
-        shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(),
-                             Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_ATLAS_VARIOUS_WRAP_SHADER_FRAG.data());
-        shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-        factoryCache.SaveShader(VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP, shader);
-      }
+      shaderType = VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP;
     }
   }
   else
   {
-    if(roundedCorner)
+    if(roundedCorner == RoundedCorner::ENABLED)
     {
-      shader = factoryCache.GetShader(VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER);
-      if(!shader)
+      if(borderline == Borderline::ENABLED)
       {
-        shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_ROUNDED_CORNER_SHADER_VERT.data(),
-                             Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_ROUNDED_CORNER_SHADER_FRAG.data());
-        shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-        factoryCache.SaveShader(VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER, shader);
+        shaderType = VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE;
+      }
+      else
+      {
+        shaderType = VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER;
       }
     }
     else
     {
-      shader = factoryCache.GetShader(VisualFactoryCache::IMAGE_SHADER);
-      if(!shader)
+      if(borderline == Borderline::ENABLED)
       {
-        shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_VERT.data(),
-                             Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG.data());
-        shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-        factoryCache.SaveShader(VisualFactoryCache::IMAGE_SHADER, shader);
+        shaderType = VisualFactoryCache::IMAGE_SHADER_BORDERLINE;
       }
     }
+  }
+
+  shader = factoryCache.GetShader(shaderType);
+  if(!shader)
+  {
+    std::string vertexShaderPrefixList;
+    std::string fragmentShaderPrefixList;
+    if(atlasing == TextureAtlas::ENABLED)
+    {
+      if(defaultTextureWrapping == DefaultTextureWrapMode::APPLY)
+      {
+        fragmentShaderPrefixList += "#define ATLAS_DEFAULT_WARP 1\n";
+      }
+      else
+      {
+        fragmentShaderPrefixList += "#define ATLAS_CUSTOM_WARP 1\n";
+      }
+    }
+    else
+    {
+      if(roundedCorner == RoundedCorner::ENABLED)
+      {
+        vertexShaderPrefixList   += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+        fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+      }
+      if(borderline == Borderline::ENABLED)
+      {
+        vertexShaderPrefixList   += "#define IS_REQUIRED_BORDERLINE 1\n";
+        fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
+      }
+    }
+
+    shader = Shader::New(Dali::Shader::GetVertexShaderPrefix()   + vertexShaderPrefixList   + SHADER_IMAGE_VISUAL_SHADER_VERT.data(),
+                         Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
+    shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+    factoryCache.SaveShader(shaderType, shader);
   }
 
   return shader;
@@ -121,7 +140,7 @@ std::string_view ImageVisualShaderFactory::GetFragmentShaderSource()
 {
   if(gFragmentShaderNoAtlas.empty())
   {
-    gFragmentShaderNoAtlas = Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG.data();
+    gFragmentShaderNoAtlas = Dali::Shader::GetFragmentShaderPrefix() + SHADER_IMAGE_VISUAL_SHADER_FRAG.data();
   }
   return gFragmentShaderNoAtlas;
 }

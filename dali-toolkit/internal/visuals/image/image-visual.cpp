@@ -626,6 +626,10 @@ void ImageVisual::InitializeRenderer()
   if(mTextures)
   {
     mImpl->mRenderer.SetTextures(mTextures);
+    if(DevelTexture::IsNative(mTextures.GetTexture(0)))
+    {
+      UpdateShader();
+    }
     mTextures.Reset(); // Visual should not keep a handle to the texture after this point.
   }
 
@@ -974,9 +978,11 @@ Shader ImageVisual::GetShader()
     // Create and cache the standard shader
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
-      mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
-      mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE,
-      IsRoundedCornerRequired());
+      mImpl->mFlags & Impl::IS_ATLASING_APPLIED ? TextureAtlas::ENABLED : TextureAtlas::DISABLED,
+      mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE ? DefaultTextureWrapMode::APPLY : DefaultTextureWrapMode::DO_NOT_APPLY,
+      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
+      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
+    );
   }
   else if(mImpl->mCustomShader)
   {
