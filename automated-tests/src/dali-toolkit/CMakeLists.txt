@@ -112,6 +112,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/test-animation-data.cpp
   dali-toolkit-test-utils/test-application.cpp
   dali-toolkit-test-utils/test-button.cpp
+  dali-toolkit-test-utils/test-encoded-image-buffer.cpp
   dali-toolkit-test-utils/test-harness.cpp
   dali-toolkit-test-utils/test-gesture-generator.cpp
   dali-toolkit-test-utils/test-gl-abstraction.cpp

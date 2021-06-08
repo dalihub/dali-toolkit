@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_TEXTURE_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/rendering/texture-set.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -52,6 +53,16 @@ DALI_TOOLKIT_API std::string AddTexture(Texture& texture);
  * @return the Url string representing this texture
  */
 DALI_TOOLKIT_API std::string AddTexture(TextureSet& textureSet);
+
+/**
+ * @brief Add a EncodedImageBuffer to texture manager
+ * Toolkit keeps the EncodedImageBuffer handle until RemoveTexture is called.
+ * @note this method check for duplicates reference,
+ *       if same EncodedImageBuffer is added multiple times, a same URL is returned
+ * @param[in] encodedImageBuffer the image buffer to add
+ * @return the Url string representing this texture
+ */
+DALI_TOOLKIT_API std::string AddTexture(const Dali::EncodedImageBuffer& encodedImageBuffer);
 
 /**
  * @brief Removes a TextureSet from toolkit

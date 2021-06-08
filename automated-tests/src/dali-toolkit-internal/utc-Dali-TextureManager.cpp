@@ -26,6 +26,9 @@
 #include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h> ///< For VisualFactory's member TextureManager.
+
+#include <test-encoded-image-buffer.h>
 
 #if defined(ELDBUS_ENABLED)
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
@@ -146,6 +149,315 @@ int UtcTextureManagerGenerateHash(void)
 
   END_TEST;
 }
+
+int UtcTextureManagerEncodedImageBuffer(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcTextureManagerEncodedImageBuffer" );
+
+  auto  visualFactory  = Toolkit::VisualFactory::Get();
+  auto& textureManager = GetImplementation(visualFactory).GetTextureManager(); // Use VisualFactory's texture manager
+
+  // Get encoded raw-buffer image and generate url
+  EncodedImageBuffer buffer1 = ConvertFileToEncodedImageBuffer(TEST_IMAGE_FILE_NAME);
+  EncodedImageBuffer buffer2 = ConvertFileToEncodedImageBuffer(TEST_IMAGE_FILE_NAME);
+
+  std::string  url1 = textureManager.AddExternalTexture(buffer1);
+  std::string  url2 = textureManager.AddExternalTexture(buffer1);
+  std::string  url3 = VisualUrl::CreateBufferUrl(""); ///< Impossible Buffer URL. for coverage
+
+  // Check if same EncodedImageBuffer get same url
+  DALI_TEST_CHECK(url1 == url2);
+  // Reduce reference count
+  textureManager.RemoveExternalTexture(url1);
+  // Check whethere url1 still valid
+  DALI_TEST_CHECK(textureManager.GetEncodedImageBuffer(url1));
+
+  url2 = textureManager.AddExternalTexture(buffer2);
+  // Check if difference EncodedImageBuffer get difference url
+  DALI_TEST_CHECK(url1 != url2);
+
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+  TestObserver observer1;
+  textureManager.RequestLoad(
+    url1,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    TextureManager::NO_ATLAS,
+    &observer1,
+    true, ///< orientationCorrection
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  DALI_TEST_EQUALS( observer1.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer1.mObserverCalled, false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( observer1.mLoaded, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer1.mObserverCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer1.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION );
+
+  TestObserver observer2;
+  // Syncload
+  Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
+    url2,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    true, ///< synchronousLoading
+    &observer2,
+    true, ///< orientationCorrection
+    preMultiply);
+
+  DALI_TEST_CHECK( pixelBuffer );
+  DALI_TEST_EQUALS( observer2.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer2.mObserverCalled, false, TEST_LOCATION );
+
+  // Asyncload
+  pixelBuffer = textureManager.LoadPixelBuffer(
+    url2,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    false, ///< synchronousLoading
+    &observer2,
+    true, ///< orientationCorrection
+    preMultiply);
+
+  DALI_TEST_EQUALS( observer2.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer2.mObserverCalled, false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( observer2.mLoaded, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer2.mObserverCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer2.mCompleteType, TestObserver::CompleteType::LOAD_COMPLETE, TEST_LOCATION );
+
+  textureManager.RemoveExternalTexture(url1);
+  textureManager.RemoveExternalTexture(url2);
+
+  // Now url1 and url2 is invalid type. mLoaded will return false
+
+  TestObserver observer3;
+  textureManager.RequestLoad(
+    url1,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    TextureManager::NO_ATLAS,
+    &observer3,
+    true, ///< orientationCorrection
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  // Load will be success because url1 is cached
+  DALI_TEST_EQUALS( observer3.mLoaded, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer3.mObserverCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer3.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION );
+
+  TestObserver observer4;
+  textureManager.RequestLoad(
+    url2,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    TextureManager::NO_ATLAS,
+    &observer4,
+    true, ///< orientationCorrection
+    TextureManager::ReloadPolicy::FORCED,
+    preMultiply);
+
+  DALI_TEST_EQUALS( observer4.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer4.mObserverCalled, false, TEST_LOCATION );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  // Load will be failed becuase reloadpolicy is forced
+  DALI_TEST_EQUALS( observer4.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer4.mObserverCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer4.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION );
+
+  TestObserver observer5;
+  pixelBuffer = textureManager.LoadPixelBuffer(
+    url2,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    true, ///< synchronousLoading
+    &observer5,
+    true, ///< orientationCorrection
+    preMultiply);
+
+  // Load will be faild because synchronousLoading doesn't use cached texture
+  DALI_TEST_CHECK( !pixelBuffer );
+  DALI_TEST_EQUALS( observer5.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer5.mObserverCalled, false, TEST_LOCATION );
+
+  TestObserver observer6;
+  pixelBuffer = textureManager.LoadPixelBuffer(
+    url3,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    false, ///< synchronousLoading
+    &observer6,
+    true, ///< orientationCorrection
+    preMultiply);
+
+  DALI_TEST_EQUALS( observer6.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer6.mObserverCalled, false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  // Load will be failed because url3 is invalid URL
+  DALI_TEST_EQUALS( observer6.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer6.mObserverCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer6.mCompleteType, TestObserver::CompleteType::LOAD_COMPLETE, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcTextureManagerEncodedImageBufferReferenceCount(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcTextureManagerEncodedImageBuffer check reference count works well" );
+
+  auto  visualFactory  = Toolkit::VisualFactory::Get();
+  auto& textureManager = GetImplementation(visualFactory).GetTextureManager(); // Use VisualFactory's texture manager
+
+  // Get encoded raw-buffer image and generate url
+  EncodedImageBuffer buffer1 = ConvertFileToEncodedImageBuffer(TEST_IMAGE_FILE_NAME);
+  EncodedImageBuffer buffer2 = ConvertFileToEncodedImageBuffer(TEST_IMAGE_FILE_NAME);
+
+  std::string  url1    = textureManager.AddExternalTexture(buffer1);
+  std::string  url2    = textureManager.AddExternalTexture(buffer1);
+
+  // Check if same EncodedImageBuffer get same url
+  DALI_TEST_CHECK(url1 == url2);
+
+  // Reduce reference count
+  textureManager.RemoveExternalTexture(url1);
+  // Check whethere url1 still valid
+  DALI_TEST_CHECK(textureManager.GetEncodedImageBuffer(url1));
+
+  // Reduce reference count
+  textureManager.RemoveExternalTexture(url1);
+  // Check whethere url1 is not valid anymore
+  DALI_TEST_CHECK(!textureManager.GetEncodedImageBuffer(url1));
+
+  // UseExternalTexture doesn't create new buffer.
+  // So, reference count is still zero.
+  textureManager.UseExternalTexture(url1);
+  DALI_TEST_CHECK(!textureManager.GetEncodedImageBuffer(url1));
+
+  url1 = textureManager.AddExternalTexture(buffer1);
+  // Check if difference EncodedImageBuffer get difference url
+  // Previous EncodedImageBuffer was deleted, so we get new url even same buffer.
+  DALI_TEST_CHECK(url1 != url2);
+
+  url2 = textureManager.AddExternalTexture(buffer2);
+  // Check if difference EncodedImageBuffer get difference url
+  DALI_TEST_CHECK(url1 != url2);
+
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+  // url1 load image by cache
+  TestObserver observer1;
+  textureManager.RequestLoad(
+    url1,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    TextureManager::NO_ATLAS,
+    &observer1,
+    true, ///< orientationCorrection
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  DALI_TEST_EQUALS( observer1.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer1.mObserverCalled, false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( observer1.mLoaded, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer1.mObserverCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer1.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION );
+
+  // LoadPixelBuffer doen't use cache. url2 will not be cached
+  TestObserver observer2;
+  Devel::PixelBuffer pixelBuffer = textureManager.LoadPixelBuffer(
+    url2,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    false, ///< synchronousLoading
+    &observer2, 
+    true, ///< orientationCorrection
+    preMultiply);
+
+  DALI_TEST_EQUALS( observer2.mLoaded, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer2.mObserverCalled, false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( observer2.mLoaded, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer2.mObserverCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( observer2.mCompleteType, TestObserver::CompleteType::LOAD_COMPLETE, TEST_LOCATION );
+
+  // Decrease each url's reference count.
+  textureManager.RemoveExternalTexture(url1);
+  textureManager.RemoveExternalTexture(url2);
+  
+  // url1 buffer is still have 1 reference count because it is cached.
+  // But url2 not valid because it is not cached.
+  DALI_TEST_CHECK(textureManager.GetEncodedImageBuffer(url1));
+  DALI_TEST_CHECK(!textureManager.GetEncodedImageBuffer(url2));
+
+  // Check url1 buffer have 1 reference count because it is cached.
+  textureManager.RemoveExternalTexture(url1);
+  DALI_TEST_CHECK(!textureManager.GetEncodedImageBuffer(url1));
+
+  END_TEST;
+}
+
 
 int UtcTextureManagerCachingForDifferentLoadingType(void)
 {
