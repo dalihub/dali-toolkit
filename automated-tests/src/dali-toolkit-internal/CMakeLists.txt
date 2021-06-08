@@ -79,6 +79,7 @@ SET(TEST_HARNESS_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-animation-data.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-button.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-encoded-image-buffer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-harness.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-gl-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-graphics-sync-impl.cpp
