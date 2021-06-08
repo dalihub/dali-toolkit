@@ -19,6 +19,7 @@
 #include "image-load-thread.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -33,6 +34,7 @@ namespace Internal
 LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex)
 : pixelBuffer(),
   url(),
+  encodedImageBuffer(),
   id(id),
   dimensions(),
   fittingMode(),
@@ -51,6 +53,26 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
 LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 : pixelBuffer(),
   url(url),
+  encodedImageBuffer(),
+  id(id),
+  dimensions(dimensions),
+  fittingMode(fittingMode),
+  samplingMode(samplingMode),
+  orientationCorrection(orientationCorrection),
+  preMultiplyOnLoad(preMultiplyOnLoad),
+  isMaskTask(false),
+  maskPixelBuffer(),
+  contentScale(1.0f),
+  cropToMask(false),
+  animatedImageLoading(),
+  frameIndex(0u)
+{
+}
+
+LoadingTask::LoadingTask(uint32_t id, const EncodedImageBuffer& encodedImageBuffer, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
+: pixelBuffer(),
+  url(),
+  encodedImageBuffer(encodedImageBuffer),
   id(id),
   dimensions(dimensions),
   fittingMode(fittingMode),
@@ -69,6 +91,7 @@ LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dime
 LoadingTask::LoadingTask(uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 : pixelBuffer(pixelBuffer),
   url(""),
+  encodedImageBuffer(),
   id(id),
   dimensions(),
   fittingMode(),
@@ -90,11 +113,15 @@ void LoadingTask::Load()
   {
     pixelBuffer = animatedImageLoading.LoadFrame(frameIndex);
   }
-  else if(url.IsLocalResource())
+  else if(encodedImageBuffer)
+  {
+    pixelBuffer = Dali::LoadImageFromBuffer(encodedImageBuffer.GetRawBuffer(), dimensions, fittingMode, samplingMode, orientationCorrection);
+  }
+  else if(url.IsValid() && url.IsLocalResource())
   {
     pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
   }
-  else
+  else if(url.IsValid())
   {
     pixelBuffer = Dali::DownloadImageSynchronously(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
   }

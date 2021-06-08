@@ -21,6 +21,9 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -71,7 +74,24 @@ uint32_t AsyncImageLoader::Load(const VisualUrl&                         url,
     mLoadThread.Start();
     mIsLoadThreadStarted = true;
   }
-  mLoadThread.AddTask(new LoadingTask(++mLoadTaskId, url, dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad));
+  if(url.IsBufferResource())
+  {
+    auto visualFactory = Toolkit::VisualFactory::Get();
+    if(visualFactory)
+    {
+      // Get EncodedImageBuffer from texturemanager
+      // and make new LoadingTask with buffer
+      auto& textureManager = GetImplementation(visualFactory).GetTextureManager();
+
+      const EncodedImageBuffer& encodedBuffer = textureManager.GetEncodedImageBuffer(url.GetUrl());
+
+      mLoadThread.AddTask(new LoadingTask(++mLoadTaskId, encodedBuffer, dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad));
+    }
+  }
+  else
+  {
+    mLoadThread.AddTask(new LoadingTask(++mLoadTaskId, url, dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad));
+  }
 
   return mLoadTaskId;
 }

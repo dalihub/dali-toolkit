@@ -45,7 +45,8 @@ public:
   {
     LOCAL,   ///< file in local file system
     TEXTURE, ///< texture uploaded to texture manager
-    REMOTE   ///< remote image
+    REMOTE,  ///< remote image
+    BUFFER   ///< encoded image buffer
   };
 
   /**
@@ -111,6 +112,11 @@ public:
   bool IsLocalResource() const;
 
   /**
+   * @return true if the location is BUFFER, i.e. may contain EncodedImageBuffer
+   */
+  bool IsBufferResource() const;
+
+  /**
    * @return the location part of the url
    */
   std::string GetLocation() const;
@@ -121,6 +127,13 @@ public:
    * @return the Url
    */
   static std::string CreateTextureUrl(const std::string& location);
+
+  /**
+   * Helper to create a URL of type BUFFER
+   * @param location the location of the texture
+   * @return the Url
+   */
+  static std::string CreateBufferUrl(const std::string& location);
 
   /**
    * Helper to get a ProtocolType from url
@@ -135,6 +148,7 @@ public:
    * @return the location
    */
   static std::string GetLocation(const std::string& url);
+
 private:
   std::string  mUrl;
   Type         mType;

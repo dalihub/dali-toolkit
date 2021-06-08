@@ -60,6 +60,11 @@ Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSourcePtr nativeImage
   return imageUrl;
 }
 
+Dali::Toolkit::ImageUrl GenerateUrl(const Dali::EncodedImageBuffer encodedImageBuffer)
+{
+  return Dali::Toolkit::ImageUrl::New(encodedImageBuffer);
+}
+
 } // namespace Image
 
 } // namespace Toolkit

@@ -16,8 +16,13 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/image-loader/image-url-impl.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -26,19 +31,50 @@ namespace Toolkit
 namespace Internal
 {
 ImageUrl::ImageUrl(Texture& texture)
-: mUrl("")
 {
   mUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
 }
 
+ImageUrl::ImageUrl(const EncodedImageBuffer& encodedImageBuffer)
+: mUrl("")
+{
+  auto visualFactory = Dali::Toolkit::VisualFactory::Get();
+  if(visualFactory)
+  {
+    auto& textureManager = GetImplementation(visualFactory).GetTextureManager();
+    mUrl = textureManager.AddExternalEncodedImageBuffer(encodedImageBuffer);
+  }
+}
+
 ImageUrl::~ImageUrl()
 {
-  Dali::Toolkit::TextureManager::RemoveTexture(mUrl);
+  if(mUrl.size() > 0)
+  {
+    auto visualFactory = Dali::Toolkit::VisualFactory::Get();
+    if(visualFactory)
+    {
+      auto& textureManager = GetImplementation(visualFactory).GetTextureManager();
+      if(VisualUrl::TEXTURE == VisualUrl::GetProtocolType(mUrl))
+      {
+        textureManager.RemoveExternalTexture(mUrl);
+      }
+      else if(VisualUrl::BUFFER == VisualUrl::GetProtocolType(mUrl))
+      {
+        textureManager.RemoveExternalEncodedImageBuffer(mUrl);
+      }
+    }
+  }
 }
 
 ImageUrlPtr ImageUrl::New(Texture& texture)
 {
   ImageUrlPtr imageUrlPtr = new ImageUrl(texture);
+  return imageUrlPtr;
+}
+
+ImageUrlPtr ImageUrl::New(const EncodedImageBuffer& encodedImageBuffer)
+{
+  ImageUrlPtr imageUrlPtr = new ImageUrl(encodedImageBuffer);
   return imageUrlPtr;
 }
 
