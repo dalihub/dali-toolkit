@@ -1643,22 +1643,22 @@ int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
   PushButton button4 = PushButton::New();
   PushButton button5 = PushButton::New();
 
-  button1.SetProperty( Actor::Property::SIZE, Vector2( 50, 50 ) );
-  button2.SetProperty( Actor::Property::SIZE, Vector2( 50, 50 ) );
-  button3.SetProperty( Actor::Property::SIZE, Vector2( 50, 50 ) );
-  button4.SetProperty( Actor::Property::SIZE, Vector2( 50, 50 ) );
-  button5.SetProperty( Actor::Property::SIZE, Vector2( 50, 50 ) );
+  button1.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
+  button2.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
+  button3.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
+  button4.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
+  button5.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
 
-  button1.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
-  button2.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
-  button3.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
-  button4.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
-  button5.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
+  button1.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE,true);
+  button2.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE,true);
+  button3.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE,true);
+  button4.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE,true);
+  button5.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE,true);
 
   application.GetScene().Add(button1);
   application.GetScene().Add(button2);
   application.GetScene().Add(button3);
-  application.GetScene().Add(button4);
+  button5.Add(button4);
   application.GetScene().Add(button5);
 
   // set position
@@ -1666,11 +1666,11 @@ int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
   //   |           |
   //   |    button5|
   // button3 -- button4
-  button1.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 0.0f));
-  button2.SetProperty( Actor::Property::POSITION, Vector2(100.0f, 0.0f));
-  button3.SetProperty( Actor::Property::POSITION, Vector2(0.0f, 100.0f));
-  button4.SetProperty( Actor::Property::POSITION, Vector2(100.0f, 100.0f));
-  button5.SetProperty( Actor::Property::POSITION, Vector2(60.0f, 60.0f));
+  button1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  button2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
+  button3.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 100.0f));
+  button4.SetProperty(Actor::Property::POSITION, Vector2(40.0f, 40.0f));
+  button5.SetProperty(Actor::Property::POSITION, Vector2(60.0f, 60.0f));
 
   // flush the queue and render once
   application.SendNotification();
@@ -1698,7 +1698,7 @@ int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
   DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
 
   // Confirm whether focus is moved to button2
-  DALI_TEST_EQUALS(button2.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS(button2.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button1);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button2);
@@ -1712,7 +1712,7 @@ int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
   DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::DOWN) == true);
 
   // Confirm whether focus is moved to button5
-  DALI_TEST_EQUALS(button5.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS(button5.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button2);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button5);
@@ -1726,7 +1726,7 @@ int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
   DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
 
   // Confirm whether focus is moved to button4
-  DALI_TEST_EQUALS(button4.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS(button4.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button5);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button4);
@@ -1740,7 +1740,7 @@ int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
   DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::LEFT) == true);
 
   // Confirm whether focus is moved to button5
-  DALI_TEST_EQUALS(button5.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS(button5.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button4);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button5);
@@ -1754,7 +1754,35 @@ int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
   DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::LEFT) == true);
 
   // Confirm whether focus is moved to button3
-  DALI_TEST_EQUALS(button3.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS(button3.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button5);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button3);
+  focusChangedCallback.Reset();
+
+  // Move the focus towards right
+  // button1 -- button2
+  //   |           |
+  //   |  [button5]|
+  // button3 -- button4
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
+
+  // Confirm whether focus is moved to button5
+  DALI_TEST_EQUALS(button5.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button3);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button5);
+  focusChangedCallback.Reset();
+
+  // Move the focus towards left
+  // button1 -- button2
+  //   |           |
+  //   |    button5|
+  //[button3] -- button4
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::LEFT) == true);
+
+  // Confirm whether focus is moved to button3
+  DALI_TEST_EQUALS(button3.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button5);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button3);
@@ -1768,7 +1796,7 @@ int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
   DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::UP) == true);
 
   // Confirm whether focus is moved to button1
-  DALI_TEST_EQUALS(button1.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS(button1.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button3);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button1);

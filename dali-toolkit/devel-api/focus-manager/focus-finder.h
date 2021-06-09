@@ -25,50 +25,17 @@ namespace Dali
 {
 namespace Toolkit
 {
-namespace Internal DALI_INTERNAL
+namespace FocusFinder
 {
-class FocusFinder;
-}
-
 /**
- * FocusFinder
- * This class used for finding the next focusable actor in a given direction
- * from a actor that currently has focus.
+ * Get the nearest focusable actor.
+ * @param [in] focusedActor The current focused actor.
+ * @param [in] direction The direction.
+ * @return The nearest focusable actor, or an empty handle if none exists.
  */
-class DALI_TOOLKIT_API FocusFinder : public BaseHandle
-{
-public:
-  /**
-   * Create a FocusFinder handle; this can be initialised with FocusFinder::Get()
-   * Calling member functions with an uninitialised handle is not allowed.
-   */
-  FocusFinder();
+DALI_TOOLKIT_API Actor GetNearestFocusableActor(Actor focusedActor, Toolkit::Control::KeyboardFocus::Direction direction);
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~FocusFinder();
-
-  /**
-   * @brief Get the singleton of FocusFinder object.
-   * @return A handle to the FocusFinder control.
-   */
-  static FocusFinder Get();
-
-  /**
-   * Get the nearest focusable actor.
-   * @param [in] focusedActor The current focused actor.
-   * @param [in] direction The direction.
-   * @return The nearest focusable actor, or null if none exists.
-   */
-  Actor GetNearestFocusableActor(Actor focusedActor, Toolkit::Control::KeyboardFocus::Direction direction);
-
-private:
-  explicit DALI_INTERNAL FocusFinder(Internal::FocusFinder* impl);
-
-}; // class FocusFinder
+} // namespace FocusFinder
 
 } // namespace Toolkit
 
