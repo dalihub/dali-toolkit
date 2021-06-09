@@ -32,10 +32,12 @@ namespace Text
  */
 struct BidirectionalLineInfoRun
 {
-  CharacterRun       characterRun;       ///< The initial character index within the whole text and the number of characters of the run.
-  CharacterIndex*    visualToLogicalMap; ///< Pointer to the visual to logical map table.
-  CharacterDirection direction : 1;      ///< Direction of the first character of the paragraph.
-  bool               isIdentity : 1;     ///< Whether the map is the identity.
+  CharacterRun       characterRun;                  ///< The initial character index within the whole text and the number of characters of the run. In case the line is splitted by MIDDLE Ellipsis, this for the first half of line.
+  CharacterIndex*    visualToLogicalMap;            ///< Pointer to the visual to logical map table. In case the line is splitted by MIDDLE Ellipsis, this for the first half of line.
+  CharacterRun       characterRunForSecondHalfLine; ///< The initial character index within the whole text and the number of characters of the run for the second half of line.
+  CharacterIndex*    visualToLogicalMapSecondHalf;  ///< Pointer to the visual to logical map table for the second half of line.
+  CharacterDirection direction : 1;                 ///< Direction of the first character of the paragraph.
+  bool               isIdentity : 1;                ///< Whether the map is the identity.
 };
 
 } // namespace Text

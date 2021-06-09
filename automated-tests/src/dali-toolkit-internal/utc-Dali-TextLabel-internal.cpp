@@ -24,6 +24,8 @@
 #include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
+#include <dali-toolkit/internal/text/rendering/text-typesetter.h>
+#include <dali-toolkit/internal/text/rendering/view-model.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -99,6 +101,62 @@ int UtcDaliTextLabelBackgroundTag(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextlabelEllipsisInternalAPIs(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs ");
+  TextLabel textLabel = TextLabel::New();
+
+  Toolkit::Internal::TextLabel& textLabelImpl = GetImpl( textLabel );
+  const ModelInterface* const textModel = textLabelImpl.GetTextController()->GetTextModel();
+
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - ELLIPSIS Disabled");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS, false);
+  DALI_TEST_EQUALS( textLabel.GetProperty< bool >( DevelTextLabel::Property::ELLIPSIS ), false, TEST_LOCATION );
+  DALI_TEST_CHECK(!(textModel->IsTextElideEnabled()));
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - ELLIPSIS Enabled");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS, true);
+  DALI_TEST_EQUALS( textLabel.GetProperty< bool >( DevelTextLabel::Property::ELLIPSIS ), true, TEST_LOCATION );
+  DALI_TEST_CHECK(textModel->IsTextElideEnabled());
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - GetStartIndexOfElidedGlyphs Default");
+  DALI_TEST_EQUALS( textModel->GetStartIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - GetEndIndexOfElidedGlyphs Default");
+  DALI_TEST_EQUALS( textModel->GetEndIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - GetFirstMiddleIndexOfElidedGlyphs Default");
+  DALI_TEST_EQUALS( textModel->GetFirstMiddleIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - GetSecondMiddleIndexOfElidedGlyphs Default");
+  DALI_TEST_EQUALS( textModel->GetSecondMiddleIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  // Tests the rendering controller has been created.
+  TypesetterPtr typesetter = Typesetter::New( textModel );
+  DALI_TEST_CHECK(typesetter);
+
+  // Tests the view model has been created.
+  ViewModel* model = typesetter->GetViewModel();
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - IsTextElideEnabled ViewModel");
+  DALI_TEST_CHECK(model->IsTextElideEnabled());
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - GetStartIndexOfElidedGlyphs ViewModel");
+  DALI_TEST_EQUALS( model->GetStartIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - GetEndIndexOfElidedGlyphs ViewModel");
+  DALI_TEST_EQUALS( model->GetEndIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - GetFirstMiddleIndexOfElidedGlyphs ViewModel");
+  DALI_TEST_EQUALS( model->GetFirstMiddleIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisInternalAPIs - GetSecondMiddleIndexOfElidedGlyphs ViewModel");
+  DALI_TEST_EQUALS( model->GetSecondMiddleIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
 int UtcDaliTextLabelTextWithSpan(void)
 {
   ToolkitTestApplication application;

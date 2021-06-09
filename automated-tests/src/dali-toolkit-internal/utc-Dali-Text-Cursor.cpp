@@ -112,7 +112,9 @@ bool GetClosestLineTest( const GetClosestLineData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -159,7 +161,9 @@ bool GetClosestCursorIndexTest( const GetClosestCursorIndexData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -210,7 +214,9 @@ bool GetCursorPositionTest( const GetCursorPositionData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -264,7 +270,9 @@ bool FindSelectionIndicesTest( const FindSelectionIndicesData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;

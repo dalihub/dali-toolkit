@@ -30,6 +30,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include "toolkit-clipboard.h"
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -3788,6 +3789,66 @@ int UtcDaliTextFieldAtlasLimitationIsEnabledPerformanceCases(void)
     DALI_TEST_GREATER( lessThanHeight, static_cast<uint32_t>(naturalSize.height), TEST_LOCATION );
 
   }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextFieldEllipsisPositionProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisPositionProperty ");
+  TextField textField = TextField::New();
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisPositionProperty - Default is END");
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisPositionProperty - Change to START");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::START);
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::START ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisPositionProperty - Change to MIDDLE");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::MIDDLE);
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::MIDDLE ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisPositionProperty - Change to END");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::END);
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisPositionProperty - Change to START using integer");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, 1);
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::START ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisPositionProperty - Change to MIDDLE using integer");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, 2);
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::MIDDLE ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisPositionProperty - Change to END using integer");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, 0);
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to START using string - uppercase");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, "START");
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::START ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to MIDDLE using string - uppercase");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, "MIDDLE");
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::MIDDLE ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to END using string - uppercase");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, "END");
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to START using string - lowercase");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, "start");
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::START ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to MIDDLE using string - lowercase");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, "middle");
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::MIDDLE ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to END using string - lowercase");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, "end");
+  DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
 
   END_TEST;
 }

@@ -544,6 +544,7 @@ bool Controller::Relayouter::DoRelayout(Controller& controller, const Size& size
 
     // Update the ellipsis
     bool elideTextEnabled = impl.mModel->mElideEnabled;
+    auto ellipsisPosition = impl.mModel->mEllipsisPosition;
 
     if(NULL != impl.mEventData)
     {
@@ -570,7 +571,8 @@ bool Controller::Relayouter::DoRelayout(Controller& controller, const Size& size
     viewUpdated               = impl.mLayoutEngine.LayoutText(layoutParameters,
                                                 newLayoutSize,
                                                 elideTextEnabled,
-                                                isAutoScrollEnabled);
+                                                isAutoScrollEnabled,
+                                                ellipsisPosition);
     impl.mIsAutoScrollEnabled = isAutoScrollEnabled;
 
     viewUpdated = viewUpdated || (newLayoutSize != layoutSize);

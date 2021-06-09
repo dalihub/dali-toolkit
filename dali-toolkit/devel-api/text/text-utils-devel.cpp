@@ -978,6 +978,7 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
   const bool               isTextMirrored          = internalDataModel.isTextMirrored;
   const Vector<Character>& mirroredUtf32Characters = internalDataModel.mirroredUtf32Characters;
   const Length             numberOfCharacters      = internalDataModel.numberOfCharacters;
+  const auto               ellipsisPosition        = textModel->mEllipsisPosition;
 
   Layout::Type layout = Layout::SINGLELINE;
 
@@ -1053,7 +1054,8 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
   layoutEngine.LayoutText(layoutParameters,
                           newLayoutSize,
                           textParameters.ellipsisEnabled,
-                          isAutoScrollEnabled);
+                          isAutoScrollEnabled,
+                          ellipsisPosition);
 
   return newLayoutSize;
 }

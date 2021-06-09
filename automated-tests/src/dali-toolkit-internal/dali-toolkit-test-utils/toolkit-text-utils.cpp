@@ -102,7 +102,9 @@ void CreateTextModel( const std::string& text,
                       ModelPtr& textModel,
                       MetricsPtr& metrics,
                       bool markupProcessorEnabled,
-                      LineWrap::Mode wrapMode )
+                      LineWrap::Mode wrapMode,
+                      bool ellipsisEnabled,
+                      DevelText::EllipsisPosition::Type ellipsisPosition)
 {
   textModel = Model::New(); ///< Pointer to the text's model.
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
@@ -132,6 +134,12 @@ void CreateTextModel( const std::string& text,
     // This is a bit horrible but std::string returns a (signed) char*
     utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
   }
+
+  //Ellipsis
+  textModel-> mElideEnabled = ellipsisEnabled;
+  textModel-> mVisualModel->SetTextElideEnabled(ellipsisEnabled);
+  textModel-> mEllipsisPosition = ellipsisPosition;
+  textModel-> mVisualModel->SetEllipsisPosition(ellipsisPosition);
 
   // 1) Convert to utf32
   Vector<Character>& utf32Characters = logicalModel->mText;
@@ -343,7 +351,8 @@ void CreateTextModel( const std::string& text,
   layoutEngine.LayoutText( layoutParameters,
                            layoutSize,
                            false,
-                           isAutoScroll );
+                           isAutoScroll,
+                           ellipsisPosition);
 
   if( options.align )
   {

@@ -141,7 +141,9 @@ bool ShapeInfoTest( const ShapeInfoData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;

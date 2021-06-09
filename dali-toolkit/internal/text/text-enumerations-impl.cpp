@@ -48,6 +48,13 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(LINE_WRAP_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::LineWrap, WORD)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::LineWrap, CHARACTER)
 DALI_ENUM_TO_STRING_TABLE_END(LINE_WRAP_MODE)
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN(ELLIPSIS_POSITION_TYPE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelText::EllipsisPosition, END)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelText::EllipsisPosition, START)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelText::EllipsisPosition, MIDDLE)
+DALI_ENUM_TO_STRING_TABLE_END(ELLIPSIS_POSITION_TYPE)
+
 } // namespace
 
 bool GetHorizontalAlignmentEnumeration(const Property::Value& propertyValue, Toolkit::Text::HorizontalAlignment::Type& alignment)
@@ -77,6 +84,11 @@ const char* GetVerticalAlignmentString(const Toolkit::Text::VerticalAlignment::T
   return Scripting::GetLinearEnumerationName<Toolkit::Text::VerticalAlignment::Type>(alignment,
                                                                                      VERTICAL_ALIGNMENT_TYPE_TABLE,
                                                                                      VERTICAL_ALIGNMENT_TYPE_TABLE_COUNT);
+}
+
+bool GetEllipsisPositionTypeEnumeration(const Property::Value& propertyValue, Toolkit::DevelText::EllipsisPosition::Type& ellipsisPositionType)
+{
+  return Scripting::GetEnumerationProperty(propertyValue, ELLIPSIS_POSITION_TYPE_TABLE, ELLIPSIS_POSITION_TYPE_TABLE_COUNT, ellipsisPositionType);
 }
 
 } // namespace Text

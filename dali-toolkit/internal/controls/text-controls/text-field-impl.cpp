@@ -138,6 +138,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "fontSizeScale", 
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "primaryCursorPosition",            INTEGER,   PRIMARY_CURSOR_POSITION             )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "grabHandleColor",                  VECTOR4,   GRAB_HANDLE_COLOR                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "inputFilter",                      MAP,       INPUT_FILTER                        )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "ellipsisPosition",                 INTEGER,   ELLIPSIS_POSITION                   )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",       SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",  SIGNAL_MAX_LENGTH_REACHED )
@@ -775,6 +776,16 @@ void TextField::SetProperty(BaseObject* object, Property::Index index, const Pro
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::ELLIPSIS_POSITION:
+      {
+        DevelText::EllipsisPosition::Type ellipsisPositionType(static_cast<DevelText::EllipsisPosition::Type>(-1)); // Set to invalid value to ensure a valid mode does get set
+        if(GetEllipsisPositionTypeEnumeration(value, ellipsisPositionType))
+        {
+          DALI_LOG_INFO(gLogFilter, Debug::General, "TextField %p EllipsisPosition::Type %d\n", impl.mController.Get(), ellipsisPositionType);
+          impl.mController->SetEllipsisPosition(ellipsisPositionType);
+        }
+        break;
+      }
     } // switch
   }   // textfield
 }
@@ -1135,6 +1146,11 @@ Property::Value TextField::GetProperty(BaseObject* object, Property::Index index
         Property::Map map;
         impl.mController->GetInputFilterOption(map);
         value = map;
+        break;
+      }
+      case Toolkit::DevelTextField::Property::ELLIPSIS_POSITION:
+      {
+        value = impl.mController->GetEllipsisPosition();
         break;
       }
     } //switch

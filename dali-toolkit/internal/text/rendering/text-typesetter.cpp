@@ -648,14 +648,16 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
   const unsigned int bufferSizeInt  = bufferWidth * bufferHeight;
   const unsigned int bufferSizeChar = 4u * bufferSizeInt;
 
-  Length numberOfGlyphs = mModel->GetNumberOfGlyphs();
+  //Elided text in ellipsis at START could start on index greater than 0
+  auto startIndexOfGlyphs = mModel->GetStartIndexOfElidedGlyphs();
+  auto endIndexOfGlyphs   = mModel->GetEndIndexOfElidedGlyphs();
 
   Devel::PixelBuffer imageBuffer;
 
   if(RENDER_MASK == behaviour)
   {
     // Generate the image buffer as an alpha mask for color glyphs.
-    imageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_MASK, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1);
+    imageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_MASK, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
   }
   else if(RENDER_NO_TEXT == behaviour)
   {
@@ -666,7 +668,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
   else
   {
     // Generate the image buffer for the text with no style.
-    imageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_NONE, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1);
+    imageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_NONE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
   }
 
   if((RENDER_NO_STYLES != behaviour) && (RENDER_MASK != behaviour))
@@ -676,7 +678,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
     if(outlineWidth != 0u)
     {
       // Create the image buffer for outline
-      Devel::PixelBuffer outlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1);
+      Devel::PixelBuffer outlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
 
       // Combine the two buffers
       imageBuffer = CombineImageBuffer(imageBuffer, outlineImageBuffer, bufferWidth, bufferHeight);
@@ -689,7 +691,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
     if(fabsf(shadowOffset.x) > Math::MACHINE_EPSILON_1 || fabsf(shadowOffset.y) > Math::MACHINE_EPSILON_1)
     {
       // Create the image buffer for shadow
-      Devel::PixelBuffer shadowImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_SHADOW, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1);
+      Devel::PixelBuffer shadowImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_SHADOW, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
 
       // Check whether it will be a soft shadow
       const float& blurRadius = mModel->GetShadowBlurRadius();
@@ -708,7 +710,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
     if(underlineEnabled)
     {
       // Create the image buffer for underline
-      Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1);
+      Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
 
       // Combine the two buffers
       imageBuffer = CombineImageBuffer(imageBuffer, underlineImageBuffer, bufferWidth, bufferHeight);
@@ -723,7 +725,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
 
       if(backgroundEnabled)
       {
-        backgroundImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_BACKGROUND, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1);
+        backgroundImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_BACKGROUND, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
       }
       else
       {
@@ -755,7 +757,6 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
   // Retrieve lines, glyphs, positions and colors from the view model.
   const Length            modelNumberOfLines = mModel->GetNumberOfLines();
   const LineRun* const    modelLinesBuffer   = mModel->GetLines();
-  const Length            numberOfGlyphs     = mModel->GetNumberOfGlyphs();
   const GlyphInfo* const  glyphsBuffer       = mModel->GetGlyphs();
   const Vector2* const    positionBuffer     = mModel->GetLayout();
   const Vector4* const    colorsBuffer       = mModel->GetColors();
@@ -763,6 +764,13 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
   const GlyphInfo*        hyphens            = mModel->GetHyphens();
   const Length*           hyphenIndices      = mModel->GetHyphenIndices();
   const Length            hyphensCount       = mModel->GetHyphensCount();
+
+  // Elided text info. Indices according to elided text and Ellipsis position.
+  const auto startIndexOfGlyphs              = mModel->GetStartIndexOfElidedGlyphs();
+  const auto endIndexOfGlyphs                = mModel->GetEndIndexOfElidedGlyphs();
+  const auto firstMiddleIndexOfElidedGlyphs  = mModel->GetFirstMiddleIndexOfElidedGlyphs();
+  const auto secondMiddleIndexOfElidedGlyphs = mModel->GetSecondMiddleIndexOfElidedGlyphs();
+  const auto ellipsisPosition                = mModel->GetEllipsisPosition();
 
   // Whether to use the default color.
   const bool     useDefaultColor = (NULL == colorsBuffer);
@@ -846,13 +854,35 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     bool  addHyphen       = false;
 
     // Traverses the glyphs of the line.
-    const GlyphIndex endGlyphIndex = std::min(numberOfGlyphs, line.glyphRun.glyphIndex + line.glyphRun.numberOfGlyphs);
-    for(GlyphIndex glyphIndex = line.glyphRun.glyphIndex; glyphIndex < endGlyphIndex; ++glyphIndex)
+    const GlyphIndex startGlyphIndex = std::max(line.glyphRun.glyphIndex, startIndexOfGlyphs);
+    GlyphIndex       endGlyphIndex   = (line.isSplitToTwoHalves ? line.glyphRunSecondHalf.glyphIndex + line.glyphRunSecondHalf.numberOfGlyphs : line.glyphRun.glyphIndex + line.glyphRun.numberOfGlyphs) - 1u;
+    endGlyphIndex                    = std::min(endGlyphIndex, endIndexOfGlyphs);
+
+    for(GlyphIndex glyphIndex = startGlyphIndex; glyphIndex <= endGlyphIndex; ++glyphIndex)
     {
       if(glyphIndex < fromGlyphIndex || glyphIndex > toGlyphIndex)
       {
         // Ignore any glyph that out of the specified range
         continue;
+      }
+
+      //To handle START case of ellipsis, the first glyph has been shifted
+      //glyphIndex represent indices in whole glyphs but elidedGlyphIndex represents indices in elided Glyphs
+      GlyphIndex elidedGlyphIndex = glyphIndex - startIndexOfGlyphs;
+
+      //To handle MIDDLE case of ellipsis, the first glyph in the second half of line has been shifted and skip the removed glyph from middle.
+      if(ellipsisPosition == DevelText::EllipsisPosition::MIDDLE)
+      {
+        if(glyphIndex > firstMiddleIndexOfElidedGlyphs &&
+           glyphIndex < secondMiddleIndexOfElidedGlyphs)
+        {
+          // Ignore any glyph that removed for MIDDLE ellipsis
+          continue;
+        }
+        if(glyphIndex >= secondMiddleIndexOfElidedGlyphs)
+        {
+          elidedGlyphIndex -= (secondMiddleIndexOfElidedGlyphs - firstMiddleIndexOfElidedGlyphs - 1u);
+        }
       }
 
       // Retrieve the glyph's info.
@@ -865,7 +895,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       }
       else
       {
-        glyphInfo = glyphsBuffer + glyphIndex;
+        glyphInfo = glyphsBuffer + elidedGlyphIndex;
       }
 
       if((glyphInfo->width < Math::MACHINE_EPSILON_1000) ||
@@ -886,11 +916,11 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       } // underline
 
       // Retrieves the glyph's position.
-      Vector2 position = *(positionBuffer + glyphIndex);
+      Vector2 position = *(positionBuffer + elidedGlyphIndex);
 
       if(addHyphen)
       {
-        GlyphInfo tempInfo = *(glyphsBuffer + glyphIndex);
+        GlyphInfo tempInfo = *(glyphsBuffer + elidedGlyphIndex);
         position.x         = position.x + tempInfo.advance - tempInfo.xBearing + glyphInfo->xBearing;
         position.y         = -glyphInfo->yBearing;
       }

@@ -67,6 +67,11 @@ DevelText::VerticalLineAlignment::Type Model::GetVerticalLineAlignment() const
   return mVerticalLineAlignment;
 }
 
+DevelText::EllipsisPosition::Type Model::GetEllipsisPosition() const
+{
+  return mEllipsisPosition;
+}
+
 bool Model::IsTextElideEnabled() const
 {
   return mElideEnabled;
@@ -95,6 +100,26 @@ const ScriptRun* const Model::GetScriptRuns() const
 Length Model::GetNumberOfGlyphs() const
 {
   return mVisualModel->mGlyphs.Count();
+}
+
+GlyphIndex Model::GetStartIndexOfElidedGlyphs() const
+{
+  return mVisualModel->GetStartIndexOfElidedGlyphs();
+}
+
+GlyphIndex Model::GetEndIndexOfElidedGlyphs() const
+{
+  return mVisualModel->GetEndIndexOfElidedGlyphs();
+}
+
+GlyphIndex Model::GetFirstMiddleIndexOfElidedGlyphs() const
+{
+  return mVisualModel->GetFirstMiddleIndexOfElidedGlyphs();
+}
+
+GlyphIndex Model::GetSecondMiddleIndexOfElidedGlyphs() const
+{
+  return mVisualModel->GetSecondMiddleIndexOfElidedGlyphs();
 }
 
 const GlyphInfo* const Model::GetGlyphs() const
@@ -229,7 +254,8 @@ Model::Model()
   mAlignmentOffset(0.0f),
   mElideEnabled(false),
   mIgnoreSpacesAfterText(true),
-  mMatchLayoutDirection(DevelText::MatchLayoutDirection::INHERIT)
+  mMatchLayoutDirection(DevelText::MatchLayoutDirection::INHERIT),
+  mEllipsisPosition(DevelText::EllipsisPosition::END)
 {
   mLogicalModel = LogicalModel::New();
   mVisualModel  = VisualModel::New();
