@@ -130,7 +130,8 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
   mVideoHoleEnabled(true),
   mMouseEventsEnabled(true),
-  mKeyEventsEnabled(true)
+  mKeyEventsEnabled(true),
+  mScreenshotCapturedCallback(nullptr)
 {
   mWebEngine = Dali::WebEngine::New();
 
@@ -154,7 +155,8 @@ WebView::WebView(uint32_t argc, char** argv)
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
   mVideoHoleEnabled(true),
   mMouseEventsEnabled(true),
-  mKeyEventsEnabled(true)
+  mKeyEventsEnabled(true),
+  mScreenshotCapturedCallback(nullptr)
 {
   mWebEngine = Dali::WebEngine::New();
 
