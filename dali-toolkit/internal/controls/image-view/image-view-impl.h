@@ -133,6 +133,11 @@ private: // From Control
    */
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override;
 
+  /**
+   * @copydoc Toolkit::Control::OnCreateTransitions()
+   */
+  virtual void OnCreateTransitions(Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod timePeriod) override;
+
 private:
   /**
    * @brief Callback for ResourceReadySignal

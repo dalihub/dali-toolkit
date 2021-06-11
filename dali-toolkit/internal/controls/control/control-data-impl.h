@@ -393,6 +393,18 @@ public:
    */
   Dali::Property GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey);
 
+  /**
+   * @brief Make visual transition from source control to this control about specific Property::Index
+   * If both of source and this control have Property::Index property, than create animation between them.
+   *
+   * @param[in] animation Return animation from source to this control.
+   * @param[in] source Source control to be used property animation.
+   * @param[in] visualIndex Property::Index to make animation.
+   * @param[in] alphaFunction alpha function of the animation.
+   * @param[in] timePeriod time period of the animation.
+   */
+  void MakeVisualTransition(Dali::Animation& animation, Dali::Toolkit::Control source, Dali::Property::Index visualIndex, AlphaFunction alphaFunction, TimePeriod timePeriod);
+
 private:
   /**
    * Used as an alternative to boolean so that it is obvious whether a visual is enabled/disabled.
