@@ -297,19 +297,34 @@ void ImageView::OnCreateTransitions(Dali::Animation& animation, Dali::Toolkit::C
 
   destinationVisual.CreatePropertyMap(destinationMap);
 
-  static auto findValue = [](const Property::Map& map, Property::Index index) -> Vector4 {
+  static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4 {
     Property::Value* propertyValue = map.Find(index);
     if(propertyValue)
     {
       return propertyValue->Get<Vector4>();
     }
-    return Vector4{};
+    return defaultValue;
+  };
+
+  static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float {
+    Property::Value* propertyValue = map.Find(index);
+    if(propertyValue)
+    {
+      return propertyValue->Get<float>();
+    }
+    return defaultValue;
   };
 
   Vector4 sourceMixColor(0.0f, 0.0f, 0.0f, 0.0f);
   Vector4 sourceCornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
-  Vector4 destinationMixColor     = findValue(destinationMap, Dali::Toolkit::Visual::Property::MIX_COLOR);
-  Vector4 destinationCornerRadius = findValue(destinationMap, Toolkit::DevelVisual::Property::CORNER_RADIUS);
+  float   sourceBorderlineWidth(0.0f);
+  Vector4 sourceBorderlineColor(0.0f, 0.0f, 0.0f, 1.0f);
+  float   sourceBorderlineOffset(0.0f);
+  Vector4 destinationMixColor         = findValueVector4(destinationMap, Dali::Toolkit::Visual::Property::MIX_COLOR, sourceMixColor);
+  Vector4 destinationCornerRadius     = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, sourceCornerRadius);
+  float   destinationBorderlineWidth  = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, sourceBorderlineWidth);
+  Vector4 destinationBorderlineColor  = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, sourceBorderlineColor);
+  float   destinationBorderlineOffset = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, sourceBorderlineOffset);
 
   Dali::Toolkit::ImageView sourceHandle = Dali::Toolkit::ImageView::DownCast(source);
   Toolkit::Visual::Base    sourceVisual;
@@ -323,8 +338,11 @@ void ImageView::OnCreateTransitions(Dali::Animation& animation, Dali::Toolkit::C
   if(sourceVisual)
   {
     sourceVisual.CreatePropertyMap(sourceMap);
-    sourceMixColor     = findValue(sourceMap, Dali::Toolkit::Visual::Property::MIX_COLOR);
-    sourceCornerRadius = findValue(sourceMap, Toolkit::DevelVisual::Property::CORNER_RADIUS);
+    sourceMixColor         = findValueVector4(sourceMap, Dali::Toolkit::Visual::Property::MIX_COLOR, sourceMixColor);
+    sourceCornerRadius     = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, sourceCornerRadius);
+    sourceBorderlineWidth  = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, sourceBorderlineWidth);
+    sourceBorderlineColor  = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, sourceBorderlineColor);
+    sourceBorderlineOffset = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, sourceBorderlineOffset);
   }
 
   std::vector<Dali::Property>                              properties;
@@ -344,6 +362,21 @@ void ImageView::OnCreateTransitions(Dali::Animation& animation, Dali::Toolkit::C
   {
     properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::DevelVisual::Property::CORNER_RADIUS));
     values.push_back(std::make_pair(sourceCornerRadius, destinationCornerRadius));
+  }
+  if(sourceBorderlineWidth != destinationBorderlineWidth)
+  {
+    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH));
+    values.push_back(std::make_pair(sourceBorderlineWidth, destinationBorderlineWidth));
+  }
+  if(sourceBorderlineColor != destinationBorderlineColor)
+  {
+    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::DevelVisual::Property::BORDERLINE_COLOR));
+    values.push_back(std::make_pair(sourceBorderlineColor, destinationBorderlineColor));
+  }
+  if(sourceBorderlineOffset != destinationBorderlineOffset)
+  {
+    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET));
+    values.push_back(std::make_pair(sourceBorderlineOffset, destinationBorderlineOffset));
   }
 
   for(uint32_t i = 0; i < properties.size(); ++i)
