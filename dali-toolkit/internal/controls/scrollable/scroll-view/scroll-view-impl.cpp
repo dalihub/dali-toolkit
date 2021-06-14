@@ -1823,10 +1823,17 @@ Toolkit::ScrollView::SnapStartedSignalType& ScrollView::SnapStartedSignal()
   return mSnapStartedSignal;
 }
 
-void ScrollView::AccessibleImpl::EnsureChildVisible(Actor child)
+bool ScrollView::AccessibleImpl::ScrollToChild(Actor child)
 {
   auto scrollView = Dali::Toolkit::ScrollView::DownCast(Self());
-  scrollView.ScrollTo(child);
+  if (Toolkit::GetImpl(scrollView).FindClosestActor() == child)
+  {
+    return false;
+  }
+
+  // FIXME: ScrollTo does not work (snaps back to original position)
+  scrollView.ScrollTo(child, scrollView.GetScrollFlickDuration());
+  return true;
 }
 
 void ScrollView::FindAndUnbindActor(Actor child)

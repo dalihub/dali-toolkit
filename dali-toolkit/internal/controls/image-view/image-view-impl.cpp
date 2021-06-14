@@ -287,6 +287,75 @@ void ImageView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   }
 }
 
+void ImageView::OnCreateTransitions(Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod timePeriod)
+{
+  Dali::Toolkit::ImageView destinationHandle = Toolkit::ImageView(GetOwner());
+  Toolkit::Visual::Base    destinationVisual = DevelControl::GetVisual(GetImplementation(destinationHandle), Toolkit::ImageView::Property::IMAGE);
+  Property::Map            destinationMap;
+
+  if(!destinationVisual)
+  {
+    return;
+  }
+
+  destinationVisual.CreatePropertyMap(destinationMap);
+
+  Vector4 sourceMixColor(0.0f, 0.0f, 0.0f, 0.0f);
+  Vector4 sourceCornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
+  Vector4 destinationMixColor     = destinationMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
+  Vector4 destinationCornerRadius = destinationMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+
+  Dali::Toolkit::ImageView sourceHandle = Dali::Toolkit::ImageView::DownCast(source);
+  Toolkit::Visual::Base    sourceVisual;
+  Property::Map            sourceMap;
+
+  if(sourceHandle)
+  {
+    sourceVisual = DevelControl::GetVisual(GetImplementation(sourceHandle), Toolkit::ImageView::Property::IMAGE);
+  }
+
+  if(sourceVisual)
+  {
+    sourceVisual.CreatePropertyMap(sourceMap);
+    sourceMixColor     = sourceMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
+    sourceCornerRadius = sourceMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+  }
+
+  std::vector<Dali::Property> properties;
+  std::vector<std::pair<Property::Value, Property::Value>> values;
+
+  if(Vector3(sourceMixColor) != Vector3(destinationMixColor))
+  {
+    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::MIX_COLOR));
+    values.push_back(std::make_pair(Vector3(sourceMixColor), Vector3(destinationMixColor)));
+  }
+  if(std::abs(sourceMixColor.a - destinationMixColor.a) > Math::MACHINE_EPSILON_1)
+  {
+    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY));
+    values.push_back(std::make_pair(sourceMixColor.a, destinationMixColor.a));
+  }
+  if(sourceCornerRadius != destinationCornerRadius)
+  {
+    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::DevelVisual::Property::CORNER_RADIUS));
+    values.push_back(std::make_pair(sourceCornerRadius, destinationCornerRadius));
+  }
+
+  for(uint32_t i = 0; i < properties.size(); ++i)
+  {
+    if(timePeriod.delaySeconds > 0.0f)
+    {
+      Dali::KeyFrames initialKeyframes = Dali::KeyFrames::New();
+      initialKeyframes.Add(0.0f, values[i].first);
+      initialKeyframes.Add(1.0f, values[i].first);
+      animation.AnimateBetween(properties[i], initialKeyframes, TimePeriod(timePeriod.delaySeconds));
+    }
+    Dali::KeyFrames keyframes = Dali::KeyFrames::New();
+    keyframes.Add(0.0f, values[i].first);
+    keyframes.Add(1.0f, values[i].second);
+    animation.AnimateBetween(properties[i], keyframes, alphaFunction, timePeriod);
+  }
+}
+
 void ImageView::OnResourceReady(Toolkit::Control control)
 {
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.

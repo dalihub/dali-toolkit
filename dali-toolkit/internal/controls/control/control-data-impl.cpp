@@ -1821,6 +1821,69 @@ Dali::Property Control::Impl::GetVisualProperty(Dali::Property::Index index, Dal
   return Dali::Property(handle, Property::INVALID_INDEX);
 }
 
+void Control::Impl::MakeVisualTransition(Dali::Animation& animation, Dali::Toolkit::Control source, Dali::Property::Index visualIndex, AlphaFunction alphaFunction, TimePeriod timePeriod)
+{
+  Dali::Toolkit::Control sourceHandle      = Dali::Toolkit::Control::DownCast(source);
+  Property::Map          sourceMap         = sourceHandle.GetProperty<Property::Map>(visualIndex);
+  Dali::Toolkit::Control destinationHandle = Dali::Toolkit::Control::DownCast(mControlImpl.Self());
+  Property::Map          destinationMap    = destinationHandle.GetProperty<Property::Map>(visualIndex);
+
+  Vector4                  mixColor(1.0f, 1.0f, 1.0f, 1.0f);
+  Vector4                  cornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
+
+  if(!destinationMap.Empty())
+  {
+    mixColor     = destinationMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
+    cornerRadius = destinationMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+
+    if(sourceMap.Empty())
+    {
+      sourceMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+      sourceMap.Insert(Dali::Toolkit::Visual::Property::MIX_COLOR, Color::TRANSPARENT);
+      sourceMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
+    }
+
+    Vector4 sourceMixColor     = sourceMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
+    Vector4 sourceCornerRadius = sourceMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+
+    std::vector<Dali::Property> properties;
+    std::vector<std::pair<Property::Value, Property::Value>> values;
+
+    if(Vector3(sourceMixColor) != Vector3(mixColor))
+    {
+      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::Visual::Property::MIX_COLOR));
+      values.push_back(std::make_pair(Vector3(sourceMixColor), Vector3(mixColor)));
+    }
+
+    if(std::abs(sourceMixColor.a - mixColor.a) > Math::MACHINE_EPSILON_1)
+    {
+      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::Visual::Property::OPACITY));
+      values.push_back(std::make_pair(sourceMixColor.a, mixColor.a));
+    }
+
+    if(sourceCornerRadius != cornerRadius)
+    {
+      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS));
+      values.push_back(std::make_pair(sourceCornerRadius, cornerRadius));
+    }
+
+    for(uint32_t i = 0; i < properties.size(); ++i)
+    {
+      if(timePeriod.delaySeconds > 0.0f)
+      {
+        Dali::KeyFrames initialKeyframes = Dali::KeyFrames::New();
+        initialKeyframes.Add(0.0f, values[i].first);
+        initialKeyframes.Add(1.0f, values[i].first);
+        animation.AnimateBetween(properties[i], initialKeyframes, TimePeriod(timePeriod.delaySeconds));
+      }
+      Dali::KeyFrames keyframes = Dali::KeyFrames::New();
+      keyframes.Add(0.0f, values[i].first);
+      keyframes.Add(1.0f, values[i].second);
+      animation.AnimateBetween(properties[i], keyframes, alphaFunction, timePeriod);
+    }
+  }
+}
+
 void Control::Impl::EmitResourceReadySignal()
 {
   if(!mIsEmittingResourceReadySignal)

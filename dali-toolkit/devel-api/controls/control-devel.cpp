@@ -122,6 +122,19 @@ Dali::Property GetVisualProperty(Control control, Dali::Property::Index index, D
   return controlDataImpl.GetVisualProperty(index, visualPropertyKey);
 }
 
+void CreateTransitions(Control control, Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod timePeriod)
+{
+  if(animation)
+  {
+    // make visual transition of control visual.
+    Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get(internalControl);
+    controlDataImpl.MakeVisualTransition(animation, source, Toolkit::Control::Property::BACKGROUND, alphaFunction, timePeriod);
+    controlDataImpl.MakeVisualTransition(animation, source, Toolkit::DevelControl::Property::SHADOW, alphaFunction, timePeriod);
+    internalControl.OnCreateTransitions(animation, source, alphaFunction, timePeriod);
+  }
+}
+
 static Toolkit::Internal::Control::Impl* GetControlImplementationIfAny(Dali::Actor actor)
 {
   Dali::Toolkit::Control c = Toolkit::Control::DownCast(actor);
