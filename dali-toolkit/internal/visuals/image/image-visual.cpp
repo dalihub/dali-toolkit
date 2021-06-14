@@ -192,12 +192,6 @@ ImageVisual::~ImageVisual()
     {
       RemoveTexture();
     }
-
-    // Remove ExternalTexture When ImageVisual is destroyed
-    if(mImageUrl.IsValid() && mImageUrl.GetProtocolType() == VisualUrl::TEXTURE)
-    {
-      mFactoryCache.GetTextureManager().RemoveExternalTexture(mImageUrl.GetUrl());
-    }
   }
 }
 
