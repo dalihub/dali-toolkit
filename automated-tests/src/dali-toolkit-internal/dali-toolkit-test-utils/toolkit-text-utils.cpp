@@ -382,6 +382,9 @@ void ConfigureTextLabel( ControllerPtr controller )
 
   // Enable the text elide.
   controller->SetTextElideEnabled( true );
+
+  // Disable match system language direction
+  controller->SetMatchSystemLanguageDirection(false);
 }
 
 void ConfigureTextField( ControllerPtr controller )
@@ -411,6 +414,9 @@ void ConfigureTextField( ControllerPtr controller )
 
   // Disable the text elide.
   controller->SetTextElideEnabled( false );
+
+  // Disable match system language direction
+  controller->SetMatchSystemLanguageDirection(false);
 }
 
 void ConfigureTextEditor( ControllerPtr controller )
@@ -440,6 +446,9 @@ void ConfigureTextEditor( ControllerPtr controller )
 
   // Disable the text elide.
   controller->SetTextElideEnabled( false );
+
+  // Disable match system language direction
+  controller->SetMatchSystemLanguageDirection(false);
 }
 
 } // namespace Text

@@ -3048,12 +3048,12 @@ int UtcDaliTextEditorMatchSystemLanguageDirectionProperty(void)
   application.SendNotification();
   application.Render();
 
-  // The default value of MATCH_SYSTEM_LANGUAGE_DIRECTION is 'false'.
-  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), false, TEST_LOCATION );
-
-  // Check the enable match system language direction property
-  editor.SetProperty( DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, true );
+  // The default value of MATCH_SYSTEM_LANGUAGE_DIRECTION is 'true'.
   DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), true, TEST_LOCATION );
+
+  // Check the disable match system language direction property
+  editor.SetProperty( DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, false );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), false, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
