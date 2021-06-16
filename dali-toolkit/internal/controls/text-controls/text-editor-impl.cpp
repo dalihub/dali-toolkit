@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
@@ -698,7 +697,7 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
       {
-        impl.mController->SetMatchSystemLanguageDirection(value.Get<bool>());
+        impl.mController->SetMatchLayoutDirection(value.Get<bool>() ? DevelText::MatchLayoutDirection::LOCALE : DevelText::MatchLayoutDirection::CONTENTS);
         break;
       }
       case Toolkit::DevelTextEditor::Property::MAX_LENGTH:
@@ -1119,7 +1118,7 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
       }
       case Toolkit::DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
       {
-        value = impl.mController->IsMatchSystemLanguageDirection();
+        value = impl.mController->GetMatchLayoutDirection() != DevelText::MatchLayoutDirection::CONTENTS;
         break;
       }
       case Toolkit::DevelTextEditor::Property::MAX_LENGTH:
@@ -1376,6 +1375,8 @@ void TextEditor::OnInitialize()
   Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(stage.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
   mController->SetLayoutDirection(layoutDirection);
 
+  self.LayoutDirectionChangedSignal().Connect(this, &TextEditor::OnLayoutDirectionChanged);
+
   // Forward input events to controller
   EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP | GestureType::PAN | GestureType::LONG_PRESS));
   GetTapGestureDetector().SetMaximumTapsRequired(2);
@@ -1501,15 +1502,8 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Vector2 contentSize(size.x - (padding.start + padding.end), size.y - (padding.top + padding.bottom));
 
   // Support Right-To-Left of padding
-  Dali::LayoutDirection::Type layoutDirection;
-  if(mController->IsMatchSystemLanguageDirection())
-  {
-    layoutDirection = static_cast<Dali::LayoutDirection::Type>(DevelWindow::Get(self).GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  }
-  else
-  {
-    layoutDirection = static_cast<Dali::LayoutDirection::Type>(self.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  }
+  Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);
+
   if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
   {
     std::swap(padding.start, padding.end);
@@ -2170,6 +2164,11 @@ void TextEditor::SetEditable(bool editable)
   {
     mInputMethodContext.Deactivate();
   }
+}
+
+void TextEditor::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
+{
+  mController->ChangedLayoutDirection();
 }
 
 TextEditor::TextEditor()

@@ -323,7 +323,6 @@ void CreateTextModel( const std::string& text,
   // Set the layout parameters.
   textModel->mHorizontalAlignment = Text::HorizontalAlignment::BEGIN;
   textModel->mIgnoreSpacesAfterText = true;
-  textModel->mMatchSystemLanguageDirection = false;
   Layout::Parameters layoutParameters( textArea,
                                        textModel );
 
@@ -385,7 +384,7 @@ void ConfigureTextLabel( ControllerPtr controller )
   controller->SetTextElideEnabled( true );
 
   // Disable match system language direction
-  controller->SetMatchSystemLanguageDirection(false);
+  controller->SetMatchLayoutDirection(DevelText::MatchLayoutDirection::CONTENTS);
 }
 
 void ConfigureTextField( ControllerPtr controller )
@@ -417,7 +416,7 @@ void ConfigureTextField( ControllerPtr controller )
   controller->SetTextElideEnabled( false );
 
   // Disable match system language direction
-  controller->SetMatchSystemLanguageDirection(false);
+  controller->SetMatchLayoutDirection(DevelText::MatchLayoutDirection::CONTENTS);
 }
 
 void ConfigureTextEditor( ControllerPtr controller )
@@ -449,7 +448,7 @@ void ConfigureTextEditor( ControllerPtr controller )
   controller->SetTextElideEnabled( false );
 
   // Disable match system language direction
-  controller->SetMatchSystemLanguageDirection(false);
+  controller->SetMatchLayoutDirection(DevelText::MatchLayoutDirection::CONTENTS);
 }
 
 } // namespace Text

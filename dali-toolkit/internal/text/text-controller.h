@@ -1441,22 +1441,34 @@ public: // Queries & retrieves.
   void SetIgnoreSpacesAfterText(bool ignore);
 
   /**
-   * @brief Retrieves matchSystemLanguageDirection value from model
-   * @return The value of matchSystemLanguageDirection
+   * @brief Sets SetMatchLayoutDirection value to model
+   * @param[in] match The value of matchLayoutDirection for the text
    */
-  bool IsMatchSystemLanguageDirection() const;
+  void SetMatchLayoutDirection(DevelText::MatchLayoutDirection type);
 
   /**
-   * @brief Sets matchSystemLanguageDirection value to model
-   * @param[in] match The value of matchSystemLanguageDirection for the text
+   * @brief Retrieves matchLayoutDirection value from model
+   * @return The value of matchLayoutDirection
    */
-  void SetMatchSystemLanguageDirection(bool match);
+  DevelText::MatchLayoutDirection GetMatchLayoutDirection() const;
 
   /**
-   * @brief Sets layoutDirection value
-   * @param[in] layoutDirection The value of system language direction
+   * @brief Sets layoutDirection type value.
+   * @param[in] layoutDirection The value of the layout direction type.
    */
   void SetLayoutDirection(Dali::LayoutDirection::Type layoutDirection);
+
+  /**
+   * @brief Gets layoutDirection type value.
+   * @param[in] actor The actor which will get the layout direction type.
+   * @return The value of the layout direction type.
+   */
+  Dali::LayoutDirection::Type GetLayoutDirection(Dali::Actor& actor) const;
+
+  /**
+   * @brief Sets the layout direction changed.
+   */
+  void ChangedLayoutDirection();
 
   /**
    * @brief Retrieves if showing real text or not.

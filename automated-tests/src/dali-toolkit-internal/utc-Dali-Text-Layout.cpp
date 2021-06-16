@@ -162,7 +162,6 @@ bool LayoutTextTest( const LayoutTextData& data )
   textModel->mHorizontalAlignment = Text::HorizontalAlignment::BEGIN;
   textModel->mLineWrapMode = LineWrap::WORD;
   textModel->mIgnoreSpacesAfterText = true;
-  textModel->mMatchSystemLanguageDirection = false;
   Layout::Parameters layoutParameters( data.textArea,
                                        textModel );
 

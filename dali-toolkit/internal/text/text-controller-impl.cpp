@@ -797,7 +797,7 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
                          startIndex,
                          requestedNumberOfCharacters,
                          bidirectionalInfo,
-                         mModel->mMatchSystemLanguageDirection,
+                         (mModel->mMatchLayoutDirection != DevelText::MatchLayoutDirection::CONTENTS),
                          mLayoutDirection);
 
     if(0u != bidirectionalInfo.Count())
@@ -1737,7 +1737,7 @@ void Controller::Impl::GetCursorPosition(CharacterIndex logical,
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
     bool isRTL = false;
-    if(mModel->mMatchSystemLanguageDirection)
+    if(mModel->mMatchLayoutDirection != DevelText::MatchLayoutDirection::CONTENTS)
     {
       isRTL = mLayoutDirection == LayoutDirection::RIGHT_TO_LEFT;
     }
