@@ -91,8 +91,6 @@ void CanvasView::OnInitialize()
       new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::IMAGE));
   });
 
-  Self().SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, true);
-
   Adaptor::Get().RegisterProcessor(*this);
 }
 
