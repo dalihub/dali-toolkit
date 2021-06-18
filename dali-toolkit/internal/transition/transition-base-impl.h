@@ -92,6 +92,15 @@ public:
    */
   void TransitionFinished();
 
+  /**
+   * @brief Set this transition is appearing transition or not.
+   * @param[in] appearingTransition True if this transition is appearing transition.
+   */
+  void SetAppearingTransition(bool appearingTransition)
+  {
+    mIsAppearingTransition = appearingTransition;
+  }
+
 protected:
   /**
    * @brief Set property map which will be used as a initial properties.
@@ -151,9 +160,17 @@ protected:
   /**
    * @brief Returns whether this transition will be applied to children of target or not.
    */
-  bool IsTransitionWithChild()
+  bool IsTransitionWithChild() const
   {
     return mTransitionWithChild;
+  }
+
+  /**
+   * @brief Returns whether this transition is appearing transition or not
+   */
+  bool IsAppearingTransition() const
+  {
+    return mIsAppearingTransition;
   }
 
 protected:
@@ -234,6 +251,7 @@ private:
   bool                         mTransitionWithChild; ///< True, if mTarget transition is inherit to its child Actors.
                                                      ///< If this is false, the child Actors are moved to the child of mCopiedActor that will have original properties of target Actor during Transition.
   bool mMoveTargetChildren;                          ///< Flag, if mTransitionWithChild is false and mTarget has children than True.
+  bool mIsAppearingTransition;                       ///< True, if this transition is appearing transition.
 };
 
 } // namespace Internal

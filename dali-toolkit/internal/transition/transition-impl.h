@@ -23,6 +23,9 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/transition/transition.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/weak-handle.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -38,7 +41,7 @@ public:
    * @brief Create a new Transition object.
    * @param[in] source A source control of this transition.
    * @param[in] destination A destination control of this transition.
-   * @param[in] durationSeconds The duration of the animation.
+   * @param[in] timePeriod The timePeriod of the animation.
    * @return A smart-pointer to the newly allocated Transition.
    */
   static TransitionPtr New(Dali::Toolkit::Control source, Dali::Toolkit::Control destination, TimePeriod timePeriod);
@@ -75,8 +78,8 @@ private:
   Transition& operator=(const Transition& rhs);
 
 private:
-  Dali::Toolkit::Control mSourceControl;
-  Dali::Toolkit::Control mDestinationControl;
+  WeakHandle<Dali::Toolkit::Control> mSourceControl;
+  WeakHandle<Dali::Toolkit::Control> mDestinationControl;
 };
 
 } // namespace Internal

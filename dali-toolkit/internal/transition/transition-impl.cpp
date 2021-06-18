@@ -79,37 +79,39 @@ Transition::~Transition()
 
 void Transition::OnPlay()
 {
-  if(!mSourceControl[Dali::Actor::Property::CONNECTED_TO_SCENE] ||
-     !mDestinationControl[Dali::Actor::Property::CONNECTED_TO_SCENE])
+  Dali::Toolkit::Control sourceControl = mSourceControl.GetHandle();
+  Dali::Toolkit::Control destinationControl = mDestinationControl.GetHandle();
+  if(!sourceControl || !sourceControl[Dali::Actor::Property::CONNECTED_TO_SCENE] ||
+     !destinationControl || !destinationControl[Dali::Actor::Property::CONNECTED_TO_SCENE])
   {
     DALI_LOG_ERROR("The source or destination is not added on the window\n");
     return;
   }
 
   //Make startPropertyMap and finishPropertyMap to use for property animation.
-  Matrix     sourceWorldTransform = mSourceControl[Dali::Actor::Property::WORLD_MATRIX];
+  Matrix     sourceWorldTransform = sourceControl[Dali::Actor::Property::WORLD_MATRIX];
   Vector3    sourcePosition, sourceScale;
   Quaternion sourceOrientation;
   sourceWorldTransform.GetTransformComponents(sourcePosition, sourceOrientation, sourceScale);
 
-  Matrix     destinationWorldTransform = GetWorldTransform(mDestinationControl);
+  Matrix     destinationWorldTransform = GetWorldTransform(destinationControl);
   Vector3    destinationPosition, destinationScale;
   Quaternion destinationOrientation;
   destinationWorldTransform.GetTransformComponents(destinationPosition, destinationOrientation, destinationScale);
 
-  Vector3       targetSize  = mDestinationControl[Dali::Actor::Property::SIZE];
-  Vector4       targetColor = GetWorldColor(mDestinationControl);
+  Vector3       targetSize  = destinationControl[Dali::Actor::Property::SIZE];
+  Vector4       targetColor = GetWorldColor(destinationControl);
   Property::Map startPropertyMap;
   Property::Map finishPropertyMap;
 
   // Use world transform if this transition requires animation of transform.
-  mDestinationControl[Dali::Actor::Property::ANCHOR_POINT]               = AnchorPoint::CENTER;
-  mDestinationControl[Dali::Actor::Property::PARENT_ORIGIN]              = ParentOrigin::CENTER;
-  mDestinationControl[Dali::Actor::Property::POSITION_USES_ANCHOR_POINT] = true;
-  mDestinationControl[Dali::Actor::Property::INHERIT_POSITION]           = false;
-  mDestinationControl[Dali::Actor::Property::INHERIT_ORIENTATION]        = false;
-  mDestinationControl[Dali::Actor::Property::INHERIT_SCALE]              = false;
-  mDestinationControl[Dali::Actor::Property::COLOR_MODE]                 = Dali::ColorMode::USE_OWN_COLOR;
+  destinationControl[Dali::Actor::Property::ANCHOR_POINT]               = AnchorPoint::CENTER;
+  destinationControl[Dali::Actor::Property::PARENT_ORIGIN]              = ParentOrigin::CENTER;
+  destinationControl[Dali::Actor::Property::POSITION_USES_ANCHOR_POINT] = true;
+  destinationControl[Dali::Actor::Property::INHERIT_POSITION]           = false;
+  destinationControl[Dali::Actor::Property::INHERIT_ORIENTATION]        = false;
+  destinationControl[Dali::Actor::Property::INHERIT_SCALE]              = false;
+  destinationControl[Dali::Actor::Property::COLOR_MODE]                 = Dali::ColorMode::USE_OWN_COLOR;
 
   // Set animation of Transform
   startPropertyMap.Insert(Dali::Actor::Property::POSITION, sourcePosition);
@@ -121,12 +123,12 @@ void Transition::OnPlay()
   startPropertyMap.Insert(Dali::Actor::Property::SCALE, sourceScale);
   finishPropertyMap.Insert(Dali::Actor::Property::SCALE, destinationScale);
 
-  Vector4 sourceColor = mSourceControl.GetCurrentProperty<Vector4>(Dali::Actor::Property::WORLD_COLOR);
+  Vector4 sourceColor = sourceControl.GetCurrentProperty<Vector4>(Dali::Actor::Property::WORLD_COLOR);
   startPropertyMap.Insert(Dali::Actor::Property::COLOR, sourceColor);
   finishPropertyMap.Insert(Dali::Actor::Property::COLOR, targetColor);
 
   // Set animation for other properties if source and destination is different.
-  Vector3 sourceSize = mSourceControl.GetCurrentProperty<Vector3>(Dali::Actor::Property::SIZE);
+  Vector3 sourceSize = sourceControl.GetCurrentProperty<Vector3>(Dali::Actor::Property::SIZE);
   if(sourceSize != targetSize)
   {
     startPropertyMap.Insert(Dali::Actor::Property::SIZE, sourceSize);
@@ -139,11 +141,11 @@ void Transition::OnPlay()
   // source View becomes transparent during transition.
   if(IsTransitionWithChild())
   {
-    mSourceControl[Dali::Actor::Property::VISIBLE] = false;
+    sourceControl[Dali::Actor::Property::VISIBLE] = false;
   }
   else
   {
-    GetImplementation(mSourceControl).SetTransparent(true);
+    GetImplementation(sourceControl).SetTransparent(true);
   }
 
   Dali::Animation animation = GetAnimation();
@@ -152,18 +154,24 @@ void Transition::OnPlay()
     DALI_LOG_ERROR("animation is still not initialized\n");
     return;
   }
-  Dali::Toolkit::DevelControl::CreateTransitions(mDestinationControl, animation, mSourceControl, GetAlphaFunction(), GetTimePeriod());
+  Dali::Toolkit::DevelControl::CreateTransitions(destinationControl, animation, sourceControl, GetAlphaFunction(), GetTimePeriod());
 }
 
 void Transition::OnFinished()
 {
+  Dali::Toolkit::Control sourceControl = mSourceControl.GetHandle();
+  if(!sourceControl)
+  {
+    return;
+  }
+
   if(IsTransitionWithChild())
   {
-    mSourceControl[Dali::Actor::Property::VISIBLE] = true;
+    sourceControl[Dali::Actor::Property::VISIBLE] = true;
   }
   else
   {
-    GetImplementation(mSourceControl).SetTransparent(false);
+    GetImplementation(sourceControl).SetTransparent(false);
   }
 }
 
