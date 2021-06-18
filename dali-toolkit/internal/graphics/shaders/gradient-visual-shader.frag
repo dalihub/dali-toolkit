@@ -155,8 +155,8 @@ mediump float calculateCornerOpacity()
   // calculate borderline opacity by potential
   if(potential > gMaxOutlinePotential)
   {
-    // potential is out of borderline range
-    opacity = 0.0;
+    // potential is out of borderline range. just discard here
+    discard;
   }
   else if(potential > gMinOutlinePotential)
   {
