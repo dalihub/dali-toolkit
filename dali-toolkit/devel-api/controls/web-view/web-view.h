@@ -34,7 +34,6 @@ class ImageView;
 class WebBackForwardList;
 class WebContext;
 class WebContextMenu;
-class WebContextMenuItem;
 class WebCookieManager;
 class WebFormRepostDecision;
 class WebSettings;
@@ -249,14 +248,14 @@ public:
   using WebViewHttpAuthHandlerSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineHttpAuthHandler>)>;
 
   /**
-   * @brief WebView signal type related with context menu customized.
+   * @brief WebView signal type related with context menu shown.
    */
-  using WebViewContextMenuCustomizedSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineContextMenu>)>;
+  using WebViewContextMenuShownSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineContextMenu>)>;
 
   /**
-   * @brief WebView signal type related with context menu item selected.
+   * @brief WebView signal type related with context menu hidden.
    */
-  using WebViewContextMenuItemSelectedSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineContextMenuItem>)>;
+  using WebViewContextMenuHiddenSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineContextMenu>)>;
 
 public:
   /**
@@ -781,18 +780,18 @@ public:
   WebViewHttpAuthHandlerSignalType& HttpAuthHandlerSignal();
 
   /**
-   * @brief Connect to this signal to be notified when context menu would be customized.
+   * @brief Connect to this signal to be notified when context menu would be shown.
    *
    * @return A signal object to connect with.
    */
-  WebViewContextMenuCustomizedSignalType& ContextMenuCustomizedSignal();
+  WebViewContextMenuShownSignalType& ContextMenuShownSignal();
 
   /**
-   * @brief Connect to this signal to be notified when context menu item is selected.
+   * @brief Connect to this signal to be notified when context menu would be hidden.
    *
    * @return A signal object to connect with.
    */
-  WebViewContextMenuItemSelectedSignalType& ContextMenuItemSelectedSignal();
+  WebViewContextMenuHiddenSignalType& ContextMenuHiddenSignal();
 
 public: // Not intended for application developers
   /// @cond internal

@@ -79,6 +79,28 @@ public:
   void SetProxyUri(const std::string& uri);
 
   /**
+   * @brief Get the proxy URI from the network backend of specific context.
+   *
+   * @return current proxy URI or null string if it's not set
+   */
+  std::string GetProxyUri() const;
+
+  /**
+   * @brief Set the given proxy to network backend of specific context.
+   *
+   * @param[in] proxy URI to set
+   * @param[in] bypass rule to set
+   */
+  void SetProxyBypassRule(const std::string& proxy, const std::string& bypass);
+
+  /**
+   * @brief Get the proxy bypass rule from the network backend of specific context.
+   *
+   * @return current proxy bypass rule or null string if it's not set
+   */
+  std::string GetProxyBypassRule() const;
+
+  /**
    * @brief Add CA certificates to persistent NSS certificate database
    *
    * Function accepts a path to a CA certificate file, a path to a directory
@@ -89,6 +111,15 @@ public:
    * @param[in] certificatePath path to a CA certificate file(s), see above for details
    */
   void SetCertificateFilePath(const std::string& certificatePath);
+
+  /**
+   * @brief Get CA certifcate file path
+   *
+   * It returns an internal string and should not be modified.
+   *
+   * @return certificate_file path which is set during ewk_context_certificate_file_set or null string otherwise
+   */
+  std::string GetCertificateFilePath() const;
 
   /**
    * @brief Set a proxy auth credential to network backend of specific context.
@@ -207,34 +238,25 @@ public:
   /**
    * @brief Query if the cache is enabled
    *
-   * @return @c true is cache is enabled or @c false otherwise
+   * @return true is cache is enabled or false otherwise
    */
   bool IsCacheEnabled() const;
 
   /**
-   * @brief Get CA certifcate file path
+   * @brief Set application id for context.
    *
-   * It returns an internal string and should not be modified.
-   *
-   * @return @c certificate_file is path which is set during ewk_context_certificate_file_set or @c null string otherwise
+   * @param[in] appId application id
    */
-  std::string GetContextCertificateFile() const;
+  void SetAppId(const std::string& appId);
 
   /**
-   * @brief Set application id for @a context.
-   *
-   * @param[in] appID application id
-   */
-  void SetContextAppId(const std::string& appID);
-
-  /**
-   * @brief Set application version for @a context.
+   * @brief Set application version for context.
    *
    * @param[in] appVersion application version
    *
-   * @return @c true if successful, @c false otherwise
+   * @return true if successful, false otherwise
    */
-  bool SetContextAppVersion(const std::string& appVersion);
+  bool SetAppVersion(const std::string& appVersion);
 
   /**
    * @brief To declare application type
@@ -242,14 +264,14 @@ public:
    * @param[in] applicationType The Application_Type enum
    *
    */
-  void SetContextApplicationType(const Dali::WebEngineContext::ApplicationType applicationType);
+  void SetApplicationType(const Dali::WebEngineContext::ApplicationType applicationType);
 
   /**
    * @brief Set time offset
    *
    * @param[in] timeOffset The value will be added to system time as offset
    */
-  void SetContextTimeOffset(float timeOffset);
+  void SetTimeOffset(float timeOffset);
 
   /**
    * @brief Set timezone offset
@@ -257,7 +279,23 @@ public:
    * @param[in] timeZoneOffset offset for time zone.
    * @param[in] daylightSavingTime The value is for daylight saving time use.
    */
-  void SetContextTimeZoneOffset(float timeZoneOffset, float daylightSavingTime);
+  void SetTimeZoneOffset(float timeZoneOffset, float daylightSavingTime);
+
+  /**
+   * @brief Set default zoom factor
+   *
+   * @param[in] zoomFactor default zoom factor
+   */
+  void SetDefaultZoomFactor(float zoomFactor);
+
+  /**
+   * @brief Get default zoom factor
+   *
+   * Gets default zoom factor for all pages opened with this context.
+   *
+   * @return default zoom factor or negative value on error
+   */
+  float GetDefaultZoomFactor() const;
 
   /**
    * @brief Register url schemes as CORS enabled
@@ -274,22 +312,6 @@ public:
    * to skip creating default frame for the object tags with the registered MIME type.
    */
   void RegisterJsPluginMimeTypes(const std::vector<std::string>& mimeTypes);
-
-  /**
-   * @brief Set default zoom factor
-   *
-   * @param[in] zoomFactor default zoom factor
-   */
-  void SetDefaultZoomFactor(float zoomFactor);
-
-  /**
-   * @brief Get default zoom factor
-   *
-   * Gets default zoom factor for all pages opened with this context.
-   *
-   * @return @c default zoom factor or negative value on error
-   */
-  float GetContextDefaultZoomFactor() const;
 
   /**
    * @brief Request for deleting all web application caches.
@@ -321,28 +343,6 @@ public:
    * @brief Delete all candidate form data from DB
    */
   void DeleteAllFormCandidateData();
-
-  /**
-   * @brief Get the proxy URI from the network backend of specific context.
-   *
-   * @return current proxy URI or @c null string if it's not set
-   */
-  std::string GetContextProxy() const;
-
-  /**
-   * @brief Set the given proxy to network backend of specific context.
-   *
-   * @param[in] proxy URI to set
-   * @param[in] bypass rule to set
-   */
-  void SetContextProxy(const std::string& proxy, const std::string& bypass);
-
-  /**
-   * @brief Get the proxy bypass rule from the network backend of specific context.
-   *
-   * @return current proxy bypass rule or @c null string if it's not set
-   */
-  std::string GetProxyBypassRule() const;
 
   /**
    * @brief Notify low memory to free unused memory.
