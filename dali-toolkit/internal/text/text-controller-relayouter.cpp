@@ -48,7 +48,6 @@ namespace Toolkit
 {
 namespace Text
 {
-
 Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Controller& controller, const Size& requestedControllerSize, const OperationsMask& requestedOperationsMask, bool restoreLinesAndGlyphPositions)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->CalculateLayoutSizeOnRequiredControllerSize\n");
@@ -66,7 +65,7 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   // The number of lines and glyph-positions inside visualModel have been changed by calling DoRelayout with requestedControllerSize.
   // Store the mLines and mGlyphPositions from visualModel so that they can be restored later on with no modifications made on them.
   //TODO: Refactor "DoRelayout" and extract common code of size calculation without modifying attributes of mVisualModel, and then blah, blah, etc.
-  Vector<LineRun> linesBackup = visualModel->mLines;
+  Vector<LineRun> linesBackup          = visualModel->mLines;
   Vector<Vector2> glyphPositionsBackup = visualModel->mGlyphPositions;
 
   // Operations that can be done only once until the text changes.
@@ -96,11 +95,10 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   const Size actualControlSize = visualModel->mControlSize;
 
   DoRelayout(controller,
-              requestedControllerSize,
-              static_cast<OperationsMask>(onlyOnceOperations |
-                                          requestedOperationsMask),
-              calculatedLayoutSize);
-
+             requestedControllerSize,
+             static_cast<OperationsMask>(onlyOnceOperations |
+                                         requestedOperationsMask),
+             calculatedLayoutSize);
 
   // Clear the update info. This info will be set the next time the text is updated.
   textUpdateInfo.Clear();
@@ -114,13 +112,12 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   // Restore the previously backed-up mLines and mGlyphPositions from visualModel.
   if(restoreLinesAndGlyphPositions)
   {
-    visualModel->mLines = linesBackup;
+    visualModel->mLines          = linesBackup;
     visualModel->mGlyphPositions = glyphPositionsBackup;
   }
 
   return calculatedLayoutSize;
 }
-
 
 Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
 {
@@ -130,17 +127,17 @@ Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
   // Make sure the model is up-to-date before layouting
   controller.ProcessModifyEvents();
 
-  Controller::Impl& impl           = *controller.mImpl;
-  ModelPtr&         model          = impl.mModel;
-  VisualModelPtr&   visualModel    = model->mVisualModel;
+  Controller::Impl& impl        = *controller.mImpl;
+  ModelPtr&         model       = impl.mModel;
+  VisualModelPtr&   visualModel = model->mVisualModel;
 
   if(impl.mRecalculateNaturalSize)
   {
     Size naturalSize;
 
     // Layout the text for the new width.
-    OperationsMask requestedOperationsMask = static_cast<OperationsMask>(LAYOUT | REORDER);
-    Size sizeMaxWidthAndMaxHeight = Size(MAX_FLOAT, MAX_FLOAT);
+    OperationsMask requestedOperationsMask  = static_cast<OperationsMask>(LAYOUT | REORDER);
+    Size           sizeMaxWidthAndMaxHeight = Size(MAX_FLOAT, MAX_FLOAT);
 
     naturalSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeMaxWidthAndMaxHeight, requestedOperationsMask, true);
 
@@ -282,10 +279,9 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
      textUpdateInfo.mFullRelayoutNeeded ||
      textUpdateInfo.mClearAll)
   {
-
     // Layout the text for the new width.
-    OperationsMask requestedOperationsMask = static_cast<OperationsMask>(LAYOUT);
-    Size sizeRequestedWidthAndMaxHeight = Size(width, MAX_FLOAT);
+    OperationsMask requestedOperationsMask        = static_cast<OperationsMask>(LAYOUT);
+    Size           sizeRequestedWidthAndMaxHeight = Size(width, MAX_FLOAT);
 
     // Skip restore, because if GetHeightForWidth called before rendering and layouting then visualModel->mControlSize will be zero which will make LineCount zero.
     // The implementation of Get LineCount property depends on calling GetHeightForWidth then read mLines.Count() from visualModel direct.
@@ -293,8 +289,7 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
     // So we will not restore the previously backed-up mLines and mGlyphPositions from visualModel in such case.
     // Another case to skip restore is when the requested width equals the Control's width which means the caller need to update the old values.
     // For example, when the text is changed.
-    bool restoreLinesAndGlyphPositions = (visualModel->mControlSize.width>0 && visualModel->mControlSize.height>0)
-                                          && (visualModel->mControlSize.width != width);
+    bool restoreLinesAndGlyphPositions = (visualModel->mControlSize.width > 0 && visualModel->mControlSize.height > 0) && (visualModel->mControlSize.width != width);
 
     layoutSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeRequestedWidthAndMaxHeight, requestedOperationsMask, restoreLinesAndGlyphPositions);
 
@@ -642,13 +637,13 @@ bool Controller::Relayouter::DoRelayout(Controller& controller, const Size& size
 
 void Controller::Relayouter::CalculateVerticalOffset(Controller& controller, const Size& controlSize)
 {
-  Controller::Impl& impl          = *controller.mImpl;
-  ModelPtr&         model         = impl.mModel;
-  VisualModelPtr&   visualModel   = model->mVisualModel;
-  Size              layoutSize    = model->mVisualModel->GetLayoutSize();
-  Size              oldLayoutSize = layoutSize;
-  float             offsetY       = 0.f;
-  bool              needRecalc    = false;
+  Controller::Impl& impl                  = *controller.mImpl;
+  ModelPtr&         model                 = impl.mModel;
+  VisualModelPtr&   visualModel           = model->mVisualModel;
+  Size              layoutSize            = model->mVisualModel->GetLayoutSize();
+  Size              oldLayoutSize         = layoutSize;
+  float             offsetY               = 0.f;
+  bool              needRecalc            = false;
   float             defaultFontLineHeight = impl.GetDefaultFontLineHeight();
 
   if(fabsf(layoutSize.height) < Math::MACHINE_EPSILON_1000)
@@ -659,12 +654,12 @@ void Controller::Relayouter::CalculateVerticalOffset(Controller& controller, con
 
   // Whether the text control is editable
   const bool isEditable = NULL != impl.mEventData;
-  if (isEditable && layoutSize.height != defaultFontLineHeight)
+  if(isEditable && layoutSize.height != defaultFontLineHeight && impl.IsShowingPlaceholderText())
   {
     // This code prevents the wrong positioning of cursor when the layout size is bigger/smaller than defaultFontLineHeight.
     // This situation occurs when the size of placeholder text is different from the default text.
     layoutSize.height = defaultFontLineHeight;
-    needRecalc = true;
+    needRecalc        = true;
   }
 
   switch(model->mVerticalAlignment)
@@ -672,34 +667,33 @@ void Controller::Relayouter::CalculateVerticalOffset(Controller& controller, con
     case VerticalAlignment::TOP:
     {
       model->mScrollPosition.y = 0.f;
-      offsetY = 0.f;
+      offsetY                  = 0.f;
       break;
     }
     case VerticalAlignment::CENTER:
     {
       model->mScrollPosition.y = floorf(0.5f * (controlSize.height - layoutSize.height)); // try to avoid pixel alignment.
-      if (needRecalc) offsetY  = floorf(0.5f * (layoutSize.height - oldLayoutSize.height));
+      if(needRecalc) offsetY = floorf(0.5f * (layoutSize.height - oldLayoutSize.height));
       break;
     }
     case VerticalAlignment::BOTTOM:
     {
       model->mScrollPosition.y = controlSize.height - layoutSize.height;
-      if (needRecalc) offsetY  = layoutSize.height - oldLayoutSize.height;
+      if(needRecalc) offsetY = layoutSize.height - oldLayoutSize.height;
       break;
     }
   }
 
-  if (needRecalc)
+  if(needRecalc)
   {
     // Update glyphPositions according to recalculation.
-    const Length positionCount = visualModel->mGlyphPositions.Count();
+    const Length     positionCount  = visualModel->mGlyphPositions.Count();
     Vector<Vector2>& glyphPositions = visualModel->mGlyphPositions;
     for(Length index = 0u; index < positionCount; index++)
     {
       glyphPositions[index].y += offsetY;
     }
   }
-
 }
 
 } // namespace Text
