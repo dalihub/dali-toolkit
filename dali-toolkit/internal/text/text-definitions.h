@@ -2,7 +2,7 @@
 #define DALI_TEXT_ABSTRACTION_TEXT_TYPE_DEFINITIONS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ typedef uint32_t GlyphIndex;                ///< An index into an array of glyph
 typedef uint32_t ScriptRunIndex;            ///< An index into an array of script runs.
 typedef uint32_t FontRunIndex;              ///< An index into an array of font runs.
 typedef uint32_t UnderlineRunIndex;         ///< An index into an array of underline runs.
+typedef uint32_t StrikethroughRunIndex;     ///< An index into an array of underline runs.
 typedef uint32_t BidirectionalRunIndex;     ///< An index into an array of bidirectional info.
 typedef uint32_t BidirectionalLineRunIndex; ///< An index into an array of bidirectional line info.
 typedef uint32_t LineIndex;                 ///< An index into an array of lines.

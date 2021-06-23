@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -611,6 +611,16 @@ const Vector4& ViewModel::GetStrikethroughColor() const
 bool ViewModel::IsStrikethroughEnabled() const
 {
   return mModel->IsStrikethroughEnabled();
+}
+
+Length ViewModel::GetNumberOfStrikethroughRuns() const
+{
+  return mModel->GetNumberOfStrikethroughRuns();
+}
+
+void ViewModel::GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns, StrikethroughRunIndex index, Length numberOfRuns) const
+{
+  mModel->GetStrikethroughRuns(strikethroughRuns, index, numberOfRuns);
 }
 
 } // namespace Text

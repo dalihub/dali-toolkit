@@ -936,6 +936,12 @@ private:
    */
   void CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns);
 
+  /**
+   * @brief Copy strikethrough-Character-Runs from Logical-Model to strikethrough-Glyph-Runs in Visual-Model
+   *
+   */
+  void CopyStrikethroughFromLogicalToVisualModels();
+
 public:
   ControlInterface*            mControlInterface;           ///< Reference to the text controller.
   EditableControlInterface*    mEditableControlInterface;   ///< Reference to the editable text controller.

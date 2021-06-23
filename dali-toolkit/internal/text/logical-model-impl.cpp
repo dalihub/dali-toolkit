@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -300,10 +300,18 @@ void LogicalModel::UpdateTextStyleRuns(CharacterIndex index, int numberOfCharact
   // Process the underlined runs.
   Vector<UnderlinedCharacterRun> removedUnderlinedCharacterRuns;
   UpdateCharacterRuns<UnderlinedCharacterRun>(index,
-                                numberOfCharacters,
-                                totalNumberOfCharacters,
-                                mUnderlinedCharacterRuns,
-                                removedUnderlinedCharacterRuns);
+                                              numberOfCharacters,
+                                              totalNumberOfCharacters,
+                                              mUnderlinedCharacterRuns,
+                                              removedUnderlinedCharacterRuns);
+
+  // Process the strikethrough runs.
+  Vector<StrikethroughCharacterRun> removedStrikethroughCharacterRuns;
+  UpdateCharacterRuns<StrikethroughCharacterRun>(index,
+                                                 numberOfCharacters,
+                                                 totalNumberOfCharacters,
+                                                 mStrikethroughCharacterRuns,
+                                                 removedStrikethroughCharacterRuns);
 
   // Process the background color runs.
   Vector<ColorRun> removedBackgroundColorRuns;

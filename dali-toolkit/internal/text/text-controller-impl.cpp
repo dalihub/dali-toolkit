@@ -1626,6 +1626,34 @@ void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearP
   }
 }
 
+void Controller::Impl::CopyStrikethroughFromLogicalToVisualModels()
+{
+  //Strikethrough character runs from markup-processor
+  const Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns = mModel->mLogicalModel->mStrikethroughCharacterRuns;
+  const Vector<GlyphIndex>&                charactersToGlyph          = mModel->mVisualModel->mCharactersToGlyph;
+  const Vector<Length>&                    glyphsPerCharacter         = mModel->mVisualModel->mGlyphsPerCharacter;
+
+  mModel->mVisualModel->mStrikethroughRuns.Clear();
+
+  for(Vector<StrikethroughCharacterRun>::ConstIterator it = strikethroughCharacterRuns.Begin(), endIt = strikethroughCharacterRuns.End(); it != endIt; ++it)
+  {
+    CharacterIndex        characterIndex     = it->characterRun.characterIndex;
+    Length                numberOfCharacters = it->characterRun.numberOfCharacters;
+    StrikethroughGlyphRun strikethroughGlyphRun;
+    strikethroughGlyphRun.color                   = it->color;
+    strikethroughGlyphRun.isColorSet              = it->isColorSet;
+    strikethroughGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex];
+    strikethroughGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex];
+
+    for(Length index = 1u; index < numberOfCharacters; index++)
+    {
+      strikethroughGlyphRun.glyphRun.numberOfGlyphs += glyphsPerCharacter[characterIndex + index];
+    }
+
+    mModel->mVisualModel->mStrikethroughRuns.PushBack(strikethroughGlyphRun);
+  }
+}
+
 void Controller::Impl::SetAutoScrollEnabled(bool enable)
 {
   if(mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX)
