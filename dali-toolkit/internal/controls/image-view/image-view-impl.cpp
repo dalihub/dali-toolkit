@@ -300,10 +300,19 @@ void ImageView::OnCreateTransitions(Dali::Animation& animation, Dali::Toolkit::C
 
   destinationVisual.CreatePropertyMap(destinationMap);
 
+  static auto findValue = [](const Property::Map& map, Property::Index index) -> Vector4 {
+    Property::Value* propertyValue = map.Find(index);
+    if(propertyValue)
+    {
+      return propertyValue->Get<Vector4>();
+    }
+    return Vector4{};
+  };
+
   Vector4 sourceMixColor(0.0f, 0.0f, 0.0f, 0.0f);
   Vector4 sourceCornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
-  Vector4 destinationMixColor     = destinationMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
-  Vector4 destinationCornerRadius = destinationMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+  Vector4 destinationMixColor     = findValue(destinationMap, Dali::Toolkit::Visual::Property::MIX_COLOR);
+  Vector4 destinationCornerRadius = findValue(destinationMap, Toolkit::DevelVisual::Property::CORNER_RADIUS);
 
   Dali::Toolkit::ImageView sourceHandle = Dali::Toolkit::ImageView::DownCast(source);
   Toolkit::Visual::Base    sourceVisual;
@@ -317,11 +326,11 @@ void ImageView::OnCreateTransitions(Dali::Animation& animation, Dali::Toolkit::C
   if(sourceVisual)
   {
     sourceVisual.CreatePropertyMap(sourceMap);
-    sourceMixColor     = sourceMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
-    sourceCornerRadius = sourceMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+    sourceMixColor     = findValue(sourceMap, Dali::Toolkit::Visual::Property::MIX_COLOR);
+    sourceCornerRadius = findValue(sourceMap, Toolkit::DevelVisual::Property::CORNER_RADIUS);
   }
 
-  std::vector<Dali::Property> properties;
+  std::vector<Dali::Property>                              properties;
   std::vector<std::pair<Property::Value, Property::Value>> values;
 
   if(Vector3(sourceMixColor) != Vector3(destinationMixColor))

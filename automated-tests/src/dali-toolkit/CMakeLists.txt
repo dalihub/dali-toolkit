@@ -19,6 +19,7 @@ SET(TC_SOURCES
   utc-Dali-ConfirmationPopup.cpp
   utc-Dali-CubeTransitionEffect.cpp
   utc-Dali-EffectsView.cpp
+  utc-Dali-Fade.cpp
   utc-Dali-FlexContainer.cpp
   utc-Dali-FlexNode.cpp
   utc-Dali-GaussianBlurView.cpp

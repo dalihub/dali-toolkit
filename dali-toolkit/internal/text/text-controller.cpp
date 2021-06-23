@@ -1234,28 +1234,37 @@ void Controller::SetInputColor(const Vector4& color)
 
     if(EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState)
     {
-      const bool handlesCrossed = mImpl->mEventData->mLeftSelectionPosition > mImpl->mEventData->mRightSelectionPosition;
+      if(EventData::SELECTING == mImpl->mEventData->mState)
+      {
+        const bool handlesCrossed = mImpl->mEventData->mLeftSelectionPosition > mImpl->mEventData->mRightSelectionPosition;
 
-      // Get start and end position of selection
-      const CharacterIndex startOfSelectedText  = handlesCrossed ? mImpl->mEventData->mRightSelectionPosition : mImpl->mEventData->mLeftSelectionPosition;
-      const Length         lengthOfSelectedText = (handlesCrossed ? mImpl->mEventData->mLeftSelectionPosition : mImpl->mEventData->mRightSelectionPosition) - startOfSelectedText;
+        // Get start and end position of selection
+        const CharacterIndex startOfSelectedText  = handlesCrossed ? mImpl->mEventData->mRightSelectionPosition : mImpl->mEventData->mLeftSelectionPosition;
+        const Length         lengthOfSelectedText = (handlesCrossed ? mImpl->mEventData->mLeftSelectionPosition : mImpl->mEventData->mRightSelectionPosition) - startOfSelectedText;
 
-      // Add the color run.
-      const VectorBase::SizeType numberOfRuns = mImpl->mModel->mLogicalModel->mColorRuns.Count();
-      mImpl->mModel->mLogicalModel->mColorRuns.Resize(numberOfRuns + 1u);
+        // Add the color run.
+        const VectorBase::SizeType numberOfRuns = mImpl->mModel->mLogicalModel->mColorRuns.Count();
+        mImpl->mModel->mLogicalModel->mColorRuns.Resize(numberOfRuns + 1u);
 
-      ColorRun& colorRun                       = *(mImpl->mModel->mLogicalModel->mColorRuns.Begin() + numberOfRuns);
-      colorRun.color                           = color;
-      colorRun.characterRun.characterIndex     = startOfSelectedText;
-      colorRun.characterRun.numberOfCharacters = lengthOfSelectedText;
+        ColorRun& colorRun                       = *(mImpl->mModel->mLogicalModel->mColorRuns.Begin() + numberOfRuns);
+        colorRun.color                           = color;
+        colorRun.characterRun.characterIndex     = startOfSelectedText;
+        colorRun.characterRun.numberOfCharacters = lengthOfSelectedText;
+
+        mImpl->mTextUpdateInfo.mCharacterIndex             = startOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = lengthOfSelectedText;
+      }
+      else
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex             = 0;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = mImpl->mModel->mLogicalModel->mText.Count();
+      }
 
       // Request to relayout.
       mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | COLOR);
       mImpl->RequestRelayout();
-
-      mImpl->mTextUpdateInfo.mCharacterIndex             = startOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = lengthOfSelectedText;
     }
   }
 }

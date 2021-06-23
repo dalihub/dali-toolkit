@@ -131,9 +131,16 @@ public:
   AlphaFunction GetAlphaFunction() const;
 
   /**
-   * @brief A View could be transition with its child Views or without them.
+   * @brief A Control could be transition with its child Controls or without them.
+   * @param[in] transitionWithChild True if the Control is transitioned with children.
    */
   void TransitionWithChild(bool transitionWithChild);
+
+  /**
+   * @brief Set this transition is appearing transition or not.
+   * @param[in] appearingTransition True if this transition is appearing transition.
+   */
+  void SetAppearingTransition(bool appearingTransition);
 
 public: // Not intended for use by Application developers
   /// @cond internal

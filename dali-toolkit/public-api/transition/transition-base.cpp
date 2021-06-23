@@ -76,7 +76,12 @@ AlphaFunction TransitionBase::GetAlphaFunction() const
 
 void TransitionBase::TransitionWithChild(bool transitionWithChild)
 {
-  return GetImplementation(*this).TransitionWithChild(transitionWithChild);
+  GetImplementation(*this).TransitionWithChild(transitionWithChild);
+}
+
+void TransitionBase::SetAppearingTransition(bool appearingTransition)
+{
+  GetImplementation(*this).SetAppearingTransition(appearingTransition);
 }
 
 } // namespace Toolkit

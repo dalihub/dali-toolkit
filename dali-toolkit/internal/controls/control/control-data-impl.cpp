@@ -1456,10 +1456,10 @@ Dali::Accessibility::ReadingInfoTypes Control::Impl::GetAccessibilityReadingInfo
   else
   {
     Dali::Accessibility::ReadingInfoTypes types;
-    types[Dali::Accessibility::ReadingInfoType::NAME] = true;
-    types[Dali::Accessibility::ReadingInfoType::ROLE] = true;
+    types[Dali::Accessibility::ReadingInfoType::NAME]        = true;
+    types[Dali::Accessibility::ReadingInfoType::ROLE]        = true;
     types[Dali::Accessibility::ReadingInfoType::DESCRIPTION] = true;
-    types[Dali::Accessibility::ReadingInfoType::STATE] = true;
+    types[Dali::Accessibility::ReadingInfoType::STATE]       = true;
     return types;
   }
 
@@ -1828,13 +1828,22 @@ void Control::Impl::MakeVisualTransition(Dali::Animation& animation, Dali::Toolk
   Dali::Toolkit::Control destinationHandle = Dali::Toolkit::Control::DownCast(mControlImpl.Self());
   Property::Map          destinationMap    = destinationHandle.GetProperty<Property::Map>(visualIndex);
 
-  Vector4                  mixColor(1.0f, 1.0f, 1.0f, 1.0f);
-  Vector4                  cornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
+  Vector4 mixColor(1.0f, 1.0f, 1.0f, 1.0f);
+  Vector4 cornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
 
   if(!destinationMap.Empty())
   {
-    mixColor     = destinationMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
-    cornerRadius = destinationMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+    static auto findValue = [](const Property::Map& map, Property::Index index) -> Vector4 {
+      Property::Value* propertyValue = map.Find(index);
+      if(propertyValue)
+      {
+        return propertyValue->Get<Vector4>();
+      }
+      return Vector4{};
+    };
+
+    mixColor     = findValue(destinationMap, Dali::Toolkit::Visual::Property::MIX_COLOR);
+    cornerRadius = findValue(destinationMap, Toolkit::DevelVisual::Property::CORNER_RADIUS);
 
     if(sourceMap.Empty())
     {
@@ -1843,10 +1852,10 @@ void Control::Impl::MakeVisualTransition(Dali::Animation& animation, Dali::Toolk
       sourceMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
     }
 
-    Vector4 sourceMixColor     = sourceMap.Find(Dali::Toolkit::Visual::Property::MIX_COLOR)->Get<Vector4>();
-    Vector4 sourceCornerRadius = sourceMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+    Vector4 sourceMixColor     = findValue(sourceMap, Dali::Toolkit::Visual::Property::MIX_COLOR);
+    Vector4 sourceCornerRadius = findValue(sourceMap, Toolkit::DevelVisual::Property::CORNER_RADIUS);
 
-    std::vector<Dali::Property> properties;
+    std::vector<Dali::Property>                              properties;
     std::vector<std::pair<Property::Value, Property::Value>> values;
 
     if(Vector3(sourceMixColor) != Vector3(mixColor))
