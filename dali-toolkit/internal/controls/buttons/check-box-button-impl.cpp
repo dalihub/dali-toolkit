@@ -85,11 +85,13 @@ void CheckBoxButton::OnInitialize()
 
 Dali::Accessibility::States CheckBoxButton::AccessibleImpl::CalculateStates()
 {
-  auto tmp = Button::AccessibleImpl::CalculateStates();
-  auto slf = Toolkit::Button::DownCast(Self());
-  if(slf.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
-    tmp[Dali::Accessibility::State::CHECKED] = true;
-  return tmp;
+  auto state = Button::AccessibleImpl::CalculateStates();
+  auto self = Toolkit::Button::DownCast(Self());
+  if(self.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
+  {
+    state[Dali::Accessibility::State::CHECKED] = true;
+  }
+  return state;
 }
 
 void CheckBoxButton::OnStateChange(State newState)
@@ -98,8 +100,7 @@ void CheckBoxButton::OnStateChange(State newState)
   if(Dali::Accessibility::IsUp() && (Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self())
      && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
-    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
-      Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
   }
 }
 

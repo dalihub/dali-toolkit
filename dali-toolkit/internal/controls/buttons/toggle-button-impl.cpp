@@ -377,7 +377,9 @@ Dali::Accessibility::States ToggleButton::AccessibleImpl::CalculateStates()
   auto states = Button::AccessibleImpl::CalculateStates();
   auto button = Toolkit::ToggleButton::DownCast(Self());
   if(button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX))
+  {
     states[Dali::Accessibility::State::CHECKED] = true;
+  }
   return states;
 }
 
@@ -401,9 +403,8 @@ void ToggleButton::OnStateChange(State newState)
   if(Dali::Accessibility::IsUp() && (Self() == Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
      && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
-    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
-      Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
-      Dali::Accessibility::Accessible::Get(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
+    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(Dali::Accessibility::State::CHECKED, mCurrentToggleIndex ? 1 : 0, 0);
+    Dali::Accessibility::Accessible::Get(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION);
   }
 }
 

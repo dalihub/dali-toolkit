@@ -47,13 +47,13 @@ int UtcDaliTextLabelMarkupUnderline(void)
   uint32_t expectedNumberOfUnderlinedGlyphs = 5u;
 
   Toolkit::Internal::TextLabel& textLabelImpl = GetImpl( textLabel );
-  const Text::Length numberOfUnderlineRuns = textLabelImpl.getController()->GetTextModel()->GetNumberOfUnderlineRuns();
+  const Text::Length numberOfUnderlineRuns = textLabelImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
 
   DALI_TEST_EQUALS( numberOfUnderlineRuns, expectedNumberOfUnderlinedGlyphs, TEST_LOCATION );
 
   Vector<GlyphRun> underlineRuns;
   underlineRuns.Resize(numberOfUnderlineRuns);
-  textLabelImpl.getController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+  textLabelImpl.GetTextController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
 
   //ABC are underlined
   DALI_TEST_EQUALS( underlineRuns[0u].glyphIndex, 0u, TEST_LOCATION);
@@ -83,7 +83,7 @@ int UtcDaliTextLabelBackgroundTag(void)
   application.Render();
 
   Toolkit::Internal::TextLabel& labelImpl = GetImpl( label );
-  const ColorIndex* const backgroundColorIndicesBuffer = labelImpl.getController()->GetTextModel()->GetBackgroundColorIndices();
+  const ColorIndex* const backgroundColorIndicesBuffer = labelImpl.GetTextController()->GetTextModel()->GetBackgroundColorIndices();
 
   DALI_TEST_CHECK( backgroundColorIndicesBuffer );
 
@@ -125,7 +125,7 @@ int UtcDaliTextLabelTextWithSpan(void)
   DALI_TEST_GREATER(spanSize.width, originalSize.width, TEST_LOCATION);
 
   Toolkit::Internal::TextLabel& labelImpl = GetImpl( label );
-  const ColorIndex* const colorIndicesBuffer1 = labelImpl.getController()->GetTextModel()->GetColorIndices();
+  const ColorIndex* const colorIndicesBuffer1 = labelImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
   DALI_TEST_CHECK( colorIndicesBuffer1 );
 
@@ -144,7 +144,7 @@ int UtcDaliTextLabelTextWithSpan(void)
   application.SendNotification();
   application.Render();
 
-  const ColorIndex* const colorIndicesBuffer2 = labelImpl.getController()->GetTextModel()->GetColorIndices();
+  const ColorIndex* const colorIndicesBuffer2 = labelImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
   DALI_TEST_CHECK( colorIndicesBuffer2 );
 

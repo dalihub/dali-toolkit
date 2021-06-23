@@ -135,107 +135,102 @@ void CreateTransitions(Control control, Dali::Animation& animation, Dali::Toolki
   }
 }
 
-static Toolkit::Internal::Control::Impl* GetControlImplementationIfAny(Dali::Actor actor)
+static Toolkit::Internal::Control::Impl* GetControlImplementation(Dali::Actor actor)
 {
-  Dali::Toolkit::Control c = Toolkit::Control::DownCast(actor);
-  if(c)
+  Dali::Toolkit::Control control = Toolkit::Control::DownCast(actor);
+  if(control)
   {
-    auto& impl1 = Toolkit::Internal::GetImplementation(c);
-    auto& impl2 = Toolkit::Internal::Control::Impl::Get(impl1);
-    return &impl2;
+    auto& internalControl = Toolkit::Internal::GetImplementation(control);
+    auto& controlDataImpl = Toolkit::Internal::Control::Impl::Get(internalControl);
+    return &controlDataImpl;
   }
   return nullptr;
 }
 
 Toolkit::DevelControl::AccessibilityActivateSignalType& AccessibilityActivateSignal(Toolkit::Control control)
 {
-  auto ac = GetControlImplementationIfAny(control);
-  return ac->mAccessibilityActivateSignal;
+  return GetControlImplementation(control)->mAccessibilityActivateSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingSkippedSignalType& AccessibilityReadingSkippedSignal(Toolkit::Control control)
 {
-  auto ac = GetControlImplementationIfAny(control);
-  return ac->mAccessibilityReadingSkippedSignal;
+  return GetControlImplementation(control)->mAccessibilityReadingSkippedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingPausedSignalType& AccessibilityReadingPausedSignal(Toolkit::Control control)
 {
-  auto ac = GetControlImplementationIfAny(control);
-  return ac->mAccessibilityReadingPausedSignal;
+  return GetControlImplementation(control)->mAccessibilityReadingPausedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingResumedSignalType& AccessibilityReadingResumedSignal(Toolkit::Control control)
 {
-  auto ac = GetControlImplementationIfAny(control);
-  return ac->mAccessibilityReadingResumedSignal;
+  return GetControlImplementation(control)->mAccessibilityReadingResumedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingCancelledSignalType& AccessibilityReadingCancelledSignal(Toolkit::Control control)
 {
-  auto ac = GetControlImplementationIfAny(control);
-  return ac->mAccessibilityReadingCancelledSignal;
+  return GetControlImplementation(control)->mAccessibilityReadingCancelledSignal;
 }
 
 Toolkit::DevelControl::AccessibilityReadingStoppedSignalType& AccessibilityReadingStoppedSignal(Toolkit::Control control)
 {
-  auto ac = GetControlImplementationIfAny(control);
-  return ac->mAccessibilityReadingStoppedSignal;
+  return GetControlImplementation(control)->mAccessibilityReadingStoppedSignal;
 }
 
 Toolkit::DevelControl::AccessibilityGetNameSignalType& AccessibilityGetNameSignal(Toolkit::Control control)
 {
-  auto ac = GetControlImplementationIfAny(control);
-  return ac->mAccessibilityGetNameSignal;
+  return GetControlImplementation(control)->mAccessibilityGetNameSignal;
 }
 
 Toolkit::DevelControl::AccessibilityGetDescriptionSignalType& AccessibilityGetDescriptionSignal(Toolkit::Control control)
 {
-  auto ac = GetControlImplementationIfAny(control);
-  return ac->mAccessibilityGetDescriptionSignal;
+  return GetControlImplementation(control)->mAccessibilityGetDescriptionSignal;
 }
 
 Toolkit::DevelControl::AccessibilityDoGestureSignalType& AccessibilityDoGestureSignal(Toolkit::Control control)
 {
-  auto ac = GetControlImplementationIfAny(control);
-  return ac->mAccessibilityDoGestureSignal;
+  return GetControlImplementation(control)->mAccessibilityDoGestureSignal;
 }
 
 void AppendAccessibilityRelation(Dali::Actor control, Actor destination, Dali::Accessibility::RelationType relation)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
     auto index = static_cast<Dali::Property::Array::SizeType>(relation);
-    if(index >= ac->mAccessibilityRelations.size())
+    if(index >= controlDataImpl->mAccessibilityRelations.size())
     {
       DALI_LOG_ERROR("Relation index exceeds vector size.");
       return;
     }
 
-    auto obj = ac->GetAccessibilityObject(destination);
-    if(obj)
-      ac->mAccessibilityRelations[index].push_back(obj->GetAddress());
+    auto object = controlDataImpl->GetAccessibilityObject(destination);
+    if(object)
+    {
+      controlDataImpl->mAccessibilityRelations[index].push_back(object->GetAddress());
+    }
   }
 }
 
 void RemoveAccessibilityRelation(Dali::Actor control, Actor destination, Dali::Accessibility::RelationType relation)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
     auto index = static_cast<Dali::Property::Array::SizeType>(relation);
-    if(index >= ac->mAccessibilityRelations.size())
+    if(index >= controlDataImpl->mAccessibilityRelations.size())
     {
       DALI_LOG_ERROR("Relation index exceeds vector size.");
       return;
     }
 
-    auto obj = ac->GetAccessibilityObject(destination);
-    if(!obj)
+    auto object = controlDataImpl->GetAccessibilityObject(destination);
+    if(!object)
+    {
       return;
+    }
 
-    auto address = obj->GetAddress();
+    auto address = object->GetAddress();
 
-    auto& targets = ac->mAccessibilityRelations[index];
+    auto& targets = controlDataImpl->mAccessibilityRelations[index];
     for(auto i = 0u; i < targets.size(); ++i)
     {
       if(targets[i].ToString() == address.ToString())
@@ -249,110 +244,117 @@ void RemoveAccessibilityRelation(Dali::Actor control, Actor destination, Dali::A
 
 std::vector<std::vector<Accessibility::Address>> GetAccessibilityRelations(Dali::Actor control)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    return ac->mAccessibilityRelations;
+    return controlDataImpl->mAccessibilityRelations;
   }
   return {};
 }
 
 void ClearAccessibilityRelations(Dali::Actor control)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    for(auto& it : ac->mAccessibilityRelations)
+    for(auto& it : controlDataImpl->mAccessibilityRelations)
+    {
       it.clear();
+    }
   }
 }
 
-void SetAccessibilityConstructor(Dali::Actor                                                                  control,
-                                 std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Dali::Actor)> constructor)
+void SetAccessibilityConstructor(Dali::Actor control, std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Dali::Actor)> constructor)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    ac->accessibilityConstructor = constructor;
+    controlDataImpl->mAccessibilityConstructor = constructor;
   }
 }
 
 void AppendAccessibilityAttribute(Dali::Actor control, const std::string& key, const std::string value)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    ac->AppendAccessibilityAttribute(key, value);
+    controlDataImpl->AppendAccessibilityAttribute(key, value);
   }
 }
 
 void RemoveAccessibilityAttribute(Dali::Actor control, const std::string& key)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    ac->RemoveAccessibilityAttribute(key);
+    controlDataImpl->RemoveAccessibilityAttribute(key);
   }
 }
 
 void ClearAccessibilityAttributes(Dali::Actor control)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    ac->ClearAccessibilityAttributes();
+    controlDataImpl->ClearAccessibilityAttributes();
   }
 }
 
 void SetAccessibilityReadingInfoType(Dali::Actor control, const Dali::Accessibility::ReadingInfoTypes types)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    ac->SetAccessibilityReadingInfoType(types);
+    controlDataImpl->SetAccessibilityReadingInfoType(types);
   }
 }
 
 Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Dali::Actor control)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    return ac->GetAccessibilityReadingInfoType();
+    return controlDataImpl->GetAccessibilityReadingInfoType();
   }
   return {};
 }
 
 bool ClearAccessibilityHighlight(Dali::Actor control)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    auto ptr = dynamic_cast<Dali::Accessibility::Component*>(ac->GetAccessibilityObject());
-    if(ptr)
-      return ptr->ClearHighlight();
+    auto object = dynamic_cast<Dali::Accessibility::Component*>(controlDataImpl->GetAccessibilityObject());
+    if(object)
+    {
+      return object->ClearHighlight();
+    }
   }
   return false;
 }
 
 bool GrabAccessibilityHighlight(Dali::Actor control)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    auto ptr = dynamic_cast<Dali::Accessibility::Component*>(ac->GetAccessibilityObject());
-    if(ptr)
-      return ptr->GrabHighlight();
+    auto object = dynamic_cast<Dali::Accessibility::Component*>(controlDataImpl->GetAccessibilityObject());
+    if(object)
+    {
+      return object->GrabHighlight();
+    }
   }
   return false;
 }
 
 Dali::Accessibility::States GetAccessibilityStates(Dali::Actor control)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    auto ptr = dynamic_cast<Dali::Accessibility::Component*>(ac->GetAccessibilityObject());
-    if(ptr)
-      return ptr->GetStates();
+    auto object = dynamic_cast<Dali::Accessibility::Component*>(controlDataImpl->GetAccessibilityObject());
+    if(object)
+    {
+      return object->GetStates();
+    }
   }
   return {};
 }
 
-void NotifyAccessibilityStateChange(Dali::Actor control, Dali::Accessibility::States states, bool doRecursive)
+void NotifyAccessibilityStateChange(Dali::Actor control, Dali::Accessibility::States states, bool isRecursive)
 {
-  if(auto ac = GetControlImplementationIfAny(control))
+  if(auto controlDataImpl = GetControlImplementation(control))
   {
-    ac->GetAccessibilityObject()->NotifyAccessibilityStateChange(std::move(states), doRecursive);
+    controlDataImpl->GetAccessibilityObject()->NotifyAccessibilityStateChange(std::move(states), isRecursive);
   }
 }
 

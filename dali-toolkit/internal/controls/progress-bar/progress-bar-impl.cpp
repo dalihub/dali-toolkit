@@ -683,9 +683,8 @@ double ProgressBar::AccessibleImpl::GetMinimum()
 
 double ProgressBar::AccessibleImpl::GetCurrent()
 {
-  auto p = Toolkit::ProgressBar::DownCast(Self());
-  return p.GetProperty(Toolkit::ProgressBar::Property::PROGRESS_VALUE)
-    .Get<float>();
+  auto self = Toolkit::ProgressBar::DownCast(Self());
+  return self.GetProperty(Toolkit::ProgressBar::Property::PROGRESS_VALUE).Get<float>();
 }
 
 double ProgressBar::AccessibleImpl::GetMaximum()
@@ -696,10 +695,12 @@ double ProgressBar::AccessibleImpl::GetMaximum()
 bool ProgressBar::AccessibleImpl::SetCurrent(double current)
 {
   if(current < GetMinimum() || current > GetMaximum())
+  {
     return false;
-  auto p = Toolkit::ProgressBar::DownCast(Self());
-  p.SetProperty(Toolkit::ProgressBar::Property::PROGRESS_VALUE,
-                static_cast<float>(current));
+  }
+
+  auto self = Toolkit::ProgressBar::DownCast(Self());
+  self.SetProperty(Toolkit::ProgressBar::Property::PROGRESS_VALUE, static_cast<float>(current));
   return true;
 }
 

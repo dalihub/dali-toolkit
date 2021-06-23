@@ -86,7 +86,12 @@ public:
    */
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
-  Text::ControllerPtr getController();
+  /**
+   * @brief Gets text controller
+   *
+   * @return The text controller
+   */
+  Text::ControllerPtr GetTextController();
 
 private: // From Control
   /**
@@ -190,21 +195,63 @@ private: // Data
   bool mTextUpdateNeeded : 1;
 
 protected:
+  /**
+   * @brief This structure is to connect TextLabel with Accessible functions.
+   */
   struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Text
   {
     using DevelControl::AccessibleImpl::AccessibleImpl;
 
-    std::string          GetText(size_t startOffset, size_t endOffset) override;
-    size_t               GetCharacterCount() override;
-    size_t               GetCaretOffset() override;
-    bool                 SetCaretOffset(size_t offset) override;
+    /**
+     * @copydoc Dali::Accessibility::Text::GetText()
+     */
+    std::string GetText(size_t startOffset, size_t endOffset) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetCharacterCount()
+     */
+    size_t GetCharacterCount() override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetCursorOffset()
+     */
+    size_t GetCursorOffset() override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::SetCursorOffset()
+     */
+    bool SetCursorOffset(size_t offset) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetTextAtOffset()
+     */
     Accessibility::Range GetTextAtOffset(size_t offset, Accessibility::TextBoundary boundary) override;
-    Accessibility::Range GetSelection(size_t selectionNum) override;
-    bool                 RemoveSelection(size_t selectionNum) override;
-    bool                 SetSelection(size_t selectionNum, size_t startOffset, size_t endOffset) override;
-    std::string          GetNameRaw() override;
-    Property::Index      GetNamePropertyIndex() override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetRangeOfSelection()
+     */
+    Accessibility::Range GetRangeOfSelection(size_t selectionIndex) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::RemoveSelection()
+     */
+    bool RemoveSelection(size_t selectionIndex) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::SetRangeOfSelection()
+     */
+    bool SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetNameRaw()
+     */
+    std::string GetNameRaw() override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetNamePropertyIndex()
+     */
+    Property::Index GetNamePropertyIndex() override;
   };
 };
 

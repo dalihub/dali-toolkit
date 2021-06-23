@@ -124,7 +124,7 @@ bool ControllerImplEventHandler::ProcessInputEvents(Controller::Impl& impl)
 
     if(nullptr != impl.mEditableControlInterface)
     {
-      impl.mEditableControlInterface->CaretMoved(eventData->mPrimaryCursorPosition);
+      impl.mEditableControlInterface->CursorMoved(eventData->mPrimaryCursorPosition);
     }
 
     if(eventData->mUpdateCursorHookPosition)

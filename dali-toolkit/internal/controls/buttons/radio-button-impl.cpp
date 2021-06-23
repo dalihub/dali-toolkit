@@ -103,23 +103,27 @@ void RadioButton::OnStateChange(State newState)
       }
     }
   }
+
   // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
   if(Dali::Accessibility::IsUp() && (Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor() == Self())
      && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
   {
-    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
-      Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
+    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0);
   }
 }
 
 Dali::Accessibility::States RadioButton::AccessibleImpl::CalculateStates()
 {
-  auto tmp = Button::AccessibleImpl::CalculateStates();
-  auto slf = Toolkit::Button::DownCast(Self());
-  if(slf.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
-    tmp[Dali::Accessibility::State::CHECKED] = true;
-  tmp[Dali::Accessibility::State::SELECTABLE] = true;
-  return tmp;
+  auto state = Button::AccessibleImpl::CalculateStates();
+  auto self = Toolkit::Button::DownCast(Self());
+
+  if(self.GetProperty<bool>(Toolkit::Button::Property::SELECTED))
+  {
+    state[Dali::Accessibility::State::CHECKED] = true;
+  }
+
+  state[Dali::Accessibility::State::SELECTABLE] = true;
+  return state;
 }
 
 } // namespace Internal

@@ -555,9 +555,9 @@ DALI_TOOLKIT_API Dali::Accessibility::States GetAccessibilityStates(Dali::Actor 
  *
  * @param control object to append attribute to
  * @param states      mask with states expected to broadcast
- * @param doRecursive flag pointing if notifications of children's state would be sent
+ * @param isRecursive flag pointing if notifications of children's state would be sent
  */
-DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Dali::Actor control, Dali::Accessibility::States states, bool doRecursive);
+DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Dali::Actor control, Dali::Accessibility::States states, bool isRecursive);
 
 /**
  * The method allows to set specific constructor for creating accessibility structure

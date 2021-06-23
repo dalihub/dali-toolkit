@@ -109,6 +109,13 @@ public:
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
   /**
+   * @brief Gets text controller
+   *
+   * @return The text controller
+   */
+  Text::ControllerPtr GetTextController();
+
+  /**
    * @copydoc TextEditor::TextChangedSignal()
    */
   Toolkit::TextEditor::TextChangedSignalType& TextChangedSignal();
@@ -209,9 +216,9 @@ private: // From Control
   void TextDeleted(unsigned int position, unsigned int length, const std::string& content) override;
 
   /**
-   * @copydoc Text::EditableControlInterface::CaretMoved()
+   * @copydoc Text::EditableControlInterface::CursorMoved()
    */
-  void CaretMoved(unsigned int position) override;
+  void CursorMoved(unsigned int position) override;
 
   /**
    * @copydoc Text::EditableControlInterface::TextChanged()
@@ -305,8 +312,6 @@ public:
    * @copydoc Text::AnchorControlInterface::AnchorClicked()
    */
   void AnchorClicked(const std::string& href) override;
-
-  Text::ControllerPtr getController();
 
 private: // Implementation
   /**
@@ -442,27 +447,89 @@ private: // Data
   bool  mScrollStarted : 1;
   bool  mTextChanged : 1; ///< If true, emits TextChangedSignal in next OnRelayout().
 
+  /**
+   * @brief This structure is to connect TextEditor with Accessible functions.
+   */
   struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Text,
                           public virtual Dali::Accessibility::EditableText
   {
     using DevelControl::AccessibleImpl::AccessibleImpl;
 
-    std::string           GetName() override;
-    std::string           GetText(size_t startOffset, size_t endOffset) override;
-    size_t                GetCharacterCount() override;
-    size_t                GetCaretOffset() override;
-    bool                  SetCaretOffset(size_t offset) override;
-    Accessibility::Range  GetTextAtOffset(size_t offset, Accessibility::TextBoundary boundary) override;
-    Accessibility::Range  GetSelection(size_t selectionNum) override;
-    bool                  RemoveSelection(size_t selectionNum) override;
-    bool                  SetSelection(size_t selectionNum, size_t startOffset, size_t endOffset) override;
-    bool                  CopyText(size_t startPosition, size_t endPosition) override;
-    bool                  CutText(size_t startPosition, size_t endPosition) override;
+    /**
+     * @copydoc Dali::Accessibility::Accessible::GetName()
+     */
+    std::string GetName() override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetText()
+     */
+    std::string GetText(size_t startOffset, size_t endOffset) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetCharacterCount()
+     */
+    size_t GetCharacterCount() override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetCursorOffset()
+     */
+    size_t GetCursorOffset() override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::SetCursorOffset()
+     */
+    bool SetCursorOffset(size_t offset) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetTextAtOffset()
+     */
+    Accessibility::Range GetTextAtOffset(size_t offset, Accessibility::TextBoundary boundary) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::GetRangeOfSelection()
+     */
+    Accessibility::Range GetRangeOfSelection(size_t selectionIndex) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::RemoveSelection()
+     */
+    bool RemoveSelection(size_t selectionIndex) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Text::SetRangeOfSelection()
+     */
+    bool SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset) override;
+
+    /**
+     * @copydoc Dali::Accessibility::EditableText::CopyText()
+     */
+    bool CopyText(size_t startPosition, size_t endPosition) override;
+
+    /**
+     * @copydoc Dali::Accessibility::EditableText::CutText()
+     */
+    bool CutText(size_t startPosition, size_t endPosition) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Accessible::GetStates()
+     */
     Accessibility::States CalculateStates() override;
-    bool                  InsertText(size_t startPosition, std::string text) override;
-    bool                  SetTextContents(std::string newContents) override;
-    bool                  DeleteText(size_t startPosition, size_t endPosition) override;
+
+    /**
+     * @copydoc Dali::Accessibility::EditableText::InsertText()
+     */
+    bool InsertText(size_t startPosition, std::string text) override;
+
+    /**
+     * @copydoc Dali::Accessibility::EditableText::SetTextContents()
+     */
+    bool SetTextContents(std::string newContents) override;
+
+    /**
+     * @copydoc Dali::Accessibility::EditableText::DeleteText()
+     */
+    bool DeleteText(size_t startPosition, size_t endPosition) override;
   };
 };
 

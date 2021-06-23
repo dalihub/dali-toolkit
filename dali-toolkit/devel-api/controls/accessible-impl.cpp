@@ -33,7 +33,8 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
-namespace Dali::Toolkit::DevelControl {
+namespace Dali::Toolkit::DevelControl
+{
 
 static std::string GetLocaleText(std::string string, const char *domain = "dali-toolkit")
 {
@@ -47,15 +48,17 @@ static std::string GetLocaleText(std::string string, const char *domain = "dali-
 }
 
 AccessibleImpl::AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal)
-: self(self),
-  modal(modal)
+: mSelf(self),
+  mIsModal(modal)
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
   if(controlImpl.mAccessibilityRole == Dali::Accessibility::Role::UNKNOWN)
+  {
     controlImpl.mAccessibilityRole = role;
+  }
 
   Self().PropertySetSignal().Connect(&controlImpl, [this, &controlImpl](Dali::Handle& handle, Dali::Property::Index index, Dali::Property::Value value) {
     if(this->Self() != Dali::Accessibility::Accessible::GetCurrentlyHighlightedActor())
@@ -169,15 +172,18 @@ Dali::Accessibility::Accessible* AccessibleImpl::GetChildAtIndex(size_t index)
 
 size_t AccessibleImpl::GetIndexInParent()
 {
-  auto s      = Self();
-  auto parent = s.GetParent();
+  auto self = Self();
+  auto parent = self.GetParent();
   DALI_ASSERT_ALWAYS(parent && "can't call GetIndexInParent on object without parent");
+
   auto count = parent.GetChildCount();
   for(auto i = 0u; i < count; ++i)
   {
-    auto c = parent.GetChildAt(i);
-    if(c == s)
+    auto child = parent.GetChildAt(i);
+    if(child == self)
+    {
       return i;
+    }
   }
   DALI_ASSERT_ALWAYS(false && "object isn't child of it's parent");
   return static_cast<size_t>(-1);
@@ -196,25 +202,32 @@ std::string AccessibleImpl::GetLocalizedRoleName()
 Dali::Accessibility::States AccessibleImpl::CalculateStates()
 {
   Dali::Actor self = Self();
-  Dali::Accessibility::States s;
-  s[Dali::Accessibility::State::FOCUSABLE] = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
-  s[Dali::Accessibility::State::FOCUSED]   = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
-  if(self.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).GetType() == Dali::Property::NONE)
-    s[Dali::Accessibility::State::HIGHLIGHTABLE] = false;
-  else
-    s[Dali::Accessibility::State::HIGHLIGHTABLE] = self.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).Get<bool>();
-  s[Dali::Accessibility::State::HIGHLIGHTED] = GetCurrentlyHighlightedActor() == self;
-  s[Dali::Accessibility::State::ENABLED]     = true;
-  s[Dali::Accessibility::State::SENSITIVE]   = true;
-  s[Dali::Accessibility::State::VISIBLE]     = true;
-  if(modal)
-  {
-    s[Dali::Accessibility::State::MODAL] = true;
-  }
-  s[Dali::Accessibility::State::SHOWING] = !self.GetProperty(Dali::DevelActor::Property::CULLED).Get<bool>() && self.GetCurrentProperty<bool>(Actor::Property::VISIBLE);
+  Dali::Accessibility::States state;
+  state[Dali::Accessibility::State::FOCUSABLE] = self.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE);
+  state[Dali::Accessibility::State::FOCUSED]   = Toolkit::KeyboardFocusManager::Get().GetCurrentFocusActor() == self;
 
-  s[Dali::Accessibility::State::DEFUNCT] = !self.GetProperty(Dali::DevelActor::Property::CONNECTED_TO_SCENE).Get<bool>();
-  return s;
+  if(self.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).GetType() == Dali::Property::NONE)
+  {
+    state[Dali::Accessibility::State::HIGHLIGHTABLE] = false;
+  }
+  else
+  {
+    state[Dali::Accessibility::State::HIGHLIGHTABLE] = self.GetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE).Get<bool>();
+  }
+
+  state[Dali::Accessibility::State::HIGHLIGHTED] = GetCurrentlyHighlightedActor() == self;
+  state[Dali::Accessibility::State::ENABLED]     = true;
+  state[Dali::Accessibility::State::SENSITIVE]   = true;
+  state[Dali::Accessibility::State::VISIBLE]     = true;
+
+  if(mIsModal)
+  {
+    state[Dali::Accessibility::State::MODAL] = true;
+  }
+  state[Dali::Accessibility::State::SHOWING] = !self.GetProperty(Dali::DevelActor::Property::CULLED).Get<bool>() && self.GetCurrentProperty<bool>(Actor::Property::VISIBLE);
+
+  state[Dali::Accessibility::State::DEFUNCT] = !self.GetProperty(Dali::DevelActor::Property::CONNECTED_TO_SCENE).Get<bool>();
+  return state;
 }
 
 Dali::Accessibility::States AccessibleImpl::GetStates()
@@ -224,32 +237,30 @@ Dali::Accessibility::States AccessibleImpl::GetStates()
 
 Dali::Accessibility::Attributes AccessibleImpl::GetAttributes()
 {
-  std::unordered_map<std::string, std::string> attribute_map;
-  auto                                         q = Dali::Toolkit::Control::DownCast(Self());
-  auto                                         w =
-    q.GetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
-  auto z = w.GetMap();
+  std::unordered_map<std::string, std::string> attributeMap;
+  auto control = Dali::Toolkit::Control::DownCast(Self());
+  auto attribute = control.GetProperty(Dali::Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES);
+  auto map = attribute.GetMap();
 
-  if(z)
+  if(map)
   {
-    auto map_size = z->Count();
+    auto mapSize = map->Count();
 
-    for(unsigned int i = 0; i < map_size; i++)
+    for(unsigned int i = 0; i < mapSize; i++)
     {
-      auto map_key = z->GetKeyAt(i);
-      if(map_key.type == Dali::Property::Key::STRING)
+      auto mapKey = map->GetKeyAt(i);
+      if(mapKey.type == Dali::Property::Key::STRING)
       {
-        std::string map_value;
-        if(z->GetValue(i).Get(map_value))
+        std::string mapValue;
+        if(map->GetValue(i).Get(mapValue))
         {
-          attribute_map.emplace(std::move(map_key.stringKey),
-                                std::move(map_value));
+          attributeMap.emplace(std::move(mapKey.stringKey), std::move(mapValue));
         }
       }
     }
   }
 
-  return attribute_map;
+  return attributeMap;
 }
 
 Dali::Accessibility::ComponentLayer AccessibleImpl::GetLayer()
@@ -257,21 +268,15 @@ Dali::Accessibility::ComponentLayer AccessibleImpl::GetLayer()
   return Dali::Accessibility::ComponentLayer::WINDOW;
 }
 
-Dali::Rect<> AccessibleImpl::GetExtents(Dali::Accessibility::CoordType ctype)
+Dali::Rect<> AccessibleImpl::GetExtents(Dali::Accessibility::CoordinateType type)
 {
   Dali::Actor self = Self();
-  Vector2 screenPosition =
-    self.GetProperty(Dali::DevelActor::Property::SCREEN_POSITION)
-      .Get<Vector2>();
+
+  Vector2 screenPosition = self.GetProperty(Dali::DevelActor::Property::SCREEN_POSITION).Get<Vector2>();
   auto size = self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::WORLD_SCALE);
-  bool positionUsesAnchorPoint =
-    self.GetProperty(Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT)
-      .Get<bool>();
-  Vector3 anchorPointOffSet =
-    size * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT)
-                                    : AnchorPoint::TOP_LEFT);
-  Vector2 position = Vector2(screenPosition.x - anchorPointOffSet.x,
-                             screenPosition.y - anchorPointOffSet.y);
+  bool positionUsesAnchorPoint = self.GetProperty(Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT).Get<bool>();
+  Vector3 anchorPointOffSet = size * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
+  Vector2 position = Vector2((screenPosition.x - anchorPointOffSet.x), (screenPosition.y - anchorPointOffSet.y));
 
   return {position.x, position.y, size.x, size.y};
 }
@@ -294,10 +299,12 @@ static Dali::Actor CreateHighlightIndicatorActor()
 {
   std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
   focusBorderImagePath += "/keyboard_focus.9.png";
+
   // Create the default if it hasn't been set and one that's shared by all the
   // keyboard focusable actors
   auto actor = Toolkit::ImageView::New(focusBorderImagePath);
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+
   DevelControl::AppendAccessibilityAttribute(actor, "highlight", std::string());
   actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
 
@@ -324,24 +331,35 @@ void AccessibleImpl::ScrollToSelf()
 bool AccessibleImpl::GrabHighlight()
 {
   Dali::Actor self = Self();
-  auto old = GetCurrentlyHighlightedActor();
+  auto oldHighlightedActor = GetCurrentlyHighlightedActor();
 
   if(!Dali::Accessibility::IsUp())
-    return false;
-  if(self == old)
-    return true;
-  if(old)
   {
-    auto c = dynamic_cast<Dali::Accessibility::Component*>(Internal::Control::Impl::GetAccessibilityObject(old));
-    if(c)
-      c->ClearHighlight();
+    return false;
   }
+
+  if(self == oldHighlightedActor)
+  {
+    return true;
+  }
+
+  // Clear the old highlight.
+  if(oldHighlightedActor)
+  {
+    auto oldHighlightObject = dynamic_cast<Dali::Accessibility::Component*>(Internal::Control::Impl::GetAccessibilityObject(oldHighlightedActor));
+    if(oldHighlightObject)
+    {
+      oldHighlightObject->ClearHighlight();
+    }
+  }
+
   auto highlight = GetHighlightActor();
   if(!highlight)
   {
     highlight = CreateHighlightIndicatorActor();
     SetHighlightActor(highlight);
   }
+
   highlight.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   highlight.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   highlight.SetProperty(Actor::Property::POSITION_Z, 1.0f);
@@ -349,7 +367,7 @@ bool AccessibleImpl::GrabHighlight()
 
   // Remember the highlight actor, so that when the default is changed with
   // SetHighlightActor(), the currently displayed highlight can still be cleared.
-  currentHighlightActor = highlight;
+  mCurrentHighlightActor = highlight;
   ScrollToSelf();
   self.Add(highlight);
   SetCurrentlyHighlightedActor(self);
@@ -363,11 +381,14 @@ bool AccessibleImpl::ClearHighlight()
   Dali::Actor self = Self();
 
   if(!Dali::Accessibility::IsUp())
+  {
     return false;
+  }
+
   if(GetCurrentlyHighlightedActor() == self)
   {
-    self.Remove(currentHighlightActor.GetHandle());
-    currentHighlightActor = {};
+    self.Remove(mCurrentHighlightActor.GetHandle());
+    mCurrentHighlightActor = {};
     SetCurrentlyHighlightedActor({});
     EmitHighlighted(false);
     return true;
@@ -377,7 +398,11 @@ bool AccessibleImpl::ClearHighlight()
 
 std::string AccessibleImpl::GetActionName(size_t index)
 {
-  if(index >= GetActionCount()) return {};
+  if(index >= GetActionCount())
+  {
+    return {};
+  }
+
   Dali::TypeInfo type;
   Self().GetTypeInfo(type);
   DALI_ASSERT_ALWAYS(type && "no TypeInfo object");
@@ -444,13 +469,12 @@ std::vector<Dali::Accessibility::Relation> AccessibleImpl::GetRelationSet()
 
   std::vector<Dali::Accessibility::Relation> ret;
 
-  auto& v = controlImpl.mAccessibilityRelations;
-  for(auto i = 0u; i < v.size(); ++i)
+  auto& relation = controlImpl.mAccessibilityRelations;
+  for(auto i = 0u; i < relation.size(); ++i)
   {
-    if(v[i].empty())
-      continue;
+    if(relation[i].empty()) continue;
 
-    ret.emplace_back(Accessibility::Relation{static_cast<Accessibility::RelationType>(i), v[i]});
+    ret.emplace_back(Accessibility::Relation{static_cast<Accessibility::RelationType>(i), relation[i]});
   }
 
   return ret;

@@ -540,9 +540,9 @@ int UtcDaliAccessibilityTextField(void)
   auto text = dynamic_cast< Dali::Accessibility::Text* >( accessible );
   DALI_TEST_CHECK( text );
   DALI_TEST_EQUALS( text->GetText( 0, 10 ), "", TEST_LOCATION );
-  DALI_TEST_EQUALS( text->SetCaretOffset(100), false, TEST_LOCATION );
-  DALI_TEST_EQUALS( text->SetCaretOffset(2), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( text->GetCaretOffset(), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->SetCursorOffset(100), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->SetCursorOffset(2), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->GetCursorOffset(), 2, TEST_LOCATION );
 
   auto editabletext = dynamic_cast< Dali::Accessibility::EditableText* >( accessible );
   DALI_TEST_CHECK( editabletext );
@@ -552,11 +552,11 @@ int UtcDaliAccessibilityTextField(void)
   DALI_TEST_EQUALS( editabletext->CutText( 1, 3 ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( text->GetText( 0, 1 ), "t", TEST_LOCATION );
 
-  auto range = text->GetSelection( 1 );
+  auto range = text->GetRangeOfSelection( 1 );
   DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( range.content, "", TEST_LOCATION );
-  DALI_TEST_EQUALS( text->SetSelection( 1, 0, 1 ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->SetRangeOfSelection( 1, 0, 1 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( text->RemoveSelection( 1 ), false, TEST_LOCATION );
 
   DALI_TEST_EQUALS(editabletext->SetTextContents("adef"), true, TEST_LOCATION);
@@ -596,9 +596,9 @@ int UtcDaliAccessibilityTextEditor(void)
   auto text = dynamic_cast< Dali::Accessibility::Text* >( accessible );
   DALI_TEST_CHECK( text );
   DALI_TEST_EQUALS( text->GetText( 0, 10 ), "", TEST_LOCATION );
-  DALI_TEST_EQUALS( text->SetCaretOffset(100), false, TEST_LOCATION );
-  DALI_TEST_EQUALS( text->SetCaretOffset(2), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( text->GetCaretOffset(), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->SetCursorOffset(100), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->SetCursorOffset(2), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->GetCursorOffset(), 2, TEST_LOCATION );
 
   auto editabletext = dynamic_cast< Dali::Accessibility::EditableText* >( accessible );
   DALI_TEST_CHECK( editabletext );
@@ -608,11 +608,11 @@ int UtcDaliAccessibilityTextEditor(void)
   DALI_TEST_EQUALS( editabletext->CutText( 1, 3 ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( text->GetText( 0, 1 ), "t", TEST_LOCATION );
 
-  auto range = text->GetSelection( 1 );
+  auto range = text->GetRangeOfSelection( 1 );
   DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( range.content, "", TEST_LOCATION );
-  DALI_TEST_EQUALS( text->SetSelection( 1, 0, 1 ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->SetRangeOfSelection( 1, 0, 1 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( text->RemoveSelection( 1 ), false, TEST_LOCATION );
 
   DALI_TEST_EQUALS(editabletext->SetTextContents("adef"), true, TEST_LOCATION);
@@ -650,14 +650,14 @@ int UtcDaliAccessibilityTextLabel(void)
   DALI_TEST_CHECK( text );
   DALI_TEST_EQUALS( text->GetText( 0, 10 ), "", TEST_LOCATION );
   DALI_TEST_EQUALS( text->GetText( 0, 4 ), "test", TEST_LOCATION );
-  DALI_TEST_EQUALS( text->SetCaretOffset(0), false, TEST_LOCATION );
-  DALI_TEST_EQUALS( text->GetCaretOffset(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->SetCursorOffset(0), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->GetCursorOffset(), 0, TEST_LOCATION );
 
-  auto range = text->GetSelection( 1 );
+  auto range = text->GetRangeOfSelection( 1 );
   DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( range.content, "", TEST_LOCATION );
-  DALI_TEST_EQUALS( text->SetSelection( 1, 0, 1 ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( text->SetRangeOfSelection( 1, 0, 1 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( text->RemoveSelection( 1 ), false, TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( false );
