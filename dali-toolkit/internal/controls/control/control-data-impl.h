@@ -468,6 +468,22 @@ private:
    */
   void OnIdleCallback();
 
+  /**
+   * @brief Checks highlighted object geometry if it is showing or not
+   * @param[in] propertyNotification PropertyNotification
+   */
+  void CheckHighlightedObjectGeometry(Dali::PropertyNotification& propertyNotification);
+
+  /**
+   * @brief Register property notification to check highlighted object position
+   */
+  void RegisterAccessibilityPositionPropertyNotification();
+
+  /**
+   * @brief Remove property notification added by RegisterPropertyNotification
+   */
+  void UnregisterAccessibilityPositionPropertyNotification();
+
 public:
   Control&            mControlImpl;
   DevelControl::State mState;
@@ -562,6 +578,12 @@ public:
   static const PropertyRegistration PROPERTY_20;
   static const PropertyRegistration PROPERTY_21;
   static const PropertyRegistration PROPERTY_22;
+
+private:
+  // Accessibility - notification for highlighted object to check if it is showing.
+  bool                                      mIsAccessibilityPositionPropertyNotificationSet{false};
+  Dali::PropertyNotification                mAccessibilityPositionNotification;
+  Dali::Accessibility::MovedOutOfScreenType mAccessibilityMovedOutOfScreenDirection;
 };
 
 } // namespace Internal

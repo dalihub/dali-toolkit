@@ -1051,3 +1051,63 @@ int UtcDaliAccessibilityScrollToChildNonScrollable(void)
   Dali::Accessibility::TestEnableSC( false );
   END_TEST;
 }
+
+int UtcDaliAccessibilityCheckHighlight(void)
+{
+  ToolkitTestApplication application;
+  Dali::Accessibility::TestEnableSC( true );
+  Dali::Accessibility::TestResetMoveOutedCalled();
+
+  // Make precondition two children exist in parent area
+  PushButton parentButton = PushButton::New();
+  parentButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  parentButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentButton.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f) );
+  parentButton.SetProperty( Dali::Actor::Property::SIZE, Dali::Vector2(100.0f, 200.0f) );
+  application.GetScene().Add( parentButton );
+
+  PushButton buttonA = PushButton::New();
+  buttonA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  buttonA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonA.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f) );
+  buttonA.SetProperty( Dali::Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f) );
+  parentButton.Add(buttonA);
+
+  PushButton buttonB = PushButton::New();
+  buttonB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  buttonB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  buttonB.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, 100.0f) );
+  buttonB.SetProperty( Dali::Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f) );
+  parentButton.Add(buttonB);
+  Wait(application);
+
+  // Move second child out of parent area
+  auto* accessible = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(buttonA));
+  DALI_TEST_CHECK(accessible);
+  accessible->GrabHighlight();
+  Wait(application);
+
+  buttonA.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, -200.0f) );
+  Wait(application);
+  // Need one more seding notificaiton to get correct updated position
+  application.SendNotification();
+  DALI_TEST_EQUALS( true, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
+
+  // Reset verdict data
+  Dali::Accessibility::TestResetMoveOutedCalled();
+
+  // Move second child out of parent area
+  accessible = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(buttonB));
+  DALI_TEST_CHECK(accessible);
+  accessible->GrabHighlight();
+  Wait(application);
+
+  buttonB.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(300.0f, 100.0f) );
+  Wait(application);
+  // Need one more seding notificaiton to get correct updated position
+  application.SendNotification();
+  DALI_TEST_EQUALS( true, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
+
+  Dali::Accessibility::TestEnableSC( false );
+  END_TEST;
+}
