@@ -450,14 +450,11 @@ Control::Impl::Impl(Control& controlImpl)
   mTooltip(NULL),
   mInputMethodContext(),
   mIdleCallback(nullptr),
-  mAutofillItem(),
-  mAutofillContainer(),
   mFlags(Control::ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mIsKeyboardNavigationSupported(false),
   mIsKeyboardFocusGroup(false),
   mIsEmittingResourceReadySignal(false),
-  mNeedToEmitResourceReady(false),
-  mIsAutofillEnabled(false)
+  mNeedToEmitResourceReady(false)
 {
   Dali::Accessibility::Accessible::RegisterControlAccessibilityGetter(
     [](Dali::Actor actor) -> Dali::Accessibility::Accessible* {
@@ -1958,36 +1955,6 @@ Dali::Accessibility::Accessible* Control::Impl::GetAccessibilityObject(Dali::Act
     }
   }
   return nullptr;
-}
-
-void Control::Impl::SetAutofillEnabled( bool autofillEnabled )
-{
-  mIsAutofillEnabled = autofillEnabled;
-}
-
-bool Control::Impl::IsAutofillEnabled()
-{
-  return mIsAutofillEnabled;
-}
-
-void Control::Impl::SetAutofillItemHandle( Dali::AutofillItem item )
-{
-  mAutofillItem = item;
-}
-
-Dali::AutofillItem Control::Impl::GetAutofillItemHandle()
-{
-  return mAutofillItem;
-}
-
-void Control::Impl::SetAutofillContainer( Toolkit::AutofillContainer container )
-{
-  mAutofillContainer = container;
-}
-
-Toolkit::AutofillContainer Control::Impl::GetAutofillContainer()
-{
-  return mAutofillContainer;
 }
 
 } // namespace Internal
