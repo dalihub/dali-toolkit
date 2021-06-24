@@ -18,12 +18,20 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/text-model.h>
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/environment-variable.h>
+
 namespace Dali
 {
 namespace Toolkit
 {
 namespace Text
 {
+namespace
+{
+const char* DALI_ENV_MATCH_SYSTEM_LANGUAGE_DIRECTION("DALI_MATCH_SYSTEM_LANGUAGE_DIRECTION");
+}
+
 ModelPtr Model::New()
 {
   return ModelPtr(new Model());
@@ -221,10 +229,14 @@ Model::Model()
   mAlignmentOffset(0.0f),
   mElideEnabled(false),
   mIgnoreSpacesAfterText(true),
-  mMatchSystemLanguageDirection(false)
+  mMatchSystemLanguageDirection(true)
 {
   mLogicalModel = LogicalModel::New();
   mVisualModel  = VisualModel::New();
+
+  // Check environment variable for DALI_MATCH_SYSTEM_LANGUAGE_DIRECTION
+  auto match                    = Dali::EnvironmentVariable::GetEnvironmentVariable(DALI_ENV_MATCH_SYSTEM_LANGUAGE_DIRECTION);
+  mMatchSystemLanguageDirection = match ? (std::atoi(match) == 0 ? false : true) : mMatchSystemLanguageDirection;
 }
 
 Model::~Model()

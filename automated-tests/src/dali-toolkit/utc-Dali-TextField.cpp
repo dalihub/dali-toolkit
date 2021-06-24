@@ -3162,12 +3162,12 @@ int UtcDaliTextFieldMatchSystemLanguageDirectionProperty(void)
   application.SendNotification();
   application.Render();
 
-  // The default value of MATCH_SYSTEM_LANGUAGE_DIRECTION is 'false'.
-  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), false, TEST_LOCATION );
+  // The default value of MATCH_SYSTEM_LANGUAGE_DIRECTION is 'true'.
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), true, TEST_LOCATION );
 
   // Check the match system language direction property
-  field.SetProperty( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, true );
-  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), true, TEST_LOCATION );
+  field.SetProperty( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, false );
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), false, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();

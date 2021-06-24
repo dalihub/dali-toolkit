@@ -1512,6 +1512,7 @@ int UtcDaliToolkitTextlabelTextDirection(void)
 
   label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
   label.SetProperty( TextLabel::Property::POINT_SIZE, 20 );
+  label.SetProperty( DevelTextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, false );
   application.GetScene().Add( label );
 
   // Test LTR text
