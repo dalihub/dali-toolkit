@@ -922,8 +922,13 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
           colorRun.color                           = backgroundColor;
           colorRun.characterRun.characterIndex     = attrData.startIndex + numberOfCommit;
           colorRun.characterRun.numberOfCharacters = numberOfIndices;
-
           mModel->mLogicalModel->mColorRuns.PushBack(colorRun);
+
+          //Mark-up processor case
+          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
+          {
+            CopyUnderlinedFromLogicalToVisualModels(false);
+          }
           break;
         }
         case Dali::InputMethodContext::PreeditStyle::HIGHLIGHT:
@@ -933,6 +938,12 @@ bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
           backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
           backgroundColorRun.color                           = LIGHT_BLUE;
           mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
+
+          //Mark-up processor case
+          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
+          {
+            CopyUnderlinedFromLogicalToVisualModels(false);
+          }
           break;
         }
         case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_1:
