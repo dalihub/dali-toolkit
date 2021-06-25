@@ -30,13 +30,23 @@ namespace Toolkit
 {
 namespace Internal
 {
+std::unique_ptr<TransitionLifecycleController> TransitionLifecycleController::mInstance = nullptr;
+std::once_flag                                 TransitionLifecycleController::mOnceFlag;
+
+TransitionLifecycleController& TransitionLifecycleController::GetInstance()
+{
+  std::call_once(mOnceFlag, []()
+                 { mInstance.reset(new TransitionLifecycleController); });
+  return *(mInstance.get());
+}
+
 void TransitionLifecycleController::AddTransitions(Dali::Toolkit::TransitionSet transitions)
 {
   mTransitionList.push_back(transitions);
   transitions.FinishedSignal().Connect(this, &TransitionLifecycleController::RemoveTransitions);
 }
 
-void TransitionLifecycleController::RemoveTransitions(Dali::Toolkit::TransitionSet &transitions)
+void TransitionLifecycleController::RemoveTransitions(Dali::Toolkit::TransitionSet& transitions)
 {
   mTransitionList.erase(std::remove(mTransitionList.begin(), mTransitionList.end(), transitions));
 }
