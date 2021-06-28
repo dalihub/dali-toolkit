@@ -70,6 +70,13 @@ public:
   virtual void AddDecoration(Actor& actor, bool needsClipping) = 0;
 
   /**
+   * @brief Gets the color of the control.
+   *
+   * @param[out] The color of the control.
+   */
+  virtual void GetControlBackgroundColor(Vector4& color) const = 0;
+
+  /**
    * @brief Editable status (on/off).
    *
    * @return true if it can be edit, else false.

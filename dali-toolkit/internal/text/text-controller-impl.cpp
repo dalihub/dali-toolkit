@@ -34,6 +34,8 @@
 #include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
+#include <dali-toolkit/internal/text/text-editable-control-interface.h>
+#include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 
 using namespace Dali;
@@ -98,11 +100,19 @@ struct BackgroundMesh
   Vector< unsigned short > mIndices;       ///< container of indices
 };
 
-const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f );
-const Dali::Vector4 BACKGROUND_SUB4( 0.58f, 0.87f, 0.96f, 1.f );
-const Dali::Vector4 BACKGROUND_SUB5( 0.83f, 0.94f, 0.98f, 1.f );
-const Dali::Vector4 BACKGROUND_SUB6( 1.f, 0.5f, 0.5f, 1.f );
-const Dali::Vector4 BACKGROUND_SUB7( 1.f, 0.8f, 0.8f, 1.f );
+// The relative luminance of a color is defined as (L = 0.2126 * R + 0.7152 * G + 0.0722 * B)
+// based on W3C Recommendations (https://www.w3.org/TR/WCAG20/)
+const float         BRIGHTNESS_THRESHOLD = 0.179f;
+const float         CONSTANT_R           = 0.2126f;
+const float         CONSTANT_G           = 0.7152f;
+const float         CONSTANT_B           = 0.0722f;
+const Dali::Vector4 BLACK(0.f, 0.f, 0.f, 1.f);
+const Dali::Vector4 WHITE(1.f, 1.f, 1.f, 1.f);
+const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f);
+const Dali::Vector4 BACKGROUND_SUB4(0.58f, 0.87f, 0.96f, 1.f);
+const Dali::Vector4 BACKGROUND_SUB5(0.83f, 0.94f, 0.98f, 1.f);
+const Dali::Vector4 BACKGROUND_SUB6(1.f, 0.5f, 0.5f, 1.f);
+const Dali::Vector4 BACKGROUND_SUB7(1.f, 0.8f, 0.8f, 1.f);
 
 } // namespace
 
@@ -1124,15 +1134,31 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
           ColorRun backgroundColorRun;
           backgroundColorRun.characterRun.characterIndex = attrData.startIndex + numberOfCommit;
           backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
-          backgroundColorRun.color = textColor;
-          mModel->mLogicalModel->mBackgroundColorRuns.PushBack( backgroundColorRun );
+          backgroundColorRun.color                           = textColor;
+          mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
 
           Vector4 backgroundColor = mModel->mVisualModel->GetBackgroundColor();
-          Vector<ColorRun>  colorRuns;
-          colorRuns.Resize( 1u );
-          ColorRun& colorRun = *( colorRuns.Begin() );
-          colorRun.color = backgroundColor;
-          colorRun.characterRun.characterIndex = attrData.startIndex + numberOfCommit;
+          if(backgroundColor.a == 0) // There is no text background color.
+          {
+            // Try use the control's background color.
+            if(nullptr != mEditableControlInterface)
+            {
+              mEditableControlInterface->GetControlBackgroundColor(backgroundColor);
+              if(backgroundColor.a == 0) // There is no control background color.
+              {
+                // Determines black or white color according to text color.
+                // Based on W3C Recommendations (https://www.w3.org/TR/WCAG20/)
+                float L         = CONSTANT_R * textColor.r + CONSTANT_G * textColor.g + CONSTANT_B * textColor.b;
+                backgroundColor = L > BRIGHTNESS_THRESHOLD ? BLACK : WHITE;
+              }
+            }
+          }
+
+          Vector<ColorRun> colorRuns;
+          colorRuns.Resize(1u);
+          ColorRun& colorRun                       = *(colorRuns.Begin());
+          colorRun.color                           = backgroundColor;
+          colorRun.characterRun.characterIndex     = attrData.startIndex + numberOfCommit;
           colorRun.characterRun.numberOfCharacters = numberOfIndices;
 
           mModel->mLogicalModel->mColorRuns.PushBack( colorRun );

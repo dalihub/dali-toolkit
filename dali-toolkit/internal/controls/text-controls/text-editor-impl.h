@@ -199,6 +199,11 @@ private: // From Control
    */
   void AddDecoration(Actor& actor, bool needsClipping) override;
 
+  /**
+   * @copydoc Text::EditableControlInterface::GetControlBackgroundColor()
+   */
+  void GetControlBackgroundColor(Vector4& color) const override;
+
   // From SelectableControlInterface
 public:
   /**

@@ -1630,6 +1630,18 @@ Uint32Pair TextEditor::GetTextSelectionRange() const
   return range;
 }
 
+void TextEditor::GetControlBackgroundColor(Vector4& color) const
+{
+  Property::Value propValue = Self().GetProperty(Toolkit::Control::Property::BACKGROUND);
+  Property::Map*  resultMap = propValue.GetMap();
+
+  Property::Value* colorValue = nullptr;
+  if(resultMap && (colorValue = resultMap->Find(ColorVisual::Property::MIX_COLOR)))
+  {
+    colorValue->Get(color);
+  }
+}
+
 void TextEditor::UpdateScrollBar()
 {
   using namespace Dali;
