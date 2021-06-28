@@ -417,6 +417,116 @@ void DrawBackgroundColor(
   }
 }
 
+Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuffer& buffer, const unsigned int bufferWidth, const unsigned int bufferHeight, bool ignoreHorizontalAlignment, int horizontalOffset, int verticalOffset)
+{
+  // Retrieve lines, glyphs, positions and colors from the view model.
+  const Length            modelNumberOfLines           = model->GetNumberOfLines();
+  const LineRun* const    modelLinesBuffer             = model->GetLines();
+  const Length            numberOfGlyphs               = model->GetNumberOfGlyphs();
+  const GlyphInfo* const  glyphsBuffer                 = model->GetGlyphs();
+  const Vector2* const    positionBuffer               = model->GetLayout();
+  const Vector4* const    backgroundColorsBuffer       = model->GetBackgroundColors();
+  const ColorIndex* const backgroundColorIndicesBuffer = model->GetBackgroundColorIndices();
+
+  // Create and initialize the pixel buffer.
+  GlyphData glyphData;
+  glyphData.verticalOffset   = verticalOffset;
+  glyphData.width            = bufferWidth;
+  glyphData.height           = bufferHeight;
+  glyphData.bitmapBuffer     = buffer;
+  glyphData.horizontalOffset = 0;
+
+  ColorIndex prevBackgroundColorIndex = 0;
+  ColorIndex backgroundColorIndex     = 0;
+
+  // Traverses the lines of the text.
+  for(LineIndex lineIndex = 0u; lineIndex < modelNumberOfLines; ++lineIndex)
+  {
+    const LineRun& line = *(modelLinesBuffer + lineIndex);
+
+    // Sets the horizontal offset of the line.
+    glyphData.horizontalOffset = ignoreHorizontalAlignment ? 0 : static_cast<int>(line.alignmentOffset);
+    glyphData.horizontalOffset += horizontalOffset;
+
+    // Increases the vertical offset with the line's ascender.
+    glyphData.verticalOffset += static_cast<int>(line.ascender);
+
+    // Include line spacing after first line
+    if(lineIndex > 0u)
+    {
+      glyphData.verticalOffset += static_cast<int>(line.lineSpacing);
+    }
+
+    float left     = bufferWidth;
+    float right    = 0.0f;
+    float baseline = 0.0f;
+
+    // Traverses the glyphs of the line.
+    const GlyphIndex endGlyphIndex = std::min(numberOfGlyphs, line.glyphRun.glyphIndex + line.glyphRun.numberOfGlyphs);
+    for(GlyphIndex glyphIndex = line.glyphRun.glyphIndex; glyphIndex < endGlyphIndex; ++glyphIndex)
+    {
+      // Retrieve the glyph's info.
+      const GlyphInfo* const glyphInfo = glyphsBuffer + glyphIndex;
+
+      if((glyphInfo->width < Math::MACHINE_EPSILON_1000) ||
+         (glyphInfo->height < Math::MACHINE_EPSILON_1000))
+      {
+        // Nothing to do if default background color, the glyph's width or height is zero.
+        continue;
+      }
+
+      backgroundColorIndex = (nullptr == backgroundColorsBuffer) ? 0u : *(backgroundColorIndicesBuffer + glyphIndex);
+
+      if((backgroundColorIndex != prevBackgroundColorIndex) &&
+         (prevBackgroundColorIndex != 0u))
+      {
+        const Vector4& backgroundColor = *(backgroundColorsBuffer + prevBackgroundColorIndex - 1u);
+        DrawBackgroundColor(backgroundColor, bufferWidth, bufferHeight, glyphData, baseline, line, left, right);
+      }
+
+      if(backgroundColorIndex == 0u)
+      {
+        prevBackgroundColorIndex = backgroundColorIndex;
+        //if background color is the default do nothing
+        continue;
+      }
+
+      // Retrieves the glyph's position.
+      const Vector2* const position = positionBuffer + glyphIndex;
+
+      if(baseline < position->y + glyphInfo->yBearing)
+      {
+        baseline = position->y + glyphInfo->yBearing;
+      }
+
+      // Calculate the positions of leftmost and rightmost glyphs in the current line
+      if((position->x < left) || (backgroundColorIndex != prevBackgroundColorIndex))
+      {
+        left = position->x - glyphInfo->xBearing;
+      }
+
+      if(position->x + glyphInfo->width > right)
+      {
+        right = position->x - glyphInfo->xBearing + glyphInfo->advance;
+      }
+
+      prevBackgroundColorIndex = backgroundColorIndex;
+    }
+
+    //draw last background at line end if not default
+    if(backgroundColorIndex != 0u)
+    {
+      const Vector4& backgroundColor = *(backgroundColorsBuffer + backgroundColorIndex - 1u);
+      DrawBackgroundColor(backgroundColor, bufferWidth, bufferHeight, glyphData, baseline, line, left, right);
+    }
+
+    // Increases the vertical offset with the line's descender.
+    glyphData.verticalOffset += static_cast<int>(-line.descender);
+  }
+
+  return glyphData.bitmapBuffer;
+}
+
 } // namespace
 
 TypesetterPtr Typesetter::New(const ModelInterface* const model)
@@ -587,10 +697,25 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
     }
 
     // Generate the background if enabled
-    const bool backgroundEnabled = mModel->IsBackgroundEnabled();
-    if(backgroundEnabled)
+    const bool backgroundEnabled   = mModel->IsBackgroundEnabled();
+    const bool backgroundMarkupSet = mModel->IsMarkupBackgroundColorSet();
+    if(backgroundEnabled || backgroundMarkupSet)
     {
-      Devel::PixelBuffer backgroundImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_BACKGROUND, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1);
+      Devel::PixelBuffer backgroundImageBuffer;
+
+      if(backgroundEnabled)
+      {
+        backgroundImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_BACKGROUND, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1);
+      }
+      else
+      {
+        backgroundImageBuffer = Devel::PixelBuffer::New(bufferWidth, bufferHeight, pixelFormat);
+      }
+
+      if(backgroundMarkupSet)
+      {
+        DrawGlyphsBackground(mModel, backgroundImageBuffer, bufferWidth, bufferHeight, ignoreHorizontalAlignment, penX, penY);
+      }
 
       // Combine the two buffers
       imageBuffer = CombineImageBuffer(imageBuffer, backgroundImageBuffer, bufferWidth, bufferHeight);

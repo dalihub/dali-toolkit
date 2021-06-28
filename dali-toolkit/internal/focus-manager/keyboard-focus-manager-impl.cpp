@@ -500,7 +500,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
       else
       {
         // We should find it among the actors nearby.
-        nextFocusableActor = Toolkit::FocusFinder::Get().GetNearestFocusableActor(currentFocusActor, direction);
+        nextFocusableActor = Toolkit::FocusFinder::GetNearestFocusableActor(currentFocusActor, direction);
       }
     }
 

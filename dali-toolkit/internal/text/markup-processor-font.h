@@ -25,6 +25,7 @@ namespace Toolkit
 namespace Text
 {
 struct Tag;
+struct Attribute;
 struct FontDescriptionRun;
 
 /**
@@ -34,6 +35,46 @@ struct FontDescriptionRun;
  * @param[in,out] fontRun The font description run.
  */
 void ProcessFontTag(const Tag& tag, FontDescriptionRun& fontRun);
+
+/**
+ * @brief Fill the font run with the font slant attribute value.
+ *
+ * @param[in] attribute the font slant attribute.
+ * @param[out] fontRun The font description run.
+ */
+void ProcessFontSlant(const Attribute& attribute, FontDescriptionRun& fontRun);
+
+/**
+ * @brief Fill the font run with the font width attribute value.
+ *
+ * @param[in] attribute the font width attribute.
+ * @param[out] fontRun The font description run.
+ */
+void ProcessFontWidth(const Attribute& attribute, FontDescriptionRun& fontRun);
+
+/**
+ * @brief Fill the font run with the font weight attribute value.
+ *
+ * @param[in] attribute the font weight attribute.
+ * @param[out] fontRun The font description run.
+ */
+void ProcessFontWeight(const Attribute& attribute, FontDescriptionRun& fontRun);
+
+/**
+ * @brief Fill the font run with the font size attribute value.
+ *
+ * @param[in] attribute the font size attribute.
+ * @param[out] fontRun The font description run.
+ */
+void ProcessFontSize(const Attribute& attribute, FontDescriptionRun& fontRun);
+
+/**
+ * @brief Fill the font run with the font family attribute value.
+ *
+ * @param[in] attribute the font family attribute.
+ * @param[out] fontRun The font description run.
+ */
+void ProcessFontFamily(const Attribute& attribute, FontDescriptionRun& fontRun);
 
 } // namespace Text
 

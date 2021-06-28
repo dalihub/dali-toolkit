@@ -413,6 +413,7 @@ private: // Data
 
   Actor         mRenderableActor;
   Actor         mActiveLayer;
+  Actor         mBackgroundActor;
   CallbackBase* mIdleCallback;
 
   float mAlignmentOffset;

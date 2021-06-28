@@ -160,6 +160,11 @@ const ColorIndex* const ViewModel::GetBackgroundColorIndices() const
   return mModel->GetBackgroundColorIndices();
 }
 
+bool const ViewModel::IsMarkupBackgroundColorSet() const
+{
+  return mModel->IsMarkupBackgroundColorSet();
+}
+
 const Vector4& ViewModel::GetDefaultColor() const
 {
   return mModel->GetDefaultColor();

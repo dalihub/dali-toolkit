@@ -33,24 +33,11 @@ namespace Toolkit
 {
 namespace Internal
 {
-class TransitionLifecycleController;
-
-namespace
-{
-std::unique_ptr<TransitionLifecycleController> instance = nullptr;
-std::once_flag                                 onceFlag;
-} // namespace
 
 class TransitionLifecycleController : public ConnectionTracker
 {
 public:
-  static TransitionLifecycleController& GetInstance()
-  {
-    std::call_once(onceFlag, []() {
-      instance.reset(new TransitionLifecycleController);
-    });
-    return *(instance.get());
-  }
+  static TransitionLifecycleController& GetInstance();
 
   void AddTransitions(Dali::Toolkit::TransitionSet transitions);
 
@@ -70,7 +57,9 @@ private:
   TransitionLifecycleController& operator=(const TransitionLifecycleController& rhs) = delete;
 
 private:
-  std::vector<Dali::Toolkit::TransitionSet> mTransitionList;
+  std::vector<Dali::Toolkit::TransitionSet>             mTransitionList;
+  static std::unique_ptr<TransitionLifecycleController> mInstance;
+  static std::once_flag                                 mOnceFlag;
 };
 
 } // namespace Internal

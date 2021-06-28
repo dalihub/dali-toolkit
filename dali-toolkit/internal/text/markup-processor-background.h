@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_COLOR_H
-#define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_COLOR_H
+#ifndef DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_BACKGROUND_H
+#define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_BACKGROUND_H
 
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
@@ -25,24 +25,15 @@ namespace Toolkit
 namespace Text
 {
 struct Tag;
-struct Attribute;
 struct ColorRun;
 
 /**
- * @brief Retrieves the color value from the tag and sets it to the color run.
+ * @brief Retrieves the @e background from the @p tag.
  *
- * @param[in] attribute the color attribute.
- * @param[in,out] colorRun The color run.
+ * @param[in] tag The background tag and its attributes.
+ * @param[in,out] colorRun The color run to be filled.
  */
-void ProcessColor(const Attribute& attribute, ColorRun& colorRun);
-
-/**
- * @brief Retrieves the color value from the tag and sets it to the color run.
- *
- * @param[in] tag The color tag and its attributes.
- * @param[in,out] colorRun The color run.
- */
-void ProcessColorTag(const Tag& tag, ColorRun& colorRun);
+void ProcessBackground(const Tag& tag, ColorRun& colorRun);
 
 } // namespace Text
 
@@ -50,4 +41,4 @@ void ProcessColorTag(const Tag& tag, ColorRun& colorRun);
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_COLOR_H
+#endif // DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_BACKGROUND_H

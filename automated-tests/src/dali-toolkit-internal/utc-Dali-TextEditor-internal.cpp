@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,6 +165,101 @@ int UtcDaliTextEditorFontPointSizeLargerThanAtlasPlaceholderCase(void)
   //Check if Glyph is added to AtlasGlyphManger or not
   int countAtlas = AtlasGlyphManager::Get().GetMetrics().mAtlasMetrics.mAtlasCount;
   DALI_TEST_EQUALS( countAtlas, 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorBackgroundTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorBackgroundTag\n");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  editor.SetProperty( TextEditor ::Property::ENABLE_MARKUP,  true );
+  editor.SetProperty( TextEditor::Property::TEXT, "H<background color='red'>e</background> Worl<background color='yellow'>d</background>" );
+  application.GetScene().Add( editor );
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextEditor& editorImpl = GetImpl( editor );
+  const ColorIndex* const backgroundColorIndicesBuffer = editorImpl.getController()->GetTextModel()->GetBackgroundColorIndices();
+
+  DALI_TEST_CHECK( backgroundColorIndicesBuffer );
+
+  //default color
+  DALI_TEST_EQUALS( backgroundColorIndicesBuffer[0], 0u, TEST_LOCATION);
+
+  //red color
+  DALI_TEST_EQUALS( backgroundColorIndicesBuffer[1], 1u, TEST_LOCATION);
+
+  //yellow color
+  DALI_TEST_EQUALS( backgroundColorIndicesBuffer[7], 2u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorTextWithSpan(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorTextWithSpan\n");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  editor.SetProperty( TextEditor ::Property::ENABLE_MARKUP,  true );
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello Span" );
+  application.GetScene().Add( editor );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 originalSize = editor.GetNaturalSize();
+  editor.SetProperty( TextEditor::Property::TEXT, "H<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ello</span> Span" );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 spanSize = editor.GetNaturalSize();
+
+  DALI_TEST_GREATER(spanSize.width, originalSize.width, TEST_LOCATION);
+
+  Toolkit::Internal::TextEditor& editorImpl = GetImpl( editor );
+  const ColorIndex* const colorIndicesBuffer1 = editorImpl.getController()->GetTextModel()->GetColorIndices();
+
+  DALI_TEST_CHECK( colorIndicesBuffer1 );
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer1[0], 0u, TEST_LOCATION);
+
+  //span color
+  DALI_TEST_EQUALS( colorIndicesBuffer1[1], 1u, TEST_LOCATION);
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer1[6], 0u, TEST_LOCATION);
+
+
+  editor.SetProperty( TextEditor::Property::TEXT, "<span font-size='45'>H</span>ello <span text-color='red'>S</span>pan" );
+
+  application.SendNotification();
+  application.Render();
+
+  const ColorIndex* const colorIndicesBuffer2 = editorImpl.getController()->GetTextModel()->GetColorIndices();
+
+  DALI_TEST_CHECK( colorIndicesBuffer2 );
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[0], 0u, TEST_LOCATION);
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[1], 0u, TEST_LOCATION);
+
+  //span color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[6], 1u, TEST_LOCATION);
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[7], 0u, TEST_LOCATION);
 
   END_TEST;
 }

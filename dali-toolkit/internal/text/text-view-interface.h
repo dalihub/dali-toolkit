@@ -124,6 +124,13 @@ public:
   virtual const ColorIndex* const GetBackgroundColorIndices() const = 0;
 
   /**
+   * @brief checks if there is background colors set using markup.
+   *
+   * @return boolean if there is background colors set using markup .
+   */
+  virtual bool const IsMarkupBackgroundColorSet() const = 0;
+
+  /**
    * @brief Retrieves the text color
    *
    * @return The text color

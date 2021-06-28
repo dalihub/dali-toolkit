@@ -83,7 +83,8 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
                                         logicalModel->mFontDescriptionRuns,
                                         logicalModel->mEmbeddedItems,
                                         logicalModel->mAnchors,
-                                        logicalModel->mUnderlinedCharacterRuns);
+                                        logicalModel->mUnderlinedCharacterRuns,
+                                        logicalModel->mBackgroundColorRuns);
 
     Length         textSize = 0u;
     const uint8_t* utf8     = NULL;

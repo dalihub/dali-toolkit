@@ -15,37 +15,40 @@
  *
  */
 
-// HEADER
-#include <dali-toolkit/public-api/dali-toolkit-version.h>
+// FILE HEADER
+#include <dali-toolkit/internal/text/markup-processor-background.h>
 
 // EXTERNAL INCLUDES
-#ifdef DEBUG_ENABLED
-#include <iostream>
-#endif
+#include <dali/public-api/common/dali-vector.h>
+#include <memory.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/color-run.h>
+#include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
-const unsigned int TOOLKIT_MAJOR_VERSION = 2;
-const unsigned int TOOLKIT_MINOR_VERSION = 0;
-const unsigned int TOOLKIT_MICRO_VERSION = 32;
-const char* const  TOOLKIT_BUILD_DATE    = __DATE__ " " __TIME__;
-
-#ifdef DEBUG_ENABLED
+namespace Text
+{
 namespace
 {
-/// Allows the printing of the version number ONLY when debug is enabled
-struct PrintVersion
+const std::string XHTML_COLOR_ATTRIBUTE("color");
+} // namespace
+
+void ProcessBackground(const Tag& tag, ColorRun& colorRun)
 {
-  PrintVersion()
+  for(auto&& attribute : tag.attributes)
   {
-    std::cerr << "DALi Toolkit:   " << TOOLKIT_MAJOR_VERSION << "." << TOOLKIT_MINOR_VERSION << "." << TOOLKIT_MICRO_VERSION << " (" << TOOLKIT_BUILD_DATE << ")" << std::endl;
+    if(TokenComparison(XHTML_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      ColorStringToVector4(attribute.valueBuffer, attribute.valueLength, colorRun.color);
+    }
   }
-};
-PrintVersion TOOLKIT_VERSION;
-} // unnamed namespace
-#endif
+}
+
+} // namespace Text
 
 } // namespace Toolkit
 
