@@ -1859,6 +1859,18 @@ void TextField::AddDecoration(Actor& actor, bool needsClipping)
   }
 }
 
+void TextField::GetControlBackgroundColor(Vector4& color) const
+{
+  Property::Value propValue = Self().GetProperty(Toolkit::Control::Property::BACKGROUND);
+  Property::Map*  resultMap = propValue.GetMap();
+
+  Property::Value* colorValue = nullptr;
+  if(resultMap && (colorValue = resultMap->Find(ColorVisual::Property::MIX_COLOR)))
+  {
+    colorValue->Get(color);
+  }
+}
+
 void TextField::OnSceneConnect(Dali::Actor actor)
 {
   if(mHasBeenStaged)
@@ -2203,8 +2215,8 @@ Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
   return states;
 }
 
-bool TextField::AccessibleImpl::InsertText(size_t startPosition,
-                                            std::string text)
+bool TextField::AccessibleImpl::InsertText(size_t      startPosition,
+                                           std::string text)
 {
   auto slf = Toolkit::TextField::DownCast(Self());
   auto txt = slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
