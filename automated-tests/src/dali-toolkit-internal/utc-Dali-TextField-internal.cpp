@@ -283,3 +283,67 @@ int UtcDaliTextFieldBackgroundTag(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldTextWithSpan(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextFieldTextWithSpan\n");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  field.SetProperty( TextField ::Property::ENABLE_MARKUP,  true );
+  field.SetProperty( TextField::Property::TEXT, "Hello Span" );
+  application.GetScene().Add( field );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 originalSize = field.GetNaturalSize();
+  field.SetProperty( TextField::Property::TEXT, "H<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ello</span> Span" );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 spanSize = field.GetNaturalSize();
+
+  DALI_TEST_GREATER(spanSize.width, originalSize.width, TEST_LOCATION);
+
+  Toolkit::Internal::TextField& fieldImpl = GetImpl( field );
+  const ColorIndex* const colorIndicesBuffer1 = fieldImpl.getController()->GetTextModel()->GetColorIndices();
+
+  DALI_TEST_CHECK( colorIndicesBuffer1 );
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer1[0], 0u, TEST_LOCATION);
+
+  //span color
+  DALI_TEST_EQUALS( colorIndicesBuffer1[1], 1u, TEST_LOCATION);
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer1[6], 0u, TEST_LOCATION);
+
+
+  field.SetProperty( TextField::Property::TEXT, "<span font-size='45'>H</span>ello <span text-color='red'>S</span>pan" );
+
+  application.SendNotification();
+  application.Render();
+
+  const ColorIndex* const colorIndicesBuffer2 = fieldImpl.getController()->GetTextModel()->GetColorIndices();
+
+  DALI_TEST_CHECK( colorIndicesBuffer2 );
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[0], 0u, TEST_LOCATION);
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[1], 0u, TEST_LOCATION);
+
+  //span color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[6], 1u, TEST_LOCATION);
+
+  //default color
+  DALI_TEST_EQUALS( colorIndicesBuffer2[7], 0u, TEST_LOCATION);
+
+  END_TEST;
+}

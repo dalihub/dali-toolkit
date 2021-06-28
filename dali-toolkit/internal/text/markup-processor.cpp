@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/markup-processor-embedded-item.h>
 #include <dali-toolkit/internal/text/markup-processor-font.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-processor-span.h>
 #include <dali-toolkit/internal/text/xhtml-entities.h>
 
 namespace Dali
@@ -55,6 +56,7 @@ const std::string XHTML_OUTLINE_TAG("outline");
 const std::string XHTML_ITEM_TAG("item");
 const std::string XHTML_ANCHOR_TAG("a");
 const std::string XHTML_BACKGROUND_TAG("background");
+const std::string XHTML_SPAN_TAG("span");
 
 const char LESS_THAN      = '<';
 const char GREATER_THAN   = '>';
@@ -82,15 +84,16 @@ const unsigned int DEFAULT_VECTOR_SIZE   = 16u; ///< Default size of run vectors
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MARKUP_PROCESSOR");
 #endif
 
+typedef VectorBase::SizeType RunIndex;
+
 /**
  * @brief Struct used to retrieve the style runs from the mark-up string.
  */
+template<typename StyleStackType>
 struct StyleStack
 {
-  typedef VectorBase::SizeType RunIndex;
-
-  Vector<RunIndex> stack;    ///< Use a vector as a style stack. Stores the indices pointing where the run is stored inside the logical model.
-  unsigned int     topIndex; ///< Points the top of the stack.
+  Vector<StyleStackType> stack;    ///< Use a vector as a style stack.
+  unsigned int           topIndex; ///< Points the top of the stack.
 
   StyleStack()
   : stack(),
@@ -99,7 +102,7 @@ struct StyleStack
     stack.Resize(DEFAULT_VECTOR_SIZE);
   }
 
-  void Push(RunIndex index)
+  void Push(StyleStackType item)
   {
     // Check if there is space inside the style stack.
     const VectorBase::SizeType size = stack.Count();
@@ -109,19 +112,30 @@ struct StyleStack
       stack.Resize(2u * size);
     }
 
-    // Set the run index in the top of the stack.
-    *(stack.Begin() + topIndex) = index;
+    // Set the item in the top of the stack.
+    *(stack.Begin() + topIndex) = item;
 
     // Reposition the pointer to the top of the stack.
     ++topIndex;
   }
 
-  RunIndex Pop()
+  StyleStackType Pop()
   {
     // Pop the top of the stack.
     --topIndex;
     return *(stack.Begin() + topIndex);
   }
+};
+
+/**
+ * @brief Struct used to retrieve spans from the mark-up string.
+ */
+struct Span
+{
+  RunIndex colorRunIndex;
+  RunIndex fontRunIndex;
+  bool     isColorDefined;
+  bool     isFontDefined;
 };
 
 /**
@@ -166,6 +180,19 @@ void Initialize(UnderlinedCharacterRun& underlinedCharacterRun)
 {
   underlinedCharacterRun.characterRun.characterIndex     = 0u;
   underlinedCharacterRun.characterRun.numberOfCharacters = 0u;
+}
+
+/**
+ * @brief Initializes a span to its defaults.
+ *
+ * @param[in,out] span The span to be initialized.
+ */
+void Initialize(Span& span)
+{
+  span.colorRunIndex  = 0u;
+  span.isColorDefined = false;
+  span.fontRunIndex   = 0u;
+  span.isFontDefined  = false;
 }
 
 /**
@@ -526,10 +553,10 @@ bool XHTMLNumericEntityToUtf8(const char* markupText, char* utf8)
 template<typename RunType>
 void ProcessTagForRun(
   Vector<RunType>&                          runsContainer,
-  StyleStack&                               styleStack,
+  StyleStack<RunIndex>&                     styleStack,
   const Tag&                                tag,
   const CharacterIndex                      characterIndex,
-  StyleStack::RunIndex&                     runIndex,
+  RunIndex&                                 runIndex,
   int&                                      tagReference,
   std::function<void(const Tag&, RunType&)> parameterSettingFunction)
 {
@@ -627,6 +654,94 @@ void ProcessAnchorTag(
 }
 
 /**
+ * @brief Processes span tag for the color-run & font-run.
+ *
+ * @param[in] spanTag The tag we are currently processing
+ * @param[in/out] spanStack The spans stack
+ * @param[int/out] colorRuns The container containing all the color runs
+ * @param[int/out] fontRuns The container containing all the font description runs
+ * @param[in/out] colorRunIndex The color run index
+ * @param[in/out] fontRunIndex The font run index
+ * @param[in] characterIndex The current character index
+ * @param[in] tagReference The tagReference we should increment/decrement
+ */
+void ProcessSpanForRun(
+  const Tag&                  spanTag,
+  StyleStack<Span>&           spanStack,
+  Vector<ColorRun>&           colorRuns,
+  Vector<FontDescriptionRun>& fontRuns,
+  RunIndex&                   colorRunIndex,
+  RunIndex&                   fontRunIndex,
+  const CharacterIndex        characterIndex,
+  int&                        tagReference)
+{
+  if(!spanTag.isEndTag)
+  {
+    // Create a new run.
+    ColorRun colorRun;
+    Initialize(colorRun);
+
+    FontDescriptionRun fontRun;
+    Initialize(fontRun);
+
+    Span span;
+    Initialize(span);
+
+    // Fill the run with the parameters.
+    colorRun.characterRun.characterIndex = characterIndex;
+    fontRun.characterRun.characterIndex  = characterIndex;
+
+    span.colorRunIndex = colorRunIndex;
+    span.fontRunIndex  = fontRunIndex;
+
+    ProcessSpanTag(spanTag, colorRun, fontRun, span.isColorDefined, span.isFontDefined);
+
+    // Push the span into the stack.
+    spanStack.Push(span);
+
+    // Point the next free run.
+    if(span.isColorDefined)
+    {
+      // Push the run in the logical model.
+      colorRuns.PushBack(colorRun);
+      ++colorRunIndex;
+    }
+
+    if(span.isFontDefined)
+    {
+      // Push the run in the logical model.
+      fontRuns.PushBack(fontRun);
+      ++fontRunIndex;
+    }
+
+    // Increase reference
+    ++tagReference;
+  }
+  else
+  {
+    if(tagReference > 0)
+    {
+      // Pop the top of the stack and set the number of characters of the run.
+      Span span = spanStack.Pop();
+
+      if(span.isColorDefined)
+      {
+        ColorRun& colorRun                       = *(colorRuns.Begin() + span.colorRunIndex);
+        colorRun.characterRun.numberOfCharacters = characterIndex - colorRun.characterRun.characterIndex;
+      }
+
+      if(span.isFontDefined)
+      {
+        FontDescriptionRun& fontRun             = *(fontRuns.Begin() + span.fontRunIndex);
+        fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
+      }
+
+      --tagReference;
+    }
+  }
+}
+
+/**
  * @brief Resizes the model's vectors
  *
  * @param[in/out] markupProcessData The markup process data
@@ -635,7 +750,7 @@ void ProcessAnchorTag(
  * @param[in] underlinedCharacterRunIndex The underlined character run index
  * @param[in] backgroundRunIndex The background run index
  */
-void ResizeModelVectors(MarkupProcessData& markupProcessData, const StyleStack::RunIndex fontRunIndex, const StyleStack::RunIndex colorRunIndex, const StyleStack::RunIndex underlinedCharacterRunIndex, const StyleStack::RunIndex backgroundRunIndex)
+void ResizeModelVectors(MarkupProcessData& markupProcessData, const RunIndex fontRunIndex, const RunIndex colorRunIndex, const RunIndex underlinedCharacterRunIndex, const RunIndex backgroundRunIndex)
 {
   markupProcessData.fontRuns.Resize(fontRunIndex);
   markupProcessData.colorRuns.Resize(colorRunIndex);
@@ -754,13 +869,16 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   markupProcessData.markupProcessedText.reserve(markupStringSize);
 
   // Stores a struct with the index to the first character of the run, the type of run and its parameters.
-  StyleStack styleStack;
+  StyleStack<RunIndex> styleStack;
+
+  // Stores a struct with the index to the first character of the color run & color font for the span.
+  StyleStack<Span> spanStack;
 
   // Points the next free position in the vector of runs.
-  StyleStack::RunIndex colorRunIndex               = 0u;
-  StyleStack::RunIndex fontRunIndex                = 0u;
-  StyleStack::RunIndex underlinedCharacterRunIndex = 0u;
-  StyleStack::RunIndex backgroundRunIndex          = 0u;
+  RunIndex colorRunIndex               = 0u;
+  RunIndex fontRunIndex                = 0u;
+  RunIndex underlinedCharacterRunIndex = 0u;
+  RunIndex backgroundRunIndex          = 0u;
 
   // check tag reference
   int colorTagReference      = 0u;
@@ -769,6 +887,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   int bTagReference          = 0u;
   int uTagReference          = 0u;
   int backgroundTagReference = 0u;
+  int spanTagReference       = 0u;
 
   // Give an initial default value to the model's vectors.
   markupProcessData.colorRuns.Reserve(DEFAULT_VECTOR_SIZE);
@@ -855,6 +974,10 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       {
         ProcessTagForRun<ColorRun>(
           markupProcessData.backgroundColorRuns, styleStack, tag, characterIndex, backgroundRunIndex, backgroundTagReference, [](const Tag& tag, ColorRun& run) { ProcessBackground(tag, run); });
+      }
+      else if(TokenComparison(XHTML_SPAN_TAG, tag.buffer, tag.length))
+      {
+        ProcessSpanForRun(tag, spanStack, markupProcessData.colorRuns, markupProcessData.fontRuns, colorRunIndex, fontRunIndex, characterIndex, spanTagReference);
       }
     } // end if( IsTag() )
     else if(markupStringBuffer < markupStringEndBuffer)
