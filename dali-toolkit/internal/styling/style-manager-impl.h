@@ -46,6 +46,17 @@ class StyleManager : public Dali::BaseObject, public ConnectionTracker
 {
 public:
   /**
+   * @brief The Type of BrokenImage
+   */
+  enum BrokenImageType
+  {
+    SMALL,
+    NORMAL,
+    LARGE
+  };
+
+public:
+  /**
    * Singleton access
    *
    * @return The StyleManager object
@@ -93,6 +104,16 @@ public: // Public API
    * @copydoc Toolkit::StyleManager::GetConfigurations
    */
   const Property::Map GetConfigurations();
+
+  /**
+   * @copydoc Toolkit::DevelStyleManager::SetBrokenImageUrl
+   */
+  void SetBrokenImageUrl(BrokenImageType brokenImageType, const std::string& brokenImageUrl);
+
+  /**
+   * @copydoc Toolkit::DevelStyleManager::GetBrokenImageUrl
+   */
+  std::string GetBrokenImageUrl(BrokenImageType brokenImageType);
 
   /**
    * @brief Apply the theme style to a control.
@@ -232,6 +253,8 @@ private:
   BuilderMap mBuilderCache; ///< Cache of builders keyed by JSON file name
 
   Toolkit::Internal::FeedbackStyle* mFeedbackStyle; ///< Feedback style
+
+  std::vector<std::string> mBrokenImageUrls; ///< For brokenImage
 
   // Signals
   Toolkit::StyleManager::StyleChangedSignalType mControlStyleChangeSignal; ///< Emitted when the style( theme/font ) changes for the controls to style themselves

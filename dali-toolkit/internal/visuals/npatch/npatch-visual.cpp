@@ -562,7 +562,14 @@ void NPatchVisual::ApplyTextureAndUniforms()
     DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.GetUrl().c_str());
     textureSet = TextureSet::New();
 
-    Texture croppedImage = mFactoryCache.GetBrokenVisualImage();
+    Actor actor = mPlacementActor.GetHandle();
+    Vector2 imageSize = Vector2::ZERO;
+    if(actor)
+    {
+      imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+    }
+    mFactoryCache.GetBrokenImageRenderer(mImpl->mRenderer, imageSize);
+    Texture croppedImage = mImpl->mRenderer.GetTextures().GetTexture(0);
     textureSet.SetTexture(0u, croppedImage);
     mImpl->mRenderer.RegisterProperty("uFixed[0]", Vector2::ZERO);
     mImpl->mRenderer.RegisterProperty("uFixed[1]", Vector2::ZERO);

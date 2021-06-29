@@ -28,6 +28,16 @@ namespace Toolkit
 namespace DevelStyleManager
 {
 /**
+ * @brief The Type of BrokenImage
+ */
+enum BrokenImageType
+{
+  SMALL,
+  NORMAL,
+  LARGE
+};
+
+/**
  * @brief Gets all currently defined configurations.
  *
  * @pre The Builder has been initialized.
@@ -35,6 +45,21 @@ namespace DevelStyleManager
  * @return A property map to the currently defined configurations
 **/
 DALI_TOOLKIT_API const Property::Map GetConfigurations(StyleManager styleManager);
+
+/**
+   * @brief Sets an image to be used when a visual has failed to correctly render
+   * @param[in] styleManager The instance of StyleManager
+   * @param[in] brokenImageType The type of broken image
+   * @param[in] brokenImageUrl The broken image url
+   */
+DALI_TOOLKIT_API void SetBrokenImageUrl(StyleManager styleManager, DevelStyleManager::BrokenImageType brokenImageType, const std::string& brokenImageUrl);
+
+/**
+   * @brief Gets an image to be used when a visual has failed to correctly render
+   * @param[in] styleManager The instance of StyleManager
+   * @param[in] brokenImageType BrokenImage type
+   */
+DALI_TOOLKIT_API std::string GetBrokenImageUrl(StyleManager styleManager, DevelStyleManager::BrokenImageType brokenImageType);
 
 } // namespace DevelStyleManager
 

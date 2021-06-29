@@ -807,9 +807,14 @@ TextureSet AnimatedImageVisual::SetLoadingFailed()
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::FAILED)\n");
   ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
 
-  TextureSet textureSet  = TextureSet::New();
-  Texture    brokenImage = mFactoryCache.GetBrokenVisualImage();
-  textureSet.SetTexture(0u, brokenImage);
+  Actor actor = mPlacementActor.GetHandle();
+  Vector2 imageSize = Vector2::ZERO;
+  if(actor)
+  {
+    imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+  }
+  mFactoryCache.GetBrokenImageRenderer(mImpl->mRenderer, imageSize);
+  TextureSet textureSet = mImpl->mRenderer.GetTextures();
 
   if(mFrameDelayTimer)
   {
