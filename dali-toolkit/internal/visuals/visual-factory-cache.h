@@ -28,6 +28,7 @@
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 
 namespace Dali
 {
@@ -177,12 +178,6 @@ public:
   static Geometry CreateGridGeometry(Uint16Pair gridSize);
 
   /**
-   * @brief Returns a new Texture to use when a visual has failed to correctly render
-   * @return The broken image texture.
-   */
-  Texture GetBrokenVisualImage();
-
-  /**
    * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
    */
   void SetPreMultiplyOnLoad(bool preMultiply);
@@ -194,9 +189,16 @@ public:
 
   /**
    * @brief Set an image to be used when a visual has failed to correctly render
-   * @param[in] brokenImageUrl The broken image url.
+   * @param[in] brokenImageUrlList The broken image url list
    */
-  void SetBrokenImageUrl(const std::string& brokenImageUrl);
+  void SetBrokenImageUrl(const std::vector<std::string>& brokenImageUrlList);
+
+  /**
+   * @brief Update the broken image Renderer object
+   * @param[in,out] renderer renderer for broken image
+   * @param[in] size the size of actor
+   */
+  void UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size);
 
 public:
   /**
@@ -241,17 +243,108 @@ protected:
   VisualFactoryCache& operator=(const VisualFactoryCache& rhs);
 
 private:
+  /**
+   * @brief Returns a cached Texture to use when a visual has failed to correctly render
+   * @param[in] brokenIndex The index of broken image
+   *
+   * @return The broken image texture.
+   */
+  Texture GetBrokenVisualImage(uint32_t brokenIndex);
+
+  /**
+   * @brief Gets the Proper broken image index
+   * @param[in] size The size of actor
+   *
+   * @return The index of broken image
+   */
+  int32_t GetProperBrokenImageIndex(const Vector2& size);
+
+  /**
+   * @brief Apply a texture and uniforms
+   *
+   * @param[in,out] renderer The renderer for broken image
+   * @param[in] index The index of broken image
+   */
+  void ApplyTextureAndUniforms(Renderer& renderer, int index);
+
+  /**
+   * @brief Creates a Npatch Geometry object
+   *
+   * @param[in] gridSize The gridSize for creating a geometry
+   * @return The Geometry for NPatch
+   */
+  Geometry CreateNPatchGeometry(Uint16Pair gridSize);
+
+  /**
+   * @brief Gets a geometry for npatch image
+   *
+   * @param[in] index the index of broken image
+   * @return The Geometry for NPatch
+   */
+  Geometry GetNPatchGeometry(int index);
+
+  /**
+   * @brief Gets the Npatch Shader object
+   *
+   * @param[in] index The index of broken image
+   * @return The Shader for NPatch
+   */
+  Shader GetNPatchShader(int index);
+
+  /**
+   * @brief Registers a properties for Stretch Ranges
+   *
+   * @param[in,out] renderer The renderer for broken image
+   * @param[in] uniformName The name of the uniform
+   * @param[in] stretchPixels The stretchable pixels in the cropped image space
+   * @param[in] imageExtent The imageExtent
+   */
+  void RegisterStretchProperties(Renderer& renderer, const char* uniformName, const NPatchUtility::StretchRanges& stretchPixels, uint16_t imageExtent);
+
+  /**
+   * @brief Returns a broken image type
+   * @param[in] index BrokenImage index
+   * @return The broken image type.
+   */
+  VisualUrl::Type GetBrokenImageVisualType(int index);
+
+private:
+  struct BrokenImageInfo
+  {
+    BrokenImageInfo()
+    :visualType(),
+     url(""),
+     npatchId(NPatchData::INVALID_NPATCH_DATA_ID),
+     texture(),
+     width(0),
+     height(0)
+    {
+    }
+
+    ~BrokenImageInfo()
+    {
+    }
+
+    // Data
+    VisualUrl::Type                         visualType;
+    std::string                             url;
+    NPatchData::NPatchDataId                npatchId;
+    Texture                                 texture;
+    uint32_t                                width;
+    uint32_t                                height;
+  };
+
   Geometry mGeometry[GEOMETRY_TYPE_MAX + 1];
   Shader   mShader[SHADER_TYPE_MAX + 1];
 
   ImageAtlasManagerPtr                    mAtlasManager;
   TextureManager                          mTextureManager;
   NPatchLoader                            mNPatchLoader;
-  Texture                                 mBrokenImageTexture;
+
   SvgRasterizeThread*                     mSvgRasterizeThread;
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;
-  std::string                             mBrokenImageUrl;
   bool                                    mPreMultiplyOnLoad;
+  std::vector<BrokenImageInfo>            mBrokenImageInfoContainer;
 };
 
 } // namespace Internal

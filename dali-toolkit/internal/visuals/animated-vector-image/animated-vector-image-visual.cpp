@@ -305,14 +305,10 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
 
   if(mLoadFailed)
   {
-    TextureSet textureSet = TextureSet::New();
-    mImpl->mRenderer.SetTextures(textureSet);
-
-    Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
-    textureSet.SetTexture(0u, brokenImage);
-
+    Vector2 imageSize = Vector2::ZERO;
+    imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
     actor.AddRenderer(mImpl->mRenderer);
-
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
   }
   else
