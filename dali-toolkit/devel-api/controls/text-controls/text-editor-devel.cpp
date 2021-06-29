@@ -40,6 +40,11 @@ AnchorClickedSignalType& AnchorClickedSignal(TextEditor textEditor)
   return GetImpl(textEditor).AnchorClickedSignal();
 }
 
+InputFilteredSignalType& InputFilteredSignal(TextEditor textEditor)
+{
+  return GetImpl(textEditor).InputFilteredSignal();
+}
+
 void SelectWholeText(TextEditor textEditor)
 {
   GetImpl(textEditor).SelectWholeText();

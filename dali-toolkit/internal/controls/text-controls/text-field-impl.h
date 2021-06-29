@@ -109,6 +109,11 @@ public:
    */
   DevelTextField::AnchorClickedSignalType& AnchorClickedSignal();
 
+  /**
+   * @copydoc TextField::InputFilteredSignal()
+   */
+  DevelTextField::InputFilteredSignalType& InputFilteredSignal();
+
   Text::ControllerPtr getController();
 
 private: // From Control
@@ -220,6 +225,11 @@ private: // From Control
    * @copydoc Text::EditableControlInterface::AddDecoration()
    */
   void AddDecoration(Actor& actor, bool needsClipping) override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::InputFiltered()
+   */
+  void InputFiltered(Toolkit::InputFilter::Property::Type type) override;
 
   // From SelectableControlInterface
 public:
@@ -359,6 +369,7 @@ private: // Data
   Toolkit::TextField::MaxLengthReachedSignalType   mMaxLengthReachedSignal;
   Toolkit::TextField::InputStyleChangedSignalType  mInputStyleChangedSignal;
   Toolkit::DevelTextField::AnchorClickedSignalType mAnchorClickedSignal;
+  Toolkit::DevelTextField::InputFilteredSignalType mInputFilteredSignal;
 
   InputMethodContext       mInputMethodContext;
   Text::ControllerPtr      mController;

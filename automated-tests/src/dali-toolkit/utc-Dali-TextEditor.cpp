@@ -107,6 +107,7 @@ const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSize
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
 const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "inputMethodSettings";
+const char* const PROPERTY_NAME_INPUT_FILTER                         = "inputFilter";
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
@@ -135,6 +136,8 @@ const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 static bool gAnchorClickedCallBackCalled;
 static bool gAnchorClickedCallBackNotCalled;
 static bool gTextChangedCallBackCalled;
+static bool gInputFilteredAcceptedCallbackCalled;
+static bool gInputFilteredRejectedCallbackCalled;
 static bool gInputStyleChangedCallbackCalled;
 static bool gMaxCharactersCallBackCalled;
 static Dali::Toolkit::TextEditor::InputStyle::Mask gInputStyleMask;
@@ -185,6 +188,20 @@ static void TestMaxLengthReachedCallback( TextEditor control )
   tet_infoline(" TestMaxLengthReachedCallback");
 
   gMaxCharactersCallBackCalled = true;
+}
+
+static void TestInputFilteredCallback(TextEditor control, Toolkit::InputFilter::Property::Type type)
+{
+  tet_infoline(" TestInputFilteredCallback");
+
+  if(type == Toolkit::InputFilter::Property::ACCEPTED)
+  {
+    gInputFilteredAcceptedCallbackCalled = true;
+  }
+  else if(type == Toolkit::InputFilter::Property::REJECTED)
+  {
+    gInputFilteredRejectedCallbackCalled = true;
+  }
 }
 
 // Generate a KeyEvent to send to Core.
@@ -515,6 +532,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_COLOR ) == DevelTextEditor::Property::GRAB_HANDLE_COLOR );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_METHOD_SETTINGS ) == DevelTextEditor::Property::INPUT_METHOD_SETTINGS );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_FILTER ) == DevelTextEditor::Property::INPUT_FILTER );
 
   END_TEST;
 }
@@ -968,6 +986,21 @@ int UtcDaliTextEditorSetPropertyP(void)
   int variation = 0;
   DALI_TEST_CHECK( map[ "VARIATION" ].Get( variation ) );
   DALI_TEST_EQUALS( inputVariation, variation, TEST_LOCATION );
+
+  // Check the input filter property
+  Property::Map inputFilterMapSet;
+  Property::Map inputFilterMapGet;
+  inputFilterMapSet[InputFilter::Property::ACCEPTED] = "[\\w]";
+  inputFilterMapSet[InputFilter::Property::REJECTED] = "[\\d]";
+
+  editor.SetProperty(DevelTextEditor::Property::INPUT_FILTER, inputFilterMapSet);
+
+  inputFilterMapGet = editor.GetProperty<Property::Map>(DevelTextEditor::Property::INPUT_FILTER);
+  DALI_TEST_EQUALS(inputFilterMapGet.Count(), inputFilterMapSet.Count(), TEST_LOCATION);
+
+  // Clear
+  inputFilterMapSet.Clear();
+  editor.SetProperty(DevelTextEditor::Property::INPUT_FILTER, inputFilterMapSet);
 
   application.SendNotification();
   application.Render();
@@ -3101,6 +3134,58 @@ int utcDaliTextEditorMaxCharactersReached(void)
 
   DALI_TEST_CHECK( gMaxCharactersCallBackCalled );
   DALI_TEST_CHECK( maxLengthReachedSignal );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorInputFiltered(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorInputFiltered");
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  application.GetScene().Add(editor);
+
+  Property::Map inputFilter;
+
+  // Only digit is accepted.
+  inputFilter[InputFilter::Property::ACCEPTED] = "[\\d]";
+
+  // Set input filter to TextEditor.
+  editor.SetProperty(DevelTextEditor::Property::INPUT_FILTER, inputFilter);
+
+  editor.SetKeyInputFocus();
+
+  // connect to the input filtered signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextEditor::InputFilteredSignal(editor).Connect(&TestInputFilteredCallback);
+  bool inputFilteredSignal = false;
+  editor.ConnectSignal(testTracker, "inputFiltered", CallbackFunctor(&inputFilteredSignal));
+
+  gInputFilteredAcceptedCallbackCalled = false;
+
+  application.ProcessEvent(GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ));
+
+  DALI_TEST_CHECK(gInputFilteredAcceptedCallbackCalled);
+  DALI_TEST_CHECK(inputFilteredSignal);
+
+  // Word is rejected.
+  inputFilter[InputFilter::Property::ACCEPTED] = "";
+  inputFilter[InputFilter::Property::REJECTED] = "[\\w]";
+
+  // Set input filter to TextEditor.
+  editor.SetProperty(DevelTextEditor::Property::INPUT_FILTER, inputFilter);
+
+  editor.SetKeyInputFocus();
+
+  inputFilteredSignal = false;
+  gInputFilteredRejectedCallbackCalled = false;
+
+  application.ProcessEvent(GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  DALI_TEST_CHECK(gInputFilteredAcceptedCallbackCalled);
+  DALI_TEST_CHECK(inputFilteredSignal);
 
   END_TEST;
 }

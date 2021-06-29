@@ -35,6 +35,11 @@ AnchorClickedSignalType& AnchorClickedSignal(TextField textField)
   return GetImpl(textField).AnchorClickedSignal();
 }
 
+InputFilteredSignalType& InputFilteredSignal(TextField textField)
+{
+  return GetImpl(textField).InputFilteredSignal();
+}
+
 void SelectWholeText(TextField textField)
 {
   GetImpl(textField).SelectWholeText();

@@ -1618,6 +1618,23 @@ void Controller::GetHiddenInputOption(Property::Map& options)
   }
 }
 
+void Controller::SetInputFilterOption(const Property::Map& options)
+{
+  if(!mImpl->mInputFilter)
+  {
+    mImpl->mInputFilter = std::unique_ptr<InputFilter>(new InputFilter());
+  }
+  mImpl->mInputFilter->SetProperties(options);
+}
+
+void Controller::GetInputFilterOption(Property::Map& options)
+{
+  if(NULL != mImpl->mInputFilter)
+  {
+    mImpl->mInputFilter->GetProperties(options);
+  }
+}
+
 void Controller::SetPlaceholderProperty(const Property::Map& map)
 {
   PlaceholderHandler::SetPlaceholderProperty(*this, map);
