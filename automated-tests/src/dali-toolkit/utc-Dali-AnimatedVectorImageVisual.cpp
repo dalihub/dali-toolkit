@@ -1596,18 +1596,19 @@ int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
 
+  // Make delay to drop frames
+  Test::VectorAnimationRenderer::DelayRendering(170); // longer than 16.6 * 10frames
+
   application.SendNotification();
   application.Render();
 
   // Trigger count is 1 - render the first frame
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
-  // Make delay to drop frames
-  Test::VectorAnimationRenderer::DelayRendering(170); // longer than 16.6 * 10frames
-
-  // Check dropped frame
+  // Wait for calculating frame drops
   DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
 
+  // Check dropped frame
   uint32_t frames = Test::VectorAnimationRenderer::GetDroppedFrames();
   DALI_TEST_CHECK(frames >= 9);
 

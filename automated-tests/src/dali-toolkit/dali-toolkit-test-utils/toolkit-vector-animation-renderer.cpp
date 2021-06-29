@@ -52,6 +52,7 @@ public:
     mDelayTime(0),
     mDroppedFrames(0),
     mFrameRate( 60.0f ),
+    mTestFrameDrop(false),
     mNeedDroppedFrames(false),
     mEventThreadCallback( new EventThreadCallback( MakeCallback( this, &VectorAnimationRenderer::OnTriggered ) ) )
   {
@@ -79,6 +80,7 @@ public:
     {
       // Change total frame number for test
       mTotalFrameNumber = 200;
+      mTestFrameDrop = true;
     }
     return true;
   }
@@ -112,10 +114,10 @@ public:
 
   bool Render( uint32_t frameNumber )
   {
-    if(mDelayTime != 0)
+    if(mTestFrameDrop)
     {
       std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int32_t>(mDelayTime)));
-      mDelayTime = 0;
+      mTestFrameDrop = false;
       mNeedDroppedFrames = true;
     }
     else if(mNeedDroppedFrames)
@@ -199,6 +201,7 @@ public:
   uint32_t mDelayTime;
   uint32_t mDroppedFrames;
   float mFrameRate;
+  bool mTestFrameDrop;
   bool mNeedDroppedFrames;
   Dali::VectorAnimationRenderer::UploadCompletedSignalType mUploadCompletedSignal;
   std::unique_ptr< EventThreadCallback > mEventThreadCallback;
