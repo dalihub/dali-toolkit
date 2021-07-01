@@ -24,6 +24,9 @@
 #include <dali/public-api/signals/callback.h>
 #include <string.h>
 
+// INTERNAL HEADERS
+#include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -130,7 +133,7 @@ void ImageAtlas::SetBrokenImage(const std::string& brokenImageUrl)
 }
 
 bool ImageAtlas::Upload(Vector4&             textureRect,
-                        const std::string&   url,
+                        const VisualUrl&     url,
                         ImageDimensions      size,
                         FittingMode::Type    fittingMode,
                         bool                 orientationCorrection,
@@ -140,7 +143,7 @@ bool ImageAtlas::Upload(Vector4&             textureRect,
   ImageDimensions zero;
   if(size == zero) // image size not provided
   {
-    dimensions = Dali::GetClosestImageSize(url);
+    dimensions = Dali::GetClosestImageSize(url.GetUrl());
     if(dimensions == zero) // Fail to read the image & broken image file exists
     {
       if(!mBrokenImageUrl.empty())
@@ -159,7 +162,7 @@ bool ImageAtlas::Upload(Vector4&             textureRect,
   unsigned int packPositionY = 0;
   if(mPacker.Pack(dimensions.GetWidth(), dimensions.GetHeight(), packPositionX, packPositionY))
   {
-    unsigned short loadId = mAsyncLoader.Load(url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection);
+    unsigned short loadId = GetImplementation(mAsyncLoader).Load(url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
     mLoadingTaskInfoContainer.PushBack(new LoadingTaskInfo(loadId, packPositionX, packPositionY, dimensions.GetWidth(), dimensions.GetHeight(), atlasUploadObserver));
     // apply the half pixel correction
     textureRect.x = (static_cast<float>(packPositionX) + 0.5f) / mWidth;                      // left
