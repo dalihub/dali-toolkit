@@ -1211,6 +1211,7 @@ void TextField::OnInitialize()
   // Forward input events to controller
   EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP | GestureType::PAN | GestureType::LONG_PRESS));
   GetTapGestureDetector().SetMaximumTapsRequired(2);
+  GetTapGestureDetector().ReceiveAllTapEvents(true);
 
   self.TouchedSignal().Connect(this, &TextField::OnTouched);
 
