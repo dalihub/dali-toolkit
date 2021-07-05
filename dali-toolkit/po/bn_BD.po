@@ -16,3 +16,8 @@ msgstr "পেস্ট করুন"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "ক্লিপবোর্ড"
 
+msgid "icon"
+msgstr "Icon"
+
+msgid "slider"
+msgstr "স্লাইডার"

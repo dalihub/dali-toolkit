@@ -16,3 +16,8 @@ msgstr "Zalijepi"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Međuspremnik"
 
+msgid "icon"
+msgstr "Ikona"
+
+msgid "slider"
+msgstr "Klizač"

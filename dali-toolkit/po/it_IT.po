@@ -16,3 +16,8 @@ msgstr "Incolla"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Appunti"
 
+msgid "icon"
+msgstr "Icona"
+
+msgid "slider"
+msgstr "Dispositivo di scorrimento"

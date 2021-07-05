@@ -113,6 +113,11 @@ public:
   Dali::Accessibility::Role GetRole() override;
 
   /**
+   * @copydoc Dali::Accessibility::Accessible::GetLocalizedRoleName()
+   */
+  std::string GetLocalizedRoleName() override;
+
+  /**
    * @copydoc Dali::Accessibility::Accessible::GetStates()
    */
   Dali::Accessibility::States GetStates() override;

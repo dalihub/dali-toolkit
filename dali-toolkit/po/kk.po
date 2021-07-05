@@ -16,3 +16,8 @@ msgstr "Қою"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Буфер"
 
+msgid "icon"
+msgstr "Белгіше"
+
+msgid "slider"
+msgstr "Сырғытпа"

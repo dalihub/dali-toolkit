@@ -93,6 +93,11 @@ public:
   DevelTextEditor::AnchorClickedSignalType& AnchorClickedSignal();
 
   /**
+   * @copydoc Dali::Toollkit::TextEditor::InputFilteredSignal()
+   */
+  DevelTextEditor::InputFilteredSignalType& InputFilteredSignal();
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -227,6 +232,16 @@ private: // From Control
    * @copydoc Text::EditableControlInterface::AddDecoration()
    */
   void AddDecoration(Actor& actor, bool needsClipping) override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::InputFiltered()
+   */
+  void InputFiltered(Toolkit::InputFilter::Property::Type type) override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::GetControlBackgroundColor()
+   */
+  void GetControlBackgroundColor(Vector4& color) const override;
 
   // From SelectableControlInterface
 public:
@@ -398,6 +413,7 @@ private: // Data
   Toolkit::TextEditor::ScrollStateChangedSignalType    mScrollStateChangedSignal;
   Toolkit::DevelTextEditor::MaxLengthReachedSignalType mMaxLengthReachedSignal;
   Toolkit::DevelTextEditor::AnchorClickedSignalType    mAnchorClickedSignal;
+  Toolkit::DevelTextEditor::InputFilteredSignalType    mInputFilteredSignal;
 
   InputMethodContext            mInputMethodContext;
   Text::ControllerPtr           mController;

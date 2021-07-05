@@ -16,3 +16,5 @@ msgstr "Beilleszt"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Vágólap"
 
+msgid "slider"
+msgstr "csúszka"

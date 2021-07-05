@@ -16,3 +16,5 @@ msgstr "粘贴"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "剪贴板"
 
+msgid "slider"
+msgstr "滑块"

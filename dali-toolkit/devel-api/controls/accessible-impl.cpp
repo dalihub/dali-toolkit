@@ -19,6 +19,10 @@
 #include "accessible-impl.h"
 
 // EXTERNAL INCLUDES
+#ifdef DGETTEXT_ENABLED
+#include <libintl.h>
+#endif
+
 #include <dali/devel-api/actors/actor-devel.h>
 
 // INTERNAL INCLUDES
@@ -30,6 +34,17 @@
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
 namespace Dali::Toolkit::DevelControl {
+
+static std::string GetLocaleText(std::string string, const char *domain = "dali-toolkit")
+{
+#ifdef DGETTEXT_ENABLED
+    /*TODO: currently non-localized string is used as a key for translation lookup. In case the lookup key formatting is forced
+          consider calling utility function for converting non-localized string into well-formatted key before lookup. */
+    return dgettext(domain, string.c_str());
+#else
+    return string;
+#endif
+}
 
 AccessibleImpl::AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal)
 : self(self),
@@ -72,21 +87,31 @@ std::string AccessibleImpl::GetName()
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  std::string name;
 
   if(!controlImpl.mAccessibilityGetNameSignal.Empty())
   {
-    std::string ret;
-    controlImpl.mAccessibilityGetNameSignal.Emit(ret);
-    return ret;
+    controlImpl.mAccessibilityGetNameSignal.Emit(name);
+  }
+  else if(controlImpl.mAccessibilityNameSet)
+  {
+    name = controlImpl.mAccessibilityName;
+  }
+  else if(auto raw = GetNameRaw(); !raw.empty())
+  {
+    name = raw;
+  }
+  else
+  {
+    name = Self().GetProperty<std::string>(Actor::Property::NAME);
   }
 
-  if(controlImpl.mAccessibilityNameSet)
-    return controlImpl.mAccessibilityName;
+  if(controlImpl.mAccessibilityTranslationDomainSet)
+  {
+    return GetLocaleText(name, controlImpl.mAccessibilityTranslationDomain.c_str());
+  }
 
-  if(auto raw = GetNameRaw(); !raw.empty())
-    return raw;
-
-  return Self().GetProperty<std::string>(Actor::Property::NAME);
+  return GetLocaleText(name);
 }
 
 std::string AccessibleImpl::GetNameRaw()
@@ -100,23 +125,31 @@ std::string AccessibleImpl::GetDescription()
 
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  std::string description;
 
   if(!controlImpl.mAccessibilityGetDescriptionSignal.Empty())
   {
-    std::string ret;
-    controlImpl.mAccessibilityGetDescriptionSignal.Emit(ret);
-    return ret;
+    controlImpl.mAccessibilityGetDescriptionSignal.Emit(description);
+  }
+  else if(controlImpl.mAccessibilityDescriptionSet)
+  {
+    description = controlImpl.mAccessibilityDescription;
+  }
+  else
+  {
+    description = GetDescriptionRaw();
+  }
+  if(controlImpl.mAccessibilityTranslationDomainSet)
+  {
+    return GetLocaleText(description, controlImpl.mAccessibilityTranslationDomain.c_str());
   }
 
-  if(controlImpl.mAccessibilityDescriptionSet)
-    return controlImpl.mAccessibilityDescription;
-
-  return GetDescriptionRaw();
+  return GetLocaleText(description);
 }
 
 std::string AccessibleImpl::GetDescriptionRaw()
 {
-  return "";
+  return {};
 }
 
 Dali::Accessibility::Accessible* AccessibleImpl::GetParent()
@@ -153,6 +186,11 @@ size_t AccessibleImpl::GetIndexInParent()
 Dali::Accessibility::Role AccessibleImpl::GetRole()
 {
   return Self().GetProperty<Dali::Accessibility::Role>(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE);
+}
+
+std::string AccessibleImpl::GetLocalizedRoleName()
+{
+  return GetLocaleText(GetRoleName());
 }
 
 Dali::Accessibility::States AccessibleImpl::CalculateStates()
@@ -260,7 +298,7 @@ static Dali::Actor CreateHighlightIndicatorActor()
   // keyboard focusable actors
   auto actor = Toolkit::ImageView::New(focusBorderImagePath);
   actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  DevelControl::AppendAccessibilityAttribute(actor, "highlight", "");
+  DevelControl::AppendAccessibilityAttribute(actor, "highlight", std::string());
   actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
 
   return actor;
@@ -339,7 +377,7 @@ bool AccessibleImpl::ClearHighlight()
 
 std::string AccessibleImpl::GetActionName(size_t index)
 {
-  if(index >= GetActionCount()) return "";
+  if(index >= GetActionCount()) return {};
   Dali::TypeInfo type;
   Self().GetTypeInfo(type);
   DALI_ASSERT_ALWAYS(type && "no TypeInfo object");
@@ -348,13 +386,12 @@ std::string AccessibleImpl::GetActionName(size_t index)
 
 std::string AccessibleImpl::GetLocalizedActionName(size_t index)
 {
-  // TODO: add localization
-  return GetActionName(index);
+  return GetLocaleText(GetActionName(index));
 }
 
 std::string AccessibleImpl::GetActionDescription(size_t index)
 {
-  return "";
+  return {};
 }
 
 size_t AccessibleImpl::GetActionCount()
@@ -367,7 +404,7 @@ size_t AccessibleImpl::GetActionCount()
 
 std::string AccessibleImpl::GetActionKeyBinding(size_t index)
 {
-  return "";
+  return {};
 }
 
 bool AccessibleImpl::DoAction(size_t index)

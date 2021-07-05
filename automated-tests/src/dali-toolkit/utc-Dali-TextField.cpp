@@ -106,6 +106,7 @@ const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGr
 const char* const PROPERTY_NAME_BACKGROUND                           = "textBackground";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
+const char* const PROPERTY_NAME_INPUT_FILTER                         = "inputFilter";
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
@@ -125,6 +126,8 @@ static bool gAnchorClickedCallBackCalled;
 static bool gAnchorClickedCallBackNotCalled;
 static bool gTextChangedCallBackCalled;
 static bool gMaxCharactersCallBackCalled;
+static bool gInputFilteredAcceptedCallbackCalled;
+static bool gInputFilteredRejectedCallbackCalled;
 static bool gInputStyleChangedCallbackCalled;
 static Dali::Toolkit::TextField::InputStyle::Mask gInputStyleMask;
 
@@ -232,6 +235,20 @@ static void TestMaxLengthReachedCallback( TextField control )
   tet_infoline(" TestMaxLengthReachedCallback");
 
   gMaxCharactersCallBackCalled = true;
+}
+
+static void TestInputFilteredCallback(TextField control, Toolkit::InputFilter::Property::Type type)
+{
+  tet_infoline(" TestInputFilteredCallback");
+
+  if(type == Toolkit::InputFilter::Property::ACCEPTED)
+  {
+    gInputFilteredAcceptedCallbackCalled = true;
+  }
+  else if(type == Toolkit::InputFilter::Property::REJECTED)
+  {
+    gInputFilteredRejectedCallbackCalled = true;
+  }
 }
 
 static void TestInputStyleChangedCallback( TextField control, TextField::InputStyle::Mask mask )
@@ -526,6 +543,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP ) == DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_BACKGROUND ) == DevelTextField::Property::BACKGROUND );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_GRAB_HANDLE_COLOR ) == DevelTextField::Property::GRAB_HANDLE_COLOR );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_FILTER ) == DevelTextField::Property::INPUT_FILTER );
 
   END_TEST;
 }
@@ -999,6 +1017,21 @@ int UtcDaliTextFieldSetPropertyP(void)
   //Check handle color
   field.SetProperty( DevelTextField::Property::GRAB_HANDLE_COLOR, Color::GREEN );
   DALI_TEST_EQUALS( field.GetProperty<Vector4>( DevelTextField::Property::GRAB_HANDLE_COLOR ), Color::GREEN, TEST_LOCATION );
+
+  // Check the input filter property
+  Property::Map inputFilterMapSet;
+  Property::Map inputFilterMapGet;
+  inputFilterMapSet[InputFilter::Property::ACCEPTED] = "[\\w]";
+  inputFilterMapSet[InputFilter::Property::REJECTED] = "[\\d]";
+
+  field.SetProperty(DevelTextField::Property::INPUT_FILTER, inputFilterMapSet);
+
+  inputFilterMapGet = field.GetProperty<Property::Map>(DevelTextField::Property::INPUT_FILTER);
+  DALI_TEST_EQUALS(inputFilterMapGet.Count(), inputFilterMapSet.Count(), TEST_LOCATION);
+
+  // Clear
+  inputFilterMapSet.Clear();
+  field.SetProperty(DevelTextField::Property::INPUT_FILTER, inputFilterMapSet);
 
   application.SendNotification();
   application.Render();
@@ -1540,6 +1573,135 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
 
   DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
   DALI_TEST_CHECK( !maxLengthReachedSignal );
+
+  END_TEST;
+}
+
+// Positive test for Input Filtered signal.
+int utcDaliTextFieldInputFilteredP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldInputFilteredP");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+
+  Property::Map inputFilter;
+
+  // Only digit is accepted.
+  inputFilter[InputFilter::Property::ACCEPTED] = "[\\d]";
+
+  // Set input filter to TextField.
+  field.SetProperty(DevelTextField::Property::INPUT_FILTER, inputFilter);
+
+  field.SetKeyInputFocus();
+
+  // connect to the input filtered signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::InputFilteredSignal(field).Connect(&TestInputFilteredCallback);
+  bool inputFilteredSignal = false;
+  field.ConnectSignal(testTracker, "inputFiltered", CallbackFunctor(&inputFilteredSignal));
+
+  gInputFilteredAcceptedCallbackCalled = false;
+
+  application.ProcessEvent(GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ));
+
+  DALI_TEST_CHECK(gInputFilteredAcceptedCallbackCalled);
+  DALI_TEST_CHECK(inputFilteredSignal);
+
+  // Word is rejected.
+  inputFilter[InputFilter::Property::ACCEPTED] = "";
+  inputFilter[InputFilter::Property::REJECTED] = "[\\w]";
+
+  // Set input filter to TextField.
+  field.SetProperty(DevelTextField::Property::INPUT_FILTER, inputFilter);
+
+  field.SetKeyInputFocus();
+
+  inputFilteredSignal = false;
+  gInputFilteredRejectedCallbackCalled = false;
+
+  application.ProcessEvent(GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  DALI_TEST_CHECK(gInputFilteredAcceptedCallbackCalled);
+  DALI_TEST_CHECK(inputFilteredSignal);
+
+  END_TEST;
+}
+
+// Negative test for Input Filtered signal.
+int utcDaliTextFieldInputFilteredN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldInputFilteredP");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+
+  Property::Map inputFilter;
+
+  // Only word is accepted.
+  inputFilter[InputFilter::Property::ACCEPTED] = "[\\w]";
+
+  // Set input filter to TextField.
+  field.SetProperty(DevelTextField::Property::INPUT_FILTER, inputFilter);
+
+  field.SetKeyInputFocus();
+
+  // connect to the input filtered signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::InputFilteredSignal(field).Connect(&TestInputFilteredCallback);
+  bool inputFilteredSignal = false;
+  field.ConnectSignal(testTracker, "inputFiltered", CallbackFunctor(&inputFilteredSignal));
+
+  gInputFilteredAcceptedCallbackCalled = false;
+
+  // Key a, d should not be filtered.
+  application.ProcessEvent(GenerateKey("a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::UP, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Backspace, Delete should not be filtered.
+  application.ProcessEvent(GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey( "Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(!gInputFilteredAcceptedCallbackCalled);
+  DALI_TEST_CHECK(!inputFilteredSignal);
+
+  // Digit is rejected.
+  inputFilter[InputFilter::Property::ACCEPTED] = "";
+  inputFilter[InputFilter::Property::REJECTED] = "[\\d]";
+
+  field.SetProperty(DevelTextField::Property::INPUT_FILTER, inputFilter);
+
+  field.SetKeyInputFocus();
+
+  inputFilteredSignal = false;
+  gInputFilteredRejectedCallbackCalled = false;
+
+  // Key a, d should not be filtered.
+  application.ProcessEvent(GenerateKey("a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::UP, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Backspace, Delete should not be filtered.
+  application.ProcessEvent(GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey( "Delete", "", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::DOWN, "Delete", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(!gInputFilteredAcceptedCallbackCalled);
+  DALI_TEST_CHECK(!inputFilteredSignal);
 
   END_TEST;
 }

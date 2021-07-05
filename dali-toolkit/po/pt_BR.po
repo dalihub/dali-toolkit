@@ -16,3 +16,8 @@ msgstr "Colar"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Área de transferência"
 
+msgid "icon"
+msgstr "Ícone"
+
+msgid "slider"
+msgstr "Controle deslizante"

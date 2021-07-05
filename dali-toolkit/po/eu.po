@@ -16,3 +16,8 @@ msgstr "Itsatsi"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Arbela"
 
+msgid "icon"
+msgstr "Ikonoa"
+
+msgid "slider"
+msgstr "Irristagailua"

@@ -16,3 +16,8 @@ msgstr "Lim inn"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Utklippstavle"
 
+msgid "icon"
+msgstr "Ikon"
+
+msgid "slider"
+msgstr "Glidebryter"

@@ -263,3 +263,38 @@ int UtcDaliTextEditorTextWithSpan(void)
 
   END_TEST;
 }
+
+int UtcDaliTextEditorControlBackgroundColor(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorControlBackgroundColor\n");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  Vector4 backgroundColor;
+
+  editor.SetProperty(TextEditor::Property::TEXT, "Background Color");
+  application.GetScene().Add(editor);
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextEditor& editorImpl = GetImpl(editor);
+  ControllerPtr controller = editorImpl.getController();
+  Controller::Impl& controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
+
+  // Default color is transparent
+  controllerImpl.mEditableControlInterface->GetControlBackgroundColor(backgroundColor);
+  DALI_TEST_EQUALS(backgroundColor, Color::TRANSPARENT, TEST_LOCATION);
+
+  // Set background color to red
+  editor.SetBackgroundColor(Color::RED);
+  application.SendNotification();
+  application.Render();
+
+  // Should be red
+  controllerImpl.mEditableControlInterface->GetControlBackgroundColor(backgroundColor);
+  DALI_TEST_EQUALS(backgroundColor, Color::RED, TEST_LOCATION);
+
+  END_TEST;
+}

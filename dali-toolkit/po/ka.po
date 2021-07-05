@@ -16,3 +16,8 @@ msgstr "ჩასმა"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "ბუფერული მეხს."
 
+msgid "icon"
+msgstr "ნიშანი"
+
+msgid "slider"
+msgstr "სლაიდერი"

@@ -247,12 +247,36 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", &controller, keyString.c_str());
       if(!controller.IsEditable()) return false;
 
-      if(!keyString.empty())
+      std::string refinedKey = keyString;
+      if(controller.mImpl->mInputFilter != NULL && !refinedKey.empty())
+      {
+        bool accepted = false;
+        bool rejected = false;
+        accepted      = controller.mImpl->mInputFilter->Contains(Toolkit::InputFilter::Property::ACCEPTED, keyString);
+        rejected      = controller.mImpl->mInputFilter->Contains(Toolkit::InputFilter::Property::REJECTED, keyString);
+
+        if(!accepted)
+        {
+          // The filtered key is set to empty.
+          refinedKey = "";
+          // Signal emits when the character to be inserted is filtered by the accepted filter.
+          controller.mImpl->mEditableControlInterface->InputFiltered(Toolkit::InputFilter::Property::ACCEPTED);
+        }
+        if(rejected)
+        {
+          // The filtered key is set to empty.
+          refinedKey = "";
+          // Signal emits when the character to be inserted is filtered by the rejected filter.
+          controller.mImpl->mEditableControlInterface->InputFiltered(Toolkit::InputFilter::Property::REJECTED);
+        }
+      }
+
+      if(!refinedKey.empty())
       {
         // InputMethodContext is no longer handling key-events
         controller.mImpl->ClearPreEditFlag();
 
-        controller.InsertText(keyString, COMMIT);
+        controller.InsertText(refinedKey, COMMIT);
 
         textChanged = true;
 

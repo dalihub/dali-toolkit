@@ -87,17 +87,20 @@ void Fade::OnPlay()
   Property::Map startPropertyMap;
   Property::Map finishPropertyMap;
 
+  float targetOpacity                              = GetWorldColor(targetControl).a;
+  targetControl[Dali::Actor::Property::COLOR_MODE] = Dali::ColorMode::USE_OWN_COLOR;
+
   if(IsAppearingTransition())
   {
     initialPropertyMap.Insert(Dali::Actor::Property::OPACITY, 0.0f);
-    startPropertyMap.Insert(Dali::Actor::Property::OPACITY, mOpacity);
-    finishPropertyMap.Insert(Dali::Actor::Property::OPACITY, targetControl[Dali::Actor::Property::OPACITY]);
+    startPropertyMap.Insert(Dali::Actor::Property::OPACITY, mOpacity * targetOpacity);
+    finishPropertyMap.Insert(Dali::Actor::Property::OPACITY, targetOpacity);
   }
   else
   {
-    initialPropertyMap.Insert(Dali::Actor::Property::OPACITY, targetControl[Dali::Actor::Property::OPACITY]);
-    startPropertyMap.Insert(Dali::Actor::Property::OPACITY, targetControl[Dali::Actor::Property::OPACITY]);
-    finishPropertyMap.Insert(Dali::Actor::Property::OPACITY, mOpacity);
+    initialPropertyMap.Insert(Dali::Actor::Property::OPACITY, targetOpacity);
+    startPropertyMap.Insert(Dali::Actor::Property::OPACITY, targetOpacity);
+    finishPropertyMap.Insert(Dali::Actor::Property::OPACITY, mOpacity * targetOpacity);
   }
 
   SetInitialPropertyMap(initialPropertyMap);

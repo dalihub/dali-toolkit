@@ -16,3 +16,5 @@ msgstr "Enganxar"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Porta-retalls"
 
+msgid "slider"
+msgstr "control lliscant"

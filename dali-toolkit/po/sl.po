@@ -16,3 +16,5 @@ msgstr "Prilepi"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Odložišče"
 
+msgid "slider"
+msgstr "drsnik"

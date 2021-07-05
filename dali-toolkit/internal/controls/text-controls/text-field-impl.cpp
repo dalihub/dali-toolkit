@@ -138,11 +138,13 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "enableEditing", 
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "fontSizeScale",                    FLOAT,     FONT_SIZE_SCALE                     )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "primaryCursorPosition",            INTEGER,   PRIMARY_CURSOR_POSITION             )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "grabHandleColor",                  VECTOR4,   GRAB_HANDLE_COLOR                   )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "inputFilter",                      MAP,       INPUT_FILTER                        )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",       SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",  SIGNAL_MAX_LENGTH_REACHED )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "inputStyleChanged", SIGNAL_INPUT_STYLE_CHANGED)
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "anchorClicked",     SIGNAL_ANCHOR_CLICKED     )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "inputFiltered",     SIGNAL_INPUT_FILTERED     )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -765,6 +767,15 @@ void TextField::SetProperty(BaseObject* object, Property::Index index, const Pro
         impl.RequestTextRelayout();
         break;
       }
+      case Toolkit::DevelTextField::Property::INPUT_FILTER:
+      {
+        const Property::Map* map = value.GetMap();
+        if(map)
+        {
+          impl.mController->SetInputFilterOption(*map);
+        }
+        break;
+      }
     } // switch
   }   // textfield
 }
@@ -1120,6 +1131,13 @@ Property::Value TextField::GetProperty(BaseObject* object, Property::Index index
         value = impl.mDecorator->GetHandleColor();
         break;
       }
+      case Toolkit::DevelTextField::Property::INPUT_FILTER:
+      {
+        Property::Map map;
+        impl.mController->GetInputFilterOption(map);
+        value = map;
+        break;
+      }
     } //switch
   }
 
@@ -1204,6 +1222,14 @@ bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       fieldImpl.AnchorClickedSignal().Connect(tracker, functor);
     }
   }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_INPUT_FILTERED))
+  {
+    if(field)
+    {
+      Internal::TextField& fieldImpl(GetImpl(field));
+      fieldImpl.InputFilteredSignal().Connect(tracker, functor);
+    }
+  }
   else
   {
     // signalName does not match any signal
@@ -1231,6 +1257,11 @@ Toolkit::TextField::InputStyleChangedSignalType& TextField::InputStyleChangedSig
 DevelTextField::AnchorClickedSignalType& TextField::AnchorClickedSignal()
 {
   return mAnchorClickedSignal;
+}
+
+DevelTextField::InputFilteredSignalType& TextField::InputFilteredSignal()
+{
+  return mInputFilteredSignal;
 }
 
 void TextField::OnInitialize()
@@ -1804,6 +1835,12 @@ void TextField::AnchorClicked(const std::string& href)
   mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
 }
 
+void TextField::InputFiltered(Toolkit::InputFilter::Property::Type type)
+{
+  Dali::Toolkit::TextField handle(GetOwner());
+  mInputFilteredSignal.Emit(handle, type);
+}
+
 void TextField::AddDecoration(Actor& actor, bool needsClipping)
 {
   if(actor)
@@ -1819,6 +1856,18 @@ void TextField::AddDecoration(Actor& actor, bool needsClipping)
       Self().Add(actor);
       mActiveLayer = actor;
     }
+  }
+}
+
+void TextField::GetControlBackgroundColor(Vector4& color) const
+{
+  Property::Value propValue = Self().GetProperty(Toolkit::Control::Property::BACKGROUND);
+  Property::Map*  resultMap = propValue.GetMap();
+
+  Property::Value* colorValue = nullptr;
+  if(resultMap && (colorValue = resultMap->Find(ColorVisual::Property::MIX_COLOR)))
+  {
+    colorValue->Get(color);
   }
 }
 
@@ -2166,8 +2215,8 @@ Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
   return states;
 }
 
-bool TextField::AccessibleImpl::InsertText(size_t startPosition,
-                                            std::string text)
+bool TextField::AccessibleImpl::InsertText(size_t      startPosition,
+                                           std::string text)
 {
   auto slf = Toolkit::TextField::DownCast(Self());
   auto txt = slf.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();

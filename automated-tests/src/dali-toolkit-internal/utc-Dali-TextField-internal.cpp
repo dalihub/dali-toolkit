@@ -347,3 +347,38 @@ int UtcDaliTextFieldTextWithSpan(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldControlBackgroundColor(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldControlBackgroundColor\n");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  Vector4 backgroundColor;
+
+  field.SetProperty(TextField::Property::TEXT, "Background Color");
+  application.GetScene().Add(field);
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextField& fieldImpl = GetImpl(field);
+  ControllerPtr controller = fieldImpl.getController();
+  Controller::Impl& controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
+
+  // Default color is transparent
+  controllerImpl.mEditableControlInterface->GetControlBackgroundColor(backgroundColor);
+  DALI_TEST_EQUALS(backgroundColor, Color::TRANSPARENT, TEST_LOCATION);
+
+  // Set background color to red
+  field.SetBackgroundColor(Color::RED);
+  application.SendNotification();
+  application.Render();
+
+  // Should be red
+  controllerImpl.mEditableControlInterface->GetControlBackgroundColor(backgroundColor);
+  DALI_TEST_EQUALS(backgroundColor, Color::RED, TEST_LOCATION);
+
+  END_TEST;
+}

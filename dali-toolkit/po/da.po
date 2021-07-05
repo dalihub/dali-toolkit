@@ -16,3 +16,8 @@ msgstr "Indsæt"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Udklipsholder"
 
+msgid "icon"
+msgstr "Ikon"
+
+msgid "slider"
+msgstr "skyder"

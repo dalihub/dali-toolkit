@@ -16,3 +16,8 @@ msgstr "Տեղադրել"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Գզրոց"
 
+msgid "icon"
+msgstr "Պատկերակ"
+
+msgid "slider"
+msgstr "Սողանիկ"

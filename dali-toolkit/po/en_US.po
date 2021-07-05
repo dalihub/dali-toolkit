@@ -16,3 +16,8 @@ msgstr "Paste"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Clipboard"
 
+msgid "icon"
+msgstr "Icon"
+
+msgid "slider"
+msgstr "Slider"

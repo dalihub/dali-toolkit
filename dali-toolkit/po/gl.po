@@ -16,3 +16,5 @@ msgstr "Pegar"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Portapapeis"
 
+msgid "slider"
+msgstr "Barra de desprazamento"

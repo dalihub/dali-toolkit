@@ -16,3 +16,5 @@ msgstr "Vložit"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Schránka"
 
+msgid "slider"
+msgstr "šoupátko"

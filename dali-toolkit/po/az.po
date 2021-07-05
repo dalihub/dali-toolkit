@@ -16,3 +16,8 @@ msgstr "Yapışdır"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Mübadilə buferi"
 
+msgid "icon"
+msgstr "Piktoqram"
+
+msgid "slider"
+msgstr "Sürüngəc"

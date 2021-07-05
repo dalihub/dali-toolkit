@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/input-style.h>
+#include <dali-toolkit/public-api/controls/text-controls/input-filter-properties.h>
 
 namespace Dali
 {
@@ -77,12 +78,26 @@ public:
   virtual void InputStyleChanged(InputStyle::Mask inputStyleMask) = 0;
 
   /**
+   * @brief Called when the character to be inserted is filtered by the input filter.
+   *
+   * @param[in] type The filter type is ACCEPTED or REJECTED.
+   */
+  virtual void InputFiltered(Toolkit::InputFilter::Property::Type type) = 0;
+
+  /**
    * @brief Add a decoration.
    *
    * @param[in] decoration The actor displaying a decoration.
    * @param[in] needsClipping Whether the actor needs clipping.
    */
   virtual void AddDecoration(Actor& actor, bool needsClipping) = 0;
+
+  /**
+   * @brief Gets the color of the control.
+   *
+   * @param[out] The color of the control.
+   */
+  virtual void GetControlBackgroundColor(Vector4& color) const = 0;
 
   /**
    * @brief Editable status (on/off).

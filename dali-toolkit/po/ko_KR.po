@@ -16,3 +16,5 @@ msgstr "붙여넣기"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "클립보드"
 
+msgid "slider"
+msgstr "슬라이더"

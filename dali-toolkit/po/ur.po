@@ -20,3 +20,5 @@ msgstr "جوڑ دیں"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "کلپ بورڈ"
 
+msgid "slider"
+msgstr ""

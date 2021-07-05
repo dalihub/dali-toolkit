@@ -16,3 +16,5 @@ msgstr "Wklej"
 msgid "IDS_COM_BODY_CLIPBOARD"
 msgstr "Schowek"
 
+msgid "slider"
+msgstr "slajder"
