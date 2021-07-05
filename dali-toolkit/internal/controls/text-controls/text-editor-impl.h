@@ -238,6 +238,11 @@ private: // From Control
    */
   void InputFiltered(Toolkit::InputFilter::Property::Type type) override;
 
+  /**
+   * @copydoc Text::EditableControlInterface::GetControlBackgroundColor()
+   */
+  void GetControlBackgroundColor(Vector4& color) const override;
+
   // From SelectableControlInterface
 public:
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -381,6 +381,50 @@ int UtcDaliTextControllerImfPreeditStyle(void)
 
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello w", text, TEST_LOCATION );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerImfPreeditStyleReverse(void)
+{
+  tet_infoline(" UtcDaliTextControllerImfPreeditStyleReverse");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  std::string text;
+  InputMethodContext::EventData imfEvent;
+
+  DALI_TEST_CHECK(controller);
+
+  // Configures the text controller similarly to the text-field.
+  ConfigureTextField(controller);
+
+  InputMethodContext inputMethodContext = InputMethodContext::New();
+
+  // Send PRE_EDIT event
+  imfEvent = InputMethodContext::EventData(InputMethodContext::PRE_EDIT, "Reverse", 0, 7);
+  controller->OnInputMethodContextEvent(inputMethodContext, imfEvent);
+
+  // For coverage, mEditableControlInterface is required.
+  // Creates a temporary text-field to use mEditableControlInterface.
+  TextField field = TextField::New();
+  Toolkit::Internal::TextField& fieldImpl = GetImpl(field);
+  ControllerPtr fieldController = fieldImpl.getController();
+  Controller::Impl& fieldControllerImpl = Controller::Impl::GetImplementation(*fieldController.Get());
+  Controller::Impl& controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
+
+  // For coverage, mEditableControlInterface is required.
+  controllerImpl.mEditableControlInterface = fieldControllerImpl.mEditableControlInterface;
+
+  // Set the preedit style as REVERSE
+  inputMethodContext.SetPreeditStyle(InputMethodContext::PreeditStyle::REVERSE);
+  controller->GetNaturalSize();
+
+  controller->GetText(text);
+  DALI_TEST_EQUALS("Reverse", text, TEST_LOCATION);
 
   tet_result(TET_PASS);
   END_TEST;
