@@ -1245,7 +1245,7 @@ CharacterIndex Controller::Impl::GetPrimaryCursorPosition() const
   return mEventData->mPrimaryCursorPosition;
 }
 
-bool Controller::Impl::SetPrimaryCursorPosition(CharacterIndex index)
+bool Controller::Impl::SetPrimaryCursorPosition(CharacterIndex index, bool focused)
 {
   if(nullptr == mEventData)
   {
@@ -1261,10 +1261,14 @@ bool Controller::Impl::SetPrimaryCursorPosition(CharacterIndex index)
 
   uint32_t length                    = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
   mEventData->mPrimaryCursorPosition = std::min(index, length);
-  ChangeState(EventData::EDITING);
-  mEventData->mLeftSelectionPosition = mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
-  mEventData->mUpdateCursorPosition                                        = true;
-  ScrollTextToMatchCursor();
+  // If there is no focus, only the value is updated.
+  if(focused)
+  {
+    ChangeState(EventData::EDITING);
+    mEventData->mLeftSelectionPosition = mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
+    mEventData->mUpdateCursorPosition                                        = true;
+    ScrollTextToMatchCursor();
+  }
   return true;
 }
 

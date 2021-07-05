@@ -1588,9 +1588,10 @@ public: // Text-input Event Queuing.
    * @brief Used to set the Primary cursor position.
    *
    * @param[in] index for the Primary cursor position.
+   * @param[in] focused true if UI control has gained focus to receive key event, false otherwise.
    * @return[in] true if cursor position changed, false otherwise.
    */
-  bool SetPrimaryCursorPosition(CharacterIndex index);
+  bool SetPrimaryCursorPosition(CharacterIndex index, bool focused);
 
   /**
    * @brief Creates a selection event.

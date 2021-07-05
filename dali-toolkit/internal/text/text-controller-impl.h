@@ -625,7 +625,7 @@ struct Controller::Impl
   /**
    * @copydoc Text::Controller::SetPrimaryCursorPosition()
    */
-  bool SetPrimaryCursorPosition(CharacterIndex index);
+  bool SetPrimaryCursorPosition(CharacterIndex index, bool focused);
 
   /**
    * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
