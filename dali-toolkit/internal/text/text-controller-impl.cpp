@@ -2106,8 +2106,10 @@ Actor Controller::Impl::CreateBackgroundActor()
 
       // Get the background color of the character.
       // The color index zero is reserved for the default background color (i.e. Color::TRANSPARENT)
-      const ColorIndex backgroundColorIndex = (nullptr == backgroundColorsBuffer) ? 0u : *(backgroundColorIndicesBuffer + i);
-      const Vector4&   backgroundColor      = (0u == backgroundColorIndex) ? defaultBackgroundColor : *(backgroundColorsBuffer + backgroundColorIndex - 1u);
+      const bool       isMarkupBackground       = mView.IsMarkupBackgroundColorSet();
+      const ColorIndex backgroundColorIndex     = isMarkupBackground ? *(backgroundColorIndicesBuffer + i) : 0u;
+      const bool       isDefaultBackgroundColor = (0u == backgroundColorIndex);
+      const Vector4&   backgroundColor          = isDefaultBackgroundColor ? defaultBackgroundColor : *(backgroundColorsBuffer + backgroundColorIndex - 1u);
 
       mModel->mVisualModel->GetNumberOfLines(i, 1, lineIndex, numberOfLines);
       Length lineHeight = lineRun[lineIndex].ascender + -(lineRun[lineIndex].descender) + lineRun[lineIndex].lineSpacing;
