@@ -683,6 +683,11 @@ private:
   void OnFrameRendered();
 
   /**
+   * @brief Callback function to be called when frame is rendered. This is to check initial buffer is ready.
+   */
+  void OnInitialFrameRendered();
+
+  /**
    * @brief Callback function to be called when visibility is changed.
    * @param[in] actor The actor, or child of actor, whose visibility has changed
    * @param[in] isVisible Whether the actor is now visible or not

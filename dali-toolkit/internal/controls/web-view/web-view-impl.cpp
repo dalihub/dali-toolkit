@@ -286,23 +286,12 @@ void WebView::LoadUrl(const std::string& url)
   mUrl = url;
   if(mWebEngine)
   {
-    Texture           texture        = Dali::Texture::New(*mWebEngine.GetNativeImageSource());
-    const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
-    mVisual                          = Toolkit::VisualFactory::Get().CreateVisual(
-      {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
-       {Toolkit::ImageVisual::Property::URL, nativeImageUrl}});
-
-    if(mVisual)
+    if(!mVisual)
     {
-      // Clean up previously registered visual and add new one.
-      DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
-      mWebEngine.LoadUrl(url);
+      mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnInitialFrameRendered);
     }
 
-    if(mVideoHoleEnabled)
-    {
-      EnableBlendMode(false);
-    }
+    mWebEngine.LoadUrl(url);
   }
 }
 
@@ -310,22 +299,12 @@ void WebView::LoadHtmlString(const std::string& htmlString)
 {
   if(mWebEngine)
   {
-    Texture           texture        = Dali::Texture::New(*mWebEngine.GetNativeImageSource());
-    const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
-    mVisual                          = Toolkit::VisualFactory::Get().CreateVisual(
-      {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
-       {Toolkit::ImageVisual::Property::URL, nativeImageUrl}});
-
-    if(mVisual)
+    if(!mVisual)
     {
-      DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
-      mWebEngine.LoadHtmlString(htmlString);
+      mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnInitialFrameRendered);
     }
 
-    if(mVideoHoleEnabled)
-    {
-      EnableBlendMode(false);
-    }
+    mWebEngine.LoadHtmlString(htmlString);
   }
 }
 
@@ -334,24 +313,12 @@ bool WebView::LoadHtmlStringOverrideCurrentEntry(const std::string& html, const 
   if(!mWebEngine)
     return false;
 
-  Texture           texture        = Dali::Texture::New(*mWebEngine.GetNativeImageSource());
-  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
-  mVisual                          = Toolkit::VisualFactory::Get().CreateVisual(
-    {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
-     {Toolkit::ImageVisual::Property::URL, nativeImageUrl}});
-
-  bool result = false;
-  if(mVisual)
+  if(!mVisual)
   {
-    DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
-    result = mWebEngine.LoadHtmlStringOverrideCurrentEntry(html, basicUri, unreachableUrl);
+    mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnInitialFrameRendered);
   }
 
-  if(mVideoHoleEnabled)
-  {
-    EnableBlendMode(false);
-  }
-  return result;
+  return mWebEngine.LoadHtmlStringOverrideCurrentEntry(html, basicUri, unreachableUrl);
 }
 
 bool WebView::LoadContents(const std::string& contents, uint32_t contentSize, const std::string& mimeType, const std::string& encoding, const std::string& baseUri)
@@ -359,24 +326,12 @@ bool WebView::LoadContents(const std::string& contents, uint32_t contentSize, co
   if(!mWebEngine)
     return false;
 
-  Texture           texture        = Dali::Texture::New(*mWebEngine.GetNativeImageSource());
-  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
-  mVisual                          = Toolkit::VisualFactory::Get().CreateVisual(
-    {{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE},
-     {Toolkit::ImageVisual::Property::URL, nativeImageUrl}});
-
-  bool result = false;
-  if(mVisual)
+  if(!mVisual)
   {
-    DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
-    result = mWebEngine.LoadContents(contents, contentSize, mimeType, encoding, baseUri);
+    mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnInitialFrameRendered);
   }
 
-  if(mVideoHoleEnabled)
-  {
-    EnableBlendMode(false);
-  }
-  return result;
+  return mWebEngine.LoadContents(contents, contentSize, mimeType, encoding, baseUri);
 }
 
 void WebView::Reload()
@@ -871,6 +826,21 @@ void WebView::OnFrameRendered()
   {
     Dali::Toolkit::WebView handle(GetOwner());
     mFrameRenderedSignal.Emit(handle);
+  }
+}
+
+void WebView::OnInitialFrameRendered()
+{
+  mWebEngine.FrameRenderedSignal().Disconnect(this, &WebView::OnInitialFrameRendered);
+
+  Texture           texture        = Dali::Texture::New(*mWebEngine.GetNativeImageSource());
+  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
+  mVisual                          = Toolkit::VisualFactory::Get().CreateVisual({{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE}, {Toolkit::ImageVisual::Property::URL, nativeImageUrl}});
+
+  if(mVisual)
+  {
+    DevelControl::RegisterVisual(*this, Toolkit::WebView::Property::URL, mVisual);
+    EnableBlendMode(!mVideoHoleEnabled);
   }
 }
 
