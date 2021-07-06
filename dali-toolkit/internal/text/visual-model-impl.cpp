@@ -460,6 +460,11 @@ void VisualModel::SetStrikethroughHeight(float height)
   mStrikethroughHeight = height;
 }
 
+void VisualModel::SetCharacterSpacing(float characterSpacing)
+{
+  mCharacterSpacing = characterSpacing;
+}
+
 const Vector4& VisualModel::GetTextColor() const
 {
   return mTextColor;
@@ -523,6 +528,11 @@ uint16_t VisualModel::GetOutlineWidth() const
 const Vector4& VisualModel::GetBackgroundColor() const
 {
   return mBackgroundColor;
+}
+
+const float VisualModel::GetCharacterSpacing() const
+{
+  return mCharacterSpacing;
 }
 
 bool VisualModel::IsBackgroundEnabled() const
@@ -604,6 +614,11 @@ void VisualModel::ClearCaches()
   mCachedLineIndex = 0u;
 }
 
+const Vector<CharacterIndex>& VisualModel::GetGlyphsToCharacters() const
+{
+  return mGlyphsToCharacters;
+}
+
 VisualModel::~VisualModel()
 {
 }
@@ -644,7 +659,8 @@ VisualModel::VisualModel()
   mUnderlineColorSet(false),
   mBackgroundEnabled(false),
   mMarkupProcessorEnabled(false),
-  mStrikethroughEnabled(false)
+  mStrikethroughEnabled(false),
+  mCharacterSpacing(0.0f)
 
 {
 }

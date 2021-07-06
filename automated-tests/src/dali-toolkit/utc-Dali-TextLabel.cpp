@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2628,6 +2628,29 @@ int UtcDaliToolkitTextLabelStrikethroughGeneration(void)
 
   strikethroughMapSet.Clear();
   strikethroughMapGet.Clear();
+
+  END_TEST;
+}
+
+int UtcDaliTextLabelCharacterSpacing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelCharacterSpacing ");
+
+  TextLabel textLabel = TextLabel::New();
+
+  textLabel.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 300.f));
+
+  application.GetScene().Add(textLabel);
+  application.SendNotification();
+  application.Render();
+
+  textLabel.SetProperty(TextLabel::Property::TEXT, "Hi Experiment");
+  textLabel.SetProperty(DevelTextLabel::Property::CHARACTER_SPACING, 10.f);
+  DALI_TEST_EQUALS(textLabel.GetProperty<float>(DevelTextLabel::Property::CHARACTER_SPACING), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

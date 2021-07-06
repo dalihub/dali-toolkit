@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_GLYPH_METRICS_HELPER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/metrics.h>
+#include <dali-toolkit/internal/text/visual-model-impl.h>
 
 namespace Dali
 {
@@ -76,34 +78,46 @@ Length GetNumberOfGlyphsOfGroup(GlyphIndex          glyphIndex,
  * @param[out] glyphMetrics Some glyph metrics (font height, advance, ascender and x bearing).
  * @param[in] glyphsBuffer The glyphs buffer.
  * @param[in] metrics Used to access metrics from FontClient.
+ * @param[in] calculatedAdvance The final advance value obtained by adding the CharacterSpacing value to the original advance. In some cases the CharacterSpacing should not be added. Ex: when the glyph is a ZWSP (Zero Width Space)
  */
 void GetGlyphsMetrics(GlyphIndex             glyphIndex,
                       Length                 numberOfGlyphs,
                       GlyphMetrics&          glyphMetrics,
                       const GlyphInfo* const glyphsBuffer,
-                      MetricsPtr&            metrics);
+                      MetricsPtr&            metrics,
+                      float                  calculatedAdvance);
+
+/**
+ * @brief Gets the final advance value by adding the CharacterSpacing value to it
+ *In some cases the CharacterSpacing should not be added. Ex: when the glyph is a ZWSP (Zero Width Space)
+ *
+ * @param[in] character The character of which the advance is to be calculated.
+ * @param[in] characterSpacing The character spacing to be added to the advance.
+ * @param[in] advance The original advance.
+ *
+ * @return The calculated advance
+ */
+float GetCalculatedAdvance(unsigned int character, float characterSpacing, float advance);
 
 /**
  * @brief Takes the character index, obtains the glyph index (and the number of Glyphs) from it and finally gets the glyph metrics.
  *
  * @param[in] index The character index.
- * @param[in] glyphInfoBuffer The glyphs buffer.
- * @param[in] charactersToGlyphBuffer A vector containing the glyph index for each character.
- * @param[in] glyphsPerCharacterBuffer A vector containing the number of glyphs in each character.
+ * @param[in] visualModel The visual model.
+ * @param[in] logicalModel The logical model.
  * @param[in] metrics Used to access metrics from FontClient.
  * @param[out] glyphMetrics Some glyph metrics (font height, advance, ascender and x bearing).
  * @param[out] glyphIndex The glyph index obtained from the character index.
  * @param[out] numberOfGlyphs The number of glyphs in the character of which the index was passed to the function.
  *
  */
-void GetGlyphMetricsFromCharacterIndex(CharacterIndex          index,
-                                       const GlyphInfo* const  glyphInfoBuffer,
-                                       const GlyphIndex* const charactersToGlyphBuffer,
-                                       const Length* const     glyphsPerCharacterBuffer,
-                                       MetricsPtr&             metrics,
-                                       GlyphMetrics&           glyphMetrics,
-                                       GlyphIndex&             glyphIndex,
-                                       Length&                 numberOfGlyphs);
+void GetGlyphMetricsFromCharacterIndex(CharacterIndex         index,
+                                       const VisualModelPtr&  visualModel,
+                                       const LogicalModelPtr& logicalModel,
+                                       MetricsPtr&            metrics,
+                                       GlyphMetrics&          glyphMetrics,
+                                       GlyphIndex&            glyphIndex,
+                                       Length&                numberOfGlyphs);
 
 } // namespace Text
 

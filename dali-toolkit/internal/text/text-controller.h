@@ -1468,6 +1468,24 @@ public: // Default style & Input style
    */
   void SetAnchorControlInterface(AnchorControlInterface* anchorControlInterface);
 
+  /**
+   * @brief Sets the character spacing.
+   *
+   * @note A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+   *
+   * @param[in] characterSpacing The character spacing.
+   */
+  void SetCharacterSpacing(float characterSpacing);
+
+  /**
+   * @brief Retrieves the character spacing.
+   *
+   * @note A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+   *
+   * @return The character spacing.
+   */
+  const float GetCharacterSpacing() const;
+
 public: // Queries & retrieves.
   /**
    * @brief Return the layout engine.

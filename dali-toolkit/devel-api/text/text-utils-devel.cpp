@@ -40,6 +40,7 @@
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-model.h>
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 
 namespace Dali
 {
@@ -814,9 +815,13 @@ void Ellipsis(const RendererParameters& textParameters, TextAbstraction::TextRen
   Text::ModelPtr& textModel  = internalDataModel.textModel;
   FontClient&     fontClient = internalDataModel.fontClient;
 
-  Vector<LineRun>& lines          = textModel->mVisualModel->mLines; // The laid out lines.
-  Vector<bool>&    isEmoji        = internalDataModel.isEmoji;
-  const Size       textLayoutArea = internalDataModel.textLayoutArea;
+  Vector<LineRun>&        lines                     = textModel->mVisualModel->mLines; // The laid out lines.
+  Vector<bool>&           isEmoji                   = internalDataModel.isEmoji;
+  const Size              textLayoutArea            = internalDataModel.textLayoutArea;
+  const float             characterSpacing          = textModel->mVisualModel->GetCharacterSpacing();
+  float                   calculatedAdvance         = 0.f;
+  Vector<CharacterIndex>& glyphToCharacterMap       = textModel->mVisualModel->mGlyphsToCharacters;
+  const CharacterIndex*   glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
   ////////////////////////////////////////////////////////////////////////////////
   // Ellipsis the text.
   ////////////////////////////////////////////////////////////////////////////////
@@ -902,7 +907,8 @@ void Ellipsis(const RendererParameters& textParameters, TextAbstraction::TextRen
                 firstPenSet = true;
               }
 
-              removedGlypsWidth += std::min(glyphToRemove.advance, (glyphToRemove.xBearing + glyphToRemove.width));
+              calculatedAdvance = GetCalculatedAdvance(*(textModel->mLogicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + index))), characterSpacing, glyphToRemove.advance);
+              removedGlypsWidth += std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width));
 
               // Calculate the width of the ellipsis glyph and check if it fits.
               const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;

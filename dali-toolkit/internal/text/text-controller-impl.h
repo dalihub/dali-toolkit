@@ -369,6 +369,7 @@ struct Controller::Impl
     mClipboard  = Clipboard::Get();
 
     mView.SetVisualModel(mModel->mVisualModel);
+    mView.SetLogicalModel(mModel->mLogicalModel);
 
     // Use this to access FontClient i.e. to get down-scaled Emoji metrics.
     mMetrics = Metrics::New(mFontClient);
@@ -791,9 +792,16 @@ struct Controller::Impl
   void ScrollTextToMatchCursor();
 
   /**
-   * @brief fill needed relayout parameters when line size is changed & request relayout.
+   * @brief Create an actor that renders the text background color
+   *
+   * @return the created actor or an empty handle if no background color needs to be rendered.
    */
-  void RelayoutForNewLineSize();
+  Actor CreateBackgroundActor();
+
+  /**
+   * @brief fill needed relayout parameters whenever a property is changed and a re-layout is needed for the entire text.
+   */
+  void RelayoutAllCharacters();
 
   /**
    * @copydoc Controller::IsInputStyleChangedSignalsQueueEmpty

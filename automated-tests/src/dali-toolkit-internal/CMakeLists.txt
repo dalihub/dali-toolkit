@@ -38,6 +38,7 @@ SET(TC_SOURCES
  utc-Dali-VisualUrl.cpp
  utc-Dali-Text-Hyphen-Wrapping.cpp
  utc-Dali-Text-Ellipsis.cpp
+ utc-Dali-Text-CharacterSpacing.cpp
 )
 
 IF(ELDBUS_AVAILABLE)

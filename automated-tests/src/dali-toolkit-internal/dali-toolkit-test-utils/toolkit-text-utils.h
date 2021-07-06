@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_UTILS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,23 +25,21 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
-
 namespace Text
 {
-
 /**
  * @brief Some layout options.
  */
 struct LayoutOptions
 {
   LayoutOptions()
-  : align{ true }
-  {}
+  : align{true}
+  {
+  }
 
-  bool align   : 1; ///< Whether to align the lines.
+  bool align : 1; ///< Whether to align the lines.
 };
 
 /**
@@ -60,41 +58,42 @@ struct LayoutOptions
  * @param[in] ellipsisEnabled Whether the ellipsis layout option is enabled.
  * @param[in] ellipsisPosition Where is the location the text elide.
  * @param[in] lineSpacing The height of the line in points.
+ * @param[in] characterSpacing The spacing between the characters.
  */
-void CreateTextModel( const std::string& text,
-                      const Size& textArea,
-                      const Vector<FontDescriptionRun>& fontDescriptions,
-                      const LayoutOptions& options,
-                      Size& layoutSize,
-                      ModelPtr& textModel,
-                      MetricsPtr& metrics,
-                      bool markupProcessorEnabled,
-                      LineWrap::Mode wrapMode,
-                      bool ellipsisEnabled,
-                      DevelText::EllipsisPosition::Type ellipsisPosition,
-                      float lineSpacing);
+void CreateTextModel(const std::string&                text,
+                     const Size&                       textArea,
+                     const Vector<FontDescriptionRun>& fontDescriptions,
+                     const LayoutOptions&              options,
+                     Size&                             layoutSize,
+                     ModelPtr&                         textModel,
+                     MetricsPtr&                       metrics,
+                     bool                              markupProcessorEnabled,
+                     LineWrap::Mode                    wrapMode,
+                     bool                              ellipsisEnabled,
+                     DevelText::EllipsisPosition::Type ellipsisPosition,
+                     float                             lineSpacing,
+                     float                             characterSpacing);
 
 /**
  * @brief Configures the text @p controller similarly to the one configured by the text-label.
  *
  * @param[in,out] The text controller to configure.
  */
-void ConfigureTextLabel( ControllerPtr controller );
+void ConfigureTextLabel(ControllerPtr controller);
 
 /**
  * @brief Configures the text @p controller similarly to the one configured by the text-field.
  *
  * @param[in,out] The text controller to configure.
  */
-void ConfigureTextField( ControllerPtr controller );
+void ConfigureTextField(ControllerPtr controller);
 
 /**
  * @brief Configures the text @p controller similarly to the one configured by the text-editor.
  *
  * @param[in,out] The text controller to configure.
  */
-void ConfigureTextEditor( ControllerPtr controller );
-
+void ConfigureTextEditor(ControllerPtr controller);
 
 /**
  * @brief Creates one FontDescriptionRun then add it to FontDescription list.
@@ -114,17 +113,17 @@ void ConfigureTextEditor( ControllerPtr controller );
 * @return vector contains one FontDescriptionRun.
  */
 Vector<FontDescriptionRun> CreateSingleFontDescription(
-                    const CharacterRun&         characterRun,
-                    const std::string           fontFamilyName,
-                    const FontWeight            weight,
-                    const FontWidth             width,
-                    const FontSlant             slant,
-                    const PointSize26Dot6       size,
-                    const bool                  familyDefined,
-                    const bool                  weightDefined,
-                    const bool                  widthDefined,
-                    const bool                  slantDefined,
-                    const bool                  sizeDefined);
+  const CharacterRun&   characterRun,
+  const std::string     fontFamilyName,
+  const FontWeight      weight,
+  const FontWidth       width,
+  const FontSlant       slant,
+  const PointSize26Dot6 size,
+  const bool            familyDefined,
+  const bool            weightDefined,
+  const bool            widthDefined,
+  const bool            slantDefined,
+  const bool            sizeDefined);
 
 } // namespace Text
 

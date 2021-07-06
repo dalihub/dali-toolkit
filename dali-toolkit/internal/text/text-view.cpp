@@ -23,6 +23,9 @@
 #include <dali/public-api/math/vector2.h>
 #include <memory.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -32,6 +35,7 @@ namespace Text
 struct View::Impl
 {
   VisualModelPtr              mVisualModel;
+  LogicalModelPtr             mLogicalModel;
   TextAbstraction::FontClient mFontClient; ///< Handle to the font client.
 };
 
@@ -51,6 +55,11 @@ View::~View()
 void View::SetVisualModel(VisualModelPtr visualModel)
 {
   mImpl->mVisualModel = visualModel;
+}
+
+void View::SetLogicalModel(LogicalModelPtr logicalModel)
+{
+  mImpl->mLogicalModel = logicalModel;
 }
 
 const Vector2& View::GetControlSize() const
@@ -96,8 +105,13 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
                        GlyphIndex glyphIndex,
                        Length     numberOfGlyphs) const
 {
-  Length numberOfLaidOutGlyphs       = 0u;
-  Length numberOfActualLaidOutGlyphs = 0u;
+  Length                  numberOfLaidOutGlyphs       = 0u;
+  Length                  numberOfActualLaidOutGlyphs = 0u;
+  const float             characterSpacing            = mImpl->mVisualModel->GetCharacterSpacing();
+  Vector<CharacterIndex>& glyphToCharacterMap         = mImpl->mVisualModel->mGlyphsToCharacters;
+  const CharacterIndex*   glyphToCharacterMapBuffer   = glyphToCharacterMap.Begin();
+  float                   calculatedAdvance           = 0.f;
+  const Character*        textBuffer                  = mImpl->mLogicalModel->mText.Begin();
 
   if(mImpl->mVisualModel)
   {
@@ -342,7 +356,8 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
                 firstPenSet = true;
               }
 
-              removedGlypsWidth += std::min(glyphToRemove.advance, (glyphToRemove.xBearing + glyphToRemove.width));
+              calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + indexOfEllipsis))), characterSpacing, glyphToRemove.advance);
+              removedGlypsWidth += std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width));
 
               // Calculate the width of the ellipsis glyph and check if it fits.
               const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;
@@ -807,6 +822,21 @@ void View::GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns,
                                               index,
                                               numberOfRuns);
   }
+}
+
+const float View::GetCharacterSpacing() const
+{
+  return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetCharacterSpacing() : 0.f;
+}
+
+const Character* View::GetTextBuffer() const
+{
+  return (mImpl->mVisualModel) ? mImpl->mLogicalModel->mText.Begin() : nullptr;
+}
+
+const Vector<CharacterIndex>& View::GetGlyphsToCharacters() const
+{
+  return mImpl->mVisualModel->GetGlyphsToCharacters();
 }
 
 } // namespace Text

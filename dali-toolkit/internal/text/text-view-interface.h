@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
@@ -328,6 +331,29 @@ public:
   virtual void GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns,
                                     StrikethroughRunIndex  index,
                                     Length                 numberOfRuns) const = 0;
+
+  /**
+   * @brief The spaces between characters in Pixels.
+   *
+   * @note A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+   *
+   * @return characterSpacing.
+   */
+  virtual const float GetCharacterSpacing() const = 0;
+
+  /**
+   * @brief The text buffer.
+   *
+   * @return The text buffer.
+   */
+  virtual const Character* GetTextBuffer() const = 0;
+
+  /**
+   * @brief The text Glyph to Characters Array.
+   *
+   * @return GetGlyphsToCharacters.
+   */
+  virtual const Vector<CharacterIndex>& GetGlyphsToCharacters() const = 0;
 };
 
 } // namespace Text

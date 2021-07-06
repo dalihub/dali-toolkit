@@ -28,6 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/glyph-run.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-mesh-factory.h>
@@ -475,6 +476,7 @@ struct AtlasRenderer::Impl
     const Vector4&              strikethroughColor(view.GetStrikethroughColor());
     const float                 strikethroughHeight = view.GetStrikethroughHeight();
     Vector4                     currentStrikethroughColor;
+    const float                 characterSpacing(view.GetCharacterSpacing());
 
     // Elided text info. Indices according to elided text.
     const auto startIndexOfGlyphs              = view.GetStartIndexOfElidedGlyphs();
@@ -525,8 +527,12 @@ struct AtlasRenderer::Impl
     uint32_t underlineChunkId = 0u;    // give id for each chunk.
     bool     isPreUnderlined  = false; // status of underlined for previous glyph.
 
-    uint32_t strikethroughChunkId     = 0u;    // give id for each chunk.
-    bool     isPrevGlyphStrikethrough = false; // status of strikethrough for previous glyph.
+    uint32_t                      strikethroughChunkId      = 0u;    // give id for each chunk.
+    bool                          isPrevGlyphStrikethrough  = false; // status of strikethrough for previous glyph.
+    const Character*              textBuffer                = view.GetTextBuffer();
+    float                         calculatedAdvance         = 0.f;
+    const Vector<CharacterIndex>& glyphToCharacterMap       = view.GetGlyphsToCharacters();
+    const CharacterIndex*         glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
 
     //Skip hyphenIndices less than startIndexOfGlyphs or between two middle of elided text
     if(hyphenIndices)
@@ -635,7 +641,8 @@ struct AtlasRenderer::Impl
         if(addHyphen)
         {
           GlyphInfo tempInfo = *(glyphsBuffer + i);
-          position.x         = position.x + tempInfo.advance - tempInfo.xBearing + glyph.xBearing;
+          calculatedAdvance  = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + i))), characterSpacing, tempInfo.advance);
+          position.x         = position.x + calculatedAdvance - tempInfo.xBearing + glyph.xBearing;
           position.y += tempInfo.yBearing - glyph.yBearing;
         }
 

@@ -552,6 +552,30 @@ public:
    * @return Returns the override height for a strikethrough, 0 indicates that font metrics will determine the height
    */
   float GetStrikethroughHeight() const;
+  /**
+   * @brief Set the override used for character spacing.
+   *
+   * @note A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+   *
+   * @param[in] characterSpacing The character spacing.
+   */
+  void SetCharacterSpacing(float characterSpacing);
+
+  /**
+   * @brief Retrieves the characterSpacing.
+   *
+   * @note A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+   *
+   * @return Returns the characterSpacing.
+   */
+  const float GetCharacterSpacing() const;
+
+  /**
+   * @brief Retrieves the Glyphs to Characters Array.
+   *
+   * @return The GlyphsToCharacters.
+   */
+  const Vector<CharacterIndex>& GetGlyphsToCharacters() const;
 
   /**
    * @brief Retrieves the strikethrough runs.
@@ -640,6 +664,7 @@ public:
   bool       mMarkupProcessorEnabled : 1; ///< Markup-processor enabled flag
   HyphenInfo mHyphen;                     ///< Contains hyphen glyph info & the character index to draw hyphen after.
   bool       mStrikethroughEnabled : 1;   ///< Strikethrough enabled flag
+  float      mCharacterSpacing;           ///< Contains the value of the character spacing.
 };
 
 } // namespace Text
