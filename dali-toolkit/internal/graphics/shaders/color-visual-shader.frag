@@ -140,8 +140,9 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
       textureColor = mix(textureColor, vec4(borderlineColor.xyz, 0.0), smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
     }
     borderlineOpacity *= borderlineColor.a;
+    return mix(textureColor, vec4(borderlineColor.xyz, 1.0), borderlineOpacity);
   }
-  return mix(textureColor, vec4(borderlineColor.xyz, 1.0), borderlineOpacity);
+  return mix(textureColor, borderlineColor, borderlineOpacity);
 }
 #endif
 
@@ -238,13 +239,13 @@ mediump float calculateBlurOpacity()
 
 void main()
 {
-  lowp vec4 targetColor = vec4(mixColor, 1.0) * uColor;
+  lowp vec4 targetColor = vec4(mixColor, 1.0);
 
 #if IS_REQUIRED_BLUR || IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = targetColor;
+    OUT_COLOR = targetColor * uColor;
     return;
   }
   PreprocessPotential();
@@ -253,7 +254,7 @@ void main()
 #if !IS_REQUIRED_BLUR && IS_REQUIRED_BORDERLINE
   targetColor = convertBorderlineColor(targetColor);
 #endif
-  OUT_COLOR = targetColor;
+  OUT_COLOR = targetColor * uColor;
 
 #if IS_REQUIRED_BLUR
   mediump float opacity = calculateBlurOpacity();

@@ -160,9 +160,11 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
       // potential is in texture range
       textureColor = mix(textureColor, vec4(borderlineColor.xyz, 0.0), smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
     }
+
     borderlineOpacity *= borderlineColor.a;
+    return mix(textureColor, vec4(borderlineColor.xyz, 1.0), borderlineOpacity);
   }
-  return mix(textureColor, vec4(borderlineColor.xyz, 1.0), borderlineOpacity);
+  return mix(textureColor, borderlineColor, borderlineOpacity);
 }
 #endif
 
@@ -199,13 +201,13 @@ void main()
   mediump vec2 texCoord = vTexCoord;
 #endif
 
-  lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * uColor * vec4( mixColor, 1.0 );
+  lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * vec4( mixColor, 1.0 );
 
 #if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = textureColor;
+    OUT_COLOR = textureColor * uColor;
     return;
   }
   PreprocessPotential();
@@ -214,7 +216,7 @@ void main()
 #if IS_REQUIRED_BORDERLINE
   textureColor = convertBorderlineColor(textureColor);
 #endif
-  OUT_COLOR = textureColor;
+  OUT_COLOR = textureColor * uColor;
 
 #if IS_REQUIRED_ROUNDED_CORNER
   mediump float opacity = calculateCornerOpacity();
