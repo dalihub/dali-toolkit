@@ -36,6 +36,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
+#include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -1149,7 +1150,10 @@ void TextField::SelectWholeText()
   if(mController && mController->IsShowingRealText())
   {
     mController->SelectWholeText();
-    SetKeyInputFocus();
+    if(!Self().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || !Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self()))
+    {
+      SetKeyInputFocus();
+    }
   }
 }
 
@@ -1176,7 +1180,10 @@ void TextField::SetTextSelectionRange(const uint32_t* start, const uint32_t* end
   if(mController && mController->IsShowingRealText())
   {
     mController->SetTextSelectionRange(start, end);
-    SetKeyInputFocus();
+    if(!Self().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || !Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self()))
+    {
+      SetKeyInputFocus();
+    }
   }
 }
 
@@ -1666,7 +1673,10 @@ void TextField::OnTap(const TapGesture& gesture)
   mController->TapEvent(gesture.GetNumberOfTaps(), localPoint.x - padding.start, localPoint.y - padding.top);
   mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 
-  SetKeyInputFocus();
+  if(!Self().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || !Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self()))
+  {
+    SetKeyInputFocus();
+  }
 }
 
 void TextField::OnPan(const PanGesture& gesture)
@@ -1685,7 +1695,10 @@ void TextField::OnLongPress(const LongPressGesture& gesture)
   const Vector2& localPoint = gesture.GetLocalPoint();
   mController->LongPressEvent(gesture.GetState(), localPoint.x - padding.start, localPoint.y - padding.top);
 
-  SetKeyInputFocus();
+  if(!Self().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || !Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self()))
+  {
+    SetKeyInputFocus();
+  }
 }
 
 bool TextField::OnKeyEvent(const KeyEvent& event)
@@ -2043,8 +2056,8 @@ bool TextField::AccessibleImpl::SetCursorOffset(size_t offset)
 Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
   size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto self = Toolkit::TextField::DownCast(Self());
-  auto text = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
+  auto self     = Toolkit::TextField::DownCast(Self());
+  auto text     = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
   auto textSize = text.size();
 
   auto range = Dali::Accessibility::Range{};
@@ -2065,7 +2078,7 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
     case Dali::Accessibility::TextBoundary::LINE:
     {
       auto textString = text.c_str();
-      auto breaks = std::vector<char>(textSize, 0);
+      auto breaks     = std::vector<char>(textSize, 0);
 
       if(boundary == Dali::Accessibility::TextBoundary::WORD)
       {
@@ -2140,8 +2153,8 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetRangeOfSelection(size_t
     return {};
   }
 
-  auto self  = Toolkit::TextField::DownCast(Self());
-  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
+  auto        self       = Toolkit::TextField::DownCast(Self());
+  auto        controller = Dali::Toolkit::GetImpl(self).GetTextController();
   std::string value{};
   controller->RetrieveSelection(value);
   auto indices = controller->GetSelectionIndexes();
@@ -2240,7 +2253,7 @@ Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
 
 bool TextField::AccessibleImpl::InsertText(size_t startPosition, std::string text)
 {
-  auto self = Toolkit::TextField::DownCast(Self());
+  auto self         = Toolkit::TextField::DownCast(Self());
   auto insertedText = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
 
   insertedText.insert(startPosition, text);
