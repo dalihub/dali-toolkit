@@ -179,6 +179,11 @@ public:
   void ClearHistory();
 
   /**
+   * @copydoc Dali::Toolkit::WebView::SetTtsFocus()
+   */
+  void SetTtsFocus(bool focused);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::PageLoadStartedSignal()
    */
   Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadStartedSignal();

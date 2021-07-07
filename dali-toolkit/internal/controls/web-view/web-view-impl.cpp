@@ -415,6 +415,14 @@ void WebView::ClearHistory()
   }
 }
 
+void WebView::SetTtsFocus(bool focused)
+{
+  if(mWebEngine && !HasKeyInputFocus())
+  {
+    mWebEngine.SetFocus(focused);
+  }
+}
+
 void WebView::UpdateDisplayArea( Dali::PropertyNotification& /*source*/ )
 {
   if( !mWebEngine )

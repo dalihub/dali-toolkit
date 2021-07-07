@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -488,6 +488,18 @@ int UtcDaliWebViewPropertyTitleFavicon(void)
   DALI_TEST_CHECK( favicon );
   Dali::Vector3 iconsize = favicon.GetProperty< Vector3 >( Dali::Actor::Property::SIZE );
   DALI_TEST_CHECK( ( int )iconsize.width == 2 && ( int )iconsize.height == 2 );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewMethodsForCoverage(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New( "ko-KR", "Asia/Seoul" );
+  view.SetTtsFocus(true);
+
+  DALI_TEST_CHECK( view );
 
   END_TEST;
 }
