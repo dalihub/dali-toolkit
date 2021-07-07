@@ -309,6 +309,11 @@ void WebView::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::Geolo
   Dali::Toolkit::GetImpl(*this).RegisterGeolocationPermissionCallback(callback);
 }
 
+void WebView::SetTtsFocus(bool focused)
+{
+  Dali::Toolkit::GetImpl(*this).SetTtsFocus(focused);
+}
+
 WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
 {
   return Dali::Toolkit::GetImpl(*this).PageLoadStartedSignal();
