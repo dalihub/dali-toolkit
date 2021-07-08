@@ -347,7 +347,7 @@ bool const View::IsMarkupBackgroundColorSet() const
 {
   if(mImpl->mVisualModel)
   {
-    return (mImpl->mVisualModel->mBackgroundColorIndices.Count() > 0);
+    return (mImpl->mVisualModel->mBackgroundColors.Count() > 0);
   }
 
   return false;

@@ -123,7 +123,7 @@ private:
   Typesetter& operator=(const Typesetter& handle);
 
   /**
-   * @brief Create the image buffer for the given range of the glyphs in the given style.
+   * @brief Create & draw the image buffer for the given range of the glyphs in the given style.
    *
    * Does the following operations:
    * - Retrieves the data buffers from the text model.
@@ -143,6 +143,19 @@ private:
    * @return An image buffer with the text.
    */
   Devel::PixelBuffer CreateImageBuffer(const unsigned int bufferWidth, const unsigned int bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset, TextAbstraction::GlyphIndex fromGlyphIndex, TextAbstraction::GlyphIndex toGlyphIndex);
+
+  /**
+   * @brief Create an initialized image buffer.
+   *
+   * Creates the pixel data used to generate the final image with the given size.
+   *
+   * @param[in] bufferWidth The width of the image buffer.
+   * @param[in] bufferHeight The height of the image buffer.
+   * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
+   *
+   * @return An image buffer.
+   */
+  Devel::PixelBuffer CreateImageBuffer(const unsigned int bufferWidth, const unsigned int bufferHeight, Pixel::Format pixelFormat);
 
   /**
    * @brief Combine the two RGBA image buffers together.

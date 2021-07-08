@@ -129,7 +129,7 @@ const ColorIndex* const Model::GetBackgroundColorIndices() const
 
 bool const Model::IsMarkupBackgroundColorSet() const
 {
-  return (mVisualModel->mBackgroundColorIndices.Count() > 0);
+  return (mVisualModel->mBackgroundColors.Count() > 0);
 }
 
 const Vector4& Model::GetDefaultColor() const
