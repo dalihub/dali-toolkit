@@ -37,7 +37,6 @@
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
-#include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -1205,10 +1204,7 @@ void TextEditor::SelectWholeText()
   if(mController && mController->IsShowingRealText())
   {
     mController->SelectWholeText();
-    if(!Self().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || !Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self()))
-    {
-      SetKeyInputFocus();
-    }
+    SetKeyInputFocus();
   }
 }
 
@@ -1756,10 +1752,7 @@ void TextEditor::OnTap(const TapGesture& gesture)
   mController->TapEvent(gesture.GetNumberOfTaps(), localPoint.x - padding.start, localPoint.y - padding.top);
   mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
 
-  if(!Self().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || !Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self()))
-  {
-    SetKeyInputFocus();
-  }
+  SetKeyInputFocus();
 }
 
 void TextEditor::OnPan(const PanGesture& gesture)
@@ -1778,10 +1771,7 @@ void TextEditor::OnLongPress(const LongPressGesture& gesture)
   const Vector2& localPoint = gesture.GetLocalPoint();
   mController->LongPressEvent(gesture.GetState(), localPoint.x - padding.start, localPoint.y - padding.top);
 
-  if(!Self().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || !Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self()))
-  {
-    SetKeyInputFocus();
-  }
+  SetKeyInputFocus();
 }
 
 bool TextEditor::OnKeyEvent(const KeyEvent& event)
@@ -1945,10 +1935,7 @@ void TextEditor::SetTextSelectionRange(const uint32_t* start, const uint32_t* en
   if(mController && mController->IsShowingRealText())
   {
     mController->SetTextSelectionRange(start, end);
-    if(!Self().GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) || !Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self()))
-    {
-      SetKeyInputFocus();
-    }
+    SetKeyInputFocus();
   }
 }
 
@@ -2266,10 +2253,10 @@ bool TextEditor::AccessibleImpl::SetCursorOffset(size_t offset)
   return true;
 }
 
-Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary)
+Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset( size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto self     = Toolkit::TextEditor::DownCast(Self());
-  auto text     = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
+  auto self = Toolkit::TextEditor::DownCast(Self());
+  auto text = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
   auto textSize = text.size();
 
   auto range = Dali::Accessibility::Range{};
@@ -2290,7 +2277,7 @@ Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t of
     case Dali::Accessibility::TextBoundary::LINE:
     {
       auto textString = text.c_str();
-      auto breaks     = std::vector<char>(textSize, 0);
+      auto breaks = std::vector<char>(textSize, 0);
 
       if(boundary == Dali::Accessibility::TextBoundary::WORD)
       {
@@ -2365,8 +2352,8 @@ Dali::Accessibility::Range TextEditor::AccessibleImpl::GetRangeOfSelection(size_
     return {};
   }
 
-  auto        self       = Toolkit::TextEditor::DownCast(Self());
-  auto        controller = Dali::Toolkit::GetImpl(self).GetTextController();
+  auto self  = Toolkit::TextEditor::DownCast(Self());
+  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
   std::string value{};
   controller->RetrieveSelection(value);
   auto indices = controller->GetSelectionIndexes();
@@ -2449,7 +2436,7 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
 {
   using namespace Dali::Accessibility;
 
-  auto states              = DevelControl::AccessibleImpl::CalculateStates();
+  auto states = DevelControl::AccessibleImpl::CalculateStates();
   states[State::EDITABLE]  = true;
   states[State::FOCUSABLE] = true;
 
@@ -2464,7 +2451,7 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
 
 bool TextEditor::AccessibleImpl::InsertText(size_t startPosition, std::string text)
 {
-  auto self         = Toolkit::TextEditor::DownCast(Self());
+  auto self = Toolkit::TextEditor::DownCast(Self());
   auto insertedText = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
 
   insertedText.insert(startPosition, text);
