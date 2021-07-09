@@ -102,6 +102,15 @@ int UtcDaliCanvasViewNewP(void)
   END_TEST;
 }
 
+int UtcDaliCanvasViewNewWithoutViewboxP(void)
+{
+  ToolkitTestApplication application;
+  CanvasView canvasView = CanvasView::New();
+
+  DALI_TEST_CHECK( canvasView );
+  END_TEST;
+}
+
 int UtcDaliCanvasViewDownCastP(void)
 {
   ToolkitTestApplication application;

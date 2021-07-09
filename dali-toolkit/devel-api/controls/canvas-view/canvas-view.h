@@ -64,6 +64,13 @@ public:
   /**
    * @brief Creates an initialized CanvasView
    *
+   * @return A handle to a newly allocated CanvasView
+   */
+  static CanvasView New();
+
+  /**
+   * @brief Creates an initialized CanvasView
+   *
    * @param [in] viewBox The width and height.
    * @return A handle to a newly allocated CanvasView
    */

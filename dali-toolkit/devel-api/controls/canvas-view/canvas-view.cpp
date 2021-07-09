@@ -51,6 +51,12 @@ CanvasView::~CanvasView()
 {
 }
 
+CanvasView CanvasView::New()
+{
+  CanvasView canvasView = Internal::CanvasView::New(Vector2::ZERO);
+  return canvasView;
+}
+
 CanvasView CanvasView::New(const Vector2& viewBox)
 {
   CanvasView canvasView = Internal::CanvasView::New(viewBox);
