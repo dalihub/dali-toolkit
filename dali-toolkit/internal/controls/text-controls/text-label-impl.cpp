@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/debug.h>
@@ -457,7 +456,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       }
       case Toolkit::DevelTextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
       {
-        impl.mController->SetMatchSystemLanguageDirection(value.Get<bool>());
+        impl.mController->SetMatchLayoutDirection(value.Get<bool>() ? DevelText::MatchLayoutDirection::LOCALE : DevelText::MatchLayoutDirection::CONTENTS);
         break;
       }
       case Toolkit::DevelTextLabel::Property::TEXT_FIT:
@@ -688,7 +687,7 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       }
       case Toolkit::DevelTextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
       {
-        value = impl.mController->IsMatchSystemLanguageDirection();
+        value = impl.mController->GetMatchLayoutDirection() != DevelText::MatchLayoutDirection::CONTENTS;
         break;
       }
       case Toolkit::DevelTextLabel::Property::TEXT_FIT:
@@ -785,6 +784,8 @@ void TextLabel::OnInitialize()
   Dali::Stage                 stage           = Dali::Stage::GetCurrent();
   Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(stage.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
   mController->SetLayoutDirection(layoutDirection);
+
+  self.LayoutDirectionChangedSignal().Connect(this, &TextLabel::OnLayoutDirectionChanged);
 
   // Forward input events to controller
   EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
@@ -899,8 +900,10 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::OnRelayout\n");
 
+  Actor self = Self();
+
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
 
   Vector2 contentSize(size.x - (padding.start + padding.end), size.y - (padding.top + padding.bottom));
 
@@ -911,15 +914,8 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
   }
 
   // Support Right-To-Left
-  Dali::LayoutDirection::Type layoutDirection;
-  if(mController->IsMatchSystemLanguageDirection())
-  {
-    layoutDirection = static_cast<Dali::LayoutDirection::Type>(DevelWindow::Get(Self()).GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  }
-  else
-  {
-    layoutDirection = static_cast<Dali::LayoutDirection::Type>(Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  }
+  Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);
+
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
 
   if((Text::Controller::NONE_UPDATED != (Text::Controller::MODEL_UPDATED & updateTextType)) || mTextUpdateNeeded)
@@ -1046,6 +1042,11 @@ void TextLabel::ScrollingFinished()
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::ScrollingFinished\n");
   mController->SetAutoScrollEnabled(false);
   RequestTextRelayout();
+}
+
+void TextLabel::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
+{
+  mController->ChangedLayoutDirection();
 }
 
 TextLabel::TextLabel()

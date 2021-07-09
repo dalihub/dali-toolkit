@@ -121,8 +121,8 @@ public:
    * @param[in] horizontalAlignment The horizontal alignment.
    * @param[in,out] lines The laid-out lines.
    * @param[out] alignmentOffset The alignment offset.
-   * @param[in] layoutDirection The direction of the system language.
-   * @param[in] matchSystemLanguageDirection Whether match align for system language direction or not.
+   * @param[in] layoutDirection The direction of the layout.
+   * @param[in] matchLayoutDirection Whether match align for layout direction or not.
    */
   void Align(const Size&                     size,
              CharacterIndex                  startIndex,
@@ -131,7 +131,7 @@ public:
              Vector<LineRun>&                lines,
              float&                          alignmentOffset,
              Dali::LayoutDirection::Type     layoutDirection,
-             bool                            matchSystemLanguageDirection);
+             bool                            matchLayoutDirection);
 
   /**
    * @brief Sets the default line spacing.

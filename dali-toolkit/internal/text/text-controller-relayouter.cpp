@@ -384,7 +384,7 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
     textUpdateInfo.mCharacterIndex     = 0u;
   }
 
-  if(model->mMatchSystemLanguageDirection && impl.mLayoutDirection != layoutDirection)
+  if(impl.mLayoutDirection != layoutDirection)
   {
     // Clear the update info. This info will be set the next time the text is updated.
     textUpdateInfo.mClearAll = true;
@@ -394,6 +394,7 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
                                                     GET_GLYPH_METRICS |
                                                     SHAPE_TEXT |
                                                     UPDATE_DIRECTION |
+                                                    ALIGN |
                                                     LAYOUT |
                                                     BIDI_INFO |
                                                     REORDER);
@@ -622,7 +623,7 @@ bool Controller::Relayouter::DoRelayout(Controller& controller, const Size& size
                              lines,
                              impl.mModel->mAlignmentOffset,
                              impl.mLayoutDirection,
-                             impl.mModel->mMatchSystemLanguageDirection);
+                             (impl.mModel->mMatchLayoutDirection != DevelText::MatchLayoutDirection::CONTENTS));
 
     viewUpdated = true;
   }

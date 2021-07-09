@@ -56,6 +56,18 @@ enum Mode
 
 } // namespace LineWrap
 
+/**
+ * A enum for defining text layout directions.
+ * It can also be inherited (from a parent) or deduced from the default language script of a locale.
+ * And it can be the direction of the text ifself.
+ */
+enum class MatchLayoutDirection
+{
+  INHERIT, // The text layout direction is inherited. If you change the layout direction, it will be aligned with the changed layout direction.
+  LOCALE,  // The text layout direction is determined by the locale of the system language.
+  CONTENTS // The text layout direction is determined by the text itself.
+};
+
 } // namespace DevelText
 
 } // namespace Toolkit

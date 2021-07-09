@@ -382,6 +382,13 @@ private: // Implementation
   void OnScrollIndicatorAnimationFinished(Animation& animation);
 
   /**
+  * @brief Callback function for when the layout is changed.
+  * @param[in] actor The actor whose layoutDirection is changed.
+  * @param[in] type  The layoutDirection.
+  */
+  void OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type);
+
+  /**
    * Construct a new TextEditor.
    */
   TextEditor();

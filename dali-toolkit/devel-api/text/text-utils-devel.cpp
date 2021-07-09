@@ -1031,9 +1031,8 @@ Size LayoutText(const RendererParameters& textParameters, TextAbstraction::TextR
   // Resize the vector of positions to have the same size than the vector of glyphs.
   rendererParameters.positions.Resize(numberOfGlyphs);
 
-  textModel->mLineWrapMode                 = Text::LineWrap::WORD;
-  textModel->mIgnoreSpacesAfterText        = false;
-  textModel->mMatchSystemLanguageDirection = false;
+  textModel->mLineWrapMode          = Text::LineWrap::WORD;
+  textModel->mIgnoreSpacesAfterText = false;
   Text::Layout::Parameters layoutParameters(internalDataModel.textLayoutArea,
                                             textModel);
 

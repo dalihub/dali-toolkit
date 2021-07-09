@@ -43,8 +43,8 @@ namespace Text
  * @param[in] startIndex The character from where the bidirectional info is set.
  * @param[in] numberOfCharacters The number of characters.
  * @param[out] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
- * @param[in] matchSystemLanguageDirection Whether match for system language direction or not.
- * @param[in] layoutDirection The direction of the system language.
+ * @param[in] matchLayoutDirection Whether match for layout direction or not.
+ * @param[in] layoutDirection The direction of the layout.
  */
 void SetBidirectionalInfo(const Vector<Character>&               text,
                           const Vector<ScriptRun>&               scripts,
@@ -52,8 +52,8 @@ void SetBidirectionalInfo(const Vector<Character>&               text,
                           CharacterIndex                         startIndex,
                           Length                                 numberOfCharacters,
                           Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
-                          bool                                   matchSystemLanguageDirection = false,
-                          Dali::LayoutDirection::Type            layoutDirection              = LayoutDirection::LEFT_TO_RIGHT);
+                          bool                                   matchLayoutDirection = false,
+                          Dali::LayoutDirection::Type            layoutDirection      = LayoutDirection::LEFT_TO_RIGHT);
 
 /**
  * @brief Sets the visual to logical map table for a given line.

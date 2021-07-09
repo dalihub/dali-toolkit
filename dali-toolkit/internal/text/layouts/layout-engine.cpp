@@ -1474,7 +1474,7 @@ struct Engine::Impl
              Vector<LineRun>&                lines,
              float&                          alignmentOffset,
              Dali::LayoutDirection::Type     layoutDirection,
-             bool                            matchSystemLanguageDirection)
+             bool                            matchLayoutDirection)
   {
     const CharacterIndex lastCharacterPlusOne = startIndex + numberOfCharacters;
 
@@ -1510,7 +1510,7 @@ struct Engine::Impl
                                    horizontalAlignment,
                                    line,
                                    layoutDirection,
-                                   matchSystemLanguageDirection);
+                                   matchLayoutDirection);
 
       // Updates the alignment offset.
       alignmentOffset = std::min(alignmentOffset, line.alignmentOffset);
@@ -1521,7 +1521,7 @@ struct Engine::Impl
                                     HorizontalAlignment::Type   horizontalAlignment,
                                     LineRun&                    line,
                                     Dali::LayoutDirection::Type layoutDirection,
-                                    bool                        matchSystemLanguageDirection)
+                                    bool                        matchLayoutDirection)
   {
     line.alignmentOffset = 0.f;
     const bool isLineRTL = RTL == line.direction;
@@ -1532,7 +1532,7 @@ struct Engine::Impl
     float lineLength  = line.width;
 
     // match align for system language direction
-    if(matchSystemLanguageDirection)
+    if(matchLayoutDirection)
     {
       // Swap the alignment type if the line is right to left.
       isLayoutRTL = layoutDirection == LayoutDirection::RIGHT_TO_LEFT;
@@ -1680,7 +1680,7 @@ void Engine::Align(const Size&                     size,
                    Vector<LineRun>&                lines,
                    float&                          alignmentOffset,
                    Dali::LayoutDirection::Type     layoutDirection,
-                   bool                            matchSystemLanguageDirection)
+                   bool                            matchLayoutDirection)
 {
   mImpl->Align(size,
                startIndex,
@@ -1689,7 +1689,7 @@ void Engine::Align(const Size&                     size,
                lines,
                alignmentOffset,
                layoutDirection,
-               matchSystemLanguageDirection);
+               matchLayoutDirection);
 }
 
 void Engine::SetDefaultLineSpacing(float lineSpacing)

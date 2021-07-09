@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/debug.h>
@@ -696,7 +695,7 @@ void TextField::SetProperty(BaseObject* object, Property::Index index, const Pro
       }
       case Toolkit::DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
       {
-        impl.mController->SetMatchSystemLanguageDirection(value.Get<bool>());
+        impl.mController->SetMatchLayoutDirection(value.Get<bool>() ? DevelText::MatchLayoutDirection::LOCALE : DevelText::MatchLayoutDirection::CONTENTS);
         break;
       }
       case Toolkit::DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP:
@@ -1081,7 +1080,7 @@ Property::Value TextField::GetProperty(BaseObject* object, Property::Index index
       }
       case Toolkit::DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
       {
-        value = impl.mController->IsMatchSystemLanguageDirection();
+        value = impl.mController->GetMatchLayoutDirection() != DevelText::MatchLayoutDirection::CONTENTS;
         break;
       }
       case Toolkit::DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP:
@@ -1301,6 +1300,8 @@ void TextField::OnInitialize()
   Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(stage.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
   mController->SetLayoutDirection(layoutDirection);
 
+  self.LayoutDirectionChangedSignal().Connect(this, &TextField::OnLayoutDirectionChanged);
+
   // Forward input events to controller
   EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP | GestureType::PAN | GestureType::LONG_PRESS));
   GetTapGestureDetector().SetMaximumTapsRequired(2);
@@ -1413,15 +1414,8 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
   Vector2 contentSize(size.x - (padding.start + padding.end), size.y - (padding.top + padding.bottom));
 
   // Support Right-To-Left of padding
-  Dali::LayoutDirection::Type layoutDirection;
-  if(mController->IsMatchSystemLanguageDirection())
-  {
-    layoutDirection = static_cast<Dali::LayoutDirection::Type>(DevelWindow::Get(self).GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  }
-  else
-  {
-    layoutDirection = static_cast<Dali::LayoutDirection::Type>(self.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  }
+  Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);
+
   if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
   {
     std::swap(padding.start, padding.end);
@@ -1954,6 +1948,11 @@ void TextField::OnSceneConnection(int depth)
 bool TextField::OnTouched(Actor actor, const TouchEvent& touch)
 {
   return false;
+}
+
+void TextField::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
+{
+  mController->ChangedLayoutDirection();
 }
 
 void TextField::OnIdleSignal()

@@ -19,6 +19,8 @@
 #include <dali-toolkit/internal/text/text-controller.h>
 
 // EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
 #include <memory.h>
 #include <cmath>
@@ -382,19 +384,37 @@ void Controller::SetIgnoreSpacesAfterText(bool ignore)
   mImpl->mModel->mIgnoreSpacesAfterText = ignore;
 }
 
-bool Controller::IsMatchSystemLanguageDirection() const
+void Controller::ChangedLayoutDirection()
 {
-  return mImpl->mModel->mMatchSystemLanguageDirection;
+  mImpl->mIsLayoutDirectionChanged = true;
 }
 
-void Controller::SetMatchSystemLanguageDirection(bool match)
+void Controller::SetMatchLayoutDirection(DevelText::MatchLayoutDirection type)
 {
-  mImpl->mModel->mMatchSystemLanguageDirection = match;
+  mImpl->mModel->mMatchLayoutDirection = type;
+}
+
+DevelText::MatchLayoutDirection Controller::GetMatchLayoutDirection() const
+{
+  return mImpl->mModel->mMatchLayoutDirection;
 }
 
 void Controller::SetLayoutDirection(Dali::LayoutDirection::Type layoutDirection)
 {
   mImpl->mLayoutDirection = layoutDirection;
+}
+
+Dali::LayoutDirection::Type Controller::GetLayoutDirection(Dali::Actor& actor) const
+{
+  if(mImpl->mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::LOCALE ||
+     (mImpl->mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::INHERIT && !mImpl->mIsLayoutDirectionChanged))
+  {
+    return static_cast<Dali::LayoutDirection::Type>(DevelWindow::Get(actor).GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+  }
+  else
+  {
+    return static_cast<Dali::LayoutDirection::Type>(actor.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+  }
 }
 
 bool Controller::IsShowingRealText() const
