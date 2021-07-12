@@ -488,3 +488,42 @@ int UtcDaliCanvasViewSetSizeAndAddDrawable(void)
 
   END_TEST;
 }
+
+int UtcDaliCanvasViewViewBoxP(void)
+{
+  ToolkitTestApplication application;
+
+  CanvasView canvasView = CanvasView::New(Vector2(300, 300));
+  DALI_TEST_CHECK( canvasView );
+
+  application.GetScene().Add(canvasView);
+
+  canvasView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
+  canvasView.SetProperty(Toolkit::CanvasView::Property::VIEW_BOX, Vector2(100, 100));
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliCanvasViewViewBoxN(void)
+{
+  ToolkitTestApplication application;
+
+  CanvasView canvasView = CanvasView::New(Vector2(300, 300));
+  DALI_TEST_CHECK( canvasView );
+
+  application.GetScene().Add(canvasView);
+
+  canvasView.SetProperty(Actor::Property::SIZE, Vector2(300, 300));
+  canvasView.SetProperty(Toolkit::CanvasView::Property::VIEW_BOX, Vector2(-999, -999));
+
+  application.SendNotification();
+  application.Render();
+
+  Vector2 viewBox = canvasView.GetProperty(Toolkit::CanvasView::Property::VIEW_BOX).Get<Vector2>();
+  DALI_TEST_EQUALS( viewBox, Vector2(-999, -999), TEST_LOCATION );
+
+  END_TEST;
+}

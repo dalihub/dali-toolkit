@@ -39,7 +39,8 @@ class CanvasRenderer: public Dali::BaseObject
 public:
   CanvasRenderer( const Vector2& size )
   : mPixelBuffer( Devel::PixelBuffer::New(size.width, size.height, Dali::Pixel::RGBA8888) ),
-    mSize(size)
+    mSize(size),
+    mViewBox(size)
   {
   }
 
@@ -94,10 +95,26 @@ public:
     return mSize;
   }
 
+  bool SetViewBox(const Vector2& viewBox)
+  {
+    mViewBox = viewBox;
+    // For negative test
+    if ( viewBox.width == -999 && viewBox.height == -999 )
+    {
+      return false;
+    }
+    return true;
+  }
+
+  const Vector2& GetViewBox()
+  {
+    return mViewBox;
+  }
 
 public:
    Devel::PixelBuffer mPixelBuffer;
    Vector2 mSize;
+   Vector2 mViewBox;
 };
 
 inline CanvasRenderer& GetImplementation( Dali::CanvasRenderer& renderer )
@@ -178,5 +195,14 @@ const Vector2& CanvasRenderer::GetSize()
   return Internal::Adaptor::GetImplementation(*this).GetSize();
 }
 
+bool CanvasRenderer::SetViewBox(const Vector2& viewBox)
+{
+  return Internal::Adaptor::GetImplementation(*this).SetViewBox(viewBox);
+}
+
+const Vector2& CanvasRenderer::GetViewBox()
+{
+  return Internal::Adaptor::GetImplementation(*this).GetViewBox();
+}
 
 } // namespace Dali

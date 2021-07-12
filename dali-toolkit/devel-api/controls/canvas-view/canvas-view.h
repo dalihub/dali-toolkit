@@ -51,10 +51,40 @@ class CanvasView;
  *    myCanvasView.AddDrawable( shape );
  * @endcode
  *
+ * @section CanvasViewProperties Properties
+ * |%Property enum                    |String name          |Type            |Writable|Animatable|
+ * |----------------------------------|---------------------|----------------|--------|----------|
+ * | Property::VIEW_BOX               | viewBox             |  Vector2       | O      | X        |
  *
  */
 class DALI_TOOLKIT_API CanvasView : public Control
 {
+public:
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the CanvasView class.
+   */
+  struct Property
+  {
+    /**
+     * @brief An enumeration of properties belonging to the CanvasView class.
+     */
+    enum
+    {
+      /**
+       * @brief the viewbox of the CanvasView.
+       * @details Name "viewBox", type Property::VECTOR2.
+       */
+      VIEW_BOX = PROPERTY_START_INDEX,
+    };
+  };
 public:
   /**
    * @brief Creates an uninitialized CanvasView.

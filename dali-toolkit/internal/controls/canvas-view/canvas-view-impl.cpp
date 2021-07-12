@@ -45,6 +45,7 @@ BaseHandle Create()
 }
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN(Toolkit::CanvasView, Toolkit::Control, Create);
+DALI_PROPERTY_REGISTRATION(Toolkit, CanvasView, "viewBox", VECTOR2, VIEW_BOX)
 DALI_TYPE_REGISTRATION_END()
 } // anonymous namespace
 
@@ -126,6 +127,50 @@ void CanvasView::OnSizeSet(const Vector3& targetSize)
   mSize.height = targetSize.height;
 }
 
+void CanvasView::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)
+{
+  Toolkit::CanvasView canvasView = Toolkit::CanvasView::DownCast(Dali::BaseHandle(object));
+  if(canvasView)
+  {
+    CanvasView& canvasViewImpl(GetImpl(canvasView));
+
+    switch(propertyIndex)
+    {
+      case Toolkit::CanvasView::Property::VIEW_BOX:
+      {
+        Vector2 valueVector2;
+        if(value.Get(valueVector2))
+        {
+          canvasViewImpl.SetViewBox(valueVector2);
+        }
+        break;
+      }
+    }
+  }
+}
+
+Property::Value CanvasView::GetProperty(BaseObject* object, Property::Index propertyIndex)
+{
+  Property::Value value;
+
+  Toolkit::CanvasView canvasView = Toolkit::CanvasView::DownCast(Dali::BaseHandle(object));
+
+  if(canvasView)
+  {
+    CanvasView& canvasViewImpl(GetImpl(canvasView));
+
+    switch(propertyIndex)
+    {
+      case Toolkit::CanvasView::Property::VIEW_BOX:
+      {
+        value = canvasViewImpl.GetViewBox();
+        break;
+      }
+    }
+  }
+  return value;
+}
+
 void CanvasView::Process(bool postProcessor)
 {
   if(mCanvasRenderer && mCanvasRenderer.IsCanvasChanged() && mSize.width > 0 && mSize.height > 0)
@@ -204,6 +249,24 @@ bool CanvasView::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
     return true;
   }
   return false;
+}
+
+bool CanvasView::SetViewBox(const Vector2& viewBox)
+{
+  if(mCanvasRenderer && mCanvasRenderer.SetViewBox(viewBox))
+  {
+    return true;
+  }
+  return false;
+}
+
+const Vector2& CanvasView::GetViewBox()
+{
+  if(mCanvasRenderer)
+  {
+    return mCanvasRenderer.GetViewBox();
+  }
+  return Vector2::ZERO;
 }
 } // namespace Internal
 } // namespace Toolkit

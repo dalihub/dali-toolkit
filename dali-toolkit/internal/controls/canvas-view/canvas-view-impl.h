@@ -63,6 +63,22 @@ public:
    */
   bool AddDrawable(Dali::CanvasRenderer::Drawable& drawable);
 
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] propertyIndex The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value);
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] propertyIndex The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
+
 private: // From Control
   /**
    * @copydoc Control::OnRelayout
@@ -78,6 +94,19 @@ private: // From Control
    * @copydoc Toolkit::Control::OnInitialize
    */
   void OnInitialize() override;
+
+  /**
+   * @brief This is the viewbox of the Canvas.
+   * @param[in] viewBox The size of viewbox.
+   * @return Returns True when it's successful. False otherwise.
+   */
+  bool SetViewBox(const Vector2& viewBox);
+
+  /**
+   * @brief This is the viewbox of the Canvas.
+   * @return Returns The size of viewbox.
+   */
+  const Vector2& GetViewBox();
 
   /**
    * @bried Rasterize the canvas, and add it to the view.
