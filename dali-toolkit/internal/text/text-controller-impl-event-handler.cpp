@@ -658,7 +658,7 @@ void ControllerImplEventHandler::OnSelectAllEvent(Controller::Impl& impl)
   if(impl.mEventData)
   {
     EventData& eventData = *impl.mEventData;
-    if(eventData.mSelectionEnabled)
+    if(eventData.mSelectionEnabled && eventData.mState != EventData::INACTIVE)
     {
       ModelPtr&      model          = impl.mModel;
       const Vector2& scrollPosition = model->mScrollPosition;
