@@ -606,6 +606,14 @@ void WebView::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::Geolo
   }
 }
 
+void WebView::SetTtsFocus(bool focused)
+{
+  if(mWebEngine && !HasKeyInputFocus())
+  {
+    mWebEngine.SetFocus(focused);
+  }
+}
+
 void WebView::UpdateDisplayArea(Dali::PropertyNotification& /*source*/)
 {
   if(!mWebEngine)

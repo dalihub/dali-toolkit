@@ -308,6 +308,11 @@ public:
   void RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::SetTtsFocus()
+   */
+  void SetTtsFocus(bool focused);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::PageLoadStartedSignal()
    */
   Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadStartedSignal();

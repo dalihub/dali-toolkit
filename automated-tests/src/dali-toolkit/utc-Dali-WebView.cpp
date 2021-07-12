@@ -1515,6 +1515,7 @@ int UtcDaliWebViewMethodsForCoverage(void)
     []( const std::string& arg ) {
     }
   );
+  view.SetTtsFocus(true);
 
   DALI_TEST_CHECK( view );
 
