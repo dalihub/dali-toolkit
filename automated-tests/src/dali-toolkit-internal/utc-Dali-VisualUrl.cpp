@@ -42,6 +42,18 @@ int UtcDaliVisualUrlConstructor(void)
   DALI_TEST_EQUALS( true, visualUrl3.IsValid(), TEST_LOCATION );
   DALI_TEST_EQUALS( visualUrl3.GetType(), VisualUrl::GIF, TEST_LOCATION );
   DALI_TEST_EQUALS( visualUrl3.GetProtocolType(), VisualUrl::LOCAL, TEST_LOCATION );
+
+  VisualUrl visualUrl4("dali://0");
+  visualUrl4 = visualUrl;
+  DALI_TEST_EQUALS( true, visualUrl4.IsValid(), TEST_LOCATION );
+  DALI_TEST_EQUALS( visualUrl4.GetType(), VisualUrl::GIF, TEST_LOCATION );
+  DALI_TEST_EQUALS( visualUrl4.GetProtocolType(), VisualUrl::LOCAL, TEST_LOCATION );
+
+  VisualUrl visualUrl5("dali://1");
+  visualUrl4 = visualUrl5;
+  DALI_TEST_EQUALS( true, visualUrl4.IsValid(), TEST_LOCATION );
+  DALI_TEST_EQUALS( visualUrl4.GetType(), VisualUrl::REGULAR_IMAGE, TEST_LOCATION );
+  DALI_TEST_EQUALS( visualUrl4.GetProtocolType(), VisualUrl::TEXTURE, TEST_LOCATION );
   END_TEST;
 }
 

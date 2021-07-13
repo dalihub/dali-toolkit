@@ -403,6 +403,12 @@ public:
   TextureSet RemoveExternalTexture(const std::string& url);
 
   /**
+   * @brief Notify that external textures are used.
+   * @param[in] url The URL of the texture to use.
+   */
+  void UseExternalTexture(const VisualUrl& url);
+
+  /**
    * Add an observer to the object.
    * @param[in] observer The observer to add.
    */
@@ -850,6 +856,7 @@ private:
   {
     TextureId  textureId;
     TextureSet textureSet;
+    int16_t    referenceCount{1};
   };
 
 private:

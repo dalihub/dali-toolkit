@@ -20,6 +20,10 @@
 // EXTERNAL HEADERS
 #include <cstring> // for toupper()
 
+// INTERNAL HEADERS
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -209,6 +213,14 @@ VisualUrl::VisualUrl(const std::string& url)
       // TEXTURE location url doesn't need type resolving, REGULAR_IMAGE is fine
       mType = ResolveType(url);
     }
+    else
+    {
+      Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
+      if(factory)
+      {
+        GetImplementation(factory).GetTextureManager().UseExternalTexture(*this);
+      }
+    }
   }
 }
 
@@ -217,15 +229,53 @@ VisualUrl::VisualUrl(const VisualUrl& url)
   mType(url.mType),
   mLocation(url.mLocation)
 {
+  if(VisualUrl::TEXTURE == mLocation)
+  {
+    Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
+    if(factory)
+    {
+      GetImplementation(factory).GetTextureManager().UseExternalTexture(*this);
+    }
+  }
+}
+
+VisualUrl::~VisualUrl()
+{
+  if(VisualUrl::TEXTURE == mLocation)
+  {
+    Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
+    if(factory)
+    {
+      GetImplementation(factory).GetTextureManager().RemoveExternalTexture(mUrl);
+    }
+  }
 }
 
 VisualUrl& VisualUrl::operator=(const VisualUrl& url)
 {
   if(&url != this)
   {
+    if(VisualUrl::TEXTURE == mLocation)
+    {
+      Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
+      if(factory)
+      {
+        GetImplementation(factory).GetTextureManager().RemoveExternalTexture(mUrl);
+      }
+    }
+
     mUrl      = url.mUrl;
     mType     = url.mType;
     mLocation = url.mLocation;
+
+    if(VisualUrl::TEXTURE == mLocation)
+    {
+      Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
+      if(factory)
+      {
+        GetImplementation(factory).GetTextureManager().UseExternalTexture(*this);
+      }
+    }
   }
   return *this;
 }
@@ -257,18 +307,29 @@ bool VisualUrl::IsLocalResource() const
 
 std::string VisualUrl::GetLocation() const
 {
-  const auto location = mUrl.find("://");
-  if(std::string::npos != location)
-  {
-    return mUrl.substr(location + 3u); // 3 characters forwards from the start of ://
-  }
-  return mUrl;
+  return GetLocation(mUrl);
 }
 
 std::string VisualUrl::CreateTextureUrl(const std::string& location)
 {
   return "dali://" + location;
 }
+
+VisualUrl::ProtocolType VisualUrl::GetProtocolType(const std::string& url)
+{
+  return ResolveLocation(url);
+}
+
+std::string VisualUrl::GetLocation(const std::string& url)
+{
+  const auto location = url.find("://");
+  if(std::string::npos != location)
+  {
+    return url.substr(location + 3u); // 3 characters forwards from the start of ://
+  }
+  return url;
+}
+
 
 } // namespace Internal
 

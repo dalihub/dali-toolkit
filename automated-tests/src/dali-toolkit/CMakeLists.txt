@@ -26,6 +26,7 @@ SET(TC_SOURCES
   utc-Dali-Image.cpp
   utc-Dali-ImageView.cpp
   utc-Dali-ImageVisual.cpp
+  utc-Dali-ImageUrl.cpp
   utc-Dali-JsonParser.cpp
   utc-Dali-KeyInputFocusManager.cpp
   utc-Dali-PageTurnView.cpp
