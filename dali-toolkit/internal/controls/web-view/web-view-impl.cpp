@@ -125,7 +125,7 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mPageLoadErrorSignal(),
   mUrlChangedSignal(),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
-  mVideoHoleEnabled(true),
+  mVideoHoleEnabled(false),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true),
   mScreenshotCapturedCallback(nullptr)
@@ -149,7 +149,7 @@ WebView::WebView(uint32_t argc, char** argv)
   mPageLoadErrorSignal(),
   mUrlChangedSignal(),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
-  mVideoHoleEnabled(true),
+  mVideoHoleEnabled(false),
   mMouseEventsEnabled(true),
   mKeyEventsEnabled(true),
   mScreenshotCapturedCallback(nullptr)

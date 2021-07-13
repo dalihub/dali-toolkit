@@ -670,8 +670,8 @@ int UtcDaliWebViewPropertyVideoHoleEnabled(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK( view );
 
-  const bool kDefaultValue = true;
-  const bool kTestValue = false;
+  const bool kDefaultValue = false;
+  const bool kTestValue = true;
 
   // Check default value
   bool output;

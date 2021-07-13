@@ -117,7 +117,7 @@ public:
       /**
        * @brief Whether video hole is enabled or not.
        * @details name "videoHoleEnabled", type Property::BOOLEAN.
-       * @note The value is read-only.
+       * @note False by default.
        */
       VIDEO_HOLE_ENABLED,
 
