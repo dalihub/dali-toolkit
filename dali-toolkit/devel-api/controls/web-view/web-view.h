@@ -684,7 +684,6 @@ public:
   /**
    * @brief Set or unset TTS focus of the webview.
    * @param[in] focused True if it is gained, false lost.
-   * @return true if succeeded, false otherwise.
    * @note It only works when the webview does not have keyinput focus. If it has keyinput focus, the TTS focus is set automatically.
    */
   void SetTtsFocus(bool focused);
