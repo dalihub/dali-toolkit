@@ -79,6 +79,11 @@ public:
    */
   static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
+  /**
+   * @copydoc Toolkit::Control::CanvasView::RemoveDrawable
+   */
+  bool RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable);
+
 private: // From Control
   /**
    * @copydoc Control::OnRelayout

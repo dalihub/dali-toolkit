@@ -38,7 +38,8 @@ class CanvasRenderer: public Dali::BaseObject
 {
 public:
   CanvasRenderer( const Vector2& size )
-  : mPixelBuffer( Devel::PixelBuffer::New(size.width, size.height, Dali::Pixel::RGBA8888) ),
+  : mDrawable(nullptr),
+    mPixelBuffer( Devel::PixelBuffer::New(size.width, size.height, Dali::Pixel::RGBA8888) ),
     mSize(size),
     mViewBox(size)
   {
@@ -69,7 +70,22 @@ public:
     {
       return false;
     }
+    mDrawable = &drawable;
     return true;
+  }
+
+  bool RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
+  {
+    if (!drawable)
+    {
+      return false;
+    }
+    if (mDrawable == &drawable)
+    {
+      mDrawable = nullptr;
+      return true;
+    }
+    return false;
   }
 
   Devel::PixelBuffer GetPixelBuffer()
@@ -112,6 +128,7 @@ public:
   }
 
 public:
+   Dali::CanvasRenderer::Drawable* mDrawable;
    Devel::PixelBuffer mPixelBuffer;
    Vector2 mSize;
    Vector2 mViewBox;
@@ -183,6 +200,11 @@ Devel::PixelBuffer CanvasRenderer::GetPixelBuffer()
 bool CanvasRenderer::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
 {
   return Internal::Adaptor::GetImplementation(*this).AddDrawable(drawable);
+}
+
+bool CanvasRenderer::RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
+{
+  return Internal::Adaptor::GetImplementation(*this).RemoveDrawable(drawable);
 }
 
 bool CanvasRenderer::SetSize(const Vector2& size)

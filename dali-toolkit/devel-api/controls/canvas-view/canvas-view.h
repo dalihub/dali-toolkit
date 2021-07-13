@@ -157,8 +157,17 @@ public:
   /**
    * @brief Add drawable object to the CanvasView.
    * This method is similar to registration. The added shape is drawn on the inner canvas.
+   * @param[in] drawable the drawable object.
    */
   void AddDrawable(Dali::CanvasRenderer::Drawable& drawable);
+
+  /**
+   * @brief Remove drawable object to the CanvasView.
+   * This method is similar to deregistration.
+   * @param[in] drawable the drawable object.
+   * @return Returns True when it's successful. False otherwise.
+   */
+  bool RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable);
 
 public: // Not intended for application developers
   /// @cond internal
