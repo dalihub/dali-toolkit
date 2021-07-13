@@ -127,7 +127,8 @@ KeyboardFocusManager::KeyboardFocusManager()
   mAlwaysShowIndicator(ALWAYS_SHOW),
   mFocusGroupLoopEnabled(false),
   mIsWaitingKeyboardFocusChangeCommit(false),
-  mClearFocusOnTouch(true)
+  mClearFocusOnTouch(true),
+  mEnableDefaultAlgorithm(false)
 {
   // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorShown.
 
@@ -497,7 +498,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
         nextFocusableActor                  = mPreFocusChangeSignal.Emit(currentFocusActor, Actor(), direction);
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
-      else
+      else if(mEnableDefaultAlgorithm)
       {
         // We should find it among the actors nearby.
         nextFocusableActor = Toolkit::FocusFinder::GetNearestFocusableActor(currentFocusActor, direction);
@@ -1082,6 +1083,16 @@ void KeyboardFocusManager::EnableFocusIndicator(bool enable)
 bool KeyboardFocusManager::IsFocusIndicatorEnabled() const
 {
   return (mEnableFocusIndicator == ENABLE);
+}
+
+void KeyboardFocusManager::EnableDefaultAlgorithm(bool enable)
+{
+  mEnableDefaultAlgorithm = enable;
+}
+
+bool KeyboardFocusManager::IsDefaultAlgorithmEnabled() const
+{
+  return mEnableDefaultAlgorithm;
 }
 
 } // namespace Internal
