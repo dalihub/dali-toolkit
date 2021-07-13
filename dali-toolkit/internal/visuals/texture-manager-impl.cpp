@@ -519,7 +519,6 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 void TextureManager::Remove(const TextureManager::TextureId textureId, TextureUploadObserver* observer)
 {
   int textureInfoIndex = GetCacheIndexFromId(textureId);
-
   if(textureInfoIndex != INVALID_INDEX)
   {
     TextureInfo& textureInfo(mTextureInfoContainer[textureInfoIndex]);
@@ -661,7 +660,6 @@ std::string TextureManager::AddExternalTexture(TextureSet& textureSet)
   info.textureId  = GenerateUniqueTextureId();
   info.textureSet = textureSet;
   mExternalTextures.emplace_back(info);
-
   return VisualUrl::CreateTextureUrl(std::to_string(info.textureId));
 }
 
@@ -670,9 +668,10 @@ TextureSet TextureManager::RemoveExternalTexture(const std::string& url)
   if(url.size() > 0u)
   {
     // get the location from the Url
-    if(VisualUrl::TEXTURE == VisualUrl::GetProtocolType(url))
+    VisualUrl parseUrl(url);
+    if(VisualUrl::TEXTURE == parseUrl.GetProtocolType())
     {
-      std::string location = VisualUrl::GetLocation(url);
+      std::string location = parseUrl.GetLocation();
       if(location.size() > 0u)
       {
         TextureId  id  = std::stoi(location);
@@ -682,10 +681,7 @@ TextureSet TextureManager::RemoveExternalTexture(const std::string& url)
           if(iter->textureId == id)
           {
             auto textureSet = iter->textureSet;
-            if(--(iter->referenceCount) <= 0)
-            {
-              mExternalTextures.erase(iter);
-            }
+            mExternalTextures.erase(iter);
             return textureSet;
           }
         }
@@ -693,26 +689,6 @@ TextureSet TextureManager::RemoveExternalTexture(const std::string& url)
     }
   }
   return TextureSet();
-}
-
-void TextureManager::UseExternalTexture(const VisualUrl& url)
-{
-  if(VisualUrl::TEXTURE == url.GetProtocolType())
-  {
-    std::string location = url.GetLocation();
-    if(location.size() > 0u)
-    {
-      TextureId id = std::stoi(location);
-      for(auto&& elem : mExternalTextures)
-      {
-        if(elem.textureId == id)
-        {
-          elem.referenceCount++;
-          return;
-        }
-      }
-    }
-  }
 }
 
 void TextureManager::AddObserver(TextureManager::LifecycleObserver& observer)

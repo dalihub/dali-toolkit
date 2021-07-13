@@ -19,7 +19,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
-#include <dali-toolkit/public-api/image-loader/image-url.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
@@ -30,34 +29,30 @@ namespace Toolkit
 {
 namespace Image
 {
-Dali::Toolkit::ImageUrl GenerateUrl(Dali::FrameBuffer frameBuffer, Pixel::Format pixelFormat, uint32_t width, uint32_t height)
+std::string GenerateUrl(Dali::FrameBuffer frameBuffer, Pixel::Format pixelFormat, uint32_t width, uint32_t height)
 {
   Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelFormat, width, height);
   frameBuffer.AttachColorTexture(texture, 0u, 0u);
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture);
-  return imageUrl;
+  return Dali::Toolkit::TextureManager::AddTexture(texture);
 }
 
-Dali::Toolkit::ImageUrl GenerateUrl(const Dali::FrameBuffer frameBuffer, uint8_t index)
+std::string GenerateUrl(const Dali::FrameBuffer frameBuffer, uint8_t index)
 {
   Texture texture = Dali::DevelFrameBuffer::GetColorTexture(frameBuffer, index);
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture);
-  return imageUrl;
+  return Dali::Toolkit::TextureManager::AddTexture(texture);
 }
 
-Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData)
+std::string GenerateUrl(const Dali::PixelData pixelData)
 {
   Texture texture = Texture::New(TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
   texture.Upload(pixelData);
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture);
-  return imageUrl;
+  return Dali::Toolkit::TextureManager::AddTexture(texture);
 }
 
-Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource)
+std::string GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource)
 {
   Texture texture = Dali::Texture::New(*nativeImageSource);
-  Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture);
-  return imageUrl;
+  return Dali::Toolkit::TextureManager::AddTexture(texture);
 }
 
 } // namespace Image

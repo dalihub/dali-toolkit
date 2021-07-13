@@ -24,7 +24,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
-#include <dali-toolkit/public-api/image-loader/image-url.h>
 
 namespace Dali
 {
@@ -45,9 +44,9 @@ namespace Image
  * @param[in] pixelFormat the pixel format for this frame buffer
  * @param[in] width the width for this frame buffer
  * @param[in] height the height for this frame buffer
- * @return the ImageUrl representing this frame buffer
+ * @return the Url string representing this frame buffer
  */
-DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::FrameBuffer frameBuffer, Pixel::Format pixelFormat, uint32_t width, uint32_t height);
+DALI_TOOLKIT_API std::string GenerateUrl(const Dali::FrameBuffer frameBuffer, Pixel::Format pixelFormat, uint32_t width, uint32_t height);
 
 /**
  * @brief Generate a Url from frame buffer.
@@ -56,27 +55,27 @@ DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::FrameBuffer fra
  * This method does not check for duplicates, If same frame buffer is entered multiple times, a different URL is returned each time.
  * @param[in] frameBuffer the frame buffer to converted to Url
  * @param[in] index the index of the attached color texture.
- * @return the ImageUrl representing this frame buffer
+ * @return the Url string representing this frame buffer
  */
-DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::FrameBuffer frameBuffer, uint8_t index);
+DALI_TOOLKIT_API std::string GenerateUrl(const Dali::FrameBuffer frameBuffer, uint8_t index);
 
 /**
  * @brief Generate a Url from Pixel data.
  * This Url can be used in visuals to render the pixel data.
  * @note This method does not check for duplicates, If same pixel data is entered multiple times, a different URL is returned each time.
  * @param[in] pixelData the pixel data to converted to Url
- * @return the ImageUrl representing this pixel data
+ * @return the Url string representing this pixel data
  */
-DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixelData);
+DALI_TOOLKIT_API std::string GenerateUrl(const Dali::PixelData pixelData);
 
 /**
  * @brief Generate a Url from native image source.
  * This Url can be used in visuals to render the native image source.
  * @note This method does not check for duplicates, If same native image source is entered multiple times, a different URL is returned each time.
  * @param[in] nativeImageSource the native image source to converted to Url
- * @return the ImageUrl representing this native image source
+ * @return the Url string representing this native image source
  */
-DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource);
+DALI_TOOLKIT_API std::string GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource);
 
 } // namespace Image
 

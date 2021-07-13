@@ -55,16 +55,8 @@ public:
   VisualUrl();
 
   /**
-   * Default Destructor.
-   * Delete an external texture if if protocolType is TEXTURE.
-   */
-  ~VisualUrl();
-
-  /**
    * Constructor.
    * Determines type of visual and whether the url is local or remote
-   * Notify that it is using an external texture if if protocolType is TEXTURE.
-   *
    * @param[in] url The URL to store and resolve
    */
   VisualUrl(const std::string& url);
@@ -122,19 +114,6 @@ public:
    */
   static std::string CreateTextureUrl(const std::string& location);
 
-  /**
-   * Helper to get a ProtocolType from url
-   * @param url the url of the texture
-   * @return the protocol type
-   */
-  static VisualUrl::ProtocolType GetProtocolType(const std::string& url);
-
-  /**
-   * Helper to get a location from url
-   * @param url the location of the texture
-   * @return the location
-   */
-  static std::string GetLocation(const std::string& url);
 private:
   std::string  mUrl;
   Type         mType;
