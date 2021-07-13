@@ -470,9 +470,8 @@ private:
 
   /**
    * @brief Checks highlighted object geometry if it is showing or not
-   * @param[in] propertyNotification PropertyNotification
    */
-  void CheckHighlightedObjectGeometry(Dali::PropertyNotification& propertyNotification);
+  void CheckHighlightedObjectGeometry();
 
   /**
    * @brief Register property notification to check highlighted object position
@@ -583,7 +582,7 @@ private:
   // Accessibility - notification for highlighted object to check if it is showing.
   bool                                      mIsAccessibilityPositionPropertyNotificationSet{false};
   Dali::PropertyNotification                mAccessibilityPositionNotification;
-  Dali::Accessibility::MovedOutOfScreenType mAccessibilityMovedOutOfScreenDirection{Accessibility::MovedOutOfScreenType::NONE};
+  Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType;
 };
 
 } // namespace Internal
