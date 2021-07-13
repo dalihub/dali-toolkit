@@ -257,16 +257,16 @@ public:
    * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
    * Typically this will have a negative value with scrolling occurs.
    */
-  Vector2                                mScrollPosition;                   ///< The text is offset by this position when scrolling.
-  Vector2                                mScrollPositionLast;               ///< The last offset value of mScrollPosition
-  HorizontalAlignment::Type              mHorizontalAlignment;              ///< The layout's horizontal alignment.
-  VerticalAlignment::Type                mVerticalAlignment;                ///< The layout's vertical alignment.
-  DevelText::VerticalLineAlignment::Type mVerticalLineAlignment;            ///< The layout's vertical line alignment.
-  Text::LineWrap::Mode                   mLineWrapMode;                     ///< The text wrap mode
-  float                                  mAlignmentOffset;                  ///< The alignment offset.
-  bool                                   mElideEnabled : 1;                 ///< Whether the text's elide is enabled.
-  bool                                   mIgnoreSpacesAfterText : 1;        ///< Whether ignoring spaces after text or not. Default is true.
-  bool                                   mMatchSystemLanguageDirection : 1; ///< Whether match align for system language direction or not. Default is false.
+  Vector2                                mScrollPosition;            ///< The text is offset by this position when scrolling.
+  Vector2                                mScrollPositionLast;        ///< The last offset value of mScrollPosition
+  HorizontalAlignment::Type              mHorizontalAlignment;       ///< The layout's horizontal alignment.
+  VerticalAlignment::Type                mVerticalAlignment;         ///< The layout's vertical alignment.
+  DevelText::VerticalLineAlignment::Type mVerticalLineAlignment;     ///< The layout's vertical line alignment.
+  Text::LineWrap::Mode                   mLineWrapMode;              ///< The text wrap mode
+  float                                  mAlignmentOffset;           ///< The alignment offset.
+  bool                                   mElideEnabled : 1;          ///< Whether the text's elide is enabled.
+  bool                                   mIgnoreSpacesAfterText : 1; ///< Whether ignoring spaces after text or not. Default is true.
+  DevelText::MatchLayoutDirection        mMatchLayoutDirection;      ///< Whether to match text alignment with layout direction or not.
 };
 
 } // namespace Text

@@ -172,13 +172,13 @@ int UtcDaliTextFieldMarkupUnderline(void)
   uint32_t expectedNumberOfUnderlinedGlyphs = 5u;
 
   Toolkit::Internal::TextField& textFieldImpl = GetImpl( textField );
-  const Text::Length numberOfUnderlineRuns = textFieldImpl.getController()->GetTextModel()->GetNumberOfUnderlineRuns();
+  const Text::Length numberOfUnderlineRuns = textFieldImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
 
   DALI_TEST_EQUALS( numberOfUnderlineRuns, expectedNumberOfUnderlinedGlyphs, TEST_LOCATION );
 
   Vector<GlyphRun> underlineRuns;
   underlineRuns.Resize(numberOfUnderlineRuns);
-  textFieldImpl.getController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+  textFieldImpl.GetTextController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
 
   //ABC are underlined
   DALI_TEST_EQUALS( underlineRuns[0u].glyphIndex, 0u, TEST_LOCATION);
@@ -268,7 +268,7 @@ int UtcDaliTextFieldBackgroundTag(void)
   application.Render();
 
   Toolkit::Internal::TextField& fieldImpl = GetImpl( field );
-  const ColorIndex* const backgroundColorIndicesBuffer = fieldImpl.getController()->GetTextModel()->GetBackgroundColorIndices();
+  const ColorIndex* const backgroundColorIndicesBuffer = fieldImpl.GetTextController()->GetTextModel()->GetBackgroundColorIndices();
 
   DALI_TEST_CHECK( backgroundColorIndicesBuffer );
 
@@ -310,7 +310,7 @@ int UtcDaliTextFieldTextWithSpan(void)
   DALI_TEST_GREATER(spanSize.width, originalSize.width, TEST_LOCATION);
 
   Toolkit::Internal::TextField& fieldImpl = GetImpl( field );
-  const ColorIndex* const colorIndicesBuffer1 = fieldImpl.getController()->GetTextModel()->GetColorIndices();
+  const ColorIndex* const colorIndicesBuffer1 = fieldImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
   DALI_TEST_CHECK( colorIndicesBuffer1 );
 
@@ -329,7 +329,7 @@ int UtcDaliTextFieldTextWithSpan(void)
   application.SendNotification();
   application.Render();
 
-  const ColorIndex* const colorIndicesBuffer2 = fieldImpl.getController()->GetTextModel()->GetColorIndices();
+  const ColorIndex* const colorIndicesBuffer2 = fieldImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
   DALI_TEST_CHECK( colorIndicesBuffer2 );
 
@@ -364,7 +364,7 @@ int UtcDaliTextFieldControlBackgroundColor(void)
   application.Render();
 
   Toolkit::Internal::TextField& fieldImpl = GetImpl(field);
-  ControllerPtr controller = fieldImpl.getController();
+  ControllerPtr controller = fieldImpl.GetTextController();
   Controller::Impl& controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
 
   // Default color is transparent

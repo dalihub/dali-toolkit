@@ -129,7 +129,7 @@ const ColorIndex* const Model::GetBackgroundColorIndices() const
 
 bool const Model::IsMarkupBackgroundColorSet() const
 {
-  return (mVisualModel->mBackgroundColorIndices.Count() > 0);
+  return (mVisualModel->mBackgroundColors.Count() > 0);
 }
 
 const Vector4& Model::GetDefaultColor() const
@@ -229,14 +229,17 @@ Model::Model()
   mAlignmentOffset(0.0f),
   mElideEnabled(false),
   mIgnoreSpacesAfterText(true),
-  mMatchSystemLanguageDirection(true)
+  mMatchLayoutDirection(DevelText::MatchLayoutDirection::INHERIT)
 {
   mLogicalModel = LogicalModel::New();
   mVisualModel  = VisualModel::New();
 
   // Check environment variable for DALI_MATCH_SYSTEM_LANGUAGE_DIRECTION
-  auto match                    = Dali::EnvironmentVariable::GetEnvironmentVariable(DALI_ENV_MATCH_SYSTEM_LANGUAGE_DIRECTION);
-  mMatchSystemLanguageDirection = match ? (std::atoi(match) == 0 ? false : true) : mMatchSystemLanguageDirection;
+  auto match = Dali::EnvironmentVariable::GetEnvironmentVariable(DALI_ENV_MATCH_SYSTEM_LANGUAGE_DIRECTION);
+  if(match && (std::atoi(match) == 0))
+  {
+    mMatchLayoutDirection = DevelText::MatchLayoutDirection::CONTENTS;
+  }
 }
 
 Model::~Model()

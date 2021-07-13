@@ -309,6 +309,11 @@ void WebView::RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::Geolo
   Dali::Toolkit::GetImpl(*this).RegisterGeolocationPermissionCallback(callback);
 }
 
+void WebView::SetTtsFocus(bool focused)
+{
+  Dali::Toolkit::GetImpl(*this).SetTtsFocus(focused);
+}
+
 WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
 {
   return Dali::Toolkit::GetImpl(*this).PageLoadStartedSignal();
@@ -379,14 +384,14 @@ WebView::WebViewHttpAuthHandlerSignalType& WebView::HttpAuthHandlerSignal()
   return Dali::Toolkit::GetImpl(*this).HttpAuthHandlerSignal();
 }
 
-WebView::WebViewContextMenuCustomizedSignalType& WebView::ContextMenuCustomizedSignal()
+WebView::WebViewContextMenuShownSignalType& WebView::ContextMenuShownSignal()
 {
-  return Dali::Toolkit::GetImpl(*this).ContextMenuCustomizedSignal();
+  return Dali::Toolkit::GetImpl(*this).ContextMenuShownSignal();
 }
 
-WebView::WebViewContextMenuItemSelectedSignalType& WebView::ContextMenuItemSelectedSignal()
+WebView::WebViewContextMenuHiddenSignalType& WebView::ContextMenuHiddenSignal()
 {
-  return Dali::Toolkit::GetImpl(*this).ContextMenuItemSelectedSignal();
+  return Dali::Toolkit::GetImpl(*this).ContextMenuHiddenSignal();
 }
 
 WebView::WebView(Internal::WebView& implementation)

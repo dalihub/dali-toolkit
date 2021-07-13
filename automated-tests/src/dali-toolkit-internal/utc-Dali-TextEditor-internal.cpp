@@ -90,13 +90,13 @@ int UtcDaliTextEditorMarkupUnderline(void)
   uint32_t expectedNumberOfUnderlinedGlyphs = 5u;
 
   Toolkit::Internal::TextEditor& textEditorImpl = GetImpl( textEditor );
-  const Text::Length numberOfUnderlineRuns = textEditorImpl.getController()->GetTextModel()->GetNumberOfUnderlineRuns();
+  const Text::Length numberOfUnderlineRuns = textEditorImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
 
   DALI_TEST_EQUALS( numberOfUnderlineRuns, expectedNumberOfUnderlinedGlyphs, TEST_LOCATION );
 
   Vector<GlyphRun> underlineRuns;
   underlineRuns.Resize(numberOfUnderlineRuns);
-  textEditorImpl.getController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+  textEditorImpl.GetTextController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
 
   //ABC are underlined
   DALI_TEST_EQUALS( underlineRuns[0u].glyphIndex, 0u, TEST_LOCATION);
@@ -184,7 +184,7 @@ int UtcDaliTextEditorBackgroundTag(void)
   application.Render();
 
   Toolkit::Internal::TextEditor& editorImpl = GetImpl( editor );
-  const ColorIndex* const backgroundColorIndicesBuffer = editorImpl.getController()->GetTextModel()->GetBackgroundColorIndices();
+  const ColorIndex* const backgroundColorIndicesBuffer = editorImpl.GetTextController()->GetTextModel()->GetBackgroundColorIndices();
 
   DALI_TEST_CHECK( backgroundColorIndicesBuffer );
 
@@ -226,7 +226,7 @@ int UtcDaliTextEditorTextWithSpan(void)
   DALI_TEST_GREATER(spanSize.width, originalSize.width, TEST_LOCATION);
 
   Toolkit::Internal::TextEditor& editorImpl = GetImpl( editor );
-  const ColorIndex* const colorIndicesBuffer1 = editorImpl.getController()->GetTextModel()->GetColorIndices();
+  const ColorIndex* const colorIndicesBuffer1 = editorImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
   DALI_TEST_CHECK( colorIndicesBuffer1 );
 
@@ -245,7 +245,7 @@ int UtcDaliTextEditorTextWithSpan(void)
   application.SendNotification();
   application.Render();
 
-  const ColorIndex* const colorIndicesBuffer2 = editorImpl.getController()->GetTextModel()->GetColorIndices();
+  const ColorIndex* const colorIndicesBuffer2 = editorImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
   DALI_TEST_CHECK( colorIndicesBuffer2 );
 
@@ -280,7 +280,7 @@ int UtcDaliTextEditorControlBackgroundColor(void)
   application.Render();
 
   Toolkit::Internal::TextEditor& editorImpl = GetImpl(editor);
-  ControllerPtr controller = editorImpl.getController();
+  ControllerPtr controller = editorImpl.GetTextController();
   Controller::Impl& controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
 
   // Default color is transparent

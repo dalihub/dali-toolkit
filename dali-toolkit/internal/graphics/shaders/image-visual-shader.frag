@@ -150,19 +150,22 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     mediump float tCornerRadius = -gCenterPosition;
     mediump float MaxTexturelinePotential = tCornerRadius + gPotentialRange;
     mediump float MinTexturelinePotential = tCornerRadius - gPotentialRange;
+    lowp vec3 BorderlineColorRGB = borderlineColor.xyz;
+    BorderlineColorRGB *= mix(1.0, borderlineColor.a, preMultipliedAlpha);
     if(potential > MaxTexturelinePotential)
     {
       // potential is out of texture range. use borderline color instead of texture
-      textureColor = vec4(borderlineColor.xyz, 0.0);
+      textureColor = vec4(BorderlineColorRGB, 0.0);
     }
     else if(potential > MinTexturelinePotential)
     {
       // potential is in texture range
-      textureColor = mix(textureColor, vec4(borderlineColor.xyz, 0.0), smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
+      textureColor = mix(textureColor, vec4(BorderlineColorRGB, 0.0), smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
     }
     borderlineOpacity *= borderlineColor.a;
+    return mix(textureColor, vec4(BorderlineColorRGB, 1.0), borderlineOpacity);
   }
-  return mix(textureColor, vec4(borderlineColor.xyz, 1.0), borderlineOpacity);
+  return mix(textureColor, borderlineColor, borderlineOpacity);
 }
 #endif
 
@@ -199,13 +202,13 @@ void main()
   mediump vec2 texCoord = vTexCoord;
 #endif
 
-  lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * uColor * vec4( mixColor, 1.0 );
+  lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * vec4( mixColor, 1.0 );
 
 #if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = textureColor;
+    OUT_COLOR = textureColor * uColor;
     return;
   }
   PreprocessPotential();
@@ -214,7 +217,7 @@ void main()
 #if IS_REQUIRED_BORDERLINE
   textureColor = convertBorderlineColor(textureColor);
 #endif
-  OUT_COLOR = textureColor;
+  OUT_COLOR = textureColor * uColor;
 
 #if IS_REQUIRED_ROUNDED_CORNER
   mediump float opacity = calculateCornerOpacity();

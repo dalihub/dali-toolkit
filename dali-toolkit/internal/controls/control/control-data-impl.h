@@ -342,8 +342,7 @@ public:
    * Attribute is added if not existed previously or updated
    * if existed.
    */
-  void AppendAccessibilityAttribute(const std::string& key,
-                                    const std::string  value);
+  void AppendAccessibilityAttribute(const std::string& key, const std::string value);
 
   /**
    * @brief Removes accessibility attribute
@@ -404,6 +403,22 @@ public:
    * @param[in] timePeriod time period of the animation.
    */
   void MakeVisualTransition(Dali::Animation& animation, Dali::Toolkit::Control source, Dali::Property::Index visualIndex, AlphaFunction alphaFunction, TimePeriod timePeriod);
+
+  /**
+   * @brief Gets the current control's accessible object.
+   *
+   * @return The handle to Accessible object
+   */
+  Dali::Accessibility::Accessible* GetAccessibilityObject();
+
+  /**
+   * @brief Gets Accessible object handle.
+   *
+   * The method acquires Accessible handle from Actor object
+   * @param  actor Actor object
+   * @return The handle to Accessible object
+   */
+  static Dali::Accessibility::Accessible* GetAccessibilityObject(Dali::Actor actor);
 
 private:
   /**
@@ -475,6 +490,8 @@ public:
   Toolkit::Control::KeyInputFocusSignalType                      mKeyInputFocusLostSignal;
   Toolkit::Control::ResourceReadySignalType                      mResourceReadySignal;
   DevelControl::VisualEventSignalType                            mVisualEventSignal;
+
+  // Accessibility
   Toolkit::DevelControl::AccessibilityActivateSignalType         mAccessibilityActivateSignal;
   Toolkit::DevelControl::AccessibilityReadingSkippedSignalType   mAccessibilityReadingSkippedSignal;
   Toolkit::DevelControl::AccessibilityReadingPausedSignalType    mAccessibilityReadingPausedSignal;
@@ -482,17 +499,15 @@ public:
   Toolkit::DevelControl::AccessibilityReadingCancelledSignalType mAccessibilityReadingCancelledSignal;
   Toolkit::DevelControl::AccessibilityReadingStoppedSignalType   mAccessibilityReadingStoppedSignal;
 
-  Toolkit::DevelControl::AccessibilityGetNameSignalType        mAccessibilityGetNameSignal;
-  Toolkit::DevelControl::AccessibilityGetDescriptionSignalType mAccessibilityGetDescriptionSignal;
-  Toolkit::DevelControl::AccessibilityDoGestureSignalType      mAccessibilityDoGestureSignal;
+  Toolkit::DevelControl::AccessibilityGetNameSignalType          mAccessibilityGetNameSignal;
+  Toolkit::DevelControl::AccessibilityGetDescriptionSignalType   mAccessibilityGetDescriptionSignal;
+  Toolkit::DevelControl::AccessibilityDoGestureSignalType        mAccessibilityDoGestureSignal;
 
   std::string mAccessibilityName;
-  bool        mAccessibilityNameSet = false;
-
   std::string mAccessibilityDescription;
-  bool        mAccessibilityDescriptionSet = false;
-
   std::string mAccessibilityTranslationDomain;
+  bool        mAccessibilityNameSet = false;
+  bool        mAccessibilityDescriptionSet = false;
   bool        mAccessibilityTranslationDomainSet = false;
 
   bool mAccessibilityHighlightable    = false;
@@ -500,7 +515,9 @@ public:
 
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
-  std::vector<std::vector<Accessibility::Address>> mAccessibilityRelations;
+  std::vector<std::vector<Accessibility::Address>>                       mAccessibilityRelations;
+  std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)> mAccessibilityConstructor;
+  std::unique_ptr<Dali::Accessibility::Accessible>                       mAccessibilityObject;
 
   // Gesture Detection
   PinchGestureDetector     mPinchGestureDetector;
@@ -545,17 +562,6 @@ public:
   static const PropertyRegistration PROPERTY_20;
   static const PropertyRegistration PROPERTY_21;
   static const PropertyRegistration PROPERTY_22;
-
-  /**
-   * The method acquires Accessible handle from Actor object
-   * @param  actor Actor object
-   * @return       handle to Accessible object
-   */
-  static Dali::Accessibility::Accessible* GetAccessibilityObject(Dali::Actor actor);
-  Dali::Accessibility::Accessible*        GetAccessibilityObject();
-
-  std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)> accessibilityConstructor;
-  std::unique_ptr<Dali::Accessibility::Accessible>                       accessibilityObject;
 };
 
 } // namespace Internal

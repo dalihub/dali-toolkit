@@ -49,9 +49,29 @@ void WebContext::SetProxyUri(const std::string& uri)
   mWebEngineContext.SetProxyUri(uri);
 }
 
+std::string WebContext::GetProxyUri() const
+{
+  return mWebEngineContext.GetProxyUri();
+}
+
+void WebContext::SetProxyBypassRule(const std::string& proxy, const std::string& bypass)
+{
+  mWebEngineContext.SetProxyBypassRule(proxy, bypass);
+}
+
+std::string WebContext::GetProxyBypassRule() const
+{
+  return mWebEngineContext.GetProxyBypassRule();
+}
+
 void WebContext::SetCertificateFilePath(const std::string& certificatePath)
 {
   mWebEngineContext.SetCertificateFilePath(certificatePath);
+}
+
+std::string WebContext::GetCertificateFilePath() const
+{
+  return mWebEngineContext.GetCertificateFilePath();
 }
 
 void WebContext::SetDefaultProxyAuth(const std::string& username, const std::string& password)
@@ -134,34 +154,39 @@ bool WebContext::IsCacheEnabled() const
   return mWebEngineContext.IsCacheEnabled();
 }
 
-std::string WebContext::GetContextCertificateFile() const
+void WebContext::SetAppId(const std::string& appId)
 {
-  return mWebEngineContext.GetContextCertificateFile();
+  mWebEngineContext.SetAppId(appId);
 }
 
-void WebContext::SetContextAppId(const std::string& appID)
+bool WebContext::SetAppVersion(const std::string& appVersion)
 {
-  mWebEngineContext.SetContextAppId(appID);
+  return mWebEngineContext.SetAppVersion(appVersion);
 }
 
-bool WebContext::SetContextAppVersion(const std::string& appVersion)
+void WebContext::SetApplicationType(const Dali::WebEngineContext::ApplicationType applicationType)
 {
-  return mWebEngineContext.SetContextAppVersion(appVersion);
+  mWebEngineContext.SetApplicationType(applicationType);
 }
 
-void WebContext::SetContextApplicationType(const Dali::WebEngineContext::ApplicationType applicationType)
+void WebContext::SetTimeOffset(float timeOffset)
 {
-  mWebEngineContext.SetContextApplicationType(applicationType);
+  mWebEngineContext.SetTimeOffset(timeOffset);
 }
 
-void WebContext::SetContextTimeOffset(float timeOffset)
+void WebContext::SetTimeZoneOffset(float timeZoneOffset, float daylightSavingTime)
 {
-  mWebEngineContext.SetContextTimeOffset(timeOffset);
+  mWebEngineContext.SetTimeZoneOffset(timeZoneOffset, daylightSavingTime);
 }
 
-void WebContext::SetContextTimeZoneOffset(float timeZoneOffset, float daylightSavingTime)
+void WebContext::SetDefaultZoomFactor(float zoomFactor)
 {
-  mWebEngineContext.SetContextTimeZoneOffset(timeZoneOffset, daylightSavingTime);
+  mWebEngineContext.SetDefaultZoomFactor(zoomFactor);
+}
+
+float WebContext::GetDefaultZoomFactor() const
+{
+  return mWebEngineContext.GetDefaultZoomFactor();
 }
 
 void WebContext::RegisterUrlSchemesAsCorsEnabled(const std::vector<std::string>& schemes)
@@ -172,16 +197,6 @@ void WebContext::RegisterUrlSchemesAsCorsEnabled(const std::vector<std::string>&
 void WebContext::RegisterJsPluginMimeTypes(const std::vector<std::string>& mimeTypes)
 {
   mWebEngineContext.RegisterJsPluginMimeTypes(mimeTypes);
-}
-
-void WebContext::SetDefaultZoomFactor(float zoomFactor)
-{
-  mWebEngineContext.SetDefaultZoomFactor(zoomFactor);
-}
-
-float WebContext::GetContextDefaultZoomFactor() const
-{
-  return mWebEngineContext.GetContextDefaultZoomFactor();
 }
 
 bool WebContext::DeleteAllApplicationCache()
@@ -207,21 +222,6 @@ void WebContext::DeleteAllFormPasswordData()
 void WebContext::DeleteAllFormCandidateData()
 {
   mWebEngineContext.DeleteAllFormCandidateData();
-}
-
-std::string WebContext::GetContextProxy() const
-{
-  return mWebEngineContext.GetContextProxy();
-}
-
-void WebContext::SetContextProxy(const std::string& proxy, const std::string& bypass)
-{
-  mWebEngineContext.SetContextProxy(proxy, bypass);
-}
-
-std::string WebContext::GetProxyBypassRule() const
-{
-  return mWebEngineContext.GetProxyBypassRule();
 }
 
 bool WebContext::FreeUnusedMemory()

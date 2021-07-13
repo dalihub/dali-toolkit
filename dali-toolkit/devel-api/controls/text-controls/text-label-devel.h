@@ -95,7 +95,7 @@ enum Type
   /**
      * @brief Modifies the default text alignment to match the direction of the system language.
      * @details Name "matchSystemLanguageDirection", type (Property::BOLEAN), Read/Write
-     * @note The default value is false
+     * @note The default value is true
      *
      * If MATCH_SYSTEM_LANGUAGE_DIRECTION property set true, the default text alignment to match the direction of the system language.
      *
@@ -105,10 +105,10 @@ enum Type
      *
      * | TextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION                 |
      * |-----------------------------------------------------------------------
-     * |        false (default)            |                true              |
+     * |               false               |          true (default)          |
      * |-----------------------------------|----------------------------------|
      * |                     Hello world   |                  Hello world     |
-     * |   ﻡﺮﺤﺑﺍ.                          |                      ﻡﺮﺤﺑﺍ.      |
+     * |   ﻡﺮﺤﺑﺍ.                     |                          ﻡﺮﺤﺑﺍ.      |
      *
      */
   MATCH_SYSTEM_LANGUAGE_DIRECTION,
@@ -154,6 +154,7 @@ enum Type
    *  - fontSize: 10pt, fontSizeScale: 1.5
    */
   FONT_SIZE_SCALE,
+
 };
 
 } // namespace Property

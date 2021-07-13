@@ -539,6 +539,24 @@ ViewModel* Typesetter::GetViewModel()
   return mModel;
 }
 
+Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth, const unsigned int bufferHeight, Pixel::Format pixelFormat)
+{
+  Devel::PixelBuffer imageBuffer = Devel::PixelBuffer::New(bufferWidth, bufferHeight, pixelFormat);
+
+  if(Pixel::RGBA8888 == pixelFormat)
+  {
+    const unsigned int bufferSizeInt  = bufferWidth * bufferHeight;
+    const unsigned int bufferSizeChar = 4u * bufferSizeInt;
+    memset(imageBuffer.GetBuffer(), 0u, bufferSizeChar);
+  }
+  else
+  {
+    memset(imageBuffer.GetBuffer(), 0, bufferWidth * bufferHeight);
+  }
+
+  return imageBuffer;
+}
+
 PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat)
 {
   // @todo. This initial implementation for a TextLabel has only one visible page.
@@ -709,7 +727,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
       }
       else
       {
-        backgroundImageBuffer = Devel::PixelBuffer::New(bufferWidth, bufferHeight, pixelFormat);
+        backgroundImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, pixelFormat);
       }
 
       if(backgroundMarkupSet)
@@ -755,19 +773,8 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
   glyphData.verticalOffset   = verticalOffset;
   glyphData.width            = bufferWidth;
   glyphData.height           = bufferHeight;
-  glyphData.bitmapBuffer     = Devel::PixelBuffer::New(bufferWidth, bufferHeight, pixelFormat);
+  glyphData.bitmapBuffer     = CreateImageBuffer(bufferWidth, bufferHeight, pixelFormat);
   glyphData.horizontalOffset = 0;
-
-  if(Pixel::RGBA8888 == pixelFormat)
-  {
-    const unsigned int bufferSizeInt  = bufferWidth * bufferHeight;
-    const unsigned int bufferSizeChar = 4u * bufferSizeInt;
-    memset(glyphData.bitmapBuffer.GetBuffer(), 0u, bufferSizeChar);
-  }
-  else
-  {
-    memset(glyphData.bitmapBuffer.GetBuffer(), 0, bufferWidth * bufferHeight);
-  }
 
   // Get a handle of the font client. Used to retrieve the bitmaps of the glyphs.
   TextAbstraction::FontClient fontClient  = TextAbstraction::FontClient::Get();

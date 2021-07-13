@@ -308,6 +308,11 @@ public:
   void RegisterGeolocationPermissionCallback(Dali::WebEnginePlugin::GeolocationPermissionCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::SetTtsFocus()
+   */
+  void SetTtsFocus(bool focused);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::PageLoadStartedSignal()
    */
   Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadStartedSignal();
@@ -378,14 +383,14 @@ public:
   Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType& HttpAuthHandlerSignal();
 
   /**
-   * @copydoc Dali::Toolkit::WebView::ContextMenuCustomizedSignal()
+   * @copydoc Dali::Toolkit::WebView::ContextMenuShownSignal()
    */
-  Dali::Toolkit::WebView::WebViewContextMenuCustomizedSignalType& ContextMenuCustomizedSignal();
+  Dali::Toolkit::WebView::WebViewContextMenuShownSignalType& ContextMenuShownSignal();
 
   /**
-   * @copydoc Dali::Toolkit::WebView::ContextMenuItemSelectedSignal()
+   * @copydoc Dali::Toolkit::WebView::ContextMenuHiddenSignal()
    */
-  Dali::Toolkit::WebView::WebViewContextMenuItemSelectedSignalType& ContextMenuItemSelectedSignal();
+  Dali::Toolkit::WebView::WebViewContextMenuHiddenSignalType& ContextMenuHiddenSignal();
 
 public: // Properties
   /**
@@ -522,10 +527,16 @@ private:
   std::string GetSelectedText() const;
 
   /**
+   * @brief Get url of web page.
+   * @return The string of url
+   */
+  std::string GetUrl() const;
+
+  /**
    * @brief Get user agent string.
    * @return The string value of user agent
    */
-  const std::string& GetUserAgent() const;
+  std::string GetUserAgent() const;
 
   /**
    * @brief Set user agent string.
@@ -738,39 +749,38 @@ private:
   void OnHttpAuthenticationRequest(std::shared_ptr<Dali::WebEngineHttpAuthHandler> handler);
 
   /**
-   * @brief Callback function to be called when context menu would be customized.
+   * @brief Callback function to be called when context menu would be shown.
    * @param[in] e The scroll edge reached.
    */
-  void OnContextMenuCustomized(std::shared_ptr<Dali::WebEngineContextMenu> menu);
+  void OnContextMenuShown(std::shared_ptr<Dali::WebEngineContextMenu> menu);
 
   /**
-   * @brief Callback function to be called when context menu item is selected.
+   * @brief Callback function to be called when context menu would be hidden.
    * @param[in] url The url currently being loaded
    */
-  void OnContextMenuItemSelected(std::shared_ptr<Dali::WebEngineContextMenuItem> item);
+  void OnContextMenuHidden(std::shared_ptr<Dali::WebEngineContextMenu> menu);
 
 private:
-  std::string                 mUrl;
   Dali::Toolkit::Visual::Base mVisual;
   Dali::Size                  mWebViewSize;
   Dali::WebEngine             mWebEngine;
 
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType                mPageLoadStartedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType                mPageLoadInProgressSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType                mPageLoadFinishedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType           mPageLoadErrorSignal;
-  Dali::Toolkit::WebView::WebViewUrlChangedSignalType              mUrlChangedSignal;
-  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType       mScrollEdgeReachedSignal;
-  Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType      mFormRepostDecisionSignal;
-  Dali::Toolkit::WebView::WebViewFrameRenderedSignalType           mFrameRenderedSignal;
-  Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType      mRequestInterceptorSignal;
-  Dali::Toolkit::WebView::WebViewConsoleMessageSignalType          mConsoleMessageSignal;
-  Dali::Toolkit::WebView::WebViewResponsePolicyDecisionSignalType  mResponsePolicyDecisionSignal;
-  Dali::Toolkit::WebView::WebViewCertificateSignalType             mCertificateConfirmSignal;
-  Dali::Toolkit::WebView::WebViewCertificateSignalType             mSslCertificateChangedSignal;
-  Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType         mHttpAuthHandlerSignal;
-  Dali::Toolkit::WebView::WebViewContextMenuCustomizedSignalType   mContextMenuCustomizedSignal;
-  Dali::Toolkit::WebView::WebViewContextMenuItemSelectedSignalType mContextMenuItemSelectedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType               mPageLoadStartedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType               mPageLoadInProgressSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType               mPageLoadFinishedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType          mPageLoadErrorSignal;
+  Dali::Toolkit::WebView::WebViewUrlChangedSignalType             mUrlChangedSignal;
+  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType      mScrollEdgeReachedSignal;
+  Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType     mFormRepostDecisionSignal;
+  Dali::Toolkit::WebView::WebViewFrameRenderedSignalType          mFrameRenderedSignal;
+  Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType     mRequestInterceptorSignal;
+  Dali::Toolkit::WebView::WebViewConsoleMessageSignalType         mConsoleMessageSignal;
+  Dali::Toolkit::WebView::WebViewResponsePolicyDecisionSignalType mResponsePolicyDecisionSignal;
+  Dali::Toolkit::WebView::WebViewCertificateSignalType            mCertificateConfirmSignal;
+  Dali::Toolkit::WebView::WebViewCertificateSignalType            mSslCertificateChangedSignal;
+  Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType        mHttpAuthHandlerSignal;
+  Dali::Toolkit::WebView::WebViewContextMenuShownSignalType       mContextMenuShownSignal;
+  Dali::Toolkit::WebView::WebViewContextMenuHiddenSignalType      mContextMenuHiddenSignal;
 
   std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
   std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;

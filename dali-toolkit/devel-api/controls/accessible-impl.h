@@ -47,13 +47,14 @@ struct DALI_TOOLKIT_API AccessibleImpl : public virtual Dali::Accessibility::Acc
                                          public virtual Dali::Accessibility::Action
 {
 protected:
-  Dali::WeakHandle<Dali::Actor> self;
-  Dali::WeakHandle<Dali::Actor> currentHighlightActor;
-  bool        modal = false, root = false;
+  Dali::WeakHandle<Dali::Actor> mSelf;
+  Dali::WeakHandle<Dali::Actor> mCurrentHighlightActor;
+  bool mIsModal = false;
+  bool mIsRoot = false;
 
   Dali::Actor Self()
   {
-    auto handle = self.GetHandle();
+    auto handle = mSelf.GetHandle();
 
     // Control::Impl holds a std::unique_ptr to the Accessible object,
     // so that one does not outlive the other.
@@ -130,7 +131,7 @@ public:
   /**
    * @copydoc Dali::Accessibility::Component::GetExtents()
    */
-  Dali::Rect<> GetExtents(Dali::Accessibility::CoordType ctype) override;
+  Dali::Rect<> GetExtents(Accessibility::CoordinateType type) override;
 
   /**
    * @copydoc Dali::Accessibility::Component::GetLayer()

@@ -1324,9 +1324,13 @@ Property::Index Button::AccessibleImpl::GetNamePropertyIndex()
   Property::Map   labelMap = Self().GetProperty<Property::Map>(label);
 
   if(MapContainsTextString(labelMap))
+  {
     return label;
+  }
   else
+  {
     return Property::INVALID_INDEX;
+  }
 }
 
 Dali::Accessibility::States Button::AccessibleImpl::CalculateStates()

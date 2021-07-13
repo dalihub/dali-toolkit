@@ -712,7 +712,7 @@ int UtcDaliAccessibilityGetExtents(void)
   auto a = Dali::Accessibility::Accessible::Get( control );
   auto a_component = dynamic_cast<Dali::Accessibility::Component*>( a );
 
-  auto extents = a_component->GetExtents(Dali::Accessibility::CoordType::SCREEN);
+  auto extents = a_component->GetExtents(Dali::Accessibility::CoordinateType::SCREEN);
   DALI_TEST_EQUALS( extents.x, 5.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( extents.y, 5.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( extents.height, 10.0f, TEST_LOCATION );
@@ -728,7 +728,7 @@ int UtcDaliAccessibilityGetExtents(void)
   application.SendNotification();
   application.Render( 1 );
 
-  extents = a_component->GetExtents(Dali::Accessibility::CoordType::SCREEN);
+  extents = a_component->GetExtents(Dali::Accessibility::CoordinateType::SCREEN);
   DALI_TEST_EQUALS( extents.x, 10.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( extents.y, 10.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( extents.height, 10.0f, TEST_LOCATION );

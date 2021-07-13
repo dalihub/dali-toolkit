@@ -56,11 +56,11 @@ public:
   /**
    * @brief Called to signal that caret (cursor position) has been moved.
    */
-  virtual void CaretMoved(unsigned int position) = 0;
+  virtual void CursorMoved(unsigned int position) = 0;
 
   /**
    * @brief Called to signal that text has been inserted or deleted.
-   * 
+   *
    * @param[in] immediate If true, it immediately emits the signal, if false, only emits once the signal when OnRelayout() is called next time.
    */
   virtual void TextChanged(bool immediate) = 0;

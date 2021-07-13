@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/debug.h>
@@ -457,7 +456,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       }
       case Toolkit::DevelTextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
       {
-        impl.mController->SetMatchSystemLanguageDirection(value.Get<bool>());
+        impl.mController->SetMatchLayoutDirection(value.Get<bool>() ? DevelText::MatchLayoutDirection::LOCALE : DevelText::MatchLayoutDirection::CONTENTS);
         break;
       }
       case Toolkit::DevelTextLabel::Property::TEXT_FIT:
@@ -495,7 +494,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
   }
 }
 
-Text::ControllerPtr TextLabel::getController()
+Text::ControllerPtr TextLabel::GetTextController()
 {
   return mController;
 }
@@ -688,7 +687,7 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       }
       case Toolkit::DevelTextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
       {
-        value = impl.mController->IsMatchSystemLanguageDirection();
+        value = impl.mController->GetMatchLayoutDirection() != DevelText::MatchLayoutDirection::CONTENTS;
         break;
       }
       case Toolkit::DevelTextLabel::Property::TEXT_FIT:
@@ -785,6 +784,8 @@ void TextLabel::OnInitialize()
   Dali::Stage                 stage           = Dali::Stage::GetCurrent();
   Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(stage.GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
   mController->SetLayoutDirection(layoutDirection);
+
+  self.LayoutDirectionChangedSignal().Connect(this, &TextLabel::OnLayoutDirectionChanged);
 
   // Forward input events to controller
   EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
@@ -899,8 +900,10 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel::OnRelayout\n");
 
+  Actor self = Self();
+
   Extents padding;
-  padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
+  padding = self.GetProperty<Extents>(Toolkit::Control::Property::PADDING);
 
   Vector2 contentSize(size.x - (padding.start + padding.end), size.y - (padding.top + padding.bottom));
 
@@ -911,15 +914,8 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
   }
 
   // Support Right-To-Left
-  Dali::LayoutDirection::Type layoutDirection;
-  if(mController->IsMatchSystemLanguageDirection())
-  {
-    layoutDirection = static_cast<Dali::LayoutDirection::Type>(DevelWindow::Get(Self()).GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  }
-  else
-  {
-    layoutDirection = static_cast<Dali::LayoutDirection::Type>(Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  }
+  Dali::LayoutDirection::Type layoutDirection = mController->GetLayoutDirection(self);
+
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout(contentSize, layoutDirection);
 
   if((Text::Controller::NONE_UPDATED != (Text::Controller::MODEL_UPDATED & updateTextType)) || mTextUpdateNeeded)
@@ -1048,6 +1044,11 @@ void TextLabel::ScrollingFinished()
   RequestTextRelayout();
 }
 
+void TextLabel::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
+{
+  mController->ChangedLayoutDirection();
+}
+
 TextLabel::TextLabel()
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
@@ -1061,8 +1062,8 @@ TextLabel::~TextLabel()
 
 std::string TextLabel::AccessibleImpl::GetNameRaw()
 {
-  auto slf = Toolkit::TextLabel::DownCast(Self());
-  return slf.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
+  auto self = Toolkit::TextLabel::DownCast(Self());
+  return self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
 }
 
 Property::Index TextLabel::AccessibleImpl::GetNamePropertyIndex()
@@ -1070,47 +1071,47 @@ Property::Index TextLabel::AccessibleImpl::GetNamePropertyIndex()
   return Toolkit::TextLabel::Property::TEXT;
 }
 
-std::string TextLabel::AccessibleImpl::GetText(size_t startOffset,
-                                               size_t endOffset)
+std::string TextLabel::AccessibleImpl::GetText(size_t startOffset, size_t endOffset)
 {
   if(endOffset <= startOffset)
+  {
     return {};
+  }
 
-  auto slf = Toolkit::TextLabel::DownCast(Self());
-  auto txt =
-    slf.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
+  auto self = Toolkit::TextLabel::DownCast(Self());
+  auto text = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
 
-  if(startOffset > txt.size() || endOffset > txt.size())
+  if(startOffset > text.size() || endOffset > text.size())
+  {
     return {};
+  }
 
-  return txt.substr(startOffset, endOffset - startOffset);
+  return text.substr(startOffset, endOffset - startOffset);
 }
 
 size_t TextLabel::AccessibleImpl::GetCharacterCount()
 {
-  auto slf = Toolkit::TextLabel::DownCast(Self());
-  auto txt =
-    slf.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
+  auto self = Toolkit::TextLabel::DownCast(Self());
+  auto text = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
 
-  return txt.size();
+  return text.size();
 }
 
-size_t TextLabel::AccessibleImpl::GetCaretOffset()
+size_t TextLabel::AccessibleImpl::GetCursorOffset()
 {
   return {};
 }
 
-bool TextLabel::AccessibleImpl::SetCaretOffset(size_t offset)
+bool TextLabel::AccessibleImpl::SetCursorOffset(size_t offset)
 {
   return {};
 }
 
-Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(
-  size_t offset, Dali::Accessibility::TextBoundary boundary)
+Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto slf      = Toolkit::TextLabel::DownCast(Self());
-  auto txt      = slf.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
-  auto txt_size = txt.size();
+  auto self = Toolkit::TextLabel::DownCast(Self());
+  auto text = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
+  auto textSize = text.size();
 
   auto range = Dali::Accessibility::Range{};
 
@@ -1118,62 +1119,78 @@ Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(
   {
     case Dali::Accessibility::TextBoundary::CHARACTER:
     {
-      if(offset < txt_size)
+      if(offset < textSize)
       {
-        range.content     = txt[offset];
+        range.content     = text[offset];
         range.startOffset = offset;
         range.endOffset   = offset + 1;
       }
+      break;
     }
-    break;
     case Dali::Accessibility::TextBoundary::WORD:
     case Dali::Accessibility::TextBoundary::LINE:
     {
-      auto txt_c_string = txt.c_str();
-      auto breaks       = std::vector<char>(txt_size, 0);
+      auto textString = text.c_str();
+      auto breaks = std::vector<char>(textSize, 0);
+
       if(boundary == Dali::Accessibility::TextBoundary::WORD)
-        Accessibility::Accessible::FindWordSeparationsUtf8((const utf8_t*)txt_c_string, txt_size, "", breaks.data());
+      {
+        Accessibility::Accessible::FindWordSeparationsUtf8(reinterpret_cast<const utf8_t*>(textString), textSize, "", breaks.data());
+      }
       else
-        Accessibility::Accessible::FindLineSeparationsUtf8((const utf8_t*)txt_c_string, txt_size, "", breaks.data());
-      auto index   = 0u;
+      {
+        Accessibility::Accessible::FindLineSeparationsUtf8(reinterpret_cast<const utf8_t*>(textString), textSize, "", breaks.data());
+      }
+
+      auto index = 0u;
       auto counter = 0u;
-      while(index < txt_size && counter <= offset)
+      while(index < textSize && counter <= offset)
       {
         auto start = index;
         if(breaks[index])
         {
           while(breaks[index])
+          {
             index++;
+          }
           counter++;
         }
         else
         {
           if(boundary == Dali::Accessibility::TextBoundary::WORD)
+          {
             index++;
+          }
           if(boundary == Dali::Accessibility::TextBoundary::LINE)
+          {
             counter++;
+          }
         }
+
         if((counter > 0) && ((counter - 1) == offset))
         {
-          range.content     = txt.substr(start, index - start + 1);
+          range.content     = text.substr(start, index - start + 1);
           range.startOffset = start;
           range.endOffset   = index + 1;
         }
+
         if(boundary == Dali::Accessibility::TextBoundary::LINE)
+        {
           index++;
+        }
       }
+      break;
     }
-    break;
     case Dali::Accessibility::TextBoundary::SENTENCE:
     {
-      /* not supported by efl */
+      /* not supported by default */
+      break;
     }
-    break;
     case Dali::Accessibility::TextBoundary::PARAGRAPH:
     {
       /* Paragraph is not supported by libunibreak library */
+      break;
     }
-    break;
     default:
       break;
   }
@@ -1181,44 +1198,46 @@ Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(
   return range;
 }
 
-Dali::Accessibility::Range
-TextLabel::AccessibleImpl::GetSelection(size_t selectionNum)
+Dali::Accessibility::Range TextLabel::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex)
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
-  if(selectionNum > 0)
+  if(selectionIndex > 0)
+  {
     return {};
+  }
 
-  auto        slf  = Toolkit::TextLabel::DownCast(Self());
-  auto        ctrl = Dali::Toolkit::GetImpl(slf).getController();
-  std::string ret;
-  ctrl->RetrieveSelection(ret);
-  auto r = ctrl->GetSelectionIndexes();
+  auto self  = Toolkit::TextLabel::DownCast(Self());
+  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
+  std::string value{};
+  controller->RetrieveSelection(value);
+  auto indices = controller->GetSelectionIndexes();
 
-  return {static_cast<size_t>(r.first), static_cast<size_t>(r.second), ret};
+  return {static_cast<size_t>(indices.first), static_cast<size_t>(indices.second), value};
 }
 
-bool TextLabel::AccessibleImpl::RemoveSelection(size_t selectionNum)
+bool TextLabel::AccessibleImpl::RemoveSelection(size_t selectionIndex)
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
-  if(selectionNum > 0)
+  if(selectionIndex > 0)
+  {
     return false;
+  }
 
-  auto slf = Toolkit::TextLabel::DownCast(Self());
-  Dali::Toolkit::GetImpl(slf).getController()->SetSelection(0, 0);
+  auto self = Toolkit::TextLabel::DownCast(Self());
+  Dali::Toolkit::GetImpl(self).GetTextController()->SetSelection(0, 0);
   return true;
 }
 
-bool TextLabel::AccessibleImpl::SetSelection(size_t selectionNum,
-                                             size_t startOffset,
-                                             size_t endOffset)
+bool TextLabel::AccessibleImpl::SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset)
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
-  if(selectionNum > 0)
+  if(selectionIndex > 0)
+  {
     return false;
+  }
 
-  auto slf = Toolkit::TextLabel::DownCast(Self());
-  Dali::Toolkit::GetImpl(slf).getController()->SetSelection(startOffset,
-                                                            endOffset);
+  auto self = Toolkit::TextLabel::DownCast(Self());
+  Dali::Toolkit::GetImpl(self).GetTextController()->SetSelection(startOffset, endOffset);
   return true;
 }
 

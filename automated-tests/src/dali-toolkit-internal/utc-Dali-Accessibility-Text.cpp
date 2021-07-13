@@ -141,7 +141,7 @@ int utcDaliAccessibilityTextEditorGetTextAtOffset(void)
   END_TEST;
 }
 
-int utcDaliAccessibilityTextEditorGetSetSelection(void)
+int utcDaliAccessibilityTextEditorGetSetRangeOfSelection(void)
 {
   ToolkitTestApplication application;
 
@@ -151,14 +151,14 @@ int utcDaliAccessibilityTextEditorGetSetSelection(void)
   DALI_TEST_CHECK( x );
   if( x )
   {
-    auto range = x->GetSelection( 0 );
+    auto range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.content, "", TEST_LOCATION );
 
-    x->SetSelection( 0, 4, 9 );
+    x->SetRangeOfSelection( 0, 4, 9 );
     editor.SetProperty( Toolkit::TextEditor::Property::TEXT, "exemplary_text" );
-    range = x->GetSelection( 0 );
+    range = x->GetRangeOfSelection( 0 );
 
     DALI_TEST_EQUALS( range.startOffset, 4, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 9, TEST_LOCATION );
@@ -178,17 +178,17 @@ int utcDaliAccessibilityTextEditorRemoveSelection(void)
   DALI_TEST_CHECK( x );
   if( x )
   {
-    auto range = x->GetSelection( 0 );
+    auto range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
 
-    x->SetSelection( 0, 4, 9 );
-    range = x->GetSelection( 0 );
+    x->SetRangeOfSelection( 0, 4, 9 );
+    range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 4, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 9, TEST_LOCATION );
 
     x->RemoveSelection( 0 );
-    range = x->GetSelection( 0 );
+    range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
   }
@@ -299,7 +299,7 @@ int utcDaliAccessibilityTextFieldGetTextAtOffset(void)
   END_TEST;
 }
 
-int utcDaliAccessibilityTextFieldGetSetSelection(void)
+int utcDaliAccessibilityTextFieldGetSetRangeOfSelection(void)
 {
   ToolkitTestApplication application;
 
@@ -309,14 +309,14 @@ int utcDaliAccessibilityTextFieldGetSetSelection(void)
   DALI_TEST_CHECK( x );
   if( x )
   {
-    auto range = x->GetSelection( 0 );
+    auto range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.content, "", TEST_LOCATION );
 
-    x->SetSelection( 0, 4, 9 );
+    x->SetRangeOfSelection( 0, 4, 9 );
     field.SetProperty( Toolkit::TextEditor::Property::TEXT, "exemplary_text" );
-    range = x->GetSelection( 0 );
+    range = x->GetRangeOfSelection( 0 );
 
     DALI_TEST_EQUALS( range.startOffset, 4, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 9, TEST_LOCATION );
@@ -336,17 +336,17 @@ int utcDaliAccessibilityTextFieldRemoveSelection(void)
   DALI_TEST_CHECK( x );
   if( x )
   {
-    auto range = x->GetSelection( 0 );
+    auto range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
 
-    x->SetSelection( 0, 4, 9 );
-    range = x->GetSelection( 0 );
+    x->SetRangeOfSelection( 0, 4, 9 );
+    range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 4, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 9, TEST_LOCATION );
 
     x->RemoveSelection( 0 );
-    range = x->GetSelection( 0 );
+    range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
   }
@@ -467,17 +467,17 @@ int utcDaliAccessibilityTextLabelRemoveSelection( void )
   DALI_TEST_CHECK( x );
   if( x )
   {
-    auto range = x->GetSelection( 0 );
+    auto range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
 
-    x->SetSelection( 0, 4, 9 );
-    range = x->GetSelection( 0 );
+    x->SetRangeOfSelection( 0, 4, 9 );
+    range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 4, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 9, TEST_LOCATION );
 
     x->RemoveSelection( 0 );
-    range = x->GetSelection( 0 );
+    range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
   }

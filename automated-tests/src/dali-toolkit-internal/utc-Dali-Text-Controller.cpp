@@ -412,7 +412,7 @@ int UtcDaliTextControllerImfPreeditStyleReverse(void)
   // Creates a temporary text-field to use mEditableControlInterface.
   TextField field = TextField::New();
   Toolkit::Internal::TextField& fieldImpl = GetImpl(field);
-  ControllerPtr fieldController = fieldImpl.getController();
+  ControllerPtr fieldController = fieldImpl.GetTextController();
   Controller::Impl& fieldControllerImpl = Controller::Impl::GetImplementation(*fieldController.Get());
   Controller::Impl& controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
 

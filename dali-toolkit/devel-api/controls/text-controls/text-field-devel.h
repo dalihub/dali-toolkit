@@ -100,7 +100,7 @@ enum
   /**
    * @brief Modifies the default text alignment to match the direction of the system language.
    * @details Name "matchSystemLanguageDirection", type (Property::BOOLEAN), Read/Write
-   * @note The default value is false
+   * @note The default value is true
    */
   MATCH_SYSTEM_LANGUAGE_DIRECTION = ELLIPSIS + 3,
 

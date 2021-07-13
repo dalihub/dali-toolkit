@@ -222,44 +222,57 @@ static bool DoAction(BaseObject* object, const std::string& actionName, const Pr
 
   DALI_ASSERT_ALWAYS(control);
 
-  if(0 == strcmp(actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED) ||
-     actionName == "activate")
+  if(0 == strcmp(actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED) || actionName == "activate")
   {
     // if cast succeeds there is an implementation so no need to check
     if(!DevelControl::AccessibilityActivateSignal(control).Empty())
+    {
       DevelControl::AccessibilityActivateSignal(control).Emit();
+    }
     else
+    {
       ret = Internal::GetImplementation(control).OnAccessibilityActivated();
+    }
   }
   else if(0 == strcmp(actionName.c_str(), ACTION_ACCESSIBILITY_READING_SKIPPED))
   {
     // if cast succeeds there is an implementation so no need to check
     if(!DevelControl::AccessibilityReadingSkippedSignal(control).Empty())
+    {
       DevelControl::AccessibilityReadingSkippedSignal(control).Emit();
+    }
   }
   else if(0 == strcmp(actionName.c_str(), ACTION_ACCESSIBILITY_READING_PAUSED))
   {
     // if cast succeeds there is an implementation so no need to check
     if(!DevelControl::AccessibilityReadingPausedSignal(control).Empty())
+    {
       DevelControl::AccessibilityReadingPausedSignal(control).Emit();
+    }
   }
   else if(0 == strcmp(actionName.c_str(), ACTION_ACCESSIBILITY_READING_RESUMED))
   {
     // if cast succeeds there is an implementation so no need to check
     if(!DevelControl::AccessibilityReadingResumedSignal(control).Empty())
+    {
       DevelControl::AccessibilityReadingResumedSignal(control).Emit();
+    }
   }
   else if(0 == strcmp(actionName.c_str(), ACTION_ACCESSIBILITY_READING_CANCELLED))
   {
     // if cast succeeds there is an implementation so no need to check
     if(!DevelControl::AccessibilityReadingCancelledSignal(control).Empty())
+    {
       DevelControl::AccessibilityReadingCancelledSignal(control).Emit();
+    }
   }
   else if(0 == strcmp(actionName.c_str(), ACTION_ACCESSIBILITY_READING_STOPPED))
   {
     // if cast succeeds there is an implementation so no need to check
     if(!DevelControl::AccessibilityReadingStoppedSignal(control).Empty())
+    {
       DevelControl::AccessibilityReadingStoppedSignal(control).Emit();
+    }
   }
   else
   {
@@ -414,12 +427,12 @@ const PropertyRegistration Control::Impl::PROPERTY_12(typeRegistration, "rightFo
 const PropertyRegistration Control::Impl::PROPERTY_13(typeRegistration, "upFocusableActorId",             Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,            Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_14(typeRegistration, "downFocusableActorId",           Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID,          Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_15(typeRegistration, "shadow",                         Toolkit::DevelControl::Property::SHADOW,                           Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_16(typeRegistration, "accessibilityAttributes",        Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES,         Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_17(typeRegistration, "accessibilityName",              Toolkit::DevelControl::Property::ACCESSIBILITY_NAME,               Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_18(typeRegistration, "accessibilityDescription",       Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION,        Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_19(typeRegistration, "accessibilityTranslationDomain", Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN, Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_20(typeRegistration, "accessibilityRole",              Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE,               Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_21(typeRegistration, "accessibilityHighlightable",     Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE,      Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_16(typeRegistration, "accessibilityName",              Toolkit::DevelControl::Property::ACCESSIBILITY_NAME,               Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_17(typeRegistration, "accessibilityDescription",       Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION,        Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_18(typeRegistration, "accessibilityTranslationDomain", Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN, Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_19(typeRegistration, "accessibilityRole",              Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE,               Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_20(typeRegistration, "accessibilityHighlightable",     Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE,      Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_21(typeRegistration, "accessibilityAttributes",        Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES,         Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 // clang-format on
 
 Control::Impl::Impl(Control& controlImpl)
@@ -461,14 +474,13 @@ Control::Impl::Impl(Control& controlImpl)
       return Control::Impl::GetAccessibilityObject(actor);
     });
 
-  accessibilityConstructor = [](Dali::Actor actor) -> std::unique_ptr<Dali::Accessibility::Accessible> {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(new DevelControl::AccessibleImpl(actor,
-                                                                                             Dali::Accessibility::Role::UNKNOWN));
+  mAccessibilityConstructor = [](Dali::Actor actor) -> std::unique_ptr<Dali::Accessibility::Accessible> {
+    return std::unique_ptr<Dali::Accessibility::Accessible>(new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::UNKNOWN));
   };
 
-  size_t len = static_cast<size_t>(Dali::Accessibility::RelationType::MAX_COUNT);
-  mAccessibilityRelations.reserve(len);
-  for(auto i = 0u; i < len; ++i)
+  size_t length = static_cast<size_t>(Dali::Accessibility::RelationType::MAX_COUNT);
+  mAccessibilityRelations.reserve(length);
+  for(auto i = 0u; i < length; ++i)
   {
     mAccessibilityRelations.push_back({});
   }
@@ -958,11 +970,10 @@ void Control::Impl::DoAction(Dali::Property::Index visualIndex, Dali::Property::
   }
 }
 
-void Control::Impl::AppendAccessibilityAttribute(const std::string& key,
-                                                 const std::string  value)
+void Control::Impl::AppendAccessibilityAttribute(const std::string& key, const std::string value)
 {
-  Property::Value* val = mAccessibilityAttributes.Find(key);
-  if(val)
+  Property::Value* checkedValue = mAccessibilityAttributes.Find(key);
+  if(checkedValue)
   {
     mAccessibilityAttributes[key] = Property::Value(value);
   }
@@ -1041,76 +1052,6 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         if(value.Get(focusId))
         {
           controlImpl.mImpl->mRightFocusableActorId = focusId;
-        }
-      }
-      break;
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
-      {
-        std::string name;
-        if(value.Get(name))
-        {
-          controlImpl.mImpl->mAccessibilityName    = name;
-          controlImpl.mImpl->mAccessibilityNameSet = true;
-        }
-        else
-        {
-          controlImpl.mImpl->mAccessibilityNameSet = false;
-        }
-      }
-      break;
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
-      {
-        std::string txt;
-        if(value.Get(txt))
-        {
-          controlImpl.mImpl->mAccessibilityDescription    = txt;
-          controlImpl.mImpl->mAccessibilityDescriptionSet = true;
-        }
-        else
-        {
-          controlImpl.mImpl->mAccessibilityDescriptionSet = false;
-        }
-      }
-      break;
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN:
-      {
-        std::string txt;
-        if(value.Get(txt))
-        {
-          controlImpl.mImpl->mAccessibilityTranslationDomain    = txt;
-          controlImpl.mImpl->mAccessibilityTranslationDomainSet = true;
-        }
-        else
-        {
-          controlImpl.mImpl->mAccessibilityTranslationDomainSet = false;
-        }
-      }
-      break;
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
-      {
-        bool highlightable;
-        if(value.Get(highlightable))
-        {
-          controlImpl.mImpl->mAccessibilityHighlightable    = highlightable;
-          controlImpl.mImpl->mAccessibilityHighlightableSet = true;
-        }
-        else
-        {
-          controlImpl.mImpl->mAccessibilityHighlightableSet = false;
-        }
-      }
-      break;
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
-      {
-        Dali::Accessibility::Role val;
-        if(value.Get(val))
-        {
-          controlImpl.mImpl->mAccessibilityRole = val;
         }
       }
       break;
@@ -1224,6 +1165,76 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         break;
       }
 
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
+      {
+        std::string name;
+        if(value.Get(name))
+        {
+          controlImpl.mImpl->mAccessibilityName    = name;
+          controlImpl.mImpl->mAccessibilityNameSet = true;
+        }
+        else
+        {
+          controlImpl.mImpl->mAccessibilityNameSet = false;
+        }
+      }
+      break;
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
+      {
+        std::string text;
+        if(value.Get(text))
+        {
+          controlImpl.mImpl->mAccessibilityDescription    = text;
+          controlImpl.mImpl->mAccessibilityDescriptionSet = true;
+        }
+        else
+        {
+          controlImpl.mImpl->mAccessibilityDescriptionSet = false;
+        }
+      }
+      break;
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN:
+      {
+        std::string text;
+        if(value.Get(text))
+        {
+          controlImpl.mImpl->mAccessibilityTranslationDomain    = text;
+          controlImpl.mImpl->mAccessibilityTranslationDomainSet = true;
+        }
+        else
+        {
+          controlImpl.mImpl->mAccessibilityTranslationDomainSet = false;
+        }
+      }
+      break;
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
+      {
+        Dali::Accessibility::Role role;
+        if(value.Get(role))
+        {
+          controlImpl.mImpl->mAccessibilityRole = role;
+        }
+      }
+      break;
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
+      {
+        bool highlightable;
+        if(value.Get(highlightable))
+        {
+          controlImpl.mImpl->mAccessibilityHighlightable    = highlightable;
+          controlImpl.mImpl->mAccessibilityHighlightableSet = true;
+        }
+        else
+        {
+          controlImpl.mImpl->mAccessibilityHighlightableSet = false;
+        }
+      }
+      break;
+
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
       {
         const Property::Map* map = value.GetMap();
@@ -1276,48 +1287,6 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID:
       {
         value = controlImpl.mImpl->mRightFocusableActorId;
-        break;
-      }
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
-      {
-        if(controlImpl.mImpl->mAccessibilityNameSet)
-        {
-          value = controlImpl.mImpl->mAccessibilityName;
-        }
-        break;
-      }
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
-      {
-        if(controlImpl.mImpl->mAccessibilityDescriptionSet)
-        {
-          value = controlImpl.mImpl->mAccessibilityDescription;
-        }
-        break;
-      }
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN:
-      {
-        if(controlImpl.mImpl->mAccessibilityTranslationDomainSet)
-        {
-          value = controlImpl.mImpl->mAccessibilityTranslationDomain;
-        }
-        break;
-      }
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
-      {
-        if(controlImpl.mImpl->mAccessibilityHighlightableSet)
-        {
-          value = controlImpl.mImpl->mAccessibilityHighlightable;
-        }
-        break;
-      }
-
-      case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
-      {
-        value = Property::Value(controlImpl.mImpl->mAccessibilityRole);
         break;
       }
 
@@ -1388,6 +1357,48 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
         break;
       }
 
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
+      {
+        if(controlImpl.mImpl->mAccessibilityNameSet)
+        {
+          value = controlImpl.mImpl->mAccessibilityName;
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
+      {
+        if(controlImpl.mImpl->mAccessibilityDescriptionSet)
+        {
+          value = controlImpl.mImpl->mAccessibilityDescription;
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN:
+      {
+        if(controlImpl.mImpl->mAccessibilityTranslationDomainSet)
+        {
+          value = controlImpl.mImpl->mAccessibilityTranslationDomain;
+        }
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
+      {
+        value = Property::Value(controlImpl.mImpl->mAccessibilityRole);
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
+      {
+        if(controlImpl.mImpl->mAccessibilityHighlightableSet)
+        {
+          value = controlImpl.mImpl->mAccessibilityHighlightable;
+        }
+        break;
+      }
+
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
       {
         value = controlImpl.mImpl->mAccessibilityAttributes;
@@ -1401,9 +1412,11 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
 void Control::Impl::RemoveAccessibilityAttribute(const std::string& key)
 {
-  Property::Value* val = mAccessibilityAttributes.Find(key);
-  if(val)
+  Property::Value* value = mAccessibilityAttributes.Find(key);
+  if(value)
+  {
     mAccessibilityAttributes[key] = Property::Value();
+  }
 }
 
 void Control::Impl::ClearAccessibilityAttributes()
@@ -1413,7 +1426,7 @@ void Control::Impl::ClearAccessibilityAttributes()
 
 void Control::Impl::SetAccessibilityReadingInfoType(const Dali::Accessibility::ReadingInfoTypes types)
 {
-  std::string value;
+  std::string value{};
   if(types[Dali::Accessibility::ReadingInfoType::NAME])
   {
     value += READING_INFO_TYPE_NAME;
@@ -1447,7 +1460,7 @@ void Control::Impl::SetAccessibilityReadingInfoType(const Dali::Accessibility::R
 
 Dali::Accessibility::ReadingInfoTypes Control::Impl::GetAccessibilityReadingInfoType() const
 {
-  std::string value;
+  std::string value{};
   auto        place = mAccessibilityAttributes.Find(READING_INFO_TYPE_ATTRIBUTE_NAME);
   if(place)
   {
@@ -1830,30 +1843,51 @@ void Control::Impl::MakeVisualTransition(Dali::Animation& animation, Dali::Toolk
 
   Vector4 mixColor(1.0f, 1.0f, 1.0f, 1.0f);
   Vector4 cornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
+  float   borderlineWidth(0.0f);
+  Vector4 borderlineColor(0.0f, 0.0f, 0.0f, 1.0f);
+  float   borderlineOffset(0.0f);
 
   if(!destinationMap.Empty())
   {
-    static auto findValue = [](const Property::Map& map, Property::Index index) -> Vector4 {
+    static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4 {
       Property::Value* propertyValue = map.Find(index);
       if(propertyValue)
       {
         return propertyValue->Get<Vector4>();
       }
-      return Vector4{};
+      return defaultValue;
     };
 
-    mixColor     = findValue(destinationMap, Dali::Toolkit::Visual::Property::MIX_COLOR);
-    cornerRadius = findValue(destinationMap, Toolkit::DevelVisual::Property::CORNER_RADIUS);
+    static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float {
+      Property::Value* propertyValue = map.Find(index);
+      if(propertyValue)
+      {
+        return propertyValue->Get<float>();
+      }
+      return defaultValue;
+    };
+
+    mixColor         = findValueVector4(destinationMap, Dali::Toolkit::Visual::Property::MIX_COLOR, mixColor);
+    cornerRadius     = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
+    borderlineWidth  = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth);
+    borderlineColor  = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, borderlineColor);
+    borderlineOffset = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset);
 
     if(sourceMap.Empty())
     {
       sourceMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
       sourceMap.Insert(Dali::Toolkit::Visual::Property::MIX_COLOR, Color::TRANSPARENT);
       sourceMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
+      sourceMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth);
+      sourceMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, borderlineColor);
+      sourceMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset);
     }
 
-    Vector4 sourceMixColor     = findValue(sourceMap, Dali::Toolkit::Visual::Property::MIX_COLOR);
-    Vector4 sourceCornerRadius = findValue(sourceMap, Toolkit::DevelVisual::Property::CORNER_RADIUS);
+    Vector4 sourceMixColor         = findValueVector4(sourceMap, Dali::Toolkit::Visual::Property::MIX_COLOR, mixColor);
+    Vector4 sourceCornerRadius     = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
+    float   sourceBorderlineWidth  = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth);
+    Vector4 sourceBorderlineColor  = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, borderlineColor);
+    float   sourceBorderlineOffset = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset);
 
     std::vector<Dali::Property>                              properties;
     std::vector<std::pair<Property::Value, Property::Value>> values;
@@ -1874,6 +1908,24 @@ void Control::Impl::MakeVisualTransition(Dali::Animation& animation, Dali::Toolk
     {
       properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS));
       values.push_back(std::make_pair(sourceCornerRadius, cornerRadius));
+    }
+
+    if(sourceBorderlineWidth != borderlineWidth)
+    {
+      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::DevelVisual::Property::BORDERLINE_WIDTH));
+      values.push_back(std::make_pair(sourceBorderlineWidth, borderlineWidth));
+    }
+
+    if(sourceBorderlineColor != borderlineColor)
+    {
+      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::DevelVisual::Property::BORDERLINE_COLOR));
+      values.push_back(std::make_pair(sourceBorderlineColor, borderlineColor));
+    }
+
+    if(sourceBorderlineOffset != borderlineOffset)
+    {
+      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::DevelVisual::Property::BORDERLINE_OFFSET));
+      values.push_back(std::make_pair(sourceBorderlineOffset, borderlineOffset));
     }
 
     for(uint32_t i = 0; i < properties.size(); ++i)
@@ -1947,20 +1999,22 @@ void Control::Impl::OnIdleCallback()
 
 Dali::Accessibility::Accessible* Control::Impl::GetAccessibilityObject()
 {
-  if(!accessibilityObject)
-    accessibilityObject = accessibilityConstructor(mControlImpl.Self());
-  return accessibilityObject.get();
+  if(!mAccessibilityObject)
+  {
+    mAccessibilityObject = mAccessibilityConstructor(mControlImpl.Self());
+  }
+  return mAccessibilityObject.get();
 }
 
 Dali::Accessibility::Accessible* Control::Impl::GetAccessibilityObject(Dali::Actor actor)
 {
   if(actor)
   {
-    auto q = Dali::Toolkit::Control::DownCast(actor);
-    if(q)
+    auto control = Dali::Toolkit::Control::DownCast(actor);
+    if(control)
     {
-      auto q2 = static_cast<Internal::Control*>(&q.GetImplementation());
-      return q2->mImpl->GetAccessibilityObject();
+      auto controlImpl = static_cast<Internal::Control*>(&control.GetImplementation());
+      return controlImpl->mImpl->GetAccessibilityObject();
     }
   }
   return nullptr;

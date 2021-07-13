@@ -355,7 +355,8 @@ struct Controller::Impl
     mTextFitMaxSize(DEFAULT_TEXTFIT_MAX),
     mTextFitStepSize(DEFAULT_TEXTFIT_STEP),
     mTextFitEnabled(false),
-    mFontSizeScale(DEFAULT_FONT_SIZE_SCALE)
+    mFontSizeScale(DEFAULT_FONT_SIZE_SCALE),
+    mIsLayoutDirectionChanged(false)
   {
     mModel = Model::New();
 
@@ -834,11 +835,12 @@ public:
 
   Shader mShaderBackground; ///< The shader for text background.
 
-  float mTextFitMinSize;     ///< Minimum Font Size for text fit. Default 10
-  float mTextFitMaxSize;     ///< Maximum Font Size for text fit. Default 100
-  float mTextFitStepSize;    ///< Step Size for font intervalse. Default 1
-  bool  mTextFitEnabled : 1; ///< Whether the text's fit is enabled.
-  float mFontSizeScale;      ///< Scale value for Font Size. Default 1.0
+  float mTextFitMinSize;               ///< Minimum Font Size for text fit. Default 10
+  float mTextFitMaxSize;               ///< Maximum Font Size for text fit. Default 100
+  float mTextFitStepSize;              ///< Step Size for font intervalse. Default 1
+  bool  mTextFitEnabled : 1;           ///< Whether the text's fit is enabled.
+  float mFontSizeScale;                ///< Scale value for Font Size. Default 1.0
+  bool  mIsLayoutDirectionChanged : 1; ///< Whether the layout has changed.
 
 private:
   friend ControllerImplEventHandler;
