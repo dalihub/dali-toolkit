@@ -38,27 +38,14 @@ VisualUrl::ProtocolType ResolveLocation(const std::string& url)
   const uint32_t length  = url.size();
   if((length > 7) && urlCStr[5] == ':' && urlCStr[6] == '/' && urlCStr[7] == '/')
   {
-    // https:// or enbuf://
-    const char hOre = tolower(urlCStr[0]);
-    const char tOrn = tolower(urlCStr[1]);
-    const char tOrb = tolower(urlCStr[2]);
-    const char pOru = tolower(urlCStr[3]);
-    const char sOrf = tolower(urlCStr[4]);
-    if(('h' == hOre) &&
-       ('t' == tOrn) &&
-       ('t' == tOrb) &&
-       ('p' == pOru) &&
-       ('s' == sOrf))
+    // https://
+    if(('h' == tolower(urlCStr[0])) &&
+       ('t' == tolower(urlCStr[1])) &&
+       ('t' == tolower(urlCStr[2])) &&
+       ('p' == tolower(urlCStr[3])) &&
+       ('s' == tolower(urlCStr[4])))
     {
       return VisualUrl::REMOTE;
-    }
-    if(('e' == hOre) &&
-       ('n' == tOrn) &&
-       ('b' == tOrb) &&
-       ('u' == pOru) &&
-       ('f' == sOrf))
-    {
-      return VisualUrl::BUFFER;
     }
   }
   else if((length > 6) && urlCStr[4] == ':' && urlCStr[5] == '/' && urlCStr[6] == '/')
@@ -86,20 +73,18 @@ VisualUrl::ProtocolType ResolveLocation(const std::string& url)
   else if((length > 5) && urlCStr[3] == ':' && urlCStr[4] == '/' && urlCStr[5] == '/')
   {
     // ftp:// or ssh://
-    const char fOrs = tolower(urlCStr[0]);
-    const char tOrs = tolower(urlCStr[1]);
-    const char pOrh = tolower(urlCStr[2]);
-    if(('f' == fOrs) &&
-       ('t' == tOrs) &&
-       ('p' == pOrh))
+    const char fOrS = tolower(urlCStr[0]);
+    if(('f' == fOrS) || ('s' == fOrS))
     {
-      return VisualUrl::REMOTE;
-    }
-    if(('s' == fOrs) &&
-       ('s' == tOrs) &&
-       ('h' == pOrh))
-    {
-      return VisualUrl::REMOTE;
+      const char tOrs = tolower(urlCStr[1]);
+      if(('t' == tOrs) || ('s' == tOrs))
+      {
+        const char pOrh = tolower(urlCStr[2]);
+        if(('p' == pOrh) || ('h' == pOrh))
+        {
+          return VisualUrl::REMOTE;
+        }
+      }
     }
   }
   return VisualUrl::LOCAL;
@@ -223,9 +208,9 @@ VisualUrl::VisualUrl(const std::string& url)
   if(!url.empty())
   {
     mLocation = ResolveLocation(url);
-    if(VisualUrl::TEXTURE != mLocation && VisualUrl::BUFFER != mLocation)
+    if(VisualUrl::TEXTURE != mLocation)
     {
-      // TEXTURE and BUFFER location url doesn't need type resolving, REGULAR_IMAGE is fine
+      // TEXTURE location url doesn't need type resolving, REGULAR_IMAGE is fine
       mType = ResolveType(url);
     }
     else
@@ -244,7 +229,7 @@ VisualUrl::VisualUrl(const VisualUrl& url)
   mType(url.mType),
   mLocation(url.mLocation)
 {
-  if(VisualUrl::TEXTURE == mLocation || VisualUrl::BUFFER == mLocation)
+  if(VisualUrl::TEXTURE == mLocation)
   {
     Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
     if(factory)
@@ -256,7 +241,7 @@ VisualUrl::VisualUrl(const VisualUrl& url)
 
 VisualUrl::~VisualUrl()
 {
-  if(VisualUrl::TEXTURE == mLocation || VisualUrl::BUFFER == mLocation)
+  if(VisualUrl::TEXTURE == mLocation)
   {
     Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
     if(factory)
@@ -270,7 +255,7 @@ VisualUrl& VisualUrl::operator=(const VisualUrl& url)
 {
   if(&url != this)
   {
-    if(VisualUrl::TEXTURE == mLocation || VisualUrl::BUFFER == mLocation)
+    if(VisualUrl::TEXTURE == mLocation)
     {
       Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
       if(factory)
@@ -283,7 +268,7 @@ VisualUrl& VisualUrl::operator=(const VisualUrl& url)
     mType     = url.mType;
     mLocation = url.mLocation;
 
-    if(VisualUrl::TEXTURE == mLocation || VisualUrl::BUFFER == mLocation)
+    if(VisualUrl::TEXTURE == mLocation)
     {
       Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
       if(factory)
@@ -320,11 +305,6 @@ bool VisualUrl::IsLocalResource() const
   return mLocation == VisualUrl::LOCAL;
 }
 
-bool VisualUrl::IsBufferResource() const
-{
-  return mLocation == VisualUrl::BUFFER;
-}
-
 std::string VisualUrl::GetLocation() const
 {
   return GetLocation(mUrl);
@@ -333,11 +313,6 @@ std::string VisualUrl::GetLocation() const
 std::string VisualUrl::CreateTextureUrl(const std::string& location)
 {
   return "dali://" + location;
-}
-
-std::string VisualUrl::CreateBufferUrl(const std::string& location)
-{
-  return "enbuf://" + location;
 }
 
 VisualUrl::ProtocolType VisualUrl::GetProtocolType(const std::string& url)
@@ -354,6 +329,7 @@ std::string VisualUrl::GetLocation(const std::string& url)
   }
   return url;
 }
+
 
 } // namespace Internal
 
