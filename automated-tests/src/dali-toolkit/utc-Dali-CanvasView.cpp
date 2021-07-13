@@ -196,6 +196,34 @@ int UtcDaliCanvasViewRemoveN(void)
   END_TEST;
 }
 
+int UtcDaliCanvasViewRemoveAllP(void)
+{
+  ToolkitTestApplication application;
+  CanvasView canvasView = CanvasView::New(Vector2(100,100));
+  DALI_TEST_CHECK( canvasView );
+
+  Dali::CanvasRenderer::Shape shape = Dali::CanvasRenderer::Shape::New();
+
+  canvasView.AddDrawable(shape);
+
+  canvasView.RemoveAllDrawables();
+
+  END_TEST;
+}
+
+int UtcDaliCanvasViewRemoveAllN(void)
+{
+  ToolkitTestApplication application;
+
+  CanvasView canvasView = CanvasView::New(Vector2(100,100));
+  DALI_TEST_CHECK( canvasView );
+
+  canvasView.RemoveAllDrawables();
+
+  END_TEST;
+}
+
+
 int UtcDaliCanvasViewChangeSizeP(void)
 {
   ToolkitTestApplication application;

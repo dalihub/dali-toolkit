@@ -260,6 +260,15 @@ bool CanvasView::RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
   return false;
 }
 
+bool CanvasView::RemoveAllDrawables()
+{
+  if(mCanvasRenderer && mCanvasRenderer.RemoveAllDrawables())
+  {
+    return true;
+  }
+  return false;
+}
+
 bool CanvasView::SetViewBox(const Vector2& viewBox)
 {
   if(mCanvasRenderer && mCanvasRenderer.SetViewBox(viewBox))

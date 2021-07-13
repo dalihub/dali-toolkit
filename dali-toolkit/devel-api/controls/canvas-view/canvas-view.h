@@ -169,6 +169,11 @@ public:
    */
   bool RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable);
 
+  /**
+   * @brief Remove all drawable objects added to the CanvasView.
+   */
+  void RemoveAllDrawables();
+
 public: // Not intended for application developers
   /// @cond internal
   /**

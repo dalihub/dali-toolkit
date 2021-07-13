@@ -84,6 +84,11 @@ public:
    */
   bool RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable);
 
+  /**
+   * @copydoc Toolkit::Control::CanvasView::RemoveAllDrawables
+   */
+  bool RemoveAllDrawables();
+
 private: // From Control
   /**
    * @copydoc Control::OnRelayout

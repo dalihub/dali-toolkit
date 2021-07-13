@@ -78,6 +78,11 @@ bool CanvasView::RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
   return Dali::Toolkit::GetImpl(*this).RemoveDrawable(drawable);
 }
 
+void CanvasView::RemoveAllDrawables()
+{
+  Dali::Toolkit::GetImpl(*this).RemoveAllDrawables();
+}
+
 CanvasView::CanvasView(Internal::CanvasView& implementation)
 : Control(implementation)
 {

@@ -88,6 +88,15 @@ public:
     return false;
   }
 
+  bool RemoveAllDrawables()
+  {
+    if (mDrawable)
+    {
+      return true;
+    }
+    return false;
+  }
+
   Devel::PixelBuffer GetPixelBuffer()
   {
     return mPixelBuffer;
@@ -205,6 +214,11 @@ bool CanvasRenderer::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
 bool CanvasRenderer::RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
 {
   return Internal::Adaptor::GetImplementation(*this).RemoveDrawable(drawable);
+}
+
+bool CanvasRenderer::RemoveAllDrawables()
+{
+  return Internal::Adaptor::GetImplementation(*this).RemoveAllDrawables();
 }
 
 bool CanvasRenderer::SetSize(const Vector2& size)
