@@ -112,7 +112,9 @@ bool SetBidirectionalInfoTest( const SetBidirectionalInfoData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -198,7 +200,9 @@ bool GetMirroredTextTest( const GetMirroredTextData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -275,7 +279,9 @@ bool GetCharactersDirectionTest( const GetCharactersDirectionData& data )
                    textModel,
                    metrics,
                    data.markupProcessorEnabled,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;

@@ -80,7 +80,9 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -165,7 +167,9 @@ bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;

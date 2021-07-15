@@ -284,6 +284,40 @@ int UtcDaliTextFieldBackgroundTag(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextFieldEllipsisInternalAPIs(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisInternalAPIs ");
+  TextField textField = TextField::New();
+
+  Toolkit::Internal::TextField& textFieldImpl = GetImpl( textField );
+  Text::ViewInterface& view = textFieldImpl.GetTextController()->GetView();
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisInternalAPIs - ELLIPSIS Disabled");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS, false);
+  DALI_TEST_EQUALS( textField.GetProperty< bool >( DevelTextField::Property::ELLIPSIS ), false, TEST_LOCATION );
+  DALI_TEST_CHECK(!(view.IsTextElideEnabled()));
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisInternalAPIs - ELLIPSIS Enabled");
+  textField.SetProperty(DevelTextField::Property::ELLIPSIS, true);
+  DALI_TEST_EQUALS( textField.GetProperty< bool >( DevelTextField::Property::ELLIPSIS ), true, TEST_LOCATION );
+  DALI_TEST_CHECK(view.IsTextElideEnabled());
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisInternalAPIs - GetStartIndexOfElidedGlyphs Default");
+  DALI_TEST_EQUALS( view.GetStartIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisInternalAPIs - GetEndIndexOfElidedGlyphs Default");
+  DALI_TEST_EQUALS( view.GetEndIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisInternalAPIs - GetFirstMiddleIndexOfElidedGlyphs Default");
+  DALI_TEST_EQUALS( view.GetFirstMiddleIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextFieldEllipsisInternalAPIs - GetSecondMiddleIndexOfElidedGlyphs Default");
+  DALI_TEST_EQUALS( view.GetSecondMiddleIndexOfElidedGlyphs(), 0u, TEST_LOCATION );
+
+
+  END_TEST;
+}
 int UtcDaliTextFieldTextWithSpan(void)
 {
   ToolkitTestApplication application;

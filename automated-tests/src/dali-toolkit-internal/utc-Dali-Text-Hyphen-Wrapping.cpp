@@ -91,7 +91,9 @@ bool LayoutTextTest( const LayoutTextData& data )
                    textModel,
                    metrics,
                    false,
-                   data.wrapMode );
+                   data.wrapMode,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   Vector<LineRun>& lines = textModel->mVisualModel->mLines;
 
@@ -157,7 +159,7 @@ int UtcDaliTextHyphenWrapping(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun1 );
   Size textArea(65.0f, 200.f);
-  
+
   LineRun line1 =
   {
     { 0u, 5u },
@@ -184,7 +186,7 @@ int UtcDaliTextHyphenWrapping(void)
     false,
     false
   };
-  
+
   Vector<LineRun> lines;
   lines.PushBack( line1 );
   lines.PushBack( line2 );
@@ -237,7 +239,7 @@ int UtcDaliTextMixedWrapping(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun1 );
   Size textArea(72.0f, 200.f);
-  
+
   LineRun line1 =
   {
     { 0u, 3u },
@@ -277,7 +279,7 @@ int UtcDaliTextMixedWrapping(void)
     false,
     false
   };
-  
+
   Vector<LineRun> lines;
   lines.PushBack( line1 );
   lines.PushBack( line2 );

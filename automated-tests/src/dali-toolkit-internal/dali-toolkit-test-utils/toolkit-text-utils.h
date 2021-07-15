@@ -56,6 +56,9 @@ struct LayoutOptions
  * @param[out] textModel Pointer to a text model instance.
  * @param[out] metrics Pointer to a wrapper around FontClient used to get metrics.
  * @param[in] markupProcessorEnabled Enable markup processor to use markup text.
+ * @param[in] wrapMode Line wrap mode.
+ * @param[in] ellipsisEnabled Whether the ellipsis layout option is enabled.
+ * @param[in] ellipsisPosition Where is the location the text elide.
  */
 void CreateTextModel( const std::string& text,
                       const Size& textArea,
@@ -65,7 +68,9 @@ void CreateTextModel( const std::string& text,
                       ModelPtr& textModel,
                       MetricsPtr& metrics,
                       bool markupProcessorEnabled,
-                      LineWrap::Mode wrapMode );
+                      LineWrap::Mode wrapMode,
+                      bool ellipsisEnabled,
+                      DevelText::EllipsisPosition::Type ellipsisPosition);
 
 /**
  * @brief Configures the text @p controller similarly to the one configured by the text-label.

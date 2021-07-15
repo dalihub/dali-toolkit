@@ -41,21 +41,22 @@ const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
 struct LayoutTextData
 {
-  std::string          description;
-  std::string          text;
-  Size                 textArea;
-  unsigned int         numberOfFonts;
-  FontDescriptionRun*  fontDescriptions;
-  Size                 layoutSize;
-  unsigned int         totalNumberOfGlyphs;
-  float*               positions;
-  unsigned int         numberOfLines;
-  LineRun*             lines;
-  Layout::Engine::Type layout;
-  unsigned int         startIndex;
-  unsigned int         numberOfGlyphs;
-  bool                 ellipsis:1;
-  bool                 updated:1;
+  std::string                                       description;
+  std::string                                       text;
+  Size                                              textArea;
+  unsigned int                                      numberOfFonts;
+  FontDescriptionRun*                               fontDescriptions;
+  Size                                              layoutSize;
+  unsigned int                                      totalNumberOfGlyphs;
+  float*                                            positions;
+  unsigned int                                      numberOfLines;
+  LineRun*                                          lines;
+  Layout::Engine::Type                              layout;
+  unsigned int                                      startIndex;
+  unsigned int                                      numberOfGlyphs;
+  bool                                              ellipsis:1;
+  DevelText::EllipsisPosition::Type                 ellipsisPosition;
+  bool                                              updated:1;
 };
 
 void Print( const LineRun& line )
@@ -109,7 +110,9 @@ bool LayoutTextTest( const LayoutTextData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -179,7 +182,8 @@ bool LayoutTextTest( const LayoutTextData& data )
   const bool updated = engine.LayoutText( layoutParameters,
                                           layoutSize,
                                           data.ellipsis,
-                                          isAutoScroll );
+                                          isAutoScroll,
+                                          data.ellipsisPosition );
 
   // 4) Compare the results.
 
@@ -364,7 +368,9 @@ bool AlignTest( const AlignData& data )
                    textModel,
                    metrics,
                    false,
-                   LineWrap::WORD );
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -501,6 +507,7 @@ int UtcDaliTextLayoutNoText(void)
     0u,
     0u,
     false,
+    DevelText::EllipsisPosition::END,
     false
   };
 
@@ -555,6 +562,7 @@ int UtcDaliTextLayoutSmallTextArea01(void)
     0u,
     11u,
     false,
+    DevelText::EllipsisPosition::END,
     false
   };
 
@@ -626,6 +634,7 @@ int UtcDaliTextLayoutSmallTextArea02(void)
     0u,
     11u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -774,6 +783,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     0u,
     48u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -988,6 +998,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     0u,
     55u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -1092,6 +1103,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     0u,
     29u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -1179,6 +1191,7 @@ int UtcDaliTextLayoutMultilineText04(void)
     0u,
     13u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -1295,6 +1308,7 @@ int UtcDaliTextLayoutMultilineText05(void)
     0u,
     17u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -1383,6 +1397,7 @@ int UtcDaliTextLayoutMultilineText06(void)
     0u,
     10u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -1486,6 +1501,7 @@ int UtcDaliTextLayoutMultilineText07(void)
     0u,
     9u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -2061,6 +2077,7 @@ int UtcDaliTextUpdateLayout01(void)
     0u,
     64u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -2636,6 +2653,7 @@ int UtcDaliTextUpdateLayout02(void)
     64u,
     64u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -3211,6 +3229,7 @@ int UtcDaliTextUpdateLayout03(void)
     128u,
     64u,
     false,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -3288,6 +3307,7 @@ int UtcDaliTextLayoutEllipsis01(void)
     0u,
     51u,
     true,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -3380,6 +3400,7 @@ int UtcDaliTextLayoutEllipsis02(void)
     0u,
     51u,
     true,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -3523,6 +3544,7 @@ int UtcDaliTextLayoutEllipsis03(void)
     0u,
     72u,
     true,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -3681,6 +3703,7 @@ int UtcDaliTextLayoutEllipsis04(void)
     0u,
     72u,
     true,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -3756,6 +3779,7 @@ int UtcDaliTextLayoutEllipsis05(void)
     0u,
     11u,
     true,
+    DevelText::EllipsisPosition::END,
     true
   };
 
@@ -5377,6 +5401,7 @@ int UtcDaliTextLayoutGetGlyphMetrics(void)
       0u,
       1u,
       false,
+      DevelText::EllipsisPosition::END,
       true
     },
     {
@@ -5394,6 +5419,7 @@ int UtcDaliTextLayoutGetGlyphMetrics(void)
       0u,
       2u,
       false,
+      DevelText::EllipsisPosition::END,
       true
     },
    {
@@ -5411,6 +5437,7 @@ int UtcDaliTextLayoutGetGlyphMetrics(void)
       0u,
       2u,
       false,
+      DevelText::EllipsisPosition::END,
       true
     }
   };

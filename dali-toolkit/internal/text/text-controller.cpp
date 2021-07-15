@@ -459,6 +459,7 @@ Text::LineWrap::Mode Controller::GetLineWrapMode() const
 void Controller::SetTextElideEnabled(bool enabled)
 {
   mImpl->mModel->mElideEnabled = enabled;
+  mImpl->mModel->mVisualModel->SetTextElideEnabled(enabled);
 }
 
 bool Controller::IsTextElideEnabled() const
@@ -1717,6 +1718,17 @@ Toolkit::DevelText::VerticalLineAlignment::Type Controller::GetVerticalLineAlign
 void Controller::SetVerticalLineAlignment(Toolkit::DevelText::VerticalLineAlignment::Type alignment)
 {
   mImpl->mModel->mVerticalLineAlignment = alignment;
+}
+
+Toolkit::DevelText::EllipsisPosition::Type Controller::GetEllipsisPosition() const
+{
+  return mImpl->mModel->GetEllipsisPosition();
+}
+
+void Controller::SetEllipsisPosition(Toolkit::DevelText::EllipsisPosition::Type ellipsisPosition)
+{
+  mImpl->mModel->mEllipsisPosition = ellipsisPosition;
+  mImpl->mModel->mVisualModel->SetEllipsisPosition(ellipsisPosition);
 }
 
 // public : Relayout.

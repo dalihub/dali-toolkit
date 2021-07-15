@@ -35,7 +35,11 @@ ViewModel::ViewModel(const ModelInterface* const model)
 : mModel(model),
   mElidedGlyphs(),
   mElidedLayout(),
-  mIsTextElided(false)
+  mIsTextElided(false),
+  mStartIndexOfElidedGlyphs(0u),
+  mEndIndexOfElidedGlyphs(0u),
+  mFirstMiddleIndexOfElidedGlyphs(0u),
+  mSecondMiddleIndexOfElidedGlyphs(0u)
 {
 }
 
@@ -71,6 +75,11 @@ VerticalAlignment::Type ViewModel::GetVerticalAlignment() const
 DevelText::VerticalLineAlignment::Type ViewModel::GetVerticalLineAlignment() const
 {
   return mModel->GetVerticalLineAlignment();
+}
+
+DevelText::EllipsisPosition::Type ViewModel::GetEllipsisPosition() const
+{
+  return mModel->GetEllipsisPosition();
 }
 
 bool ViewModel::IsTextElideEnabled() const
@@ -110,6 +119,46 @@ Length ViewModel::GetNumberOfGlyphs() const
   }
 
   return 0u;
+}
+
+GlyphIndex ViewModel::GetStartIndexOfElidedGlyphs() const
+{
+  if(mIsTextElided && mModel->IsTextElideEnabled())
+  {
+    return mStartIndexOfElidedGlyphs;
+  }
+
+  return mModel->GetStartIndexOfElidedGlyphs();
+}
+
+GlyphIndex ViewModel::GetEndIndexOfElidedGlyphs() const
+{
+  if(mIsTextElided && mModel->IsTextElideEnabled())
+  {
+    return mEndIndexOfElidedGlyphs;
+  }
+
+  return mModel->GetEndIndexOfElidedGlyphs();
+}
+
+GlyphIndex ViewModel::GetFirstMiddleIndexOfElidedGlyphs() const
+{
+  if(mIsTextElided && mModel->IsTextElideEnabled())
+  {
+    return mFirstMiddleIndexOfElidedGlyphs;
+  }
+
+  return mModel->GetFirstMiddleIndexOfElidedGlyphs();
+}
+
+GlyphIndex ViewModel::GetSecondMiddleIndexOfElidedGlyphs() const
+{
+  if(mIsTextElided && mModel->IsTextElideEnabled())
+  {
+    return mSecondMiddleIndexOfElidedGlyphs;
+  }
+
+  return mModel->GetSecondMiddleIndexOfElidedGlyphs();
 }
 
 const GlyphInfo* const ViewModel::GetGlyphs() const
@@ -252,157 +301,283 @@ Length ViewModel::GetHyphensCount() const
 
 void ViewModel::ElideGlyphs()
 {
-  mIsTextElided = false;
+  mIsTextElided             = false;
+  mStartIndexOfElidedGlyphs = mFirstMiddleIndexOfElidedGlyphs = mSecondMiddleIndexOfElidedGlyphs = 0;
+  mEndIndexOfElidedGlyphs                                                                        = mModel->GetNumberOfGlyphs() - 1u;
 
-  if(mModel->IsTextElideEnabled())
+  auto ellipsisPosition = GetEllipsisPosition();
+
+  if(IsTextElideEnabled())
   {
     const Length numberOfLines = mModel->GetNumberOfLines();
     if(0u != numberOfLines)
     {
       const LineRun* const lines = mModel->GetLines();
 
-      const LineRun& lastLine              = *(lines + (numberOfLines - 1u));
-      const Length   numberOfLaidOutGlyphs = lastLine.glyphRun.glyphIndex + lastLine.glyphRun.numberOfGlyphs;
+      //Get line of ellipsis
+      const LineRun* ellipsisLine     = nullptr;
+      const LineRun* ellipsisNextLine = nullptr;
 
-      if(lastLine.ellipsis && (0u != numberOfLaidOutGlyphs))
+      for(Length lineIndex = 0; lineIndex < numberOfLines; lineIndex++)
       {
-        mIsTextElided                          = true;
-        TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-
-        const GlyphInfo* const glyphs    = mModel->GetGlyphs();
-        const Vector2* const   positions = mModel->GetLayout();
-
-        // Copy the glyphs to be elided.
-        mElidedGlyphs.Resize(numberOfLaidOutGlyphs);
-        mElidedLayout.Resize(numberOfLaidOutGlyphs);
-
-        GlyphInfo* elidedGlyphsBuffer    = mElidedGlyphs.Begin();
-        Vector2*   elidedPositionsBuffer = mElidedLayout.Begin();
-
-        memcpy(elidedGlyphsBuffer, glyphs, numberOfLaidOutGlyphs * sizeof(GlyphInfo));
-        memcpy(elidedPositionsBuffer, positions, numberOfLaidOutGlyphs * sizeof(Vector2));
-
-        const Size& controlSize = mModel->GetControlSize();
-
-        if((1u == numberOfLines) &&
-           (lastLine.ascender - lastLine.descender > controlSize.height))
+        const LineRun* line = (lines + lineIndex);
+        if(line->ellipsis)
         {
-          // Get the first glyph which is going to be replaced and the ellipsis glyph.
-          GlyphInfo&       glyphToRemove = *elidedGlyphsBuffer;
-          const GlyphInfo& ellipsisGlyph = fontClient.GetEllipsisGlyph(fontClient.GetPointSize(glyphToRemove.fontId));
+          ellipsisLine = line;
+          if(lineIndex < numberOfLines - 1u)
+          {
+            ellipsisNextLine = (lines + lineIndex + 1u);
+          }
+          break;
+        }
+      }
 
-          // Change the 'x' and 'y' position of the ellipsis glyph.
-          Vector2& position = *elidedPositionsBuffer;
+      // Check if there is a line contains Ellipsis.
+      // Then find total number of glyphs and total number of laid out glyphs.
+      // Check where to set Ellipsis glyph in line.
+      // Determine index of Ellipsis glyph and how many glyphs should be replaced by Ellipsis glyph, according to width of Ellipsis glyph.
+      if(ellipsisLine != nullptr)
+      {
+        // Total number of glyphs.
+        const Length numberOfGlyphs = mModel->GetNumberOfGlyphs();
+        // Total number of laid out glyphs.
+        Length numberOfActualLaidOutGlyphs = 0u;
 
-          position.x = ellipsisGlyph.xBearing;
-          position.y = -lastLine.ascender + controlSize.height - ellipsisGlyph.yBearing;
-
-          // Replace the glyph by the ellipsis glyph and resize the buffers.
-          glyphToRemove = ellipsisGlyph;
-
-          mElidedGlyphs.Resize(1u);
-          mElidedLayout.Resize(1u);
-
-          return;
+        // Accumulate laid out glyphs for each line to find total number of laid out glyphs.
+        for(Length lineIndex = 0u; lineIndex < numberOfLines; lineIndex++)
+        {
+          numberOfActualLaidOutGlyphs += lines[lineIndex].glyphRun.numberOfGlyphs + lines[lineIndex].glyphRunSecondHalf.numberOfGlyphs;
         }
 
-        // firstPenX, penY and firstPenSet are used to position the ellipsis glyph if needed.
-        float firstPenX   = 0.f; // Used if rtl text is elided.
-        float penY        = 0.f;
-        bool  firstPenSet = false;
-
-        // Add the ellipsis glyph.
-        bool       inserted              = false;
-        float      removedGlypsWidth     = 0.f;
-        Length     numberOfRemovedGlyphs = 0u;
-        GlyphIndex index                 = numberOfLaidOutGlyphs - 1u;
-
-        // The ellipsis glyph has to fit in the place where the last glyph(s) is(are) removed.
-        while(!inserted)
+        // Make sure there are laid out glyphs.
+        if(0u != numberOfActualLaidOutGlyphs)
         {
-          const GlyphInfo& glyphToRemove = *(elidedGlyphsBuffer + index);
+          // There are elided glyphs.
+          mIsTextElided                          = true;
+          TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
-          if(0u != glyphToRemove.fontId)
+          // Retrieve the whole glyphs and their positions.
+          const GlyphInfo* const glyphs    = mModel->GetGlyphs();
+          const Vector2* const   positions = mModel->GetLayout();
+
+          // Copy the glyphs to be elided.
+          mElidedGlyphs.Resize(numberOfGlyphs);
+          mElidedLayout.Resize(numberOfGlyphs);
+          GlyphInfo* elidedGlyphsBuffer    = mElidedGlyphs.Begin();
+          Vector2*   elidedPositionsBuffer = mElidedLayout.Begin();
+
+          memcpy(elidedGlyphsBuffer, glyphs, numberOfGlyphs * sizeof(GlyphInfo));
+          memcpy(elidedPositionsBuffer, positions, numberOfGlyphs * sizeof(Vector2));
+
+          const Size& controlSize = mModel->GetControlSize();
+
+          // Set index where to set Ellipsis according to the selected position of Ellipsis.
+          // Start with this index to replace its glyph by Ellipsis, if the width  is not enough, then remove more glyphs.
+          GlyphIndex startIndexOfEllipsis = 0u;
+          if(ellipsisPosition == DevelText::EllipsisPosition::START)
           {
-            // i.e. The font id of the glyph shaped from the '\n' character is zero.
-
-            // Need to reshape the glyph as the font may be different in size.
-            const GlyphInfo& ellipsisGlyph = fontClient.GetEllipsisGlyph(fontClient.GetPointSize(glyphToRemove.fontId));
-
-            if(!firstPenSet || EqualsZero(glyphToRemove.advance))
-            {
-              const Vector2& position = *(elidedPositionsBuffer + index);
-
-              // Calculates the penY of the current line. It will be used to position the ellipsis glyph.
-              penY = position.y + glyphToRemove.yBearing;
-
-              // Calculates the first penX which will be used if rtl text is elided.
-              firstPenX = position.x - glyphToRemove.xBearing;
-              if(firstPenX < -ellipsisGlyph.xBearing)
-              {
-                // Avoids to exceed the bounding box when rtl text is elided.
-                firstPenX = -ellipsisGlyph.xBearing;
-              }
-
-              removedGlypsWidth = -ellipsisGlyph.xBearing;
-
-              if(!EqualsZero(firstPenX))
-              {
-                firstPenSet = true;
-              }
-            }
-
-            removedGlypsWidth += std::min(glyphToRemove.advance, (glyphToRemove.xBearing + glyphToRemove.width));
-
-            // Calculate the width of the ellipsis glyph and check if it fits.
-            const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;
-
-            // If it is the last glyph to remove, add the ellipsis glyph without checking its width.
-            if((ellipsisGlyphWidth < removedGlypsWidth) || (index == 0u))
-            {
-              GlyphInfo& glyphInfo = *(elidedGlyphsBuffer + index);
-              Vector2&   position  = *(elidedPositionsBuffer + index);
-              position.x -= (0.f > glyphInfo.xBearing) ? glyphInfo.xBearing : 0.f;
-
-              // Replace the glyph by the ellipsis glyph.
-              glyphInfo = ellipsisGlyph;
-
-              // Change the 'x' and 'y' position of the ellipsis glyph.
-              if(position.x > firstPenX)
-              {
-                position.x = firstPenX;
-                if(ellipsisGlyphWidth < removedGlypsWidth)
-                {
-                  position.x += removedGlypsWidth - ellipsisGlyphWidth;
-                }
-              }
-
-              position.x += ellipsisGlyph.xBearing;
-              position.y = penY - ellipsisGlyph.yBearing;
-
-              inserted = true;
-            }
+            // It's the fisrt glyph in line.
+            startIndexOfEllipsis = ellipsisLine->glyphRun.glyphIndex;
+          }
+          else if(ellipsisPosition == DevelText::EllipsisPosition::MIDDLE)
+          {
+            // It's the second middle of the line in case the line split to two halves.
+            // Otherwise it's It's the last glyph in line (line before all removed lines).
+            startIndexOfEllipsis = ellipsisLine->isSplitToTwoHalves ? (ellipsisLine->glyphRunSecondHalf.glyphIndex) : (ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs - 1u);
+          }
+          else // DevelText::EllipsisPosition::END
+          {
+            // It's the last glyph in line.
+            startIndexOfEllipsis = ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs - 1u;
           }
 
-          if(!inserted)
+          // When the hight is not enough then show one glyph and that should be the first laid out glyph.
+          if((1u == numberOfLines) &&
+             (ellipsisLine->ascender - ellipsisLine->descender > controlSize.height))
           {
-            if(index > 0u)
+            // Replace the first glyph with ellipsis glyph
+            auto indexOfFirstGlyph = (ellipsisPosition == DevelText::EllipsisPosition::START) ? startIndexOfEllipsis : 0u;
+
+            // Regardless where the location of ellipsis,in-case the hight of line is greater than control's height
+            // then replace the first glyph with ellipsis glyph.
+
+            // Get the first glyph which is going to be replaced and the ellipsis glyph.
+            GlyphInfo&       glyphToRemove = *(elidedGlyphsBuffer + indexOfFirstGlyph);
+            const GlyphInfo& ellipsisGlyph = fontClient.GetEllipsisGlyph(fontClient.GetPointSize(glyphToRemove.fontId));
+
+            // Change the 'x' and 'y' position of the ellipsis glyph.
+            Vector2& position = *(elidedPositionsBuffer + indexOfFirstGlyph);
+
+            position.x = ellipsisGlyph.xBearing;
+            position.y = -ellipsisLine->ascender + controlSize.height - ellipsisGlyph.yBearing;
+
+            // Replace the glyph by the ellipsis glyph and resize the buffers.
+            glyphToRemove = ellipsisGlyph;
+
+            mElidedGlyphs.Resize(1u);
+            mElidedLayout.Resize(1u);
+
+            mEndIndexOfElidedGlyphs = mStartIndexOfElidedGlyphs = mFirstMiddleIndexOfElidedGlyphs = mSecondMiddleIndexOfElidedGlyphs = indexOfFirstGlyph;
+
+            return;
+          }
+
+          // firstPenX, penY and firstPenSet are used to position the ellipsis glyph if needed.
+          float firstPenX   = 0.f; // Used if rtl text is elided.
+          float penY        = 0.f;
+          bool  firstPenSet = false;
+
+          // Add the ellipsis glyph.
+          bool       inserted              = false;
+          float      removedGlypsWidth     = 0.f;
+          Length     numberOfRemovedGlyphs = 0u;
+          GlyphIndex indexOfEllipsis       = startIndexOfEllipsis;
+
+          // Tail Mode: start by the end of line.
+          bool isTailMode = (ellipsisPosition == DevelText::EllipsisPosition::END) ||
+                            (ellipsisPosition == DevelText::EllipsisPosition::MIDDLE && numberOfLines != 1u);
+
+          // The ellipsis glyph has to fit in the place where the last glyph(s) is(are) removed.
+          while(!inserted)
+          {
+            const GlyphInfo& glyphToRemove = *(elidedGlyphsBuffer + indexOfEllipsis);
+
+            if(0u != glyphToRemove.fontId)
             {
-              --index;
+              // i.e. The font id of the glyph shaped from the '\n' character is zero.
+
+              // Need to reshape the glyph as the font may be different in size.
+              const GlyphInfo& ellipsisGlyph = fontClient.GetEllipsisGlyph(fontClient.GetPointSize(glyphToRemove.fontId));
+
+              if(!firstPenSet)
+              {
+                const Vector2& position = *(elidedPositionsBuffer + indexOfEllipsis);
+
+                // Calculates the penY of the current line. It will be used to position the ellipsis glyph.
+                penY = position.y + glyphToRemove.yBearing;
+
+                // Calculates the first penX which will be used if rtl text is elided.
+                firstPenX = position.x - glyphToRemove.xBearing;
+                if(firstPenX < -ellipsisGlyph.xBearing)
+                {
+                  // Avoids to exceed the bounding box when rtl text is elided.
+                  firstPenX = -ellipsisGlyph.xBearing;
+                }
+
+                removedGlypsWidth = -ellipsisGlyph.xBearing;
+
+                firstPenSet = true;
+              }
+
+              removedGlypsWidth += std::min(glyphToRemove.advance, (glyphToRemove.xBearing + glyphToRemove.width));
+
+              // Calculate the width of the ellipsis glyph and check if it fits.
+              const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;
+
+              // If it is the last glyph to remove, add the ellipsis glyph without checking its width.
+              if((ellipsisGlyphWidth < removedGlypsWidth) || (isTailMode ? (indexOfEllipsis == 0u) : (indexOfEllipsis == numberOfGlyphs - 1u)))
+              {
+                GlyphInfo& glyphInfo = *(elidedGlyphsBuffer + indexOfEllipsis);
+                Vector2&   position  = *(elidedPositionsBuffer + indexOfEllipsis);
+                position.x -= (0.f > glyphInfo.xBearing) ? glyphInfo.xBearing : 0.f;
+
+                // Replace the glyph by the ellipsis glyph.
+                glyphInfo = ellipsisGlyph;
+
+                // Change the 'x' and 'y' position of the ellipsis glyph.
+                if(position.x > firstPenX)
+                {
+                  position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
+                }
+
+                position.x += ellipsisGlyph.xBearing;
+                position.y = penY - ellipsisGlyph.yBearing;
+
+                inserted = true;
+              }
+            }
+
+            if(!inserted)
+            {
+              if(!isTailMode && indexOfEllipsis < numberOfGlyphs - 1u)
+              {
+                // Tail Mode: remove glyphs from startIndexOfEllipsis then decrement indexOfEllipsis, until arrive to index zero.
+                ++indexOfEllipsis;
+              }
+              else if(isTailMode && indexOfEllipsis > 0u)
+              {
+                // Not Tail Mode: remove glyphs from startIndexOfEllipsis then increase indexOfEllipsis, until arrive to last index (numberOfGlyphs - 1u).
+                --indexOfEllipsis;
+              }
+              else
+              {
+                // No space for the ellipsis.
+                inserted = true;
+              }
+              ++numberOfRemovedGlyphs;
+            }
+          } // while( !inserted )
+
+          //Reduce size, shift glyphs and start from ellipsis glyph
+          Length numberOfElidedGlyphs = numberOfActualLaidOutGlyphs - numberOfRemovedGlyphs;
+          mElidedGlyphs.Resize(numberOfElidedGlyphs);
+          mElidedLayout.Resize(numberOfElidedGlyphs);
+
+          if(ellipsisPosition == DevelText::EllipsisPosition::START)
+          {
+            // 'Shifts' glyphs after ellipsis glyph and 'Removes' before ellipsis glyph
+            memcpy(elidedGlyphsBuffer, elidedGlyphsBuffer + indexOfEllipsis, numberOfElidedGlyphs * sizeof(GlyphInfo));
+            memcpy(elidedPositionsBuffer, elidedPositionsBuffer + indexOfEllipsis, numberOfElidedGlyphs * sizeof(Vector2));
+
+            mStartIndexOfElidedGlyphs = mFirstMiddleIndexOfElidedGlyphs = mSecondMiddleIndexOfElidedGlyphs = indexOfEllipsis;
+          }
+          else if(ellipsisPosition == DevelText::EllipsisPosition::MIDDLE)
+          {
+            // 'Shifts and connects' glyphs before and after ellipsis glyph and 'Removes' in-between.
+            bool isOnlySecondHalf = false;
+
+            if(isTailMode)
+            {
+              mFirstMiddleIndexOfElidedGlyphs = indexOfEllipsis;
+              if(ellipsisNextLine != nullptr)
+              {
+                mSecondMiddleIndexOfElidedGlyphs = ellipsisNextLine->glyphRun.glyphIndex;
+              }
+              else
+              {
+                mEndIndexOfElidedGlyphs = mSecondMiddleIndexOfElidedGlyphs = mFirstMiddleIndexOfElidedGlyphs;
+              }
             }
             else
             {
-              // No space for the ellipsis.
-              inserted = true;
+              mFirstMiddleIndexOfElidedGlyphs  = (ellipsisLine->glyphRun.numberOfGlyphs > 0u) ? (ellipsisLine->glyphRun.glyphIndex + ellipsisLine->glyphRun.numberOfGlyphs - 1u) : (ellipsisLine->glyphRun.glyphIndex);
+              mSecondMiddleIndexOfElidedGlyphs = indexOfEllipsis;
+              isOnlySecondHalf                 = ellipsisLine->glyphRun.numberOfGlyphs == 0u && ellipsisLine->glyphRunSecondHalf.numberOfGlyphs > 0u;
             }
-            ++numberOfRemovedGlyphs;
-          }
-        } // while( !inserted )
 
-        // 'Removes' all the glyphs after the ellipsis glyph.
-        const Length numberOfGlyphs = numberOfLaidOutGlyphs - numberOfRemovedGlyphs;
-        mElidedGlyphs.Resize(numberOfGlyphs);
-        mElidedLayout.Resize(numberOfGlyphs);
+            if(isOnlySecondHalf)
+            {
+              Length numberOfSecondHalfGlyphs = numberOfElidedGlyphs - mFirstMiddleIndexOfElidedGlyphs;
+
+              //Copy elided glyphs after the ellipsis glyph.
+              memcpy(elidedGlyphsBuffer + mFirstMiddleIndexOfElidedGlyphs, elidedGlyphsBuffer + mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(GlyphInfo));
+              memcpy(elidedPositionsBuffer + mFirstMiddleIndexOfElidedGlyphs, elidedPositionsBuffer + mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(Vector2));
+            }
+            else
+            {
+              Length numberOfSecondHalfGlyphs = numberOfElidedGlyphs - mFirstMiddleIndexOfElidedGlyphs + 1u;
+
+              //Copy elided glyphs after the ellipsis glyph.
+              memcpy(elidedGlyphsBuffer + mFirstMiddleIndexOfElidedGlyphs + 1u, elidedGlyphsBuffer + mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(GlyphInfo));
+              memcpy(elidedPositionsBuffer + mFirstMiddleIndexOfElidedGlyphs + 1u, elidedPositionsBuffer + mSecondMiddleIndexOfElidedGlyphs, numberOfSecondHalfGlyphs * sizeof(Vector2));
+            }
+          }
+          else // DevelText::EllipsisPosition::END
+          {
+            // 'Removes' all the glyphs after the ellipsis glyph.
+            mEndIndexOfElidedGlyphs = indexOfEllipsis;
+          }
+        }
       }
     }
   }

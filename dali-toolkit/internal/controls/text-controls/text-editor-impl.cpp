@@ -149,6 +149,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "grabHandleColor
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableGrabHandlePopup",                BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP            )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputMethodSettings",                  MAP,       INPUT_METHOD_SETTINGS               )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputFilter",                          MAP,       INPUT_FILTER                        )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsis",                             BOOLEAN,   ELLIPSIS                            )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsisPosition",                     INTEGER,   ELLIPSIS_POSITION                   )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
@@ -812,6 +814,24 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::ELLIPSIS:
+      {
+        const bool ellipsis = value.Get<bool>();
+        DALI_LOG_INFO(gLogFilter, Debug::General, "TextEditor %p ELLIPSIS %d\n", impl.mController.Get(), ellipsis);
+
+        impl.mController->SetTextElideEnabled(ellipsis);
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ELLIPSIS_POSITION:
+      {
+        DevelText::EllipsisPosition::Type ellipsisPositionType(static_cast<DevelText::EllipsisPosition::Type>(-1)); // Set to invalid value to ensure a valid mode does get set
+        if(GetEllipsisPositionTypeEnumeration(value, ellipsisPositionType))
+        {
+          DALI_LOG_INFO(gLogFilter, Debug::General, "TextEditor %p EllipsisPosition::Type %d\n", impl.mController.Get(), ellipsisPositionType);
+          impl.mController->SetEllipsisPosition(ellipsisPositionType);
+        }
+        break;
+      }
     } // switch
   }   // texteditor
 }
@@ -1190,6 +1210,16 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
         Property::Map map;
         impl.mController->GetInputFilterOption(map);
         value = map;
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ELLIPSIS:
+      {
+        value = impl.mController->IsTextElideEnabled();
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ELLIPSIS_POSITION:
+      {
+        value = impl.mController->GetEllipsisPosition();
         break;
       }
     } //switch

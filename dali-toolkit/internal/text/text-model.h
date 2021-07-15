@@ -83,6 +83,11 @@ public:
   DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const override;
 
   /**
+   * @copydoc ModelInterface::GetEllipsisPosition()
+   */
+  DevelText::EllipsisPosition::Type GetEllipsisPosition() const override;
+
+  /**
    * @copydoc ModelInterface::IsTextElideEnabled()
    */
   bool IsTextElideEnabled() const override;
@@ -111,6 +116,26 @@ public:
    * @copydoc ModelInterface::GetNumberOfGlyphs()
    */
   Length GetNumberOfGlyphs() const override;
+
+  /**
+   * @copydoc ModelInterface::GetStartIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetStartIndexOfElidedGlyphs() const override;
+
+  /**
+   * @copydoc ModelInterface::GetEndIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetEndIndexOfElidedGlyphs() const override;
+
+  /**
+   * @copydoc ModelInterface::GetFirstMiddleIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetFirstMiddleIndexOfElidedGlyphs() const override;
+
+  /**
+   * @copydoc ModelInterface::GetSecondMiddleIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetSecondMiddleIndexOfElidedGlyphs() const override;
 
   /**
    * @copydoc ModelInterface::GetGlyphs()
@@ -267,6 +292,7 @@ public:
   bool                                   mElideEnabled : 1;          ///< Whether the text's elide is enabled.
   bool                                   mIgnoreSpacesAfterText : 1; ///< Whether ignoring spaces after text or not. Default is true.
   DevelText::MatchLayoutDirection        mMatchLayoutDirection;      ///< Whether to match text alignment with layout direction or not.
+  DevelText::EllipsisPosition::Type      mEllipsisPosition;          ///< Where is the location the text elide
 };
 
 } // namespace Text

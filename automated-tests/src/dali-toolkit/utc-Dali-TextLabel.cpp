@@ -74,6 +74,8 @@ const char* const PROPERTY_NAME_ELLIPSIS = "ellipsis";
 const char* const PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY = "autoScrollLoopDelay";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE = "fontSizeScale";
 
+const char* const PROPERTY_NAME_ELLIPSIS_POSITION = "ellipsisPosition";
+
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
 
@@ -341,6 +343,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextLabel::Property::ELLIPSIS );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY ) == TextLabel::Property::AUTO_SCROLL_LOOP_DELAY );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_FONT_SIZE_SCALE ) == DevelTextLabel::Property::FONT_SIZE_SCALE );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS_POSITION ) == DevelTextLabel::Property::ELLIPSIS_POSITION );
 
   END_TEST;
 }
@@ -1926,6 +1929,67 @@ int utcDaliTextLabelGetHeightForWidthChangeLineCountWhenTextChanged(void)
   // Because the GetHeightForWidth is called in Controller::GetLineCount(float width)
   DALI_TEST_EQUALS( lineCountBefore ,1, TEST_LOCATION );
   DALI_TEST_GREATER( lineCountAfter,1, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelEllipsisPositionProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty ");
+  TextLabel textLabel = TextLabel::New();
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Default is END");
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to START");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::START);
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::START ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to MIDDLE");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::MIDDLE);
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::MIDDLE ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to END");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::END);
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to START using integer");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, 1);
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::START ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to MIDDLE using integer");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, 2);
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::MIDDLE ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to END using integer");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, 0);
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to START using string - uppercase");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, "START");
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::START ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to MIDDLE using string - uppercase");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, "MIDDLE");
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::MIDDLE ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to END using string - uppercase");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, "END");
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to START using string - lowercase");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, "start");
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::START ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to MIDDLE using string - lowercase");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, "middle");
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::MIDDLE ), TEST_LOCATION );
+
+  tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to END using string - lowercase");
+  textLabel.SetProperty(DevelTextLabel::Property::ELLIPSIS_POSITION, "end");
+  DALI_TEST_EQUALS( textLabel.GetProperty< int >( DevelTextLabel::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
 
 
   END_TEST;

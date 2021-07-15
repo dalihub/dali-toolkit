@@ -46,7 +46,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 const float    ZERO(0.0f);
 const float    HALF(0.5f);
 const float    ONE(1.0f);
-const uint32_t DOUBLE_PIXEL_PADDING = 4u;//Padding will be added twice to Atlas
+const uint32_t DOUBLE_PIXEL_PADDING = 4u; //Padding will be added twice to Atlas
 const uint16_t NO_OUTLINE           = 0u;
 } // namespace
 
@@ -249,13 +249,12 @@ struct AtlasRenderer::Impl
           // If CheckAtlas in AtlasManager::Add can't fit the bitmap in the current atlas it will create a new atlas
 
           // Setting the block size and size of new atlas does not mean a new one will be created. An existing atlas may still surffice.
-          uint32_t default_width = defaultTextAtlasSize.width;
+          uint32_t default_width  = defaultTextAtlasSize.width;
           uint32_t default_height = defaultTextAtlasSize.height;
 
-          while (
+          while(
             (blockSize.mNeededBlockWidth >= (default_width - (DOUBLE_PIXEL_PADDING + 1u)) ||
-             blockSize.mNeededBlockHeight >= (default_height - (DOUBLE_PIXEL_PADDING + 1u)))
-            &&
+             blockSize.mNeededBlockHeight >= (default_height - (DOUBLE_PIXEL_PADDING + 1u))) &&
             (default_width < maximumTextAtlasSize.width &&
              default_height < maximumTextAtlasSize.height))
           {
@@ -433,6 +432,11 @@ struct AtlasRenderer::Impl
     const Length*    hyphenIndices = view.GetHyphenIndices();
     const Length     hyphensCount  = view.GetHyphensCount();
 
+    // Elided text info. Indices according to elided text.
+    const auto startIndexOfGlyphs              = view.GetStartIndexOfElidedGlyphs();
+    const auto firstMiddleIndexOfElidedGlyphs  = view.GetFirstMiddleIndexOfElidedGlyphs();
+    const auto secondMiddleIndexOfElidedGlyphs = view.GetSecondMiddleIndexOfElidedGlyphs();
+
     const bool useDefaultColor = (NULL == colorsBuffer);
 
     // Get the underline runs.
@@ -466,13 +470,23 @@ struct AtlasRenderer::Impl
     uint32_t               hyphenIndex = 0;
 
     //For septated underlined chunks. (this is for Markup case)
-    uint32_t underlineChunkId = 0u; // give id for each chunk.
-    bool     isPreUnderlined = false; // status of underlined for previous glyph.
+    uint32_t underlineChunkId = 0u;    // give id for each chunk.
+    bool     isPreUnderlined  = false; // status of underlined for previous glyph.
+
+    //Skip hyphenIndices less than startIndexOfGlyphs or between two middle of elided text
+    if(hyphenIndices)
+    {
+      while((hyphenIndex < hyphensCount) && (hyphenIndices[hyphenIndex] < startIndexOfGlyphs ||
+                                             (hyphenIndices[hyphenIndex] > firstMiddleIndexOfElidedGlyphs && hyphenIndices[hyphenIndex] < secondMiddleIndexOfElidedGlyphs)))
+      {
+        ++hyphenIndex;
+      }
+    }
 
     for(uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i)
     {
       GlyphInfo glyph;
-      bool      addHyphen = ((hyphenIndex < hyphensCount) && hyphenIndices && (i == hyphenIndices[hyphenIndex]));
+      bool      addHyphen = ((hyphenIndex < hyphensCount) && hyphenIndices && ((i + startIndexOfGlyphs) == hyphenIndices[hyphenIndex]));
       if(addHyphen && hyphens)
       {
         glyph = hyphens[hyphenIndex];
@@ -601,10 +615,9 @@ struct AtlasRenderer::Impl
                        0u);
         }
 
-
         //The new underlined chunk. Add new id if they are not consecutive indices (this is for Markup case)
         // Examples: "Hello <u>World</u> Hello <u>World</u>", "<u>World</u> Hello <u>World</u>", "<u>   World</u> Hello <u>World</u>"
-        if( isPreUnderlined && (isPreUnderlined != isGlyphUnderlined))
+        if(isPreUnderlined && (isPreUnderlined != isGlyphUnderlined))
         {
           underlineChunkId++;
         }
@@ -871,7 +884,7 @@ struct AtlasRenderer::Impl
       extent.mUnderlinePosition  = underlinePosition;
       extent.mUnderlineThickness = underlineThickness;
       extent.mMeshRecordIndex    = index;
-      extent.mUnderlineChunkId = underlineChunkId;
+      extent.mUnderlineChunkId   = underlineChunkId;
       extents.PushBack(extent);
     }
   }
