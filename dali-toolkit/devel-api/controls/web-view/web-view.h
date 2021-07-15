@@ -33,9 +33,7 @@ namespace Toolkit
 class ImageView;
 class WebBackForwardList;
 class WebContext;
-class WebContextMenu;
 class WebCookieManager;
-class WebFormRepostDecision;
 class WebSettings;
 
 namespace Internal DALI_INTERNAL
@@ -191,71 +189,6 @@ public:
    * @brief WebView callback related with screen-shot captured.
    */
   using WebViewScreenshotCapturedCallback = std::function<void(Dali::Toolkit::ImageView)>;
-
-  /**
-   * @brief WebView signal type related with page loading.
-   */
-  using WebViewPageLoadSignalType = Signal<void(WebView, const std::string&)>;
-
-  /**
-   * @brief WebView signal type related with page loading error.
-   */
-  using WebViewPageLoadErrorSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineLoadError>)>;
-
-  /**
-   * @brief WebView signal type related with scroll edge reached.
-   */
-  using WebViewScrollEdgeReachedSignalType = Signal<void(WebView, Dali::WebEnginePlugin::ScrollEdge)>;
-
-  /**
-   * @brief WebView signal type related with url changed.
-   */
-  using WebViewUrlChangedSignalType = Signal<void(WebView, const std::string&)>;
-
-  /**
-   * @brief WebView signal type related with form repost decision.
-   */
-  using WebViewFormRepostDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineFormRepostDecision>)>;
-
-  /**
-   * @brief WebView signal type related with frame rendered.
-   */
-  using WebViewFrameRenderedSignalType = Signal<void(WebView)>;
-
-  /**
-   * @brief WebView signal type related with http request interceptor.
-   */
-  using WebViewRequestInterceptorSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineRequestInterceptor>)>;
-
-  /**
-   * @brief WebView signal type related with console message.
-   */
-  using WebViewConsoleMessageSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineConsoleMessage>)>;
-
-  /**
-   * @brief WebView signal type related with response policy decision.
-   */
-  using WebViewResponsePolicyDecisionSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEnginePolicyDecision>)>;
-
-  /**
-   * @brief WebView signal type related with certificate changed.
-   */
-  using WebViewCertificateSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineCertificate>)>;
-
-  /**
-   * @brief WebView signal type related with http authentication.
-   */
-  using WebViewHttpAuthHandlerSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineHttpAuthHandler>)>;
-
-  /**
-   * @brief WebView signal type related with context menu shown.
-   */
-  using WebViewContextMenuShownSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineContextMenu>)>;
-
-  /**
-   * @brief WebView signal type related with context menu hidden.
-   */
-  using WebViewContextMenuHiddenSignalType = Signal<void(WebView, std::shared_ptr<Dali::WebEngineContextMenu>)>;
 
 public:
   /**
@@ -500,9 +433,9 @@ public:
    * @brief Evaluate JavaScript code represented as a string.
    *
    * @param[in] script The JavaScript code
-   * @param[in] resultHandler The callback function to be called by the JavaScript runtime. This carries evaluation result
+   * @param[in] resultHandler The callback to be called by the JavaScript runtime. This carries evaluation result
    */
-  void EvaluateJavaScript(const std::string& script, std::function<void(const std::string&)> resultHandler);
+  void EvaluateJavaScript(const std::string& script, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback resultHandler);
 
   /**
    * @brief Evaluate JavaScript code represented as a string.
@@ -535,7 +468,7 @@ public:
    * @param[in] exposedObjectName The name of exposed object
    * @param[in] handler The callback function
    */
-  void AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler);
+  void AddJavaScriptMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler);
 
   /**
    * @brief Register alert callback for javascript.
@@ -689,116 +622,116 @@ public:
   void SetTtsFocus(bool focused);
 
   /**
-   * @brief Connect to this signal to be notified when page loading is started.
+   * @brief Callback to be called when page loading is started.
    *
-   * @return A signal object to connect with
+   * @param[in] callback
    */
-  WebViewPageLoadSignalType& PageLoadStartedSignal();
+  void RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when page loading is in progress.
+   * @brief Callback to be called when page loading is in progress.
    *
-   * @return A signal object to connect with
+   * @param[in] callback
    */
-  WebViewPageLoadSignalType& PageLoadInProgressSignal();
+  void RegisterPageLoadInProgressCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when page loading is finished.
+   * @brief Callback to be called when page loading is finished.
    *
-   * @return A signal object to connect with
+   * @param[in] callback
    */
-  WebViewPageLoadSignalType& PageLoadFinishedSignal();
+  void RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when an error occurs in page loading.
+   * @brief Callback to be called when an error occurs in page loading.
    *
-   * @return A signal object to connect with
+   * @param[in] callback
    */
-  WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
+  void RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when scroll edge is reached.
+   * @brief Callback to be called when scroll edge is reached.
    *
-   * @return A signal object to connect with
+   * @param[in] callback
    */
-  WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
+  void RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when url is changed.
+   * @brief Callback to be called when url is changed.
    *
-   * @return A signal object to connect with
+   * @param[in] callback
    */
-  WebViewUrlChangedSignalType& UrlChangedSignal();
+  void RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when form repost decision is requested.
+   * @brief Callback to be called when form repost decision is requested.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewFormRepostDecisionSignalType& FormRepostDecisionSignal();
+  void RegisterFormRepostDecidedCallback(Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when frame is rendered.
+   * @brief Callback to be called when frame is rendered.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewFrameRenderedSignalType& FrameRenderedSignal();
+  void RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFrameRenderedCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when http request need be intercepted.
+   * @brief Callback to be called when http request need be intercepted.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewRequestInterceptorSignalType& RequestInterceptorSignal();
+  void RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when console message will be logged.
+   * @brief Callback to be called when console message will be logged.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewConsoleMessageSignalType& ConsoleMessageSignal();
+  void RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when response policy would be decided.
+   * @brief Callback to be called when response policy would be decided.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewResponsePolicyDecisionSignalType& ResponsePolicyDecisionSignal();
+  void RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when certificate need be confirmed.
+   * @brief Callback to be called when certificate need be confirmed.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewCertificateSignalType& CertificateConfirmSignal();
+  void RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when ssl certificate is changed.
+   * @brief Callback to be called when ssl certificate is changed.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewCertificateSignalType& SslCertificateChangedSignal();
+  void RegisterSslCertificateChangedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when http authentication need be confirmed.
+   * @brief Callback to be called when http authentication need be confirmed.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewHttpAuthHandlerSignalType& HttpAuthHandlerSignal();
+  void RegisterHttpAuthHandlerCallback(Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when context menu would be shown.
+   * @brief Callback to be called when context menu would be shown.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewContextMenuShownSignalType& ContextMenuShownSignal();
+  void RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngineContextMenuShownCallback callback);
 
   /**
-   * @brief Connect to this signal to be notified when context menu would be hidden.
+   * @brief Callback to be called when context menu would be hidden.
    *
-   * @return A signal object to connect with.
+   * @param[in] callback
    */
-  WebViewContextMenuHiddenSignalType& ContextMenuHiddenSignal();
+  void RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback);
 
 public: // Not intended for application developers
   /// @cond internal

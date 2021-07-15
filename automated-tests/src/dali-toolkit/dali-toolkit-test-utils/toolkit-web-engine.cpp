@@ -1153,8 +1153,6 @@ class WebEngine: public Dali::BaseObject
 {
 public:
 
-  using JavaScriptEvaluatedResultCallback = std::function<void(const std::string&)>;
-
   WebEngine()
     : mUrl()
     , mCurrentPlusOnePos( 0 )
@@ -1454,84 +1452,84 @@ public:
     }
   }
 
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadStartedSignal()
-  {
-    return mPageLoadStartedSignal;
-  }
-
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadInProgressSignal()
-  {
-    return mPageLoadInProgressSignal;
-  }
-
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadFinishedSignal()
-  {
-    return mPageLoadFinishedSignal;
-  }
-
-  Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType& PageLoadErrorSignal()
-  {
-    return mPageLoadErrorSignal;
-  }
-
-  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType& ScrollEdgeReachedSignal()
-  {
-    return mScrollEdgeReachedSignal;
-  }
-
-  Dali::WebEnginePlugin::WebEngineUrlChangedSignalType& UrlChangedSignal()
-  {
-    return mUrlChangedSignal;
-  }
-
-  Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType& FormRepostDecisionSignal()
-  {
-    return mFormRepostDecisionSignal;
-  }
-
   Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType& FrameRenderedSignal()
   {
     return mFrameRenderedSignal;
   }
 
-  Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType& RequestInterceptorSignal()
+  void RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
   {
-    return mRequestInterceptorSignal;
+    mPageLoadStartedCallback = callback;
   }
 
-  Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType& ConsoleMessageSignal()
+  void RegisterPageLoadInProgressCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
   {
-    return mConsoleMessageSignal;
+    mPageLoadInProgressCallback = callback;
   }
 
-  Dali::WebEnginePlugin::WebEngineResponsePolicyDecisionSignalType& ResponsePolicyDecisionSignal()
+  void RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
   {
-    return mResponsePolicyDecisionSignal;
+    mPageLoadFinishedCallback = callback;
   }
 
-  Dali::WebEnginePlugin::WebEngineCertificateSignalType& CertificateConfirmSignal()
+  void RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback)
   {
-    return mCertificateConfirmSignal;
+    mPageLoadErrorCallback = callback;
   }
 
-  Dali::WebEnginePlugin::WebEngineCertificateSignalType& SslCertificateChangedSignal()
+  void RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
   {
-    return mSslCertificateChangedSignal;
+    mScrollEdgeReachedCallback = callback;
   }
 
-  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType& HttpAuthHandlerSignal()
+  void RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
   {
-    return mHttpAuthHandlerSignal;
+    mUrlChangedCallback = callback;
   }
 
-  Dali::WebEnginePlugin::WebEngineContextMenuShownSignalType& ContextMenuShownSignal()
+  void RegisterFormRepostDecidedCallback(Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback callback)
   {
-    return mContextMenuShownSignal;
+    mFormRepostDecidedCallback = callback;
   }
 
-  Dali::WebEnginePlugin::WebEngineContextMenuHiddenSignalType& ContextMenuHiddenSignal()
+  void RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback)
   {
-    return mContextMenuHiddenSignal;
+    mRequestInterceptorCallback = callback;
+  }
+
+  void RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback)
+  {
+    mConsoleMessageCallback = callback;
+  }
+
+  void RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback)
+  {
+    mResponsePolicyDecisionCallback = callback;
+  }
+
+  void RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
+  {
+    mCertificateConfirmCallback = callback;
+  }
+
+  void RegisterSslCertificateChangedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
+  {
+    mSslCertificateChangedCallback = callback;
+  }
+
+  void RegisterHttpAuthHandlerCallback(Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback callback)
+  {
+    mHttpAuthHandlerCallback = callback;
+  }
+
+  void RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngineContextMenuShownCallback callback)
+  {
+    mContextMenuShownCallback = callback;
+  }
+
+  void RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback)
+  {
+    mContextMenuHiddenCallback = callback;
   }
 
   std::string              mUrl;
@@ -1539,22 +1537,7 @@ public:
   size_t                   mCurrentPlusOnePos;
   std::string              mUserAgent;
 
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType               mPageLoadStartedSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType               mPageLoadInProgressSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadSignalType               mPageLoadFinishedSignal;
-  Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType          mPageLoadErrorSignal;
-  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType      mScrollEdgeReachedSignal;
-  Dali::WebEnginePlugin::WebEngineUrlChangedSignalType             mUrlChangedSignal;
-  Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType     mFormRepostDecisionSignal;
-  Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType          mFrameRenderedSignal;
-  Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType     mRequestInterceptorSignal;
-  Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType         mConsoleMessageSignal;
-  Dali::WebEnginePlugin::WebEngineResponsePolicyDecisionSignalType mResponsePolicyDecisionSignal;
-  Dali::WebEnginePlugin::WebEngineCertificateSignalType            mCertificateConfirmSignal;
-  Dali::WebEnginePlugin::WebEngineCertificateSignalType            mSslCertificateChangedSignal;
-  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType        mHttpAuthHandlerSignal;
-  Dali::WebEnginePlugin::WebEngineContextMenuShownSignalType       mContextMenuShownSignal;
-  Dali::WebEnginePlugin::WebEngineContextMenuHiddenSignalType      mContextMenuHiddenSignal;
+  Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType mFrameRenderedSignal;
 
   bool  mEvaluating;
   float mPageZoomFactor;
@@ -1569,14 +1552,31 @@ public:
   WebEngineCookieManager*   mockWebEngineCookieManager;
   WebEngineSettings*        mockWebEngineSettings;
 
-  std::vector<JavaScriptEvaluatedResultCallback>         mResultCallbacks;
-  Dali::WebEnginePlugin::JavaScriptAlertCallback         mJavaScriptAlertCallback;
-  Dali::WebEnginePlugin::JavaScriptConfirmCallback       mJavaScriptConfirmCallback;
-  Dali::WebEnginePlugin::JavaScriptPromptCallback        mJavaScriptPromptCallback;
-  Dali::WebEnginePlugin::ScreenshotCapturedCallback      mScreenshotCapturedCallback;
-  Dali::WebEnginePlugin::VideoPlayingCallback            mVideoPlayingCallback;
-  Dali::WebEnginePlugin::GeolocationPermissionCallback   mGeolocationPermissionCallback;
-  Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback mHitTestCreatedCallback;
+  std::vector<Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback> mResultCallbacks;
+
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback               mPageLoadStartedCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback               mPageLoadInProgressCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback               mPageLoadFinishedCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback          mPageLoadErrorCallback;
+  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback      mScrollEdgeReachedCallback;
+  Dali::WebEnginePlugin::WebEngineUrlChangedCallback             mUrlChangedCallback;
+  Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback      mFormRepostDecidedCallback;
+  Dali::WebEnginePlugin::WebEngineFrameRenderedCallback          mFrameRenderedCallback;
+  Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback     mRequestInterceptorCallback;
+  Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback mConsoleMessageCallback;
+  Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback  mResponsePolicyDecisionCallback;
+  Dali::WebEnginePlugin::WebEngineCertificateCallback            mCertificateConfirmCallback;
+  Dali::WebEnginePlugin::WebEngineCertificateCallback            mSslCertificateChangedCallback;
+  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback        mHttpAuthHandlerCallback;
+  Dali::WebEnginePlugin::WebEngineContextMenuShownCallback       mContextMenuShownCallback;
+  Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback      mContextMenuHiddenCallback;
+  Dali::WebEnginePlugin::JavaScriptAlertCallback                 mJavaScriptAlertCallback;
+  Dali::WebEnginePlugin::JavaScriptConfirmCallback               mJavaScriptConfirmCallback;
+  Dali::WebEnginePlugin::JavaScriptPromptCallback                mJavaScriptPromptCallback;
+  Dali::WebEnginePlugin::ScreenshotCapturedCallback              mScreenshotCapturedCallback;
+  Dali::WebEnginePlugin::VideoPlayingCallback                    mVideoPlayingCallback;
+  Dali::WebEnginePlugin::GeolocationPermissionCallback           mGeolocationPermissionCallback;
+  Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback         mHitTestCreatedCallback;
 };
 
 
@@ -1617,35 +1617,77 @@ bool OnLoadUrl()
     }
     gInstance->mHistory.push_back( gInstance->mUrl );
     gInstance->mCurrentPlusOnePos++;
-    gInstance->mPageLoadStartedSignal.Emit( gInstance->mUrl );
-    gInstance->mPageLoadInProgressSignal.Emit( gInstance->mUrl );
-    gInstance->mPageLoadFinishedSignal.Emit( gInstance->mUrl );
-    gInstance->mUrlChangedSignal.Emit( "http://new-test" );
-
-    std::shared_ptr<Dali::WebEngineFormRepostDecision> repostDecision(new MockWebEngineFormRepostDecision());
-    gInstance->mFormRepostDecisionSignal.Emit(std::move(repostDecision));
+    if (gInstance->mPageLoadStartedCallback)
+    {
+      gInstance->mPageLoadStartedCallback( gInstance->mUrl );
+    }
+    if (gInstance->mPageLoadInProgressCallback)
+    {
+      gInstance->mPageLoadInProgressCallback( gInstance->mUrl );
+    }
+    if (gInstance->mPageLoadFinishedCallback)
+    {
+      gInstance->mPageLoadFinishedCallback( gInstance->mUrl );
+    }
+    if (gInstance->mPageLoadErrorCallback)
+    {
+      std::unique_ptr<Dali::WebEngineLoadError> error(new MockWebEngineLoadError(gInstance->mUrl));
+      gInstance->mPageLoadErrorCallback(std::move(error));
+    }
+    if (gInstance->mUrlChangedCallback)
+    {
+      gInstance->mUrlChangedCallback( "http://new-test" );
+    }
+    if (gInstance->mFormRepostDecidedCallback)
+    {
+      std::unique_ptr<Dali::WebEngineFormRepostDecision> repostDecision(new MockWebEngineFormRepostDecision());
+      gInstance->mFormRepostDecidedCallback(std::move(repostDecision));
+    }
     gInstance->mFrameRenderedSignal.Emit();
-    std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor(new MockWebEngineRequestInterceptor());
-    gInstance->mRequestInterceptorSignal.Emit(std::move(interceptor));
-
-    std::shared_ptr<Dali::WebEngineLoadError> error(new MockWebEngineLoadError(gInstance->mUrl));
-    gInstance->mPageLoadErrorSignal.Emit(std::move(error));
-    std::shared_ptr<Dali::WebEngineConsoleMessage> message(new MockWebEngineConsoleMessage());
-    gInstance->mConsoleMessageSignal.Emit(std::move(message));
-    std::shared_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
-    gInstance->mResponsePolicyDecisionSignal.Emit(std::move(policyDecision));
-
-    std::shared_ptr<Dali::WebEngineCertificate> certificate(new MockWebEngineCertificate());
-    gInstance->mCertificateConfirmSignal.Emit(std::move(certificate));
-    std::shared_ptr<Dali::WebEngineCertificate> sslCertificate(new MockWebEngineCertificate());
-    gInstance->mSslCertificateChangedSignal.Emit(std::move(sslCertificate));
-    std::shared_ptr<Dali::WebEngineHttpAuthHandler> handler(new MockWebEngineHttpAuthHandler());
-    gInstance->mHttpAuthHandlerSignal.Emit(std::move(handler));
-
-    std::shared_ptr<Dali::WebEngineContextMenu> menu(new MockWebEngineContextMenu());
-    gInstance->mContextMenuShownSignal.Emit(std::move(menu));
-    std::shared_ptr<Dali::WebEngineContextMenu> hiddenMenu(new MockWebEngineContextMenu());
-    gInstance->mContextMenuHiddenSignal.Emit(std::move(hiddenMenu));
+    if (gInstance->mFrameRenderedCallback)
+    {
+      gInstance->mFrameRenderedCallback();
+    }
+    if (gInstance->mRequestInterceptorCallback)
+    {
+      std::unique_ptr<Dali::WebEngineRequestInterceptor> interceptor(new MockWebEngineRequestInterceptor());
+      gInstance->mRequestInterceptorCallback(std::move(interceptor));
+    }
+    if (gInstance->mConsoleMessageCallback)
+    {
+      std::unique_ptr<Dali::WebEngineConsoleMessage> message(new MockWebEngineConsoleMessage());
+      gInstance->mConsoleMessageCallback(std::move(message));
+    }
+    if (gInstance->mResponsePolicyDecisionCallback)
+    {
+      std::unique_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
+      gInstance->mResponsePolicyDecisionCallback(std::move(policyDecision));
+    }
+    if (gInstance->mCertificateConfirmCallback)
+    {
+      std::unique_ptr<Dali::WebEngineCertificate> certificate(new MockWebEngineCertificate());
+      gInstance->mCertificateConfirmCallback(std::move(certificate));
+    }
+    if (gInstance->mSslCertificateChangedCallback)
+    {
+      std::unique_ptr<Dali::WebEngineCertificate> sslCertificate(new MockWebEngineCertificate());
+      gInstance->mSslCertificateChangedCallback(std::move(sslCertificate));
+    }
+    if (gInstance->mHttpAuthHandlerCallback)
+    {
+      std::unique_ptr<Dali::WebEngineHttpAuthHandler> handler(new MockWebEngineHttpAuthHandler());
+      gInstance->mHttpAuthHandlerCallback(std::move(handler));
+    }
+    if (gInstance->mContextMenuShownCallback)
+    {
+      std::unique_ptr<Dali::WebEngineContextMenu> menu(new MockWebEngineContextMenu());
+      gInstance->mContextMenuShownCallback(std::move(menu));
+    }
+    if (gInstance->mContextMenuHiddenCallback)
+    {
+      std::unique_ptr<Dali::WebEngineContextMenu> hiddenMenu(new MockWebEngineContextMenu());
+      gInstance->mContextMenuHiddenCallback(std::move(hiddenMenu));
+    }
   }
   return false;
 }
@@ -1654,9 +1696,9 @@ bool OnScrollEdge()
 {
   DisconnectFromGlobalSignal( &OnScrollEdge );
 
-  if( gInstance )
+  if( gInstance && gInstance->mScrollEdgeReachedCallback )
   {
-    gInstance->mScrollEdgeReachedSignal.Emit( Dali::WebEnginePlugin::ScrollEdge::BOTTOM );
+    gInstance->mScrollEdgeReachedCallback( Dali::WebEnginePlugin::ScrollEdge::BOTTOM );
   }
 
   return false;
@@ -2269,84 +2311,84 @@ void WebEngine::EnableKeyEvents( bool enabled )
 {
 }
 
-Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadStartedSignal()
-{
-  return Internal::Adaptor::GetImplementation( *this ).PageLoadStartedSignal();
-}
-
-Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadInProgressSignal()
-{
-  return Internal::Adaptor::GetImplementation( *this ).PageLoadInProgressSignal();
-}
-
-Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadFinishedSignal()
-{
-  return Internal::Adaptor::GetImplementation( *this ).PageLoadFinishedSignal();
-}
-
-Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType& WebEngine::PageLoadErrorSignal()
-{
-  return Internal::Adaptor::GetImplementation( *this ).PageLoadErrorSignal();
-}
-
-Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType& WebEngine::ScrollEdgeReachedSignal()
-{
-  return Internal::Adaptor::GetImplementation( *this ).ScrollEdgeReachedSignal();
-}
-
-Dali::WebEnginePlugin::WebEngineUrlChangedSignalType& WebEngine::UrlChangedSignal()
-{
-  return Internal::Adaptor::GetImplementation( *this ).UrlChangedSignal();
-}
-
-Dali::WebEnginePlugin::WebEngineFormRepostDecisionSignalType& WebEngine::FormRepostDecisionSignal()
-{
-  return Internal::Adaptor::GetImplementation(*this).FormRepostDecisionSignal();
-}
-
 Dali::WebEnginePlugin::WebEngineFrameRenderedSignalType& WebEngine::FrameRenderedSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).FrameRenderedSignal();
 }
 
-Dali::WebEnginePlugin::WebEngineRequestInterceptorSignalType& WebEngine::RequestInterceptorSignal()
+void WebEngine::RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return Internal::Adaptor::GetImplementation(*this).RequestInterceptorSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadStartedCallback(callback);
 }
 
-Dali::WebEnginePlugin::WebEngineConsoleMessageSignalType& WebEngine::ConsoleMessageSignal()
+void WebEngine::RegisterPageLoadInProgressCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return Internal::Adaptor::GetImplementation(*this).ConsoleMessageSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadInProgressCallback(callback);
 }
 
-Dali::WebEnginePlugin::WebEngineResponsePolicyDecisionSignalType& WebEngine::ResponsePolicyDecisionSignal()
+void WebEngine::RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return Internal::Adaptor::GetImplementation(*this).ResponsePolicyDecisionSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadFinishedCallback(callback);
 }
 
-Dali::WebEnginePlugin::WebEngineCertificateSignalType& WebEngine::CertificateConfirmSignal()
+void WebEngine::RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback)
 {
-  return Internal::Adaptor::GetImplementation(*this).CertificateConfirmSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterPageLoadErrorCallback(callback);
 }
 
-Dali::WebEnginePlugin::WebEngineCertificateSignalType& WebEngine::SslCertificateChangedSignal()
+void WebEngine::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
 {
-  return Internal::Adaptor::GetImplementation(*this).SslCertificateChangedSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterScrollEdgeReachedCallback(callback);
 }
 
-Dali::WebEnginePlugin::WebEngineHttpAuthHandlerSignalType& WebEngine::HttpAuthHandlerSignal()
+void WebEngine::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
 {
-  return Internal::Adaptor::GetImplementation(*this).HttpAuthHandlerSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterUrlChangedCallback(callback);
 }
 
-Dali::WebEnginePlugin::WebEngineContextMenuShownSignalType& WebEngine::ContextMenuShownSignal()
+void WebEngine::RegisterFormRepostDecidedCallback(Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback callback)
 {
-  return Internal::Adaptor::GetImplementation( *this ).ContextMenuShownSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterFormRepostDecidedCallback(callback);
 }
 
-Dali::WebEnginePlugin::WebEngineContextMenuHiddenSignalType& WebEngine::ContextMenuHiddenSignal()
+void WebEngine::RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback)
 {
-  return Internal::Adaptor::GetImplementation( *this ).ContextMenuHiddenSignal();
+  Internal::Adaptor::GetImplementation( *this ).RegisterRequestInterceptorCallback(callback);
+}
+
+void WebEngine::RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback)
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterConsoleMessageReceivedCallback(callback);
+}
+
+void WebEngine::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback)
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterResponsePolicyDecidedCallback(callback);
+}
+
+void WebEngine::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterCertificateConfirmedCallback(callback);
+}
+
+void WebEngine::RegisterSslCertificateChangedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterSslCertificateChangedCallback(callback);
+}
+
+void WebEngine::RegisterHttpAuthHandlerCallback(Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback callback)
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterHttpAuthHandlerCallback(callback);
+}
+
+void WebEngine::RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngineContextMenuShownCallback callback)
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterContextMenuShownCallback(callback);
+}
+
+void WebEngine::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback)
+{
+  Internal::Adaptor::GetImplementation( *this ).RegisterContextMenuHiddenCallback(callback);
 }
 
 } // namespace Dali;

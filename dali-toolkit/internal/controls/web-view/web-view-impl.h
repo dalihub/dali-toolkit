@@ -205,12 +205,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::WebView::EvaluateJavaScript()
    */
-  void EvaluateJavaScript(const std::string& script, std::function<void(const std::string&)> resultHandler);
+  void EvaluateJavaScript(const std::string& script, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback resultHandler);
 
   /**
    * @copydoc Dali::Toolkit::WebView::AddJavaScriptMessageHandler()
    */
-  void AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler);
+  void AddJavaScriptMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler);
 
   /**
    * @copydoc Dali::Toolkit::WebView::RegisterJavaScriptAlertCallback()
@@ -313,84 +313,84 @@ public:
   void SetTtsFocus(bool focused);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::PageLoadStartedSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterPageLoadStartedCallback()
    */
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadStartedSignal();
+  void RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::PageLoadInProgressSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterPageLoadInProgressCallback()
    */
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadInProgressSignal();
+  void RegisterPageLoadInProgressCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::PageLoadFinishedSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterPageLoadFinishedCallback()
    */
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadFinishedSignal();
+  void RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::PageLoadErrorSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterPageLoadErrorCallback()
    */
-  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
+  void RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::ScrollEdgeReachedSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterScrollEdgeReachedCallback()
    */
-  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
+  void RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::UrlChangedSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterUrlChangedCallback()
    */
-  Dali::Toolkit::WebView::WebViewUrlChangedSignalType& UrlChangedSignal();
+  void RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::FormRepostDecisionSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterFormRepostDecidedCallback()
    */
-  Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType& FormRepostDecisionSignal();
+  void RegisterFormRepostDecidedCallback(Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::FrameRenderedSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterFrameRenderedCallback()
    */
-  Dali::Toolkit::WebView::WebViewFrameRenderedSignalType& FrameRenderedSignal();
+  void RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFrameRenderedCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::RequestInterceptorSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterRequestInterceptorCallback()
    */
-  Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType& RequestInterceptorSignal();
+  void RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::ConsoleMessageSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterConsoleMessageReceivedCallback()
    */
-  Dali::Toolkit::WebView::WebViewConsoleMessageSignalType& ConsoleMessageSignal();
+  void RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::ResponsePolicyDecisionSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterResponsePolicyDecidedCallback()
    */
-  Dali::Toolkit::WebView::WebViewResponsePolicyDecisionSignalType& ResponsePolicyDecisionSignal();
+  void RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::CertificateConfirmSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterCertificateConfirmedCallback()
    */
-  Dali::Toolkit::WebView::WebViewCertificateSignalType& CertificateConfirmSignal();
+  void RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::SslCertificateChangedSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterSslCertificateChangedCallback()
    */
-  Dali::Toolkit::WebView::WebViewCertificateSignalType& SslCertificateChangedSignal();
+  void RegisterSslCertificateChangedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::HttpAuthHandlerSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterHttpAuthHandlerCallback()
    */
-  Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType& HttpAuthHandlerSignal();
+  void RegisterHttpAuthHandlerCallback(Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::ContextMenuShownSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterContextMenuShownCallback()
    */
-  Dali::Toolkit::WebView::WebViewContextMenuShownSignalType& ContextMenuShownSignal();
+  void RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngineContextMenuShownCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::ContextMenuHiddenSignal()
+   * @copydoc Dali::Toolkit::WebView::RegisterContextMenuHiddenCallback()
    */
-  Dali::Toolkit::WebView::WebViewContextMenuHiddenSignalType& ContextMenuHiddenSignal();
+  void RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback);
 
 public: // Properties
   /**
@@ -410,17 +410,6 @@ public: // Properties
    * @return The current value of the property.
    */
   static Dali::Property::Value GetProperty(Dali::BaseObject* object, Dali::Property::Index propertyIndex);
-
-  /**
-   * Connects a callback function with the object's signals.
-   * @param[in] object The object providing the signal.
-   * @param[in] tracker Used to disconnect the signal.
-   * @param[in] signalName The signal to connect to.
-   * @param[in] functor A newly allocated FunctorDelegate.
-   * @return True if the signal was connected.
-   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the c
-   */
-  static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
 private: // From Control
   /**
@@ -622,43 +611,6 @@ private:
   Dali::Toolkit::ImageView CreateImageView(Dali::PixelData pixel) const;
 
   /**
-   * @brief Callback function to be called when page load started.
-   * @param[in] url The url currently being loaded
-   */
-  void OnPageLoadStarted(const std::string& url);
-
-  /**
-   * @brief Callback function to be called when page is loading in progress.
-   * @param[in] url The url currently being loaded
-   */
-  void OnPageLoadInProgress(const std::string& url);
-
-  /**
-   * @brief Callback function to be called when page load finished.
-   * @param[in] url The url currently being loaded
-   */
-  void OnPageLoadFinished(const std::string& url);
-
-  /**
-   * @brief Callback function to be called when there is an error in page loading.
-   * @param[in] url The url currently being loaded
-   * @param[in] errorCode The error code
-   */
-  void OnPageLoadError(std::shared_ptr<Dali::WebEngineLoadError> error);
-
-  /**
-   * @brief Callback function to be called when scroll edge is reached.
-   * @param[in] edge The scroll edge reached.
-   */
-  void OnScrollEdgeReached(Dali::WebEnginePlugin::ScrollEdge edge);
-
-  /**
-   * @brief Callback function to be called when url is changed.
-   * @param[in] url The url currently being loaded
-   */
-  void OnUrlChanged(const std::string& url);
-
-  /**
    * @brief Signal occurs when the Web View has been touched.
    * @param[in] actor The Actor Touched
    * @param[in] touch The Touch Data.
@@ -681,12 +633,6 @@ private:
    * @return Whether to consume event or not.
    */
   bool OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel);
-
-  /**
-   * @brief Callback function to be called when form repost decision need be checked.
-   * @param[in] decision The new decision for form repost
-   */
-  void OnFormRepostDecision(std::shared_ptr<Dali::WebEngineFormRepostDecision> decision);
 
   /**
    * @brief Callback function to be called when frame is rendered.
@@ -712,75 +658,10 @@ private:
    */
   void OnScreenshotCaptured(Dali::PixelData pixel);
 
-  /**
-   * @brief Callback function to be called when http request need be intercepted.
-   * @param [in] request The http request interceptor.
-   */
-  void OnInterceptRequest(std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor);
-
-  /**
-   * @brief Callback function to be called when console message will be logged.
-   * @param[in] message The message logged.
-   */
-  void OnConsoleMessage(std::shared_ptr<Dali::WebEngineConsoleMessage> message);
-
-  /**
-   * @brief Callback function to be called when response policy need be decided.
-   * @param[in] decision The policy decided.
-   */
-  void OnResponsePolicyDecided(std::shared_ptr<Dali::WebEnginePolicyDecision> decision);
-
-  /**
-   * @brief Callback function to be called when certificate need be confirmed.
-   * @param[in] certificate The certificate policy decision.
-   */
-  void OnCertificateConfirm(std::shared_ptr<Dali::WebEngineCertificate> certificate);
-
-  /**
-   * @brief Callback function to be called when ssl certificate is changed.
-   * @param[in] certificate The certificate information received.
-   */
-  void OnSslCertificateChanged(std::shared_ptr<Dali::WebEngineCertificate> certificate);
-
-  /**
-   * @brief Callback function to be called when http authentication need be confirmed.
-   * @param[in] handler The handler for http authentication
-   */
-  void OnHttpAuthenticationRequest(std::shared_ptr<Dali::WebEngineHttpAuthHandler> handler);
-
-  /**
-   * @brief Callback function to be called when context menu would be shown.
-   * @param[in] e The scroll edge reached.
-   */
-  void OnContextMenuShown(std::shared_ptr<Dali::WebEngineContextMenu> menu);
-
-  /**
-   * @brief Callback function to be called when context menu would be hidden.
-   * @param[in] url The url currently being loaded
-   */
-  void OnContextMenuHidden(std::shared_ptr<Dali::WebEngineContextMenu> menu);
-
 private:
   Dali::Toolkit::Visual::Base mVisual;
   Dali::Size                  mWebViewSize;
   Dali::WebEngine             mWebEngine;
-
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType               mPageLoadStartedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType               mPageLoadInProgressSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadSignalType               mPageLoadFinishedSignal;
-  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType          mPageLoadErrorSignal;
-  Dali::Toolkit::WebView::WebViewUrlChangedSignalType             mUrlChangedSignal;
-  Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType      mScrollEdgeReachedSignal;
-  Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType     mFormRepostDecisionSignal;
-  Dali::Toolkit::WebView::WebViewFrameRenderedSignalType          mFrameRenderedSignal;
-  Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType     mRequestInterceptorSignal;
-  Dali::Toolkit::WebView::WebViewConsoleMessageSignalType         mConsoleMessageSignal;
-  Dali::Toolkit::WebView::WebViewResponsePolicyDecisionSignalType mResponsePolicyDecisionSignal;
-  Dali::Toolkit::WebView::WebViewCertificateSignalType            mCertificateConfirmSignal;
-  Dali::Toolkit::WebView::WebViewCertificateSignalType            mSslCertificateChangedSignal;
-  Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType        mHttpAuthHandlerSignal;
-  Dali::Toolkit::WebView::WebViewContextMenuShownSignalType       mContextMenuShownSignal;
-  Dali::Toolkit::WebView::WebViewContextMenuHiddenSignalType      mContextMenuHiddenSignal;
 
   std::unique_ptr<Dali::Toolkit::WebContext>         mWebContext;
   std::unique_ptr<Dali::Toolkit::WebCookieManager>   mWebCookieManager;
@@ -796,6 +677,7 @@ private:
   bool                       mKeyEventsEnabled;
 
   Dali::Toolkit::WebView::WebViewScreenshotCapturedCallback mScreenshotCapturedCallback;
+  Dali::WebEnginePlugin::WebEngineFrameRenderedCallback     mFrameRenderedCallback;
 };
 
 } // namespace Internal

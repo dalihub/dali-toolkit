@@ -87,23 +87,6 @@ DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "pageZoomFactor",          FLOAT,  
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "textZoomFactor",          FLOAT,   TEXT_ZOOM_FACTOR          )
 DALI_PROPERTY_REGISTRATION(Toolkit, WebView, "loadProgressPercentage",  FLOAT,   LOAD_PROGRESS_PERCENTAGE  )
 
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadStarted",       PAGE_LOAD_STARTED_SIGNAL      )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadInProgress",    PAGE_LOAD_IN_PROGRESS_SIGNAL  )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadFinished",      PAGE_LOAD_FINISHED_SIGNAL     )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "pageLoadError",         PAGE_LOAD_ERROR_SIGNAL        )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "scrollEdgeReached",     SCROLL_EDGE_REACHED_SIGNAL    )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "urlChanged",            URL_CHANGED_SIGNAL            )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "formRepostDecision",    FORM_REPOST_DECISION_SIGNAL   )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "frameRendered",         FRAME_RENDERED_SIGNAL         )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "requestInterceptor",    REQUEST_INTERCEPTOR_SIGNAL    )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "consoleMessage",        CONSOLE_MESSAGE_SIGNAL        )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "responsePolicyDecided", POLICY_DECISION               )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "certificateConfirm",    CERTIFICATE_CONFIRM_SIGNAL    )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "sslCertificateChanged", SSL_CERTIFICATE_CHANGED_SIGNAL)
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "httpAuthRequest",       HTTP_AUTH_REQUEST_SIGNAL      )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "contextMenuShown",      CONTEXT_MENU_SHOWN_SIGNAL     )
-DALI_SIGNAL_REGISTRATION(Toolkit, WebView, "contextMenuHidden",     CONTEXT_MENU_HIDDEN_SIGNAL    )
-
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
 
@@ -120,10 +103,6 @@ WebView::WebView(const std::string& locale, const std::string& timezoneId)
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
-  mPageLoadStartedSignal(),
-  mPageLoadFinishedSignal(),
-  mPageLoadErrorSignal(),
-  mUrlChangedSignal(),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
   mVideoHoleEnabled(false),
   mMouseEventsEnabled(true),
@@ -144,10 +123,6 @@ WebView::WebView(uint32_t argc, char** argv)
   mVisual(),
   mWebViewSize(Stage::GetCurrent().GetSize()),
   mWebEngine(),
-  mPageLoadStartedSignal(),
-  mPageLoadFinishedSignal(),
-  mPageLoadErrorSignal(),
-  mUrlChangedSignal(),
   mWebViewArea(0, 0, mWebViewSize.width, mWebViewSize.height),
   mVideoHoleEnabled(false),
   mMouseEventsEnabled(true),
@@ -172,6 +147,7 @@ WebView::~WebView()
 {
   if(mWebEngine)
   {
+    mWebEngine.FrameRenderedSignal().Disconnect(this, &WebView::OnFrameRendered);
     mWebEngine.Destroy();
   }
 }
@@ -222,23 +198,7 @@ void WebView::OnInitialize()
 
   if(mWebEngine)
   {
-    mWebEngine.PageLoadStartedSignal().Connect(this, &WebView::OnPageLoadStarted);
-    mWebEngine.PageLoadInProgressSignal().Connect(this, &WebView::OnPageLoadInProgress);
-    mWebEngine.PageLoadFinishedSignal().Connect(this, &WebView::OnPageLoadFinished);
-    mWebEngine.PageLoadErrorSignal().Connect(this, &WebView::OnPageLoadError);
-    mWebEngine.ScrollEdgeReachedSignal().Connect(this, &WebView::OnScrollEdgeReached);
-    mWebEngine.UrlChangedSignal().Connect(this, &WebView::OnUrlChanged);
-    mWebEngine.FormRepostDecisionSignal().Connect(this, &WebView::OnFormRepostDecision);
     mWebEngine.FrameRenderedSignal().Connect(this, &WebView::OnFrameRendered);
-    mWebEngine.RequestInterceptorSignal().Connect(this, &WebView::OnInterceptRequest);
-    mWebEngine.ConsoleMessageSignal().Connect(this, &WebView::OnConsoleMessage);
-    mWebEngine.ResponsePolicyDecisionSignal().Connect(this, &WebView::OnResponsePolicyDecided);
-    mWebEngine.CertificateConfirmSignal().Connect(this, &WebView::OnCertificateConfirm);
-    mWebEngine.SslCertificateChangedSignal().Connect(this, &WebView::OnSslCertificateChanged);
-    mWebEngine.HttpAuthHandlerSignal().Connect(this, &WebView::OnHttpAuthenticationRequest);
-    mWebEngine.ContextMenuShownSignal().Connect(this, &WebView::OnContextMenuShown);
-    mWebEngine.ContextMenuHiddenSignal().Connect(this, &WebView::OnContextMenuHidden);
-
     mWebContext         = std::unique_ptr<Dali::Toolkit::WebContext>(new WebContext(mWebEngine.GetContext()));
     mWebCookieManager   = std::unique_ptr<Dali::Toolkit::WebCookieManager>(new WebCookieManager(mWebEngine.GetCookieManager()));
     mWebSettings        = std::unique_ptr<Dali::Toolkit::WebSettings>(new WebSettings(mWebEngine.GetSettings()));
@@ -680,155 +640,136 @@ Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel) const
   return imageView;
 }
 
-Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
+void WebView::RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return mPageLoadStartedSignal;
-}
-
-Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadInProgressSignal()
-{
-  return mPageLoadInProgressSignal;
-}
-
-Dali::Toolkit::WebView::WebViewPageLoadSignalType& WebView::PageLoadFinishedSignal()
-{
-  return mPageLoadFinishedSignal;
-}
-
-Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSignal()
-{
-  return mPageLoadErrorSignal;
-}
-
-Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
-{
-  return mScrollEdgeReachedSignal;
-}
-
-Dali::Toolkit::WebView::WebViewUrlChangedSignalType& WebView::UrlChangedSignal()
-{
-  return mUrlChangedSignal;
-}
-
-Dali::Toolkit::WebView::WebViewFormRepostDecisionSignalType& WebView::FormRepostDecisionSignal()
-{
-  return mFormRepostDecisionSignal;
-}
-
-Dali::Toolkit::WebView::WebViewFrameRenderedSignalType& WebView::FrameRenderedSignal()
-{
-  return mFrameRenderedSignal;
-}
-
-Dali::Toolkit::WebView::WebViewRequestInterceptorSignalType& WebView::RequestInterceptorSignal()
-{
-  return mRequestInterceptorSignal;
-}
-
-Dali::Toolkit::WebView::WebViewConsoleMessageSignalType& WebView::ConsoleMessageSignal()
-{
-  return mConsoleMessageSignal;
-}
-
-Dali::Toolkit::WebView::WebViewResponsePolicyDecisionSignalType& WebView::ResponsePolicyDecisionSignal()
-{
-  return mResponsePolicyDecisionSignal;
-}
-
-Dali::Toolkit::WebView::WebViewCertificateSignalType& WebView::CertificateConfirmSignal()
-{
-  return mCertificateConfirmSignal;
-}
-
-Dali::Toolkit::WebView::WebViewCertificateSignalType& WebView::SslCertificateChangedSignal()
-{
-  return mSslCertificateChangedSignal;
-}
-
-Dali::Toolkit::WebView::WebViewHttpAuthHandlerSignalType& WebView::HttpAuthHandlerSignal()
-{
-  return mHttpAuthHandlerSignal;
-}
-
-Dali::Toolkit::WebView::WebViewContextMenuShownSignalType& WebView::ContextMenuShownSignal()
-{
-  return mContextMenuShownSignal;
-}
-
-Dali::Toolkit::WebView::WebViewContextMenuHiddenSignalType& WebView::ContextMenuHiddenSignal()
-{
-  return mContextMenuHiddenSignal;
-}
-
-void WebView::OnPageLoadStarted(const std::string& url)
-{
-  if(!mPageLoadStartedSignal.Empty())
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mPageLoadStartedSignal.Emit(handle, url);
+    mWebEngine.RegisterPageLoadStartedCallback(callback);
   }
 }
 
-void WebView::OnPageLoadInProgress(const std::string& url)
+void WebView::RegisterPageLoadInProgressCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  if(!mPageLoadInProgressSignal.Empty())
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mPageLoadInProgressSignal.Emit(handle, url);
+    mWebEngine.RegisterPageLoadInProgressCallback(callback);
   }
 }
 
-void WebView::OnPageLoadFinished(const std::string& url)
+void WebView::RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  if(!mPageLoadFinishedSignal.Empty())
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mPageLoadFinishedSignal.Emit(handle, url);
+    mWebEngine.RegisterPageLoadFinishedCallback(callback);
   }
 }
 
-void WebView::OnPageLoadError(std::shared_ptr<Dali::WebEngineLoadError> error)
+void WebView::RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback)
 {
-  if(!mPageLoadErrorSignal.Empty())
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mPageLoadErrorSignal.Emit(handle, std::move(error));
+    mWebEngine.RegisterPageLoadErrorCallback(callback);
   }
 }
 
-void WebView::OnScrollEdgeReached(Dali::WebEnginePlugin::ScrollEdge edge)
+void WebView::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
 {
-  if(!mScrollEdgeReachedSignal.Empty())
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mScrollEdgeReachedSignal.Emit(handle, edge);
+    mWebEngine.RegisterScrollEdgeReachedCallback(callback);
   }
 }
 
-void WebView::OnUrlChanged(const std::string& url)
+void WebView::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
 {
-  if(!mUrlChangedSignal.Empty())
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mUrlChangedSignal.Emit(handle, url);
+    mWebEngine.RegisterUrlChangedCallback(callback);
   }
 }
 
-void WebView::OnFormRepostDecision(std::shared_ptr<Dali::WebEngineFormRepostDecision> decision)
+void WebView::RegisterFormRepostDecidedCallback(Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback callback)
 {
-  if(!mFormRepostDecisionSignal.Empty())
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mFormRepostDecisionSignal.Emit(handle, std::move(decision));
+    mWebEngine.RegisterFormRepostDecidedCallback(callback);
+  }
+}
+
+void WebView::RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFrameRenderedCallback callback)
+{
+  mFrameRenderedCallback = callback;
+}
+
+void WebView::RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterRequestInterceptorCallback(callback);
+  }
+}
+
+void WebView::RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterConsoleMessageReceivedCallback(callback);
+  }
+}
+
+void WebView::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterResponsePolicyDecidedCallback(callback);
+  }
+}
+
+void WebView::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterCertificateConfirmedCallback(callback);
+  }
+}
+
+void WebView::RegisterSslCertificateChangedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterSslCertificateChangedCallback(callback);
+  }
+}
+
+void WebView::RegisterHttpAuthHandlerCallback(Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterHttpAuthHandlerCallback(callback);
+  }
+}
+
+void WebView::RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngineContextMenuShownCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterContextMenuShownCallback(callback);
+  }
+}
+
+void WebView::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterContextMenuHiddenCallback(callback);
   }
 }
 
 void WebView::OnFrameRendered()
 {
-  if(!mFrameRenderedSignal.Empty())
+  if(mFrameRenderedCallback)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mFrameRenderedSignal.Emit(handle);
+    mFrameRenderedCallback();
   }
 }
 
@@ -864,167 +805,72 @@ void WebView::OnScreenshotCaptured(Dali::PixelData pixel)
   }
 }
 
-void WebView::OnInterceptRequest(std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor)
+void WebView::OnSceneConnection(int depth)
 {
-  if(!mRequestInterceptorSignal.Empty())
-  {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mRequestInterceptorSignal.Emit(handle, std::move(interceptor));
-  }
+  Control::OnSceneConnection(depth);
+  EnableBlendMode(!mVideoHoleEnabled);
 }
 
-void WebView::OnConsoleMessage(std::shared_ptr<Dali::WebEngineConsoleMessage> message)
+bool WebView::OnTouchEvent(Actor actor, const Dali::TouchEvent& touch)
 {
-  if(!mConsoleMessageSignal.Empty())
+  bool result = false;
+
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mConsoleMessageSignal.Emit(handle, std::move(message));
+    result = mWebEngine.SendTouchEvent(touch);
   }
+  return result;
 }
 
-void WebView::OnResponsePolicyDecided(std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
+bool WebView::OnKeyEvent(const Dali::KeyEvent& event)
 {
-  if(!mResponsePolicyDecisionSignal.Empty())
+  bool result = false;
+
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mResponsePolicyDecisionSignal.Emit(handle, std::move(decision));
+    result = mWebEngine.SendKeyEvent(event);
   }
+  return result;
 }
 
-void WebView::OnCertificateConfirm(std::shared_ptr<Dali::WebEngineCertificate> certificate)
+bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
 {
-  if(!mCertificateConfirmSignal.Empty())
+  bool result = false;
+  if(mWebEngine && mMouseEventsEnabled)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mCertificateConfirmSignal.Emit(handle, std::move(certificate));
+    result = mWebEngine.SendHoverEvent(hover);
   }
+  return result;
 }
 
-void WebView::OnSslCertificateChanged(std::shared_ptr<Dali::WebEngineCertificate> certificate)
+bool WebView::OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel)
 {
-  if(!mSslCertificateChangedSignal.Empty())
+  bool result = false;
+  if(mWebEngine && mMouseEventsEnabled)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mSslCertificateChangedSignal.Emit(handle, std::move(certificate));
+    result = mWebEngine.SendWheelEvent(wheel);
   }
+  return result;
 }
 
-void WebView::OnHttpAuthenticationRequest(std::shared_ptr<Dali::WebEngineHttpAuthHandler> handler)
+void WebView::OnKeyInputFocusGained()
 {
-  if(!mHttpAuthHandlerSignal.Empty())
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mHttpAuthHandlerSignal.Emit(handle, std::move(handler));
+    mWebEngine.SetFocus(true);
   }
+
+  EmitKeyInputFocusSignal(true); // Calls back into the Control hence done last.
 }
 
-void WebView::OnContextMenuShown(std::shared_ptr<Dali::WebEngineContextMenu> menu)
+void WebView::OnKeyInputFocusLost()
 {
-  if(!mContextMenuShownSignal.Empty())
+  if(mWebEngine)
   {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mContextMenuShownSignal.Emit(handle, std::move(menu));
-  }
-}
-
-void WebView::OnContextMenuHidden(std::shared_ptr<Dali::WebEngineContextMenu> menu)
-{
-  if(!mContextMenuHiddenSignal.Empty())
-  {
-    Dali::Toolkit::WebView handle(GetOwner());
-    mContextMenuHiddenSignal.Emit(handle, std::move(menu));
-  }
-}
-
-bool WebView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
-{
-  Dali::BaseHandle handle(object);
-
-  bool             connected = false;
-  Toolkit::WebView webView   = Toolkit::WebView::DownCast(handle);
-
-  if(0 == strcmp(signalName.c_str(), PAGE_LOAD_STARTED_SIGNAL))
-  {
-    webView.PageLoadStartedSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), PAGE_LOAD_IN_PROGRESS_SIGNAL))
-  {
-    webView.PageLoadInProgressSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), PAGE_LOAD_FINISHED_SIGNAL))
-  {
-    webView.PageLoadFinishedSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), PAGE_LOAD_ERROR_SIGNAL))
-  {
-    webView.PageLoadErrorSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), SCROLL_EDGE_REACHED_SIGNAL))
-  {
-    webView.ScrollEdgeReachedSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), URL_CHANGED_SIGNAL))
-  {
-    webView.UrlChangedSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), FORM_REPOST_DECISION_SIGNAL))
-  {
-    webView.FormRepostDecisionSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), FRAME_RENDERED_SIGNAL))
-  {
-    webView.FrameRenderedSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), REQUEST_INTERCEPTOR_SIGNAL))
-  {
-    webView.RequestInterceptorSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), CONSOLE_MESSAGE_SIGNAL))
-  {
-    webView.ConsoleMessageSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), POLICY_DECISION))
-  {
-    webView.ResponsePolicyDecisionSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), CERTIFICATE_CONFIRM_SIGNAL))
-  {
-    webView.CertificateConfirmSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), SSL_CERTIFICATE_CHANGED_SIGNAL))
-  {
-    webView.SslCertificateChangedSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), HTTP_AUTH_REQUEST_SIGNAL))
-  {
-    webView.HttpAuthHandlerSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), CONTEXT_MENU_SHOWN_SIGNAL))
-  {
-    webView.ContextMenuShownSignal().Connect(tracker, functor);
-    connected = true;
-  }
-  else if(0 == strcmp(signalName.c_str(), CONTEXT_MENU_HIDDEN_SIGNAL))
-  {
-    webView.ContextMenuHiddenSignal().Connect(tracker, functor);
-    connected = true;
+    mWebEngine.SetFocus(false);
   }
 
-  return connected;
+  EmitKeyInputFocusSignal(false); // Calls back into the Control hence done last.
 }
 
 Vector3 WebView::GetNaturalSize()
@@ -1037,13 +883,6 @@ Vector3 WebView::GetNaturalSize()
   }
 
   return Vector3(mWebViewSize);
-}
-
-void WebView::OnSceneConnection(int depth)
-{
-  Control::OnSceneConnection(depth);
-
-  EnableBlendMode(!mVideoHoleEnabled);
 }
 
 void WebView::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
@@ -1251,68 +1090,6 @@ Property::Value WebView::GetProperty(BaseObject* object, Property::Index propert
   }
 
   return value;
-}
-
-bool WebView::OnTouchEvent(Actor actor, const Dali::TouchEvent& touch)
-{
-  bool result = false;
-
-  if(mWebEngine)
-  {
-    result = mWebEngine.SendTouchEvent(touch);
-  }
-  return result;
-}
-
-bool WebView::OnKeyEvent(const Dali::KeyEvent& event)
-{
-  bool result = false;
-
-  if(mWebEngine)
-  {
-    result = mWebEngine.SendKeyEvent(event);
-  }
-  return result;
-}
-
-bool WebView::OnHoverEvent(Actor actor, const Dali::HoverEvent& hover)
-{
-  bool result = false;
-  if(mWebEngine && mMouseEventsEnabled)
-  {
-    result = mWebEngine.SendHoverEvent(hover);
-  }
-  return result;
-}
-
-bool WebView::OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel)
-{
-  bool result = false;
-  if(mWebEngine && mMouseEventsEnabled)
-  {
-    result = mWebEngine.SendWheelEvent(wheel);
-  }
-  return result;
-}
-
-void WebView::OnKeyInputFocusGained()
-{
-  if(mWebEngine)
-  {
-    mWebEngine.SetFocus(true);
-  }
-
-  EmitKeyInputFocusSignal(true); // Calls back into the Control hence done last.
-}
-
-void WebView::OnKeyInputFocusLost()
-{
-  if(mWebEngine)
-  {
-    mWebEngine.SetFocus(false);
-  }
-
-  EmitKeyInputFocusSignal(false); // Calls back into the Control hence done last.
 }
 
 void WebView::SetScrollPosition(int32_t x, int32_t y)

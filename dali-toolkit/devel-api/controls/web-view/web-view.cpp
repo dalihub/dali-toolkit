@@ -199,7 +199,7 @@ void WebView::GoBack()
   Dali::Toolkit::GetImpl(*this).GoBack();
 }
 
-void WebView::EvaluateJavaScript(const std::string& script, std::function<void(const std::string&)> resultHandler)
+void WebView::EvaluateJavaScript(const std::string& script, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback resultHandler)
 {
   Dali::Toolkit::GetImpl(*this).EvaluateJavaScript(script, resultHandler);
 }
@@ -209,7 +209,7 @@ void WebView::EvaluateJavaScript(const std::string& script)
   Dali::Toolkit::GetImpl(*this).EvaluateJavaScript(script, nullptr);
 }
 
-void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, std::function<void(const std::string&)> handler)
+void WebView::AddJavaScriptMessageHandler(const std::string& exposedObjectName, Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback handler)
 {
   Dali::Toolkit::GetImpl(*this).AddJavaScriptMessageHandler(exposedObjectName, handler);
 }
@@ -314,84 +314,84 @@ void WebView::SetTtsFocus(bool focused)
   Dali::Toolkit::GetImpl(*this).SetTtsFocus(focused);
 }
 
-WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
+void WebView::RegisterPageLoadStartedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).PageLoadStartedSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterPageLoadStartedCallback(callback);
 }
 
-WebView::WebViewPageLoadSignalType& WebView::PageLoadInProgressSignal()
+void WebView::RegisterPageLoadInProgressCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).PageLoadInProgressSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterPageLoadInProgressCallback(callback);
 }
 
-WebView::WebViewPageLoadSignalType& WebView::PageLoadFinishedSignal()
+void WebView::RegisterPageLoadFinishedCallback(Dali::WebEnginePlugin::WebEnginePageLoadCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).PageLoadFinishedSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterPageLoadFinishedCallback(callback);
 }
 
-WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSignal()
+void WebView::RegisterPageLoadErrorCallback(Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).PageLoadErrorSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterPageLoadErrorCallback(callback);
 }
 
-WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
+void WebView::RegisterScrollEdgeReachedCallback(Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).ScrollEdgeReachedSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterScrollEdgeReachedCallback(callback);
 }
 
-WebView::WebViewUrlChangedSignalType& WebView::UrlChangedSignal()
+void WebView::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlChangedCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).UrlChangedSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterUrlChangedCallback(callback);
 }
 
-WebView::WebViewFormRepostDecisionSignalType& WebView::FormRepostDecisionSignal()
+void WebView::RegisterFormRepostDecidedCallback(Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).FormRepostDecisionSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterFormRepostDecidedCallback(callback);
 }
 
-WebView::WebViewFrameRenderedSignalType& WebView::FrameRenderedSignal()
+void WebView::RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFrameRenderedCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).FrameRenderedSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterFrameRenderedCallback(callback);
 }
 
-WebView::WebViewRequestInterceptorSignalType& WebView::RequestInterceptorSignal()
+void WebView::RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).RequestInterceptorSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterRequestInterceptorCallback(callback);
 }
 
-WebView::WebViewConsoleMessageSignalType& WebView::ConsoleMessageSignal()
+void WebView::RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).ConsoleMessageSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterConsoleMessageReceivedCallback(callback);
 }
 
-WebView::WebViewResponsePolicyDecisionSignalType& WebView::ResponsePolicyDecisionSignal()
+void WebView::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).ResponsePolicyDecisionSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterResponsePolicyDecidedCallback(callback);
 }
 
-WebView::WebViewCertificateSignalType& WebView::CertificateConfirmSignal()
+void WebView::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).CertificateConfirmSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterCertificateConfirmedCallback(callback);
 }
 
-WebView::WebViewCertificateSignalType& WebView::SslCertificateChangedSignal()
+void WebView::RegisterSslCertificateChangedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).SslCertificateChangedSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterSslCertificateChangedCallback(callback);
 }
 
-WebView::WebViewHttpAuthHandlerSignalType& WebView::HttpAuthHandlerSignal()
+void WebView::RegisterHttpAuthHandlerCallback(Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).HttpAuthHandlerSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterHttpAuthHandlerCallback(callback);
 }
 
-WebView::WebViewContextMenuShownSignalType& WebView::ContextMenuShownSignal()
+void WebView::RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngineContextMenuShownCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).ContextMenuShownSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterContextMenuShownCallback(callback);
 }
 
-WebView::WebViewContextMenuHiddenSignalType& WebView::ContextMenuHiddenSignal()
+void WebView::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback)
 {
-  return Dali::Toolkit::GetImpl(*this).ContextMenuHiddenSignal();
+  Dali::Toolkit::GetImpl(*this).RegisterContextMenuHiddenCallback(callback);
 }
 
 WebView::WebView(Internal::WebView& implementation)
