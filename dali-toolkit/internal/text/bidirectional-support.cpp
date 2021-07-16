@@ -170,7 +170,7 @@ void ReorderLine(const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo
 
   lineInfoRun.visualToLogicalMapSecondHalf = reinterpret_cast<CharacterIndex*>(malloc(numberOfCharactersInSecondHalfLine * sizeof(CharacterIndex)));
 
-  if(nullptr != lineInfoRun.visualToLogicalMap)
+  if(nullptr != lineInfoRun.visualToLogicalMap && nullptr != lineInfoRun.visualToLogicalMapSecondHalf)
   {
     // Reorders the line.
     bidirectionalSupport.Reorder(bidirectionalParagraphInfo.bidirectionalInfoIndex,
