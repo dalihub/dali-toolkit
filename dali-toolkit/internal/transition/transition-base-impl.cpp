@@ -219,11 +219,10 @@ void TransitionBase::CopyTarget()
 {
   mCopiedActor = Dali::Actor::New();
   mTarget.GetParent().Add(mCopiedActor);
-
   mCopiedActor[Dali::DevelActor::Property::SIBLING_ORDER] = static_cast<int32_t>(mTarget[Dali::DevelActor::Property::SIBLING_ORDER]) + 1;
-  while(mTarget.GetChildCount() > 0)
+  for(uint32_t i = 0; i < mTarget.GetChildCount(); ++i)
   {
-    Dali::Actor child = mTarget.GetChildAt(0);
+    Dali::Actor child = mTarget.GetChildAt(i);
     Dali::DevelActor::SwitchParent(child, mCopiedActor);
   }
 
@@ -239,9 +238,9 @@ void TransitionBase::TransitionFinished()
   mTarget.SetProperties(mOriginalPropertyMap);
   if(mMoveTargetChildren)
   {
-    while(mCopiedActor.GetChildCount() > 0)
+    for(uint32_t i = 0; i < mCopiedActor.GetChildCount(); ++i)
     {
-      Dali::Actor child = mCopiedActor.GetChildAt(0);
+      Dali::Actor child = mCopiedActor.GetChildAt(i);
       Dali::DevelActor::SwitchParent(child, mTarget);
     }
     mCopiedActor.Unparent();
