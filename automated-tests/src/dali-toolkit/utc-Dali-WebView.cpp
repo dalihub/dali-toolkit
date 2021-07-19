@@ -61,7 +61,7 @@ static int gPageLoadStartedCallbackCalled = 0;
 static int gPageLoadInProgressCallbackCalled = 0;
 static int gPageLoadFinishedCallbackCalled = 0;
 static int gPageLoadErrorCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineLoadError> gPageLoadErrorInstance = nullptr;
+static std::unique_ptr<Dali::WebEngineLoadError> gPageLoadErrorInstance = nullptr;
 static int gScrollEdgeReachedCallbackCalled = 0;
 static int gUrlChangedCallbackCalled = 0;
 static int gEvaluateJavaScriptCallbackCalled = 0;
@@ -74,21 +74,21 @@ static int gGeolocationPermissionCallbackCalled = 0;
 static bool gTouched = false;
 static bool gHovered = false;
 static bool gWheelEventHandled = false;
-static int gFormRepostDecisionCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineFormRepostDecision> gFormRepostDecisionInstance = nullptr;
+static int gFormRepostDecidedCallbackCalled = 0;
+static std::unique_ptr<Dali::WebEngineFormRepostDecision> gFormRepostDecidedInstance = nullptr;
 static int gFrameRenderedCallbackCalled = 0;
 static int gRequestInterceptorCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineRequestInterceptor> gRequestInterceptorInstance = nullptr;
+static std::unique_ptr<Dali::WebEngineRequestInterceptor> gRequestInterceptorInstance = nullptr;
 static int gConsoleMessageCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineConsoleMessage> gConsoleMessageInstance = nullptr;
+static std::unique_ptr<Dali::WebEngineConsoleMessage> gConsoleMessageInstance = nullptr;
 static int gResponsePolicyDecidedCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEnginePolicyDecision> gResponsePolicyDecisionInstance = nullptr;
+static std::unique_ptr<Dali::WebEnginePolicyDecision> gResponsePolicyDecisionInstance = nullptr;
 static int gCertificateConfirmCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineCertificate> gCertificateConfirmInstance = nullptr;
+static std::unique_ptr<Dali::WebEngineCertificate> gCertificateConfirmInstance = nullptr;
 static int gSslCertificateChangedCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineCertificate> gSslCertificateInstance = nullptr;
+static std::unique_ptr<Dali::WebEngineCertificate> gSslCertificateInstance = nullptr;
 static int gHttpAuthHandlerCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineHttpAuthHandler> gHttpAuthInstance = nullptr;
+static std::unique_ptr<Dali::WebEngineHttpAuthHandler> gHttpAuthInstance = nullptr;
 static int gSecurityOriginsAcquiredCallbackCalled = 0;
 static int gStorageUsageAcquiredCallbackCalled = 0;
 static int gFormPasswordsAcquiredCallbackCalled = 0;
@@ -97,9 +97,9 @@ static int gMimeOverriddenCallbackCalled = 0;
 static std::vector<std::unique_ptr<Dali::WebEngineSecurityOrigin>> gSecurityOriginList;
 static std::vector<std::unique_ptr<Dali::WebEngineContext::PasswordData>> gPasswordDataList;
 static int gContextMenuShownCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineContextMenu> gContextMenuShownInstance = nullptr;
+static std::unique_ptr<Dali::WebEngineContextMenu> gContextMenuShownInstance = nullptr;
 static int gContextMenuHiddenCallbackCalled = 0;
-static std::shared_ptr<Dali::WebEngineContextMenu> gContextMenuHiddenInstance = nullptr;
+static std::unique_ptr<Dali::WebEngineContextMenu> gContextMenuHiddenInstance = nullptr;
 static int gHitTestCreatedCallbackCalled = 0;
 static int gCookieManagerChangsWatchCallbackCalled = 0;
 
@@ -117,33 +117,33 @@ struct CallbackFunctor
   bool* mCallbackFlag;
 };
 
-static void OnPageLoadStarted( WebView view, const std::string& url )
+static void OnPageLoadStarted(const std::string& url)
 {
   gPageLoadStartedCallbackCalled++;
 }
 
-static void OnPageLoadInProgress( WebView view, const std::string& url )
+static void OnPageLoadInProgress(const std::string& url)
 {
   gPageLoadInProgressCallbackCalled++;
 }
 
-static void OnPageLoadFinished( WebView view, const std::string& url )
+static void OnPageLoadFinished(const std::string& url)
 {
   gPageLoadFinishedCallbackCalled++;
 }
 
-static void OnScrollEdgeReached( WebView view, Dali::WebEnginePlugin::ScrollEdge edge )
+static void OnScrollEdgeReached(Dali::WebEnginePlugin::ScrollEdge edge)
 {
   gScrollEdgeReachedCallbackCalled++;
 }
 
-static void OnResponsePolicyDecided(WebView view, std::shared_ptr<Dali::WebEnginePolicyDecision> decision)
+static void OnResponsePolicyDecided(std::unique_ptr<Dali::WebEnginePolicyDecision> decision)
 {
   gResponsePolicyDecidedCallbackCalled++;
   gResponsePolicyDecisionInstance = std::move(decision);
 }
 
-static void OnUrlChanged( WebView view, const std::string& url )
+static void OnUrlChanged(const std::string& url)
 {
   gUrlChangedCallbackCalled++;
 }
@@ -154,30 +154,30 @@ static bool OnHitTestCreated(std::unique_ptr<Dali::WebEngineHitTest> test)
   return true;
 }
 
-static void OnPageLoadError(WebView view, std::shared_ptr<Dali::WebEngineLoadError> error)
+static void OnPageLoadError(std::unique_ptr<Dali::WebEngineLoadError> error)
 {
   gPageLoadErrorCallbackCalled++;
   gPageLoadErrorInstance = std::move(error);
 }
 
-static void OnEvaluateJavaScript( const std::string& result )
+static void OnEvaluateJavaScript(const std::string& result)
 {
   gEvaluateJavaScriptCallbackCalled++;
 }
 
-static bool OnJavaScriptAlert( const std::string& result )
+static bool OnJavaScriptAlert(const std::string& result)
 {
   gJavaScriptAlertCallbackCalled++;
   return true;
 }
 
-static bool OnJavaScriptConfirm( const std::string& result )
+static bool OnJavaScriptConfirm(const std::string& result)
 {
   gJavaScriptConfirmCallbackCalled++;
   return true;
 }
 
-static bool OnJavaScriptPrompt( const std::string& meesage1, const std::string& message2 )
+static bool OnJavaScriptPrompt(const std::string& meesage1, const std::string& message2)
 {
   gJavaScriptPromptCallbackCalled++;
   return true;
@@ -210,54 +210,54 @@ static void OnChangesWatch()
   gCookieManagerChangsWatchCallbackCalled++;
 }
 
-static bool OnHovered( Actor actor, const Dali::HoverEvent& hover )
+static bool OnHovered(Actor actor, const Dali::HoverEvent& hover)
 {
   gHovered = true;
   return true;
 }
 
-static bool OnWheelEvent( Actor actor, const Dali::WheelEvent& wheel )
+static bool OnWheelEvent(Actor actor, const Dali::WheelEvent& wheel)
 {
   gWheelEventHandled = true;
   return true;
 }
 
-static void OnFormRepostDecision(WebView, std::shared_ptr<Dali::WebEngineFormRepostDecision> decision)
+static void OnFormRepostDecided(std::unique_ptr<Dali::WebEngineFormRepostDecision> decision)
 {
-  gFormRepostDecisionCallbackCalled++;
-  gFormRepostDecisionInstance = std::move(decision);
+  gFormRepostDecidedCallbackCalled++;
+  gFormRepostDecidedInstance = std::move(decision);
 }
 
-static void OnFrameRendered(WebView)
+static void OnFrameRendered()
 {
   gFrameRenderedCallbackCalled++;
 }
 
-static void OnRequestInterceptor(WebView view, std::shared_ptr<Dali::WebEngineRequestInterceptor> interceptor)
+static void OnRequestInterceptor(std::unique_ptr<Dali::WebEngineRequestInterceptor> interceptor)
 {
   gRequestInterceptorCallbackCalled++;
   gRequestInterceptorInstance = std::move(interceptor);
 }
 
-static void OnConsoleMessage(WebView view, std::shared_ptr<Dali::WebEngineConsoleMessage> message)
+static void OnConsoleMessage(std::unique_ptr<Dali::WebEngineConsoleMessage> message)
 {
   gConsoleMessageCallbackCalled++;
   gConsoleMessageInstance = std::move(message);
 }
 
-static void OnCertificateConfirm(WebView view, std::shared_ptr<Dali::WebEngineCertificate> certificate )
+static void OnCertificateConfirm(std::unique_ptr<Dali::WebEngineCertificate> certificate)
 {
   gCertificateConfirmCallbackCalled++;
   gCertificateConfirmInstance = std::move(certificate);
 }
 
-static void OnSslCertificateChanged(WebView view, std::shared_ptr<Dali::WebEngineCertificate> certificate )
+static void OnSslCertificateChanged(std::unique_ptr<Dali::WebEngineCertificate> certificate)
 {
   gSslCertificateChangedCallbackCalled++;
   gSslCertificateInstance = std::move(certificate);
 }
 
-static void OnHttpAuthHandler( WebView view, std::shared_ptr<Dali::WebEngineHttpAuthHandler> hander )
+static void OnHttpAuthHandler(std::unique_ptr<Dali::WebEngineHttpAuthHandler> hander)
 {
   gHttpAuthHandlerCallbackCalled++;
   gHttpAuthInstance = std::move(hander);
@@ -293,13 +293,13 @@ static bool OnMimeOverridden(const std::string&, const std::string&, std::string
   return false;
 }
 
-static void OnContextMenuShown(WebView view, std::shared_ptr<Dali::WebEngineContextMenu> menu)
+static void OnContextMenuShown(std::unique_ptr<Dali::WebEngineContextMenu> menu)
 {
   gContextMenuShownCallbackCalled++;
   gContextMenuShownInstance = std::move(menu);
 }
 
-static void OnContextMenuHidden(WebView view, std::shared_ptr<Dali::WebEngineContextMenu> menu)
+static void OnContextMenuHidden(std::unique_ptr<Dali::WebEngineContextMenu> menu)
 {
   gContextMenuHiddenCallbackCalled++;
   gContextMenuHiddenInstance = std::move(menu);
@@ -375,21 +375,10 @@ int UtcDaliWebViewPageNavigation(void)
   application.Render();
   DALI_TEST_CHECK( view );
 
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  view.PageLoadStartedSignal().Connect( &OnPageLoadStarted );
-  view.PageLoadInProgressSignal().Connect( &OnPageLoadInProgress );
-  view.PageLoadFinishedSignal().Connect( &OnPageLoadFinished );
-  view.UrlChangedSignal().Connect( &OnUrlChanged );
-  bool signal1 = false;
-  bool signal2 = false;
-  bool signal3 = false;
-  bool signal4 = false;
-  bool signal5 = false;
-  view.ConnectSignal( testTracker, "pageLoadStarted", CallbackFunctor(&signal1) );
-  view.ConnectSignal( testTracker, "pageLoadInProgress", CallbackFunctor(&signal2) );
-  view.ConnectSignal( testTracker, "pageLoadFinished", CallbackFunctor(&signal3) );
-  view.ConnectSignal( testTracker, "urlChanged", CallbackFunctor(&signal4) );
-  view.ConnectSignal( testTracker, "invalidname", CallbackFunctor(&signal5) );
+  view.RegisterPageLoadStartedCallback( &OnPageLoadStarted );
+  view.RegisterPageLoadInProgressCallback( &OnPageLoadInProgress );
+  view.RegisterPageLoadFinishedCallback( &OnPageLoadFinished );
+  view.RegisterUrlChangedCallback( &OnUrlChanged );
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadInProgressCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 0, TEST_LOCATION );
@@ -403,8 +392,6 @@ int UtcDaliWebViewPageNavigation(void)
   DALI_TEST_EQUALS( gPageLoadInProgressCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gUrlChangedCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 & signal2 & signal3 & signal4 );
-  DALI_TEST_CHECK( !signal5 );
 
   view.LoadUrl( TEST_URL2 );
   view.Suspend();
@@ -454,13 +441,8 @@ int UtcDaliWebViewPageLoadErrorConsoleMessage(void)
   application.Render();
   DALI_TEST_CHECK( view );
 
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  view.PageLoadErrorSignal().Connect( &OnPageLoadError );
-  view.ConsoleMessageSignal().Connect( &OnConsoleMessage );
-  bool signal1 = false;
-  bool signal2 = false;
-  view.ConnectSignal( testTracker, "pageLoadError", CallbackFunctor(&signal1) );
-  view.ConnectSignal( testTracker, "consoleMessage", CallbackFunctor(&signal2) );
+  view.RegisterPageLoadErrorCallback( &OnPageLoadError );
+  view.RegisterConsoleMessageReceivedCallback( &OnConsoleMessage );
   DALI_TEST_EQUALS( gPageLoadErrorCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gConsoleMessageCallbackCalled, 0, TEST_LOCATION );
 
@@ -468,7 +450,6 @@ int UtcDaliWebViewPageLoadErrorConsoleMessage(void)
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS( gPageLoadErrorCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gConsoleMessageCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 & signal2);
 
   // error code.
   DALI_TEST_CHECK(gPageLoadErrorInstance);
@@ -670,8 +651,8 @@ int UtcDaliWebViewPropertyVideoHoleEnabled(void)
   WebView view = WebView::New();
   DALI_TEST_CHECK( view );
 
-  const bool kDefaultValue = true;
-  const bool kTestValue = false;
+  const bool kDefaultValue = false;
+  const bool kTestValue = true;
 
   // Check default value
   bool output;
@@ -794,7 +775,7 @@ int UtcDaliWebViewHoverAndWheel(void)
   END_TEST;
 }
 
-int UtcDaliWebViewFormRepostDecisionFrameRendering(void)
+int UtcDaliWebViewFormRepostDecidedFrameRendering(void)
 {
   ToolkitTestApplication application;
 
@@ -808,28 +789,22 @@ int UtcDaliWebViewFormRepostDecisionFrameRendering(void)
   application.Render();
   DALI_TEST_CHECK( view );
 
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  view.FormRepostDecisionSignal().Connect(&OnFormRepostDecision);
-  view.FrameRenderedSignal().Connect(&OnFrameRendered);
-  bool signal1 = false;
-  bool signal2 = false;
-  view.ConnectSignal( testTracker, "formRepostDecision", CallbackFunctor(&signal1) );
-  view.ConnectSignal( testTracker, "frameRendered", CallbackFunctor(&signal2) );
-  DALI_TEST_EQUALS( gFormRepostDecisionCallbackCalled, 0, TEST_LOCATION );
+  view.RegisterFormRepostDecidedCallback(&OnFormRepostDecided);
+  view.RegisterFrameRenderedCallback(&OnFrameRendered);
+  DALI_TEST_EQUALS( gFormRepostDecidedCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gFrameRenderedCallbackCalled, 0, TEST_LOCATION );
 
   view.LoadUrl( TEST_URL1 );
   Test::EmitGlobalTimerSignal();
-  DALI_TEST_EQUALS( gFormRepostDecisionCallbackCalled, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gFormRepostDecidedCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gFrameRenderedCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 & signal2);
 
   // form repost decision.
-  DALI_TEST_CHECK(gFormRepostDecisionInstance);
-  gFormRepostDecisionInstance->Reply(true);
+  DALI_TEST_CHECK(gFormRepostDecidedInstance);
+  gFormRepostDecidedInstance->Reply(true);
 
   // reset
-  gFormRepostDecisionInstance = nullptr;
+  gFormRepostDecidedInstance = nullptr;
 
   END_TEST;
 }
@@ -848,16 +823,9 @@ int UtcDaliWebViewSslCertificateHttpAuthentication(void)
   application.Render();
   DALI_TEST_CHECK( view );
 
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  view.CertificateConfirmSignal().Connect(&OnCertificateConfirm);
-  view.SslCertificateChangedSignal().Connect(&OnSslCertificateChanged);
-  view.HttpAuthHandlerSignal().Connect(&OnHttpAuthHandler);
-  bool signal1 = false;
-  bool signal2 = false;
-  bool signal3 = false;
-  view.ConnectSignal( testTracker, "certificateConfirm", CallbackFunctor(&signal1) );
-  view.ConnectSignal( testTracker, "sslCertificateChanged", CallbackFunctor(&signal2) );
-  view.ConnectSignal( testTracker, "httpAuthRequest", CallbackFunctor(&signal3) );
+  view.RegisterCertificateConfirmedCallback(&OnCertificateConfirm);
+  view.RegisterSslCertificateChangedCallback(&OnSslCertificateChanged);
+  view.RegisterHttpAuthHandlerCallback(&OnHttpAuthHandler);
   DALI_TEST_EQUALS( gCertificateConfirmCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gSslCertificateChangedCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gHttpAuthHandlerCallbackCalled, 0, TEST_LOCATION );
@@ -867,7 +835,6 @@ int UtcDaliWebViewSslCertificateHttpAuthentication(void)
   DALI_TEST_EQUALS( gCertificateConfirmCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gSslCertificateChangedCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gHttpAuthHandlerCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 & signal2 & signal3);
 
   // certificate.
   DALI_TEST_CHECK(gCertificateConfirmInstance);
@@ -1080,13 +1047,8 @@ int UtcDaliWebViewContextMenuShownAndHidden(void)
   DALI_TEST_CHECK( view );
 
   // load url.
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  view.ContextMenuShownSignal().Connect( &OnContextMenuShown );
-  view.ContextMenuHiddenSignal().Connect( &OnContextMenuHidden );
-  bool signal1 = false;
-  bool signal2 = false;
-  view.ConnectSignal( testTracker, "contextMenuShown", CallbackFunctor(&signal1) );
-  view.ConnectSignal( testTracker, "contextMenuHidden", CallbackFunctor(&signal2) );
+  view.RegisterContextMenuShownCallback( &OnContextMenuShown );
+  view.RegisterContextMenuHiddenCallback( &OnContextMenuHidden );
   DALI_TEST_EQUALS( gContextMenuShownCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( gContextMenuHiddenCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_CHECK(gContextMenuShownInstance == 0);
@@ -1096,8 +1058,6 @@ int UtcDaliWebViewContextMenuShownAndHidden(void)
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS( gContextMenuShownCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gContextMenuHiddenCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 );
-  DALI_TEST_CHECK( signal2 );
 
   // check context meun & its items.
   DALI_TEST_CHECK(gContextMenuShownInstance != 0);
@@ -1140,10 +1100,7 @@ int UtcDaliWebViewScrollBy(void)
   DALI_TEST_CHECK( view );
 
   // load url.
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  view.ScrollEdgeReachedSignal().Connect( &OnScrollEdgeReached );
-  bool signal1 = false;
-  view.ConnectSignal( testTracker, "scrollEdgeReached", CallbackFunctor(&signal1) );
+  view.RegisterScrollEdgeReachedCallback( &OnScrollEdgeReached );
   DALI_TEST_EQUALS( gScrollEdgeReachedCallbackCalled, 0, TEST_LOCATION );
 
   view.LoadUrl( TEST_URL1 );
@@ -1163,7 +1120,6 @@ int UtcDaliWebViewScrollBy(void)
   view.GetProperty( WebView::Property::SCROLL_POSITION ).Get( output );
   DALI_TEST_CHECK( output.x == 150 && output.y == 150 );
   DALI_TEST_EQUALS( gScrollEdgeReachedCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 );
 
   // scroll by and trigger scrollEdgeReached event.
   bool result = view.ScrollEdgeBy( 50, 50 );
@@ -1173,7 +1129,6 @@ int UtcDaliWebViewScrollBy(void)
   view.GetProperty( WebView::Property::SCROLL_POSITION ).Get( output );
   DALI_TEST_CHECK( output.x == 200 && output.y == 200 );
   DALI_TEST_EQUALS( gScrollEdgeReachedCallbackCalled, 2, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 );
 
   END_TEST;
 }
@@ -1277,17 +1232,13 @@ int UtcDaliWebViewHttpRequestInterceptor(void)
   DALI_TEST_CHECK( view );
 
   // load url.
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  view.RequestInterceptorSignal().Connect( &OnRequestInterceptor );
-  bool signal1 = false;
-  view.ConnectSignal( testTracker, "requestInterceptor", CallbackFunctor(&signal1) );
+  view.RegisterRequestInterceptorCallback( &OnRequestInterceptor );
   DALI_TEST_EQUALS( gRequestInterceptorCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_CHECK(gRequestInterceptorInstance == 0);
 
   view.LoadUrl( TEST_URL1 );
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS( gRequestInterceptorCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 );
 
   // check request interceptor.
   DALI_TEST_CHECK(gRequestInterceptorInstance != 0);
@@ -1311,17 +1262,13 @@ int UtcDaliWebViewResponsePolicyDecisionRequest(void)
   DALI_TEST_CHECK( view );
 
   // load url.
-  ConnectionTracker* testTracker = new ConnectionTracker();
-  view.ResponsePolicyDecisionSignal().Connect( &OnResponsePolicyDecided );
-  bool signal1 = false;
-  view.ConnectSignal( testTracker, "responsePolicyDecided", CallbackFunctor(&signal1) );
+  view.RegisterResponsePolicyDecidedCallback( &OnResponsePolicyDecided );
   DALI_TEST_EQUALS( gResponsePolicyDecidedCallbackCalled, 0, TEST_LOCATION );
   DALI_TEST_CHECK(gResponsePolicyDecisionInstance == 0);
 
   view.LoadUrl( TEST_URL1 );
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS( gResponsePolicyDecidedCallbackCalled, 1, TEST_LOCATION );
-  DALI_TEST_CHECK( signal1 );
 
   // check response policy decision & its frame.
   DALI_TEST_CHECK(gResponsePolicyDecisionInstance != 0);

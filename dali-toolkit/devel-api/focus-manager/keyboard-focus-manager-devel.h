@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_KEYBOARD_FOCUS_MANAGER_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,22 @@ DALI_TOOLKIT_API void EnableFocusIndicator(KeyboardFocusManager keyboardFocusMan
  * @return True when focus indicator is enabled
  */
 DALI_TOOLKIT_API bool IsFocusIndicatorEnabled(KeyboardFocusManager keyboardFocusManager);
+
+/**
+ * @brief Decide using default focus algorithm or not
+ *
+ * @param[in] keyboardFocusManager The instance of KeyboardFocusManager
+ * @param[in] enable Whether using default focus algorithm or not
+ */
+DALI_TOOLKIT_API void EnableDefaultAlgorithm(KeyboardFocusManager keyboardFocusManager, bool enable);
+
+/**
+ * @brief Check default focus algorithm is enabled or not
+ *
+ * @param[in] keyboardFocusManager The instance of KeyboardFocusManager
+ * @return True when default focus algorithm is enabled
+ */
+DALI_TOOLKIT_API bool IsDefaultAlgorithmEnabled(KeyboardFocusManager keyboardFocusManager);
 
 } // namespace DevelKeyboardFocusManager
 

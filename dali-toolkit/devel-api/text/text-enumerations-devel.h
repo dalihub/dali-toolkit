@@ -68,6 +68,83 @@ enum class MatchLayoutDirection
   CONTENTS // The text layout direction is determined by the text itself.
 };
 
+/**
+ * @brief Contains types which specify where the text is truncated and replaced by Ellipsis glyph.
+ *
+ * If the text cannot fit into layout size then truncate text and replace it by Ellipsis glyph.
+ *
+ * Ellipsis works after layouting text normally according to LineWrap mode.
+ *
+ * Ellipsis glyph is three dots "...".
+ *
+ * The Ellipsis property should be enabled.
+ *
+ *
+ * Example: "Hello here is test goodbye."
+ *
+ * Assume LineWrap is CHARACTER.
+ *
+ * EllipsisPosition::END type in single line, truncate tail of line then add Ellipsis:
+ * @code
+ * +-----------+
+ * |Hello he...|
+ * +-----------+
+ * @endcode
+ *
+ * EllipsisPosition::END type in multi-lines, truncate tail of the last appeared line then add Ellipsis:
+ * @code
+ * +-----------+
+ * |Hello here |
+ * |is test ...|
+ * +-----------+
+ * @endcode
+ *
+ * EllipsisPosition::START type in single line, truncate head of line then add Ellipsis:
+ * @code
+ * +-----------+
+ * |...goodbye.|
+ * +-----------+
+ * @endcode
+ *
+ * EllipsisPosition::START type in multi-lines, truncate head of the first appeared line then add Ellipsis:
+ * @code
+ * +-----------+
+ * |...test goo|
+ * |dbye.      |
+ * +-----------+
+ * @endcode
+ *
+ * EllipsisPosition::MIDDLE type in single line, truncate middle of line then add Ellipsis:
+ * @code
+ * +-----------+
+ * |Hell...bye.|
+ * +-----------+
+ * @endcode
+ *
+ * EllipsisPosition::MIDDLE type in multi-lines, truncate middle lines. In the end of the last appeared line before removed lines add Ellipsis:
+ * @code
+ * +-----------+
+ * |Hello he...|
+ * |dbye.      |
+ * +-----------+
+ * @endcode
+ *
+ */
+namespace EllipsisPosition
+{
+/**
+ * @brief Enumerations specifying where to position the ellipsis glyph.
+ * @see EllipsisPosition
+ */
+enum Type
+{
+  END = 0, ///< END position will truncate tail of text that exceeds the layout size then replace it by Ellipsis glyph in the end of the last appeared line.
+  START,   ///< START position will truncate head of text that exceeds the layout size then replace it by Ellipsis glyph in the start of the first appeared line. In multilines, the lines are removed from top until the text fit into layout height.
+  MIDDLE   ///< MIDDLE position will truncate middle of text that exceeds the layout size then replace it by Ellipsis glyph in the middle of line. In multilines, the lines are removed from middle until the text fit into layout height then add ellipsis glyph in the end of the last line appeared before removed lines.
+};
+
+} // namespace EllipsisPosition
+
 } // namespace DevelText
 
 } // namespace Toolkit

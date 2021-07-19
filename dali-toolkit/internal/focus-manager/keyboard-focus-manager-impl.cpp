@@ -127,7 +127,8 @@ KeyboardFocusManager::KeyboardFocusManager()
   mAlwaysShowIndicator(ALWAYS_SHOW),
   mFocusGroupLoopEnabled(false),
   mIsWaitingKeyboardFocusChangeCommit(false),
-  mClearFocusOnTouch(true)
+  mClearFocusOnTouch(true),
+  mEnableDefaultAlgorithm(false)
 {
   // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorShown.
 
@@ -497,7 +498,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
         nextFocusableActor                  = mPreFocusChangeSignal.Emit(currentFocusActor, Actor(), direction);
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
-      else
+      else if(mEnableDefaultAlgorithm)
       {
         // We should find it among the actors nearby.
         nextFocusableActor = Toolkit::FocusFinder::GetNearestFocusableActor(currentFocusActor, direction);
@@ -878,7 +879,15 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       {
         // "Tab" key changes the focus group in the forward direction and
         // "Shift-Tab" key changes it in the backward direction.
-        DoMoveFocusToNextFocusGroup(!event.IsShiftModifier());
+        if(!DoMoveFocusToNextFocusGroup(!event.IsShiftModifier()))
+        {
+          // If the focus group is not changed, Move the focus towards right, "Shift-Tap" key moves the focus towards left.
+          if(!MoveFocus(event.IsShiftModifier() ? Toolkit::Control::KeyboardFocus::LEFT : Toolkit::Control::KeyboardFocus::RIGHT))
+          {
+            // If the focus is not moved, Move the focus towards down, "Shift-Tap" key moves the focus towards up.
+            MoveFocus(event.IsShiftModifier() ? Toolkit::Control::KeyboardFocus::UP : Toolkit::Control::KeyboardFocus::DOWN);
+          }
+        }
       }
 
       isFocusStartableKey = true;
@@ -1074,6 +1083,16 @@ void KeyboardFocusManager::EnableFocusIndicator(bool enable)
 bool KeyboardFocusManager::IsFocusIndicatorEnabled() const
 {
   return (mEnableFocusIndicator == ENABLE);
+}
+
+void KeyboardFocusManager::EnableDefaultAlgorithm(bool enable)
+{
+  mEnableDefaultAlgorithm = enable;
+}
+
+bool KeyboardFocusManager::IsDefaultAlgorithmEnabled() const
+{
+  return mEnableDefaultAlgorithm;
 }
 
 } // namespace Internal

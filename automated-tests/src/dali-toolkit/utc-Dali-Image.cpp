@@ -22,6 +22,7 @@
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
+#include <dali-toolkit/public-api/image-loader/image-url.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -51,9 +52,9 @@ int UtcDaliImageConvertFrameBufferToUrl1(void)
   FrameBuffer frameBuffer = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
 
   DALI_TEST_CHECK( frameBuffer );
-  std::string url = Dali::Toolkit::Image::GenerateUrl( frameBuffer, Pixel::Format::RGBA8888, width, height );
+  ImageUrl url = Dali::Toolkit::Image::GenerateUrl( frameBuffer, Pixel::Format::RGBA8888, width, height );
 
-  DALI_TEST_CHECK( url.size() > 0u );
+  DALI_TEST_CHECK( url.GetUrl().size() > 0u );
 
   END_TEST;
 }
@@ -71,7 +72,7 @@ int UtcDaliImageConvertFrameBufferToUrl2(void)
   Texture texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height );
   frameBuffer.AttachColorTexture( texture );
 
-  DALI_TEST_CHECK( Dali::Toolkit::Image::GenerateUrl( frameBuffer, 0 ).size() > 0u );
+  DALI_TEST_CHECK( Dali::Toolkit::Image::GenerateUrl( frameBuffer, 0 ).GetUrl().size() > 0u );
 
   END_TEST;
 }
@@ -89,7 +90,7 @@ int UtcDaliImageConvertPixelDataToUrl(void)
   unsigned char* buffer= reinterpret_cast<unsigned char*>( malloc( bufferSize ) );
   PixelData pixelData = PixelData::New( buffer, bufferSize, width, height, Pixel::RGB888, PixelData::FREE );
 
-  DALI_TEST_CHECK( Dali::Toolkit::Image::GenerateUrl( pixelData ).size() > 0u );
+  DALI_TEST_CHECK( Dali::Toolkit::Image::GenerateUrl( pixelData ).GetUrl().size() > 0u );
 
   END_TEST;
 }
@@ -106,7 +107,7 @@ int UtcDaliImageConvertNativeImageSourceToUrl(void)
   {
     NativeImageSourcePtr nativeImageSource = NativeImageSource::New(width, height, NativeImageSource::COLOR_DEPTH_DEFAULT );
 
-    DALI_TEST_CHECK( Dali::Toolkit::Image::GenerateUrl( nativeImageSource ).size() > 0u );
+    DALI_TEST_CHECK( Dali::Toolkit::Image::GenerateUrl( nativeImageSource ).GetUrl().size() > 0u );
   }
   catch(Dali::DaliException& e)
   {

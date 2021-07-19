@@ -81,9 +81,14 @@ public:
   Text::VerticalAlignment::Type GetVerticalAlignment() const override;
 
   /**
- * @copydoc ModelInterface::GetVerticalLineAlignment()
- */
+  * @copydoc ModelInterface::GetVerticalLineAlignment()
+  */
   DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const override;
+
+  /**
+  * @copydoc ModelInterface::GetEllipsisPosition()
+  */
+  DevelText::EllipsisPosition::Type GetEllipsisPosition() const override;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
@@ -114,6 +119,26 @@ public:
    * @copydoc ModelInterface::GetNumberOfGlyphs()
    */
   Length GetNumberOfGlyphs() const override;
+
+  /**
+   * @copydoc ModelInterface::GetStartIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetStartIndexOfElidedGlyphs() const override;
+
+  /**
+   * @copydoc ModelInterface::GetEndIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetEndIndexOfElidedGlyphs() const override;
+
+  /**
+   * @copydoc ModelInterface::GetFirstMiddleIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetFirstMiddleIndexOfElidedGlyphs() const override;
+
+  /**
+   * @copydoc ModelInterface::GetSecondMiddleIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetSecondMiddleIndexOfElidedGlyphs() const override;
 
   /**
    * @copydoc ModelInterface::GetGlyphs()
@@ -236,20 +261,26 @@ public:
   Length GetHyphensCount() const override;
 
   /**
-   * @brief Does the text elide.
+   * @brief Does the text elide at the end, start or middle of text according to ellipsis position
    *
    * It stores a copy of the visible glyphs and removes as many glyphs as needed
-   * from the last visible line to add the ellipsis glyph.
+   * from the last visible line to add the ellipsis glyph in END case,
+   * from the first visible line to add the ellipsis glyph in START case,
+   * between the first and last visible lines to add the ellipsis glyph.
    *
    * It stores as well a copy of the positions for each visible glyph.
    */
   void ElideGlyphs();
 
 private:
-  const ModelInterface* const mModel;            ///< Pointer to the text's model.
-  Vector<GlyphInfo>           mElidedGlyphs;     ///< Stores the glyphs of the elided text.
-  Vector<Vector2>             mElidedLayout;     ///< Stores the positions of each glyph of the elided text.
-  bool                        mIsTextElided : 1; ///< Whether the text has been elided.
+  const ModelInterface* const mModel;                           ///< Pointer to the text's model.
+  Vector<GlyphInfo>           mElidedGlyphs;                    ///< Stores the glyphs of the elided text.
+  Vector<Vector2>             mElidedLayout;                    ///< Stores the positions of each glyph of the elided text.
+  bool                        mIsTextElided : 1;                ///< Whether the text has been elided.
+  GlyphIndex                  mStartIndexOfElidedGlyphs;        ///< The start index of elided glyphs.
+  GlyphIndex                  mEndIndexOfElidedGlyphs;          ///< The end index of elided glyphs.
+  GlyphIndex                  mFirstMiddleIndexOfElidedGlyphs;  ///< The first end index of elided glyphs, index before ellipsis of middle.
+  GlyphIndex                  mSecondMiddleIndexOfElidedGlyphs; ///< The second end index of elided glyphs, index of ellipsis of middle.
 };
 
 } // namespace Text

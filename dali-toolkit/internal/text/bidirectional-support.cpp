@@ -147,6 +147,8 @@ void ReorderLine(const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo
                  BidirectionalLineRunIndex            bidiLineIndex,
                  CharacterIndex                       startIndex,
                  Length                               numberOfCharacters,
+                 CharacterIndex                       startIndexInSecondHalfLine,
+                 Length                               numberOfCharactersInSecondHalfLine,
                  CharacterDirection                   direction)
 {
   // Handle to the bidirectional info module in text-abstraction.
@@ -159,11 +161,16 @@ void ReorderLine(const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo
   lineInfoRun.direction                       = direction;
   lineInfoRun.isIdentity                      = true;
 
+  lineInfoRun.characterRunForSecondHalfLine.characterIndex     = startIndexInSecondHalfLine;
+  lineInfoRun.characterRunForSecondHalfLine.numberOfCharacters = numberOfCharactersInSecondHalfLine;
+
   // Allocate space for the conversion maps.
   // The memory is freed after the visual to logical to visual conversion tables are built in the logical model.
   lineInfoRun.visualToLogicalMap = reinterpret_cast<CharacterIndex*>(malloc(numberOfCharacters * sizeof(CharacterIndex)));
 
-  if(nullptr != lineInfoRun.visualToLogicalMap)
+  lineInfoRun.visualToLogicalMapSecondHalf = reinterpret_cast<CharacterIndex*>(malloc(numberOfCharactersInSecondHalfLine * sizeof(CharacterIndex)));
+
+  if(nullptr != lineInfoRun.visualToLogicalMap && nullptr != lineInfoRun.visualToLogicalMapSecondHalf)
   {
     // Reorders the line.
     bidirectionalSupport.Reorder(bidirectionalParagraphInfo.bidirectionalInfoIndex,
@@ -171,11 +178,25 @@ void ReorderLine(const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo
                                  lineInfoRun.characterRun.numberOfCharacters,
                                  lineInfoRun.visualToLogicalMap);
 
+    bidirectionalSupport.Reorder(bidirectionalParagraphInfo.bidirectionalInfoIndex,
+                                 lineInfoRun.characterRunForSecondHalfLine.characterIndex - bidirectionalParagraphInfo.characterRun.characterIndex,
+                                 lineInfoRun.characterRunForSecondHalfLine.numberOfCharacters,
+                                 lineInfoRun.visualToLogicalMapSecondHalf);
+
     // For those LTR lines inside a bidirectional paragraph.
     // It will save to relayout the line after reordering.
     for(unsigned int i = 0; i < numberOfCharacters; ++i)
     {
       if(i != *(lineInfoRun.visualToLogicalMap + i))
+      {
+        lineInfoRun.isIdentity = false;
+        break;
+      }
+    }
+
+    for(unsigned int i = 0; i < numberOfCharactersInSecondHalfLine; ++i)
+    {
+      if(i != *(lineInfoRun.visualToLogicalMapSecondHalf + i))
       {
         lineInfoRun.isIdentity = false;
         break;

@@ -205,6 +205,14 @@ enum
    * @endcode
    */
   INPUT_FILTER,
+
+  /**
+  * @brief The enumerations used to specify whether to position the ellipsis at the END, START or MIDDLE of the text.
+  * @details Name "EllipsisPosition", type [Type](@ref Dali::Toolkit::DevelText::EllipsisPosition::Type) (Property::INTEGER), or Property::STRING. Read/Write
+  * @note Default is EllipsisPosition::END.
+  * @see DevelText::EllipsisPosition
+  */
+  ELLIPSIS_POSITION,
 };
 
 } // namespace Property

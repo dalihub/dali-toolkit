@@ -1429,6 +1429,18 @@ public: // Queries & retrieves.
   void SetVerticalLineAlignment(Toolkit::DevelText::VerticalLineAlignment::Type alignment);
 
   /**
+   * @brief Retrieves ellipsis position
+   * @return The ellipsis position
+   */
+  Toolkit::DevelText::EllipsisPosition::Type GetEllipsisPosition() const;
+
+  /**
+   * @brief Sets ellipsis position
+   * @param[in] ellipsisPosition The ellipsis position for the text
+   */
+  void SetEllipsisPosition(Toolkit::DevelText::EllipsisPosition::Type ellipsisPosition);
+
+  /**
    * @brief Retrieves ignoreSpaceAfterText value from model
    * @return The value of ignoreSpaceAfterText
    */

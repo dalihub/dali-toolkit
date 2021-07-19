@@ -24,6 +24,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
+// DEVEL INCLUDES
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 namespace Dali
 {
 namespace Toolkit
@@ -67,6 +69,14 @@ const char* GetHorizontalAlignmentString(const Toolkit::Text::HorizontalAlignmen
  * @return the string equivalent
  */
 const char* GetVerticalAlignmentString(const Toolkit::Text::VerticalAlignment::Type& alignment);
+
+/**
+ * @brief Get the ellipsis-location-type from the provided property value.
+ * @param[in] propertyValue The source value (which can be a Property::INTEGER or Property::STRING type)
+ * @param[out] ellipsisPositionType The resulting ellipsisPositionType from the given source
+ * @return true if the resulting ellipsisPositionType has been updated
+ */
+bool GetEllipsisPositionTypeEnumeration(const Property::Value& propertyValue, Toolkit::DevelText::EllipsisPosition::Type& ellipsisPositionType);
 
 } // namespace Text
 

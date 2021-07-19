@@ -167,6 +167,36 @@ public:
    */
   uint16_t GetOutlineWidth() const override;
 
+  /**
+  * @copydoc Dali::Toolkit::Text::ViewInterface::GetEllipsisPosition()
+  */
+  DevelText::EllipsisPosition::Type GetEllipsisPosition() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::IsTextElideEnabled()
+   */
+  bool IsTextElideEnabled() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetStartIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetStartIndexOfElidedGlyphs() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetEndIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetEndIndexOfElidedGlyphs() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetFirstMiddleIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetFirstMiddleIndexOfElidedGlyphs() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetSecondMiddleIndexOfElidedGlyphs()
+   */
+  GlyphIndex GetSecondMiddleIndexOfElidedGlyphs() const override;
+
 private:
   // Undefined
   View(const View& handle);

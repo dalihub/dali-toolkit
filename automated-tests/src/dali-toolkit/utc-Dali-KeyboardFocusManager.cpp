@@ -1689,6 +1689,9 @@ int UtcDaliKeyboardFocusManagerWithoutFocusablePropertiesMoveFocus(void)
   focusChangedCallback.Reset();
 
   // without set the navigation properties, but we can focus move
+  // enable the default algorithm
+  Dali::Toolkit::DevelKeyboardFocusManager::EnableDefaultAlgorithm(manager, true);
+  DALI_TEST_CHECK( Dali::Toolkit::DevelKeyboardFocusManager::IsDefaultAlgorithmEnabled(manager) );
 
   // Move the focus towards right
   // button1 -- [button2]
@@ -1896,6 +1899,97 @@ int UtcDaliKeyboardFocusManagerSetAndGetCurrentFocusActorInTouchMode(void)
 
   // Check that the focus is successfully to the second actor
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+
+  END_TEST;
+}
+
+int UtcDaliKeyboardFocusManagerEnableDefaultAlgorithm(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerEnableDefaultAlgorithm");
+
+  // Register Type
+  TypeInfo type;
+  type = TypeRegistry::Get().GetTypeInfo( "KeyboardFocusManager" );
+  DALI_TEST_CHECK( type );
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK( handle );
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  bool focusChangedSignalVerified = false;
+  FocusChangedCallback focusChangedCallback(focusChangedSignalVerified);
+  manager.FocusChangedSignal().Connect( &focusChangedCallback, &FocusChangedCallback::Callback );
+
+  PushButton button1 = PushButton::New();
+  PushButton button2 = PushButton::New();
+
+  button1.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
+  button2.SetProperty(Actor::Property::SIZE, Vector2(50, 50));
+
+  button1.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE,true);
+  button2.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE,true);
+
+  application.GetScene().Add(button1);
+  application.GetScene().Add(button2);
+
+  // set position
+  // button1 -- button2
+  button1.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+  button2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 0.0f));
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Set the focus to the button1
+  // [button1] -- button2
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(button1) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == button1);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button1);
+  focusChangedCallback.Reset();
+
+  // without set the navigation properties, but we can focus move
+  // enable the default algorithm
+  Dali::Toolkit::DevelKeyboardFocusManager::EnableDefaultAlgorithm(manager, true);
+  DALI_TEST_CHECK( Dali::Toolkit::DevelKeyboardFocusManager::IsDefaultAlgorithmEnabled(manager) );
+
+  // Move the focus towards right
+  // button1 -- [button2]
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
+
+  // Confirm whether focus is moved to button2
+  DALI_TEST_EQUALS(button2.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button1);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button2);
+  focusChangedCallback.Reset();
+
+  // disable the default algorithm
+  Dali::Toolkit::DevelKeyboardFocusManager::EnableDefaultAlgorithm(manager, false);
+  DALI_TEST_CHECK( !Dali::Toolkit::DevelKeyboardFocusManager::IsDefaultAlgorithmEnabled(manager) );
+
+  // Move the focus towards left, The focus move will fail because the default algorithm is disabled.
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::LEFT) == false);
+
+  // enable the default algorithm
+  Dali::Toolkit::DevelKeyboardFocusManager::EnableDefaultAlgorithm(manager, true);
+  DALI_TEST_CHECK( Dali::Toolkit::DevelKeyboardFocusManager::IsDefaultAlgorithmEnabled(manager) );
+
+  // Move the focus towards left, The focus move will success because the default algorithm is enabled.
+  // [button1] -- button2
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::LEFT) == true);
+  // Confirm whether focus is moved to button2
+  DALI_TEST_EQUALS(button1.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == button2);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == button1);
+  focusChangedCallback.Reset();
+
 
   END_TEST;
 }
