@@ -24,12 +24,9 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/dali-toolkit.h>
-
-#include <test-encoded-image-buffer.h>
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -500,52 +497,6 @@ int UtcDaliImageVisualWithNativeImageRemoved(void)
   imageUrl.Reset();
   application.GetScene().Remove( actor );
   actor.Reset();
-
-  END_TEST;
-}
-
-int UtcDaliImageVisualWithEncodedImageBuffer(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "Use Encoded Image Buffer as url" );
-
-  EncodedImageBuffer rawBuffer = ConvertFileToEncodedImageBuffer(TEST_LARGE_IMAGE_FILE_NAME);
-  ImageUrl url = Dali::Toolkit::Image::GenerateUrl(rawBuffer);
-
-  VisualFactory factory = VisualFactory::Get();
-  DALI_TEST_CHECK( factory );
-
-  Property::Map propertyMap;
-  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::URL, url.GetUrl() );
-
-  Visual::Base visual = factory.CreateVisual( propertyMap );
-  DALI_TEST_CHECK( visual );
-
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  TraceCallStack& textureTrace = gl.GetTextureTrace();
-  textureTrace.Enable(true);
-
-  DummyControl actor = DummyControl::New();
-  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
-
-  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
-
-  application.GetScene().Add( actor );
-  application.SendNotification();
-
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
-
-  application.GetScene().Remove( actor );
-  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }

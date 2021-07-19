@@ -38,12 +38,6 @@ ImageUrl ImageUrl::New(Texture& texture)
   return ImageUrl(internal.Get());
 }
 
-ImageUrl ImageUrl::New(const EncodedImageBuffer& encodedImageBuffer)
-{
-  Toolkit::Internal::ImageUrlPtr internal = Toolkit::Internal::ImageUrl::New(encodedImageBuffer);
-  return ImageUrl(internal.Get());
-}
-
 ImageUrl ImageUrl::DownCast(BaseHandle handle)
 {
   return ImageUrl(dynamic_cast<Toolkit::Internal::ImageUrl*>(handle.GetObjectPtr()));

@@ -28,11 +28,8 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/public-api/image-loader/image.h>
-#include <dali-toolkit/public-api/image-loader/image-url.h>
 
 #include <test-native-image.h>
-#include <test-encoded-image-buffer.h>
 #include <sstream>
 #include <unistd.h>
 
@@ -537,6 +534,8 @@ int UtcDaliImageViewAsyncLoadingWithoutAltasing(void)
   const std::vector<GLuint>& textures2 = gl.GetBoundTextures();
   DALI_TEST_GREATER( textures2.size(), numTextures, TEST_LOCATION );
 
+
+
   END_TEST;
 }
 
@@ -711,150 +710,6 @@ int UtcDaliImageViewSyncLoading02(void)
     DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
                       true, TEST_LOCATION );
   }
-  END_TEST;
-}
-
-int UtcDaliImageViewAsyncLoadingEncodedBuffer(void)
-{
-  ToolkitTestApplication application;
-  TestGlAbstraction& gl = application.GetGlAbstraction();
-  const std::vector<GLuint>& textures = gl.GetBoundTextures();
-  size_t numTextures = textures.size();
-
-  // Get encoded raw-buffer image and generate url
-  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_600_RGB);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
-
-  // Async loading, no atlasing for big size image
-  ImageView imageView = ImageView::New(url.GetUrl());
-
-  // By default, Aysnc loading is used
-  application.GetScene().Add(imageView);
-  imageView.SetProperty( Actor::Property::SIZE, Vector2(100, 100) );
-  imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-
-  const std::vector<GLuint>& textures2 = gl.GetBoundTextures();
-  DALI_TEST_GREATER( textures2.size(), numTextures, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewAsyncLoadingEncodedBufferWithAtlasing(void)
-{
-  ToolkitTestApplication application;
-
-  // Get encoded raw-buffer image and generate url
-  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_600_RGB);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
-  ImageUrl           url2   = Toolkit::Image::GenerateUrl(buffer);
-
-  // Generate url is not equal to url2
-  // NOTE : This behavior may changed when ImageUrl compare operator changed.
-  DALI_TEST_CHECK(url != url2);
-  // Generate url's string is equal to url2's string
-  DALI_TEST_CHECK(url.GetUrl() == url2.GetUrl());
-
-  EncodedImageBuffer buffer2 = ConvertFileToEncodedImageBuffer(gImage_600_RGB);
-  url2 = Toolkit::Image::GenerateUrl(buffer2);
-
-  // Check whethere two url are not equal
-  DALI_TEST_CHECK(url.GetUrl() != url2.GetUrl());
-
-  // Async loading, automatic atlasing for small size image
-  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-  callStack.Reset();
-  callStack.Enable(true);
-
-  Property::Map imageMap;
-
-  imageMap[ ImageVisual::Property::URL ] = url.GetUrl();
-  imageMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
-  imageMap[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
-  imageMap[ ImageVisual::Property::ATLASING] = true;
-
-  ImageView imageView = ImageView::New();
-  imageView.SetProperty( ImageView::Property::IMAGE, imageMap );
-  imageView.SetProperty( Toolkit::Control::Property::PADDING, Extents( 10u, 10u, 10u, 10u ) );
-
-  // By default, Aysnc loading is used
-  // loading is not started if the actor is offScene
-
-  application.GetScene().Add( imageView );
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
-
-  // Change url to url2
-  imageMap[ ImageVisual::Property::URL ] = url2.GetUrl();
-  imageView.SetProperty( ImageView::Property::IMAGE, imageMap );
-
-  imageView.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION,  Dali::LayoutDirection::RIGHT_TO_LEFT );
-  application.SendNotification();
-  application.Render(16);
-  application.Render(16);
-  application.SendNotification();
-
-  // loading started, this waits for the loader thread for max 30 seconds
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(16);
-
-  callStack.Enable(false);
-
-  TraceCallStack::NamedParams params;
-  params["width"] << 34;
-  params["height"] << 34;
-  DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ), true, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliImageViewSyncLoadingEncodedBuffer(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline("ImageView Testing sync loading from EncodedImageBuffer");
-
-  // Get encoded raw-buffer image and generate url
-  EncodedImageBuffer buffer = ConvertFileToEncodedImageBuffer(gImage_34_RGBA);
-  ImageUrl           url    = Toolkit::Image::GenerateUrl(buffer);
-
-  // Sync loading, automatic atlasing for small size image
-  {
-    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
-    callStack.Reset();
-    callStack.Enable(true);
-
-    ImageView imageView = ImageView::New( );
-
-    // Sync loading is used
-    Property::Map syncLoadingMap;
-    syncLoadingMap[ "url" ] = url.GetUrl();
-    syncLoadingMap[ "desiredHeight" ] = 34;
-    syncLoadingMap[ "desiredWidth" ] = 34;
-    syncLoadingMap[ "synchronousLoading" ] = true;
-    syncLoadingMap[ "atlasing" ] = true;
-    imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
-
-    application.GetScene().Add( imageView );
-    application.SendNotification();
-    application.Render(16);
-
-    TraceCallStack::NamedParams params;
-    params["width"] << 34;
-    params["height"] << 34;
-    DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
-                      true, TEST_LOCATION );
-  }
-
   END_TEST;
 }
 
