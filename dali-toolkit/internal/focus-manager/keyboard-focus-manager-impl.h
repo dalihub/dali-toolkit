@@ -152,6 +152,16 @@ public:
    */
   bool IsFocusIndicatorEnabled() const;
 
+  /**
+   * @copydoc Toolkit::DevelKeyboardFocusManager::EnableDefaultAlgorithm
+   */
+  void EnableDefaultAlgorithm(bool enable);
+
+  /**
+   * @copydoc Toolkit::DevelKeyboardFocusManager::IsDefaultAlgorithmEnabled
+   */
+  bool IsDefaultAlgorithmEnabled() const;
+
 public:
   /**
    * @copydoc Toolkit::KeyboardFocusManager::PreFocusChangeSignal()
@@ -332,6 +342,8 @@ private:
   bool mIsWaitingKeyboardFocusChangeCommit : 1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
 
   bool mClearFocusOnTouch : 1; ///< Whether clear focus on touch.
+
+  bool mEnableDefaultAlgorithm : 1; ///< Whether use default algorithm focus
 };
 
 } // namespace Internal
