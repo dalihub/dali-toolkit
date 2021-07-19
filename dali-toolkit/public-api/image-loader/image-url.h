@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <dali/public-api/rendering/texture.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -61,6 +62,14 @@ public:
    * @return A handle to a newly allocated Dali resource.
    */
   static ImageUrl New(Texture& texture);
+
+  /**
+   * @brief Create an initialized ImageUrl.
+   *
+   * @param[in] encodedImageBuffer The encoded image buffer url is got from external buffer.
+   * @return A handle to a newly allocated Dali resource.
+   */
+  static ImageUrl New(const EncodedImageBuffer& encodedImageBuffer);
 
   /**
    * @brief Downcast an Object handle to ImageUrl handle.

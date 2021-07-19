@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_IMAGE_ATLAS_H
 #define DALI_TOOLKIT_IMAGE_ATLAS_H
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,7 +157,7 @@ public:
    * @param [in] size The width and height to fit the loaded image to.
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
-   * @param[in] atlasUploadObserver The observer to observe the upload state inside the ImageAtlas.
+   * @param [in] atlasUploadObserver The observer to observe the upload state inside the ImageAtlas.
    * @return True if there is enough space to fit this image in,false otherwise.
    * @note The valid callback function here is required to have the signature of void( void ).
    */
