@@ -104,6 +104,11 @@ bool ControllerImplEventHandler::ProcessInputEvents(Controller::Impl& impl)
           OnSelectNoneEvent(impl);
           break;
         }
+        case Event::SELECT_RANGE:
+        {
+          OnSelectRangeEvent(impl, *iter);
+          break;
+        }
       }
     }
   }
@@ -689,6 +694,29 @@ void ControllerImplEventHandler::OnSelectNoneEvent(Controller::Impl& impl)
       eventData.mUpdateCursorPosition      = true;
       eventData.mUpdateInputStyle          = true;
       eventData.mScrollAfterUpdatePosition = true;
+    }
+  }
+}
+
+void ControllerImplEventHandler::OnSelectRangeEvent(Controller::Impl& impl, const Event& event)
+{
+  if(impl.mEventData && impl.mEventData->mSelectionEnabled && impl.mEventData->mState != EventData::INACTIVE)
+  {
+    ModelPtr&      model          = impl.mModel;
+    const Vector2& scrollPosition = model->mScrollPosition;
+
+    // Calculate the selection index.
+    const uint32_t length = static_cast<uint32_t>(model->mLogicalModel->mText.Count());
+    const uint32_t start  = std::min(event.p2.mUint, length);
+    const uint32_t end    = std::min(event.p3.mUint, length);
+
+    if(start != end)
+    {
+      // Calculates the logical position from the x,y coords.
+      impl.RepositionSelectionHandles(0.f - scrollPosition.x, 0.f - scrollPosition.y, Controller::NoTextTap::HIGHLIGHT);
+
+      impl.mEventData->mLeftSelectionPosition  = start;
+      impl.mEventData->mRightSelectionPosition = end;
     }
   }
 }

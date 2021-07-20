@@ -363,6 +363,21 @@ DALI_TOOLKIT_API void SelectWholeText(TextEditor textEditor);
 DALI_TOOLKIT_API void SelectNone(TextEditor textEditor);
 
 /**
+ * @brief Select the text from start index to end index of TextEditor.
+ * @note
+ * The selection index is based on the cursor index.
+ *
+ * text   H e l l o
+ * index 0 1 2 3 4 5
+ * if textEditor.SelectText(1, 4); is executed, "ell" is selected.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ * @param[in] start The start index of the text to select. (The starting point of start index is 0.)
+ * @param[in] end The end index of the text to select. (If end index > text's length, the end index is set to the length of the text.)
+ */
+DALI_TOOLKIT_API void SelectText(TextEditor textEditor, const uint32_t start, const uint32_t end);
+
+/**
  * @brief Scroll the TextEditor by specific amount.
  *
  * @param[in] textEditor The instance of TextEditor.

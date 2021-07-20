@@ -66,6 +66,7 @@ struct Event
     SELECT,
     SELECT_ALL,
     SELECT_NONE,
+    SELECT_RANGE,
   };
 
   union Param

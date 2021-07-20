@@ -55,6 +55,11 @@ void SelectNone(TextEditor textEditor)
   GetImpl(textEditor).SelectNone();
 }
 
+void SelectText(TextEditor textEditor, const uint32_t start, const uint32_t end)
+{
+  GetImpl(textEditor).SelectText(start, end);
+}
+
 void ScrollBy(TextEditor textEditor, Vector2 scroll)
 {
   GetImpl(textEditor).ScrollBy(scroll);

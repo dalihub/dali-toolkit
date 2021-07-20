@@ -536,6 +536,27 @@ void Controller::EventHandler::SelectEvent(Controller& controller, float x, floa
   }
 }
 
+void Controller::EventHandler::SelectEvent(Controller& controller, const uint32_t start, const uint32_t end, SelectionType selectType)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::SelectEvent\n");
+
+  if(NULL != controller.mImpl->mEventData)
+  {
+    if(selectType == SelectionType::RANGE)
+    {
+      Event event(Event::SELECT_RANGE);
+      event.p2.mUint = start;
+      event.p3.mUint = end;
+      controller.mImpl->mEventData->mEventQueue.push_back(event);
+    }
+
+    controller.mImpl->mEventData->mCheckScrollAmount     = true;
+    controller.mImpl->mEventData->mIsLeftHandleSelected  = true;
+    controller.mImpl->mEventData->mIsRightHandleSelected = true;
+    controller.mImpl->RequestRelayout();
+  }
+}
+
 void Controller::EventHandler::ProcessModifyEvents(Controller& controller)
 {
   Vector<ModifyEvent>& events = controller.mImpl->mModifyEvents;

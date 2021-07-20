@@ -264,6 +264,11 @@ public:
   void SelectNone() override;
 
   /**
+   * @copydoc Text::SelectableControlInterface::SelectText()
+   */
+  void SelectText(const uint32_t start, const uint32_t end) override;
+
+  /**
    * @copydoc Text::SelectableControlInterface::GetSelectedText()
    */
   string GetSelectedText() const override;

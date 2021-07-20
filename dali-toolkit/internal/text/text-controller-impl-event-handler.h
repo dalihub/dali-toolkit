@@ -104,6 +104,14 @@ struct ControllerImplEventHandler
    */
   static void OnSelectNoneEvent(Controller::Impl& controllerImpl);
 
+  /**
+   * @brief Called by Controller::Impl when a select range event is received.
+   *
+   * @param controllerImpl A reference to Controller::Impl
+   * @param event The event
+   */
+  static void OnSelectRangeEvent(Controller::Impl& controllerImpl, const Event& event);
+
 private:
   /**
    * @brief Called by OnHandleEvent when we are in the Pressed state.
