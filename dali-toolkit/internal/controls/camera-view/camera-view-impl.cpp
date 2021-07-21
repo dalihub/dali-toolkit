@@ -145,7 +145,7 @@ void CameraView::SetNativeImageTarget()
   mNativeTexture                                  = Dali::Texture::New(*nativeImageSourcePtr);
 
   Dali::Geometry   geometry   = VisualFactoryCache::CreateQuadGeometry();
-  Dali::Shader     shader     = CreateShader(nativeImageSourcePtr->GetCustomFragmentPrefix());
+  Dali::Shader     shader     = CreateShader(nativeImageSourcePtr);
   Dali::TextureSet textureSet = Dali::TextureSet::New();
   textureSet.SetTexture(0u, mNativeTexture);
 
@@ -181,13 +181,12 @@ void CameraView::UpdateDisplayArea(Dali::PropertyNotification& source)
   mCameraPlayer.SetDisplayArea(mDisplayArea);
 }
 
-Dali::Shader CameraView::CreateShader(const char* fragmentPrefix)
+Dali::Shader CameraView::CreateShader(Dali::NativeImageSourcePtr nativeImageSourcePtr)
 {
-  std::string fragmentShader = fragmentPrefix;
-  std::string vertexShader;
+  std::string vertexShader = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
+  std::string fragmentShader = SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
 
-  vertexShader = SHADER_VIDEO_VIEW_TEXTURE_VERT.data();
-  fragmentShader += SHADER_VIDEO_VIEW_TEXTURE_FRAG.data();
+  nativeImageSourcePtr->ApplyNativeFragmentShader(fragmentShader);
 
   return Dali::Shader::New(vertexShader, fragmentShader);
 }
