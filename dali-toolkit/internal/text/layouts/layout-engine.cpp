@@ -1881,7 +1881,7 @@ struct Engine::Impl
             linesBuffer[lineIndex].ellipsis = false;
           }
           numberOfLines--;
-          ellipsisLineIndex = middleLineIndex > 0u ? middleLineIndex - 1u : 0u;
+          ellipsisLineIndex = middleLineIndex - 1u;
           middleLineIndex   = (numberOfLines) / 2u;
         }
 
