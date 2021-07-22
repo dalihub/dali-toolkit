@@ -48,6 +48,7 @@ static int gPageLoadFinishedCallbackCalled = 0;
 static int gScrollEdgeReachedCallbackCalled = 0;
 static int gEvaluateJavaScriptCallbackCalled = 0;
 static bool gTouched = false;
+static int gPlainTextReceivedCallbackCalled = 0;
 
 struct CallbackFunctor
 {
@@ -76,6 +77,12 @@ static void OnPageLoadFinished( WebView view, const std::string& url )
 static void OnScrollEdgeReached( WebView view, Dali::WebEnginePlugin::ScrollEdge edge )
 {
   gScrollEdgeReachedCallbackCalled++;
+}
+
+static bool OnPlainTextReceived(const std::string& plainText)
+{
+  gPlainTextReceivedCallbackCalled++;
+  return true;
 }
 
 static void OnPageLoadError( WebView view, const std::string& url, WebView::LoadErrorCode errorCode )
@@ -794,3 +801,18 @@ int UtcDaliWebSettingsGetSetDefaultTextEncodingName(void)
   END_TEST;
 }
 
+int UtcDaliWebViewGetPlainText(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.LoadUrl(TEST_URL1);
+
+  view.GetPlainTextAsynchronously(&OnPlainTextReceived);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gPlainTextReceivedCallbackCalled, 1, TEST_LOCATION);
+
+  END_TEST;
+}

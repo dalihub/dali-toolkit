@@ -532,6 +532,14 @@ void WebView::OnScrollEdgeReached( Dali::WebEnginePlugin::ScrollEdge edge )
   }
 }
 
+void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.GetPlainTextAsynchronously(callback);
+  }
+}
+
 bool WebView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );

@@ -199,6 +199,11 @@ WebView::WebViewScrollEdgeReachedSignalType& WebView::ScrollEdgeReachedSignal()
   return Dali::Toolkit::GetImpl( *this ).ScrollEdgeReachedSignal();
 }
 
+void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).GetPlainTextAsynchronously(callback);
+}
+
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)
 {

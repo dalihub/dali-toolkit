@@ -50,6 +50,7 @@ bool OnGoForward();
 bool OnLoadUrl();
 bool OnEvaluteJavaScript();
 bool OnClearHistory();
+bool OnPlainTextReceived();
 
 static void ConnectToGlobalSignal( bool (*func)() )
 {
@@ -484,6 +485,15 @@ public:
     return mScrollEdgeReachedSignal;
   }
 
+  void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
+  {
+    if (callback)
+    {
+      ConnectToGlobalSignal(&OnPlainTextReceived);
+      mPlainTextReceivedCallback = callback;
+    }
+  }
+
   std::string                                                mUrl;
   std::vector< std::string >                                 mHistory;
   size_t                                                     mCurrentPlusOnePos;
@@ -502,6 +512,7 @@ public:
   WebEngineContext*                                           mockWebEngineContext;
   WebEngineCookieManager*                                     mockWebEngineCookieManager;
   WebEngineSettings*                                          mockWebEngineSettings;
+  Dali::WebEnginePlugin::PlainTextReceivedCallback            mPlainTextReceivedCallback;
 };
 
 inline WebEngine& GetImplementation( Dali::WebEngine& webEngine )
@@ -588,6 +599,18 @@ bool OnClearHistory()
   }
   return false;
 }
+
+bool OnPlainTextReceived()
+{
+  DisconnectFromGlobalSignal(&OnPlainTextReceived);
+  if (gInstance)
+  {
+    std::string dummyResultText;
+    gInstance->mPlainTextReceivedCallback(dummyResultText);
+  }
+  return false;
+}
+
 } // namespace
 
 } // namespace Adaptor
@@ -828,6 +851,11 @@ Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType& WebEngine::PageLoadErro
 Dali::WebEnginePlugin::WebEngineScrollEdgeReachedSignalType& WebEngine::ScrollEdgeReachedSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).ScrollEdgeReachedSignal();
+}
+
+void WebEngine::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).GetPlainTextAsynchronously(callback);
 }
 
 } // namespace Dali;

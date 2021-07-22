@@ -203,6 +203,11 @@ public:
    */
   Dali::Toolkit::WebView::WebViewScrollEdgeReachedSignalType& ScrollEdgeReachedSignal();
 
+  /**
+   * @copydoc Dali::Toolkit::WebView::GetPlainTextAsynchronously()
+   */
+  void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback);
+
 public: // Properties
 
   /**
