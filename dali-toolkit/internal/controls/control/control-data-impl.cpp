@@ -410,6 +410,35 @@ void SetVisualsOffScene(const RegisteredVisualContainer& container, Actor parent
   }
 }
 
+Dali::Rect<> GetShowingGeometry(Dali::Rect<> rect, Dali::Toolkit::DevelControl::AccessibleImpl* accessibleImpl)
+{
+  Rect<>  parentRect;
+  Vector2 currentPosition;
+  auto    parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(accessibleImpl->GetParent());
+
+  while(parent)
+  {
+    parentRect = parent->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
+
+    currentPosition.x = rect.x;
+    currentPosition.y = rect.y;
+
+    rect.x      = rect.x > parentRect.x ? rect.x : parentRect.x;
+    rect.y      = rect.y > parentRect.y ? rect.y : parentRect.y;
+    rect.width  = currentPosition.x + rect.width < parentRect.x + parentRect.width ? currentPosition.x + rect.width - rect.x : parentRect.x + parentRect.width - rect.x;
+    rect.height = currentPosition.y + rect.height < parentRect.y + parentRect.height ? currentPosition.y + rect.height - rect.y : parentRect.y + parentRect.height - rect.y;
+
+    if(rect.width < 0 || rect.height < 0)
+    {
+      return rect;
+    }
+
+    parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(parent->GetParent());
+  }
+
+  return rect;
+}
+
 } // unnamed namespace
 
 // clang-format off
@@ -516,6 +545,70 @@ Control::Impl& Control::Impl::Get(Internal::Control& internalControl)
 const Control::Impl& Control::Impl::Get(const Internal::Control& internalControl)
 {
   return *internalControl.mImpl;
+}
+
+void Control::Impl::CheckHighlightedObjectGeometry(PropertyNotification& propertyNotification)
+{
+  auto accessibleImpl = dynamic_cast<Dali::Toolkit::DevelControl::AccessibleImpl*>(mAccessibilityObject.get());
+  auto lastPosition   = accessibleImpl->GetLastPosition();
+  auto accessibleRect = accessibleImpl->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
+
+  if(lastPosition.x == accessibleRect.x && lastPosition.y == accessibleRect.y)
+  {
+    return;
+  }
+
+  auto rect = GetShowingGeometry(accessibleRect, accessibleImpl);
+
+  // MoveOuted is sent already, no need to send it again
+  if(mAccessibilityMovedOutOfScreenDirection != Dali::Accessibility::MovedOutOfScreenType::NONE)
+  {
+    if(rect.width > 0 && rect.height > 0)
+    {
+      // flick next does not use MoveOuted - ScrollToSelf makes object show, so reset for sending MoveOuted next
+      mAccessibilityMovedOutOfScreenDirection = Dali::Accessibility::MovedOutOfScreenType::NONE;
+    }
+    return;
+  }
+
+  if(rect.width < 0)
+  {
+    mAccessibilityMovedOutOfScreenDirection = (accessibleRect.x < lastPosition.x) ? Dali::Accessibility::MovedOutOfScreenType::TOP_LEFT : Dali::Accessibility::MovedOutOfScreenType::BOTTOM_RIGHT;
+  }
+
+  if(rect.height < 0)
+  {
+    mAccessibilityMovedOutOfScreenDirection = (accessibleRect.y < lastPosition.y) ? Dali::Accessibility::MovedOutOfScreenType::TOP_LEFT : Dali::Accessibility::MovedOutOfScreenType::BOTTOM_RIGHT;
+  }
+
+  if(mAccessibilityMovedOutOfScreenDirection != Dali::Accessibility::MovedOutOfScreenType::NONE)
+  {
+    mAccessibilityObject.get()->EmitMovedOutOfScreen(mAccessibilityMovedOutOfScreenDirection);
+    accessibleImpl->SetLastPosition(Vector2(0.0f, 0.0f));
+    return;
+  }
+
+  accessibleImpl->SetLastPosition(Vector2(accessibleRect.x, accessibleRect.y));
+}
+
+void Control::Impl::RegisterAccessibilityPositionPropertyNotification()
+{
+  if(mIsAccessibilityPositionPropertyNotificationSet)
+  {
+    return;
+  }
+
+  mAccessibilityMovedOutOfScreenDirection = Dali::Accessibility::MovedOutOfScreenType::NONE;
+  mAccessibilityPositionNotification      = mControlImpl.Self().AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
+  mAccessibilityPositionNotification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
+  mAccessibilityPositionNotification.NotifySignal().Connect(this, &Control::Impl::CheckHighlightedObjectGeometry);
+  mIsAccessibilityPositionPropertyNotificationSet = true;
+}
+
+void Control::Impl::UnregisterAccessibilityPositionPropertyNotification()
+{
+  mControlImpl.Self().RemovePropertyNotification(mAccessibilityPositionNotification);
+  mIsAccessibilityPositionPropertyNotificationSet = false;
 }
 
 // Gesture Detection Methods

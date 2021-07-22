@@ -10,6 +10,8 @@ namespace Dali {
         using MethodType = TestDBusWrapper::MethodType;
         using MessagePtr = DBusWrapper::MessagePtr;
 
+        static bool MoveOutedCalled = false;
+
         void TestEnableSC(bool b) {
             static bool firstTime = true;
             if (b && firstTime) {
@@ -69,6 +71,11 @@ namespace Dali {
                 };
                 wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "TextCaretMoved", MethodType::Method}] =
                 [wr](const MessagePtr &m) -> MessagePtr {
+                    return wr->newReplyMessage(m);
+                };
+                wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "MoveOuted", MethodType::Method}] =
+                [wr](const MessagePtr &m) -> MessagePtr {
+                    MoveOutedCalled = true;
                     return wr->newReplyMessage(m);
                 };
             }
@@ -267,6 +274,15 @@ namespace Dali {
             return std::move(std::get<0>(chs));
         }
 
+        void TestResetMoveOutedCalled ()
+        {
+          MoveOutedCalled = false;
+        }
+
+        bool TestGetMoveOutedCalled ()
+        {
+          return MoveOutedCalled;
+        }
 
         void printTree(const Address &root, size_t depth)
         {
