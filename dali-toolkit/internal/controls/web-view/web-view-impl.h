@@ -392,6 +392,11 @@ public:
    */
   void RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback);
 
+  /**
+   * @copydoc Dali::Toolkit::WebView::GetPlainTextAsynchronously()
+   */
+  void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback);
+
 public: // Properties
   /**
    * @brief Called when a property of an object of this type is set.

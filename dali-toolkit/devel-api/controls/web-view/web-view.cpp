@@ -394,6 +394,11 @@ void WebView::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngine
   Dali::Toolkit::GetImpl(*this).RegisterContextMenuHiddenCallback(callback);
 }
 
+void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).GetPlainTextAsynchronously(callback);
+}
+
 WebView::WebView(Internal::WebView& implementation)
 : Control(implementation)
 {
