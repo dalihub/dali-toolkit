@@ -766,6 +766,14 @@ void WebView::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngine
   }
 }
 
+void WebView::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.GetPlainTextAsynchronously(callback);
+  }
+}
+
 void WebView::OnFrameRendered()
 {
   if(mFrameRenderedCallback)

@@ -84,6 +84,7 @@ bool OnFormPasswordAcquired();
 bool OnDownloadStarted();
 bool OnMimeOverridden();
 bool OnChangesWatch();
+bool OnPlainTextReceived();
 
 static void ConnectToGlobalSignal( bool ( *func )() )
 {
@@ -1532,6 +1533,15 @@ public:
     mContextMenuHiddenCallback = callback;
   }
 
+  void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
+  {
+    if (callback)
+    {
+      ConnectToGlobalSignal(&OnPlainTextReceived);
+      mPlainTextReceivedCallback = callback;
+    }
+  }
+
   std::string              mUrl;
   std::vector<std::string> mHistory;
   size_t                   mCurrentPlusOnePos;
@@ -1577,6 +1587,7 @@ public:
   Dali::WebEnginePlugin::VideoPlayingCallback                    mVideoPlayingCallback;
   Dali::WebEnginePlugin::GeolocationPermissionCallback           mGeolocationPermissionCallback;
   Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback         mHitTestCreatedCallback;
+  Dali::WebEnginePlugin::PlainTextReceivedCallback               mPlainTextReceivedCallback;
 };
 
 
@@ -1881,6 +1892,17 @@ bool OnChangesWatch()
     }
   }
 
+  return false;
+}
+
+bool OnPlainTextReceived()
+{
+  DisconnectFromGlobalSignal(&OnPlainTextReceived);
+  if (gInstance)
+  {
+    std::string dummyResultText;
+    gInstance->mPlainTextReceivedCallback(dummyResultText);
+  }
   return false;
 }
 
@@ -2389,6 +2411,11 @@ void WebEngine::RegisterContextMenuShownCallback(Dali::WebEnginePlugin::WebEngin
 void WebEngine::RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback)
 {
   Internal::Adaptor::GetImplementation( *this ).RegisterContextMenuHiddenCallback(callback);
+}
+
+void WebEngine::GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).GetPlainTextAsynchronously(callback);
 }
 
 } // namespace Dali;

@@ -733,6 +733,13 @@ public:
    */
   void RegisterContextMenuHiddenCallback(Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback callback);
 
+  /**
+   * @brief Get a plain text of current web page asynchronously.
+   *
+   * @param[in] callback The callback function called asynchronously.
+   */
+  void GetPlainTextAsynchronously(Dali::WebEnginePlugin::PlainTextReceivedCallback callback);
+
 public: // Not intended for application developers
   /// @cond internal
   /**
