@@ -550,6 +550,12 @@ const Control::Impl& Control::Impl::Get(const Internal::Control& internalControl
 void Control::Impl::CheckHighlightedObjectGeometry(PropertyNotification& propertyNotification)
 {
   auto accessibleImpl = dynamic_cast<Dali::Toolkit::DevelControl::AccessibleImpl*>(mAccessibilityObject.get());
+  if(!accessibleImpl)
+  {
+    DALI_LOG_ERROR("accessibleImpl is not a pointer to a DevelControl::AccessibleImpl type");
+    return;
+  }
+
   auto lastPosition   = accessibleImpl->GetLastPosition();
   auto accessibleRect = accessibleImpl->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
 
