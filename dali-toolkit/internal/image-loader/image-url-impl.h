@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -44,19 +43,9 @@ public:
   ImageUrl(Texture& texture);
 
   /**
-   * @brief Constructor.
-   */
-  ImageUrl(const EncodedImageBuffer& encodedImageBuffer);
-
-  /**
    * @copydoc Dali::Toolkit::ImageUrl::New
    */
   static ImageUrlPtr New(Texture& texture);
-
-  /**
-   * @copydoc Dali::Toolkit::ImageUrl::New
-   */
-  static ImageUrlPtr New(const EncodedImageBuffer& encodedImageBuffer);
 
   /**
    * @copydoc Dali::Toolkit::ImageUrl::GetUrl

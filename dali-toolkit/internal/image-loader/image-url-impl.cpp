@@ -31,12 +31,6 @@ ImageUrl::ImageUrl(Texture& texture)
   mUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
 }
 
-ImageUrl::ImageUrl(const EncodedImageBuffer& encodedImageBuffer)
-: mUrl("")
-{
-  mUrl = Dali::Toolkit::TextureManager::AddTexture(encodedImageBuffer);
-}
-
 ImageUrl::~ImageUrl()
 {
   Dali::Toolkit::TextureManager::RemoveTexture(mUrl);
@@ -45,12 +39,6 @@ ImageUrl::~ImageUrl()
 ImageUrlPtr ImageUrl::New(Texture& texture)
 {
   ImageUrlPtr imageUrlPtr = new ImageUrl(texture);
-  return imageUrlPtr;
-}
-
-ImageUrlPtr ImageUrl::New(const EncodedImageBuffer& encodedImageBuffer)
-{
-  ImageUrlPtr imageUrlPtr = new ImageUrl(encodedImageBuffer);
   return imageUrlPtr;
 }
 

@@ -233,15 +233,6 @@ int UtcDaliVisualUrlLocationP(void)
   DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
   DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::BUFFER, VisualUrl("enbuf://").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::BUFFER, VisualUrl("enbuf://1234").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::BUFFER, VisualUrl("ENBUF://1234").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::BUFFER, VisualUrl("enbuf://.gif").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::BUFFER, VisualUrl("enbuf://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::BUFFER, VisualUrl("enbuf://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::BUFFER, VisualUrl("enbuf://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::BUFFER, VisualUrl("enbuf://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
-
   END_TEST;
 }
 
@@ -271,8 +262,6 @@ int UtcDaliVisualUrlLocationN(void)
   DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ssh:a/bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
   DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("shh://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
   DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("sss://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("fsh://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("stp://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
   DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http:/bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
   DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("h1tps://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
   DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ht2ps://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
@@ -290,18 +279,6 @@ int UtcDaliVisualUrlLocationN(void)
   DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dali4//1").GetProtocolType(), TEST_LOCATION );
   DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dali:5/1").GetProtocolType(), TEST_LOCATION );
   DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dali:/61").GetProtocolType(), TEST_LOCATION );
-
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("eunki://1").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("enbu://1").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("eubnf://1").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("1nbuf://1").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("e2bun://1").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("en3uf://1").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("enb4f://1").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("enbu5://1").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("enbuf6//1").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("enbuf:7/1").GetProtocolType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("enbuf:/81").GetProtocolType(), TEST_LOCATION );
 
   END_TEST;
 }
@@ -390,7 +367,6 @@ int UtcDaliVisualUrlGetLocationP(void)
 
   DALI_TEST_EQUAL( "a", VisualUrl("http://a").GetLocation() );
   DALI_TEST_EQUAL( "1", VisualUrl("dali://1").GetLocation() );
-  DALI_TEST_EQUAL( "4", VisualUrl("enbuf://4").GetLocation() );
   DALI_TEST_EQUAL( "", VisualUrl("ftp://").GetLocation() );
   DALI_TEST_EQUAL( "http://", VisualUrl("http://http://").GetLocation() );
 
@@ -405,7 +381,6 @@ int UtcDaliVisualUrlGetLocationN(void)
   DALI_TEST_EQUAL( "a", VisualUrl("a").GetLocation() );
   DALI_TEST_EQUAL( "dali:/1", VisualUrl("dali:/1").GetLocation() );
   DALI_TEST_EQUAL( "dali//1", VisualUrl("dali//1").GetLocation() );
-  DALI_TEST_EQUAL( "enbuf:/2", VisualUrl("enbuf:/2").GetLocation() );
   DALI_TEST_EQUAL( "", VisualUrl("http:/http://").GetLocation() );
 
   END_TEST;
@@ -418,17 +393,6 @@ int UtcDaliVisualUrlCreateTextureUrl(void)
   DALI_TEST_EQUAL( "dali://a", VisualUrl::CreateTextureUrl( "a" ) );
   DALI_TEST_EQUAL( "dali://1234", VisualUrl::CreateTextureUrl( "1234" ) );
   DALI_TEST_EQUAL( "dali://", VisualUrl::CreateTextureUrl( "" ) );
-
-  END_TEST;
-}
-
-int UtcDaliVisualUrlCreateBufferUrl(void)
-{
-  tet_infoline( "UtcDaliVisualUrl CreateBufferUrl" );
-
-  DALI_TEST_EQUAL( "enbuf://a", VisualUrl::CreateBufferUrl( "a" ) );
-  DALI_TEST_EQUAL( "enbuf://1234", VisualUrl::CreateBufferUrl( "1234" ) );
-  DALI_TEST_EQUAL( "enbuf://", VisualUrl::CreateBufferUrl( "" ) );
 
   END_TEST;
 }

@@ -19,7 +19,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/native-image-source.h>
-#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 
@@ -78,15 +77,6 @@ DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::PixelData pixel
  * @return the ImageUrl representing this native image source
  */
 DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::NativeImageSourcePtr nativeImageSource);
-
-/**
- * @brief Generate a Url from encoded image buffer.
- * This Url can be used in visuals to render the image.
- * @note This method does not check for duplicates, If same encoded image buffer is entered multiple times, a different URL is returned each time.
- * @param[in] encodedImageBuffer the encoded image buffer to converted to Url
- * @return the ImageUrl representing this encoded image buffer
- */
-DALI_TOOLKIT_API Dali::Toolkit::ImageUrl GenerateUrl(const Dali::EncodedImageBuffer encodedImageBuffer);
 
 } // namespace Image
 

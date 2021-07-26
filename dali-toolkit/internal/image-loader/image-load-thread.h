@@ -29,7 +29,6 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
 namespace Dali
 {
@@ -64,26 +63,6 @@ struct LoadingTask
    */
   LoadingTask(uint32_t                                 id,
               const VisualUrl&                         url,
-              ImageDimensions                          dimensions,
-              FittingMode::Type                        fittingMode,
-              SamplingMode::Type                       samplingMode,
-              bool                                     orientationCorrection,
-              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
-
-  /**
-   * Constructor.
-   * @param [in] id of the task
-   * @param [in] url The URL of the image file to load.
-   * @param [in] encodedImageBuffer The encoded buffer of the image to load.
-   * @param [in] size The width and height to fit the loaded image to, 0.0 means whole image
-   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
-   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
-   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
-   * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
-   */
-  LoadingTask(uint32_t                                 id,
-              const VisualUrl&                         url,
-              const EncodedImageBuffer&                encodedImageBuffer,
               ImageDimensions                          dimensions,
               FittingMode::Type                        fittingMode,
               SamplingMode::Type                       samplingMode,
@@ -132,7 +111,6 @@ public:
   Devel::PixelBuffer pixelBuffer;                                     ///< pixelBuffer handle after successful load
                                                                       ///< or pixelBuffer to be masked image in the mask task
   VisualUrl                                url;                       ///< url of the image to load
-  EncodedImageBuffer                       encodedImageBuffer;        ///< encoded buffer of the image to load
   uint32_t                                 id;                        ///< The unique id associated with this task.
   ImageDimensions                          dimensions;                ///< dimensions to load
   FittingMode::Type                        fittingMode;               ///< fitting options
