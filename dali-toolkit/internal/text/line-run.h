@@ -48,6 +48,13 @@ struct LineRun
   CharacterRun       characterRunForSecondHalfLine; ///< The initial character index and the number of characters of the run for the second half of line.
 };
 
+/**
+ * @brief Get the line height for the specified line run.
+ *
+ * @param[in] lineRun The line runs to get the height for.
+ */
+float GetLineHeight(const LineRun lineRun);
+
 } // namespace Text
 
 } // namespace Toolkit

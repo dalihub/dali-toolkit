@@ -1219,12 +1219,31 @@ const std::string& Controller::GetDefaultOutlineProperties() const
   return EMPTY_STRING;
 }
 
+void Controller::RelayoutForNewLineSize()
+{
+  // relayout all characters
+  mImpl->mTextUpdateInfo.mCharacterIndex             = 0;
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+  mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = mImpl->mModel->mLogicalModel->mText.Count();
+  mImpl->mOperationsPending                          = static_cast<OperationsMask>(mImpl->mOperationsPending | LAYOUT);
+
+  //remove selection
+  if((mImpl->mEventData != nullptr) && (mImpl->mEventData->mState == EventData::SELECTING))
+  {
+    mImpl->ChangeState(EventData::EDITING);
+  }
+
+  mImpl->RequestRelayout();
+}
+
 bool Controller::SetDefaultLineSpacing(float lineSpacing)
 {
   if(std::fabs(lineSpacing - mImpl->mLayoutEngine.GetDefaultLineSpacing()) > Math::MACHINE_EPSILON_1000)
   {
     mImpl->mLayoutEngine.SetDefaultLineSpacing(lineSpacing);
     mImpl->mRecalculateNaturalSize = true;
+
+    RelayoutForNewLineSize();
     return true;
   }
   return false;
@@ -1241,6 +1260,8 @@ bool Controller::SetDefaultLineSize(float lineSize)
   {
     mImpl->mLayoutEngine.SetDefaultLineSize(lineSize);
     mImpl->mRecalculateNaturalSize = true;
+
+    RelayoutForNewLineSize();
     return true;
   }
   return false;

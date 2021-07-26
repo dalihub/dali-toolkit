@@ -338,7 +338,7 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
     const LineRun& line = *(visualModel->mLines.Begin() + previousLineIndex);
 
     // Get the next hit 'y' point.
-    const float hitPointY = cursorInfo.lineOffset - 0.5f * (line.ascender - line.descender);
+    const float hitPointY = cursorInfo.lineOffset - 0.5f * GetLineHeight(line);
 
     // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
     bool matchedCharacter = false;
@@ -374,7 +374,7 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       const LineRun& line = *(visualModel->mLines.Begin() + lineIndex + 1u);
 
       // Get the next hit 'y' point.
-      const float hitPointY = cursorInfo.lineOffset + cursorInfo.lineHeight + 0.5f * (line.ascender - line.descender);
+      const float hitPointY = cursorInfo.lineOffset + cursorInfo.lineHeight + 0.5f * GetLineHeight(line);
 
       // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
       bool matchedCharacter = false;

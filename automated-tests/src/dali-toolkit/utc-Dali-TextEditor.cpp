@@ -1005,6 +1005,11 @@ int UtcDaliTextEditorSetPropertyP(void)
   application.SendNotification();
   application.Render();
 
+  // Check the line size property
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::MIN_LINE_SIZE ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  editor.SetProperty( DevelTextEditor::Property::MIN_LINE_SIZE, 50.f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::MIN_LINE_SIZE ), 50.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -3973,6 +3978,56 @@ int UtcDaliToolkitTextEditorEllipsisPositionProperty(void)
   tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to END using string - lowercase");
   textEditor.SetProperty(DevelTextEditor::Property::ELLIPSIS_POSITION, "end");
   DALI_TEST_EQUALS( textEditor.GetProperty< int >( DevelTextEditor::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorLineSpacing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorLineSpacing ");
+
+  TextEditor textEditor = TextEditor::New();
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.f ) );
+  application.GetScene().Add( textEditor );
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Line #1\nLine #2\nLine #3" );
+  textEditor.SetProperty( DevelTextEditor::Property::LINE_SPACING, 0 );
+
+  Vector3 sizeBefore = textEditor.GetNaturalSize();
+
+  textEditor.SetProperty( DevelTextEditor::Property::LINE_SPACING, 20 );
+
+  //add 20 for each line  20 * 3
+  DALI_TEST_EQUALS(sizeBefore.height + 60.0f, textEditor.GetNaturalSize().height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorMinLineSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMinLineSize ");
+
+  TextEditor textEditor = TextEditor::New();
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.f ) );
+  application.GetScene().Add( textEditor );
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Line #1\nLine #2\nLine #3" );
+  textEditor.SetProperty( DevelTextEditor::Property::MIN_LINE_SIZE, 0 );
+
+  Vector3 sizeBefore = textEditor.GetNaturalSize();
+
+  textEditor.SetProperty( DevelTextEditor::Property::MIN_LINE_SIZE, 60 );
+
+  DALI_TEST_NOT_EQUALS( sizeBefore, textEditor.GetNaturalSize(), 0.0f, TEST_LOCATION);
+
+  //60 * 3 lines
+  DALI_TEST_EQUALS(180.0f, textEditor.GetNaturalSize().height, TEST_LOCATION);
 
   END_TEST;
 }

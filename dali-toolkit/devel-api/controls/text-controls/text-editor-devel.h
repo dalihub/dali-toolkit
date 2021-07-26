@@ -267,6 +267,13 @@ enum Type
   * @see DevelText::EllipsisPosition
   */
   ELLIPSIS_POSITION,
+
+  /**
+   * @brief Sets the height of the line in points.
+   * @details Name "minLineSize", type Property::FLOAT.
+   * @note If the font size is larger than the line size, it works with the font size.
+   */
+  MIN_LINE_SIZE,
 };
 
 } // namespace Property
