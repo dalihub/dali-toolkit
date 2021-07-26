@@ -27,6 +27,7 @@
 #include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include <dali-toolkit/internal/visuals/npatch-data.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -68,7 +69,7 @@ public:
    * @param [in] synchronousLoading True if the image will be loaded in synchronous time.
    * @return id of the texture.
    */
-  std::size_t Load(TextureManager& textureManager, TextureUploadObserver* textureObserver, const std::string& url, const Rect<int>& border, bool& preMultiplyOnLoad, bool synchronousLoading);
+  std::size_t Load(TextureManager& textureManager, TextureUploadObserver* textureObserver, const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad, bool synchronousLoading);
 
   /**
    * @brief Set loaded PixelBuffer and its information

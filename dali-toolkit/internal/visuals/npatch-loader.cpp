@@ -52,9 +52,9 @@ NPatchData::NPatchDataId NPatchLoader::GenerateUniqueNPatchDataId()
   return mCurrentNPatchDataId++;
 }
 
-std::size_t NPatchLoader::Load(TextureManager& textureManager, TextureUploadObserver* textureObserver, const std::string& url, const Rect<int>& border, bool& preMultiplyOnLoad, bool synchronousLoading)
+std::size_t NPatchLoader::Load(TextureManager& textureManager, TextureUploadObserver* textureObserver, const VisualUrl& url, const Rect<int>& border, bool& preMultiplyOnLoad, bool synchronousLoading)
 {
-  std::size_t                                 hash  = CalculateHash(url);
+  std::size_t                                 hash  = CalculateHash(url.GetUrl());
   OwnerContainer<NPatchData*>::SizeType       index = UNINITIALIZED_ID;
   const OwnerContainer<NPatchData*>::SizeType count = mCache.Count();
 
@@ -63,7 +63,7 @@ std::size_t NPatchLoader::Load(TextureManager& textureManager, TextureUploadObse
     if(mCache[index]->GetHash() == hash)
     {
       // hash match, check url as well in case of hash collision
-      if(mCache[index]->GetUrl() == url)
+      if(mCache[index]->GetUrl().GetUrl() == url.GetUrl())
       {
         // Use cached data
         if(mCache[index]->GetBorder() == border)

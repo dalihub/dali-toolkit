@@ -85,12 +85,12 @@ uint32_t NPatchData::GetObserverCount() const
   return mObserverList.Count();
 }
 
-void NPatchData::SetUrl(const std::string url)
+void NPatchData::SetUrl(const VisualUrl& url)
 {
   mUrl = url;
 }
 
-std::string NPatchData::GetUrl() const
+VisualUrl NPatchData::GetUrl() const
 {
   return mUrl;
 }

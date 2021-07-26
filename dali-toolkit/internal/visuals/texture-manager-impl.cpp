@@ -30,6 +30,7 @@
 #include <string>
 
 // INTERNAL HEADERS
+#include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
 #include <dali-toolkit/internal/image-loader/image-atlas-impl.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
@@ -1267,7 +1268,7 @@ void TextureManager::AsyncLoadingHelper::LoadAnimatedImage(TextureId            
                                                            uint32_t                   frameIndex)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id                             = DevelAsyncImageLoader::LoadAnimatedImage(mLoader, animatedImageLoading, frameIndex);
+  auto id                             = GetImplementation(mLoader).LoadAnimatedImage(animatedImageLoading, frameIndex);
   mLoadingInfoContainer.back().loadId = id;
 }
 
@@ -1280,7 +1281,7 @@ void TextureManager::AsyncLoadingHelper::Load(TextureId                         
                                               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id                             = DevelAsyncImageLoader::Load(mLoader, url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
+  auto id                             = GetImplementation(mLoader).Load(url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
   mLoadingInfoContainer.back().loadId = id;
 }
 
@@ -1292,7 +1293,7 @@ void TextureManager::AsyncLoadingHelper::ApplyMask(TextureId                    
                                                    DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id                             = DevelAsyncImageLoader::ApplyMask(mLoader, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad);
+  auto id                             = GetImplementation(mLoader).ApplyMask(pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad);
   mLoadingInfoContainer.back().loadId = id;
 }
 

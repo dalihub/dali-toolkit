@@ -156,7 +156,7 @@ void NPatchVisual::LoadImages()
   if(mId == NPatchData::INVALID_NPATCH_DATA_ID && mImageUrl.IsLocalResource())
   {
     bool preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader ? true : false;
-    mId                    = mLoader.Load(textureManager, this, mImageUrl.GetUrl(), mBorder, preMultiplyOnLoad, synchronousLoading);
+    mId                    = mLoader.Load(textureManager, this, mImageUrl, mBorder, preMultiplyOnLoad, synchronousLoading);
 
     const NPatchData* data;
     if(mLoader.GetNPatchData(mId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
