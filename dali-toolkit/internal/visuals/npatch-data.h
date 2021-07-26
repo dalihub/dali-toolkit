@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/utility/npatch-utilities.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -100,14 +101,14 @@ public:
    *
    * @param [in] url NPatch image url
    */
-  void SetUrl(const std::string url);
+  void SetUrl(const VisualUrl& url);
 
   /**
    * @brief Retrieve the image url.
    *
    * @return Return the image url.
    */
-  std::string GetUrl() const;
+  VisualUrl GetUrl() const;
 
   /**
    * @brief Set texture set on the cache data
@@ -274,7 +275,7 @@ private:
 
   NPatchDataId                 mId;
   ObserverListType             mObserverList;      ///< Container used to store all observer clients of this Texture
-  std::string                  mUrl;               ///< Url of the N-Patch
+  VisualUrl                    mUrl;               ///< Url of the N-Patch
   TextureSet                   mTextureSet;        ///< Texture containing the cropped image
   NPatchUtility::StretchRanges mStretchPixelsX;    ///< X stretch pixels
   NPatchUtility::StretchRanges mStretchPixelsY;    ///< Y stretch pixels

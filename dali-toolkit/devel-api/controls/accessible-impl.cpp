@@ -328,6 +328,22 @@ void AccessibleImpl::ScrollToSelf()
   }
 }
 
+void AccessibleImpl::RegisterPositionPropertyNotification()
+{
+  auto                     control         = Dali::Toolkit::Control::DownCast(Self());
+  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
+  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  controlImpl.RegisterAccessibilityPositionPropertyNotification();
+}
+
+void AccessibleImpl::UnregisterPositionPropertyNotification()
+{
+  auto                     control         = Dali::Toolkit::Control::DownCast(Self());
+  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
+  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+  controlImpl.UnregisterAccessibilityPositionPropertyNotification();
+}
+
 bool AccessibleImpl::GrabHighlight()
 {
   Dali::Actor self = Self();
@@ -360,10 +376,14 @@ bool AccessibleImpl::GrabHighlight()
     SetHighlightActor(highlight);
   }
 
-  highlight.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  highlight.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  highlight.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   highlight.SetProperty(Actor::Property::POSITION_Z, 1.0f);
   highlight.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
+
+  // Need to set resize policy again, to update SIZE property which is set by
+  // AccessibleImpl_NUI. The highlight could move from AccessibleImpl_NUI to
+  // AccessibleImpl. In this case, highlight has incorrect size.
+  highlight.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Remember the highlight actor, so that when the default is changed with
   // SetHighlightActor(), the currently displayed highlight can still be cleared.
@@ -372,6 +392,7 @@ bool AccessibleImpl::GrabHighlight()
   self.Add(highlight);
   SetCurrentlyHighlightedActor(self);
   EmitHighlighted(true);
+  RegisterPositionPropertyNotification();
 
   return true;
 }
@@ -387,6 +408,7 @@ bool AccessibleImpl::ClearHighlight()
 
   if(GetCurrentlyHighlightedActor() == self)
   {
+    UnregisterPositionPropertyNotification();
     self.Remove(mCurrentHighlightActor.GetHandle());
     mCurrentHighlightActor = {};
     SetCurrentlyHighlightedActor({});
@@ -493,6 +515,16 @@ Dali::Property::Index AccessibleImpl::GetNamePropertyIndex()
 Dali::Property::Index AccessibleImpl::GetDescriptionPropertyIndex()
 {
   return Dali::Property::INVALID_INDEX;
+}
+
+void AccessibleImpl::SetLastPosition(Vector2 position)
+{
+  mLastPosition = position;
+}
+
+Vector2 AccessibleImpl::GetLastPosition() const
+{
+  return mLastPosition;
 }
 
 } // namespace Dali::Toolkit::DevelControl

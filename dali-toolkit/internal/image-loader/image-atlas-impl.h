@@ -27,6 +27,7 @@
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 #include <dali-toolkit/internal/image-loader/atlas-packer.h>
 #include <dali-toolkit/public-api/image-loader/async-image-loader.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -78,7 +79,7 @@ public:
    * @copydoc Toolkit::ImageAtlas::Upload( Vector4&, const std::string&, ImageDimensions,FittingMode::Type, bool )
    */
   bool Upload(Vector4&             textureRect,
-              const std::string&   url,
+              const VisualUrl&     url,
               ImageDimensions      size,
               FittingMode::Type    fittingMode,
               bool                 orientationCorrection,

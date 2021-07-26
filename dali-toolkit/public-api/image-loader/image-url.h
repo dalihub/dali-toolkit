@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <dali/public-api/rendering/texture.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -39,6 +40,7 @@ class ImageUrl;
  * Application can get url from ImageUrl.
  * When application does not use this anymore, the destructor of the ImageUrl is called.
  * At this time, the buffer is deleted from the texture manager.
+ * @note Visual also have reference of the buffer. In this case, buffer will be deleted after visual is deleted.
  */
 class DALI_TOOLKIT_API ImageUrl : public BaseHandle
 {
@@ -61,6 +63,14 @@ public:
    * @return A handle to a newly allocated Dali resource.
    */
   static ImageUrl New(Texture& texture);
+
+  /**
+   * @brief Create an initialized ImageUrl.
+   *
+   * @param[in] encodedImageBuffer The encoded image buffer url is got from external buffer.
+   * @return A handle to a newly allocated Dali resource.
+   */
+  static ImageUrl New(const EncodedImageBuffer& encodedImageBuffer);
 
   /**
    * @brief Downcast an Object handle to ImageUrl handle.

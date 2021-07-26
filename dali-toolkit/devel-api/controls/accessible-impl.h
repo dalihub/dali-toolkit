@@ -47,6 +47,7 @@ struct DALI_TOOLKIT_API AccessibleImpl : public virtual Dali::Accessibility::Acc
                                          public virtual Dali::Accessibility::Action
 {
 protected:
+  Vector2                       mLastPosition{0.0f, 0.0f};
   Dali::WeakHandle<Dali::Actor> mSelf;
   Dali::WeakHandle<Dali::Actor> mCurrentHighlightActor;
   bool mIsModal = false;
@@ -64,6 +65,16 @@ protected:
   }
 
   void ScrollToSelf();
+
+  /**
+   * @brief Register property notification to check highlighted object position
+   */
+  void RegisterPositionPropertyNotification();
+
+  /**
+   * @brief Remove property notification added by RegisterPropertyNotification
+   */
+  void UnregisterPositionPropertyNotification();
 
 public:
   AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
@@ -228,6 +239,18 @@ public:
    * @brief Returns the index of the property that represents this actor's description
    */
   virtual Dali::Property::Index GetDescriptionPropertyIndex();
+
+  /**
+   * @brief Sets last object position
+   * @param[in] position Last object position
+   */
+  void SetLastPosition(Vector2 position);
+
+  /**
+   * @brief Gets last object position
+   * @return The Last object position
+   */
+  Vector2 GetLastPosition() const;
 };
 
 } // namespace Dali::Toolkit::DevelControl

@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -67,7 +68,7 @@ public:
    * @return The texture set containing the image.
    */
   TextureSet Add(Vector4&             textureRect,
-                 const std::string&   url,
+                 const VisualUrl&     url,
                  ImageDimensions&     size,
                  FittingMode::Type    fittingMode           = FittingMode::DEFAULT,
                  bool                 orientationCorrection = true,

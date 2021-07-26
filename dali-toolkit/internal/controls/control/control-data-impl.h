@@ -468,6 +468,22 @@ private:
    */
   void OnIdleCallback();
 
+  /**
+   * @brief Checks highlighted object geometry if it is showing or not
+   * @param[in] propertyNotification PropertyNotification
+   */
+  void CheckHighlightedObjectGeometry(Dali::PropertyNotification& propertyNotification);
+
+  /**
+   * @brief Register property notification to check highlighted object position
+   */
+  void RegisterAccessibilityPositionPropertyNotification();
+
+  /**
+   * @brief Remove property notification added by RegisterPropertyNotification
+   */
+  void UnregisterAccessibilityPositionPropertyNotification();
+
 public:
   Control&            mControlImpl;
   DevelControl::State mState;
@@ -479,17 +495,17 @@ public:
   int mUpFocusableActorId;    ///< Actor ID of Up focusable control.
   int mDownFocusableActorId;  ///< Actor ID of Down focusable control.
 
-  RegisteredVisualContainer                                      mVisuals; ///< Stores visuals needed by the control, non trivial type so std::vector used.
-  std::string                                                    mStyleName;
-  Vector4                                                        mBackgroundColor;    ///< The color of the background visual
-  Vector3*                                                       mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
-  Extents                                                        mMargin;             ///< The margin values
-  Extents                                                        mPadding;            ///< The padding values
-  Toolkit::Control::KeyEventSignalType                           mKeyEventSignal;
-  Toolkit::Control::KeyInputFocusSignalType                      mKeyInputFocusGainedSignal;
-  Toolkit::Control::KeyInputFocusSignalType                      mKeyInputFocusLostSignal;
-  Toolkit::Control::ResourceReadySignalType                      mResourceReadySignal;
-  DevelControl::VisualEventSignalType                            mVisualEventSignal;
+  RegisteredVisualContainer                 mVisuals; ///< Stores visuals needed by the control, non trivial type so std::vector used.
+  std::string                               mStyleName;
+  Vector4                                   mBackgroundColor;    ///< The color of the background visual
+  Vector3*                                  mStartingPinchScale; ///< The scale when a pinch gesture starts, TODO: consider removing this
+  Extents                                   mMargin;             ///< The margin values
+  Extents                                   mPadding;            ///< The padding values
+  Toolkit::Control::KeyEventSignalType      mKeyEventSignal;
+  Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
+  Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
+  Toolkit::Control::ResourceReadySignalType mResourceReadySignal;
+  DevelControl::VisualEventSignalType       mVisualEventSignal;
 
   // Accessibility
   Toolkit::DevelControl::AccessibilityActivateSignalType         mAccessibilityActivateSignal;
@@ -499,15 +515,15 @@ public:
   Toolkit::DevelControl::AccessibilityReadingCancelledSignalType mAccessibilityReadingCancelledSignal;
   Toolkit::DevelControl::AccessibilityReadingStoppedSignalType   mAccessibilityReadingStoppedSignal;
 
-  Toolkit::DevelControl::AccessibilityGetNameSignalType          mAccessibilityGetNameSignal;
-  Toolkit::DevelControl::AccessibilityGetDescriptionSignalType   mAccessibilityGetDescriptionSignal;
-  Toolkit::DevelControl::AccessibilityDoGestureSignalType        mAccessibilityDoGestureSignal;
+  Toolkit::DevelControl::AccessibilityGetNameSignalType        mAccessibilityGetNameSignal;
+  Toolkit::DevelControl::AccessibilityGetDescriptionSignalType mAccessibilityGetDescriptionSignal;
+  Toolkit::DevelControl::AccessibilityDoGestureSignalType      mAccessibilityDoGestureSignal;
 
   std::string mAccessibilityName;
   std::string mAccessibilityDescription;
   std::string mAccessibilityTranslationDomain;
-  bool        mAccessibilityNameSet = false;
-  bool        mAccessibilityDescriptionSet = false;
+  bool        mAccessibilityNameSet              = false;
+  bool        mAccessibilityDescriptionSet       = false;
   bool        mAccessibilityTranslationDomainSet = false;
 
   bool mAccessibilityHighlightable    = false;
@@ -562,6 +578,12 @@ public:
   static const PropertyRegistration PROPERTY_20;
   static const PropertyRegistration PROPERTY_21;
   static const PropertyRegistration PROPERTY_22;
+
+private:
+  // Accessibility - notification for highlighted object to check if it is showing.
+  bool                                      mIsAccessibilityPositionPropertyNotificationSet{false};
+  Dali::PropertyNotification                mAccessibilityPositionNotification;
+  Dali::Accessibility::MovedOutOfScreenType mAccessibilityMovedOutOfScreenDirection{Accessibility::MovedOutOfScreenType::NONE};
 };
 
 } // namespace Internal

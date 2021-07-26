@@ -153,10 +153,10 @@ void NPatchVisual::LoadImages()
   TextureManager& textureManager     = mFactoryCache.GetTextureManager();
   bool            synchronousLoading = mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
 
-  if(mId == NPatchData::INVALID_NPATCH_DATA_ID && mImageUrl.IsLocalResource())
+  if(mId == NPatchData::INVALID_NPATCH_DATA_ID && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource()))
   {
     bool preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader ? true : false;
-    mId                    = mLoader.Load(textureManager, this, mImageUrl.GetUrl(), mBorder, preMultiplyOnLoad, synchronousLoading);
+    mId                    = mLoader.Load(textureManager, this, mImageUrl, mBorder, preMultiplyOnLoad, synchronousLoading);
 
     const NPatchData* data;
     if(mLoader.GetNPatchData(mId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
@@ -165,7 +165,7 @@ void NPatchVisual::LoadImages()
     }
   }
 
-  if(!mAuxiliaryPixelBuffer && mAuxiliaryUrl.IsValid() && mAuxiliaryUrl.IsLocalResource())
+  if(!mAuxiliaryPixelBuffer && mAuxiliaryUrl.IsValid() && (mAuxiliaryUrl.IsLocalResource() || mAuxiliaryUrl.IsBufferResource()))
   {
     // Load the auxiliary image
     auto preMultiplyOnLoading = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;

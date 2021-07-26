@@ -1881,7 +1881,7 @@ struct Engine::Impl
             linesBuffer[lineIndex].ellipsis = false;
           }
           numberOfLines--;
-          ellipsisLineIndex = middleLineIndex > 0u ? middleLineIndex - 1u : 0u;
+          ellipsisLineIndex = middleLineIndex - 1u;
           middleLineIndex   = (numberOfLines) / 2u;
         }
 
@@ -2071,18 +2071,23 @@ struct Engine::Impl
 
   void Initialize(LineRun& line)
   {
-    line.glyphRun.glyphIndex             = 0u;
-    line.glyphRun.numberOfGlyphs         = 0u;
-    line.characterRun.characterIndex     = 0u;
-    line.characterRun.numberOfCharacters = 0u;
-    line.width                           = 0.f;
-    line.ascender                        = 0.f;
-    line.descender                       = 0.f;
-    line.extraLength                     = 0.f;
-    line.alignmentOffset                 = 0.f;
-    line.direction                       = LTR;
-    line.ellipsis                        = false;
-    line.lineSpacing                     = mDefaultLineSpacing;
+    line.glyphRun.glyphIndex                              = 0u;
+    line.glyphRun.numberOfGlyphs                          = 0u;
+    line.characterRun.characterIndex                      = 0u;
+    line.characterRun.numberOfCharacters                  = 0u;
+    line.width                                            = 0.f;
+    line.ascender                                         = 0.f;
+    line.descender                                        = 0.f;
+    line.extraLength                                      = 0.f;
+    line.alignmentOffset                                  = 0.f;
+    line.direction                                        = LTR;
+    line.ellipsis                                         = false;
+    line.lineSpacing                                      = mDefaultLineSpacing;
+    line.isSplitToTwoHalves                               = false;
+    line.glyphRunSecondHalf.glyphIndex                    = 0u;
+    line.glyphRunSecondHalf.numberOfGlyphs                = 0u;
+    line.characterRunForSecondHalfLine.characterIndex     = 0u;
+    line.characterRunForSecondHalfLine.numberOfCharacters = 0u;
   }
 
   Type  mLayout;

@@ -36,7 +36,8 @@ namespace Dali {
         bool TestDoAction ( const Address &adr, const std::string& name );
         std::string TestGetActionKeyBinding ( const Address &adr, size_t index );
         std::string TestGetActionDescription ( const Address &adr, size_t index );
-
+        void TestResetMoveOutedCalled ();
+        bool TestGetMoveOutedCalled ();
     }
 }
 

@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/geometry.h>
@@ -389,11 +390,32 @@ public:
   TextureSet GetTextureSet(TextureId textureId);
 
   /**
+   * @brief Get the encoded image buffer
+   * @param[in] textureId The textureId to look up
+   * @return the encoded image buffer, or an empty handle if textureId is not valid
+   */
+  EncodedImageBuffer GetEncodedImageBuffer(TextureId textureId);
+
+  /**
+   * @brief Get the encoded image buffer by VisualUrl
+   * @param[in] url The url to look up
+   * @return the encoded image buffer, or an empty handle if url is not buffer resource or buffer is not valid
+   */
+  EncodedImageBuffer GetEncodedImageBuffer(const std::string& url);
+
+  /**
    * Adds an external texture to the texture manager
    * @param[in] texture The texture to add
    * @return string containing the URL for the texture
    */
   std::string AddExternalTexture(TextureSet& texture);
+
+  /**
+   * Adds an external encoded image buffer to the texture manager
+   * @param[in] encodedImageBuffer The image buffer to add
+   * @return string containing the URL for the texture
+   */
+  std::string AddExternalEncodedImageBuffer(const EncodedImageBuffer& encodedImageBuffer);
 
   /**
    * Removes an external texture from texture manager
@@ -403,10 +425,17 @@ public:
   TextureSet RemoveExternalTexture(const std::string& url);
 
   /**
-   * @brief Notify that external textures are used.
+   * Removes an external encoded image buffer from texture manager
+   * @param[in] url The string containing the encoded image buffer to remove
+   * @return handle to the encoded image buffer
+   */
+  EncodedImageBuffer RemoveExternalEncodedImageBuffer(const std::string& url);
+
+  /**
+   * @brief Notify that external textures or external encoded image buffers are used.
    * @param[in] url The URL of the texture to use.
    */
-  void UseExternalTexture(const VisualUrl& url);
+  void UseExternalResource(const VisualUrl& url);
 
   /**
    * Add an observer to the object.
@@ -859,6 +888,20 @@ private:
     int16_t    referenceCount{1};
   };
 
+  struct EncodedBufferTextureInfo
+  {
+    EncodedBufferTextureInfo(TextureId                 textureId,
+                             const EncodedImageBuffer& encodedImageBuffer)
+    : textureId(textureId),
+      encodedImageBuffer(encodedImageBuffer),
+      referenceCount(1u)
+    {
+    }
+    TextureId          textureId;
+    EncodedImageBuffer encodedImageBuffer;
+    int16_t            referenceCount;
+  };
+
 private:
   /**
    * Deleted copy constructor.
@@ -877,15 +920,16 @@ private:
    */
   void ObserverDestroyed(TextureUploadObserver* observer);
 
-private:                                                             // Member Variables:
-  TextureInfoContainerType                    mTextureInfoContainer; ///< Used to manage the life-cycle and caching of Textures
-  RoundRobinContainerView<AsyncLoadingHelper> mAsyncLocalLoaders;    ///< The Asynchronous image loaders used to provide all local async loads
-  RoundRobinContainerView<AsyncLoadingHelper> mAsyncRemoteLoaders;   ///< The Asynchronous image loaders used to provide all remote async loads
-  std::vector<ExternalTextureInfo>            mExternalTextures;     ///< Externally provided textures
-  Dali::Vector<LifecycleObserver*>            mLifecycleObservers;   ///< Lifecycle observers of texture manager
-  Dali::Vector<LoadQueueElement>              mLoadQueue;            ///< Queue of textures to load after NotifyObservers
-  TextureId                                   mCurrentTextureId;     ///< The current value used for the unique Texture Id generation
-  bool                                        mQueueLoadFlag;        ///< Flag that causes Load Textures to be queued.
+private:                                                              // Member Variables:
+  TextureInfoContainerType                    mTextureInfoContainer;  ///< Used to manage the life-cycle and caching of Textures
+  RoundRobinContainerView<AsyncLoadingHelper> mAsyncLocalLoaders;     ///< The Asynchronous image loaders used to provide all local async loads
+  RoundRobinContainerView<AsyncLoadingHelper> mAsyncRemoteLoaders;    ///< The Asynchronous image loaders used to provide all remote async loads
+  std::vector<ExternalTextureInfo>            mExternalTextures;      ///< Externally provided textures
+  std::vector<EncodedBufferTextureInfo>       mEncodedBufferTextures; ///< Externally encoded buffer textures
+  Dali::Vector<LifecycleObserver*>            mLifecycleObservers;    ///< Lifecycle observers of texture manager
+  Dali::Vector<LoadQueueElement>              mLoadQueue;             ///< Queue of textures to load after NotifyObservers
+  TextureId                                   mCurrentTextureId;      ///< The current value used for the unique Texture Id generation
+  bool                                        mQueueLoadFlag;         ///< Flag that causes Load Textures to be queued.
 };
 
 } // namespace Internal

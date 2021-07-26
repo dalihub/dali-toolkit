@@ -102,6 +102,7 @@ static int gContextMenuHiddenCallbackCalled = 0;
 static std::unique_ptr<Dali::WebEngineContextMenu> gContextMenuHiddenInstance = nullptr;
 static int gHitTestCreatedCallbackCalled = 0;
 static int gCookieManagerChangsWatchCallbackCalled = 0;
+static int gPlainTextReceivedCallbackCalled = 0;
 
 struct CallbackFunctor
 {
@@ -151,6 +152,12 @@ static void OnUrlChanged(const std::string& url)
 static bool OnHitTestCreated(std::unique_ptr<Dali::WebEngineHitTest> test)
 {
   gHitTestCreatedCallbackCalled++;
+  return true;
+}
+
+static bool OnPlainTextReceived(const std::string& plainText)
+{
+  gPlainTextReceivedCallbackCalled++;
   return true;
 }
 
@@ -2290,6 +2297,22 @@ int UtcDaliWebSettingsSetExtraFeature(void)
   settings->SetExtraFeature("test", true);
   bool value = settings->IsExtraFeatureEnabled("test");
   DALI_TEST_CHECK( value );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewGetPlainText(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  view.LoadUrl(TEST_URL1);
+
+  view.GetPlainTextAsynchronously(&OnPlainTextReceived);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gPlainTextReceivedCallbackCalled, 1, TEST_LOCATION);
 
   END_TEST;
 }

@@ -21,6 +21,9 @@
 // EXTERNAL HEADER
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 
+// INTERNAL HEADERS
+#include <dali-toolkit/internal/image-loader/image-atlas-impl.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -44,7 +47,7 @@ ImageAtlasManager::~ImageAtlasManager()
 }
 
 TextureSet ImageAtlasManager::Add(Vector4&             textureRect,
-                                  const std::string&   url,
+                                  const VisualUrl&     url,
                                   ImageDimensions&     size,
                                   FittingMode::Type    fittingMode,
                                   bool                 orientationCorrection,
@@ -54,7 +57,7 @@ TextureSet ImageAtlasManager::Add(Vector4&             textureRect,
   ImageDimensions zero;
   if(size == zero)
   {
-    dimensions = Dali::GetClosestImageSize(url);
+    dimensions = Dali::GetClosestImageSize(url.GetUrl());
   }
 
   // big image, atlasing is not applied
@@ -67,7 +70,7 @@ TextureSet ImageAtlasManager::Add(Vector4&             textureRect,
   unsigned int i = 0;
   for(AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)
   {
-    if((*iter).Upload(textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver))
+    if(GetImplementation(*iter).Upload(textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver))
     {
       return mTextureSetList[i];
     }
@@ -75,7 +78,7 @@ TextureSet ImageAtlasManager::Add(Vector4&             textureRect,
   }
 
   CreateNewAtlas();
-  mAtlasList.back().Upload(textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver);
+  GetImplementation(mAtlasList.back()).Upload(textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver);
   return mTextureSetList.back();
 }
 

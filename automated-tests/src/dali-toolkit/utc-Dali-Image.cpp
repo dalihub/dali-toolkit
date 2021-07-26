@@ -122,3 +122,18 @@ int UtcDaliImageConvertNativeImageSourceToUrl(void)
 
   END_TEST;
 }
+
+int UtcDaliImageConvertEncodedImageBufferToUrl(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageConvertEncodedImageBufferToUrl" );
+
+  Dali::Vector<uint8_t> buffer;
+  buffer.PushBack(0x11);
+  buffer.PushBack(0x22);
+  buffer.PushBack(0x33);
+
+  DALI_TEST_CHECK( Dali::Toolkit::Image::GenerateUrl( EncodedImageBuffer::New(buffer) ).GetUrl().size() > 0u );
+
+  END_TEST;
+}

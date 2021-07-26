@@ -101,10 +101,10 @@ private:
 
   /**
    * @brief CreateShader for native image target
-   * @param[in] fragmentPrefix prefix of fragment
+   * @param[in] nativeImageSourcePtr to apply custom fragment prefix
    * @return Returns the shader for NativeImage.
    */
-  Dali::Shader CreateShader(const char* fragmentPrefix);
+  Dali::Shader CreateShader(Dali::NativeImageSourcePtr nativeImageSourcePtr);
 
 private:
   Dali::CameraPlayer mCameraPlayer;

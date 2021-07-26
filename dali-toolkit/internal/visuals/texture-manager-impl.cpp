@@ -30,6 +30,7 @@
 #include <string>
 
 // INTERNAL HEADERS
+#include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
 #include <dali-toolkit/internal/image-loader/image-atlas-impl.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
@@ -199,7 +200,18 @@ Devel::PixelBuffer TextureManager::LoadPixelBuffer(
   {
     if(url.IsValid())
     {
-      pixelBuffer = LoadImageFromFile(url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+      if(url.IsBufferResource())
+      {
+        const EncodedImageBuffer& encodedImageBuffer = GetEncodedImageBuffer(url.GetUrl());
+        if(encodedImageBuffer)
+        {
+          pixelBuffer = LoadImageFromBuffer(encodedImageBuffer.GetRawBuffer(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+        }
+      }
+      else
+      {
+        pixelBuffer = LoadImageFromFile(url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+      }
       if(pixelBuffer && preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
       {
         PreMultiply(pixelBuffer, preMultiplyOnLoad);
@@ -244,7 +256,19 @@ TextureSet TextureManager::LoadTexture(
     PixelData data;
     if(url.IsValid())
     {
-      Devel::PixelBuffer pixelBuffer = LoadImageFromFile(url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+      Devel::PixelBuffer pixelBuffer;
+      if(url.IsBufferResource())
+      {
+        const EncodedImageBuffer& encodedImageBuffer = GetEncodedImageBuffer(url.GetUrl());
+        if(encodedImageBuffer)
+        {
+          pixelBuffer = LoadImageFromBuffer(encodedImageBuffer.GetRawBuffer(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+        }
+      }
+      else
+      {
+        pixelBuffer = LoadImageFromFile(url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+      }
       if(maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
       {
         Devel::PixelBuffer maskPixelBuffer = LoadImageFromFile(maskInfo->mAlphaMaskUrl.GetUrl(), ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true);
@@ -433,12 +457,35 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) Using cached texture id@%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId);
   }
 
+  // Check if the requested Texture exist in Encoded Buffer
+  // This mean, that buffer is not cached, and need to be decoded.
+  if(textureId == INVALID_TEXTURE_ID && VisualUrl::BUFFER == url.GetProtocolType())
+  {
+    std::string location = url.GetLocation();
+    if(location.size() > 0u)
+    {
+      TextureId                 targetId           = std::stoi(location);
+      const EncodedImageBuffer& encodedImageBuffer = GetEncodedImageBuffer(targetId);
+      if(encodedImageBuffer)
+      {
+        textureId = targetId;
+        // Insert this buffer at mTextureInfoContainer.
+        // This buffer will decode at ImageLoaderThread.
+        bool preMultiply = (preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
+        mTextureInfoContainer.push_back(TextureInfo(textureId, maskTextureId, url, desiredSize, contentScale, fittingMode, samplingMode, false, cropToMask, useAtlas, textureHash, orientationCorrection, preMultiply, animatedImageLoading, frameIndex));
+        cacheIndex = mTextureInfoContainer.size() - 1u;
+
+        DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) New buffered texture, cacheIndex:%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId);
+      }
+    }
+  }
+
   if(textureId == INVALID_TEXTURE_ID) // There was no caching, or caching not required
   {
     // We need a new Texture.
     textureId        = GenerateUniqueTextureId();
     bool preMultiply = (preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
-    mTextureInfoContainer.push_back(TextureInfo(textureId, maskTextureId, url.GetUrl(), desiredSize, contentScale, fittingMode, samplingMode, false, cropToMask, useAtlas, textureHash, orientationCorrection, preMultiply, animatedImageLoading, frameIndex));
+    mTextureInfoContainer.push_back(TextureInfo(textureId, maskTextureId, url, desiredSize, contentScale, fittingMode, samplingMode, false, cropToMask, useAtlas, textureHash, orientationCorrection, preMultiply, animatedImageLoading, frameIndex));
     cacheIndex = mTextureInfoContainer.size() - 1u;
 
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId);
@@ -655,6 +702,35 @@ TextureSet TextureManager::GetTextureSet(TextureId textureId)
   return textureSet;
 }
 
+EncodedImageBuffer TextureManager::GetEncodedImageBuffer(TextureId textureId)
+{
+  EncodedImageBuffer encodedImageBuffer; // empty handle
+  for(auto&& elem : mEncodedBufferTextures)
+  {
+    if(elem.textureId == textureId)
+    {
+      encodedImageBuffer = elem.encodedImageBuffer;
+      break;
+    }
+  }
+  return encodedImageBuffer;
+}
+
+EncodedImageBuffer TextureManager::GetEncodedImageBuffer(const std::string& url)
+{
+  EncodedImageBuffer encodedImageBuffer; // empty handle
+  if(url.size() > 0 && VisualUrl::BUFFER == VisualUrl::GetProtocolType(url))
+  {
+    std::string location = VisualUrl::GetLocation(url);
+    if(location.size() > 0u)
+    {
+      TextureId targetId = std::stoi(location);
+      return GetEncodedImageBuffer(targetId);
+    }
+  }
+  return encodedImageBuffer;
+}
+
 std::string TextureManager::AddExternalTexture(TextureSet& textureSet)
 {
   TextureManager::ExternalTextureInfo info;
@@ -665,13 +741,30 @@ std::string TextureManager::AddExternalTexture(TextureSet& textureSet)
   return VisualUrl::CreateTextureUrl(std::to_string(info.textureId));
 }
 
+std::string TextureManager::AddExternalEncodedImageBuffer(const EncodedImageBuffer& encodedImageBuffer)
+{
+  // Duplication check
+  for(auto&& elem : mEncodedBufferTextures)
+  {
+    if(elem.encodedImageBuffer == encodedImageBuffer)
+    {
+      // If same buffer added, increase reference count and return.
+      elem.referenceCount++;
+      return VisualUrl::CreateBufferUrl(std::to_string(elem.textureId));;
+    }
+  }
+  TextureManager::EncodedBufferTextureInfo info(GenerateUniqueTextureId(), encodedImageBuffer);
+  mEncodedBufferTextures.emplace_back(info);
+  return VisualUrl::CreateBufferUrl(std::to_string(info.textureId));
+}
+
 TextureSet TextureManager::RemoveExternalTexture(const std::string& url)
 {
   if(url.size() > 0u)
   {
-    // get the location from the Url
     if(VisualUrl::TEXTURE == VisualUrl::GetProtocolType(url))
     {
+      // get the location from the Url
       std::string location = VisualUrl::GetLocation(url);
       if(location.size() > 0u)
       {
@@ -695,7 +788,37 @@ TextureSet TextureManager::RemoveExternalTexture(const std::string& url)
   return TextureSet();
 }
 
-void TextureManager::UseExternalTexture(const VisualUrl& url)
+EncodedImageBuffer TextureManager::RemoveExternalEncodedImageBuffer(const std::string& url)
+{
+  if(url.size() > 0u)
+  {
+    if(VisualUrl::BUFFER == VisualUrl::GetProtocolType(url))
+    {
+      // get the location from the Url
+      std::string location = VisualUrl::GetLocation(url);
+      if(location.size() > 0u)
+      {
+        TextureId id = std::stoi(location);
+        const auto end = mEncodedBufferTextures.end();
+        for(auto iter = mEncodedBufferTextures.begin(); iter != end; ++iter)
+        {
+          if(iter->textureId == id)
+          {
+            auto encodedImageBuffer = iter->encodedImageBuffer;
+            if(--(iter->referenceCount) <= 0)
+            {
+              mEncodedBufferTextures.erase(iter);
+            }
+            return encodedImageBuffer;
+          }
+        }
+      }
+    }
+  }
+  return EncodedImageBuffer();
+}
+
+void TextureManager::UseExternalResource(const VisualUrl& url)
 {
   if(VisualUrl::TEXTURE == url.GetProtocolType())
   {
@@ -704,6 +827,22 @@ void TextureManager::UseExternalTexture(const VisualUrl& url)
     {
       TextureId id = std::stoi(location);
       for(auto&& elem : mExternalTextures)
+      {
+        if(elem.textureId == id)
+        {
+          elem.referenceCount++;
+          return;
+        }
+      }
+    }
+  }
+  else if(VisualUrl::BUFFER == url.GetProtocolType())
+  {
+    std::string location = url.GetLocation();
+    if(location.size() > 0u)
+    {
+      TextureId id = std::stoi(location);
+      for(auto&& elem : mEncodedBufferTextures)
       {
         if(elem.textureId == id)
         {
@@ -796,7 +935,7 @@ void TextureManager::LoadTexture(TextureInfo& textureInfo, TextureUploadObserver
   textureInfo.loadState = LoadState::LOADING;
   if(!textureInfo.loadSynchronously)
   {
-    auto& loadersContainer  = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
+    auto& loadersContainer  = (textureInfo.url.IsLocalResource() || textureInfo.url.IsBufferResource()) ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
     auto  loadingHelperIt   = loadersContainer.GetNext();
     auto  premultiplyOnLoad = (textureInfo.preMultiplyOnLoad && textureInfo.maskTextureId == INVALID_TEXTURE_ID) ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
     DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
@@ -995,7 +1134,7 @@ void TextureManager::ApplyMask(TextureInfo& textureInfo, TextureId maskTextureId
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::ApplyMask(): url:%s sync:%s\n", textureInfo.url.GetUrl().c_str(), textureInfo.loadSynchronously ? "T" : "F");
 
     textureInfo.loadState   = LoadState::MASK_APPLYING;
-    auto& loadersContainer  = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
+    auto& loadersContainer  = (textureInfo.url.IsLocalResource() || textureInfo.url.IsBufferResource()) ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
     auto  loadingHelperIt   = loadersContainer.GetNext();
     auto  premultiplyOnLoad = textureInfo.preMultiplyOnLoad ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
     DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
@@ -1267,7 +1406,7 @@ void TextureManager::AsyncLoadingHelper::LoadAnimatedImage(TextureId            
                                                            uint32_t                   frameIndex)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id                             = DevelAsyncImageLoader::LoadAnimatedImage(mLoader, animatedImageLoading, frameIndex);
+  auto id                             = GetImplementation(mLoader).LoadAnimatedImage(animatedImageLoading, frameIndex);
   mLoadingInfoContainer.back().loadId = id;
 }
 
@@ -1280,7 +1419,7 @@ void TextureManager::AsyncLoadingHelper::Load(TextureId                         
                                               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id                             = DevelAsyncImageLoader::Load(mLoader, url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
+  auto id                             = GetImplementation(mLoader).Load(url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
   mLoadingInfoContainer.back().loadId = id;
 }
 
@@ -1292,7 +1431,7 @@ void TextureManager::AsyncLoadingHelper::ApplyMask(TextureId                    
                                                    DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id                             = DevelAsyncImageLoader::ApplyMask(mLoader, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad);
+  auto id                             = GetImplementation(mLoader).ApplyMask(pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad);
   mLoadingInfoContainer.back().loadId = id;
 }
 
