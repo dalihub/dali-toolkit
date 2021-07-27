@@ -136,6 +136,11 @@ bool Controller::IsMarkupProcessorEnabled() const
   return mImpl->mMarkupProcessorEnabled;
 }
 
+bool Controller::HasAnchors() const
+{
+  return (mImpl->mMarkupProcessorEnabled && mImpl->mModel->mLogicalModel->mAnchors.Count() && mImpl->IsShowingRealText());
+}
+
 void Controller::SetAutoScrollEnabled(bool enable)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled[%s] SingleBox[%s]-> [%p]\n", (enable) ? "true" : "false", (mImpl->mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX) ? "true" : "false", this);
