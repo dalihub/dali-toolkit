@@ -69,6 +69,13 @@ PositionSize Window::GetPositionSize() const
   return mRenderSurface.GetPositionSize();
 }
 
+Dali::Window::WindowSize Window::GetSize() const
+{
+  PositionSize positionSize = mRenderSurface.GetPositionSize();
+
+  return Dali::Window::WindowSize(positionSize.width, positionSize.height);
+}
+
 void Window::SetPositionSize(PositionSize positionSize)
 {
   mRenderSurface.MoveResize(positionSize);
