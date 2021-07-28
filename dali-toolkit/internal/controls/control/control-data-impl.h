@@ -580,9 +580,9 @@ public:
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.
-  bool                                      mIsAccessibilityPositionPropertyNotificationSet{false};
-  Dali::PropertyNotification                mAccessibilityPositionNotification;
-  Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType;
+  bool                                        mIsAccessibilityPositionPropertyNotificationSet{false};
+  Dali::PropertyNotification                  mAccessibilityPositionNotification;
+  Dali::Accessibility::ScreenRelativeMoveType mAccessibilityLastScreenRelativeMoveType{Accessibility::ScreenRelativeMoveType::OUTSIDE};
 };
 
 } // namespace Internal
