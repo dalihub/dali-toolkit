@@ -24,6 +24,7 @@
 #endif
 
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
@@ -278,7 +279,16 @@ Dali::Rect<> AccessibleImpl::GetExtents(Dali::Accessibility::CoordinateType type
   Vector3 anchorPointOffSet = size * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
   Vector2 position = Vector2((screenPosition.x - anchorPointOffSet.x), (screenPosition.y - anchorPointOffSet.y));
 
-  return {position.x, position.y, size.x, size.y};
+  if(type == Dali::Accessibility::CoordinateType::WINDOW)
+  {
+    return {position.x, position.y, size.x, size.y};
+  }
+  else // Dali::Accessibility::CoordinateType::SCREEN
+  {
+    auto window = Dali::DevelWindow::Get(self);
+    auto windowPosition = window.GetPosition();
+    return {position.x + windowPosition.GetX(), position.y + windowPosition.GetY(), size.x, size.y};
+  }
 }
 
 int16_t AccessibleImpl::GetMdiZOrder()

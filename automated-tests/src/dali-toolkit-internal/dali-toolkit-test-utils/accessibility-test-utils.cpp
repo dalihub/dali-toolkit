@@ -204,10 +204,10 @@ namespace Dali {
             return std::move(std::get<0>(chs));
         }
 
-        std::tuple< int32_t, int32_t, int32_t, int32_t > TestGetExtents(const Address &adr)
+        std::tuple< int32_t, int32_t, int32_t, int32_t > TestGetExtents(const Address &adr, Dali::Accessibility::CoordinateType coordinateType)
         {
             auto wr = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
-            auto chs = wr->fromTestCall< std::tuple< int32_t, int32_t, int32_t, int32_t > >(adr.GetPath(), "org.a11y.atspi.Component", "GetExtents", std::tuple<uint32_t>(0));
+            auto chs = wr->fromTestCall< std::tuple< int32_t, int32_t, int32_t, int32_t > >(adr.GetPath(), "org.a11y.atspi.Component", "GetExtents", std::make_tuple(static_cast<uint32_t>(coordinateType)));
             return std::move(std::get<0>(chs));
         }
 

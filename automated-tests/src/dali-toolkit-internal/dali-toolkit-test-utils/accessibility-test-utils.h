@@ -24,7 +24,7 @@ namespace Dali {
         bool TestGrabFocus(const Address &adr);
         bool TestGrabHighlight(const Address &adr);
         bool TestClearHighlight(const Address &adr);
-        std::tuple< int32_t, int32_t, int32_t, int32_t > TestGetExtents(const Address &adr);
+        std::tuple< int32_t, int32_t, int32_t, int32_t > TestGetExtents(const Address &adr, Dali::Accessibility::CoordinateType coordinateType );
         int TestGetMdiZOrder(const Address &adr);
         double TestGetAlpha(const Address &adr);
         void printTree(const Address &root, size_t depth = 0);
