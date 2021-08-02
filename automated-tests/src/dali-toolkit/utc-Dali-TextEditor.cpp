@@ -4004,6 +4004,297 @@ int UtcDaliToolkitTextEditorEllipsisPositionProperty(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorCopyText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorCopyText ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  std::string selectedText = "";
+  std::string copiedText = "";
+
+  application.GetScene().Add( textEditor );
+
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textEditor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textEditor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  // Hello is selected
+  DevelTextEditor::SelectText( textEditor, 0, 5 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "Hello", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 5, TEST_LOCATION );
+
+  // Hello is copied
+  copiedText = DevelTextEditor::CopyText( textEditor );
+  DALI_TEST_EQUALS( "Hello", copiedText, TEST_LOCATION );
+
+  // world is selected
+  DevelTextEditor::SelectText( textEditor, 6, 11 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "world", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 6, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 11, TEST_LOCATION );
+
+  // world is copied
+  copiedText = DevelTextEditor::CopyText( textEditor );
+  DALI_TEST_EQUALS( "world", copiedText, TEST_LOCATION );
+
+  // "lo wo" is selected
+  DevelTextEditor::SelectText( textEditor, 3, 8 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "lo wo", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 8, TEST_LOCATION );
+
+  // "lo wo" is copied
+  copiedText = DevelTextEditor::CopyText( textEditor );
+  DALI_TEST_EQUALS( "lo wo", copiedText, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorCutText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorCutText ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  std::string selectedText = "";
+
+  application.GetScene().Add( textEditor );
+
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textEditor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textEditor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  // Hello is selected
+  DevelTextEditor::SelectText( textEditor, 0, 5 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "Hello", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 5, TEST_LOCATION );
+
+  // Hello is cut
+  DALI_TEST_EQUALS( "Hello", DevelTextEditor::CutText( textEditor ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), " world", TEST_LOCATION );
+
+  // " w" is selected
+  DevelTextEditor::SelectText( textEditor, 0, 2 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( " w", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 2, TEST_LOCATION );
+
+  // " w" is cut
+  DALI_TEST_EQUALS( " w", DevelTextEditor::CutText( textEditor ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "orld", TEST_LOCATION );
+
+  // Test Cut from the middle
+
+  // "rl" is selected
+  DevelTextEditor::SelectText( textEditor, 1, 3 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "rl", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 3, TEST_LOCATION );
+
+  // "rl" is cut
+  DALI_TEST_EQUALS( "rl", DevelTextEditor::CutText( textEditor ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "od", TEST_LOCATION );
+
+  // Test Cut from the end
+
+  // "d" is selected
+  DevelTextEditor::SelectText( textEditor, 1, 2 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "d", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 2, TEST_LOCATION );
+
+  // "d" is cut
+  DALI_TEST_EQUALS( "d", DevelTextEditor::CutText( textEditor ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "o", TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorPasteText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorPasteText ");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  std::string cutText = "";
+  std::string copiedText = "";
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Select some text in the right of the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Cut the selected text
+  cutText = DevelTextEditor::CutText(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( "wor", cutText, TEST_LOCATION );
+  DALI_TEST_EQUALS( "Hello\nld\nHello world", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
+
+  // Select some text in the left of the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN,  "",DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Copy the selected text
+  copiedText = DevelTextEditor::CopyText(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( "lo\n", copiedText, TEST_LOCATION );
+  DALI_TEST_EQUALS( "Hello\nld\nHello world", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
+
+
+  // Move the cursor to the third line
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Paste the selected text at the current cursor position
+  DevelTextEditor::PasteText(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( "Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
+
+  END_TEST;
+}
 int UtcDaliTextEditorLineSpacing(void)
 {
   ToolkitTestApplication application;

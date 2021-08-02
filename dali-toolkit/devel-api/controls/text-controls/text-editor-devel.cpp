@@ -75,6 +75,21 @@ void ScrollBy(TextEditor textEditor, Vector2 scroll)
   GetImpl(textEditor).ScrollBy(scroll);
 }
 
+string CopyText(TextEditor textEditor)
+{
+  return GetImpl(textEditor).CopyText();
+}
+
+string CutText(TextEditor textEditor)
+{
+  return GetImpl(textEditor).CutText();
+}
+
+void PasteText(TextEditor textEditor)
+{
+  GetImpl(textEditor).PasteText();
+}
+
 } // namespace DevelTextEditor
 
 } // namespace Toolkit

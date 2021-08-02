@@ -1216,6 +1216,35 @@ Uint32Pair TextField::GetTextSelectionRange() const
   return range;
 }
 
+string TextField::CopyText()
+{
+  string copiedText = "";
+  if(mController && mController->IsShowingRealText())
+  {
+    copiedText = mController->CopyText();
+  }
+  return copiedText;
+}
+
+string TextField::CutText()
+{
+  string cutText = "";
+  if(mController && mController->IsShowingRealText())
+  {
+    cutText = mController->CutText();
+  }
+  return cutText;
+}
+
+void TextField::PasteText()
+{
+  if(mController)
+  {
+    SetKeyInputFocus(); //Giving focus to the field that was passed to the PasteText in case the passed field (current field) doesn't have focus.
+    mController->PasteText();
+  }
+}
+
 InputMethodContext TextField::GetInputMethodContext()
 {
   return mInputMethodContext;

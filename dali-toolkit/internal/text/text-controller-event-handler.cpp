@@ -952,43 +952,17 @@ void Controller::EventHandler::TextPopupButtonTouched(Controller& controller, Da
   {
     case Toolkit::TextSelectionPopup::CUT:
     {
-      if(!controller.IsEditable()) return;
-      controller.mImpl->SendSelectionToClipboard(true); // Synchronous call to modify text
-      controller.mImpl->mOperationsPending = ALL_OPERATIONS;
-
-      if((0u != controller.mImpl->mModel->mLogicalModel->mText.Count()) ||
-         !controller.mImpl->IsPlaceholderAvailable())
-      {
-        controller.mImpl->QueueModifyEvent(ModifyEvent::TEXT_DELETED);
-      }
-      else
-      {
-        controller.ShowPlaceholderText();
-      }
-
-      controller.mImpl->mEventData->mUpdateCursorPosition = true;
-      controller.mImpl->mEventData->mScrollAfterDelete    = true;
-
-      controller.mImpl->RequestRelayout();
-
-      if(NULL != controller.mImpl->mEditableControlInterface)
-      {
-        controller.mImpl->mEditableControlInterface->TextChanged(true);
-      }
+      controller.CutText();
       break;
     }
     case Toolkit::TextSelectionPopup::COPY:
     {
-      controller.mImpl->SendSelectionToClipboard(false); // Text not modified
-
-      controller.mImpl->mEventData->mUpdateCursorPosition = true;
-
-      controller.mImpl->RequestRelayout(); // Cursor, Handles, Selection Highlight, Popup
+      controller.CopyText();
       break;
     }
     case Toolkit::TextSelectionPopup::PASTE:
     {
-      controller.mImpl->RequestGetTextFromClipboard(); // Request clipboard service to retrieve an item
+      controller.PasteText();
       break;
     }
     case Toolkit::TextSelectionPopup::SELECT:

@@ -347,6 +347,29 @@ DALI_TOOLKIT_API void SelectNone(TextField textField);
  */
 DALI_TOOLKIT_API void SelectText(TextField textField, const uint32_t start, const uint32_t end);
 
+/**
+ * @brief Copy and return the selected text of TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ * @return The copied text.
+ */
+DALI_TOOLKIT_API std::string CopyText(TextField textField);
+
+/**
+ * @brief Cut and return the selected text of TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ * @return The cut text.
+ */
+DALI_TOOLKIT_API std::string CutText(TextField textField);
+
+/**
+ * @brief Paste the most recent clipboard text item into the TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ */
+DALI_TOOLKIT_API void PasteText(TextField textField);
+
 } // namespace DevelTextField
 
 } // namespace Toolkit

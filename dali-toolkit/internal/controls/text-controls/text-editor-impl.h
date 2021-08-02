@@ -326,6 +326,21 @@ public:
    */
   void SetEditable(bool editable) override;
 
+  /**
+   * @copydoc Text::EditableControlInterface::CopyText()
+   */
+  string CopyText() override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::CutText()
+   */
+  string CutText() override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::PasteText()
+   */
+  void PasteText() override;
+
   // From AnchorControlInterface
 
   /**

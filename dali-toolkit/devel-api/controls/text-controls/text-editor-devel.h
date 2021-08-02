@@ -433,6 +433,29 @@ DALI_TOOLKIT_API void SelectText(TextEditor textEditor, const uint32_t start, co
  */
 DALI_TOOLKIT_API void ScrollBy(TextEditor textEditor, Vector2 scroll);
 
+/**
+ * @brief Copy and return the selected text of TextEditor.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ * @return The copied text.
+ */
+DALI_TOOLKIT_API std::string CopyText(TextEditor textEditor);
+
+/**
+ * @brief Cut and return the selected text of TextEditor.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ * @return The cut text.
+ */
+DALI_TOOLKIT_API std::string CutText(TextEditor textEditor);
+
+/**
+ * @brief Paste the most recent clipboard text item into the TextEditor.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ */
+DALI_TOOLKIT_API void PasteText(TextEditor textEditor);
+
 } // namespace DevelTextEditor
 
 } // namespace Toolkit

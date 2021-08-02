@@ -298,6 +298,21 @@ public:
    */
   void SetEditable(bool editable) override;
 
+  /**
+   * @copydoc Dali::EditableControlInterface::CopyText()
+   */
+  string CopyText() override;
+
+  /**
+   * @copydoc Dali::EditableControlInterface::CutText()
+   */
+  string CutText() override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::PasteText()
+   */
+  void PasteText() override;
+
   // From AnchorControlInterface
 
   /**

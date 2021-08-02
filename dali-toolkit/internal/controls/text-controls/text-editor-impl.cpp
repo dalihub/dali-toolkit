@@ -1263,6 +1263,35 @@ void TextEditor::SelectText(const uint32_t start, const uint32_t end)
   }
 }
 
+string TextEditor::CopyText()
+{
+  string copiedText = "";
+  if(mController && mController->IsShowingRealText())
+  {
+    copiedText = mController->CopyText();
+  }
+  return copiedText;
+}
+
+string TextEditor::CutText()
+{
+  string cutText = "";
+  if(mController && mController->IsShowingRealText())
+  {
+    cutText = mController->CutText();
+  }
+  return cutText;
+}
+
+void TextEditor::PasteText()
+{
+  if(mController)
+  {
+    SetKeyInputFocus(); //Giving focus to the editor that was passed to the PasteText in case the passed editor (current editor) doesn't have focus.
+    mController->PasteText();
+  }
+}
+
 void TextEditor::ScrollBy(Vector2 scroll)
 {
   if(mController && mController->IsShowingRealText())

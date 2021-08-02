@@ -1913,6 +1913,59 @@ string Controller::GetSelectedText() const
   return text;
 }
 
+string Controller::CopyText()
+{
+  string text;
+  mImpl->RetrieveSelection(text, false);
+  mImpl->SendSelectionToClipboard(false); // Text not modified
+
+  mImpl->mEventData->mUpdateCursorPosition = true;
+
+  mImpl->RequestRelayout(); // Cursor, Handles, Selection Highlight, Popup
+
+  return text;
+}
+
+string Controller::CutText()
+{
+  string text;
+  mImpl->RetrieveSelection(text, false);
+
+  if(!IsEditable())
+  {
+    return "";
+  }
+
+  mImpl->SendSelectionToClipboard(true); // Synchronous call to modify text
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+
+  if((0u != mImpl->mModel->mLogicalModel->mText.Count()) ||
+     !mImpl->IsPlaceholderAvailable())
+  {
+    mImpl->QueueModifyEvent(ModifyEvent::TEXT_DELETED);
+  }
+  else
+  {
+    ShowPlaceholderText();
+  }
+
+  mImpl->mEventData->mUpdateCursorPosition = true;
+  mImpl->mEventData->mScrollAfterDelete    = true;
+
+  mImpl->RequestRelayout();
+
+  if(nullptr != mImpl->mEditableControlInterface)
+  {
+    mImpl->mEditableControlInterface->TextChanged(true);
+  }
+  return text;
+}
+
+void Controller::PasteText()
+{
+  mImpl->RequestGetTextFromClipboard(); // Request clipboard service to retrieve an item
+}
+
 InputMethodContext::CallbackData Controller::OnInputMethodContextEvent(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
 {
   return EventHandler::OnInputMethodContextEvent(*this, inputMethodContext, inputMethodContextEvent);
