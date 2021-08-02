@@ -50,6 +50,11 @@ InputFilteredSignalType& InputFilteredSignal(TextEditor textEditor)
   return GetImpl(textEditor).InputFilteredSignal();
 }
 
+SelectionChangedSignalType& SelectionChangedSignal(TextEditor textEditor)
+{
+  return GetImpl(textEditor).SelectionChangedSignal();
+}
+
 void SelectWholeText(TextEditor textEditor)
 {
   GetImpl(textEditor).SelectWholeText();

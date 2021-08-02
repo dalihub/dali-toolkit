@@ -146,6 +146,7 @@ DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "inputStyleChanged",     SIGNAL_INP
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "anchorClicked",         SIGNAL_ANCHOR_CLICKED         )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "inputFiltered",         SIGNAL_INPUT_FILTERED         )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "cursorPositionChanged", SIGNAL_CURSOR_POSITION_CHANGED)
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "selectionChanged",      SIGNAL_SELECTION_CHANGED      )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -1263,6 +1264,14 @@ bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       fieldImpl.InputFilteredSignal().Connect(tracker, functor);
     }
   }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_CHANGED))
+  {
+    if(field)
+    {
+      Internal::TextField& fieldImpl(GetImpl(field));
+      fieldImpl.SelectionChangedSignal().Connect(tracker, functor);
+    }
+  }
   else
   {
     // signalName does not match any signal
@@ -1300,6 +1309,11 @@ DevelTextField::CursorPositionChangedSignalType& TextField::CursorPositionChange
 DevelTextField::InputFilteredSignalType& TextField::InputFilteredSignal()
 {
   return mInputFilteredSignal;
+}
+
+DevelTextField::SelectionChangedSignalType& TextField::SelectionChangedSignal()
+{
+  return mSelectionChangedSignal;
 }
 
 void TextField::OnInitialize()
@@ -1501,6 +1515,11 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
   if(mCursorPositionChanged)
   {
     EmitCursorPositionChangedSignal();
+  }
+
+  if(mSelectionChanged)
+  {
+    EmitSelectionChangedSignal();
   }
 
   // The text-field emits signals when the input style changes. These changes of style are
@@ -1892,6 +1911,31 @@ void TextField::InputFiltered(Toolkit::InputFilter::Property::Type type)
   mInputFilteredSignal.Emit(handle, type);
 }
 
+void TextField::EmitSelectionChangedSignal()
+{
+  Dali::Toolkit::TextField handle(GetOwner());
+  mSelectionChangedSignal.Emit(handle, mOldSelectionStart, mOldSelectionEnd);
+  mSelectionChanged = false;
+}
+
+void TextField::SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t newStart, uint32_t newEnd)
+{
+  if(((oldStart != newStart) || (oldEnd != newEnd)) && !mSelectionChanged)
+  {
+    mSelectionChanged  = true;
+    mOldSelectionStart = oldStart;
+    mOldSelectionEnd   = oldEnd;
+
+    if(mOldSelectionStart > mOldSelectionEnd)
+    {
+      //swap
+      uint32_t temp      = mOldSelectionStart;
+      mOldSelectionStart = mOldSelectionEnd;
+      mOldSelectionEnd   = temp;
+    }
+  }
+}
+
 void TextField::AddDecoration(Actor& actor, bool needsClipping)
 {
   if(actor)
@@ -2029,7 +2073,8 @@ TextField::TextField()
   mExceedPolicy(Dali::Toolkit::TextField::EXCEED_POLICY_CLIP),
   mHasBeenStaged(false),
   mTextChanged(false),
-  mCursorPositionChanged(false)
+  mCursorPositionChanged(false),
+  mSelectionChanged(false)
 {
 }
 

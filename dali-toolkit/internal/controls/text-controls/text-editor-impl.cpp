@@ -159,7 +159,7 @@ DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "maxLengthReached",      SIGNAL_MA
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "anchorClicked",         SIGNAL_ANCHOR_CLICKED         )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputFiltered",         SIGNAL_INPUT_FILTERED         )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "cursorPositionChanged", SIGNAL_CURSOR_POSITION_CHANGED)
-
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "selectionChanged",      SIGNAL_SELECTION_CHANGED      )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -1324,6 +1324,11 @@ DevelTextEditor::InputFilteredSignalType& TextEditor::InputFilteredSignal()
   return mInputFilteredSignal;
 }
 
+DevelTextEditor::SelectionChangedSignalType& TextEditor::SelectionChangedSignal()
+{
+  return mSelectionChangedSignal;
+}
+
 Text::ControllerPtr TextEditor::GetTextController()
 {
   return mController;
@@ -1374,6 +1379,14 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
     {
       Internal::TextEditor& editorImpl(GetImpl(editor));
       editorImpl.InputFilteredSignal().Connect(tracker, functor);
+    }
+  }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_CHANGED))
+  {
+    if(editor)
+    {
+      Internal::TextEditor& editorImpl(GetImpl(editor));
+      editorImpl.SelectionChangedSignal().Connect(tracker, functor);
     }
   }
   else
@@ -1611,6 +1624,11 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
   if(mCursorPositionChanged)
   {
     EmitCursorPositionChangedSignal();
+  }
+
+  if(mSelectionChanged)
+  {
+    EmitSelectionChangedSignal();
   }
 
   // The text-editor emits signals when the input style changes. These changes of style are
@@ -1985,6 +2003,31 @@ void TextEditor::InputFiltered(Toolkit::InputFilter::Property::Type type)
   mInputFilteredSignal.Emit(handle, type);
 }
 
+void TextEditor::EmitSelectionChangedSignal()
+{
+  Dali::Toolkit::TextEditor handle(GetOwner());
+  mSelectionChangedSignal.Emit(handle, mOldSelectionStart, mOldSelectionEnd);
+  mSelectionChanged = false;
+}
+
+void TextEditor::SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t newStart, uint32_t newEnd)
+{
+  if(((oldStart != newStart) || (oldEnd != newEnd)) && !mSelectionChanged)
+  {
+    mSelectionChanged  = true;
+    mOldSelectionStart = oldStart;
+    mOldSelectionEnd   = oldEnd;
+
+    if(mOldSelectionStart > mOldSelectionEnd)
+    {
+      //swap
+      uint32_t temp      = mOldSelectionStart;
+      mOldSelectionStart = mOldSelectionEnd;
+      mOldSelectionEnd   = temp;
+    }
+  }
+}
+
 void TextEditor::AddDecoration(Actor& actor, bool needsClipping)
 {
   if(actor)
@@ -2263,7 +2306,8 @@ TextEditor::TextEditor()
   mScrollBarEnabled(false),
   mScrollStarted(false),
   mTextChanged(false),
-  mCursorPositionChanged(false)
+  mCursorPositionChanged(false),
+  mSelectionChanged(false)
 {
 }
 
