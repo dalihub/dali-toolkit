@@ -29,7 +29,8 @@
 namespace Dali
 {
 
-typedef Dali::Rect<int> PositionSize;
+using PositionSize   = Dali::Rect<int>;
+using WindowPosition = Uint16Pair;
 
 namespace Internal
 {
@@ -43,6 +44,12 @@ public:
   Window( const PositionSize& positionSize );
   virtual ~Window() = default;
   static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent);
+
+  WindowPosition GetPosition() const;
+  PositionSize   GetPositionSize() const;
+
+  void SetPositionSize(PositionSize positionSize);
+
   FocusChangeSignalType mFocusChangeSignal;
   ResizeSignalType      mResizeSignal;
   int                   mRotationAngle;

@@ -31,9 +31,9 @@ class TestRenderSurface : public Dali::RenderSurfaceInterface
 {
 public:
 
-  TestRenderSurface( PositionSize positionSize ) {};
+  TestRenderSurface( PositionSize positionSize ) : mPositionSize(positionSize) {};
 
-  PositionSize GetPositionSize() const override { PositionSize size; return size; };
+  PositionSize GetPositionSize() const override { return mPositionSize; };
 
   virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical ) { dpiHorizontal = dpiVertical = 96; }
 
@@ -45,7 +45,7 @@ public:
 
   bool ReplaceGraphicsSurface() override { return false; };
 
-  void MoveResize( Dali::PositionSize positionSize ) override {};
+  void MoveResize( Dali::PositionSize positionSize ) override { mPositionSize = positionSize; };
 
   void StartRender() override {};
 
@@ -76,6 +76,9 @@ public:
   void SetBackgroundColor( Vector4 color ) {};
 
   Vector4 GetBackgroundColor() { return Color::WHITE; };
+
+private:
+  PositionSize mPositionSize;
 };
 
 namespace Internal
@@ -120,7 +123,7 @@ public:
 
   Dali::RenderSurfaceInterface& GetRenderSurface();
 
-private:
+protected:
 
   TestRenderSurface mRenderSurface;
   Integration::Scene mScene;
