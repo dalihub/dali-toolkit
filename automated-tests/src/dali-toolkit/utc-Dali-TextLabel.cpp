@@ -1788,7 +1788,34 @@ int UtcDaliToolkitTextlabelAnchorClicked(void)
   application.Render();
 
   // Create a tap event to touch the text label.
-  TestGenerateTap(application, 5.0f, 25.0f);
+  TestGenerateTap(application, 5.0f, 25.0f, 100);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gAnchorClickedCallBackCalled);
+  DALI_TEST_CHECK(anchorClickedSignal);
+
+  // reset
+  gAnchorClickedCallBackCalled = false;
+  anchorClickedSignal = false;
+  label.SetProperty(TextLabel::Property::TEXT, "");
+  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, false);
+
+  application.SendNotification();
+  application.Render();
+
+  // sets anchor text
+  label.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  label.SetProperty(TextLabel::Property::TEXT, "<a href='https://www.tizen.org'>TIZEN</a>");
+  label.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  label.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  label.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event to touch the text label.
+  TestGenerateTap(application, 5.0f, 25.0f, 200);
   application.SendNotification();
   application.Render();
 
@@ -1798,7 +1825,7 @@ int UtcDaliToolkitTextlabelAnchorClicked(void)
 
   gAnchorClickedCallBackNotCalled = true;
   // Tap the outside of anchor, callback should not be called.
-  TestGenerateTap(application, 150.f, 100.f);
+  TestGenerateTap(application, 150.f, 100.f, 300);
   application.SendNotification();
   application.Render();
 

@@ -439,6 +439,11 @@ Dali::Rect<> GetShowingGeometry(Dali::Rect<> rect, Dali::Toolkit::DevelControl::
   return rect;
 }
 
+static bool IsShowingGeometryOnScreen(Dali::Rect<> rect)
+{
+  return rect.width > 0 && rect.height > 0;
+}
+
 } // unnamed namespace
 
 // clang-format off
@@ -547,7 +552,7 @@ const Control::Impl& Control::Impl::Get(const Internal::Control& internalControl
   return *internalControl.mImpl;
 }
 
-void Control::Impl::CheckHighlightedObjectGeometry(PropertyNotification& propertyNotification)
+void Control::Impl::CheckHighlightedObjectGeometry()
 {
   auto accessibleImpl = dynamic_cast<Dali::Toolkit::DevelControl::AccessibleImpl*>(mAccessibilityObject.get());
   if(!accessibleImpl)
@@ -558,40 +563,52 @@ void Control::Impl::CheckHighlightedObjectGeometry(PropertyNotification& propert
 
   auto lastPosition   = accessibleImpl->GetLastPosition();
   auto accessibleRect = accessibleImpl->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
-
-  if(lastPosition.x == accessibleRect.x && lastPosition.y == accessibleRect.y)
-  {
-    return;
-  }
-
   auto rect = GetShowingGeometry(accessibleRect, accessibleImpl);
 
-  // MoveOuted is sent already, no need to send it again
-  if(mAccessibilityMovedOutOfScreenDirection != Dali::Accessibility::MovedOutOfScreenType::NONE)
+  switch(mAccessibilityLastScreenRelativeMoveType)
   {
-    if(rect.width > 0 && rect.height > 0)
+    case Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE:
     {
-      // flick next does not use MoveOuted - ScrollToSelf makes object show, so reset for sending MoveOuted next
-      mAccessibilityMovedOutOfScreenDirection = Dali::Accessibility::MovedOutOfScreenType::NONE;
+      if(IsShowingGeometryOnScreen(rect))
+      {
+        mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::INSIDE;
+      }
+      break;
     }
-    return;
-  }
-
-  if(rect.width < 0)
-  {
-    mAccessibilityMovedOutOfScreenDirection = (accessibleRect.x < lastPosition.x) ? Dali::Accessibility::MovedOutOfScreenType::TOP_LEFT : Dali::Accessibility::MovedOutOfScreenType::BOTTOM_RIGHT;
-  }
-
-  if(rect.height < 0)
-  {
-    mAccessibilityMovedOutOfScreenDirection = (accessibleRect.y < lastPosition.y) ? Dali::Accessibility::MovedOutOfScreenType::TOP_LEFT : Dali::Accessibility::MovedOutOfScreenType::BOTTOM_RIGHT;
-  }
-
-  if(mAccessibilityMovedOutOfScreenDirection != Dali::Accessibility::MovedOutOfScreenType::NONE)
-  {
-    mAccessibilityObject.get()->EmitMovedOutOfScreen(mAccessibilityMovedOutOfScreenDirection);
-    accessibleImpl->SetLastPosition(Vector2(0.0f, 0.0f));
-    return;
+    case Dali::Accessibility::ScreenRelativeMoveType::INSIDE:
+    {
+      if(rect.width < 0 && accessibleRect.x != lastPosition.x)
+      {
+        mAccessibilityLastScreenRelativeMoveType = (accessibleRect.x < lastPosition.x) ? Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
+      }
+      if(rect.height < 0 && accessibleRect.y != lastPosition.y)
+      {
+        mAccessibilityLastScreenRelativeMoveType = (accessibleRect.y < lastPosition.y) ? Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT : Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT;
+      }
+      // notify AT-clients on outgoing moves only
+      if(mAccessibilityLastScreenRelativeMoveType != Dali::Accessibility::ScreenRelativeMoveType::INSIDE)
+      {
+        mAccessibilityObject.get()->EmitMovedOutOfScreen(mAccessibilityLastScreenRelativeMoveType);
+      }
+      break;
+    }
+    case Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_TOP_LEFT:
+    case Dali::Accessibility::ScreenRelativeMoveType::OUTGOING_BOTTOM_RIGHT:
+    {
+      if(IsShowingGeometryOnScreen(rect))
+      {
+        mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::INSIDE;
+      }
+      else
+      {
+        mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE;
+      }
+      break;
+    }
+    default:
+    {
+      break;
+    }
   }
 
   accessibleImpl->SetLastPosition(Vector2(accessibleRect.x, accessibleRect.y));
@@ -603,11 +620,13 @@ void Control::Impl::RegisterAccessibilityPositionPropertyNotification()
   {
     return;
   }
-
-  mAccessibilityMovedOutOfScreenDirection = Dali::Accessibility::MovedOutOfScreenType::NONE;
-  mAccessibilityPositionNotification      = mControlImpl.Self().AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
+  // set default value until first move of object is detected
+  mAccessibilityLastScreenRelativeMoveType = Dali::Accessibility::ScreenRelativeMoveType::OUTSIDE;
+  // recalculate mAccessibilityLastScreenRelativeMoveType accordingly to the initial position
+  CheckHighlightedObjectGeometry();
+  mAccessibilityPositionNotification       = mControlImpl.Self().AddPropertyNotification(Actor::Property::WORLD_POSITION, StepCondition(1.0f, 1.0f));
   mAccessibilityPositionNotification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
-  mAccessibilityPositionNotification.NotifySignal().Connect(this, &Control::Impl::CheckHighlightedObjectGeometry);
+  mAccessibilityPositionNotification.NotifySignal().Connect(this, [this](PropertyNotification&){ CheckHighlightedObjectGeometry(); });
   mIsAccessibilityPositionPropertyNotificationSet = true;
 }
 

@@ -231,6 +231,13 @@ public: // Configure the text controller.
   bool IsMarkupProcessorEnabled() const;
 
   /**
+   * @brief Retrieves whether the current text contains anchors.
+   *
+   * @return @e true if the current text contains anchors. @e false.
+   */
+  bool HasAnchors() const;
+
+  /**
    * @brief Enables/disables the auto text scrolling
    *
    * By default is disabled.

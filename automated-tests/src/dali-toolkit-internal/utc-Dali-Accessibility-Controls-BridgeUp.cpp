@@ -1081,12 +1081,13 @@ int UtcDaliAccessibilityCheckHighlight(void)
   parentButton.Add(buttonB);
   Wait(application);
 
-  // Move second child out of parent area
+  // Set highlight to first child (A) to enable movement tracking
   auto* accessible = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(buttonA));
   DALI_TEST_CHECK(accessible);
   accessible->GrabHighlight();
   Wait(application);
 
+  // Move first child (A) out of parent area through the parent's area top edge - single move outed event expected for A object and OUTGOING_TOP_LEFT direction
   buttonA.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, -200.0f) );
   Wait(application);
   // Need one more seding notificaiton to get correct updated position
@@ -1096,17 +1097,67 @@ int UtcDaliAccessibilityCheckHighlight(void)
   // Reset verdict data
   Dali::Accessibility::TestResetMoveOutedCalled();
 
-  // Move second child out of parent area
+  // Move first child (A) outside of parent area (both start and end position are outside of parent area) - no move outed event expected for A object
+  buttonA.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, -300.0f) );
+  Wait(application);
+  // Need one more seding notificaiton to get correct updated position
+  application.SendNotification();
+  DALI_TEST_EQUALS( false, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
+
+  // Reset verdict data
+  Dali::Accessibility::TestResetMoveOutedCalled();
+
+  // Set highlight to second child (B) to enable movement tracking
   accessible = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(buttonB));
   DALI_TEST_CHECK(accessible);
   accessible->GrabHighlight();
   Wait(application);
 
+  // Move second child (B) inside of parent area (both start and end position are inside of parent area) - no move outed event expected for B object
+  // B: (0,100) --> (0, 50)
+  buttonB.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, 50.0f) );
+  Wait(application);
+  // Need one more seding notificaiton to get correct updated position
+  application.SendNotification();
+  DALI_TEST_EQUALS( false, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
+
+  // Reset verdict data
+  Dali::Accessibility::TestResetMoveOutedCalled();
+
+  // Move second child (B) out of parent area through the parent's area right edge - single move outed event expected for B object and OUTGOING_BOTTOM_RIGHT direction
   buttonB.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(300.0f, 100.0f) );
   Wait(application);
   // Need one more seding notificaiton to get correct updated position
   application.SendNotification();
   DALI_TEST_EQUALS( true, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
+
+  // Reset verdict data
+  Dali::Accessibility::TestResetMoveOutedCalled();
+
+  // Move second child (B) back into parent area (start position is outside but end position is inside of parent area) - no move outed event expected for B object
+  // B: (300,100) --> (0, 100)
+  buttonB.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, 100.0f) );
+  Wait(application);
+  // Need one more seding notificaiton to get correct updated position
+  application.SendNotification();
+  DALI_TEST_EQUALS( false, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
+
+  // Reset verdict data
+  Dali::Accessibility::TestResetMoveOutedCalled();
+
+  // Disable movement tracking on B by giving highlight to A
+  accessible = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(buttonA));
+  DALI_TEST_CHECK(accessible);
+  accessible->GrabHighlight();
+  Wait(application);
+
+  // Move B (untracked) out of parent area through the parent's area right edge - no move outed event expected for B object
+  // B: (0,100) --> (300, 100)
+  buttonB.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(300.0f, 100.0f) );
+  Wait(application);
+  // Need one more seding notificaiton to get correct updated position
+  application.SendNotification();
+  DALI_TEST_EQUALS( false, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( false );
   END_TEST;

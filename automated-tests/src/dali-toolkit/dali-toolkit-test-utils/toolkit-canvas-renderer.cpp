@@ -38,8 +38,10 @@ class CanvasRenderer: public Dali::BaseObject
 {
 public:
   CanvasRenderer( const Vector2& size )
-  : mPixelBuffer( Devel::PixelBuffer::New(size.width, size.height, Dali::Pixel::RGBA8888) ),
-    mSize(size)
+  : mDrawable(nullptr),
+    mPixelBuffer( Devel::PixelBuffer::New(size.width, size.height, Dali::Pixel::RGBA8888) ),
+    mSize(size),
+    mViewBox(size)
   {
   }
 
@@ -52,13 +54,47 @@ public:
      return true;
   }
 
+  bool IsCanvasChanged() const
+  {
+     return true;
+  }
+
+  bool Rasterize()
+  {
+     return true;
+  }
+
   bool AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
   {
     if (!drawable)
     {
       return false;
     }
+    mDrawable = &drawable;
     return true;
+  }
+
+  bool RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
+  {
+    if (!drawable)
+    {
+      return false;
+    }
+    if (mDrawable == &drawable)
+    {
+      mDrawable = nullptr;
+      return true;
+    }
+    return false;
+  }
+
+  bool RemoveAllDrawables()
+  {
+    if (mDrawable)
+    {
+      return true;
+    }
+    return false;
   }
 
   Devel::PixelBuffer GetPixelBuffer()
@@ -84,10 +120,27 @@ public:
     return mSize;
   }
 
+  bool SetViewBox(const Vector2& viewBox)
+  {
+    mViewBox = viewBox;
+    // For negative test
+    if ( viewBox.width == -999 && viewBox.height == -999 )
+    {
+      return false;
+    }
+    return true;
+  }
+
+  const Vector2& GetViewBox()
+  {
+    return mViewBox;
+  }
 
 public:
+   Dali::CanvasRenderer::Drawable* mDrawable;
    Devel::PixelBuffer mPixelBuffer;
    Vector2 mSize;
+   Vector2 mViewBox;
 };
 
 inline CanvasRenderer& GetImplementation( Dali::CanvasRenderer& renderer )
@@ -138,6 +191,16 @@ bool CanvasRenderer::Commit()
   return Internal::Adaptor::GetImplementation(*this).Commit();
 }
 
+bool CanvasRenderer::IsCanvasChanged() const
+{
+  return Internal::Adaptor::GetImplementation(*this).IsCanvasChanged();
+}
+
+bool CanvasRenderer::Rasterize()
+{
+  return Internal::Adaptor::GetImplementation(*this).Rasterize();
+}
+
 Devel::PixelBuffer CanvasRenderer::GetPixelBuffer()
 {
   return Internal::Adaptor::GetImplementation(*this).GetPixelBuffer();
@@ -146,6 +209,16 @@ Devel::PixelBuffer CanvasRenderer::GetPixelBuffer()
 bool CanvasRenderer::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
 {
   return Internal::Adaptor::GetImplementation(*this).AddDrawable(drawable);
+}
+
+bool CanvasRenderer::RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
+{
+  return Internal::Adaptor::GetImplementation(*this).RemoveDrawable(drawable);
+}
+
+bool CanvasRenderer::RemoveAllDrawables()
+{
+  return Internal::Adaptor::GetImplementation(*this).RemoveAllDrawables();
 }
 
 bool CanvasRenderer::SetSize(const Vector2& size)
@@ -158,5 +231,14 @@ const Vector2& CanvasRenderer::GetSize()
   return Internal::Adaptor::GetImplementation(*this).GetSize();
 }
 
+bool CanvasRenderer::SetViewBox(const Vector2& viewBox)
+{
+  return Internal::Adaptor::GetImplementation(*this).SetViewBox(viewBox);
+}
+
+const Vector2& CanvasRenderer::GetViewBox()
+{
+  return Internal::Adaptor::GetImplementation(*this).GetViewBox();
+}
 
 } // namespace Dali

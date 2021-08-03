@@ -266,6 +266,17 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       case Toolkit::TextLabel::Property::TEXT:
       {
         impl.mController->SetText(value.Get<std::string>());
+
+        if(impl.mController->HasAnchors())
+        {
+          // Forward input events to controller
+          impl.EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+        }
+        else
+        {
+          impl.DisableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+        }
+
         break;
       }
       case Toolkit::TextLabel::Property::FONT_FAMILY:
@@ -318,6 +329,16 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       {
         const bool enableMarkup = value.Get<bool>();
         impl.mController->SetMarkupProcessorEnabled(enableMarkup);
+
+        if(impl.mController->HasAnchors())
+        {
+          // Forward input events to controller
+          impl.EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+        }
+        else
+        {
+          impl.DisableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
+        }
         break;
       }
       case Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL:
@@ -804,10 +825,6 @@ void TextLabel::OnInitialize()
 
   self.LayoutDirectionChangedSignal().Connect(this, &TextLabel::OnLayoutDirectionChanged);
 
-  // Forward input events to controller
-  EnableGestureDetection(static_cast<GestureType::Value>(GestureType::TAP));
-  GetTapGestureDetector().SetMaximumTapsRequired(1);
-
   Layout::Engine& engine = mController->GetLayoutEngine();
   engine.SetCursorWidth(0u); // Do not layout space for the cursor.
 
@@ -858,9 +875,6 @@ void TextLabel::OnTap(const TapGesture& gesture)
   padding                   = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
   const Vector2& localPoint = gesture.GetLocalPoint();
   mController->AnchorEvent(localPoint.x - padding.start, localPoint.y - padding.top);
-
-  // parents can also listen for tap gesture events
-  Dali::DevelActor::SetNeedGesturePropagation(Self(), true);
 }
 
 void TextLabel::AnchorClicked(const std::string& href)

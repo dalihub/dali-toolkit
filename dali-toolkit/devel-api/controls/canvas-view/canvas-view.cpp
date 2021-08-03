@@ -51,6 +51,12 @@ CanvasView::~CanvasView()
 {
 }
 
+CanvasView CanvasView::New()
+{
+  CanvasView canvasView = Internal::CanvasView::New(Vector2::ZERO);
+  return canvasView;
+}
+
 CanvasView CanvasView::New(const Vector2& viewBox)
 {
   CanvasView canvasView = Internal::CanvasView::New(viewBox);
@@ -65,6 +71,16 @@ CanvasView CanvasView::DownCast(BaseHandle handle)
 void CanvasView::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)
 {
   Dali::Toolkit::GetImpl(*this).AddDrawable(drawable);
+}
+
+bool CanvasView::RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable)
+{
+  return Dali::Toolkit::GetImpl(*this).RemoveDrawable(drawable);
+}
+
+void CanvasView::RemoveAllDrawables()
+{
+  Dali::Toolkit::GetImpl(*this).RemoveAllDrawables();
 }
 
 CanvasView::CanvasView(Internal::CanvasView& implementation)

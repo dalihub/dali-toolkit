@@ -33,10 +33,11 @@ namespace Dali
 {
 namespace Toolkit
 {
-class CanvasView;
-
 namespace Internal
 {
+class CanvasView;
+class CanvasViewRasterizeThread;
+
 class CanvasView : public Control, public Integration::Processor
 {
 public:
@@ -62,6 +63,32 @@ public:
    */
   bool AddDrawable(Dali::CanvasRenderer::Drawable& drawable);
 
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] propertyIndex The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value);
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] propertyIndex The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
+
+  /**
+   * @copydoc Toolkit::Control::CanvasView::RemoveDrawable
+   */
+  bool RemoveDrawable(Dali::CanvasRenderer::Drawable& drawable);
+
+  /**
+   * @copydoc Toolkit::Control::CanvasView::RemoveAllDrawables
+   */
+  bool RemoveAllDrawables();
+
 private: // From Control
   /**
    * @copydoc Control::OnRelayout
@@ -78,27 +105,50 @@ private: // From Control
    */
   void OnInitialize() override;
 
-protected: // Implementation of Processor
+  /**
+   * @brief This is the viewbox of the Canvas.
+   * @param[in] viewBox The size of viewbox.
+   * @return Returns True when it's successful. False otherwise.
+   */
+  bool SetViewBox(const Vector2& viewBox);
+
+  /**
+   * @brief This is the viewbox of the Canvas.
+   * @return Returns The size of viewbox.
+   */
+  const Vector2& GetViewBox();
+
+  /**
+   * @bried Rasterize the canvas, and add it to the view.
+   *
+   * @param[in] size The target size of the canvas view rasterization.
+   */
+  void AddRasterizationTask();
+
+protected:
   /**
    * @copydoc Dali::Integration::Processor::Process()
    */
   void Process(bool postProcessor) override;
 
-private:
+public:
   /**
-   * @brief Draw drawables added to CanvasView on inner canvas.
-   * Then make that buffer into a texture and add it to renderer.
+   * @bried Apply the rasterized image to the canvas view
+   *
+   * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
    */
-  void Commit();
+  void ApplyRasterizedImage(PixelData rasterizedPixelData);
 
 private:
   CanvasView(const CanvasView&) = delete;
   CanvasView& operator=(const CanvasView&) = delete;
 
 private:
-  CanvasRenderer mCanvasRenderer;
-  Dali::Texture  mTexture;
-  bool           mChanged;
+  CanvasRenderer             mCanvasRenderer;
+  Dali::Texture              mTexture;
+  TextureSet                 mTextureSet;
+  Vector2                    mSize;
+  CanvasViewRasterizeThread* mCanvasViewRasterizeThread;
 };
 
 } // namespace Internal
