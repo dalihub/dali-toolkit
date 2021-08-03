@@ -57,6 +57,27 @@ Window* Window::New(const PositionSize& positionSize, const std::string& name, c
   return new Window( positionSize );
 }
 
+WindowPosition Window::GetPosition() const
+{
+  PositionSize positionSize = mRenderSurface.GetPositionSize();
+
+  return WindowPosition(positionSize.x, positionSize.y);
+}
+
+PositionSize Window::GetPositionSize() const
+{
+  return mRenderSurface.GetPositionSize();
+}
+
+void Window::SetPositionSize(PositionSize positionSize)
+{
+  mRenderSurface.MoveResize(positionSize);
+
+  Uint16Pair newSize(positionSize.width, positionSize.height);
+  Dali::Window handle(this);
+  mResizeSignal.Emit(handle, newSize);
+}
+
 } // Adaptor
 } // Internal
 
@@ -204,8 +225,7 @@ Window DownCast( BaseHandle handle )
 
 void SetPositionSize(Window window, PositionSize positionSize)
 {
-  Uint16Pair newSize(positionSize.width, positionSize.height);
-  GetImplementation( window ).mResizeSignal.Emit(window,newSize);
+  GetImplementation( window ).SetPositionSize(positionSize);
 }
 
 int GetPhysicalOrientation(Window window)
