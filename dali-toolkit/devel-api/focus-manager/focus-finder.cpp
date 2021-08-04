@@ -37,6 +37,8 @@ namespace FocusFinder
 {
 namespace
 {
+static constexpr float FULLY_TRANSPARENT(0.01f); ///< Alpha values must rise above this, before an object is considered to be visible.
+
 static int MajorAxisDistanceRaw(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Rect<float> source, Dali::Rect<float> dest)
 {
   switch(direction)
@@ -340,6 +342,14 @@ bool IsBetterCandidate(Toolkit::Control::KeyboardFocus::Direction direction, Rec
                                                                                                MinorAxisDistance(direction, focusedRect, bestCandidateRect)));
 }
 
+bool IsFocusable(Actor& actor)
+{
+  return (actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
+          actor.GetProperty<bool>(Actor::Property::VISIBLE) &&
+          actor.GetProperty<bool>(Actor::Property::SENSITIVE) &&
+          actor.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a > FULLY_TRANSPARENT);
+}
+
 Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect, Rect<float>& bestCandidateRect, Toolkit::Control::KeyboardFocus::Direction direction)
 {
   Actor nearestActor;
@@ -350,7 +360,7 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect,
     for(auto i = 0u; i < childCount; ++i)
     {
       Dali::Actor child = actor.GetChildAt(i);
-      if(child && child != focusedActor && child.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+      if(child && child != focusedActor && IsFocusable(child))
       {
         Rect<float> candidateRect = DevelActor::CalculateScreenExtents(child);
 
