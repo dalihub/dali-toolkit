@@ -129,17 +129,15 @@ static int MinorAxisDistance(Dali::Toolkit::Control::KeyboardFocus::Direction di
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
       // the distance between the center verticals
-      return std::abs(
-        (((source.top + source.bottom) * 0.5f) -
-         (((dest.top + dest.bottom) * 0.5f))));
+      return std::abs((source.top + (source.bottom - source.top) * 0.5f) -
+                      (dest.top + (dest.bottom - dest.top) * 0.5f));
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
       // the distance between the center horizontals
-      return std::abs(
-        (((source.left + source.right) * 0.5f) -
-         (((dest.left + dest.right) * 0.5f))));
+      return std::abs((source.left + (source.right - source.left) * 0.5f) -
+                      (dest.left + (dest.right - dest.left) * 0.5f));
     }
     default:
     {
@@ -190,19 +188,19 @@ static bool IsCandidate(Dali::Rect<float> srcRect, Dali::Rect<float> destRect, D
   {
     case Dali::Toolkit::Control::KeyboardFocus::LEFT:
     {
-      return (srcRect.right > destRect.right || srcRect.left >= destRect.right) && srcRect.left > destRect.left;
+      return (srcRect.right > destRect.right || srcRect.left >= destRect.right);
     }
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
-      return (srcRect.left < destRect.left || srcRect.right <= destRect.left) && srcRect.right < destRect.right;
+      return (srcRect.left < destRect.left || srcRect.right <= destRect.left);
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     {
-      return (srcRect.bottom > destRect.bottom || srcRect.top >= destRect.bottom) && srcRect.top > destRect.top;
+      return (srcRect.bottom > destRect.bottom || srcRect.top >= destRect.bottom);
     }
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
-      return (srcRect.top < destRect.top || srcRect.bottom <= destRect.top) && srcRect.bottom < destRect.bottom;
+      return (srcRect.top < destRect.top || srcRect.bottom <= destRect.top);
     }
     default:
     {
