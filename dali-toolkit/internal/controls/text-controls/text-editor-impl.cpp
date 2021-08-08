@@ -153,11 +153,12 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsis",     
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsisPosition",                     INTEGER,   ELLIPSIS_POSITION                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "minLineSize",                          FLOAT,     MIN_LINE_SIZE                       )
 
-DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
-DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
-DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
-DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "anchorClicked",      SIGNAL_ANCHOR_CLICKED     )
-DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputFiltered",      SIGNAL_INPUT_FILTERED     )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "maxLengthReached",      SIGNAL_MAX_LENGTH_REACHED     )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "anchorClicked",         SIGNAL_ANCHOR_CLICKED         )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputFiltered",         SIGNAL_INPUT_FILTERED         )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "cursorPositionChanged", SIGNAL_CURSOR_POSITION_CHANGED)
 
 
 DALI_TYPE_REGISTRATION_END()
@@ -1313,6 +1314,11 @@ DevelTextEditor::AnchorClickedSignalType& TextEditor::AnchorClickedSignal()
   return mAnchorClickedSignal;
 }
 
+DevelTextEditor::CursorPositionChangedSignalType& TextEditor::CursorPositionChangedSignal()
+{
+  return mCursorPositionChangedSignal;
+}
+
 DevelTextEditor::InputFilteredSignalType& TextEditor::InputFilteredSignal()
 {
   return mInputFilteredSignal;
@@ -1352,6 +1358,14 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
     {
       Internal::TextEditor& editorImpl(GetImpl(editor));
       editorImpl.AnchorClickedSignal().Connect(tracker, functor);
+    }
+  }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_CURSOR_POSITION_CHANGED))
+  {
+    if(editor)
+    {
+      Internal::TextEditor& editorImpl(GetImpl(editor));
+      editorImpl.CursorPositionChangedSignal().Connect(tracker, functor);
     }
   }
   else if(0 == strcmp(signalName.c_str(), SIGNAL_INPUT_FILTERED))
@@ -1592,6 +1606,11 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
 
     RenderText(updateTextType);
+  }
+
+  if(mCursorPositionChanged)
+  {
+    EmitCursorPositionChangedSignal();
   }
 
   // The text-editor emits signals when the input style changes. These changes of style are
@@ -1854,11 +1873,17 @@ void TextEditor::TextDeleted(unsigned int position, unsigned int length, const s
   }
 }
 
-void TextEditor::CursorMoved(unsigned int position)
+void TextEditor::CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition)
 {
   if(Accessibility::IsUp())
   {
-    Control::Impl::GetAccessibilityObject(Self())->EmitTextCursorMoved(position);
+    Control::Impl::GetAccessibilityObject(Self())->EmitTextCursorMoved(newPosition);
+  }
+
+  if((oldPosition != newPosition) && !mCursorPositionChanged)
+  {
+    mCursorPositionChanged = true;
+    mOldPosition           = oldPosition;
   }
 }
 
@@ -1945,6 +1970,13 @@ void TextEditor::AnchorClicked(const std::string& href)
 {
   Dali::Toolkit::TextEditor handle(GetOwner());
   mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
+}
+
+void TextEditor::EmitCursorPositionChangedSignal()
+{
+  Dali::Toolkit::TextEditor handle(GetOwner());
+  mCursorPositionChanged = false;
+  mCursorPositionChangedSignal.Emit(handle, mOldPosition);
 }
 
 void TextEditor::InputFiltered(Toolkit::InputFilter::Property::Type type)
@@ -2230,7 +2262,8 @@ TextEditor::TextEditor()
   mScrollAnimationEnabled(false),
   mScrollBarEnabled(false),
   mScrollStarted(false),
-  mTextChanged(false)
+  mTextChanged(false),
+  mCursorPositionChanged(false)
 {
 }
 

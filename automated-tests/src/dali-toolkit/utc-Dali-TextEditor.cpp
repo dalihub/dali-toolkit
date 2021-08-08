@@ -140,6 +140,8 @@ static bool gInputFilteredAcceptedCallbackCalled;
 static bool gInputFilteredRejectedCallbackCalled;
 static bool gInputStyleChangedCallbackCalled;
 static bool gMaxCharactersCallBackCalled;
+static bool gCursorPositionChangedCallbackCalled;
+static uint32_t oldCursorPos;
 static Dali::Toolkit::TextEditor::InputStyle::Mask gInputStyleMask;
 
 struct CallbackFunctor
@@ -166,6 +168,14 @@ static void TestAnchorClickedCallback(TextEditor control, const char* href, unsi
   {
     gAnchorClickedCallBackCalled = true;
   }
+}
+
+static void TestCursorPositionChangedCallback( TextEditor control, unsigned int oldPos )
+{
+  tet_infoline(" TestCursorPositionChangedCallback");
+
+  gCursorPositionChangedCallbackCalled = true;
+  oldCursorPos = oldPos;
 }
 
 static void TestTextChangedCallback( TextEditor control )
@@ -4028,6 +4038,108 @@ int UtcDaliTextEditorMinLineSize(void)
 
   //60 * 3 lines
   DALI_TEST_EQUALS(180.0f, textEditor.GetNaturalSize().height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliTextEditorCursorPositionChangedSignal(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorCursorPositionChangedSignal");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextEditor::CursorPositionChangedSignal(editor).Connect(&TestCursorPositionChangedCallback);
+  bool cursorPositionChangedSignal = false;
+  editor.ConnectSignal( testTracker, "cursorPositionChanged",   CallbackFunctor(&cursorPositionChangedSignal) );
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  editor.SetKeyInputFocus();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 23, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  // Move to left.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 18, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  // Insert C
+  application.ProcessEvent( GenerateKey( "c", "", "c", KEY_C_CODE, 0, 0, Integration::KeyEvent::DOWN, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 17, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  //delete one character
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 18, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello" );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 17, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  editor.SetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 3);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 5, TEST_LOCATION);
 
   END_TEST;
 }

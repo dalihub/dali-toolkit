@@ -1260,6 +1260,7 @@ bool Controller::Impl::SetPrimaryCursorPosition(CharacterIndex index, bool focus
   }
 
   uint32_t length                    = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
+  uint32_t oldCursorPos              = mEventData->mPrimaryCursorPosition;
   mEventData->mPrimaryCursorPosition = std::min(index, length);
   // If there is no focus, only the value is updated.
   if(focused)
@@ -1269,6 +1270,12 @@ bool Controller::Impl::SetPrimaryCursorPosition(CharacterIndex index, bool focus
     mEventData->mUpdateCursorPosition                                        = true;
     ScrollTextToMatchCursor();
   }
+
+  if(nullptr != mEditableControlInterface)
+  {
+    mEditableControlInterface->CursorPositionChanged(oldCursorPos, mEventData->mPrimaryCursorPosition);
+  }
+
   return true;
 }
 

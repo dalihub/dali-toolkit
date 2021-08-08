@@ -35,6 +35,11 @@ AnchorClickedSignalType& AnchorClickedSignal(TextField textField)
   return GetImpl(textField).AnchorClickedSignal();
 }
 
+CursorPositionChangedSignalType& CursorPositionChangedSignal(TextField textField)
+{
+  return GetImpl(textField).CursorPositionChangedSignal();
+}
+
 InputFilteredSignalType& InputFilteredSignal(TextField textField)
 {
   return GetImpl(textField).InputFilteredSignal();
