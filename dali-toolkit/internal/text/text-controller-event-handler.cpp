@@ -81,6 +81,13 @@ void Controller::EventHandler::KeyboardFocusLostEvent(Controller& controller)
   {
     if(EventData::INTERRUPTED != controller.mImpl->mEventData->mState)
     {
+      // Init selection position
+      if(controller.mImpl->mEventData->mState == EventData::SELECTING)
+      {
+        controller.mImpl->mEventData->mLeftSelectionPosition  = controller.mImpl->mEventData->mPrimaryCursorPosition;
+        controller.mImpl->mEventData->mRightSelectionPosition = controller.mImpl->mEventData->mPrimaryCursorPosition;
+      }
+
       controller.mImpl->ChangeState(EventData::INACTIVE);
 
       if(!controller.mImpl->IsShowingRealText())
