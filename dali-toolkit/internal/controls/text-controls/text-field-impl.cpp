@@ -1176,6 +1176,15 @@ void TextField::SelectNone()
   }
 }
 
+void TextField::SelectText(const uint32_t start, const uint32_t end)
+{
+  if(mController && mController->IsShowingRealText())
+  {
+    mController->SelectText(start, end);
+    SetKeyInputFocus();
+  }
+}
+
 string TextField::GetSelectedText() const
 {
   string selectedText = "";

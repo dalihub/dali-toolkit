@@ -1822,6 +1822,11 @@ void Controller::SelectEvent(float x, float y, SelectionType selectType)
   EventHandler::SelectEvent(*this, x, y, selectType);
 }
 
+void Controller::SelectEvent(const uint32_t start, const uint32_t end, SelectionType selectType)
+{
+  EventHandler::SelectEvent(*this, start, end, selectType);
+}
+
 void Controller::SetTextSelectionRange(const uint32_t* start, const uint32_t* end)
 {
   if(mImpl->mEventData)
@@ -1870,6 +1875,11 @@ void Controller::SelectWholeText()
 void Controller::SelectNone()
 {
   SelectEvent(0.f, 0.f, SelectionType::NONE);
+}
+
+void Controller::SelectText(const uint32_t start, const uint32_t end)
+{
+  SelectEvent(start, end, SelectionType::RANGE);
 }
 
 string Controller::GetSelectedText() const

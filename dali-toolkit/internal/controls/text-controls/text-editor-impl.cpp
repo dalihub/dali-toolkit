@@ -1245,6 +1245,15 @@ void TextEditor::SelectNone()
   }
 }
 
+void TextEditor::SelectText(const uint32_t start, const uint32_t end)
+{
+  if(mController && mController->IsShowingRealText())
+  {
+    mController->SelectText(start, end);
+    SetKeyInputFocus();
+  }
+}
+
 void TextEditor::ScrollBy(Vector2 scroll)
 {
   if(mController && mController->IsShowingRealText())

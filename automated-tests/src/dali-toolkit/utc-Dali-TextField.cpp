@@ -3482,6 +3482,66 @@ int UtcDaliTextFieldSelectWholeText(void)
   END_TEST;
 }
 
+int UtcDaliTextFieldSelectText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldSelectText ");
+
+  TextField textField = TextField::New();
+
+  application.GetScene().Add( textField );
+
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  DevelTextField::SelectText( textField, 0, 5 );
+
+  application.SendNotification();
+  application.Render();
+
+  // Nothing is selected
+  std::string selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "", selectedText, TEST_LOCATION );
+
+  textField.SetProperty( TextField::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  // Hello is selected
+  DevelTextField::SelectText( textField, 0, 5 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "Hello", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 5, TEST_LOCATION );
+
+  // world is selected
+  DevelTextField::SelectText( textField, 6, 11 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "world", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 6, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 11, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliTextFieldSelectNone(void)
 {
   ToolkitTestApplication application;

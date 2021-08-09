@@ -52,9 +52,10 @@ class RenderingController;
    */
 enum SelectionType
 {
-  INTERACTIVE = 0x0000,
-  ALL         = 0x0001,
-  NONE        = 0x0002
+  INTERACTIVE = 0x0000, ///< Select the word where the cursor is located.
+  ALL         = 0x0001, ///< Select the whole text.
+  NONE        = 0x0002, ///< Unselect the whole text.
+  RANGE       = 0x0003  ///< Select the range text.
 };
 
 typedef IntrusivePtr<Controller> ControllerPtr;
@@ -1605,6 +1606,18 @@ public: // Text-input Event Queuing.
   void SelectEvent(float x, float y, SelectionType selection);
 
   /**
+   * @brief Creates a selection event with a selection index.
+   *
+   * It could be called from the SelectText().
+   * The start and end parameters are passed through the event.
+   *
+   * @param[in] start The start selection position.
+   * @param[in] end The end selection position.
+   * @param[in] selection type like the range.
+   */
+  void SelectEvent(const uint32_t start, const uint32_t end, SelectionType selection);
+
+  /**
    * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
    */
   void SetTextSelectionRange(const uint32_t* start, const uint32_t* end);
@@ -1623,6 +1636,11 @@ public: // Text-input Event Queuing.
    * @copydoc Text::SelectableControlInterface::SelectNone()
    */
   void SelectNone();
+
+  /**
+   * @copydoc Text::SelectableControlInterface::SelectText()
+   */
+  void SelectText(const uint32_t start, const uint32_t end);
 
   /**
    * @copydoc Text::SelectableControlInterface::GetSelectedText()

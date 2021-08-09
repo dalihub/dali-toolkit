@@ -273,6 +273,11 @@ public:
   void SelectNone() override;
 
   /**
+   * @copydoc Text::SelectableControlInterface::SelectText()
+   */
+  void SelectText(const uint32_t start, const uint32_t end) override;
+
+  /**
    * @copydoc Dali::Toolkit::DevelTextEditor::ScrollBy()
    */
   void ScrollBy(Vector2 Scroll);

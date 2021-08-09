@@ -61,6 +61,13 @@ public:
   virtual void SelectNone() = 0;
 
   /**
+   * @brief Called to set the selection postions in the texts.
+   * @param start start selection position.
+   * @param end end selection position.
+   */
+  virtual void SelectText(const uint32_t start, const uint32_t end) = 0;
+
+  /**
    * @brief Retrive Selected text.
    * @return The seletced text.
    */
