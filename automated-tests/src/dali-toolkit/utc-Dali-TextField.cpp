@@ -3675,6 +3675,7 @@ int UtcDaliTextFieldPrimaryCursorPosition(void)
   textField.SetProperty( DevelTextField::Property::PRIMARY_CURSOR_POSITION, 3);
   application.SendNotification();
   application.Render();
+  textField.SetKeyInputFocus();
 
   application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
