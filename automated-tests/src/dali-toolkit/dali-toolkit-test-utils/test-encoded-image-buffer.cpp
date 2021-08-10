@@ -33,8 +33,9 @@ EncodedImageBuffer ConvertFileToEncodedImageBuffer(const char* url)
     Dali::Vector<uint8_t> data;
     data.Resize(size);
     fseek(fp, 0, SEEK_SET);
-    fread(data.Begin(), size, sizeof(uint8_t), fp);
+    size_t realSize = fread(data.Begin(), sizeof(uint8_t), size, fp);
     fclose(fp);
+    data.Resize(realSize);
     buffer = EncodedImageBuffer::New(data);
   }
   return buffer;
