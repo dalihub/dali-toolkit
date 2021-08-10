@@ -64,7 +64,7 @@ enum Type
   OPACITY             = Dali::Toolkit::Visual::Property::OPACITY,
 
   /**
-   * @brief The fitting mode of the visual
+   * @brief The fitting mode of the visual.
    * @details Name "fittingMode", type FittingMode (Property::INTEGER) or Property::STRING.
    * @see DevelVisual::FittingMode
    * @note The default is defined by the type of visual (if it's suitable to be stretched or not).
@@ -72,12 +72,12 @@ enum Type
   VISUAL_FITTING_MODE = OPACITY + 1,
 
   /**
-   * @brief The radius for the rounded corners of the visual
+   * @brief The radius for the rounded corners of the visual.
    * @details Name "cornerRadius", type Property::FLOAT or Prooperty::VECTOR4, animatable
    * @note By default, it is Vector::ZERO.
    * @note Only Property::Vector4 can be animated.
    * @note Each radius will clamp internally to the half of smaller of the visual width and visual height.
-   * @note Their may exist some alias when you use it as ClippingMode::CLIP_CHILDREN
+   * @note Their may exist some alias when you use it as ClippingMode::CLIP_CHILDREN.
    * @note Radius value are used in clockwise order from top-left-corner to bottom-left-corner.
    *       When radius is Vector4(x, y, z, w)
    *       x    y
@@ -89,7 +89,7 @@ enum Type
   CORNER_RADIUS = OPACITY + 2,
 
   /**
-   * @brief Whether the corner radius value is relative (percentage [0.0f to 1.0f] of the visual size) or absolute (in world units).
+   * @brief Whether the corner radius value is relative (percentage [0.0f to 0.5f] of the visual size) or absolute (in world units).
    * @details Name "cornerRadiusPolicy", type Property::INTEGER.
    * @see Policy::Type
    * @note By default, it is ABSOLUTE to the visual's size.
@@ -98,16 +98,17 @@ enum Type
   CORNER_RADIUS_POLICY = OPACITY + 3,
 
   /**
-   * @brief The width for the borderline of the visual
+   * @brief The width for the borderline of the visual.
    * @details Name "borderlineWidth", type Property::FLOAT, animatable
    * @note Optional. Default value is 0.0f.
    */
   BORDERLINE_WIDTH = OPACITY + 4,
 
   /**
-   * @brief The color for the borderline of the visual
+   * @brief The color for the borderline of the visual.
    * @details Name "borderlineColor", type Property::VECTOR4, animatable
-   * @note Default value is Color::BLACK
+   * @note Default value is Color::BLACK.
+   * @note This color is affected by opacity.
    */
   BORDERLINE_COLOR = OPACITY + 5,
 
