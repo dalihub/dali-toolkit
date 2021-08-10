@@ -752,7 +752,7 @@ void TextField::SetProperty(BaseObject* object, Property::Index index, const Pro
       {
         uint32_t position = static_cast<uint32_t>(value.Get<int>());
         DALI_LOG_INFO(gLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_POSITION %d\n", impl.mController.Get(), position);
-        if(impl.mController->SetPrimaryCursorPosition(position))
+        if(impl.mController->SetPrimaryCursorPosition(position, impl.HasKeyInputFocus()))
         {
           impl.SetKeyInputFocus();
         }
@@ -1173,6 +1173,15 @@ void TextField::SelectNone()
   if(mController && mController->IsShowingRealText())
   {
     mController->SelectNone();
+  }
+}
+
+void TextField::SelectText(const uint32_t start, const uint32_t end)
+{
+  if(mController && mController->IsShowingRealText())
+  {
+    mController->SelectText(start, end);
+    SetKeyInputFocus();
   }
 }
 

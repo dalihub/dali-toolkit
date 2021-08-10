@@ -45,6 +45,7 @@ struct Controller::EventHandler
   static void PanEvent(Controller& controller, GestureState state, const Vector2& displacement);
   static void LongPressEvent(Controller& controller, GestureState state, float x, float y);
   static void SelectEvent(Controller& controller, float x, float y, SelectionType selectType);
+  static void SelectEvent(Controller& controller, const uint32_t start, const uint32_t end, SelectionType selectType);
   static void ProcessModifyEvents(Controller& controller);
   static void TextReplacedEvent(Controller& controller);
   static void TextInsertedEvent(Controller& controller);

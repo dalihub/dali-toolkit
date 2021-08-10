@@ -4,6 +4,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-impl.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
@@ -694,17 +695,24 @@ int UtcDaliAccessibilityGrabFocus(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityGetExtents(void)
+int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionMatch(void)
 {
   ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAccessibilityGetExtentsScreenAndWindowPositionMatch" );
 
   Dali::Accessibility::TestEnableSC( true );
 
   auto control = Control::New();
   Stage::GetCurrent().GetRootLayer().Add( control );
 
-  control.SetProperty(Actor::Property::POSITION, Vector3(10, 10, 100));
-  control.SetProperty(Actor::Property::SIZE, Vector2(10, 10));
+  auto window = Dali::DevelWindow::Get( control );
+  DALI_TEST_CHECK( window );
+
+  //window.SetPosition({0,0});
+  DevelWindow::SetPositionSize( window, PositionSize( 0,0,480, 240 ) );
+
+  control.SetProperty( Actor::Property::POSITION, Vector3( 10, 10, 100 ) );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 10, 10 ) );
 
   application.SendNotification();
   application.Render( 1 );
@@ -712,13 +720,25 @@ int UtcDaliAccessibilityGetExtents(void)
   auto a = Dali::Accessibility::Accessible::Get( control );
   auto a_component = dynamic_cast<Dali::Accessibility::Component*>( a );
 
-  auto extents = a_component->GetExtents(Dali::Accessibility::CoordinateType::SCREEN);
+  auto extents = a_component->GetExtents( Dali::Accessibility::CoordinateType::SCREEN );
   DALI_TEST_EQUALS( extents.x, 5.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( extents.y, 5.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( extents.height, 10.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( extents.width, 10.0f, TEST_LOCATION );
 
-  auto bridge_extents = TestGetExtents( a_component -> GetAddress() );
+  auto bridge_extents = TestGetExtents( a_component -> GetAddress(), Dali::Accessibility::CoordinateType::SCREEN );
+  DALI_TEST_EQUALS( std::get< 0 >( bridge_extents ), 5, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 1 >( bridge_extents ), 5, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 2 >( bridge_extents ), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 3 >( bridge_extents ), 10, TEST_LOCATION );
+
+  extents = a_component->GetExtents( Dali::Accessibility::CoordinateType::WINDOW );
+  DALI_TEST_EQUALS( extents.x, 5.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.y, 5.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.height, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.width, 10.0f, TEST_LOCATION );
+
+  bridge_extents = TestGetExtents( a_component -> GetAddress(), Dali::Accessibility::CoordinateType::WINDOW );
   DALI_TEST_EQUALS( std::get< 0 >( bridge_extents ), 5, TEST_LOCATION );
   DALI_TEST_EQUALS( std::get< 1 >( bridge_extents ), 5, TEST_LOCATION );
   DALI_TEST_EQUALS( std::get< 2 >( bridge_extents ), 10, TEST_LOCATION );
@@ -728,13 +748,103 @@ int UtcDaliAccessibilityGetExtents(void)
   application.SendNotification();
   application.Render( 1 );
 
-  extents = a_component->GetExtents(Dali::Accessibility::CoordinateType::SCREEN);
+  extents = a_component->GetExtents( Dali::Accessibility::CoordinateType::SCREEN );
   DALI_TEST_EQUALS( extents.x, 10.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( extents.y, 10.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( extents.height, 10.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( extents.width, 10.0f, TEST_LOCATION );
 
-  bridge_extents = TestGetExtents( a_component -> GetAddress() );
+  bridge_extents = TestGetExtents( a_component -> GetAddress(), Dali::Accessibility::CoordinateType::SCREEN );
+  DALI_TEST_EQUALS( std::get< 0 >( bridge_extents ), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 1 >( bridge_extents ), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 2 >( bridge_extents ), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 3 >( bridge_extents ), 10, TEST_LOCATION );
+
+  extents = a_component->GetExtents( Dali::Accessibility::CoordinateType::WINDOW );
+  DALI_TEST_EQUALS( extents.x, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.y, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.height, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.width, 10.0f, TEST_LOCATION );
+
+  bridge_extents = TestGetExtents( a_component -> GetAddress(), Dali::Accessibility::CoordinateType::WINDOW );
+  DALI_TEST_EQUALS( std::get< 0 >( bridge_extents ), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 1 >( bridge_extents ), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 2 >( bridge_extents ), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 3 >( bridge_extents ), 10, TEST_LOCATION );
+
+  Dali::Accessibility::TestEnableSC( false );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityGetExtentsScreenAndWindowPositionDoNotMatch(void)
+{
+  ToolkitTestApplication application;
+
+  Dali::Accessibility::TestEnableSC( true );
+
+  auto control = Control::New();
+  Stage::GetCurrent().GetRootLayer().Add( control );
+  auto window = Dali::DevelWindow::Get( control );
+  //window.SetPosition({33,33});
+  DevelWindow::SetPositionSize( window, PositionSize( 33,33,480, 240 ) );
+
+  control.SetProperty( Actor::Property::POSITION, Vector3( 10, 10, 100 ) );
+  control.SetProperty( Actor::Property::SIZE, Vector2( 10, 10 ) );
+
+  application.SendNotification();
+  application.Render( 1 );
+
+  auto a = Dali::Accessibility::Accessible::Get( control );
+  auto a_component = dynamic_cast<Dali::Accessibility::Component*>( a );
+
+  auto extents = a_component->GetExtents( Dali::Accessibility::CoordinateType::SCREEN );
+  DALI_TEST_EQUALS( extents.x, 38.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.y, 38.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.height, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.width, 10.0f, TEST_LOCATION );
+
+  auto bridge_extents = TestGetExtents( a_component -> GetAddress(), Dali::Accessibility::CoordinateType::SCREEN );
+  DALI_TEST_EQUALS( std::get< 0 >( bridge_extents ), 38, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 1 >( bridge_extents ), 38, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 2 >( bridge_extents ), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 3 >( bridge_extents ), 10, TEST_LOCATION );
+
+  extents = a_component->GetExtents( Dali::Accessibility::CoordinateType::WINDOW );
+  DALI_TEST_EQUALS( extents.x, 5.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.y, 5.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.height, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.width, 10.0f, TEST_LOCATION );
+
+  bridge_extents = TestGetExtents( a_component -> GetAddress(), Dali::Accessibility::CoordinateType::WINDOW );
+  DALI_TEST_EQUALS( std::get< 0 >( bridge_extents ), 5, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 1 >( bridge_extents ), 5, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 2 >( bridge_extents ), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 3 >( bridge_extents ), 10, TEST_LOCATION );
+
+  control.SetProperty( Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT, false );
+  application.SendNotification();
+  application.Render( 1 );
+
+  extents = a_component->GetExtents( Dali::Accessibility::CoordinateType::SCREEN );
+  DALI_TEST_EQUALS( extents.x, 43.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.y, 43.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.height, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.width, 10.0f, TEST_LOCATION );
+
+  bridge_extents = TestGetExtents( a_component -> GetAddress(), Dali::Accessibility::CoordinateType::SCREEN );
+  DALI_TEST_EQUALS( std::get< 0 >( bridge_extents ), 43, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 1 >( bridge_extents ), 43, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 2 >( bridge_extents ), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( std::get< 3 >( bridge_extents ), 10, TEST_LOCATION );
+
+  extents = a_component->GetExtents( Dali::Accessibility::CoordinateType::WINDOW );
+  DALI_TEST_EQUALS( extents.x, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.y, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.height, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( extents.width, 10.0f, TEST_LOCATION );
+
+  bridge_extents = TestGetExtents( a_component -> GetAddress(), Dali::Accessibility::CoordinateType::WINDOW );
   DALI_TEST_EQUALS( std::get< 0 >( bridge_extents ), 10, TEST_LOCATION );
   DALI_TEST_EQUALS( std::get< 1 >( bridge_extents ), 10, TEST_LOCATION );
   DALI_TEST_EQUALS( std::get< 2 >( bridge_extents ), 10, TEST_LOCATION );
@@ -1060,24 +1170,25 @@ int UtcDaliAccessibilityCheckHighlight(void)
 
   // Make precondition two children exist in parent area
   PushButton parentButton = PushButton::New();
+  parentButton.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   parentButton.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   parentButton.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  parentButton.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f) );
-  parentButton.SetProperty( Dali::Actor::Property::SIZE, Dali::Vector2(100.0f, 200.0f) );
+  parentButton.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
+  parentButton.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 200.0f));
   application.GetScene().Add( parentButton );
 
   PushButton buttonA = PushButton::New();
   buttonA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   buttonA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  buttonA.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f) );
-  buttonA.SetProperty( Dali::Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f) );
+  buttonA.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 0.0f));
+  buttonA.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f));
   parentButton.Add(buttonA);
 
   PushButton buttonB = PushButton::New();
   buttonB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   buttonB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  buttonB.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, 100.0f) );
-  buttonB.SetProperty( Dali::Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f) );
+  buttonB.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, 100.0f));
+  buttonB.SetProperty(Actor::Property::SIZE, Dali::Vector2(100.0f, 100.0f));
   parentButton.Add(buttonB);
   Wait(application);
 
@@ -1088,9 +1199,9 @@ int UtcDaliAccessibilityCheckHighlight(void)
   Wait(application);
 
   // Move first child (A) out of parent area through the parent's area top edge - single move outed event expected for A object and OUTGOING_TOP_LEFT direction
-  buttonA.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, -200.0f) );
+  buttonA.SetProperty(Actor::Property::POSITION, Dali::Vector2(0.0f, -200.0f));
   Wait(application);
-  // Need one more seding notificaiton to get correct updated position
+  // Need one more notificaiton to get correct updated position
   application.SendNotification();
   DALI_TEST_EQUALS( true, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
 
@@ -1100,7 +1211,7 @@ int UtcDaliAccessibilityCheckHighlight(void)
   // Move first child (A) outside of parent area (both start and end position are outside of parent area) - no move outed event expected for A object
   buttonA.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, -300.0f) );
   Wait(application);
-  // Need one more seding notificaiton to get correct updated position
+  // Need one more notificaiton to get correct updated position
   application.SendNotification();
   DALI_TEST_EQUALS( false, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
 
@@ -1117,7 +1228,7 @@ int UtcDaliAccessibilityCheckHighlight(void)
   // B: (0,100) --> (0, 50)
   buttonB.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(0.0f, 50.0f) );
   Wait(application);
-  // Need one more seding notificaiton to get correct updated position
+  // Need one more notificaiton to get correct updated position
   application.SendNotification();
   DALI_TEST_EQUALS( false, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
 
@@ -1125,9 +1236,9 @@ int UtcDaliAccessibilityCheckHighlight(void)
   Dali::Accessibility::TestResetMoveOutedCalled();
 
   // Move second child (B) out of parent area through the parent's area right edge - single move outed event expected for B object and OUTGOING_BOTTOM_RIGHT direction
-  buttonB.SetProperty( Dali::Actor::Property::POSITION, Dali::Vector2(300.0f, 100.0f) );
+  buttonB.SetProperty(Actor::Property::POSITION, Dali::Vector2(300.0f, 100.0f));
   Wait(application);
-  // Need one more seding notificaiton to get correct updated position
+  // Need one more notificaiton to get correct updated position
   application.SendNotification();
   DALI_TEST_EQUALS( true, Dali::Accessibility::TestGetMoveOutedCalled(), TEST_LOCATION );
 

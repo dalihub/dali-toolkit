@@ -81,6 +81,13 @@ void Controller::EventHandler::KeyboardFocusLostEvent(Controller& controller)
   {
     if(EventData::INTERRUPTED != controller.mImpl->mEventData->mState)
     {
+      // Init selection position
+      if(controller.mImpl->mEventData->mState == EventData::SELECTING)
+      {
+        controller.mImpl->mEventData->mLeftSelectionPosition  = controller.mImpl->mEventData->mPrimaryCursorPosition;
+        controller.mImpl->mEventData->mRightSelectionPosition = controller.mImpl->mEventData->mPrimaryCursorPosition;
+      }
+
       controller.mImpl->ChangeState(EventData::INACTIVE);
 
       if(!controller.mImpl->IsShowingRealText())
@@ -519,6 +526,27 @@ void Controller::EventHandler::SelectEvent(Controller& controller, float x, floa
       Event event(Event::SELECT);
       event.p2.mFloat = x;
       event.p3.mFloat = y;
+      controller.mImpl->mEventData->mEventQueue.push_back(event);
+    }
+
+    controller.mImpl->mEventData->mCheckScrollAmount     = true;
+    controller.mImpl->mEventData->mIsLeftHandleSelected  = true;
+    controller.mImpl->mEventData->mIsRightHandleSelected = true;
+    controller.mImpl->RequestRelayout();
+  }
+}
+
+void Controller::EventHandler::SelectEvent(Controller& controller, const uint32_t start, const uint32_t end, SelectionType selectType)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::SelectEvent\n");
+
+  if(NULL != controller.mImpl->mEventData)
+  {
+    if(selectType == SelectionType::RANGE)
+    {
+      Event event(Event::SELECT_RANGE);
+      event.p2.mUint = start;
+      event.p3.mUint = end;
       controller.mImpl->mEventData->mEventQueue.push_back(event);
     }
 

@@ -475,6 +475,9 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   // Sets some text.
   controller->SetText( "Hello world" );
 
+  // When the TextSelectionPopup is active, the controller has focus.
+  controller->KeyboardFocusGainEvent();
+
   // Select the whole text.
   button = PushButton::DownCast( textPopup.FindChildByName( OPTION_SELECT_ALL ) );
   DALI_TEST_CHECK( button );

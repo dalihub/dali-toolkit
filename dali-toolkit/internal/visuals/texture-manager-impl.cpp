@@ -1419,8 +1419,16 @@ void TextureManager::AsyncLoadingHelper::Load(TextureId                         
                                               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id                             = GetImplementation(mLoader).Load(url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
-  mLoadingInfoContainer.back().loadId = id;
+  if(DALI_UNLIKELY(url.IsBufferResource()))
+  {
+    auto id                             = GetImplementation(mLoader).LoadEncodedImageBuffer(mTextureManager.GetEncodedImageBuffer(url.GetUrl()), desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
+    mLoadingInfoContainer.back().loadId = id;
+  }
+  else
+  {
+    auto id                             = GetImplementation(mLoader).Load(url, desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
+    mLoadingInfoContainer.back().loadId = id;
+  }
 }
 
 void TextureManager::AsyncLoadingHelper::ApplyMask(TextureId                                textureId,

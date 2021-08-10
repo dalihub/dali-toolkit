@@ -3242,6 +3242,65 @@ int UtcDaliTextEditorSelectWholeText(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorSelectText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorSelectText ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add( textEditor );
+
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textEditor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textEditor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  DevelTextEditor::SelectText( textEditor ,0, 5 );
+
+  application.SendNotification();
+  application.Render();
+
+  // Nothing is selected
+  std::string selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "", selectedText, TEST_LOCATION );
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  DevelTextEditor::SelectText( textEditor, 0, 5 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "Hello", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 5, TEST_LOCATION );
+
+  // world is selected
+  DevelTextEditor::SelectText( textEditor, 6, 11 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "world", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_START ).Get<int>(), 6, TEST_LOCATION );
+  DALI_TEST_EQUALS( textEditor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT_END ).Get<int>(), 11, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliTextEditorSelectNone(void)
 {
   ToolkitTestApplication application;
@@ -3465,6 +3524,7 @@ int UtcDaliTextEditorPrimaryCursorPosition(void)
   textEditor.SetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 3);
   application.SendNotification();
   application.Render();
+  textEditor.SetKeyInputFocus();
 
   application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 

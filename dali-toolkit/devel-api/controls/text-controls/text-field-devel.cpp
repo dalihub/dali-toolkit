@@ -50,6 +50,11 @@ void SelectNone(TextField textField)
   GetImpl(textField).SelectNone();
 }
 
+void SelectText(TextField textField, const uint32_t start, const uint32_t end)
+{
+  GetImpl(textField).SelectText(start, end);
+}
+
 } // namespace DevelTextField
 
 } // namespace Toolkit

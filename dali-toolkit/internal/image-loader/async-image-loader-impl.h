@@ -62,6 +62,23 @@ public:
                 DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**
+   * @brief Starts an image loading task by encoded image buffer.
+   * @param[in] encodedImageBuffer The encoded buffer of the image to load
+   * @param[in] dimensions The width and height to fit the loaded image to
+   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
+   * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
+   * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
+   * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha.
+   * @return The loading task id
+   */
+  uint32_t LoadEncodedImageBuffer(const EncodedImageBuffer&                encodedImageBuffer,
+                                  ImageDimensions                          dimensions,
+                                  FittingMode::Type                        fittingMode,
+                                  SamplingMode::Type                       samplingMode,
+                                  bool                                     orientationCorrection,
+                                  DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
+
+  /**
    * @brief Starts an mask applying task.
    * @param[in] pixelBuffer of the to be masked image
    * @param[in] maskPixelBuffer of the mask image

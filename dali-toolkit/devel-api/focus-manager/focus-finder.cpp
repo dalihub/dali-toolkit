@@ -37,6 +37,8 @@ namespace FocusFinder
 {
 namespace
 {
+static constexpr float FULLY_TRANSPARENT(0.01f); ///< Alpha values must rise above this, before an object is considered to be visible.
+
 static int MajorAxisDistanceRaw(Dali::Toolkit::Control::KeyboardFocus::Direction direction, Dali::Rect<float> source, Dali::Rect<float> dest)
 {
   switch(direction)
@@ -127,17 +129,15 @@ static int MinorAxisDistance(Dali::Toolkit::Control::KeyboardFocus::Direction di
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
       // the distance between the center verticals
-      return std::abs(
-        (((source.top + source.bottom) * 0.5f) -
-         (((dest.top + dest.bottom) * 0.5f))));
+      return std::abs((source.top + (source.bottom - source.top) * 0.5f) -
+                      (dest.top + (dest.bottom - dest.top) * 0.5f));
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
       // the distance between the center horizontals
-      return std::abs(
-        (((source.left + source.right) * 0.5f) -
-         (((dest.left + dest.right) * 0.5f))));
+      return std::abs((source.left + (source.right - source.left) * 0.5f) -
+                      (dest.left + (dest.right - dest.left) * 0.5f));
     }
     default:
     {
@@ -188,19 +188,19 @@ static bool IsCandidate(Dali::Rect<float> srcRect, Dali::Rect<float> destRect, D
   {
     case Dali::Toolkit::Control::KeyboardFocus::LEFT:
     {
-      return (srcRect.right > destRect.right || srcRect.left >= destRect.right) && srcRect.left > destRect.left;
+      return (srcRect.right > destRect.right || srcRect.left >= destRect.right);
     }
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
-      return (srcRect.left < destRect.left || srcRect.right <= destRect.left) && srcRect.right < destRect.right;
+      return (srcRect.left < destRect.left || srcRect.right <= destRect.left);
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     {
-      return (srcRect.bottom > destRect.bottom || srcRect.top >= destRect.bottom) && srcRect.top > destRect.top;
+      return (srcRect.bottom > destRect.bottom || srcRect.top >= destRect.bottom);
     }
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
-      return (srcRect.top < destRect.top || srcRect.bottom <= destRect.top) && srcRect.bottom < destRect.bottom;
+      return (srcRect.top < destRect.top || srcRect.bottom <= destRect.top);
     }
     default:
     {
@@ -340,6 +340,14 @@ bool IsBetterCandidate(Toolkit::Control::KeyboardFocus::Direction direction, Rec
                                                                                                MinorAxisDistance(direction, focusedRect, bestCandidateRect)));
 }
 
+bool IsFocusable(Actor& actor)
+{
+  return (actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) &&
+          actor.GetProperty<bool>(Actor::Property::VISIBLE) &&
+          actor.GetProperty<bool>(Actor::Property::SENSITIVE) &&
+          actor.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a > FULLY_TRANSPARENT);
+}
+
 Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect, Rect<float>& bestCandidateRect, Toolkit::Control::KeyboardFocus::Direction direction)
 {
   Actor nearestActor;
@@ -350,7 +358,7 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect,
     for(auto i = 0u; i < childCount; ++i)
     {
       Dali::Actor child = actor.GetChildAt(i);
-      if(child && child != focusedActor && child.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
+      if(child && child != focusedActor && IsFocusable(child))
       {
         Rect<float> candidateRect = DevelActor::CalculateScreenExtents(child);
 

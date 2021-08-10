@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.0.37
+Version:    2.0.38
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -100,12 +100,6 @@ Requires:   %{dali2_scene_loader} = %{version}-%{release}
 %description -n %{dali2_scene_loader}-devel
 Development components for dali-scene-loader.
 
-##############################
-# Preparation
-##############################
-%prep
-%setup -q
-
 %define dali_data_rw_dir            %TZ_SYS_SHARE/dali/
 %define dali_data_ro_dir            %TZ_SYS_RO_SHARE/dali/
 
@@ -116,6 +110,16 @@ Development components for dali-scene-loader.
 
 %define dali_xml_file_dir     %TZ_SYS_RO_PACKAGES
 
+##############################
+# Preparation
+##############################
+%prep
+%setup -q
+
+##############################
+# Build
+##############################
+%build
 # PO
 {
 cd %{_builddir}/dali2-toolkit-%{version}/dali-toolkit/po
@@ -126,10 +130,6 @@ do
 done
 } &> /dev/null
 
-##############################
-# Build
-##############################
-%build
 PREFIX="/usr"
 CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
 LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -Wl,-Bsymbolic-functions "
