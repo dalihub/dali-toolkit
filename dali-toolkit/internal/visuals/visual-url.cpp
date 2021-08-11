@@ -20,10 +20,6 @@
 // EXTERNAL HEADERS
 #include <cstring> // for toupper()
 
-// INTERNAL HEADERS
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
-
 namespace Dali
 {
 namespace Toolkit
@@ -228,14 +224,6 @@ VisualUrl::VisualUrl(const std::string& url)
       // TEXTURE and BUFFER location url doesn't need type resolving, REGULAR_IMAGE is fine
       mType = ResolveType(url);
     }
-    else
-    {
-      Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
-      if(factory)
-      {
-        GetImplementation(factory).GetTextureManager().UseExternalResource(*this);
-      }
-    }
   }
 }
 
@@ -244,69 +232,19 @@ VisualUrl::VisualUrl(const VisualUrl& url)
   mType(url.mType),
   mLocation(url.mLocation)
 {
-  if(VisualUrl::TEXTURE == mLocation || VisualUrl::BUFFER == mLocation)
-  {
-    Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
-    if(factory)
-    {
-      GetImplementation(factory).GetTextureManager().UseExternalResource(*this);
-    }
-  }
 }
 
 VisualUrl::~VisualUrl()
 {
-  if(VisualUrl::TEXTURE == mLocation)
-  {
-    Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
-    if(factory)
-    {
-      GetImplementation(factory).GetTextureManager().RemoveExternalTexture(mUrl);
-    }
-  }
-  else if(VisualUrl::BUFFER == mLocation)
-  {
-    Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
-    if(factory)
-    {
-      GetImplementation(factory).GetTextureManager().RemoveExternalEncodedImageBuffer(mUrl);
-    }
-  }
 }
 
 VisualUrl& VisualUrl::operator=(const VisualUrl& url)
 {
   if(&url != this)
   {
-    if(VisualUrl::TEXTURE == mLocation)
-    {
-      Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
-      if(factory)
-      {
-        GetImplementation(factory).GetTextureManager().RemoveExternalTexture(mUrl);
-      }
-    }
-    else if(VisualUrl::BUFFER == mLocation)
-    {
-      Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
-      if(factory)
-      {
-        GetImplementation(factory).GetTextureManager().RemoveExternalEncodedImageBuffer(mUrl);
-      }
-    }
-
     mUrl      = url.mUrl;
     mType     = url.mType;
     mLocation = url.mLocation;
-
-    if(VisualUrl::TEXTURE == mLocation || VisualUrl::BUFFER == mLocation)
-    {
-      Toolkit::VisualFactory factory = Toolkit::VisualFactory::Get();
-      if(factory)
-      {
-        GetImplementation(factory).GetTextureManager().UseExternalResource(*this);
-      }
-    }
   }
   return *this;
 }
