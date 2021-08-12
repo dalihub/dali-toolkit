@@ -125,7 +125,7 @@ public:
 
   /**
    * @brief Retrieves direction to be used to move target Control
-   * 
+   *
    * @note The direction is normalized Vector.
    */
   Vector2 GetDirection() const;

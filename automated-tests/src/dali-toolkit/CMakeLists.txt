@@ -35,6 +35,7 @@ SET(TC_SOURCES
   utc-Dali-ScrollView.cpp
   utc-Dali-ShaderEffects.cpp
   utc-Dali-ShadowView.cpp
+  utc-Dali-ScaleTransition.cpp
   utc-Dali-SlideTransition.cpp
   utc-Dali-Slider.cpp
   utc-Dali-TableView.cpp
