@@ -111,10 +111,8 @@ void Controller::PlaceholderHandler::SetPlaceholderFontFamily(Controller& contro
 {
   if(NULL != controller.mImpl->mEventData)
   {
-    if(NULL == controller.mImpl->mEventData->mPlaceholderFont)
-    {
-      controller.mImpl->mEventData->mPlaceholderFont = new FontDefaults();
-    }
+    // if mPlaceholderFont is null, create an instance.
+    CreatePlaceholderFont(controller);
 
     controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.family = placeholderTextFontFamily;
     DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetPlaceholderFontFamily %s\n", placeholderTextFontFamily.c_str());
@@ -138,10 +136,8 @@ void Controller::PlaceholderHandler::SetPlaceholderTextFontWeight(Controller& co
 {
   if(NULL != controller.mImpl->mEventData)
   {
-    if(NULL == controller.mImpl->mEventData->mPlaceholderFont)
-    {
-      controller.mImpl->mEventData->mPlaceholderFont = new FontDefaults();
-    }
+    // if mPlaceholderFont is null, create an instance.
+    CreatePlaceholderFont(controller);
 
     controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.weight = weight;
     controller.mImpl->mEventData->mPlaceholderFont->weightDefined           = true;
@@ -173,10 +169,8 @@ void Controller::PlaceholderHandler::SetPlaceholderTextFontWidth(Controller& con
 {
   if(NULL != controller.mImpl->mEventData)
   {
-    if(NULL == controller.mImpl->mEventData->mPlaceholderFont)
-    {
-      controller.mImpl->mEventData->mPlaceholderFont = new FontDefaults();
-    }
+    // if mPlaceholderFont is null, create an instance.
+    CreatePlaceholderFont(controller);
 
     controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.width = width;
     controller.mImpl->mEventData->mPlaceholderFont->widthDefined           = true;
@@ -208,10 +202,8 @@ void Controller::PlaceholderHandler::SetPlaceholderTextFontSlant(Controller& con
 {
   if(NULL != controller.mImpl->mEventData)
   {
-    if(NULL == controller.mImpl->mEventData->mPlaceholderFont)
-    {
-      controller.mImpl->mEventData->mPlaceholderFont = new FontDefaults();
-    }
+    // if mPlaceholderFont is null, create an instance.
+    CreatePlaceholderFont(controller);
 
     controller.mImpl->mEventData->mPlaceholderFont->mFontDescription.slant = slant;
     controller.mImpl->mEventData->mPlaceholderFont->slantDefined           = true;
@@ -243,10 +235,8 @@ void Controller::PlaceholderHandler::SetPlaceholderTextFontSize(Controller& cont
 {
   if(NULL != controller.mImpl->mEventData)
   {
-    if(NULL == controller.mImpl->mEventData->mPlaceholderFont)
-    {
-      controller.mImpl->mEventData->mPlaceholderFont = new FontDefaults();
-    }
+    // if mPlaceholderFont is null, create an instance.
+    CreatePlaceholderFont(controller);
 
     switch(type)
     {
@@ -530,6 +520,14 @@ void Controller::PlaceholderHandler::ShowPlaceholderText(Controller& controller)
 
     // Update the rest of the model during size negotiation
     impl.QueueModifyEvent(ModifyEvent::TEXT_REPLACED);
+  }
+}
+
+void Controller::PlaceholderHandler::CreatePlaceholderFont(Controller& controller)
+{
+  if(nullptr == controller.mImpl->mEventData->mPlaceholderFont)
+  {
+    controller.mImpl->mEventData->mPlaceholderFont = std::unique_ptr<FontDefaults>(new FontDefaults());
   }
 }
 
