@@ -116,12 +116,12 @@ struct EventData
     return (stateToCheck == EDITING || stateToCheck == EDITING_WITH_POPUP || stateToCheck == EDITING_WITH_GRAB_HANDLE || stateToCheck == EDITING_WITH_PASTE_POPUP);
   }
 
-  DecoratorPtr       mDecorator;               ///< Pointer to the decorator.
-  InputMethodContext mInputMethodContext;      ///< The Input Method Framework Manager.
-  FontDefaults*      mPlaceholderFont;         ///< The placeholder default font.
-  std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus.
-  std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive.
-  Vector4            mPlaceholderTextColor;    ///< The in/active placeholder text color.
+  DecoratorPtr                  mDecorator;               ///< Pointer to the decorator.
+  InputMethodContext            mInputMethodContext;      ///< The Input Method Framework Manager.
+  std::unique_ptr<FontDefaults> mPlaceholderFont;         ///< The placeholder default font.
+  std::string                   mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus.
+  std::string                   mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive.
+  Vector4                       mPlaceholderTextColor;    ///< The in/active placeholder text color.
 
   /**
    * This is used to delay handling events until after the model has been updated.
