@@ -85,7 +85,7 @@ namespace Text
 EventData::EventData(DecoratorPtr decorator, InputMethodContext& inputMethodContext)
 : mDecorator(decorator),
   mInputMethodContext(inputMethodContext),
-  mPlaceholderFont(nullptr),
+  mPlaceholderFont(NULL),
   mPlaceholderTextActive(),
   mPlaceholderTextInactive(),
   mPlaceholderTextColor(0.8f, 0.8f, 0.8f, 0.8f), // This color has been published in the Public API (placeholder-properties.h).
