@@ -188,19 +188,19 @@ static bool IsCandidate(Dali::Rect<float> srcRect, Dali::Rect<float> destRect, D
   {
     case Dali::Toolkit::Control::KeyboardFocus::LEFT:
     {
-      return (srcRect.right > destRect.right || srcRect.left >= destRect.right);
+      return (srcRect.right > destRect.right || srcRect.left >= destRect.right) && srcRect.left > destRect.left;
     }
     case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
-      return (srcRect.left < destRect.left || srcRect.right <= destRect.left);
+      return (srcRect.left < destRect.left || srcRect.right <= destRect.left) && srcRect.right < destRect.right;
     }
     case Dali::Toolkit::Control::KeyboardFocus::UP:
     {
-      return (srcRect.bottom > destRect.bottom || srcRect.top >= destRect.bottom);
+      return (srcRect.bottom > destRect.bottom || srcRect.top >= destRect.bottom) && srcRect.top > destRect.top;
     }
     case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
-      return (srcRect.top < destRect.top || srcRect.bottom <= destRect.top);
+      return (srcRect.top < destRect.top || srcRect.bottom <= destRect.top) && srcRect.bottom < destRect.bottom;
     }
     default:
     {
