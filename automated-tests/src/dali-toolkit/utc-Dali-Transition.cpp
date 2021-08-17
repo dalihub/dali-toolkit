@@ -580,7 +580,6 @@ int UtcDaliTransitionBetweenImageViewPairWithDelay(void)
 
   DALI_TEST_EQUALS(startWorldPosition, control2.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
 
-
   application.SendNotification();
   application.Render(400);
 

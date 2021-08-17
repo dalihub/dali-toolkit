@@ -128,9 +128,12 @@ void TransitionSet::TransitionStart()
 
 void TransitionSet::TransitionFinished(Dali::Animation& source)
 {
-  for(auto&& transition : mTransitions)
+  // Call TransitionFinished() in reverse order.
+  // This let the first copied original properties will be return again at the final.
+  std::vector<TransitionBasePtr>::reverse_iterator riter;
+  for(riter = mTransitions.rbegin(); riter != mTransitions.rend(); riter++)
   {
-    transition->TransitionFinished();
+    (*riter)->TransitionFinished();
   }
 
   EmitFinishedSignal();

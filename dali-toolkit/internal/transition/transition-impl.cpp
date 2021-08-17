@@ -71,6 +71,7 @@ Transition::Transition(Dali::Toolkit::Control source, Dali::Toolkit::Control des
 {
   SetTarget(destination);
   SetTimePeriod(timePeriod);
+  SetPairTransition(true);
 }
 
 Transition::~Transition()
@@ -94,24 +95,14 @@ void Transition::OnPlay()
   Quaternion sourceOrientation;
   sourceWorldTransform.GetTransformComponents(sourcePosition, sourceOrientation, sourceScale);
 
-  Matrix     destinationWorldTransform = GetWorldTransform(destinationControl);
-  Vector3    destinationPosition, destinationScale;
-  Quaternion destinationOrientation;
-  destinationWorldTransform.GetTransformComponents(destinationPosition, destinationOrientation, destinationScale);
+  Vector3    destinationPosition    = destinationControl[Dali::Actor::Property::POSITION];
+  Vector3    destinationScale       = destinationControl[Dali::Actor::Property::SCALE];
+  Quaternion destinationOrientation = destinationControl[Dali::Actor::Property::ORIENTATION];
+  Vector4    targetColor            = destinationControl[Dali::Actor::Property::COLOR];
+  Vector3    targetSize             = destinationControl[Dali::Actor::Property::SIZE];
 
-  Vector3       targetSize  = destinationControl[Dali::Actor::Property::SIZE];
-  Vector4       targetColor = GetWorldColor(destinationControl);
   Property::Map startPropertyMap;
   Property::Map finishPropertyMap;
-
-  // Use world transform if this transition requires animation of transform.
-  destinationControl[Dali::Actor::Property::ANCHOR_POINT]               = AnchorPoint::CENTER;
-  destinationControl[Dali::Actor::Property::PARENT_ORIGIN]              = ParentOrigin::CENTER;
-  destinationControl[Dali::Actor::Property::POSITION_USES_ANCHOR_POINT] = true;
-  destinationControl[Dali::Actor::Property::INHERIT_POSITION]           = false;
-  destinationControl[Dali::Actor::Property::INHERIT_ORIENTATION]        = false;
-  destinationControl[Dali::Actor::Property::INHERIT_SCALE]              = false;
-  destinationControl[Dali::Actor::Property::COLOR_MODE]                 = Dali::ColorMode::USE_OWN_COLOR;
 
   // Set animation of Transform
   startPropertyMap.Insert(Dali::Actor::Property::POSITION, sourcePosition);
