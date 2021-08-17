@@ -3221,6 +3221,70 @@ int UtcDaliTextFieldSettingPlaceholder(void)
   END_TEST;
 }
 
+int UtcDaliTextFieldPlaceholderCoverage(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextFieldPlaceholderCoverage");
+
+  // mPlaceholderFont is created only once, so create a new control for coverage.
+  TextField fieldForCoverage = TextField::New();
+  DALI_TEST_CHECK(fieldForCoverage);
+  application.GetScene().Add(fieldForCoverage);
+
+  // for SetPlaceholderFontFamily() coverage.
+  Property::Map fontFamilyMap;
+  fontFamilyMap[Text::PlaceHolder::Property::FONT_FAMILY] = "Arial";
+  fieldForCoverage.SetProperty(TextField::Property::PLACEHOLDER, fontFamilyMap);
+
+  // mPlaceholderFont is created only once, so create a new control for coverage.
+  fieldForCoverage = TextField::New();
+  DALI_TEST_CHECK(fieldForCoverage);
+  application.GetScene().Add(fieldForCoverage);
+
+  // for SetPlaceholderTextFontSize coverage.
+  Property::Map fontSizeMap;
+  fontSizeMap[Text::PlaceHolder::Property::PIXEL_SIZE] = 15.0f;
+  fieldForCoverage.SetProperty(TextField::Property::PLACEHOLDER, fontSizeMap);
+
+  // mPlaceholderFont is created only once, so create a new control for coverage.
+  fieldForCoverage = TextField::New();
+  DALI_TEST_CHECK(fieldForCoverage);
+  application.GetScene().Add(fieldForCoverage);
+
+  // for SetPlaceholderTextFontWeight coverage.
+  Property::Map fontStyleWeightMap;
+  Property::Map fontStyleWeightPropertyMap;
+  fontStyleWeightPropertyMap.Insert("weight", "bold");
+  fontStyleWeightMap[Text::PlaceHolder::Property::FONT_STYLE] = fontStyleWeightPropertyMap;
+  fieldForCoverage.SetProperty(TextField::Property::PLACEHOLDER, fontStyleWeightMap);
+
+  // mPlaceholderFont is created only once, so create a new control for coverage.
+  fieldForCoverage = TextField::New();
+  DALI_TEST_CHECK(fieldForCoverage);
+  application.GetScene().Add(fieldForCoverage);
+
+  // for SetPlaceholderTextFontWidth coverage.
+  Property::Map fontStyleWidthMap;
+  Property::Map fontStyleWidthPropertyMap;
+  fontStyleWidthPropertyMap.Insert("width", "expanded");
+  fontStyleWidthMap[Text::PlaceHolder::Property::FONT_STYLE] = fontStyleWidthPropertyMap;
+  fieldForCoverage.SetProperty(TextField::Property::PLACEHOLDER, fontStyleWidthMap);
+
+  // mPlaceholderFont is created only once, so create a new control for coverage.
+  fieldForCoverage = TextField::New();
+  DALI_TEST_CHECK(fieldForCoverage);
+  application.GetScene().Add(fieldForCoverage);
+
+  // for SetPlaceholderTextFontSlant coverage.
+  Property::Map fontStyleSlantMap;
+  Property::Map fontStyleSlantPropertyMap;
+  fontStyleSlantPropertyMap.Insert("slant", "italic");
+  fontStyleSlantMap[Text::PlaceHolder::Property::FONT_STYLE] = fontStyleSlantPropertyMap;
+  fieldForCoverage.SetProperty(TextField::Property::PLACEHOLDER, fontStyleSlantMap);
+
+  END_TEST;
+}
+
 int UtcDaliTextFieldSetPaddingProperty(void)
 {
   ToolkitTestApplication application;

@@ -103,7 +103,7 @@ public:
   }
 
 
-  bool SetSize(const Vector2& size)
+  bool SetSize(Vector2 size)
   {
     mSize = size;
     // For negative test
@@ -114,10 +114,9 @@ public:
     return true;
   }
 
-  const Vector2& GetSize()
+  Vector2 GetSize() const
   {
-    mSize = Vector2(200, 200);
-    return mSize;
+    return Vector2(200, 200);
   }
 
   bool SetViewBox(const Vector2& viewBox)
@@ -221,12 +220,12 @@ bool CanvasRenderer::RemoveAllDrawables()
   return Internal::Adaptor::GetImplementation(*this).RemoveAllDrawables();
 }
 
-bool CanvasRenderer::SetSize(const Vector2& size)
+bool CanvasRenderer::SetSize(Vector2 size)
 {
   return Internal::Adaptor::GetImplementation(*this).SetSize(size);
 }
 
-const Vector2& CanvasRenderer::GetSize()
+Vector2 CanvasRenderer::GetSize() const
 {
   return Internal::Adaptor::GetImplementation(*this).GetSize();
 }
