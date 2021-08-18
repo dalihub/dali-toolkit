@@ -1590,12 +1590,6 @@ int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
 
   application.GetScene().Add(actor);
 
-  application.SendNotification();
-  application.Render();
-
-  // Trigger count is 1 - render the first frame
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
-
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
 
@@ -1605,8 +1599,8 @@ int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
   application.SendNotification();
   application.Render();
 
-  // Wait for calculating frame drops
-  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  // Trigger count is 2 - render the first frame & calculating frame drops
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
 
   // Check dropped frame
   uint32_t frames = Test::VectorAnimationRenderer::GetDroppedFrames();
