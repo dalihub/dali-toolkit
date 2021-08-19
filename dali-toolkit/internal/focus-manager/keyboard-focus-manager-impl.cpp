@@ -199,6 +199,22 @@ bool KeyboardFocusManager::SetCurrentFocusActor(Actor actor)
 bool KeyboardFocusManager::DoSetCurrentFocusActor(Actor actor)
 {
   bool success = false;
+
+  // If the parent's KEYBOARD_FOCUSABLE_CHILDREN is false, it cannot have focus.
+  if(actor)
+  {
+    Actor parent = actor.GetParent();
+    while(parent)
+    {
+      if(!parent.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN))
+      {
+        DALI_LOG_INFO(gLogFilter, Debug::General, "[%s:%d] Parent Actor has KEYBOARD_FOCUSABLE_CHILDREN false,\n", __FUNCTION__, __LINE__);
+        return false;
+      }
+      parent = parent.GetParent();
+    }
+  }
+
   if(actor && actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
   {
     Integration::SceneHolder currentWindow = Integration::SceneHolder::Get(actor);

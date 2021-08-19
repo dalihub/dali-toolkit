@@ -102,6 +102,7 @@ public:
    * @return Whether the focus is successful or not
    * @pre The KeyboardFocusManager has been initialized.
    * @pre The Actor has been initialized.
+   * @note If the parent of this actor has the KEYBOARD FOCUSABLE CHILDREN property set to false, it will not be focused.
    */
   bool SetCurrentFocusActor(Actor actor);
 

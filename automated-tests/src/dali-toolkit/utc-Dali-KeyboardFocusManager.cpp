@@ -1993,3 +1993,47 @@ int UtcDaliKeyboardFocusManagerEnableDefaultAlgorithm(void)
 
   END_TEST;
 }
+
+
+int UtcDaliKeyboardFocusManagerWithKeyboardFocusableChildren(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerWithKeyboardFocusableChildren");
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  // Create the first actor and add it to the stage
+  Actor first = Actor::New();
+  first.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true);
+  application.GetScene().Add(first);
+
+  // Create the second actor and add it to the first actor.
+  Actor second = Actor::New();
+  second.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE, true);
+  first.Add(second);
+
+  // Check that no actor is being focused yet.
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
+
+  // Check that the focus is set on the first actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+
+  // Set KeyboardFocusableChildren false.
+  first.SetProperty( DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, false);
+
+  // Check that it will fail to set focus on the second actor as it's not focusable
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == false);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+
+  // Set KeyboardFocusableChildren true.
+  first.SetProperty( DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, true);
+
+  // Check that the focus is set on the second actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+
+  END_TEST;
+}
