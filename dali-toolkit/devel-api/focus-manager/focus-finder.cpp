@@ -350,7 +350,7 @@ bool IsFocusable(Actor& actor)
 Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect, Rect<float>& bestCandidateRect, Toolkit::Control::KeyboardFocus::Direction direction)
 {
   Actor nearestActor;
-  if(actor && actor.GetProperty<bool>(Actor::Property::VISIBLE))
+  if(actor && actor.GetProperty<bool>(Actor::Property::VISIBLE) && actor.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN))
   {
     // Recursively children
     const auto childCount = actor.GetChildCount();

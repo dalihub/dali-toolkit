@@ -478,6 +478,7 @@ public:
   bool mIsEmittingResourceReadySignal :1;  ///< True during ResourceReady().
   bool mNeedToEmitResourceReady :1;        ///< True if need to emit the resource ready signal again.
   bool mIsAutofillEnabled : 1;             ///< Stroes whether the Autofill functionality is enabled.
+  bool mDispatchKeyEvents : 1;             ///< Whether the actor emits key event signals
 
   RegisteredVisualContainer mRemoveVisuals;         ///< List of visuals that are being replaced by another visual once ready
 
@@ -498,6 +499,7 @@ public:
   static const PropertyRegistration PROPERTY_13;
   static const PropertyRegistration PROPERTY_14;
   static const PropertyRegistration PROPERTY_15;
+  static const PropertyRegistration PROPERTY_16;
 };
 
 

@@ -26,6 +26,9 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
+
 namespace Dali
 {
 
@@ -134,6 +137,18 @@ bool KeyInputFocusManager::OnKeyEvent( const KeyEvent& event )
   Toolkit::Control control = GetCurrentFocusControl();
   if( control )
   {
+    Dali::Actor dispatch = control;
+    while(dispatch)
+    {
+      // If the DISPATCH_KEY_EVENTS is false, it cannot emit key event.
+      Toolkit::Control dispatchControl = Toolkit::Control::DownCast(dispatch);
+      if(dispatchControl && !dispatchControl.GetProperty<bool>(Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS))
+      {
+        return true;
+      }
+      dispatch = dispatch.GetParent();
+    }
+
     // Notify the control about the key event
     consumed = EmitKeyEventSignal( control, event );
   }

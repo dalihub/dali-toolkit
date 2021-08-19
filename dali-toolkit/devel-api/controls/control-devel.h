@@ -115,7 +115,14 @@ enum
    * @brief The shadow of the control.
    * @details Name "shadow", type Property::MAP.
    */
-  SHADOW = PADDING + 8
+  SHADOW = PADDING + 8,
+
+  /**
+   * @brief Whether a Control and its descendants can emit key signals.
+   * @details Name "dispatchKeyEvents", type Property::BOOLEAN
+   * @note If a control's dispatchKeyEvents is set to false, then it's children will not emit a key event signal either.
+   */
+  DISPATCH_KEY_EVENTS,
 };
 
 } // namespace Property
