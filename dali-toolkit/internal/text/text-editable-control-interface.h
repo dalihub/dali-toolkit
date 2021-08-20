@@ -56,7 +56,7 @@ public:
   /**
    * @brief Called to signal that caret (cursor position) has been moved.
    */
-  virtual void CursorMoved(unsigned int position) = 0;
+  virtual void CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition) = 0;
 
   /**
    * @brief Called to signal that text has been inserted or deleted.

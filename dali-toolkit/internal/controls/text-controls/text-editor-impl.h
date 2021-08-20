@@ -93,6 +93,11 @@ public:
   DevelTextEditor::AnchorClickedSignalType& AnchorClickedSignal();
 
   /**
+   * @copydoc Dali::Toollkit::TextEditor::CursorPositionChangedSignal()
+   */
+  DevelTextEditor::CursorPositionChangedSignalType& CursorPositionChangedSignal();
+
+  /**
    * @copydoc Dali::Toollkit::TextEditor::InputFilteredSignal()
    */
   DevelTextEditor::InputFilteredSignalType& InputFilteredSignal();
@@ -216,9 +221,9 @@ private: // From Control
   void TextDeleted(unsigned int position, unsigned int length, const std::string& content) override;
 
   /**
-   * @copydoc Text::EditableControlInterface::CursorMoved()
+   * @copydoc Text::EditableControlInterface::CursorPositionChanged()
    */
-  void CursorMoved(unsigned int position) override;
+  void CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition) override;
 
   /**
    * @copydoc Text::EditableControlInterface::TextChanged()
@@ -368,6 +373,11 @@ private: // Implementation
   void OnIdleSignal();
 
   /**
+   * @brief Emits CursorPositionChanged signal.
+   */
+  void EmitCursorPositionChangedSignal();
+
+  /**
    * @brief Emits TextChanged signal.
    */
   void EmitTextChangedSignal();
@@ -425,12 +435,13 @@ private: // Implementation
 
 private: // Data
   // Signals
-  Toolkit::TextEditor::TextChangedSignalType           mTextChangedSignal;
-  Toolkit::TextEditor::InputStyleChangedSignalType     mInputStyleChangedSignal;
-  Toolkit::TextEditor::ScrollStateChangedSignalType    mScrollStateChangedSignal;
-  Toolkit::DevelTextEditor::MaxLengthReachedSignalType mMaxLengthReachedSignal;
-  Toolkit::DevelTextEditor::AnchorClickedSignalType    mAnchorClickedSignal;
-  Toolkit::DevelTextEditor::InputFilteredSignalType    mInputFilteredSignal;
+  Toolkit::TextEditor::TextChangedSignalType                mTextChangedSignal;
+  Toolkit::TextEditor::InputStyleChangedSignalType          mInputStyleChangedSignal;
+  Toolkit::TextEditor::ScrollStateChangedSignalType         mScrollStateChangedSignal;
+  Toolkit::DevelTextEditor::MaxLengthReachedSignalType      mMaxLengthReachedSignal;
+  Toolkit::DevelTextEditor::AnchorClickedSignalType         mAnchorClickedSignal;
+  Toolkit::DevelTextEditor::InputFilteredSignalType         mInputFilteredSignal;
+  Toolkit::DevelTextEditor::CursorPositionChangedSignalType mCursorPositionChangedSignal;
 
   InputMethodContext            mInputMethodContext;
   Text::ControllerPtr           mController;
@@ -457,7 +468,11 @@ private: // Data
   bool  mScrollAnimationEnabled : 1;
   bool  mScrollBarEnabled : 1;
   bool  mScrollStarted : 1;
-  bool  mTextChanged : 1; ///< If true, emits TextChangedSignal in next OnRelayout().
+  bool  mTextChanged : 1;           ///< If true, emits TextChangedSignal in next OnRelayout().
+  bool  mCursorPositionChanged : 1; ///< If true, emits CursorPositionChangedSignal at the end of OnRelayout().
+
+  //args for cursor PositionChanged event
+  unsigned int mOldPosition;
 
   /**
    * @brief This structure is to connect TextEditor with Accessible functions.

@@ -325,6 +325,26 @@ using AnchorClickedSignalType = Signal<void(TextEditor, const char*, uint32_t)>;
 DALI_TOOLKIT_API AnchorClickedSignalType& AnchorClickedSignal(TextEditor textEditor);
 
 /**
+ * @brief cursor position changed signal type.
+ *
+ * @note Signal
+ *  - uint32_t    : old position.
+ */
+using CursorPositionChangedSignalType = Signal<void(TextEditor, uint32_t)>;
+
+/**
+ * @brief This signal is emitted when the cursor position has been changed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName(TextEditor textEditor, uint32_t oldPosition);
+ * @endcode
+ * @param[in] textEditor The instance of TextEditor.
+ * @return The signal to connect to.
+ */
+DALI_TOOLKIT_API CursorPositionChangedSignalType& CursorPositionChangedSignal(TextEditor textEditor);
+
+/**
  * @brief Input filtered signal type.
  */
 using InputFilteredSignalType = Signal<void(TextEditor, Toolkit::InputFilter::Property::Type)>;

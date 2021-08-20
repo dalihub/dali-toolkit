@@ -54,6 +54,8 @@ bool ControllerImplEventHandler::ProcessInputEvents(Controller::Impl& impl)
     return false;
   }
 
+  unsigned int oldPos = eventData->mPrimaryCursorPosition;
+
   if(eventData->mDecorator)
   {
     for(std::vector<Event>::iterator iter = eventData->mEventQueue.begin();
@@ -124,12 +126,14 @@ bool ControllerImplEventHandler::ProcessInputEvents(Controller::Impl& impl)
   {
     // Updates the cursor position and scrolls the text to make it visible.
     CursorInfo cursorInfo;
+
     // Calculate the cursor position from the new cursor index.
     impl.GetCursorPosition(eventData->mPrimaryCursorPosition, cursorInfo);
 
-    if(nullptr != impl.mEditableControlInterface)
+    //only emit the event if the cursor is moved in current function.
+    if(nullptr != impl.mEditableControlInterface && eventData->mEventQueue.size() > 0)
     {
-      impl.mEditableControlInterface->CursorMoved(eventData->mPrimaryCursorPosition);
+      impl.mEditableControlInterface->CursorPositionChanged(oldPos, eventData->mPrimaryCursorPosition);
     }
 
     if(eventData->mUpdateCursorHookPosition)

@@ -130,6 +130,8 @@ static bool gMaxCharactersCallBackCalled;
 static bool gInputFilteredAcceptedCallbackCalled;
 static bool gInputFilteredRejectedCallbackCalled;
 static bool gInputStyleChangedCallbackCalled;
+static bool gCursorPositionChangedCallbackCalled;
+static uint32_t oldCursorPos;
 static Dali::Toolkit::TextField::InputStyle::Mask gInputStyleMask;
 
 static void LoadBitmapResource(TestPlatformAbstraction& platform, int width, int height)
@@ -222,6 +224,14 @@ static void TestAnchorClickedCallback(TextField control, const char* href, unsig
   {
     gAnchorClickedCallBackCalled = true;
   }
+}
+
+static void TestCursorPositionChangedCallback( TextField control, unsigned int oldPos )
+{
+  tet_infoline(" TestCursorPositionChangedCallback");
+
+  gCursorPositionChangedCallbackCalled = true;
+  oldCursorPos = oldPos;
 }
 
 static void TestTextChangedCallback( TextField control )
@@ -3974,6 +3984,108 @@ int UtcDaliToolkitTextFieldEllipsisPositionProperty(void)
   tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to END using string - lowercase");
   textField.SetProperty(DevelTextField::Property::ELLIPSIS_POSITION, "end");
   DALI_TEST_EQUALS( textField.GetProperty< int >( DevelTextField::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextFieldCursorPositionChangedSignal(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldCursorPositionChangedSignal");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  application.GetScene().Add( field );
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::CursorPositionChangedSignal(field).Connect(&TestCursorPositionChangedCallback);
+  bool cursorPositionChangedSignal = false;
+  field.ConnectSignal( testTracker, "cursorPositionChanged",   CallbackFunctor(&cursorPositionChangedSignal) );
+
+  field.SetProperty( TextField::Property::TEXT, "Hello world Hello world" );
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  field.SetKeyInputFocus();
+
+  // Tap on the text field
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 23, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  // Move to left.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 17, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  // Insert D
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 16, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  //delete one character
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 17, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  field.SetProperty( TextField::Property::TEXT, "Hello" );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 16, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  field.SetProperty(DevelTextField::Property::PRIMARY_CURSOR_POSITION, 3);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 5, TEST_LOCATION);
 
   END_TEST;
 }
