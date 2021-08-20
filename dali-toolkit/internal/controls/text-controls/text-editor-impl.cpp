@@ -151,6 +151,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputMethodSett
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputFilter",                          MAP,       INPUT_FILTER                        )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsis",                             BOOLEAN,   ELLIPSIS                            )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsisPosition",                     INTEGER,   ELLIPSIS_POSITION                   )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "minLineSize",                          FLOAT,     MIN_LINE_SIZE                       )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
@@ -491,13 +492,8 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextEditor::Property::LINE_SPACING:
       {
-        // The line spacing isn't supported by the TextEditor. Since it's supported
-        // by the TextLabel for now it must be ignored. The property is being shadowed
-        // locally so its value isn't affected.
         const float lineSpacing = value.Get<float>();
-        impl.mLineSpacing       = lineSpacing;
-        // set it to 0.0 due to missing implementation
-        impl.mController->SetDefaultLineSpacing(0.0f);
+        impl.mController->SetDefaultLineSpacing(lineSpacing);
         impl.mRenderer.Reset();
         break;
       }
@@ -832,6 +828,15 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::MIN_LINE_SIZE:
+      {
+        const float minLineSize = value.Get<float>();
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextEditor %p MIN_LINE_SIZE %f\n", impl.mController.Get(), minLineSize);
+
+        impl.mController->SetDefaultLineSize(minLineSize);
+        impl.mRenderer.Reset();
+        break;
+      }
     } // switch
   }   // texteditor
 }
@@ -1011,9 +1016,7 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
       }
       case Toolkit::TextEditor::Property::LINE_SPACING:
       {
-        // LINE_SPACING isn't implemented for the TextEditor. Returning
-        // only shadowed value, not the real one.
-        value = impl.mLineSpacing;
+        value = impl.mController->GetDefaultLineSpacing();
         break;
       }
       case Toolkit::TextEditor::Property::INPUT_LINE_SPACING:
@@ -1220,6 +1223,11 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
       case Toolkit::DevelTextEditor::Property::ELLIPSIS_POSITION:
       {
         value = impl.mController->GetEllipsisPosition();
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::MIN_LINE_SIZE:
+      {
+        value = impl.mController->GetDefaultLineSize();
         break;
       }
     } //switch
@@ -2291,10 +2299,10 @@ bool TextEditor::AccessibleImpl::SetCursorOffset(size_t offset)
   return true;
 }
 
-Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset( size_t offset, Dali::Accessibility::TextBoundary boundary)
+Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto self = Toolkit::TextEditor::DownCast(Self());
-  auto text = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
+  auto self     = Toolkit::TextEditor::DownCast(Self());
+  auto text     = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
   auto textSize = text.size();
 
   auto range = Dali::Accessibility::Range{};
@@ -2315,7 +2323,7 @@ Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset( size_t o
     case Dali::Accessibility::TextBoundary::LINE:
     {
       auto textString = text.c_str();
-      auto breaks = std::vector<char>(textSize, 0);
+      auto breaks     = std::vector<char>(textSize, 0);
 
       if(boundary == Dali::Accessibility::TextBoundary::WORD)
       {
@@ -2390,8 +2398,8 @@ Dali::Accessibility::Range TextEditor::AccessibleImpl::GetRangeOfSelection(size_
     return {};
   }
 
-  auto self  = Toolkit::TextEditor::DownCast(Self());
-  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
+  auto        self       = Toolkit::TextEditor::DownCast(Self());
+  auto        controller = Dali::Toolkit::GetImpl(self).GetTextController();
   std::string value{};
   controller->RetrieveSelection(value);
   auto indices = controller->GetSelectionIndexes();
@@ -2474,7 +2482,7 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
 {
   using namespace Dali::Accessibility;
 
-  auto states = DevelControl::AccessibleImpl::CalculateStates();
+  auto states              = DevelControl::AccessibleImpl::CalculateStates();
   states[State::EDITABLE]  = true;
   states[State::FOCUSABLE] = true;
 
@@ -2489,7 +2497,7 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
 
 bool TextEditor::AccessibleImpl::InsertText(size_t startPosition, std::string text)
 {
-  auto self = Toolkit::TextEditor::DownCast(Self());
+  auto self         = Toolkit::TextEditor::DownCast(Self());
   auto insertedText = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
 
   insertedText.insert(startPosition, text);

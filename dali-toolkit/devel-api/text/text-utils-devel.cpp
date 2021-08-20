@@ -828,7 +828,7 @@ void Ellipsis(const RendererParameters& textParameters, TextAbstraction::TextRen
     {
       Length finalNumberOfGlyphs = 0u;
 
-      if((line.ascender - line.descender) > textLayoutArea.height)
+      if((GetLineHeight(line)) > textLayoutArea.height)
       {
         // The height of the line is bigger than the height of the text area.
         // Show the ellipsis glyph even if it doesn't fit in the text area.
@@ -1524,7 +1524,7 @@ Dali::Property::Array RenderForLastIndex(RendererParameters& textParameters)
     const LineRun& line = *(lines.Begin() + index);
     numberOfCharacters += line.characterRun.numberOfCharacters;
 
-    lineOffset = lineSize > 0.f ? lineSize : (line.ascender + -line.descender);
+    lineOffset = lineSize > 0.f ? lineSize : GetLineHeight(line);
     penY += lineOffset;
     if((penY + lineOffset) > boundingBox)
     {

@@ -155,9 +155,7 @@ LineIndex GetClosestLine(VisualModelPtr visualModel,
   {
     const LineRun& lineRun = *it;
 
-    // The line height is the addition of the line ascender and the line descender.
-    // However, the line descender has a negative value, hence the subtraction.
-    totalHeight += lineRun.ascender - lineRun.descender;
+    totalHeight += GetLineHeight(lineRun);
 
     if(visualY < totalHeight)
     {
@@ -186,9 +184,7 @@ float CalculateLineOffset(const Vector<LineRun>& lines,
   {
     const LineRun& lineRun = *it;
 
-    // The line height is the addition of the line ascender and the line descender.
-    // However, the line descender has a negative value, hence the subtraction.
-    offset += lineRun.ascender - lineRun.descender;
+    offset += GetLineHeight(lineRun);
   }
 
   return offset;
@@ -495,9 +491,7 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
     cursorInfo.lineOffset = CalculateLineOffset(parameters.visualModel->mLines,
                                                 newLineIndex);
 
-    // The line height is the addition of the line ascender and the line descender.
-    // However, the line descender has a negative value, hence the subtraction.
-    cursorInfo.lineHeight = newLine.ascender - newLine.descender;
+    cursorInfo.lineHeight = GetLineHeight(newLine);
 
     // Set the primary cursor's height.
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
@@ -543,9 +537,7 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
     cursorInfo.lineOffset = CalculateLineOffset(parameters.visualModel->mLines,
                                                 lineIndex);
 
-    // The line height is the addition of the line ascender and the line descender.
-    // However, the line descender has a negative value, hence the subtraction.
-    cursorInfo.lineHeight = line.ascender - line.descender;
+    cursorInfo.lineHeight = GetLineHeight(line);
 
     // Calculate the primary cursor.
 

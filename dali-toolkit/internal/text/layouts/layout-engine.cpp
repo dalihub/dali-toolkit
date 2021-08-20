@@ -36,6 +36,12 @@ namespace Toolkit
 {
 namespace Text
 {
+float GetLineHeight(const LineRun lineRun)
+{
+  // The line height is the addition of the line ascender, the line descender and the line spacing.
+  // However, the line descender has a negative value, hence the subtraction.
+  return lineRun.ascender - lineRun.descender + lineRun.lineSpacing;
+}
 namespace Layout
 {
 namespace
@@ -1275,7 +1281,7 @@ struct Engine::Impl
       layoutSize.width = layoutParameters.boundingBox.width;
       if(layoutSize.height < Math::MACHINE_EPSILON_1000)
       {
-        layoutSize.height += (lineRun->ascender + -lineRun->descender) + lineRun->lineSpacing;
+        layoutSize.height += GetLineHeight(*lineRun);
       }
 
       const Vector<BidirectionalLineInfoRun>& bidirectionalLinesInfo = layoutParameters.textModel->mLogicalModel->mBidirectionalLineInfo;
@@ -1382,7 +1388,7 @@ struct Engine::Impl
       layoutSize.width = lineRun.width;
     }
 
-    layoutSize.height += (lineRun.ascender + -lineRun.descender) + lineRun.lineSpacing;
+    layoutSize.height += GetLineHeight(lineRun);
   }
 
   /**
@@ -1433,7 +1439,7 @@ struct Engine::Impl
 
     lineRun.lineSpacing += mDefaultLineSpacing;
 
-    layoutSize.height += (lineRun.ascender + -lineRun.descender) + lineRun.lineSpacing;
+    layoutSize.height += GetLineHeight(lineRun);
   }
 
   /**
@@ -1457,7 +1463,7 @@ struct Engine::Impl
         layoutSize.width = line.width;
       }
 
-      layoutSize.height += (line.ascender + -line.descender) + line.lineSpacing;
+      layoutSize.height += GetLineHeight(line);
     }
   }
 

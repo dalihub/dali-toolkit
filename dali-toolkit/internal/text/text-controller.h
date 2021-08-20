@@ -1874,6 +1874,11 @@ private: // Helpers.
    */
   void ResetScrollPosition();
 
+  /**
+   * @brief fill needed relayout parameters when line size is changed & request relayout.
+   */
+  void RelayoutForNewLineSize();
+
 private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
