@@ -319,6 +319,23 @@ using SelectionChangedSignalType = Signal<void(TextField, uint32_t, uint32_t)>;
 DALI_TOOLKIT_API SelectionChangedSignalType& SelectionChangedSignal(TextField textField);
 
 /**
+ * @brief selection cleared signal type.
+ */
+using SelectionClearedSignalType = Signal<void(TextField)>;
+
+/**
+ * @brief This signal is emitted when the selection has been cleared.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( TextField textField);
+ * @endcode
+ * @param[in] textField The instance of TextField.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API SelectionClearedSignalType& SelectionClearedSignal(TextField textField);
+
+/**
  * @brief Select the whole text of TextField.
  *
  * @param[in] textField The instance of TextField.

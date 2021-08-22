@@ -147,6 +147,7 @@ DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "anchorClicked",         SIGNAL_ANC
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "inputFiltered",         SIGNAL_INPUT_FILTERED         )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "cursorPositionChanged", SIGNAL_CURSOR_POSITION_CHANGED)
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "selectionChanged",      SIGNAL_SELECTION_CHANGED      )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "selectionCleared",      SIGNAL_SELECTION_CLEARED      )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -1272,6 +1273,14 @@ bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       fieldImpl.SelectionChangedSignal().Connect(tracker, functor);
     }
   }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_CLEARED))
+  {
+    if(field)
+    {
+      Internal::TextField& fieldImpl(GetImpl(field));
+      fieldImpl.SelectionClearedSignal().Connect(tracker, functor);
+    }
+  }
   else
   {
     // signalName does not match any signal
@@ -1314,6 +1323,11 @@ DevelTextField::InputFilteredSignalType& TextField::InputFilteredSignal()
 DevelTextField::SelectionChangedSignalType& TextField::SelectionChangedSignal()
 {
   return mSelectionChangedSignal;
+}
+
+DevelTextField::SelectionClearedSignalType& TextField::SelectionClearedSignal()
+{
+  return mSelectionClearedSignal;
 }
 
 void TextField::OnInitialize()
@@ -1520,6 +1534,11 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
   if(mSelectionChanged)
   {
     EmitSelectionChangedSignal();
+  }
+
+  if(mSelectionCleared)
+  {
+    EmitSelectionClearedSignal();
   }
 
   // The text-field emits signals when the input style changes. These changes of style are
@@ -1918,10 +1937,22 @@ void TextField::EmitSelectionChangedSignal()
   mSelectionChanged = false;
 }
 
+void TextField::EmitSelectionClearedSignal()
+{
+  Dali::Toolkit::TextField handle(GetOwner());
+  mSelectionClearedSignal.Emit(handle);
+  mSelectionCleared = false;
+}
+
 void TextField::SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t newStart, uint32_t newEnd)
 {
   if(((oldStart != newStart) || (oldEnd != newEnd)) && !mSelectionChanged)
   {
+    if(newStart == newEnd)
+    {
+      mSelectionCleared = true;
+    }
+
     mSelectionChanged  = true;
     mOldSelectionStart = oldStart;
     mOldSelectionEnd   = oldEnd;
@@ -2074,7 +2105,8 @@ TextField::TextField()
   mHasBeenStaged(false),
   mTextChanged(false),
   mCursorPositionChanged(false),
-  mSelectionChanged(false)
+  mSelectionChanged(false),
+  mSelectionCleared(false)
 {
 }
 

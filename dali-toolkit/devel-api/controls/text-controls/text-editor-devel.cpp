@@ -55,6 +55,11 @@ SelectionChangedSignalType& SelectionChangedSignal(TextEditor textEditor)
   return GetImpl(textEditor).SelectionChangedSignal();
 }
 
+SelectionClearedSignalType& SelectionClearedSignal(TextEditor textEditor)
+{
+  return GetImpl(textEditor).SelectionClearedSignal();
+}
+
 void SelectWholeText(TextEditor textEditor)
 {
   GetImpl(textEditor).SelectWholeText();

@@ -50,6 +50,11 @@ SelectionChangedSignalType& SelectionChangedSignal(TextField textField)
   return GetImpl(textField).SelectionChangedSignal();
 }
 
+SelectionClearedSignalType& SelectionClearedSignal(TextField textField)
+{
+  return GetImpl(textField).SelectionClearedSignal();
+}
+
 void SelectWholeText(TextField textField)
 {
   GetImpl(textField).SelectWholeText();

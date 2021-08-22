@@ -397,6 +397,23 @@ using SelectionChangedSignalType = Signal<void(TextEditor, uint32_t, uint32_t)>;
 DALI_TOOLKIT_API SelectionChangedSignalType& SelectionChangedSignal(TextEditor textEditor);
 
 /**
+ * @brief selection cleared signal type.
+ */
+using SelectionClearedSignalType = Signal<void(TextEditor)>;
+
+/**
+ * @brief This signal is emitted when the selection has been cleared.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( TextEditor textEditor);
+ * @endcode
+ * @param[in] textEditor The instance of TextEditor.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API SelectionClearedSignalType& SelectionClearedSignal(TextEditor textEditor);
+
+/**
  * @brief Select the whole text of TextEditor.
  *
  * @param[in] textEditor The instance of TextEditor.
