@@ -18,11 +18,19 @@
 // CLASS HEADER
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 
+// INTERNAL INCLUDES
+#include "test-native-image-source.h"
+
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/any.h>
 
 namespace Dali
 {
+
+const char* NativeImageSourceTest::GetCustomFragmentPrefix()
+{
+  return "#extension GL_OES_EGL_image_external:require\n";
+}
 
 NativeImageSourcePtr NativeImageSource::New( unsigned int width, unsigned int height, ColorDepth depth )
 {
@@ -100,13 +108,9 @@ int NativeImageSource::GetTextureTarget() const
   return 0;
 }
 
-const char* NativeImageSource::GetCustomFragmentPrefix() const
-{
-  return "";
-}
-
 bool NativeImageSource::ApplyNativeFragmentShader(std::string& shader)
 {
+  shader = Dali::NativeImageSourceTest::GetCustomFragmentPrefix() + shader;
   return true;
 }
 

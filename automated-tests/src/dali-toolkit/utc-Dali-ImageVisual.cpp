@@ -31,6 +31,7 @@
 
 #include <test-encoded-image-buffer.h>
 #include "dummy-control.h"
+#include "test-native-image-source.h"
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -459,7 +460,7 @@ int UtcDaliImageVisualWithNativeImage(void)
   const Property::Map* outMap = value.GetMap();
   std::string fragmentShader = (*outMap)["fragment"].Get<std::string>();
 
-  const char* fragmentPrefix = nativeImageSource->GetCustomFragmentPrefix();
+  const char* fragmentPrefix = Dali::NativeImageSourceTest::GetCustomFragmentPrefix();
   size_t pos = fragmentShader.find(fragmentPrefix);
 
   DALI_TEST_EQUALS( pos != std::string::npos, true, TEST_LOCATION );
