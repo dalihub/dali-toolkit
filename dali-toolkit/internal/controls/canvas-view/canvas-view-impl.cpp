@@ -101,7 +101,7 @@ void CanvasView::OnInitialize()
       new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::IMAGE));
   });
 
-  Adaptor::Get().RegisterProcessor(*this);
+  Adaptor::Get().RegisterProcessor(*this, true);
 }
 
 void CanvasView::OnRelayout(const Vector2& size, RelayoutContainer& container)
