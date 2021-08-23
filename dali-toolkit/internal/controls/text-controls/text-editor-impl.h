@@ -103,6 +103,11 @@ public:
   DevelTextEditor::InputFilteredSignalType& InputFilteredSignal();
 
   /**
+   * @copydoc Dali::Toollkit::TextEditor::SelectionChangedSignal()
+   */
+  DevelTextEditor::SelectionChangedSignalType& SelectionChangedSignal();
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -239,6 +244,11 @@ private: // From Control
    * @copydoc Text::EditableControlInterface::InputStyleChanged()
    */
   void InputStyleChanged(Text::InputStyle::Mask inputStyleMask) override;
+
+  /**
+   * @copydoc Text::SelectableControlInterface::SelectionChanged()
+   */
+  void SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t newStart, uint32_t newEnd) override;
 
   /**
    * @copydoc Text::EditableControlInterface::AddDecoration()
@@ -383,6 +393,11 @@ private: // Implementation
   void EmitTextChangedSignal();
 
   /**
+   * @brief Emits SelectionChanged signal.
+   */
+  void EmitSelectionChangedSignal();
+
+  /**
    * @brief set RenderActor's position with new scrollPosition
    *
    * Apply updated scroll position or start scroll animation if VerticalScrollAnimation is enabled
@@ -442,6 +457,7 @@ private: // Data
   Toolkit::DevelTextEditor::AnchorClickedSignalType         mAnchorClickedSignal;
   Toolkit::DevelTextEditor::InputFilteredSignalType         mInputFilteredSignal;
   Toolkit::DevelTextEditor::CursorPositionChangedSignalType mCursorPositionChangedSignal;
+  Toolkit::DevelTextEditor::SelectionChangedSignalType      mSelectionChangedSignal;
 
   InputMethodContext            mInputMethodContext;
   Text::ControllerPtr           mController;
@@ -470,9 +486,14 @@ private: // Data
   bool  mScrollStarted : 1;
   bool  mTextChanged : 1;           ///< If true, emits TextChangedSignal in next OnRelayout().
   bool  mCursorPositionChanged : 1; ///< If true, emits CursorPositionChangedSignal at the end of OnRelayout().
+  bool  mSelectionChanged : 1;      ///< If true, emits SelectionChangedSignal at the end of OnRelayout().
 
   //args for cursor PositionChanged event
   unsigned int mOldPosition;
+
+  //args for selection changed event
+  uint32_t mOldSelectionStart;
+  uint32_t mOldSelectionEnd;
 
   /**
    * @brief This structure is to connect TextEditor with Accessible functions.

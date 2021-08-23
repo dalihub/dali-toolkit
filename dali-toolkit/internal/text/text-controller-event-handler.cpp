@@ -84,8 +84,17 @@ void Controller::EventHandler::KeyboardFocusLostEvent(Controller& controller)
       // Init selection position
       if(controller.mImpl->mEventData->mState == EventData::SELECTING)
       {
+        uint32_t oldStart, oldEnd;
+        oldStart = controller.mImpl->mEventData->mLeftSelectionPosition;
+        oldEnd   = controller.mImpl->mEventData->mRightSelectionPosition;
+
         controller.mImpl->mEventData->mLeftSelectionPosition  = controller.mImpl->mEventData->mPrimaryCursorPosition;
         controller.mImpl->mEventData->mRightSelectionPosition = controller.mImpl->mEventData->mPrimaryCursorPosition;
+
+        if(controller.mImpl->mSelectableControlInterface != nullptr)
+        {
+          controller.mImpl->mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, controller.mImpl->mEventData->mPrimaryCursorPosition, controller.mImpl->mEventData->mPrimaryCursorPosition);
+        }
       }
 
       controller.mImpl->ChangeState(EventData::INACTIVE);
@@ -158,12 +167,22 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
         // Release the active highlight.
         if(controller.mImpl->mEventData->mState == EventData::SELECTING)
         {
+          uint32_t oldStart, oldEnd;
+          oldStart = controller.mImpl->mEventData->mLeftSelectionPosition;
+          oldEnd   = controller.mImpl->mEventData->mRightSelectionPosition;
+
           controller.mImpl->ChangeState(EventData::EDITING);
 
           // Update selection position.
           controller.mImpl->mEventData->mLeftSelectionPosition  = controller.mImpl->mEventData->mPrimaryCursorPosition;
           controller.mImpl->mEventData->mRightSelectionPosition = controller.mImpl->mEventData->mPrimaryCursorPosition;
           controller.mImpl->mEventData->mUpdateCursorPosition   = true;
+
+          if(controller.mImpl->mSelectableControlInterface != nullptr)
+          {
+            controller.mImpl->mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, controller.mImpl->mEventData->mLeftSelectionPosition, controller.mImpl->mEventData->mRightSelectionPosition);
+          }
+
           controller.mImpl->RequestRelayout();
         }
         return false;
@@ -597,12 +616,21 @@ void Controller::EventHandler::ProcessModifyEvents(Controller& controller)
 
   if(NULL != controller.mImpl->mEventData)
   {
+    uint32_t oldStart, oldEnd;
+    oldStart = controller.mImpl->mEventData->mLeftSelectionPosition;
+    oldEnd   = controller.mImpl->mEventData->mRightSelectionPosition;
+
     // When the text is being modified, delay cursor blinking
     controller.mImpl->mEventData->mDecorator->DelayCursorBlink();
 
     // Update selection position after modifying the text
     controller.mImpl->mEventData->mLeftSelectionPosition  = controller.mImpl->mEventData->mPrimaryCursorPosition;
     controller.mImpl->mEventData->mRightSelectionPosition = controller.mImpl->mEventData->mPrimaryCursorPosition;
+
+    if(controller.mImpl->mSelectableControlInterface != nullptr && controller.mImpl->mEventData->mState == EventData::SELECTING)
+    {
+      controller.mImpl->mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, controller.mImpl->mEventData->mLeftSelectionPosition, controller.mImpl->mEventData->mRightSelectionPosition);
+    }
   }
 
   // DISCARD temporary text

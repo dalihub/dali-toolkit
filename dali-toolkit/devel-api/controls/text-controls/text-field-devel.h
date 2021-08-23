@@ -298,6 +298,27 @@ using InputFilteredSignalType = Signal<void(TextField, Toolkit::InputFilter::Pro
 DALI_TOOLKIT_API InputFilteredSignalType& InputFilteredSignal(TextField textField);
 
 /**
+ * @brief selection changed signal type.
+ *
+ * @note Signal
+ *  - uint32_t  : selection start before the change.
+ *  - uint32_t  : selection end before the change.
+ */
+using SelectionChangedSignalType = Signal<void(TextField, uint32_t, uint32_t)>;
+
+/**
+ * @brief This signal is emitted when the selection has been changed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( TextField textField, uint32_t oldStart, uint32_t oldEnd);
+ * @endcode
+ * @param[in] textField The instance of TextField.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API SelectionChangedSignalType& SelectionChangedSignal(TextField textField);
+
+/**
  * @brief Select the whole text of TextField.
  *
  * @param[in] textField The instance of TextField.

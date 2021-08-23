@@ -69,6 +69,11 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
        (EventData::EDITING_WITH_GRAB_HANDLE == eventData->mState) ||
        (EventData::EDITING_WITH_PASTE_POPUP == eventData->mState))
     {
+      if((impl.mSelectableControlInterface != nullptr) && (EventData::SELECTING == eventData->mState))
+      {
+        impl.mSelectableControlInterface->SelectionChanged(eventData->mLeftSelectionPosition, eventData->mRightSelectionPosition, eventData->mPrimaryCursorPosition, eventData->mPrimaryCursorPosition);
+      }
+
       impl.ChangeState(EventData::EDITING);
     }
   }

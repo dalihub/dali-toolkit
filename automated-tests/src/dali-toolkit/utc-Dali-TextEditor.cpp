@@ -133,6 +133,9 @@ const char* HANDLE_RIGHT_SELECTION_FILE_NAME = TEST_RESOURCE_DIR "/selection_han
 
 const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 
+static bool gSelectionChangedCallbackCalled;
+static uint32_t oldSelectionStart;
+static uint32_t oldSelectionEnd;
 static bool gAnchorClickedCallBackCalled;
 static bool gAnchorClickedCallBackNotCalled;
 static bool gTextChangedCallBackCalled;
@@ -157,6 +160,15 @@ struct CallbackFunctor
   }
   bool* mCallbackFlag;
 };
+
+static void TestSelectionChangedCallback(TextEditor control, uint32_t oldStart, uint32_t oldEnd)
+{
+  tet_infoline(" TestSelectionChangedCallback");
+
+  gSelectionChangedCallbackCalled = true;
+  oldSelectionStart = oldStart;
+  oldSelectionEnd   = oldEnd;
+}
 
 static void TestAnchorClickedCallback(TextEditor control, const char* href, unsigned int hrefLength)
 {
@@ -4140,6 +4152,139 @@ int utcDaliTextEditorCursorPositionChangedSignal(void)
 
   DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
   DALI_TEST_EQUALS(oldCursorPos, 5, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliTextEditorSelectionChangedSignal(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorSelectionChangedSignal");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextEditor::SelectionChangedSignal(editor).Connect(&TestSelectionChangedCallback);
+  bool selectionChangedSignal = false;
+  editor.ConnectSignal( testTracker, "selectionChanged",   CallbackFunctor(&selectionChangedSignal) );
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Select some text in the right of the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, oldSelectionEnd, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(oldSelectionEnd, 7, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(oldSelectionEnd, 8, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+  editor.SetKeyInputFocus();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DevelTextEditor::SelectText( editor ,0, 5 );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, oldSelectionEnd, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+
+  editor.SetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 3);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(oldSelectionEnd, 5, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+
+  // select all text
+  DevelTextEditor::SelectWholeText(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, oldSelectionEnd, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+
+  // select none
+  DevelTextEditor::SelectNone(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(oldSelectionEnd, 23, TEST_LOCATION);
 
   END_TEST;
 }
