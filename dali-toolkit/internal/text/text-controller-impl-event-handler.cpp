@@ -839,7 +839,7 @@ void ControllerImplEventHandler::OnHandlePressed(Controller::Impl& impl, const E
     eventData.mIsRightHandleSelected = true;
   }
 
-  if((impl.mSelectableControlInterface != nullptr) || eventData.mUpdateRightSelectionPosition || eventData.mUpdateLeftSelectionPosition)
+  if((impl.mSelectableControlInterface != nullptr) && ((oldStart != eventData.mLeftSelectionPosition) || (oldEnd != eventData.mRightSelectionPosition)))
   {
     impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
   }
@@ -926,7 +926,7 @@ void ControllerImplEventHandler::OnHandleReleased(Controller::Impl& impl, const 
     }
   }
 
-  if((impl.mSelectableControlInterface != nullptr) || eventData.mUpdateRightSelectionPosition || eventData.mUpdateLeftSelectionPosition)
+  if((impl.mSelectableControlInterface != nullptr) && ((oldStart != eventData.mLeftSelectionPosition) || (oldEnd != eventData.mRightSelectionPosition)))
   {
     impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
   }
