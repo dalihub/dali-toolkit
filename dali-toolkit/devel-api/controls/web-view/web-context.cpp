@@ -144,6 +144,11 @@ void WebContext::RegisterMimeOverriddenCallback(Dali::WebEngineContext::WebEngin
   mWebEngineContext.RegisterMimeOverriddenCallback(callback);
 }
 
+void WebContext::RegisterRequestInterceptedCallback(Dali::WebEngineContext::WebEngineRequestInterceptedCallback callback)
+{
+  mWebEngineContext.RegisterRequestInterceptedCallback(callback);
+}
+
 void WebContext::EnableCache(bool cacheEnabled)
 {
   mWebEngineContext.EnableCache(cacheEnabled);
