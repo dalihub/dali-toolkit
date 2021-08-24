@@ -225,7 +225,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
 
               lastGlyphIndexOfLine = (line->isSplitToTwoHalves ? line->glyphRunSecondHalf.glyphIndex + line->glyphRunSecondHalf.numberOfGlyphs : line->glyphRun.glyphIndex + line->glyphRun.numberOfGlyphs) - 1u;
 
-              penY += line->ascender;
+              penY += line->ascender + line->lineSpacing;
             }
           }
         }
@@ -265,7 +265,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
           const LineRun& elidedLine = *ellipsisLine;
 
           if((1u == numberOfLines) &&
-             (elidedLine.ascender - elidedLine.descender > mImpl->mVisualModel->mControlSize.height))
+             (GetLineHeight(elidedLine) > mImpl->mVisualModel->mControlSize.height))
           {
             // Replace the first glyph with ellipsis glyph
             auto indexOfFirstGlyph = (ellipsisPosition == DevelText::EllipsisPosition::START) ? startIndexOfEllipsis : 0u;

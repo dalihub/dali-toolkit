@@ -133,6 +133,9 @@ const char* HANDLE_RIGHT_SELECTION_FILE_NAME = TEST_RESOURCE_DIR "/selection_han
 
 const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 
+static bool gSelectionChangedCallbackCalled;
+static uint32_t oldSelectionStart;
+static uint32_t oldSelectionEnd;
 static bool gAnchorClickedCallBackCalled;
 static bool gAnchorClickedCallBackNotCalled;
 static bool gTextChangedCallBackCalled;
@@ -140,6 +143,8 @@ static bool gInputFilteredAcceptedCallbackCalled;
 static bool gInputFilteredRejectedCallbackCalled;
 static bool gInputStyleChangedCallbackCalled;
 static bool gMaxCharactersCallBackCalled;
+static bool gCursorPositionChangedCallbackCalled;
+static uint32_t oldCursorPos;
 static Dali::Toolkit::TextEditor::InputStyle::Mask gInputStyleMask;
 
 struct CallbackFunctor
@@ -156,6 +161,15 @@ struct CallbackFunctor
   bool* mCallbackFlag;
 };
 
+static void TestSelectionChangedCallback(TextEditor control, uint32_t oldStart, uint32_t oldEnd)
+{
+  tet_infoline(" TestSelectionChangedCallback");
+
+  gSelectionChangedCallbackCalled = true;
+  oldSelectionStart = oldStart;
+  oldSelectionEnd   = oldEnd;
+}
+
 static void TestAnchorClickedCallback(TextEditor control, const char* href, unsigned int hrefLength)
 {
   tet_infoline(" TestAnchorClickedCallback");
@@ -166,6 +180,14 @@ static void TestAnchorClickedCallback(TextEditor control, const char* href, unsi
   {
     gAnchorClickedCallBackCalled = true;
   }
+}
+
+static void TestCursorPositionChangedCallback( TextEditor control, unsigned int oldPos )
+{
+  tet_infoline(" TestCursorPositionChangedCallback");
+
+  gCursorPositionChangedCallbackCalled = true;
+  oldCursorPos = oldPos;
 }
 
 static void TestTextChangedCallback( TextEditor control )
@@ -1004,6 +1026,11 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   application.SendNotification();
   application.Render();
+
+  // Check the line size property
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::MIN_LINE_SIZE ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  editor.SetProperty( DevelTextEditor::Property::MIN_LINE_SIZE, 50.f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::MIN_LINE_SIZE ), 50.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }
@@ -3973,6 +4000,291 @@ int UtcDaliToolkitTextEditorEllipsisPositionProperty(void)
   tet_infoline(" UtcDaliToolkitTextlabelEllipsisPositionProperty - Change to END using string - lowercase");
   textEditor.SetProperty(DevelTextEditor::Property::ELLIPSIS_POSITION, "end");
   DALI_TEST_EQUALS( textEditor.GetProperty< int >( DevelTextEditor::Property::ELLIPSIS_POSITION ), static_cast< int >( Toolkit::DevelText::EllipsisPosition::END ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorLineSpacing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorLineSpacing ");
+
+  TextEditor textEditor = TextEditor::New();
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.f ) );
+  application.GetScene().Add( textEditor );
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Line #1\nLine #2\nLine #3" );
+  textEditor.SetProperty( DevelTextEditor::Property::LINE_SPACING, 0 );
+
+  Vector3 sizeBefore = textEditor.GetNaturalSize();
+
+  textEditor.SetProperty( DevelTextEditor::Property::LINE_SPACING, 20 );
+
+  //add 20 for each line  20 * 3
+  DALI_TEST_EQUALS(sizeBefore.height + 60.0f, textEditor.GetNaturalSize().height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorMinLineSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMinLineSize ");
+
+  TextEditor textEditor = TextEditor::New();
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 400.0f, 400.f ) );
+  application.GetScene().Add( textEditor );
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Line #1\nLine #2\nLine #3" );
+  textEditor.SetProperty( DevelTextEditor::Property::MIN_LINE_SIZE, 0 );
+
+  Vector3 sizeBefore = textEditor.GetNaturalSize();
+
+  textEditor.SetProperty( DevelTextEditor::Property::MIN_LINE_SIZE, 60 );
+
+  DALI_TEST_NOT_EQUALS( sizeBefore, textEditor.GetNaturalSize(), 0.0f, TEST_LOCATION);
+
+  //60 * 3 lines
+  DALI_TEST_EQUALS(180.0f, textEditor.GetNaturalSize().height, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliTextEditorCursorPositionChangedSignal(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorCursorPositionChangedSignal");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextEditor::CursorPositionChangedSignal(editor).Connect(&TestCursorPositionChangedCallback);
+  bool cursorPositionChangedSignal = false;
+  editor.ConnectSignal( testTracker, "cursorPositionChanged",   CallbackFunctor(&cursorPositionChangedSignal) );
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  editor.SetKeyInputFocus();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 23, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  // Move to left.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 18, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  // Insert C
+  application.ProcessEvent( GenerateKey( "c", "", "c", KEY_C_CODE, 0, 0, Integration::KeyEvent::DOWN, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 17, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  //delete one character
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 18, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello" );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 17, TEST_LOCATION);
+
+  gCursorPositionChangedCallbackCalled = false;
+
+  editor.SetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 3);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldCursorPos, 5, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliTextEditorSelectionChangedSignal(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorSelectionChangedSignal");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextEditor::SelectionChangedSignal(editor).Connect(&TestSelectionChangedCallback);
+  bool selectionChangedSignal = false;
+  editor.ConnectSignal( testTracker, "selectionChanged",   CallbackFunctor(&selectionChangedSignal) );
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Select some text in the right of the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, oldSelectionEnd, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(oldSelectionEnd, 7, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(oldSelectionEnd, 8, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+  editor.SetKeyInputFocus();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DevelTextEditor::SelectText( editor ,0, 5 );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, oldSelectionEnd, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+
+  editor.SetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 3);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(oldSelectionEnd, 5, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+
+  // select all text
+  DevelTextEditor::SelectWholeText(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, oldSelectionEnd, TEST_LOCATION);
+
+  gSelectionChangedCallbackCalled = false;
+
+  // select none
+  DevelTextEditor::SelectNone(editor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
+  DALI_TEST_EQUALS(oldSelectionStart, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(oldSelectionEnd, 23, TEST_LOCATION);
 
   END_TEST;
 }

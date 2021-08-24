@@ -187,6 +187,23 @@ ImageVisual::~ImageVisual()
       }
     }
 
+    if(mImageUrl.IsValid())
+    {
+      // Decrease reference count of External Resources :
+      // EncodedImageBuffer or ExternalTextures.
+      // Ensure the stage is still valid before accessing texture manager.
+      if(mImageUrl.GetProtocolType() == VisualUrl::TEXTURE)
+      {
+        TextureManager& textureManager = mFactoryCache.GetTextureManager();
+        textureManager.RemoveExternalTexture(mImageUrl.GetUrl());
+      }
+      else if(mImageUrl.IsBufferResource())
+      {
+        TextureManager& textureManager = mFactoryCache.GetTextureManager();
+        textureManager.RemoveExternalEncodedImageBuffer(mImageUrl.GetUrl());
+      }
+    }
+
     // ImageVisual destroyed so remove texture unless ReleasePolicy is set to never release
     if((mTextureId != TextureManager::INVALID_TEXTURE_ID) && (mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER))
     {
@@ -528,6 +545,15 @@ void ImageVisual::OnInitialize()
     {
       geometry = CreateGeometry(mFactoryCache, ImageDimensions(1, 1));
     }
+  }
+
+  // Increase reference count of External Resources :
+  // EncodedImageBuffer or ExternalTextures.
+  // Reference count will be decreased at destructor of the visual.
+  if(mImageUrl.IsValid() && (mImageUrl.IsBufferResource() || mImageUrl.GetProtocolType() == VisualUrl::TEXTURE))
+  {
+    TextureManager& textureManager = mFactoryCache.GetTextureManager();
+    textureManager.UseExternalResource(mImageUrl.GetUrl());
   }
 
   Shader shader = GetShader();

@@ -93,9 +93,19 @@ public:
   DevelTextEditor::AnchorClickedSignalType& AnchorClickedSignal();
 
   /**
+   * @copydoc Dali::Toollkit::TextEditor::CursorPositionChangedSignal()
+   */
+  DevelTextEditor::CursorPositionChangedSignalType& CursorPositionChangedSignal();
+
+  /**
    * @copydoc Dali::Toollkit::TextEditor::InputFilteredSignal()
    */
   DevelTextEditor::InputFilteredSignalType& InputFilteredSignal();
+
+  /**
+   * @copydoc Dali::Toollkit::TextEditor::SelectionChangedSignal()
+   */
+  DevelTextEditor::SelectionChangedSignalType& SelectionChangedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -216,9 +226,9 @@ private: // From Control
   void TextDeleted(unsigned int position, unsigned int length, const std::string& content) override;
 
   /**
-   * @copydoc Text::EditableControlInterface::CursorMoved()
+   * @copydoc Text::EditableControlInterface::CursorPositionChanged()
    */
-  void CursorMoved(unsigned int position) override;
+  void CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition) override;
 
   /**
    * @copydoc Text::EditableControlInterface::TextChanged()
@@ -234,6 +244,11 @@ private: // From Control
    * @copydoc Text::EditableControlInterface::InputStyleChanged()
    */
   void InputStyleChanged(Text::InputStyle::Mask inputStyleMask) override;
+
+  /**
+   * @copydoc Text::SelectableControlInterface::SelectionChanged()
+   */
+  void SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t newStart, uint32_t newEnd) override;
 
   /**
    * @copydoc Text::EditableControlInterface::AddDecoration()
@@ -368,9 +383,19 @@ private: // Implementation
   void OnIdleSignal();
 
   /**
+   * @brief Emits CursorPositionChanged signal.
+   */
+  void EmitCursorPositionChangedSignal();
+
+  /**
    * @brief Emits TextChanged signal.
    */
   void EmitTextChangedSignal();
+
+  /**
+   * @brief Emits SelectionChanged signal.
+   */
+  void EmitSelectionChangedSignal();
 
   /**
    * @brief set RenderActor's position with new scrollPosition
@@ -425,12 +450,14 @@ private: // Implementation
 
 private: // Data
   // Signals
-  Toolkit::TextEditor::TextChangedSignalType           mTextChangedSignal;
-  Toolkit::TextEditor::InputStyleChangedSignalType     mInputStyleChangedSignal;
-  Toolkit::TextEditor::ScrollStateChangedSignalType    mScrollStateChangedSignal;
-  Toolkit::DevelTextEditor::MaxLengthReachedSignalType mMaxLengthReachedSignal;
-  Toolkit::DevelTextEditor::AnchorClickedSignalType    mAnchorClickedSignal;
-  Toolkit::DevelTextEditor::InputFilteredSignalType    mInputFilteredSignal;
+  Toolkit::TextEditor::TextChangedSignalType                mTextChangedSignal;
+  Toolkit::TextEditor::InputStyleChangedSignalType          mInputStyleChangedSignal;
+  Toolkit::TextEditor::ScrollStateChangedSignalType         mScrollStateChangedSignal;
+  Toolkit::DevelTextEditor::MaxLengthReachedSignalType      mMaxLengthReachedSignal;
+  Toolkit::DevelTextEditor::AnchorClickedSignalType         mAnchorClickedSignal;
+  Toolkit::DevelTextEditor::InputFilteredSignalType         mInputFilteredSignal;
+  Toolkit::DevelTextEditor::CursorPositionChangedSignalType mCursorPositionChangedSignal;
+  Toolkit::DevelTextEditor::SelectionChangedSignalType      mSelectionChangedSignal;
 
   InputMethodContext            mInputMethodContext;
   Text::ControllerPtr           mController;
@@ -457,7 +484,16 @@ private: // Data
   bool  mScrollAnimationEnabled : 1;
   bool  mScrollBarEnabled : 1;
   bool  mScrollStarted : 1;
-  bool  mTextChanged : 1; ///< If true, emits TextChangedSignal in next OnRelayout().
+  bool  mTextChanged : 1;           ///< If true, emits TextChangedSignal in next OnRelayout().
+  bool  mCursorPositionChanged : 1; ///< If true, emits CursorPositionChangedSignal at the end of OnRelayout().
+  bool  mSelectionChanged : 1;      ///< If true, emits SelectionChangedSignal at the end of OnRelayout().
+
+  //args for cursor PositionChanged event
+  unsigned int mOldPosition;
+
+  //args for selection changed event
+  uint32_t mOldSelectionStart;
+  uint32_t mOldSelectionEnd;
 
   /**
    * @brief This structure is to connect TextEditor with Accessible functions.

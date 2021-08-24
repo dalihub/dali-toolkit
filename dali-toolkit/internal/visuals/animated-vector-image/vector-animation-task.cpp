@@ -538,7 +538,7 @@ VectorAnimationTask::TimePoint VectorAnimationTask::CalculateNextFrameTime(bool 
   {
     uint32_t droppedFrames = 0;
 
-    while(current > std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds)))
+    while(current > std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds)) && droppedFrames < mTotalFrame)
     {
       droppedFrames++;
       mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds));

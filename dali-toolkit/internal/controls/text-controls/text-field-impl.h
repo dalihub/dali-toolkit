@@ -117,9 +117,19 @@ public:
   DevelTextField::AnchorClickedSignalType& AnchorClickedSignal();
 
   /**
+   * @copydoc TextField::CursorPositionChangedSignal()
+   */
+  DevelTextField::CursorPositionChangedSignalType& CursorPositionChangedSignal();
+
+  /**
    * @copydoc TextField::InputFilteredSignal()
    */
   DevelTextField::InputFilteredSignalType& InputFilteredSignal();
+
+  /**
+   * @copydoc TextField::SelectionChangedSignal()
+   */
+  DevelTextField::SelectionChangedSignalType& SelectionChangedSignal();
 
 private: // From Control
   /**
@@ -207,9 +217,9 @@ private: // From Control
   void TextDeleted(unsigned int position, unsigned int length, const std::string& content) override;
 
   /**
-   * @copydoc Text::EditableControlInterface::CursorMoved()
+   * @copydoc Text::EditableControlInterface::CursorPositionChanged()
    */
-  void CursorMoved(unsigned int position) override;
+  void CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition) override;
 
   /**
    * @copydoc Text::EditableControlInterface::TextChanged()
@@ -225,6 +235,11 @@ private: // From Control
    * @copydoc Text::EditableControlInterface::InputStyleChanged()
    */
   void InputStyleChanged(Text::InputStyle::Mask inputStyleMask) override;
+
+  /**
+   * @copydoc Text::SelectableControlInterface::SelectionChanged()
+   */
+  void SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t newStart, uint32_t newEnd) override;
 
   /**
    * @copydoc Text::EditableControlInterface::AddDecoration()
@@ -343,6 +358,16 @@ private: // Implementation
   void EmitTextChangedSignal();
 
   /**
+   * @brief Emits CursorPositionChanged signal.
+   */
+  void EmitCursorPositionChangedSignal();
+
+  /**
+   * @brief Emits SelectionChanged signal.
+   */
+  void EmitSelectionChangedSignal();
+
+  /**
    * @brief Callback function for when the layout is changed.
    * @param[in] actor The actor whose layoutDirection is changed.
    * @param[in] type  The layoutDirection.
@@ -381,11 +406,13 @@ private: // Implementation
 
 private: // Data
   // Signals
-  Toolkit::TextField::TextChangedSignalType        mTextChangedSignal;
-  Toolkit::TextField::MaxLengthReachedSignalType   mMaxLengthReachedSignal;
-  Toolkit::TextField::InputStyleChangedSignalType  mInputStyleChangedSignal;
-  Toolkit::DevelTextField::AnchorClickedSignalType mAnchorClickedSignal;
-  Toolkit::DevelTextField::InputFilteredSignalType mInputFilteredSignal;
+  Toolkit::TextField::TextChangedSignalType                mTextChangedSignal;
+  Toolkit::TextField::MaxLengthReachedSignalType           mMaxLengthReachedSignal;
+  Toolkit::TextField::InputStyleChangedSignalType          mInputStyleChangedSignal;
+  Toolkit::DevelTextField::AnchorClickedSignalType         mAnchorClickedSignal;
+  Toolkit::DevelTextField::InputFilteredSignalType         mInputFilteredSignal;
+  Toolkit::DevelTextField::CursorPositionChangedSignalType mCursorPositionChangedSignal;
+  Toolkit::DevelTextField::SelectionChangedSignalType      mSelectionChangedSignal;
 
   InputMethodContext       mInputMethodContext;
   Text::ControllerPtr      mController;
@@ -404,7 +431,16 @@ private: // Data
   int   mRenderingBackend;
   int   mExceedPolicy;
   bool  mHasBeenStaged : 1;
-  bool  mTextChanged : 1; ///< If true, emits TextChangedSignal in next OnRelayout().
+  bool  mTextChanged : 1;           ///< If true, emits TextChangedSignal in next OnRelayout().
+  bool  mCursorPositionChanged : 1; ///< If true, emits CursorPositionChangedSignal at the end of OnRelayout().
+  bool  mSelectionChanged : 1;      ///< If true, emits SelectionChangedSignal at the end of OnRelayout().
+
+  //args for cursor position changed event
+  unsigned int mOldPosition;
+
+  //args for selection changed event
+  uint32_t mOldSelectionStart;
+  uint32_t mOldSelectionEnd;
 
 protected:
   /**

@@ -69,6 +69,11 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
        (EventData::EDITING_WITH_GRAB_HANDLE == eventData->mState) ||
        (EventData::EDITING_WITH_PASTE_POPUP == eventData->mState))
     {
+      if((impl.mSelectableControlInterface != nullptr) && (EventData::SELECTING == eventData->mState))
+      {
+        impl.mSelectableControlInterface->SelectionChanged(eventData->mLeftSelectionPosition, eventData->mRightSelectionPosition, eventData->mPrimaryCursorPosition, eventData->mPrimaryCursorPosition);
+      }
+
       impl.ChangeState(EventData::EDITING);
     }
   }
@@ -139,6 +144,8 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
     controller.ShowPlaceholderText();
   }
 
+  unsigned int oldCursorPos = (nullptr != eventData ? eventData->mPrimaryCursorPosition : 0);
+
   // Resets the cursor position.
   controller.ResetCursorPosition(lastCursorIndex);
 
@@ -156,6 +163,7 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
   // Do this last since it provides callbacks into application code.
   if(NULL != impl.mEditableControlInterface)
   {
+    impl.mEditableControlInterface->CursorPositionChanged(oldCursorPos, lastCursorIndex);
     impl.mEditableControlInterface->TextChanged(true);
   }
 }
@@ -172,9 +180,10 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
     return;
   }
 
-  bool removedPrevious  = false;
-  bool removedSelected  = false;
-  bool maxLengthReached = false;
+  bool         removedPrevious  = false;
+  bool         removedSelected  = false;
+  bool         maxLengthReached = false;
+  unsigned int oldCursorPos     = eventData->mPrimaryCursorPosition;
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::InsertText %p %s (%s) mPrimaryCursorPosition %d mPreEditFlag %d mPreEditStartPosition %d mPreEditLength %d\n", &controller, text.c_str(), (COMMIT == type ? "COMMIT" : "PRE_EDIT"), eventData->mPrimaryCursorPosition, eventData->mPreEditFlag, eventData->mPreEditStartPosition, eventData->mPreEditLength);
 
@@ -418,6 +427,11 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
     }
   }
 
+  if(nullptr != impl.mEditableControlInterface)
+  {
+    impl.mEditableControlInterface->CursorPositionChanged(oldCursorPos, eventData->mPrimaryCursorPosition);
+  }
+
   if(maxLengthReached)
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "MaxLengthReached (%d)\n", logicalModel->mText.Count());
@@ -559,6 +573,11 @@ bool Controller::TextUpdater::RemoveText(
       if(impl.mMarkupProcessorEnabled)
       {
         RemoveTextAnchor(controller, cursorOffset, numberOfCharacters, previousCursorIndex);
+      }
+
+      if(nullptr != impl.mEditableControlInterface)
+      {
+        impl.mEditableControlInterface->CursorPositionChanged(previousCursorIndex, cursorIndex);
       }
 
       // Cursor position retreat

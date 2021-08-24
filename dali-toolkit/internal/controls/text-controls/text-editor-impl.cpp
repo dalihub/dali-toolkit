@@ -151,13 +151,15 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputMethodSett
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputFilter",                          MAP,       INPUT_FILTER                        )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsis",                             BOOLEAN,   ELLIPSIS                            )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsisPosition",                     INTEGER,   ELLIPSIS_POSITION                   )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "minLineSize",                          FLOAT,     MIN_LINE_SIZE                       )
 
-DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED       )
-DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED)
-DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
-DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "anchorClicked",      SIGNAL_ANCHOR_CLICKED     )
-DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputFiltered",      SIGNAL_INPUT_FILTERED     )
-
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "maxLengthReached",      SIGNAL_MAX_LENGTH_REACHED     )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "anchorClicked",         SIGNAL_ANCHOR_CLICKED         )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputFiltered",         SIGNAL_INPUT_FILTERED         )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "cursorPositionChanged", SIGNAL_CURSOR_POSITION_CHANGED)
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "selectionChanged",      SIGNAL_SELECTION_CHANGED      )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -491,13 +493,8 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextEditor::Property::LINE_SPACING:
       {
-        // The line spacing isn't supported by the TextEditor. Since it's supported
-        // by the TextLabel for now it must be ignored. The property is being shadowed
-        // locally so its value isn't affected.
         const float lineSpacing = value.Get<float>();
-        impl.mLineSpacing       = lineSpacing;
-        // set it to 0.0 due to missing implementation
-        impl.mController->SetDefaultLineSpacing(0.0f);
+        impl.mController->SetDefaultLineSpacing(lineSpacing);
         impl.mRenderer.Reset();
         break;
       }
@@ -832,6 +829,15 @@ void TextEditor::SetProperty(BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::MIN_LINE_SIZE:
+      {
+        const float minLineSize = value.Get<float>();
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextEditor %p MIN_LINE_SIZE %f\n", impl.mController.Get(), minLineSize);
+
+        impl.mController->SetDefaultLineSize(minLineSize);
+        impl.mRenderer.Reset();
+        break;
+      }
     } // switch
   }   // texteditor
 }
@@ -1011,9 +1017,7 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
       }
       case Toolkit::TextEditor::Property::LINE_SPACING:
       {
-        // LINE_SPACING isn't implemented for the TextEditor. Returning
-        // only shadowed value, not the real one.
-        value = impl.mLineSpacing;
+        value = impl.mController->GetDefaultLineSpacing();
         break;
       }
       case Toolkit::TextEditor::Property::INPUT_LINE_SPACING:
@@ -1222,6 +1226,11 @@ Property::Value TextEditor::GetProperty(BaseObject* object, Property::Index inde
         value = impl.mController->GetEllipsisPosition();
         break;
       }
+      case Toolkit::DevelTextEditor::Property::MIN_LINE_SIZE:
+      {
+        value = impl.mController->GetDefaultLineSize();
+        break;
+      }
     } //switch
   }
 
@@ -1305,9 +1314,19 @@ DevelTextEditor::AnchorClickedSignalType& TextEditor::AnchorClickedSignal()
   return mAnchorClickedSignal;
 }
 
+DevelTextEditor::CursorPositionChangedSignalType& TextEditor::CursorPositionChangedSignal()
+{
+  return mCursorPositionChangedSignal;
+}
+
 DevelTextEditor::InputFilteredSignalType& TextEditor::InputFilteredSignal()
 {
   return mInputFilteredSignal;
+}
+
+DevelTextEditor::SelectionChangedSignalType& TextEditor::SelectionChangedSignal()
+{
+  return mSelectionChangedSignal;
 }
 
 Text::ControllerPtr TextEditor::GetTextController()
@@ -1346,12 +1365,28 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
       editorImpl.AnchorClickedSignal().Connect(tracker, functor);
     }
   }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_CURSOR_POSITION_CHANGED))
+  {
+    if(editor)
+    {
+      Internal::TextEditor& editorImpl(GetImpl(editor));
+      editorImpl.CursorPositionChangedSignal().Connect(tracker, functor);
+    }
+  }
   else if(0 == strcmp(signalName.c_str(), SIGNAL_INPUT_FILTERED))
   {
     if(editor)
     {
       Internal::TextEditor& editorImpl(GetImpl(editor));
       editorImpl.InputFilteredSignal().Connect(tracker, functor);
+    }
+  }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_CHANGED))
+  {
+    if(editor)
+    {
+      Internal::TextEditor& editorImpl(GetImpl(editor));
+      editorImpl.SelectionChangedSignal().Connect(tracker, functor);
     }
   }
   else
@@ -1584,6 +1619,16 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
 
     RenderText(updateTextType);
+  }
+
+  if(mCursorPositionChanged)
+  {
+    EmitCursorPositionChangedSignal();
+  }
+
+  if(mSelectionChanged)
+  {
+    EmitSelectionChangedSignal();
   }
 
   // The text-editor emits signals when the input style changes. These changes of style are
@@ -1846,11 +1891,17 @@ void TextEditor::TextDeleted(unsigned int position, unsigned int length, const s
   }
 }
 
-void TextEditor::CursorMoved(unsigned int position)
+void TextEditor::CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition)
 {
   if(Accessibility::IsUp())
   {
-    Control::Impl::GetAccessibilityObject(Self())->EmitTextCursorMoved(position);
+    Control::Impl::GetAccessibilityObject(Self())->EmitTextCursorMoved(newPosition);
+  }
+
+  if((oldPosition != newPosition) && !mCursorPositionChanged)
+  {
+    mCursorPositionChanged = true;
+    mOldPosition           = oldPosition;
   }
 }
 
@@ -1939,10 +1990,42 @@ void TextEditor::AnchorClicked(const std::string& href)
   mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
 }
 
+void TextEditor::EmitCursorPositionChangedSignal()
+{
+  Dali::Toolkit::TextEditor handle(GetOwner());
+  mCursorPositionChanged = false;
+  mCursorPositionChangedSignal.Emit(handle, mOldPosition);
+}
+
 void TextEditor::InputFiltered(Toolkit::InputFilter::Property::Type type)
 {
   Dali::Toolkit::TextEditor handle(GetOwner());
   mInputFilteredSignal.Emit(handle, type);
+}
+
+void TextEditor::EmitSelectionChangedSignal()
+{
+  Dali::Toolkit::TextEditor handle(GetOwner());
+  mSelectionChangedSignal.Emit(handle, mOldSelectionStart, mOldSelectionEnd);
+  mSelectionChanged = false;
+}
+
+void TextEditor::SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t newStart, uint32_t newEnd)
+{
+  if(((oldStart != newStart) || (oldEnd != newEnd)) && !mSelectionChanged)
+  {
+    mSelectionChanged  = true;
+    mOldSelectionStart = oldStart;
+    mOldSelectionEnd   = oldEnd;
+
+    if(mOldSelectionStart > mOldSelectionEnd)
+    {
+      //swap
+      uint32_t temp      = mOldSelectionStart;
+      mOldSelectionStart = mOldSelectionEnd;
+      mOldSelectionEnd   = temp;
+    }
+  }
 }
 
 void TextEditor::AddDecoration(Actor& actor, bool needsClipping)
@@ -2222,7 +2305,9 @@ TextEditor::TextEditor()
   mScrollAnimationEnabled(false),
   mScrollBarEnabled(false),
   mScrollStarted(false),
-  mTextChanged(false)
+  mTextChanged(false),
+  mCursorPositionChanged(false),
+  mSelectionChanged(false)
 {
 }
 
@@ -2291,10 +2376,10 @@ bool TextEditor::AccessibleImpl::SetCursorOffset(size_t offset)
   return true;
 }
 
-Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset( size_t offset, Dali::Accessibility::TextBoundary boundary)
+Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto self = Toolkit::TextEditor::DownCast(Self());
-  auto text = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
+  auto self     = Toolkit::TextEditor::DownCast(Self());
+  auto text     = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
   auto textSize = text.size();
 
   auto range = Dali::Accessibility::Range{};
@@ -2315,7 +2400,7 @@ Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset( size_t o
     case Dali::Accessibility::TextBoundary::LINE:
     {
       auto textString = text.c_str();
-      auto breaks = std::vector<char>(textSize, 0);
+      auto breaks     = std::vector<char>(textSize, 0);
 
       if(boundary == Dali::Accessibility::TextBoundary::WORD)
       {
@@ -2390,8 +2475,8 @@ Dali::Accessibility::Range TextEditor::AccessibleImpl::GetRangeOfSelection(size_
     return {};
   }
 
-  auto self  = Toolkit::TextEditor::DownCast(Self());
-  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
+  auto        self       = Toolkit::TextEditor::DownCast(Self());
+  auto        controller = Dali::Toolkit::GetImpl(self).GetTextController();
   std::string value{};
   controller->RetrieveSelection(value);
   auto indices = controller->GetSelectionIndexes();
@@ -2474,7 +2559,7 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
 {
   using namespace Dali::Accessibility;
 
-  auto states = DevelControl::AccessibleImpl::CalculateStates();
+  auto states              = DevelControl::AccessibleImpl::CalculateStates();
   states[State::EDITABLE]  = true;
   states[State::FOCUSABLE] = true;
 
@@ -2489,7 +2574,7 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
 
 bool TextEditor::AccessibleImpl::InsertText(size_t startPosition, std::string text)
 {
-  auto self = Toolkit::TextEditor::DownCast(Self());
+  auto self         = Toolkit::TextEditor::DownCast(Self());
   auto insertedText = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
 
   insertedText.insert(startPosition, text);

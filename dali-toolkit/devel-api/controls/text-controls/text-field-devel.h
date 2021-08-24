@@ -247,6 +247,26 @@ using AnchorClickedSignalType = Signal<void(TextField, const char*, uint32_t)>;
 DALI_TOOLKIT_API AnchorClickedSignalType& AnchorClickedSignal(TextField textField);
 
 /**
+ * @brief cursor position changed signal type.
+ *
+ * @note Signal
+ *  - uint32_t    : old position.
+ */
+using CursorPositionChangedSignalType = Signal<void(TextField, uint32_t)>;
+
+/**
+ * @brief This signal is emitted when the cursor position has been changed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName(TextField textField, uint32_t oldPosition);
+ * @endcode
+ * @param[in] textField The instance of TextField.
+ * @return The signal to connect to.
+ */
+DALI_TOOLKIT_API CursorPositionChangedSignalType& CursorPositionChangedSignal(TextField textField);
+
+/**
  * @brief Input filtered signal type.
  */
 using InputFilteredSignalType = Signal<void(TextField, Toolkit::InputFilter::Property::Type)>;
@@ -276,6 +296,27 @@ using InputFilteredSignalType = Signal<void(TextField, Toolkit::InputFilter::Pro
  * @return The signal to connect to.
  */
 DALI_TOOLKIT_API InputFilteredSignalType& InputFilteredSignal(TextField textField);
+
+/**
+ * @brief selection changed signal type.
+ *
+ * @note Signal
+ *  - uint32_t  : selection start before the change.
+ *  - uint32_t  : selection end before the change.
+ */
+using SelectionChangedSignalType = Signal<void(TextField, uint32_t, uint32_t)>;
+
+/**
+ * @brief This signal is emitted when the selection has been changed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( TextField textField, uint32_t oldStart, uint32_t oldEnd);
+ * @endcode
+ * @param[in] textField The instance of TextField.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API SelectionChangedSignalType& SelectionChangedSignal(TextField textField);
 
 /**
  * @brief Select the whole text of TextField.

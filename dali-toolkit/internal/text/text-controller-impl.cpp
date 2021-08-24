@@ -1209,7 +1209,9 @@ void Controller::Impl::SetTextSelectionRange(const uint32_t* pStart, const uint3
 
   if(mEventData->mSelectionEnabled && (pStart || pEnd))
   {
-    uint32_t length = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
+    uint32_t length   = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
+    uint32_t oldStart = mEventData->mLeftSelectionPosition;
+    uint32_t oldEnd   = mEventData->mRightSelectionPosition;
 
     if(pStart)
     {
@@ -1232,6 +1234,11 @@ void Controller::Impl::SetTextSelectionRange(const uint32_t* pStart, const uint3
       mEventData->mUpdateHighlightBox           = true;
       mEventData->mUpdateLeftSelectionPosition  = true;
       mEventData->mUpdateRightSelectionPosition = true;
+    }
+
+    if(mSelectableControlInterface != nullptr)
+    {
+      mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition);
     }
   }
 }
@@ -1260,15 +1267,31 @@ bool Controller::Impl::SetPrimaryCursorPosition(CharacterIndex index, bool focus
   }
 
   uint32_t length                    = static_cast<uint32_t>(mModel->mLogicalModel->mText.Count());
+  uint32_t oldCursorPos              = mEventData->mPrimaryCursorPosition;
   mEventData->mPrimaryCursorPosition = std::min(index, length);
   // If there is no focus, only the value is updated.
   if(focused)
   {
+    bool     wasInSelectingState = mEventData->mState == EventData::SELECTING;
+    uint32_t oldStart            = mEventData->mLeftSelectionPosition;
+    uint32_t oldEnd              = mEventData->mRightSelectionPosition;
     ChangeState(EventData::EDITING);
     mEventData->mLeftSelectionPosition = mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
     mEventData->mUpdateCursorPosition                                        = true;
+
+    if(mSelectableControlInterface != nullptr && wasInSelectingState)
+    {
+      mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition);
+    }
+
     ScrollTextToMatchCursor();
   }
+
+  if(nullptr != mEditableControlInterface)
+  {
+    mEditableControlInterface->CursorPositionChanged(oldCursorPos, mEventData->mPrimaryCursorPosition);
+  }
+
   return true;
 }
 
@@ -1377,9 +1400,17 @@ void Controller::Impl::RetrieveSelection(std::string& selectedText, bool deleteA
 
 void Controller::Impl::SetSelection(int start, int end)
 {
+  uint32_t oldStart = mEventData->mLeftSelectionPosition;
+  uint32_t oldEnd   = mEventData->mRightSelectionPosition;
+
   mEventData->mLeftSelectionPosition  = start;
   mEventData->mRightSelectionPosition = end;
   mEventData->mUpdateCursorPosition   = true;
+
+  if(mSelectableControlInterface != nullptr)
+  {
+    mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, start, end);
+  }
 }
 
 std::pair<int, int> Controller::Impl::GetSelectionIndexes() const

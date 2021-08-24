@@ -72,6 +72,16 @@ public:
    * @return The seletced text.
    */
   virtual string GetSelectedText() const = 0;
+
+  /**
+   * @brief Called when the selection has been changed.
+   *
+   * @param oldStart the selection handles start position before the change.
+   * @param oldEnd   the selection handles end position before the change.
+   * @param newStart the selection handles start position after the change.
+   * @param newEnd   the selection handles end position after the change.
+   */
+  virtual void SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t newStart, uint32_t newEnd) = 0;
 };
 
 } // namespace Text

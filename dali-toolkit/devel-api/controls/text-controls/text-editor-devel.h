@@ -267,6 +267,13 @@ enum Type
   * @see DevelText::EllipsisPosition
   */
   ELLIPSIS_POSITION,
+
+  /**
+   * @brief Sets the height of the line in points.
+   * @details Name "minLineSize", type Property::FLOAT.
+   * @note If the font size is larger than the line size, it works with the font size.
+   */
+  MIN_LINE_SIZE,
 };
 
 } // namespace Property
@@ -318,6 +325,26 @@ using AnchorClickedSignalType = Signal<void(TextEditor, const char*, uint32_t)>;
 DALI_TOOLKIT_API AnchorClickedSignalType& AnchorClickedSignal(TextEditor textEditor);
 
 /**
+ * @brief cursor position changed signal type.
+ *
+ * @note Signal
+ *  - uint32_t    : old position.
+ */
+using CursorPositionChangedSignalType = Signal<void(TextEditor, uint32_t)>;
+
+/**
+ * @brief This signal is emitted when the cursor position has been changed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName(TextEditor textEditor, uint32_t oldPosition);
+ * @endcode
+ * @param[in] textEditor The instance of TextEditor.
+ * @return The signal to connect to.
+ */
+DALI_TOOLKIT_API CursorPositionChangedSignalType& CursorPositionChangedSignal(TextEditor textEditor);
+
+/**
  * @brief Input filtered signal type.
  */
 using InputFilteredSignalType = Signal<void(TextEditor, Toolkit::InputFilter::Property::Type)>;
@@ -347,6 +374,27 @@ using InputFilteredSignalType = Signal<void(TextEditor, Toolkit::InputFilter::Pr
  * @return The signal to connect to.
  */
 DALI_TOOLKIT_API InputFilteredSignalType& InputFilteredSignal(TextEditor textEditor);
+
+/**
+ * @brief selection changed signal type.
+ *
+ * @note Signal
+ *  - uint32_t  : selection start before the change.
+ *  - uint32_t  : selection end before the change.
+ */
+using SelectionChangedSignalType = Signal<void(TextEditor, uint32_t, uint32_t)>;
+
+/**
+ * @brief This signal is emitted when the selection has been changed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( TextEditor textEditor, uint32_t oldStart, uint32_t oldEnd);
+ * @endcode
+ * @param[in] textEditor The instance of TextEditor.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API SelectionChangedSignalType& SelectionChangedSignal(TextEditor textEditor);
 
 /**
  * @brief Select the whole text of TextEditor.

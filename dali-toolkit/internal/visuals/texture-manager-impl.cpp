@@ -469,6 +469,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
       if(encodedImageBuffer)
       {
         textureId = targetId;
+
+        // Increase EncodedImageBuffer reference during it contains mTextureInfoContainer.
+        UseExternalResource(url.GetUrl());
+
         // Insert this buffer at mTextureInfoContainer.
         // This buffer will decode at ImageLoaderThread.
         bool preMultiply = (preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
@@ -604,6 +608,11 @@ void TextureManager::Remove(const TextureManager::TextureId textureId, TextureUp
       // If the state allows us to remove the TextureInfo data, we do so.
       if(removeTextureInfo)
       {
+        // If url location is BUFFER, decrease reference count of EncodedImageBuffer.
+        if(textureInfo.url.IsBufferResource())
+        {
+          RemoveExternalEncodedImageBuffer(textureInfo.url.GetUrl());
+        }
         // Permanently remove the textureInfo struct.
         mTextureInfoContainer.erase(mTextureInfoContainer.begin() + textureInfoIndex);
       }

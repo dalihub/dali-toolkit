@@ -144,9 +144,7 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
 
   lineRun += firstLineIndex;
 
-  // The line height is the addition of the line ascender and the line descender.
-  // However, the line descender has a negative value, hence the subtraction.
-  selectionBoxInfo->lineHeight = lineRun->ascender - lineRun->descender;
+  selectionBoxInfo->lineHeight = GetLineHeight(*lineRun);
 
   GlyphIndex lastGlyphOfLine = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
 
@@ -275,9 +273,7 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
         // Update the line's vertical offset.
         selectionBoxInfo->lineOffset = currentLineOffset + currentLineHeight;
 
-        // The line height is the addition of the line ascender and the line descender.
-        // However, the line descender has a negative value, hence the subtraction.
-        selectionBoxInfo->lineHeight = lineRun->ascender - lineRun->descender;
+        selectionBoxInfo->lineHeight = GetLineHeight(*lineRun);
       }
     }
   }
@@ -495,6 +491,9 @@ void SelectionHandleController::Reposition(Controller::Impl& impl, float visualX
 
   if(characterHit || (Controller::NoTextTap::HIGHLIGHT == action))
   {
+    uint32_t oldStart = eventData->mLeftSelectionPosition;
+    uint32_t oldEnd   = eventData->mRightSelectionPosition;
+
     impl.ChangeState(EventData::SELECTING);
 
     eventData->mLeftSelectionPosition  = selectionStart;
@@ -514,6 +513,11 @@ void SelectionHandleController::Reposition(Controller::Impl& impl, float visualX
 
     // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
     eventData->mPrimaryCursorPosition = std::max(eventData->mLeftSelectionPosition, eventData->mRightSelectionPosition);
+
+    if(impl.mSelectableControlInterface != nullptr)
+    {
+      impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, eventData->mLeftSelectionPosition, eventData->mRightSelectionPosition);
+    }
   }
   else if(Controller::NoTextTap::SHOW_SELECTION_POPUP == action)
   {

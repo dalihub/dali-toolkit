@@ -54,6 +54,8 @@ bool ControllerImplEventHandler::ProcessInputEvents(Controller::Impl& impl)
     return false;
   }
 
+  unsigned int oldPos = eventData->mPrimaryCursorPosition;
+
   if(eventData->mDecorator)
   {
     for(std::vector<Event>::iterator iter = eventData->mEventQueue.begin();
@@ -124,12 +126,14 @@ bool ControllerImplEventHandler::ProcessInputEvents(Controller::Impl& impl)
   {
     // Updates the cursor position and scrolls the text to make it visible.
     CursorInfo cursorInfo;
+
     // Calculate the cursor position from the new cursor index.
     impl.GetCursorPosition(eventData->mPrimaryCursorPosition, cursorInfo);
 
-    if(nullptr != impl.mEditableControlInterface)
+    //only emit the event if the cursor is moved in current function.
+    if(nullptr != impl.mEditableControlInterface && eventData->mEventQueue.size() > 0)
     {
-      impl.mEditableControlInterface->CursorMoved(eventData->mPrimaryCursorPosition);
+      impl.mEditableControlInterface->CursorPositionChanged(oldPos, eventData->mPrimaryCursorPosition);
     }
 
     if(eventData->mUpdateCursorHookPosition)
@@ -338,7 +342,7 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
     const LineRun& line = *(visualModel->mLines.Begin() + previousLineIndex);
 
     // Get the next hit 'y' point.
-    const float hitPointY = cursorInfo.lineOffset - 0.5f * (line.ascender - line.descender);
+    const float hitPointY = cursorInfo.lineOffset - 0.5f * GetLineHeight(line);
 
     // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
     bool matchedCharacter = false;
@@ -374,7 +378,7 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       const LineRun& line = *(visualModel->mLines.Begin() + lineIndex + 1u);
 
       // Get the next hit 'y' point.
-      const float hitPointY = cursorInfo.lineOffset + cursorInfo.lineHeight + 0.5f * (line.ascender - line.descender);
+      const float hitPointY = cursorInfo.lineOffset + cursorInfo.lineHeight + 0.5f * GetLineHeight(line);
 
       // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
       bool matchedCharacter = false;
@@ -406,7 +410,15 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       int cursorPositionDelta = primaryCursorPosition - previousPrimaryCursorPosition;
       if(cursorPositionDelta > 0 || eventData.mRightSelectionPosition > 0u) // Check the boundary
       {
+        uint32_t oldStart = eventData.mLeftSelectionPosition;
+        uint32_t oldEnd   = eventData.mRightSelectionPosition;
+
         eventData.mRightSelectionPosition += cursorPositionDelta;
+
+        if(impl.mSelectableControlInterface != nullptr)
+        {
+          impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
+        }
       }
       selecting = true;
     }
@@ -673,8 +685,16 @@ void ControllerImplEventHandler::OnSelectAllEvent(Controller::Impl& impl)
                                       0.f - scrollPosition.y,
                                       Controller::NoTextTap::HIGHLIGHT);
 
+      uint32_t oldStart = eventData.mLeftSelectionPosition;
+      uint32_t oldEnd   = eventData.mRightSelectionPosition;
+
       eventData.mLeftSelectionPosition  = 0u;
       eventData.mRightSelectionPosition = model->mLogicalModel->mText.Count();
+
+      if(impl.mSelectableControlInterface != nullptr)
+      {
+        impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
+      }
     }
   }
 }
@@ -689,11 +709,19 @@ void ControllerImplEventHandler::OnSelectNoneEvent(Controller::Impl& impl)
     if(eventData.mSelectionEnabled && eventData.mState == EventData::SELECTING)
     {
       eventData.mPrimaryCursorPosition = 0u;
+      uint32_t oldStart                = eventData.mLeftSelectionPosition;
+      uint32_t oldEnd                  = eventData.mRightSelectionPosition;
+
       eventData.mLeftSelectionPosition = eventData.mRightSelectionPosition = eventData.mPrimaryCursorPosition;
       impl.ChangeState(EventData::INACTIVE);
       eventData.mUpdateCursorPosition      = true;
       eventData.mUpdateInputStyle          = true;
       eventData.mScrollAfterUpdatePosition = true;
+
+      if(impl.mSelectableControlInterface != nullptr)
+      {
+        impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
+      }
     }
   }
 }
@@ -712,11 +740,19 @@ void ControllerImplEventHandler::OnSelectRangeEvent(Controller::Impl& impl, cons
 
     if(start != end)
     {
+      uint32_t oldStart = impl.mEventData->mLeftSelectionPosition;
+      uint32_t oldEnd   = impl.mEventData->mRightSelectionPosition;
+
       // Calculates the logical position from the x,y coords.
       impl.RepositionSelectionHandles(0.f - scrollPosition.x, 0.f - scrollPosition.y, Controller::NoTextTap::HIGHLIGHT);
 
       impl.mEventData->mLeftSelectionPosition  = start;
       impl.mEventData->mRightSelectionPosition = end;
+
+      if(impl.mSelectableControlInterface != nullptr)
+      {
+        impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, start, end);
+      }
     }
   }
 }
@@ -741,6 +777,8 @@ void ControllerImplEventHandler::OnHandlePressed(Controller::Impl& impl, const E
                                                                        matchedCharacter);
 
   EventData& eventData = *impl.mEventData;
+  uint32_t   oldStart  = eventData.mLeftSelectionPosition;
+  uint32_t   oldEnd    = eventData.mRightSelectionPosition;
 
   if(Event::GRAB_HANDLE_EVENT == event.type)
   {
@@ -800,6 +838,11 @@ void ControllerImplEventHandler::OnHandlePressed(Controller::Impl& impl, const E
     eventData.mIsLeftHandleSelected  = false;
     eventData.mIsRightHandleSelected = true;
   }
+
+  if((impl.mSelectableControlInterface != nullptr) || eventData.mUpdateRightSelectionPosition || eventData.mUpdateLeftSelectionPosition)
+  {
+    impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
+  }
 }
 
 void ControllerImplEventHandler::OnHandleReleased(Controller::Impl& impl, const Event& event, const bool isSmoothHandlePanEnabled, const bool handleStopScrolling)
@@ -825,6 +868,8 @@ void ControllerImplEventHandler::OnHandleReleased(Controller::Impl& impl, const 
   }
 
   EventData& eventData = *impl.mEventData;
+  uint32_t   oldStart  = eventData.mLeftSelectionPosition;
+  uint32_t   oldEnd    = eventData.mRightSelectionPosition;
 
   if(Event::GRAB_HANDLE_EVENT == event.type)
   {
@@ -879,6 +924,11 @@ void ControllerImplEventHandler::OnHandleReleased(Controller::Impl& impl, const 
         eventData.mRightSelectionPosition = handlePosition;
       }
     }
+  }
+
+  if((impl.mSelectableControlInterface != nullptr) || eventData.mUpdateRightSelectionPosition || eventData.mUpdateLeftSelectionPosition)
+  {
+    impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
   }
 
   eventData.mDecoratorUpdated = true;
@@ -995,6 +1045,8 @@ void ControllerImplEventHandler::OnHandleScrolling(Controller::Impl& impl, const
                                                                       position.y - scrollPosition.y,
                                                                       CharacterHitTest::SCROLL,
                                                                       matchedCharacter);
+    uint32_t             oldStart         = eventData.mLeftSelectionPosition;
+    uint32_t             oldEnd           = eventData.mRightSelectionPosition;
 
     if(leftSelectionHandleEvent)
     {
@@ -1025,6 +1077,11 @@ void ControllerImplEventHandler::OnHandleScrolling(Controller::Impl& impl, const
       impl.RepositionSelectionHandles();
 
       eventData.mScrollAfterUpdatePosition = !isSmoothHandlePanEnabled;
+
+      if(impl.mSelectableControlInterface != nullptr)
+      {
+        impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
+      }
     }
   }
   eventData.mDecoratorUpdated = true;

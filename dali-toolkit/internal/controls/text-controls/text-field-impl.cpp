@@ -140,11 +140,13 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "grabHandleColor"
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "inputFilter",                      MAP,       INPUT_FILTER                        )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "ellipsisPosition",                 INTEGER,   ELLIPSIS_POSITION                   )
 
-DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",       SIGNAL_TEXT_CHANGED       )
-DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",  SIGNAL_MAX_LENGTH_REACHED )
-DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "inputStyleChanged", SIGNAL_INPUT_STYLE_CHANGED)
-DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "anchorClicked",     SIGNAL_ANCHOR_CLICKED     )
-DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "inputFiltered",     SIGNAL_INPUT_FILTERED     )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",           SIGNAL_TEXT_CHANGED           )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",      SIGNAL_MAX_LENGTH_REACHED     )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "anchorClicked",         SIGNAL_ANCHOR_CLICKED         )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "inputFiltered",         SIGNAL_INPUT_FILTERED         )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "cursorPositionChanged", SIGNAL_CURSOR_POSITION_CHANGED)
+DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "selectionChanged",      SIGNAL_SELECTION_CHANGED      )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -1246,12 +1248,28 @@ bool TextField::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       fieldImpl.AnchorClickedSignal().Connect(tracker, functor);
     }
   }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_CURSOR_POSITION_CHANGED))
+  {
+    if(field)
+    {
+      Internal::TextField& fieldImpl(GetImpl(field));
+      fieldImpl.CursorPositionChangedSignal().Connect(tracker, functor);
+    }
+  }
   else if(0 == strcmp(signalName.c_str(), SIGNAL_INPUT_FILTERED))
   {
     if(field)
     {
       Internal::TextField& fieldImpl(GetImpl(field));
       fieldImpl.InputFilteredSignal().Connect(tracker, functor);
+    }
+  }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_CHANGED))
+  {
+    if(field)
+    {
+      Internal::TextField& fieldImpl(GetImpl(field));
+      fieldImpl.SelectionChangedSignal().Connect(tracker, functor);
     }
   }
   else
@@ -1283,9 +1301,19 @@ DevelTextField::AnchorClickedSignalType& TextField::AnchorClickedSignal()
   return mAnchorClickedSignal;
 }
 
+DevelTextField::CursorPositionChangedSignalType& TextField::CursorPositionChangedSignal()
+{
+  return mCursorPositionChangedSignal;
+}
+
 DevelTextField::InputFilteredSignalType& TextField::InputFilteredSignal()
 {
   return mInputFilteredSignal;
+}
+
+DevelTextField::SelectionChangedSignalType& TextField::SelectionChangedSignal()
+{
+  return mSelectionChangedSignal;
 }
 
 void TextField::OnInitialize()
@@ -1482,6 +1510,16 @@ void TextField::OnRelayout(const Vector2& size, RelayoutContainer& container)
     }
 
     RenderText(updateTextType);
+  }
+
+  if(mCursorPositionChanged)
+  {
+    EmitCursorPositionChangedSignal();
+  }
+
+  if(mSelectionChanged)
+  {
+    EmitSelectionChangedSignal();
   }
 
   // The text-field emits signals when the input style changes. These changes of style are
@@ -1765,11 +1803,17 @@ void TextField::TextDeleted(unsigned int position, unsigned int length, const st
   }
 }
 
-void TextField::CursorMoved(unsigned int position)
+void TextField::CursorPositionChanged(unsigned int oldPosition, unsigned int newPosition)
 {
   if(Accessibility::IsUp())
   {
-    Control::Impl::GetAccessibilityObject(Self())->EmitTextCursorMoved(position);
+    Control::Impl::GetAccessibilityObject(Self())->EmitTextCursorMoved(newPosition);
+  }
+
+  if((oldPosition != newPosition) && !mCursorPositionChanged)
+  {
+    mCursorPositionChanged = true;
+    mOldPosition           = oldPosition;
   }
 }
 
@@ -1854,10 +1898,42 @@ void TextField::AnchorClicked(const std::string& href)
   mAnchorClickedSignal.Emit(handle, href.c_str(), href.length());
 }
 
+void TextField::EmitCursorPositionChangedSignal()
+{
+  Dali::Toolkit::TextField handle(GetOwner());
+  mCursorPositionChangedSignal.Emit(handle, mOldPosition);
+  mCursorPositionChanged = false;
+}
+
 void TextField::InputFiltered(Toolkit::InputFilter::Property::Type type)
 {
   Dali::Toolkit::TextField handle(GetOwner());
   mInputFilteredSignal.Emit(handle, type);
+}
+
+void TextField::EmitSelectionChangedSignal()
+{
+  Dali::Toolkit::TextField handle(GetOwner());
+  mSelectionChangedSignal.Emit(handle, mOldSelectionStart, mOldSelectionEnd);
+  mSelectionChanged = false;
+}
+
+void TextField::SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t newStart, uint32_t newEnd)
+{
+  if(((oldStart != newStart) || (oldEnd != newEnd)) && !mSelectionChanged)
+  {
+    mSelectionChanged  = true;
+    mOldSelectionStart = oldStart;
+    mOldSelectionEnd   = oldEnd;
+
+    if(mOldSelectionStart > mOldSelectionEnd)
+    {
+      //swap
+      uint32_t temp      = mOldSelectionStart;
+      mOldSelectionStart = mOldSelectionEnd;
+      mOldSelectionEnd   = temp;
+    }
+  }
 }
 
 void TextField::AddDecoration(Actor& actor, bool needsClipping)
@@ -1996,7 +2072,9 @@ TextField::TextField()
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mExceedPolicy(Dali::Toolkit::TextField::EXCEED_POLICY_CLIP),
   mHasBeenStaged(false),
-  mTextChanged(false)
+  mTextChanged(false),
+  mCursorPositionChanged(false),
+  mSelectionChanged(false)
 {
 }
 
@@ -2067,8 +2145,8 @@ bool TextField::AccessibleImpl::SetCursorOffset(size_t offset)
 Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
   size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto self = Toolkit::TextField::DownCast(Self());
-  auto text = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
+  auto self     = Toolkit::TextField::DownCast(Self());
+  auto text     = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
   auto textSize = text.size();
 
   auto range = Dali::Accessibility::Range{};
@@ -2089,7 +2167,7 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
     case Dali::Accessibility::TextBoundary::LINE:
     {
       auto textString = text.c_str();
-      auto breaks = std::vector<char>(textSize, 0);
+      auto breaks     = std::vector<char>(textSize, 0);
 
       if(boundary == Dali::Accessibility::TextBoundary::WORD)
       {
@@ -2164,8 +2242,8 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetRangeOfSelection(size_t
     return {};
   }
 
-  auto self  = Toolkit::TextField::DownCast(Self());
-  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
+  auto        self       = Toolkit::TextField::DownCast(Self());
+  auto        controller = Dali::Toolkit::GetImpl(self).GetTextController();
   std::string value{};
   controller->RetrieveSelection(value);
   auto indices = controller->GetSelectionIndexes();
@@ -2264,7 +2342,7 @@ Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
 
 bool TextField::AccessibleImpl::InsertText(size_t startPosition, std::string text)
 {
-  auto self = Toolkit::TextField::DownCast(Self());
+  auto self         = Toolkit::TextField::DownCast(Self());
   auto insertedText = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
 
   insertedText.insert(startPosition, text);
