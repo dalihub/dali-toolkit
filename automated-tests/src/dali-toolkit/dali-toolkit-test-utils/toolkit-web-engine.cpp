@@ -83,6 +83,7 @@ bool OnStorageUsageAcquired();
 bool OnFormPasswordAcquired();
 bool OnDownloadStarted();
 bool OnMimeOverridden();
+bool OnRequestIntercepted();
 bool OnChangesWatch();
 bool OnPlainTextReceived();
 
@@ -155,7 +156,7 @@ public:
   {
   }
 
-  bool GetWebDatabaseOrigins(Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback callback)
+  bool GetWebDatabaseOrigins(Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback callback) override
   {
     if (callback)
     {
@@ -165,12 +166,12 @@ public:
     return true;
   }
 
-  bool DeleteWebDatabase(Dali::WebEngineSecurityOrigin& origin)
+  bool DeleteWebDatabase(Dali::WebEngineSecurityOrigin& origin) override
   {
     return true;
   }
 
-  bool GetWebStorageOrigins(Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback callback)
+  bool GetWebStorageOrigins(Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback callback) override
   {
     if (callback)
     {
@@ -180,7 +181,7 @@ public:
     return true;
   }
 
-  bool GetWebStorageUsageForOrigin(Dali::WebEngineSecurityOrigin& origin, Dali::WebEngineContext::WebEngineStorageUsageAcquiredCallback callback) 
+  bool GetWebStorageUsageForOrigin(Dali::WebEngineSecurityOrigin& origin, Dali::WebEngineContext::WebEngineStorageUsageAcquiredCallback callback) override
   {
     if (callback)
     {
@@ -194,7 +195,7 @@ public:
   {
   }
 
-  bool DeleteWebStorage(Dali::WebEngineSecurityOrigin& origin)
+  bool DeleteWebStorage(Dali::WebEngineSecurityOrigin& origin) override
   {
     return true;
   }
@@ -207,12 +208,12 @@ public:
   {
   }
 
-  bool DeleteApplicationCache(Dali::WebEngineSecurityOrigin& origin)
+  bool DeleteApplicationCache(Dali::WebEngineSecurityOrigin& origin) override
   {
     return true;
   }
 
-  void GetFormPasswordList(Dali::WebEngineContext::WebEngineFormPasswordAcquiredCallback callback)
+  void GetFormPasswordList(Dali::WebEngineContext::WebEngineFormPasswordAcquiredCallback callback) override
   {
     if (callback)
     {
@@ -221,7 +222,7 @@ public:
     }
   }
 
-  void RegisterDownloadStartedCallback(Dali::WebEngineContext::WebEngineDownloadStartedCallback callback)
+  void RegisterDownloadStartedCallback(Dali::WebEngineContext::WebEngineDownloadStartedCallback callback) override
   {
     if (callback)
     {
@@ -230,12 +231,21 @@ public:
     }
   }
 
-  void RegisterMimeOverriddenCallback(Dali::WebEngineContext::WebEngineMimeOverriddenCallback callback)
+  void RegisterMimeOverriddenCallback(Dali::WebEngineContext::WebEngineMimeOverriddenCallback callback) override
   {
     if (callback)
     {
       ConnectToGlobalSignal(&OnMimeOverridden);
       mMimeOverriddenCallback = callback;
+    }
+  }
+
+  void RegisterRequestInterceptedCallback(Dali::WebEngineContext::WebEngineRequestInterceptedCallback callback) override
+  {
+    if (callback)
+    {
+      ConnectToGlobalSignal(&OnRequestIntercepted);
+      mRequestInterceptedCallback = callback;
     }
   }
 
@@ -317,10 +327,11 @@ public:
 
 public:
   Dali::WebEngineContext::WebEngineSecurityOriginAcquiredCallback mSecurityOriginAcquiredCallback;
-  Dali::WebEngineContext::WebEngineStorageUsageAcquiredCallback mStorageUsageAcquiredCallback;
-  Dali::WebEngineContext::WebEngineFormPasswordAcquiredCallback mFormPasswordAcquiredCallback;
-  Dali::WebEngineContext::WebEngineDownloadStartedCallback mDownloadStartedCallback;
-  Dali::WebEngineContext::WebEngineMimeOverriddenCallback mMimeOverriddenCallback;
+  Dali::WebEngineContext::WebEngineStorageUsageAcquiredCallback   mStorageUsageAcquiredCallback;
+  Dali::WebEngineContext::WebEngineFormPasswordAcquiredCallback   mFormPasswordAcquiredCallback;
+  Dali::WebEngineContext::WebEngineDownloadStartedCallback        mDownloadStartedCallback;
+  Dali::WebEngineContext::WebEngineMimeOverriddenCallback         mMimeOverriddenCallback;
+  Dali::WebEngineContext::WebEngineRequestInterceptedCallback     mRequestInterceptedCallback;
 
 private:
   Dali::WebEngineContext::CacheModel mockModel;
@@ -611,25 +622,55 @@ public:
     return "http://test.html";
   }
 
+  Dali::Property::Map GetHeaders() const override
+  {
+    return mockHeadersMap;
+  }
+
+  std::string GetMethod() const override
+  {
+    return "GET";
+  }
+
   bool Ignore() override
   {
     return true;
   }
 
-  bool SetResponseStatus(int statusCode, const std::string &customedStatusText) override
+  bool SetResponseStatus(int statusCode, const std::string& customedStatusText) override
   {
     return true;
   }
 
-  bool AddResponseHeader(const std::string &fieldName, const std::string &fieldValue) override
+  bool AddResponseHeader(const std::string& fieldName, const std::string& fieldValue) override
+  {
+    mockHeadersMap.Add(fieldName, fieldValue);
+    return true;
+  }
+
+  bool AddResponseHeaders(const Dali::Property::Map& headers) override
+  {
+    mockHeadersMap.Merge(headers);
+    return true;
+  }
+
+  bool AddResponseBody(const std::string& body, uint32_t length) override
   {
     return true;
   }
 
-  bool AddResponseBody(const std::string &body, uint32_t length) override
+  bool AddResponse(const std::string& headers, const std::string& body, uint32_t length) override
   {
     return true;
   }
+
+  bool WriteResponseChunk(const std::string& chunk, uint32_t length) override
+  {
+    return true;
+  }
+
+private:
+  Dali::Property::Map mockHeadersMap;
 };
 
 class MockWebEngineConsoleMessage : public Dali::WebEngineConsoleMessage
@@ -835,7 +876,7 @@ public:
     return "test";
   }
 
-  Dali::Property::Map& GetAttributes() const override
+  Dali::Property::Map GetAttributes() const override
   {
     return mockAttributesMap;
   }
@@ -1493,11 +1534,6 @@ public:
     mFormRepostDecidedCallback = callback;
   }
 
-  void RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback)
-  {
-    mRequestInterceptorCallback = callback;
-  }
-
   void RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback)
   {
     mConsoleMessageCallback = callback;
@@ -1572,7 +1608,6 @@ public:
   Dali::WebEnginePlugin::WebEngineUrlChangedCallback             mUrlChangedCallback;
   Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback      mFormRepostDecidedCallback;
   Dali::WebEnginePlugin::WebEngineFrameRenderedCallback          mFrameRenderedCallback;
-  Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback     mRequestInterceptorCallback;
   Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback mConsoleMessageCallback;
   Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback  mResponsePolicyDecisionCallback;
   Dali::WebEnginePlugin::WebEngineCertificateCallback            mCertificateConfirmCallback;
@@ -1658,11 +1693,6 @@ bool OnLoadUrl()
     if (gInstance->mFrameRenderedCallback)
     {
       gInstance->mFrameRenderedCallback();
-    }
-    if (gInstance->mRequestInterceptorCallback)
-    {
-      std::unique_ptr<Dali::WebEngineRequestInterceptor> interceptor(new MockWebEngineRequestInterceptor());
-      gInstance->mRequestInterceptorCallback(std::move(interceptor));
     }
     if (gInstance->mConsoleMessageCallback)
     {
@@ -1875,6 +1905,17 @@ bool OnMimeOverridden()
   {
     std::string newMime;
     gWebEngineContextInstance->mMimeOverriddenCallback("http://test.html", "txt/xml", newMime);
+  }
+  return false;
+}
+
+bool OnRequestIntercepted()
+{
+  DisconnectFromGlobalSignal(&OnRequestIntercepted);
+  if (gWebEngineContextInstance)
+  {
+    Dali::WebEngineRequestInterceptorPtr interceptor = new MockWebEngineRequestInterceptor();
+    gWebEngineContextInstance->mRequestInterceptedCallback(interceptor);
   }
   return false;
 }
@@ -2371,11 +2412,6 @@ void WebEngine::RegisterUrlChangedCallback(Dali::WebEnginePlugin::WebEngineUrlCh
 void WebEngine::RegisterFormRepostDecidedCallback(Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback callback)
 {
   Internal::Adaptor::GetImplementation( *this ).RegisterFormRepostDecidedCallback(callback);
-}
-
-void WebEngine::RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback)
-{
-  Internal::Adaptor::GetImplementation( *this ).RegisterRequestInterceptorCallback(callback);
 }
 
 void WebEngine::RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback)

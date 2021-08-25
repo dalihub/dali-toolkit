@@ -229,6 +229,13 @@ public:
   void RegisterMimeOverriddenCallback(Dali::WebEngineContext::WebEngineMimeOverriddenCallback callback);
 
   /**
+   * @brief Callback to be called when http request need be intercepted.
+   *
+   * @param[in] callback
+   */
+  void RegisterRequestInterceptedCallback(Dali::WebEngineContext::WebEngineRequestInterceptedCallback callback);
+
+  /**
    * @brief Toggle the cache to be enabled or disabled
    *
    * @param[in] cacheEnabled enable or disable cache
