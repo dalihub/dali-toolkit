@@ -47,7 +47,7 @@ class VectorAnimationTask : public RefObject
 public:
   using UploadCompletedSignalType = Dali::VectorAnimationRenderer::UploadCompletedSignalType;
 
-  using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
+  using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
 
   /**
    * Flags for re-sending data to the vector animation thread
