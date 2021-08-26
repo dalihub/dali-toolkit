@@ -105,11 +105,6 @@ public:
   void SetBackground(const Property::Map& map);
 
   /**
-   * @copydoc Dali::CustomActorImpl::RelayoutRequest()
-   */
-  void RelayoutRequest();
-
-  /**
    * @copydoc Dali::Toolkit::Control::ClearBackground
    */
   void ClearBackground();

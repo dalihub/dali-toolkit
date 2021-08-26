@@ -383,12 +383,6 @@ bool Control::EmitKeyEventSignal(const KeyEvent& event)
   return consumed;
 }
 
-void Control::RelayoutRequest()
-{
-  CustomActorImpl::RelayoutRequest();
-}
-
-
 Control::Control(ControlBehaviour behaviourFlags)
 : CustomActorImpl(static_cast<ActorFlags>(behaviourFlags)),
   mImpl(new Impl(*this))
