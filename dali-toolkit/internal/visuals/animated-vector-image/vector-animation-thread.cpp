@@ -216,7 +216,7 @@ void VectorAnimationThread::Rasterize()
   {
     VectorAnimationTaskPtr nextTask = *it;
 
-    auto currentTime   = std::chrono::system_clock::now();
+    auto currentTime   = std::chrono::steady_clock::now();
     auto nextFrameTime = nextTask->GetNextFrameTime();
 
 #if defined(DEBUG_ENABLED)
@@ -300,7 +300,7 @@ VectorAnimationThread::SleepThread::~SleepThread()
   Join();
 }
 
-void VectorAnimationThread::SleepThread::SleepUntil(std::chrono::time_point<std::chrono::system_clock> timeToSleepUntil)
+void VectorAnimationThread::SleepThread::SleepUntil(std::chrono::time_point<std::chrono::steady_clock> timeToSleepUntil)
 {
   ConditionalWait::ScopedLock lock(mConditionalWait);
   mSleepTimePoint = timeToSleepUntil;
@@ -316,7 +316,7 @@ void VectorAnimationThread::SleepThread::Run()
   while(!mDestroyThread)
   {
     bool                                               needToSleep;
-    std::chrono::time_point<std::chrono::system_clock> sleepTimePoint;
+    std::chrono::time_point<std::chrono::steady_clock> sleepTimePoint;
 
     {
       ConditionalWait::ScopedLock lock(mConditionalWait);
@@ -330,7 +330,7 @@ void VectorAnimationThread::SleepThread::Run()
     if(needToSleep)
     {
 #if defined(DEBUG_ENABLED)
-      auto sleepDuration = std::chrono::duration_cast<std::chrono::milliseconds>(mSleepTimePoint - std::chrono::system_clock::now());
+      auto sleepDuration = std::chrono::duration_cast<std::chrono::milliseconds>(mSleepTimePoint - std::chrono::steady_clock::now());
 
       DALI_LOG_INFO(gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationThread::SleepThread::Run: [sleep duration = %lld]\n", sleepDuration.count());
 #endif

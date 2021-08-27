@@ -524,11 +524,11 @@ uint32_t VectorAnimationTask::GetStoppedFrame(uint32_t startFrame, uint32_t endF
 
 VectorAnimationTask::TimePoint VectorAnimationTask::CalculateNextFrameTime(bool renderNow)
 {
-  // std::chrono::time_point template has second parameter duration which defaults to the std::chrono::system_clock supported
+  // std::chrono::time_point template has second parameter duration which defaults to the std::chrono::steady_clock supported
   // duration. In some C++11 implementations it is a milliseconds duration, so it fails to compile unless mNextFrameStartTime
   // is casted to use the default duration.
   mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds));
-  auto current        = std::chrono::system_clock::now();
+  auto current        = std::chrono::steady_clock::now();
   if(renderNow)
   {
     mNextFrameStartTime = current;
