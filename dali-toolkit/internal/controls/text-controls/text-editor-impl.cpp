@@ -160,6 +160,7 @@ DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "anchorClicked",         SIGNAL_AN
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputFiltered",         SIGNAL_INPUT_FILTERED         )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "cursorPositionChanged", SIGNAL_CURSOR_POSITION_CHANGED)
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "selectionChanged",      SIGNAL_SELECTION_CHANGED      )
+DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "selectionCleared",      SIGNAL_SELECTION_CLEARED      )
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -1358,6 +1359,11 @@ DevelTextEditor::SelectionChangedSignalType& TextEditor::SelectionChangedSignal(
   return mSelectionChangedSignal;
 }
 
+DevelTextEditor::SelectionClearedSignalType& TextEditor::SelectionClearedSignal()
+{
+  return mSelectionClearedSignal;
+}
+
 Text::ControllerPtr TextEditor::GetTextController()
 {
   return mController;
@@ -1416,6 +1422,14 @@ bool TextEditor::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
     {
       Internal::TextEditor& editorImpl(GetImpl(editor));
       editorImpl.SelectionChangedSignal().Connect(tracker, functor);
+    }
+  }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_SELECTION_CLEARED))
+  {
+    if(editor)
+    {
+      Internal::TextEditor& editorImpl(GetImpl(editor));
+      editorImpl.SelectionClearedSignal().Connect(tracker, functor);
     }
   }
   else
@@ -1658,6 +1672,11 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
   if(mSelectionChanged)
   {
     EmitSelectionChangedSignal();
+  }
+
+  if(mSelectionCleared)
+  {
+    EmitSelectionClearedSignal();
   }
 
   // The text-editor emits signals when the input style changes. These changes of style are
@@ -2039,10 +2058,22 @@ void TextEditor::EmitSelectionChangedSignal()
   mSelectionChanged = false;
 }
 
+void TextEditor::EmitSelectionClearedSignal()
+{
+  Dali::Toolkit::TextEditor handle(GetOwner());
+  mSelectionClearedSignal.Emit(handle);
+  mSelectionCleared = false;
+}
+
 void TextEditor::SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t newStart, uint32_t newEnd)
 {
   if(((oldStart != newStart) || (oldEnd != newEnd)) && !mSelectionChanged)
   {
+    if(newStart == newEnd)
+    {
+      mSelectionCleared = true;
+    }
+
     mSelectionChanged  = true;
     mOldSelectionStart = oldStart;
     mOldSelectionEnd   = oldEnd;
@@ -2336,7 +2367,8 @@ TextEditor::TextEditor()
   mScrollStarted(false),
   mTextChanged(false),
   mCursorPositionChanged(false),
-  mSelectionChanged(false)
+  mSelectionChanged(false),
+  mSelectionCleared(false)
 {
 }
 

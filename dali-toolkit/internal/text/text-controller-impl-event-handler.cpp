@@ -286,6 +286,8 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
   ModelPtr&        model           = impl.mModel;
   LogicalModelPtr& logicalModel    = model->mLogicalModel;
   VisualModelPtr&  visualModel     = model->mVisualModel;
+  uint32_t         oldSelStart     = eventData.mLeftSelectionPosition;
+  uint32_t         oldSelEnd       = eventData.mRightSelectionPosition;
 
   CharacterIndex& primaryCursorPosition         = eventData.mPrimaryCursorPosition;
   CharacterIndex  previousPrimaryCursorPosition = primaryCursorPosition;
@@ -397,6 +399,11 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
     // Update selection position after moving the cursor
     eventData.mLeftSelectionPosition  = primaryCursorPosition;
     eventData.mRightSelectionPosition = primaryCursorPosition;
+
+    if(impl.mSelectableControlInterface != nullptr && eventData.mDecorator->IsHighlightVisible())
+    {
+      impl.mSelectableControlInterface->SelectionChanged(oldSelStart, oldSelEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
+    }
   }
 
   if(isShiftModifier && impl.IsShowingRealText() && eventData.mShiftSelectionFlag)
@@ -410,14 +417,11 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       int cursorPositionDelta = primaryCursorPosition - previousPrimaryCursorPosition;
       if(cursorPositionDelta > 0 || eventData.mRightSelectionPosition > 0u) // Check the boundary
       {
-        uint32_t oldStart = eventData.mLeftSelectionPosition;
-        uint32_t oldEnd   = eventData.mRightSelectionPosition;
-
         eventData.mRightSelectionPosition += cursorPositionDelta;
 
         if(impl.mSelectableControlInterface != nullptr)
         {
-          impl.mSelectableControlInterface->SelectionChanged(oldStart, oldEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
+          impl.mSelectableControlInterface->SelectionChanged(oldSelStart, oldSelEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
         }
       }
       selecting = true;
@@ -477,8 +481,10 @@ void ControllerImplEventHandler::OnTapEvent(Controller::Impl& impl, const Event&
       if(impl.IsShowingRealText())
       {
         // Convert from control's coords to text's coords.
-        const float xPosition = event.p2.mFloat - model->mScrollPosition.x;
-        const float yPosition = event.p3.mFloat - model->mScrollPosition.y;
+        const float xPosition   = event.p2.mFloat - model->mScrollPosition.x;
+        const float yPosition   = event.p3.mFloat - model->mScrollPosition.y;
+        uint32_t    oldSelStart = eventData.mLeftSelectionPosition;
+        uint32_t    oldSelEnd   = eventData.mRightSelectionPosition;
 
         // Keep the tap 'x' position. Used to move the cursor.
         eventData.mCursorHookPositionX = xPosition;
@@ -492,6 +498,11 @@ void ControllerImplEventHandler::OnTapEvent(Controller::Impl& impl, const Event&
                                                                        yPosition,
                                                                        CharacterHitTest::TAP,
                                                                        matchedCharacter);
+
+        if(impl.mSelectableControlInterface != nullptr && eventData.mDecorator->IsHighlightVisible())
+        {
+          impl.mSelectableControlInterface->SelectionChanged(oldSelStart, oldSelEnd, eventData.mPrimaryCursorPosition, eventData.mPrimaryCursorPosition);
+        }
 
         // When the cursor position is changing, delay cursor blinking
         eventData.mDecorator->DelayCursorBlink();

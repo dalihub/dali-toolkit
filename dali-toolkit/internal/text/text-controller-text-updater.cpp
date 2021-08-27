@@ -607,6 +607,9 @@ bool Controller::TextUpdater::RemoveSelectedText(Controller& controller)
   if(EventData::SELECTING == impl.mEventData->mState)
   {
     std::string removedString;
+    uint32_t    oldSelStart = impl.mEventData->mLeftSelectionPosition;
+    uint32_t    oldSelEnd   = impl.mEventData->mRightSelectionPosition;
+
     impl.RetrieveSelection(removedString, true);
 
     if(!removedString.empty())
@@ -622,6 +625,11 @@ bool Controller::TextUpdater::RemoveSelectedText(Controller& controller)
         CharacterIndex  previousCursorIndex = cursorIndex + numberOfCharacters;
 
         RemoveTextAnchor(controller, cursorOffset, numberOfCharacters, previousCursorIndex);
+      }
+
+      if(impl.mSelectableControlInterface != nullptr)
+      {
+        impl.mSelectableControlInterface->SelectionChanged(oldSelStart, oldSelEnd, impl.mEventData->mPrimaryCursorPosition, impl.mEventData->mPrimaryCursorPosition);
       }
     }
   }

@@ -127,6 +127,7 @@ const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 static bool gSelectionChangedCallbackCalled;
 static uint32_t oldSelectionStart;
 static uint32_t oldSelectionEnd;
+static bool gSelectionClearedCallbackCalled;
 static bool gAnchorClickedCallBackCalled;
 static bool gAnchorClickedCallBackNotCalled;
 static bool gTextChangedCallBackCalled;
@@ -217,6 +218,13 @@ struct CallbackFunctor
   }
   bool* mCallbackFlag;
 };
+
+static void TestSelectionClearedCallback(TextField control)
+{
+  tet_infoline(" TestSelectionClearedCallback");
+
+  gSelectionClearedCallbackCalled = true;
+}
 
 static void TestSelectionChangedCallback(TextField control, uint32_t oldStart, uint32_t oldEnd)
 {
@@ -4379,6 +4387,140 @@ int utcDaliTextFieldCursorPositionChangedSignal(void)
 
   DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
   DALI_TEST_EQUALS(oldCursorPos, 5, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliTextFieldSelectionClearedSignal(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldSelectionClearedSignal");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  application.GetScene().Add( field );
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::SelectionClearedSignal(field).Connect(&TestSelectionClearedCallback);
+  bool selectionClearedSignal = false;
+  field.ConnectSignal( testTracker, "selectionCleared",   CallbackFunctor(&selectionClearedSignal) );
+
+  field.SetProperty( TextField::Property::TEXT, "Hello\nworld\nHello world" );
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text & Select some text in the right of the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) ); 
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // remove selection
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  gSelectionClearedCallbackCalled = false;
+
+  // Move to second line of the text & select.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  //remove selection
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
+
+  gSelectionClearedCallbackCalled = false;
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text & select.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // replace D with selected text
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
+
+  gSelectionClearedCallbackCalled = false;
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DevelTextField::SelectText( field ,1, 3 );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  field.SetProperty( DevelTextField::Property::PRIMARY_CURSOR_POSITION, 3);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
+
+  gSelectionClearedCallbackCalled = false;
+
+  DevelTextField::SelectText( field ,1, 3 );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // select none
+  DevelTextField::SelectNone(field);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
 
   END_TEST;
 }
