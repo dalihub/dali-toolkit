@@ -719,12 +719,11 @@ void ControllerImplEventHandler::OnSelectNoneEvent(Controller::Impl& impl)
     EventData& eventData = *impl.mEventData;
     if(eventData.mSelectionEnabled && eventData.mState == EventData::SELECTING)
     {
-      eventData.mPrimaryCursorPosition = 0u;
       uint32_t oldStart                = eventData.mLeftSelectionPosition;
       uint32_t oldEnd                  = eventData.mRightSelectionPosition;
 
       eventData.mLeftSelectionPosition = eventData.mRightSelectionPosition = eventData.mPrimaryCursorPosition;
-      impl.ChangeState(EventData::INACTIVE);
+      impl.ChangeState(EventData::EDITING);
       eventData.mUpdateCursorPosition      = true;
       eventData.mUpdateInputStyle          = true;
       eventData.mScrollAfterUpdatePosition = true;
