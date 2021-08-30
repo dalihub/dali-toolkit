@@ -43,7 +43,8 @@ namespace
  * Take from https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/AnimatedCube
  */
 const char* TEST_GLTF_FILE_NAME[] = {TEST_RESOURCE_DIR "/AnimatedCube.gltf",
-                                     TEST_RESOURCE_DIR "/InterpolationTest.gltf"};
+                                     TEST_RESOURCE_DIR "/InterpolationTest.gltf",
+                                     TEST_RESOURCE_DIR "/coverageTest.gltf"};
 /**
  * For the diffuse and specular cube map texture.
  * These textures are based off version of Wave engine sample

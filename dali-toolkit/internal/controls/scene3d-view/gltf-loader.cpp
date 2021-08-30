@@ -231,21 +231,20 @@ void FitBuffer(Dali::Vector<Vector4>& bufferDestination, Dali::Vector<T>& buffer
 template<typename T>
 bool ReadBinFile(Vector<T>& dataBuffer, std::string url, int32_t offset, int32_t count)
 {
+  size_t readCount = 0;
   Dali::FileStream fileStream(url, FileStream::READ | FileStream::BINARY);
   FILE*            fp = fileStream.GetFile();
-  if(!fp)
+  if(fp)
   {
-    return false;
+    dataBuffer.Resize(count);
+    if(!fseek(fp, offset, SEEK_SET))
+    {
+      readCount = fread(&dataBuffer[0], sizeof(T), count, fp);
+      dataBuffer.Resize(readCount);
+    }
   }
 
-  dataBuffer.Resize(count);
-  ssize_t result = -1;
-  if(!fseek(fp, offset, SEEK_SET))
-  {
-    result = fread(&dataBuffer[0], sizeof(T), count, fp);
-  }
-
-  return (result >= 0);
+  return (readCount > 0);
 }
 
 template<typename T>
@@ -301,38 +300,50 @@ void LoadDataFromAccessor(int32_t accessorIdx, Dali::Vector<T>& bufferData, std:
   if(accessor.componentType == 5120)
   {
     Dali::Vector<int8_t> inputBufferData;
-    ReadBinFile<int8_t>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count);
-    FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    if(ReadBinFile<int8_t>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count))
+    {
+      FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    }
   }
   else if(accessor.componentType == 5121)
   {
     Dali::Vector<uint8_t> inputBufferData;
-    ReadBinFile<uint8_t>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count);
-    FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    if(ReadBinFile<uint8_t>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count))
+    {
+      FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    }
   }
   else if(accessor.componentType == 5122)
   {
     Dali::Vector<int16_t> inputBufferData;
-    ReadBinFile<int16_t>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count);
-    FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    if(ReadBinFile<int16_t>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count))
+    {
+      FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    }
   }
   else if(accessor.componentType == 5123)
   {
     Dali::Vector<uint16_t> inputBufferData;
-    ReadBinFile<uint16_t>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count);
-    FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    if(ReadBinFile<uint16_t>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count))
+    {
+      FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    }
   }
   else if(accessor.componentType == 5125)
   {
     Dali::Vector<uint32_t> inputBufferData;
-    ReadBinFile<uint32_t>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count);
-    FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    if(ReadBinFile<uint32_t>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count))
+    {
+      FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    }
   }
   else if(accessor.componentType == 5126)
   {
     Dali::Vector<float> inputBufferData;
-    ReadBinFile<float>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count);
-    FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    if(ReadBinFile<float>(inputBufferData, path + load_uri, bufferView.byteOffset + accessor.byteOffset, elementNumOfByteStride * accessor.count))
+    {
+      FitBuffer(bufferData, inputBufferData, accessor.count, elementNumOfByteStride, accessor.normalized);
+    }
   }
 }
 
