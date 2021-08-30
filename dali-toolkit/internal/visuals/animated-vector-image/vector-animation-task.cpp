@@ -254,9 +254,8 @@ void VectorAnimationTask::SetPlayRange(const Property::Array& playRange)
     std::string marker;
     if(playRange.GetElementAt(0).Get(marker))
     {
-      if(mVectorRenderer)
+      if(mVectorRenderer && mVectorRenderer.GetMarkerInfo(marker, startFrame, endFrame))
       {
-        mVectorRenderer.GetMarkerInfo(marker, startFrame, endFrame);
         valid = true;
       }
     }
