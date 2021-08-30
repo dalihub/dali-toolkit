@@ -36,7 +36,19 @@ namespace Internal
 {
 namespace
 {
+static constexpr float OPACITY_TRANSPARENT = 0.0f;
+
 const Dali::AlphaFunction DEFAULT_ALPHA_FUNCTION(Dali::AlphaFunction::DEFAULT);
+
+const Property::Map PROPERTY_MAP_INDEPENDENT_CONTROL{
+  {Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER},
+  {Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER},
+  {Dali::Actor::Property::POSITION_USES_ANCHOR_POINT, true},
+  {Dali::Actor::Property::INHERIT_POSITION, false},
+  {Dali::Actor::Property::INHERIT_ORIENTATION, false},
+  {Dali::Actor::Property::INHERIT_SCALE, false},
+  {Dali::Actor::Property::COLOR_MODE, Dali::ColorMode::USE_OWN_COLOR},
+};
 
 Property::Map GetOriginalProperties(Dali::Toolkit::Control control)
 {
@@ -105,7 +117,8 @@ TransitionBase::TransitionBase()
   mTimePeriod(TimePeriod(0.0f)),
   mTransitionWithChild(false),
   mMoveTargetChildren(false),
-  mIsAppearingTransition(true)
+  mIsAppearingTransition(true),
+  mIsPairTransition(false)
 {
 }
 
@@ -168,6 +181,20 @@ void TransitionBase::Play()
     return;
   }
 
+  // Set world transform and color to the target control to make it independent of the parent control and its transition.
+  // The properties will be returned at the TransitionFinished() method.
+  Matrix     targetWorldTransform = GetWorldTransform(mTarget);
+  Vector3    targetPosition, targetScale;
+  Quaternion targetOrientation;
+  targetWorldTransform.GetTransformComponents(targetPosition, targetOrientation, targetScale);
+  Vector4 targetColor = GetWorldColor(mTarget);
+
+  mTarget.SetProperties(PROPERTY_MAP_INDEPENDENT_CONTROL);
+  mTarget[Dali::Actor::Property::POSITION]    = targetPosition;
+  mTarget[Dali::Actor::Property::SCALE]       = targetScale;
+  mTarget[Dali::Actor::Property::ORIENTATION] = targetOrientation;
+  mTarget[Dali::Actor::Property::COLOR]       = targetColor;
+
   OnPlay();
 
   SetAnimation();
@@ -181,31 +208,40 @@ void TransitionBase::SetAnimation()
     return;
   }
 
+  // If this transition is not a transition from a Control to another Control
+  // and a transition effect to appear with delay,
+  // the mTarget should not be shown until delay seconds.
+  if(!IsPairTransition() && mIsAppearingTransition && mAnimation && mTimePeriod.delaySeconds > Dali::Math::MACHINE_EPSILON_10)
+  {
+    Dali::KeyFrames initialKeyframes = Dali::KeyFrames::New();
+    initialKeyframes.Add(0.0f, OPACITY_TRANSPARENT);
+    initialKeyframes.Add(1.0f, OPACITY_TRANSPARENT);
+    mAnimation.AnimateBetween(Property(mTarget, Dali::Actor::Property::OPACITY), initialKeyframes, TimePeriod(mTimePeriod.delaySeconds));
+  }
+
   for(uint32_t i = 0; i < mStartPropertyMap.Count(); ++i)
   {
-    Property::Value* initialValuePointer = mInitialPropertyMap.Find(mStartPropertyMap.GetKeyAt(i).indexKey);
     Property::Value* finishValue = mFinishPropertyMap.Find(mStartPropertyMap.GetKeyAt(i).indexKey);
     if(finishValue)
     {
-      Property::Value initialValue = mStartPropertyMap.GetValue(i);
-      if(initialValuePointer)
-      {
-        initialValue = *initialValuePointer;
-      }
-      AnimateBetween(mTarget, mStartPropertyMap.GetKeyAt(i).indexKey, initialValue, mStartPropertyMap.GetValue(i), *finishValue);
+      AnimateBetween(mTarget, mStartPropertyMap.GetKeyAt(i).indexKey, mStartPropertyMap.GetValue(i), *finishValue);
     }
   }
 }
 
-void TransitionBase::AnimateBetween(Dali::Toolkit::Control target, Property::Index index, Property::Value initialValue, Property::Value sourceValue, Property::Value destinationValue)
+void TransitionBase::AnimateBetween(Dali::Toolkit::Control target, Property::Index index, Property::Value sourceValue, Property::Value destinationValue)
 {
   if(mAnimation)
   {
-    if(mTimePeriod.delaySeconds>0.0f)
+    // To make each property keep start value during delay time.
+    // When this transition is not Pair transition, it is not required.
+    // (For appearing transition, the mTarget control will not be shown during delay time,
+    //  For disapplearing transition, the property of mTarget control keeps current value during delay time)
+    if(IsPairTransition() && mTimePeriod.delaySeconds > Dali::Math::MACHINE_EPSILON_10)
     {
       Dali::KeyFrames initialKeyframes = Dali::KeyFrames::New();
-      initialKeyframes.Add(0.0f, initialValue);
-      initialKeyframes.Add(1.0f, initialValue);
+      initialKeyframes.Add(0.0f, sourceValue);
+      initialKeyframes.Add(1.0f, sourceValue);
       mAnimation.AnimateBetween(Property(target, index), initialKeyframes, TimePeriod(mTimePeriod.delaySeconds));
     }
     Dali::KeyFrames keyframes = Dali::KeyFrames::New();
