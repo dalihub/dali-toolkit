@@ -418,13 +418,23 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       if(cursorPositionDelta > 0 || eventData.mRightSelectionPosition > 0u) // Check the boundary
       {
         eventData.mRightSelectionPosition += cursorPositionDelta;
+        eventData.mPrimaryCursorPosition = eventData.mRightSelectionPosition;
 
         if(impl.mSelectableControlInterface != nullptr)
         {
           impl.mSelectableControlInterface->SelectionChanged(oldSelStart, oldSelEnd, eventData.mLeftSelectionPosition, eventData.mRightSelectionPosition);
         }
       }
-      selecting = true;
+
+      if(impl.mSelectableControlInterface != nullptr && eventData.mLeftSelectionPosition == eventData.mRightSelectionPosition)
+      {
+        // If left selection position and right selection position are the same, the selection is canceled.
+        selecting = false;
+      }
+      else
+      {
+        selecting = true;
+      }
     }
     else if(eventData.mLeftSelectionPosition != eventData.mRightSelectionPosition)
     {
@@ -453,6 +463,12 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       {
         eventData.mDecorator->SetPopupActive(false);
       }
+    }
+    else
+    {
+      // If no selection, set a normal cursor.
+      impl.ChangeState(EventData::EDITING);
+      eventData.mUpdateCursorPosition = true;
     }
   }
   else
@@ -701,6 +717,7 @@ void ControllerImplEventHandler::OnSelectAllEvent(Controller::Impl& impl)
 
       eventData.mLeftSelectionPosition  = 0u;
       eventData.mRightSelectionPosition = model->mLogicalModel->mText.Count();
+      eventData.mPrimaryCursorPosition  = eventData.mRightSelectionPosition;
 
       if(impl.mSelectableControlInterface != nullptr)
       {
@@ -719,8 +736,8 @@ void ControllerImplEventHandler::OnSelectNoneEvent(Controller::Impl& impl)
     EventData& eventData = *impl.mEventData;
     if(eventData.mSelectionEnabled && eventData.mState == EventData::SELECTING)
     {
-      uint32_t oldStart                = eventData.mLeftSelectionPosition;
-      uint32_t oldEnd                  = eventData.mRightSelectionPosition;
+      uint32_t oldStart = eventData.mLeftSelectionPosition;
+      uint32_t oldEnd   = eventData.mRightSelectionPosition;
 
       eventData.mLeftSelectionPosition = eventData.mRightSelectionPosition = eventData.mPrimaryCursorPosition;
       impl.ChangeState(EventData::EDITING);
@@ -758,6 +775,7 @@ void ControllerImplEventHandler::OnSelectRangeEvent(Controller::Impl& impl, cons
 
       impl.mEventData->mLeftSelectionPosition  = start;
       impl.mEventData->mRightSelectionPosition = end;
+      impl.mEventData->mPrimaryCursorPosition  = end;
 
       if(impl.mSelectableControlInterface != nullptr)
       {
