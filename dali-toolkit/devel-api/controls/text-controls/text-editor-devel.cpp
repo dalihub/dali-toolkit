@@ -55,6 +55,11 @@ SelectionChangedSignalType& SelectionChangedSignal(TextEditor textEditor)
   return GetImpl(textEditor).SelectionChangedSignal();
 }
 
+SelectionClearedSignalType& SelectionClearedSignal(TextEditor textEditor)
+{
+  return GetImpl(textEditor).SelectionClearedSignal();
+}
+
 void SelectWholeText(TextEditor textEditor)
 {
   GetImpl(textEditor).SelectWholeText();
@@ -73,6 +78,21 @@ void SelectText(TextEditor textEditor, const uint32_t start, const uint32_t end)
 void ScrollBy(TextEditor textEditor, Vector2 scroll)
 {
   GetImpl(textEditor).ScrollBy(scroll);
+}
+
+string CopyText(TextEditor textEditor)
+{
+  return GetImpl(textEditor).CopyText();
+}
+
+string CutText(TextEditor textEditor)
+{
+  return GetImpl(textEditor).CutText();
+}
+
+void PasteText(TextEditor textEditor)
+{
+  GetImpl(textEditor).PasteText();
 }
 
 } // namespace DevelTextEditor

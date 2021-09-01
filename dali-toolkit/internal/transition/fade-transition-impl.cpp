@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/transition/fade-impl.h>
+#include <dali-toolkit/internal/transition/fade-transition-impl.h>
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -31,13 +31,8 @@ namespace Toolkit
 {
 namespace Internal
 {
-namespace
-{
-const Dali::AlphaFunction DEFAULT_ALPHA_FUNCTION(Dali::AlphaFunction::DEFAULT);
 
-} // anonymous namespace
-
-FadePtr Fade::New(Dali::Toolkit::Control control, float opacity, TimePeriod timePeriod)
+FadeTransitionPtr FadeTransition::New(Dali::Toolkit::Control control, float opacity, TimePeriod timePeriod)
 {
   float delaySeconds = timePeriod.delaySeconds;
   if(delaySeconds < 0.0f)
@@ -53,15 +48,15 @@ FadePtr Fade::New(Dali::Toolkit::Control control, float opacity, TimePeriod time
     durationSeconds = 0.0f;
   }
 
-  FadePtr fade = new Fade(control, Dali::Clamp(opacity, 0.0f, 1.0f), TimePeriod(delaySeconds, durationSeconds));
+  FadeTransitionPtr fadeTransition = new FadeTransition(control, Dali::Clamp(opacity, 0.0f, 1.0f), TimePeriod(delaySeconds, durationSeconds));
 
   // Second-phase construction
-  fade->Initialize();
+  fadeTransition->Initialize();
 
-  return fade;
+  return fadeTransition;
 }
 
-Fade::Fade(Dali::Toolkit::Control control, float opacity, TimePeriod timePeriod)
+FadeTransition::FadeTransition(Dali::Toolkit::Control control, float opacity, TimePeriod timePeriod)
 : TransitionBase(),
   mTargetControl(control),
   mOpacity(opacity)
@@ -70,11 +65,11 @@ Fade::Fade(Dali::Toolkit::Control control, float opacity, TimePeriod timePeriod)
   SetTimePeriod(timePeriod);
 }
 
-Fade::~Fade()
+FadeTransition::~FadeTransition()
 {
 }
 
-void Fade::OnPlay()
+void FadeTransition::OnPlay()
 {
   Dali::Toolkit::Control targetControl = mTargetControl.GetHandle();
   if(!targetControl || !targetControl[Dali::Actor::Property::CONNECTED_TO_SCENE])
@@ -83,27 +78,21 @@ void Fade::OnPlay()
     return;
   }
 
-  Property::Map initialPropertyMap;
   Property::Map startPropertyMap;
   Property::Map finishPropertyMap;
 
-  float targetOpacity                              = GetWorldColor(targetControl).a;
-  targetControl[Dali::Actor::Property::COLOR_MODE] = Dali::ColorMode::USE_OWN_COLOR;
-
+  float targetOpacity = targetControl[Dali::Actor::Property::OPACITY];
   if(IsAppearingTransition())
   {
-    initialPropertyMap.Insert(Dali::Actor::Property::OPACITY, 0.0f);
     startPropertyMap.Insert(Dali::Actor::Property::OPACITY, mOpacity * targetOpacity);
     finishPropertyMap.Insert(Dali::Actor::Property::OPACITY, targetOpacity);
   }
   else
   {
-    initialPropertyMap.Insert(Dali::Actor::Property::OPACITY, targetOpacity);
     startPropertyMap.Insert(Dali::Actor::Property::OPACITY, targetOpacity);
     finishPropertyMap.Insert(Dali::Actor::Property::OPACITY, mOpacity * targetOpacity);
   }
 
-  SetInitialPropertyMap(initialPropertyMap);
   SetStartPropertyMap(startPropertyMap);
   SetFinishPropertyMap(finishPropertyMap);
 }

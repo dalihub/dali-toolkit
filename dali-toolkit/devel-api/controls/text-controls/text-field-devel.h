@@ -319,6 +319,23 @@ using SelectionChangedSignalType = Signal<void(TextField, uint32_t, uint32_t)>;
 DALI_TOOLKIT_API SelectionChangedSignalType& SelectionChangedSignal(TextField textField);
 
 /**
+ * @brief selection cleared signal type.
+ */
+using SelectionClearedSignalType = Signal<void(TextField)>;
+
+/**
+ * @brief This signal is emitted when the selection has been cleared.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( TextField textField);
+ * @endcode
+ * @param[in] textField The instance of TextField.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API SelectionClearedSignalType& SelectionClearedSignal(TextField textField);
+
+/**
  * @brief Select the whole text of TextField.
  *
  * @param[in] textField The instance of TextField.
@@ -346,6 +363,29 @@ DALI_TOOLKIT_API void SelectNone(TextField textField);
  * @param[in] end The end index of the text to select. (If end index > text's length, the end index is set to the length of the text.)
  */
 DALI_TOOLKIT_API void SelectText(TextField textField, const uint32_t start, const uint32_t end);
+
+/**
+ * @brief Copy and return the selected text of TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ * @return The copied text.
+ */
+DALI_TOOLKIT_API std::string CopyText(TextField textField);
+
+/**
+ * @brief Cut and return the selected text of TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ * @return The cut text.
+ */
+DALI_TOOLKIT_API std::string CutText(TextField textField);
+
+/**
+ * @brief Paste the most recent clipboard text item into the TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ */
+DALI_TOOLKIT_API void PasteText(TextField textField);
 
 } // namespace DevelTextField
 

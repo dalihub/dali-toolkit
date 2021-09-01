@@ -23,7 +23,7 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/transition/transition-set.h>
 #include <dali-toolkit/public-api/transition/transition-base.h>
-#include <dali-toolkit/public-api/transition/fade.h>
+#include <dali-toolkit/public-api/transition/fade-transition.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -75,14 +75,14 @@ struct TransitionFinishCheck
   bool& mSignalReceived; // owned by individual tests
 };
 
-int UtcDaliFadeSetGetProperty(void)
+int UtcDaliFadeTransitionSetGetProperty(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliFadeSetGetProperty");
+  tet_infoline("UtcDaliFadeTransitionSetGetProperty");
 
   Control control = Control::New();
 
-  Fade fade = Fade::New(control, 0.5, TimePeriod(-0.5f, -0.5f));
+  FadeTransition fade = FadeTransition::New(control, 0.5, TimePeriod(-0.5f, -0.5f));
 
   TimePeriod timePeriod = fade.GetTimePeriod();
   DALI_TEST_EQUALS(0.0f, timePeriod.delaySeconds, TEST_LOCATION);
@@ -91,10 +91,10 @@ int UtcDaliFadeSetGetProperty(void)
   END_TEST;
 }
 
-int UtcDaliFadeWithOffScene(void)
+int UtcDaliFadeTransitionWithOffScene(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliFadeWithOffScene");
+  tet_infoline("UtcDaliFadeTransitionWithOffScene");
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
@@ -112,7 +112,7 @@ int UtcDaliFadeWithOffScene(void)
 
   DALI_TEST_EQUALS(1.0f, control.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
 
-  Fade fade = Fade::New(control, 0.5, TimePeriod(0.5f));
+  FadeTransition fade = FadeTransition::New(control, 0.5, TimePeriod(0.5f));
   fade.SetAppearingTransition(false); // set fade out
   TransitionSet transitionSet = TransitionSet::New();
   transitionSet.AddTransition(fade);
@@ -146,10 +146,10 @@ int UtcDaliFadeWithOffScene(void)
   END_TEST;
 }
 
-int UtcDaliFadeOut(void)
+int UtcDaliFadeTransitionDisappearing(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliFadeOut");
+  tet_infoline("UtcDaliFadeTransitionOut");
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
@@ -169,7 +169,7 @@ int UtcDaliFadeOut(void)
 
   DALI_TEST_EQUALS(1.0f, control.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
 
-  Fade fade = Fade::New(control, 0.5, TimePeriod(0.5f));
+  FadeTransition fade = FadeTransition::New(control, 0.5, TimePeriod(0.5f));
   fade.SetAppearingTransition(false); // set fade out
   TransitionSet transitionSet = TransitionSet::New();
   transitionSet.AddTransition(fade);
@@ -205,10 +205,10 @@ int UtcDaliFadeOut(void)
   END_TEST;
 }
 
-int UtcDaliFadeIn(void)
+int UtcDaliFadeTransitionAppearing(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliFadeIn");
+  tet_infoline("UtcDaliFadeTransitionIn");
 
   Control control = Control::New();
   control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
@@ -228,7 +228,7 @@ int UtcDaliFadeIn(void)
 
   DALI_TEST_EQUALS(1.0f, control.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
 
-  Fade fade = Fade::New(control, 0.5, TimePeriod(0.5f));
+  FadeTransition fade = FadeTransition::New(control, 0.5, TimePeriod(0.5f));
   fade.SetAppearingTransition(true); // set fade in
   TransitionSet transitionSet = TransitionSet::New();
   transitionSet.AddTransition(fade);
@@ -248,6 +248,75 @@ int UtcDaliFadeIn(void)
   float currentOpacity = control.GetCurrentProperty<float>(Actor::Property::OPACITY);
   DALI_TEST_CHECK(currentOpacity <= 1.0 && currentOpacity >= 0.8);
   
+  application.SendNotification();
+  application.Render(200);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  application.SendNotification();
+  application.Render(20);
+
+  DALI_TEST_EQUALS(1.0f, control.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
+
+  END_TEST;
+}
+
+
+int UtcDaliFadeTransitionAppearingWithDelay(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliFadeTransitionIn");
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
+  control.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
+  control.SetProperty(Actor::Property::OPACITY, 1.0f);
+  Property::Map controlProperty;
+  controlProperty.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  controlProperty.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+  control.SetProperty(Toolkit::Control::Property::BACKGROUND, controlProperty);
+
+  application.GetScene().Add(control);
+
+  application.SendNotification();
+  application.Render(20);
+
+  DALI_TEST_EQUALS(1.0f, control.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
+
+  FadeTransition fade = FadeTransition::New(control, 0.5, TimePeriod(0.5f, 0.5f));
+  fade.SetAppearingTransition(true); // set fade in
+  TransitionSet transitionSet = TransitionSet::New();
+  transitionSet.AddTransition(fade);
+  transitionSet.Play();
+
+  bool signalReceived(false);
+  TransitionFinishCheck finishCheck(signalReceived);
+  transitionSet.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(400);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  float currentOpacity = control.GetCurrentProperty<float>(Actor::Property::OPACITY);
+  DALI_TEST_CHECK(currentOpacity <= 0.01f);
+
+  application.SendNotification();
+  application.Render(500);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  currentOpacity = control.GetCurrentProperty<float>(Actor::Property::OPACITY);
+  DALI_TEST_CHECK(currentOpacity <= 1.0 && currentOpacity >= 0.8);
+
   application.SendNotification();
   application.Render(200);
 

@@ -60,7 +60,7 @@
 
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
-#include <dali-toolkit/public-api/transition/fade.h>
+#include <dali-toolkit/public-api/transition/fade-transition.h>
 #include <dali-toolkit/public-api/transition/transition.h>
 #include <dali-toolkit/public-api/transition/transition-set.h>
 

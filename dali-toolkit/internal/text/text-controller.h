@@ -1633,6 +1633,21 @@ public: // Text-input Event Queuing.
   void SelectWholeText();
 
   /**
+   * @copydoc Text::EditableControlInterface::CopyText()
+   */
+  string CopyText();
+
+  /**
+   * @copydoc Text::EditableControlInterface::CutText()
+   */
+  string CutText();
+
+  /**
+   * @copydoc Text::EditableControlInterface::PasteText()
+   */
+  void PasteText();
+
+  /**
    * @copydoc Text::SelectableControlInterface::SelectNone()
    */
   void SelectNone();
@@ -1751,8 +1766,7 @@ private: // Update.
   void InsertText(const std::string& text, InsertType type);
 
   /**
-   * @brief Paste given string into Text model
-   * @param[in] stringToPaste this string will be inserted into the text model
+   * @copydoc Text::EditableControlInterface::PasteText()
    */
   void PasteText(const std::string& stringToPaste);
 

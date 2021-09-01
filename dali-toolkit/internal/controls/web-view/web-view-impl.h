@@ -353,11 +353,6 @@ public:
   void RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFrameRenderedCallback callback);
 
   /**
-   * @copydoc Dali::Toolkit::WebView::RegisterRequestInterceptorCallback()
-   */
-  void RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback);
-
-  /**
    * @copydoc Dali::Toolkit::WebView::RegisterConsoleMessageReceivedCallback()
    */
   void RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback);

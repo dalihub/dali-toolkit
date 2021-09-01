@@ -108,6 +108,11 @@ public:
   DevelTextEditor::SelectionChangedSignalType& SelectionChangedSignal();
 
   /**
+   * @copydoc Dali::Toollkit::TextEditor::SelectionClearedSignal()
+   */
+  DevelTextEditor::SelectionClearedSignalType& SelectionClearedSignal();
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -326,6 +331,21 @@ public:
    */
   void SetEditable(bool editable) override;
 
+  /**
+   * @copydoc Text::EditableControlInterface::CopyText()
+   */
+  string CopyText() override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::CutText()
+   */
+  string CutText() override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::PasteText()
+   */
+  void PasteText() override;
+
   // From AnchorControlInterface
 
   /**
@@ -398,6 +418,11 @@ private: // Implementation
   void EmitSelectionChangedSignal();
 
   /**
+   * @brief Emits SelectionCleared signal.
+   */
+  void EmitSelectionClearedSignal();
+
+  /**
    * @brief set RenderActor's position with new scrollPosition
    *
    * Apply updated scroll position or start scroll animation if VerticalScrollAnimation is enabled
@@ -458,6 +483,7 @@ private: // Data
   Toolkit::DevelTextEditor::InputFilteredSignalType         mInputFilteredSignal;
   Toolkit::DevelTextEditor::CursorPositionChangedSignalType mCursorPositionChangedSignal;
   Toolkit::DevelTextEditor::SelectionChangedSignalType      mSelectionChangedSignal;
+  Toolkit::DevelTextEditor::SelectionClearedSignalType      mSelectionClearedSignal;
 
   InputMethodContext            mInputMethodContext;
   Text::ControllerPtr           mController;
@@ -487,6 +513,7 @@ private: // Data
   bool  mTextChanged : 1;           ///< If true, emits TextChangedSignal in next OnRelayout().
   bool  mCursorPositionChanged : 1; ///< If true, emits CursorPositionChangedSignal at the end of OnRelayout().
   bool  mSelectionChanged : 1;      ///< If true, emits SelectionChangedSignal at the end of OnRelayout().
+  bool  mSelectionCleared : 1;      ///< If true, emits SelectionClearedSignal at the end of OnRelayout().
 
   //args for cursor PositionChanged event
   unsigned int mOldPosition;

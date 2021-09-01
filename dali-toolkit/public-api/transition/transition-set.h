@@ -37,11 +37,13 @@ class TransitionSet;
 
 /**
  * @brief
- *
  * TransitionSet is used to control lifetime of multiple Transitions.
  * Transition could be played with multiple other transitions for a scene change.
  * For the case, it is more useful to manage a group of transitions with same lifetime and a finished signal.
  * TransitionSet provides a single Play call and Finished callback for the multiple traisitions those added on it.
+ *
+ * @note
+ * Do not add transitions for a View by dividing them into multiple TransitionSets.
  */
 class DALI_TOOLKIT_API TransitionSet : public BaseHandle
 {

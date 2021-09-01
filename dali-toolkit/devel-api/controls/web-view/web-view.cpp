@@ -354,11 +354,6 @@ void WebView::RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFram
   Dali::Toolkit::GetImpl(*this).RegisterFrameRenderedCallback(callback);
 }
 
-void WebView::RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback)
-{
-  Dali::Toolkit::GetImpl(*this).RegisterRequestInterceptorCallback(callback);
-}
-
 void WebView::RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterConsoleMessageReceivedCallback(callback);

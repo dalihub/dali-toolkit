@@ -102,14 +102,7 @@ public:
   }
 
 protected:
-  /**
-   * @brief Set property map which will be used as a initial properties.
-   * @param[in] propertyMap propertyMap that will be used as a start value of transition.
-   */
-  void SetInitialPropertyMap(const Property::Map& propertyMap)
-  {
-    mInitialPropertyMap = propertyMap;
-  }
+
   /**
    * @brief Set property map which will be used as a animation start properties.
    * @param[in] propertyMap propertyMap that will be used as a start value of transition.
@@ -173,6 +166,23 @@ protected:
     return mIsAppearingTransition;
   }
 
+  /**
+   * @brief Set whether this transition is a transition from a Control to another Control or effect to appearing or disappearing.
+   * @param[in] pairTransition True if this transition is appearing transition.
+   */
+  void SetPairTransition(bool pairTransition)
+  {
+    mIsPairTransition = pairTransition;
+  }
+
+  /**
+   * @brief Returns whether this transition is a transition from a Control to another Control or effect to appearing or disappearing.
+   */
+  bool IsPairTransition() const
+  {
+    return mIsPairTransition;
+  }
+
 protected:
   /**
    * Construct a new TransitionBase.
@@ -206,11 +216,10 @@ private:
    * @brief Adds a property on an animation between sourceValue and destimationValue.
    * @param[in] target target control to be animated.
    * @param[in] index property index for animation.
-   * @param[in] initialValue initial value of animation.
    * @param[in] sourceValue source value of animation.
    * @param[in] destinationValue destination value of animation.
    */
-  void AnimateBetween(Dali::Toolkit::Control target, Property::Index index, Property::Value initialValue, Property::Value sourceValue, Property::Value destinationValue);
+  void AnimateBetween(Dali::Toolkit::Control target, Property::Index index, Property::Value sourceValue, Property::Value destinationValue);
 
   /**
    * @brief Copy target to make clone for the child Actors
@@ -243,7 +252,6 @@ private:
   Dali::Actor                  mCopiedActor;         ///< Copied View that will replace mTarget during transition
   Dali::Animation              mAnimation;           ///< Property animations for the transition of mTarget
   AlphaFunction                mAlphaFunction;       ///< Alpha function that will applied for the property animation
-  Property::Map                mInitialPropertyMap;  ///< Initial properties to be animated. (world transform)
   Property::Map                mStartPropertyMap;    ///< Start properties to be animated. (world transform)
   Property::Map                mFinishPropertyMap;   ///< Finish properties to be animated. (world transform)
   Property::Map                mOriginalPropertyMap; ///< Original properties of mTarget to be used to restore after the transition is finished.
@@ -252,6 +260,7 @@ private:
                                                      ///< If this is false, the child Actors are moved to the child of mCopiedActor that will have original properties of target Actor during Transition.
   bool mMoveTargetChildren;                          ///< Flag, if mTransitionWithChild is false and mTarget has children than True.
   bool mIsAppearingTransition;                       ///< True, if this transition is appearing transition.
+  bool mIsPairTransition;                            ///< True, if this transition is started from a Control to another Control.
 };
 
 } // namespace Internal

@@ -139,7 +139,7 @@ private:
     /**
      * @brief Sleeps untile the specified time point.
      */
-    void SleepUntil(std::chrono::time_point<std::chrono::system_clock> timeToSleepUntil);
+    void SleepUntil(std::chrono::time_point<std::chrono::steady_clock> timeToSleepUntil);
 
   protected:
     /**
@@ -154,7 +154,7 @@ private:
   private:
     ConditionalWait                                    mConditionalWait;
     std::unique_ptr<CallbackBase>                      mAwakeCallback;
-    std::chrono::time_point<std::chrono::system_clock> mSleepTimePoint;
+    std::chrono::time_point<std::chrono::steady_clock> mSleepTimePoint;
     const Dali::LogFactoryInterface&                   mLogFactory;
     bool                                               mNeedToSleep;
     bool                                               mDestroyThread;

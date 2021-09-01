@@ -77,8 +77,6 @@ static bool gWheelEventHandled = false;
 static int gFormRepostDecidedCallbackCalled = 0;
 static std::unique_ptr<Dali::WebEngineFormRepostDecision> gFormRepostDecidedInstance = nullptr;
 static int gFrameRenderedCallbackCalled = 0;
-static int gRequestInterceptorCallbackCalled = 0;
-static std::unique_ptr<Dali::WebEngineRequestInterceptor> gRequestInterceptorInstance = nullptr;
 static int gConsoleMessageCallbackCalled = 0;
 static std::unique_ptr<Dali::WebEngineConsoleMessage> gConsoleMessageInstance = nullptr;
 static int gResponsePolicyDecidedCallbackCalled = 0;
@@ -94,6 +92,8 @@ static int gStorageUsageAcquiredCallbackCalled = 0;
 static int gFormPasswordsAcquiredCallbackCalled = 0;
 static int gDownloadStartedCallbackCalled = 0;
 static int gMimeOverriddenCallbackCalled = 0;
+static int gRequestInterceptedCallbackCalled = 0;
+static Dali::WebEngineRequestInterceptorPtr gRequestInterceptorInstance = nullptr;
 static std::vector<std::unique_ptr<Dali::WebEngineSecurityOrigin>> gSecurityOriginList;
 static std::vector<std::unique_ptr<Dali::WebEngineContext::PasswordData>> gPasswordDataList;
 static int gContextMenuShownCallbackCalled = 0;
@@ -240,12 +240,6 @@ static void OnFrameRendered()
   gFrameRenderedCallbackCalled++;
 }
 
-static void OnRequestInterceptor(std::unique_ptr<Dali::WebEngineRequestInterceptor> interceptor)
-{
-  gRequestInterceptorCallbackCalled++;
-  gRequestInterceptorInstance = std::move(interceptor);
-}
-
 static void OnConsoleMessage(std::unique_ptr<Dali::WebEngineConsoleMessage> message)
 {
   gConsoleMessageCallbackCalled++;
@@ -297,6 +291,13 @@ static void OnDownloadStarted(const std::string& url)
 static bool OnMimeOverridden(const std::string&, const std::string&, std::string&)
 {
   gMimeOverriddenCallbackCalled++;
+  return false;
+}
+
+static bool OnRequestIntercepted(Dali::WebEngineRequestInterceptorPtr interceptor)
+{
+  gRequestInterceptedCallbackCalled++;
+  gRequestInterceptorInstance = interceptor;
   return false;
 }
 
@@ -1231,36 +1232,6 @@ int UtcDaliWebViewVideoPlayingGeolocationPermission(void)
   END_TEST;
 }
 
-int UtcDaliWebViewHttpRequestInterceptor(void)
-{
-  ToolkitTestApplication application;
-
-  WebView view = WebView::New();
-  DALI_TEST_CHECK( view );
-
-  // load url.
-  view.RegisterRequestInterceptorCallback( &OnRequestInterceptor );
-  DALI_TEST_EQUALS( gRequestInterceptorCallbackCalled, 0, TEST_LOCATION );
-  DALI_TEST_CHECK(gRequestInterceptorInstance == 0);
-
-  view.LoadUrl( TEST_URL1 );
-  Test::EmitGlobalTimerSignal();
-  DALI_TEST_EQUALS( gRequestInterceptorCallbackCalled, 1, TEST_LOCATION );
-
-  // check request interceptor.
-  DALI_TEST_CHECK(gRequestInterceptorInstance != 0);
-  DALI_TEST_CHECK(gRequestInterceptorInstance->Ignore());
-  DALI_TEST_CHECK(gRequestInterceptorInstance->SetResponseStatus(400, "error"));
-  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseHeader("key", "value"));
-  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseBody("test", 4));
-  std::string testUrl("http://test.html");
-  DALI_TEST_EQUALS(gRequestInterceptorInstance->GetUrl(), testUrl, TEST_LOCATION);
-
-  gRequestInterceptorInstance = nullptr;
-
-  END_TEST;
-}
-
 int UtcDaliWebViewResponsePolicyDecisionRequest(void)
 {
   ToolkitTestApplication application;
@@ -1334,8 +1305,8 @@ int UtcDaliWebViewHitTest(void)
   DALI_TEST_EQUALS(hitTest->GetTagName(), testTagName, TEST_LOCATION);
   std::string testNodeValue("test");
   DALI_TEST_EQUALS(hitTest->GetNodeValue(), testNodeValue, TEST_LOCATION);
-  Dali::Property::Map* testMap = &hitTest->GetAttributes();
-  DALI_TEST_CHECK(testMap);
+  Dali::Property::Map testMap = hitTest->GetAttributes();
+  DALI_TEST_EQUALS(testMap.Count(), 0, TEST_LOCATION);
   std::string testImageFileNameExtension("jpg");
   DALI_TEST_EQUALS(hitTest->GetImageFileNameExtension(), testImageFileNameExtension, TEST_LOCATION);
   Dali::PixelData testImageBuffer = hitTest->GetImageBuffer();
@@ -1664,6 +1635,47 @@ int UtcDaliWebContextGetWebDatabaseStorageOrigins(void)
 
   gSecurityOriginList.clear();
   gPasswordDataList.clear();
+
+  END_TEST;
+}
+
+int UtcDaliWebContextHttpRequestInterceptor(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  Dali::Toolkit::WebContext* context = view.GetContext();
+  DALI_TEST_CHECK( context != 0 )
+
+  // load url.
+  context->RegisterRequestInterceptedCallback(&OnRequestIntercepted);
+  DALI_TEST_EQUALS(gRequestInterceptedCallbackCalled, 0, TEST_LOCATION);
+  DALI_TEST_CHECK(gRequestInterceptorInstance == 0);
+
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS( gRequestInterceptedCallbackCalled, 1, TEST_LOCATION );
+
+  // check request interceptor.
+  DALI_TEST_CHECK(gRequestInterceptorInstance != 0);
+  DALI_TEST_CHECK(gRequestInterceptorInstance->Ignore());
+  DALI_TEST_CHECK(gRequestInterceptorInstance->SetResponseStatus(400, "error"));
+  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseHeader("key1", "value1"));
+  Dali::Property::Map testHeaders;
+  testHeaders.Insert("key2", "value2");
+  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseHeaders(testHeaders));
+  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseBody("test", 4));
+  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponse("key:value", "test", 4));
+  DALI_TEST_CHECK(gRequestInterceptorInstance->WriteResponseChunk("test", 4));
+  std::string testUrl("http://test.html");
+  DALI_TEST_EQUALS(gRequestInterceptorInstance->GetUrl(), testUrl, TEST_LOCATION);
+  std::string testMethod("GET");
+  DALI_TEST_EQUALS(gRequestInterceptorInstance->GetMethod(), testMethod, TEST_LOCATION);
+  Dali::Property::Map resultHeaders = gRequestInterceptorInstance->GetHeaders();
+  DALI_TEST_EQUALS(resultHeaders.Count(), 2, TEST_LOCATION);
+
+  gRequestInterceptorInstance = nullptr;
 
   END_TEST;
 }

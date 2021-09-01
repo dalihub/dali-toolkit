@@ -131,6 +131,11 @@ public:
    */
   DevelTextField::SelectionChangedSignalType& SelectionChangedSignal();
 
+  /**
+   * @copydoc TextField::SelectionClearedSignal()
+   */
+  DevelTextField::SelectionClearedSignalType& SelectionClearedSignal();
+
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()
@@ -298,6 +303,21 @@ public:
    */
   void SetEditable(bool editable) override;
 
+  /**
+   * @copydoc Dali::EditableControlInterface::CopyText()
+   */
+  string CopyText() override;
+
+  /**
+   * @copydoc Dali::EditableControlInterface::CutText()
+   */
+  string CutText() override;
+
+  /**
+   * @copydoc Text::EditableControlInterface::PasteText()
+   */
+  void PasteText() override;
+
   // From AnchorControlInterface
 
   /**
@@ -368,6 +388,11 @@ private: // Implementation
   void EmitSelectionChangedSignal();
 
   /**
+   * @brief Emits SelectionCleared signal.
+   */
+  void EmitSelectionClearedSignal();
+
+  /**
    * @brief Callback function for when the layout is changed.
    * @param[in] actor The actor whose layoutDirection is changed.
    * @param[in] type  The layoutDirection.
@@ -413,6 +438,7 @@ private: // Data
   Toolkit::DevelTextField::InputFilteredSignalType         mInputFilteredSignal;
   Toolkit::DevelTextField::CursorPositionChangedSignalType mCursorPositionChangedSignal;
   Toolkit::DevelTextField::SelectionChangedSignalType      mSelectionChangedSignal;
+  Toolkit::DevelTextField::SelectionClearedSignalType      mSelectionClearedSignal;
 
   InputMethodContext       mInputMethodContext;
   Text::ControllerPtr      mController;
@@ -434,6 +460,7 @@ private: // Data
   bool  mTextChanged : 1;           ///< If true, emits TextChangedSignal in next OnRelayout().
   bool  mCursorPositionChanged : 1; ///< If true, emits CursorPositionChangedSignal at the end of OnRelayout().
   bool  mSelectionChanged : 1;      ///< If true, emits SelectionChangedSignal at the end of OnRelayout().
+  bool  mSelectionCleared : 1;      ///< If true, emits SelectionClearedSignal at the end of OnRelayout().
 
   //args for cursor position changed event
   unsigned int mOldPosition;

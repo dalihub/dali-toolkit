@@ -50,6 +50,11 @@ SelectionChangedSignalType& SelectionChangedSignal(TextField textField)
   return GetImpl(textField).SelectionChangedSignal();
 }
 
+SelectionClearedSignalType& SelectionClearedSignal(TextField textField)
+{
+  return GetImpl(textField).SelectionClearedSignal();
+}
+
 void SelectWholeText(TextField textField)
 {
   GetImpl(textField).SelectWholeText();
@@ -63,6 +68,21 @@ void SelectNone(TextField textField)
 void SelectText(TextField textField, const uint32_t start, const uint32_t end)
 {
   GetImpl(textField).SelectText(start, end);
+}
+
+string CopyText(TextField textField)
+{
+  return GetImpl(textField).CopyText();
+}
+
+string CutText(TextField textField)
+{
+  return GetImpl(textField).CutText();
+}
+
+void PasteText(TextField textField)
+{
+  GetImpl(textField).PasteText();
 }
 
 } // namespace DevelTextField

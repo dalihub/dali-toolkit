@@ -31,7 +31,6 @@
 #include <dali/devel-api/adaptor-framework/web-engine-http-auth-handler.h>
 #include <dali/devel-api/adaptor-framework/web-engine-load-error.h>
 #include <dali/devel-api/adaptor-framework/web-engine-policy-decision.h>
-#include <dali/devel-api/adaptor-framework/web-engine-request-interceptor.h>
 #include <dali/devel-api/adaptor-framework/web-engine-settings.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/scripting/enum-helper.h>
@@ -700,14 +699,6 @@ void WebView::RegisterFormRepostDecidedCallback(Dali::WebEnginePlugin::WebEngine
 void WebView::RegisterFrameRenderedCallback(Dali::WebEnginePlugin::WebEngineFrameRenderedCallback callback)
 {
   mFrameRenderedCallback = callback;
-}
-
-void WebView::RegisterRequestInterceptorCallback(Dali::WebEnginePlugin::WebEngineRequestInterceptorCallback callback)
-{
-  if(mWebEngine)
-  {
-    mWebEngine.RegisterRequestInterceptorCallback(callback);
-  }
 }
 
 void WebView::RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback callback)

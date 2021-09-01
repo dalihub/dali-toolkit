@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_FADE_H
-#define DALI_TOOLKIT_FADE_H
+#ifndef DALI_TOOLKIT_FADE_TRANSITION_H
+#define DALI_TOOLKIT_FADE_TRANSITION_H
 
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
@@ -28,56 +28,56 @@ namespace Toolkit
 {
 namespace Internal DALI_INTERNAL
 {
-class Fade;
+class FadeTransition;
 }
 
 /**
  * @brief Fade provides smoothly appearing/disappearing effects for target Control.
  */
-class DALI_TOOLKIT_API Fade : public TransitionBase
+class DALI_TOOLKIT_API FadeTransition : public TransitionBase
 {
 public:
   /**
-   * @brief Creates an uninitialized Fade; this can be initialized with Fade::New().
+   * @brief Creates an uninitialized FadeTransition; this can be initialized with FadeTransition::New().
    *
-   * Calling member functions with an uninitialized Fade handle is not allowed.
+   * Calling member functions with an uninitialized FadeTransition handle is not allowed.
    */
-  Fade();
+  FadeTransition();
 
   /**
-   * @brief Creates an initialized Fade.
+   * @brief Creates an initialized FadeTransition.
    *
    * @param[in] control A control of this transition.
    * @param[in] opacity opacity value the control Opacity property will be changed from/to. Opacity must be between [0, 1].
    * @param[in] timePeriod The duration of the animation.
    * @return A handle to a newly allocated Dali resource
    */
-  static Fade New(Dali::Toolkit::Control control, float opacity, TimePeriod timePeriod);
+  static FadeTransition New(Dali::Toolkit::Control control, float opacity, TimePeriod timePeriod);
 
   /**
-   * @brief Downcasts a handle to Fade handle.
+   * @brief Downcasts a handle to FadeTransition handle.
    *
-   * If handle points to an Fade object, the downcast produces valid handle.
+   * If handle points to an FadeTransition object, the downcast produces valid handle.
    * If not, the returned handle is left uninitialized.
    *
    * @param[in] handle Handle to an object
-   * @return Handle to an Fade object or an uninitialized handle
+   * @return Handle to an FadeTransition object or an uninitialized handle
    */
-  static Fade DownCast(BaseHandle handle);
+  static FadeTransition DownCast(BaseHandle handle);
 
   /**
    * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  ~Fade();
+  ~FadeTransition();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @param[in] handle A reference to the copied handle
    */
-  Fade(const Fade& handle);
+  FadeTransition(const FadeTransition& handle);
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -85,14 +85,14 @@ public:
    * @param[in] rhs A reference to the copied handle
    * @return A reference to this
    */
-  Fade& operator=(const Fade& rhs);
+  FadeTransition& operator=(const FadeTransition& rhs);
 
   /**
    * @brief Move constructor.
    *
    * @param[in] rhs A reference to the moved handle
    */
-  Fade(Fade&& rhs);
+  FadeTransition(FadeTransition&& rhs);
 
   /**
    * @brief Move assignment operator.
@@ -100,15 +100,15 @@ public:
    * @param[in] rhs A reference to the moved handle
    * @return A reference to this handle
    */
-  Fade& operator=(Fade&& rhs);
+  FadeTransition& operator=(FadeTransition&& rhs);
 
 public: // Not intended for use by Application developers
   /// @cond internal
   /**
-   * @brief This constructor is used by Fade::New() methods.
-   * @param[in] fade A pointer to a newly allocated Dali resource
+   * @brief This constructor is used by FadeTransition::New() methods.
+   * @param[in] fadeTransition A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL Fade(Internal::Fade* fade);
+  explicit DALI_INTERNAL FadeTransition(Internal::FadeTransition* fadeTransition);
   /// @endcond
 };
 
@@ -116,4 +116,4 @@ public: // Not intended for use by Application developers
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_FADE_H
+#endif // DALI_TOOLKIT_FADE_TRANSITION_H

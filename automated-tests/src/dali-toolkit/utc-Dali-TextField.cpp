@@ -120,7 +120,6 @@ const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 const int KEY_RETURN_CODE = 36;
 const int KEY_A_CODE = 38;
 const int KEY_D_CODE = 40;
-
 const int KEY_SHIFT_MODIFIER = 257;
 
 const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
@@ -128,6 +127,7 @@ const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
 static bool gSelectionChangedCallbackCalled;
 static uint32_t oldSelectionStart;
 static uint32_t oldSelectionEnd;
+static bool gSelectionClearedCallbackCalled;
 static bool gAnchorClickedCallBackCalled;
 static bool gAnchorClickedCallBackNotCalled;
 static bool gTextChangedCallBackCalled;
@@ -218,6 +218,13 @@ struct CallbackFunctor
   }
   bool* mCallbackFlag;
 };
+
+static void TestSelectionClearedCallback(TextField control)
+{
+  tet_infoline(" TestSelectionClearedCallback");
+
+  gSelectionClearedCallbackCalled = true;
+}
 
 static void TestSelectionChangedCallback(TextField control, uint32_t oldStart, uint32_t oldEnd)
 {
@@ -4002,6 +4009,286 @@ int UtcDaliToolkitTextFieldEllipsisPositionProperty(void)
   END_TEST;
 }
 
+int UtcDaliTextFieldCopyText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldCopyText ");
+
+  TextField textField = TextField::New();
+
+  std::string selectedText = "";
+  std::string copiedText = "";
+
+  application.GetScene().Add( textField );
+
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textField.SetProperty( TextField::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  // Hello is selected
+  DevelTextField::SelectText( textField, 0, 5 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "Hello", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 5, TEST_LOCATION );
+
+  // Hello is copied
+  copiedText = DevelTextField::CopyText( textField );
+  DALI_TEST_EQUALS( "Hello", copiedText, TEST_LOCATION );
+
+  // world is selected
+  DevelTextField::SelectText( textField, 6, 11 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "world", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 6, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 11, TEST_LOCATION );
+
+  // world is copied
+  copiedText = DevelTextField::CopyText( textField );
+  DALI_TEST_EQUALS( "world", copiedText, TEST_LOCATION );
+
+  // "lo wo" is selected
+  DevelTextField::SelectText( textField, 3, 8 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "lo wo", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 8, TEST_LOCATION );
+
+  // "lo wo" is copied
+  copiedText = DevelTextField::CopyText( textField );
+  DALI_TEST_EQUALS( "lo wo", copiedText, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldCutText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldCutText ");
+
+  TextField textField = TextField::New();
+
+  std::string selectedText = "";
+
+  application.GetScene().Add( textField );
+
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textField.SetProperty( TextField::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  // Hello is selected
+  DevelTextField::SelectText( textField, 0, 5 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "Hello", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 5, TEST_LOCATION );
+
+  // Hello is cut
+  DALI_TEST_EQUALS( "Hello", DevelTextField::CutText( textField ), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( TextField::Property::TEXT ).Get<std::string>(), " world", TEST_LOCATION );
+
+  // " w" is selected
+  DevelTextField::SelectText( textField, 0, 2 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( " w", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 2, TEST_LOCATION );
+
+  // " w" is cut
+  DALI_TEST_EQUALS( " w", DevelTextField::CutText( textField ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textField.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "orld", TEST_LOCATION );
+
+  // Test Cut from the middle
+
+  // "rl" is selected
+  DevelTextField::SelectText( textField, 1, 3 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "rl", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 3, TEST_LOCATION );
+
+  // "rl" is cut
+  DALI_TEST_EQUALS( "rl", DevelTextField::CutText( textField ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textField.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "od", TEST_LOCATION );
+
+  // Test Cut from the end
+
+  // "d" is selected
+  DevelTextField::SelectText( textField, 1, 2 );
+
+  application.SendNotification();
+  application.Render();
+
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "d", selectedText, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_START ).Get<int>(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( DevelTextField::Property::SELECTED_TEXT_END ).Get<int>(), 2, TEST_LOCATION );
+
+  // "d" is cut
+  DALI_TEST_EQUALS( "d", DevelTextField::CutText( textField ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textField.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "o", TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldPasteText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldPasteText ");
+
+  TextField textField = TextField::New();
+
+  application.GetScene().Add( textField );
+
+  std::string cutText = "";
+  std::string copiedText = "";
+
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textField.SetProperty( TextField::Property::TEXT, "Hello World" );
+
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Select some text in the right of the current cursor position
+  DevelTextField::SelectText( textField, 0, 3 );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Cut the selected text
+  cutText = DevelTextField::CutText(textField);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( "Hel", cutText, TEST_LOCATION );
+  DALI_TEST_EQUALS( textField.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "lo World", TEST_LOCATION );
+
+  DevelTextField::SelectText( textField, 0, 3 );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Copy the selected text
+  copiedText = DevelTextField::CopyText(textField);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( "lo ", copiedText, TEST_LOCATION );
+  DALI_TEST_EQUALS( "lo World", textField.GetProperty<std::string>( TextField::Property::TEXT ), TEST_LOCATION );
+
+  // Move the cursor to the end of the line
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Paste the selected text at the current cursor position
+  DevelTextField::PasteText(textField);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textField.GetProperty( TextField::Property::TEXT ).Get<std::string>(), "lo Worldlo ", TEST_LOCATION );
+
+  END_TEST;
+}
 int utcDaliTextFieldCursorPositionChangedSignal(void)
 {
   ToolkitTestApplication application;
@@ -4100,6 +4387,140 @@ int utcDaliTextFieldCursorPositionChangedSignal(void)
 
   DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
   DALI_TEST_EQUALS(oldCursorPos, 5, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliTextFieldSelectionClearedSignal(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldSelectionClearedSignal");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  application.GetScene().Add( field );
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::SelectionClearedSignal(field).Connect(&TestSelectionClearedCallback);
+  bool selectionClearedSignal = false;
+  field.ConnectSignal( testTracker, "selectionCleared",   CallbackFunctor(&selectionClearedSignal) );
+
+  field.SetProperty( TextField::Property::TEXT, "Hello\nworld\nHello world" );
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text & Select some text in the right of the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) ); 
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // remove selection
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  gSelectionClearedCallbackCalled = false;
+
+  // Move to second line of the text & select.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  //remove selection
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
+
+  gSelectionClearedCallbackCalled = false;
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text & select.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // replace D with selected text
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
+
+  gSelectionClearedCallbackCalled = false;
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DevelTextField::SelectText( field ,1, 3 );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  field.SetProperty( DevelTextField::Property::PRIMARY_CURSOR_POSITION, 3);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
+
+  gSelectionClearedCallbackCalled = false;
+
+  DevelTextField::SelectText( field ,1, 3 );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // select none
+  DevelTextField::SelectNone(field);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
 
   END_TEST;
 }

@@ -112,6 +112,23 @@ public:
    * @param[in] editable The editable status.
    */
   virtual void SetEditable(bool editable) = 0;
+
+  /**
+   * @brief Called to copy the selected text.
+   * @return The copied text.
+   */
+  virtual string CopyText() = 0;
+
+  /**
+   * @brief Called to cut the selected text.
+   * @return The cut text.
+   */
+  virtual string CutText() = 0;
+
+  /**
+   * @brief Called to paste the most recent clipboard text item into the control.
+   */
+  virtual void PasteText() = 0;
 };
 
 } // namespace Text
