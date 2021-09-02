@@ -154,6 +154,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
                 visualPtr = NPatchVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap);
                 break;
               }
+              case VisualUrl::TVG:
               case VisualUrl::SVG:
               {
                 visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap);
@@ -318,6 +319,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageD
         visualPtr = NPatchVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl);
         break;
       }
+      case VisualUrl::TVG:
       case VisualUrl::SVG:
       {
         visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl);

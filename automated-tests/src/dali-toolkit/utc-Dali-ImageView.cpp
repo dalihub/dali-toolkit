@@ -2883,6 +2883,27 @@ int UtcDaliImageViewSvgRasterizationFailure(void)
   END_TEST;
 }
 
+int UtcDaliImageViewTVGLoading(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing TVG image loading");
+
+  {
+    ImageView imageView = ImageView::New( );
+
+    imageView.SetImage( TEST_RESOURCE_DIR "/test.tvg" );
+
+    application.GetScene().Add( imageView );
+    DALI_TEST_CHECK( imageView );
+    Vector3 naturalSize = imageView.GetNaturalSize();
+
+    DALI_TEST_EQUALS( naturalSize.width, 100.0f, TEST_LOCATION );
+    DALI_TEST_EQUALS( naturalSize.height, 100.0f, TEST_LOCATION );
+  }
+  END_TEST;
+}
+
 namespace
 {
 
