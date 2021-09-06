@@ -45,8 +45,9 @@ public:
   virtual ~Window() = default;
   static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent);
 
-  WindowPosition GetPosition() const;
-  PositionSize   GetPositionSize() const;
+  WindowPosition           GetPosition() const;
+  PositionSize             GetPositionSize() const;
+  Dali::Window::WindowSize GetSize() const;
 
   void SetPositionSize(PositionSize positionSize);
 
