@@ -1641,7 +1641,7 @@ int UtcDaliToolkitTextlabelTextFit(void)
   application.SendNotification();
   application.Render();
 
-  const Vector3 EXPECTED_NATURAL_SIZE( 452.0f, 94.0f, 0.0f );
+  const Vector3 EXPECTED_NATURAL_SIZE( 450.0f, 96.0f, 0.0f );
   DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION );
 
   // check pixel size

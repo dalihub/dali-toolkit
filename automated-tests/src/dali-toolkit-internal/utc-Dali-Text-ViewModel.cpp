@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,14 +49,14 @@ const char* LOREM_IPSUM = "Lorem ipsum dolor sit amet, aeque definiebas ea mei, 
   "Aliquip sanctůs delicáta quí ěá, et natum aliquam est?\n"
   "Asšúm sapěret usu ůť.\n"
   "Síť ut apeirián laboramúš percipitur, sůas hařum ín éos?\n";
-const Vector2 LOREM_SCROLL_POSITION( 0.f, -284.f );
-const Length LOREM_NUMBER_OF_LINES = 36u;
+const Vector2 LOREM_SCROLL_POSITION( 0.f, -265.f );
+const Length LOREM_NUMBER_OF_LINES = 35u;
 const Length LOREM_NUMBER_OF_LINES_ELIDED = 21u;
 const Length LOREM_NUMBER_OF_GLYPHS = 632;
-const Length LOREM_NUMBER_OF_GLYPHS_ELIDED = 373u;
+const Length LOREM_NUMBER_OF_GLYPHS_ELIDED = 393u;
 
 // The expected layout size for UtcDaliTextViewModelGetLayoutSize
-const Size LAYOUT_SIZE( 182.f, 45.f );
+const Size LAYOUT_SIZE( 181.f, 48.f );
 
 // The expected color indices for UtcDaliTextViewModelGetColors
 const ColorIndex COLOR_INDICES[] = { 0u, 0u, 0u, 0u, 0u, 0u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u, 1u, 1u, 1u, 1u, 1u, 3u, 1u, 1u, 1u, 0u, 0u, 0u, 0u };
@@ -601,16 +601,16 @@ int UtcDaliTextViewModelElideText02(void)
   Size textSize00( 100.f, 100.f );
 
   Size textSize01( 80.f, 100.f );
-  float positions01[] = { 0.f, 8.f, 16.f, 26.f, 34.f, 43.f, 47.f, 58.f, 64.0f };
+  float positions01[] = { 0.f, 7.f, 16.f, 26.f, 33.f, 41.f, 45.f, 55.f, 64.0f };
 
   Size textSize02( 80.f, 100.f );
-  float positions02[] = { 69.f, 63.f, 58.f, 50.f, 45.f, 41.f, 32.f, 23.f, 5.f };
+  float positions02[] = { 68.f, 62.f, 58.f, 50.f, 46.f, 42.f, 32.f, 24.f, 5.f };
 
   Size textSize03( 80.f, 100.f );
-  float positions03[] = { 72.f, 65.f, 61.f, 59.f, 53.f, 47.f, 43.f, 38.f, 30.f, 25.f, 21.f, 7.f };
+  float positions03[] = { 78.f, 72.f, 66.f, 62.f, 57.f, 50.f, 45.f, 41.f, 39.f, 33.f, 30.f, 24.f, 5.0f };
 
   Size textSize04( 80.f, 10.f );
-  float positions04[] = { 2.f };
+  float positions04[] = { 1.f };
 
   struct ElideData data[] =
   {
@@ -643,7 +643,7 @@ int UtcDaliTextViewModelElideText02(void)
       "<font family='TizenSansArabic'>عل النفط ديسمبر الإمداد بال, بين وترك شعار هو. لمّ من المبرمة النفط بالسيطرة, أم يتم تحرّك وبغطاء, عدم في لإعادة وإقامة رجوعهم.</font>",
       textSize03,
       5u,
-      62u,
+      66u,
       positions03
     },
     {

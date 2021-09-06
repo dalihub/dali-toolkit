@@ -395,112 +395,112 @@ int UtcDaliTextLabelElideTextLocation(void)
   Size textSize00( 100.f, 100.f );
 
   Size  textSize01( 120.0f, 50.0f );
-  float positions01[] = { 0.f, 11.f, 23.f, 32.f, 42.f, 52.f, 62.f, 73.f, 83.f, 95.f };
+  float positions01[] = { 0.0f, 11.0f, 21.0f, 31.0f, 41.0f, 50.0f, 60.0f, 70.0f, 80.0f, 91.0f };
 
   Size  textSize02( 120.0f, 50.0f );
-  float positions02[] = { 0.f, 11.f, 23.f, 32.f, 42.f, 52.f, 62.f, 73.f, 83.f, 93.f, 103.f, 112.f, 0.f, 10.f, 22.f, 31.f, 41.f, 51.f, 61.f, 72.f, 82.f, 94.f };
+  float positions02[] = { 0.0f, 11.0f, 21.0f, 31.0f, 41.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 109.0f, 0.0f, 10.0f, 20.0f, 30.0f, 40.0f, 49.0f, 59.0f, 69.0f, 79.0f, 90.0f };
 
   Size  textSize03( 120.0f, 60.0f );
-  float positions03[] = { 0.f, 12.f, 21.f, 26.f, 30.f, 39.f, 45.f, 57.f, 61.f, 0.f, 10.f, 19.f, 29.f, 39.f, 46.f, 50.f, 66.f, 76.f, 85.f, 0.f, 15.f, 25.f, 30.f, 38.f, 48.f, 64.f, 73.f, 79.f, 93.f };
+  float positions03[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 0.0f, 8.0f, 18.0f, 27.0f, 38.0f, 44.0f, 49.0f, 63.0f, 73.0f, 82.0f, 0.0f, 14.0f, 24.0f, 28.0f, 36.0f, 47.0f, 61.0f, 70.0f, 76.0f, 88.0f };
 
   Size  textSize04( 120.0f, 60.0f );
-  float positions04[] = { 0.f, 12.f, 21.f, 26.f, 30.f, 39.f, 45.f, 57.f, 61.f, 67.f, 77.f, 86.f, 96.f, 106.f, 113.f, 0.f, 15.f, 25.f, 34.f, 39.f, 55.f, 65.f, 69.f, 78.f, 88.f, 104.f, 112.f, 0.f, 12.f, 21.f, 26.f, 30.f, 39.f, 45.f, 57.f, 61.f, 67.f, 77.f, 86.f, 98.f };
+  float positions04[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f, 84.0f, 92.0f, 103.0f, 109.0f, 0.0f, 14.0f, 24.0f, 33.0f, 38.0f, 52.0f, 63.0f, 66.0f, 75.0f, 85.0f, 99.0f, 109.0f, 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f, 84.0f, 93.0f };
 
   Size  textSize05( 110.0f, 60.0f );
-  float positions05[] = { 0.f, 12.f, 21.f, 26.f, 30.f, 39.f, 45.f, 57.f, 61.f, 67.f, 77.f, 0.f, 10.f, 20.f, 26.f, 31.f, 46.f, 56.f, 65.f, 70.f, 86.f, 96.f, 0.f, 8.f, 18.f, 34.f, 43.f, 49.f, 61.f, 71.f, 75.f, 81.f };
+  float positions05[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f, 0.0f, 8.0f, 19.0f, 25.0f, 30.0f, 44.0f, 54.0f, 63.0f, 68.0f, 82.0f, 93.0f, 0.0f, 8.0f, 19.0f, 33.0f, 42.0f, 48.0f, 59.0f, 69.0f, 74.0f, 78.0f };
 
   Size  textSize06( 110.0f, 60.0f );
-  float positions06[] = { 0.f, 12.f, 21.f, 26.f, 30.f, 39.f, 45.f, 57.f, 61.f, 0.f, 10.f, 19.f, 29.f, 39.f, 46.f, 50.f, 66.f, 76.f, 85.f, 0.f, 15.f, 25.f, 30.f, 38.f, 48.f, 64.f, 73.f, 81.f };
+  float positions06[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 0.0f, 8.0f, 18.0f, 27.0f, 38.0f, 44.0f, 49.0f, 63.0f, 73.0f, 82.0f, 0.0f, 14.0f, 24.0f, 28.0f, 36.0f, 47.0f, 61.0f, 70.0f, 77.0f };
 
   Size  textSize07( 120.0f, 50.0f );
-  float positions07[] = { 6.0f, 23.0f, 32.0f, 42.0f, 53.0f, 63.0f, 73.0f, 83.0f, 93.0f, 104.0f, 113.0f } ;
+  float positions07[] = { 5.0f, 21.0f, 31.0f, 41.0f, 50.0f, 61.0f, 71.0f, 80.0f, 90.0f, 100.0f, 109.0f };
 
   Size  textSize08( 120.0f, 50.0f );
-  float positions08[] = { 5.0f, 22.0f, 31.0f, 41.0f, 51.0f, 62.0f, 72.0f, 82.0f, 92.0f, 102.0f, 112.0f };
+  float positions08[] = { 5.0f, 21.0f, 31.0f, 41.0f, 50.0f, 61.0f, 70.0f, 80.0f, 90.0f, 100.0f, 109.0f };
 
   Size  textSize09( 120.0f, 60.0f );
-  float positions09[] = { 9.0f, 25.0f, 30.0f, 38.0f, 48.0f, 64.0f, 73.0f, 79.0f, 91.0f, 101.0f, 105.0f, 110.0f, 118.0f };
+  float positions09[] = { 8.0f, 24.0f, 28.0f, 36.0f, 47.0f, 61.0f, 70.0f, 76.0f, 87.0f, 97.0f, 102.0f, 105.0f, 115.0f };
 
   Size  textSize10( 120.0f, 60.0f );
-  float positions10[] = { 8.0f, 25.0f, 34.0f, 39.0f, 55.0f, 65.0f, 69.0f, 78.0f, 88.0f, 104.0f, 112.0f };
+  float positions10[] = { 8.0f, 24.0f, 33.0f, 38.0f, 52.0f, 63.0f, 66.0f, 75.0f, 85.0f, 99.0f, 109.0f };
 
   Size  textSize11( 100.0f, 60.0f );
-  float positions11[] = { 5.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f };
+  float positions11[] = { 4.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f };
 
   Size  textSize12( 100.0f, 60.0f );
-  float positions12[] = { 5.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f };
+  float positions12[] = { 4.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f };
 
   Size  textSize13( 120.0f, 60.0f );
-  float positions13[] = { 118.0f, 111.0f, 96.0f, 88.0f, 79.0f, 73.0f, 62.0f, 57.0f, 52.0f, 43.0f, 35.0f, 29.0f, 19.0f, 6.0f };
+  float positions13[] = { 118.0f, 111.0f, 97.0f, 89.0f, 80.0f, 74.0f, 64.0f, 59.0f, 54.0f, 46.0f, 37.0f, 31.0f, 22.0f, 7.0f };
 
   Size  textSize14( 120.0f, 60.0f );
-  float positions14[] = { 114.0f, 108.0f, 93.0f, 85.0f, 76.0f, 70.0f, 59.0f, 54.0f, 49.0f, 40.0f, 32.0f, 27.0f, 112.0f, 103.0f, 93.0f, 88.0f, 86.0f, 79.0f, 76.0f, 66.0f, 57.0f, 52.0f, 42.0f, 35.0f, 32.0f, 27.0f, 140.0f, 128.0f, 123.0f, 119.0f, 116.0f, 106.0f, 102.0f, 87.0f, 79.0f, 70.0f, 67.0f, 61.0f, 55.0f, 50.0f, 38.0f };
+  float positions14[] = { 115.0f, 108.0f, 94.0f, 86.0f, 77.0f, 71.0f, 61.0f, 56.0f, 51.0f, 43.0f, 34.0f, 30.0f, 112.0f, 104.0f, 94.0f, 89.0f, 87.0f, 81.0f, 77.0f, 67.0f, 59.0f, 54.0f, 45.0f, 38.0f, 34.0f, 30.0f, 142.0f, 131.0f, 126.0f, 121.0f, 119.0f, 109.0f, 105.0f, 91.0f, 83.0f, 74.0f, 72.0f, 66.0f, 60.0f, 55.0f, 46.0f, 32.0f };
 
   Size  textSize15( 110.0f, 60.0f );
-  float positions15[] = { 107.0f, 100.0f, 86.0f, 77.0f, 68.0f, 62.0f, 52.0f, 46.0f, 42.0f, 33.0f, 24.0f, 18.0f, 8.0f, 0.0f, 95.0f, 90.0f, 87.0f, 81.0f, 78.0f, 67.0f, 59.0f, 54.0f, 44.0f, 37.0f, 33.0f, 27.0f, 24.0f, 12.0f, 7.0f, 2.0f, 0.0f, 93.0f, 89.0f, 75.0f, 66.0f, 57.0f, 55.0f, 49.0f, 43.0f, 37.0f, 28.0f, 15.0f };
+  float positions15[] = { 108.0f, 101.0f, 87.0f, 79.0f, 70.0f, 64.0f, 54.0f, 49.0f, 44.0f, 36.0f, 27.0f, 21.0f, 12.0f, 4.0f, 96.0f, 91.0f, 89.0f, 83.0f, 79.0f, 69.0f, 61.0f, 56.0f, 47.0f, 40.0f, 36.0f, 30.0f, 27.0f, 16.0f, 11.0f, 6.0f, 4.0f, 102.0f, 98.0f, 84.0f, 75.0f, 66.0f, 64.0f, 58.0f, 53.0f, 47.0f, 38.0f, 25.0f, 22.0f, 5.0f };
 
   Size  textSize16( 110.0f, 60.0f );
-  float positions16[] = { 104.0f, 98.0f, 83.0f, 75.0f, 66.0f, 60.0f, 49.0f, 44.0f, 39.0f, 30.0f, 22.0f, 17.0f, 102.0f, 93.0f, 83.0f, 78.0f, 76.0f, 69.0f, 66.0f, 56.0f, 47.0f, 42.0f, 32.0f, 25.0f, 22.0f, 17.0f, 116.0f, 104.0f, 99.0f, 94.0f, 91.0f, 82.0f, 78.0f, 63.0f, 54.0f, 45.0f, 43.0f, 37.0f, 23.0f };
+  float positions16[] = { 105.0f, 98.0f, 84.0f, 76.0f, 67.0f, 61.0f, 51.0f, 46.0f, 41.0f, 33.0f, 24.0f, 20.0f, 102.0f, 94.0f, 84.0f, 79.0f, 77.0f, 71.0f, 67.0f, 57.0f, 49.0f, 44.0f, 35.0f, 28.0f, 24.0f, 20.0f, 116.0f, 104.0f, 99.0f, 95.0f, 92.0f, 83.0f, 79.0f, 65.0f, 56.0f, 48.0f, 45.0f, 39.0f, 24.0f };
 
   Size  textSize17( 110.0f, 60.0f );
-  float positions17[] = { 104.0f, 98.0f, 83.0f, 75.0f, 66.0f, 60.0f, 49.0f, 44.0f, 39.0f, 30.0f, 22.0f, 17.0f, 102.0f, 93.0f, 83.0f, 78.0f, 76.0f, 69.0f, 66.0f, 56.0f, 47.0f, 42.0f, 32.0f, 25.0f, 22.0f, 17.0f, 116.0f, 104.0f, 99.0f, 94.0f, 91.0f, 82.0f, 78.0f, 63.0f, 54.0f, 45.0f, 43.0f, 37.0f, 23.0f };
+  float positions17[] = { 105.0f, 98.0f, 84.0f, 76.0f, 67.0f, 61.0f, 51.0f, 46.0f, 41.0f, 33.0f, 24.0f, 20.0f, 102.0f, 94.0f, 84.0f, 79.0f, 77.0f, 71.0f, 67.0f, 57.0f, 49.0f, 44.0f, 35.0f, 28.0f, 24.0f, 20.0f, 116.0f, 104.0f, 99.0f, 95.0f, 92.0f, 83.0f, 79.0f, 65.0f, 56.0f, 48.0f, 45.0f, 39.0f, 24.0f };
 
   Size  textSize18( 120.0f, 60.0f );
-  float positions18[] = { 96.0f, 84.0f, 75.0f, 73.0f, 66.0f, 61.0f, 55.0f, 46.0f, 32.0f, 29.0f, 17.0f, 10.0f, 3.0f };
+  float positions18[] = { 89.0f, 79.0f, 70.0f, 68.0f, 62.0f, 56.0f, 51.0f, 42.0f, 28.0f, 25.0f, 14.0f, 7.0f, 0.0f };
 
   Size  textSize19( 120.0f, 60.0f );
-  float positions19[] = { 102.0f, 89.0f, 84.0f, 82.0f, 75.0f, 72.0f, 62.0f, 53.0f, 48.0f, 38.0f, 31.0f, 28.0f, 23.0f, };
+  float positions19[] = { 103.0f, 91.0f, 86.0f, 84.0f, 78.0f, 74.0f, 64.0f, 56.0f, 51.0f, 42.0f, 35.0f, 31.0f, 27.0f };
 
   Size  textSize20( 110.0f, 60.0f );
-  float positions20[] = { 89.0f, 81.0f, 78.0f, 67.0f, 59.0f, 54.0f, 44.0f, 37.0f, 33.0f, 27.0f, 24.0f, 12.0f, 7.0f, 2.0f, 0.0f };
+  float positions20[] = { 89.0f, 82.0f, 78.0f, 68.0f, 60.0f, 55.0f, 46.0f, 39.0f, 35.0f, 29.0f, 26.0f, 15.0f, 10.0f, 5.0f, 3.0f };
 
   Size  textSize21( 110.0f, 60.0f );
-  float positions21[] = { 92.0f, 79.0f, 74.0f, 72.0f, 65.0f, 62.0f, 52.0f, 43.0f, 38.0f, 28.0f, 21.0f, 18.0f, 13.0f };
+  float positions21[] = { 93.0f, 81.0f, 76.0f, 74.0f, 68.0f, 64.0f, 54.0f, 46.0f, 41.0f, 32.0f, 25.0f, 21.0f, 17.0f };
 
   Size  textSize22( 110.0f, 60.0f );
-  float positions22[] = {  92.0f, 79.0f, 74.0f, 72.0f, 65.0f, 62.0f, 52.0f, 43.0f, 38.0f, 28.0f, 21.0f, 18.0f, 13.0f };
+  float positions22[] = { 93.0f, 81.0f, 76.0f, 74.0f, 68.0f, 64.0f, 54.0f, 46.0f, 41.0f, 32.0f, 25.0f, 21.0f, 17.0f };
 
   Size  textSize23( 120.0f, 50.0f );
-  float positions23[] = { 0.0f, 11.0f, 22.0f, 33.0f, 46.0f };
+  float positions23[] = { 0.0f, 11.0f, 20.0f, 32.0f, 44.0f };
 
   Size  textSize24( 120.0f, 50.0f );
-  float positions24[] = { 0.0f, 11.0f, 23.0f, 32.0f, 42.0f, 52.0f, 62.0f, 73.0f, 83.0f, 95.0f };
+  float positions24[] = { 0.0f, 11.0f, 21.0f, 31.0f, 41.0f, 50.0f, 60.0f, 70.0f, 80.0f, 91.0f };
 
   Size  textSize25( 120.0f, 60.0f );
-  float positions25[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 0.0f, 10.0f, 19.0f, 29.0f, 39.0f, 46.0f, 50.0f, 68.0f };
+  float positions25[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 0.0f, 8.0f, 18.0f, 27.0f, 38.0f, 44.0f, 49.0f, 64.0f };
 
   Size  textSize26( 120.0f, 60.0f );
-  float positions26[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f, 86.0f, 96.0f, 106.0f, 113.0f, 0.0f, 15.0f, 25.0f, 34.0f, 39.0f, 55.0f, 65.0f, 69.0f, 78.0f, 90.0f };
+  float positions26[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f, 84.0f, 92.0f, 103.0f, 109.0f, 0.0f, 14.0f, 24.0f, 33.0f, 38.0f, 52.0f, 63.0f, 66.0f, 75.0f, 86.0f };
 
   Size  textSize27( 110.0f, 60.0f );
-  float positions27[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f, 0.0f, 10.0f, 20.0f, 26.0f, 31.0f, 46.0f, 56.0f, 65.0f, 72.0f };
+  float positions27[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f, 0.0f, 8.0f, 19.0f, 25.0f, 30.0f, 44.0f, 54.0f, 63.0f, 69.0f };
 
   Size  textSize28( 110.0f, 60.0f );
-  float positions28[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 0.0f, 10.0f, 19.0f, 29.0f, 39.0f, 46.0f, 50.0f, 68.0f };
+  float positions28[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 0.0f, 8.0f, 18.0f, 27.0f, 38.0f, 44.0f, 49.0f, 64.0f };
 
   Size  textSize29( 120.0f, 60.0f );
-  float positions29[] = { 116.0f, 109.0f, 94.0f, 86.0f, 77.0f, 71.0f, 60.0f };
+  float positions29[] = { 115.0f, 108.0f, 94.0f, 86.0f, 78.0f, 72.0f, 61.0f };
 
   Size  textSize30( 120.0f, 60.0f );
-  float positions30[] = { 114.0f, 108.0f, 93.0f, 85.0f, 76.0f, 70.0f, 59.0f, 54.0f, 49.0f, 40.0f, 32.0f, 27.0f, 112.0f, 103.0f, 93.0f, 88.0f, 86.0f, 79.0f, 76.0f, 66.0f, 57.0f, 52.0f, 33.0f };
+  float positions30[] = { 115.0f, 108.0f, 94.0f, 86.0f, 77.0f, 71.0f, 61.0f, 56.0f, 51.0f, 43.0f, 34.0f, 30.0f, 112.0f, 104.0f, 94.0f, 89.0f, 87.0f, 81.0f, 77.0f, 67.0f, 59.0f, 54.0f, 34.0f };
 
   Size  textSize31( 110.0f, 60.0f );
-  float positions31[] = { 107.0f, 100.0f, 86.0f, 77.0f, 68.0f, 62.0f, 52.0f, 46.0f, 42.0f, 33.0f, 24.0f, 18.0f, 8.0f, 0.0f, 95.0f, 90.0f, 87.0f, 81.0f, 78.0f, 67.0f, 59.0f, 54.0f, 44.0f, 37.0f, 33.0f, 27.0f, 24.0f, 9.0f};
+  float positions31[] = { 108.0f, 101.0f, 87.0f, 79.0f, 70.0f, 64.0f, 54.0f, 49.0f, 44.0f, 36.0f, 27.0f, 21.0f, 12.0f, 4.0f, 96.0f, 91.0f, 89.0f, 83.0f, 79.0f, 69.0f, 61.0f, 56.0f, 47.0f, 40.0f, 36.0f, 30.0f, 27.0f, 11.0f };
 
   Size  textSize32( 110.0f, 60.0f );
-  float positions32[] = {  104.0f, 98.0f, 83.0f, 75.0f, 66.0f, 60.0f, 49.0f, 44.0f, 39.0f, 30.0f, 22.0f, 17.0f, 102.0f, 93.0f, 83.0f, 78.0f, 76.0f, 69.0f, 66.0f, 56.0f, 47.0f, 42.0f, 23.0f };
+  float positions32[] = { 105.0f, 98.0f, 84.0f, 76.0f, 67.0f, 61.0f, 51.0f, 46.0f, 41.0f, 33.0f, 24.0f, 20.0f, 102.0f, 94.0f, 84.0f, 79.0f, 77.0f, 71.0f, 67.0f, 57.0f, 49.0f, 44.0f, 24.0f };
 
   Size  textSize33( 110.0f, 60.0f );
-  float positions33[] = { 104.0f, 98.0f, 83.0f, 75.0f, 66.0f, 60.0f, 49.0f, 44.0f, 39.0f, 30.0f, 22.0f, 17.0f, 102.0f, 93.0f, 83.0f, 78.0f, 76.0f, 69.0f, 66.0f, 56.0f, 47.0f, 42.0f, 23.0f };
+  float positions33[] = { 105.0f, 98.0f, 84.0f, 76.0f, 67.0f, 61.0f, 51.0f, 46.0f, 41.0f, 33.0f, 24.0f, 20.0f, 102.0f, 94.0f, 84.0f, 79.0f, 77.0f, 71.0f, 67.0f, 57.0f, 49.0f, 44.0f, 24.0f };
 
   Size  textSize34( 120.0f, 30.0f );
-  float positions34[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f, 86.0f, 98.0f };
+  float positions34[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f, 84.0f, 93.0f };
 
   Size  textSize35( 120.0f, 30.0f );
-  float positions35[] = { 2.0f, 20.0f, 29.0f, 39.0f, 44.0f, 60.0f, 69.0f, 74.0f, 83.0f, 92.0f, 108.0f };
+  float positions35[] = { 8.0f, 24.0f, 35.0f, 44.0f, 49.0f, 63.0f, 74.0f, 77.0f, 85.0f, 96.0f, 110.0f };
 
   Size  textSize36( 120.0f, 30.0f );
-  float positions36[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f };
+  float positions36[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f };
 
   struct ElideData data[] =
   {
@@ -724,7 +724,7 @@ int UtcDaliTextLabelElideTextLocation(void)
       false,
       textSize14,
       3u,
-      41u,
+      42u,
       positions14
     },
 
@@ -737,7 +737,7 @@ int UtcDaliTextLabelElideTextLocation(void)
       false,
       textSize15,
       3u,
-      42u,
+      44u,
       positions15
     },
 
@@ -922,7 +922,7 @@ int UtcDaliTextLabelElideTextLocation(void)
       false,
       textSize29,
       1u,
-      12u,
+      13u,
       positions29
     },
 
@@ -948,7 +948,7 @@ int UtcDaliTextLabelElideTextLocation(void)
       false,
       textSize31,
       3u,
-      30u,
+      29u,
       positions31
     },
 
@@ -1041,40 +1041,40 @@ int UtcDaliTextFieldlElideTextLocation(void)
   Size textSize00( 100.f, 100.f );
 
   Size  textSize01( 120.0f, 50.0f );
-  float positions01[] = { 0.0f, 11.0f, 23.0f, 32.0f, 42.0f, 52.0f, 62.0f, 73.0f, 83.0f, 95.0f };
+  float positions01[] = { 0.0f, 11.0f, 21.0f, 31.0f, 41.0f, 50.0f, 60.0f, 70.0f, 80.0f, 91.0f };
 
   Size  textSize02( 120.0f, 50.0f );
-  float positions02[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f, 86.0f, 98.0f };
+  float positions02[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f, 84.0f, 93.0f };
 
   Size  textSize03( 120.0f, 50.0f );
-  float positions03[] = { 118.0f, 111.0f, 97.0f, 89.0f, 80.0f, 74.0f, 63.0f, 58.0f, 53.0f, 44.0f, 35.0f, 29.0f, 20.0f, 7.0f };
+  float positions03[] = { 117.0f, 111.0f, 97.0f, 88.0f, 80.0f, 74.0f, 64.0f, 59.0f, 54.0f, 45.0f, 37.0f, 31.0f, 22.0f, 7.0f };
 
   Size  textSize04( 120.0f, 50.0f );
-  float positions04[] = { 6.0f, 23.0f, 32.0f, 42.0f, 53.0f, 63.0f, 73.0f, 83.0f, 93.0f, 104.0f, 113.0f };
+  float positions04[] = { 5.0f, 21.0f, 31.0f, 41.0f, 50.0f, 61.0f, 71.0f, 80.0f, 90.0f, 100.0f, 109.0f };
 
   Size  textSize05( 120.0f, 50.0f );
-  float positions05[] = { 2.0f, 20.0f, 29.0f, 39.0f, 44.0f, 60.0f, 69.0f, 74.0f, 83.0f, 92.0f, 108.0f };
+  float positions05[] = { 8.0f, 24.0f, 35.0f, 44.0f, 49.0f, 63.0f, 74.0f, 77.0f, 85.0f, 96.0f, 110.0f };
 
   Size  textSize06( 120.0f, 50.0f );
-  float positions06[] = { 99.0f, 87.0f, 78.0f, 76.0f, 69.0f, 64.0f, 58.0f, 49.0f, 35.0f, 32.0f, 20.0f, 13.0f, 6.0f };
+  float positions06[] = { 90.0f, 79.0f, 70.0f, 68.0f, 62.0f, 56.0f, 51.0f, 42.0f, 29.0f, 26.0f, 15.0f, 7.0f, 0.0f };
 
   Size  textSize07( 120.0f, 50.0f );
-  float positions07[] = { 0.0f, 11.0f, 23.0f, 32.0f, 42.0f, 57.0f, 73.0f };
+  float positions07[] = { 0.0f, 11.0f, 21.0f, 31.0f, 41.0f, 53.0f };
 
   Size  textSize08( 120.0f, 50.0f );
-  float positions08[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f, 86.0f, 98.0f };
+  float positions08[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f };
 
   Size  textSize09( 120.0f, 50.0f );
-  float positions09[] = { 118.0f, 111.0f, 97.0f, 89.0f, 80.0f, 74.0f, 63.0f, 58.0f, 53.0f, 44.0f, 35.0f, 29.0f, 20.0f, 7.0f };
+  float positions09[] = { 116.0f, 109.0f, 96.0f, 87.0f, 79.0f, 73.0f, 63.0f };
 
   Size  textSize10( 120.0f, 50.0f );
-  float positions10[] = { 118.0f, 113.0f, 107.0f, 102.0f, 97.0f, 92.0f, 87.0f, 82.0f, 79.0f, 72.0f, 57.0f, 49.0f, 40.0f, 34.0f, 23.0f, 11.0f };
+  float positions10[] = { 121.0f, 116.0f, 111.0f, 106.0f, 101.0f, 96.0f, 92.0f, 87.0f, 83.0f, 77.0f, 63.0f, 55.0f, 46.0f, 40.0f, 30.0f, 16.0f };
 
   Size  textSize11( 120.0f, 50.0f );
-  float positions11[] = { 95.0f, 78.0f, 75.0f, 64.0f, 56.0f, 49.0f, 44.0f, 39.0f, 34.0f, 29.0f, 23.0f, 18.0f, 13.0f, 8.0f, 3.0f };
+  float positions11[] = { 93.0f, 77.0f, 74.0f, 63.0f, 56.0f, 49.0f, 44.0f, 39.0f, 34.0f, 29.0f, 24.0f, 19.0f, 14.0f, 9.0f, 5.0f };
 
   Size  textSize12( 120.0f, 50.0f );
-  float positions12[] = { 113.0f, 108.0f, 103.0f, 98.0f, 93.0f, 88.0f, 83.0f, 78.0f, 74.0f, 67.0f };
+  float positions12[] = { 117.0f, 112.0f, 107.0f, 102.0f, 97.0f, 92.0f, 87.0f, 82.0f, 79.0f, 72.0f };
 
   struct ElideData data[] =
   {
@@ -1230,7 +1230,7 @@ int UtcDaliTextFieldlElideTextLocation(void)
       false,
       textSize09,
       1u,
-      12u,
+      13u,
       positions09
     },
 
@@ -1298,94 +1298,94 @@ int UtcDaliTextEditorElideTextLocation(void)
   Size textSize00( 100.f, 100.f );
 
   Size  textSize01( 120.0f, 50.0f );
-  float positions01[] = { 0.0f, 11.0f, 23.0f, 32.0f, 42.0f, 52.0f, 62.0f, 73.0f, 83.0f, 93.0f, 103.0f, 112.0f, 0.0f, 10.0f, 22.0f, 31.0f, 41.0f, 51.0f, 61.0f, 72.0f, 82.0f, 94.0f };
+  float positions01[] =  { 0.0f, 11.0f, 21.0f, 31.0f, 41.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f };
 
   Size  textSize02( 120.0f, 60.0f );
-  float positions02[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 0.0f, 10.0f, 19.0f, 29.0f, 39.0f, 46.0f, 50.0f, 66.0f, 76.0f, 85.0f, 0.0f, 15.0f, 25.0f, 30.0f, 38.0f, 48.0f, 64.0f, 73.0f, 79.0f, 93.0f };
+  float positions02[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 0.0f };
 
   Size  textSize03( 120.0f, 60.0f );
-  float positions03[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f, 86.0f, 96.0f, 106.0f, 113.0f, 0.0f, 15.0f, 25.0f, 34.0f, 39.0f, 55.0f, 65.0f, 69.0f, 78.0f, 88.0f, 104.0f, 112.0f, 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f, 86.0f, 98.0f };
+  float positions03[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f, 84.0f, 92.0f };
 
   Size  textSize04( 110.0f, 60.0f );
-  float positions04[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f, 0.0f, 10.0f, 20.0f, 26.0f, 31.0f, 46.0f, 56.0f, 65.0f, 70.0f, 86.0f, 96.0f, 0.0f, 8.0f, 18.0f, 34.0f, 43.0f, 49.0f, 61.0f, 71.0f, 75.0f, 81.0f };
+  float positions04[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f };
 
   Size  textSize05( 110.0f, 60.0f );
-  float positions05[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 0.0f, 10.0f, 19.0f, 29.0f, 39.0f, 46.0f, 50.0f, 66.0f, 76.0f, 85.0f, 0.0f, 15.0f, 25.0f, 30.0f, 38.0f, 48.0f, 64.0f, 73.0f, 81.0f };
+  float positions05[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f };
 
   Size  textSize06( 120.0f, 50.0f );
-  float positions06[] = { 5.0f, 22.0f, 31.0f, 41.0f, 51.0f, 62.0f, 72.0f, 82.0f, 92.0f, 102.0f, 112.0f };
+  float positions06[] = { 5.0f, 21.0f, 31.0f, 41.0f, 50.0f, 61.0f, 70.0f, 80.0f, 90.0f, 100.0f, 109.0f };
 
   Size  textSize07( 120.0f, 60.0f );
-  float positions07[] = { 9.f, 25.f, 30.f, 38.f, 48.f, 64.f, 73.f, 79.f, 91.f, 101.f, 105.f, 110.f, 118.f };
+  float positions07[] = { 8.0f, 24.0f, 28.0f, 36.0f, 47.0f, 61.0f, 70.0f, 76.0f, 87.0f, 97.0f, 102.0f, 105.0f, 115.0f };
 
   Size  textSize08( 120.0f, 60.0f );
-  float positions08[] = { 8.f, 25.f, 34.f, 39.f, 55.f, 65.f, 69.f, 78.f, 88.f, 104.f, 112.f };
+  float positions08[] = { 8.0f, 24.0f, 33.0f, 38.0f, 52.0f, 63.0f, 66.0f, 75.0f, 85.0f, 99.0f, 109.0f };
 
   Size  textSize09( 100.0f, 60.0f );
-  float positions09[] = { 5.f, 21.f, 26.f, 30.f, 39.f, 45.f, 57.f, 61.f, 67.f, 77.f  };
+  float positions09[] = { 4.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f };
 
   Size  textSize10( 100.0f, 60.0f );
-  float positions10[] = { 5.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f };
+  float positions10[] = { 4.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f };
 
   Size  textSize11( 120.0f, 60.0f );
-  float positions11[] = { 119.0f, 112.0f, 98.0f, 89.0f, 80.0f, 74.0f, 63.0f, 58.0f, 53.0f, 45.0f, 36.0f, 31.0f, 112.0f, 103.0f, 93.0f };
+  float positions11[] = { 117.0f, 111.0f, 97.0f, 89.0f, 80.0f, 74.0f, 64.0f, 59.0f, 54.0f, 45.0f, 37.0f, 32.0f, 112.0f, 103.0f, 94.0f, 89.0f };
 
   Size  textSize12( 110.0f, 60.0f );
-  float positions12[] = { 115.0f, 108.0f, 94.0f, 85.0f, 76.0f, 70.0f, 60.0f, 54.0f, 50.0f, 41.0f, 32.0f };
+  float positions12[] = { 109.0f, 102.0f, 89.0f, 80.0f, 72.0f, 66.0f, 56.0f, 50.0f, 46.0f, 37.0f, 29.0f, 23.0f, 14.0f };
 
   Size  textSize13( 110.0f, 60.0f );
-  float positions13[] = { 113.0f, 106.0f, 92.0f, 83.0f, 74.0f, 68.0f, 58.0f, 52.0f, 48.0f, 39.0f, 30.0f, 25.0f, 106.0f };
+  float positions13[] = { 116.0f, 109.0f, 96.0f, 87.0f, 79.0f, 73.0f, 63.0f, 57.0f, 53.0f, 44.0f, 36.0f, 31.0f, 111.0f };
 
   Size  textSize14( 110.0f, 60.0f );
-  float positions14[] = { 113.0f, 106.0f, 92.0f, 83.0f, 74.0f, 68.0f, 58.0f, 52.0f, 48.0f, 39.0f, 30.0f, 25.0f, 106.0f };
+  float positions14[] = { 116.0f, 109.0f, 96.0f, 87.0f, 79.0f, 73.0f, 63.0f, 57.0f, 53.0f, 44.0f, 36.0f, 31.0f, 111.0f };
 
   Size  textSize15( 120.0f, 60.0f );
-  float positions15[] = { 125.f, 112.f, 107.f, 105.f, 98.f, 95.f, 85.f, 76.f, 71.f, 61.f, 54.f, 51.f, 46.f };
+  float positions15[] = { 130.0f, 118.0f, 113.0f, 111.0f, 105.0f, 101.0f, 91.0f, 83.0f, 78.0f, 69.0f, 62.0f, 58.0f, 54.0f };
 
   Size  textSize16( 110.0f, 60.0f );
-  float positions16[] = { 89.f, 81.f, 78.f, 67.f, 59.f, 54.f, 44.f, 37.f, 33.f, 27.f, 24.f, 12.f, 7.f, 2.f, 0.f };
+  float positions16[] = { 92.0f, 85.0f, 81.0f, 71.0f, 63.0f, 58.0f, 49.0f, 42.0f, 38.0f, 32.0f, 29.0f, 18.0f, 13.0f, 8.0f, 6.0f };
 
   Size  textSize17( 110.0f, 60.0f );
-  float positions17[] = { 105.f, 92.f, 87.f, 85.f, 78.f, 75.f, 65.f, 56.f, 51.f, 41.f, 34.f, 31.f, 26.f };
+  float positions17[] = { 110.0f, 98.0f, 93.0f, 91.0f, 85.0f, 81.0f, 71.0f, 63.0f, 58.0f, 49.0f, 42.0f, 38.0f, 34.0f };
 
   Size  textSize18( 110.0f, 60.0f );
-  float positions18[] = { 105.f, 92.f, 87.f, 85.f, 78.f, 75.f, 65.f, 56.f, 51.f, 41.f, 34.f, 31.f, 26.f };
+  float positions18[] = { 110.0f, 98.0f, 93.0f, 91.0f, 85.0f, 81.0f, 71.0f, 63.0f, 58.0f, 49.0f, 42.0f, 38.0f, 34.0f };
 
   Size  textSize19( 120.0f, 50.0f );
-  float positions19[] = { 0.f, 11.f, 23.f, 32.f, 42.f, 52.f, 62.f, 73.f, 83.f, 95.f };
+  float positions19[] = { 0.0f, 11.0f, 21.0f, 31.0f, 41.0f, 50.0f, 60.0f, 70.0f, 80.0f, 91.0f };
 
   Size  textSize20( 120.0f, 60.0f );
-  float positions20[] = { 0.f, 12.f, 21.f, 26.f, 30.f, 39.f, 45.f, 57.f, 61.f, 0.f, 10.f, 19.f, 29.f, 39.f, 46.f, 50.f, 68.f };
+  float positions20[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f };
 
   Size  textSize21( 120.0f, 60.0f );
-  float positions21[] = { 0.f, 12.f, 21.f, 26.f, 30.f, 39.f, 45.f, 57.f, 61.f, 67.f, 77.f, 86.f, 96.f, 106.f, 113.f, 0.f, 15.f, 25.f, 34.f, 39.f, 55.f, 65.f, 69.f, 78.f, 90.f };
+  float positions21[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f };
 
   Size  textSize22( 110.0f, 60.0f );
-  float positions22[] = { 0.f, 12.f, 21.f, 26.f, 30.f, 39.f, 45.f, 57.f, 61.f, 67.f, 77.f, 0.f, 10.f, 20.f, 26.f, 31.f, 46.f, 56.f, 65.f, 72.f };
+  float positions22[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f };
 
   Size  textSize23( 110.0f, 60.0f );
-  float positions23[] = { 0.f, 12.f, 21.f, 26.f, 30.f, 39.f, 45.f, 57.f, 61.f, 0.f, 10.f, 19.f, 29.f, 39.f, 46.f, 50.f, 68.f };
+  float positions23[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f };
 
   Size  textSize24( 120.0f, 60.0f );
-  float positions24[] = { 137.0f, 131.0f, 116.0f, 108.0f, 99.0f, 93.0f, 82.0f, 77.0f, 72.0f, 63.0f, 55.0f };
+  float positions24[] = { 142.0f, 135.0f, 121.0f, 113.0f, 104.0f, 98.0f, 88.0f, 83.0f, 78.0f, 70.0f, 61.0f };
 
   Size  textSize25( 110.0f, 60.0f );
-  float positions25[] = { 107.f, 100.f, 86.f, 77.f, 68.f, 62.f, 52.f, 46.f, 42.f, 33.f, 24.f, 18.f, 8.f, 0.f, 95.f, 90.f, 87.f, 81.f, 78.f, 67.f, 59.f, 54.f, 44.f, 37.f, 33.f, 27.f, 24.f, 9.f };
+  float positions25[] = { 111.0f, 104.0f, 90.0f, 82.0f, 73.0f, 67.0f, 57.0f, 52.0f, 47.0f, 39.0f, 30.0f, 24.0f, 15.0f, 7.0f };
 
   Size  textSize26( 110.0f, 60.0f );
-  float positions26[] = { 117.0f, 111.0f, 96.0f, 88.0f, 79.0f, 73.0f, 62.0f, 57.0f, 52.0f, 43.0f, 35.0f };
+  float positions26[] = { 122.0f, 115.0f, 101.0f, 93.0f, 84.0f, 78.0f, 68.0f, 63.0f, 58.0f, 50.0f, 41.0f };
 
   Size  textSize27( 110.0f, 60.0f );
-  float positions27[] = { 117.0f, 111.0f, 96.0f, 88.0f, 79.0f, 73.0f, 62.0f, 57.0f, 52.0f, 43.0f, 35.0f };
+  float positions27[] = { 122.0f, 115.0f, 101.0f, 93.0f, 84.0f, 78.0f, 68.0f, 63.0f, 58.0f, 50.0f, 41.0f };
 
   Size  textSize28( 120.0f, 30.0f );
-  float positions28[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f, 61.0f, 67.0f, 77.0f, 86.0f, 98.0f };
+  float positions28[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f, 59.0f, 65.0f, 73.0f, 84.0f, 93.0f };
 
   Size  textSize29( 120.0f, 30.0f );
-  float positions29[] = { 2.0f, 20.0f, 29.0f, 39.0f, 44.0f, 60.0f, 69.0f, 74.0f, 83.0f, 92.0f, 108.0f };
+  float positions29[] = { 8.0f, 24.0f, 35.0f, 44.0f, 49.0f, 63.0f, 74.0f, 77.0f, 85.0f, 96.0f, 110.0f };
 
   Size  textSize30( 120.0f, 30.0f );
-  float positions30[] = { 0.0f, 12.0f, 21.0f, 26.0f, 30.0f, 39.0f, 45.0f, 57.0f };
+  float positions30[] = { 0.0f, 10.0f, 21.0f, 25.0f, 28.0f, 38.0f, 44.0f, 55.0f };
 
 
   struct ElideData data[] =
@@ -1574,7 +1574,7 @@ int UtcDaliTextEditorElideTextLocation(void)
       false,
       textSize11,
       3u,
-      41u,
+      42u,
       positions11
     },
 
@@ -1587,7 +1587,7 @@ int UtcDaliTextEditorElideTextLocation(void)
       false,
       textSize12,
       3u,
-      42u,
+      44u,
       positions12
     },
 
@@ -1762,7 +1762,7 @@ int UtcDaliTextEditorElideTextLocation(void)
       false,
       textSize25,
       3u,
-      30u,
+      29u,
       positions25
     },
 
