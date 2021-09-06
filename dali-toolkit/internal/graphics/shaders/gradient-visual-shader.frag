@@ -25,6 +25,7 @@ uniform lowp vec3 mixColor;
 uniform mediump float borderlineWidth;
 uniform mediump float borderlineOffset;
 uniform lowp vec4 borderlineColor;
+uniform lowp vec4 uActorColor;
 #endif
 
 #if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
@@ -122,6 +123,11 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     borderlineOpacity = smoothstep(gMinInlinePotential, gMaxInlinePotential, potential);
   }
 
+  lowp vec3  BorderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
+  lowp float BorderlineColorAlpha = borderlineColor.a * uActorColor.a;
+  // Gradient is always preMultiplied.
+  BorderlineColorRGB *= BorderlineColorAlpha;
+
   //calculate inside of borderline when outilneColor.a < 1.0
   if(borderlineColor.a < 1.0)
   {
@@ -139,10 +145,11 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
       // potential is in texture range
       textureColor = mix(textureColor, vec4(BorderlineColorRGB, 0.0), smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
     }
+    // TODO : need to fix here when uColor.a = 0.0 and uActorColor.a != 0
     borderlineOpacity *= borderlineColor.a;
     return mix(textureColor, vec4(BorderlineColorRGB, 1.0), borderlineOpacity);
   }
-  return mix(textureColor, borderlineColor, borderlineOpacity);
+  return mix(textureColor, vec4(BorderlineColorRGB, BorderlineColorAlpha), borderlineOpacity);
 }
 #endif
 
@@ -171,16 +178,16 @@ mediump float calculateCornerOpacity()
 void main()
 {
 #if RADIAL
-  lowp vec4 textureColor = TEXTURE(sTexture, vec2(length(vTexCoord), 0.5)) * vec4(mixColor, 1.0);
+  lowp vec4 textureColor = TEXTURE(sTexture, vec2(length(vTexCoord), 0.5)) * vec4(mixColor, 1.0) * uColor;
 #else
-  lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y, 0.5)) * vec4(mixColor, 1.0);
+  lowp vec4 textureColor = TEXTURE(sTexture, vec2(vTexCoord.y, 0.5)) * vec4(mixColor, 1.0) * uColor;
 #endif
 
 #if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = textureColor * uColor;
+    OUT_COLOR = textureColor;
     return;
   }
   PreprocessPotential();
@@ -189,7 +196,7 @@ void main()
 #if IS_REQUIRED_BORDERLINE
   textureColor = convertBorderlineColor(textureColor);
 #endif
-  OUT_COLOR = textureColor * uColor;
+  OUT_COLOR = textureColor;
 
 #if IS_REQUIRED_ROUNDED_CORNER
   mediump float opacity = calculateCornerOpacity();

@@ -23,6 +23,7 @@ uniform lowp vec3 mixColor;
 uniform mediump float borderlineWidth;
 uniform mediump float borderlineOffset;
 uniform lowp vec4 borderlineColor;
+uniform lowp vec4 uActorColor;
 #endif
 #if IS_REQUIRED_BLUR
 uniform mediump float blurRadius;
@@ -123,6 +124,9 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     borderlineOpacity = smoothstep(gMinInlinePotential, gMaxInlinePotential, potential);
   }
 
+  lowp vec3  BorderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
+  lowp float BorderlineColorAlpha = borderlineColor.a * uActorColor.a;
+
   //calculate inside of borderline when outilneColor.a < 1.0
   if(borderlineColor.a < 1.0)
   {
@@ -132,17 +136,18 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     if(potential > MaxTexturelinePotential)
     {
       // potential is out of texture range. use borderline color instead of texture
-      textureColor = vec4(borderlineColor.xyz, 0.0);
+      textureColor = vec4(BorderlineColorRGB, 0.0);
     }
     else if(potential > MinTexturelinePotential)
     {
       // potential is in texture range
-      textureColor = mix(textureColor, vec4(borderlineColor.xyz, 0.0), smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
+      textureColor = mix(textureColor, vec4(BorderlineColorRGB, 0.0), smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
     }
+    // TODO : need to fix here when uColor.a = 0.0 and uActorColor.a != 0
     borderlineOpacity *= borderlineColor.a;
-    return mix(textureColor, vec4(borderlineColor.xyz, 1.0), borderlineOpacity);
+    return mix(textureColor, vec4(BorderlineColorRGB, 1.0), borderlineOpacity);
   }
-  return mix(textureColor, borderlineColor, borderlineOpacity);
+  return mix(textureColor, vec4(BorderlineColorRGB, BorderlineColorAlpha), borderlineOpacity);
 }
 #endif
 
@@ -239,13 +244,13 @@ mediump float calculateBlurOpacity()
 
 void main()
 {
-  lowp vec4 targetColor = vec4(mixColor, 1.0);
+  lowp vec4 targetColor = vec4(mixColor, 1.0) * uColor;
 
 #if IS_REQUIRED_BLUR || IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
   // skip most potential calculate for performance
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
-    OUT_COLOR = targetColor * uColor;
+    OUT_COLOR = targetColor;
     return;
   }
   PreprocessPotential();
@@ -254,7 +259,7 @@ void main()
 #if !IS_REQUIRED_BLUR && IS_REQUIRED_BORDERLINE
   targetColor = convertBorderlineColor(targetColor);
 #endif
-  OUT_COLOR = targetColor * uColor;
+  OUT_COLOR = targetColor;
 
 #if IS_REQUIRED_BLUR
   mediump float opacity = calculateBlurOpacity();
