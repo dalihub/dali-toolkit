@@ -535,15 +535,19 @@ void AnimatedImageVisual::OnSetTransform()
   }
 }
 
+void AnimatedImageVisual::UpdateShader()
+{
+  if(mImpl->mRenderer)
+  {
+    Shader shader = GenerateShader();
+    mImpl->mRenderer.SetShader(shader);
+  }
+}
+
 void AnimatedImageVisual::OnInitialize()
 {
   bool   defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
-  Shader shader          = mImageVisualShaderFactory.GetShader(
-    mFactoryCache,
-    TextureAtlas::DISABLED,
-    defaultWrapMode ? DefaultTextureWrapMode::APPLY : DefaultTextureWrapMode::DO_NOT_APPLY,
-    IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
-    IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED);
+  Shader shader          = GenerateShader();
 
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
@@ -816,6 +820,19 @@ TextureSet AnimatedImageVisual::SetLoadingFailed()
   SetImageSize(textureSet);
 
   return textureSet;
+}
+
+Shader AnimatedImageVisual::GenerateShader() const
+{
+  bool   defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
+  Shader shader;
+  shader = mImageVisualShaderFactory.GetShader(
+    mFactoryCache,
+    TextureAtlas::DISABLED,
+    defaultWrapMode ? DefaultTextureWrapMode::APPLY : DefaultTextureWrapMode::DO_NOT_APPLY,
+    IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
+    IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED);
+  return shader;
 }
 
 } // namespace Internal

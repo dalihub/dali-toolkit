@@ -140,6 +140,16 @@ protected:
   void OnSetTransform() override;
 
   /**
+   * @copydoc Visual::Base::UpdateShader
+   */
+  void UpdateShader() override;
+
+  /**
+   * @copydoc Visual::Base::GenerateShader
+   */
+  Shader GenerateShader() const override;
+
+  /**
    * @copydoc Visual::Base::OnDoAction
    */
   void OnDoAction(const Property::Index actionId, const Property::Value& attributes) override;

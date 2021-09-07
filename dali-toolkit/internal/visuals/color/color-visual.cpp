@@ -182,7 +182,7 @@ void ColorVisual::UpdateShader()
 {
   if(mImpl->mRenderer)
   {
-    Shader shader = GetShader();
+    Shader shader = GenerateShader();
     mImpl->mRenderer.SetShader(shader);
   }
 }
@@ -191,7 +191,7 @@ void ColorVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
-  Shader shader = GetShader();
+  Shader shader = GenerateShader();
 
   mImpl->mRenderer = Renderer::New(geometry, shader);
 
@@ -210,7 +210,7 @@ void ColorVisual::OnInitialize()
   mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
-Shader ColorVisual::GetShader()
+Shader ColorVisual::GenerateShader() const
 {
   Shader shader;
   VisualFactoryCache::ShaderType shaderType;

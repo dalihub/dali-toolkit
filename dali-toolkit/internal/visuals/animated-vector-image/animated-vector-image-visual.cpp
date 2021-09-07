@@ -283,26 +283,7 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
 
 void AnimatedVectorImageVisual::OnInitialize(void)
 {
-  Shader shader;
-
-  if(mImpl->mCustomShader)
-  {
-    shader = Shader::New(mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->mCustomShader->mVertexShader,
-                         mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->mCustomShader->mFragmentShader,
-                         mImpl->mCustomShader->mHints);
-
-    shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-  }
-  else
-  {
-    shader = mImageVisualShaderFactory.GetShader(
-      mFactoryCache,
-      TextureAtlas::DISABLED,
-      DefaultTextureWrapMode::APPLY,
-      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
-      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
-    );
-  }
+  Shader shader = GenerateShader();
 
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
@@ -408,6 +389,15 @@ void AnimatedVectorImageVisual::OnSetTransform()
     }
 
     SendAnimationData();
+  }
+}
+
+void AnimatedVectorImageVisual::UpdateShader()
+{
+  if(mImpl->mRenderer)
+  {
+    Shader shader = GenerateShader();
+    mImpl->mRenderer.SetShader(shader);
   }
 }
 
@@ -632,6 +622,31 @@ void AnimatedVectorImageVisual::OnProcessEvents()
 
   mEventCallback = nullptr; // The callback will be deleted in the VectorAnimationManager
 }
+
+Shader AnimatedVectorImageVisual::GenerateShader() const
+{
+  Shader shader;
+  if(mImpl->mCustomShader)
+  {
+    shader = Shader::New(mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->mCustomShader->mVertexShader,
+                         mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->mCustomShader->mFragmentShader,
+                         mImpl->mCustomShader->mHints);
+
+    shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+  }
+  else
+  {
+    shader = mImageVisualShaderFactory.GetShader(
+      mFactoryCache,
+      TextureAtlas::DISABLED,
+      DefaultTextureWrapMode::APPLY,
+      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
+      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
+    );
+  }
+  return shader;
+}
+
 
 } // namespace Internal
 

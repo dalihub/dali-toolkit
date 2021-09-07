@@ -556,7 +556,7 @@ void ImageVisual::OnInitialize()
     textureManager.UseExternalResource(mImageUrl.GetUrl());
   }
 
-  Shader shader = GetShader();
+  Shader shader = GenerateShader();
 
   // Create the renderer
   mImpl->mRenderer = Renderer::New(geometry, shader);
@@ -822,7 +822,7 @@ void ImageVisual::UpdateShader()
 {
   if(mImpl->mRenderer)
   {
-    Shader shader = GetShader();
+    Shader shader = GenerateShader();
     mImpl->mRenderer.SetShader(shader);
   }
 }
@@ -960,7 +960,7 @@ void ImageVisual::RemoveTexture()
   }
 }
 
-Shader ImageVisual::GetShader()
+Shader ImageVisual::GenerateShader() const
 {
   Shader shader;
 

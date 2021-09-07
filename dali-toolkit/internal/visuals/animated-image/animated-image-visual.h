@@ -181,6 +181,16 @@ protected:
    */
   void OnSetTransform() override;
 
+  /**
+   * @copydoc Visual::Base::UpdateShader
+   */
+  void UpdateShader() override;
+
+  /**
+   * @copydoc Visual::Base::GenerateShader
+   */
+  Shader GenerateShader() const override;
+
 private:
   /**
    * Creates the renderer for the animated image

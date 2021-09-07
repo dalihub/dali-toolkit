@@ -363,6 +363,16 @@ protected:
   }
 
   /**
+   * @brief Generate a shader by the current properties from each sub classes's own shader-generate logic.
+   * @param[in] factoryCache The visual factory cache to store the generated shader.
+   * @return If the function defined, Generated shader by the current properties. Else, empty shader.
+   */
+  virtual Dali::Shader GenerateShader() const
+  {
+    return Dali::Shader();
+  }
+
+  /**
    * @brief Called by GetPropertyObject() allowing sub classes to respond to the GetPropertyObject event
    * @note The derived class is required to register the given property.
    * @param[in] key The key of the visual's property.

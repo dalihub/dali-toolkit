@@ -3663,7 +3663,6 @@ int UtcDaliSvgVisualCustomShader(void)
 
 int UtcDaliVisualRoundedCorner(void)
 {
-#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualRoundedCorner" );
 
@@ -3738,8 +3737,11 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius) ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+#endif
   }
 
   // color visual 2
@@ -3770,8 +3772,11 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE ), true, TEST_LOCATION );
+#endif
   }
 
   // color visual 3 - invalid value
@@ -3802,9 +3807,12 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+#endif
   }
 
   // gradient visual
@@ -3849,9 +3857,12 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius) ), true, TEST_LOCATION );
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+#endif
   }
 
   // animated image visual
@@ -3885,8 +3896,11 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+#endif
   }
 
   // vector image visual
@@ -3918,9 +3932,12 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
+#endif
   }
 
   // animated vector image visual
@@ -3954,19 +3971,18 @@ int UtcDaliVisualRoundedCorner(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius) ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE ), true, TEST_LOCATION );
-  }
-#else
-  tet_result(TET_PASS);
 #endif
+  }
 
   END_TEST;
 }
 
 int UtcDaliVisualBorderline(void)
 {
-#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualBorderline" );
 
@@ -4058,10 +4074,13 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", borderlineColor ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", borderlineOffset ), true, TEST_LOCATION );
+#endif
   }
 
   // color visual 2, default color, default offset
@@ -4091,11 +4110,14 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
     // Default borderline color is BLACK.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", Color::BLACK ), true, TEST_LOCATION );
     // Default borderline offset is 0.0f.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", 0.0f ), true, TEST_LOCATION );
+#endif
   }
 
   // color visual 3, offset not [-1.0 ~ 1.0], but uniform value is same anyway
@@ -4129,10 +4151,13 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", borderlineColor ), true, TEST_LOCATION );
     // NOTE : borderlineOffset will clamp in fragment shader. not visual itself
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", borderlineOffset ), true, TEST_LOCATION );
+#endif
   }
 
   // gradient visual
@@ -4179,6 +4204,8 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", Vector4(cornerRadius, cornerRadius, cornerRadius, cornerRadius) ), true, TEST_LOCATION );
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
@@ -4187,6 +4214,7 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", Color::BLACK ), true, TEST_LOCATION );
     // Default borderline offset is 0.0f.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", 0.0f ), true, TEST_LOCATION );
+#endif
   }
 
   // animated image visual
@@ -4221,10 +4249,13 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
     // Default borderline color is BLACK.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", Color::BLACK ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", borderlineOffset ), true, TEST_LOCATION );
+#endif
   }
 
   // vector image visual
@@ -4260,6 +4291,8 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     // Default corner radius policy is absolute.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::ABSOLUTE ), true, TEST_LOCATION );
@@ -4267,6 +4300,7 @@ int UtcDaliVisualBorderline(void)
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", borderlineColor ), true, TEST_LOCATION );
     // Default borderline offset is 0.0.
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", 0.0f ), true, TEST_LOCATION );
+#endif
   }
 
   // animated vector image visual
@@ -4305,15 +4339,15 @@ int UtcDaliVisualBorderline(void)
     application.SendNotification();
     application.Render();
 
+#ifdef OLD_GRAPHICS_TEST
+    // Currently test with multiple program doesn't work well. will fix another day
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadiusPolicy", Toolkit::Visual::Transform::Policy::RELATIVE ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineWidth", borderlineWidth ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< Vector4 >( "borderlineColor", borderlineColor ), true, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "borderlineOffset", borderlineOffset ), true, TEST_LOCATION );
-  }
-#else
-  tet_result(TET_PASS);
 #endif
+  }
 
   END_TEST;
 }
@@ -4631,7 +4665,7 @@ int UtcDaliVisualGetVisualProperty01(void)
 int UtcDaliVisualGetVisualProperty02(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetVisualProperty02: Test animatable property" );
+  tet_infoline( "UtcDaliVisualGetVisualProperty02: Test animatable property, ColorVisual" );
 
   static std::vector<UniformData> customUniforms =
   {
@@ -4730,6 +4764,7 @@ int UtcDaliVisualGetVisualProperty02(void)
   DALI_TEST_EQUALS(blurRadiusValue->Get< float >(), targetBlurRadius, TEST_LOCATION);
 
 #ifdef OLD_GRAPHICS_TEST
+  // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform values
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", targetColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector2>("offset", targetOffset), true, TEST_LOCATION);
@@ -4743,7 +4778,6 @@ int UtcDaliVisualGetVisualProperty02(void)
 
 int UtcDaliVisualGetVisualProperty03(void)
 {
-#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualGetVisualProperty03: Test animatable property, ImageVisual" );
 
@@ -4762,9 +4796,6 @@ int UtcDaliVisualGetVisualProperty03(void)
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE);
   propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME);
-  //We must set some value because application cannot notify shader changed
-  propertyMap.Insert(DevelVisual::Property::CORNER_RADIUS, 1.0f);
-  propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 1.0f);
 
   Visual::Base imageVisual = factory.CreateVisual(propertyMap);
 
@@ -4822,13 +4853,13 @@ int UtcDaliVisualGetVisualProperty03(void)
   DALI_TEST_CHECK(borderlineOffsetValue);
   DALI_TEST_EQUALS(borderlineOffsetValue->Get< float >(), targetBorderlineOffset, TEST_LOCATION);
 
+#ifdef OLD_GRAPHICS_TEST
+  // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
-#else
-  tet_result(TET_PASS);
 #endif
 
   END_TEST;
@@ -4836,9 +4867,8 @@ int UtcDaliVisualGetVisualProperty03(void)
 
 int UtcDaliVisualGetVisualProperty04(void)
 {
-#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetVisualProperty01: Test animatable property, GradientVisual" );
+  tet_infoline( "UtcDaliVisualGetVisualProperty04: Test animatable property, GradientVisual" );
 
   static std::vector<UniformData> customUniforms =
   {
@@ -4897,10 +4927,286 @@ int UtcDaliVisualGetVisualProperty04(void)
   DALI_TEST_CHECK(cornerRadiusValue);
   DALI_TEST_EQUALS(cornerRadiusValue->Get< Vector4 >(), targetCornerRadius, TEST_LOCATION);
 
+#ifdef OLD_GRAPHICS_TEST
+  // Currently test with multiple program doesn't work well. will fix another day
   // Test uniform value
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
-#else
-  tet_result(TET_PASS);
+#endif
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetVisualProperty05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetVisualProperty05: Test animatable property, SvgVisual" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("cornerRadius", Property::Type::VECTOR4),
+    UniformData("borderlineWidth", Property::Type::FLOAT),
+    UniformData("borderlineColor", Property::Type::VECTOR4),
+    UniformData("borderlineOffset", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::SVG);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_SVG_FILE_NAME);
+
+  Visual::Base svgVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, svgVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait for image loading
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  float targetOpacity = 0.5f;
+  Vector4 targetCornerRadius(20.0f, 20.0f, 0.0f, 0.0f);
+  float targetBorderlineWidth = 10.0f;
+  Vector4 targetBorderlineColor(1.0f, 0.0f, 1.0f, 0.5f);
+  float targetBorderlineOffset = -1.5f;
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), targetBorderlineOffset);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render();
+  application.Render(1001u); // End of animation
+
+  Property::Map resultMap;
+  svgVisual.CreatePropertyMap( resultMap );
+
+  // Test property values: they should be updated
+  Property::Value* colorValue = resultMap.Find(Visual::Property::MIX_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(colorValue);
+  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(1.0f, 1.0f, 1.0f, targetOpacity), TEST_LOCATION);
+
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< Vector4 >(), targetCornerRadius, TEST_LOCATION);
+
+  Property::Value* borderlineWidthValue = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineWidthValue);
+  DALI_TEST_EQUALS(borderlineWidthValue->Get< float >(), targetBorderlineWidth, TEST_LOCATION);
+
+  Property::Value* borderlineColorValue = resultMap.Find(DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(borderlineColorValue);
+  DALI_TEST_EQUALS(borderlineColorValue->Get< Vector4 >(), targetBorderlineColor, TEST_LOCATION);
+
+  Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineOffsetValue);
+  DALI_TEST_EQUALS(borderlineOffsetValue->Get< float >(), targetBorderlineOffset, TEST_LOCATION);
+
+#ifdef OLD_GRAPHICS_TEST
+  // Currently test with multiple program doesn't work well. will fix another day
+  // Test uniform value
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
+#endif
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetVisualProperty06(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetVisualProperty06: Test animatable property, AnimatedImageVisual" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("cornerRadius", Property::Type::VECTOR4),
+    UniformData("borderlineWidth", Property::Type::FLOAT),
+    UniformData("borderlineColor", Property::Type::VECTOR4),
+    UniformData("borderlineOffset", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+
+  Visual::Base animatedImageVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedImageVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait for image loading
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  float targetOpacity = 0.5f;
+  Vector4 targetCornerRadius(20.0f, 20.0f, 0.0f, 0.0f);
+  float targetBorderlineWidth = 10.0f;
+  Vector4 targetBorderlineColor(1.0f, 0.0f, 1.0f, 0.5f);
+  float targetBorderlineOffset = -1.5f;
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), targetBorderlineOffset);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render();
+  application.Render(1001u); // End of animation
+
+  Property::Map resultMap;
+  animatedImageVisual.CreatePropertyMap( resultMap );
+
+  // Test property values: they should be updated
+  Property::Value* colorValue = resultMap.Find(Visual::Property::MIX_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(colorValue);
+  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(1.0f, 1.0f, 1.0f, targetOpacity), TEST_LOCATION);
+
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< Vector4 >(), targetCornerRadius, TEST_LOCATION);
+
+  Property::Value* borderlineWidthValue = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineWidthValue);
+  DALI_TEST_EQUALS(borderlineWidthValue->Get< float >(), targetBorderlineWidth, TEST_LOCATION);
+
+  Property::Value* borderlineColorValue = resultMap.Find(DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(borderlineColorValue);
+  DALI_TEST_EQUALS(borderlineColorValue->Get< Vector4 >(), targetBorderlineColor, TEST_LOCATION);
+
+  Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineOffsetValue);
+  DALI_TEST_EQUALS(borderlineOffsetValue->Get< float >(), targetBorderlineOffset, TEST_LOCATION);
+
+#ifdef OLD_GRAPHICS_TEST
+  // Currently test with multiple program doesn't work well. will fix another day
+  // Test uniform value
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
+#endif
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetVisualProperty07(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetVisualProperty07: Test animatable property, AnimatedVectorVisual" );
+
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("cornerRadius", Property::Type::VECTOR4),
+    UniformData("borderlineWidth", Property::Type::FLOAT),
+    UniformData("borderlineColor", Property::Type::VECTOR4),
+    UniformData("borderlineOffset", Property::Type::FLOAT),
+  };
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.AddCustomUniforms(customUniforms);
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, DevelVisual::Type::ANIMATED_VECTOR_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME);
+
+  Visual::Base animatedVectorVisual = factory.CreateVisual(propertyMap);
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, animatedVectorVisual);
+  dummyControl[Actor::Property::SIZE] = Vector2(200.f, 200.f);
+  application.GetScene().Add(dummyControl);
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait for image loading
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  float targetOpacity = 0.5f;
+  Vector4 targetCornerRadius(20.0f, 20.0f, 0.0f, 0.0f);
+  float targetBorderlineWidth = 10.0f;
+  Vector4 targetBorderlineColor(1.0f, 0.0f, 1.0f, 0.5f);
+  float targetBorderlineOffset = -1.5f;
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), targetOpacity);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), targetCornerRadius);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), targetBorderlineWidth);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), targetBorderlineColor);
+  animation.AnimateTo(DevelControl::GetVisualProperty(dummyControl, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_OFFSET), targetBorderlineOffset);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render();
+  application.Render(1001u); // End of animation
+
+  Property::Map resultMap;
+  animatedVectorVisual.CreatePropertyMap( resultMap );
+
+  // Test property values: they should be updated
+  Property::Value* colorValue = resultMap.Find(Visual::Property::MIX_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(colorValue);
+  DALI_TEST_EQUALS(colorValue->Get<Vector4>(), Vector4(1.0f, 1.0f, 1.0f, targetOpacity), TEST_LOCATION);
+
+  Property::Value* cornerRadiusValue = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
+  DALI_TEST_CHECK(cornerRadiusValue);
+  DALI_TEST_EQUALS(cornerRadiusValue->Get< Vector4 >(), targetCornerRadius, TEST_LOCATION);
+
+  Property::Value* borderlineWidthValue = resultMap.Find(DevelVisual::Property::BORDERLINE_WIDTH, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineWidthValue);
+  DALI_TEST_EQUALS(borderlineWidthValue->Get< float >(), targetBorderlineWidth, TEST_LOCATION);
+
+  Property::Value* borderlineColorValue = resultMap.Find(DevelVisual::Property::BORDERLINE_COLOR, Property::VECTOR4);
+  DALI_TEST_CHECK(borderlineColorValue);
+  DALI_TEST_EQUALS(borderlineColorValue->Get< Vector4 >(), targetBorderlineColor, TEST_LOCATION);
+
+  Property::Value* borderlineOffsetValue = resultMap.Find(DevelVisual::Property::BORDERLINE_OFFSET, Property::FLOAT);
+  DALI_TEST_CHECK(borderlineOffsetValue);
+  DALI_TEST_EQUALS(borderlineOffsetValue->Get< float >(), targetBorderlineOffset, TEST_LOCATION);
+
+#ifdef OLD_GRAPHICS_TEST
+  // Currently test with multiple program doesn't work well. will fix another day
+  // Test uniform value
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("cornerRadius", targetCornerRadius), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineWidth", targetBorderlineWidth), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("borderlineColor", targetBorderlineColor), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<float>("borderlineOffset", targetBorderlineOffset), true, TEST_LOCATION);
 #endif
 
   END_TEST;
