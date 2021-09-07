@@ -1590,6 +1590,10 @@ int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
 
   application.GetScene().Add(actor);
 
+  Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  Property::Value* value = map.Find( DevelImageVisual::Property::TOTAL_FRAME_NUMBER );
+  int totalFrameNumber = value->Get< int >();
+
   Property::Map attributes;
   DevelControl::DoAction(actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes);
 
@@ -1605,6 +1609,7 @@ int UtcDaliAnimatedVectorImageVisualFrameDrops(void)
   // Check dropped frame
   uint32_t frames = Test::VectorAnimationRenderer::GetDroppedFrames();
   DALI_TEST_CHECK(frames > 0);
+  DALI_TEST_CHECK(frames <= static_cast<uint32_t>(totalFrameNumber));
 
   END_TEST;
 }
