@@ -2369,10 +2369,7 @@ TextEditor::TextEditor()
   mTextChanged(false),
   mCursorPositionChanged(false),
   mSelectionChanged(false),
-  mSelectionCleared(false),
-  mOldPosition(0u),
-  mOldSelectionStart(0u),
-  mOldSelectionEnd(0u)
+  mSelectionCleared(false)
 {
 }
 
