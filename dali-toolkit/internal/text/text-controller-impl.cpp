@@ -1260,7 +1260,7 @@ bool Controller::Impl::SetPrimaryCursorPosition(CharacterIndex index, bool focus
     return false;
   }
 
-  if(mEventData->mPrimaryCursorPosition == index)
+  if(mEventData->mPrimaryCursorPosition == index && mEventData->mState != EventData::SELECTING)
   {
     // Nothing for same cursor position.
     return false;
