@@ -108,7 +108,6 @@ enum Type
    * @brief The color for the borderline of the visual.
    * @details Name "borderlineColor", type Property::VECTOR4, animatable
    * @note Default value is Color::BLACK.
-   * @note This color is affected by opacity.
    */
   BORDERLINE_COLOR = OPACITY + 5,
 
