@@ -62,6 +62,7 @@
 
 #include <dali-toolkit/public-api/transition/fade-transition.h>
 #include <dali-toolkit/public-api/transition/slide-transition.h>
+#include <dali-toolkit/public-api/transition/scale-transition.h>
 #include <dali-toolkit/public-api/transition/transition.h>
 #include <dali-toolkit/public-api/transition/transition-set.h>
 
