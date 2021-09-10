@@ -20,6 +20,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/key-event-integ.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali/devel-api/common/stage-devel.h>
 
@@ -301,6 +302,53 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
   DALI_TEST_CHECK( !callback1.mIsCalled );
   DALI_TEST_CHECK( callback2.mIsCalled );
   DALI_TEST_CHECK( callback3.mIsCalled );
+
+  END_TEST;
+}
+
+int UtcDaliKeyInputFocusManagerDispatchKeyEvents(void)
+{
+
+  ToolkitTestApplication application;
+  Integration::Scene stage = application.GetScene();
+
+  tet_infoline("Test KeyEvents propagation. If DISPATCH_KEY_EVENTS property is false, the KeyEvent is also not received.");
+
+  KeyInputFocusManager manager = KeyInputFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  DummyControl dummy1 = DummyControl::New(true);
+  dummy1.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
+  KeyEventCallback callback1( false );
+  dummy1.KeyEventSignal().Connect( &callback1, &KeyEventCallback::Callback );
+  stage.Add( dummy1 );
+
+  DummyControl dummy2 = DummyControl::New(true);
+  dummy2.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
+  KeyEventCallback callback2( false );
+  dummy2.KeyEventSignal().Connect( &callback2, &KeyEventCallback::Callback );
+  // dummy2 set DISPATCH_KEY_EVENTS property to false.
+  dummy2.SetProperty( Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS, false);
+  dummy1.Add( dummy2 );
+
+  DummyControl dummy3 = DummyControl::New(true);
+  Impl::DummyControl& dummy3Impl = static_cast<Impl::DummyControl&>(dummy3.GetImplementation());
+  dummy3.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
+  KeyEventCallback callback3( false );
+  dummy3.KeyEventSignal().Connect( &callback3, &KeyEventCallback::Callback );
+  dummy2.Add( dummy3 );
+  DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusGained );
+  DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusLost );
+
+  manager.SetFocus( dummy3 );
+  DALI_TEST_CHECK( dummy3Impl.keyInputFocusGained );
+
+  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "", "", Device::Class::TOUCH, Device::Subclass::NONE );
+  application.ProcessEvent(event);
+
+  DALI_TEST_CHECK( !callback1.mIsCalled );
+  DALI_TEST_CHECK( !callback2.mIsCalled );
+  DALI_TEST_CHECK( !callback3.mIsCalled );
 
   END_TEST;
 }

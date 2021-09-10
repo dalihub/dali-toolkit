@@ -467,6 +467,8 @@ const PropertyRegistration Control::Impl::PROPERTY_18(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_19(typeRegistration, "accessibilityRole",              Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE,               Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_20(typeRegistration, "accessibilityHighlightable",     Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE,      Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_21(typeRegistration, "accessibilityAttributes",        Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES,         Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_22(typeRegistration, "dispatchKeyEvents",              Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS,               Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+
 // clang-format on
 
 Control::Impl::Impl(Control& controlImpl)
@@ -501,7 +503,8 @@ Control::Impl::Impl(Control& controlImpl)
   mIsKeyboardNavigationSupported(false),
   mIsKeyboardFocusGroup(false),
   mIsEmittingResourceReadySignal(false),
-  mNeedToEmitResourceReady(false)
+  mNeedToEmitResourceReady(false),
+  mDispatchKeyEvents(true)
 {
   Dali::Accessibility::Accessible::RegisterControlAccessibilityGetter(
     [](Dali::Actor actor) -> Dali::Accessibility::Accessible* {
@@ -1362,6 +1365,16 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         }
         break;
       }
+
+      case Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS:
+      {
+        bool dispatch;
+        if(value.Get(dispatch))
+        {
+          controlImpl.mImpl->mDispatchKeyEvents = dispatch;
+        }
+        break;
+      }
     }
   }
 }
@@ -1520,6 +1533,11 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
       {
         value = controlImpl.mImpl->mAccessibilityAttributes;
+        break;
+      }
+      case Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS:
+      {
+        value = controlImpl.mImpl->mDispatchKeyEvents;
         break;
       }
     }
