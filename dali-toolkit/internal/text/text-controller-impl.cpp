@@ -507,10 +507,14 @@ void Controller::Impl::ClearGlyphModelData(CharacterIndex startIndex, CharacterI
     mModel->mVisualModel->mCharactersPerGlyph.Erase(charactersPerGlyphBuffer + mTextUpdateInfo.mStartGlyphIndex,
                                                     charactersPerGlyphBuffer + endGlyphIndexPlusOne);
 
-    // Clear the positions buffer.
-    Vector2* positionsBuffer = mModel->mVisualModel->mGlyphPositions.Begin();
-    mModel->mVisualModel->mGlyphPositions.Erase(positionsBuffer + mTextUpdateInfo.mStartGlyphIndex,
-                                                positionsBuffer + endGlyphIndexPlusOne);
+    // Should pass if mGlyphPositions has already been cleared in Controller::Relayouter::Relayout
+    if(0u != mModel->mVisualModel->mGlyphPositions.Count())
+    {
+      // Clear the positions buffer.
+      Vector2* positionsBuffer = mModel->mVisualModel->mGlyphPositions.Begin();
+      mModel->mVisualModel->mGlyphPositions.Erase(positionsBuffer + mTextUpdateInfo.mStartGlyphIndex,
+                                                  positionsBuffer + endGlyphIndexPlusOne);
+    }
   }
 
   if(NO_OPERATION != (LAYOUT & operations))
