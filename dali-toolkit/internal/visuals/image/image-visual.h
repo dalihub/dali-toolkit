@@ -233,6 +233,11 @@ protected:
    */
   void UpdateShader() override;
 
+  /**
+   * @copydoc Visual::Base::GenerateShader
+   */
+  Shader GenerateShader() const override;
+
 public:
   /**
    * @copydoc AtlasUploadObserver::UploadCompleted
@@ -314,12 +319,6 @@ private:
    * @param[in] value The value
    */
   void DoSetProperty(Property::Index index, const Property::Value& value);
-
-  /**
-   * @brief Get a shader for the current properties.
-   * @return The shader for the current properties.
-   */
-  Shader GetShader();
 
 private:
   Vector4                            mPixelArea;

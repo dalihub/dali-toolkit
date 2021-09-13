@@ -183,7 +183,7 @@ void GradientVisual::UpdateShader()
 {
   if(mImpl->mRenderer)
   {
-    Shader shader = GetShader();
+    Shader shader = GenerateShader();
     mImpl->mRenderer.SetShader(shader);
   }
 }
@@ -239,7 +239,7 @@ void GradientVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 void GradientVisual::OnInitialize()
 {
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  Shader   shader   = GetShader();
+  Shader   shader   = GenerateShader();
 
   //Set up the texture set
   TextureSet    textureSet    = TextureSet::New();
@@ -345,7 +345,7 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
   return true;
 }
 
-Shader GradientVisual::GetShader()
+Shader GradientVisual::GenerateShader() const
 {
   bool userspaceUnit  = (mGradient->GetGradientUnits() == Toolkit::GradientVisual::Units::USER_SPACE);
   bool roundedCorner  = IsRoundedCornerRequired();

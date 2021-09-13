@@ -34,6 +34,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/styling/style-manager.cpp
   ${public_api_src_dir}/transition/fade-transition.cpp
   ${public_api_src_dir}/transition/slide-transition.cpp
+  ${public_api_src_dir}/transition/scale-transition.cpp
   ${public_api_src_dir}/transition/transition-base.cpp
   ${public_api_src_dir}/transition/transition-set.cpp
   ${public_api_src_dir}/transition/transition.cpp
@@ -154,6 +155,7 @@ SET( public_api_visuals_header_files
 SET( public_api_transition_header_files
   ${public_api_src_dir}/transition/fade-transition.h
   ${public_api_src_dir}/transition/slide-transition.h
+  ${public_api_src_dir}/transition/scale-transition.h
   ${public_api_src_dir}/transition/transition-base.h
   ${public_api_src_dir}/transition/transition-set.h
   ${public_api_src_dir}/transition/transition.h

@@ -84,26 +84,7 @@ SvgVisual::~SvgVisual()
 
 void SvgVisual::OnInitialize()
 {
-  Shader shader;
-  if(!mImpl->mCustomShader)
-  {
-    shader = mImageVisualShaderFactory.GetShader(
-      mFactoryCache,
-      mAttemptAtlasing ? TextureAtlas::ENABLED : TextureAtlas::DISABLED,
-      DefaultTextureWrapMode::APPLY,
-      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
-      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
-    );
-  }
-  else
-  {
-    shader = Shader::New(mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->mCustomShader->mVertexShader,
-                         mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->mCustomShader->mFragmentShader,
-                         mImpl->mCustomShader->mHints);
-
-    shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
-  }
-
+  Shader shader = GenerateShader();
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
   mImpl->mRenderer  = Renderer::New(geometry, shader);
 }
@@ -381,6 +362,39 @@ bool SvgVisual::IsResourceReady() const
 {
   return (mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
           mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED);
+}
+
+void SvgVisual::UpdateShader()
+{
+  if(mImpl->mRenderer)
+  {
+    Shader shader = GenerateShader();
+    mImpl->mRenderer.SetShader(shader);
+  }
+}
+
+Shader SvgVisual::GenerateShader() const
+{
+  Shader shader;
+  if(!mImpl->mCustomShader)
+  {
+    shader = mImageVisualShaderFactory.GetShader(
+      mFactoryCache,
+      mAttemptAtlasing ? TextureAtlas::ENABLED : TextureAtlas::DISABLED,
+      DefaultTextureWrapMode::APPLY,
+      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
+      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
+    );
+  }
+  else
+  {
+    shader = Shader::New(mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource().data() : mImpl->mCustomShader->mVertexShader,
+                         mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource().data() : mImpl->mCustomShader->mFragmentShader,
+                         mImpl->mCustomShader->mHints);
+
+    shader.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT);
+  }
+  return shader;
 }
 
 } // namespace Internal

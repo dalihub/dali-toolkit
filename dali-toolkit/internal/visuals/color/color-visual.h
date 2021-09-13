@@ -114,16 +114,14 @@ protected:
   void UpdateShader() override;
 
   /**
+   * @copydoc Visual::Base::GenerateShader
+   */
+  Shader GenerateShader() const override;
+
+  /**
    * @copydoc Visual::Base::OnGetPropertyObject
    */
   Dali::Property OnGetPropertyObject(Dali::Property::Key key) override;
-
-private:
-  /**
-   * @brief Get a shader for the current properties.
-   * @return The shader for the current properties.
-   */
-  Shader GetShader();
 
 private:
   // Undefined

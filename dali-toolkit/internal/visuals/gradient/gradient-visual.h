@@ -139,6 +139,11 @@ protected:
    */
   void UpdateShader() override;
 
+  /**
+   * @copydoc Visual::Base::GenerateShader
+   */
+  Shader GenerateShader() const override;
+
 private:
   /**
    * New a gradient object with the given property map.
@@ -146,12 +151,6 @@ private:
    * @return True if the property map provides valid properties to create a gradient. Otherwise, returns false.
    */
   bool NewGradient(Type gradientType, const Property::Map& propertyMap);
-
-  /**
-   * @brief Get a shader for the current properties.
-   * @return The shader for the current properties.
-   */
-  Shader GetShader();
 
   /**
    * Get the stop-offsets from the property.

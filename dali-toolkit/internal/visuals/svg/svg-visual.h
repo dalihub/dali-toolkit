@@ -137,6 +137,16 @@ protected:
    */
   bool IsResourceReady() const override;
 
+  /**
+   * @copydoc Visual::Base::UpdateShader
+   */
+  void UpdateShader() override;
+
+  /**
+   * @copydoc Visual::Base::GenerateShader
+   */
+  Shader GenerateShader() const override;
+
 public:
   /**
    * @bried Apply the rasterized image to the visual.
