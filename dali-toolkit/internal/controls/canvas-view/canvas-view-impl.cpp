@@ -207,7 +207,7 @@ void CanvasView::ApplyRasterizedImage(PixelData rasterizedPixelData)
     {
       if(!mTexture || mTexture.GetWidth() != rasterizedPixelDataWidth || mTexture.GetHeight() != rasterizedPixelDataHeight)
       {
-        mTexture = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, rasterizedPixelDataWidth, rasterizedPixelDataHeight);
+        mTexture = Texture::New(TextureType::TEXTURE_2D, rasterizedPixelData.GetPixelFormat(), rasterizedPixelDataWidth, rasterizedPixelDataHeight);
         mTexture.Upload(rasterizedPixelData);
 
         if(!mTextureSet)
