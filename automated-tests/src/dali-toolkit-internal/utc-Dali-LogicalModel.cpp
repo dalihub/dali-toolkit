@@ -121,7 +121,8 @@ bool CreateParagraphTest( const CreateParagraphData& data )
                    false,
                    LineWrap::WORD,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -186,7 +187,8 @@ bool FindParagraphTest( const FindParagraphData& data )
                    false,
                    LineWrap::WORD,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -240,7 +242,8 @@ bool FetchBidirectionalLineInfoTest( const FetchBidirectionalLineInfoData& data 
                    false,
                    LineWrap::WORD,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -289,7 +292,8 @@ bool GetLogicalCharacterIndexTest( const GetLogicalCharacterIndexData& data )
                    false,
                    LineWrap::WORD,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -355,7 +359,8 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
                    false,
                    LineWrap::WORD,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;

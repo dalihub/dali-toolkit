@@ -144,7 +144,8 @@ bool ShapeInfoTest( const ShapeInfoData& data )
                    data.markupProcessorEnabled,
                    LineWrap::WORD,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;

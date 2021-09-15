@@ -100,6 +100,20 @@ void GetGlyphsMetrics(GlyphIndex             glyphIndex,
   glyphMetrics.width += (firstGlyph.isItalicRequired && !isItalicFont) ? TextAbstraction::FontClient::DEFAULT_ITALIC_ANGLE * firstGlyph.height : 0.f;
 }
 
+void GetGlyphMetricsFromCharacterIndex(CharacterIndex index, const GlyphInfo* const glyphInfoBuffer, const GlyphIndex* const charactersToGlyphBuffer, const Length* const glyphsPerCharacterBuffer, MetricsPtr& metrics, GlyphMetrics& glyphMetrics, GlyphIndex& glyphIndex, Length& numberOfGlyphs)
+{
+  //Takes the character index, obtains the glyph index (and the number of Glyphs) from it and finally gets the glyph metrics.
+  glyphIndex     = *(charactersToGlyphBuffer + index);
+  numberOfGlyphs = *(glyphsPerCharacterBuffer + index);
+
+  // Get the metrics for the group of glyphs.
+  GetGlyphsMetrics(glyphIndex,
+                   numberOfGlyphs,
+                   glyphMetrics,
+                   glyphInfoBuffer,
+                   metrics);
+}
+
 } // namespace Text
 
 } // namespace Toolkit

@@ -1195,7 +1195,10 @@ void Controller::Impl::GetCursorPosition(CharacterIndex logical,
   parameters.logical      = logical;
   parameters.isMultiline  = isMultiLine;
 
+  float defaultFontLineHeight = GetDefaultFontLineHeight();
+
   Text::GetCursorPosition(parameters,
+                          defaultFontLineHeight,
                           cursorInfo);
 
   // Adds Outline offset.

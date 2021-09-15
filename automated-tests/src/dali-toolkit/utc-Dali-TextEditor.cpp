@@ -4842,6 +4842,53 @@ int utcDaliTextEditorSelectionClearedSignal(void)
   END_TEST;
 }
 
+int utcDaliTextEditorSelectionWithSecondaryCursor(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorSelectionWithSecondaryCursor");
+
+  // Checks if the actor is created.
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  editor.SetProperty( TextEditor::Property::ENABLE_MARKUP, true );
+  editor.SetProperty( TextEditor::Property::TEXT, "اللغة العربية\nمرحبا بالجميع\nالسلام عليكم <span font-size='12' font-family='DejaVu Sans' >Hello world</span>" );
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 12.f );
+  editor.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 50.f ) );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  editor.SetProperty( DevelTextEditor::Property::MIN_LINE_SIZE, 50.f );
+  editor.SetProperty( DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, false );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap( application, 3.0f, 25.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  //Select the last Arabic word (RTL) & some the space before the English (LTR) letters.
+  DevelTextEditor::SelectText( editor, 35, 41 );// This will activate the alternative cursor position and thus 'cursorInfo.isSecondaryCursor' will be true.
+
+  application.SendNotification();
+  application.Render();
+
+  std::string selectedText = editor.GetProperty( DevelTextEditor::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "عليكم ", selectedText, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int utcDaliTextEditorSelectionChangedSignal(void)
 {
   ToolkitTestApplication application;

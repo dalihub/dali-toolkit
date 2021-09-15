@@ -93,7 +93,8 @@ bool LayoutTextTest( const LayoutTextData& data )
                    false,
                    data.wrapMode,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   Vector<LineRun>& lines = textModel->mVisualModel->mLines;
 

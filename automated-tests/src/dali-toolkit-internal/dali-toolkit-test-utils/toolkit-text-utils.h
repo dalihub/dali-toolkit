@@ -59,6 +59,7 @@ struct LayoutOptions
  * @param[in] wrapMode Line wrap mode.
  * @param[in] ellipsisEnabled Whether the ellipsis layout option is enabled.
  * @param[in] ellipsisPosition Where is the location the text elide.
+ * @param[in] lineSpacing The height of the line in points.
  */
 void CreateTextModel( const std::string& text,
                       const Size& textArea,
@@ -70,7 +71,8 @@ void CreateTextModel( const std::string& text,
                       bool markupProcessorEnabled,
                       LineWrap::Mode wrapMode,
                       bool ellipsisEnabled,
-                      DevelText::EllipsisPosition::Type ellipsisPosition);
+                      DevelText::EllipsisPosition::Type ellipsisPosition,
+                      float lineSpacing);
 
 /**
  * @brief Configures the text @p controller similarly to the one configured by the text-label.
