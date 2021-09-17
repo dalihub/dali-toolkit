@@ -78,6 +78,7 @@ SET(TC_SOURCES
   utc-Dali-ControlWrapper.cpp
   utc-Dali-DragAndDropDetector.cpp
   utc-Dali-NPatchUtilities.cpp
+  utc-Dali-GlView.cpp
 )
 
 # List of test harness files (Won't get parsed for test cases)
