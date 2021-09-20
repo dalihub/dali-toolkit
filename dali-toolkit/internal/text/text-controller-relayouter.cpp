@@ -49,7 +49,7 @@ namespace Toolkit
 {
 namespace Text
 {
-Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Controller& controller, const Size& requestedControllerSize, const OperationsMask& requestedOperationsMask, bool restoreLinesAndGlyphPositions)
+Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Controller& controller, const Size& requestedControllerSize, const OperationsMask& requestedOperationsMask)
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->CalculateLayoutSizeOnRequiredControllerSize\n");
   Size calculatedLayoutSize;
@@ -57,17 +57,6 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   Controller::Impl& impl        = *controller.mImpl;
   ModelPtr&         model       = impl.mModel;
   VisualModelPtr&   visualModel = model->mVisualModel;
-
-  // Store the pending operations mask so that it can be restored later on with no modifications made on it
-  // while getting the natural size were reflected on the original mask.
-  OperationsMask operationsPendingBackUp = static_cast<OperationsMask>(impl.mOperationsPending);
-
-  // This is a hotfix for side effect on Scrolling, LineWrap and Invalid position of cursor in TextEditor after calling CalculateLayoutSizeOnRequiredControllerSize.
-  // The number of lines and glyph-positions inside visualModel have been changed by calling DoRelayout with requestedControllerSize.
-  // Store the mLines and mGlyphPositions from visualModel so that they can be restored later on with no modifications made on them.
-  //TODO: Refactor "DoRelayout" and extract common code of size calculation without modifying attributes of mVisualModel, and then blah, blah, etc.
-  Vector<LineRun> linesBackup          = visualModel->mLines;
-  Vector<Vector2> glyphPositionsBackup = visualModel->mGlyphPositions;
 
   // Operations that can be done only once until the text changes.
   const OperationsMask onlyOnceOperations = static_cast<OperationsMask>(CONVERT_TO_UTF32 |
@@ -89,39 +78,59 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   textUpdateInfo.mParagraphCharacterIndex     = 0u;
   textUpdateInfo.mRequestedNumberOfCharacters = model->mLogicalModel->mText.Count();
 
-  // Make sure the model is up-to-date before layouting
-  impl.UpdateModel(onlyOnceOperations);
+  // This is to keep Index to the first character to be updated.
+  // Then restore it after calling Clear method.
+  auto updateInfoCharIndexBackup = textUpdateInfo.mCharacterIndex;
 
   // Get a reference to the pending operations member
   OperationsMask& operationsPending = impl.mOperationsPending;
 
   // Layout the text for the new width.
-  operationsPending = static_cast<OperationsMask>(operationsPending | requestedOperationsMask);
+  // Apply the pending operations, requested operations and the only once operations.
+  // Then remove onlyOnceOperations
+  operationsPending = static_cast<OperationsMask>(operationsPending | requestedOperationsMask | onlyOnceOperations);
+
+  // Make sure the model is up-to-date before layouting
+  impl.UpdateModel(static_cast<OperationsMask>(operationsPending & ~UPDATE_LAYOUT_SIZE));
 
   // Store the actual control's size to restore later.
   const Size actualControlSize = visualModel->mControlSize;
 
   DoRelayout(impl,
              requestedControllerSize,
-             static_cast<OperationsMask>(onlyOnceOperations |
-                                         requestedOperationsMask),
+             static_cast<OperationsMask>(operationsPending & ~UPDATE_LAYOUT_SIZE),
              calculatedLayoutSize);
 
   // Clear the update info. This info will be set the next time the text is updated.
   textUpdateInfo.Clear();
-  textUpdateInfo.mClearAll = true;
+
+  //TODO: Refactor "DoRelayout" and extract common code of size calculation without modifying attributes of mVisualModel,
+  //TODO: then calculate GlyphPositions. Lines, Size, Layout for Natural-Size
+  //TODO: and utilize the values in OperationsPending and TextUpdateInfo without changing the original one.
+  //TODO: Also it will improve performance because there is no need todo FullRelyout on the next need for layouting.
+
+  // FullRelayoutNeeded should be true because DoRelayout is MAX_FLOAT, MAX_FLOAT.
+  // By this no need to take backup and restore it.
+  textUpdateInfo.mFullRelayoutNeeded = true;
+
+  // Restore mCharacterIndex. Because "Clear" set it to the maximum integer.
+  // The "CalculateTextUpdateIndices" does not work proprely because the mCharacterIndex will be greater than mPreviousNumberOfCharacters.
+  // Which apply an assumption to update only the last  paragraph. That could cause many of out of index crashes.
+  textUpdateInfo.mCharacterIndex = updateInfoCharIndexBackup;
+
+  // Do not do again the only once operations.
+  operationsPending = static_cast<OperationsMask>(operationsPending & ~onlyOnceOperations);
+
+  // Do the size related operations again.
+
+  const OperationsMask sizeOperations = static_cast<OperationsMask>(LAYOUT |
+                                                                    ALIGN |
+                                                                    REORDER);
+
+  operationsPending = static_cast<OperationsMask>(operationsPending | sizeOperations);
 
   // Restore the actual control's size.
   visualModel->mControlSize = actualControlSize;
-  // Restore the previously backed-up pending operations' mask without the only once operations.
-  impl.mOperationsPending = static_cast<OperationsMask>(operationsPendingBackUp & ~onlyOnceOperations);
-
-  // Restore the previously backed-up mLines and mGlyphPositions from visualModel.
-  if(restoreLinesAndGlyphPositions)
-  {
-    visualModel->mLines          = linesBackup;
-    visualModel->mGlyphPositions = glyphPositionsBackup;
-  }
 
   return calculatedLayoutSize;
 }
@@ -146,7 +155,7 @@ Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
     OperationsMask requestedOperationsMask  = static_cast<OperationsMask>(LAYOUT | REORDER);
     Size           sizeMaxWidthAndMaxHeight = Size(MAX_FLOAT, MAX_FLOAT);
 
-    naturalSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeMaxWidthAndMaxHeight, requestedOperationsMask, true);
+    naturalSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeMaxWidthAndMaxHeight, requestedOperationsMask);
 
     // Stores the natural size to avoid recalculate it again
     // unless the text/style changes.
@@ -295,15 +304,7 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
     OperationsMask requestedOperationsMask        = static_cast<OperationsMask>(LAYOUT);
     Size           sizeRequestedWidthAndMaxHeight = Size(width, MAX_FLOAT);
 
-    // Skip restore, because if GetHeightForWidth called before rendering and layouting then visualModel->mControlSize will be zero which will make LineCount zero.
-    // The implementation of Get LineCount property depends on calling GetHeightForWidth then read mLines.Count() from visualModel direct.
-    // If the LineCount property is requested before rendering and layouting then the value will be zero, which is incorrect.
-    // So we will not restore the previously backed-up mLines and mGlyphPositions from visualModel in such case.
-    // Another case to skip restore is when the requested width equals the Control's width which means the caller need to update the old values.
-    // For example, when the text is changed.
-    bool restoreLinesAndGlyphPositions = (visualModel->mControlSize.width > 0 && visualModel->mControlSize.height > 0) && (visualModel->mControlSize.width != width);
-
-    layoutSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeRequestedWidthAndMaxHeight, requestedOperationsMask, restoreLinesAndGlyphPositions);
+    layoutSize = CalculateLayoutSizeOnRequiredControllerSize(controller, sizeRequestedWidthAndMaxHeight, requestedOperationsMask);
 
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth calculated %f\n", layoutSize.height);
   }

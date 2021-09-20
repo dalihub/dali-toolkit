@@ -116,7 +116,6 @@ void UpdateCursorPosition(Dali::Toolkit::Text::EventData* eventData)
 
 namespace Dali::Toolkit::Text
 {
-
 void Controller::EnableTextInput(DecoratorPtr decorator, InputMethodContext& inputMethodContext)
 {
   if(!decorator)
