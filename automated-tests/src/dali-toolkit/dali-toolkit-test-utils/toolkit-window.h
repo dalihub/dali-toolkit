@@ -77,6 +77,7 @@ public:
   Vector4 GetBackgroundColor() const;
   void Raise();
   void Hide();
+  bool IsVisible() const;
   FocusChangeSignalType& FocusChangeSignal();
   KeyEventSignalType& KeyEventSignal();
   TouchEventSignalType& TouchedSignal();

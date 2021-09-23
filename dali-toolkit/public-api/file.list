@@ -27,6 +27,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/controls/text-controls/text-field.cpp
   ${public_api_src_dir}/controls/video-view/video-view.cpp
   ${public_api_src_dir}/controls/camera-view/camera-view.cpp
+  ${public_api_src_dir}/controls/gl-view/gl-view.cpp
   ${public_api_src_dir}/image-loader/image.cpp
   ${public_api_src_dir}/image-loader/image-url.cpp
   ${public_api_src_dir}/image-loader/async-image-loader.cpp
@@ -141,6 +142,10 @@ SET( public_api_camera_view_header_files
   ${public_api_src_dir}/controls/camera-view/camera-view.h
 )
 
+SET( public_api_gl_view_header_files
+  ${public_api_src_dir}/controls/gl-view/gl-view.h
+)
+
 SET( public_api_visuals_header_files
   ${public_api_src_dir}/visuals/border-visual-properties.h
   ${public_api_src_dir}/visuals/color-visual-properties.h
@@ -186,4 +191,5 @@ SET( PUBLIC_API_HEADERS ${PUBLIC_API_HEADERS}
   ${public_api_video_view_header_files}
   ${public_api_visuals_header_files}
   ${public_api_camera_view_header_files}
+  ${public_api_gl_view_header_files}
 )
