@@ -54,6 +54,7 @@ public:
   FocusChangeSignalType mFocusChangeSignal;
   ResizeSignalType      mResizeSignal;
   int                   mRotationAngle;
+  bool                  mVisible;
   DevelWindow::VisibilityChangedSignalType mVisibilityChangedSignal;
 };
 

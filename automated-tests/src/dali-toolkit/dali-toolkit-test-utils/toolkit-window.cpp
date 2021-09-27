@@ -48,6 +48,7 @@ Window::Window( const PositionSize& positionSize )
   mFocusChangeSignal(),
   mResizeSignal(),
   mRotationAngle(90), // dummy angle for test coverage
+  mVisible(true),
   mVisibilityChangedSignal()
 {
 }
@@ -183,6 +184,12 @@ void Window::Raise()
 void Window::Hide()
 {
   GetImplementation( *this ).mVisibilityChangedSignal.Emit( *this, false );
+  GetImplementation( *this ).mVisible = false;
+}
+
+bool Window::IsVisible() const
+{
+  return GetImplementation( *this ).mVisible;
 }
 
 FocusChangeSignalType& Window::FocusChangeSignal()

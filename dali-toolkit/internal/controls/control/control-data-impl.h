@@ -551,6 +551,7 @@ public:
   bool             mIsKeyboardFocusGroup : 1;             ///< Stores whether the control is a focus group.
   bool             mIsEmittingResourceReadySignal : 1;    ///< True during ResourceReady().
   bool             mNeedToEmitResourceReady : 1;          ///< True if need to emit the resource ready signal again.
+  bool             mDispatchKeyEvents : 1;                ///< Whether the actor emits key event signals
 
   RegisteredVisualContainer mRemoveVisuals; ///< List of visuals that are being replaced by another visual once ready
 

@@ -52,9 +52,9 @@ Model3dView Model3dView::New()
 Model3dView Model3dView::New(const std::string& objUrl, const std::string& mtlUrl, const std::string& imagesUrl)
 {
   Model3dView model3dView = Internal::Model3dView::New();
+  model3dView.SetProperty(Model3dView::Property::IMAGES_URL, Dali::Property::Value(imagesUrl));
   model3dView.SetProperty(Model3dView::Property::GEOMETRY_URL, Dali::Property::Value(objUrl));
   model3dView.SetProperty(Model3dView::Property::MATERIAL_URL, Dali::Property::Value(mtlUrl));
-  model3dView.SetProperty(Model3dView::Property::IMAGES_URL, Dali::Property::Value(imagesUrl));
 
   return model3dView;
 }

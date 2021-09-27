@@ -1388,7 +1388,8 @@ void UpdateBuffer(Devel::PixelBuffer src, Devel::PixelBuffer dst, unsigned int x
   }
 
   const unsigned int bytesPerPixel = Dali::Pixel::GetBytesPerPixel(pixelFormat);
-  if(bytesPerPixel == 0u || bytesPerPixel == 12u || bytesPerPixel == 24u)
+  // Ignore when pixelFormat is invalid or contain float
+  if(bytesPerPixel == 0u || bytesPerPixel == 6u || bytesPerPixel == 12u)
   {
     return;
   }

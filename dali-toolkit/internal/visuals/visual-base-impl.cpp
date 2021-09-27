@@ -60,6 +60,56 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(VISUAL_FITTING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Visual::FittingMode, FIT_HEIGHT)
 DALI_ENUM_TO_STRING_TABLE_END(VISUAL_FITTING_MODE)
 
+/**
+ * @brief Check whether this visual type can use corner radius feature or not.
+ * @param type VisualType that want to checkup
+ * @return true if type can use corner radius feature.
+ */
+static bool IsTypeAvailableForCornerRadius(Toolkit::Visual::Type type)
+{
+  switch(static_cast<Toolkit::DevelVisual::Type>(type))
+  {
+    case Toolkit::Visual::Type::COLOR:
+    case Toolkit::Visual::Type::GRADIENT:
+    case Toolkit::Visual::Type::IMAGE:
+    case Toolkit::Visual::Type::SVG:
+    case Toolkit::Visual::Type::ANIMATED_IMAGE:
+    case Toolkit::DevelVisual::Type::ANIMATED_VECTOR_IMAGE:
+    {
+      return true;
+    }
+    default:
+    {
+      return false;
+    }
+  }
+}
+
+/**
+ * @brief Check whether this visual type can use borderline feature or not.
+ * @param type VisualType that want to checkup
+ * @return true if type can use borderline feature.
+ */
+static bool IsTypeAvailableForBorderline(Toolkit::Visual::Type type)
+{
+  switch(static_cast<Toolkit::DevelVisual::Type>(type))
+  {
+    case Toolkit::Visual::Type::COLOR:
+    case Toolkit::Visual::Type::GRADIENT:
+    case Toolkit::Visual::Type::IMAGE:
+    case Toolkit::Visual::Type::SVG:
+    case Toolkit::Visual::Type::ANIMATED_IMAGE:
+    case Toolkit::DevelVisual::Type::ANIMATED_VECTOR_IMAGE:
+    {
+      return true;
+    }
+    default:
+    {
+      return false;
+    }
+  }
+}
+
 } // namespace
 
 Visual::Base::Base(VisualFactoryCache& factoryCache, FittingMode fittingMode, Toolkit::Visual::Type type)
@@ -95,7 +145,7 @@ void Visual::Base::Initialize()
       mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_COLOR,  BORDERLINE_COLOR,  mImpl->mBorderlineColor);
       mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
 
-      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
     }
   }
 }
@@ -525,22 +575,32 @@ bool Visual::Base::IsOnScene() const
 
 bool Visual::Base::IsRoundedCornerRequired() const
 {
-  if(mImpl->mRenderer && mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
+  // If VisualType doesn't support rounded corner, always return false.
+  if(IsTypeAvailableForCornerRadius(mImpl->mType))
   {
-    // Update values from Renderer
-    mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<Vector4>(mImpl->mCornerRadiusIndex);
+    if(mImpl->mRenderer && mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
+    {
+      // Update values from Renderer
+      mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<Vector4>(mImpl->mCornerRadiusIndex);
+    }
+    return !(mImpl->mCornerRadius == Vector4::ZERO) || mImpl->mNeedCornerRadius;
   }
-  return !(mImpl->mCornerRadius == Vector4::ZERO) || mImpl->mNeedCornerRadius;
+  return false;
 }
 
 bool Visual::Base::IsBorderlineRequired() const
 {
-  if(mImpl->mRenderer && mImpl->mBorderlineWidthIndex != Property::INVALID_INDEX)
+  // If VisualType doesn't support borderline, always return false.
+  if(IsTypeAvailableForBorderline(mImpl->mType))
   {
-    // Update values from Renderer
-    mImpl->mBorderlineWidth = mImpl->mRenderer.GetProperty<float>(mImpl->mBorderlineWidthIndex);
+    if(mImpl->mRenderer && mImpl->mBorderlineWidthIndex != Property::INVALID_INDEX)
+    {
+      // Update values from Renderer
+      mImpl->mBorderlineWidth = mImpl->mRenderer.GetProperty<float>(mImpl->mBorderlineWidthIndex);
+    }
+    return !EqualsZero(mImpl->mBorderlineWidth) || mImpl->mNeedBorderline;
   }
-  return !EqualsZero(mImpl->mBorderlineWidth) || mImpl->mNeedBorderline;
+  return false;
 }
 
 void Visual::Base::OnDoAction(const Property::Index actionId, const Property::Value& attributes)
@@ -897,11 +957,12 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
   Property::Index index = GetPropertyIndex(key);
   if(index == Property::INVALID_INDEX)
   {
-    if((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_WIDTH)  || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_WIDTH) ||
-       (key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_COLOR)  || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_COLOR) ||
-       (key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_OFFSET) || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_OFFSET))
+    if(IsTypeAvailableForBorderline(mImpl->mType) &&
+       ((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_WIDTH)  || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_WIDTH) ||
+        (key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_COLOR)  || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_COLOR) ||
+        (key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_OFFSET) || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_OFFSET)))
     {
-      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
 
       // Register borderline properties
       mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_WIDTH, BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
@@ -914,13 +975,17 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
       // Change shader
       UpdateShader();
     }
-    else if((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::CORNER_RADIUS) || (key.type == Property::Key::STRING && key.stringKey == CORNER_RADIUS))
+    else if(IsTypeAvailableForCornerRadius(mImpl->mType) && ((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::CORNER_RADIUS) || (key.type == Property::Key::STRING && key.stringKey == CORNER_RADIUS)))
     {
       // Register CORNER_RADIUS property
       mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
       mImpl->mRenderer.RegisterProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
 
-      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+      if(!mImpl->mNeedBorderline)
+      {
+        // If mNeedBorderline is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+        mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+      }
 
       index                    = mImpl->mCornerRadiusIndex;
       mImpl->mNeedCornerRadius = true;

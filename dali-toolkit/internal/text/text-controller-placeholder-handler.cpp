@@ -322,6 +322,8 @@ void Controller::PlaceholderHandler::SetPlaceholderTextColor(Controller& control
   if(controller.mImpl->IsShowingPlaceholderText())
   {
     controller.mImpl->mModel->mVisualModel->SetTextColor(textColor);
+    controller.mImpl->mModel->mLogicalModel->mColorRuns.Clear();
+    controller.mImpl->mOperationsPending = static_cast<OperationsMask>(controller.mImpl->mOperationsPending | COLOR);
     controller.mImpl->RequestRelayout();
   }
 }

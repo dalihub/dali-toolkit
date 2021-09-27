@@ -184,7 +184,14 @@ enum
    * @brief Set of accessibility attributes describing object in accessibility hierarchy
    * @details Name "accessibilityAttributes", type Property::MAP
    */
-  ACCESSIBILITY_ATTRIBUTES
+  ACCESSIBILITY_ATTRIBUTES,
+
+  /**
+   * @brief Whether a Control and its descendants can emit key signals.
+   * @details Name "dispatchKeyEvents", type Property::BOOLEAN
+   * @note If a control's dispatchKeyEvents is set to false, then it's children will not emit a key event signal either.
+   */
+  DISPATCH_KEY_EVENTS,
 };
 
 } // namespace Property
