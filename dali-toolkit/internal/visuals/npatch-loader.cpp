@@ -104,7 +104,6 @@ std::size_t NPatchLoader::Load(TextureManager& textureManager, TextureUploadObse
             newData->AddObserver(textureObserver);
 
             mCache.PushBack(newData);
-
             return newData->GetId(); // valid ids start from 1u
           }
         }
@@ -133,7 +132,6 @@ std::size_t NPatchLoader::Load(TextureManager& textureManager, TextureUploadObse
     preMultiplyOnLoad = (preMultiplyOnLoading == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD) ? true : false;
     data->SetLoadedNPatchData(pixelBuffer, preMultiplyOnLoad);
   }
-
   return data->GetId();
 }
 
