@@ -118,7 +118,9 @@ VisualUrl::Type ResolveType(const std::string& url)
     char         GIF[4]    = {'f', 'i', 'g', '.'};
     char         WEBP[5]   = {'p', 'b', 'e', 'w', '.'};
     char         JSON[5]   = {'n', 'o', 's', 'j', '.'};
+    char         TVG[4]    = {'g', 'v', 't', '.'};
     unsigned int svgScore  = 0;
+    unsigned int tvgScore  = 0;
     unsigned int gifScore  = 0;
     unsigned int webpScore = 0;
     unsigned int jsonScore = 0;
@@ -133,6 +135,14 @@ VisualUrl::Type ResolveType(const std::string& url)
         if(++svgScore == sizeof(SVG))
         {
           return VisualUrl::SVG;
+        }
+      }
+      if((offsetFromEnd < sizeof(TVG)) && (currentChar == TVG[offsetFromEnd]))
+      {
+        // early out if TVG as can't be used in N patch for now
+        if(++tvgScore == sizeof(TVG))
+        {
+          return VisualUrl::TVG;
         }
       }
       if((offsetFromEnd < sizeof(GIF)) && (currentChar == GIF[offsetFromEnd]))
