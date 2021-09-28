@@ -24,6 +24,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
@@ -284,114 +285,36 @@ void ImageView::OnRelayout(const Vector2& size, RelayoutContainer& container)
   }
 }
 
-void ImageView::OnCreateTransitions(Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod timePeriod)
+void ImageView::OnCreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                                    std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                                    Dali::Toolkit::Control                                              source,
+                                    Dali::Toolkit::Control                                              destination)
 {
-  Dali::Toolkit::ImageView destinationHandle = Toolkit::ImageView(GetOwner());
-  Toolkit::Visual::Base    destinationVisual = DevelControl::GetVisual(GetImplementation(destinationHandle), Toolkit::ImageView::Property::IMAGE);
-  Property::Map            destinationMap;
-
-  if(!destinationVisual)
+  // Retrieves image properties to be transitioned.
+  Dali::Property::Map imageSourcePropertyMap, imageDestinationPropertyMap;
+  MakeVisualTransition(imageSourcePropertyMap, imageDestinationPropertyMap, source, destination, Toolkit::ImageView::Property::IMAGE);
+  if(imageSourcePropertyMap.Count() > 0)
   {
-    return;
+    sourceProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::ImageView::Property::IMAGE, imageSourcePropertyMap));
+    destinationProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::ImageView::Property::IMAGE, imageDestinationPropertyMap));
   }
+}
 
-  destinationVisual.CreatePropertyMap(destinationMap);
+void ImageView::OnUpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+{
+  Toolkit::Visual::Base visual = DevelControl::GetVisual(*this, Toolkit::ImageView::Property::IMAGE);
+  if(visual)
+  {
+    Dali::Toolkit::Control handle(GetOwner());
 
-  static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4 {
-    Property::Value* propertyValue = map.Find(index);
-    if(propertyValue)
+    for(auto&& data : properties)
     {
-      return propertyValue->Get<Vector4>();
+      if(data.first == Toolkit::ImageView::Property::IMAGE)
+      {
+        DevelControl::DoAction(handle, Toolkit::ImageView::Property::IMAGE, DevelVisual::Action::UPDATE_PROPERTY, data.second);
+        break;
+      }
     }
-    return defaultValue;
-  };
-
-  static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float {
-    Property::Value* propertyValue = map.Find(index);
-    if(propertyValue)
-    {
-      return propertyValue->Get<float>();
-    }
-    return defaultValue;
-  };
-
-  Vector4 sourceMixColor(0.0f, 0.0f, 0.0f, 0.0f);
-  Vector4 sourceCornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
-  float   sourceBorderlineWidth(0.0f);
-  Vector4 sourceBorderlineColor(0.0f, 0.0f, 0.0f, 1.0f);
-  float   sourceBorderlineOffset(0.0f);
-  Vector4 destinationMixColor         = findValueVector4(destinationMap, Dali::Toolkit::Visual::Property::MIX_COLOR, sourceMixColor);
-  Vector4 destinationCornerRadius     = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, sourceCornerRadius);
-  float   destinationBorderlineWidth  = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, sourceBorderlineWidth);
-  Vector4 destinationBorderlineColor  = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, sourceBorderlineColor);
-  float   destinationBorderlineOffset = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, sourceBorderlineOffset);
-
-  Dali::Toolkit::ImageView sourceHandle = Dali::Toolkit::ImageView::DownCast(source);
-  Toolkit::Visual::Base    sourceVisual;
-  Property::Map            sourceMap;
-
-  if(sourceHandle)
-  {
-    sourceVisual = DevelControl::GetVisual(GetImplementation(sourceHandle), Toolkit::ImageView::Property::IMAGE);
-  }
-
-  if(sourceVisual)
-  {
-    sourceVisual.CreatePropertyMap(sourceMap);
-    sourceMixColor         = findValueVector4(sourceMap, Dali::Toolkit::Visual::Property::MIX_COLOR, sourceMixColor);
-    sourceCornerRadius     = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, sourceCornerRadius);
-    sourceBorderlineWidth  = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, sourceBorderlineWidth);
-    sourceBorderlineColor  = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, sourceBorderlineColor);
-    sourceBorderlineOffset = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, sourceBorderlineOffset);
-  }
-
-  std::vector<Dali::Property>                              properties;
-  std::vector<std::pair<Property::Value, Property::Value>> values;
-
-  if(Vector3(sourceMixColor) != Vector3(destinationMixColor))
-  {
-    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::MIX_COLOR));
-    values.push_back(std::make_pair(Vector3(sourceMixColor), Vector3(destinationMixColor)));
-  }
-  if(std::abs(sourceMixColor.a - destinationMixColor.a) > Math::MACHINE_EPSILON_1)
-  {
-    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::Visual::Property::OPACITY));
-    values.push_back(std::make_pair(sourceMixColor.a, destinationMixColor.a));
-  }
-  if(sourceCornerRadius != destinationCornerRadius)
-  {
-    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::DevelVisual::Property::CORNER_RADIUS));
-    values.push_back(std::make_pair(sourceCornerRadius, destinationCornerRadius));
-  }
-  if(sourceBorderlineWidth != destinationBorderlineWidth)
-  {
-    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH));
-    values.push_back(std::make_pair(sourceBorderlineWidth, destinationBorderlineWidth));
-  }
-  if(sourceBorderlineColor != destinationBorderlineColor)
-  {
-    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::DevelVisual::Property::BORDERLINE_COLOR));
-    values.push_back(std::make_pair(sourceBorderlineColor, destinationBorderlineColor));
-  }
-  if(sourceBorderlineOffset != destinationBorderlineOffset)
-  {
-    properties.push_back(DevelControl::GetVisualProperty(destinationHandle, Toolkit::ImageView::Property::IMAGE, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET));
-    values.push_back(std::make_pair(sourceBorderlineOffset, destinationBorderlineOffset));
-  }
-
-  for(uint32_t i = 0; i < properties.size(); ++i)
-  {
-    if(timePeriod.delaySeconds > 0.0f)
-    {
-      Dali::KeyFrames initialKeyframes = Dali::KeyFrames::New();
-      initialKeyframes.Add(0.0f, values[i].first);
-      initialKeyframes.Add(1.0f, values[i].first);
-      animation.AnimateBetween(properties[i], initialKeyframes, TimePeriod(timePeriod.delaySeconds));
-    }
-    Dali::KeyFrames keyframes = Dali::KeyFrames::New();
-    keyframes.Add(0.0f, values[i].first);
-    keyframes.Add(1.0f, values[i].second);
-    animation.AnimateBetween(properties[i], keyframes, alphaFunction, timePeriod);
   }
 }
 

@@ -393,16 +393,32 @@ public:
   Dali::Property GetVisualProperty(Dali::Property::Index index, Dali::Property::Key visualPropertyKey);
 
   /**
-   * @brief Make visual transition from source control to this control about specific Property::Index
-   * If both of source and this control have Property::Index property, than create animation between them.
+   * @brief Retrieves source and destination visual properties for the Transition of this Control.
+   * The properties of this Control will be transitioned from the propeties of source Control to that of destination control.
+   * If a property value is different between source and destination Control,
+   * the property information of each Control will be included in sourceProperties and destinationProperties.
    *
-   * @param[in] animation Return animation from source to this control.
-   * @param[in] source Source control to be used property animation.
-   * @param[in] visualIndex Property::Index to make animation.
-   * @param[in] alphaFunction alpha function of the animation.
-   * @param[in] timePeriod time period of the animation.
+   * @param[out] sourceProperties Source property list to be applied on this Control.
+   * @param[out] destinationProperties Destination property list to be applied on this Control.
+   * @param[in] source Source control of the animation.
+   * @param[in] destination Destination control of the animation.
+   *
+   * @note This method do not handle Actor properties.
+   * And the size and order of the sourceProperties and destinationProperties must be synchronized.
+   *
+   * This method triggers Control::OnCreateTransition().
    */
-  void MakeVisualTransition(Dali::Animation& animation, Dali::Toolkit::Control source, Dali::Property::Index visualIndex, AlphaFunction alphaFunction, TimePeriod timePeriod);
+  void CreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                         std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                         Dali::Toolkit::Control source, Dali::Toolkit::Control destination);
+
+  /**
+   * @brief Update visual properties.
+   * @param[in] properties Property list to be used to update visual properties of this Control.
+   *
+   * @note This method triggers Control::OnUpdateVisualProperties().
+   */
+  void UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties);
 
   /**
    * @brief Gets the current control's accessible object.

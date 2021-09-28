@@ -32,9 +32,9 @@ Transition::Transition(Internal::Transition* transition)
 {
 }
 
-Transition Transition::New(Dali::Toolkit::Control source, Dali::Toolkit::Control destination, TimePeriod timePeriod)
+Transition Transition::New(Dali::Toolkit::Control source, Dali::Toolkit::Control destination, bool useDestinationTarget, TimePeriod timePeriod)
 {
-  Internal::TransitionPtr internal = Dali::Toolkit::Internal::Transition::New(source, destination, timePeriod);
+  Internal::TransitionPtr internal = Dali::Toolkit::Internal::Transition::New(source, destination, useDestinationTarget, timePeriod);
 
   return Transition(internal.Get());
 }

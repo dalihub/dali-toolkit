@@ -295,6 +295,11 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         {
           mImpl->mBorderlineWidth = width;
         }
+
+        if(mImpl->mBorderlineWidthIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mImpl->mBorderlineWidthIndex, mImpl->mBorderlineWidth);
+        }
         break;
       }
       case Toolkit::DevelVisual::Property::BORDERLINE_COLOR:
@@ -304,6 +309,11 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         {
           mImpl->mBorderlineColor = color;
         }
+
+        if(mImpl->mBorderlineColorIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mImpl->mBorderlineColorIndex, mImpl->mBorderlineColor);
+        }
         break;
       }
       case Toolkit::DevelVisual::Property::BORDERLINE_OFFSET:
@@ -312,6 +322,11 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         if(value.Get(offset))
         {
           mImpl->mBorderlineOffset = offset;
+        }
+
+        if(mImpl->mBorderlineOffsetIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mImpl->mBorderlineOffsetIndex, mImpl->mBorderlineOffset);
         }
         break;
       }
@@ -337,6 +352,11 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           {
             mImpl->mCornerRadius = Vector4(radius, radius, radius, radius);
           }
+        }
+
+        if(mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mImpl->mCornerRadiusIndex, mImpl->mCornerRadius);
         }
         break;
       }
