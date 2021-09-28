@@ -123,33 +123,49 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
     borderlineOpacity = smoothstep(gMinInlinePotential, gMaxInlinePotential, potential);
   }
 
-  lowp vec3  BorderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
-  lowp float BorderlineColorAlpha = borderlineColor.a * uActorColor.a;
-  // Gradient is always preMultiplied.
-  BorderlineColorRGB *= BorderlineColorAlpha;
+  lowp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
+  lowp float borderlineColorAlpha = borderlineColor.a * uActorColor.a;
+  // NOTE : gradient-visual is always preMultiplied.
+  borderlineColorRGB *= borderlineColorAlpha;
 
-  //calculate inside of borderline when outilneColor.a < 1.0
-  if(borderlineColor.a < 1.0)
+  // Calculate inside of borderline when alpha is between (0.0  1.0). So we need to apply texture color.
+  // If borderlineOpacity is exactly 0.0, we always use whole texture color. In this case, we don't need to run below code.
+  // But if borderlineOpacity > 0.0 and borderlineColor.a == 0.0, we need to apply tCornerRadius.
+  if(borderlineOpacity > 0.0 && borderlineColor.a * borderlineOpacity < 1.0)
   {
     mediump float tCornerRadius = -gCenterPosition;
     mediump float MaxTexturelinePotential = tCornerRadius + gPotentialRange;
     mediump float MinTexturelinePotential = tCornerRadius - gPotentialRange;
-    lowp vec3 BorderlineColorRGB = borderlineColor.xyz * borderlineColor.a;
     if(potential > MaxTexturelinePotential)
     {
-      // potential is out of texture range. use borderline color instead of texture
-      textureColor = vec4(BorderlineColorRGB, 0.0);
+      // potential is out of texture range.
+      textureColor = vec4(0.0);
     }
-    else if(potential > MinTexturelinePotential)
+    else
     {
-      // potential is in texture range
-      textureColor = mix(textureColor, vec4(BorderlineColorRGB, 0.0), smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
+      // potential is in texture range.
+      lowp float textureAlphaScale = mix(1.0, 0.0, smoothstep(MinTexturelinePotential, MaxTexturelinePotential, potential));
+      textureColor.a *= textureAlphaScale;
+      textureColor.rgb *= textureAlphaScale;
     }
-    // TODO : need to fix here when uColor.a = 0.0 and uActorColor.a != 0
-    borderlineOpacity *= borderlineColor.a;
-    return mix(textureColor, vec4(BorderlineColorRGB, 1.0), borderlineOpacity);
+
+    // NOTE : gradient-visual is always preMultiplied.
+    borderlineColorAlpha *= borderlineOpacity;
+    borderlineColorRGB *= borderlineOpacity;
+    // We use pre-multiplied color to reduce operations.
+    // In here, textureColor and borderlineColorRGB is pre-multiplied color now.
+
+    // Manual blend operation with premultiplied colors.
+    // Final alpha = borderlineColorAlpha + (1.0 - borderlineColorAlpha) * textureColor.a.
+    // (Final rgb * alpha) =  borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb
+    // If preMultipliedAlpha == 1.0, just return vec4(rgb*alpha, alpha)
+    // Else, return vec4((rgb*alpha) / alpha, alpha)
+
+    lowp float finalAlpha = mix(textureColor.a, 1.0, borderlineColorAlpha);
+    lowp vec3  finalMultipliedRGB = borderlineColorRGB + (1.0 - borderlineColorAlpha) * textureColor.rgb;
+    return vec4(finalMultipliedRGB, finalAlpha);
   }
-  return mix(textureColor, vec4(BorderlineColorRGB, BorderlineColorAlpha), borderlineOpacity);
+  return mix(textureColor, vec4(borderlineColorRGB, borderlineColorAlpha), borderlineOpacity);
 }
 #endif
 

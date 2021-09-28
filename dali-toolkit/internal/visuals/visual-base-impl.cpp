@@ -988,7 +988,7 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
 
       if(!IsBorderlineRequired())
       {
-        // If mNeedBorderline is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+        // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
         mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
       }
 
