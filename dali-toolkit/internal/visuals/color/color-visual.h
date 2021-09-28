@@ -131,9 +131,9 @@ private:
   ColorVisual& operator=(const ColorVisual& colorRenderer);
 
 private:
-  float           mBlurRadius;      ///< The blur radius
-  Property::Index mBlurRadiusIndex; ///< The blur radius property index
-  bool            mNeedBlurRadius;  ///< Whether we need the blur radius in shader.
+  float           mBlurRadius;                ///< The blur radius
+  Property::Index mBlurRadiusIndex;           ///< The blur radius property index
+  bool            mAlwaysUsingBlurRadius : 1; ///< Whether we need the blur radius in shader always.
 };
 
 } // namespace Internal
