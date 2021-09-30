@@ -17,22 +17,43 @@
 #include <dali/public-api/actors/layer.h>
 
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/text/text-view.h>
 
 namespace Dali::Toolkit::Internal
 {
+void CommonTextUtils::SynchronizeTextAnchorsInParent(
+  Actor                             parent,
+  Text::ControllerPtr               controller,
+  std::vector<Toolkit::TextAnchor>& anchorActors)
+{
+  for(auto& anchorActor : anchorActors)
+  {
+    parent.Remove(anchorActor);
+  }
+  if(Dali::Accessibility::IsUp())
+  {
+    controller->GetAnchorActors(anchorActors);
+    for(auto& anchorActor : anchorActors)
+    {
+      parent.Add(anchorActor);
+    }
+  }
+}
+
 void CommonTextUtils::RenderText(
-  Actor                            textActor,
-  Text::RendererPtr                renderer,
-  Text::ControllerPtr              controller,
-  Text::DecoratorPtr               decorator,
-  float&                           alignmentOffset,
-  Actor&                           renderableActor,
-  Actor&                           backgroundActor,
-  Toolkit::Control&                stencil,
-  std::vector<Actor>&              clippingDecorationActors,
-  Text::Controller::UpdateTextType updateTextType)
+  Actor                             textActor,
+  Text::RendererPtr                 renderer,
+  Text::ControllerPtr               controller,
+  Text::DecoratorPtr                decorator,
+  float&                            alignmentOffset,
+  Actor&                            renderableActor,
+  Actor&                            backgroundActor,
+  Toolkit::Control&                 stencil,
+  std::vector<Actor>&               clippingDecorationActors,
+  std::vector<Toolkit::TextAnchor>& anchorActors,
+  Text::Controller::UpdateTextType  updateTextType)
 {
   Actor newRenderableActor;
 
@@ -126,6 +147,7 @@ void CommonTextUtils::RenderText(
         backgroundActor.LowerToBottom();
       }
     }
+    SynchronizeTextAnchorsInParent(textActor, controller, anchorActors);
   }
 }
 

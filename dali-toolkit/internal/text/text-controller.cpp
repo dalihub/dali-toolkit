@@ -1644,6 +1644,16 @@ Actor Controller::CreateBackgroundActor()
   return mImpl->CreateBackgroundActor();
 }
 
+void Controller::GetAnchorActors(std::vector<Toolkit::TextAnchor>& anchorActors)
+{
+  mImpl->GetAnchorActors(anchorActors);
+}
+
+int Controller::GetAnchorIndex(size_t characterOffset)
+{
+  return mImpl->GetAnchorIndex(characterOffset);
+}
+
 Controller::Controller(ControlInterface*           controlInterface,
                        EditableControlInterface*   editableControlInterface,
                        SelectableControlInterface* selectableControlInterface,

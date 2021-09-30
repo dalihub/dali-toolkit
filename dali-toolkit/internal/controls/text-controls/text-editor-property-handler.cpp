@@ -15,6 +15,7 @@
  */
 
 #include <dali-toolkit/internal/controls/text-controls/text-editor-property-handler.h>
+#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 
@@ -311,6 +312,7 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       DALI_LOG_INFO(gTextEditorLogFilter, Debug::General, "TextEditor %p ENABLE_MARKUP %d\n", impl.mController.Get(), enableMarkup);
 
       impl.mController->SetMarkupProcessorEnabled(enableMarkup);
+      CommonTextUtils::SynchronizeTextAnchorsInParent(textEditor, impl.mController, impl.mAnchorActors);
       break;
     }
     case Toolkit::TextEditor::Property::INPUT_COLOR:

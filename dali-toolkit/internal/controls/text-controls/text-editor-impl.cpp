@@ -478,6 +478,11 @@ Toolkit::TextEditor::ScrollStateChangedSignalType& TextEditor::ScrollStateChange
   return mScrollStateChangedSignal;
 }
 
+void TextEditor::OnAccessibilityStatusChanged()
+{
+  CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
+}
+
 void TextEditor::OnInitialize()
 {
   Actor self = Self();
@@ -568,6 +573,9 @@ void TextEditor::OnInitialize()
     return std::unique_ptr<Dali::Accessibility::Accessible>(
       new AccessibleImpl(actor, Dali::Accessibility::Role::ENTRY));
   });
+
+  Accessibility::Bridge::EnabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
+  Accessibility::Bridge::DisabledSignal().Connect(this, &TextEditor::OnAccessibilityStatusChanged);
 }
 
 void TextEditor::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)
@@ -724,7 +732,7 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
 void TextEditor::RenderText(Text::Controller::UpdateTextType updateTextType)
 {
-  CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mStencil, mClippingDecorationActors, updateTextType);
+  CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mStencil, mClippingDecorationActors, mAnchorActors, updateTextType);
   if(mRenderableActor)
   {
     ApplyScrollPosition();
@@ -1538,6 +1546,30 @@ bool TextEditor::AccessibleImpl::SetTextContents(std::string newContents)
   auto self = Toolkit::TextEditor::DownCast(Self());
   self.SetProperty(Toolkit::TextEditor::Property::TEXT, std::move(newContents));
   return true;
+}
+
+int32_t TextEditor::AccessibleImpl::GetLinkCount() const
+{
+  auto self = Toolkit::TextEditor::DownCast(Self());
+  return Dali::Toolkit::GetImpl(self).mAnchorActors.size();
+}
+
+Accessibility::Hyperlink* TextEditor::AccessibleImpl::GetLink(int32_t linkIndex) const
+{
+  if(linkIndex < 0 || linkIndex >= GetLinkCount())
+  {
+    return nullptr;
+  }
+  auto self        = Toolkit::TextEditor::DownCast(Self());
+  auto anchorActor = Dali::Toolkit::GetImpl(self).mAnchorActors[linkIndex];
+  return dynamic_cast<Accessibility::Hyperlink*>(Dali::Accessibility::Accessible::Get(anchorActor));
+}
+
+int32_t TextEditor::AccessibleImpl::GetLinkIndex(int32_t characterOffset) const
+{
+  auto self       = Toolkit::TextEditor::DownCast(Self());
+  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
+  return controller->GetAnchorIndex(static_cast<size_t>(characterOffset));
 }
 
 } // namespace Internal

@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <dali-toolkit/devel-api/controls/text-controls/text-anchor-devel.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-controller.h>
@@ -42,6 +42,7 @@ public:
    * @param[in,out] backgroundActor Actor for rendering background
    * @param[in,out] stencil Clipping actor
    * @param[in,out] clippingDecorationActors Clipping decoration actors
+   * @param[in,out] anchorActors Anchor actors
    * @param[in] updateTextType How the text has been updated
    */
   static void RenderText(
@@ -54,7 +55,19 @@ public:
     Actor&                           backgroundActor,
     Toolkit::Control&                stencil,
     std::vector<Actor>&              clippingDecorationActors,
+    std::vector<Toolkit::TextAnchor>& anchorActors,
     Text::Controller::UpdateTextType updateTextType);
+
+  /**
+   * Common method to synchronize TextAnchor actors with Anchor objects in text's logical model.
+   * @param[in] parent The actor that is a parent of anchor actors
+   * @param[in] controller pointer to the text controller
+   * @param[in,out] anchorActors Anchor actors
+   */
+  static void SynchronizeTextAnchorsInParent(
+    Actor                             parent,
+    Text::ControllerPtr               controller,
+    std::vector<Toolkit::TextAnchor>& anchorActors);
 };
 
 } // namespace Dali::Toolkit::Internal

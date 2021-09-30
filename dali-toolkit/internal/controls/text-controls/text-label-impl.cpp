@@ -37,6 +37,7 @@
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-view.h>
+#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -850,6 +851,9 @@ void TextLabel::OnInitialize()
     return std::unique_ptr<Dali::Accessibility::Accessible>(
       new AccessibleImpl(actor, Dali::Accessibility::Role::LABEL));
   });
+
+  Accessibility::Bridge::EnabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
+  Accessibility::Bridge::DisabledSignal().Connect(this, &TextLabel::OnAccessibilityStatusChanged);
 }
 
 void TextLabel::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)
@@ -935,6 +939,12 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
         mController->SetDefaultColor(textColor);
         mTextUpdateNeeded = true;
       }
+      break;
+    }
+    case Toolkit::TextLabel::Property::TEXT:
+    case Toolkit::TextLabel::Property::ENABLE_MARKUP:
+    {
+      CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
       break;
     }
     default:
@@ -1110,6 +1120,11 @@ void TextLabel::EmitTextFitChangedSignal()
   mTextFitChangedSignal.Emit(handle);
 }
 
+void TextLabel::OnAccessibilityStatusChanged()
+{
+  CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
+}
+
 TextLabel::TextLabel()
 : Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
@@ -1170,8 +1185,8 @@ bool TextLabel::AccessibleImpl::SetCursorOffset(size_t offset)
 
 Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto self = Toolkit::TextLabel::DownCast(Self());
-  auto text = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
+  auto self     = Toolkit::TextLabel::DownCast(Self());
+  auto text     = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
   auto textSize = text.size();
 
   auto range = Dali::Accessibility::Range{};
@@ -1192,7 +1207,7 @@ Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t off
     case Dali::Accessibility::TextBoundary::LINE:
     {
       auto textString = text.c_str();
-      auto breaks = std::vector<char>(textSize, 0);
+      auto breaks     = std::vector<char>(textSize, 0);
 
       if(boundary == Dali::Accessibility::TextBoundary::WORD)
       {
@@ -1203,7 +1218,7 @@ Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t off
         Accessibility::Accessible::FindLineSeparationsUtf8(reinterpret_cast<const utf8_t*>(textString), textSize, "", breaks.data());
       }
 
-      auto index = 0u;
+      auto index   = 0u;
       auto counter = 0u;
       while(index < textSize && counter <= offset)
       {
@@ -1267,8 +1282,8 @@ Dali::Accessibility::Range TextLabel::AccessibleImpl::GetRangeOfSelection(size_t
     return {};
   }
 
-  auto self  = Toolkit::TextLabel::DownCast(Self());
-  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
+  auto        self       = Toolkit::TextLabel::DownCast(Self());
+  auto        controller = Dali::Toolkit::GetImpl(self).GetTextController();
   std::string value{};
   controller->RetrieveSelection(value);
   auto indices = controller->GetSelectionIndexes();
@@ -1300,6 +1315,30 @@ bool TextLabel::AccessibleImpl::SetRangeOfSelection(size_t selectionIndex, size_
   auto self = Toolkit::TextLabel::DownCast(Self());
   Dali::Toolkit::GetImpl(self).GetTextController()->SetSelection(startOffset, endOffset);
   return true;
+}
+
+int32_t TextLabel::AccessibleImpl::GetLinkCount() const
+{
+  auto self = Toolkit::TextLabel::DownCast(Self());
+  return Dali::Toolkit::GetImpl(self).mAnchorActors.size();
+}
+
+Accessibility::Hyperlink* TextLabel::AccessibleImpl::GetLink(int32_t linkIndex) const
+{
+  if(linkIndex < 0 || linkIndex >= GetLinkCount())
+  {
+    return nullptr;
+  }
+  auto self        = Toolkit::TextLabel::DownCast(Self());
+  auto anchorActor = Dali::Toolkit::GetImpl(self).mAnchorActors[linkIndex];
+  return dynamic_cast<Accessibility::Hyperlink*>(Dali::Accessibility::Accessible::Get(anchorActor));
+}
+
+int32_t TextLabel::AccessibleImpl::GetLinkIndex(int32_t characterOffset) const
+{
+  auto self       = Toolkit::TextLabel::DownCast(Self());
+  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
+  return controller->GetAnchorIndex(static_cast<size_t>(characterOffset));
 }
 
 } // namespace Internal

@@ -429,6 +429,9 @@ private: // Implementation
   // Connection needed to re-render text, when a Text Field returns to the scene.
   void OnSceneConnect(Dali::Actor actor);
 
+  // Needed to synchronize TextAnchor actors with Anchor objects in text's logical model
+  void OnAccessibilityStatusChanged();
+
 private: // Data
   // Signals
   Toolkit::TextField::TextChangedSignalType                mTextChangedSignal;
@@ -440,13 +443,14 @@ private: // Data
   Toolkit::DevelTextField::SelectionChangedSignalType      mSelectionChangedSignal;
   Toolkit::DevelTextField::SelectionClearedSignalType      mSelectionClearedSignal;
 
-  InputMethodContext       mInputMethodContext;
-  Text::ControllerPtr      mController;
-  Text::RendererPtr        mRenderer;
-  Text::DecoratorPtr       mDecorator;
-  Toolkit::Control         mStencil;                  ///< For EXCEED_POLICY_CLIP
-  std::vector<Actor>       mClippingDecorationActors; ///< Decoration actors which need clipping.
-  Dali::InputMethodOptions mInputMethodOptions;
+  InputMethodContext               mInputMethodContext;
+  Text::ControllerPtr              mController;
+  Text::RendererPtr                mRenderer;
+  Text::DecoratorPtr               mDecorator;
+  Toolkit::Control                 mStencil;                  ///< For EXCEED_POLICY_CLIP
+  std::vector<Actor>               mClippingDecorationActors; ///< Decoration actors which need clipping.
+  std::vector<Toolkit::TextAnchor> mAnchorActors;
+  Dali::InputMethodOptions         mInputMethodOptions;
 
   Actor         mRenderableActor;
   Actor         mActiveLayer;
@@ -477,7 +481,8 @@ protected:
    */
   struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Text,
-                          public virtual Dali::Accessibility::EditableText
+                          public virtual Dali::Accessibility::EditableText,
+                          public virtual Dali::Accessibility::Hypertext
   {
     using DevelControl::AccessibleImpl::AccessibleImpl;
 
@@ -555,6 +560,21 @@ protected:
      * @copydoc Dali::Accessibility::EditableText::DeleteText()
      */
     bool DeleteText(size_t startPosition, size_t endPosition) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Hypertext::GetLink()
+     */
+    Accessibility::Hyperlink* GetLink(int32_t linkIndex) const override;
+
+    /**
+     * @copydoc Dali::Accessibility::Hypertext::GetLinkIndex()
+     */
+    int32_t GetLinkIndex(int32_t characterOffset) const override;
+
+    /**
+     * @copydoc Dali::Accessibility::Hypertext::GetLinkCount()
+     */
+    int32_t GetLinkCount() const override;
   };
 };
 
