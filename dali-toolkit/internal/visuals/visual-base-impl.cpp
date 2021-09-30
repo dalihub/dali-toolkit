@@ -583,7 +583,7 @@ bool Visual::Base::IsRoundedCornerRequired() const
       // Update values from Renderer
       mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<Vector4>(mImpl->mCornerRadiusIndex);
     }
-    return !(mImpl->mCornerRadius == Vector4::ZERO) || mImpl->mNeedCornerRadius;
+    return !(mImpl->mCornerRadius == Vector4::ZERO) || mImpl->mAlwaysUsingCornerRadius;
   }
   return false;
 }
@@ -598,7 +598,7 @@ bool Visual::Base::IsBorderlineRequired() const
       // Update values from Renderer
       mImpl->mBorderlineWidth = mImpl->mRenderer.GetProperty<float>(mImpl->mBorderlineWidthIndex);
     }
-    return !EqualsZero(mImpl->mBorderlineWidth) || mImpl->mNeedBorderline;
+    return !EqualsZero(mImpl->mBorderlineWidth) || mImpl->mAlwaysUsingBorderline;
   }
   return false;
 }
@@ -968,7 +968,9 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
       mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_WIDTH, BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
       mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_COLOR, BORDERLINE_COLOR, mImpl->mBorderlineColor);
       mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
-      mImpl->mNeedBorderline        = true;
+
+      // Borderline is animated now. we always have to use borderline feature.
+      mImpl->mAlwaysUsingBorderline = true;
 
       index = mImpl->mRenderer.GetPropertyIndex(key);
 
@@ -981,14 +983,16 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
       mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
       mImpl->mRenderer.RegisterProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
 
-      if(!mImpl->mNeedBorderline)
+      // ConerRadius is animated now. we always have to use corner radius feature.
+      mImpl->mAlwaysUsingCornerRadius = true;
+
+      if(!IsBorderlineRequired())
       {
         // If mNeedBorderline is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
         mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
       }
 
-      index                    = mImpl->mCornerRadiusIndex;
-      mImpl->mNeedCornerRadius = true;
+      index = mImpl->mCornerRadiusIndex;
 
       // Change shader
       UpdateShader();
