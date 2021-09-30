@@ -47,11 +47,10 @@
 #include <dali-toolkit/devel-api/controls/web-view/web-context.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-cookie-manager.h>
 #include <dali-toolkit/devel-api/controls/web-view/web-settings.h>
-#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
-#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 namespace Dali
 {
@@ -634,7 +633,7 @@ Dali::Toolkit::ImageView WebView::CreateImageView(Dali::PixelData pixel) const
     return Dali::Toolkit::ImageView();
   }
 
-  Dali::Toolkit::ImageUrl url       = Dali::Toolkit::Image::GenerateUrl(pixel);
+  Dali::Toolkit::ImageUrl  url       = Dali::Toolkit::Image::GenerateUrl(pixel);
   Dali::Toolkit::ImageView imageView = Dali::Toolkit::ImageView::New(url.GetUrl());
   imageView.SetProperty(Dali::Actor::Property::SIZE, Vector2(pixel.GetWidth(), pixel.GetHeight()));
   return imageView;
@@ -777,9 +776,8 @@ void WebView::OnInitialFrameRendered()
 {
   mWebEngine.FrameRenderedSignal().Disconnect(this, &WebView::OnInitialFrameRendered);
 
-  Texture           texture        = Dali::Texture::New(*mWebEngine.GetNativeImageSource());
-  const std::string nativeImageUrl = Dali::Toolkit::TextureManager::AddTexture(texture);
-  mVisual                          = Toolkit::VisualFactory::Get().CreateVisual({{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE}, {Toolkit::ImageVisual::Property::URL, nativeImageUrl}});
+  Dali::Toolkit::ImageUrl nativeImageUrl = Dali::Toolkit::Image::GenerateUrl(mWebEngine.GetNativeImageSource());
+  mVisual                                = Toolkit::VisualFactory::Get().CreateVisual({{Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE}, {Toolkit::ImageVisual::Property::URL, nativeImageUrl.GetUrl()}});
 
   if(mVisual)
   {
