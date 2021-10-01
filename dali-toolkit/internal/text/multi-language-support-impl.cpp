@@ -228,7 +228,8 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
       // Check if whether is right to left markup and Keeps true if the previous value was true.
       currentScriptRun.isRightToLeft = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftMark(character);
 
-      if(TextAbstraction::EMOJI == currentScriptRun.script)
+      // ZWJ, ZWNJ between emojis should be treated as EMOJI.
+      if(TextAbstraction::EMOJI == currentScriptRun.script && !(TextAbstraction::IsZeroWidthJoiner(character) || TextAbstraction::IsZeroWidthNonJoiner(character)))
       {
         // Emojis doesn't mix well with characters common to all scripts. Insert the emoji run.
         scripts.Insert(scripts.Begin() + scriptIndex, currentScriptRun);
@@ -444,7 +445,8 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
   Vector<ScriptRun>::ConstIterator scriptRunEndIt          = scripts.End();
   bool                             isNewParagraphCharacter = false;
 
-  bool isPreviousEmojiScript = false;
+  bool   isPreviousEmojiScript = false;
+  FontId previousEmojiFontId   = 0u;
 
   CharacterIndex lastCharacter = startIndex + numberOfCharacters;
   for(Length index = startIndex; index < lastCharacter; ++index)
@@ -533,6 +535,16 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
       currentFontRun.fontId                          = fontId;
       currentFontRun.isItalicRequired                = false;
       currentFontRun.isBoldRequired                  = false;
+    }
+
+    // ZWJ, ZWNJ between emojis should use the previous emoji font.
+    if(isEmojiScript && (TextAbstraction::IsZeroWidthJoiner(character) || TextAbstraction::IsZeroWidthNonJoiner(character)))
+    {
+      if(0u != previousEmojiFontId)
+      {
+        fontId      = previousEmojiFontId;
+        isValidFont = true;
+      }
     }
 
     // If the given font is not valid, it means either:
@@ -646,6 +658,15 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
         } // !isValidFont (3)
       }   // !isValidFont (2)
     }     // !isValidFont (1)
+
+    // Store the font id when the first character is an emoji.
+    if(isEmojiScript && !isPreviousEmojiScript)
+    {
+      if(0u != fontId)
+      {
+        previousEmojiFontId = fontId;
+      }
+    }
 
 #ifdef DEBUG_ENABLED
     {

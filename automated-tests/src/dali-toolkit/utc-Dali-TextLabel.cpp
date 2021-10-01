@@ -836,6 +836,13 @@ int UtcDaliToolkitTextLabelEmojisP(void)
   application.SendNotification();
   application.Render();
 
+  // EMOJI + ZWJ + EMOJI case for coverage.
+  const std::string emojiWithZWJ = "&#x1f469;&#x200d;&#x1f52c;";
+  label.SetProperty( TextLabel::Property::TEXT, emojiWithZWJ );
+
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 
