@@ -122,6 +122,9 @@ lowp vec4 convertBorderlineColor(lowp vec4 textureColor)
   {
     // potential is inside borderline range.
     borderlineOpacity = smoothstep(gMinInlinePotential, gMaxInlinePotential, potential);
+
+    // Muliply borderlineWidth to resolve very thin borderline
+    borderlineOpacity *= min(1.0, borderlineWidth);
   }
 
   lowp vec3  borderlineColorRGB   = borderlineColor.rgb * uActorColor.rgb;
