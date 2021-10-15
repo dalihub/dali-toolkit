@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ TextureSet ImageAtlasManager::Add(Vector4&             textureRect,
   }
   size = dimensions;
 
-  unsigned int i = 0;
+  uint32_t i = 0;
   for(AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)
   {
     if(GetImplementation(*iter).Upload(textureRect, url, size, fittingMode, orientationCorrection, atlasUploadObserver))
@@ -99,6 +99,34 @@ TextureSet ImageAtlasManager::Add(Vector4&             textureRect,
   return mTextureSetList.back();
 }
 
+TextureSet ImageAtlasManager::Add(Vector4&                  textureRect,
+                                  const EncodedImageBuffer& encodedImageBuffer,
+                                  const ImageDimensions&    size,
+                                  FittingMode::Type         fittingMode,
+                                  bool                      orientationCorrection,
+                                  AtlasUploadObserver*      atlasUploadObserver)
+{
+  // big image, atlasing is not applied
+  if(static_cast<uint32_t>(size.GetWidth()) * static_cast<uint32_t>(size.GetHeight()) > MAX_ITEM_AREA || size.GetWidth() > DEFAULT_ATLAS_SIZE || size.GetHeight() > DEFAULT_ATLAS_SIZE)
+  {
+    return TextureSet();
+  }
+
+  uint32_t i = 0;
+  for(AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)
+  {
+    if(GetImplementation(*iter).Upload(textureRect, encodedImageBuffer, size, fittingMode, orientationCorrection, atlasUploadObserver))
+    {
+      return mTextureSetList[i];
+    }
+    i++;
+  }
+
+  CreateNewAtlas();
+  GetImplementation(mAtlasList.back()).Upload(textureRect, encodedImageBuffer, size, fittingMode, orientationCorrection, atlasUploadObserver);
+  return mTextureSetList.back();
+}
+
 TextureSet ImageAtlasManager::Add(Vector4&  textureRect,
                                   PixelData pixelData)
 {
@@ -108,7 +136,7 @@ TextureSet ImageAtlasManager::Add(Vector4&  textureRect,
     return TextureSet();
   }
 
-  unsigned int i = 0;
+  uint32_t i = 0;
   for(AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)
   {
     if((*iter).Upload(textureRect, pixelData))
@@ -125,7 +153,7 @@ TextureSet ImageAtlasManager::Add(Vector4&  textureRect,
 
 void ImageAtlasManager::Remove(TextureSet textureSet, const Vector4& textureRect)
 {
-  unsigned int i = 0;
+  uint32_t i = 0;
   for(TextureSetContainer::iterator iter = mTextureSetList.begin(); iter != mTextureSetList.end(); ++iter)
   {
     if((*iter) == textureSet)

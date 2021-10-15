@@ -784,9 +784,25 @@ int UtcDaliImageViewAsyncLoadingEncodedBufferWithAtlasing(void)
   Property::Map imageMap;
 
   imageMap[ImageVisual::Property::URL]            = url.GetUrl();
+  imageMap[ImageVisual::Property::DESIRED_HEIGHT] = 600;
+  imageMap[ImageVisual::Property::DESIRED_WIDTH]  = 600;
+  imageMap[ImageVisual::Property::ATLASING]       = true;
+
+  // No atlasing with big image
+  ImageView imageView_bigdesired = ImageView::New();
+  imageView_bigdesired.SetProperty(ImageView::Property::IMAGE, imageMap);
+  imageView_bigdesired.SetProperty(Toolkit::Control::Property::PADDING, Extents(10u, 10u, 10u, 10u));
+
+  imageMap[ImageVisual::Property::DESIRED_HEIGHT] = 0;
+  imageMap[ImageVisual::Property::DESIRED_WIDTH]  = 0;
+
+  // No atlasing with zero desired size
+  ImageView imageView_nodesired = ImageView::New();
+  imageView_nodesired.SetProperty(ImageView::Property::IMAGE, imageMap);
+  imageView_nodesired.SetProperty(Toolkit::Control::Property::PADDING, Extents(10u, 10u, 10u, 10u));
+
   imageMap[ImageVisual::Property::DESIRED_HEIGHT] = 34;
   imageMap[ImageVisual::Property::DESIRED_WIDTH]  = 34;
-  imageMap[ImageVisual::Property::ATLASING]       = true;
 
   ImageView imageView = ImageView::New();
   imageView.SetProperty(ImageView::Property::IMAGE, imageMap);
@@ -794,10 +810,15 @@ int UtcDaliImageViewAsyncLoadingEncodedBufferWithAtlasing(void)
 
   // By default, Aysnc loading is used
   // loading is not started if the actor is offScene
-
   application.GetScene().Add(imageView);
+  application.GetScene().Add(imageView_bigdesired);
+  application.GetScene().Add(imageView_nodesired);
   application.SendNotification();
   application.Render(16);
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+
   application.Render(16);
   application.SendNotification();
 
@@ -848,6 +869,7 @@ int UtcDaliImageViewSyncLoadingEncodedBuffer(void)
     // Sync loading is used
     Property::Map syncLoadingMap;
     syncLoadingMap["url"]                = url.GetUrl();
+    syncLoadingMap["alphaMaskUrl"]       = gImage_34_RGBA;
     syncLoadingMap["desiredHeight"]      = 34;
     syncLoadingMap["desiredWidth"]       = 34;
     syncLoadingMap["synchronousLoading"] = true;
