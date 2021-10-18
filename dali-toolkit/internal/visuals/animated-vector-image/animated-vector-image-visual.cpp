@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-signals-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
@@ -442,15 +443,6 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
       {
         mAnimationData.currentFrame = frameNumber;
         mAnimationData.resendFlag |= VectorAnimationTask::RESEND_CURRENT_FRAME;
-      }
-      break;
-    }
-    case DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY:
-    {
-      const Property::Map* map = attributes.GetMap();
-      if(map)
-      {
-        DoSetProperties(*map);
       }
       break;
     }

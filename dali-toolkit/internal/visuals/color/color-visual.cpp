@@ -23,7 +23,6 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/color-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -158,23 +157,6 @@ void ColorVisual::OnSetTransform()
   if(mImpl->mRenderer)
   {
     mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-  }
-}
-
-void ColorVisual::OnDoAction(const Property::Index actionId, const Property::Value& attributes)
-{
-  // Check if action is valid for this visual type and perform action if possible
-  switch(actionId)
-  {
-    case DevelColorVisual::Action::UPDATE_PROPERTY:
-    {
-      const Property::Map* map = attributes.GetMap();
-      if(map)
-      {
-        DoSetProperties(*map);
-      }
-      break;
-    }
   }
 }
 

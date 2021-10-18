@@ -27,6 +27,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-signals-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
@@ -707,7 +708,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
 
   attributes.Clear();
   attributes.Add( DevelImageVisual::Property::PLAY_RANGE, array );
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   application.SendNotification();
   application.Render();
@@ -746,7 +747,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
 
   attributes.Clear();
   attributes.Add( DevelImageVisual::Property::PLAY_RANGE, array );
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   application.SendNotification();
   application.Render();
@@ -825,7 +826,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
 
   attributes.Clear();
   attributes.Add( DevelImageVisual::Property::PLAY_RANGE, array );
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   application.SendNotification();
   application.Render();
@@ -849,7 +850,7 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
 
   attributes.Clear();
   attributes.Add( DevelImageVisual::Property::PLAY_RANGE, array );
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   application.SendNotification();
   application.Render();
@@ -956,7 +957,7 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 
   Property::Map attributes;
   attributes.Add( DevelImageVisual::Property::PLAY_RANGE, array );
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 3 );
 
@@ -979,7 +980,7 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   array.PushBack( 4 );
 
   attributes.Add( DevelImageVisual::Property::PLAY_RANGE, array );
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   attributes.Clear();
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
@@ -1074,7 +1075,7 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   attributes.Add( DevelImageVisual::Property::PLAY_RANGE, playRange );
   attributes.Add( DevelImageVisual::Property::LOOP_COUNT, 5 );
 
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   application.SendNotification();
   application.Render();
@@ -1100,7 +1101,7 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
 
   attributes.Add( DevelImageVisual::Property::PLAY_RANGE, playRange );
 
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   application.SendNotification();
   application.Render();
@@ -1125,7 +1126,7 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
 
   attributes.Add( DevelImageVisual::Property::LOOP_COUNT, 10 );
 
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   application.SendNotification();
   application.Render();
@@ -1176,7 +1177,7 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   // Change stop behavior
   attributes.Add( DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::LAST_FRAME );
 
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   attributes.Clear();
 
@@ -1201,7 +1202,7 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   attributes.Add( DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::CURRENT_FRAME );
   attributes.Add( DevelImageVisual::Property::LOOP_COUNT, -1 );
 
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   attributes.Clear();
 
@@ -1271,7 +1272,7 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   // Change stop behavior
   attributes.Add( DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::CURRENT_FRAME );
 
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   // Play again
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
@@ -1289,7 +1290,7 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   // Change looping mode
   attributes.Add( DevelImageVisual::Property::LOOPING_MODE, DevelImageVisual::LoopingMode::RESTART );
 
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   // Play again
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
@@ -1418,8 +1419,8 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
   Property::Map attributes;
   attributes.Add( DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::LAST_FRAME );
 
-  DevelControl::DoAction( actor1, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
-  DevelControl::DoAction( actor2, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor1, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor2, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   DevelControl::DoAction( actor1, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, Property::Map() );
 

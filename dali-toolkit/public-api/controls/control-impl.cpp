@@ -37,7 +37,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
-#include <dali-toolkit/devel-api/visuals/color-visual-actions-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -133,7 +133,7 @@ void Control::SetBackgroundColor(const Vector4& color)
   if(visual && visual.GetType() == Toolkit::Visual::COLOR)
   {
     // Update background color only
-    mImpl->DoAction(Toolkit::Control::Property::BACKGROUND, DevelColorVisual::Action::UPDATE_PROPERTY, map);
+    mImpl->DoAction(Toolkit::Control::Property::BACKGROUND, DevelVisual::Action::UPDATE_PROPERTY, map);
     return;
   }
 
