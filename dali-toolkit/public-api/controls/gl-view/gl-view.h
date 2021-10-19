@@ -165,7 +165,7 @@ public:
    * <b>You can't call Dali APIs in your callbacks because it is invoked in GlView's own render thread.</b>
    * And this must be called before adding GlView to the scene.
    */
-  void RegisterGlCallback(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback);
+  void RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback);
 
   /**
    * @brief Sets the ResizeCallback of the GlView.

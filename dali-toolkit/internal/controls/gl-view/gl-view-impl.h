@@ -55,9 +55,9 @@ public:
   GlView(Dali::Toolkit::GlView::ColorFormat colorFormat);
 
   /**
-   * @copydoc Dali::Toolkit::GlView::RegisterGlCallback()
+   * @copydoc Dali::Toolkit::GlView::RegisterGlCallbacks()
    */
-  void RegisterGlCallback(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback);
+  void RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback);
 
   /**
    * @copydoc Dali::Toolkit::GlView::SetResizeCallback()
