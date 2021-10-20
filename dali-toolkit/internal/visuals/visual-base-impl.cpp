@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/helpers/property-helper.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -423,6 +424,20 @@ void Visual::Base::GetNaturalSize(Vector2& naturalSize)
 void Visual::Base::DoAction(const Property::Index actionId, const Property::Value attributes)
 {
   OnDoAction(actionId, attributes);
+
+  // Check if action is valid for this visual type and perform action if possible
+  switch(actionId)
+  {
+    case DevelVisual::Action::UPDATE_PROPERTY:
+    {
+      const Property::Map* map = attributes.GetMap();
+      if(map)
+      {
+        SetProperties(*map);
+      }
+      break;
+    }
+  }
 }
 
 void Visual::Base::SetDepthIndex(int index)

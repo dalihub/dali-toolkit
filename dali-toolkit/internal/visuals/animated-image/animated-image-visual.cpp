@@ -187,9 +187,9 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mUrlIndex(0),
   mFrameCount(0),
   mImageSize(),
+  mActionStatus(DevelAnimatedImageVisual::Action::PLAY),
   mWrapModeU(WrapMode::DEFAULT),
   mWrapModeV(WrapMode::DEFAULT),
-  mActionStatus(DevelAnimatedImageVisual::Action::PLAY),
   mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mStartFirstFrame(false),
   mIsJumpTo(false)

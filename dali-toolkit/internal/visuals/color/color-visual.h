@@ -104,11 +104,6 @@ protected:
   void OnSetTransform() override;
 
   /**
-   * @copydoc Visual::Base::OnDoAction
-   */
-  void OnDoAction(const Property::Index actionId, const Property::Value& attributes) override;
-
-  /**
    * @copydoc Visual::Base::UpdateShader
    */
   void UpdateShader() override;

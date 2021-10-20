@@ -22,7 +22,6 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/arc-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -185,23 +184,6 @@ void ArcVisual::OnSetTransform()
   if(mImpl->mRenderer)
   {
     mImpl->mRenderer.SetProperty(mRadiusIndex, mRadius);
-  }
-}
-
-void ArcVisual::OnDoAction(const Property::Index actionId, const Property::Value& attributes)
-{
-  // Check if action is valid for this visual type and perform action if possible
-  switch(actionId)
-  {
-    case DevelArcVisual::Action::UPDATE_PROPERTY:
-    {
-      const Property::Map* map = attributes.GetMap();
-      if(map)
-      {
-        DoSetProperties(*map);
-      }
-      break;
-    }
   }
 }
 
