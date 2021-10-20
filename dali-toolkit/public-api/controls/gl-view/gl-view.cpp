@@ -51,9 +51,9 @@ GlView GlView::DownCast(BaseHandle handle)
   return Control::DownCast<GlView, Internal::GlView>(handle);
 }
 
-void GlView::RegisterGlCallback(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
+void GlView::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
 {
-  Dali::Toolkit::GetImpl(*this).RegisterGlCallback(initCallback, renderFrameCallback, terminateCallback);
+  Dali::Toolkit::GetImpl(*this).RegisterGlCallbacks(initCallback, renderFrameCallback, terminateCallback);
 }
 
 void GlView::SetResizeCallback(CallbackBase* resizeCallback)

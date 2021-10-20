@@ -72,7 +72,7 @@ GlViewRenderThread::GlViewRenderThread(Dali::NativeImageSourceQueuePtr queue)
   }
 }
 
-void GlViewRenderThread::RegisterGlCallback(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
+void GlViewRenderThread::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
 {
   if(!mGlInitCallback && !mGlRenderFrameCallback && !mGlTerminateCallback)
   {
