@@ -718,46 +718,6 @@ ScrollView::~ScrollView()
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 }
 
-AlphaFunction ScrollView::GetScrollSnapAlphaFunction() const
-{
-  return mSnapAlphaFunction;
-}
-
-void ScrollView::SetScrollSnapAlphaFunction(AlphaFunction alpha)
-{
-  mSnapAlphaFunction = alpha;
-}
-
-AlphaFunction ScrollView::GetScrollFlickAlphaFunction() const
-{
-  return mFlickAlphaFunction;
-}
-
-void ScrollView::SetScrollFlickAlphaFunction(AlphaFunction alpha)
-{
-  mFlickAlphaFunction = alpha;
-}
-
-float ScrollView::GetScrollSnapDuration() const
-{
-  return mSnapDuration;
-}
-
-void ScrollView::SetScrollSnapDuration(float time)
-{
-  mSnapDuration = time;
-}
-
-float ScrollView::GetScrollFlickDuration() const
-{
-  return mFlickDuration;
-}
-
-void ScrollView::SetScrollFlickDuration(float time)
-{
-  mFlickDuration = time;
-}
-
 void ScrollView::ApplyEffect(Toolkit::ScrollViewEffect effect)
 {
   Dali::Toolkit::ScrollView self = Dali::Toolkit::ScrollView::DownCast(Self());
@@ -828,16 +788,6 @@ void ScrollView::ApplyConstraintToChildren(Constraint constraint)
 void ScrollView::RemoveConstraintsFromChildren()
 {
   RemoveConstraintsFromBoundActors();
-}
-
-const RulerPtr ScrollView::GetRulerX() const
-{
-  return mRulerX;
-}
-
-const RulerPtr ScrollView::GetRulerY() const
-{
-  return mRulerY;
 }
 
 void ScrollView::SetRulerX(RulerPtr ruler)
@@ -953,11 +903,6 @@ void ScrollView::UpdatePropertyDomain()
   }
 }
 
-bool ScrollView::GetScrollSensitive()
-{
-  return mSensitive;
-}
-
 void ScrollView::SetScrollSensitive(bool sensitive)
 {
   Actor              self = Self();
@@ -998,29 +943,9 @@ void ScrollView::SetMaxOvershoot(float overshootX, float overshootY)
   mConstraints.UpdateMainInternalConstraint(*this);
 }
 
-void ScrollView::SetSnapOvershootAlphaFunction(AlphaFunction alpha)
-{
-  mSnapOvershootAlphaFunction = alpha;
-}
-
-float ScrollView::GetSnapOvershootDuration()
-{
-  return mSnapOvershootDuration;
-}
-
-void ScrollView::SetSnapOvershootDuration(float duration)
-{
-  mSnapOvershootDuration = duration;
-}
-
 bool ScrollView::GetActorAutoSnap()
 {
   return mActorAutoSnapEnabled;
-}
-
-void ScrollView::SetActorAutoSnap(bool enable)
-{
-  mActorAutoSnapEnabled = enable;
 }
 
 void ScrollView::SetAutoResize(bool enable)
@@ -1029,41 +954,16 @@ void ScrollView::SetAutoResize(bool enable)
   // TODO: This needs a lot of issues to be addressed before working.
 }
 
-bool ScrollView::GetWrapMode() const
-{
-  return mWrapMode;
-}
-
 void ScrollView::SetWrapMode(bool enable)
 {
   mWrapMode = enable;
   Self().SetProperty(Toolkit::ScrollView::Property::WRAP, enable);
 }
 
-int ScrollView::GetScrollUpdateDistance() const
-{
-  return mScrollUpdateDistance;
-}
-
-void ScrollView::SetScrollUpdateDistance(int distance)
-{
-  mScrollUpdateDistance = distance;
-}
-
-bool ScrollView::GetAxisAutoLock() const
-{
-  return mAxisAutoLock;
-}
-
 void ScrollView::SetAxisAutoLock(bool enable)
 {
   mAxisAutoLock = enable;
   mConstraints.UpdateMainInternalConstraint(*this);
-}
-
-float ScrollView::GetAxisAutoLockGradient() const
-{
-  return mAxisAutoLockGradient;
 }
 
 void ScrollView::SetAxisAutoLockGradient(float gradient)
@@ -1073,65 +973,10 @@ void ScrollView::SetAxisAutoLockGradient(float gradient)
   mConstraints.UpdateMainInternalConstraint(*this);
 }
 
-float ScrollView::GetFrictionCoefficient() const
-{
-  return mFrictionCoefficient;
-}
-
 void ScrollView::SetFrictionCoefficient(float friction)
 {
   DALI_ASSERT_DEBUG(friction > 0.0f);
   mFrictionCoefficient = friction;
-}
-
-float ScrollView::GetFlickSpeedCoefficient() const
-{
-  return mFlickSpeedCoefficient;
-}
-
-void ScrollView::SetFlickSpeedCoefficient(float speed)
-{
-  mFlickSpeedCoefficient = speed;
-}
-
-Vector2 ScrollView::GetMinimumDistanceForFlick() const
-{
-  return mMinFlickDistance;
-}
-
-void ScrollView::SetMinimumDistanceForFlick(const Vector2& distance)
-{
-  mMinFlickDistance = distance;
-}
-
-float ScrollView::GetMinimumSpeedForFlick() const
-{
-  return mFlickSpeedThreshold;
-}
-
-void ScrollView::SetMinimumSpeedForFlick(float speed)
-{
-  mFlickSpeedThreshold = speed;
-}
-
-float ScrollView::GetMaxFlickSpeed() const
-{
-  return mMaxFlickSpeed;
-}
-
-void ScrollView::SetMaxFlickSpeed(float speed)
-{
-  mMaxFlickSpeed = speed;
-}
-
-void ScrollView::SetWheelScrollDistanceStep(Vector2 step)
-{
-  mWheelScrollDistanceStep = step;
-}
-
-Vector2 ScrollView::GetWheelScrollDistanceStep() const
-{
-  return mWheelScrollDistanceStep;
 }
 
 unsigned int ScrollView::GetCurrentPage() const
