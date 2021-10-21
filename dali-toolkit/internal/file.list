@@ -92,6 +92,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.cpp
    ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-effect-impl.cpp
    ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-impl.cpp
+   ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-impl-constraints.cpp
    ${toolkit_src_dir}/controls/scrollable/scroll-view/scroll-view-page-path-effect-impl.cpp
    ${toolkit_src_dir}/controls/scene3d-view/scene3d-view-impl.cpp
    ${toolkit_src_dir}/controls/scene3d-view/gltf-loader.cpp

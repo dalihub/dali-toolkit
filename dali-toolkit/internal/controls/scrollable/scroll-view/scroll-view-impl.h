@@ -30,6 +30,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl-constraints.h>
 
 namespace Dali
 {
@@ -765,26 +766,6 @@ private:
    */
   void WrapPosition(Vector2& position) const;
 
-  /**
-   * Updates the main internal scroll constraints with new ruler and domain
-   * values
-   */
-  void UpdateMainInternalConstraint();
-
-  /**
-   * Enables/disables the overshoot constraints
-   *
-   * @param[in] enabled whether to enable or disable the overshoot constraints
-   */
-  void SetOvershootConstraintsEnabled(bool enabled);
-
-  /**
-   * Sets internal constraints for this ScrollView.
-   * Many of these internal constraints are based on properties within
-   * ScrollView.
-   */
-  void SetInternalConstraints();
-
 protected:
   struct AccessibleImpl : public Scrollable::AccessibleImpl
   {
@@ -865,6 +846,8 @@ private:
   ScrollView& operator=(const ScrollView& rhs);
 
 private:
+  ScrollViewConstraints mConstraints;
+
   unsigned long mTouchDownTime; ///< The touch down time
 
   int     mGestureStackDepth; ///< How many gestures are currently occuring.
@@ -922,17 +905,6 @@ private:
 
   Vector2 mWheelScrollDistanceStep; ///< The step of scroll distance in actor coordinates in X and Y axes for each wheel event received.
 
-  //ScrollInternalConstraintsPtr mScrollInternalConstraints;
-  Constraint mScrollMainInternalPrePositionConstraint;
-  Constraint mScrollMainInternalPositionConstraint;
-  Constraint mScrollMainInternalOvershootXConstraint;
-  Constraint mScrollMainInternalOvershootYConstraint;
-  Constraint mScrollMainInternalDeltaConstraint;
-  Constraint mScrollMainInternalFinalConstraint;
-  Constraint mScrollMainInternalRelativeConstraint;
-  Constraint mScrollMainInternalDomainConstraint;
-  Constraint mScrollMainInternalPrePositionMaxConstraint;
-
   ScrollOvershootIndicatorPtr    mOvershootIndicator;
   WeakHandle<Toolkit::ScrollBar> mScrollBar;
 
@@ -953,7 +925,20 @@ private:
   bool mCanScrollHorizontal : 1;        ///< Local value of our property to check against
   bool mCanScrollVertical : 1;          ///< Local value of our property to check against
   bool mTransientScrollBar : 1;         ///< True if scroll-bar should be automatically show/hidden during/after panning
+
+  friend ScrollViewConstraints;
 };
+
+/**
+ * Returns whether to lock scrolling to a particular axis
+ *
+ * @param[in] panDelta Distance panned since gesture started
+ * @param[in] currentLockAxis The current lock axis value
+ * @param[in] lockGradient How quickly to lock to a particular axis
+ *
+ * @return The new axis lock state
+ */
+ScrollView::LockAxis GetLockAxis(const Vector2& panDelta, ScrollView::LockAxis currentLockAxis, float lockGradient);
 
 } // namespace Internal
 
