@@ -35,11 +35,7 @@
 #include <dali-toolkit/internal/text/text-selectable-control-interface.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
-namespace Dali
-{
-namespace Toolkit
-{
-namespace Text
+namespace Dali::Toolkit::Text
 {
 class Controller;
 class ControlInterface;
@@ -170,7 +166,10 @@ public: // Constructor.
    *
    * @return A pointer to a new Controller.
    */
-  static ControllerPtr New();
+  static ControllerPtr New()
+  {
+    return ControllerPtr(new Controller());
+  }
 
   /**
    * @brief Create a new instance of a Controller.
@@ -179,7 +178,10 @@ public: // Constructor.
    *
    * @return A pointer to a new Controller.
    */
-  static ControllerPtr New(ControlInterface* controlInterface);
+  static ControllerPtr New(ControlInterface* controlInterface)
+  {
+    return ControllerPtr(new Controller(controlInterface));
+  }
 
   /**
    * @brief Create a new instance of a Controller.
@@ -194,7 +196,13 @@ public: // Constructor.
   static ControllerPtr New(ControlInterface*           controlInterface,
                            EditableControlInterface*   editableControlInterface,
                            SelectableControlInterface* selectableControlInterface,
-                           AnchorControlInterface*     anchorControlInterface);
+                           AnchorControlInterface*     anchorControlInterface)
+  {
+    return ControllerPtr(new Controller(controlInterface,
+                                        editableControlInterface,
+                                        selectableControlInterface,
+                                        anchorControlInterface));
+  }
 
 public: // Configure the text controller.
   /**
@@ -1897,12 +1905,18 @@ private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
    */
-  Controller();
+  Controller()
+  : Controller(nullptr, nullptr, nullptr, nullptr)
+  {
+  }
 
   /**
    * @brief Private constructor.
    */
-  Controller(ControlInterface* controlInterface);
+  Controller(ControlInterface* controlInterface)
+  : Controller(controlInterface, nullptr, nullptr, nullptr)
+  {
+  }
 
   /**
    * @brief Private constructor.
@@ -1912,11 +1926,8 @@ private: // Private contructors & copy operator.
              SelectableControlInterface* selectableControlInterface,
              AnchorControlInterface*     anchorControlInterface);
 
-  // Undefined
-  Controller(const Controller& handle);
-
-  // Undefined
-  Controller& operator=(const Controller& handle);
+  Controller(const Controller& handle) = delete;
+  Controller& operator=(const Controller& handle) = delete;
 
 protected: // Destructor.
   /**
@@ -1937,10 +1948,6 @@ private:
   Impl* mImpl;
 };
 
-} // namespace Text
-
-} // namespace Toolkit
-
-} // namespace Dali
+} // namespace Dali::Toolkit::Text
 
 #endif // DALI_TOOLKIT_TEXT_CONTROLLER_H

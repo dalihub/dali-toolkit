@@ -46,48 +46,76 @@ constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const std::string EMPTY_STRING("");
 
-int ConvertPixelToPint(float pixel)
+template<typename Type>
+void EnsureCreated(Type*& object)
+{
+  if(!object)
+  {
+    object = new Type();
+  }
+}
+
+template<typename Type>
+void EnsureCreated(std::unique_ptr<Type>& object)
+{
+  if(!object)
+  {
+    object = std::unique_ptr<Type>(new Type());
+  }
+}
+
+template<typename Type, typename Arg1>
+void EnsureCreated(Type*& object, Arg1 arg1)
+{
+  if(!object)
+  {
+    object = new Type(arg1);
+  }
+}
+
+template<typename Type, typename Arg1, typename Arg2>
+void EnsureCreated(Type*& object, Arg1 arg1, Arg2 arg2)
+{
+  if(!object)
+  {
+    object = new Type(arg1, arg2);
+  }
+}
+
+float GetDpi()
 {
   unsigned int                      horizontalDpi = 0u;
   unsigned int                      verticalDpi   = 0u;
   Dali::TextAbstraction::FontClient fontClient    = Dali::TextAbstraction::FontClient::Get();
   fontClient.GetDpi(horizontalDpi, verticalDpi);
+  return static_cast<float>(horizontalDpi);
+}
 
-  return (pixel * 72.f) / static_cast<float>(horizontalDpi);
+float ConvertPixelToPoint(float pixel)
+{
+  return pixel * 72.0f / GetDpi();
+}
+
+float ConvertPointToPixel(float point)
+{
+  // Pixel size = Point size * DPI / 72.f
+  return point * GetDpi() / 72.0f;
+}
+
+void UpdateCursorPosition(Dali::Toolkit::Text::EventData* eventData)
+{
+  if(eventData && Dali::Toolkit::Text::EventData::IsEditingState(eventData->mState))
+  {
+    // Update the cursor position if it's in editing mode
+    eventData->mDecoratorUpdated     = true;
+    eventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font size is updated.
+  }
 }
 
 } // namespace
 
-namespace Dali
+namespace Dali::Toolkit::Text
 {
-namespace Toolkit
-{
-namespace Text
-{
-// public : Constructor.
-
-ControllerPtr Controller::New()
-{
-  return ControllerPtr(new Controller());
-}
-
-ControllerPtr Controller::New(ControlInterface* controlInterface)
-{
-  return ControllerPtr(new Controller(controlInterface));
-}
-
-ControllerPtr Controller::New(ControlInterface*           controlInterface,
-                              EditableControlInterface*   editableControlInterface,
-                              SelectableControlInterface* selectableControlInterface,
-                              AnchorControlInterface*     anchorControlInterface)
-{
-  return ControllerPtr(new Controller(controlInterface,
-                                      editableControlInterface,
-                                      selectableControlInterface,
-                                      anchorControlInterface));
-}
-
-// public : Configure the text controller.
 
 void Controller::EnableTextInput(DecoratorPtr decorator, InputMethodContext& inputMethodContext)
 {
@@ -100,10 +128,7 @@ void Controller::EnableTextInput(DecoratorPtr decorator, InputMethodContext& inp
     return;
   }
 
-  if(NULL == mImpl->mEventData)
-  {
-    mImpl->mEventData = new EventData(decorator, inputMethodContext);
-  }
+  EnsureCreated(mImpl->mEventData, decorator, inputMethodContext);
 }
 
 void Controller::SetGlyphType(TextAbstraction::GlyphType glyphType)
@@ -147,24 +172,20 @@ void Controller::SetAutoScrollEnabled(bool enable)
 
   if(mImpl->mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX)
   {
+    mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending |
+                                                            LAYOUT |
+                                                            ALIGN |
+                                                            UPDATE_LAYOUT_SIZE |
+                                                            REORDER);
+
     if(enable)
     {
       DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled for SINGLE_LINE_BOX\n");
-      mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending |
-                                                              LAYOUT |
-                                                              ALIGN |
-                                                              UPDATE_LAYOUT_SIZE |
-                                                              UPDATE_DIRECTION |
-                                                              REORDER);
+      mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | UPDATE_DIRECTION);
     }
     else
     {
       DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled Disabling autoscroll\n");
-      mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending |
-                                                              LAYOUT |
-                                                              ALIGN |
-                                                              UPDATE_LAYOUT_SIZE |
-                                                              REORDER);
     }
 
     mImpl->mIsAutoScrollEnabled = enable;
@@ -192,62 +213,42 @@ CharacterDirection Controller::GetAutoScrollDirection() const
 float Controller::GetAutoScrollLineAlignment() const
 {
   float offset = 0.f;
-
-  if(mImpl->mModel->mVisualModel &&
-     (0u != mImpl->mModel->mVisualModel->mLines.Count()))
+  if(mImpl->mModel->mVisualModel && (0u != mImpl->mModel->mVisualModel->mLines.Count()))
   {
     offset = (*mImpl->mModel->mVisualModel->mLines.Begin()).alignmentOffset;
   }
-
   return offset;
 }
 
 void Controller::SetHorizontalScrollEnabled(bool enable)
 {
-  if((NULL != mImpl->mEventData) &&
-     mImpl->mEventData->mDecorator)
+  if(mImpl->mEventData && mImpl->mEventData->mDecorator)
   {
     mImpl->mEventData->mDecorator->SetHorizontalScrollEnabled(enable);
   }
 }
+
 bool Controller::IsHorizontalScrollEnabled() const
 {
-  if((NULL != mImpl->mEventData) &&
-     mImpl->mEventData->mDecorator)
-  {
-    return mImpl->mEventData->mDecorator->IsHorizontalScrollEnabled();
-  }
-
-  return false;
+  return mImpl->mEventData && mImpl->mEventData->mDecorator && mImpl->mEventData->mDecorator->IsHorizontalScrollEnabled();
 }
 
 void Controller::SetVerticalScrollEnabled(bool enable)
 {
-  if((NULL != mImpl->mEventData) &&
-     mImpl->mEventData->mDecorator)
+  if(mImpl->mEventData && mImpl->mEventData->mDecorator)
   {
-    if(mImpl->mEventData->mDecorator)
-    {
-      mImpl->mEventData->mDecorator->SetVerticalScrollEnabled(enable);
-    }
+    mImpl->mEventData->mDecorator->SetVerticalScrollEnabled(enable);
   }
 }
 
 bool Controller::IsVerticalScrollEnabled() const
 {
-  if((NULL != mImpl->mEventData) &&
-     mImpl->mEventData->mDecorator)
-  {
-    return mImpl->mEventData->mDecorator->IsVerticalScrollEnabled();
-  }
-
-  return false;
+  return mImpl->mEventData && mImpl->mEventData->mDecorator && mImpl->mEventData->mDecorator->IsVerticalScrollEnabled();
 }
 
 void Controller::SetSmoothHandlePanEnabled(bool enable)
 {
-  if((NULL != mImpl->mEventData) &&
-     mImpl->mEventData->mDecorator)
+  if(mImpl->mEventData && mImpl->mEventData->mDecorator)
   {
     mImpl->mEventData->mDecorator->SetSmoothHandlePanEnabled(enable);
   }
@@ -255,13 +256,7 @@ void Controller::SetSmoothHandlePanEnabled(bool enable)
 
 bool Controller::IsSmoothHandlePanEnabled() const
 {
-  if((NULL != mImpl->mEventData) &&
-     mImpl->mEventData->mDecorator)
-  {
-    return mImpl->mEventData->mDecorator->IsSmoothHandlePanEnabled();
-  }
-
-  return false;
+  return mImpl->mEventData && mImpl->mEventData->mDecorator && mImpl->mEventData->mDecorator->IsSmoothHandlePanEnabled();
 }
 
 void Controller::SetMaximumNumberOfCharacters(Length maxCharacters)
@@ -278,12 +273,11 @@ void Controller::SetEnableCursorBlink(bool enable)
 {
   DALI_ASSERT_DEBUG(NULL != mImpl->mEventData && "TextInput disabled");
 
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mCursorBlinkEnabled = enable;
 
-    if(!enable &&
-       mImpl->mEventData->mDecorator)
+    if(!enable && mImpl->mEventData->mDecorator)
     {
       mImpl->mEventData->mDecorator->StopCursorBlink();
     }
@@ -292,12 +286,7 @@ void Controller::SetEnableCursorBlink(bool enable)
 
 bool Controller::GetEnableCursorBlink() const
 {
-  if(NULL != mImpl->mEventData)
-  {
-    return mImpl->mEventData->mCursorBlinkEnabled;
-  }
-
-  return false;
+  return mImpl->mEventData && mImpl->mEventData->mCursorBlinkEnabled;
 }
 
 void Controller::SetMultiLineEnabled(bool enable)
@@ -367,9 +356,7 @@ void Controller::SetVerticalAlignment(VerticalAlignment::Type alignment)
   {
     // Set the alignment.
     mImpl->mModel->mVerticalAlignment = alignment;
-
     mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | ALIGN);
-
     mImpl->RequestRelayout();
   }
 }
@@ -484,19 +471,7 @@ bool Controller::IsTextFitEnabled() const
 
 void Controller::SetTextFitMinSize(float minSize, FontSizeType type)
 {
-  switch(type)
-  {
-    case POINT_SIZE:
-    {
-      mImpl->mTextFitMinSize = minSize;
-      break;
-    }
-    case PIXEL_SIZE:
-    {
-      mImpl->mTextFitMinSize = ConvertPixelToPint(minSize);
-      break;
-    }
-  }
+  mImpl->mTextFitMinSize = (type == POINT_SIZE) ? minSize : ConvertPixelToPoint(minSize);
 }
 
 float Controller::GetTextFitMinSize() const
@@ -506,19 +481,7 @@ float Controller::GetTextFitMinSize() const
 
 void Controller::SetTextFitMaxSize(float maxSize, FontSizeType type)
 {
-  switch(type)
-  {
-    case POINT_SIZE:
-    {
-      mImpl->mTextFitMaxSize = maxSize;
-      break;
-    }
-    case PIXEL_SIZE:
-    {
-      mImpl->mTextFitMaxSize = ConvertPixelToPint(maxSize);
-      break;
-    }
-  }
+  mImpl->mTextFitMaxSize = (type == POINT_SIZE) ? maxSize : ConvertPixelToPoint(maxSize);
 }
 
 float Controller::GetTextFitMaxSize() const
@@ -528,19 +491,7 @@ float Controller::GetTextFitMaxSize() const
 
 void Controller::SetTextFitStepSize(float step, FontSizeType type)
 {
-  switch(type)
-  {
-    case POINT_SIZE:
-    {
-      mImpl->mTextFitStepSize = step;
-      break;
-    }
-    case PIXEL_SIZE:
-    {
-      mImpl->mTextFitStepSize = ConvertPixelToPint(step);
-      break;
-    }
-  }
+  mImpl->mTextFitStepSize = (type == POINT_SIZE) ? step : ConvertPixelToPoint(step);
 }
 
 float Controller::GetTextFitStepSize() const
@@ -607,8 +558,6 @@ bool Controller::IsGrabHandlePopupEnabled() const
 {
   return mImpl->mEventData->mGrabHandlePopupEnabled;
 }
-
-// public : Update
 
 void Controller::SetText(const std::string& text)
 {
@@ -678,28 +627,16 @@ void Controller::SendSelectionToClipboard(bool deleteAfterSending)
   mImpl->SendSelectionToClipboard(deleteAfterSending);
 }
 
-// public : Default style & Input style
-
 void Controller::SetDefaultFontFamily(const std::string& defaultFontFamily)
 {
-  if(NULL == mImpl->mFontDefaults)
-  {
-    mImpl->mFontDefaults = new FontDefaults();
-  }
+  EnsureCreated(mImpl->mFontDefaults);
 
   mImpl->mFontDefaults->mFontDescription.family = defaultFontFamily;
   DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetDefaultFontFamily %s\n", defaultFontFamily.c_str());
   mImpl->mFontDefaults->familyDefined = !defaultFontFamily.empty();
 
-  if(mImpl->mEventData)
-  {
-    // Update the cursor position if it's in editing mode
-    if(EventData::IsEditingState(mImpl->mEventData->mState))
-    {
-      mImpl->mEventData->mDecoratorUpdated     = true;
-      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font family is updated.
-    }
-  }
+  // Update the cursor position if it's in editing mode
+  UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
   ClearFontData();
@@ -709,12 +646,7 @@ void Controller::SetDefaultFontFamily(const std::string& defaultFontFamily)
 
 const std::string& Controller::GetDefaultFontFamily() const
 {
-  if(NULL != mImpl->mFontDefaults)
-  {
-    return mImpl->mFontDefaults->mFontDescription.family;
-  }
-
-  return EMPTY_STRING;
+  return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFontDescription.family : EMPTY_STRING;
 }
 
 void Controller::SetPlaceholderFontFamily(const std::string& placeholderTextFontFamily)
@@ -729,23 +661,13 @@ const std::string& Controller::GetPlaceholderFontFamily() const
 
 void Controller::SetDefaultFontWeight(FontWeight weight)
 {
-  if(NULL == mImpl->mFontDefaults)
-  {
-    mImpl->mFontDefaults = new FontDefaults();
-  }
+  EnsureCreated(mImpl->mFontDefaults);
 
   mImpl->mFontDefaults->mFontDescription.weight = weight;
   mImpl->mFontDefaults->weightDefined           = true;
 
-  if(mImpl->mEventData)
-  {
-    // Update the cursor position if it's in editing mode
-    if(EventData::IsEditingState(mImpl->mEventData->mState))
-    {
-      mImpl->mEventData->mDecoratorUpdated     = true;
-      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font weight is updated.
-    }
-  }
+  // Update the cursor position if it's in editing mode
+  UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
   ClearFontData();
@@ -755,22 +677,12 @@ void Controller::SetDefaultFontWeight(FontWeight weight)
 
 bool Controller::IsDefaultFontWeightDefined() const
 {
-  if(NULL != mImpl->mFontDefaults)
-  {
-    return mImpl->mFontDefaults->weightDefined;
-  }
-
-  return false;
+  return mImpl->mFontDefaults && mImpl->mFontDefaults->weightDefined;
 }
 
 FontWeight Controller::GetDefaultFontWeight() const
 {
-  if(NULL != mImpl->mFontDefaults)
-  {
-    return mImpl->mFontDefaults->mFontDescription.weight;
-  }
-
-  return TextAbstraction::FontWeight::NORMAL;
+  return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFontDescription.weight : TextAbstraction::FontWeight::NORMAL;
 }
 
 void Controller::SetPlaceholderTextFontWeight(FontWeight weight)
@@ -781,7 +693,6 @@ void Controller::SetPlaceholderTextFontWeight(FontWeight weight)
 bool Controller::IsPlaceholderTextFontWeightDefined() const
 {
   return PlaceholderHandler::IsPlaceholderTextFontWeightDefined(*this);
-  ;
 }
 
 FontWeight Controller::GetPlaceholderTextFontWeight() const
@@ -791,23 +702,13 @@ FontWeight Controller::GetPlaceholderTextFontWeight() const
 
 void Controller::SetDefaultFontWidth(FontWidth width)
 {
-  if(NULL == mImpl->mFontDefaults)
-  {
-    mImpl->mFontDefaults = new FontDefaults();
-  }
+  EnsureCreated(mImpl->mFontDefaults);
 
   mImpl->mFontDefaults->mFontDescription.width = width;
   mImpl->mFontDefaults->widthDefined           = true;
 
-  if(mImpl->mEventData)
-  {
-    // Update the cursor position if it's in editing mode
-    if(EventData::IsEditingState(mImpl->mEventData->mState))
-    {
-      mImpl->mEventData->mDecoratorUpdated     = true;
-      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font width is updated.
-    }
-  }
+  // Update the cursor position if it's in editing mode
+  UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
   ClearFontData();
@@ -817,22 +718,12 @@ void Controller::SetDefaultFontWidth(FontWidth width)
 
 bool Controller::IsDefaultFontWidthDefined() const
 {
-  if(NULL != mImpl->mFontDefaults)
-  {
-    return mImpl->mFontDefaults->widthDefined;
-  }
-
-  return false;
+  return mImpl->mFontDefaults && mImpl->mFontDefaults->widthDefined;
 }
 
 FontWidth Controller::GetDefaultFontWidth() const
 {
-  if(NULL != mImpl->mFontDefaults)
-  {
-    return mImpl->mFontDefaults->mFontDescription.width;
-  }
-
-  return TextAbstraction::FontWidth::NORMAL;
+  return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFontDescription.width : TextAbstraction::FontWidth::NORMAL;
 }
 
 void Controller::SetPlaceholderTextFontWidth(FontWidth width)
@@ -852,23 +743,13 @@ FontWidth Controller::GetPlaceholderTextFontWidth() const
 
 void Controller::SetDefaultFontSlant(FontSlant slant)
 {
-  if(NULL == mImpl->mFontDefaults)
-  {
-    mImpl->mFontDefaults = new FontDefaults();
-  }
+  EnsureCreated(mImpl->mFontDefaults);
 
   mImpl->mFontDefaults->mFontDescription.slant = slant;
   mImpl->mFontDefaults->slantDefined           = true;
 
-  if(mImpl->mEventData)
-  {
-    // Update the cursor position if it's in editing mode
-    if(EventData::IsEditingState(mImpl->mEventData->mState))
-    {
-      mImpl->mEventData->mDecoratorUpdated     = true;
-      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font slant is updated.
-    }
-  }
+  // Update the cursor position if it's in editing mode
+  UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
   ClearFontData();
@@ -878,21 +759,12 @@ void Controller::SetDefaultFontSlant(FontSlant slant)
 
 bool Controller::IsDefaultFontSlantDefined() const
 {
-  if(NULL != mImpl->mFontDefaults)
-  {
-    return mImpl->mFontDefaults->slantDefined;
-  }
-  return false;
+  return mImpl->mFontDefaults && mImpl->mFontDefaults->slantDefined;
 }
 
 FontSlant Controller::GetDefaultFontSlant() const
 {
-  if(NULL != mImpl->mFontDefaults)
-  {
-    return mImpl->mFontDefaults->mFontDescription.slant;
-  }
-
-  return TextAbstraction::FontSlant::NORMAL;
+  return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFontDescription.slant : TextAbstraction::FontSlant::NORMAL;
 }
 
 void Controller::SetPlaceholderTextFontSlant(FontSlant slant)
@@ -914,15 +786,8 @@ void Controller::SetFontSizeScale(float scale)
 {
   mImpl->mFontSizeScale = scale;
 
-  if(mImpl->mEventData)
-  {
-    // Update the cursor position if it's in editing mode
-    if(EventData::IsEditingState(mImpl->mEventData->mState))
-    {
-      mImpl->mEventData->mDecoratorUpdated     = true;
-      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font size is updated.
-    }
-  }
+  // Update the cursor position if it's in editing mode
+  UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
   ClearFontData();
@@ -932,52 +797,18 @@ void Controller::SetFontSizeScale(float scale)
 
 float Controller::GetFontSizeScale() const
 {
-  if(nullptr != mImpl->mFontDefaults)
-  {
-    return mImpl->mFontSizeScale;
-  }
-
-  return 1.f;
+  return mImpl->mFontDefaults ? mImpl->mFontSizeScale : 1.0f;
 }
 
 void Controller::SetDefaultFontSize(float fontSize, FontSizeType type)
 {
-  if(NULL == mImpl->mFontDefaults)
-  {
-    mImpl->mFontDefaults = new FontDefaults();
-  }
+  EnsureCreated(mImpl->mFontDefaults);
 
-  switch(type)
-  {
-    case POINT_SIZE:
-    {
-      mImpl->mFontDefaults->mDefaultPointSize = fontSize;
-      mImpl->mFontDefaults->sizeDefined       = true;
-      break;
-    }
-    case PIXEL_SIZE:
-    {
-      // Point size = Pixel size * 72.f / DPI
-      unsigned int                horizontalDpi = 0u;
-      unsigned int                verticalDpi   = 0u;
-      TextAbstraction::FontClient fontClient    = TextAbstraction::FontClient::Get();
-      fontClient.GetDpi(horizontalDpi, verticalDpi);
+  mImpl->mFontDefaults->mDefaultPointSize = (type == POINT_SIZE) ? fontSize : ConvertPixelToPoint(fontSize);
+  mImpl->mFontDefaults->sizeDefined       = true;
 
-      mImpl->mFontDefaults->mDefaultPointSize = (fontSize * 72.f) / static_cast<float>(horizontalDpi);
-      mImpl->mFontDefaults->sizeDefined       = true;
-      break;
-    }
-  }
-
-  if(mImpl->mEventData)
-  {
-    // Update the cursor position if it's in editing mode
-    if(EventData::IsEditingState(mImpl->mEventData->mState))
-    {
-      mImpl->mEventData->mDecoratorUpdated     = true;
-      mImpl->mEventData->mUpdateCursorPosition = true; // Cursor position should be updated when the font size is updated.
-    }
-  }
+  // Update the cursor position if it's in editing mode
+  UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
   ClearFontData();
@@ -987,32 +818,11 @@ void Controller::SetDefaultFontSize(float fontSize, FontSizeType type)
 
 float Controller::GetDefaultFontSize(FontSizeType type) const
 {
-  float value = 0.0f;
-  if(NULL != mImpl->mFontDefaults)
+  if(mImpl->mFontDefaults)
   {
-    switch(type)
-    {
-      case POINT_SIZE:
-      {
-        value = mImpl->mFontDefaults->mDefaultPointSize;
-        break;
-      }
-      case PIXEL_SIZE:
-      {
-        // Pixel size = Point size * DPI / 72.f
-        unsigned int                horizontalDpi = 0u;
-        unsigned int                verticalDpi   = 0u;
-        TextAbstraction::FontClient fontClient    = TextAbstraction::FontClient::Get();
-        fontClient.GetDpi(horizontalDpi, verticalDpi);
-
-        value = mImpl->mFontDefaults->mDefaultPointSize * static_cast<float>(horizontalDpi) / 72.f;
-        break;
-      }
-    }
-    return value;
+    return (type == POINT_SIZE) ? mImpl->mFontDefaults->mDefaultPointSize : ConvertPointToPixel(mImpl->mFontDefaults->mDefaultPointSize);
   }
-
-  return value;
+  return 0.0f;
 }
 
 void Controller::SetPlaceholderTextFontSize(float fontSize, FontSizeType type)
@@ -1032,11 +842,8 @@ void Controller::SetDefaultColor(const Vector4& color)
   if(!mImpl->IsShowingPlaceholderText())
   {
     mImpl->mModel->mVisualModel->SetTextColor(color);
-
     mImpl->mModel->mLogicalModel->mColorRuns.Clear();
-
     mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | COLOR);
-
     mImpl->RequestRelayout();
   }
 }
@@ -1059,7 +866,6 @@ const Vector4& Controller::GetPlaceholderTextColor() const
 void Controller::SetShadowOffset(const Vector2& shadowOffset)
 {
   mImpl->mModel->mVisualModel->SetShadowOffset(shadowOffset);
-
   mImpl->RequestRelayout();
 }
 
@@ -1071,7 +877,6 @@ const Vector2& Controller::GetShadowOffset() const
 void Controller::SetShadowColor(const Vector4& shadowColor)
 {
   mImpl->mModel->mVisualModel->SetShadowColor(shadowColor);
-
   mImpl->RequestRelayout();
 }
 
@@ -1085,7 +890,6 @@ void Controller::SetShadowBlurRadius(const float& shadowBlurRadius)
   if(fabsf(GetShadowBlurRadius() - shadowBlurRadius) > Math::MACHINE_EPSILON_1)
   {
     mImpl->mModel->mVisualModel->SetShadowBlurRadius(shadowBlurRadius);
-
     mImpl->RequestRelayout();
   }
 }
@@ -1098,7 +902,6 @@ const float& Controller::GetShadowBlurRadius() const
 void Controller::SetUnderlineColor(const Vector4& color)
 {
   mImpl->mModel->mVisualModel->SetUnderlineColor(color);
-
   mImpl->RequestRelayout();
 }
 
@@ -1110,7 +913,6 @@ const Vector4& Controller::GetUnderlineColor() const
 void Controller::SetUnderlineEnabled(bool enabled)
 {
   mImpl->mModel->mVisualModel->SetUnderlineEnabled(enabled);
-
   mImpl->RequestRelayout();
 }
 
@@ -1122,7 +924,6 @@ bool Controller::IsUnderlineEnabled() const
 void Controller::SetUnderlineHeight(float height)
 {
   mImpl->mModel->mVisualModel->SetUnderlineHeight(height);
-
   mImpl->RequestRelayout();
 }
 
@@ -1134,7 +935,6 @@ float Controller::GetUnderlineHeight() const
 void Controller::SetOutlineColor(const Vector4& color)
 {
   mImpl->mModel->mVisualModel->SetOutlineColor(color);
-
   mImpl->RequestRelayout();
 }
 
@@ -1146,7 +946,6 @@ const Vector4& Controller::GetOutlineColor() const
 void Controller::SetOutlineWidth(uint16_t width)
 {
   mImpl->mModel->mVisualModel->SetOutlineWidth(width);
-
   mImpl->RequestRelayout();
 }
 
@@ -1158,7 +957,6 @@ uint16_t Controller::GetOutlineWidth() const
 void Controller::SetBackgroundColor(const Vector4& color)
 {
   mImpl->mModel->mVisualModel->SetBackgroundColor(color);
-
   mImpl->RequestRelayout();
 }
 
@@ -1170,7 +968,6 @@ const Vector4& Controller::GetBackgroundColor() const
 void Controller::SetBackgroundEnabled(bool enabled)
 {
   mImpl->mModel->mVisualModel->SetBackgroundEnabled(enabled);
-
   mImpl->RequestRelayout();
 }
 
@@ -1181,42 +978,24 @@ bool Controller::IsBackgroundEnabled() const
 
 void Controller::SetDefaultEmbossProperties(const std::string& embossProperties)
 {
-  if(NULL == mImpl->mEmbossDefaults)
-  {
-    mImpl->mEmbossDefaults = new EmbossDefaults();
-  }
-
+  EnsureCreated(mImpl->mEmbossDefaults);
   mImpl->mEmbossDefaults->properties = embossProperties;
 }
 
 const std::string& Controller::GetDefaultEmbossProperties() const
 {
-  if(NULL != mImpl->mEmbossDefaults)
-  {
-    return mImpl->mEmbossDefaults->properties;
-  }
-
-  return EMPTY_STRING;
+  return mImpl->mEmbossDefaults ? mImpl->mEmbossDefaults->properties : EMPTY_STRING;
 }
 
 void Controller::SetDefaultOutlineProperties(const std::string& outlineProperties)
 {
-  if(NULL == mImpl->mOutlineDefaults)
-  {
-    mImpl->mOutlineDefaults = new OutlineDefaults();
-  }
-
+  EnsureCreated(mImpl->mOutlineDefaults);
   mImpl->mOutlineDefaults->properties = outlineProperties;
 }
 
 const std::string& Controller::GetDefaultOutlineProperties() const
 {
-  if(NULL != mImpl->mOutlineDefaults)
-  {
-    return mImpl->mOutlineDefaults->properties;
-  }
-
-  return EMPTY_STRING;
+  return mImpl->mOutlineDefaults ? mImpl->mOutlineDefaults->properties : EMPTY_STRING;
 }
 
 void Controller::RelayoutForNewLineSize()
@@ -1228,7 +1007,7 @@ void Controller::RelayoutForNewLineSize()
   mImpl->mOperationsPending                          = static_cast<OperationsMask>(mImpl->mOperationsPending | LAYOUT);
 
   //remove selection
-  if((mImpl->mEventData != nullptr) && (mImpl->mEventData->mState == EventData::SELECTING))
+  if(mImpl->mEventData && mImpl->mEventData->mState == EventData::SELECTING)
   {
     mImpl->ChangeState(EventData::EDITING);
   }
@@ -1274,7 +1053,7 @@ float Controller::GetDefaultLineSize() const
 
 void Controller::SetInputColor(const Vector4& color)
 {
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mInputStyle.textColor      = color;
     mImpl->mEventData->mInputStyle.isDefaultColor = false;
@@ -1318,13 +1097,8 @@ void Controller::SetInputColor(const Vector4& color)
 
 const Vector4& Controller::GetInputColor() const
 {
-  if(NULL != mImpl->mEventData)
-  {
-    return mImpl->mEventData->mInputStyle.textColor;
-  }
-
-  // Return the default text's color if there is no EventData.
-  return mImpl->mTextColor;
+  // Return event text input color if we have it, otherwise just return the default text's color
+  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.textColor : mImpl->mTextColor;
 }
 
 void Controller::SetInputFontFamily(const std::string& fontFamily)
@@ -1394,7 +1168,7 @@ float Controller::GetInputFontPointSize() const
 
 void Controller::SetInputLineSpacing(float lineSpacing)
 {
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mInputStyle.lineSpacing          = lineSpacing;
     mImpl->mEventData->mInputStyle.isLineSpacingDefined = true;
@@ -1403,17 +1177,12 @@ void Controller::SetInputLineSpacing(float lineSpacing)
 
 float Controller::GetInputLineSpacing() const
 {
-  if(NULL != mImpl->mEventData)
-  {
-    return mImpl->mEventData->mInputStyle.lineSpacing;
-  }
-
-  return 0.f;
+  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.lineSpacing : 0.0f;
 }
 
 void Controller::SetInputShadowProperties(const std::string& shadowProperties)
 {
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mInputStyle.shadowProperties = shadowProperties;
   }
@@ -1421,17 +1190,12 @@ void Controller::SetInputShadowProperties(const std::string& shadowProperties)
 
 const std::string& Controller::GetInputShadowProperties() const
 {
-  if(NULL != mImpl->mEventData)
-  {
-    return mImpl->mEventData->mInputStyle.shadowProperties;
-  }
-
-  return EMPTY_STRING;
+  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.shadowProperties : EMPTY_STRING;
 }
 
 void Controller::SetInputUnderlineProperties(const std::string& underlineProperties)
 {
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mInputStyle.underlineProperties = underlineProperties;
   }
@@ -1439,17 +1203,12 @@ void Controller::SetInputUnderlineProperties(const std::string& underlinePropert
 
 const std::string& Controller::GetInputUnderlineProperties() const
 {
-  if(NULL != mImpl->mEventData)
-  {
-    return mImpl->mEventData->mInputStyle.underlineProperties;
-  }
-
-  return EMPTY_STRING;
+  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.underlineProperties : EMPTY_STRING;
 }
 
 void Controller::SetInputEmbossProperties(const std::string& embossProperties)
 {
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mInputStyle.embossProperties = embossProperties;
   }
@@ -1457,17 +1216,12 @@ void Controller::SetInputEmbossProperties(const std::string& embossProperties)
 
 const std::string& Controller::GetInputEmbossProperties() const
 {
-  if(NULL != mImpl->mEventData)
-  {
-    return mImpl->mEventData->mInputStyle.embossProperties;
-  }
-
-  return GetDefaultEmbossProperties();
+  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.embossProperties : GetDefaultEmbossProperties();
 }
 
 void Controller::SetInputOutlineProperties(const std::string& outlineProperties)
 {
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mInputStyle.outlineProperties = outlineProperties;
   }
@@ -1475,17 +1229,12 @@ void Controller::SetInputOutlineProperties(const std::string& outlineProperties)
 
 const std::string& Controller::GetInputOutlineProperties() const
 {
-  if(NULL != mImpl->mEventData)
-  {
-    return mImpl->mEventData->mInputStyle.outlineProperties;
-  }
-
-  return GetDefaultOutlineProperties();
+  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.outlineProperties : GetDefaultOutlineProperties();
 }
 
 void Controller::SetInputModePassword(bool passwordInput)
 {
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mPasswordInput = passwordInput;
   }
@@ -1493,16 +1242,12 @@ void Controller::SetInputModePassword(bool passwordInput)
 
 bool Controller::IsInputModePassword()
 {
-  if(NULL != mImpl->mEventData)
-  {
-    return mImpl->mEventData->mPasswordInput;
-  }
-  return false;
+  return mImpl->mEventData && mImpl->mEventData->mPasswordInput;
 }
 
 void Controller::SetNoTextDoubleTapAction(NoTextTap::Action action)
 {
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mDoubleTapAction = action;
   }
@@ -1510,19 +1255,12 @@ void Controller::SetNoTextDoubleTapAction(NoTextTap::Action action)
 
 Controller::NoTextTap::Action Controller::GetNoTextDoubleTapAction() const
 {
-  NoTextTap::Action action = NoTextTap::NO_ACTION;
-
-  if(NULL != mImpl->mEventData)
-  {
-    action = mImpl->mEventData->mDoubleTapAction;
-  }
-
-  return action;
+  return mImpl->mEventData ? mImpl->mEventData->mDoubleTapAction : NoTextTap::NO_ACTION;
 }
 
 void Controller::SetNoTextLongPressAction(NoTextTap::Action action)
 {
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     mImpl->mEventData->mLongPressAction = action;
   }
@@ -1530,14 +1268,7 @@ void Controller::SetNoTextLongPressAction(NoTextTap::Action action)
 
 Controller::NoTextTap::Action Controller::GetNoTextLongPressAction() const
 {
-  NoTextTap::Action action = NoTextTap::NO_ACTION;
-
-  if(NULL != mImpl->mEventData)
-  {
-    action = mImpl->mEventData->mLongPressAction;
-  }
-
-  return action;
+  return mImpl->mEventData ? mImpl->mEventData->mLongPressAction : NoTextTap::NO_ACTION;
 }
 
 bool Controller::IsUnderlineSetByString()
@@ -1580,8 +1311,6 @@ void Controller::FontStyleSetByString(bool setByString)
   mImpl->mFontStyleSetByString = setByString;
 }
 
-// public : Queries & retrieves.
-
 Layout::Engine& Controller::GetLayoutEngine()
 {
   return mImpl->mLayoutEngine;
@@ -1615,8 +1344,7 @@ float Controller::GetHeightForWidth(float width)
 int Controller::GetLineCount(float width)
 {
   GetHeightForWidth(width);
-  int numberofLines = mImpl->mModel->GetNumberOfLines();
-  return numberofLines;
+  return mImpl->mModel->GetNumberOfLines();
 }
 
 const ModelInterface* const Controller::GetTextModel() const
@@ -1650,16 +1378,13 @@ bool Controller::GetTextScrollInfo(float& scrollPosition, float& controlHeight, 
 
 void Controller::SetHiddenInputOption(const Property::Map& options)
 {
-  if(NULL == mImpl->mHiddenInput)
-  {
-    mImpl->mHiddenInput = new HiddenText(this);
-  }
+  EnsureCreated<HiddenText, Controller*>(mImpl->mHiddenInput, this);
   mImpl->mHiddenInput->SetProperties(options);
 }
 
 void Controller::GetHiddenInputOption(Property::Map& options)
 {
-  if(NULL != mImpl->mHiddenInput)
+  if(mImpl->mHiddenInput)
   {
     mImpl->mHiddenInput->GetProperties(options);
   }
@@ -1667,16 +1392,13 @@ void Controller::GetHiddenInputOption(Property::Map& options)
 
 void Controller::SetInputFilterOption(const Property::Map& options)
 {
-  if(!mImpl->mInputFilter)
-  {
-    mImpl->mInputFilter = std::unique_ptr<InputFilter>(new InputFilter());
-  }
+  EnsureCreated(mImpl->mInputFilter);
   mImpl->mInputFilter->SetProperties(options);
 }
 
 void Controller::GetInputFilterOption(Property::Map& options)
 {
-  if(NULL != mImpl->mInputFilter)
+  if(mImpl->mInputFilter)
   {
     mImpl->mInputFilter->GetProperties(options);
   }
@@ -1757,8 +1479,6 @@ void Controller::SetEllipsisPosition(Toolkit::DevelText::EllipsisPosition::Type 
   mImpl->mModel->mVisualModel->SetEllipsisPosition(ellipsisPosition);
 }
 
-// public : Relayout.
-
 Controller::UpdateTextType Controller::Relayout(const Size& size, Dali::LayoutDirection::Type layoutDirection)
 {
   return Relayouter::Relayout(*this, size, layoutDirection);
@@ -1769,8 +1489,6 @@ void Controller::RequestRelayout()
   mImpl->RequestRelayout();
 }
 
-// public : Input style change signals.
-
 bool Controller::IsInputStyleChangedSignalsQueueEmpty()
 {
   return (NULL == mImpl->mEventData) || (0u == mImpl->mEventData->mInputStyleChangedQueue.Count());
@@ -1778,30 +1496,19 @@ bool Controller::IsInputStyleChangedSignalsQueueEmpty()
 
 void Controller::ProcessInputStyleChangedSignals()
 {
-  if(NULL == mImpl->mEventData)
+  if(mImpl->mEventData)
   {
-    // Nothing to do.
-    return;
-  }
-
-  for(Vector<InputStyle::Mask>::ConstIterator it    = mImpl->mEventData->mInputStyleChangedQueue.Begin(),
-                                              endIt = mImpl->mEventData->mInputStyleChangedQueue.End();
-      it != endIt;
-      ++it)
-  {
-    const InputStyle::Mask mask = *it;
-
-    if(NULL != mImpl->mEditableControlInterface)
+    if(mImpl->mEditableControlInterface)
     {
-      // Emit the input style changed signal.
-      mImpl->mEditableControlInterface->InputStyleChanged(mask);
+      // Emit the input style changed signal for each mask
+      std::for_each(mImpl->mEventData->mInputStyleChangedQueue.begin(),
+                    mImpl->mEventData->mInputStyleChangedQueue.end(),
+                    [&](const auto mask) { mImpl->mEditableControlInterface->InputStyleChanged(mask); } );
     }
+
+    mImpl->mEventData->mInputStyleChangedQueue.Clear();
   }
-
-  mImpl->mEventData->mInputStyleChangedQueue.Clear();
 }
-
-// public : Text-input Event Queuing.
 
 void Controller::KeyboardFocusGainEvent()
 {
@@ -1933,7 +1640,7 @@ string Controller::CutText()
 
   if(!IsEditable())
   {
-    return "";
+    return EMPTY_STRING;
   }
 
   mImpl->SendSelectionToClipboard(true); // Synchronous call to modify text
@@ -1976,8 +1683,6 @@ void Controller::PasteClipboardItemEvent()
   EventHandler::PasteClipboardItemEvent(*this);
 }
 
-// protected : Inherit from Text::Decorator::ControllerInterface.
-
 void Controller::GetTargetSize(Vector2& targetSize)
 {
   targetSize = mImpl->mModel->mVisualModel->mControlSize;
@@ -1985,7 +1690,7 @@ void Controller::GetTargetSize(Vector2& targetSize)
 
 void Controller::AddDecoration(Actor& actor, bool needsClipping)
 {
-  if(NULL != mImpl->mEditableControlInterface)
+  if(mImpl->mEditableControlInterface)
   {
     mImpl->mEditableControlInterface->AddDecoration(actor, needsClipping);
   }
@@ -2037,30 +1742,20 @@ void Controller::ScrollBy(Vector2 scroll)
 
 float Controller::GetHorizontalScrollPosition()
 {
-  if(mImpl->mEventData)
-  {
-    //scroll values are negative internally so we convert them to positive numbers
-    return -mImpl->mModel->mScrollPosition.x;
-  }
-  return 0;
+  // Scroll values are negative internally so we convert them to positive numbers
+  return mImpl->mEventData ? -mImpl->mModel->mScrollPosition.x : 0.0f;
 }
 
 float Controller::GetVerticalScrollPosition()
 {
-  if(mImpl->mEventData)
-  {
-    //scroll values are negative internally so we convert them to positive numbers
-    return -mImpl->mModel->mScrollPosition.y;
-  }
-  return 0;
+  // Scroll values are negative internally so we convert them to positive numbers
+  return mImpl->mEventData ? -mImpl->mModel->mScrollPosition.y : 0.0f;
 }
 
 void Controller::DecorationEvent(HandleType handleType, HandleState state, float x, float y)
 {
   EventHandler::DecorationEvent(*this, handleType, state, x, y);
 }
-
-// protected : Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
 
 void Controller::TextPopupButtonTouched(Dali::Toolkit::TextSelectionPopup::Buttons button)
 {
@@ -2076,8 +1771,6 @@ void Controller::DisplayTimeExpired()
   mImpl->RequestRelayout();
 }
 
-// private : Update.
-
 void Controller::InsertText(const std::string& text, Controller::InsertType type)
 {
   TextUpdater::InsertText(*this, text, type);
@@ -2088,9 +1781,7 @@ void Controller::PasteText(const std::string& stringToPaste)
   TextUpdater::PasteText(*this, stringToPaste);
 }
 
-bool Controller::RemoveText(int                  cursorOffset,
-                            int                  numberOfCharacters,
-                            UpdateInputStyleType type)
+bool Controller::RemoveText(int cursorOffset, int numberOfCharacters, UpdateInputStyleType type)
 {
   return TextUpdater::RemoveText(*this, cursorOffset, numberOfCharacters, type);
 }
@@ -2100,24 +1791,17 @@ bool Controller::RemoveSelectedText()
   return TextUpdater::RemoveSelectedText(*this);
 }
 
-void Controller::InsertTextAnchor(int            numberOfCharacters,
-                                  CharacterIndex previousCursorIndex)
+void Controller::InsertTextAnchor(int numberOfCharacters, CharacterIndex previousCursorIndex)
 {
   TextUpdater::InsertTextAnchor(*this, numberOfCharacters, previousCursorIndex);
 }
 
-void Controller::RemoveTextAnchor(int            cursorOffset,
-                                  int            numberOfCharacters,
-                                  CharacterIndex previousCursorIndex)
+void Controller::RemoveTextAnchor(int cursorOffset, int numberOfCharacters, CharacterIndex previousCursorIndex)
 {
   TextUpdater::RemoveTextAnchor(*this, cursorOffset, numberOfCharacters, previousCursorIndex);
 }
 
-// private : Relayout.
-
-bool Controller::DoRelayout(const Size&    size,
-                            OperationsMask operationsRequired,
-                            Size&          layoutSize)
+bool Controller::DoRelayout(const Size& size, OperationsMask operationsRequired, Size& layoutSize)
 {
   return Relayouter::DoRelayout(*this, size, operationsRequired, layoutSize);
 }
@@ -2126,8 +1810,6 @@ void Controller::CalculateVerticalOffset(const Size& controlSize)
 {
   Relayouter::CalculateVerticalOffset(*this, controlSize);
 }
-
-// private : Events.
 
 void Controller::ProcessModifyEvents()
 {
@@ -2224,7 +1906,7 @@ CharacterIndex Controller::GetCursorPosition()
 
 void Controller::ResetScrollPosition()
 {
-  if(NULL != mImpl->mEventData)
+  if(mImpl->mEventData)
   {
     // Reset the scroll position.
     mImpl->mModel->mScrollPosition                = Vector2::ZERO;
@@ -2252,18 +1934,6 @@ Actor Controller::CreateBackgroundActor()
   return mImpl->CreateBackgroundActor();
 }
 
-// private : Private contructors & copy operator.
-
-Controller::Controller()
-: Controller(nullptr, nullptr, nullptr, nullptr)
-{
-}
-
-Controller::Controller(ControlInterface* controlInterface)
-: Controller(controlInterface, nullptr, nullptr, nullptr)
-{
-}
-
 Controller::Controller(ControlInterface*           controlInterface,
                        EditableControlInterface*   editableControlInterface,
                        SelectableControlInterface* selectableControlInterface,
@@ -2272,17 +1942,9 @@ Controller::Controller(ControlInterface*           controlInterface,
 {
 }
 
-// The copy constructor and operator are left unimplemented.
-
-// protected : Destructor.
-
 Controller::~Controller()
 {
   delete mImpl;
 }
 
-} // namespace Text
-
-} // namespace Toolkit
-
-} // namespace Dali
+} // namespace Dali::Toolkit::Text
