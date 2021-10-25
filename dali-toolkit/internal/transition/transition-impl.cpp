@@ -121,7 +121,7 @@ void Transition::OnPlay()
   finishPropertyMap.Insert(Dali::Actor::Property::COLOR, destinationColor);
 
   // Set animation for other properties if source and destination is different.
-  Vector3 sourceSize      = sourceControl.GetCurrentProperty<Vector3>(Dali::Actor::Property::SIZE);
+  Vector3 sourceSize      = sourceControl[Dali::Actor::Property::SIZE];
   Vector3 destinationSize = destinationControl[Dali::Actor::Property::SIZE];
   if(sourceSize != destinationSize)
   {
