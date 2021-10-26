@@ -23,6 +23,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
@@ -221,6 +222,20 @@ int utcDaliAccessibilityTextFieldGetText(void)
     DALI_TEST_EQUALS( x->GetText( 0, 0 ), "", TEST_LOCATION );
     field.SetProperty( Toolkit::TextField::Property::TEXT, "exemplary_text" );
     DALI_TEST_EQUALS( x->GetText( 0, 9 ), "exemplary", TEST_LOCATION );
+
+    Dali::Property::Map hiddenInputSettings;
+    hiddenInputSettings[ Toolkit::HiddenInput::Property::MODE ] = Toolkit::HiddenInput::Mode::HIDE_ALL;
+
+    field.SetProperty( Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS, hiddenInputSettings );
+
+    DALI_TEST_EQUALS( x->GetName(), "", TEST_LOCATION );
+    DALI_TEST_EQUALS( x->GetText( 0, 9 ), "*********", TEST_LOCATION );
+
+    hiddenInputSettings[ Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER ] = 0x23;
+    field.SetProperty( Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS, hiddenInputSettings );
+
+    DALI_TEST_EQUALS( x->GetName(), "", TEST_LOCATION );
+    DALI_TEST_EQUALS( x->GetText( 0, 9 ), "#########", TEST_LOCATION );
   }
 
   END_TEST;
@@ -294,6 +309,16 @@ int utcDaliAccessibilityTextFieldGetTextAtOffset(void)
     DALI_TEST_EQUALS( range.content, " test sentence", TEST_LOCATION );
     DALI_TEST_EQUALS( range.startOffset, 25, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 39, TEST_LOCATION );
+
+    Dali::Property::Map hiddenInputSettings;
+    hiddenInputSettings[ Toolkit::HiddenInput::Property::MODE ] = Toolkit::HiddenInput::Mode::HIDE_ALL;
+    hiddenInputSettings[ Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER ] = 0x23;
+    field.SetProperty( Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS, hiddenInputSettings );
+    range = x->GetTextAtOffset( 8, Dali::Accessibility::TextBoundary::LINE );
+    DALI_TEST_EQUALS( range.content, "", TEST_LOCATION );
+    DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
+
   }
 
   END_TEST;
@@ -321,6 +346,15 @@ int utcDaliAccessibilityTextFieldGetSetRangeOfSelection(void)
     DALI_TEST_EQUALS( range.startOffset, 4, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 9, TEST_LOCATION );
     DALI_TEST_EQUALS( range.content, "plary", TEST_LOCATION );
+
+    Dali::Property::Map hiddenInputSettings;
+    hiddenInputSettings[ Toolkit::HiddenInput::Property::MODE ] = Toolkit::HiddenInput::Mode::HIDE_ALL;
+    field.SetProperty( Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS, hiddenInputSettings );
+
+    range = x->GetRangeOfSelection( 0 );
+    DALI_TEST_EQUALS( range.startOffset, 4, TEST_LOCATION );
+    DALI_TEST_EQUALS( range.endOffset, 9, TEST_LOCATION );
+    DALI_TEST_EQUALS( range.content, "*****", TEST_LOCATION );
   }
 
   END_TEST;

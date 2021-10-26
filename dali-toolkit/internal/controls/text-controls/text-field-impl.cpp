@@ -201,6 +201,28 @@ Toolkit::TextField::InputStyle::Mask ConvertInputStyle(Text::InputStyle::Mask in
   return fieldInputStyleMask;
 }
 
+bool IsHiddenInput(Toolkit::TextField textField)
+{
+  Property::Map hiddenInputSettings = textField.GetProperty<Property::Map>(Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS);
+  auto mode  = hiddenInputSettings.Find(Toolkit::HiddenInput::Property::MODE);
+  if (mode && (mode->Get<int>() != Toolkit::HiddenInput::Mode::HIDE_NONE))
+  {
+    return true;
+  }
+  return false;
+}
+
+char GetSubstituteCharacter(Toolkit::TextField textField)
+{
+  Property::Map hiddenInputSettings = textField.GetProperty<Property::Map>(Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS);
+  auto substChar = hiddenInputSettings.Find(Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER);
+  if (substChar)
+  {
+    return static_cast<char>(substChar->Get<int>());
+  }
+  return STAR;
+}
+
 } // namespace
 
 Toolkit::TextField TextField::New()
@@ -1101,6 +1123,11 @@ TextField::~TextField()
 std::string TextField::AccessibleImpl::GetName()
 {
   auto self = Toolkit::TextField::DownCast(Self());
+  if (IsHiddenInput(self))
+  {
+    return {};
+  }
+
   return self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
 }
 
@@ -1118,7 +1145,10 @@ std::string TextField::AccessibleImpl::GetText(size_t startOffset, size_t endOff
   {
     return {};
   }
-
+  if(IsHiddenInput(self))
+  {
+    return std::string(endOffset - startOffset, GetSubstituteCharacter(self));
+  }
   return text.substr(startOffset, endOffset - startOffset);
 }
 
@@ -1156,10 +1186,17 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
   size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
   auto self     = Toolkit::TextField::DownCast(Self());
+  auto range    = Dali::Accessibility::Range{};
+
+  if(IsHiddenInput(self))
+  {
+    // Returning empty object, as there is no possibility to parse the textfield
+    // when its content is hidden.
+    return range;
+  }
+
   auto text     = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
   auto textSize = text.size();
-
-  auto range = Dali::Accessibility::Range{};
 
   switch(boundary)
   {
@@ -1252,13 +1289,21 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetRangeOfSelection(size_t
     return {};
   }
 
-  auto        self       = Toolkit::TextField::DownCast(Self());
-  auto        controller = Dali::Toolkit::GetImpl(self).GetTextController();
-  std::string value{};
-  controller->RetrieveSelection(value);
+  auto self = Toolkit::TextField::DownCast(Self());
+  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
   auto indices = controller->GetSelectionIndexes();
 
-  return {static_cast<size_t>(indices.first), static_cast<size_t>(indices.second), value};
+  auto startOffset = static_cast<size_t>(indices.first);
+  auto endOffset = static_cast<size_t>(indices.second);
+
+  if (IsHiddenInput(self))
+  {
+    return {startOffset, endOffset, std::string(endOffset - startOffset, GetSubstituteCharacter(self))};
+  }
+
+  std::string value{};
+  controller->RetrieveSelection(value);
+  return {startOffset, endOffset, value};
 }
 
 bool TextField::AccessibleImpl::RemoveSelection(size_t selectionIndex)
