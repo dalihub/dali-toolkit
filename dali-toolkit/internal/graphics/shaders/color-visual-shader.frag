@@ -241,18 +241,18 @@ mediump float calculateBlurOpacity()
 
     // solve (v.x - x)^2 + (v.y - x)^2 = (cr / cy * x)^2
 #if IS_REQUIRED_ROUNDED_CORNER
-    // NOTE : lowspec HW cannot calculate here. need to reduce numeric error
-    mediump float A = (cr * cr - 2.0 * cy * cy);
-    mediump float B = cy * (v.x + v.y);
-    mediump float V = dot(v,v);
-    mediump float D = B * B + A * V;
+    // Note : lowspec HW cannot calculate here. need to reduce numeric error
+    highp float A = (cr * cr - 2.0 * cy * cy);
+    highp float B = cy * (v.x + v.y);
+    highp float V = dot(v,v);
+    highp float D = B * B + A * V;
     potential = V * (cr + cy) / (sqrt(D) + B);
 #else
     // We can simplify this value cause cy = 0.8 * blurRadius, cr = 1.2 * blurRadius
     // potential = 5.0*(sqrt(4.0*(v.x+v.y)^2 + dot(v,v)) - 2.0*(v.x+v.y));
     //           = 10.0*(v.x+v.y) * (sqrt(1.0 + (length(v) / (2.0*(v.x+v.y)))^2) - 1.0);
     //           = 10.0*(v.x+v.y) * (sqrt(1.25 - x + x^2) - 1.0);
-    //          ~= 10.0*(v.x+v.y) * (0.11803399 - 0.44721360x + 0.35777088x^2 - 0.14310x^3 + O(x^4)) (Taylor series)
+    //          ~= 10.0*(v.x+v.y) * (0.11803399 - 0.44721360x + 0.35777088x^2 - 0.14310x^3 + O(x^5)) (Taylor series)
     //          ~= -1.0557281 * (v.x + v.y) + 2.236068 * length(v) - ~~~ (here, x <= 0.5 * (1.0 - sqrt(0.5)) < 0.1464467)
     // Note : This simplify need cause we should use it on lowspec HW.
     mediump float x = 0.5 * (1.0 - length(v) / (v.x + v.y));
