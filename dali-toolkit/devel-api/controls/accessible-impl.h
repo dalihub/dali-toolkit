@@ -226,6 +226,11 @@ public:
   std::vector<Dali::Accessibility::Relation> GetRelationSet() override;
 
   /**
+   * @copydoc Dali::Accessibility::Accessible::GetInternalActor()
+   */
+  Dali::Actor GetInternalActor() override;
+
+  /**
    * @copydoc Dali::Accessibility::Accessible::GetStates()
    */
   virtual Dali::Accessibility::States CalculateStates();
