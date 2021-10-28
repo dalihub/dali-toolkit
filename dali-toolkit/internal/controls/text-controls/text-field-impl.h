@@ -470,6 +470,8 @@ private: // Data
   uint32_t mOldSelectionEnd;
 
 protected:
+  struct PropertyHandler;
+
   /**
    * @brief This structure is to connect TextField with Accessible functions.
    */
