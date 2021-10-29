@@ -24,6 +24,8 @@
 #include <dali-toolkit/public-api/transition/transition-set.h>
 #include <dali-toolkit/public-api/transition/transition-base.h>
 #include <dali-toolkit/public-api/transition/transition.h>
+#include <dali-toolkit/public-api/transition/fade-transition.h>
+#include <dali-toolkit/public-api/transition/slide-transition.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -1183,6 +1185,85 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutScaleInheritance(void)
 
   currentScale = control3.GetProperty<Vector3>(Actor::Property::WORLD_SCALE);
   DALI_TEST_EQUALS(currentScale, destinationScale, 0.0001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+
+int UtcDaliMultipleTransitionAppearing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliMultipleTransitionAppearing");
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  control.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  control.SetProperty(Actor::Property::POSITION, Vector3(100, 200, 0));
+  control.SetProperty(Actor::Property::SIZE, Vector3(150, 150, 0));
+  Property::Map controlProperty;
+  controlProperty.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  controlProperty.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+  control.SetProperty(Toolkit::Control::Property::BACKGROUND, controlProperty);
+
+  application.GetScene().Add(control);
+
+  application.SendNotification();
+  application.Render(20);
+
+  DALI_TEST_EQUALS(1.0f, control.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
+
+  TransitionSet transitionSet = TransitionSet::New();
+  FadeTransition fade = FadeTransition::New(control, 0.5, TimePeriod(1.0f, 1.0f));
+  fade.SetAppearingTransition(true); // set fade in
+  transitionSet.AddTransition(fade);
+  SlideTransition slide = SlideTransition::New(control, Dali::Toolkit::SlideTransitionDirection::BOTTOM, TimePeriod(0.5f, 1.0f));
+  slide.SetAppearingTransition(true); // set slide
+  transitionSet.AddTransition(slide);
+  transitionSet.Play();
+
+  bool signalReceived(false);
+  TransitionFinishCheck finishCheck(signalReceived);
+  transitionSet.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(300);
+
+  float currentOpacity = control.GetCurrentProperty<float>(Actor::Property::OPACITY);
+  DALI_TEST_CHECK(currentOpacity == 0.0f);
+
+  application.SendNotification();
+  application.Render(400);
+
+  currentOpacity = control.GetCurrentProperty<float>(Actor::Property::OPACITY);
+  DALI_TEST_CHECK(currentOpacity == 0.5f);
+
+  application.SendNotification();
+  application.Render(500);
+
+  currentOpacity = control.GetCurrentProperty<float>(Actor::Property::OPACITY);
+  DALI_TEST_CHECK(currentOpacity > 0.5f && currentOpacity < 1.0f);
+
+  application.SendNotification();
+  application.Render(500);
+
+  currentOpacity = control.GetCurrentProperty<float>(Actor::Property::OPACITY);
+  DALI_TEST_CHECK(currentOpacity > 0.5f && currentOpacity < 1.0f);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.SendNotification();
+  application.Render(500);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  application.SendNotification();
+  application.Render(20);
+
+  DALI_TEST_EQUALS(1.0f, control.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
 
   END_TEST;
 }
