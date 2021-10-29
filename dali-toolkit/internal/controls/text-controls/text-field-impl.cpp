@@ -24,17 +24,18 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
+#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-property-handler.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -152,6 +153,53 @@ DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "selectionCleared",      SIGNAL_SEL
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
+
+Toolkit::TextField::InputStyle::Mask ConvertInputStyle(Text::InputStyle::Mask inputStyleMask)
+{
+  Toolkit::TextField::InputStyle::Mask fieldInputStyleMask = Toolkit::TextField::InputStyle::NONE;
+
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_COLOR))
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::COLOR);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_FAMILY))
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_FAMILY);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_POINT_SIZE))
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::POINT_SIZE);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_WEIGHT))
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_WIDTH))
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_SLANT))
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_UNDERLINE))
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::UNDERLINE);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_SHADOW))
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::SHADOW);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_EMBOSS))
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::EMBOSS);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_OUTLINE))
+  {
+    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::OUTLINE);
+  }
+  return fieldInputStyleMask;
+}
 
 } // namespace
 
@@ -632,101 +680,7 @@ Text::ControllerPtr TextField::GetTextController()
 
 void TextField::RenderText(Text::Controller::UpdateTextType updateTextType)
 {
-  Actor renderableActor;
-
-  if(Text::Controller::NONE_UPDATED != (Text::Controller::MODEL_UPDATED & updateTextType))
-  {
-    if(mRenderer)
-    {
-      Dali::Toolkit::TextField handle = Dali::Toolkit::TextField(GetOwner());
-
-      renderableActor = mRenderer->Render(mController->GetView(),
-                                          handle,
-                                          Property::INVALID_INDEX, // Animatable property not supported
-                                          mAlignmentOffset,
-                                          DepthIndex::CONTENT);
-    }
-
-    if(renderableActor != mRenderableActor)
-    {
-      UnparentAndReset(mBackgroundActor);
-      UnparentAndReset(mRenderableActor);
-      mRenderableActor = renderableActor;
-
-      if(mRenderableActor)
-      {
-        mBackgroundActor = mController->CreateBackgroundActor();
-      }
-    }
-  }
-
-  if(mRenderableActor)
-  {
-    const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
-
-    float renderableActorPositionX, renderableActorPositionY;
-
-    if(mStencil)
-    {
-      renderableActorPositionX = scrollOffset.x + mAlignmentOffset;
-      renderableActorPositionY = scrollOffset.y;
-    }
-    else
-    {
-      Extents padding;
-      padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-
-      // Support Right-To-Left of padding
-      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-      if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
-      {
-        std::swap(padding.start, padding.end);
-      }
-
-      renderableActorPositionX = scrollOffset.x + mAlignmentOffset + padding.start;
-      renderableActorPositionY = scrollOffset.y + padding.top;
-    }
-
-    mRenderableActor.SetProperty(Actor::Property::POSITION, Vector2(renderableActorPositionX, renderableActorPositionY));
-
-    // Make sure the actors are parented correctly with/without clipping
-    Actor self = mStencil ? mStencil : Self();
-
-    Actor highlightActor;
-
-    for(std::vector<Actor>::iterator it    = mClippingDecorationActors.begin(),
-                                     endIt = mClippingDecorationActors.end();
-        it != endIt;
-        ++it)
-    {
-      self.Add(*it);
-      it->LowerToBottom();
-
-      if(it->GetProperty<std::string>(Dali::Actor::Property::NAME) == "HighlightActor")
-      {
-        highlightActor = *it;
-      }
-    }
-    mClippingDecorationActors.clear();
-
-    self.Add(mRenderableActor);
-
-    if(mBackgroundActor)
-    {
-      if(mDecorator && mDecorator->IsHighlightVisible())
-      {
-        self.Add(mBackgroundActor);
-        mBackgroundActor.SetProperty(Actor::Property::POSITION, Vector2(renderableActorPositionX, renderableActorPositionY)); // In text field's coords.
-        mBackgroundActor.LowerBelow(highlightActor);
-      }
-      else
-      {
-        mRenderableActor.Add(mBackgroundActor);
-        mBackgroundActor.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f)); // In renderable actor's coords.
-        mBackgroundActor.LowerToBottom();
-      }
-    }
-  }
+  CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mStencil, mClippingDecorationActors, updateTextType);
 }
 
 void TextField::OnKeyInputFocusGained()
@@ -928,51 +882,7 @@ void TextField::MaxLengthReached()
 void TextField::InputStyleChanged(Text::InputStyle::Mask inputStyleMask)
 {
   Dali::Toolkit::TextField handle(GetOwner());
-
-  Toolkit::TextField::InputStyle::Mask fieldInputStyleMask = Toolkit::TextField::InputStyle::NONE;
-
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_COLOR))
-  {
-    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::COLOR);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_FAMILY))
-  {
-    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_FAMILY);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_POINT_SIZE))
-  {
-    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::POINT_SIZE);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_WEIGHT))
-  {
-    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_WIDTH))
-  {
-    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_SLANT))
-  {
-    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::FONT_STYLE);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_UNDERLINE))
-  {
-    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::UNDERLINE);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_SHADOW))
-  {
-    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::SHADOW);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_EMBOSS))
-  {
-    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::EMBOSS);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_OUTLINE))
-  {
-    fieldInputStyleMask = static_cast<Toolkit::TextField::InputStyle::Mask>(fieldInputStyleMask | Toolkit::TextField::InputStyle::OUTLINE);
-  }
-
-  mInputStyleChangedSignal.Emit(handle, fieldInputStyleMask);
+  mInputStyleChangedSignal.Emit(handle, ConvertInputStyle(inputStyleMask));
 }
 
 void TextField::AnchorClicked(const std::string& href)

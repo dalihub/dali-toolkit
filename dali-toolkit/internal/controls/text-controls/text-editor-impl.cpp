@@ -24,6 +24,7 @@
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -31,11 +32,11 @@
 #include <limits>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/controls/text-controls/text-editor-property-handler.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -165,6 +166,57 @@ DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "selectionCleared",      SIGNAL_SE
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
+
+Toolkit::TextEditor::InputStyle::Mask ConvertInputStyle(Text::InputStyle::Mask inputStyleMask)
+{
+  Toolkit::TextEditor::InputStyle::Mask editorInputStyleMask = Toolkit::TextEditor::InputStyle::NONE;
+
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_COLOR))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::COLOR);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_FAMILY))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_FAMILY);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_POINT_SIZE))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::POINT_SIZE);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_WEIGHT))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_WIDTH))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_SLANT))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_LINE_SPACING))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::LINE_SPACING);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_UNDERLINE))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::UNDERLINE);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_SHADOW))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::SHADOW);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_EMBOSS))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::EMBOSS);
+  }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_OUTLINE))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::OUTLINE);
+  }
+  return editorInputStyleMask;
+}
 
 } // namespace
 
@@ -672,100 +724,9 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
 void TextEditor::RenderText(Text::Controller::UpdateTextType updateTextType)
 {
-  Actor renderableActor;
-
-  if(Text::Controller::NONE_UPDATED != (Text::Controller::MODEL_UPDATED & updateTextType))
-  {
-    if(mRenderer)
-    {
-      Dali::Toolkit::TextEditor handle = Dali::Toolkit::TextEditor(GetOwner());
-
-      renderableActor = mRenderer->Render(mController->GetView(),
-                                          handle,
-                                          Property::INVALID_INDEX, // Animatable property not supported
-                                          mAlignmentOffset,
-                                          DepthIndex::CONTENT);
-    }
-
-    if(renderableActor != mRenderableActor)
-    {
-      UnparentAndReset(mBackgroundActor);
-      UnparentAndReset(mRenderableActor);
-      mRenderableActor = renderableActor;
-
-      if(mRenderableActor)
-      {
-        mBackgroundActor = mController->CreateBackgroundActor();
-      }
-    }
-  }
-
+  CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mStencil, mClippingDecorationActors, updateTextType);
   if(mRenderableActor)
   {
-    const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
-
-    float renderableActorPositionX, renderableActorPositionY;
-
-    if(mStencil)
-    {
-      renderableActorPositionX = scrollOffset.x + mAlignmentOffset;
-      renderableActorPositionY = scrollOffset.y;
-    }
-    else
-    {
-      Extents padding;
-      padding = Self().GetProperty<Extents>(Toolkit::Control::Property::PADDING);
-
-      // Support Right-To-Left of padding
-      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-      if(Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
-      {
-        std::swap(padding.start, padding.end);
-      }
-
-      renderableActorPositionX = scrollOffset.x + mAlignmentOffset + padding.start;
-      renderableActorPositionY = scrollOffset.y + padding.top;
-    }
-
-    mRenderableActor.SetProperty(Actor::Property::POSITION, Vector2(renderableActorPositionX, renderableActorPositionY));
-    // Make sure the actors are parented correctly with/without clipping
-    Actor self = mStencil ? mStencil : Self();
-
-    Actor highlightActor;
-
-    for(std::vector<Actor>::iterator it    = mClippingDecorationActors.begin(),
-                                     endIt = mClippingDecorationActors.end();
-        it != endIt;
-        ++it)
-    {
-      self.Add(*it);
-      it->LowerToBottom();
-
-      if(it->GetProperty<std::string>(Dali::Actor::Property::NAME) == "HighlightActor")
-      {
-        highlightActor = *it;
-      }
-    }
-    mClippingDecorationActors.clear();
-
-    self.Add(mRenderableActor);
-
-    if(mBackgroundActor)
-    {
-      if(mDecorator && mDecorator->IsHighlightVisible())
-      {
-        self.Add(mBackgroundActor);
-        mBackgroundActor.SetProperty(Actor::Property::POSITION, Vector2(renderableActorPositionX, renderableActorPositionY)); // In text field's coords.
-        mBackgroundActor.LowerBelow(highlightActor);
-      }
-      else
-      {
-        mRenderableActor.Add(mBackgroundActor);
-        mBackgroundActor.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f)); // In renderable actor's coords.
-        mBackgroundActor.LowerToBottom();
-      }
-    }
-
     ApplyScrollPosition();
   }
   UpdateScrollBar();
@@ -952,55 +913,7 @@ void TextEditor::MaxLengthReached()
 void TextEditor::InputStyleChanged(Text::InputStyle::Mask inputStyleMask)
 {
   Dali::Toolkit::TextEditor handle(GetOwner());
-
-  Toolkit::TextEditor::InputStyle::Mask editorInputStyleMask = Toolkit::TextEditor::InputStyle::NONE;
-
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_COLOR))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::COLOR);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_FAMILY))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_FAMILY);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_POINT_SIZE))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::POINT_SIZE);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_WEIGHT))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_WIDTH))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_FONT_SLANT))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::FONT_STYLE);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_LINE_SPACING))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::LINE_SPACING);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_UNDERLINE))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::UNDERLINE);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_SHADOW))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::SHADOW);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_EMBOSS))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::EMBOSS);
-  }
-  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_OUTLINE))
-  {
-    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::OUTLINE);
-  }
-
-  mInputStyleChangedSignal.Emit(handle, editorInputStyleMask);
+  mInputStyleChangedSignal.Emit(handle, ConvertInputStyle(inputStyleMask));
 }
 
 void TextEditor::AnchorClicked(const std::string& href)
