@@ -157,9 +157,9 @@ void SvgVisual::DoSetOnScene(Actor& actor)
 
   if(mLoadFailed)
   {
-    Vector2 imageSize = Vector2::ZERO;
-    imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-    mFactoryCache.GetBrokenImageRenderer(mImpl->mRenderer, imageSize);
+    Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
+    textureSet.SetTexture(0u, brokenImage);
+
     actor.AddRenderer(mImpl->mRenderer);
 
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
@@ -327,9 +327,11 @@ void SvgVisual::ApplyRasterizedImage(VectorImageRenderer vectorRenderer, PixelDa
     Actor actor = mPlacementActor.GetHandle();
     if(actor)
     {
-      Vector2 imageSize = Vector2::ZERO;     
-      imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-      mFactoryCache.GetBrokenImageRenderer(mImpl->mRenderer, imageSize);
+      TextureSet textureSet = mImpl->mRenderer.GetTextures();
+
+      Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
+      textureSet.SetTexture(0u, brokenImage);
+
       actor.AddRenderer(mImpl->mRenderer);
     }
 

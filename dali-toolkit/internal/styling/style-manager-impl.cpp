@@ -45,8 +45,6 @@ const char* APPLICATION_RESOURCE_PATH_KEY = "APPLICATION_RESOURCE_PATH";
 
 const char* DEFAULT_TOOLKIT_PACKAGE_PATH = "/toolkit/";
 
-static constexpr int32_t COUNT_BROKEN_IMAGE_MAX = 3;
-
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_STYLE");
 #endif
@@ -127,9 +125,6 @@ StyleManager::StyleManager()
 
   // Sound & haptic style
   mFeedbackStyle = new FeedbackStyle();
-
-  // Initialize BrokenImages
-  mBrokenImageUrls.assign(COUNT_BROKEN_IMAGE_MAX, "");
 }
 
 StyleManager::~StyleManager()
@@ -312,17 +307,6 @@ const Property::Map StyleManager::GetConfigurations()
   DALI_LOG_STREAM(gLogFilter, Debug::Verbose, "          result: " << result);
 
   return result;
-}
-
-void StyleManager::SetBrokenImageUrl(BrokenImageType brokenImageType, const std::string& brokenImageUrl)
-{
-  mBrokenImageUrls[brokenImageType] = brokenImageUrl;
-  EmitStyleChangeSignals(StyleChange::THEME_CHANGE);
-}
-
-std::string StyleManager::GetBrokenImageUrl(BrokenImageType brokenImageType)
-{
-  return mBrokenImageUrls[brokenImageType];
 }
 
 bool StyleManager::LoadFile(const std::string& filename, std::string& stringOut)

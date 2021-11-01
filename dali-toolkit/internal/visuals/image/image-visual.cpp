@@ -513,14 +513,8 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
       }
       else
       {
-        Actor actor = mPlacementActor.GetHandle();
-        Vector2 imageSize = Vector2::ZERO;
-        if(actor)
-        {
-          imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-        }
-        mFactoryCache.GetBrokenImageRenderer(mImpl->mRenderer, imageSize);
-        Texture brokenImage = mImpl->mRenderer.GetTextures().GetTexture(0);
+        Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
+
         naturalSize.x = brokenImage.GetWidth();
         naturalSize.y = brokenImage.GetWidth();
       }
@@ -716,12 +710,12 @@ void ImageVisual::DoSetOnScene(Actor& actor)
   }
   else if(mLoadState == TextureManager::LoadState::LOAD_FAILED)
   {
-    Vector2 imageSize = Vector2::ZERO;
-    if(actor)
-    {
-      imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-    }
-    mFactoryCache.GetBrokenImageRenderer(mImpl->mRenderer, imageSize);
+    Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
+
+    mTextures = TextureSet::New();
+    mTextures.SetTexture(0u, brokenImage);
+    mImpl->mRenderer.SetTextures(mTextures);
+
     actor.AddRenderer(mImpl->mRenderer);
     mPlacementActor.Reset();
 
@@ -866,30 +860,26 @@ void ImageVisual::UploadComplete(bool loadingSuccess, int32_t textureId, Texture
     EnablePreMultipliedAlpha(preMultiplied);
 
     Actor actor = mPlacementActor.GetHandle();
-    if(!loadingSuccess)
-    {
-      Vector2 imageSize = Vector2::ZERO;
-      if(actor)
-      {
-        imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
-      }
-      mFactoryCache.GetBrokenImageRenderer(mImpl->mRenderer, imageSize);
-      textureSet = mImpl->mRenderer.GetTextures();
-    }
-    else
-    {
-      Sampler sampler = Sampler::New();
-      sampler.SetWrapMode(mWrapModeU, mWrapModeV);
-      textureSet.SetSampler(0u, sampler);
-      mImpl->mRenderer.SetTextures(textureSet);
-    }
-
     if(actor)
     {
       actor.AddRenderer(mImpl->mRenderer);
       // reset the weak handle so that the renderer only get added to actor once
       mPlacementActor.Reset();
     }
+
+    if(!loadingSuccess)
+    {
+      Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
+
+      textureSet = TextureSet::New();
+      textureSet.SetTexture(0u, brokenImage);
+      mImpl->mRenderer.SetTextures(textureSet);
+    }
+
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(mWrapModeU, mWrapModeV);
+    textureSet.SetSampler(0u, sampler);
+    mImpl->mRenderer.SetTextures(textureSet);
   }
 
   // Storing TextureSet needed when renderer staged.
