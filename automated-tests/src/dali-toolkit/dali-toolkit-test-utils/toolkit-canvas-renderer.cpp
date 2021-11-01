@@ -39,7 +39,7 @@ class CanvasRenderer: public Dali::BaseObject
 public:
   CanvasRenderer( const Vector2& size )
   : mDrawable(nullptr),
-    mPixelBuffer( Devel::PixelBuffer::New(size.width, size.height, Dali::Pixel::RGBA8888) ),
+    mTexture ( Dali::Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, size.width, size.height ) ),
     mSize(size),
     mViewBox(size)
   {
@@ -57,6 +57,11 @@ public:
   bool IsCanvasChanged() const
   {
      return true;
+  }
+
+  Dali::Texture GetRasterizedTexture()
+  {
+    return mTexture;
   }
 
   bool Rasterize()
@@ -97,12 +102,6 @@ public:
     return false;
   }
 
-  Devel::PixelBuffer GetPixelBuffer()
-  {
-    return mPixelBuffer;
-  }
-
-
   bool SetSize(Vector2 size)
   {
     mSize = size;
@@ -137,7 +136,7 @@ public:
 
 public:
    Dali::CanvasRenderer::Drawable* mDrawable;
-   Devel::PixelBuffer mPixelBuffer;
+   Dali::Texture mTexture;
    Vector2 mSize;
    Vector2 mViewBox;
 };
@@ -200,9 +199,9 @@ bool CanvasRenderer::Rasterize()
   return Internal::Adaptor::GetImplementation(*this).Rasterize();
 }
 
-Devel::PixelBuffer CanvasRenderer::GetPixelBuffer()
+Dali::Texture CanvasRenderer::GetRasterizedTexture()
 {
-  return Internal::Adaptor::GetImplementation(*this).GetPixelBuffer();
+  return Internal::Adaptor::GetImplementation(*this).GetRasterizedTexture();
 }
 
 bool CanvasRenderer::AddDrawable(Dali::CanvasRenderer::Drawable& drawable)

@@ -91,17 +91,13 @@ void VisualFactory::OnStyleChangedSignal(Toolkit::StyleManager styleManager, Sty
 {
   if(type == StyleChange::THEME_CHANGE)
   {
-    const std::string imageDirPath   = AssetManager::GetDaliImagePath();
-    std::string       brokenImageUrl = imageDirPath + BROKEN_IMAGE_FILE_NAME;
-
-    Property::Map config = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
-    config["brokenImageUrl"].Get(brokenImageUrl);
-
-    if(mFactoryCache)
-    {
-      mFactoryCache->SetBrokenImageUrl(brokenImageUrl);
-    }
+    SetBrokenImageUrl(styleManager);
   }
+}
+
+void VisualFactory::OnBrokenImageChangedSignal(Toolkit::StyleManager styleManager)
+{
+  SetBrokenImageUrl(styleManager);
 }
 
 Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyMap)
@@ -154,6 +150,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
                 visualPtr = NPatchVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap);
                 break;
               }
+              case VisualUrl::TVG:
               case VisualUrl::SVG:
               {
                 visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap);
@@ -318,6 +315,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const std::string& url, ImageD
         visualPtr = NPatchVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl);
         break;
       }
+      case VisualUrl::TVG:
       case VisualUrl::SVG:
       {
         visualPtr = SvgVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl);
@@ -370,24 +368,43 @@ Internal::TextureManager& VisualFactory::GetTextureManager()
   return GetFactoryCache().GetTextureManager();
 }
 
+void VisualFactory::SetBrokenImageUrl(Toolkit::StyleManager& styleManager)
+{
+  const std::string imageDirPath   = AssetManager::GetDaliImagePath();
+  std::string       brokenImageUrl = imageDirPath + BROKEN_IMAGE_FILE_NAME;
+  std::vector<std::string> customBrokenImageUrlList;
+
+  if(styleManager)
+  {
+    customBrokenImageUrlList = Toolkit::DevelStyleManager::GetBrokenImageUrlList(styleManager);
+    if(customBrokenImageUrlList.size() == 0)
+    {
+      Property::Map config = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
+      config["brokenImageUrl"].Get(brokenImageUrl);
+      customBrokenImageUrlList.push_back(brokenImageUrl);
+    }
+    mFactoryCache->SetBrokenImageUrl(customBrokenImageUrlList);
+  }
+  else
+  {
+    // Set default image
+    customBrokenImageUrlList.push_back(brokenImageUrl);
+    mFactoryCache->SetBrokenImageUrl(customBrokenImageUrlList);
+  }
+}
+
 Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
 {
   if(!mFactoryCache)
   {
     mFactoryCache = std::unique_ptr<VisualFactoryCache>(new VisualFactoryCache(mPreMultiplyOnLoad));
-
-    const std::string imageDirPath   = AssetManager::GetDaliImagePath();
-    std::string       brokenImageUrl = imageDirPath + BROKEN_IMAGE_FILE_NAME;
-
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
     if(styleManager)
     {
-      Property::Map config = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
-      config["brokenImageUrl"].Get(brokenImageUrl);
       styleManager.StyleChangedSignal().Connect(mSlotDelegate, &VisualFactory::OnStyleChangedSignal);
+      Toolkit::DevelStyleManager::BrokenImageChangedSignal(styleManager).Connect(mSlotDelegate, &VisualFactory::OnBrokenImageChangedSignal);
     }
-
-    mFactoryCache->SetBrokenImageUrl(brokenImageUrl);
+    SetBrokenImageUrl(styleManager);
   }
   return *mFactoryCache;
 }

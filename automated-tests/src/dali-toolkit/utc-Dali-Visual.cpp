@@ -4352,6 +4352,242 @@ int UtcDaliVisualBorderline(void)
   END_TEST;
 }
 
+int UtcDaliVisualBorderlineBlendModeTest(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualBorderlineBlendModeTest" );
+  VisualFactory factory = VisualFactory::Get();
+
+  // Case 1 : Test which doesn't support borderline feature.
+  {
+    tet_printf("Test Unsupported visual type\n");
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::BORDER);
+    propertyMap.Insert(BorderVisual::Property::COLOR, Color::BLUE);
+    propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 1.0f);
+    Visual::Base borderVisual = factory.CreateVisual( propertyMap );
+
+    DummyControl actor = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, borderVisual );
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
+    actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+    application.GetScene().Add(actor);
+
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+    Renderer renderer = actor.GetRendererAt(0);
+
+    Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+    // Visual::BORDER doesn't support BORDERLINE. BlendMode is AUTO.
+    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
+
+    application.GetScene().Remove(actor);
+  }
+
+  // Case 2 : Test which support borderline feature.
+  {
+    tet_printf("Test normal case\n");
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
+    propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
+    propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 1.0f);
+    Visual::Base colorVisual = factory.CreateVisual( propertyMap );
+
+    DummyControl actor = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, colorVisual );
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
+    actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+    application.GetScene().Add(actor);
+
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+    Renderer renderer = actor.GetRendererAt(0);
+
+    Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+    // Visual::COLOR support BORDERLINE. BlendMode is ON_WITHOUT_CULL.
+    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON_WITHOUT_CULL, TEST_LOCATION );
+
+    application.GetScene().Remove(actor);
+  }
+
+  // Case 3 : Test which animated borderline.
+  {
+    tet_printf("Test borderline animate case\n");
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
+    propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
+    Visual::Base colorVisual = factory.CreateVisual( propertyMap );
+
+    DummyControl actor = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, colorVisual );
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
+    actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+    application.GetScene().Add(actor);
+
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+    Renderer renderer = actor.GetRendererAt(0);
+
+    Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+    // BlendMode is AUTO.
+    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
+
+    Animation animation = Animation::New(0.1f);
+    animation.AnimateTo( DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), 1.0f );
+    animation.Play();
+
+    application.SendNotification();
+    application.Render();
+    application.Render(101u); // End of animation
+
+    blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+    // BlendMode is ON_WITHOUT_CULL.
+    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON_WITHOUT_CULL, TEST_LOCATION );
+
+    Animation revanimation = Animation::New(0.1f);
+    revanimation.AnimateTo( DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_WIDTH), 0.0f );
+    revanimation.Play();
+
+    application.SendNotification();
+    application.Render();
+    application.Render(101u); // End of animation
+
+    blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+    // BlendMode is still ON_WITHOUT_CULL.
+    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON_WITHOUT_CULL, TEST_LOCATION );
+
+    application.GetScene().Remove(actor);
+  }
+
+  // Case 4 : Test which animated corner radius occur.
+  {
+    tet_printf("Test borderline animate case\n");
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::COLOR);
+    propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
+    propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 1.0f);
+    Visual::Base colorVisual = factory.CreateVisual( propertyMap );
+
+    DummyControl actor = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, colorVisual );
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
+    actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+    application.GetScene().Add(actor);
+
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+    Renderer renderer = actor.GetRendererAt(0);
+
+    Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+    // BlendMode is ON_WITHOUT_CULL.
+    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON_WITHOUT_CULL, TEST_LOCATION );
+
+    Animation animation = Animation::New(0.1f);
+    animation.AnimateTo( DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::CORNER_RADIUS), Vector4(1.0f, 1.0f, 1.0f, 1.0f) );
+    animation.Play();
+
+    application.SendNotification();
+    application.Render();
+    application.Render(101u); // End of animation
+
+    blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+    // BlendMode is ON_WITHOUT_CULL.
+    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON_WITHOUT_CULL, TEST_LOCATION );
+
+    application.GetScene().Remove(actor);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVisualBorderlineColorAnimateTest(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualBorderlineColorAnimateTest color" );
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  static std::vector<UniformData> customUniforms =
+  {
+    UniformData("mixColor", Property::Type::VECTOR3),
+    UniformData("cornerRadius", Property::Type::VECTOR4),
+    UniformData("cornerRadiusPolicy", Property::Type::FLOAT),
+    UniformData("borderlineWidth", Property::Type::FLOAT),
+    UniformData("borderlineColor", Property::Type::VECTOR4),
+    UniformData("borderlineOffset", Property::Type::FLOAT),
+  };
+  graphics.AddCustomUniforms(customUniforms);
+
+  {
+    const Vector3 INITIAL_MIX_COLOR( 1.0f,0.0f,1.0f );
+    const float   INITIAL_MIX_OPACITY( 0.5f );
+    const Vector4 INITIAL_BORDERLINE_COLOR( 0.0f,1.0f,0.0f,1.0f );
+    const float   INITIAL_ACTOR_OPACITY( 1.0f );
+    const Vector3 TARGET_MIX_COLOR( 1.0f, 0.0f, 0.0f );
+    const float   TARGET_MIX_OPACITY( 0.8f );
+    const Vector4 TARGET_BORDERLINE_COLOR( 1.0f, 0.0f, 1.0f, 0.2f);
+    const float   TARGET_ACTOR_OPACITY( 0.5f );
+
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+    propertyMap.Insert(Visual::Property::MIX_COLOR, INITIAL_MIX_COLOR);
+    propertyMap.Insert(Visual::Property::OPACITY, INITIAL_MIX_OPACITY);
+    propertyMap.Insert(DevelVisual::Property::BORDERLINE_WIDTH, 1.0f);
+    propertyMap.Insert(DevelVisual::Property::BORDERLINE_COLOR, INITIAL_BORDERLINE_COLOR);
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+
+    DummyControl actor = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+    actor.SetProperty( Actor::Property::SIZE, Vector2( 2000.f, 2000.f ) );
+    actor.SetProperty( Actor::Property::OPACITY, INITIAL_ACTOR_OPACITY );
+    actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+    application.GetScene().Add(actor);
+
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+    Animation animation = Animation::New(4.0f);
+    animation.AnimateTo( DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, Visual::Property::MIX_COLOR), TARGET_MIX_COLOR );
+    animation.AnimateTo( DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, Visual::Property::OPACITY), TARGET_MIX_OPACITY);
+    animation.AnimateTo( DevelControl::GetVisualProperty(actor, DummyControl::Property::TEST_VISUAL, DevelVisual::Property::BORDERLINE_COLOR), TARGET_BORDERLINE_COLOR );
+    animation.AnimateTo( Property(actor, Actor::Property::OPACITY), TARGET_ACTOR_OPACITY);
+    animation.Play();
+
+    TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+
+    application.SendNotification();
+    application.Render(0);
+    application.Render(2000u); // halfway point
+    application.SendNotification();
+
+    Vector3 halfwayMixColor        = (INITIAL_MIX_COLOR        + TARGET_MIX_COLOR       ) * 0.5f;
+    float   halfwayMixOpacity      = (INITIAL_MIX_OPACITY      + TARGET_MIX_OPACITY     ) * 0.5f;
+    Vector4 halfwayBorderlineColor = (INITIAL_BORDERLINE_COLOR + TARGET_BORDERLINE_COLOR) * 0.5f;
+    float   halfwayActorOpacity    = (INITIAL_ACTOR_OPACITY    + TARGET_ACTOR_OPACITY   ) * 0.5f;
+    halfwayMixOpacity *= halfwayActorOpacity;
+    DALI_TEST_EQUALS( glAbstraction.CheckUniformValue<Vector3>("mixColor", halfwayMixColor), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( glAbstraction.CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, halfwayMixOpacity)), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( glAbstraction.CheckUniformValue<Vector4>("uActorColor", Vector4(1.0f, 1.0f, 1.0f, halfwayActorOpacity)), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( glAbstraction.CheckUniformValue<Vector4>("borderlineColor", halfwayBorderlineColor), true, TEST_LOCATION );
+
+    application.Render(2001u); // go past end
+    application.SendNotification(); // Trigger signals
+
+    DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY), TEST_LOCATION );
+    DALI_TEST_EQUALS( glAbstraction.CheckUniformValue<Vector3>("mixColor", TARGET_MIX_COLOR), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( glAbstraction.CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, TARGET_MIX_OPACITY * TARGET_ACTOR_OPACITY) ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( glAbstraction.CheckUniformValue<Vector4>("uActorColor", Vector4(1.0f, 1.0f, 1.0f, TARGET_ACTOR_OPACITY)), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( glAbstraction.CheckUniformValue<Vector4>("borderlineColor", TARGET_BORDERLINE_COLOR ), true, TEST_LOCATION );
+
+    actor.Unparent();
+  }
+
+  END_TEST;
+}
 
 int UtcDaliColorVisualBlurRadius(void)
 {

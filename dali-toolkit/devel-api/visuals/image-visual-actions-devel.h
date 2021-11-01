@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_ACTIONS_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  * limitations under the License.
  *
  */
+#include <dali-toolkit/devel-api/toolkit-action-index-ranges.h>
 
 namespace Dali
 {
@@ -34,7 +35,7 @@ namespace Action
  */
 enum Type
 {
-  RELOAD = 0 ///< Force reloading of the image, all visuals using this image will get the latest one.
+  RELOAD = VISUAL_ACTION_START_INDEX ///< Force reloading of the image, all visuals using this image will get the latest one.
 };
 
 } // namespace Action

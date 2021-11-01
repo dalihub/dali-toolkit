@@ -118,7 +118,7 @@ int UtcDaliTransitionSetGetProperty01(void)
   application.SendNotification();
   application.Render(20);
 
-  Transition transition = Transition::New(control1, control2, TimePeriod(-0.1f, -0.1f));
+  Transition transition = Transition::New(control1, control2, true, TimePeriod(-0.1f, -0.1f));
   TimePeriod timePeriod = transition.GetTimePeriod();
   DALI_TEST_EQUALS(0.0f, timePeriod.durationSeconds, TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, timePeriod.delaySeconds, TEST_LOCATION);
@@ -178,7 +178,7 @@ int UtcDaliTransitionSetGetProperty02(void)
   application.SendNotification();
   application.Render(20);
 
-  Transition transition = Transition::New(control1, control2, TimePeriod(-0.1f));
+  Transition transition = Transition::New(control1, control2, true, TimePeriod(-0.1f));
   TimePeriod timePeriod = transition.GetTimePeriod();
   DALI_TEST_EQUALS(0.0f, timePeriod.durationSeconds, TEST_LOCATION);
   DALI_TEST_EQUALS(0.0f, timePeriod.delaySeconds, TEST_LOCATION);
@@ -268,7 +268,7 @@ int UtcDaliTransitionBetweenControlPair(void)
   application.SendNotification();
   application.Render(20);
 
-  Transition transition = Transition::New(control1, control2, TimePeriod(0.5f));
+  Transition transition = Transition::New(control1, control2, true, TimePeriod(0.5f));
   TransitionSet transitionSet = TransitionSet::New();
   transitionSet.AddTransition(transition);
   transitionSet.Play();
@@ -333,6 +333,185 @@ int UtcDaliTransitionBetweenControlPair(void)
   END_TEST;
 }
 
+int UtcDaliTransitionBetweenControlPair2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTransitionBetweenControlPair2 - source target will be transitioned.");
+
+  Vector3 sourcePosition(100, 200, 0);
+  Vector3 sourceSize(150, 150, 0);
+  Vector3 sourceScale(1, 2, 0);
+  Vector4 sourceColor(1.0f, 1.0f, 1.0f, 0.5f);
+  float sourceOpacity(0.5f);
+  float sourceRadius(30.f);
+  float sourceBorderlineWidth(60.0f);
+  Vector4 sourceBorderlineColor(1.0f, 0.0f, 0.0f, 1.0f);
+  float sourceBorderlineOffset(1.f);
+  Vector4 sourceRadiusV4 = Vector4(sourceRadius, sourceRadius, sourceRadius, sourceRadius);
+
+  Vector3 destinationPosition(50, 50, 0);
+  Vector3 destinationSize(120, 120, 0);
+  Vector3 destinationScale(2, 1, 0);
+  Vector4 destinationColor(1.0f, 0.5f, 1.0f, 0.8f);
+  float destinationOpacity(0.8f);
+  float destinationRadius(50.f);
+  float destinationBorderlineWidth(80.0f);
+  Vector4 destinationBorderlineColor(0.5f, 1.0f, 0.5f, 0.3f);
+  float destinationBorderlineOffset(-1.0f);
+  Vector4 destinationRadiusV4 = Vector4(destinationRadius, destinationRadius, destinationRadius, destinationRadius);
+
+  Control control1 = Control::New();
+  control1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  control1.SetProperty(Actor::Property::POSITION, sourcePosition);
+  control1.SetProperty(Actor::Property::SIZE, sourceSize);
+  control1.SetProperty(Actor::Property::SCALE, sourceScale);
+  control1.SetProperty(Actor::Property::COLOR, sourceColor);
+  control1.SetProperty(Actor::Property::OPACITY, sourceOpacity);
+  Property::Map controlProperty1;
+  controlProperty1.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  controlProperty1.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+  controlProperty1.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, sourceRadius);
+  controlProperty1.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, sourceBorderlineWidth);
+  controlProperty1.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, sourceBorderlineColor);
+  controlProperty1.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, sourceBorderlineOffset);
+  control1.SetProperty(Toolkit::Control::Property::BACKGROUND, controlProperty1);
+
+  Control control2 = Control::New();
+  control2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  control2.SetProperty(Actor::Property::ANCHOR_POINT, ParentOrigin::CENTER);
+  control2.SetProperty(Actor::Property::POSITION, destinationPosition);
+  control2.SetProperty(Actor::Property::SIZE, destinationSize);
+  control2.SetProperty(Actor::Property::SCALE, destinationScale);
+  control2.SetProperty(Actor::Property::COLOR, destinationColor);
+  control2.SetProperty(Actor::Property::OPACITY, destinationOpacity);
+  Property::Map controlProperty2;
+  controlProperty2.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
+  controlProperty2.Insert(Toolkit::ColorVisual::Property::MIX_COLOR, Vector4(1.0f, 1.0f, 0.0f, 0.5f));
+  controlProperty2.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, destinationRadius);
+  controlProperty2.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, destinationBorderlineWidth);
+  controlProperty2.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, destinationBorderlineColor);
+  controlProperty2.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, destinationBorderlineOffset);
+  control2.SetProperty(Toolkit::Control::Property::BACKGROUND, controlProperty2);
+
+  DALI_TEST_EQUALS(destinationPosition, control2.GetProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
+  Property::Map backgroundMap = control2.GetProperty<Property::Map>(Toolkit::Control::Property::BACKGROUND);
+  Vector4 cornerRadius = backgroundMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS)->Get<Vector4>();
+  DALI_TEST_EQUALS(destinationRadiusV4, cornerRadius, TEST_LOCATION);
+  float borderlineWidth = backgroundMap.Find(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH)->Get<float>();
+  DALI_TEST_EQUALS(destinationBorderlineWidth, borderlineWidth, TEST_LOCATION);
+  Vector4 borderlineColor = backgroundMap.Find(Toolkit::DevelVisual::Property::BORDERLINE_COLOR)->Get<Vector4>();
+  DALI_TEST_EQUALS(destinationBorderlineColor, borderlineColor, TEST_LOCATION);
+  float borderlineOffset = backgroundMap.Find(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET)->Get<float>();
+  DALI_TEST_EQUALS(destinationBorderlineOffset, borderlineOffset, TEST_LOCATION);
+
+  application.GetScene().Add(control1);
+  application.GetScene().Add(control2);
+
+  application.SendNotification();
+  application.Render(20);
+
+  Transition transition = Transition::New(control1, control2, false, TimePeriod(0.5f));
+  TransitionSet transitionSet = TransitionSet::New();
+  transitionSet.AddTransition(transition);
+  transitionSet.Play();
+
+  bool signalReceived(false);
+  TransitionFinishCheck finishCheck(signalReceived);
+  transitionSet.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(50);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  DALI_TEST_NOT_EQUALS(destinationPosition, control1.GetCurrentProperty<Vector3>(Actor::Property::POSITION), 0.00001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1, control1.GetRendererCount(), TEST_LOCATION);
+
+  Dali::Renderer renderer = control1.GetRendererAt(0);
+  Property::Index index = renderer.GetPropertyIndex(DevelVisual::Property::CORNER_RADIUS);
+  cornerRadius = renderer.GetCurrentProperty<Vector4>(index);
+  DALI_TEST_NOT_EQUALS(destinationRadiusV4, cornerRadius, 0.00001f, TEST_LOCATION);
+
+  index = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_WIDTH);
+  borderlineWidth = renderer.GetCurrentProperty<float>(index);
+  DALI_TEST_NOT_EQUALS(destinationBorderlineWidth, borderlineWidth, 0.00001f, TEST_LOCATION);
+
+  index = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_COLOR);
+  borderlineColor = renderer.GetCurrentProperty<Vector4>(index);
+  DALI_TEST_NOT_EQUALS(destinationBorderlineColor, borderlineColor, 0.00001f, TEST_LOCATION);
+
+  index = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_OFFSET);
+  borderlineOffset = renderer.GetCurrentProperty<float>(index);
+  DALI_TEST_NOT_EQUALS(destinationBorderlineOffset, borderlineOffset, 0.00001f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(700);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  // After the transition is finished,
+  // every current and renderer propeties of control1 are equal to destination properties.
+  DALI_TEST_EQUALS(destinationPosition, control1.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
+  DALI_TEST_EQUALS(destinationSize, control1.GetCurrentProperty<Vector3>(Actor::Property::SIZE), TEST_LOCATION);
+  DALI_TEST_EQUALS(destinationScale, control1.GetCurrentProperty<Vector3>(Actor::Property::SCALE), TEST_LOCATION);
+  DALI_TEST_EQUALS(destinationColor, control1.GetCurrentProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  DALI_TEST_EQUALS(destinationOpacity, control1.GetCurrentProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(1, control1.GetRendererCount(), TEST_LOCATION);
+  renderer = control1.GetRendererAt(0);
+  index = renderer.GetPropertyIndex(DevelVisual::Property::CORNER_RADIUS);
+  cornerRadius = renderer.GetCurrentProperty<Vector4>(index);
+  DALI_TEST_EQUALS(destinationRadiusV4, cornerRadius, TEST_LOCATION);
+
+  index = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_WIDTH);
+  borderlineWidth = renderer.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(destinationBorderlineWidth, borderlineWidth, TEST_LOCATION);
+
+  index = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_COLOR);
+  borderlineColor = renderer.GetCurrentProperty<Vector4>(index);
+  DALI_TEST_EQUALS(destinationBorderlineColor, borderlineColor, TEST_LOCATION);
+
+  index = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_OFFSET);
+  borderlineOffset = renderer.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(destinationBorderlineOffset, borderlineOffset, TEST_LOCATION);
+
+  // every actor properties of control1 are returned to the source properties.
+  DALI_TEST_EQUALS(sourcePosition, control1.GetProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
+  DALI_TEST_EQUALS(sourceSize, control1.GetProperty<Vector3>(Actor::Property::SIZE), TEST_LOCATION);
+  DALI_TEST_EQUALS(sourceScale, control1.GetProperty<Vector3>(Actor::Property::SCALE), TEST_LOCATION);
+  DALI_TEST_EQUALS(sourceColor, control1.GetProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  DALI_TEST_EQUALS(sourceOpacity, control1.GetProperty<float>(Actor::Property::OPACITY), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(20);
+
+  // after next update, renderer properties are returned to the source properties.
+  DALI_TEST_EQUALS(1, control1.GetRendererCount(), TEST_LOCATION);
+  renderer = control1.GetRendererAt(0);
+  index = renderer.GetPropertyIndex(DevelVisual::Property::CORNER_RADIUS);
+  cornerRadius = renderer.GetCurrentProperty<Vector4>(index);
+  DALI_TEST_EQUALS(sourceRadiusV4, cornerRadius, TEST_LOCATION);
+
+  index = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_WIDTH);
+  borderlineWidth = renderer.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(sourceBorderlineWidth, borderlineWidth, TEST_LOCATION);
+
+  index = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_COLOR);
+  borderlineColor = renderer.GetCurrentProperty<Vector4>(index);
+  DALI_TEST_EQUALS(sourceBorderlineColor, borderlineColor, TEST_LOCATION);
+
+  index = renderer.GetPropertyIndex(DevelVisual::Property::BORDERLINE_OFFSET);
+  borderlineOffset = renderer.GetCurrentProperty<float>(index);
+  DALI_TEST_EQUALS(sourceBorderlineOffset, borderlineOffset, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliTransitionBetweenControlPairWithoutEmptySourceBackground(void)
 {
   ToolkitTestApplication application;
@@ -377,7 +556,7 @@ int UtcDaliTransitionBetweenControlPairWithoutEmptySourceBackground(void)
   application.SendNotification();
   application.Render(20);
 
-  Transition transition = Transition::New(control1, control2, TimePeriod(0.5f));
+  Transition transition = Transition::New(control1, control2, true, TimePeriod(0.5f));
   TransitionSet transitionSet = TransitionSet::New();
   transitionSet.AddTransition(transition);
   transitionSet.Play();
@@ -474,7 +653,7 @@ int UtcDaliTransitionBetweenImageViewPair(void)
   Vector3 startWorldPosition = control1.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
   Vector3 finishWorldPosition = control2.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
 
-  Transition transition = Transition::New(control1, control2, TimePeriod(0.5f));
+  Transition transition = Transition::New(control1, control2, true, TimePeriod(0.5f));
   TransitionSet transitionSet = TransitionSet::New();
   transitionSet.AddTransition(transition);
   transitionSet.Play();
@@ -562,7 +741,7 @@ int UtcDaliTransitionBetweenImageViewPairWithDelay(void)
   Vector3 startWorldPosition = control1.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
   Vector3 finishWorldPosition = control2.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
 
-  Transition transition = Transition::New(control1, control2, TimePeriod(0.5f, 0.5f));
+  Transition transition = Transition::New(control1, control2, true, TimePeriod(0.5f, 0.5f));
   TransitionSet transitionSet = TransitionSet::New();
   transitionSet.AddTransition(transition);
   transitionSet.Play();
@@ -654,7 +833,7 @@ int UtcDaliTransitionBetweenControlPairWithTree(void)
   application.SendNotification();
   application.Render(20);
 
-  Transition transition = Transition::New(control1, control2, TimePeriod(0.5f));
+  Transition transition = Transition::New(control1, control2, true, TimePeriod(0.5f));
   TransitionSet transitionSet = TransitionSet::New();
   transitionSet.AddTransition(transition);
   transitionSet.Play();
@@ -721,7 +900,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithChild(void)
   application.SendNotification();
   application.Render(20);
 
-  Transition transition = Transition::New(control1, control2, TimePeriod(0.5f));
+  Transition transition = Transition::New(control1, control2, true, TimePeriod(0.5f));
   transition.TransitionWithChild(true);
   TransitionSet transitionSet = TransitionSet::New();
   transitionSet.AddTransition(transition);
@@ -801,7 +980,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutPositionInheritance(void)
   control3.SetProperty(Actor::Property::INHERIT_ORIENTATION, true);
   control3.SetProperty(Actor::Property::INHERIT_SCALE, true);
 
-  transition = Transition::New(control1, control3, TimePeriod(0.5f));
+  transition = Transition::New(control1, control3, true, TimePeriod(0.5f));
   transitionSet = TransitionSet::New();
   transitionSet.AddTransition(transition);
   transitionSet.Play();
@@ -892,7 +1071,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutOrientationInheritance(voi
   bool signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
 
-  transition = Transition::New(control1, control3, TimePeriod(0.5f));
+  transition = Transition::New(control1, control3, true, TimePeriod(0.5f));
   transitionSet = TransitionSet::New();
   transitionSet.AddTransition(transition);
   transitionSet.Play();
@@ -978,7 +1157,7 @@ int UtcDaliTransitionBetweenControlPairWithTreeWithoutScaleInheritance(void)
   bool signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
 
-  transition = Transition::New(control1, control3, TimePeriod(0.5f));
+  transition = Transition::New(control1, control3, true, TimePeriod(0.5f));
   transitionSet = TransitionSet::New();
   transitionSet.AddTransition(transition);
   transitionSet.Play();

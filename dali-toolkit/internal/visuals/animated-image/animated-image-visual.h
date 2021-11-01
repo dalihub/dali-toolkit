@@ -275,9 +275,10 @@ private:
   uint32_t        mFrameCount; // Number of frames
   ImageDimensions mImageSize;
 
+  DevelAnimatedImageVisual::Action::Type mActionStatus;
+
   Dali::WrapMode::Type                   mWrapModeU : 3;
   Dali::WrapMode::Type                   mWrapModeV : 3;
-  DevelAnimatedImageVisual::Action::Type mActionStatus : 3;
   DevelImageVisual::StopBehavior::Type   mStopBehavior : 2;
   bool                                   mStartFirstFrame : 1;
   bool                                   mIsJumpTo : 1;

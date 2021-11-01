@@ -17,6 +17,7 @@
  * limitations under the License.
  *
  */
+#include <dali-toolkit/devel-api/toolkit-action-index-ranges.h>
 
 namespace Dali
 {
@@ -34,11 +35,10 @@ namespace Action
  */
 enum Type
 {
-  PLAY,           ///< Play the animated vector image.
-  PAUSE,          ///< Pause the animated vector image.
-  STOP,           ///< Stop the animated vector image. This is also Default playback mode.
-  JUMP_TO,        ///< Jump to the specified frame. Property::INTEGER value should be passed.
-  UPDATE_PROPERTY ///< Update the properties of the animated vector image.
+  PLAY = VISUAL_ACTION_START_INDEX, ///< Play the animated vector image.
+  PAUSE,                            ///< Pause the animated vector image.
+  STOP,                             ///< Stop the animated vector image. This is also Default playback mode.
+  JUMP_TO,                          ///< Jump to the specified frame. Property::INTEGER value should be passed.
 };
 
 } // namespace Action

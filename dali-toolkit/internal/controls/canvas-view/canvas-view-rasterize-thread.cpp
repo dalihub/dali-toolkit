@@ -31,8 +31,7 @@ namespace Internal
 CanvasRendererRasterizingTask::CanvasRendererRasterizingTask(CanvasView* canvasView, CanvasRenderer canvasRenderer)
 : mCanvasView(canvasView),
   mCanvasRenderer(canvasRenderer),
-  mPixelData(PixelData()),
-  mBufferSize(0, 0)
+  mRasterizedTexture()
 {
 }
 
@@ -40,17 +39,7 @@ bool CanvasRendererRasterizingTask::Rasterize()
 {
   if(mCanvasRenderer && mCanvasRenderer.Rasterize())
   {
-    Devel::PixelBuffer pixbuf = mCanvasRenderer.GetPixelBuffer();
-    auto               width  = pixbuf.GetWidth();
-    auto               height = pixbuf.GetHeight();
-    if(width > 0 && height > 0)
-    {
-      mBufferSize.width  = width;
-      mBufferSize.height = height;
-
-      mPixelData = Devel::PixelBuffer::Convert(pixbuf);
-      return true;
-    }
+    return true;
   }
   return false;
 }
@@ -60,14 +49,9 @@ CanvasView* CanvasRendererRasterizingTask::GetCanvasView() const
   return mCanvasView.Get();
 }
 
-PixelData CanvasRendererRasterizingTask::GetPixelData() const
+Texture CanvasRendererRasterizingTask::GetRasterizedTexture()
 {
-  return mPixelData;
-}
-
-Vector2 CanvasRendererRasterizingTask::GetBufferSize() const
-{
-  return mBufferSize;
+  return mCanvasRenderer.GetRasterizedTexture();
 }
 
 CanvasViewRasterizeThread::CanvasViewRasterizeThread()
@@ -220,7 +204,7 @@ void CanvasViewRasterizeThread::ApplyRasterized()
 {
   while(CanvasRendererRasterizingTaskPtr task = NextCompletedTask())
   {
-    RasterizationCompletedSignal().Emit(task->GetPixelData());
+    RasterizationCompletedSignal().Emit(task->GetRasterizedTexture()); // Here texture get
   }
 
   UnregisterProcessor();

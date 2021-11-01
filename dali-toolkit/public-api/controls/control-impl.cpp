@@ -37,7 +37,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
-#include <dali-toolkit/devel-api/visuals/color-visual-actions-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -133,7 +133,7 @@ void Control::SetBackgroundColor(const Vector4& color)
   if(visual && visual.GetType() == Toolkit::Visual::COLOR)
   {
     // Update background color only
-    mImpl->DoAction(Toolkit::Control::Property::BACKGROUND, DevelColorVisual::Action::UPDATE_PROPERTY, map);
+    mImpl->DoAction(Toolkit::Control::Property::BACKGROUND, DevelVisual::Action::UPDATE_PROPERTY, map);
     return;
   }
 
@@ -700,6 +700,102 @@ void Control::SignalConnected(SlotObserver* slotObserver, CallbackBase* callback
 void Control::SignalDisconnected(SlotObserver* slotObserver, CallbackBase* callback)
 {
   mImpl->SignalDisconnected(slotObserver, callback);
+}
+
+void Control::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali::Property::Map& destinationPropertyMap,
+                                   Dali::Toolkit::Control source, Dali::Toolkit::Control destination, Dali::Property::Index visualIndex)
+{
+  sourcePropertyMap.Clear();
+  destinationPropertyMap.Clear();
+
+  Toolkit::Visual::Base sourceVisual      = DevelControl::GetVisual(GetImplementation(source), visualIndex);
+  Toolkit::Visual::Base destinationVisual = DevelControl::GetVisual(GetImplementation(destination), visualIndex);
+
+  // If source or destination doesn't have the visual, do not create transition for the visual.
+  if(!sourceVisual || !destinationVisual)
+  {
+    return;
+  }
+
+  Property::Map sourceMap;
+  Property::Map destinationMap;
+  sourceVisual.CreatePropertyMap(sourceMap);
+  destinationVisual.CreatePropertyMap(destinationMap);
+
+  static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4
+  {
+    Property::Value* propertyValue = map.Find(index);
+    if(propertyValue)
+    {
+      return propertyValue->Get<Vector4>();
+    }
+    return defaultValue;
+  };
+
+  static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float
+  {
+    Property::Value* propertyValue = map.Find(index);
+    if(propertyValue)
+    {
+      return propertyValue->Get<float>();
+    }
+    return defaultValue;
+  };
+
+  Vector4 defaultMixColor(Color::TRANSPARENT);
+  Vector4 defaultCornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
+  float   defaultBorderlineWidth(0.0f);
+  Vector4 defaultBorderlineColor(0.0f, 0.0f, 0.0f, 1.0f);
+  float   defaultBorderlineOffset(0.0f);
+
+  Vector4 sourceMixColor         = findValueVector4(sourceMap, Dali::Toolkit::Visual::Property::MIX_COLOR, defaultMixColor);
+  Vector4 sourceCornerRadius     = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, defaultCornerRadius);
+  float   sourceBorderlineWidth  = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, defaultBorderlineWidth);
+  Vector4 sourceBorderlineColor  = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, defaultBorderlineColor);
+  float   sourceBorderlineOffset = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, defaultBorderlineOffset);
+
+  Vector4 destinationMixColor         = findValueVector4(destinationMap, Dali::Toolkit::Visual::Property::MIX_COLOR, defaultMixColor);
+  Vector4 destinationCornerRadius     = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, defaultCornerRadius);
+  float   destinationBorderlineWidth  = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, defaultBorderlineWidth);
+  Vector4 destinationBorderlineColor  = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, defaultBorderlineColor);
+  float   destinationBorderlineOffset = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, defaultBorderlineOffset);
+
+  // If the value of the source Control and that of destination Control is different, the property should be transitioned.
+  if(Vector3(sourceMixColor) != Vector3(destinationMixColor))
+  {
+    sourcePropertyMap.Add(Dali::Toolkit::Visual::Property::MIX_COLOR, Vector3(sourceMixColor));
+    destinationPropertyMap.Add(Dali::Toolkit::Visual::Property::MIX_COLOR, Vector3(destinationMixColor));
+  }
+
+  if(std::abs(sourceMixColor.a - destinationMixColor.a) > Math::MACHINE_EPSILON_1)
+  {
+    sourcePropertyMap.Add(Dali::Toolkit::Visual::Property::OPACITY, sourceMixColor.a);
+    destinationPropertyMap.Add(Dali::Toolkit::Visual::Property::OPACITY, destinationMixColor.a);
+  }
+
+  if(sourceCornerRadius != destinationCornerRadius)
+  {
+    sourcePropertyMap.Add(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS, sourceCornerRadius);
+    destinationPropertyMap.Add(Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS, destinationCornerRadius);
+  }
+
+  if(sourceBorderlineWidth != destinationBorderlineWidth)
+  {
+    sourcePropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, sourceBorderlineWidth);
+    destinationPropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, destinationBorderlineWidth);
+  }
+
+  if(sourceBorderlineColor != destinationBorderlineColor)
+  {
+    sourcePropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_COLOR, sourceBorderlineColor);
+    destinationPropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_COLOR, destinationBorderlineColor);
+  }
+
+  if(sourceBorderlineOffset != destinationBorderlineOffset)
+  {
+    sourcePropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, sourceBorderlineOffset);
+    destinationPropertyMap.Add(Dali::Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, destinationBorderlineOffset);
+  }
 }
 
 Control& GetImplementation(Dali::Toolkit::Control& handle)

@@ -41,10 +41,11 @@ public:
    * @brief Create a new Transition object.
    * @param[in] source A source control of this transition.
    * @param[in] destination A destination control of this transition.
+   * @param[in] useDestinationTarget True if this transition uses destination control as target.
    * @param[in] timePeriod The timePeriod of the animation.
    * @return A smart-pointer to the newly allocated Transition.
    */
-  static TransitionPtr New(Dali::Toolkit::Control source, Dali::Toolkit::Control destination, TimePeriod timePeriod);
+  static TransitionPtr New(Dali::Toolkit::Control source, Dali::Toolkit::Control destination, bool useDestinationTarget, TimePeriod timePeriod);
 
 protected:
   /**
@@ -63,6 +64,7 @@ protected:
    */
   Transition(Dali::Toolkit::Control source,
              Dali::Toolkit::Control destination,
+             bool                   useDestinationTarget,
              TimePeriod             timePeriod);
 
   /**
@@ -78,8 +80,15 @@ private:
   Transition& operator=(const Transition& rhs);
 
 private:
-  WeakHandle<Dali::Toolkit::Control> mSourceControl;
-  WeakHandle<Dali::Toolkit::Control> mDestinationControl;
+  Dali::Toolkit::Control GetTargetControl();
+  Dali::Toolkit::Control GetWaitingControl();
+
+private:
+  bool                                                               mUseDestinationTarget;
+  Vector3                                                            mOriginalSize;
+  std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>> mOriginalVisualProperties;
+  WeakHandle<Dali::Toolkit::Control>                                 mSourceControl;
+  WeakHandle<Dali::Toolkit::Control>                                 mDestinationControl;
 };
 
 } // namespace Internal

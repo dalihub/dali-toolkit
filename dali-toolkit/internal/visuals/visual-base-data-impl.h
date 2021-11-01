@@ -134,12 +134,12 @@ struct Base::Impl
   Property::Index                 mBorderlineColorIndex;
   Property::Index                 mBorderlineOffsetIndex;
   Property::Index                 mCornerRadiusIndex;
-  FittingMode                     mFittingMode; //< How the contents should fit the view
+  FittingMode                     mFittingMode; ///< How the contents should fit the view
   int                             mFlags;
   Toolkit::Visual::ResourceStatus mResourceStatus;
   const Toolkit::Visual::Type     mType;
-  bool                            mNeedCornerRadius;
-  bool                            mNeedBorderline;
+  bool                            mAlwaysUsingBorderline : 1;   ///< Whether we need the borderline in shader always.
+  bool                            mAlwaysUsingCornerRadius : 1; ///< Whether we need the corner radius in shader always.
 };
 
 } // namespace Visual

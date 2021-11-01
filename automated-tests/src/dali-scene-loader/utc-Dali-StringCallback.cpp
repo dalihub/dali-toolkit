@@ -41,6 +41,6 @@ int UtcDaliUtilsDefaultStringCallback(void)
 {
   InstallLogFunction(TestLogFunction);
   DefaultErrorCallback("Hello world!");
-  DALI_TEST_EQUAL(std::string(sBuffer), "2: DefaultErrorCallback Hello world!");
+  DALI_TEST_EQUAL(std::string(sBuffer), "2: string-callback.cpp: DefaultErrorCallback(26) > Hello world!");
   END_TEST;
 }

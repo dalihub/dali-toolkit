@@ -134,8 +134,8 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
   mFlags(0),
   mResourceStatus(Toolkit::Visual::ResourceStatus::PREPARING),
   mType(type),
-  mNeedCornerRadius(false),
-  mNeedBorderline(false)
+  mAlwaysUsingBorderline(false),
+  mAlwaysUsingCornerRadius(false)
 {
 }
 

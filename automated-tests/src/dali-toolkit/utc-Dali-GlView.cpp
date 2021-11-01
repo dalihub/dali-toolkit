@@ -181,15 +181,15 @@ void resizeCB(Vector2 size)
 {
 }
 
-int UtcDaliGlViewRegisterGlCallbackN(void)
+int UtcDaliGlViewRegisterGlCallbacksN(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliGlViewRegisterGlCallback");
+  tet_infoline("UtcDaliGlViewRegisterGlCallbacksN");
   GlView view;
 
   try
   {
-    view.RegisterGlCallback(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
+    view.RegisterGlCallbacks(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
     DALI_TEST_CHECK(false);
   }
   catch(...)
@@ -243,7 +243,7 @@ int UtcDaliGlViewWindowVisibilityChanged(void)
   application.GetScene().Add( view );
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
-  view.RegisterGlCallback(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
+  view.RegisterGlCallbacks(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
   view.SetResizeCallback(Dali::MakeCallback(resizeCB));
 
   application.SendNotification();
@@ -268,7 +268,7 @@ int UtcDaliGlViewOnScene(void)
   application.GetScene().Add( view );
   view.SetRenderingMode(GlView::RenderingMode::CONTINUOUS);
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
-  view.RegisterGlCallback(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
+  view.RegisterGlCallbacks(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
 
   application.SendNotification();
   application.Render();
@@ -314,7 +314,7 @@ int UtcDaliGlViewResize(void)
 
   application.GetScene().Add( view );
   view.SetGraphicsConfig(true, true, 0, GlView::GraphicsApiVersion::GLES_VERSION_2_0);
-  view.RegisterGlCallback(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
+  view.RegisterGlCallbacks(Dali::MakeCallback(glInit), Dali::MakeCallback(glRenderFrame), Dali::MakeCallback(glTerminate));
   view.SetResizeCallback(Dali::MakeCallback(resizeCB));
   view.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
   view.SetProperty(Actor::Property::SIZE, Vector2(360.0f, 360.0f));

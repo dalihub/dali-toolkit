@@ -107,11 +107,6 @@ protected:
    */
   void OnSetTransform() override;
 
-  /**
-   * @copydoc Visual::Base::OnDoAction
-   */
-  void OnDoAction(const Property::Index actionId, const Property::Value& attributes) override;
-
 private:
   // Undefined
   ArcVisual(const ArcVisual& arcVisual) = delete;

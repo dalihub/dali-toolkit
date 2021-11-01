@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-signals-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
@@ -305,14 +306,10 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
 
   if(mLoadFailed)
   {
-    TextureSet textureSet = TextureSet::New();
-    mImpl->mRenderer.SetTextures(textureSet);
-
-    Texture brokenImage = mFactoryCache.GetBrokenVisualImage();
-    textureSet.SetTexture(0u, brokenImage);
-
+    Vector2 imageSize = Vector2::ZERO;
+    imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+    mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
     actor.AddRenderer(mImpl->mRenderer);
-
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
   }
   else
@@ -446,15 +443,6 @@ void AnimatedVectorImageVisual::OnDoAction(const Property::Index actionId, const
       {
         mAnimationData.currentFrame = frameNumber;
         mAnimationData.resendFlag |= VectorAnimationTask::RESEND_CURRENT_FRAME;
-      }
-      break;
-    }
-    case DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY:
-    {
-      const Property::Map* map = attributes.GetMap();
-      if(map)
-      {
-        DoSetProperties(*map);
       }
       break;
     }
