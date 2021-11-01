@@ -135,9 +135,9 @@ public:
   /**
    * @bried Apply the rasterized image to the canvas view
    *
-   * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
+   * @param[in] rasterizedTexture The texture with the rasterized pixels
    */
-  void ApplyRasterizedImage(PixelData rasterizedPixelData);
+  void ApplyRasterizedImage(Texture rasterizedTexture);
 
 private:
   CanvasView(const CanvasView&) = delete;

@@ -30,6 +30,7 @@
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali-toolkit/internal/builder/style.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 
 namespace Dali
 {
@@ -95,6 +96,21 @@ public: // Public API
   const Property::Map GetConfigurations();
 
   /**
+   * @copydoc Toolkit::DevelStyleManager::SetBrokenImageUrl
+   */
+  void SetBrokenImageUrl(DevelStyleManager::BrokenImageType brokenImageType, const std::string& brokenImageUrl);
+
+  /**
+   * @copydoc Toolkit::DevelStyleManager::GetBrokenImageUrl
+   */
+  std::string GetBrokenImageUrl(DevelStyleManager::BrokenImageType brokenImageType);
+
+  /**
+   * @copydoc Toolkit::DevelStyleManager::GetBrokenImageUrlList
+   */
+  std::vector<std::string> GetBrokenImageUrlList();
+
+  /**
    * @brief Apply the theme style to a control.
    *
    * @param[in] control The control to apply style.
@@ -135,6 +151,12 @@ public:
    * It should not be exposed in the public API
    */
   Toolkit::StyleManager::StyleChangedSignalType& ControlStyleChangeSignal();
+
+  /**
+   * This signal is sent to the visual factory following a broken image change.
+   * It should not be exposed in the public API
+   */
+  Toolkit::DevelStyleManager::BrokenImageChangedSignalType& BrokenImageChangedSignal();
 
 private:
   typedef std::vector<std::string> StringList;
@@ -233,9 +255,12 @@ private:
 
   Toolkit::Internal::FeedbackStyle* mFeedbackStyle; ///< Feedback style
 
+  std::vector<std::string> mBrokenImageUrls;    ///< Broken Image Urls received from user
+
   // Signals
-  Toolkit::StyleManager::StyleChangedSignalType mControlStyleChangeSignal; ///< Emitted when the style( theme/font ) changes for the controls to style themselves
-  Toolkit::StyleManager::StyleChangedSignalType mStyleChangedSignal;       ///< Emitted after the controls have been styled
+  Toolkit::StyleManager::StyleChangedSignalType            mControlStyleChangeSignal; ///< Emitted when the style( theme/font ) changes for the controls to style themselves
+  Toolkit::StyleManager::StyleChangedSignalType            mStyleChangedSignal;       ///< Emitted after the controls have been styled
+  Toolkit::DevelStyleManager::BrokenImageChangedSignalType mBrokenImageChangedSignal; ///< Emitted after brokenImageChangedSignal
 };
 
 } // namespace Internal

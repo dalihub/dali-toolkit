@@ -61,8 +61,10 @@ vec4 ComputeVertexPosition()
   vOptRectSize -= 0.2929 * maxRadius + 1.0;
 #endif
 
+  mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
 #if IS_REQUIRED_BORDERLINE
   vPosition = aPosition * (visualSize + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth);
+  vertexPosition.xy *= (1.0 + (1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth / visualSize);
   vOptRectSize -= (1.0 - clamp(borderlineOffset, -1.0, 1.0)) * 0.5 * borderlineWidth + 1.0;
 #elif IS_REQUIRED_ROUNDED_CORNER
   vPosition = aPosition * visualSize;
@@ -70,15 +72,16 @@ vec4 ComputeVertexPosition()
   mediump vec2 vPosition = aPosition * visualSize;
 #endif
 
+#if USER_SPACE
+  vertexPosition.xyz *= uSize;
+#endif
+
+  vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;
+
   return vec4(vPosition + anchorPoint * visualSize + (visualOffset + origin) * uSize.xy, 0.0, 1.0);
 }
 
 void main()
 {
-  mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
   gl_Position = uMvpMatrix * ComputeVertexPosition();
-#if USER_SPACE
-  vertexPosition.xyz *= uSize;
-#endif
-  vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;
 }

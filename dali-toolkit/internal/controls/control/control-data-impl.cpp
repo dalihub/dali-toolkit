@@ -36,6 +36,7 @@
 #include <limits>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -1970,115 +1971,46 @@ Dali::Property Control::Impl::GetVisualProperty(Dali::Property::Index index, Dal
   return Dali::Property(handle, Property::INVALID_INDEX);
 }
 
-void Control::Impl::MakeVisualTransition(Dali::Animation& animation, Dali::Toolkit::Control source, Dali::Property::Index visualIndex, AlphaFunction alphaFunction, TimePeriod timePeriod)
+void Control::Impl::CreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                                      std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                                      Dali::Toolkit::Control source, Dali::Toolkit::Control destination)
 {
-  Dali::Toolkit::Control sourceHandle      = Dali::Toolkit::Control::DownCast(source);
-  Property::Map          sourceMap         = sourceHandle.GetProperty<Property::Map>(visualIndex);
-  Dali::Toolkit::Control destinationHandle = Dali::Toolkit::Control::DownCast(mControlImpl.Self());
-  Property::Map          destinationMap    = destinationHandle.GetProperty<Property::Map>(visualIndex);
-
-  Vector4 mixColor(1.0f, 1.0f, 1.0f, 1.0f);
-  Vector4 cornerRadius(0.0f, 0.0f, 0.0f, 0.0f);
-  float   borderlineWidth(0.0f);
-  Vector4 borderlineColor(0.0f, 0.0f, 0.0f, 1.0f);
-  float   borderlineOffset(0.0f);
-
-  if(!destinationMap.Empty())
+  // Retrieves background properties to be transitioned.
+  Dali::Property::Map backgroundSourcePropertyMap, backgroundDestinationPropertyMap;
+  mControlImpl.MakeVisualTransition(backgroundSourcePropertyMap, backgroundDestinationPropertyMap, source, destination, Toolkit::Control::Property::BACKGROUND);
+  if(backgroundSourcePropertyMap.Count() > 0)
   {
-    static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4 {
-      Property::Value* propertyValue = map.Find(index);
-      if(propertyValue)
-      {
-        return propertyValue->Get<Vector4>();
-      }
-      return defaultValue;
-    };
+    sourceProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::Control::Property::BACKGROUND, backgroundSourcePropertyMap));
+    destinationProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::Control::Property::BACKGROUND, backgroundDestinationPropertyMap));
+  }
 
-    static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float {
-      Property::Value* propertyValue = map.Find(index);
-      if(propertyValue)
-      {
-        return propertyValue->Get<float>();
-      }
-      return defaultValue;
-    };
+  // Retrieves shadow properties to be transitioned.
+  Dali::Property::Map shadowSourcePropertyMap, shadowDestinationPropertyMap;
+  mControlImpl.MakeVisualTransition(shadowSourcePropertyMap, shadowDestinationPropertyMap, source, destination, Toolkit::DevelControl::Property::SHADOW);
+  if(shadowSourcePropertyMap.Count() > 0)
+  {
+    sourceProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::DevelControl::Property::SHADOW, shadowSourcePropertyMap));
+    destinationProperties.push_back(std::pair<Dali::Property::Index, Dali::Property::Map>(Toolkit::DevelControl::Property::SHADOW, shadowDestinationPropertyMap));
+  }
 
-    mixColor         = findValueVector4(destinationMap, Dali::Toolkit::Visual::Property::MIX_COLOR, mixColor);
-    cornerRadius     = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
-    borderlineWidth  = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth);
-    borderlineColor  = findValueVector4(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, borderlineColor);
-    borderlineOffset = findValueFloat(destinationMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset);
+  // Retrieves transition from inherited class.
+  mControlImpl.OnCreateTransitions(sourceProperties, destinationProperties, source, destination);
+}
 
-    if(sourceMap.Empty())
+void Control::Impl::UpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+{
+  for(auto&& data : properties)
+  {
+    if(data.first == Toolkit::Control::Property::BACKGROUND)
     {
-      sourceMap.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR);
-      sourceMap.Insert(Dali::Toolkit::Visual::Property::MIX_COLOR, Color::TRANSPARENT);
-      sourceMap.Insert(Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
-      sourceMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth);
-      sourceMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_COLOR, borderlineColor);
-      sourceMap.Insert(Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset);
+      DoAction(Toolkit::Control::Property::BACKGROUND, DevelVisual::Action::UPDATE_PROPERTY, data.second);
     }
-
-    Vector4 sourceMixColor         = findValueVector4(sourceMap, Dali::Toolkit::Visual::Property::MIX_COLOR, mixColor);
-    Vector4 sourceCornerRadius     = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::CORNER_RADIUS, cornerRadius);
-    float   sourceBorderlineWidth  = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_WIDTH, borderlineWidth);
-    Vector4 sourceBorderlineColor  = findValueVector4(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_COLOR, borderlineColor);
-    float   sourceBorderlineOffset = findValueFloat(sourceMap, Toolkit::DevelVisual::Property::BORDERLINE_OFFSET, borderlineOffset);
-
-    std::vector<Dali::Property>                              properties;
-    std::vector<std::pair<Property::Value, Property::Value>> values;
-
-    if(Vector3(sourceMixColor) != Vector3(mixColor))
+    else if(data.first == Toolkit::DevelControl::Property::SHADOW)
     {
-      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::Visual::Property::MIX_COLOR));
-      values.push_back(std::make_pair(Vector3(sourceMixColor), Vector3(mixColor)));
-    }
-
-    if(std::abs(sourceMixColor.a - mixColor.a) > Math::MACHINE_EPSILON_1)
-    {
-      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::Visual::Property::OPACITY));
-      values.push_back(std::make_pair(sourceMixColor.a, mixColor.a));
-    }
-
-    if(sourceCornerRadius != cornerRadius)
-    {
-      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::DevelVisual::Property::CORNER_RADIUS));
-      values.push_back(std::make_pair(sourceCornerRadius, cornerRadius));
-    }
-
-    if(sourceBorderlineWidth != borderlineWidth)
-    {
-      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::DevelVisual::Property::BORDERLINE_WIDTH));
-      values.push_back(std::make_pair(sourceBorderlineWidth, borderlineWidth));
-    }
-
-    if(sourceBorderlineColor != borderlineColor)
-    {
-      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::DevelVisual::Property::BORDERLINE_COLOR));
-      values.push_back(std::make_pair(sourceBorderlineColor, borderlineColor));
-    }
-
-    if(sourceBorderlineOffset != borderlineOffset)
-    {
-      properties.push_back(GetVisualProperty(visualIndex, Dali::Toolkit::DevelVisual::Property::BORDERLINE_OFFSET));
-      values.push_back(std::make_pair(sourceBorderlineOffset, borderlineOffset));
-    }
-
-    for(uint32_t i = 0; i < properties.size(); ++i)
-    {
-      if(timePeriod.delaySeconds > 0.0f)
-      {
-        Dali::KeyFrames initialKeyframes = Dali::KeyFrames::New();
-        initialKeyframes.Add(0.0f, values[i].first);
-        initialKeyframes.Add(1.0f, values[i].first);
-        animation.AnimateBetween(properties[i], initialKeyframes, TimePeriod(timePeriod.delaySeconds));
-      }
-      Dali::KeyFrames keyframes = Dali::KeyFrames::New();
-      keyframes.Add(0.0f, values[i].first);
-      keyframes.Add(1.0f, values[i].second);
-      animation.AnimateBetween(properties[i], keyframes, alphaFunction, timePeriod);
+      DoAction(Toolkit::DevelControl::Property::SHADOW, DevelVisual::Action::UPDATE_PROPERTY, data.second);
     }
   }
+  mControlImpl.OnUpdateVisualProperties(properties);
 }
 
 void Control::Impl::EmitResourceReadySignal()

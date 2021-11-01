@@ -45,6 +45,8 @@ const char* APPLICATION_RESOURCE_PATH_KEY = "APPLICATION_RESOURCE_PATH";
 
 const char* DEFAULT_TOOLKIT_PACKAGE_PATH = "/toolkit/";
 
+static constexpr int32_t COUNT_BROKEN_IMAGE_MAX = 3;
+
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_STYLE");
 #endif
@@ -125,6 +127,9 @@ StyleManager::StyleManager()
 
   // Sound & haptic style
   mFeedbackStyle = new FeedbackStyle();
+
+  // Initialize BrokenImages
+  mBrokenImageUrls.assign(COUNT_BROKEN_IMAGE_MAX, "");
 }
 
 StyleManager::~StyleManager()
@@ -230,6 +235,11 @@ Toolkit::StyleManager::StyleChangedSignalType& StyleManager::ControlStyleChangeS
   return mControlStyleChangeSignal;
 }
 
+Toolkit::DevelStyleManager::BrokenImageChangedSignalType& StyleManager::BrokenImageChangedSignal()
+{
+  return mBrokenImageChangedSignal;
+}
+
 void StyleManager::SetTheme(const std::string& themeFile)
 {
   bool themeLoaded = false;
@@ -307,6 +317,34 @@ const Property::Map StyleManager::GetConfigurations()
   DALI_LOG_STREAM(gLogFilter, Debug::Verbose, "          result: " << result);
 
   return result;
+}
+
+void StyleManager::SetBrokenImageUrl(DevelStyleManager::BrokenImageType brokenImageType, const std::string& brokenImageUrl)
+{
+  int brokenType = static_cast<int>(brokenImageType);
+  mBrokenImageUrls[brokenType] = brokenImageUrl;
+  Toolkit::StyleManager styleManager = StyleManager::Get();
+  mBrokenImageChangedSignal.Emit(styleManager);
+}
+
+std::string StyleManager::GetBrokenImageUrl(DevelStyleManager::BrokenImageType brokenImageType)
+{
+  int brokenType = static_cast<int>(brokenImageType);
+  return mBrokenImageUrls[brokenType];
+}
+
+std::vector<std::string> StyleManager::GetBrokenImageUrlList()
+{
+  // create a list for brokenImage
+  std::vector<std::string> brokenImageUrlList;
+  for(int i = 0; i < COUNT_BROKEN_IMAGE_MAX; i++)
+  {
+    if(!mBrokenImageUrls[i].empty())
+    {
+      brokenImageUrlList.push_back(mBrokenImageUrls[i]);
+    }
+  }
+  return brokenImageUrlList;
 }
 
 bool StyleManager::LoadFile(const std::string& filename, std::string& stringOut)

@@ -30,6 +30,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl-constraints.h>
 
 namespace Dali
 {
@@ -103,42 +104,66 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::GetScrollSnapAlphaFunction
    */
-  AlphaFunction GetScrollSnapAlphaFunction() const;
+  AlphaFunction GetScrollSnapAlphaFunction() const
+  {
+    return mSnapAlphaFunction;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetScrollSnapAlphaFunction
    */
-  void SetScrollSnapAlphaFunction(AlphaFunction alpha);
+  void SetScrollSnapAlphaFunction(AlphaFunction alpha)
+  {
+    mSnapAlphaFunction = alpha;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::GetScrollFlickAlphaFunction
    */
-  AlphaFunction GetScrollFlickAlphaFunction() const;
+  AlphaFunction GetScrollFlickAlphaFunction() const
+  {
+    return mFlickAlphaFunction;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetScrollFlickAlphaFunction
    */
-  void SetScrollFlickAlphaFunction(AlphaFunction alpha);
+  void SetScrollFlickAlphaFunction(AlphaFunction alpha)
+  {
+    mFlickAlphaFunction = alpha;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::GetScrollSnapDuration
    */
-  float GetScrollSnapDuration() const;
+  float GetScrollSnapDuration() const
+  {
+    return mSnapDuration;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetScrollSnapDuration
    */
-  void SetScrollSnapDuration(float time);
+  void SetScrollSnapDuration(float time)
+  {
+    mSnapDuration = time;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::GetScrollFlickDuration
    */
-  float GetScrollFlickDuration() const;
+  float GetScrollFlickDuration() const
+  {
+    return mFlickDuration;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetScrollFlickDuration
    */
-  void SetScrollFlickDuration(float time);
+  void SetScrollFlickDuration(float time)
+  {
+    mFlickDuration = time;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::ApplyEffect
@@ -168,12 +193,18 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::GetRulerX
    */
-  const RulerPtr GetRulerX() const;
+  const RulerPtr GetRulerX() const
+  {
+    return mRulerX;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::GetRulerY
    */
-  const RulerPtr GetRulerY() const;
+  const RulerPtr GetRulerY() const
+  {
+    return mRulerY;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetRulerX
@@ -190,7 +221,10 @@ public:
    *
    * @return whether the touch sensitivity is true or false.
    */
-  bool GetScrollSensitive();
+  bool GetScrollSensitive()
+  {
+    return mSensitive;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetScrollSensitive
@@ -205,19 +239,28 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::SetSnapOvershootAlphaFunction
    */
-  void SetSnapOvershootAlphaFunction(AlphaFunction alpha);
+  void SetSnapOvershootAlphaFunction(AlphaFunction alpha)
+  {
+    mSnapOvershootAlphaFunction = alpha;
+  }
 
   /**
    * Retrieve the duartion of Snap Overshoot animation
    *
    * @return the duration.
    */
-  float GetSnapOvershootDuration();
+  float GetSnapOvershootDuration()
+  {
+    return mSnapOvershootDuration;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetSnapOvershootDuration
    */
-  void SetSnapOvershootDuration(float duration);
+  void SetSnapOvershootDuration(float duration)
+  {
+    mSnapOvershootDuration = duration;
+  }
 
   /**
    * Retrieve whether Actor Auto-Snap mode is enabled or not.
@@ -229,7 +272,10 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::SetActorAutoSnap
    */
-  void SetActorAutoSnap(bool enable);
+  void SetActorAutoSnap(bool enable)
+  {
+    mActorAutoSnapEnabled = enable;
+  }
 
   /**
    * Enables or Disables Auto Resizing mode for ScrollView contents.
@@ -251,7 +297,10 @@ public:
    *
    * @return Wrap Mode Enabled flag.
    */
-  bool GetWrapMode() const;
+  bool GetWrapMode() const
+  {
+    return mWrapMode;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetWrapMode
@@ -261,17 +310,26 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::GetScrollupdateDistance
    */
-  int GetScrollUpdateDistance() const;
+  int GetScrollUpdateDistance() const
+  {
+    return mScrollUpdateDistance;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetScrollUpdateDistance
    */
-  void SetScrollUpdateDistance(int distance);
+  void SetScrollUpdateDistance(int distance)
+  {
+    mScrollUpdateDistance = distance;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::GetAxisAutoLock
    */
-  bool GetAxisAutoLock() const;
+  bool GetAxisAutoLock() const
+  {
+    return mAxisAutoLock;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetAxisAutoLock
@@ -281,7 +339,10 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::GetAxisAutoLockGradient
    */
-  float GetAxisAutoLockGradient() const;
+  float GetAxisAutoLockGradient() const
+  {
+    return mAxisAutoLockGradient;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetAxisAutoLockGradient
@@ -291,7 +352,10 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::GetFrictionCoefficient
    */
-  float GetFrictionCoefficient() const;
+  float GetFrictionCoefficient() const
+  {
+    return mFrictionCoefficient;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetFrictionCoefficient
@@ -301,52 +365,82 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::GetFlickSpeedCoefficient
    */
-  float GetFlickSpeedCoefficient() const;
+  float GetFlickSpeedCoefficient() const
+  {
+    return mFlickSpeedCoefficient;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetFlickSpeedCoefficient
    */
-  void SetFlickSpeedCoefficient(float speed);
+  void SetFlickSpeedCoefficient(float speed)
+  {
+    mFlickSpeedCoefficient = speed;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::GetMinimumDistanceForFlick
    */
-  Vector2 GetMinimumDistanceForFlick() const;
+  Vector2 GetMinimumDistanceForFlick() const
+  {
+    return mMinFlickDistance;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetMinimumDistanceForFlick
    */
-  void SetMinimumDistanceForFlick(const Vector2& distance);
+  void SetMinimumDistanceForFlick(const Vector2& distance)
+  {
+    mMinFlickDistance = distance;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::GetMinimumSpeedForFlick
    */
-  float GetMinimumSpeedForFlick() const;
+  float GetMinimumSpeedForFlick() const
+  {
+    return mFlickSpeedThreshold;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetMinimumSpeedForFlick
    */
-  void SetMinimumSpeedForFlick(float speed);
+  void SetMinimumSpeedForFlick(float speed)
+  {
+    mFlickSpeedThreshold = speed;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::GetMaxFlickSpeed
    */
-  float GetMaxFlickSpeed() const;
+  float GetMaxFlickSpeed() const
+  {
+    return mMaxFlickSpeed;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetMaxFlickSpeed
    */
-  void SetMaxFlickSpeed(float speed);
+  void SetMaxFlickSpeed(float speed)
+  {
+    mMaxFlickSpeed = speed;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::GetWheelScrollDistanceStep
    */
-  Vector2 GetWheelScrollDistanceStep() const;
+  Vector2 GetWheelScrollDistanceStep() const
+  {
+    return mWheelScrollDistanceStep;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::SetWheelScrollDistanceStep
    */
-  void SetWheelScrollDistanceStep(Vector2 step);
+  void SetWheelScrollDistanceStep(Vector2 step)
+  {
+    mWheelScrollDistanceStep = step;
+  }
 
   /**
    * @copydoc Toolkit::ScrollView::GetCurrentPage
@@ -765,26 +859,6 @@ private:
    */
   void WrapPosition(Vector2& position) const;
 
-  /**
-   * Updates the main internal scroll constraints with new ruler and domain
-   * values
-   */
-  void UpdateMainInternalConstraint();
-
-  /**
-   * Enables/disables the overshoot constraints
-   *
-   * @param[in] enabled whether to enable or disable the overshoot constraints
-   */
-  void SetOvershootConstraintsEnabled(bool enabled);
-
-  /**
-   * Sets internal constraints for this ScrollView.
-   * Many of these internal constraints are based on properties within
-   * ScrollView.
-   */
-  void SetInternalConstraints();
-
 protected:
   struct AccessibleImpl : public Scrollable::AccessibleImpl
   {
@@ -865,6 +939,8 @@ private:
   ScrollView& operator=(const ScrollView& rhs);
 
 private:
+  ScrollViewConstraints mConstraints;
+
   unsigned long mTouchDownTime; ///< The touch down time
 
   int     mGestureStackDepth; ///< How many gestures are currently occuring.
@@ -922,17 +998,6 @@ private:
 
   Vector2 mWheelScrollDistanceStep; ///< The step of scroll distance in actor coordinates in X and Y axes for each wheel event received.
 
-  //ScrollInternalConstraintsPtr mScrollInternalConstraints;
-  Constraint mScrollMainInternalPrePositionConstraint;
-  Constraint mScrollMainInternalPositionConstraint;
-  Constraint mScrollMainInternalOvershootXConstraint;
-  Constraint mScrollMainInternalOvershootYConstraint;
-  Constraint mScrollMainInternalDeltaConstraint;
-  Constraint mScrollMainInternalFinalConstraint;
-  Constraint mScrollMainInternalRelativeConstraint;
-  Constraint mScrollMainInternalDomainConstraint;
-  Constraint mScrollMainInternalPrePositionMaxConstraint;
-
   ScrollOvershootIndicatorPtr    mOvershootIndicator;
   WeakHandle<Toolkit::ScrollBar> mScrollBar;
 
@@ -953,7 +1018,20 @@ private:
   bool mCanScrollHorizontal : 1;        ///< Local value of our property to check against
   bool mCanScrollVertical : 1;          ///< Local value of our property to check against
   bool mTransientScrollBar : 1;         ///< True if scroll-bar should be automatically show/hidden during/after panning
+
+  friend ScrollViewConstraints;
 };
+
+/**
+ * Returns whether to lock scrolling to a particular axis
+ *
+ * @param[in] panDelta Distance panned since gesture started
+ * @param[in] currentLockAxis The current lock axis value
+ * @param[in] lockGradient How quickly to lock to a particular axis
+ *
+ * @return The new axis lock state
+ */
+ScrollView::LockAxis GetLockAxis(const Vector2& panDelta, ScrollView::LockAxis currentLockAxis, float lockGradient);
 
 } // namespace Internal
 

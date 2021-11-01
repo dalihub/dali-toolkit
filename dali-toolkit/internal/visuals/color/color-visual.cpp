@@ -23,7 +23,6 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/color-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -72,7 +71,7 @@ ColorVisual::ColorVisual(VisualFactoryCache& factoryCache)
 : Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::COLOR),
   mBlurRadius(0.0f),
   mBlurRadiusIndex(Property::INVALID_INDEX),
-  mNeedBlurRadius(false)
+  mAlwaysUsingBlurRadius(false)
 {
 }
 
@@ -161,23 +160,6 @@ void ColorVisual::OnSetTransform()
   }
 }
 
-void ColorVisual::OnDoAction(const Property::Index actionId, const Property::Value& attributes)
-{
-  // Check if action is valid for this visual type and perform action if possible
-  switch(actionId)
-  {
-    case DevelColorVisual::Action::UPDATE_PROPERTY:
-    {
-      const Property::Map* map = attributes.GetMap();
-      if(map)
-      {
-        DoSetProperties(*map);
-      }
-      break;
-    }
-  }
-}
-
 void ColorVisual::UpdateShader()
 {
   if(mImpl->mRenderer)
@@ -217,7 +199,7 @@ Shader ColorVisual::GenerateShader() const
 
   bool roundedCorner = IsRoundedCornerRequired();
   bool borderline    = IsBorderlineRequired();
-  bool blur          = !EqualsZero(mBlurRadius) || mNeedBlurRadius;
+  bool blur          = !EqualsZero(mBlurRadius) || mAlwaysUsingBlurRadius;
   int shaderTypeFlag = ColorVisualRequireFlag::DEFAULT;
 
   if(roundedCorner)
@@ -276,9 +258,10 @@ Dali::Property ColorVisual::OnGetPropertyObject(Dali::Property::Key key)
   {
     mBlurRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
 
-    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+    // Blur is animated now. we always have to use blur feature.
+    mAlwaysUsingBlurRadius = true;
 
-    mNeedBlurRadius = true;
+    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
 
     // Change shader
     UpdateShader();

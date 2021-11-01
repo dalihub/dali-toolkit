@@ -30,6 +30,7 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
 #include <dali-toolkit/public-api/image-loader/image-url.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 
 #include <test-native-image.h>
 #include <test-encoded-image-buffer.h>
@@ -60,6 +61,13 @@ const char* TEST_IMAGE_FILE_NAME2 =  "gallery_image_02.jpg";
 
 const char* TEST_IMAGE_1 = TEST_RESOURCE_DIR "/TB-gloss.png";
 const char* TEST_IMAGE_2 = TEST_RESOURCE_DIR "/tb-norm.png";
+
+const char* TEST_BROKEN_IMAGE_DEFAULT = TEST_RESOURCE_DIR "/broken.png";
+const char* TEST_BROKEN_IMAGE_S = TEST_RESOURCE_DIR "/broken_s.9.png";
+const char* TEST_BROKEN_IMAGE_M = TEST_RESOURCE_DIR "/broken_m.9.png";
+const char* TEST_BROKEN_IMAGE_L = TEST_RESOURCE_DIR "/broken_l.9.png";
+const char* TEST_BROKEN_IMAGE_01 =  TEST_RESOURCE_DIR "/button-up.9.png";
+const char* TEST_BROKEN_IMAGE_02 =  TEST_RESOURCE_DIR "/heartsframe.9.png";
 
 // resolution: 34*34, pixel format: RGBA8888
 static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
@@ -2879,6 +2887,116 @@ int UtcDaliImageViewSvgRasterizationFailure(void)
   DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
   // Fail to rasterize because the size is 0.
   DALI_TEST_EQUALS( imageView.GetVisualResourceStatus( ImageView::Property::IMAGE ), Visual::ResourceStatus::FAILED, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewTVGLoading(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing TVG image loading");
+
+  {
+    ImageView imageView = ImageView::New( );
+
+    imageView.SetImage( TEST_RESOURCE_DIR "/test.tvg" );
+
+    application.GetScene().Add( imageView );
+    DALI_TEST_CHECK( imageView );
+    Vector3 naturalSize = imageView.GetNaturalSize();
+
+    DALI_TEST_EQUALS( naturalSize.width, 100.0f, TEST_LOCATION );
+    DALI_TEST_EQUALS( naturalSize.height, 100.0f, TEST_LOCATION );
+  }
+  END_TEST;
+}
+int UtcDaliImageViewImageLoadFailure01(void)
+{
+  ToolkitTestApplication application;
+
+  Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL, TEST_BROKEN_IMAGE_S);
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL, TEST_BROKEN_IMAGE_M);
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::LARGE, TEST_BROKEN_IMAGE_L);
+
+  std::string brokenUrl;
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_S, brokenUrl, TEST_LOCATION);
+
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_M, brokenUrl, TEST_LOCATION);
+
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::LARGE);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_L, brokenUrl, TEST_LOCATION);
+
+  ImageView imageView = ImageView::New("invalidUrl.png");
+  imageView.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+
+  application.GetScene().Add( imageView );
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewImageLoadFailure02(void)
+{
+  ToolkitTestApplication application;
+
+  Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL, TEST_BROKEN_IMAGE_DEFAULT);
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL, TEST_BROKEN_IMAGE_M);
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::LARGE, TEST_BROKEN_IMAGE_L);
+
+  std::string brokenUrl;
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_DEFAULT, brokenUrl, TEST_LOCATION);
+
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_M, brokenUrl, TEST_LOCATION);
+
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::LARGE);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_L, brokenUrl, TEST_LOCATION);
+
+  ImageView imageView = ImageView::New("invalidUrl.png");
+  imageView.SetProperty( Actor::Property::SIZE, Vector2( 30.f, 30.f ) );
+  application.GetScene().Add( imageView );
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewImageLoadFailure03(void)
+{
+  ToolkitTestApplication application;
+
+  Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL, TEST_BROKEN_IMAGE_01);
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL, TEST_BROKEN_IMAGE_02);
+
+  std::string brokenUrl;
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_01, brokenUrl, TEST_LOCATION);
+
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_02, brokenUrl, TEST_LOCATION);
+
+  ImageView imageView = ImageView::New("invalidUrl.png");
+  imageView.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  application.GetScene().Add( imageView );
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   END_TEST;
 }

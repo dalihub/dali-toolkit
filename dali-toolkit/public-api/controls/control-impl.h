@@ -45,6 +45,7 @@ class StyleManager;
 
 namespace Internal
 {
+
 /**
  * @brief This is the internal base class for all controls.
  *
@@ -617,18 +618,47 @@ public: // API for derived classes to override
     return NULL;
   }
 
-  // Transition
+  // Transition APIs
 
   /**
-   * @brief Retrieve visual property animations.
-   * This Control is a destination.
+   * @brief Make visual transition from source control to destination control about specific Visual.
+   * If both of source and destination control have same visual index, than generates information for the transition of this Control.
    *
-   * @param[in] animation generated animation
-   * @param[in] source source control of the animation.
-   * @param[in] alphaFunction AlphaFunction of the animation
-   * @param[in] timePeriod TimePeriod of the animation
+   * @param[out] sourcePropertyMap Source property map to be applied on this Control.
+   * @param[out] destinationPropertyMap Destination property map to be applied on this Control.
+   * @param[in] source Source control of the animation.
+   * @param[in] destination Destination control of the animation.
+   * @param[in] visualIndex Property::Index to make animation.
    */
-  virtual void OnCreateTransitions(Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod timePeriod)
+  void MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, Dali::Property::Map& destinationPropertyMap,
+                            Dali::Toolkit::Control source, Dali::Toolkit::Control destination, Dali::Property::Index visualIndex);
+
+  /**
+   * @brief Retrieves source and destination visual properties for the Transition of this Control.
+   * The properties of this Control will be transitioned from the propeties of source Control to that of destination control.
+   * If a property value is different between source and destination Control,
+   * the property information of each Control will be included in sourceProperties and destinationProperties.
+   *
+   * @param[out] sourceProperties Source property list to be applied on this Control.
+   * @param[out] destinationProperties Destination property list to be applied on this Control.
+   * @param[in] source Source control of the animation.
+   * @param[in] destination Destination control of the animation.
+   *
+   * @note This method do not handle Actor properties.
+   * And the size and order of the sourceProperties and destinationProperties must be synchronized.
+   */
+  virtual void OnCreateTransitions(std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                                   std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                                   Dali::Toolkit::Control                                              source,
+                                   Dali::Toolkit::Control                                              destination)
+  {
+  }
+
+  /**
+   * @brief Update visual properties.
+   * @param[in] properties Property list to be used to update visual properties of this Control.
+   */
+  virtual void OnUpdateVisualProperties(const std::vector<std::pair<Dali::Property::Index, Dali::Property::Map>>& properties)
   {
   }
 

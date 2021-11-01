@@ -30,6 +30,26 @@ const Property::Map GetConfigurations(StyleManager styleManager)
   return GetImpl(styleManager).GetConfigurations();
 }
 
+void SetBrokenImageUrl(StyleManager styleManager, DevelStyleManager::BrokenImageType brokenImageType, const std::string& brokenImageUrl)
+{
+  return GetImpl(styleManager).SetBrokenImageUrl(brokenImageType, brokenImageUrl);
+}
+
+std::string GetBrokenImageUrl(StyleManager styleManager, DevelStyleManager::BrokenImageType brokenImageType)
+{
+  return GetImpl(styleManager).GetBrokenImageUrl(brokenImageType);
+}
+
+std::vector<std::string> GetBrokenImageUrlList(StyleManager styleManager)
+{
+  return GetImpl(styleManager).GetBrokenImageUrlList();
+}
+
+BrokenImageChangedSignalType& BrokenImageChangedSignal(StyleManager styleManager)
+{
+  return GetImpl(styleManager).BrokenImageChangedSignal();
+}
+
 } // namespace DevelStyleManager
 
 } // namespace Toolkit

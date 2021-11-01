@@ -67,11 +67,11 @@ GlView::~GlView()
   }
 }
 
-void GlView::RegisterGlCallback(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
+void GlView::RegisterGlCallbacks(CallbackBase* initCallback, CallbackBase* renderFrameCallback, CallbackBase* terminateCallback)
 {
   if(mRenderThread)
   {
-    mRenderThread->RegisterGlCallback(initCallback, renderFrameCallback, terminateCallback);
+    mRenderThread->RegisterGlCallbacks(initCallback, renderFrameCallback, terminateCallback);
   }
 }
 

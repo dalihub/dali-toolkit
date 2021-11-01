@@ -25,7 +25,6 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <memory>
@@ -81,15 +80,9 @@ public:
 
   /**
    * Get the rasterization result.
-   * @return The pixel data with the rasterized pixels.
+   * @return The texture with the rasterized pixels.
    */
-  PixelData GetPixelData() const;
-
-  /**
-   * Get size of rasterization result.
-   * @return The size of the pixel data.
-   */
-  Vector2 GetBufferSize() const;
+  Texture GetRasterizedTexture();
 
 private:
   // Undefined
@@ -101,8 +94,7 @@ private:
 private:
   CanvasViewPtr  mCanvasView;
   CanvasRenderer mCanvasRenderer;
-  PixelData      mPixelData;
-  Vector2        mBufferSize;
+  Texture        mRasterizedTexture;
 };
 
 /**
@@ -112,7 +104,7 @@ class CanvasViewRasterizeThread : public Thread, Integration::Processor
 {
 public:
   /// @brief ApplyRasterizedImage Event signal type
-  using RasterizationCompletedSignalType = Signal<void(PixelData)>;
+  using RasterizationCompletedSignalType = Signal<void(Texture)>;
 
 public:
   /**

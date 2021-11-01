@@ -371,20 +371,6 @@ DALI_TOOLKIT_API VisualEventSignalType& VisualEventSignal(Control control);
 DALI_TOOLKIT_API Dali::Property GetVisualProperty(Control control, Dali::Property::Index index, Dali::Property::Key visualPropertyKey);
 
 /**
- * @brief Retrieve visual/renderer property animation between this Control and source control.
- * Input animation must be created before this method called.
- * And the animations between this method created are added the input animation.
- * This method generates visual/renderer property animation but not creates Actor property animation.
- *
- * @param[in] control The control
- * @param[in] animation generated animation
- * @param[in] source source control of the animation.
- * @param[in] alphaFunction AlphaFunction of the animation
- * @param[in] timePeriod TimePeriod of the animation
- */
-DALI_TOOLKIT_API void CreateTransitions(Control control, Dali::Animation& animation, Dali::Toolkit::Control source, AlphaFunction alphaFunction, TimePeriod timePeriod);
-
-/**
  * @brief The signal is emmited as a succession of "activate" signal send by accessibility client.
  * @return The signal to connect to
  */

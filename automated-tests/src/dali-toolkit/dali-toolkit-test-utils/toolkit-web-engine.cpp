@@ -2056,7 +2056,7 @@ std::string WebEngine::GetUrl() const
   return Internal::Adaptor::GetImplementation( *this ).GetUrl();
 }
 
-NativeImageInterfacePtr WebEngine::GetNativeImageSource()
+NativeImageSourcePtr WebEngine::GetNativeImageSource()
 {
   Any source;
   Dali::NativeImageSourcePtr sourcePtr = Dali::NativeImageSource::New( source );

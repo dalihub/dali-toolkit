@@ -302,42 +302,6 @@ int UtcDaliCanvasViewRasterizeTaskGetCanvasViewP(void)
   END_TEST;
 }
 
-int UtcDaliCanvasViewRasterizeTaskGetBufferSizeP(void)
-{
-  ToolkitTestApplication application;
-
-  Dali::Toolkit::Internal::CanvasView* dummyInternalCanvasView = new Dali::Toolkit::Internal::CanvasView(Vector2(100,100));
-  DALI_TEST_CHECK( dummyInternalCanvasView );
-
-  Dali::CanvasRenderer dummyCanvasRenderer = Dali::CanvasRenderer::New(Vector2(100, 100));
-  DALI_TEST_CHECK( dummyCanvasRenderer );
-
-  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = new Dali::Toolkit::Internal::CanvasRendererRasterizingTask(dummyInternalCanvasView, dummyCanvasRenderer);
-  DALI_TEST_CHECK( task );
-
-  //There is no rasterized buffer.
-  DALI_TEST_EQUALS( task->GetBufferSize(), Vector2(0, 0), TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliCanvasViewRasterizeTaskGetPixelDataP(void)
-{
-
-  Dali::Toolkit::Internal::CanvasView* dummyInternalCanvasView = new Dali::Toolkit::Internal::CanvasView(Vector2(100,100));
-  DALI_TEST_CHECK( dummyInternalCanvasView );
-
-  Dali::CanvasRenderer dummyCanvasRenderer = Dali::CanvasRenderer::New(Vector2(100, 100));
-  DALI_TEST_CHECK( dummyCanvasRenderer );
-
-  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = new Dali::Toolkit::Internal::CanvasRendererRasterizingTask(dummyInternalCanvasView, dummyCanvasRenderer);
-  DALI_TEST_CHECK( task );
-
-  DALI_TEST_EQUALS( task->GetPixelData(), PixelData(), TEST_LOCATION );
-
-  END_TEST;
-}
-
 int UtcDaliCanvasViewRasterizeThreadP(void)
 {
   ToolkitTestApplication application;
@@ -488,13 +452,13 @@ int UtcDaliCanvasViewRasterizeThreadRasterizationCompletedSignalP(void)
 {
   ToolkitTestApplication application;
 
-  Dali::Toolkit::Internal::CanvasView* dummyInternalCanvasView = new Dali::Toolkit::Internal::CanvasView(Vector2(100,100));
-  DALI_TEST_CHECK( dummyInternalCanvasView );
+  Dali::Toolkit::CanvasView canvasView = Dali::Toolkit::CanvasView::New(Vector2(100, 100));
+  Dali::Toolkit::Internal::CanvasView& dummyInternalCanvasView = GetImpl(canvasView);
 
   Dali::CanvasRenderer dummyCanvasRenderer = Dali::CanvasRenderer::New(Vector2(100, 100));
   DALI_TEST_CHECK( dummyCanvasRenderer );
 
-  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = new Dali::Toolkit::Internal::CanvasRendererRasterizingTask(dummyInternalCanvasView, dummyCanvasRenderer);
+  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = new Dali::Toolkit::Internal::CanvasRendererRasterizingTask(&dummyInternalCanvasView, dummyCanvasRenderer);
   DALI_TEST_CHECK( task );
 
   Dali::Toolkit::Internal::CanvasViewRasterizeThread *dummyThread = new Dali::Toolkit::Internal::CanvasViewRasterizeThread();
@@ -504,10 +468,10 @@ int UtcDaliCanvasViewRasterizeThreadRasterizationCompletedSignalP(void)
 
   dummyThread->Process(false);
 
-  PixelData pixelData = CreatePixelData( 100, 100 );
+  auto texture = Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100 );
 
-  dummyThread->RasterizationCompletedSignal().Connect(dummyInternalCanvasView, &Dali::Toolkit::Internal::CanvasView::ApplyRasterizedImage);
-  dummyThread->RasterizationCompletedSignal().Emit(pixelData);
+  dummyThread->RasterizationCompletedSignal().Connect(&dummyInternalCanvasView, &Dali::Toolkit::Internal::CanvasView::ApplyRasterizedImage);
+  dummyThread->RasterizationCompletedSignal().Emit(texture);
 
   application.SendNotification();
   application.Render();

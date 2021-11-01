@@ -38,7 +38,8 @@ public:
     SVG,
     GIF,
     WEBP,
-    JSON
+    JSON,
+    TVG
   };
 
   enum ProtocolType

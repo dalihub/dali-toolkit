@@ -51,13 +51,14 @@ public:
   /**
    * @brief Creates an initialized Transition.
    *
-   * @param[in] source Source
-   * @param[in] destination Destination
+   * @param[in] source A source control of this transition.
+   * @param[in] destination A destination control of this transition.
+   * @param[in] useDestinationTarget True if this transition uses destination control as target.
    * @param[in] timePeriod The duration in seconds
    * @return A handle to a newly allocated Dali resource
    * @note durationSeconds can not be negative.
    */
-  static Transition New(Dali::Toolkit::Control source, Dali::Toolkit::Control destination, TimePeriod timePeriod);
+  static Transition New(Dali::Toolkit::Control source, Dali::Toolkit::Control destination, bool useDestinationTarget, TimePeriod timePeriod);
 
   /**
    * @brief Downcasts a handle to Transition handle.

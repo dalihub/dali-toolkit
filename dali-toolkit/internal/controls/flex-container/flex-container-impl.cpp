@@ -39,7 +39,7 @@ namespace
 // currently not called from code so compiler will optimize these away, kept here for future debugging
 
 #define FLEX_CONTAINER_TAG "DALI Toolkit::FlexContainer "
-#define FC_LOG(fmt, args, ...) Debug::LogMessage(Debug::DebugInfo, FLEX_CONTAINER_TAG fmt, ##args)
+#define FC_LOG(fmt, args, ...) Debug::LogMessageWithFunctionLine(Debug::DebugInfo, FLEX_CONTAINER_TAG fmt, ##args)
 // #define FLEX_CONTAINER_DEBUG 1
 
 #if defined(FLEX_CONTAINER_DEBUG)

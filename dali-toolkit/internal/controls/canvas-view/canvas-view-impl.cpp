@@ -196,43 +196,21 @@ void CanvasView::AddRasterizationTask()
   }
 }
 
-void CanvasView::ApplyRasterizedImage(PixelData rasterizedPixelData)
+void CanvasView::ApplyRasterizedImage(Texture rasterizedTexture)
 {
-  if(rasterizedPixelData)
+  if (rasterizedTexture && rasterizedTexture.GetWidth() != 0 && rasterizedTexture.GetHeight() != 0)
   {
-    auto rasterizedPixelDataWidth  = rasterizedPixelData.GetWidth();
-    auto rasterizedPixelDataHeight = rasterizedPixelData.GetHeight();
-
-    if(rasterizedPixelDataWidth > 0 && rasterizedPixelDataHeight > 0)
+    if(!mTextureSet)
     {
-      if(!mTexture || mTexture.GetWidth() != rasterizedPixelDataWidth || mTexture.GetHeight() != rasterizedPixelDataHeight)
-      {
-        mTexture = Texture::New(TextureType::TEXTURE_2D, rasterizedPixelData.GetPixelFormat(), rasterizedPixelDataWidth, rasterizedPixelDataHeight);
-        mTexture.Upload(rasterizedPixelData);
-
-        if(!mTextureSet)
-        {
-          mTextureSet       = TextureSet::New();
-          Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-          Shader   shader   = Shader::New(SHADER_CANVAS_VIEW_VERT, SHADER_CANVAS_VIEW_FRAG);
-          Renderer renderer = Renderer::New(geometry, shader);
-          renderer.SetTextures(mTextureSet);
-          renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
-
-          Actor actor = Self();
-          if(actor)
-          {
-            actor.AddRenderer(renderer);
-          }
-        }
-        mTextureSet.SetTexture(0, mTexture);
-      }
-      else
-      {
-        //Update texture
-        mTexture.Upload(rasterizedPixelData);
-      }
+      mTextureSet       = TextureSet::New();
+      Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
+      Shader   shader   = Shader::New(SHADER_CANVAS_VIEW_VERT, SHADER_CANVAS_VIEW_FRAG);
+      Renderer renderer = Renderer::New(geometry, shader);
+      renderer.SetTextures(mTextureSet);
+      renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
+      Self().AddRenderer(renderer);
     }
+    mTextureSet.SetTexture(0, rasterizedTexture);
   }
 
   //If there are accumulated changes to CanvasRenderer during Rasterize, Rasterize once again.

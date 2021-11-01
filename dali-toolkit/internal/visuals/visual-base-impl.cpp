@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/helpers/property-helper.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -294,6 +295,11 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         {
           mImpl->mBorderlineWidth = width;
         }
+
+        if(mImpl->mBorderlineWidthIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mImpl->mBorderlineWidthIndex, mImpl->mBorderlineWidth);
+        }
         break;
       }
       case Toolkit::DevelVisual::Property::BORDERLINE_COLOR:
@@ -303,6 +309,11 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         {
           mImpl->mBorderlineColor = color;
         }
+
+        if(mImpl->mBorderlineColorIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mImpl->mBorderlineColorIndex, mImpl->mBorderlineColor);
+        }
         break;
       }
       case Toolkit::DevelVisual::Property::BORDERLINE_OFFSET:
@@ -311,6 +322,11 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         if(value.Get(offset))
         {
           mImpl->mBorderlineOffset = offset;
+        }
+
+        if(mImpl->mBorderlineOffsetIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mImpl->mBorderlineOffsetIndex, mImpl->mBorderlineOffset);
         }
         break;
       }
@@ -336,6 +352,11 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           {
             mImpl->mCornerRadius = Vector4(radius, radius, radius, radius);
           }
+        }
+
+        if(mImpl->mCornerRadiusIndex != Property::INVALID_INDEX)
+        {
+          mImpl->mRenderer.SetProperty(mImpl->mCornerRadiusIndex, mImpl->mCornerRadius);
         }
         break;
       }
@@ -423,6 +444,20 @@ void Visual::Base::GetNaturalSize(Vector2& naturalSize)
 void Visual::Base::DoAction(const Property::Index actionId, const Property::Value attributes)
 {
   OnDoAction(actionId, attributes);
+
+  // Check if action is valid for this visual type and perform action if possible
+  switch(actionId)
+  {
+    case DevelVisual::Action::UPDATE_PROPERTY:
+    {
+      const Property::Map* map = attributes.GetMap();
+      if(map)
+      {
+        SetProperties(*map);
+      }
+      break;
+    }
+  }
 }
 
 void Visual::Base::SetDepthIndex(int index)
@@ -583,7 +618,7 @@ bool Visual::Base::IsRoundedCornerRequired() const
       // Update values from Renderer
       mImpl->mCornerRadius = mImpl->mRenderer.GetProperty<Vector4>(mImpl->mCornerRadiusIndex);
     }
-    return !(mImpl->mCornerRadius == Vector4::ZERO) || mImpl->mNeedCornerRadius;
+    return !(mImpl->mCornerRadius == Vector4::ZERO) || mImpl->mAlwaysUsingCornerRadius;
   }
   return false;
 }
@@ -598,7 +633,7 @@ bool Visual::Base::IsBorderlineRequired() const
       // Update values from Renderer
       mImpl->mBorderlineWidth = mImpl->mRenderer.GetProperty<float>(mImpl->mBorderlineWidthIndex);
     }
-    return !EqualsZero(mImpl->mBorderlineWidth) || mImpl->mNeedBorderline;
+    return !EqualsZero(mImpl->mBorderlineWidth) || mImpl->mAlwaysUsingBorderline;
   }
   return false;
 }
@@ -968,7 +1003,9 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
       mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_WIDTH, BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
       mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_COLOR, BORDERLINE_COLOR, mImpl->mBorderlineColor);
       mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
-      mImpl->mNeedBorderline        = true;
+
+      // Borderline is animated now. we always have to use borderline feature.
+      mImpl->mAlwaysUsingBorderline = true;
 
       index = mImpl->mRenderer.GetPropertyIndex(key);
 
@@ -981,14 +1018,16 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
       mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
       mImpl->mRenderer.RegisterProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
 
-      if(!mImpl->mNeedBorderline)
+      // ConerRadius is animated now. we always have to use corner radius feature.
+      mImpl->mAlwaysUsingCornerRadius = true;
+
+      if(!IsBorderlineRequired())
       {
-        // If mNeedBorderline is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+        // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
         mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
       }
 
-      index                    = mImpl->mCornerRadiusIndex;
-      mImpl->mNeedCornerRadius = true;
+      index = mImpl->mCornerRadiusIndex;
 
       // Change shader
       UpdateShader();

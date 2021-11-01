@@ -58,6 +58,13 @@ public:
   void OnStyleChangedSignal(Toolkit::StyleManager styleManager, StyleChange::Type type);
 
   /**
+   * @brief BrokenImageChanged callback
+   *
+   * @param[in] styleManager Handle for style manager.
+   */
+  void OnBrokenImageChangedSignal(Toolkit::StyleManager styleManager);
+
+  /**
    * @copydoc Toolkit::VisualFactory::CreateVisual( const Property::Map& )
    */
   Toolkit::Visual::Base CreateVisual(const Property::Map& propertyMap);
@@ -89,6 +96,12 @@ protected:
   ~VisualFactory() override;
 
 private:
+  /**
+   * @brief Set the Broken Image url
+   * @param[in] styleManager The instance of StyleManager
+   */
+  void SetBrokenImageUrl(Toolkit::StyleManager& styleManager);
+
   /**
    * Get the factory cache, creating it if necessary.
    */

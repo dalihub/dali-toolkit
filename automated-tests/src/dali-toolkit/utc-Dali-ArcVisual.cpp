@@ -22,7 +22,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/arc-visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/arc-visual-actions-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include "dummy-control.h"
 
@@ -307,7 +307,7 @@ int UtcDaliArcVisualUpdateProperty(void)
             .Add( DevelArcVisual::Property::START_ANGLE, startAngle )
             .Add( DevelArcVisual::Property::SWEEP_ANGLE, sweepAngle );
 
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelArcVisual::Action::UPDATE_PROPERTY, attributes );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelVisual::Action::UPDATE_PROPERTY, attributes );
 
   application.SendNotification();
   application.Render();

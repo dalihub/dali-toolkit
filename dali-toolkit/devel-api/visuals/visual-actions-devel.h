@@ -1,8 +1,8 @@
-#ifndef DALI_TOOLKIT_DEVEL_API_VISUALS_COLOR_VISUAL_ACTIONS_DEVEL_H
-#define DALI_TOOLKIT_DEVEL_API_VISUALS_COLOR_VISUAL_ACTIONS_DEVEL_H
+#ifndef DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_ACTIONS_DEVEL_H
+#define DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_ACTIONS_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,18 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali-toolkit/devel-api/toolkit-action-index-ranges.h>
+
 namespace Dali
 {
 namespace Toolkit
 {
-namespace DevelColorVisual
+namespace DevelVisual
 {
+
 /**
- * @brief Actions that the color visual can perform. These actions are called through the Visual::Base::DoAction API.
+ * @brief Actions that the visual can perform. These actions are called through the Visual::Base::DoAction API.
  */
 namespace Action
 {
@@ -37,15 +41,15 @@ enum Type
   /**
    * @brief Update the properties of the visual.
    */
-  UPDATE_PROPERTY = 0
+  UPDATE_PROPERTY = VISUAL_ACTION_BASE_START_INDEX
 };
 
 } // namespace Action
 
-} // namespace DevelColorVisual
+} // namespace DevelVisual
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_DEVEL_API_VISUALS_COLOR_VISUAL_ACTIONS_DEVEL_H
+#endif // DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_ACTIONS_DEVEL_H
