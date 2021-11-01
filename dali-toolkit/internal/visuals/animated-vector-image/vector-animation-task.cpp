@@ -528,11 +528,10 @@ VectorAnimationTask::TimePoint VectorAnimationTask::CalculateNextFrameTime(bool 
   // is casted to use the default duration.
   mNextFrameStartTime = std::chrono::time_point_cast<TimePoint::duration>(mNextFrameStartTime + std::chrono::microseconds(mFrameDurationMicroSeconds));
   auto current        = std::chrono::steady_clock::now();
-  mDroppedFrames      = 0;
-
   if(renderNow)
   {
     mNextFrameStartTime = current;
+    mDroppedFrames      = 0;
   }
   else if(mNextFrameStartTime < current)
   {
