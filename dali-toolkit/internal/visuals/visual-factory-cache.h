@@ -28,7 +28,6 @@
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
 
 namespace Dali
 {
@@ -125,18 +124,7 @@ public:
     GEOMETRY_TYPE_MAX = WIREFRAME_GEOMETRY
   };
 
-  /**
-   * @brief The Type of BrokenImage
-   */
-  enum BrokenImageType
-  {
-    SMALL,
-    NORMAL,
-    LARGE
-  };
-
 public:
-
   /**
    * @brief Constructor
    *
@@ -189,6 +177,12 @@ public:
   static Geometry CreateGridGeometry(Uint16Pair gridSize);
 
   /**
+   * @brief Returns a new Texture to use when a visual has failed to correctly render
+   * @return The broken image texture.
+   */
+  Texture GetBrokenVisualImage();
+
+  /**
    * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
    */
   void SetPreMultiplyOnLoad(bool preMultiply);
@@ -199,32 +193,10 @@ public:
   bool GetPreMultiplyOnLoad();
 
   /**
-   * @brief Enable a custom broken image
-   *
-   * @param[in] enabled True if cache use custom broken image
-   */
-  void EnableCustomBrokenImage(bool enabled);
-
-  /**
    * @brief Set an image to be used when a visual has failed to correctly render
-   * @param[in] brokenImageType BrokenImage type
-   * @param[in] brokenImageUrl The broken image url
+   * @param[in] brokenImageUrl The broken image url.
    */
-  void SetBrokenImageUrl(BrokenImageType brokenImageType, const std::string& brokenImageUrl);
-
-  /**
-   * @brief Returns a broken image type
-   * @param[in] brokenImageType BrokenImage type
-   * @return The broken image type.
-   */
-  VisualUrl::Type GetBrokenImageVisualType(BrokenImageType brokenImageType);
-
-  /**
-   * @brief Get the Npatch Renderer object
-   * @param[in] renderer renderer for npatch
-   * @param[in] size     the size of actor
-   */
-  void GetBrokenImageRenderer(Renderer& renderer, const Vector2& size);
+  void SetBrokenImageUrl(const std::string& brokenImageUrl);
 
 public:
   /**
@@ -269,101 +241,17 @@ protected:
   VisualFactoryCache& operator=(const VisualFactoryCache& rhs);
 
 private:
-  /**
-   * @brief Returns a new Texture to use when a visual has failed to correctly render
-   * @return The broken image texture.
-   */
-  Texture GetBrokenVisualImage(BrokenImageType brokenImageType);
-
-  /**
-   * @brief Change the Proper broken image type
-   * @param[in] size The size of actor
-   *
-   * @return The type of broken image
-   */
-  BrokenImageType GetProperBrokenImageType(const Vector2& size);
-
-  /**
-   * @brief Apply a texture and uniforms
-   *
-   * @param renderer The renderer for broken image
-   * @param brokenImageType The type of broken image
-   */
-  void ApplyTextureAndUniforms(Renderer& renderer, BrokenImageType brokenImageType);
-
-  /**
-   * @brief Creates a Npatch Geometry object
-   *
-   * @param[in] gridSize The gridSize for creating a geometry
-   * @return The Geometry for NPatch
-   */
-  Geometry CreateNPatchGeometry(Uint16Pair gridSize);
-
-  /**
-   * @brief Gets a geometry for npatch image
-   *
-   * @param[in] brokenImageType the type of broken image
-   * @return The Geometry for NPatch
-   */
-  Geometry GetNPatchGeometry(BrokenImageType brokenImageType);
-
-  /**
-   * @brief Gets the Npatch Shader object
-   *
-   * @param[in] brokenImageType The type of broken image
-   * @return The Shader for NPatch
-   */
-  Shader GetNPatchShader(BrokenImageType brokenImageType);
-
-  /**
-   * @brief Registers a properties for Stretch Ranges
-   *
-   * @param renderer The renderer for broken image
-   * @param brokenImageType The type of broken image
-   * @param uniformName The name of the uniform
-   * @param stretchPixels The stretchable pixels in the cropped image space
-   * @param imageExtent The imageExtent
-   */
-  void RegisterStretchProperties(Renderer& renderer, BrokenImageType brokenImageType, const char* uniformName, const NPatchUtility::StretchRanges& stretchPixels, uint16_t imageExtent);
-
-private:
-  struct BrokenImageInfo
-  {
-    BrokenImageInfo()
-    :visualType(),
-     url(""),
-     npatchId(NPatchData::INVALID_NPATCH_DATA_ID),
-     texture(),
-     width(0),
-     height(0)
-    {
-    }
-
-    ~BrokenImageInfo()
-    {
-    }
-
-    // Data
-    VisualUrl::Type                         visualType;
-    std::string                             url;
-    NPatchData::NPatchDataId                npatchId;
-    Texture                                 texture;
-    uint32_t                                width;
-    uint32_t                                height;
-  };
-
   Geometry mGeometry[GEOMETRY_TYPE_MAX + 1];
   Shader   mShader[SHADER_TYPE_MAX + 1];
 
   ImageAtlasManagerPtr                    mAtlasManager;
   TextureManager                          mTextureManager;
   NPatchLoader                            mNPatchLoader;
-
+  Texture                                 mBrokenImageTexture;
   SvgRasterizeThread*                     mSvgRasterizeThread;
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;
+  std::string                             mBrokenImageUrl;
   bool                                    mPreMultiplyOnLoad;
-  std::vector<BrokenImageInfo>            mBrokenImageInfoContainer;
-  bool                                    mUseCustomBrokenImage;
 };
 
 } // namespace Internal

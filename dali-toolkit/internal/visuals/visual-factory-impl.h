@@ -90,12 +90,6 @@ protected:
 
 private:
   /**
-   * @brief Set the Broken Image url
-   *
-   */
-  void SetBrokenImageUrl(Toolkit::StyleManager& styleManager);
-
-  /**
    * Get the factory cache, creating it if necessary.
    */
   Internal::VisualFactoryCache& GetFactoryCache();
