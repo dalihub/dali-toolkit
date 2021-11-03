@@ -23,7 +23,6 @@
 #include <dali/devel-api/images/pixel-data-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
-#include <dali/public-api/animation/constraints.h>
 #include <string.h>
 
 // INTERNAL HEADER
@@ -291,22 +290,28 @@ void TextVisual::DoSetOnScene(Actor& actor)
   // Enable the pre-multiplied alpha to improve the text quality
   EnablePreMultipliedAlpha(true);
 
-  const Vector4&        defaultColor         = mController->GetTextModel()->GetDefaultColor();
-  Dali::Property::Index shaderTextColorIndex = mImpl->mRenderer.RegisterProperty("uTextColorAnimatable", defaultColor);
-
   if(mAnimatableTextColorPropertyIndex != Property::INVALID_INDEX)
   {
+    const Vector4&        defaultColor         = mController->GetTextModel()->GetDefaultColor();
+    Dali::Property::Index shaderTextColorIndex = mImpl->mRenderer.RegisterProperty("uTextColorAnimatable", defaultColor);
+
     // Create constraint for the animatable text's color Property with uTextColorAnimatable in the renderer.
     if(shaderTextColorIndex != Property::INVALID_INDEX)
     {
-      Constraint colorConstraint = Constraint::New<Vector4>(mImpl->mRenderer, shaderTextColorIndex, TextColorConstraint);
-      colorConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
-      colorConstraint.Apply();
+      if(!mColorConstraint)
+      {
+        mColorConstraint = Constraint::New<Vector4>(mImpl->mRenderer, shaderTextColorIndex, TextColorConstraint);
+        mColorConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
+      }
+      mColorConstraint.Apply();
 
       // Make zero if the alpha value of text color is zero to skip rendering text
-      Constraint opacityConstraint = Constraint::New<float>(mImpl->mRenderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
-      opacityConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
-      opacityConstraint.Apply();
+      if(!mOpacityConstraint)
+      {
+        mOpacityConstraint = Constraint::New<float>(mImpl->mRenderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
+        mOpacityConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
+      }
+      mOpacityConstraint.Apply();
     }
   }
 
@@ -335,6 +340,15 @@ void TextVisual::RemoveRenderer(Actor& actor)
 
 void TextVisual::DoSetOffScene(Actor& actor)
 {
+  if(mColorConstraint)
+  {
+    mColorConstraint.Remove();
+  }
+  if(mOpacityConstraint)
+  {
+    mOpacityConstraint.Remove();
+  }
+
   RemoveRenderer(actor);
 
   // Resets the control handle.
