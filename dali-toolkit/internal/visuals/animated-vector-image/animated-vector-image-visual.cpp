@@ -626,10 +626,9 @@ Shader AnimatedVectorImageVisual::GenerateShader() const
   {
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
-      TextureAtlas::DISABLED,
-      DefaultTextureWrapMode::APPLY,
-      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
-      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
+      ImageVisualShaderFeature::FeatureBuilder()
+      .EnableRoundedCorner(IsRoundedCornerRequired())
+      .EnableBorderline(IsBorderlineRequired())
     );
   }
   return shader;

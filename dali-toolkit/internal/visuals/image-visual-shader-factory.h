@@ -29,41 +29,101 @@ namespace Toolkit
 {
 namespace Internal
 {
+
+/**
+ * ImageVisualShaderFeature contains feature lists what image visual shader need to know.
+ */
+namespace ImageVisualShaderFeature
+{
+namespace TextureAtlas
+{
 /**
  * @brief Whether use texture with atlas, or not
  */
-enum class TextureAtlas
+enum Type
 {
-  DISABLED = 0, ///< Image visual use ATLAS
-  ENABLED       ///< Image visual doesn't use ATLAS
+  DISABLED = 0, ///< Image visual doesn't use ATLAS
+  ENABLED       ///< Image visual uses ATLAS
 };
+} // namespace TextureAtlas
 
+namespace DefaultTextureWrapMode
+{
 /**
  * @brief Whether apply to texture wraping in default, or not
  */
-enum class DefaultTextureWrapMode
+enum Type
 {
-  DO_NOT_APPLY = 0, ///< Image visual doesn't apply to wraping texture in default
-  APPLY             ///< Image visual apply to wraping texture in default
+  APPLY = 0,   ///< Image visual applies to wraping texture in default
+  DO_NOT_APPLY ///< Image visual doesn't apply to wraping texture in default
 };
+} // namespace DefaultTextureWrapMode
 
+namespace RoundedCorner
+{
 /**
  * @brief Whether use rounded corner, or not
  */
-enum class RoundedCorner
+enum Type
 {
   DISABLED = 0, ///< Image visual doesn't use rounded corner
-  ENABLED       ///< Image visual use rounded corner
+  ENABLED       ///< Image visual uses rounded corner
 };
+} // namespace RoundedCorner
 
+namespace Borderline
+{
 /**
  * @brief Whether use borderline, or not
  */
-enum class Borderline
+enum Type
 {
   DISABLED = 0, ///< Image visual doesn't use borderline
-  ENABLED       ///< Image visual use borderline
+  ENABLED       ///< Image visual uses borderline
 };
+} // namespace Borderline
+
+namespace ChangeFragmentShader
+{
+/**
+ * @brief Whether native image change the default fragment shader, or not
+ */
+enum Type
+{
+  DONT_CHANGE = 0, ///< Native image doesn't change default fragment shader.
+  NEED_CHANGE,     ///< Native image changes default fragment shader. We need another shader cache.
+  UNDECIDED,       ///< Undecided.
+};
+} // namespace ChangeFragmentShader
+
+/**
+ * @brief Collection of current image visual feature. Only use for ImageVisualShaderFactory::GetShader()
+ */
+struct FeatureBuilder
+{
+  FeatureBuilder()
+  : mTextureAtlas(TextureAtlas::DISABLED),
+    mDefaultTextureWrapMode(DefaultTextureWrapMode::APPLY),
+    mRoundedCorner(RoundedCorner::DISABLED),
+    mBorderline(Borderline::DISABLED),
+    mTexture()
+  {
+  }
+
+  FeatureBuilder& EnableTextureAtlas(bool enableTextureAtlas);
+  FeatureBuilder& ApplyDefaultTextureWrapMode(bool applyDefaultTextureWrapMode);
+  FeatureBuilder& EnableRoundedCorner(bool enableRoundedCorner);
+  FeatureBuilder& EnableBorderline(bool enableBorderline);
+  FeatureBuilder& SetTextureForFragmentShaderCheck(const Dali::Texture& texture);
+
+  TextureAtlas::Type           mTextureAtlas : 2;           ///< Whether use texture with atlas, or not. default as TextureAtlas::DISABLED
+  DefaultTextureWrapMode::Type mDefaultTextureWrapMode : 2; ///< Whether apply to texture wraping in default, or not. default as DefaultTextureWrapMode::APPLY
+  RoundedCorner::Type          mRoundedCorner : 2;          ///< Whether use rounded corner, or not. default as RoundedCorner::DISABLED
+  Borderline::Type             mBorderline : 2;             ///< Whether use borderline, or not. default as Borderline::DISABLED
+  Dali::Texture                mTexture;                    ///< Texture to check whether we need to change fragment shader or not
+};
+
+} // namespace ImageVisualShaderFactoryFeature
 
 /**
  * ImageVisualShaderFactory is an object that provides and shares shaders between image visuals
@@ -83,23 +143,21 @@ public:
   ~ImageVisualShaderFactory();
 
   /**
-   * Get the standard image rendering shader.
+   * @brief Get the standard image rendering shader.
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @param[in] atlasing Whether texture atlasing is applied.
-   * @param[in] defaultTextureWrapping Whether the default texture wrap mode is applied.
-   * @param[in] roundedCorner Whether the rounded corder is applied.
-   * @param[in] borderline Whether the borderline of visual is applied.
+   * @param[in] featureBuilder Collection of current image shader's features
+   * @return The standard image rendering shader with features.
    */
-  Shader GetShader(VisualFactoryCache& factoryCache, TextureAtlas atlasing, DefaultTextureWrapMode defaultTextureWrapping, RoundedCorner roundedCorner, Borderline borderline);
+  Shader GetShader(VisualFactoryCache& factoryCache, const ImageVisualShaderFeature::FeatureBuilder& featureBuilder);
 
   /**
-   * Request the default vertex shader source.
+   * @brief Request the default vertex shader source.
    * @return The default vertex shader source.
    */
   std::string_view GetVertexShaderSource();
 
   /**
-   * Request the default fragment shader source.
+   * @brief Request the default fragment shader source.
    * @return The default fragment shader source.
    */
   std::string_view GetFragmentShaderSource();
@@ -116,6 +174,19 @@ protected:
   ImageVisualShaderFactory& operator=(const ImageVisualShaderFactory& rhs);
 
 private:
+
+  /**
+   * @brief Cached information whether native image should change fragment shader.
+   * Default it is ChangeFragmentShader::UNDECIDED.
+   * If we have any chance to check native image source apply fragment shader,
+   * this vaule will be changed one of these : ChangeFragmentShader::DONT_CHANGE or ChangeFragmentShader::NEED_CHANGE
+   *
+   * After result cached, this value will not be changed.
+   *
+   * If value is DONT_CHANGE, ImageVisualShaderFactory::GetShader never call ApplyNativeFragmentShader.
+   * Else, ImageVisualShaderFactory::GetShader will call ApplyNativeFragmentShader if native image source texture come.
+   */
+  ImageVisualShaderFeature::ChangeFragmentShader::Type mFragmentShaderNeedChange : 3;
 };
 
 } // namespace Internal

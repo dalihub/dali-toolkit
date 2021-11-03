@@ -422,7 +422,6 @@ int UtcDaliImageVisualRemoteImageLoad(void)
   END_TEST;
 }
 
-
 int UtcDaliImageVisualWithNativeImage(void)
 {
   ToolkitTestApplication application;
@@ -464,6 +463,71 @@ int UtcDaliImageVisualWithNativeImage(void)
   size_t pos = fragmentShader.find(fragmentPrefix);
 
   DALI_TEST_EQUALS( pos != std::string::npos, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualWithNativeImageCustomShader(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Use Native Image as url and Use custom shader" );
+
+  NativeImageSourcePtr nativeImageSource = NativeImageSource::New(500, 500, NativeImageSource::COLOR_DEPTH_DEFAULT);
+  ImageUrl imageUrl = Dali::Toolkit::Image::GenerateUrl(nativeImageSource);
+  std::string url = imageUrl.GetUrl();
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  Property::Map shaderMap;
+  const std::string customVertexShaderSource = "Foobar";
+  const std::string customFragmentShaderSource = "Foobar";
+  shaderMap[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = customFragmentShaderSource;
+  shaderMap[Toolkit::Visual::Shader::Property::VERTEX_SHADER] = customVertexShaderSource;
+
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,   Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::SHADER, shaderMap );
+  propertyMap.Insert( ImageVisual::Property::URL,        url );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+
+  actor.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  application.GetScene().Add( actor );
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(16);
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Shader shader = renderer.GetShader();
+
+  Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
+  DALI_TEST_CHECK(value.GetType() == Property::MAP);
+  const Property::Map* outMap = value.GetMap();
+  std::string fragmentShaderSource = (*outMap)["fragment"].Get<std::string>();
+  std::string vertexShaderSource = (*outMap)["vertex"].Get<std::string>();
+
+  // Compare vertex shader is equal
+  DALI_TEST_EQUALS( customVertexShaderSource, vertexShaderSource, TEST_LOCATION );
+
+  // Check fragment shader changed
+  const char* fragmentPrefix = Dali::NativeImageSourceTest::GetCustomFragmentPrefix();
+  size_t pos = fragmentShaderSource.find(fragmentPrefix);
+
+  DALI_TEST_EQUALS( pos != std::string::npos, true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( std::string(fragmentPrefix) + customFragmentShaderSource, fragmentShaderSource, TEST_LOCATION );
 
   END_TEST;
 }
