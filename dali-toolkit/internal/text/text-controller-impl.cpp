@@ -2737,6 +2737,10 @@ Actor Controller::Impl::CreateBackgroundActor()
 
     Vector4 quad;
     uint32_t numberOfQuads = 0u;
+    Length    yLineOffset   = 0;
+    Length    prevLineIndex = 0;
+    LineIndex lineIndex;
+    Length    numberOfLines;
 
     for( uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i )
     {
@@ -2747,38 +2751,46 @@ Actor Controller::Impl::CreateBackgroundActor()
       const ColorIndex backgroundColorIndex = ( nullptr == backgroundColorsBuffer ) ? 0u : *( backgroundColorIndicesBuffer + i );
       const Vector4& backgroundColor = ( 0u == backgroundColorIndex ) ? defaultBackgroundColor : *( backgroundColorsBuffer + backgroundColorIndex - 1u );
 
-      // Only create quads for glyphs with a background color
-      if ( backgroundColor != Color::TRANSPARENT )
-      {
-        const Vector2 position = *( positionsBuffer + i );
+      mModel->mVisualModel->GetNumberOfLines(i, 1, lineIndex, numberOfLines);
+      Length lineHeight = lineRun[lineIndex].ascender + -(lineRun[lineIndex].descender) + lineRun[lineIndex].lineSpacing;
 
-        if ( i == 0u && glyphSize == 1u ) // Only one glyph in the whole text
+      if(lineIndex != prevLineIndex)
+      {
+        yLineOffset += lineHeight;
+      }
+
+      // Only create quads for glyphs with a background color
+      if(backgroundColor != Color::TRANSPARENT)
+      {
+        const Vector2 position = *(positionsBuffer + i);
+
+        if(i == 0u && glyphSize == 1u) // Only one glyph in the whole text
         {
           quad.x = position.x;
-          quad.y = 0.0f;
-          quad.z = quad.x + std::max( glyph.advance, glyph.xBearing + glyph.width );
-          quad.w = textSize.height;
+          quad.y = yLineOffset;
+          quad.z = quad.x + std::max(glyph.advance, glyph.xBearing + glyph.width);
+          quad.w = lineHeight;
         }
-        else if ( i == 0u ) // The first glyph in the whole text
+        else if((lineIndex != prevLineIndex) || (i == 0u)) // The first glyph in the line
         {
           quad.x = position.x;
-          quad.y = 0.0f;
+          quad.y = yLineOffset;
           quad.z = quad.x - glyph.xBearing + glyph.advance;
-          quad.w = textSize.height;
+          quad.w = quad.y + lineHeight;
         }
-        else if ( i == glyphSize - 1u ) // The last glyph in the whole text
+        else if(i == glyphSize - 1u) // The last glyph in the whole text
         {
           quad.x = position.x - glyph.xBearing;
-          quad.y = 0.0f;
-          quad.z = quad.x + std::max( glyph.advance, glyph.xBearing + glyph.width );
-          quad.w = textSize.height;
+          quad.y = yLineOffset;
+          quad.z = quad.x + std::max(glyph.advance, glyph.xBearing + glyph.width);
+          quad.w = quad.y + lineHeight;
         }
         else // The glyph in the middle of the text
         {
           quad.x = position.x - glyph.xBearing;
-          quad.y = 0.0f;
+          quad.y = yLineOffset;
           quad.z = quad.x + glyph.advance;
-          quad.w = textSize.height;
+          quad.w = quad.y + lineHeight;
         }
 
         BackgroundVertex vertex;
@@ -2787,35 +2799,40 @@ Actor Controller::Impl::CreateBackgroundActor()
         vertex.mPosition.x = quad.x - offsetX;
         vertex.mPosition.y = quad.y - offsetY;
         vertex.mColor = backgroundColor;
-        mesh.mVertices.PushBack( vertex );
+        mesh.mVertices.PushBack(vertex);
 
         // Top right
         vertex.mPosition.x = quad.z - offsetX;
         vertex.mPosition.y = quad.y - offsetY;
         vertex.mColor = backgroundColor;
-        mesh.mVertices.PushBack( vertex );
+        mesh.mVertices.PushBack(vertex);
 
         // Bottom left
         vertex.mPosition.x = quad.x - offsetX;
         vertex.mPosition.y = quad.w - offsetY;
         vertex.mColor = backgroundColor;
-        mesh.mVertices.PushBack( vertex );
+        mesh.mVertices.PushBack(vertex);
 
         // Bottom right
         vertex.mPosition.x = quad.z - offsetX;
         vertex.mPosition.y = quad.w - offsetY;
         vertex.mColor = backgroundColor;
-        mesh.mVertices.PushBack( vertex );
+        mesh.mVertices.PushBack(vertex);
 
         // Six indices in counter clockwise winding
-        mesh.mIndices.PushBack( 1u + 4 * numberOfQuads );
-        mesh.mIndices.PushBack( 0u + 4 * numberOfQuads );
-        mesh.mIndices.PushBack( 2u + 4 * numberOfQuads );
-        mesh.mIndices.PushBack( 2u + 4 * numberOfQuads );
-        mesh.mIndices.PushBack( 3u + 4 * numberOfQuads );
-        mesh.mIndices.PushBack( 1u + 4 * numberOfQuads );
+        mesh.mIndices.PushBack(1u + 4 * numberOfQuads);
+        mesh.mIndices.PushBack(0u + 4 * numberOfQuads);
+        mesh.mIndices.PushBack(2u + 4 * numberOfQuads);
+        mesh.mIndices.PushBack(2u + 4 * numberOfQuads);
+        mesh.mIndices.PushBack(3u + 4 * numberOfQuads);
+        mesh.mIndices.PushBack(1u + 4 * numberOfQuads);
 
         numberOfQuads++;
+      }
+
+      if(lineIndex != prevLineIndex)
+      {
+        prevLineIndex = lineIndex;
       }
     }
 
