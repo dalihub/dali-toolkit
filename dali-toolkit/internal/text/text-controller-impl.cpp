@@ -1586,7 +1586,7 @@ Actor Controller::Impl::CreateBackgroundActor()
 
     const Vector2 textSize = mView.GetLayoutSize();
 
-    const float offsetX = textSize.width * 0.5f;
+    const float offsetX = alignmentOffset + textSize.width * 0.5f;
     const float offsetY = textSize.height * 0.5f;
 
     const Vector4* const    backgroundColorsBuffer       = mView.GetBackgroundColors();
