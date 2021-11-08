@@ -101,6 +101,30 @@ public:
     mIsAppearingTransition = appearingTransition;
   }
 
+  /**
+   * @brief Returns whether this transition is appearing transition or not
+   */
+  bool IsAppearingTransition() const
+  {
+    return mIsAppearingTransition;
+  }
+
+  /**
+   * @brief Returns whether this transition is a transition from a Control to another Control or effect to appearing or disappearing.
+   */
+  bool IsPairTransition() const
+  {
+    return mIsPairTransition;
+  }
+
+  /**
+   * @brief Returns target which will be transition.
+   */
+  const Dali::Toolkit::Control GetTarget() const
+  {
+    return mTarget;
+  }
+
 protected:
 
   /**
@@ -159,28 +183,12 @@ protected:
   }
 
   /**
-   * @brief Returns whether this transition is appearing transition or not
-   */
-  bool IsAppearingTransition() const
-  {
-    return mIsAppearingTransition;
-  }
-
-  /**
    * @brief Set whether this transition is a transition from a Control to another Control or effect to appearing or disappearing.
    * @param[in] pairTransition True if this transition is appearing transition.
    */
   void SetPairTransition(bool pairTransition)
   {
     mIsPairTransition = pairTransition;
-  }
-
-  /**
-   * @brief Returns whether this transition is a transition from a Control to another Control or effect to appearing or disappearing.
-   */
-  bool IsPairTransition() const
-  {
-    return mIsPairTransition;
   }
 
 protected:
