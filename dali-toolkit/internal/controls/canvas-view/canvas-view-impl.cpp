@@ -23,6 +23,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/rendering/texture-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -202,10 +203,14 @@ void CanvasView::ApplyRasterizedImage(Texture rasterizedTexture)
   {
     if(!mTextureSet)
     {
+      std::string fragmentShader = SHADER_CANVAS_VIEW_FRAG.data();
+      DevelTexture::ApplyNativeFragmentShader(rasterizedTexture, fragmentShader);
+
       mTextureSet       = TextureSet::New();
       Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-      Shader   shader   = Shader::New(SHADER_CANVAS_VIEW_VERT, SHADER_CANVAS_VIEW_FRAG);
+      Shader   shader   = Shader::New(SHADER_CANVAS_VIEW_VERT, fragmentShader);
       Renderer renderer = Renderer::New(geometry, shader);
+
       renderer.SetTextures(mTextureSet);
       renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
       Self().AddRenderer(renderer);
