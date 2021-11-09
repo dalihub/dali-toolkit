@@ -208,22 +208,18 @@ void TransitionBase::SetAnimation()
     return;
   }
 
-  // If this transition is not a transition from a Control to another Control
-  // and a transition effect to appear with delay,
-  // the mTarget should not be shown until delay seconds.
-  if(!IsPairTransition() && mIsAppearingTransition && mAnimation && mTimePeriod.delaySeconds > Dali::Math::MACHINE_EPSILON_10)
-  {
-    Dali::KeyFrames initialKeyframes = Dali::KeyFrames::New();
-    initialKeyframes.Add(0.0f, OPACITY_TRANSPARENT);
-    initialKeyframes.Add(1.0f, OPACITY_TRANSPARENT);
-    mAnimation.AnimateBetween(Property(mTarget, Dali::Actor::Property::OPACITY), initialKeyframes, TimePeriod(mTimePeriod.delaySeconds));
-  }
-
   for(uint32_t i = 0; i < mStartPropertyMap.Count(); ++i)
   {
     Property::Value* finishValue = mFinishPropertyMap.Find(mStartPropertyMap.GetKeyAt(i).indexKey);
     if(finishValue)
     {
+      // If this transition is appearing transition, this property keeps start value during delay.
+      // If multiple transitions are applied to this Control and others run before this transition,
+      // this property should keep start value until this transition starts.
+      if(!IsPairTransition() && IsAppearingTransition() && mTimePeriod.delaySeconds > Dali::Math::MACHINE_EPSILON_10)
+      {
+        mTarget.SetProperty(mStartPropertyMap.GetKeyAt(i).indexKey, mStartPropertyMap.GetValue(i));
+      }
       AnimateBetween(mTarget, mStartPropertyMap.GetKeyAt(i).indexKey, mStartPropertyMap.GetValue(i), *finishValue);
     }
   }
