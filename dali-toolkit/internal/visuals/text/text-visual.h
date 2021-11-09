@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
 
@@ -333,8 +332,6 @@ private:
   Text::ControllerPtr mController;                       ///< The text's controller.
   Text::TypesetterPtr mTypesetter;                       ///< The text's typesetter.
   WeakHandle<Actor>   mControl;                          ///< The control where the renderer is added.
-  Constraint          mColorConstraint{};                ///< Color constraint
-  Constraint          mOpacityConstraint{};              ///< Opacity constraint
   Property::Index     mAnimatableTextColorPropertyIndex; ///< The index of animatable text color property registered by the control.
   bool                mRendererUpdateNeeded : 1;         ///< The flag to indicate whether the renderer needs to be updated.
   RendererContainer   mRendererList;
