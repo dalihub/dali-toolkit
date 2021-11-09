@@ -46,6 +46,7 @@ const float DEFAULT_FONT_SIZE_SCALE = 1.f;
 struct CursorInfo;
 struct FontDefaults;
 struct ControllerImplEventHandler;
+struct ControllerImplModelUpdater;
 struct SelectionHandleController;
 
 class SelectableControlInterface;
@@ -845,6 +846,7 @@ public:
 
 private:
   friend ControllerImplEventHandler;
+  friend ControllerImplModelUpdater;
   friend SelectionHandleController;
 };
 

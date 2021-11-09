@@ -25,16 +25,11 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
-#include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
-#include <dali-toolkit/internal/text/color-segmentation.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
-#include <dali-toolkit/internal/text/hyphenator.h>
-#include <dali-toolkit/internal/text/multi-language-support.h>
-#include <dali-toolkit/internal/text/segmentation.h>
-#include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
+#include <dali-toolkit/internal/text/text-controller-impl-model-updater.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
@@ -60,28 +55,82 @@ struct BackgroundMesh
   Vector<unsigned short>   mIndices;  ///< container of indices
 };
 
-// The relative luminance of a color is defined as (L = 0.2126 * R + 0.7152 * G + 0.0722 * B)
-// based on W3C Recommendations (https://www.w3.org/TR/WCAG20/)
-const float         BRIGHTNESS_THRESHOLD = 0.179f;
-const float         CONSTANT_R           = 0.2126f;
-const float         CONSTANT_G           = 0.7152f;
-const float         CONSTANT_B           = 0.0722f;
-const Dali::Vector4 BLACK(0.f, 0.f, 0.f, 1.f);
-const Dali::Vector4 WHITE(1.f, 1.f, 1.f, 1.f);
-const Dali::Vector4 LIGHT_BLUE(0.75f, 0.96f, 1.f, 1.f);
-const Dali::Vector4 BACKGROUND_SUB4(0.58f, 0.87f, 0.96f, 1.f);
-const Dali::Vector4 BACKGROUND_SUB5(0.83f, 0.94f, 0.98f, 1.f);
-const Dali::Vector4 BACKGROUND_SUB6(1.f, 0.5f, 0.5f, 1.f);
-const Dali::Vector4 BACKGROUND_SUB7(1.f, 0.8f, 0.8f, 1.f);
-
 } // namespace
 
-namespace Dali
+namespace Dali::Toolkit::Text
 {
-namespace Toolkit
+
+namespace
 {
-namespace Text
+
+void SetDefaultInputStyle(InputStyle& inputStyle, const FontDefaults* const fontDefaults, const Vector4& textColor)
 {
+  // Sets the default text's color.
+  inputStyle.textColor      = textColor;
+  inputStyle.isDefaultColor = true;
+
+  inputStyle.familyName.clear();
+  inputStyle.weight = TextAbstraction::FontWeight::NORMAL;
+  inputStyle.width  = TextAbstraction::FontWidth::NORMAL;
+  inputStyle.slant  = TextAbstraction::FontSlant::NORMAL;
+  inputStyle.size   = 0.f;
+
+  inputStyle.lineSpacing = 0.f;
+
+  inputStyle.underlineProperties.clear();
+  inputStyle.shadowProperties.clear();
+  inputStyle.embossProperties.clear();
+  inputStyle.outlineProperties.clear();
+
+  inputStyle.isFamilyDefined = false;
+  inputStyle.isWeightDefined = false;
+  inputStyle.isWidthDefined  = false;
+  inputStyle.isSlantDefined  = false;
+  inputStyle.isSizeDefined   = false;
+
+  inputStyle.isLineSpacingDefined = false;
+
+  inputStyle.isUnderlineDefined = false;
+  inputStyle.isShadowDefined    = false;
+  inputStyle.isEmbossDefined    = false;
+  inputStyle.isOutlineDefined   = false;
+
+  // Sets the default font's family name, weight, width, slant and size.
+  if(fontDefaults)
+  {
+    if(fontDefaults->familyDefined)
+    {
+      inputStyle.familyName      = fontDefaults->mFontDescription.family;
+      inputStyle.isFamilyDefined = true;
+    }
+
+    if(fontDefaults->weightDefined)
+    {
+      inputStyle.weight          = fontDefaults->mFontDescription.weight;
+      inputStyle.isWeightDefined = true;
+    }
+
+    if(fontDefaults->widthDefined)
+    {
+      inputStyle.width          = fontDefaults->mFontDescription.width;
+      inputStyle.isWidthDefined = true;
+    }
+
+    if(fontDefaults->slantDefined)
+    {
+      inputStyle.slant          = fontDefaults->mFontDescription.slant;
+      inputStyle.isSlantDefined = true;
+    }
+
+    if(fontDefaults->sizeDefined)
+    {
+      inputStyle.size          = fontDefaults->mDefaultPointSize;
+      inputStyle.isSizeDefined = true;
+    }
+  }
+}
+} // unnamed Namespace
+
 EventData::EventData(DecoratorPtr decorator, InputMethodContext& inputMethodContext)
 : mDecorator(decorator),
   mInputMethodContext(inputMethodContext),
@@ -588,600 +637,12 @@ void Controller::Impl::ClearModelData(CharacterIndex startIndex, CharacterIndex 
 
 bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::UpdateModel\n");
-
-  // Calculate the operations to be done.
-  const OperationsMask operations = static_cast<OperationsMask>(mOperationsPending & operationsRequired);
-
-  if(NO_OPERATION == operations)
-  {
-    // Nothing to do if no operations are pending and required.
-    return false;
-  }
-
-  Vector<Character>& srcCharacters = mModel->mLogicalModel->mText;
-  Vector<Character>  displayCharacters;
-  bool               useHiddenText = false;
-  if(mHiddenInput && mEventData != nullptr && !mEventData->mIsShowingPlaceholderText)
-  {
-    mHiddenInput->Substitute(srcCharacters, displayCharacters);
-    useHiddenText = true;
-  }
-
-  Vector<Character>& utf32Characters    = useHiddenText ? displayCharacters : srcCharacters;
-  const Length       numberOfCharacters = utf32Characters.Count();
-
-  // Index to the first character of the first paragraph to be updated.
-  CharacterIndex startIndex = 0u;
-  // Number of characters of the paragraphs to be removed.
-  Length paragraphCharacters = 0u;
-
-  CalculateTextUpdateIndices(paragraphCharacters);
-
-  // Check whether the indices for updating the text is valid
-  if(numberOfCharacters > 0u &&
-     (mTextUpdateInfo.mParagraphCharacterIndex > numberOfCharacters ||
-      mTextUpdateInfo.mRequestedNumberOfCharacters > numberOfCharacters))
-  {
-    std::string currentText;
-    Utf32ToUtf8(mModel->mLogicalModel->mText.Begin(), numberOfCharacters, currentText);
-
-    DALI_LOG_ERROR("Controller::Impl::UpdateModel: mTextUpdateInfo has invalid indices\n");
-    DALI_LOG_ERROR("Number of characters: %d, current text is: %s\n", numberOfCharacters, currentText.c_str());
-
-    // Dump mTextUpdateInfo
-    DALI_LOG_ERROR("Dump mTextUpdateInfo:\n");
-    DALI_LOG_ERROR("     mTextUpdateInfo.mCharacterIndex = %u\n", mTextUpdateInfo.mCharacterIndex);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mNumberOfCharactersToRemove = %u\n", mTextUpdateInfo.mNumberOfCharactersToRemove);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mNumberOfCharactersToAdd = %u\n", mTextUpdateInfo.mNumberOfCharactersToAdd);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mPreviousNumberOfCharacters = %u\n", mTextUpdateInfo.mPreviousNumberOfCharacters);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mParagraphCharacterIndex = %u\n", mTextUpdateInfo.mParagraphCharacterIndex);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mRequestedNumberOfCharacters = %u\n", mTextUpdateInfo.mRequestedNumberOfCharacters);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mStartGlyphIndex = %u\n", mTextUpdateInfo.mStartGlyphIndex);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mStartLineIndex = %u\n", mTextUpdateInfo.mStartLineIndex);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mEstimatedNumberOfLines = %u\n", mTextUpdateInfo.mEstimatedNumberOfLines);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mClearAll = %d\n", mTextUpdateInfo.mClearAll);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mFullRelayoutNeeded = %d\n", mTextUpdateInfo.mFullRelayoutNeeded);
-    DALI_LOG_ERROR("     mTextUpdateInfo.mIsLastCharacterNewParagraph = %d\n", mTextUpdateInfo.mIsLastCharacterNewParagraph);
-
-    return false;
-  }
-
-  startIndex = mTextUpdateInfo.mParagraphCharacterIndex;
-
-  if(mTextUpdateInfo.mClearAll ||
-     (0u != paragraphCharacters))
-  {
-    ClearModelData(startIndex, startIndex + ((paragraphCharacters > 0u) ? paragraphCharacters - 1u : 0u), operations);
-  }
-
-  mTextUpdateInfo.mClearAll = false;
-
-  // Whether the model is updated.
-  bool updated = false;
-
-  Vector<LineBreakInfo>& lineBreakInfo               = mModel->mLogicalModel->mLineBreakInfo;
-  const Length           requestedNumberOfCharacters = mTextUpdateInfo.mRequestedNumberOfCharacters;
-
-  if(NO_OPERATION != (GET_LINE_BREAKS & operations))
-  {
-    // Retrieves the line break info. The line break info is used to split the text in 'paragraphs' to
-    // calculate the bidirectional info for each 'paragraph'.
-    // It's also used to layout the text (where it should be a new line) or to shape the text (text in different lines
-    // is not shaped together).
-    lineBreakInfo.Resize(numberOfCharacters, TextAbstraction::LINE_NO_BREAK);
-
-    SetLineBreakInfo(utf32Characters,
-                     startIndex,
-                     requestedNumberOfCharacters,
-                     lineBreakInfo);
-
-    if(mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
-       mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::MIXED))
-    {
-      CharacterIndex end                 = startIndex + requestedNumberOfCharacters;
-      LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
-
-      for(CharacterIndex index = startIndex; index < end; index++)
-      {
-        CharacterIndex wordEnd = index;
-        while((*(lineBreakInfoBuffer + wordEnd) != TextAbstraction::LINE_ALLOW_BREAK) && (*(lineBreakInfoBuffer + wordEnd) != TextAbstraction::LINE_MUST_BREAK))
-        {
-          wordEnd++;
-        }
-
-        if((wordEnd + 1) == end) // add last char
-        {
-          wordEnd++;
-        }
-
-        Vector<bool> hyphens = GetWordHyphens(utf32Characters.Begin() + index, wordEnd - index, nullptr);
-
-        for(CharacterIndex i = 0; i < (wordEnd - index); i++)
-        {
-          if(hyphens[i])
-          {
-            *(lineBreakInfoBuffer + index + i) = TextAbstraction::LINE_HYPHENATION_BREAK;
-          }
-        }
-
-        index = wordEnd;
-      }
-    }
-
-    // Create the paragraph info.
-    mModel->mLogicalModel->CreateParagraphInfo(startIndex,
-                                               requestedNumberOfCharacters);
-    updated = true;
-  }
-
-  const bool getScripts    = NO_OPERATION != (GET_SCRIPTS & operations);
-  const bool validateFonts = NO_OPERATION != (VALIDATE_FONTS & operations);
-
-  Vector<ScriptRun>& scripts    = mModel->mLogicalModel->mScriptRuns;
-  Vector<FontRun>&   validFonts = mModel->mLogicalModel->mFontRuns;
-
-  if(getScripts || validateFonts)
-  {
-    // Validates the fonts assigned by the application or assigns default ones.
-    // It makes sure all the characters are going to be rendered by the correct font.
-    MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
-
-    if(getScripts)
-    {
-      // Retrieves the scripts used in the text.
-      multilanguageSupport.SetScripts(utf32Characters,
-                                      startIndex,
-                                      requestedNumberOfCharacters,
-                                      scripts);
-    }
-
-    if(validateFonts)
-    {
-      // Validate the fonts set through the mark-up string.
-      Vector<FontDescriptionRun>& fontDescriptionRuns = mModel->mLogicalModel->mFontDescriptionRuns;
-
-      // Get the default font's description.
-      TextAbstraction::FontDescription defaultFontDescription;
-      TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE * mFontSizeScale;
-
-      //Get the number of points per one unit of point-size
-      uint32_t numberOfPointsPerOneUnitOfPointSize = mFontClient.GetNumberOfPointsPerOneUnitOfPointSize();
-
-      if(IsShowingPlaceholderText() && mEventData && (nullptr != mEventData->mPlaceholderFont))
-      {
-        // If the placeholder font is set specifically, only placeholder font is changed.
-        defaultFontDescription = mEventData->mPlaceholderFont->mFontDescription;
-        if(mEventData->mPlaceholderFont->sizeDefined)
-        {
-          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * mFontSizeScale * numberOfPointsPerOneUnitOfPointSize;
-        }
-      }
-      else if(nullptr != mFontDefaults)
-      {
-        // Set the normal font and the placeholder font.
-        defaultFontDescription = mFontDefaults->mFontDescription;
-
-        if(mTextFitEnabled)
-        {
-          defaultPointSize = mFontDefaults->mFitPointSize * numberOfPointsPerOneUnitOfPointSize;
-        }
-        else
-        {
-          defaultPointSize = mFontDefaults->mDefaultPointSize * mFontSizeScale * numberOfPointsPerOneUnitOfPointSize;
-        }
-      }
-
-      // Validates the fonts. If there is a character with no assigned font it sets a default one.
-      // After this call, fonts are validated.
-      multilanguageSupport.ValidateFonts(utf32Characters,
-                                         scripts,
-                                         fontDescriptionRuns,
-                                         defaultFontDescription,
-                                         defaultPointSize,
-                                         startIndex,
-                                         requestedNumberOfCharacters,
-                                         validFonts);
-    }
-    updated = true;
-  }
-
-  Vector<Character> mirroredUtf32Characters;
-  bool              textMirrored       = false;
-  const Length      numberOfParagraphs = mModel->mLogicalModel->mParagraphInfo.Count();
-  if(NO_OPERATION != (BIDI_INFO & operations))
-  {
-    Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mModel->mLogicalModel->mBidirectionalParagraphInfo;
-    bidirectionalInfo.Reserve(numberOfParagraphs);
-
-    // Calculates the bidirectional info for the whole paragraph if it contains right to left scripts.
-    SetBidirectionalInfo(utf32Characters,
-                         scripts,
-                         lineBreakInfo,
-                         startIndex,
-                         requestedNumberOfCharacters,
-                         bidirectionalInfo,
-                         (mModel->mMatchLayoutDirection != DevelText::MatchLayoutDirection::CONTENTS),
-                         mLayoutDirection);
-
-    if(0u != bidirectionalInfo.Count())
-    {
-      // Only set the character directions if there is right to left characters.
-      Vector<CharacterDirection>& directions = mModel->mLogicalModel->mCharacterDirections;
-      GetCharactersDirection(bidirectionalInfo,
-                             numberOfCharacters,
-                             startIndex,
-                             requestedNumberOfCharacters,
-                             directions);
-
-      // This paragraph has right to left text. Some characters may need to be mirrored.
-      // TODO: consider if the mirrored string can be stored as well.
-
-      textMirrored = GetMirroredText(utf32Characters,
-                                     directions,
-                                     bidirectionalInfo,
-                                     startIndex,
-                                     requestedNumberOfCharacters,
-                                     mirroredUtf32Characters);
-    }
-    else
-    {
-      // There is no right to left characters. Clear the directions vector.
-      mModel->mLogicalModel->mCharacterDirections.Clear();
-    }
-    updated = true;
-  }
-
-  Vector<GlyphInfo>&      glyphs                = mModel->mVisualModel->mGlyphs;
-  Vector<CharacterIndex>& glyphsToCharactersMap = mModel->mVisualModel->mGlyphsToCharacters;
-  Vector<Length>&         charactersPerGlyph    = mModel->mVisualModel->mCharactersPerGlyph;
-  Vector<GlyphIndex>      newParagraphGlyphs;
-  newParagraphGlyphs.Reserve(numberOfParagraphs);
-
-  const Length currentNumberOfGlyphs = glyphs.Count();
-  if(NO_OPERATION != (SHAPE_TEXT & operations))
-  {
-    const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
-    // Shapes the text.
-    ShapeText(textToShape,
-              lineBreakInfo,
-              scripts,
-              validFonts,
-              startIndex,
-              mTextUpdateInfo.mStartGlyphIndex,
-              requestedNumberOfCharacters,
-              glyphs,
-              glyphsToCharactersMap,
-              charactersPerGlyph,
-              newParagraphGlyphs);
-
-    // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-    mModel->mVisualModel->CreateGlyphsPerCharacterTable(startIndex, mTextUpdateInfo.mStartGlyphIndex, requestedNumberOfCharacters);
-    mModel->mVisualModel->CreateCharacterToGlyphTable(startIndex, mTextUpdateInfo.mStartGlyphIndex, requestedNumberOfCharacters);
-
-    updated = true;
-  }
-
-  const Length numberOfGlyphs = glyphs.Count() - currentNumberOfGlyphs;
-
-  if(NO_OPERATION != (GET_GLYPH_METRICS & operations))
-  {
-    GlyphInfo* glyphsBuffer = glyphs.Begin();
-    mMetrics->GetGlyphMetrics(glyphsBuffer + mTextUpdateInfo.mStartGlyphIndex, numberOfGlyphs);
-
-    // Update the width and advance of all new paragraph characters.
-    for(Vector<GlyphIndex>::ConstIterator it = newParagraphGlyphs.Begin(), endIt = newParagraphGlyphs.End(); it != endIt; ++it)
-    {
-      const GlyphIndex index = *it;
-      GlyphInfo&       glyph = *(glyphsBuffer + index);
-
-      glyph.xBearing = 0.f;
-      glyph.width    = 0.f;
-      glyph.advance  = 0.f;
-    }
-    updated = true;
-  }
-
-  if((nullptr != mEventData) &&
-     mEventData->mPreEditFlag &&
-     (0u != mModel->mVisualModel->mCharactersToGlyph.Count()))
-  {
-    Dali::InputMethodContext::PreEditAttributeDataContainer attrs;
-    mEventData->mInputMethodContext.GetPreeditStyle(attrs);
-    Dali::InputMethodContext::PreeditStyle type = Dali::InputMethodContext::PreeditStyle::NONE;
-
-    // Check the type of preedit and run it.
-    for(Dali::InputMethodContext::PreEditAttributeDataContainer::Iterator it = attrs.Begin(), endIt = attrs.End(); it != endIt; it++)
-    {
-      Dali::InputMethodContext::PreeditAttributeData attrData = *it;
-      DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::UpdateModel PreeditStyle type : %d  start %d end %d \n", attrData.preeditType, attrData.startIndex, attrData.endIndex);
-      type = attrData.preeditType;
-
-      // Check the number of commit characters for the start position.
-      unsigned int numberOfCommit  = mEventData->mPrimaryCursorPosition - mEventData->mPreEditLength;
-      Length       numberOfIndices = attrData.endIndex - attrData.startIndex;
-
-      switch(type)
-      {
-        case Dali::InputMethodContext::PreeditStyle::UNDERLINE:
-        {
-          // Add the underline for the pre-edit text.
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = numberOfIndices;
-          mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
-
-          //Mark-up processor case
-          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
-          {
-            CopyUnderlinedFromLogicalToVisualModels(false);
-          }
-          break;
-        }
-        case Dali::InputMethodContext::PreeditStyle::REVERSE:
-        {
-          Vector4  textColor = mModel->mVisualModel->GetTextColor();
-          ColorRun backgroundColorRun;
-          backgroundColorRun.characterRun.characterIndex     = attrData.startIndex + numberOfCommit;
-          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
-          backgroundColorRun.color                           = textColor;
-          mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
-
-          Vector4 backgroundColor = mModel->mVisualModel->GetBackgroundColor();
-          if(backgroundColor.a == 0) // There is no text background color.
-          {
-            // Try use the control's background color.
-            if(nullptr != mEditableControlInterface)
-            {
-              mEditableControlInterface->GetControlBackgroundColor(backgroundColor);
-              if(backgroundColor.a == 0) // There is no control background color.
-              {
-                // Determines black or white color according to text color.
-                // Based on W3C Recommendations (https://www.w3.org/TR/WCAG20/)
-                float L         = CONSTANT_R * textColor.r + CONSTANT_G * textColor.g + CONSTANT_B * textColor.b;
-                backgroundColor = L > BRIGHTNESS_THRESHOLD ? BLACK : WHITE;
-              }
-            }
-          }
-
-          Vector<ColorRun> colorRuns;
-          colorRuns.Resize(1u);
-          ColorRun& colorRun                       = *(colorRuns.Begin());
-          colorRun.color                           = backgroundColor;
-          colorRun.characterRun.characterIndex     = attrData.startIndex + numberOfCommit;
-          colorRun.characterRun.numberOfCharacters = numberOfIndices;
-          mModel->mLogicalModel->mColorRuns.PushBack(colorRun);
-
-          //Mark-up processor case
-          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
-          {
-            CopyUnderlinedFromLogicalToVisualModels(false);
-          }
-          break;
-        }
-        case Dali::InputMethodContext::PreeditStyle::HIGHLIGHT:
-        {
-          ColorRun backgroundColorRun;
-          backgroundColorRun.characterRun.characterIndex     = attrData.startIndex + numberOfCommit;
-          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
-          backgroundColorRun.color                           = LIGHT_BLUE;
-          mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
-
-          //Mark-up processor case
-          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
-          {
-            CopyUnderlinedFromLogicalToVisualModels(false);
-          }
-          break;
-        }
-        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_1:
-        {
-          // CUSTOM_PLATFORM_STYLE_1 should be drawn with background and underline together.
-          ColorRun backgroundColorRun;
-          backgroundColorRun.characterRun.characterIndex     = attrData.startIndex + numberOfCommit;
-          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
-          backgroundColorRun.color                           = BACKGROUND_SUB4;
-          mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
-
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = numberOfIndices;
-          mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
-
-          //Mark-up processor case
-          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
-          {
-            CopyUnderlinedFromLogicalToVisualModels(false);
-          }
-          break;
-        }
-        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_2:
-        {
-          // CUSTOM_PLATFORM_STYLE_2 should be drawn with background and underline together.
-          ColorRun backgroundColorRun;
-          backgroundColorRun.characterRun.characterIndex     = attrData.startIndex + numberOfCommit;
-          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
-          backgroundColorRun.color                           = BACKGROUND_SUB5;
-          mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
-
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = numberOfIndices;
-          mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
-
-          //Mark-up processor case
-          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
-          {
-            CopyUnderlinedFromLogicalToVisualModels(false);
-          }
-          break;
-        }
-        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_3:
-        {
-          // CUSTOM_PLATFORM_STYLE_3 should be drawn with background and underline together.
-          ColorRun backgroundColorRun;
-          backgroundColorRun.characterRun.characterIndex     = attrData.startIndex + numberOfCommit;
-          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
-          backgroundColorRun.color                           = BACKGROUND_SUB6;
-          mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
-
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = numberOfIndices;
-          mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
-
-          //Mark-up processor case
-          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
-          {
-            CopyUnderlinedFromLogicalToVisualModels(false);
-          }
-          break;
-        }
-        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_4:
-        {
-          // CUSTOM_PLATFORM_STYLE_4 should be drawn with background and underline together.
-          ColorRun backgroundColorRun;
-          backgroundColorRun.characterRun.characterIndex     = attrData.startIndex + numberOfCommit;
-          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
-          backgroundColorRun.color                           = BACKGROUND_SUB7;
-          mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
-
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = numberOfIndices;
-          mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
-
-          //Mark-up processor case
-          if(mModel->mVisualModel->IsMarkupProcessorEnabled())
-          {
-            CopyUnderlinedFromLogicalToVisualModels(false);
-          }
-          break;
-        }
-        case Dali::InputMethodContext::PreeditStyle::NONE:
-        default:
-        {
-          break;
-        }
-      }
-    }
-    attrs.Clear();
-    updated = true;
-  }
-
-  if(NO_OPERATION != (COLOR & operations))
-  {
-    // Set the color runs in glyphs.
-    SetColorSegmentationInfo(mModel->mLogicalModel->mColorRuns,
-                             mModel->mVisualModel->mCharactersToGlyph,
-                             mModel->mVisualModel->mGlyphsPerCharacter,
-                             startIndex,
-                             mTextUpdateInfo.mStartGlyphIndex,
-                             requestedNumberOfCharacters,
-                             mModel->mVisualModel->mColors,
-                             mModel->mVisualModel->mColorIndices);
-
-    // Set the background color runs in glyphs.
-    SetColorSegmentationInfo(mModel->mLogicalModel->mBackgroundColorRuns,
-                             mModel->mVisualModel->mCharactersToGlyph,
-                             mModel->mVisualModel->mGlyphsPerCharacter,
-                             startIndex,
-                             mTextUpdateInfo.mStartGlyphIndex,
-                             requestedNumberOfCharacters,
-                             mModel->mVisualModel->mBackgroundColors,
-                             mModel->mVisualModel->mBackgroundColorIndices);
-
-    updated = true;
-  }
-
-  if((NO_OPERATION != (SHAPE_TEXT & operations)) &&
-     !((nullptr != mEventData) &&
-       mEventData->mPreEditFlag &&
-       (0u != mModel->mVisualModel->mCharactersToGlyph.Count())))
-  {
-    //Mark-up processor case
-    if(mModel->mVisualModel->IsMarkupProcessorEnabled())
-    {
-      CopyUnderlinedFromLogicalToVisualModels(true);
-    }
-
-    updated = true;
-  }
-
-  // The estimated number of lines. Used to avoid reallocations when layouting.
-  mTextUpdateInfo.mEstimatedNumberOfLines = std::max(mModel->mVisualModel->mLines.Count(), mModel->mLogicalModel->mParagraphInfo.Count());
-
-  // Set the previous number of characters for the next time the text is updated.
-  mTextUpdateInfo.mPreviousNumberOfCharacters = numberOfCharacters;
-
-  return updated;
+  return ControllerImplModelUpdater::Update(*this, operationsRequired);
 }
 
 void Controller::Impl::RetrieveDefaultInputStyle(InputStyle& inputStyle)
 {
-  // Sets the default text's color.
-  inputStyle.textColor      = mTextColor;
-  inputStyle.isDefaultColor = true;
-
-  inputStyle.familyName.clear();
-  inputStyle.weight = TextAbstraction::FontWeight::NORMAL;
-  inputStyle.width  = TextAbstraction::FontWidth::NORMAL;
-  inputStyle.slant  = TextAbstraction::FontSlant::NORMAL;
-  inputStyle.size   = 0.f;
-
-  inputStyle.lineSpacing = 0.f;
-
-  inputStyle.underlineProperties.clear();
-  inputStyle.shadowProperties.clear();
-  inputStyle.embossProperties.clear();
-  inputStyle.outlineProperties.clear();
-
-  inputStyle.isFamilyDefined = false;
-  inputStyle.isWeightDefined = false;
-  inputStyle.isWidthDefined  = false;
-  inputStyle.isSlantDefined  = false;
-  inputStyle.isSizeDefined   = false;
-
-  inputStyle.isLineSpacingDefined = false;
-
-  inputStyle.isUnderlineDefined = false;
-  inputStyle.isShadowDefined    = false;
-  inputStyle.isEmbossDefined    = false;
-  inputStyle.isOutlineDefined   = false;
-
-  // Sets the default font's family name, weight, width, slant and size.
-  if(mFontDefaults)
-  {
-    if(mFontDefaults->familyDefined)
-    {
-      inputStyle.familyName      = mFontDefaults->mFontDescription.family;
-      inputStyle.isFamilyDefined = true;
-    }
-
-    if(mFontDefaults->weightDefined)
-    {
-      inputStyle.weight          = mFontDefaults->mFontDescription.weight;
-      inputStyle.isWeightDefined = true;
-    }
-
-    if(mFontDefaults->widthDefined)
-    {
-      inputStyle.width          = mFontDefaults->mFontDescription.width;
-      inputStyle.isWidthDefined = true;
-    }
-
-    if(mFontDefaults->slantDefined)
-    {
-      inputStyle.slant          = mFontDefaults->mFontDescription.slant;
-      inputStyle.isSlantDefined = true;
-    }
-
-    if(mFontDefaults->sizeDefined)
-    {
-      inputStyle.size          = mFontDefaults->mDefaultPointSize;
-      inputStyle.isSizeDefined = true;
-    }
-  }
+  SetDefaultInputStyle(inputStyle, mFontDefaults, mTextColor);
 }
 
 float Controller::Impl::GetDefaultFontLineHeight()
@@ -2125,7 +1586,7 @@ Actor Controller::Impl::CreateBackgroundActor()
 
     const Vector2 textSize = mView.GetLayoutSize();
 
-    const float offsetX = textSize.width * 0.5f;
+    const float offsetX = alignmentOffset + textSize.width * 0.5f;
     const float offsetY = textSize.height * 0.5f;
 
     const Vector4* const    backgroundColorsBuffer       = mView.GetBackgroundColors();
@@ -2297,8 +1758,4 @@ void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearP
   }
 }
 
-} // namespace Text
-
-} // namespace Toolkit
-
-} // namespace Dali
+} // namespace Dali::Toolkit::Text

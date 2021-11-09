@@ -522,6 +522,8 @@ private: // Data
   uint32_t mOldSelectionStart;
   uint32_t mOldSelectionEnd;
 
+  struct PropertyHandler;
+
   /**
    * @brief This structure is to connect TextEditor with Accessible functions.
    */
