@@ -336,7 +336,6 @@ private:
   Constraint          mColorConstraint{};                ///< Color constraint
   Constraint          mOpacityConstraint{};              ///< Opacity constraint
   Property::Index     mAnimatableTextColorPropertyIndex; ///< The index of animatable text color property registered by the control.
-  Property::Index     mTextColorAnimatableIndex;         ///< The index of uTextColorAnimatable property.
   bool                mRendererUpdateNeeded : 1;         ///< The flag to indicate whether the renderer needs to be updated.
   RendererContainer   mRendererList;
 };

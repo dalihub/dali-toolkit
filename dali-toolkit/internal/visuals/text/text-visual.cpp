@@ -239,7 +239,6 @@ TextVisual::TextVisual(VisualFactoryCache& factoryCache)
   mController(Text::Controller::New()),
   mTypesetter(Text::Typesetter::New(mController->GetTextModel())),
   mAnimatableTextColorPropertyIndex(Property::INVALID_INDEX),
-  mTextColorAnimatableIndex(Property::INVALID_INDEX),
   mRendererUpdateNeeded(false)
 {
 }
@@ -291,36 +290,29 @@ void TextVisual::DoSetOnScene(Actor& actor)
   // Enable the pre-multiplied alpha to improve the text quality
   EnablePreMultipliedAlpha(true);
 
-  const Vector4& defaultColor = mController->GetTextModel()->GetDefaultColor();
-  if(mTextColorAnimatableIndex == Property::INVALID_INDEX)
-  {
-    mTextColorAnimatableIndex = mImpl->mRenderer.RegisterProperty("uTextColorAnimatable", defaultColor);
-  }
-  else
-  {
-    mImpl->mRenderer.SetProperty(mTextColorAnimatableIndex, defaultColor);
-  }
-
   if(mAnimatableTextColorPropertyIndex != Property::INVALID_INDEX)
   {
+    const Vector4&        defaultColor         = mController->GetTextModel()->GetDefaultColor();
+    Dali::Property::Index shaderTextColorIndex = mImpl->mRenderer.RegisterProperty("uTextColorAnimatable", defaultColor);
+
     // Create constraint for the animatable text's color Property with uTextColorAnimatable in the renderer.
-    if(mTextColorAnimatableIndex != Property::INVALID_INDEX)
+    if(shaderTextColorIndex != Property::INVALID_INDEX)
     {
       if(!mColorConstraint)
       {
-        mColorConstraint = Constraint::New<Vector4>(mImpl->mRenderer, mTextColorAnimatableIndex, TextColorConstraint);
+        mColorConstraint = Constraint::New<Vector4>(mImpl->mRenderer, shaderTextColorIndex, TextColorConstraint);
         mColorConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
       }
       mColorConstraint.Apply();
-    }
 
-    // Make zero if the alpha value of text color is zero to skip rendering text
-    if(!mOpacityConstraint)
-    {
-      mOpacityConstraint = Constraint::New<float>(mImpl->mRenderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
-      mOpacityConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
+      // Make zero if the alpha value of text color is zero to skip rendering text
+      if(!mOpacityConstraint)
+      {
+        mOpacityConstraint = Constraint::New<float>(mImpl->mRenderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint);
+        mOpacityConstraint.AddSource(Source(actor, mAnimatableTextColorPropertyIndex));
+      }
+      mOpacityConstraint.Apply();
     }
-    mOpacityConstraint.Apply();
   }
 
   // Renderer needs textures and to be added to control
