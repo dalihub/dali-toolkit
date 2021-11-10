@@ -783,6 +783,11 @@ void Controller::Impl::SetEditable(bool editable)
   if(mEventData)
   {
     mEventData->mEditingEnabled = editable;
+
+    if(mEventData->mDecorator)
+    {
+      mEventData->mDecorator->SetEditable(editable);
+    }
   }
 }
 
@@ -1730,6 +1735,86 @@ Actor Controller::Impl::CreateBackgroundActor()
   }
 
   return actor;
+}
+
+void Controller::Impl::RelayoutForNewLineSize()
+{
+  // relayout all characters
+  mTextUpdateInfo.mCharacterIndex             = 0;
+  mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
+  mTextUpdateInfo.mNumberOfCharactersToAdd    = mModel->mLogicalModel->mText.Count();
+  mOperationsPending                          = static_cast<OperationsMask>(mOperationsPending | LAYOUT);
+
+  //remove selection
+  if(mEventData && mEventData->mState == EventData::SELECTING)
+  {
+    ChangeState(EventData::EDITING);
+  }
+
+  RequestRelayout();
+}
+
+bool Controller::Impl::IsInputStyleChangedSignalsQueueEmpty()
+{
+  return (NULL == mEventData) || (0u == mEventData->mInputStyleChangedQueue.Count());
+}
+
+void Controller::Impl::ProcessInputStyleChangedSignals()
+{
+  if(mEventData)
+  {
+    if(mEditableControlInterface)
+    {
+      // Emit the input style changed signal for each mask
+      std::for_each(mEventData->mInputStyleChangedQueue.begin(),
+                    mEventData->mInputStyleChangedQueue.end(),
+                    [&](const auto mask) { mEditableControlInterface->InputStyleChanged(mask); } );
+    }
+
+    mEventData->mInputStyleChangedQueue.Clear();
+  }
+}
+
+void Controller::Impl::ScrollBy(Vector2 scroll)
+{
+  if(mEventData && (fabs(scroll.x) > Math::MACHINE_EPSILON_0 || fabs(scroll.y) > Math::MACHINE_EPSILON_0))
+  {
+    const Vector2& layoutSize    = mModel->mVisualModel->GetLayoutSize();
+    const Vector2  currentScroll = mModel->mScrollPosition;
+
+    scroll.x = -scroll.x;
+    scroll.y = -scroll.y;
+
+    if(fabs(scroll.x) > Math::MACHINE_EPSILON_0)
+    {
+      mModel->mScrollPosition.x += scroll.x;
+      ClampHorizontalScroll(layoutSize);
+    }
+
+    if(fabs(scroll.y) > Math::MACHINE_EPSILON_0)
+    {
+      mModel->mScrollPosition.y += scroll.y;
+      ClampVerticalScroll(layoutSize);
+    }
+
+    if(mModel->mScrollPosition != currentScroll)
+    {
+      mEventData->mDecorator->UpdatePositions(mModel->mScrollPosition - currentScroll);
+      RequestRelayout();
+    }
+  }
+}
+
+float Controller::Impl::GetHorizontalScrollPosition()
+{
+  // Scroll values are negative internally so we convert them to positive numbers
+  return mEventData ? -mModel->mScrollPosition.x : 0.0f;
+}
+
+float Controller::Impl::GetVerticalScrollPosition()
+{
+  // Scroll values are negative internally so we convert them to positive numbers
+  return mEventData ? -mModel->mScrollPosition.y : 0.0f;
 }
 
 void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns)
