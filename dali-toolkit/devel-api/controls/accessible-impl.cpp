@@ -363,7 +363,6 @@ void AccessibleImpl::ScrollToSelf()
       parent->ScrollToChild(child->Self());
     }
 
-    child = parent;
     parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(parent->GetParent());
   }
 }

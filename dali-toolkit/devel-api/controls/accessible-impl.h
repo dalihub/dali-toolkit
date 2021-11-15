@@ -236,7 +236,7 @@ public:
   virtual Dali::Accessibility::States CalculateStates();
 
   /**
-   * @brief Makes sure that a given child of this container (e.g. ItemView) is visible
+   * @brief Makes sure that a given child (descendant) of this container (e.g. ItemView) is visible
    * @return false if scrolling is not supported or child is already visible
    */
   virtual bool ScrollToChild(Actor child);
