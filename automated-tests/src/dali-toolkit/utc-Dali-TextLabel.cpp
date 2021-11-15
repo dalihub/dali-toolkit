@@ -82,6 +82,8 @@ const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
 static bool gAnchorClickedCallBackCalled;
 static bool gAnchorClickedCallBackNotCalled;
 
+static bool gTextFitChangedCallBackCalled;
+
 struct CallbackFunctor
 {
   CallbackFunctor(bool* callbackFlag)
@@ -106,6 +108,12 @@ static void TestAnchorClickedCallback(TextLabel control, const char* href, unsig
   {
     gAnchorClickedCallBackCalled = true;
   }
+}
+
+static void TestTextFitChangedCallback(TextLabel control)
+{
+  tet_infoline(" TestTextFitChangedCallback");
+  gTextFitChangedCallBackCalled = true;
 }
 
 bool DaliTestCheckMaps( const Property::Map& mapGet, const Property::Map& mapSet, const std::vector<std::string>& indexConversionTable = std::vector<std::string>() )
@@ -1632,6 +1640,13 @@ int UtcDaliToolkitTextlabelTextFit(void)
   label.SetProperty( Actor::Property::SIZE, size );
   label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
 
+   // connect to the text git changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextLabel::TextFitChangedSignal(label).Connect(&TestTextFitChangedCallback);
+  bool textFitChangedSignal = false;
+  label.ConnectSignal(testTracker, "textFitChanged", CallbackFunctor(&textFitChangedSignal));
+  gTextFitChangedCallBackCalled = false;
+
   // check point size
   Property::Map textFitMapSet;
   textFitMapSet["enable"] = true;
@@ -1650,6 +1665,9 @@ int UtcDaliToolkitTextlabelTextFit(void)
 
   const Vector3 EXPECTED_NATURAL_SIZE( 450.0f, 96.0f, 0.0f );
   DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION );
+
+  DALI_TEST_CHECK(gTextFitChangedCallBackCalled);
+  DALI_TEST_CHECK(textFitChangedSignal);
 
   // check pixel size
   textFitMapSet.Clear();

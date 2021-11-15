@@ -482,6 +482,27 @@ public: // Configure the text controller.
   Vector2 GetTextFitContentSize() const;
 
   /**
+   * @brief Retrieve the fited point size.
+   *
+   * @return The fited point size.
+   */
+  float GetTextFitPointSize() const;
+
+  /**
+   * @brief Sets whether the text fit properties have changed.
+   *
+   * @param[in] changed Whether to changed the text fit.
+   */
+  void SetTextFitChanged(bool changed);
+
+  /**
+   * @brief Whether the text fit properties are changed or not.
+   *
+   * @return True if the text fit properties are changed
+   */
+  bool IsTextFitChanged() const;
+
+  /**
    * @brief Enable or disable the placeholder text elide.
    * @param enabled Whether to enable the placeholder text elide.
    */
