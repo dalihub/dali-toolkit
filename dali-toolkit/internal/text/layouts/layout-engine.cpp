@@ -1867,7 +1867,6 @@ struct Engine::Impl
             linesBuffer[lineIndex].ellipsis = false;
           }
           numberOfLines--;
-          lineIndex++;
         }
         linesBuffer[0u].ellipsis = true;
       }

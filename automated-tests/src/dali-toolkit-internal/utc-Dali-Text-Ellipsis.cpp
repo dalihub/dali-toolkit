@@ -118,6 +118,21 @@ namespace
     const GlyphIndex     firstMiddleIndexOfGlyphs  = model->GetFirstMiddleIndexOfElidedGlyphs();
 
 
+    //Test total height of lines is fit inside Controller's size
+    Length heightOfLines = 0;
+    for(Length lineIndex=0u; lineIndex < numberOfLines; lineIndex++)
+    {
+        const LineRun& tempLine         = *( model->GetLines() + lineIndex);
+        heightOfLines+= (tempLine.ascender - tempLine.descender);
+    }
+
+    if(heightOfLines > data.size.height)
+    {
+        std::cout << "The heightOfLines should be less than height of controller.";
+        std::cout << " The heightOfLines is "<< heightOfLines << "and the height of controller is "<< data.size.height <<std::endl;
+        return false;
+    }
+
     if( numberOfLines != 0u )
     {
       Length   elidedLineIndex    = 0u;
@@ -295,6 +310,21 @@ namespace
     const GlyphIndex endIndexOfGlyphs          = textModel->GetEndIndexOfElidedGlyphs();
     const GlyphIndex firstMiddleIndexOfGlyphs  = textModel->GetFirstMiddleIndexOfElidedGlyphs();
     const GlyphIndex secondMiddleIndexOfGlyphs = textModel->GetSecondMiddleIndexOfElidedGlyphs();
+
+    //Test total height of lines is fit inside Controller's size
+    Length heightOfLines = 0;
+    for(Length lineIndex=0u; lineIndex < numberOfLines; lineIndex++)
+    {
+        const LineRun& tempLine         = *( textModel->GetLines() + lineIndex);
+        heightOfLines+= (tempLine.ascender - tempLine.descender);
+    }
+
+    if(heightOfLines > data.size.height)
+    {
+        std::cout << "The heightOfLines should be less than height of controller.";
+        std::cout << " The heightOfLines is "<< heightOfLines << "and the height of controller is "<< data.size.height <<std::endl;
+        return false;
+    }
 
     if( numberOfLines != 0u )
     {
