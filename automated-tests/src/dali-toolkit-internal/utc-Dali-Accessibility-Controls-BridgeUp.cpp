@@ -1157,6 +1157,7 @@ int UtcDaliAccessibilityScrollToChildNonScrollable(void)
 
   DALI_TEST_EQUALS(accessible->IsScrollable(), false, TEST_LOCATION);
   DALI_TEST_EQUALS(accessible->ScrollToChild({}), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(accessible->GetInternalActor(), Dali::Actor{}, TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC( false );
   END_TEST;

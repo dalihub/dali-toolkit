@@ -1,6 +1,6 @@
 Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    2.0.51
+Version:    2.0.52
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -34,6 +34,7 @@ Requires:   %{name} = %{version}-%{release}
 Conflicts:  %{name}-resources_480x800
 Conflicts:  %{name}-resources_720x1280
 Conflicts:  %{name}-resources_1920x1080
+Conflicts:  %{name}-resources_1920x1080_rpi
 %description resources_360x360
 dali-toolkit default resource files for 360x360
 Contain po / sounds / common images / style / style images
@@ -44,6 +45,7 @@ Requires:   %{name} = %{version}-%{release}
 Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_720x1280
 Conflicts:  %{name}-resources_1920x1080
+Conflicts:  %{name}-resources_1920x1080_rpi
 %description resources_480x800
 dali-toolkit default resource files for 480x800
 Contain po / sounds / common images / style / style images
@@ -54,6 +56,7 @@ Requires:   %{name} = %{version}-%{release}
 Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_480x800
 Conflicts:  %{name}-resources_1920x1080
+Conflicts:  %{name}-resources_1920x1080_rpi
 %description resources_720x1280
 dali-toolkit default resource files for 720x1280
 Contain po / sounds / common images / style / style images
@@ -64,9 +67,22 @@ Requires:   %{name} = %{version}-%{release}
 Conflicts:  %{name}-resources_360x360
 Conflicts:  %{name}-resources_480x800
 Conflicts:  %{name}-resources_720x1280
+Conflicts:  %{name}-resources_1920x1080_rpi
 %description resources_1920x1080
 dali-toolkit default resource files for 1920x1080
 Contain po / sounds / common images / style / style images
+
+%package resources_1920x1080_rpi
+Summary:    default resource files for 1920x1080 on Raspberry Pi 4
+Requires:   %{name} = %{version}-%{release}
+Conflicts:  %{name}-resources_360x360
+Conflicts:  %{name}-resources_480x800
+Conflicts:  %{name}-resources_720x1280
+Conflicts:  %{name}-resources_1920x1080
+%description resources_1920x1080_rpi
+dali-toolkit default resource files for 1920x1080 on Raspberry Pi 4
+Contain po / sounds / common images / style / style images
+
 
 ##############################
 # devel
@@ -199,6 +215,8 @@ mkdir -p %{buildroot}%{dali_toolkit_style_files}/720x1280
 cp -r dali-toolkit/styles/720x1280/* %{buildroot}%{dali_toolkit_style_files}/720x1280
 mkdir -p %{buildroot}%{dali_toolkit_style_files}/1920x1080
 cp -r dali-toolkit/styles/1920x1080/* %{buildroot}%{dali_toolkit_style_files}/1920x1080
+mkdir -p %{buildroot}%{dali_toolkit_style_files}/1920x1080_rpi
+cp -r dali-toolkit/styles/1920x1080_rpi/* %{buildroot}%{dali_toolkit_style_files}/1920x1080_rpi
 
 # Copy default feedback theme
 cp dali-toolkit/styles/default-feedback-theme.json %{buildroot}%{dali_toolkit_style_files}
@@ -244,6 +262,15 @@ case "$1" in
   ;;
 esac
 
+%pre resources_1920x1080_rpi
+case "$1" in
+  2)
+    pushd %{dali_toolkit_style_files}
+    rm -rf ./*
+    popd
+  ;;
+esac
+
 ##############################
 # Post Install
 ##############################
@@ -268,6 +295,11 @@ popd
 
 %post resources_1920x1080
 pushd %{dali_toolkit_style_files}/1920x1080
+for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
+popd
+
+%post resources_1920x1080_rpi
+pushd %{dali_toolkit_style_files}/1920x1080_rpi
 for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
 popd
 
@@ -319,6 +351,17 @@ case "$1" in
   ;;
 esac
 
+%preun resources_1920x1080_rpi
+case "$1" in
+  0)
+    %preun resources_1920x1080_rpi
+    pushd %{dali_toolkit_style_files}
+    mv images ./1920x1080_rpi
+    mv dali-toolkit-default-theme.json ./1920x1080_rpi
+    popd
+  ;;
+esac
+
 ##############################
 # Post Uninstall
 ##############################
@@ -354,6 +397,15 @@ case "$1" in
 esac
 
 %postun resources_1920x1080
+case "$1" in
+  0)
+    pushd %{dali_toolkit_style_files}
+    rm -rf *
+    popd
+  ;;
+esac
+
+%postun resources_1920x1080_rpi
 case "$1" in
   0)
     pushd %{dali_toolkit_style_files}
@@ -414,6 +466,15 @@ esac
 %{dali_toolkit_image_files}/*
 %{dali_toolkit_sound_files}/*
 %{dali_toolkit_style_files}/1920x1080/*
+%{dali_toolkit_style_files}/default-feedback-theme.json
+%{_datadir}/locale/*/LC_MESSAGES/*
+
+%files resources_1920x1080_rpi
+%manifest dali-toolkit-resources.manifest
+%defattr(-,root,root,-)
+%{dali_toolkit_image_files}/*
+%{dali_toolkit_sound_files}/*
+%{dali_toolkit_style_files}/1920x1080_rpi/*
 %{dali_toolkit_style_files}/default-feedback-theme.json
 %{_datadir}/locale/*/LC_MESSAGES/*
 

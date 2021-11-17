@@ -507,7 +507,7 @@ Control::Impl::Impl(Control& controlImpl)
   mNeedToEmitResourceReady(false),
   mDispatchKeyEvents(true)
 {
-  Dali::Accessibility::Accessible::RegisterControlAccessibilityGetter(
+  Dali::Accessibility::Accessible::RegisterExternalAccessibleGetter(
     [](Dali::Actor actor) -> Dali::Accessibility::Accessible* {
       return Control::Impl::GetAccessibilityObject(actor);
     });
