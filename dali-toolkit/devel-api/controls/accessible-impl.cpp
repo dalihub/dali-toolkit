@@ -363,7 +363,6 @@ void AccessibleImpl::ScrollToSelf()
       parent->ScrollToChild(child->Self());
     }
 
-    child = parent;
     parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(parent->GetParent());
   }
 }
@@ -540,6 +539,11 @@ std::vector<Dali::Accessibility::Relation> AccessibleImpl::GetRelationSet()
   }
 
   return ret;
+}
+
+Dali::Actor AccessibleImpl::GetInternalActor()
+{
+  return Dali::Actor{};
 }
 
 bool AccessibleImpl::ScrollToChild(Actor child)
