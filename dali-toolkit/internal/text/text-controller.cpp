@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/text-controller-event-handler.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 #include <dali-toolkit/internal/text/text-controller-input-font-handler.h>
+#include <dali-toolkit/internal/text/text-controller-input-properties.h>
 #include <dali-toolkit/internal/text/text-controller-placeholder-handler.h>
 #include <dali-toolkit/internal/text/text-controller-relayouter.h>
 #include <dali-toolkit/internal/text/text-controller-text-updater.h>
@@ -998,23 +999,6 @@ const std::string& Controller::GetDefaultOutlineProperties() const
   return mImpl->mOutlineDefaults ? mImpl->mOutlineDefaults->properties : EMPTY_STRING;
 }
 
-void Controller::RelayoutForNewLineSize()
-{
-  // relayout all characters
-  mImpl->mTextUpdateInfo.mCharacterIndex             = 0;
-  mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-  mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = mImpl->mModel->mLogicalModel->mText.Count();
-  mImpl->mOperationsPending                          = static_cast<OperationsMask>(mImpl->mOperationsPending | LAYOUT);
-
-  //remove selection
-  if(mImpl->mEventData && mImpl->mEventData->mState == EventData::SELECTING)
-  {
-    mImpl->ChangeState(EventData::EDITING);
-  }
-
-  mImpl->RequestRelayout();
-}
-
 bool Controller::SetDefaultLineSpacing(float lineSpacing)
 {
   if(std::fabs(lineSpacing - mImpl->mLayoutEngine.GetDefaultLineSpacing()) > Math::MACHINE_EPSILON_1000)
@@ -1022,7 +1006,7 @@ bool Controller::SetDefaultLineSpacing(float lineSpacing)
     mImpl->mLayoutEngine.SetDefaultLineSpacing(lineSpacing);
     mImpl->mRecalculateNaturalSize = true;
 
-    RelayoutForNewLineSize();
+    mImpl->RelayoutForNewLineSize();
     return true;
   }
   return false;
@@ -1040,7 +1024,7 @@ bool Controller::SetDefaultLineSize(float lineSize)
     mImpl->mLayoutEngine.SetDefaultLineSize(lineSize);
     mImpl->mRecalculateNaturalSize = true;
 
-    RelayoutForNewLineSize();
+    mImpl->RelayoutForNewLineSize();
     return true;
   }
   return false;
@@ -1053,52 +1037,12 @@ float Controller::GetDefaultLineSize() const
 
 void Controller::SetInputColor(const Vector4& color)
 {
-  if(mImpl->mEventData)
-  {
-    mImpl->mEventData->mInputStyle.textColor      = color;
-    mImpl->mEventData->mInputStyle.isDefaultColor = false;
-
-    if(EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState)
-    {
-      if(EventData::SELECTING == mImpl->mEventData->mState)
-      {
-        const bool handlesCrossed = mImpl->mEventData->mLeftSelectionPosition > mImpl->mEventData->mRightSelectionPosition;
-
-        // Get start and end position of selection
-        const CharacterIndex startOfSelectedText  = handlesCrossed ? mImpl->mEventData->mRightSelectionPosition : mImpl->mEventData->mLeftSelectionPosition;
-        const Length         lengthOfSelectedText = (handlesCrossed ? mImpl->mEventData->mLeftSelectionPosition : mImpl->mEventData->mRightSelectionPosition) - startOfSelectedText;
-
-        // Add the color run.
-        const VectorBase::SizeType numberOfRuns = mImpl->mModel->mLogicalModel->mColorRuns.Count();
-        mImpl->mModel->mLogicalModel->mColorRuns.Resize(numberOfRuns + 1u);
-
-        ColorRun& colorRun                       = *(mImpl->mModel->mLogicalModel->mColorRuns.Begin() + numberOfRuns);
-        colorRun.color                           = color;
-        colorRun.characterRun.characterIndex     = startOfSelectedText;
-        colorRun.characterRun.numberOfCharacters = lengthOfSelectedText;
-
-        mImpl->mTextUpdateInfo.mCharacterIndex             = startOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = lengthOfSelectedText;
-      }
-      else
-      {
-        mImpl->mTextUpdateInfo.mCharacterIndex             = 0;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = mImpl->mModel->mLogicalModel->mText.Count();
-      }
-
-      // Request to relayout.
-      mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | COLOR);
-      mImpl->RequestRelayout();
-    }
-  }
+  InputProperties::SetInputColor(*this, color);
 }
 
 const Vector4& Controller::GetInputColor() const
 {
-  // Return event text input color if we have it, otherwise just return the default text's color
-  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.textColor : mImpl->mTextColor;
+  return InputProperties::GetInputColor(*this);
 }
 
 void Controller::SetInputFontFamily(const std::string& fontFamily)
@@ -1168,81 +1112,62 @@ float Controller::GetInputFontPointSize() const
 
 void Controller::SetInputLineSpacing(float lineSpacing)
 {
-  if(mImpl->mEventData)
-  {
-    mImpl->mEventData->mInputStyle.lineSpacing          = lineSpacing;
-    mImpl->mEventData->mInputStyle.isLineSpacingDefined = true;
-  }
+  InputProperties::SetInputLineSpacing(*this, lineSpacing);
 }
 
 float Controller::GetInputLineSpacing() const
 {
-  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.lineSpacing : 0.0f;
+  return InputProperties::GetInputLineSpacing(*this);
 }
 
 void Controller::SetInputShadowProperties(const std::string& shadowProperties)
 {
-  if(mImpl->mEventData)
-  {
-    mImpl->mEventData->mInputStyle.shadowProperties = shadowProperties;
-  }
+  InputProperties::SetInputShadowProperties(*this, shadowProperties);
 }
 
 const std::string& Controller::GetInputShadowProperties() const
 {
-  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.shadowProperties : EMPTY_STRING;
+  return InputProperties::GetInputShadowProperties(*this);
 }
 
 void Controller::SetInputUnderlineProperties(const std::string& underlineProperties)
 {
-  if(mImpl->mEventData)
-  {
-    mImpl->mEventData->mInputStyle.underlineProperties = underlineProperties;
-  }
+  InputProperties::SetInputUnderlineProperties(*this, underlineProperties);
 }
 
 const std::string& Controller::GetInputUnderlineProperties() const
 {
-  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.underlineProperties : EMPTY_STRING;
+  return InputProperties::GetInputUnderlineProperties(*this);
 }
 
 void Controller::SetInputEmbossProperties(const std::string& embossProperties)
 {
-  if(mImpl->mEventData)
-  {
-    mImpl->mEventData->mInputStyle.embossProperties = embossProperties;
-  }
+  InputProperties::SetInputEmbossProperties(*this, embossProperties);
 }
 
 const std::string& Controller::GetInputEmbossProperties() const
 {
-  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.embossProperties : GetDefaultEmbossProperties();
+  return InputProperties::GetInputEmbossProperties(*this);
 }
 
 void Controller::SetInputOutlineProperties(const std::string& outlineProperties)
 {
-  if(mImpl->mEventData)
-  {
-    mImpl->mEventData->mInputStyle.outlineProperties = outlineProperties;
-  }
+  InputProperties::SetInputOutlineProperties(*this, outlineProperties);
 }
 
 const std::string& Controller::GetInputOutlineProperties() const
 {
-  return mImpl->mEventData ? mImpl->mEventData->mInputStyle.outlineProperties : GetDefaultOutlineProperties();
+  return InputProperties::GetInputOutlineProperties(*this);
 }
 
 void Controller::SetInputModePassword(bool passwordInput)
 {
-  if(mImpl->mEventData)
-  {
-    mImpl->mEventData->mPasswordInput = passwordInput;
-  }
+  InputProperties::SetInputModePassword(*this, passwordInput);
 }
 
 bool Controller::IsInputModePassword()
 {
-  return mImpl->mEventData && mImpl->mEventData->mPasswordInput;
+  return InputProperties::IsInputModePassword(*this);
 }
 
 void Controller::SetNoTextDoubleTapAction(NoTextTap::Action action)
@@ -1491,23 +1416,12 @@ void Controller::RequestRelayout()
 
 bool Controller::IsInputStyleChangedSignalsQueueEmpty()
 {
-  return (NULL == mImpl->mEventData) || (0u == mImpl->mEventData->mInputStyleChangedQueue.Count());
+  return mImpl->IsInputStyleChangedSignalsQueueEmpty();
 }
 
 void Controller::ProcessInputStyleChangedSignals()
 {
-  if(mImpl->mEventData)
-  {
-    if(mImpl->mEditableControlInterface)
-    {
-      // Emit the input style changed signal for each mask
-      std::for_each(mImpl->mEventData->mInputStyleChangedQueue.begin(),
-                    mImpl->mEventData->mInputStyleChangedQueue.end(),
-                    [&](const auto mask) { mImpl->mEditableControlInterface->InputStyleChanged(mask); } );
-    }
-
-    mImpl->mEventData->mInputStyleChangedQueue.Clear();
-  }
+  mImpl->ProcessInputStyleChangedSignals();
 }
 
 void Controller::KeyboardFocusGainEvent()
@@ -1704,52 +1618,21 @@ bool Controller::IsEditable() const
 void Controller::SetEditable(bool editable)
 {
   mImpl->SetEditable(editable);
-  if(mImpl->mEventData && mImpl->mEventData->mDecorator)
-  {
-    mImpl->mEventData->mDecorator->SetEditable(editable);
-  }
 }
 
 void Controller::ScrollBy(Vector2 scroll)
 {
-  if(mImpl->mEventData && (fabs(scroll.x) > Math::MACHINE_EPSILON_0 || fabs(scroll.y) > Math::MACHINE_EPSILON_0))
-  {
-    const Vector2& layoutSize    = mImpl->mModel->mVisualModel->GetLayoutSize();
-    const Vector2  currentScroll = mImpl->mModel->mScrollPosition;
-
-    scroll.x = -scroll.x;
-    scroll.y = -scroll.y;
-
-    if(fabs(scroll.x) > Math::MACHINE_EPSILON_0)
-    {
-      mImpl->mModel->mScrollPosition.x += scroll.x;
-      mImpl->ClampHorizontalScroll(layoutSize);
-    }
-
-    if(fabs(scroll.y) > Math::MACHINE_EPSILON_0)
-    {
-      mImpl->mModel->mScrollPosition.y += scroll.y;
-      mImpl->ClampVerticalScroll(layoutSize);
-    }
-
-    if(mImpl->mModel->mScrollPosition != currentScroll)
-    {
-      mImpl->mEventData->mDecorator->UpdatePositions(mImpl->mModel->mScrollPosition - currentScroll);
-      mImpl->RequestRelayout();
-    }
-  }
+  mImpl->ScrollBy(scroll);
 }
 
 float Controller::GetHorizontalScrollPosition()
 {
-  // Scroll values are negative internally so we convert them to positive numbers
-  return mImpl->mEventData ? -mImpl->mModel->mScrollPosition.x : 0.0f;
+  return mImpl->GetHorizontalScrollPosition();
 }
 
 float Controller::GetVerticalScrollPosition()
 {
-  // Scroll values are negative internally so we convert them to positive numbers
-  return mImpl->mEventData ? -mImpl->mModel->mScrollPosition.y : 0.0f;
+  return mImpl->GetVerticalScrollPosition();
 }
 
 void Controller::DecorationEvent(HandleType handleType, HandleState state, float x, float y)

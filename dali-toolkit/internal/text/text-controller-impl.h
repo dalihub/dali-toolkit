@@ -771,6 +771,37 @@ struct Controller::Impl
    */
   Actor CreateBackgroundActor();
 
+  /**
+   * @brief fill needed relayout parameters when line size is changed & request relayout.
+   */
+  void RelayoutForNewLineSize();
+
+  /**
+   * @copydoc Controller::IsInputStyleChangedSignalsQueueEmpty
+   */
+  bool IsInputStyleChangedSignalsQueueEmpty();
+
+  /**
+   * @copydoc Controller::ProcessInputStyleChangedSignals
+   */
+  void ProcessInputStyleChangedSignals();
+
+  /**
+   * @copydoc Controller::ScrollBy()
+   */
+  void ScrollBy(Vector2 scroll);
+
+  /**
+   * @copydoc Controller::GetHorizontalScrollPosition()
+   */
+  float GetHorizontalScrollPosition();
+
+  /**
+   * @copydoc Controller::GetVerticalScrollPosition()
+   */
+  float GetVerticalScrollPosition();
+
+
 public:
   /**
    * @brief Gets implementation from the controller handle.
