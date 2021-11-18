@@ -843,6 +843,37 @@ int UtcDaliToolkitTextLabelEmojisP(void)
   application.SendNotification();
   application.Render();
 
+  // EMOJI Sequences case for coverage.
+  std::string emojiSequences =
+       "Text VS15 &#x262a;&#xfe0e;\n"                                                         //text presentation sequence and selector
+      "Color VS16 &#x262a;&#xfe0f;\n"                                                        //emoji presentation sequence and selector
+      "Default &#x262a; \n"                                                                  //default presentation
+      "FamilyManWomanGirlBoy &#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F467;&#x200D;&#x1F466;\n" // emoji multi zwj sequence
+      "WomanScientist &#x1f469;&#x200d;&#x1f52c;\n"                                          // emoji zwj sequence
+      "WomanScientistLightSkinTone&#x1F469;&#x1F3FB;&#x200D;&#x1F52C; \n"                    //emoji modifier sequence: skin tone & JWZ
+      "LeftRightArrowText&#x2194;&#xfe0e;\n"                                                 //text presentation sequence and selector
+      "LeftRightArrowEmoji&#x2194;&#xfe0f;\n"                                                //emoji presentation sequence and selector
+      "SouthKoreaFlag&#x1f1f0;&#x1f1f7;\n"                                                   //emoji flag sequence
+      "JordanFlag&#x1f1ef;&#x1f1f4;\n"                                                       // emoji flag sequence
+      "EnglandFlag&#x1F3F4;&#xE0067;&#xE0062;&#xE0065;&#xE006E;&#xE0067;&#xE007F;\n"         //emoji tag sequence like England flag
+      "Runner &#x1f3c3;&#x200d;&#x27a1;&#xfe0f; \n"
+      "VictoryHandMediumLightSkinTone:&#x270C;&#xFE0F;&#x1F3FC;\n"               //emoji modifier sequence: skin tone
+      "RainbowFlag:&#x1F3F3;&#xFE0F;&#x200D;&#x1F308; \n"                        //emoji zwj sequence: Rainbow Flag
+      "keycap# &#x0023;&#xFE0F;&#x20E3; \n"                                      // fully-qualified  emoji keycap sequence
+      "keycap#_text &#x0023;&#x20E3; \n"                                         // unqualified emoji keycap sequence
+      "keycap3 &#x0033;&#xfe0f;&#x20e3; \n"                                      // fully-qualified  emoji keycap sequence
+      "keycap3_text &#x0033;&#x20e3; \n"                                         // unqualified emoji keycap sequence
+      "two adjacent glyphs &#x262a;&#xfe0f;&#xfe0f;&#xfe0f;&#x262a;&#xfe0f;\n"   //This line should be rendered as two adjacent glyphs
+      "Digit 8&#xfe0f; 8&#xfe0e; 8\n"                                            // should be rendered according to selector
+      "Surfing Medium Skin Female:  &#x1f3c4;&#x1f3fc;&#x200d;&#x2640;&#xfe0f;"; // Person Surfing + Medium Skin Tone +? Zero Width Joiner + Female Sign
+
+  label.SetProperty( TextLabel::Property::TEXT, emojiSequences );
+  label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty( TextLabel::Property::ELLIPSIS, false);
+
+  application.SendNotification();
+  application.Render();
   END_TEST;
 }
 

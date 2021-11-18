@@ -460,6 +460,47 @@ void ConfigureTextEditor( ControllerPtr controller )
   controller->SetMatchLayoutDirection(DevelText::MatchLayoutDirection::CONTENTS);
 }
 
+
+Vector<FontDescriptionRun> CreateSingleFontDescription(
+                    const CharacterRun&         characterRun,
+                    const std::string           fontFamilyName,
+                    const FontWeight            weight,
+                    const FontWidth             width,
+                    const FontSlant             slant,
+                    const PointSize26Dot6       size,
+                    const bool                  familyDefined,
+                    const bool                  weightDefined,
+                    const bool                  widthDefined,
+                    const bool                  slantDefined,
+                    const bool                  sizeDefined)
+{
+
+  FontDescriptionRun fontDescriptionRun =
+  {
+    characterRun,
+    nullptr,
+    0u,
+    weight,
+    width,
+    slant,
+    size,
+    familyDefined,
+    weightDefined,
+    widthDefined,
+    slantDefined,
+    sizeDefined
+  };
+
+  fontDescriptionRun.familyLength = fontFamilyName.size();
+  fontDescriptionRun.familyName = new char[fontDescriptionRun.familyLength];
+  memcpy( fontDescriptionRun.familyName, fontFamilyName.c_str(), fontDescriptionRun.familyLength );
+
+  Vector<FontDescriptionRun> fontDescriptionRuns;
+  fontDescriptionRuns.PushBack(fontDescriptionRun);
+
+  return fontDescriptionRuns;
+}
+
 } // namespace Text
 
 } // namespace Toolkit

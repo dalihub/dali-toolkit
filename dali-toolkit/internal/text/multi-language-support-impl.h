@@ -160,6 +160,28 @@ public:
 private:
   Vector<DefaultFonts*>           mDefaultFontPerScriptCache; ///< Caches default fonts for a script.
   Vector<ValidateFontsPerScript*> mValidFontsPerScriptCache;  ///< Caches valid fonts for a script.
+
+  //Methods
+
+  /**
+ * @brief Add the current script to scripts and create new script.
+ *
+ * @param[in] requestedScript The script of the new script run.
+ * @param[in] isRightToLeft The direction of the new script run.
+ * @param[in] addScriptCharactersToNewScript Whether to add the pending characters to the new script run or to the current script run.
+ * @param[inout] currentScriptRun The current character script run and it will be updated it to the new script run.
+ * @param[inout] numberOfAllScriptCharacters The pending characters.
+ * @param[inout] scripts The list of scripts.
+ * @param[inout] scriptIndex The current index of scripts.
+ *
+ */
+  void AddCurrentScriptAndCreatNewScript(const Script       requestedScript,
+                                         const bool         isRightToLeft,
+                                         const bool         addScriptCharactersToNewScript,
+                                         ScriptRun&         currentScriptRun,
+                                         Length&            numberOfAllScriptCharacters,
+                                         Vector<ScriptRun>& scripts,
+                                         ScriptRunIndex&    scriptIndex);
 };
 
 } // namespace Internal
