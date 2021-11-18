@@ -37,7 +37,7 @@ public:
    * @param[in] renderer pointer to the text renderer
    * @param[in] controller pointer to the text controller
    * @param[in] decorator pointer to the text decorator
-   * @param[in] alignmentOffset Alignment offset
+   * @param[in,out] alignmentOffset Alignment offset
    * @param[in,out] renderableActor Actor for rendering text
    * @param[in,out] backgroundActor Actor for rendering background
    * @param[in,out] stencil Clipping actor
@@ -49,7 +49,7 @@ public:
     Text::RendererPtr                renderer,
     Text::ControllerPtr              controller,
     Text::DecoratorPtr               decorator,
-    float                            alignmentOffset,
+    float&                           alignmentOffset,
     Actor&                           renderableActor,
     Actor&                           backgroundActor,
     Toolkit::Control&                stencil,
