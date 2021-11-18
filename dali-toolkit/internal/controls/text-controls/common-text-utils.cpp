@@ -27,7 +27,7 @@ void CommonTextUtils::RenderText(
   Text::RendererPtr                renderer,
   Text::ControllerPtr              controller,
   Text::DecoratorPtr               decorator,
-  float                            alignmentOffset,
+  float&                           alignmentOffset,
   Actor&                           renderableActor,
   Actor&                           backgroundActor,
   Toolkit::Control&                stencil,
