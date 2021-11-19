@@ -47,6 +47,8 @@ typedef IntrusivePtr<ScrollInternalConstraints> ScrollInternalConstraintsPtr;
 class ScrollOvershootIndicator;
 typedef IntrusivePtr<ScrollOvershootIndicator> ScrollOvershootIndicatorPtr;
 
+class ScrollViewPropertyHandler;
+
 /**
  * @copydoc Toolkit::ScrollView
  */
@@ -774,13 +776,6 @@ private:
   void SnapInternalYTo(float position);
 
   /**
-   * This is called internally whenever the Scroll Rulers are
-   * modified. This will update the properties: 'scrollPositionMin'
-   * and 'scrollPositionMax' to reflect the changes.
-   */
-  void UpdatePropertyDomain();
-
-  /**
    * Called when the gesture starts.
    */
   void GestureStarted();
@@ -819,20 +814,6 @@ private:
    * (occurs upon finishing gesture i.e. releasing)
    */
   void FinishTransform();
-
-  /**
-   * Returns overshoot vector based on current position
-   *
-   * Overshoot vector is defined as how far outside of bounds
-   * the viewport is trying to view (prior to being clamped).
-   *
-   * an overshoot of (100,50), means user is in bottom right corner,
-   * trying to pan +100 to the right, and +50 below. This can be used
-   * to determine an effect, such as stretching.
-   *
-   * @param[in] position The position for which you wish to obtain overshoot vector
-   */
-  Vector2 GetOvershoot(Vector2& position) const;
 
   /**
    * Clamps position within the domain set up by X/Y Rulers
@@ -924,13 +905,6 @@ private:
    */
   void OnScrollUpdateNotification(Dali::PropertyNotification& source);
 
-  /**
-   * Set up default rulers using a property map
-   * @param[in] scrollModeMap A map defining the characteristics of X and Y scrolling
-   * using either FixedRuler or DefaultRuler.
-   */
-  void SetScrollMode(const Property::Map& scrollModeMap);
-
 private:
   // Undefined
   ScrollView(const ScrollView&);
@@ -1020,6 +994,7 @@ private:
   bool mTransientScrollBar : 1;         ///< True if scroll-bar should be automatically show/hidden during/after panning
 
   friend ScrollViewConstraints;
+  friend ScrollViewPropertyHandler;
 };
 
 /**

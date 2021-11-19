@@ -138,7 +138,7 @@ void Controller::SetGlyphType(TextAbstraction::GlyphType glyphType)
   mImpl->mMetrics->SetGlyphType(glyphType);
 
   // Clear the font-specific data
-  ClearFontData();
+  mImpl->ClearFontData();
 
   mImpl->RequestRelayout();
 }
@@ -170,39 +170,12 @@ bool Controller::HasAnchors() const
 void Controller::SetAutoScrollEnabled(bool enable)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled[%s] SingleBox[%s]-> [%p]\n", (enable) ? "true" : "false", (mImpl->mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX) ? "true" : "false", this);
-
-  if(mImpl->mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX)
-  {
-    mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending |
-                                                            LAYOUT |
-                                                            ALIGN |
-                                                            UPDATE_LAYOUT_SIZE |
-                                                            REORDER);
-
-    if(enable)
-    {
-      DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled for SINGLE_LINE_BOX\n");
-      mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | UPDATE_DIRECTION);
-    }
-    else
-    {
-      DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled Disabling autoscroll\n");
-    }
-
-    mImpl->mIsAutoScrollEnabled = enable;
-    mImpl->RequestRelayout();
-  }
-  else
-  {
-    DALI_LOG_WARNING("Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored\n");
-    mImpl->mIsAutoScrollEnabled = false;
-  }
+  mImpl->SetAutoScrollEnabled(enable);
 }
 
 bool Controller::IsAutoScrollEnabled() const
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::IsAutoScrollEnabled[%s]\n", mImpl->mIsAutoScrollEnabled ? "true" : "false");
-
   return mImpl->mIsAutoScrollEnabled;
 }
 
@@ -272,17 +245,7 @@ int Controller::GetMaximumNumberOfCharacters()
 
 void Controller::SetEnableCursorBlink(bool enable)
 {
-  DALI_ASSERT_DEBUG(NULL != mImpl->mEventData && "TextInput disabled");
-
-  if(mImpl->mEventData)
-  {
-    mImpl->mEventData->mCursorBlinkEnabled = enable;
-
-    if(!enable && mImpl->mEventData->mDecorator)
-    {
-      mImpl->mEventData->mDecorator->StopCursorBlink();
-    }
-  }
+  mImpl->SetEnableCursorBlink(enable);
 }
 
 bool Controller::GetEnableCursorBlink() const
@@ -292,27 +255,7 @@ bool Controller::GetEnableCursorBlink() const
 
 void Controller::SetMultiLineEnabled(bool enable)
 {
-  const Layout::Engine::Type layout = enable ? Layout::Engine::MULTI_LINE_BOX : Layout::Engine::SINGLE_LINE_BOX;
-
-  if(layout != mImpl->mLayoutEngine.GetLayout())
-  {
-    // Set the layout type.
-    mImpl->mLayoutEngine.SetLayout(layout);
-
-    // Set the flags to redo the layout operations
-    const OperationsMask layoutOperations = static_cast<OperationsMask>(LAYOUT |
-                                                                        UPDATE_LAYOUT_SIZE |
-                                                                        ALIGN |
-                                                                        REORDER);
-
-    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
-    mImpl->mOperationsPending                  = static_cast<OperationsMask>(mImpl->mOperationsPending | layoutOperations);
-
-    // Need to recalculate natural size
-    mImpl->mRecalculateNaturalSize = true;
-
-    mImpl->RequestRelayout();
-  }
+  mImpl->SetMultiLineEnabled(enable);
 }
 
 bool Controller::IsMultiLineEnabled() const
@@ -322,28 +265,7 @@ bool Controller::IsMultiLineEnabled() const
 
 void Controller::SetHorizontalAlignment(Text::HorizontalAlignment::Type alignment)
 {
-  if(alignment != mImpl->mModel->mHorizontalAlignment)
-  {
-    // Set the alignment.
-    mImpl->mModel->mHorizontalAlignment = alignment;
-
-    // Set the flag to redo the alignment operation.
-    mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | ALIGN);
-
-    if(mImpl->mEventData)
-    {
-      mImpl->mEventData->mUpdateAlignment = true;
-
-      // Update the cursor if it's in editing mode
-      if(EventData::IsEditingState(mImpl->mEventData->mState))
-      {
-        mImpl->ChangeState(EventData::EDITING);
-        mImpl->mEventData->mUpdateCursorPosition = true;
-      }
-    }
-
-    mImpl->RequestRelayout();
-  }
+  mImpl->SetHorizontalAlignment(alignment);
 }
 
 Text::HorizontalAlignment::Type Controller::GetHorizontalAlignment() const
@@ -353,13 +275,7 @@ Text::HorizontalAlignment::Type Controller::GetHorizontalAlignment() const
 
 void Controller::SetVerticalAlignment(VerticalAlignment::Type alignment)
 {
-  if(alignment != mImpl->mModel->mVerticalAlignment)
-  {
-    // Set the alignment.
-    mImpl->mModel->mVerticalAlignment = alignment;
-    mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | ALIGN);
-    mImpl->RequestRelayout();
-  }
+  mImpl->SetVerticalAlignment(alignment);
 }
 
 VerticalAlignment::Type Controller::GetVerticalAlignment() const
@@ -417,31 +333,7 @@ bool Controller::IsShowingRealText() const
 
 void Controller::SetLineWrapMode(Text::LineWrap::Mode lineWrapMode)
 {
-  if(lineWrapMode != mImpl->mModel->mLineWrapMode)
-  {
-    // Update Text layout for applying wrap mode
-    mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending |
-                                                            ALIGN |
-                                                            LAYOUT |
-                                                            UPDATE_LAYOUT_SIZE |
-                                                            REORDER);
-
-    if((mImpl->mModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) || (lineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
-       (mImpl->mModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::MIXED) || (lineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::MIXED)) // hyphen is treated as line break
-    {
-      mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | GET_LINE_BREAKS);
-    }
-
-    // Set the text wrap mode.
-    mImpl->mModel->mLineWrapMode = lineWrapMode;
-
-    mImpl->mTextUpdateInfo.mCharacterIndex             = 0u;
-    mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = mImpl->mModel->mLogicalModel->mText.Count();
-
-    // Request relayout
-    mImpl->RequestRelayout();
-  }
+  mImpl->SetLineWrapMode(lineWrapMode);
 }
 
 Text::LineWrap::Mode Controller::GetLineWrapMode() const
@@ -590,17 +482,7 @@ void Controller::GetPlaceholderText(PlaceholderType type, std::string& text) con
 
 void Controller::UpdateAfterFontChange(const std::string& newDefaultFont)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::UpdateAfterFontChange\n");
-
-  if(!mImpl->mFontDefaults->familyDefined) // If user defined font then should not update when system font changes
-  {
-    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str());
-    mImpl->mFontDefaults->mFontDescription.family = newDefaultFont;
-
-    ClearFontData();
-
-    mImpl->RequestRelayout();
-  }
+  mImpl->UpdateAfterFontChange(newDefaultFont);
 }
 
 void Controller::RetrieveSelection(std::string& selectedText) const
@@ -640,7 +522,7 @@ void Controller::SetDefaultFontFamily(const std::string& defaultFontFamily)
   UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
-  ClearFontData();
+  mImpl->ClearFontData();
 
   mImpl->RequestRelayout();
 }
@@ -671,7 +553,7 @@ void Controller::SetDefaultFontWeight(FontWeight weight)
   UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
-  ClearFontData();
+  mImpl->ClearFontData();
 
   mImpl->RequestRelayout();
 }
@@ -712,7 +594,7 @@ void Controller::SetDefaultFontWidth(FontWidth width)
   UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
-  ClearFontData();
+  mImpl->ClearFontData();
 
   mImpl->RequestRelayout();
 }
@@ -753,7 +635,7 @@ void Controller::SetDefaultFontSlant(FontSlant slant)
   UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
-  ClearFontData();
+  mImpl->ClearFontData();
 
   mImpl->RequestRelayout();
 }
@@ -791,7 +673,7 @@ void Controller::SetFontSizeScale(float scale)
   UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
-  ClearFontData();
+  mImpl->ClearFontData();
 
   mImpl->RequestRelayout();
 }
@@ -812,7 +694,7 @@ void Controller::SetDefaultFontSize(float fontSize, FontSizeType type)
   UpdateCursorPosition(mImpl->mEventData);
 
   // Clear the font-specific data
-  ClearFontData();
+  mImpl->ClearFontData();
 
   mImpl->RequestRelayout();
 }
@@ -838,15 +720,7 @@ float Controller::GetPlaceholderTextFontSize(FontSizeType type) const
 
 void Controller::SetDefaultColor(const Vector4& color)
 {
-  mImpl->mTextColor = color;
-
-  if(!mImpl->IsShowingPlaceholderText())
-  {
-    mImpl->mModel->mVisualModel->SetTextColor(color);
-    mImpl->mModel->mLogicalModel->mColorRuns.Clear();
-    mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending | COLOR);
-    mImpl->RequestRelayout();
-  }
+  mImpl->SetDefaultColor(color);
 }
 
 const Vector4& Controller::GetDefaultColor() const
@@ -1001,15 +875,7 @@ const std::string& Controller::GetDefaultOutlineProperties() const
 
 bool Controller::SetDefaultLineSpacing(float lineSpacing)
 {
-  if(std::fabs(lineSpacing - mImpl->mLayoutEngine.GetDefaultLineSpacing()) > Math::MACHINE_EPSILON_1000)
-  {
-    mImpl->mLayoutEngine.SetDefaultLineSpacing(lineSpacing);
-    mImpl->mRecalculateNaturalSize = true;
-
-    mImpl->RelayoutForNewLineSize();
-    return true;
-  }
-  return false;
+  return mImpl->SetDefaultLineSpacing(lineSpacing);
 }
 
 float Controller::GetDefaultLineSpacing() const
@@ -1019,15 +885,7 @@ float Controller::GetDefaultLineSpacing() const
 
 bool Controller::SetDefaultLineSize(float lineSize)
 {
-  if(std::fabs(lineSize - mImpl->mLayoutEngine.GetDefaultLineSize()) > Math::MACHINE_EPSILON_1000)
-  {
-    mImpl->mLayoutEngine.SetDefaultLineSize(lineSize);
-    mImpl->mRecalculateNaturalSize = true;
-
-    mImpl->RelayoutForNewLineSize();
-    return true;
-  }
-  return false;
+  return mImpl->SetDefaultLineSize(lineSize);
 }
 
 float Controller::GetDefaultLineSize() const
@@ -1731,39 +1589,6 @@ void Controller::ShowPlaceholderText()
   PlaceholderHandler::ShowPlaceholderText(*this);
 }
 
-void Controller::ClearFontData()
-{
-  if(mImpl->mFontDefaults)
-  {
-    mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
-  }
-
-  // Set flags to update the model.
-  mImpl->mTextUpdateInfo.mCharacterIndex             = 0u;
-  mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
-  mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd    = mImpl->mModel->mLogicalModel->mText.Count();
-
-  mImpl->mTextUpdateInfo.mClearAll           = true;
-  mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
-  mImpl->mRecalculateNaturalSize             = true;
-
-  mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending |
-                                                          VALIDATE_FONTS |
-                                                          SHAPE_TEXT |
-                                                          BIDI_INFO |
-                                                          GET_GLYPH_METRICS |
-                                                          LAYOUT |
-                                                          UPDATE_LAYOUT_SIZE |
-                                                          REORDER |
-                                                          ALIGN);
-}
-
-void Controller::ClearStyleData()
-{
-  mImpl->mModel->mLogicalModel->mColorRuns.Clear();
-  mImpl->mModel->mLogicalModel->ClearFontDescriptionRuns();
-}
-
 void Controller::ResetCursorPosition(CharacterIndex cursorIndex)
 {
   // Reset the cursor position
@@ -1781,20 +1606,7 @@ void Controller::ResetCursorPosition(CharacterIndex cursorIndex)
 
 CharacterIndex Controller::GetCursorPosition()
 {
-  if(!mImpl->mEventData)
-    return 0;
-
-  return mImpl->mEventData->mPrimaryCursorPosition;
-}
-
-void Controller::ResetScrollPosition()
-{
-  if(mImpl->mEventData)
-  {
-    // Reset the scroll position.
-    mImpl->mModel->mScrollPosition                = Vector2::ZERO;
-    mImpl->mEventData->mScrollAfterUpdatePosition = true;
-  }
+  return mImpl->mEventData ? mImpl->mEventData->mPrimaryCursorPosition : 0;
 }
 
 void Controller::SetControlInterface(ControlInterface* controlInterface)

@@ -1881,21 +1881,6 @@ private: // Helpers.
    */
   void ShowPlaceholderText();
 
-  /**
-   * @brief Helper to clear font-specific data (only).
-   */
-  void ClearFontData();
-
-  /**
-   * @brief Helper to clear text's style data.
-   */
-  void ClearStyleData();
-
-  /**
-   * @brief Used to reset the scroll position after setting a new text.
-   */
-  void ResetScrollPosition();
-
 private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.

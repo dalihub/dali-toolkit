@@ -545,42 +545,17 @@ struct Controller::Impl
   }
 
   /**
+   * @copydoc Controller::GetLayoutDirection()
+   */
+  Dali::LayoutDirection::Type GetLayoutDirection(Dali::Actor& actor) const;
+
+  /**
    * @brief Calculates the start character index of the first paragraph to be updated and
    * the end character index of the last paragraph to be updated.
    *
    * @param[out] numberOfCharacters The number of characters to be updated.
    */
   void CalculateTextUpdateIndices(Length& numberOfCharacters);
-
-  /**
-   * @brief Helper to clear completely the parts of the model specified by the given @p operations.
-   *
-   * @note It never clears the text stored in utf32.
-   */
-  void ClearFullModelData(OperationsMask operations);
-
-  /**
-   * @brief Helper to clear completely the parts of the model related with the characters specified by the given @p operations.
-   *
-   * @note It never clears the text stored in utf32.
-   *
-   * @param[in] startIndex Index to the first character to be cleared.
-   * @param[in] endIndex Index to the last character to be cleared.
-   * @param[in] operations The operations required.
-   */
-  void ClearCharacterModelData(CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations);
-
-  /**
-   * @brief Helper to clear completely the parts of the model related with the glyphs specified by the given @p operations.
-   *
-   * @note It never clears the text stored in utf32.
-   * @note Character indices are transformed to glyph indices.
-   *
-   * @param[in] startIndex Index to the first character to be cleared.
-   * @param[in] endIndex Index to the last character to be cleared.
-   * @param[in] operations The operations required.
-   */
-  void ClearGlyphModelData(CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations);
 
   /**
    * @brief Helper to clear the parts of the model specified by the given @p operations and from @p startIndex to @p endIndex.
@@ -620,6 +595,16 @@ struct Controller::Impl
   float GetDefaultFontLineHeight();
 
   /**
+   * @copydoc Controller::SetDefaultLineSpacing
+   */
+  bool SetDefaultLineSpacing(float lineSpacing);
+
+  /**
+   * @copydoc Controller::SetDefaultLineSize
+   */
+  bool SetDefaultLineSize(float lineSize);
+
+  /**
    * @copydoc Text::Controller::GetPrimaryCursorPosition()
    */
   CharacterIndex GetPrimaryCursorPosition() const;
@@ -648,6 +633,11 @@ struct Controller::Impl
    * @copydoc Text::EditableControlInterface::SetEditable()
    */
   void SetEditable(bool editable);
+
+  /**
+   * @copydoc Controller::UpdateAfterFontChange
+   */
+  void UpdateAfterFontChange(const std::string& newDefaultFont);
 
   /**
    * @brief Retrieves the selected text. It removes the text if the @p deleteAfterRetrieval parameter is @e true.
@@ -801,6 +791,55 @@ struct Controller::Impl
    */
   float GetVerticalScrollPosition();
 
+  /**
+   * @copydoc Controller::SetAutoScrollEnabled()
+   */
+  void SetAutoScrollEnabled(bool enable);
+
+  /**
+   * @copydoc Controller::SetEnableCursorBlink()
+   */
+  void SetEnableCursorBlink(bool enable);
+
+  /**
+   * @copydoc Controller::SetMultiLineEnabled()
+   */
+  void SetMultiLineEnabled(bool enable);
+
+  /**
+   * @copydoc Controller::SetHorizontalAlignment()
+   */
+  void SetHorizontalAlignment(HorizontalAlignment::Type alignment);
+
+  /**
+   * @copydoc Controller::SetVerticalAlignment()
+   */
+  void SetVerticalAlignment(VerticalAlignment::Type alignment);
+
+  /**
+   * @copydoc Controller::SetLineWrapMode()
+   */
+  void SetLineWrapMode(Text::LineWrap::Mode textWarpMode);
+
+  /**
+   * @copydoc Controller::SetDefaultColor()
+   */
+  void SetDefaultColor(const Vector4& color);
+
+  /**
+   * @brief Helper to clear font-specific data (only).
+   */
+  void ClearFontData();
+
+  /**
+   * @brief Helper to clear text's style data.
+   */
+  void ClearStyleData();
+
+  /**
+   * @brief Used to reset the scroll position after setting a new text.
+   */
+  void ResetScrollPosition();
 
 public:
   /**
