@@ -572,14 +572,6 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
       }
       break;
     }
-    case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
-    {
-      if(Dali::Accessibility::IsUp())
-      {
-        Dali::Accessibility::Accessible::Get(Self())->Emit(Dali::Accessibility::ObjectPropertyChangeEvent::ROLE);
-      }
-      break;
-    }
   }
 }
 
