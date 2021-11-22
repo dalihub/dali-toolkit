@@ -24,6 +24,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/emoji-helper.h>
 #include <dali-toolkit/internal/text/multi-language-helper-functions.h>
 
 namespace Dali
@@ -97,11 +98,11 @@ MultilanguageSupport::MultilanguageSupport()
 {
   // Initializes the default font cache to zero (invalid font).
   // Reserves space to cache the default fonts and access them with the script as an index.
-  mDefaultFontPerScriptCache.Resize(TextAbstraction::UNKNOWN + 1, NULL);
+  mDefaultFontPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
 
   // Initializes the valid fonts cache to NULL (no valid fonts).
   // Reserves space to cache the valid fonts and access them with the script as an index.
-  mValidFontsPerScriptCache.Resize(TextAbstraction::UNKNOWN + 1, NULL);
+  mValidFontsPerScriptCache.Resize(TextAbstraction::GetNumberOfScripts(), NULL);
 }
 
 MultilanguageSupport::~MultilanguageSupport()
@@ -205,6 +206,7 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
 
   // Traverse all characters and set the scripts.
   const Length lastCharacter = startIndex + numberOfCharacters;
+
   for(Length index = startIndex; index < lastCharacter; ++index)
   {
     Character character = *(textBuffer + index);
@@ -222,25 +224,39 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
 
     // Skip those characters valid for many scripts like white spaces or '\n'.
     bool endOfText = index == lastCharacter;
+
+    //Handle all Emoji Sequence cases
+    if(IsNewSequence(textBuffer, currentScriptRun.script, index, lastCharacter, script))
+    {
+      AddCurrentScriptAndCreatNewScript(script,
+                                        false,
+                                        false,
+                                        currentScriptRun,
+                                        numberOfAllScriptCharacters,
+                                        scripts,
+                                        scriptIndex);
+    }
+    else if(IsScriptChangedToFollowSequence(currentScriptRun.script, character, script))
+    {
+      currentScriptRun.script = script;
+    }
+    else if(IsOneOfEmojiScripts(currentScriptRun.script) && (TextAbstraction::COMMON == script))
+    {
+      // Emojis doesn't mix well with characters common to all scripts. Insert the emoji run.
+      AddCurrentScriptAndCreatNewScript(TextAbstraction::UNKNOWN,
+                                        false,
+                                        false,
+                                        currentScriptRun,
+                                        numberOfAllScriptCharacters,
+                                        scripts,
+                                        scriptIndex);
+    }
+
     while(!endOfText &&
           (TextAbstraction::COMMON == script))
     {
       // Check if whether is right to left markup and Keeps true if the previous value was true.
       currentScriptRun.isRightToLeft = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftMark(character);
-
-      // ZWJ, ZWNJ between emojis should be treated as EMOJI.
-      if(TextAbstraction::EMOJI == currentScriptRun.script && !(TextAbstraction::IsZeroWidthJoiner(character) || TextAbstraction::IsZeroWidthNonJoiner(character)))
-      {
-        // Emojis doesn't mix well with characters common to all scripts. Insert the emoji run.
-        scripts.Insert(scripts.Begin() + scriptIndex, currentScriptRun);
-        ++scriptIndex;
-
-        // Initialize the new one.
-        currentScriptRun.characterRun.characterIndex     = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
-        currentScriptRun.characterRun.numberOfCharacters = 0u;
-        currentScriptRun.script                          = TextAbstraction::UNKNOWN;
-        numberOfAllScriptCharacters                      = 0u;
-      }
 
       // Count all these characters to be added into a script.
       ++numberOfAllScriptCharacters;
@@ -253,20 +269,13 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
         // the same direction than the first script of the paragraph.
         isFirstScriptToBeSet = true;
 
-        // Characters common to all scripts at the end of the paragraph are added to the last script.
-        currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
-
-        // Store the script run.
-        scripts.Insert(scripts.Begin() + scriptIndex, currentScriptRun);
-        ++scriptIndex;
-
-        // Initialize the new one.
-        currentScriptRun.characterRun.characterIndex     = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
-        currentScriptRun.characterRun.numberOfCharacters = 0u;
-        currentScriptRun.script                          = TextAbstraction::UNKNOWN;
-        numberOfAllScriptCharacters                      = 0u;
-        // Initialize whether is right to left direction
-        currentScriptRun.isRightToLeft = false;
+        AddCurrentScriptAndCreatNewScript(TextAbstraction::UNKNOWN,
+                                          false,
+                                          false,
+                                          currentScriptRun,
+                                          numberOfAllScriptCharacters,
+                                          scripts,
+                                          scriptIndex);
       }
 
       // Get the next character.
@@ -276,6 +285,22 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
       {
         character = *(textBuffer + index);
         script    = TextAbstraction::GetCharacterScript(character);
+
+        //Handle all Emoji Sequence cases
+        if(IsNewSequence(textBuffer, currentScriptRun.script, index, lastCharacter, script))
+        {
+          AddCurrentScriptAndCreatNewScript(script,
+                                            false,
+                                            false,
+                                            currentScriptRun,
+                                            numberOfAllScriptCharacters,
+                                            scripts,
+                                            scriptIndex);
+        }
+        else if(IsScriptChangedToFollowSequence(currentScriptRun.script, character, script))
+        {
+          currentScriptRun.script = script;
+        }
       }
     } // end while( !endOfText && ( TextAbstraction::COMMON == script ) )
 
@@ -290,7 +315,10 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
     if(isFirstScriptToBeSet &&
        (TextAbstraction::UNKNOWN != script) &&
        (TextAbstraction::COMMON != script) &&
-       (TextAbstraction::EMOJI != script))
+       (TextAbstraction::EMOJI != script) &&
+       (TextAbstraction::EMOJI_TEXT != script) &&
+       (TextAbstraction::EMOJI_COLOR != script) &&
+       (!TextAbstraction::IsSymbolScript(script)))
     {
       // Sets the direction of the first valid script.
       isParagraphRTL       = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftScript(script);
@@ -319,26 +347,21 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text,
         numberOfAllScriptCharacters = 0u;
       }
       else if((TextAbstraction::UNKNOWN == currentScriptRun.script) &&
-              (TextAbstraction::EMOJI == script))
+              (TextAbstraction::IsSymbolOrEmojiOrTextScript(script)))
       {
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
         numberOfAllScriptCharacters = 0u;
       }
 
-      if(0u != currentScriptRun.characterRun.numberOfCharacters)
-      {
-        // Store the script run.
-        scripts.Insert(scripts.Begin() + scriptIndex, currentScriptRun);
-        ++scriptIndex;
-      }
-
-      // Initialize the new one.
-      currentScriptRun.characterRun.characterIndex     = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
-      currentScriptRun.characterRun.numberOfCharacters = numberOfAllScriptCharacters + 1u; // Adds the white spaces which are at the begining of the script.
-      currentScriptRun.script                          = script;
-      numberOfAllScriptCharacters                      = 0u;
-      // Check if whether is right to left script.
-      currentScriptRun.isRightToLeft = TextAbstraction::IsRightToLeftScript(currentScriptRun.script);
+      // Adds the white spaces which are at the begining of the script.
+      numberOfAllScriptCharacters++;
+      AddCurrentScriptAndCreatNewScript(script,
+                                        TextAbstraction::IsRightToLeftScript(script),
+                                        true,
+                                        currentScriptRun,
+                                        numberOfAllScriptCharacters,
+                                        scripts,
+                                        scriptIndex);
     }
     else
     {
@@ -445,8 +468,8 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
   Vector<ScriptRun>::ConstIterator scriptRunEndIt          = scripts.End();
   bool                             isNewParagraphCharacter = false;
 
-  bool   isPreviousEmojiScript = false;
-  FontId previousEmojiFontId   = 0u;
+  FontId                  previousEmojiFontId = 0u;
+  TextAbstraction::Script previousScript      = TextAbstraction::UNKNOWN;
 
   CharacterIndex lastCharacter = startIndex + numberOfCharacters;
   for(Length index = startIndex; index < lastCharacter; ++index)
@@ -518,28 +541,11 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
     }
 
     bool isCommonScript = false;
-    bool isEmojiScript  = TextAbstraction::EMOJI == script;
+    bool isEmojiScript  = TextAbstraction::IsEmojiScript(script) || TextAbstraction::IsEmojiColorScript(script) || TextAbstraction::IsEmojiTextScript(script);
 
-    if(isEmojiScript && !isPreviousEmojiScript)
+    if(isEmojiScript && (previousScript == script))
     {
-      if(0u != currentFontRun.characterRun.numberOfCharacters)
-      {
-        // Store the font run.
-        fonts.Insert(fonts.Begin() + fontIndex, currentFontRun);
-        ++fontIndex;
-      }
-
-      // Initialize the new one.
-      currentFontRun.characterRun.characterIndex     = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
-      currentFontRun.characterRun.numberOfCharacters = 0u;
-      currentFontRun.fontId                          = fontId;
-      currentFontRun.isItalicRequired                = false;
-      currentFontRun.isBoldRequired                  = false;
-    }
-
-    // ZWJ, ZWNJ between emojis should use the previous emoji font.
-    if(isEmojiScript && (TextAbstraction::IsZeroWidthJoiner(character) || TextAbstraction::IsZeroWidthNonJoiner(character)))
-    {
+      // Emoji sequence should use the previous emoji font.
       if(0u != previousEmojiFontId)
       {
         fontId      = previousEmojiFontId;
@@ -567,7 +573,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
       //
       //      Many fonts support 'white spaces' so probably the font set by the user or the platform's default
       //      supports the 'white space'. However, that font may not support the DEVANAGARI script.
-      isCommonScript = TextAbstraction::IsCommonScript(character);
+      isCommonScript = TextAbstraction::IsCommonScript(character) || TextAbstraction::IsEmojiPresentationSelector(character);
 
       // Check in the valid fonts cache.
       ValidateFontsPerScript* validateFontsPerScript = *(validFontsPerScriptCacheBuffer + script);
@@ -659,13 +665,54 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
       }   // !isValidFont (2)
     }     // !isValidFont (1)
 
-    // Store the font id when the first character is an emoji.
-    if(isEmojiScript && !isPreviousEmojiScript)
+    if(isEmojiScript && (previousScript != script))
     {
-      if(0u != fontId)
+      //New Emoji sequence should select font according to the variation selector (VS15 or VS16).
+      if(0u != currentFontRun.characterRun.numberOfCharacters)
+      {
+        // Store the font run.
+        fonts.Insert(fonts.Begin() + fontIndex, currentFontRun);
+        ++fontIndex;
+      }
+
+      // Initialize the new one.
+      currentFontRun.characterRun.characterIndex     = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
+      currentFontRun.characterRun.numberOfCharacters = 0u;
+      currentFontRun.fontId                          = fontId;
+      currentFontRun.isItalicRequired                = false;
+      currentFontRun.isBoldRequired                  = false;
+
+      if(TextAbstraction::IsEmojiColorScript(script) || TextAbstraction::IsEmojiTextScript(script))
+      {
+        bool       isModifiedByVariationSelector = false;
+        GlyphIndex glyphIndexChar                = fontClient.GetGlyphIndex(fontId, character);
+        GlyphIndex glyphIndexCharByVS            = fontClient.GetGlyphIndex(fontId, character, Text::GetVariationSelectorByScript(script));
+
+        isModifiedByVariationSelector = glyphIndexChar != glyphIndexCharByVS;
+
+        if(isModifiedByVariationSelector)
+        {
+          FontId requestedFontId = fontClient.FindDefaultFont(character, currentFontPointSize, IsEmojiColorScript(script));
+          if(0u != requestedFontId)
+          {
+            currentFontRun.fontId = fontId = requestedFontId;
+            isValidFont                    = true;
+          }
+        }
+      }
+    }
+
+    // Store the font id when the first character is an emoji.
+    if(isEmojiScript)
+    {
+      if(0u != fontId && previousScript != script)
       {
         previousEmojiFontId = fontId;
       }
+    }
+    else
+    {
+      previousEmojiFontId = 0u;
     }
 
 #ifdef DEBUG_ENABLED
@@ -715,7 +762,7 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
 
     // Whether the current character is a new paragraph character.
     isNewParagraphCharacter = TextAbstraction::IsNewParagraph(character);
-    isPreviousEmojiScript   = isEmojiScript;
+    previousScript          = script;
   } // end traverse characters.
 
   if(0u != currentFontRun.characterRun.numberOfCharacters)
@@ -744,6 +791,34 @@ void MultilanguageSupport::ValidateFonts(const Vector<Character>&               
   }
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "<--MultilanguageSupport::ValidateFonts\n");
+}
+
+void MultilanguageSupport::AddCurrentScriptAndCreatNewScript(const Script       requestedScript,
+                                                             const bool         isRightToLeft,
+                                                             const bool         addScriptCharactersToNewScript,
+                                                             ScriptRun&         currentScriptRun,
+                                                             Length&            numberOfAllScriptCharacters,
+                                                             Vector<ScriptRun>& scripts,
+                                                             ScriptRunIndex&    scriptIndex)
+{
+  // Add the pending characters to the current script
+  currentScriptRun.characterRun.numberOfCharacters += (addScriptCharactersToNewScript ? 0u : numberOfAllScriptCharacters);
+
+  // In-case the current script is empty then no need to add it for scripts
+  if(0u != currentScriptRun.characterRun.numberOfCharacters)
+  {
+    // Store the script run.
+    scripts.Insert(scripts.Begin() + scriptIndex, currentScriptRun);
+    ++scriptIndex;
+  }
+
+  // Initialize the new one by the requested script
+  currentScriptRun.characterRun.characterIndex     = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
+  currentScriptRun.characterRun.numberOfCharacters = (addScriptCharactersToNewScript ? numberOfAllScriptCharacters : 0u);
+  currentScriptRun.script                          = requestedScript;
+  numberOfAllScriptCharacters                      = 0u;
+  // Initialize whether is right to left direction
+  currentScriptRun.isRightToLeft = isRightToLeft;
 }
 
 } // namespace Internal

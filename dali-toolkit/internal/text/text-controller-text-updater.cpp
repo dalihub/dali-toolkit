@@ -55,7 +55,7 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
   ResetText(controller);
 
   // Remove the style.
-  controller.ClearStyleData();
+  impl.ClearStyleData();
 
   CharacterIndex lastCursorIndex = 0u;
 
@@ -150,7 +150,7 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
   controller.ResetCursorPosition(lastCursorIndex);
 
   // Scrolls the text to make the cursor visible.
-  controller.ResetScrollPosition();
+  impl.ResetScrollPosition();
 
   impl.RequestRelayout();
 

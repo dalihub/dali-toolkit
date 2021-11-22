@@ -176,6 +176,11 @@ enum Type
 using AnchorClickedSignalType = Signal<void(TextLabel, const char*, uint32_t)>;
 
 /**
+ * @brief TextFit property changed signal type.
+ */
+using TextFitChangedSignalType = Signal<void(TextLabel)>;
+
+/**
  * @brief This signal is emitted when the anchor is clicked.
  *
  * A callback of the following type may be connected:
@@ -186,6 +191,18 @@ using AnchorClickedSignalType = Signal<void(TextLabel, const char*, uint32_t)>;
  * @return The signal to connect to.
  */
 DALI_TOOLKIT_API AnchorClickedSignalType& AnchorClickedSignal(TextLabel textLabel);
+
+/**
+ * @brief This signal is emitted when the textfit property is changed.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName(TextLabel textLabel);
+ * @endcode
+ * @param[in] textLabel The instance of TextLabel.
+ * @return The signal to connect to.
+ */
+DALI_TOOLKIT_API TextFitChangedSignalType& TextFitChangedSignal(TextLabel textLabel);
 
 } // namespace DevelTextLabel
 

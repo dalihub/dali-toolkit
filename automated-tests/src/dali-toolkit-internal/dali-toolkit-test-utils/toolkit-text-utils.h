@@ -93,6 +93,37 @@ void ConfigureTextField( ControllerPtr controller );
  */
 void ConfigureTextEditor( ControllerPtr controller );
 
+
+/**
+ * @brief Creates one FontDescriptionRun then add it to FontDescription list.
+ *
+ * @param[in] characterRun The initial character index and the number of characters of the run.
+ * @param[in] fontFamilyName The font's family name.
+ * @param[in] weight The font's weight.
+ * @param[in] width The font's width.
+ * @param[in] slant The font's slant.
+ * @param[in] size Whether the font's family is defined.
+ * @param[in] familyDefined Whether the font's weight is defined.
+ * @param[in] weightDefined Whether the font's width is defined.
+ * @param[in] widthDefined Whether the ellipsis layout option is enabled.
+ * @param[in] slantDefined Whether the font's slant is defined.
+ * @param[in] sizeDefined Whether the font's size is defined.
+
+* @return vector contains one FontDescriptionRun.
+ */
+Vector<FontDescriptionRun> CreateSingleFontDescription(
+                    const CharacterRun&         characterRun,
+                    const std::string           fontFamilyName,
+                    const FontWeight            weight,
+                    const FontWidth             width,
+                    const FontSlant             slant,
+                    const PointSize26Dot6       size,
+                    const bool                  familyDefined,
+                    const bool                  weightDefined,
+                    const bool                  widthDefined,
+                    const bool                  slantDefined,
+                    const bool                  sizeDefined);
+
 } // namespace Text
 
 } // namespace Toolkit

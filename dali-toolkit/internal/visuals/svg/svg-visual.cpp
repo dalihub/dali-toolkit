@@ -378,10 +378,10 @@ Shader SvgVisual::GenerateShader() const
   {
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
-      mAttemptAtlasing ? TextureAtlas::ENABLED : TextureAtlas::DISABLED,
-      DefaultTextureWrapMode::APPLY,
-      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
-      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
+      ImageVisualShaderFeature::FeatureBuilder()
+      .EnableTextureAtlas(mAttemptAtlasing)
+      .EnableRoundedCorner(IsRoundedCornerRequired())
+      .EnableBorderline(IsBorderlineRequired())
     );
   }
   else
