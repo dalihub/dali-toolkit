@@ -32,6 +32,9 @@ namespace Toolkit
 {
 namespace Text
 {
+
+static constexpr const uint32_t STAR = 0x2A; // Set default substitute character as '*'
+
 /**
  * Class to handle the hidden text
  */

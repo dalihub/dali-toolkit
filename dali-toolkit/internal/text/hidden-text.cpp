@@ -23,7 +23,6 @@
 
 using namespace Dali::Toolkit;
 
-const uint32_t STAR                  = 0x2A; // Set default substitute character as '*'
 const int      DEFAULT_SHOW_DURATION = 1000;
 
 namespace Dali
