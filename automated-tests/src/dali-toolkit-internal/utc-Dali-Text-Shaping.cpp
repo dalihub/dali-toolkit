@@ -119,6 +119,7 @@ struct ShapeInfoData
   Length*         charactersPerGlyph;                 ///< The characters per glyph.
   uint32_t        expectedNumberOfNewParagraphGlyphs; ///< The expected number of glyphs.
   GlyphIndex*     newParagraphGlyphs;                 ///< Indices to the new paragraphs glyphs.
+  bool            markupProcessorEnabled;             //< Enable markup processor to use markup text.
   Vector<FontDescriptionRun> fontDescriptions;        ///< Fonts which is used for text.
 };
 
@@ -140,7 +141,7 @@ bool ShapeInfoTest( const ShapeInfoData& data )
                    layoutSize,
                    textModel,
                    metrics,
-                   false,
+                   data.markupProcessorEnabled,
                    LineWrap::WORD,
                    false,
                    Toolkit::DevelText::EllipsisPosition::END );
@@ -335,6 +336,34 @@ void LoadSoftwareStylingFonts()
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/roboto/Roboto-Bold.ttf" );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/roboto/Roboto-Italic.ttf" );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/roboto/Roboto-BoldItalic.ttf" );
+}
+
+void LoadEmojiFonts()
+{
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.ClearCache();
+  fontClient.SetDpi( 96u, 96u );
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+
+  TextAbstraction::FontDescription fontDescriptionText;
+  fontDescriptionText.path   = "";
+  fontDescriptionText.family = "DejaVuSans";
+  fontDescriptionText.width  = TextAbstraction::FontWidth::NONE;
+  fontDescriptionText.weight = TextAbstraction::FontWeight::NORMAL;
+  fontDescriptionText.slant  = TextAbstraction::FontSlant::NONE;
+  fontClient.GetFontId(fontDescriptionText, TextAbstraction::FontClient::DEFAULT_POINT_SIZE);
+
+  TextAbstraction::FontDescription fontDescriptionEmoji;
+  fontDescriptionEmoji.path   = "";
+  fontDescriptionEmoji.family = "NotoColorEmoji";
+  fontDescriptionEmoji.width  = TextAbstraction::FontWidth::NONE;
+  fontDescriptionEmoji.weight = TextAbstraction::FontWeight::NORMAL;
+  fontDescriptionEmoji.slant  = TextAbstraction::FontSlant::NONE;
+  fontClient.GetFontId(fontDescriptionEmoji, TextAbstraction::FontClient::DEFAULT_POINT_SIZE);
 }
 
 } // namespace
@@ -671,7 +700,8 @@ int UtcDaliTextShape(void)
       nullptr,
       nullptr,
       0u,
-      nullptr
+      nullptr,
+      false,
     },
     {
       "Latin script",
@@ -684,6 +714,7 @@ int UtcDaliTextShape(void)
       charactersPerGlyph02,
       0u,
       nullptr,
+      false,
       fontDescriptions01
     },
     {
@@ -697,6 +728,7 @@ int UtcDaliTextShape(void)
       charactersPerGlyph03,
       2u,
       newParagraphGlyphs03,
+      false,
       fontDescriptions02
     },
     {
@@ -710,6 +742,7 @@ int UtcDaliTextShape(void)
       charactersPerGlyph04,
       0u,
       nullptr,
+      false,
       fontDescriptions03
     },
     {
@@ -723,7 +756,8 @@ int UtcDaliTextShape(void)
       charactersPerGlyph05,
       1u,
       newParagraphGlyphs05,
-      fontDescriptions04
+      false,
+      fontDescriptions04,
     },
     {
       "Latin script with some paragraphs. Update mid paragraph.",
@@ -736,6 +770,7 @@ int UtcDaliTextShape(void)
       charactersPerGlyph05,
       1u,
       newParagraphGlyphs06,
+      false,
       fontDescriptions05
     },
     {
@@ -749,6 +784,7 @@ int UtcDaliTextShape(void)
       charactersPerGlyph05,
       1u,
       newParagraphGlyphs07,
+      false,
       fontDescriptions06
     },
   };
@@ -927,6 +963,7 @@ int UtcDaliTextSoftwareStyling(void)
       charactersPerGlyph,
       0u,
       nullptr,
+      false,
       fontDescriptions01
     },
     {
@@ -940,6 +977,7 @@ int UtcDaliTextSoftwareStyling(void)
       charactersPerGlyph,
       0u,
       nullptr,
+      false,
       fontDescriptions02
     }
   };
@@ -951,6 +989,145 @@ int UtcDaliTextSoftwareStyling(void)
     ToolkitTestApplication application;
     LoadSoftwareStylingFonts();
 
+    if( !ShapeInfoTest( data[index] ) )
+    {
+      tet_result(TET_FAIL);
+    }
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+
+int UtcDaliTextShapeEmojiSequences(void)
+{
+
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliTextShapeEmojiSequences");
+
+  const std::string colorFontFamily( "NotoColorEmoji" );
+  const std::string textFontFamily( "DejaVuSans" );
+
+  LoadEmojiFonts();
+
+  //Common attributes for font Descriptions
+  CharacterRun    characterRun = {0u, 2u};
+  FontWeight      weight       = TextAbstraction::FontWeight::NORMAL;
+  FontWidth       width        = TextAbstraction::FontWidth::NORMAL;
+  FontSlant       slant        = TextAbstraction::FontSlant::ITALIC;
+  PointSize26Dot6 size         = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
+
+  bool familyDefined = true;
+  bool weightDefined = false;
+  bool widthDefined  = false;
+  bool slantDefined  = false;
+  bool sizeDefined   = false;
+
+
+  // variation selector 16 (Emoji)
+  struct GlyphInfoData glyphsVS16[] =
+  {
+    { 2u, 74u, 0.f, 0.f, 0.f, 0.f, 39.0f, 0.f, false, false },
+  };
+  CharacterIndex characterIndicesVS16[] = { 0u, 1u};
+  Length charactersPerGlyphVS16[] = { 2u };
+
+
+
+  // variation selector 15 (Text)
+  struct GlyphInfoData glyphsVS15[] =
+  {
+    { 1u, 3842u, 0.f, 0.f, 0.f, 0.f, 14.0f, 0.f, false, false },
+    { 1u, 8203u, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, false, false },
+  };
+  CharacterIndex characterIndicesVS15[] = { 0u, 0u};
+  Length charactersPerGlyphVS15[] = { 0u, 2u };
+
+  //Font Descriptions
+  Vector<FontDescriptionRun> fontDescriptionsColorVS16 =
+                    CreateSingleFontDescription (characterRun, colorFontFamily, weight, width,
+                     slant, size, familyDefined, weightDefined, widthDefined, slantDefined, sizeDefined);
+
+  Vector<FontDescriptionRun> fontDescriptionsColorVS15 =
+                    CreateSingleFontDescription (characterRun, colorFontFamily, weight, width,
+                     slant, size, familyDefined, weightDefined, widthDefined, slantDefined, sizeDefined);
+
+  Vector<FontDescriptionRun> fontDescriptionsTextVS16 =
+                    CreateSingleFontDescription (characterRun, textFontFamily, weight, width,
+                     slant, size, familyDefined, weightDefined, widthDefined, slantDefined, sizeDefined);
+
+  Vector<FontDescriptionRun> fontDescriptionsTextVS15 =
+                    CreateSingleFontDescription (characterRun, textFontFamily, weight, width,
+                     slant, size, familyDefined, weightDefined, widthDefined, slantDefined, sizeDefined);
+
+
+  struct ShapeInfoData data[] =
+  {
+     {
+      "EMOJI Sequence: Color Font with VS16",
+      "&#x262a;&#xfe0f;",
+      0u,
+      2u,
+      1u,
+      glyphsVS16,
+      characterIndicesVS16,
+      charactersPerGlyphVS16,
+      0u,
+      nullptr,
+      true,
+      fontDescriptionsColorVS16
+    },
+    {
+      "EMOJI Sequence: Color Font with VS15",
+      "&#x262a;&#xfe0e;",
+      0u,
+      2u,
+      2u,
+      glyphsVS15,
+      characterIndicesVS15,
+      charactersPerGlyphVS15,
+      0u,
+      nullptr,
+      true,
+      fontDescriptionsColorVS15
+    },
+    {
+      "EMOJI Sequence: Text Font with VS16",
+      "&#x262a;&#xfe0f;",
+      0u,
+      2u,
+      1u,
+      glyphsVS16,
+      characterIndicesVS16,
+      charactersPerGlyphVS16,
+      0u,
+      nullptr,
+      true,
+      fontDescriptionsTextVS16
+    },
+    {
+      "EMOJI Sequence: Text Font with VS15",
+      "&#x262a;&#xfe0e;",
+      0u,
+      2u,
+      2u,
+      glyphsVS15,
+      characterIndicesVS15,
+      charactersPerGlyphVS15,
+      0u,
+      nullptr,
+      true,
+      fontDescriptionsTextVS15
+    },
+  };
+
+  const unsigned int numberOfTests = 4u;
+
+  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  {
+     tet_infoline( data[index].description.c_str());
     if( !ShapeInfoTest( data[index] ) )
     {
       tet_result(TET_FAIL);

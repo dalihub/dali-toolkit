@@ -482,6 +482,27 @@ public: // Configure the text controller.
   Vector2 GetTextFitContentSize() const;
 
   /**
+   * @brief Retrieve the fited point size.
+   *
+   * @return The fited point size.
+   */
+  float GetTextFitPointSize() const;
+
+  /**
+   * @brief Sets whether the text fit properties have changed.
+   *
+   * @param[in] changed Whether to changed the text fit.
+   */
+  void SetTextFitChanged(bool changed);
+
+  /**
+   * @brief Whether the text fit properties are changed or not.
+   *
+   * @return True if the text fit properties are changed
+   */
+  bool IsTextFitChanged() const;
+
+  /**
    * @brief Enable or disable the placeholder text elide.
    * @param enabled Whether to enable the placeholder text elide.
    */
@@ -1881,26 +1902,6 @@ private: // Helpers.
    */
   void ShowPlaceholderText();
 
-  /**
-   * @brief Helper to clear font-specific data (only).
-   */
-  void ClearFontData();
-
-  /**
-   * @brief Helper to clear text's style data.
-   */
-  void ClearStyleData();
-
-  /**
-   * @brief Used to reset the scroll position after setting a new text.
-   */
-  void ResetScrollPosition();
-
-  /**
-   * @brief fill needed relayout parameters when line size is changed & request relayout.
-   */
-  void RelayoutForNewLineSize();
-
 private: // Private contructors & copy operator.
   /**
    * @brief Private constructor.
@@ -1941,6 +1942,7 @@ public:
 private:
   struct EventHandler;
   struct InputFontHandler;
+  struct InputProperties;
   struct PlaceholderHandler;
   struct Relayouter;
   struct TextUpdater;

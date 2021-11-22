@@ -19,8 +19,10 @@
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cmath>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -28,6 +30,7 @@
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
+#include <dali-toolkit/internal/text/text-controller-impl-data-clearer.h>
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
 #include <dali-toolkit/internal/text/text-controller-impl-model-updater.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
@@ -129,6 +132,243 @@ void SetDefaultInputStyle(InputStyle& inputStyle, const FontDefaults* const font
     }
   }
 }
+
+void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState)
+{
+  EventData* eventData = impl.mEventData;
+
+  if(nullptr == eventData)
+  {
+    // Nothing to do if there is no text input.
+    return;
+  }
+
+  DecoratorPtr& decorator = eventData->mDecorator;
+  if(!decorator)
+  {
+    // Nothing to do if there is no decorator.
+    return;
+  }
+
+  DALI_LOG_INFO(gLogFilter, Debug::General, "ChangeState state:%d  newstate:%d\n", eventData->mState, newState);
+
+  if(eventData->mState != newState)
+  {
+    eventData->mPreviousState = eventData->mState;
+    eventData->mState         = newState;
+
+    switch(eventData->mState)
+    {
+      case EventData::INACTIVE:
+      {
+        decorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
+        decorator->StopCursorBlink();
+        decorator->SetHandleActive(GRAB_HANDLE, false);
+        decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
+        decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
+        decorator->SetHighlightActive(false);
+        decorator->SetPopupActive(false);
+        eventData->mDecoratorUpdated = true;
+        break;
+      }
+
+      case EventData::INTERRUPTED:
+      {
+        decorator->SetHandleActive(GRAB_HANDLE, false);
+        decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
+        decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
+        decorator->SetHighlightActive(false);
+        decorator->SetPopupActive(false);
+        eventData->mDecoratorUpdated = true;
+        break;
+      }
+
+      case EventData::SELECTING:
+      {
+        decorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
+        decorator->StopCursorBlink();
+        decorator->SetHandleActive(GRAB_HANDLE, false);
+        if(eventData->mGrabHandleEnabled)
+        {
+          decorator->SetHandleActive(LEFT_SELECTION_HANDLE, true);
+          decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, true);
+        }
+        decorator->SetHighlightActive(true);
+        if(eventData->mGrabHandlePopupEnabled)
+        {
+          impl.SetPopupButtons();
+          decorator->SetPopupActive(true);
+        }
+        eventData->mDecoratorUpdated = true;
+        break;
+      }
+
+      case EventData::EDITING:
+      {
+        decorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
+        if(eventData->mCursorBlinkEnabled)
+        {
+          decorator->StartCursorBlink();
+        }
+        // Grab handle is not shown until a tap is received whilst EDITING
+        decorator->SetHandleActive(GRAB_HANDLE, false);
+        decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
+        decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
+        decorator->SetHighlightActive(false);
+        if(eventData->mGrabHandlePopupEnabled)
+        {
+          decorator->SetPopupActive(false);
+        }
+        eventData->mDecoratorUpdated = true;
+        break;
+      }
+      case EventData::EDITING_WITH_POPUP:
+      {
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "EDITING_WITH_POPUP \n", newState);
+
+        decorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
+        if(eventData->mCursorBlinkEnabled)
+        {
+          decorator->StartCursorBlink();
+        }
+        if(eventData->mSelectionEnabled)
+        {
+          decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
+          decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
+          decorator->SetHighlightActive(false);
+        }
+        else if(eventData->mGrabHandleEnabled)
+        {
+          decorator->SetHandleActive(GRAB_HANDLE, true);
+        }
+        if(eventData->mGrabHandlePopupEnabled)
+        {
+          impl.SetPopupButtons();
+          decorator->SetPopupActive(true);
+        }
+        eventData->mDecoratorUpdated = true;
+        break;
+      }
+      case EventData::EDITING_WITH_GRAB_HANDLE:
+      {
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "EDITING_WITH_GRAB_HANDLE \n", newState);
+
+        decorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
+        if(eventData->mCursorBlinkEnabled)
+        {
+          decorator->StartCursorBlink();
+        }
+        // Grab handle is not shown until a tap is received whilst EDITING
+        if(eventData->mGrabHandleEnabled)
+        {
+          decorator->SetHandleActive(GRAB_HANDLE, true);
+        }
+        decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
+        decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
+        decorator->SetHighlightActive(false);
+        if(eventData->mGrabHandlePopupEnabled)
+        {
+          decorator->SetPopupActive(false);
+        }
+        eventData->mDecoratorUpdated = true;
+        break;
+      }
+
+      case EventData::SELECTION_HANDLE_PANNING:
+      {
+        decorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
+        decorator->StopCursorBlink();
+        decorator->SetHandleActive(GRAB_HANDLE, false);
+        if(eventData->mGrabHandleEnabled)
+        {
+          decorator->SetHandleActive(LEFT_SELECTION_HANDLE, true);
+          decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, true);
+        }
+        decorator->SetHighlightActive(true);
+        if(eventData->mGrabHandlePopupEnabled)
+        {
+          decorator->SetPopupActive(false);
+        }
+        eventData->mDecoratorUpdated = true;
+        break;
+      }
+
+      case EventData::GRAB_HANDLE_PANNING:
+      {
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "GRAB_HANDLE_PANNING \n", newState);
+
+        decorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
+        if(eventData->mCursorBlinkEnabled)
+        {
+          decorator->StartCursorBlink();
+        }
+        if(eventData->mGrabHandleEnabled)
+        {
+          decorator->SetHandleActive(GRAB_HANDLE, true);
+        }
+        decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
+        decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
+        decorator->SetHighlightActive(false);
+        if(eventData->mGrabHandlePopupEnabled)
+        {
+          decorator->SetPopupActive(false);
+        }
+        eventData->mDecoratorUpdated = true;
+        break;
+      }
+
+      case EventData::EDITING_WITH_PASTE_POPUP:
+      {
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "EDITING_WITH_PASTE_POPUP \n", newState);
+
+        decorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
+        if(eventData->mCursorBlinkEnabled)
+        {
+          decorator->StartCursorBlink();
+        }
+
+        if(eventData->mGrabHandleEnabled)
+        {
+          decorator->SetHandleActive(GRAB_HANDLE, true);
+        }
+        decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
+        decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
+        decorator->SetHighlightActive(false);
+
+        if(eventData->mGrabHandlePopupEnabled)
+        {
+          impl.SetPopupButtons();
+          decorator->SetPopupActive(true);
+        }
+        eventData->mDecoratorUpdated = true;
+        break;
+      }
+
+      case EventData::TEXT_PANNING:
+      {
+        decorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
+        decorator->StopCursorBlink();
+        decorator->SetHandleActive(GRAB_HANDLE, false);
+        if(eventData->mDecorator->IsHandleActive(LEFT_SELECTION_HANDLE) ||
+            decorator->IsHandleActive(RIGHT_SELECTION_HANDLE))
+        {
+          decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
+          decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
+          decorator->SetHighlightActive(true);
+        }
+
+        if(eventData->mGrabHandlePopupEnabled)
+        {
+          decorator->SetPopupActive(false);
+        }
+
+        eventData->mDecoratorUpdated = true;
+        break;
+      }
+    }
+  }
+}
+
 } // unnamed Namespace
 
 EventData::EventData(DecoratorPtr decorator, InputMethodContext& inputMethodContext)
@@ -268,6 +508,19 @@ void Controller::Impl::GetText(CharacterIndex index, std::string& text) const
   }
 }
 
+Dali::LayoutDirection::Type Controller::Impl::GetLayoutDirection(Dali::Actor& actor) const
+{
+  if(mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::LOCALE ||
+     (mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::INHERIT && !mIsLayoutDirectionChanged))
+  {
+    return static_cast<Dali::LayoutDirection::Type>(DevelWindow::Get(actor).GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+  }
+  else
+  {
+    return static_cast<Dali::LayoutDirection::Type>(actor.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+  }
+}
+
 void Controller::Impl::CalculateTextUpdateIndices(Length& numberOfCharacters)
 {
   mTextUpdateInfo.mParagraphCharacterIndex = 0u;
@@ -353,286 +606,9 @@ void Controller::Impl::CalculateTextUpdateIndices(Length& numberOfCharacters)
   mTextUpdateInfo.mStartGlyphIndex             = *(mModel->mVisualModel->mCharactersToGlyph.Begin() + mTextUpdateInfo.mParagraphCharacterIndex);
 }
 
-void Controller::Impl::ClearFullModelData(OperationsMask operations)
-{
-  if(NO_OPERATION != (GET_LINE_BREAKS & operations))
-  {
-    mModel->mLogicalModel->mLineBreakInfo.Clear();
-    mModel->mLogicalModel->mParagraphInfo.Clear();
-  }
-
-  if(NO_OPERATION != (GET_SCRIPTS & operations))
-  {
-    mModel->mLogicalModel->mScriptRuns.Clear();
-  }
-
-  if(NO_OPERATION != (VALIDATE_FONTS & operations))
-  {
-    mModel->mLogicalModel->mFontRuns.Clear();
-  }
-
-  if(0u != mModel->mLogicalModel->mBidirectionalParagraphInfo.Count())
-  {
-    if(NO_OPERATION != (BIDI_INFO & operations))
-    {
-      mModel->mLogicalModel->mBidirectionalParagraphInfo.Clear();
-      mModel->mLogicalModel->mCharacterDirections.Clear();
-    }
-
-    if(NO_OPERATION != (REORDER & operations))
-    {
-      // Free the allocated memory used to store the conversion table in the bidirectional line info run.
-      for(Vector<BidirectionalLineInfoRun>::Iterator it    = mModel->mLogicalModel->mBidirectionalLineInfo.Begin(),
-                                                     endIt = mModel->mLogicalModel->mBidirectionalLineInfo.End();
-          it != endIt;
-          ++it)
-      {
-        BidirectionalLineInfoRun& bidiLineInfo = *it;
-
-        free(bidiLineInfo.visualToLogicalMap);
-        bidiLineInfo.visualToLogicalMap = NULL;
-      }
-      mModel->mLogicalModel->mBidirectionalLineInfo.Clear();
-    }
-  }
-
-  if(NO_OPERATION != (SHAPE_TEXT & operations))
-  {
-    mModel->mVisualModel->mGlyphs.Clear();
-    mModel->mVisualModel->mGlyphsToCharacters.Clear();
-    mModel->mVisualModel->mCharactersToGlyph.Clear();
-    mModel->mVisualModel->mCharactersPerGlyph.Clear();
-    mModel->mVisualModel->mGlyphsPerCharacter.Clear();
-    mModel->mVisualModel->mGlyphPositions.Clear();
-  }
-
-  if(NO_OPERATION != (LAYOUT & operations))
-  {
-    mModel->mVisualModel->mLines.Clear();
-  }
-
-  if(NO_OPERATION != (COLOR & operations))
-  {
-    mModel->mVisualModel->mColorIndices.Clear();
-    mModel->mVisualModel->mBackgroundColorIndices.Clear();
-  }
-}
-
-void Controller::Impl::ClearCharacterModelData(CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations)
-{
-  const CharacterIndex endIndexPlusOne = endIndex + 1u;
-
-  if(NO_OPERATION != (GET_LINE_BREAKS & operations))
-  {
-    // Clear the line break info.
-    LineBreakInfo* lineBreakInfoBuffer = mModel->mLogicalModel->mLineBreakInfo.Begin();
-
-    mModel->mLogicalModel->mLineBreakInfo.Erase(lineBreakInfoBuffer + startIndex,
-                                                lineBreakInfoBuffer + endIndexPlusOne);
-
-    // Clear the paragraphs.
-    ClearCharacterRuns(startIndex,
-                       endIndex,
-                       mModel->mLogicalModel->mParagraphInfo);
-  }
-
-  if(NO_OPERATION != (GET_SCRIPTS & operations))
-  {
-    // Clear the scripts.
-    ClearCharacterRuns(startIndex,
-                       endIndex,
-                       mModel->mLogicalModel->mScriptRuns);
-  }
-
-  if(NO_OPERATION != (VALIDATE_FONTS & operations))
-  {
-    // Clear the fonts.
-    ClearCharacterRuns(startIndex,
-                       endIndex,
-                       mModel->mLogicalModel->mFontRuns);
-  }
-
-  if(0u != mModel->mLogicalModel->mBidirectionalParagraphInfo.Count())
-  {
-    if(NO_OPERATION != (BIDI_INFO & operations))
-    {
-      // Clear the bidirectional paragraph info.
-      ClearCharacterRuns(startIndex,
-                         endIndex,
-                         mModel->mLogicalModel->mBidirectionalParagraphInfo);
-
-      // Clear the character's directions.
-      CharacterDirection* characterDirectionsBuffer = mModel->mLogicalModel->mCharacterDirections.Begin();
-
-      mModel->mLogicalModel->mCharacterDirections.Erase(characterDirectionsBuffer + startIndex,
-                                                        characterDirectionsBuffer + endIndexPlusOne);
-    }
-
-    if(NO_OPERATION != (REORDER & operations))
-    {
-      uint32_t startRemoveIndex = mModel->mLogicalModel->mBidirectionalLineInfo.Count();
-      uint32_t endRemoveIndex   = startRemoveIndex;
-      ClearCharacterRuns(startIndex,
-                         endIndex,
-                         mModel->mLogicalModel->mBidirectionalLineInfo,
-                         startRemoveIndex,
-                         endRemoveIndex);
-
-      BidirectionalLineInfoRun* bidirectionalLineInfoBuffer = mModel->mLogicalModel->mBidirectionalLineInfo.Begin();
-
-      // Free the allocated memory used to store the conversion table in the bidirectional line info run.
-      for(Vector<BidirectionalLineInfoRun>::Iterator it    = bidirectionalLineInfoBuffer + startRemoveIndex,
-                                                     endIt = bidirectionalLineInfoBuffer + endRemoveIndex;
-          it != endIt;
-          ++it)
-      {
-        BidirectionalLineInfoRun& bidiLineInfo = *it;
-
-        free(bidiLineInfo.visualToLogicalMap);
-        bidiLineInfo.visualToLogicalMap = NULL;
-      }
-
-      mModel->mLogicalModel->mBidirectionalLineInfo.Erase(bidirectionalLineInfoBuffer + startRemoveIndex,
-                                                          bidirectionalLineInfoBuffer + endRemoveIndex);
-    }
-  }
-}
-
-void Controller::Impl::ClearGlyphModelData(CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations)
-{
-  const CharacterIndex endIndexPlusOne           = endIndex + 1u;
-  const Length         numberOfCharactersRemoved = endIndexPlusOne - startIndex;
-
-  // Convert the character index to glyph index before deleting the character to glyph and the glyphs per character buffers.
-  GlyphIndex* charactersToGlyphBuffer  = mModel->mVisualModel->mCharactersToGlyph.Begin();
-  Length*     glyphsPerCharacterBuffer = mModel->mVisualModel->mGlyphsPerCharacter.Begin();
-
-  const GlyphIndex endGlyphIndexPlusOne  = *(charactersToGlyphBuffer + endIndex) + *(glyphsPerCharacterBuffer + endIndex);
-  const Length     numberOfGlyphsRemoved = endGlyphIndexPlusOne - mTextUpdateInfo.mStartGlyphIndex;
-
-  if(NO_OPERATION != (SHAPE_TEXT & operations))
-  {
-    // Update the character to glyph indices.
-    for(Vector<GlyphIndex>::Iterator it    = charactersToGlyphBuffer + endIndexPlusOne,
-                                     endIt = charactersToGlyphBuffer + mModel->mVisualModel->mCharactersToGlyph.Count();
-        it != endIt;
-        ++it)
-    {
-      CharacterIndex& index = *it;
-      index -= numberOfGlyphsRemoved;
-    }
-
-    // Clear the character to glyph conversion table.
-    mModel->mVisualModel->mCharactersToGlyph.Erase(charactersToGlyphBuffer + startIndex,
-                                                   charactersToGlyphBuffer + endIndexPlusOne);
-
-    // Clear the glyphs per character table.
-    mModel->mVisualModel->mGlyphsPerCharacter.Erase(glyphsPerCharacterBuffer + startIndex,
-                                                    glyphsPerCharacterBuffer + endIndexPlusOne);
-
-    // Clear the glyphs buffer.
-    GlyphInfo* glyphsBuffer = mModel->mVisualModel->mGlyphs.Begin();
-    mModel->mVisualModel->mGlyphs.Erase(glyphsBuffer + mTextUpdateInfo.mStartGlyphIndex,
-                                        glyphsBuffer + endGlyphIndexPlusOne);
-
-    CharacterIndex* glyphsToCharactersBuffer = mModel->mVisualModel->mGlyphsToCharacters.Begin();
-
-    // Update the glyph to character indices.
-    for(Vector<CharacterIndex>::Iterator it    = glyphsToCharactersBuffer + endGlyphIndexPlusOne,
-                                         endIt = glyphsToCharactersBuffer + mModel->mVisualModel->mGlyphsToCharacters.Count();
-        it != endIt;
-        ++it)
-    {
-      CharacterIndex& index = *it;
-      index -= numberOfCharactersRemoved;
-    }
-
-    // Clear the glyphs to characters buffer.
-    mModel->mVisualModel->mGlyphsToCharacters.Erase(glyphsToCharactersBuffer + mTextUpdateInfo.mStartGlyphIndex,
-                                                    glyphsToCharactersBuffer + endGlyphIndexPlusOne);
-
-    // Clear the characters per glyph buffer.
-    Length* charactersPerGlyphBuffer = mModel->mVisualModel->mCharactersPerGlyph.Begin();
-    mModel->mVisualModel->mCharactersPerGlyph.Erase(charactersPerGlyphBuffer + mTextUpdateInfo.mStartGlyphIndex,
-                                                    charactersPerGlyphBuffer + endGlyphIndexPlusOne);
-
-    // Should pass if mGlyphPositions has already been cleared in Controller::Relayouter::Relayout
-    if(0u != mModel->mVisualModel->mGlyphPositions.Count())
-    {
-      // Clear the positions buffer.
-      Vector2* positionsBuffer = mModel->mVisualModel->mGlyphPositions.Begin();
-      mModel->mVisualModel->mGlyphPositions.Erase(positionsBuffer + mTextUpdateInfo.mStartGlyphIndex,
-                                                  positionsBuffer + endGlyphIndexPlusOne);
-    }
-  }
-
-  if(NO_OPERATION != (LAYOUT & operations))
-  {
-    // Clear the lines.
-    uint32_t startRemoveIndex = mModel->mVisualModel->mLines.Count();
-    uint32_t endRemoveIndex   = startRemoveIndex;
-    ClearCharacterRuns(startIndex,
-                       endIndex,
-                       mModel->mVisualModel->mLines,
-                       startRemoveIndex,
-                       endRemoveIndex);
-
-    // Will update the glyph runs.
-    startRemoveIndex = mModel->mVisualModel->mLines.Count();
-    endRemoveIndex   = startRemoveIndex;
-    ClearGlyphRuns(mTextUpdateInfo.mStartGlyphIndex,
-                   endGlyphIndexPlusOne - 1u,
-                   mModel->mVisualModel->mLines,
-                   startRemoveIndex,
-                   endRemoveIndex);
-
-    // Set the line index from where to insert the new laid-out lines.
-    mTextUpdateInfo.mStartLineIndex = startRemoveIndex;
-
-    LineRun* linesBuffer = mModel->mVisualModel->mLines.Begin();
-    mModel->mVisualModel->mLines.Erase(linesBuffer + startRemoveIndex,
-                                       linesBuffer + endRemoveIndex);
-  }
-
-  if(NO_OPERATION != (COLOR & operations))
-  {
-    if(0u != mModel->mVisualModel->mColorIndices.Count())
-    {
-      ColorIndex* colorIndexBuffer = mModel->mVisualModel->mColorIndices.Begin();
-      mModel->mVisualModel->mColorIndices.Erase(colorIndexBuffer + mTextUpdateInfo.mStartGlyphIndex,
-                                                colorIndexBuffer + endGlyphIndexPlusOne);
-    }
-
-    if(0u != mModel->mVisualModel->mBackgroundColorIndices.Count())
-    {
-      ColorIndex* backgroundColorIndexBuffer = mModel->mVisualModel->mBackgroundColorIndices.Begin();
-      mModel->mVisualModel->mBackgroundColorIndices.Erase(backgroundColorIndexBuffer + mTextUpdateInfo.mStartGlyphIndex,
-                                                          backgroundColorIndexBuffer + endGlyphIndexPlusOne);
-    }
-  }
-}
-
 void Controller::Impl::ClearModelData(CharacterIndex startIndex, CharacterIndex endIndex, OperationsMask operations)
 {
-  if(mTextUpdateInfo.mClearAll ||
-     ((0u == startIndex) &&
-      (mTextUpdateInfo.mPreviousNumberOfCharacters == endIndex + 1u)))
-  {
-    ClearFullModelData(operations);
-  }
-  else
-  {
-    // Clear the model data related with characters.
-    ClearCharacterModelData(startIndex, endIndex, operations);
-
-    // Clear the model data related with glyphs.
-    ClearGlyphModelData(startIndex, endIndex, operations);
-  }
-
-  // The estimated number of lines. Used to avoid reallocations when layouting.
-  mTextUpdateInfo.mEstimatedNumberOfLines = std::max(mModel->mVisualModel->mLines.Count(), mModel->mLogicalModel->mParagraphInfo.Count());
-
-  mModel->mVisualModel->ClearCaches();
+  ControllerImplDataClearer::ClearModelData(*this, startIndex, endIndex, operations);
 }
 
 bool Controller::Impl::UpdateModel(OperationsMask operationsRequired)
@@ -662,6 +638,32 @@ float Controller::Impl::GetDefaultFontLineHeight()
   mMetrics->GetFontMetrics(defaultFontId, fontMetrics);
 
   return (fontMetrics.ascender - fontMetrics.descender);
+}
+
+bool Controller::Impl::SetDefaultLineSpacing(float lineSpacing)
+{
+  if(std::fabs(lineSpacing - mLayoutEngine.GetDefaultLineSpacing()) > Math::MACHINE_EPSILON_1000)
+  {
+    mLayoutEngine.SetDefaultLineSpacing(lineSpacing);
+    mRecalculateNaturalSize = true;
+
+    RelayoutForNewLineSize();
+    return true;
+  }
+  return false;
+}
+
+bool Controller::Impl::SetDefaultLineSize(float lineSize)
+{
+  if(std::fabs(lineSize - mLayoutEngine.GetDefaultLineSize()) > Math::MACHINE_EPSILON_1000)
+  {
+    mLayoutEngine.SetDefaultLineSize(lineSize);
+    mRecalculateNaturalSize = true;
+
+    RelayoutForNewLineSize();
+    return true;
+  }
+  return false;
 }
 
 void Controller::Impl::SetTextSelectionRange(const uint32_t* pStart, const uint32_t* pEnd)
@@ -783,6 +785,26 @@ void Controller::Impl::SetEditable(bool editable)
   if(mEventData)
   {
     mEventData->mEditingEnabled = editable;
+
+    if(mEventData->mDecorator)
+    {
+      mEventData->mDecorator->SetEditable(editable);
+    }
+  }
+}
+
+void Controller::Impl::UpdateAfterFontChange(const std::string& newDefaultFont)
+{
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::UpdateAfterFontChange\n");
+
+  if(!mFontDefaults->familyDefined) // If user defined font then should not update when system font changes
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Controller::UpdateAfterFontChange newDefaultFont(%s)\n", newDefaultFont.c_str());
+    mFontDefaults->mFontDescription.family = newDefaultFont;
+
+    ClearFontData();
+
+    RequestRelayout();
   }
 }
 
@@ -1003,222 +1025,7 @@ void Controller::Impl::SetPopupButtons()
 
 void Controller::Impl::ChangeState(EventData::State newState)
 {
-  if(nullptr == mEventData)
-  {
-    // Nothing to do if there is no text input.
-    return;
-  }
-
-  DALI_LOG_INFO(gLogFilter, Debug::General, "ChangeState state:%d  newstate:%d\n", mEventData->mState, newState);
-
-  if(mEventData->mState != newState)
-  {
-    mEventData->mPreviousState = mEventData->mState;
-    mEventData->mState         = newState;
-
-    switch(mEventData->mState)
-    {
-      case EventData::INACTIVE:
-      {
-        mEventData->mDecorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive(GRAB_HANDLE, false);
-        mEventData->mDecorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHighlightActive(false);
-        mEventData->mDecorator->SetPopupActive(false);
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::INTERRUPTED:
-      {
-        mEventData->mDecorator->SetHandleActive(GRAB_HANDLE, false);
-        mEventData->mDecorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHighlightActive(false);
-        mEventData->mDecorator->SetPopupActive(false);
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::SELECTING:
-      {
-        mEventData->mDecorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive(GRAB_HANDLE, false);
-        if(mEventData->mGrabHandleEnabled)
-        {
-          mEventData->mDecorator->SetHandleActive(LEFT_SELECTION_HANDLE, true);
-          mEventData->mDecorator->SetHandleActive(RIGHT_SELECTION_HANDLE, true);
-        }
-        mEventData->mDecorator->SetHighlightActive(true);
-        if(mEventData->mGrabHandlePopupEnabled)
-        {
-          SetPopupButtons();
-          mEventData->mDecorator->SetPopupActive(true);
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::EDITING:
-      {
-        mEventData->mDecorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
-        if(mEventData->mCursorBlinkEnabled)
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        // Grab handle is not shown until a tap is received whilst EDITING
-        mEventData->mDecorator->SetHandleActive(GRAB_HANDLE, false);
-        mEventData->mDecorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHighlightActive(false);
-        if(mEventData->mGrabHandlePopupEnabled)
-        {
-          mEventData->mDecorator->SetPopupActive(false);
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::EDITING_WITH_POPUP:
-      {
-        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "EDITING_WITH_POPUP \n", newState);
-
-        mEventData->mDecorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
-        if(mEventData->mCursorBlinkEnabled)
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        if(mEventData->mSelectionEnabled)
-        {
-          mEventData->mDecorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
-          mEventData->mDecorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
-          mEventData->mDecorator->SetHighlightActive(false);
-        }
-        else if(mEventData->mGrabHandleEnabled)
-        {
-          mEventData->mDecorator->SetHandleActive(GRAB_HANDLE, true);
-        }
-        if(mEventData->mGrabHandlePopupEnabled)
-        {
-          SetPopupButtons();
-          mEventData->mDecorator->SetPopupActive(true);
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::EDITING_WITH_GRAB_HANDLE:
-      {
-        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "EDITING_WITH_GRAB_HANDLE \n", newState);
-
-        mEventData->mDecorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
-        if(mEventData->mCursorBlinkEnabled)
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        // Grab handle is not shown until a tap is received whilst EDITING
-        if(mEventData->mGrabHandleEnabled)
-        {
-          mEventData->mDecorator->SetHandleActive(GRAB_HANDLE, true);
-        }
-        mEventData->mDecorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHighlightActive(false);
-        if(mEventData->mGrabHandlePopupEnabled)
-        {
-          mEventData->mDecorator->SetPopupActive(false);
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::SELECTION_HANDLE_PANNING:
-      {
-        mEventData->mDecorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive(GRAB_HANDLE, false);
-        if(mEventData->mGrabHandleEnabled)
-        {
-          mEventData->mDecorator->SetHandleActive(LEFT_SELECTION_HANDLE, true);
-          mEventData->mDecorator->SetHandleActive(RIGHT_SELECTION_HANDLE, true);
-        }
-        mEventData->mDecorator->SetHighlightActive(true);
-        if(mEventData->mGrabHandlePopupEnabled)
-        {
-          mEventData->mDecorator->SetPopupActive(false);
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::GRAB_HANDLE_PANNING:
-      {
-        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "GRAB_HANDLE_PANNING \n", newState);
-
-        mEventData->mDecorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
-        if(mEventData->mCursorBlinkEnabled)
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-        if(mEventData->mGrabHandleEnabled)
-        {
-          mEventData->mDecorator->SetHandleActive(GRAB_HANDLE, true);
-        }
-        mEventData->mDecorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHighlightActive(false);
-        if(mEventData->mGrabHandlePopupEnabled)
-        {
-          mEventData->mDecorator->SetPopupActive(false);
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::EDITING_WITH_PASTE_POPUP:
-      {
-        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "EDITING_WITH_PASTE_POPUP \n", newState);
-
-        mEventData->mDecorator->SetActiveCursor(ACTIVE_CURSOR_PRIMARY);
-        if(mEventData->mCursorBlinkEnabled)
-        {
-          mEventData->mDecorator->StartCursorBlink();
-        }
-
-        if(mEventData->mGrabHandleEnabled)
-        {
-          mEventData->mDecorator->SetHandleActive(GRAB_HANDLE, true);
-        }
-        mEventData->mDecorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
-        mEventData->mDecorator->SetHighlightActive(false);
-
-        if(mEventData->mGrabHandlePopupEnabled)
-        {
-          SetPopupButtons();
-          mEventData->mDecorator->SetPopupActive(true);
-        }
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-      case EventData::TEXT_PANNING:
-      {
-        mEventData->mDecorator->SetActiveCursor(ACTIVE_CURSOR_NONE);
-        mEventData->mDecorator->StopCursorBlink();
-        mEventData->mDecorator->SetHandleActive(GRAB_HANDLE, false);
-        if(mEventData->mDecorator->IsHandleActive(LEFT_SELECTION_HANDLE) ||
-           mEventData->mDecorator->IsHandleActive(RIGHT_SELECTION_HANDLE))
-        {
-          mEventData->mDecorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
-          mEventData->mDecorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
-          mEventData->mDecorator->SetHighlightActive(true);
-        }
-
-        if(mEventData->mGrabHandlePopupEnabled)
-        {
-          mEventData->mDecorator->SetPopupActive(false);
-        }
-
-        mEventData->mDecoratorUpdated = true;
-        break;
-      }
-    }
-  }
+  ChangeTextControllerState(*this, newState);
 }
 
 void Controller::Impl::GetCursorPosition(CharacterIndex logical,
@@ -1732,6 +1539,86 @@ Actor Controller::Impl::CreateBackgroundActor()
   return actor;
 }
 
+void Controller::Impl::RelayoutForNewLineSize()
+{
+  // relayout all characters
+  mTextUpdateInfo.mCharacterIndex             = 0;
+  mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
+  mTextUpdateInfo.mNumberOfCharactersToAdd    = mModel->mLogicalModel->mText.Count();
+  mOperationsPending                          = static_cast<OperationsMask>(mOperationsPending | LAYOUT);
+
+  //remove selection
+  if(mEventData && mEventData->mState == EventData::SELECTING)
+  {
+    ChangeState(EventData::EDITING);
+  }
+
+  RequestRelayout();
+}
+
+bool Controller::Impl::IsInputStyleChangedSignalsQueueEmpty()
+{
+  return (NULL == mEventData) || (0u == mEventData->mInputStyleChangedQueue.Count());
+}
+
+void Controller::Impl::ProcessInputStyleChangedSignals()
+{
+  if(mEventData)
+  {
+    if(mEditableControlInterface)
+    {
+      // Emit the input style changed signal for each mask
+      std::for_each(mEventData->mInputStyleChangedQueue.begin(),
+                    mEventData->mInputStyleChangedQueue.end(),
+                    [&](const auto mask) { mEditableControlInterface->InputStyleChanged(mask); } );
+    }
+
+    mEventData->mInputStyleChangedQueue.Clear();
+  }
+}
+
+void Controller::Impl::ScrollBy(Vector2 scroll)
+{
+  if(mEventData && (fabs(scroll.x) > Math::MACHINE_EPSILON_0 || fabs(scroll.y) > Math::MACHINE_EPSILON_0))
+  {
+    const Vector2& layoutSize    = mModel->mVisualModel->GetLayoutSize();
+    const Vector2  currentScroll = mModel->mScrollPosition;
+
+    scroll.x = -scroll.x;
+    scroll.y = -scroll.y;
+
+    if(fabs(scroll.x) > Math::MACHINE_EPSILON_0)
+    {
+      mModel->mScrollPosition.x += scroll.x;
+      ClampHorizontalScroll(layoutSize);
+    }
+
+    if(fabs(scroll.y) > Math::MACHINE_EPSILON_0)
+    {
+      mModel->mScrollPosition.y += scroll.y;
+      ClampVerticalScroll(layoutSize);
+    }
+
+    if(mModel->mScrollPosition != currentScroll)
+    {
+      mEventData->mDecorator->UpdatePositions(mModel->mScrollPosition - currentScroll);
+      RequestRelayout();
+    }
+  }
+}
+
+float Controller::Impl::GetHorizontalScrollPosition()
+{
+  // Scroll values are negative internally so we convert them to positive numbers
+  return mEventData ? -mModel->mScrollPosition.x : 0.0f;
+}
+
+float Controller::Impl::GetVerticalScrollPosition()
+{
+  // Scroll values are negative internally so we convert them to positive numbers
+  return mEventData ? -mModel->mScrollPosition.y : 0.0f;
+}
+
 void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns)
 {
   //Underlined character runs for markup-processor
@@ -1755,6 +1642,199 @@ void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearP
       underlineGlyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex + index];
       mModel->mVisualModel->mUnderlineRuns.PushBack(underlineGlyphRun);
     }
+  }
+}
+
+void Controller::Impl::SetAutoScrollEnabled(bool enable)
+{
+  if(mLayoutEngine.GetLayout() == Layout::Engine::SINGLE_LINE_BOX)
+  {
+    mOperationsPending = static_cast<OperationsMask>(mOperationsPending |
+                                                     LAYOUT |
+                                                     ALIGN |
+                                                     UPDATE_LAYOUT_SIZE |
+                                                     REORDER);
+
+    if(enable)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled for SINGLE_LINE_BOX\n");
+      mOperationsPending = static_cast<OperationsMask>(mOperationsPending | UPDATE_DIRECTION);
+    }
+    else
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::General, "Controller::SetAutoScrollEnabled Disabling autoscroll\n");
+    }
+
+    mIsAutoScrollEnabled = enable;
+    RequestRelayout();
+  }
+  else
+  {
+    DALI_LOG_WARNING("Attempted AutoScrolling on a non SINGLE_LINE_BOX, request ignored\n");
+    mIsAutoScrollEnabled = false;
+  }
+}
+
+void Controller::Impl::SetEnableCursorBlink(bool enable)
+{
+  DALI_ASSERT_DEBUG(NULL != mEventData && "TextInput disabled");
+
+  if(mEventData)
+  {
+    mEventData->mCursorBlinkEnabled = enable;
+
+    if(!enable && mEventData->mDecorator)
+    {
+      mEventData->mDecorator->StopCursorBlink();
+    }
+  }
+}
+
+void Controller::Impl::SetMultiLineEnabled(bool enable)
+{
+  const Layout::Engine::Type layout = enable ? Layout::Engine::MULTI_LINE_BOX : Layout::Engine::SINGLE_LINE_BOX;
+
+  if(layout != mLayoutEngine.GetLayout())
+  {
+    // Set the layout type.
+    mLayoutEngine.SetLayout(layout);
+
+    // Set the flags to redo the layout operations
+    const OperationsMask layoutOperations = static_cast<OperationsMask>(LAYOUT |
+                                                                        UPDATE_LAYOUT_SIZE |
+                                                                        ALIGN |
+                                                                        REORDER);
+
+    mTextUpdateInfo.mFullRelayoutNeeded = true;
+    mOperationsPending                  = static_cast<OperationsMask>(mOperationsPending | layoutOperations);
+
+    // Need to recalculate natural size
+    mRecalculateNaturalSize = true;
+
+    RequestRelayout();
+  }
+}
+
+void Controller::Impl::SetHorizontalAlignment(Text::HorizontalAlignment::Type alignment)
+{
+  if(alignment != mModel->mHorizontalAlignment)
+  {
+    // Set the alignment.
+    mModel->mHorizontalAlignment = alignment;
+
+    // Set the flag to redo the alignment operation.
+    mOperationsPending = static_cast<OperationsMask>(mOperationsPending | ALIGN);
+
+    if(mEventData)
+    {
+      mEventData->mUpdateAlignment = true;
+
+      // Update the cursor if it's in editing mode
+      if(EventData::IsEditingState(mEventData->mState))
+      {
+        ChangeState(EventData::EDITING);
+        mEventData->mUpdateCursorPosition = true;
+      }
+    }
+
+    RequestRelayout();
+  }
+}
+
+void Controller::Impl::SetVerticalAlignment(VerticalAlignment::Type alignment)
+{
+  if(alignment != mModel->mVerticalAlignment)
+  {
+    // Set the alignment.
+    mModel->mVerticalAlignment = alignment;
+    mOperationsPending = static_cast<OperationsMask>(mOperationsPending | ALIGN);
+    RequestRelayout();
+  }
+}
+
+void Controller::Impl::SetLineWrapMode(Text::LineWrap::Mode lineWrapMode)
+{
+  if(lineWrapMode != mModel->mLineWrapMode)
+  {
+    // Update Text layout for applying wrap mode
+    mOperationsPending = static_cast<OperationsMask>(mOperationsPending |
+                                                     ALIGN |
+                                                     LAYOUT |
+                                                     UPDATE_LAYOUT_SIZE |
+                                                     REORDER);
+
+    if((mModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) || (lineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
+       (mModel->mLineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::MIXED) || (lineWrapMode == (Text::LineWrap::Mode)DevelText::LineWrap::MIXED)) // hyphen is treated as line break
+    {
+      mOperationsPending = static_cast<OperationsMask>(mOperationsPending | GET_LINE_BREAKS);
+    }
+
+    // Set the text wrap mode.
+    mModel->mLineWrapMode = lineWrapMode;
+
+    mTextUpdateInfo.mCharacterIndex             = 0u;
+    mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
+    mTextUpdateInfo.mNumberOfCharactersToAdd    = mModel->mLogicalModel->mText.Count();
+
+    // Request relayout
+    RequestRelayout();
+  }
+}
+
+void Controller::Impl::SetDefaultColor(const Vector4& color)
+{
+  mTextColor = color;
+
+  if(!IsShowingPlaceholderText())
+  {
+    mModel->mVisualModel->SetTextColor(color);
+    mModel->mLogicalModel->mColorRuns.Clear();
+    mOperationsPending = static_cast<OperationsMask>(mOperationsPending | COLOR);
+    RequestRelayout();
+  }
+}
+
+void Controller::Impl::ClearFontData()
+{
+  if(mFontDefaults)
+  {
+    mFontDefaults->mFontId = 0u; // Remove old font ID
+  }
+
+  // Set flags to update the model.
+  mTextUpdateInfo.mCharacterIndex             = 0u;
+  mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
+  mTextUpdateInfo.mNumberOfCharactersToAdd    = mModel->mLogicalModel->mText.Count();
+
+  mTextUpdateInfo.mClearAll           = true;
+  mTextUpdateInfo.mFullRelayoutNeeded = true;
+  mRecalculateNaturalSize             = true;
+
+  mOperationsPending = static_cast<OperationsMask>(mOperationsPending |
+                                                   VALIDATE_FONTS |
+                                                   SHAPE_TEXT |
+                                                   BIDI_INFO |
+                                                   GET_GLYPH_METRICS |
+                                                   LAYOUT |
+                                                   UPDATE_LAYOUT_SIZE |
+                                                   REORDER |
+                                                   ALIGN);
+}
+
+void Controller::Impl::ClearStyleData()
+{
+  mModel->mLogicalModel->mColorRuns.Clear();
+  mModel->mLogicalModel->ClearFontDescriptionRuns();
+}
+
+
+void Controller::Impl::ResetScrollPosition()
+{
+  if(mEventData)
+  {
+    // Reset the scroll position.
+    mModel->mScrollPosition                = Vector2::ZERO;
+    mEventData->mScrollAfterUpdatePosition = true;
   }
 }
 

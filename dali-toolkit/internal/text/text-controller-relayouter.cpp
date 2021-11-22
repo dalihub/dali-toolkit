@@ -170,7 +170,7 @@ bool Controller::Relayouter::CheckForTextFit(Controller& controller, float point
   TextUpdateInfo&   textUpdateInfo  = impl.mTextUpdateInfo;
   impl.mFontDefaults->mFitPointSize = pointSize;
   impl.mFontDefaults->sizeDefined   = true;
-  controller.ClearFontData();
+  impl.ClearFontData();
 
   // Operations that can be done only once until the text changes.
   const OperationsMask onlyOnceOperations = static_cast<OperationsMask>(CONVERT_TO_UTF32 |
@@ -216,6 +216,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     float minPointSize   = impl.mTextFitMinSize;
     float maxPointSize   = impl.mTextFitMaxSize;
     float pointInterval  = impl.mTextFitStepSize;
+    float currentFitPointSize = impl.mFontDefaults->mFitPointSize;
 
     model->mElideEnabled = false;
     Vector<float> pointSizeArray;
@@ -255,9 +256,13 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     }
 
     model->mElideEnabled              = actualellipsis;
+    if(currentFitPointSize != pointSizeArray[bestSizeIndex])
+    {
+      impl.mTextFitChanged = true;
+    }
     impl.mFontDefaults->mFitPointSize = pointSizeArray[bestSizeIndex];
     impl.mFontDefaults->sizeDefined   = true;
-    controller.ClearFontData();
+    impl.ClearFontData();
   }
 }
 
@@ -561,7 +566,7 @@ bool Controller::Relayouter::DoRelayout(Controller& controller, const Size& size
       // Reset the scroll position in inactive state
       if(elideTextEnabled && (impl.mEventData->mState == EventData::INACTIVE))
       {
-        controller.ResetScrollPosition();
+        impl.ResetScrollPosition();
       }
     }
 

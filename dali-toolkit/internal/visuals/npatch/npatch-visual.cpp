@@ -378,10 +378,7 @@ void NPatchVisual::OnInitialize()
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
   Shader   shader   = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
-    TextureAtlas::DISABLED,
-    DefaultTextureWrapMode::APPLY,
-    RoundedCorner::DISABLED,
-    Borderline::DISABLED
+    ImageVisualShaderFeature::FeatureBuilder()
   );
 
   mImpl->mRenderer = Renderer::New(geometry, shader);

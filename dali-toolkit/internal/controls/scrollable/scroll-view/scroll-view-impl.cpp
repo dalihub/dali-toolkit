@@ -36,6 +36,7 @@
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl-property-handler.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-mode.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
@@ -673,7 +674,7 @@ void ScrollView::OnInitialize()
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL, mCanScrollVertical);
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL, mCanScrollHorizontal);
 
-  UpdatePropertyDomain();
+  ScrollViewPropertyHandler::UpdatePropertyDomain(*this);
   mConstraints.SetInternalConstraints(*this);
 
   // Connect wheel event
@@ -794,7 +795,7 @@ void ScrollView::SetRulerX(RulerPtr ruler)
 {
   mRulerX = ruler;
 
-  UpdatePropertyDomain();
+  ScrollViewPropertyHandler::UpdatePropertyDomain(*this);
   mConstraints.UpdateMainInternalConstraint(*this);
 }
 
@@ -802,105 +803,8 @@ void ScrollView::SetRulerY(RulerPtr ruler)
 {
   mRulerY = ruler;
 
-  UpdatePropertyDomain();
+  ScrollViewPropertyHandler::UpdatePropertyDomain(*this);
   mConstraints.UpdateMainInternalConstraint(*this);
-}
-
-void ScrollView::UpdatePropertyDomain()
-{
-  Actor   self                  = Self();
-  Vector3 size                  = self.GetTargetSize();
-  Vector2 min                   = mMinScroll;
-  Vector2 max                   = mMaxScroll;
-  bool    scrollPositionChanged = false;
-  bool    domainChanged         = false;
-
-  bool canScrollVertical   = false;
-  bool canScrollHorizontal = false;
-  UpdateLocalScrollProperties();
-  if(mRulerX->IsEnabled())
-  {
-    const Toolkit::RulerDomain& rulerDomain = mRulerX->GetDomain();
-    if(fabsf(min.x - rulerDomain.min) > Math::MACHINE_EPSILON_100 || fabsf(max.x - rulerDomain.max) > Math::MACHINE_EPSILON_100)
-    {
-      domainChanged = true;
-      min.x         = rulerDomain.min;
-      max.x         = rulerDomain.max;
-
-      // make sure new scroll value is within new domain
-      if(mScrollPrePosition.x < min.x || mScrollPrePosition.x > max.x)
-      {
-        scrollPositionChanged = true;
-        mScrollPrePosition.x  = Clamp(mScrollPrePosition.x, -(max.x - size.x), -min.x);
-      }
-    }
-    if((fabsf(rulerDomain.max - rulerDomain.min) - size.x) > Math::MACHINE_EPSILON_100)
-    {
-      canScrollHorizontal = true;
-    }
-  }
-  else if(fabs(min.x) > Math::MACHINE_EPSILON_100 || fabs(max.x) > Math::MACHINE_EPSILON_100)
-  {
-    // need to reset to 0
-    domainChanged       = true;
-    min.x               = 0.0f;
-    max.x               = 0.0f;
-    canScrollHorizontal = false;
-  }
-
-  if(mRulerY->IsEnabled())
-  {
-    const Toolkit::RulerDomain& rulerDomain = mRulerY->GetDomain();
-    if(fabsf(min.y - rulerDomain.min) > Math::MACHINE_EPSILON_100 || fabsf(max.y - rulerDomain.max) > Math::MACHINE_EPSILON_100)
-    {
-      domainChanged = true;
-      min.y         = rulerDomain.min;
-      max.y         = rulerDomain.max;
-
-      // make sure new scroll value is within new domain
-      if(mScrollPrePosition.y < min.y || mScrollPrePosition.y > max.y)
-      {
-        scrollPositionChanged = true;
-        mScrollPrePosition.y  = Clamp(mScrollPrePosition.y, -(max.y - size.y), -min.y);
-      }
-    }
-    if((fabsf(rulerDomain.max - rulerDomain.min) - size.y) > Math::MACHINE_EPSILON_100)
-    {
-      canScrollVertical = true;
-    }
-  }
-  else if(fabs(min.y) > Math::MACHINE_EPSILON_100 || fabs(max.y) > Math::MACHINE_EPSILON_100)
-  {
-    // need to reset to 0
-    domainChanged     = true;
-    min.y             = 0.0f;
-    max.y             = 0.0f;
-    canScrollVertical = false;
-  }
-
-  // avoid setting properties if possible, otherwise this will cause an entire update as well as triggering constraints using each property we update
-  if(mCanScrollVertical != canScrollVertical)
-  {
-    mCanScrollVertical = canScrollVertical;
-    self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL, canScrollVertical);
-  }
-  if(mCanScrollHorizontal != canScrollHorizontal)
-  {
-    mCanScrollHorizontal = canScrollHorizontal;
-    self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL, canScrollHorizontal);
-  }
-  if(scrollPositionChanged)
-  {
-    DALI_LOG_SCROLL_STATE("[0x%X] Domain Changed, setting SCROLL_PRE_POSITION To[%.2f, %.2f]", this, mScrollPrePosition.x, mScrollPrePosition.y);
-    self.SetProperty(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION, mScrollPrePosition);
-  }
-  if(domainChanged)
-  {
-    mMinScroll = min;
-    mMaxScroll = max;
-    self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MIN, mMinScroll);
-    self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX, mMaxScroll);
-  }
 }
 
 void ScrollView::SetScrollSensitive(bool sensitive)
@@ -1482,7 +1386,7 @@ bool ScrollView::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface*
 void ScrollView::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
   // need to update domain properties for new size
-  UpdatePropertyDomain();
+  ScrollViewPropertyHandler::UpdatePropertyDomain(*this);
 }
 
 void ScrollView::OnSizeSet(const Vector3& size)
@@ -1497,7 +1401,7 @@ void ScrollView::OnSizeSet(const Vector3& size)
       mMaxOvershoot = mUserMaxOvershoot;
     }
   }
-  UpdatePropertyDomain();
+  ScrollViewPropertyHandler::UpdatePropertyDomain(*this);
   mConstraints.UpdateMainInternalConstraint(*this);
   if(IsOvershootEnabled())
   {
@@ -2180,45 +2084,6 @@ void ScrollView::FinishTransform()
   }
 }
 
-Vector2 ScrollView::GetOvershoot(Vector2& position) const
-{
-  Vector3 size = Self().GetCurrentProperty<Vector3>(Actor::Property::SIZE);
-  Vector2 overshoot;
-
-  const RulerDomain rulerDomainX = mRulerX->GetDomain();
-  const RulerDomain rulerDomainY = mRulerY->GetDomain();
-
-  if(mRulerX->IsEnabled() && rulerDomainX.enabled)
-  {
-    const float left  = rulerDomainX.min - position.x;
-    const float right = size.width - rulerDomainX.max - position.x;
-    if(left < 0)
-    {
-      overshoot.x = left;
-    }
-    else if(right > 0)
-    {
-      overshoot.x = right;
-    }
-  }
-
-  if(mRulerY->IsEnabled() && rulerDomainY.enabled)
-  {
-    const float top    = rulerDomainY.min - position.y;
-    const float bottom = size.height - rulerDomainY.max - position.y;
-    if(top < 0)
-    {
-      overshoot.y = top;
-    }
-    else if(bottom > 0)
-    {
-      overshoot.y = bottom;
-    }
-  }
-
-  return overshoot;
-}
-
 bool ScrollView::OnAccessibilityPan(PanGesture gesture)
 {
   // Keep track of whether this is an AccessibilityPan
@@ -2263,164 +2128,12 @@ void ScrollView::WrapPosition(Vector2& position) const
 
 void ScrollView::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
 {
-  Toolkit::ScrollView scrollView = Toolkit::ScrollView::DownCast(Dali::BaseHandle(object));
-
-  if(scrollView)
-  {
-    ScrollView& scrollViewImpl(GetImpl(scrollView));
-    switch(index)
-    {
-      case Toolkit::ScrollView::Property::WRAP_ENABLED:
-      {
-        scrollViewImpl.SetWrapMode(value.Get<bool>());
-        break;
-      }
-      case Toolkit::ScrollView::Property::PANNING_ENABLED:
-      {
-        scrollViewImpl.SetScrollSensitive(value.Get<bool>());
-        break;
-      }
-      case Toolkit::ScrollView::Property::AXIS_AUTO_LOCK_ENABLED:
-      {
-        scrollViewImpl.SetAxisAutoLock(value.Get<bool>());
-        break;
-      }
-      case Toolkit::ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP:
-      {
-        scrollViewImpl.SetWheelScrollDistanceStep(value.Get<Vector2>());
-        break;
-      }
-      case Toolkit::ScrollView::Property::SCROLL_MODE:
-      {
-        const Property::Map* map = value.GetMap();
-        if(map)
-        {
-          scrollViewImpl.SetScrollMode(*map);
-        }
-      }
-    }
-  }
+  ScrollViewPropertyHandler::Set(object, index, value);
 }
 
 Property::Value ScrollView::GetProperty(BaseObject* object, Property::Index index)
 {
-  Property::Value value;
-
-  Toolkit::ScrollView scrollView = Toolkit::ScrollView::DownCast(Dali::BaseHandle(object));
-
-  if(scrollView)
-  {
-    ScrollView& scrollViewImpl(GetImpl(scrollView));
-    switch(index)
-    {
-      case Toolkit::ScrollView::Property::WRAP_ENABLED:
-      {
-        value = scrollViewImpl.GetWrapMode();
-        break;
-      }
-      case Toolkit::ScrollView::Property::PANNING_ENABLED:
-      {
-        value = scrollViewImpl.GetScrollSensitive();
-        break;
-      }
-      case Toolkit::ScrollView::Property::AXIS_AUTO_LOCK_ENABLED:
-      {
-        value = scrollViewImpl.GetAxisAutoLock();
-        break;
-      }
-      case Toolkit::ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP:
-      {
-        value = scrollViewImpl.GetWheelScrollDistanceStep();
-        break;
-      }
-    }
-  }
-
-  return value;
-}
-
-void ScrollView::SetScrollMode(const Property::Map& scrollModeMap)
-{
-  Toolkit::RulerPtr rulerX, rulerY;
-
-  // Check the scroll mode in the X axis
-  bool             xAxisScrollEnabled = true;
-  Property::Value* valuePtr           = scrollModeMap.Find(Toolkit::ScrollMode::X_AXIS_SCROLL_ENABLED, "xAxisScrollEnabled");
-  if(valuePtr && valuePtr->GetType() == Property::BOOLEAN)
-  {
-    valuePtr->Get(xAxisScrollEnabled);
-  }
-
-  if(!xAxisScrollEnabled)
-  {
-    // Default ruler and disabled
-    rulerX = new Toolkit::DefaultRuler();
-    rulerX->Disable();
-  }
-  else
-  {
-    valuePtr                  = scrollModeMap.Find(Toolkit::ScrollMode::X_AXIS_SNAP_TO_INTERVAL, "xAxisSnapToInterval");
-    float xAxisSnapToInterval = 0.0f;
-    if(valuePtr && valuePtr->Get(xAxisSnapToInterval))
-    {
-      // Fixed ruler and enabled
-      rulerX = new Toolkit::FixedRuler(xAxisSnapToInterval);
-    }
-    else
-    {
-      // Default ruler and enabled
-      rulerX = new Toolkit::DefaultRuler();
-    }
-
-    valuePtr                  = scrollModeMap.Find(Toolkit::ScrollMode::X_AXIS_SCROLL_BOUNDARY, "xAxisScrollBoundary");
-    float xAxisScrollBoundary = 0.0f;
-    if(valuePtr && valuePtr->Get(xAxisScrollBoundary))
-    {
-      // By default ruler domain is disabled unless set
-      rulerX->SetDomain(Toolkit::RulerDomain(0, xAxisScrollBoundary, true));
-    }
-  }
-
-  // Check the scroll mode in the Y axis
-  bool yAxisScrollEnabled = true;
-  valuePtr                = scrollModeMap.Find(Toolkit::ScrollMode::Y_AXIS_SCROLL_ENABLED, "yAxisScrollEnabled");
-  if(valuePtr && valuePtr->GetType() == Property::BOOLEAN)
-  {
-    valuePtr->Get(yAxisScrollEnabled);
-  }
-
-  if(!yAxisScrollEnabled)
-  {
-    // Default ruler and disabled
-    rulerY = new Toolkit::DefaultRuler();
-    rulerY->Disable();
-  }
-  else
-  {
-    valuePtr                  = scrollModeMap.Find(Toolkit::ScrollMode::Y_AXIS_SNAP_TO_INTERVAL, "yAxisSnapToInterval");
-    float yAxisSnapToInterval = 0.0f;
-    if(valuePtr && valuePtr->Get(yAxisSnapToInterval))
-    {
-      // Fixed ruler and enabled
-      rulerY = new Toolkit::FixedRuler(yAxisSnapToInterval);
-    }
-    else
-    {
-      // Default ruler and enabled
-      rulerY = new Toolkit::DefaultRuler();
-    }
-
-    valuePtr                  = scrollModeMap.Find(Toolkit::ScrollMode::Y_AXIS_SCROLL_BOUNDARY, "yAxisScrollBoundary");
-    float yAxisScrollBoundary = 0.0f;
-    if(valuePtr && valuePtr->Get(yAxisScrollBoundary))
-    {
-      // By default ruler domain is disabled unless set
-      rulerY->SetDomain(Toolkit::RulerDomain(0, yAxisScrollBoundary, true));
-    }
-  }
-
-  SetRulerX(rulerX);
-  SetRulerY(rulerY);
+  return ScrollViewPropertyHandler::Get(object, index);
 }
 
 ScrollView::LockAxis GetLockAxis(const Vector2& panDelta, ScrollView::LockAxis currentLockAxis, float lockGradient)

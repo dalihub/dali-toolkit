@@ -833,10 +833,11 @@ Shader AnimatedImageVisual::GenerateShader() const
   Shader shader;
   shader = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
-    TextureAtlas::DISABLED,
-    defaultWrapMode ? DefaultTextureWrapMode::APPLY : DefaultTextureWrapMode::DO_NOT_APPLY,
-    IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
-    IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED);
+    ImageVisualShaderFeature::FeatureBuilder()
+    .ApplyDefaultTextureWrapMode(defaultWrapMode)
+    .EnableRoundedCorner(IsRoundedCornerRequired())
+    .EnableBorderline(IsBorderlineRequired())
+  );
   return shader;
 }
 

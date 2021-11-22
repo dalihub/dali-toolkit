@@ -30,6 +30,11 @@ AnchorClickedSignalType& AnchorClickedSignal(TextLabel textLabel)
   return GetImpl(textLabel).AnchorClickedSignal();
 }
 
+TextFitChangedSignalType& TextFitChangedSignal(TextLabel textLabel)
+{
+  return GetImpl(textLabel).TextFitChangedSignal();
+}
+
 } // namespace DevelTextLabel
 
 } // namespace Toolkit

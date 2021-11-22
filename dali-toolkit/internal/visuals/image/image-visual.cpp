@@ -974,59 +974,68 @@ Shader ImageVisual::GenerateShader() const
 {
   Shader shader;
 
-  std::string_view vertexShaderView;
-  bool             usesWholeTexture = true;
-  if(mImpl->mCustomShader && !mImpl->mCustomShader->mVertexShader.empty())
-  {
-    vertexShaderView = mImpl->mCustomShader->mVertexShader;
-    usesWholeTexture = false; // Impossible to tell.
-  }
-  else
-  {
-    vertexShaderView = mImageVisualShaderFactory.GetVertexShaderSource();
-  }
+  bool             usesWholeTexture  = true;
+  const bool       useStandardShader = !mImpl->mCustomShader;
+  const bool       useNativeImage    = (mTextures && DevelTexture::IsNative(mTextures.GetTexture(0)));
 
-  std::string_view fragmentShaderView;
-  if(mImpl->mCustomShader && !mImpl->mCustomShader->mFragmentShader.empty())
-  {
-    fragmentShaderView = mImpl->mCustomShader->mFragmentShader;
-  }
-  else
-  {
-    fragmentShaderView = mImageVisualShaderFactory.GetFragmentShaderSource();
-  }
-
-  // If the texture is native, we may need to change prefix and sampler in
-  // the fragment shader
-  bool        modifiedFragmentShader = false;
-  std::string fragmentShaderString;
-  if(mTextures && DevelTexture::IsNative(mTextures.GetTexture(0)))
-  {
-    Texture nativeTexture  = mTextures.GetTexture(0);
-    fragmentShaderString   = std::string(fragmentShaderView);
-    modifiedFragmentShader = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragmentShaderString);
-    fragmentShaderView     = fragmentShaderString;
-  }
-
-  const bool useStandardShader = !mImpl->mCustomShader && !modifiedFragmentShader;
   if(useStandardShader)
   {
     // Create and cache the standard shader
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
-      mImpl->mFlags & Impl::IS_ATLASING_APPLIED ? TextureAtlas::ENABLED : TextureAtlas::DISABLED,
-      mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE ? DefaultTextureWrapMode::APPLY : DefaultTextureWrapMode::DO_NOT_APPLY,
-      IsRoundedCornerRequired() ? RoundedCorner::ENABLED : RoundedCorner::DISABLED,
-      IsBorderlineRequired() ? Borderline::ENABLED : Borderline::DISABLED
+      ImageVisualShaderFeature::FeatureBuilder()
+      .EnableTextureAtlas(mImpl->mFlags & Impl::IS_ATLASING_APPLIED && !useNativeImage)
+      .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
+      .EnableRoundedCorner(IsRoundedCornerRequired())
+      .EnableBorderline(IsBorderlineRequired())
+      .SetTextureForFragmentShaderCheck(useNativeImage ? mTextures.GetTexture(0) : Dali::Texture())
     );
-  }
-  else if(mImpl->mCustomShader)
-  {
-    shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints);
   }
   else
   {
-    shader = Shader::New(vertexShaderView, fragmentShaderView);
+    std::string_view vertexShaderView;
+    std::string_view fragmentShaderView;
+
+    if(mImpl->mCustomShader && !mImpl->mCustomShader->mVertexShader.empty())
+    {
+      vertexShaderView = mImpl->mCustomShader->mVertexShader;
+      usesWholeTexture = false; // Impossible to tell.
+    }
+    else
+    {
+      vertexShaderView = mImageVisualShaderFactory.GetVertexShaderSource();
+    }
+
+    if(mImpl->mCustomShader && !mImpl->mCustomShader->mFragmentShader.empty())
+    {
+      fragmentShaderView = mImpl->mCustomShader->mFragmentShader;
+    }
+    else
+    {
+      fragmentShaderView = mImageVisualShaderFactory.GetFragmentShaderSource();
+    }
+
+    // If the texture is native, we may need to change prefix and sampler in
+    // the fragment shader
+    if(useNativeImage)
+    {
+      bool        modifiedFragmentShader = false;
+      Texture     nativeTexture          = mTextures.GetTexture(0);
+      std::string fragmentShaderString   = std::string(fragmentShaderView);
+
+      modifiedFragmentShader = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragmentShaderString);
+      if(modifiedFragmentShader)
+      {
+        fragmentShaderView = fragmentShaderString;
+      }
+
+      // Create shader here cause fragmentShaderString scope issue
+      shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints);
+    }
+    else
+    {
+      shader = Shader::New(vertexShaderView, fragmentShaderView, mImpl->mCustomShader->mHints);
+    }
   }
 
   if(usesWholeTexture)
