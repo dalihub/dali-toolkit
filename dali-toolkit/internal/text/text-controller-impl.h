@@ -911,6 +911,7 @@ public:
   float mTextFitMaxSize;               ///< Maximum Font Size for text fit. Default 100
   float mTextFitStepSize;              ///< Step Size for font intervalse. Default 1
   bool  mTextFitEnabled : 1;           ///< Whether the text's fit is enabled.
+  float mTextFitChanged;               ///< Whether the text fit property has changed.
   float mFontSizeScale;                ///< Scale value for Font Size. Default 1.0
   bool  mIsLayoutDirectionChanged : 1; ///< Whether the layout has changed.
 

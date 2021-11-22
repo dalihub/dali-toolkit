@@ -216,6 +216,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     float minPointSize   = impl.mTextFitMinSize;
     float maxPointSize   = impl.mTextFitMaxSize;
     float pointInterval  = impl.mTextFitStepSize;
+    float currentFitPointSize = impl.mFontDefaults->mFitPointSize;
 
     model->mElideEnabled = false;
     Vector<float> pointSizeArray;
@@ -255,6 +256,10 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
     }
 
     model->mElideEnabled              = actualellipsis;
+    if(currentFitPointSize != pointSizeArray[bestSizeIndex])
+    {
+      impl.mTextFitChanged = true;
+    }
     impl.mFontDefaults->mFitPointSize = pointSizeArray[bestSizeIndex];
     impl.mFontDefaults->sizeDefined   = true;
     impl.ClearFontData();

@@ -76,6 +76,11 @@ public:
   DevelTextLabel::AnchorClickedSignalType& AnchorClickedSignal();
 
   /**
+   * @copydoc Dali::Toollkit::TextLabel::TextFitChangedSignal()
+   */
+  DevelTextLabel::TextFitChangedSignalType& TextFitChangedSignal();
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -189,6 +194,11 @@ private:
    */
   void OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type);
 
+  /**
+   * @brief Emits TextFitChanged signal.
+   */
+  void EmitTextFitChangedSignal();
+
 private: // Data
   Text::ControllerPtr   mController;
   Text::TextScrollerPtr mTextScroller;
@@ -197,6 +207,7 @@ private: // Data
 
   // Signals
   Toolkit::DevelTextLabel::AnchorClickedSignalType mAnchorClickedSignal;
+  Toolkit::DevelTextLabel::TextFitChangedSignalType mTextFitChangedSignal;
 
   int  mRenderingBackend;
   bool mTextUpdateNeeded : 1;

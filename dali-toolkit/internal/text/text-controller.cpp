@@ -362,6 +362,16 @@ bool Controller::IsTextFitEnabled() const
   return mImpl->mTextFitEnabled;
 }
 
+void Controller::SetTextFitChanged(bool changed)
+{
+  mImpl->mTextFitChanged = changed;
+}
+
+bool Controller::IsTextFitChanged() const
+{
+  return mImpl->mTextFitChanged;
+}
+
 void Controller::SetTextFitMinSize(float minSize, FontSizeType type)
 {
   mImpl->mTextFitMinSize = (type == POINT_SIZE) ? minSize : ConvertPixelToPoint(minSize);
@@ -400,6 +410,11 @@ void Controller::SetTextFitContentSize(Vector2 size)
 Vector2 Controller::GetTextFitContentSize() const
 {
   return mImpl->mTextFitContentSize;
+}
+
+float Controller::GetTextFitPointSize() const
+{
+  return mImpl->mFontDefaults ? mImpl->mFontDefaults->mFitPointSize : 0.0f;
 }
 
 void Controller::SetPlaceholderTextElideEnabled(bool enabled)

@@ -79,6 +79,7 @@ const std::string TEXT_FIT_ENABLE_KEY("enable");
 const std::string TEXT_FIT_MIN_SIZE_KEY("minSize");
 const std::string TEXT_FIT_MAX_SIZE_KEY("maxSize");
 const std::string TEXT_FIT_STEP_SIZE_KEY("stepSize");
+const std::string TEXT_FIT_FONT_SIZE_KEY("fontSize");
 const std::string TEXT_FIT_FONT_SIZE_TYPE_KEY("fontSizeType");
 
 #if defined(DEBUG_ENABLED)
@@ -143,6 +144,7 @@ DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColo
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorAlpha", TEXT_COLOR_ALPHA, TEXT_COLOR, 3)
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextLabel, "anchorClicked", SIGNAL_ANCHOR_CLICKED)
+DALI_SIGNAL_REGISTRATION(Toolkit, TextLabel, "textFitChanged", SIGNAL_TEXT_FIT_CHANGED)
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
@@ -485,6 +487,7 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
       case Toolkit::DevelTextLabel::Property::TEXT_FIT:
       {
         ParseTextFitProperty(impl.mController, value.GetMap());
+        impl.mController->SetTextFitChanged(true);
         break;
       }
       case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
@@ -729,12 +732,14 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
         const float minSize  = impl.mController->GetTextFitMinSize();
         const float maxSize  = impl.mController->GetTextFitMaxSize();
         const float stepSize = impl.mController->GetTextFitStepSize();
+        const float pointSize = impl.mController->GetTextFitPointSize();
 
         Property::Map map;
         map.Insert(TEXT_FIT_ENABLE_KEY, enabled);
         map.Insert(TEXT_FIT_MIN_SIZE_KEY, minSize);
         map.Insert(TEXT_FIT_MAX_SIZE_KEY, maxSize);
         map.Insert(TEXT_FIT_STEP_SIZE_KEY, stepSize);
+        map.Insert(TEXT_FIT_FONT_SIZE_KEY, pointSize);
         map.Insert(TEXT_FIT_FONT_SIZE_TYPE_KEY, "pointSize");
 
         value = map;
@@ -776,6 +781,14 @@ bool TextLabel::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
       labelImpl.AnchorClickedSignal().Connect(tracker, functor);
     }
   }
+  else if(0 == strcmp(signalName.c_str(), SIGNAL_TEXT_FIT_CHANGED))
+  {
+    if(label)
+    {
+      Internal::TextLabel& labelImpl(GetImpl(label));
+      labelImpl.TextFitChangedSignal().Connect(tracker, functor);
+    }
+  }
   else
   {
     // signalName does not match any signal
@@ -788,6 +801,11 @@ bool TextLabel::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* 
 DevelTextLabel::AnchorClickedSignalType& TextLabel::AnchorClickedSignal()
 {
   return mAnchorClickedSignal;
+}
+
+DevelTextLabel::TextFitChangedSignalType& TextLabel::TextFitChangedSignal()
+{
+  return mTextFitChangedSignal;
 }
 
 void TextLabel::OnInitialize()
@@ -997,6 +1015,12 @@ void TextLabel::OnRelayout(const Vector2& size, RelayoutContainer& container)
 
     mTextUpdateNeeded = false;
   }
+
+  if(mController->IsTextFitChanged())
+  {
+    EmitTextFitChangedSignal();
+    mController->SetTextFitChanged(false);
+  }
 }
 
 void TextLabel::RequestTextRelayout()
@@ -1078,6 +1102,12 @@ void TextLabel::ScrollingFinished()
 void TextLabel::OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
 {
   mController->ChangedLayoutDirection();
+}
+
+void TextLabel::EmitTextFitChangedSignal()
+{
+  Dali::Toolkit::TextLabel handle(GetOwner());
+  mTextFitChangedSignal.Emit(handle);
 }
 
 TextLabel::TextLabel()
