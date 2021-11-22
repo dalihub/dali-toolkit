@@ -566,7 +566,7 @@ void Control::OnPropertySet(Property::Index index, const Property::Value& proper
     }
     case Actor::Property::VISIBLE:
     {
-      if(Dali::Accessibility::IsUp())
+      if(Dali::Accessibility::IsUp() && !Self().GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN))
       {
         Dali::Accessibility::Accessible::Get(Self())->EmitVisible(Self().GetProperty(Actor::Property::VISIBLE).Get<bool>());
       }

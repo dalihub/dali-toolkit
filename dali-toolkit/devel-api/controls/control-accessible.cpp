@@ -282,6 +282,16 @@ Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
   return attributeMap;
 }
 
+bool ControlAccessible::IsHidden() const
+{
+  auto control = Dali::Toolkit::Control::DownCast(Self());
+
+  Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
+  Internal::Control::Impl& controlImpl     = Internal::Control::Impl::Get(internalControl);
+
+  return controlImpl.mAccessibilityHidden;
+}
+
 bool ControlAccessible::GrabFocus()
 {
   return Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self());

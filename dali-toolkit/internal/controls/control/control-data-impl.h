@@ -546,6 +546,8 @@ public:
   bool mAccessibilityHighlightable    = false;
   bool mAccessibilityHighlightableSet = false;
 
+  bool mAccessibilityHidden = false;
+
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
   std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> mAccessibilityRelations;
@@ -596,6 +598,7 @@ public:
   static const PropertyRegistration PROPERTY_20;
   static const PropertyRegistration PROPERTY_21;
   static const PropertyRegistration PROPERTY_22;
+  static const PropertyRegistration PROPERTY_23;
 
 private:
   // Accessibility - notification for highlighted object to check if it is showing.

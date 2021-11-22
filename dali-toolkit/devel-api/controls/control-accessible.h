@@ -116,6 +116,11 @@ public:
   Dali::Accessibility::Attributes GetAttributes() const override;
 
   /**
+   * @copydoc Dali::Accessibility::Accessible::IsHidden()
+   */
+  bool IsHidden() const override;
+
+  /**
    * @copydoc Dali::Accessibility::Component::GrabFocus()
    */
   bool GrabFocus() override;

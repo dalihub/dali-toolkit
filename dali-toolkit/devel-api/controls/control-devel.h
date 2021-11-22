@@ -175,11 +175,13 @@ enum
    * @see Dali::Accessibility::Role
    */
   ACCESSIBILITY_ROLE,
+
   /**
    * @brief Mark of able to highlight object.
    * @details Name "accessibilityHighlightable", type Property::BOOLEAN.
    */
   ACCESSIBILITY_HIGHLIGHTABLE,
+
   /**
    * @brief Set of accessibility attributes describing object in accessibility hierarchy
    * @details Name "accessibilityAttributes", type Property::MAP
@@ -192,6 +194,13 @@ enum
    * @note If a control's dispatchKeyEvents is set to false, then it's children will not emit a key event signal either.
    */
   DISPATCH_KEY_EVENTS,
+
+  /**
+   * @brief Marks the object as invisible to AT-SPI clients.
+   * @details Name "accessibilityHidden", type Property::BOOLEAN.
+   * @note The representative Accessible object will not appear in the AT-SPI tree.
+   */
+  ACCESSIBILITY_HIDDEN,
 };
 
 } // namespace Property

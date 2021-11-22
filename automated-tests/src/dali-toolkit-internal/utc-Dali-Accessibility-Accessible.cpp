@@ -21,6 +21,7 @@
 
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
@@ -139,6 +140,27 @@ int UtcDaliAccessibilityCheckShowingState(void)
   DALI_TEST_CHECK(q);
   states = q->GetStates();
   DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliAccessibilityHidden(void)
+{
+  ToolkitTestApplication application;
+
+  auto  control    = Toolkit::Control::New();
+  auto* accessible = Dali::Accessibility::Accessible::Get(control);
+
+  // Check not hidden
+  DALI_TEST_CHECK(accessible);
+  DALI_TEST_CHECK(!accessible->IsHidden());
+  DALI_TEST_CHECK(!control.GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN));
+
+  control.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, true);
+
+  // Check hidden
+  DALI_TEST_CHECK(accessible->IsHidden());
+  DALI_TEST_CHECK(control.GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN));
 
   END_TEST;
 }
