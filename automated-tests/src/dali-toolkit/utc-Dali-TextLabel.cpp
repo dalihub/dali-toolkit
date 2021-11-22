@@ -30,6 +30,7 @@
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-utils-devel.h>
+#include "test-text-geometry-utils.h"
 
 using namespace Dali;
 using namespace Toolkit;
@@ -2013,6 +2014,106 @@ int utcDaliTextLabelGetHeightForWidthChangeLineCountWhenTextChanged(void)
   DALI_TEST_EQUALS( lineCountBefore ,1, TEST_LOCATION );
   DALI_TEST_GREATER( lineCountAfter,1, TEST_LOCATION );
 
+
+  END_TEST;
+}
+
+int utcDaliTextLabelGeometryRTL(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextLabelGeometryRTL");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK( label );
+
+  application.GetScene().Add( label );
+
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 7.f );
+  label.SetProperty( Actor::Property::SIZE, Vector2( 150.f, 100.f ) );
+  label.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty( TextLabel::Property::TEXT, "line1 \nline2\nline 3\nالاخيرالسطر" );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  unsigned int expectedCount = 4;
+  unsigned int startIndex = 3;
+  unsigned int endIndex = 24;
+
+  Vector<Vector2> positionsList = DevelTextLabel::GetTextPosition(label, startIndex, endIndex);
+  Vector<Vector2> sizeList = DevelTextLabel::GetTextSize(label, startIndex, endIndex);
+
+  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
+
+  Vector<Vector2> expectedSizes;
+  Vector<Vector2> expectedPositions;
+
+  expectedPositions.PushBack(Vector2(24, 0));
+  expectedSizes.PushBack(Vector2(33, 25));
+
+  expectedPositions.PushBack(Vector2(-1, 25));
+  expectedSizes.PushBack(Vector2(52, 25));
+
+  expectedPositions.PushBack(Vector2(-1, 50));
+  expectedSizes.PushBack(Vector2(59, 25));
+
+  expectedPositions.PushBack(Vector2(73, 75));
+  expectedSizes.PushBack(Vector2(37, 25));
+
+  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
+
+  END_TEST;
+}
+
+int utcDaliTextLabelGeometryGlyphMiddle(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextLabelGeometryGlyphMiddle");
+
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK( label );
+
+  application.GetScene().Add( label );
+
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 7.f );
+  label.SetProperty( Actor::Property::SIZE, Vector2( 200.f, 200.f ) );
+  label.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
+  label.SetProperty( TextLabel::Property::TEXT, "لا تحتوي على لا" );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  unsigned int expectedCount = 1;
+  unsigned int startIndex = 1;
+  unsigned int endIndex = 13;
+
+  Vector<Vector2> positionsList = DevelTextLabel::GetTextPosition(label, startIndex, endIndex);
+  Vector<Vector2> sizeList = DevelTextLabel::GetTextSize(label, startIndex, endIndex);
+
+  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
+
+  Vector<Vector2> expectedSizes;
+  Vector<Vector2> expectedPositions;
+
+  expectedPositions.PushBack(Vector2(12, 0));
+  expectedSizes.PushBack(Vector2(118, 25));
+
+  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
   END_TEST;
 }

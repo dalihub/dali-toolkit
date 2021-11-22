@@ -208,6 +208,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/xhtml-entities.cpp
    ${toolkit_src_dir}/drag-drop-detector/drag-and-drop-detector-impl.cpp
    ${toolkit_src_dir}/text/emoji-helper.cpp
+   ${toolkit_src_dir}/text/text-geometry.cpp
 )
 
 SET( SOURCES ${SOURCES}

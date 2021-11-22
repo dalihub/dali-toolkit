@@ -30,6 +30,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
+#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -37,7 +38,6 @@
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-view.h>
-#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -729,10 +729,10 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       }
       case Toolkit::DevelTextLabel::Property::TEXT_FIT:
       {
-        const bool  enabled  = impl.mController->IsTextFitEnabled();
-        const float minSize  = impl.mController->GetTextFitMinSize();
-        const float maxSize  = impl.mController->GetTextFitMaxSize();
-        const float stepSize = impl.mController->GetTextFitStepSize();
+        const bool  enabled   = impl.mController->IsTextFitEnabled();
+        const float minSize   = impl.mController->GetTextFitMinSize();
+        const float maxSize   = impl.mController->GetTextFitMaxSize();
+        const float stepSize  = impl.mController->GetTextFitStepSize();
         const float pointSize = impl.mController->GetTextFitPointSize();
 
         Property::Map map;
@@ -1134,6 +1134,16 @@ TextLabel::TextLabel()
 
 TextLabel::~TextLabel()
 {
+}
+
+Vector<Vector2> TextLabel::GetTextSize(const uint32_t startIndex, const uint32_t endIndex) const
+{
+  return mController->GetTextSize(startIndex, endIndex);
+}
+
+Vector<Vector2> TextLabel::GetTextPosition(const uint32_t startIndex, const uint32_t endIndex) const
+{
+  return mController->GetTextPosition(startIndex, endIndex);
 }
 
 std::string TextLabel::AccessibleImpl::GetNameRaw()

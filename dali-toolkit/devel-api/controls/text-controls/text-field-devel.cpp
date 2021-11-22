@@ -70,6 +70,16 @@ void SelectText(TextField textField, const uint32_t start, const uint32_t end)
   GetImpl(textField).SelectText(start, end);
 }
 
+Vector<Vector2> GetTextSize(TextField textField, const uint32_t startIndex, const uint32_t endIndex)
+{
+  return GetImpl(textField).GetTextSize(startIndex, endIndex);
+}
+
+Vector<Vector2> GetTextPosition(TextField textField, const uint32_t startIndex, const uint32_t endIndex)
+{
+  return GetImpl(textField).GetTextPosition(startIndex, endIndex);
+}
+
 string CopyText(TextField textField)
 {
   return GetImpl(textField).CopyText();

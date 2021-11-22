@@ -23,9 +23,9 @@
 #include <dali/public-api/events/gesture.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-anchor-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-anchor-devel.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
@@ -1514,6 +1514,28 @@ public: // Queries & retrieves.
    * @return The value of the layout direction type.
    */
   Dali::LayoutDirection::Type GetLayoutDirection(Dali::Actor& actor) const;
+
+  /**
+   * @brief Get the rendered size of a specific text range.
+   * if the requested text is at multilines, multiple sizes will be returned for each text located in a separate line.
+   * if a line contains characters with different directions, multiple sizes will be returned for each block of contiguous characters with the same direction.
+   *
+   * @param[in] startIndex start index of the text requested to calculate size for.
+   * @param[in] endIndex end index(included) of the text requested to calculate size for.
+   * @return list of sizes of the reuested text.
+   */
+  Vector<Vector2> GetTextSize(CharacterIndex startIndex, CharacterIndex endIndex);
+
+  /**
+   * @brief Get the top/left rendered position of a specific text range.
+   * if the requested text is at multilines, multiple positions will be returned for each text located in a separate line.
+   * if a line contains characters with different directions, multiple positions will be returned for each block of contiguous characters with the same direction.
+   *
+   * @param[in] startIndex start index of the text requested to get position to.
+   * @param[in] endIndex end index(included) of the text requested to get position to.
+   * @return list of positions of the requested text.
+   */
+  Vector<Vector2> GetTextPosition(CharacterIndex startIndex, CharacterIndex endIndex);
 
   /**
    * @brief Sets the layout direction changed.

@@ -120,6 +120,13 @@ public:
   // Line interface.
 
   /**
+   * @brief Retrieves the total number of lines.
+   *
+   * @return The number of lines.
+   */
+  Length GetTotalNumberOfLines() const;
+
+  /**
    * @brief Retrieves the number of lines and the index to the first line where the given range of glyphs is laid out.
    *
    * @param[in] glyphIndex Index to the first glyph.
