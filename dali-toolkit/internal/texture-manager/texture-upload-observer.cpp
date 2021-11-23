@@ -49,6 +49,20 @@ TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnT
 {
 }
 
+TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, int32_t textureId, uint32_t frameCount, uint32_t interval)
+: returnType(returnType),
+  textureId(textureId),
+  textureSet(),
+  useAtlasing(false),
+  atlasRect(Vector4::ZERO),
+  preMultiplied(false),
+  pixelBuffer(),
+  url(),
+  frameCount(frameCount),
+  interval(interval)
+{
+}
+
 TextureUploadObserver::TextureUploadObserver()
 {
 }

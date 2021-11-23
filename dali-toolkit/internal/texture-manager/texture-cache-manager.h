@@ -204,7 +204,8 @@ public:
    * @param[in] samplingMode      The SamplingMode to use
    * @param[in] useAtlas          True if atlased
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
-   * @param[in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
+   * @param[in] preMultiplyOnLoad If the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
+   * @param[in] isAnimatedImage   True if the texture is from animated image.
    * @return                      A TextureCacheId of a cached Texture if found. Or INVALID_CACHE_INDEX if not found.
    */
   TextureCacheManager::TextureCacheIndex FindCachedTexture(
@@ -215,7 +216,8 @@ public:
     const Dali::SamplingMode::Type&            samplingMode,
     const TextureCacheManager::UseAtlas&       useAtlas,
     const TextureCacheManager::TextureId&      maskTextureId,
-    const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad);
+    const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad,
+    bool                                       isAnimatedImage);
 
   /**
    * @brief Append a Texture to the TextureCacheManager.
