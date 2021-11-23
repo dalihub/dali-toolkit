@@ -401,7 +401,7 @@ Shader VisualFactoryCache::GetNPatchShader(int index)
     yStretchCount = data->GetStretchPixelsY().Count();
   }
 
-  if(DALI_LIKELY((xStretchCount == 0 && yStretchCount == 0)))
+  if(DALI_LIKELY((xStretchCount == 0 && yStretchCount == 0) || (xStretchCount == 1 && yStretchCount == 1)))
   {
     shader = GetShader(VisualFactoryCache::NINE_PATCH_SHADER);
     if(DALI_UNLIKELY(!shader))
@@ -491,8 +491,15 @@ void VisualFactoryCache::ApplyTextureAndUniforms(Renderer& renderer, int index)
 
 void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size)
 {
+
+  bool useDefaultBrokenImage = false;
+  if(mBrokenImageInfoContainer.size() == 1)
+  {
+    useDefaultBrokenImage = true;
+  }
+
   // Load Information for broken image
-  for(uint32_t index = 0; index < mBrokenImageInfoContainer.size(); index++)
+  for(uint32_t index = 0; (index + 1 < mBrokenImageInfoContainer.size()) && !useDefaultBrokenImage; index++)
   {
     if(mBrokenImageInfoContainer[index].width == 0 && mBrokenImageInfoContainer[index].height == 0)
     {
@@ -512,15 +519,33 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
           }
           else
           {
-            DALI_LOG_ERROR("Can't update renderer for broken image. maybe image loading is failed [path:%s] \n",mBrokenImageInfoContainer[index].url.c_str());
+            DALI_LOG_ERROR("Can't update renderer for broken image. maybe image loading is failed [index:%d] [path:%s] \n",index, mBrokenImageInfoContainer[index].url.c_str());
+            useDefaultBrokenImage = true;
           }
         }
         else
         {
-          GetBrokenVisualImage(index);
+          if(!GetBrokenVisualImage(index))
+          {
+            DALI_LOG_ERROR("Can't update renderer for broken image. maybe image loading is failed [index:%d] [path:%s] \n",index, mBrokenImageInfoContainer[index].url.c_str());
+            useDefaultBrokenImage = true;
+          }
         }
       }
     }
+  }
+
+  if(useDefaultBrokenImage && mBrokenImageInfoContainer.size() > 1)
+  {
+    std::string brokenUrl = mBrokenImageInfoContainer[mBrokenImageInfoContainer.size() -1].url;
+
+    mBrokenImageInfoContainer.clear();
+    mBrokenImageInfoContainer.assign(1, BrokenImageInfo());
+
+    const int defaultBrokenIndex = 0;
+    mBrokenImageInfoContainer[defaultBrokenIndex].url = brokenUrl;
+    VisualUrl visualUrl(mBrokenImageInfoContainer[defaultBrokenIndex].url);
+    mBrokenImageInfoContainer[defaultBrokenIndex].visualType = visualUrl.GetType();
   }
 
   // Set Texutre to renderer
@@ -547,7 +572,7 @@ int32_t VisualFactoryCache::GetProperBrokenImageIndex(const Vector2& size)
 {
   // Sets the default broken type
   int32_t returnIndex = 0;
-  if((size.width == 0 || size.height == 0))
+  if((size.width == 0 || size.height == 0) || (mBrokenImageInfoContainer.size() == 1))
   {
     // To do : Need to add observer about size
     return returnIndex;
