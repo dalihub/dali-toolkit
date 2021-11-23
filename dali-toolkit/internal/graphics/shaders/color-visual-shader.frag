@@ -273,21 +273,26 @@ void main()
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
     OUT_COLOR = targetColor;
-    return;
   }
-  PreprocessPotential();
+  else
+  {
+    PreprocessPotential();
 #endif
 
 #if !IS_REQUIRED_BLUR && IS_REQUIRED_BORDERLINE
-  targetColor = convertBorderlineColor(targetColor);
+    targetColor = convertBorderlineColor(targetColor);
 #endif
-  OUT_COLOR = targetColor;
+    OUT_COLOR = targetColor;
 
 #if IS_REQUIRED_BLUR
-  mediump float opacity = calculateBlurOpacity();
-  OUT_COLOR.a *= opacity;
+    mediump float opacity = calculateBlurOpacity();
+    OUT_COLOR.a *= opacity;
 #elif IS_REQUIRED_ROUNDED_CORNER
-  mediump float opacity = calculateCornerOpacity();
-  OUT_COLOR.a *= opacity;
+    mediump float opacity = calculateCornerOpacity();
+    OUT_COLOR.a *= opacity;
+#endif
+
+#if IS_REQUIRED_BLUR || IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
+  }
 #endif
 }
