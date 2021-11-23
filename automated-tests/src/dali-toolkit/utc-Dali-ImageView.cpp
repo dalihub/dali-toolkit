@@ -3001,6 +3001,59 @@ int UtcDaliImageViewImageLoadFailure03(void)
   END_TEST;
 }
 
+int UtcDaliImageViewImageLoadFailure04(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New("invalidUrl.png");
+  imageView.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  application.GetScene().Add( imageView );
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+
+  Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL, TEST_BROKEN_IMAGE_S);
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL, "invalidBroken.png");
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::LARGE, TEST_BROKEN_IMAGE_L);
+
+  ImageView imageView2 = ImageView::New("invalidUrl.png");
+  imageView2.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  application.GetScene().Add( imageView2 );
+
+  std::string brokenUrl;
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_S, brokenUrl, TEST_LOCATION);
+
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::LARGE);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_L, brokenUrl, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL, "invalidBroken.9.png");
+
+  ImageView imageView3 = ImageView::New("invalidUrl.png");
+  imageView3.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  application.GetScene().Add( imageView3 );
+
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
 namespace
 {
 

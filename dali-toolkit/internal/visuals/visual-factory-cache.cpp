@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/devel-api/utility/npatch-helper.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -35,73 +36,14 @@ namespace Toolkit
 {
 namespace Internal
 {
-namespace
-{
-
-/**
- * @brief Creates the geometry formed from the vertices and indices
- *
- * @param[in]  vertices             The vertices to generate the geometry from
- * @param[in]  indices              The indices to generate the geometry from
- * @return The geometry formed from the vertices and indices
- */
-Geometry GenerateGeometry(const Vector<Vector2>& vertices, const Vector<unsigned short>& indices)
-{
-  Property::Map vertexFormat;
-  vertexFormat["aPosition"] = Property::VECTOR2;
-  VertexBuffer vertexBuffer = VertexBuffer::New(vertexFormat);
-  if(vertices.Size() > 0)
-  {
-    vertexBuffer.SetData(&vertices[0], vertices.Size());
-  }
-
-  // Create the geometry object
-  Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer(vertexBuffer);
-  if(indices.Size() > 0)
-  {
-    geometry.SetIndexBuffer(&indices[0], indices.Size());
-  }
-
-  return geometry;
-}
-
-/**
- * @brief Adds the indices to form a quad composed off two triangles where the indices are organised in a grid
- *
- * @param[out] indices     The indices to add to
- * @param[in]  rowIdx      The row index to start the quad
- * @param[in]  nextRowIdx  The index to the next row
- */
-void AddQuadIndices(Vector<unsigned short>& indices, unsigned int rowIdx, unsigned int nextRowIdx)
-{
-  indices.PushBack(rowIdx);
-  indices.PushBack(nextRowIdx + 1);
-  indices.PushBack(rowIdx + 1);
-
-  indices.PushBack(rowIdx);
-  indices.PushBack(nextRowIdx);
-  indices.PushBack(nextRowIdx + 1);
-}
-
-/**
- * @brief Adds the vertices to create for npatch
- * @param[out] vertices The vertices to add to
- * @param[in]  x        The x value of vector
- * @param[in]  y        The y value of vector
- */
-void AddVertex(Vector<Vector2>& vertices, unsigned int x, unsigned int y)
-{
-  vertices.PushBack(Vector2(x, y));
-}
-
-} //unnamed namespace
 
 VisualFactoryCache::VisualFactoryCache(bool preMultiplyOnLoad)
 : mSvgRasterizeThread(NULL),
   mVectorAnimationManager(),
   mPreMultiplyOnLoad(preMultiplyOnLoad),
-  mBrokenImageInfoContainer()
+  mBrokenImageInfoContainer(),
+  mDefaultBrokenImageUrl(""),
+  mUseDefaultBrokenImageOnly(true)
 {
 }
 
@@ -168,10 +110,7 @@ ImageAtlasManagerPtr VisualFactoryCache::GetAtlasManager()
   if(!mAtlasManager)
   {
     mAtlasManager = new ImageAtlasManager();
-    if(!mBrokenImageInfoContainer.empty())
-    {
-      mAtlasManager->SetBrokenImage(mBrokenImageInfoContainer[0].url);
-    }
+    mAtlasManager->SetBrokenImage(mDefaultBrokenImageUrl);
   }
 
   return mAtlasManager;
@@ -302,53 +241,22 @@ bool VisualFactoryCache::GetPreMultiplyOnLoad()
   return mPreMultiplyOnLoad;
 }
 
-void VisualFactoryCache::SetBrokenImageUrl(const std::vector<std::string>& brokenImageUrlList)
+void VisualFactoryCache::SetBrokenImageUrl(std::string& defaultBrokenUrl, const std::vector<std::string>& brokenImageUrlList)
 {
+  mUseDefaultBrokenImageOnly = false;
   mBrokenImageInfoContainer.clear();
   mBrokenImageInfoContainer.assign(brokenImageUrlList.size(), BrokenImageInfo());
   for(unsigned int i = 0; i < brokenImageUrlList.size(); i++)
   {
     mBrokenImageInfoContainer[i].url = brokenImageUrlList[i];
   }
+
+  mDefaultBrokenImageUrl = defaultBrokenUrl;
 }
 
 VisualUrl::Type VisualFactoryCache::GetBrokenImageVisualType(int index)
 {
   return mBrokenImageInfoContainer[index].visualType;
-}
-
-Geometry VisualFactoryCache::CreateNPatchGeometry(Uint16Pair gridSize)
-{
-  uint16_t gridWidth  = gridSize.GetWidth();
-  uint16_t gridHeight = gridSize.GetHeight();
-
-  // Create vertices
-  Vector<Vector2> vertices;
-  vertices.Reserve((gridWidth + 1) * (gridHeight + 1));
-
-  for(int y = 0; y < gridHeight + 1; ++y)
-  {
-    for(int x = 0; x < gridWidth + 1; ++x)
-    {
-      AddVertex(vertices, x, y);
-    }
-  }
-
-  // Create indices
-  Vector<unsigned short> indices;
-  indices.Reserve(gridWidth * gridHeight * 6);
-
-  unsigned int rowIdx     = 0;
-  unsigned int nextRowIdx = gridWidth + 1;
-  for(int y = 0; y < gridHeight; ++y, ++nextRowIdx, ++rowIdx)
-  {
-    for(int x = 0; x < gridWidth; ++x, ++nextRowIdx, ++rowIdx)
-    {
-      AddQuadIndices(indices, rowIdx, nextRowIdx);
-    }
-  }
-
-  return GenerateGeometry(vertices, indices);
 }
 
 Geometry VisualFactoryCache::GetNPatchGeometry(int index)
@@ -362,14 +270,14 @@ Geometry VisualFactoryCache::GetNPatchGeometry(int index)
       geometry = GetGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY);
       if(!geometry)
       {
-        geometry = CreateNPatchGeometry(Uint16Pair(3,3));
+        geometry = NPatchHelper::CreateGridGeometry(Uint16Pair(3,3));
         SaveGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY, geometry);
       }
     }
     else if(data->GetStretchPixelsX().Size() > 0 || data->GetStretchPixelsY().Size() > 0)
     {
       Uint16Pair gridSize(2 * data->GetStretchPixelsX().Size() + 1, 2 * data->GetStretchPixelsY().Size() + 1);
-      geometry = CreateNPatchGeometry(gridSize);
+      geometry = NPatchHelper::CreateGridGeometry(gridSize);
     }
   }
   else
@@ -378,7 +286,7 @@ Geometry VisualFactoryCache::GetNPatchGeometry(int index)
     geometry = GetGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY);
     if(!geometry)
     {
-      geometry = CreateNPatchGeometry(Uint16Pair(3,3));
+      geometry = NPatchHelper::CreateGridGeometry(Uint16Pair(3,3));
       SaveGeometry(VisualFactoryCache::NINE_PATCH_GEOMETRY, geometry);
     }
   }
@@ -401,7 +309,7 @@ Shader VisualFactoryCache::GetNPatchShader(int index)
     yStretchCount = data->GetStretchPixelsY().Count();
   }
 
-  if(DALI_LIKELY((xStretchCount == 0 && yStretchCount == 0)))
+  if(DALI_LIKELY((xStretchCount == 0 && yStretchCount == 0) || (xStretchCount == 1 && yStretchCount == 1)))
   {
     shader = GetShader(VisualFactoryCache::NINE_PATCH_SHADER);
     if(DALI_UNLIKELY(!shader))
@@ -423,37 +331,6 @@ Shader VisualFactoryCache::GetNPatchShader(int index)
   return shader;
 }
 
-void VisualFactoryCache::RegisterStretchProperties(Renderer& renderer, const char* uniformName, const NPatchUtility::StretchRanges& stretchPixels, uint16_t imageExtent)
-{
-  uint16_t     prevEnd     = 0;
-  uint16_t     prevFix     = 0;
-  uint16_t     prevStretch = 0;
-  unsigned int i           = 1;
-  for(NPatchUtility::StretchRanges::ConstIterator it = stretchPixels.Begin(); it != stretchPixels.End(); ++it, ++i)
-  {
-    uint16_t start = it->GetX();
-    uint16_t end   = it->GetY();
-
-    uint16_t fix     = prevFix + start - prevEnd;
-    uint16_t stretch = prevStretch + end - start;
-
-    std::stringstream uniform;
-    uniform << uniformName << "[" << i << "]";
-    renderer.RegisterProperty(uniform.str(), Vector2(fix, stretch));
-
-    prevEnd     = end;
-    prevFix     = fix;
-    prevStretch = stretch;
-  }
-
-  {
-    prevFix += imageExtent - prevEnd;
-    std::stringstream uniform;
-    uniform << uniformName << "[" << i << "]";
-    renderer.RegisterProperty(uniform.str(), Vector2(prevFix, prevStretch));
-  }
-}
-
 void VisualFactoryCache::ApplyTextureAndUniforms(Renderer& renderer, int index)
 {
   const NPatchData* data;
@@ -461,38 +338,23 @@ void VisualFactoryCache::ApplyTextureAndUniforms(Renderer& renderer, int index)
   if(mNPatchLoader.GetNPatchData(mBrokenImageInfoContainer[index].npatchId, data) && data->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
     textureSet = data->GetTextures();
-    mBrokenImageInfoContainer[index].texture = data->GetTextures().GetTexture(0);
-
-    if(data->GetStretchPixelsX().Size() == 1 && data->GetStretchPixelsY().Size() == 1)
-    {
-      //special case for 9 patch
-      Uint16Pair stretchX = data->GetStretchPixelsX()[0];
-      Uint16Pair stretchY = data->GetStretchPixelsY()[0];
-
-      uint16_t stretchWidth  = (stretchX.GetY() >= stretchX.GetX()) ? stretchX.GetY() - stretchX.GetX() : 0;
-      uint16_t stretchHeight = (stretchY.GetY() >= stretchY.GetX()) ? stretchY.GetY() - stretchY.GetX() : 0;
-
-      renderer.RegisterProperty("uFixed[0]", Vector2::ZERO);
-      renderer.RegisterProperty("uFixed[1]", Vector2(stretchX.GetX(), stretchY.GetX()));
-      renderer.RegisterProperty("uFixed[2]", Vector2(data->GetCroppedWidth() - stretchWidth, data->GetCroppedHeight() - stretchHeight));
-      renderer.RegisterProperty("uStretchTotal", Vector2(stretchWidth, stretchHeight));
-    }
-    else
-    {
-      renderer.RegisterProperty("uNinePatchFactorsX[0]", Vector2::ZERO);
-      renderer.RegisterProperty("uNinePatchFactorsY[0]", Vector2::ZERO);
-
-      RegisterStretchProperties(renderer, "uNinePatchFactorsX", data->GetStretchPixelsX(), data->GetCroppedWidth());
-      RegisterStretchProperties(renderer, "uNinePatchFactorsY", data->GetStretchPixelsY(), data->GetCroppedHeight());
-    }
+    mBrokenImageInfoContainer[index].texture = textureSet.GetTexture(0);
+    NPatchHelper::ApplyTextureAndUniforms(renderer, data);
     renderer.SetTextures(textureSet);
   }
 }
 
 void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vector2& size)
 {
+
+  bool useDefaultBrokenImage = false;
+  if(mBrokenImageInfoContainer.size() == 0)
+  {
+    useDefaultBrokenImage = true;
+  }
+
   // Load Information for broken image
-  for(uint32_t index = 0; index < mBrokenImageInfoContainer.size(); index++)
+  for(uint32_t index = 0; (index  < mBrokenImageInfoContainer.size()) && !useDefaultBrokenImage; index++)
   {
     if(mBrokenImageInfoContainer[index].width == 0 && mBrokenImageInfoContainer[index].height == 0)
     {
@@ -512,15 +374,34 @@ void VisualFactoryCache::UpdateBrokenImageRenderer(Renderer& renderer, const Vec
           }
           else
           {
-            DALI_LOG_ERROR("Can't update renderer for broken image. maybe image loading is failed [path:%s] \n",mBrokenImageInfoContainer[index].url.c_str());
+            DALI_LOG_ERROR("Can't update renderer for broken image. maybe image loading is failed [index:%d] [path:%s] \n",index, mBrokenImageInfoContainer[index].url.c_str());
+            useDefaultBrokenImage = true;
           }
         }
         else
         {
-          GetBrokenVisualImage(index);
+          if(!GetBrokenVisualImage(index))
+          {
+            DALI_LOG_ERROR("Can't update renderer for broken image. maybe image loading is failed [index:%d] [path:%s] \n",index, mBrokenImageInfoContainer[index].url.c_str());
+            useDefaultBrokenImage = true;
+          }
         }
       }
     }
+  }
+
+  if(!mUseDefaultBrokenImageOnly && useDefaultBrokenImage)
+  {
+    // Clear broken info
+    mBrokenImageInfoContainer.clear();
+
+    // assign for broken image
+    const int defaultBrokenIndex = 0;
+    mBrokenImageInfoContainer.assign(1, BrokenImageInfo());
+    mBrokenImageInfoContainer[defaultBrokenIndex].url = mDefaultBrokenImageUrl;
+    VisualUrl visualUrl(mBrokenImageInfoContainer[defaultBrokenIndex].url);
+    mBrokenImageInfoContainer[defaultBrokenIndex].visualType = visualUrl.GetType();
+    mUseDefaultBrokenImageOnly = true;
   }
 
   // Set Texutre to renderer
@@ -547,7 +428,7 @@ int32_t VisualFactoryCache::GetProperBrokenImageIndex(const Vector2& size)
 {
   // Sets the default broken type
   int32_t returnIndex = 0;
-  if((size.width == 0 || size.height == 0))
+  if((size.width == 0 || size.height == 0) || mUseDefaultBrokenImageOnly )
   {
     // To do : Need to add observer about size
     return returnIndex;

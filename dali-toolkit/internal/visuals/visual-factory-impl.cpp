@@ -377,20 +377,12 @@ void VisualFactory::SetBrokenImageUrl(Toolkit::StyleManager& styleManager)
   if(styleManager)
   {
     customBrokenImageUrlList = Toolkit::DevelStyleManager::GetBrokenImageUrlList(styleManager);
-    if(customBrokenImageUrlList.size() == 0)
-    {
-      Property::Map config = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
-      config["brokenImageUrl"].Get(brokenImageUrl);
-      customBrokenImageUrlList.push_back(brokenImageUrl);
-    }
-    mFactoryCache->SetBrokenImageUrl(customBrokenImageUrlList);
+    Property::Map config = Toolkit::DevelStyleManager::GetConfigurations(styleManager);
+    config["brokenImageUrl"].Get(brokenImageUrl);
   }
-  else
-  {
-    // Set default image
-    customBrokenImageUrlList.push_back(brokenImageUrl);
-    mFactoryCache->SetBrokenImageUrl(customBrokenImageUrlList);
-  }
+
+  // Add default image
+  mFactoryCache->SetBrokenImageUrl(brokenImageUrl, customBrokenImageUrlList);
 }
 
 Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
