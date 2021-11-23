@@ -1619,6 +1619,60 @@ float Controller::Impl::GetVerticalScrollPosition()
   return mEventData ? -mModel->mScrollPosition.y : 0.0f;
 }
 
+Vector3 Controller::Impl::GetAnchorPosition(Anchor anchor) const
+{
+  //TODO
+  return Vector3(10.f, 10.f, 10.f);
+}
+
+Vector2 Controller::Impl::GetAnchorSize(Anchor anchor) const
+{
+  //TODO
+  return Vector2(10.f, 10.f);
+}
+
+Toolkit::TextAnchor Controller::Impl::CreateAnchorActor(Anchor anchor)
+{
+  auto actor = Toolkit::TextAnchor::New();
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  const Vector3 anchorPosition = GetAnchorPosition(anchor);
+  actor.SetProperty(Actor::Property::POSITION, anchorPosition);
+  const Vector2 anchorSize = GetAnchorSize(anchor);
+  actor.SetProperty(Actor::Property::SIZE, anchorSize);
+  std::string anchorText(mModel->mLogicalModel->mText.Begin() + anchor.startIndex, mModel->mLogicalModel->mText.Begin() + anchor.endIndex);
+  actor.SetProperty(Actor::Property::NAME, anchorText);
+  actor.SetProperty(Toolkit::TextAnchor::Property::URI, std::string(anchor.href));
+  actor.SetProperty(Toolkit::TextAnchor::Property::START_CHARACTER_INDEX, static_cast<int>(anchor.startIndex));
+  actor.SetProperty(Toolkit::TextAnchor::Property::END_CHARACTER_INDEX, static_cast<int>(anchor.endIndex));
+  return actor;
+}
+
+void Controller::Impl::GetAnchorActors(std::vector<Toolkit::TextAnchor>& anchorActors)
+{
+  /* TODO: Now actors are created/destroyed in every "RenderText" function call. Even when we add just 1 character,
+           we need to create and destroy potentially many actors. Some optimization can be considered here.
+           Maybe a "dirty" flag in mLogicalModel? */
+  anchorActors.clear();
+  for(auto& anchor : mModel->mLogicalModel->mAnchors)
+  {
+    auto actor = CreateAnchorActor(anchor);
+    anchorActors.push_back(actor);
+  }
+}
+
+int32_t Controller::Impl::GetAnchorIndex(size_t characterOffset) const
+{
+  Vector<Anchor>::Iterator it = mModel->mLogicalModel->mAnchors.Begin();
+
+  while(it != mModel->mLogicalModel->mAnchors.End() && (it->startIndex > characterOffset || it->endIndex <= characterOffset))
+  {
+    it++;
+  }
+
+  return it == mModel->mLogicalModel->mAnchors.End() ? -1 : it - mModel->mLogicalModel->mAnchors.Begin();
+}
+
 void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns)
 {
   //Underlined character runs for markup-processor

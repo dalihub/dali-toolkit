@@ -841,6 +841,49 @@ struct Controller::Impl
    */
   void ResetScrollPosition();
 
+  /**
+   * @brief Resets a provided vector with actors that marks the position of anchors in markup enabled text
+   *
+   * @param[out] anchorActors the vector of actor (empty collection if no anchors available).
+   */
+  void GetAnchorActors(std::vector<Toolkit::TextAnchor>& anchorActors);
+
+  /**
+   * @brief Return an index of first anchor in the anchor vector whose boundaries includes given character offset
+   *
+   * @param[in] characterOffset A position in text coords.
+   *
+   * @return the 0-based index in anchor vector (-1 if an anchor not found)
+   */
+  int32_t GetAnchorIndex(size_t characterOffset) const;
+
+  /**
+   * @brief Return the geometrical position of an anchor relative to the parent origin point.
+   *
+   * @param[in] anchor An anchor.
+   *
+   * @return The x, y, z coordinates of an anchor.
+   */
+  Vector3 GetAnchorPosition(Anchor anchor) const;
+
+  /**
+   * @brief Return the size of an anchor expresed as a vector containing anchor's width and height.
+   *
+   * @param[in] anchor An anchor.
+   *
+   * @return The width and height of an anchor.
+   */
+  Vector2 GetAnchorSize(Anchor anchor) const;
+
+  /**
+   * @brief Return the actor representing an anchor.
+   *
+   * @param[in] anchor An anchor.
+   *
+   * @return The actor representing an anchor.
+   */
+  Toolkit::TextAnchor CreateAnchorActor(Anchor anchor);
+
 public:
   /**
    * @brief Gets implementation from the controller handle.

@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-anchor-devel.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
@@ -1756,6 +1757,22 @@ public: // Text-input Event Queuing.
    * @return unsigned value with cursor position
    */
   CharacterIndex GetCursorPosition();
+
+  /**
+   * @brief Resets a provided vector with actors that marks the position of anchors in markup enabled text
+   *
+   * @param[out] anchorActors the vector of actor (empty collection if no anchors available).
+   */
+  void GetAnchorActors(std::vector<Toolkit::TextAnchor>& anchorActors);
+
+  /**
+   * @brief Return an index of first anchor in the anchor vector whose boundaries includes given character offset
+   *
+   * @param[in] characterOffset A position in text coords.
+   *
+   * @return the index in anchor vector (-1 if an anchor not found)
+   */
+  int GetAnchorIndex(size_t characterOffset);
 
 protected: // Inherit from Text::Decorator::ControllerInterface.
   /**

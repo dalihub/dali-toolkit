@@ -516,6 +516,39 @@ int UtcDaliAccessibilityBloomViewConstructor(void)
 }
 
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
+#include <dali-toolkit/internal/controls/text-controls/text-anchor-impl.h>
+int UtcDaliAccessibilityTextAnchor(void)
+{
+  ToolkitTestApplication application;
+
+  auto textanchor = TextAnchor::New();
+  DALI_TEST_CHECK( textanchor );
+
+  auto textlabel = TextLabel::New();
+  DALI_TEST_CHECK( textlabel );
+
+  Dali::Accessibility::TestEnableSC( true );
+
+  textlabel.Add(textanchor);
+  auto accessible = Dali::Accessibility::Accessible::Get( textanchor );
+  DALI_TEST_CHECK( accessible );
+  auto hyperlink = dynamic_cast< Dali::Accessibility::Hyperlink* >( accessible );
+  DALI_TEST_CHECK( hyperlink );
+  textanchor.SetProperty( Toolkit::TextAnchor::Property::URI, "https://www.tizen.org" );
+  DALI_TEST_EQUALS( hyperlink->IsValid(), true, TEST_LOCATION );
+  auto action = dynamic_cast<Dali::Accessibility::Action*>( accessible );
+  // activation of valid hyperlink
+  DALI_TEST_CHECK( action->DoAction( "accessibilityActivated" ) );
+  // making hyperlink invalid
+  textanchor.SetProperty( Toolkit::TextAnchor::Property::URI, "" );
+  DALI_TEST_EQUALS( hyperlink->IsValid(), false, TEST_LOCATION );
+  DALI_TEST_CHECK( !action->DoAction( "accessibilityActivated" ) );
+
+  Dali::Accessibility::TestEnableSC( false );
+
+  END_TEST;
+}
+
 int UtcDaliAccessibilityTextField(void)
 {
   ToolkitTestApplication application;
@@ -565,6 +598,51 @@ int UtcDaliAccessibilityTextField(void)
   DALI_TEST_EQUALS(editabletext->DeleteText(5, 1), false, TEST_LOCATION);
   DALI_TEST_EQUALS(editabletext->DeleteText(1, 5), true, TEST_LOCATION);
   DALI_TEST_EQUALS(text->GetText(0, 2), "af", TEST_LOCATION);
+
+  auto hypertext = dynamic_cast< Dali::Accessibility::Hypertext* >( accessible );
+  DALI_TEST_CHECK( hypertext );
+  // text without the anchors markup and ENABLE_MARKUP property set (by default) to false
+  DALI_TEST_EQUALS( hypertext->GetLinkCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( -1 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 0 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 5 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( -1 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 0 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 5 ) == nullptr, true, TEST_LOCATION );
+  // text with the anchors markup and ENABLE_MARKUP property set (by default) to false
+  textfield.SetProperty( Toolkit::TextField::Property::TEXT, "12345<a href = 'https://www.tizen.org'>anchor1</a>12345<a href = 'https://www.tizen.org' >veryveryveryveryveryveryveryverylonganchor2</a>12345<a href = 'https://www.tizen.org'>anchor3</a>12345" );
+  DALI_TEST_EQUALS( hypertext->GetLinkCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( -1 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 0 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 5 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( -1 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 0 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 5 ) == nullptr, true, TEST_LOCATION );
+  // text with the anchors markup and ENABLE_MARKUP property set to true
+  textfield.SetProperty( Toolkit::TextField::Property::ENABLE_MARKUP, true);
+  DALI_TEST_EQUALS( hypertext->GetLinkCount(), 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( -1 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 0 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 5 ), 0, TEST_LOCATION ); //1st anchor index
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 17 ), 1, TEST_LOCATION ); //2nd anchor index
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 66 ), 2, TEST_LOCATION ); //3rd anchor index
+  DALI_TEST_EQUALS( hypertext->GetLink( -1 ) == nullptr, true, TEST_LOCATION );
+  auto hyperlink = hypertext->GetLink( 0 );
+  DALI_TEST_CHECK ( hyperlink );
+  DALI_TEST_EQUALS( hyperlink->GetStartIndex(), 5, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetEndIndex(), 12, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetAnchorCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetAnchorUri( 0 ), "https://www.tizen.org", TEST_LOCATION );
+  auto anchorAccessible = hyperlink->GetAnchorAccessible( 0 );
+  DALI_TEST_EQUALS( hyperlink == anchorAccessible, true, TEST_LOCATION );
+  hyperlink = hypertext->GetLink( 1 );
+  DALI_TEST_CHECK ( hyperlink );
+  DALI_TEST_EQUALS( hyperlink->GetStartIndex(), 17, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetEndIndex(), 60, TEST_LOCATION );
+  hyperlink = hypertext->GetLink( 2 );
+  DALI_TEST_CHECK ( hyperlink );
+  DALI_TEST_EQUALS( hyperlink->GetStartIndex(), 65, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetEndIndex(), 72, TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( false );
 
@@ -622,6 +700,51 @@ int UtcDaliAccessibilityTextEditor(void)
   DALI_TEST_EQUALS(editabletext->DeleteText(1, 5), true, TEST_LOCATION);
   DALI_TEST_EQUALS(text->GetText(0, 2), "af", TEST_LOCATION);
 
+  auto hypertext = dynamic_cast< Dali::Accessibility::Hypertext* >( accessible );
+  DALI_TEST_CHECK( hypertext );
+  // text without the anchors markup and ENABLE_MARKUP property set (by default) to false
+  DALI_TEST_EQUALS( hypertext->GetLinkCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( -1 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 0 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 5 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( -1 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 0 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 5 ) == nullptr, true, TEST_LOCATION );
+  // text with the anchors markup and ENABLE_MARKUP property set (by default) to false
+  texteditor.SetProperty( Toolkit::TextEditor::Property::TEXT, "12345<a href = 'https://www.tizen.org'>anchor1</a>12345<a href = 'https://www.tizen.org' >veryveryveryveryveryveryveryverylonganchor2</a>12345<a href = 'https://www.tizen.org'>anchor3</a>12345" );
+  DALI_TEST_EQUALS( hypertext->GetLinkCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( -1 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 0 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 5 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( -1 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 0 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 5 ) == nullptr, true, TEST_LOCATION );
+  // text with the anchors markup and ENABLE_MARKUP property set to true
+  texteditor.SetProperty( Toolkit::TextEditor::Property::ENABLE_MARKUP, true);
+  DALI_TEST_EQUALS( hypertext->GetLinkCount(), 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( -1 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 0 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 5 ), 0, TEST_LOCATION ); //1st anchor index
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 17 ), 1, TEST_LOCATION ); //2nd anchor index
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 66 ), 2, TEST_LOCATION ); //3rd anchor index
+  DALI_TEST_EQUALS( hypertext->GetLink( -1 ) == nullptr, true, TEST_LOCATION );
+  auto hyperlink = hypertext->GetLink( 0 );
+  DALI_TEST_CHECK ( hyperlink );
+  DALI_TEST_EQUALS( hyperlink->GetStartIndex(), 5, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetEndIndex(), 12, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetAnchorCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetAnchorUri( 0 ), "https://www.tizen.org", TEST_LOCATION );
+  auto anchorAccessible = hyperlink->GetAnchorAccessible( 0 );
+  DALI_TEST_EQUALS( hyperlink == anchorAccessible, true, TEST_LOCATION );
+  hyperlink = hypertext->GetLink( 1 );
+  DALI_TEST_CHECK ( hyperlink );
+  DALI_TEST_EQUALS( hyperlink->GetStartIndex(), 17, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetEndIndex(), 60, TEST_LOCATION );
+  hyperlink = hypertext->GetLink( 2 );
+  DALI_TEST_CHECK ( hyperlink );
+  DALI_TEST_EQUALS( hyperlink->GetStartIndex(), 65, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetEndIndex(), 72, TEST_LOCATION );
+
   Dali::Accessibility::TestEnableSC( false );
 
   END_TEST;
@@ -659,6 +782,51 @@ int UtcDaliAccessibilityTextLabel(void)
   DALI_TEST_EQUALS( range.content, "", TEST_LOCATION );
   DALI_TEST_EQUALS( text->SetRangeOfSelection( 1, 0, 1 ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( text->RemoveSelection( 1 ), false, TEST_LOCATION );
+
+  auto hypertext = dynamic_cast< Dali::Accessibility::Hypertext* >( accessible );
+  DALI_TEST_CHECK( hypertext );
+  // text without the anchors markup and ENABLE_MARKUP property set (by default) to false
+  DALI_TEST_EQUALS( hypertext->GetLinkCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( -1 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 0 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 5 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( -1 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 0 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 5 ) == nullptr, true, TEST_LOCATION );
+  // text with the anchors markup and ENABLE_MARKUP property set (by default) to false
+  textlabel.SetProperty( Toolkit::TextLabel::Property::TEXT, "12345<a href = 'https://www.tizen.org'>anchor1</a>12345<a href = 'https://www.tizen.org' >veryveryveryveryveryveryveryverylonganchor2</a>12345<a href = 'https://www.tizen.org'>anchor3</a>12345" );
+  DALI_TEST_EQUALS( hypertext->GetLinkCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( -1 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 0 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 5 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( -1 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 0 ) == nullptr, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLink( 5 ) == nullptr, true, TEST_LOCATION );
+  // text with the anchors markup and ENABLE_MARKUP property set to true
+  textlabel.SetProperty( Toolkit::TextLabel::Property::ENABLE_MARKUP, true);
+  DALI_TEST_EQUALS( hypertext->GetLinkCount(), 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( -1 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 0 ), -1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 5 ), 0, TEST_LOCATION ); //1st anchor index
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 17 ), 1, TEST_LOCATION ); //2nd anchor index
+  DALI_TEST_EQUALS( hypertext->GetLinkIndex( 66 ), 2, TEST_LOCATION ); //3rd anchor index
+  DALI_TEST_EQUALS( hypertext->GetLink( -1 ) == nullptr, true, TEST_LOCATION );
+  auto hyperlink = hypertext->GetLink( 0 );
+  DALI_TEST_CHECK ( hyperlink );
+  DALI_TEST_EQUALS( hyperlink->GetStartIndex(), 5, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetEndIndex(), 12, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetAnchorCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetAnchorUri( 0 ), "https://www.tizen.org", TEST_LOCATION );
+  auto anchorAccessible = hyperlink->GetAnchorAccessible( 0 );
+  DALI_TEST_EQUALS( hyperlink == anchorAccessible, true, TEST_LOCATION );
+  hyperlink = hypertext->GetLink( 1 );
+  DALI_TEST_CHECK ( hyperlink );
+  DALI_TEST_EQUALS( hyperlink->GetStartIndex(), 17, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetEndIndex(), 60, TEST_LOCATION );
+  hyperlink = hypertext->GetLink( 2 );
+  DALI_TEST_CHECK ( hyperlink );
+  DALI_TEST_EQUALS( hyperlink->GetStartIndex(), 65, TEST_LOCATION );
+  DALI_TEST_EQUALS( hyperlink->GetEndIndex(), 72, TEST_LOCATION );
 
   Dali::Accessibility::TestEnableSC( false );
 

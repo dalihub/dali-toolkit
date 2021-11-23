@@ -463,6 +463,11 @@ DevelTextField::SelectionClearedSignalType& TextField::SelectionClearedSignal()
   return mSelectionClearedSignal;
 }
 
+void TextField::OnAccessibilityStatusChanged()
+{
+  CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
+}
+
 void TextField::OnInitialize()
 {
   Actor self = Self();
@@ -541,6 +546,9 @@ void TextField::OnInitialize()
     return std::unique_ptr<Dali::Accessibility::Accessible>(
       new AccessibleImpl(actor, Dali::Accessibility::Role::ENTRY));
   });
+
+  Accessibility::Bridge::EnabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
+  Accessibility::Bridge::DisabledSignal().Connect(this, &TextField::OnAccessibilityStatusChanged);
 }
 
 void TextField::OnStyleChange(Toolkit::StyleManager styleManager, StyleChange::Type change)
@@ -702,7 +710,7 @@ Text::ControllerPtr TextField::GetTextController()
 
 void TextField::RenderText(Text::Controller::UpdateTextType updateTextType)
 {
-  CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mStencil, mClippingDecorationActors, updateTextType);
+  CommonTextUtils::RenderText(Self(), mRenderer, mController, mDecorator, mAlignmentOffset, mRenderableActor, mBackgroundActor, mStencil, mClippingDecorationActors, mAnchorActors, updateTextType);
 }
 
 void TextField::OnKeyInputFocusGained()
@@ -1412,6 +1420,30 @@ bool TextField::AccessibleImpl::SetTextContents(std::string newContents)
   auto self = Toolkit::TextField::DownCast(Self());
   self.SetProperty(Toolkit::TextField::Property::TEXT, std::move(newContents));
   return true;
+}
+
+int32_t TextField::AccessibleImpl::GetLinkCount() const
+{
+  auto self = Toolkit::TextField::DownCast(Self());
+  return Dali::Toolkit::GetImpl(self).mAnchorActors.size();
+}
+
+Accessibility::Hyperlink* TextField::AccessibleImpl::GetLink(int32_t linkIndex) const
+{
+  if(linkIndex < 0 || linkIndex >= GetLinkCount())
+  {
+    return nullptr;
+  }
+  auto self        = Toolkit::TextField::DownCast(Self());
+  auto anchorActor = Dali::Toolkit::GetImpl(self).mAnchorActors[linkIndex];
+  return dynamic_cast<Accessibility::Hyperlink*>(Dali::Accessibility::Accessible::Get(anchorActor));
+}
+
+int32_t TextField::AccessibleImpl::GetLinkIndex(int32_t characterOffset) const
+{
+  auto self       = Toolkit::TextField::DownCast(Self());
+  auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
+  return controller->GetAnchorIndex(static_cast<size_t>(characterOffset));
 }
 
 } // namespace Internal

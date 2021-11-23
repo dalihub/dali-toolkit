@@ -473,6 +473,9 @@ private: // Implementation
   // Connection needed to re-render text, when a text editor returns to the scene.
   void OnSceneConnect(Dali::Actor actor);
 
+  // Needed to synchronize TextAnchor actors with Anchor objects in text's logical model
+  void OnAccessibilityStatusChanged();
+
 private: // Data
   // Signals
   Toolkit::TextEditor::TextChangedSignalType                mTextChangedSignal;
@@ -485,17 +488,18 @@ private: // Data
   Toolkit::DevelTextEditor::SelectionChangedSignalType      mSelectionChangedSignal;
   Toolkit::DevelTextEditor::SelectionClearedSignalType      mSelectionClearedSignal;
 
-  InputMethodContext            mInputMethodContext;
-  Text::ControllerPtr           mController;
-  Text::RendererPtr             mRenderer;
-  Text::DecoratorPtr            mDecorator;
-  Text::TextVerticalScrollerPtr mTextVerticalScroller;
-  Toolkit::Control              mStencil;
-  Toolkit::ScrollBar            mScrollBar;
-  Dali::Animation               mAnimation; ///< Scroll indicator Show/Hide Animation.
-  Dali::TimePeriod              mAnimationPeriod;
-  std::vector<Actor>            mClippingDecorationActors; ///< Decoration actors which need clipping.
-  Dali::InputMethodOptions      mInputMethodOptions;
+  InputMethodContext               mInputMethodContext;
+  Text::ControllerPtr              mController;
+  Text::RendererPtr                mRenderer;
+  Text::DecoratorPtr               mDecorator;
+  Text::TextVerticalScrollerPtr    mTextVerticalScroller;
+  Toolkit::Control                 mStencil;
+  Toolkit::ScrollBar               mScrollBar;
+  Dali::Animation                  mAnimation; ///< Scroll indicator Show/Hide Animation.
+  Dali::TimePeriod                 mAnimationPeriod;
+  std::vector<Actor>               mClippingDecorationActors; ///< Decoration actors which need clipping.
+  std::vector<Toolkit::TextAnchor> mAnchorActors;
+  Dali::InputMethodOptions         mInputMethodOptions;
 
   Actor         mRenderableActor;
   Actor         mActiveLayer;
@@ -529,7 +533,8 @@ private: // Data
    */
   struct AccessibleImpl : public DevelControl::AccessibleImpl,
                           public virtual Dali::Accessibility::Text,
-                          public virtual Dali::Accessibility::EditableText
+                          public virtual Dali::Accessibility::EditableText,
+                          public virtual Dali::Accessibility::Hypertext
   {
     using DevelControl::AccessibleImpl::AccessibleImpl;
 
@@ -607,6 +612,21 @@ private: // Data
      * @copydoc Dali::Accessibility::EditableText::DeleteText()
      */
     bool DeleteText(size_t startPosition, size_t endPosition) override;
+
+    /**
+     * @copydoc Dali::Accessibility::Hypertext::GetLink()
+     */
+    Accessibility::Hyperlink* GetLink(int32_t linkIndex) const override;
+
+    /**
+     * @copydoc Dali::Accessibility::Hypertext::GetLinkIndex()
+     */
+    int32_t GetLinkIndex(int32_t characterOffset) const override;
+
+    /**
+     * @copydoc Dali::Accessibility::Hypertext::GetLinkCount()
+     */
+    int32_t GetLinkCount() const override;
   };
 };
 

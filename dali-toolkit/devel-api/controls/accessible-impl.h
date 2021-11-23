@@ -53,7 +53,7 @@ protected:
   bool mIsModal = false;
   bool mIsRoot = false;
 
-  Dali::Actor Self()
+  Dali::Actor Self() const
   {
     auto handle = mSelf.GetHandle();
 
