@@ -37,19 +37,82 @@ namespace Text
 {
 struct Controller::EventHandler
 {
+  /// @copydoc Text::Controller::KeyboardFocusGainEvent
+  /// @param[in] controller A reference to the controller class
   static void KeyboardFocusGainEvent(Controller& controller);
+
+  /// @copydoc Text::Controller::KeyboardFocusLostEvent
+  /// @param[in] controller A reference to the controller class
   static void KeyboardFocusLostEvent(Controller& controller);
+
+  /// @copydoc Text::Controller::KeyEvent
+  /// @param[in] controller A reference to the controller class
   static bool KeyEvent(Controller& controller, const Dali::KeyEvent& keyEvent);
+
+  /// @copydoc Text::Controller::AnchorEvent
+  /// @param[in] controller A reference to the controller class
   static void AnchorEvent(Controller& controller, float x, float y);
+
+  /// @copydoc Text::Controller::TapEvent
+  /// @param[in] controller A reference to the controller class
   static void TapEvent(Controller& controller, unsigned int tapCount, float x, float y);
+
+  /// @copydoc Text::Controller::PanEvent
+  /// @param[in] controller A reference to the controller class
   static void PanEvent(Controller& controller, GestureState state, const Vector2& displacement);
+
+  /// @copydoc Text::Controller::LongPressEvent
+  /// @param[in] controller A reference to the controller class
   static void LongPressEvent(Controller& controller, GestureState state, float x, float y);
+
+  /// @copydoc Text::Controller::SelectEvent
+  /// @param[in] controller A reference to the controller class
   static void SelectEvent(Controller& controller, float x, float y, SelectionType selectType);
+
+  /**
+   * @brief Creates a selection event with a selection index.
+   *
+   * It could be called from the SelectText().
+   * The start and end parameters are passed through the event.
+   *
+   * @param[in] controller A reference to the controller class
+   * @param[in] start The start selection position.
+   * @param[in] end The end selection position.
+   * @param[in] selection type like the range.
+   */
   static void SelectEvent(Controller& controller, const uint32_t start, const uint32_t end, SelectionType selectType);
+
+  /**
+   * @brief Process queued events which modify the model.
+   * @param[in] controller A reference to the controller class
+   */
   static void ProcessModifyEvents(Controller& controller);
+
+  /**
+   * @brief Used to process an event queued from SetText()
+   * @param[in] controller A reference to the controller class
+   */
   static void TextReplacedEvent(Controller& controller);
+
+  /**
+   * @brief Used to process an event queued from key events etc.
+   * @param[in] controller A reference to the controller class
+   */
   static void TextInsertedEvent(Controller& controller);
+
+  /**
+   * @brief Used to process an event queued from backspace key etc.
+   * @param[in] controller A reference to the controller class
+   */
   static void TextDeletedEvent(Controller& controller);
+
+  /**
+   * @brief Helper to KeyEvent() to handle the backspace or delete key case.
+   *
+   * @param[in] controller A reference to the controller class
+   * @param[in] keyCode The keycode for the key pressed
+   * @return True if a character was deleted.
+   */
   static bool DeleteEvent(Controller& controller, int keyCode);
 
   static InputMethodContext::CallbackData OnInputMethodContextEvent(Controller&                          controller,

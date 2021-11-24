@@ -158,6 +158,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/hyphenator.cpp
    ${toolkit_src_dir}/text/text-enumerations-impl.cpp
    ${toolkit_src_dir}/text/text-controller.cpp
+   ${toolkit_src_dir}/text/text-controller-background-actor.cpp
    ${toolkit_src_dir}/text/text-controller-event-handler.cpp
    ${toolkit_src_dir}/text/text-controller-impl.cpp
    ${toolkit_src_dir}/text/text-controller-impl-data-clearer.cpp

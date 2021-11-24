@@ -39,32 +39,64 @@ struct Controller::TextUpdater
   /// @param[in] controller The controller
   static void SetText(Controller& controller, const std::string& text);
 
-  /// @copydoc Text::Contoller::InsertText
-  /// @param[in] controller The controller
+  /**
+   * @brief Called by editable UI controls when key events are received.
+   *
+   * @param[in] controller The controller
+   * @param[in] text The text to insert.
+   * @param[in] type Used to distinguish between regular key events and InputMethodContext events.
+   */
   static void InsertText(Controller& controller, const std::string& text, Controller::InsertType type);
 
-  /// @copydoc Text::Contoller::PasteText
+  /// @copydoc Text::EditableControlInterface::PasteText()
   /// @param[in] controller The controller
   static void PasteText(Controller& controller, const std::string& stringToPaste);
 
-  /// @copydoc Text::Contoller::RemoveText
-  /// @param[in] controller The controller
+  /**
+   * @brief Remove a given number of characters
+   *
+   * When predictve text is used the pre-edit text is removed and inserted again with the new characters.
+   * The UpdateInputStyleType @type parameter if set to DONT_UPDATE_INPUT_STYLE avoids to update the input
+   * style when pre-edit text is removed.
+   *
+   * @param[in] controller The controller
+   * @param[in] cursorOffset Start position from the current cursor position to start deleting characters.
+   * @param[in] numberOfCharacters The number of characters to delete from the cursorOffset.
+   * @param[in] type Whether to update the input style.
+   * @return True if the remove was successful.
+   */
   static bool RemoveText(Controller& controller, int cursorOffset, int numberOfCharacters, UpdateInputStyleType type);
 
-  /// @copydoc Text::Contoller::RemoveSelectedText
-  /// @param[in] controller The controller
+  /**
+   * @brief Checks if text is selected and if so removes it.
+   * @param[in] controller The controller
+   * @return true if text was removed
+   */
   static bool RemoveSelectedText(Controller& controller);
 
-  /// @copydoc Text::Contoller::ResetText
-  /// @param[in] controller The controller
+  /**
+   * @brief Used to remove the text included the placeholder text.
+   * @param[in] controller The controller
+   */
   static void ResetText(Controller& controller);
 
-  /// @copydoc Text::Contoller::InsertTextAnchor
-  /// @param[in] controller The controller
+  /**
+   * @brief Update anchor position from given number of inserted characters.
+   *
+   * @param[in] controller The controller
+   * @param[in] numberOfCharacters The number of inserted characters.
+   * @param[in] previousCursorIndex A cursor position before event occurs.
+   */
   static void InsertTextAnchor(Controller& controller, int numberOfCharacters, CharacterIndex previousCursorIndex);
 
-  /// @copydoc Text::Contoller::RemoveTextAnchor
-  /// @param[in] controller The controller
+  /**
+   * @brief Update anchor position from given number of removed characters.
+   *
+   * @param[in] controller The controller
+   * @param[in] cursorOffset Start position from the current cursor position to start deleting characters.
+   * @param[in] numberOfCharacters The number of removed characters.
+   * @param[in] previousCursorIndex A cursor position before event occurs.
+   */
   static void RemoveTextAnchor(Controller& controller, int cursorOffset, int numberOfCharacters, CharacterIndex previousCursorIndex);
 };
 

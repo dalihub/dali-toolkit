@@ -28,6 +28,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali-toolkit/internal/text/text-controller-background-actor.h>
 #include <dali-toolkit/internal/text/text-controller-event-handler.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 #include <dali-toolkit/internal/text/text-controller-input-font-handler.h>
@@ -42,8 +43,6 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
-
-constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const std::string EMPTY_STRING("");
 
@@ -315,15 +314,7 @@ void Controller::SetLayoutDirection(Dali::LayoutDirection::Type layoutDirection)
 
 Dali::LayoutDirection::Type Controller::GetLayoutDirection(Dali::Actor& actor) const
 {
-  if(mImpl->mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::LOCALE ||
-     (mImpl->mModel->mMatchLayoutDirection == DevelText::MatchLayoutDirection::INHERIT && !mImpl->mIsLayoutDirectionChanged))
-  {
-    return static_cast<Dali::LayoutDirection::Type>(DevelWindow::Get(actor).GetRootLayer().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  }
-  else
-  {
-    return static_cast<Dali::LayoutDirection::Type>(actor.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
-  }
+  return mImpl->GetLayoutDirection(actor);
 }
 
 bool Controller::IsShowingRealText() const
@@ -474,15 +465,7 @@ void Controller::SetText(const std::string& text)
 
 void Controller::GetText(std::string& text) const
 {
-  if(!mImpl->IsShowingPlaceholderText())
-  {
-    // Retrieves the text string.
-    mImpl->GetText(0u, text);
-  }
-  else
-  {
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::GetText %p empty (but showing placeholder)\n", this);
-  }
+  mImpl->GetText(text);
 }
 
 void Controller::SetPlaceholderText(PlaceholderType type, const std::string& text)
@@ -1215,45 +1198,9 @@ void Controller::GetPlaceholderProperty(Property::Map& map)
 Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
 {
   // Make sure the model is up-to-date before layouting
-  ProcessModifyEvents();
+  EventHandler::ProcessModifyEvents(*this);
 
-  if(mImpl->mUpdateTextDirection)
-  {
-    // Operations that can be done only once until the text changes.
-    const OperationsMask onlyOnceOperations = static_cast<OperationsMask>(CONVERT_TO_UTF32 |
-                                                                          GET_SCRIPTS |
-                                                                          VALIDATE_FONTS |
-                                                                          GET_LINE_BREAKS |
-                                                                          BIDI_INFO |
-                                                                          SHAPE_TEXT |
-                                                                          GET_GLYPH_METRICS);
-
-    // Set the update info to relayout the whole text.
-    mImpl->mTextUpdateInfo.mParagraphCharacterIndex     = 0u;
-    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
-
-    // Make sure the model is up-to-date before layouting
-    mImpl->UpdateModel(onlyOnceOperations);
-
-    Vector3 naturalSize;
-    DoRelayout(Size(MAX_FLOAT, MAX_FLOAT),
-               static_cast<OperationsMask>(onlyOnceOperations |
-                                           LAYOUT | REORDER | UPDATE_DIRECTION),
-               naturalSize.GetVectorXY());
-
-    // Do not do again the only once operations.
-    mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending & ~onlyOnceOperations);
-
-    // Clear the update info. This info will be set the next time the text is updated.
-    mImpl->mTextUpdateInfo.Clear();
-
-    // FullRelayoutNeeded should be true because DoRelayout is MAX_FLOAT, MAX_FLOAT.
-    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
-
-    mImpl->mUpdateTextDirection = false;
-  }
-
-  return mImpl->mIsTextDirectionRTL ? Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT : Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT;
+  return mImpl->GetTextDirection();
 }
 
 Toolkit::DevelText::VerticalLineAlignment::Type Controller::GetVerticalLineAlignment() const
@@ -1337,11 +1284,6 @@ void Controller::SelectEvent(float x, float y, SelectionType selectType)
   EventHandler::SelectEvent(*this, x, y, selectType);
 }
 
-void Controller::SelectEvent(const uint32_t start, const uint32_t end, SelectionType selectType)
-{
-  EventHandler::SelectEvent(*this, start, end, selectType);
-}
-
 void Controller::SetTextSelectionRange(const uint32_t* start, const uint32_t* end)
 {
   if(mImpl->mEventData)
@@ -1351,7 +1293,7 @@ void Controller::SetTextSelectionRange(const uint32_t* start, const uint32_t* en
     mImpl->mEventData->mIsRightHandleSelected = true;
     mImpl->SetTextSelectionRange(start, end);
     mImpl->RequestRelayout();
-    KeyboardFocusGainEvent();
+    EventHandler::KeyboardFocusGainEvent(*this);
   }
 }
 
@@ -1375,7 +1317,7 @@ bool Controller::SetPrimaryCursorPosition(CharacterIndex index, bool focused)
     mImpl->mEventData->mCheckScrollAmount     = true;
     if(mImpl->SetPrimaryCursorPosition(index, focused) && focused)
     {
-      KeyboardFocusGainEvent();
+      EventHandler::KeyboardFocusGainEvent(*this);
       return true;
     }
   }
@@ -1384,75 +1326,32 @@ bool Controller::SetPrimaryCursorPosition(CharacterIndex index, bool focused)
 
 void Controller::SelectWholeText()
 {
-  SelectEvent(0.f, 0.f, SelectionType::ALL);
+  EventHandler::SelectEvent(*this, 0.f, 0.f, SelectionType::ALL);
 }
 
 void Controller::SelectNone()
 {
-  SelectEvent(0.f, 0.f, SelectionType::NONE);
+  EventHandler::SelectEvent(*this, 0.f, 0.f, SelectionType::NONE);
 }
 
 void Controller::SelectText(const uint32_t start, const uint32_t end)
 {
-  SelectEvent(start, end, SelectionType::RANGE);
+  EventHandler::SelectEvent(*this, start, end, SelectionType::RANGE);
 }
 
 string Controller::GetSelectedText() const
 {
-  string text;
-  if(EventData::SELECTING == mImpl->mEventData->mState)
-  {
-    mImpl->RetrieveSelection(text, false);
-  }
-  return text;
+  return mImpl->GetSelectedText();
 }
 
 string Controller::CopyText()
 {
-  string text;
-  mImpl->RetrieveSelection(text, false);
-  mImpl->SendSelectionToClipboard(false); // Text not modified
-
-  mImpl->mEventData->mUpdateCursorPosition = true;
-
-  mImpl->RequestRelayout(); // Cursor, Handles, Selection Highlight, Popup
-
-  return text;
+  return mImpl->CopyText();
 }
 
 string Controller::CutText()
 {
-  string text;
-  mImpl->RetrieveSelection(text, false);
-
-  if(!IsEditable())
-  {
-    return EMPTY_STRING;
-  }
-
-  mImpl->SendSelectionToClipboard(true); // Synchronous call to modify text
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-
-  if((0u != mImpl->mModel->mLogicalModel->mText.Count()) ||
-     !mImpl->IsPlaceholderAvailable())
-  {
-    mImpl->QueueModifyEvent(ModifyEvent::TEXT_DELETED);
-  }
-  else
-  {
-    ShowPlaceholderText();
-  }
-
-  mImpl->mEventData->mUpdateCursorPosition = true;
-  mImpl->mEventData->mScrollAfterDelete    = true;
-
-  mImpl->RequestRelayout();
-
-  if(nullptr != mImpl->mEditableControlInterface)
-  {
-    mImpl->mEditableControlInterface->TextChanged(true);
-  }
-  return text;
+  return mImpl->CutText();
 }
 
 void Controller::PasteText()
@@ -1527,83 +1426,6 @@ void Controller::DisplayTimeExpired()
   mImpl->RequestRelayout();
 }
 
-void Controller::InsertText(const std::string& text, Controller::InsertType type)
-{
-  TextUpdater::InsertText(*this, text, type);
-}
-
-void Controller::PasteText(const std::string& stringToPaste)
-{
-  TextUpdater::PasteText(*this, stringToPaste);
-}
-
-bool Controller::RemoveText(int cursorOffset, int numberOfCharacters, UpdateInputStyleType type)
-{
-  return TextUpdater::RemoveText(*this, cursorOffset, numberOfCharacters, type);
-}
-
-bool Controller::RemoveSelectedText()
-{
-  return TextUpdater::RemoveSelectedText(*this);
-}
-
-void Controller::InsertTextAnchor(int numberOfCharacters, CharacterIndex previousCursorIndex)
-{
-  TextUpdater::InsertTextAnchor(*this, numberOfCharacters, previousCursorIndex);
-}
-
-void Controller::RemoveTextAnchor(int cursorOffset, int numberOfCharacters, CharacterIndex previousCursorIndex)
-{
-  TextUpdater::RemoveTextAnchor(*this, cursorOffset, numberOfCharacters, previousCursorIndex);
-}
-
-bool Controller::DoRelayout(const Size& size, OperationsMask operationsRequired, Size& layoutSize)
-{
-  return Relayouter::DoRelayout(*this, size, operationsRequired, layoutSize);
-}
-
-void Controller::CalculateVerticalOffset(const Size& controlSize)
-{
-  Relayouter::CalculateVerticalOffset(*this, controlSize);
-}
-
-void Controller::ProcessModifyEvents()
-{
-  EventHandler::ProcessModifyEvents(*this);
-}
-
-void Controller::TextReplacedEvent()
-{
-  EventHandler::TextReplacedEvent(*this);
-}
-
-void Controller::TextInsertedEvent()
-{
-  EventHandler::TextInsertedEvent(*this);
-}
-
-void Controller::TextDeletedEvent()
-{
-  EventHandler::TextDeletedEvent(*this);
-}
-
-bool Controller::DeleteEvent(int keyCode)
-{
-  return EventHandler::DeleteEvent(*this, keyCode);
-}
-
-// private : Helpers.
-
-void Controller::ResetText()
-{
-  TextUpdater::ResetText(*this);
-}
-
-void Controller::ShowPlaceholderText()
-{
-  PlaceholderHandler::ShowPlaceholderText(*this);
-}
-
 void Controller::ResetCursorPosition(CharacterIndex cursorIndex)
 {
   // Reset the cursor position
@@ -1641,7 +1463,7 @@ bool Controller::ShouldClearFocusOnEscape() const
 
 Actor Controller::CreateBackgroundActor()
 {
-  return mImpl->CreateBackgroundActor();
+  return CreateControllerBackgroundActor(mImpl->mView, mImpl->mModel->mVisualModel, mImpl->mShaderBackground);
 }
 
 void Controller::GetAnchorActors(std::vector<Toolkit::TextAnchor>& anchorActors)

@@ -524,6 +524,13 @@ struct Controller::Impl
   Length GetNumberOfWhiteSpaces(CharacterIndex index) const;
 
   /**
+   * @brief Retrieve any text previously set.
+   *
+   * @param[out] text A string of UTF-8 characters.
+   */
+  void GetText(std::string& text) const;
+
+  /**
    * @brief Retrieve any text previously set starting from the given @p index.
    *
    * @param[in] index The character index from where to retrieve the text.
@@ -549,6 +556,12 @@ struct Controller::Impl
    * @copydoc Controller::GetLayoutDirection()
    */
   Dali::LayoutDirection::Type GetLayoutDirection(Dali::Actor& actor) const;
+
+  /**
+   * @brief Checks text direction.
+   * @return The text direction.
+   */
+  Toolkit::DevelText::TextDirection::Type GetTextDirection();
 
   /**
    * @brief Calculates the start character index of the first paragraph to be updated and
@@ -614,6 +627,21 @@ struct Controller::Impl
    * @copydoc Text::Controller::SetPrimaryCursorPosition()
    */
   bool SetPrimaryCursorPosition(CharacterIndex index, bool focused);
+
+  /**
+   * @copydoc Text::SelectableControlInterface::GetSelectedText()
+   */
+  string GetSelectedText();
+
+  /**
+   * @copydoc Text::EditableControlInterface::CopyText()
+   */
+  string CopyText();
+
+  /**
+   * @copydoc Text::EditableControlInterface::CutText()
+   */
+  string CutText();
 
   /**
    * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
@@ -754,13 +782,6 @@ struct Controller::Impl
    * @brief Scrolls the text to make primary cursor visible.
    */
   void ScrollTextToMatchCursor();
-
-  /**
-   * @brief Create an actor that renders the text background color
-   *
-   * @return the created actor or an empty handle if no background color needs to be rendered.
-   */
-  Actor CreateBackgroundActor();
 
   /**
    * @brief fill needed relayout parameters when line size is changed & request relayout.
