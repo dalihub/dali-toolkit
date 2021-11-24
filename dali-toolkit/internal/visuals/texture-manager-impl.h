@@ -75,9 +75,10 @@ public:
    */
   enum class StorageType : uint8_t
   {
-    KEEP_PIXEL_BUFFER,
-    RETURN_PIXEL_BUFFER,
-    UPLOAD_TO_TEXTURE
+    KEEP_PIXEL_BUFFER,    ///< Keep loaded pixel buffer inside of texture manager without making texture. This could be used for inside pixel process like mask image.
+    RETURN_PIXEL_BUFFER,  ///< Return loaded pixel buffer without making texture.
+                          ///  Because a pixel buffer cannot be used multiple texture, this pixel buffer only cached during loading, and is removed after loading is finished.
+    UPLOAD_TO_TEXTURE     ///< Loaded image will be uploaded to texture and the texture will be returned.
   };
 
   /**
@@ -177,7 +178,6 @@ public:
    *
    * @return                          The texture set containing the frame of animated image, or empty if still loading.
    */
-
   TextureSet LoadAnimatedImageTexture(Dali::AnimatedImageLoading animatedImageLoading,
                                       uint32_t                   frameIndex,
                                       Dali::SamplingMode::Type   samplingMode,
@@ -206,7 +206,6 @@ public:
    *
    * @return                          The pixel buffer containing the image, or empty if still loading.
    */
-
   Devel::PixelBuffer LoadPixelBuffer(const VisualUrl&                url,
                                      Dali::ImageDimensions           desiredSize,
                                      Dali::FittingMode::Type         fittingMode,
@@ -253,7 +252,6 @@ public:
    *
    * @return                          The texture set containing the image, or empty if still loading.
    */
-
   TextureSet LoadTexture(const VisualUrl&             url,
                          Dali::ImageDimensions        desiredSize,
                          Dali::FittingMode::Type      fittingMode,
@@ -293,6 +291,7 @@ public:
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
    * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
    * @param[in,out] preMultiplyOnLoad     True if the image color should be multiplied by it's alpha. Set to false if the image has no alpha channel
+   * @param[in] synchronousLoading    true if the frame should be loaded synchronously
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoad(const VisualUrl&             url,
@@ -303,7 +302,8 @@ public:
                         TextureUploadObserver*       observer,
                         bool                         orientationCorrection,
                         TextureManager::ReloadPolicy reloadPolicy,
-                        MultiplyOnLoad&              preMultiplyOnLoad);
+                        MultiplyOnLoad&              preMultiplyOnLoad,
+                        bool                         synchronousLoading = false);
 
   /**
    * @brief Requests an image load of the given URL, when the texture has
@@ -335,6 +335,7 @@ public:
    * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
    * @param[in] preMultiplyOnLoad     True if the image color should be multiplied by it's alpha. Set to false if the
    *                                  image has no alpha channel
+   * @param[in] synchronousLoading    true if the frame should be loaded synchronously
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoad(const VisualUrl&             url,
@@ -348,13 +349,15 @@ public:
                         TextureUploadObserver*       observer,
                         bool                         orientationCorrection,
                         TextureManager::ReloadPolicy reloadPolicy,
-                        MultiplyOnLoad&              preMultiplyOnLoad);
+                        MultiplyOnLoad&              preMultiplyOnLoad,
+                        bool                         synchronousLoading = false);
 
   /**
    * Requests a masking image to be loaded. This mask is not uploaded to GL,
    * instead, it is stored in CPU memory, and can be used for CPU blending.
    */
-  TextureId RequestMaskLoad(const VisualUrl& maskUrl);
+  TextureId RequestMaskLoad(const VisualUrl& maskUrl,
+                            bool             synchronousLoading = false);
 
   /**
    * @brief Remove a Texture from the TextureManager.
@@ -492,6 +495,7 @@ private:
    *                                  there is no alpha
    * @param[in] animatedImageLoading  The AnimatedImageLoading to load animated image
    * @param[in] frameIndex            The frame index of a frame to be loaded frame
+   * @param[in] synchronousLoading    true if the frame should be loaded synchronously
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoadInternal(
@@ -509,7 +513,8 @@ private:
     TextureManager::ReloadPolicy reloadPolicy,
     MultiplyOnLoad&              preMultiplyOnLoad,
     Dali::AnimatedImageLoading   animatedImageLoading,
-    uint32_t                     frameIndex);
+    uint32_t                     frameIndex,
+    bool                         synchronousLoading);
 
   /**
    * @brief Get the current state of a texture
@@ -518,6 +523,23 @@ private:
    * is not valid.
    */
   LoadState GetTextureStateInternal(TextureId textureId);
+
+  /**
+   * @brief Load a new image synchronously.
+   * @param[in] url                   The URL of the image to load
+   * @param[in] desiredSize           The size the image is likely to appear at.
+   *                                  This can be set to 0,0 for automatic
+   * @param[in] fittingMode           The FittingMode to use
+   * @param[in] samplingMode          The SamplingMode to use
+   * @param[in] orientationCorrection Whether to use image metadata to rotate or flip the image,
+   *                                  e.g., from portrait to landscape
+   * @return PixelBuffer of loaded image.
+   */
+  Devel::PixelBuffer LoadImageSynchronously(const VisualUrl&         url,
+                                            const ImageDimensions    desiredSize,
+                                            FittingMode::Type        fittingMode,
+                                            Dali::SamplingMode::Type samplingMode,
+                                            bool                     orientationCorrection);
 
   typedef size_t TextureHash; ///< The type used to store the hash used for Texture caching.
 
