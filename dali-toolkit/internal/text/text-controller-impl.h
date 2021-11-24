@@ -356,8 +356,9 @@ struct Controller::Impl
     mTextFitMinSize(DEFAULT_TEXTFIT_MIN),
     mTextFitMaxSize(DEFAULT_TEXTFIT_MAX),
     mTextFitStepSize(DEFAULT_TEXTFIT_STEP),
-    mTextFitEnabled(false),
     mFontSizeScale(DEFAULT_FONT_SIZE_SCALE),
+    mTextFitEnabled(false),
+    mTextFitChanged(false),
     mIsLayoutDirectionChanged(false)
   {
     mModel = Model::New();
@@ -953,9 +954,9 @@ public:
   float mTextFitMinSize;               ///< Minimum Font Size for text fit. Default 10
   float mTextFitMaxSize;               ///< Maximum Font Size for text fit. Default 100
   float mTextFitStepSize;              ///< Step Size for font intervalse. Default 1
-  bool  mTextFitEnabled : 1;           ///< Whether the text's fit is enabled.
-  float mTextFitChanged;               ///< Whether the text fit property has changed.
   float mFontSizeScale;                ///< Scale value for Font Size. Default 1.0
+  bool  mTextFitEnabled : 1;           ///< Whether the text's fit is enabled.
+  bool  mTextFitChanged : 1;           ///< Whether the text fit property has changed.
   bool  mIsLayoutDirectionChanged : 1; ///< Whether the layout has changed.
 
 private:
