@@ -193,7 +193,7 @@ void AppendAccessibilityRelation(Dali::Actor control, Actor destination, Dali::A
     auto object = controlDataImpl->GetAccessibilityObject(destination);
     if(object)
     {
-      controlDataImpl->mAccessibilityRelations[index].push_back(object->GetAddress());
+      controlDataImpl->mAccessibilityRelations[index].push_back(object);
     }
   }
 }
@@ -215,15 +215,14 @@ void RemoveAccessibilityRelation(Dali::Actor control, Actor destination, Dali::A
       return;
     }
 
-    auto address = object->GetAddress();
-
     auto& targets = controlDataImpl->mAccessibilityRelations[index];
     for(auto i = 0u; i < targets.size(); ++i)
     {
-      if(targets[i].ToString() == address.ToString())
+      if(targets[i] == object)
       {
-        targets[i] = targets.back();
-        targets.erase(targets.end() - 1);
+        std::swap(targets[i], targets.back());
+        targets.pop_back();
+        --i;
       }
     }
   }
@@ -233,8 +232,23 @@ std::vector<std::vector<Accessibility::Address>> GetAccessibilityRelations(Dali:
 {
   if(auto controlDataImpl = GetControlImplementation(control))
   {
-    return controlDataImpl->mAccessibilityRelations;
+    auto& relations = controlDataImpl->mAccessibilityRelations;
+
+    std::vector<std::vector<Accessibility::Address>> result(relations.size());
+
+    // Map every Accessible* to its Address
+    for(std::size_t i = 0; i < relations.size(); ++i)
+    {
+      auto& relation = relations[i];
+
+      std::transform(relation.begin(), relation.end(), std::back_inserter(result[i]), [](auto* x) {
+        return x->GetAddress();
+      });
+    }
+
+    return result;
   }
+
   return {};
 }
 

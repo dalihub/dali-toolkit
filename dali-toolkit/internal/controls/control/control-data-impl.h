@@ -546,7 +546,7 @@ public:
 
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
-  std::vector<std::vector<Accessibility::Address>>                       mAccessibilityRelations;
+  std::vector<std::vector<Accessibility::Accessible*>>                   mAccessibilityRelations;
   std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)> mAccessibilityConstructor;
   std::unique_ptr<Dali::Accessibility::Accessible>                       mAccessibilityObject;
 
