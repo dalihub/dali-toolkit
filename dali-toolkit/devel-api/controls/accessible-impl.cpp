@@ -536,12 +536,23 @@ std::vector<Dali::Accessibility::Relation> AccessibleImpl::GetRelationSet()
 
   std::vector<Dali::Accessibility::Relation> ret;
 
-  auto& relation = controlImpl.mAccessibilityRelations;
-  for(auto i = 0u; i < relation.size(); ++i)
+  auto& relations = controlImpl.mAccessibilityRelations;
+  for(auto i = 0u; i < relations.size(); ++i)
   {
-    if(relation[i].empty()) continue;
+    auto& relation = relations[i];
 
-    ret.emplace_back(Accessibility::Relation{static_cast<Accessibility::RelationType>(i), relation[i]});
+    if(relation.empty())
+    {
+      continue;
+    }
+
+    // Map every Accessible* to its Address
+    std::vector<Accessibility::Address> targets;
+    std::transform(relation.begin(), relation.end(), std::back_inserter(targets), [](auto* x) {
+      return x->GetAddress();
+    });
+
+    ret.emplace_back(Accessibility::Relation{static_cast<Accessibility::RelationType>(i), std::move(targets)});
   }
 
   return ret;
