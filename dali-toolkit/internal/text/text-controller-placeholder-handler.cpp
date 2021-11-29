@@ -61,7 +61,7 @@ void Controller::PlaceholderHandler::SetPlaceholderTextElideEnabled(Controller& 
   if(controller.mImpl->IsShowingPlaceholderText() ||
      (0u == controller.mImpl->mModel->mLogicalModel->mText.Count()))
   {
-    controller.ShowPlaceholderText();
+    ShowPlaceholderText(*controller.mImpl);
   }
 }
 
@@ -87,7 +87,7 @@ void Controller::PlaceholderHandler::SetPlaceholderText(Controller& controller, 
     if(controller.mImpl->IsShowingPlaceholderText() ||
        (0u == controller.mImpl->mModel->mLogicalModel->mText.Count()))
     {
-      controller.ShowPlaceholderText();
+      ShowPlaceholderText(*controller.mImpl);
     }
   }
 }
@@ -443,10 +443,8 @@ void Controller::PlaceholderHandler::GetPlaceholderProperty(Controller& controll
   }
 }
 
-void Controller::PlaceholderHandler::ShowPlaceholderText(Controller& controller)
+void Controller::PlaceholderHandler::ShowPlaceholderText(Controller::Impl& impl)
 {
-  Controller::Impl& impl = *controller.mImpl;
-
   if(impl.IsPlaceholderAvailable())
   {
     EventData*& eventData = impl.mEventData;

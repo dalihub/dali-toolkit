@@ -26,6 +26,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
+#include <dali-toolkit/internal/text/text-controller-placeholder-handler.h>
+#include <dali-toolkit/internal/text/text-controller-text-updater.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 namespace
@@ -66,7 +68,7 @@ void Controller::EventHandler::KeyboardFocusGainEvent(Controller& controller)
     if(controller.mImpl->IsShowingPlaceholderText())
     {
       // Show alternative placeholder-text when editing
-      controller.ShowPlaceholderText();
+      PlaceholderHandler::ShowPlaceholderText(*controller.mImpl);
     }
 
     controller.mImpl->RequestRelayout();
@@ -102,7 +104,7 @@ void Controller::EventHandler::KeyboardFocusLostEvent(Controller& controller)
       if(!controller.mImpl->IsShowingRealText())
       {
         // Revert to regular placeholder-text when not editing
-        controller.ShowPlaceholderText();
+        PlaceholderHandler::ShowPlaceholderText(*controller.mImpl);
       }
     }
   }
@@ -237,7 +239,7 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
     else if((Dali::DALI_KEY_BACKSPACE == keyCode) ||
             (Dali::DevelKey::DALI_KEY_DELETE == keyCode))
     {
-      textChanged = controller.DeleteEvent(keyCode);
+      textChanged = DeleteEvent(controller, keyCode);
 
       // Will request for relayout.
       relayoutNeeded = true;
@@ -302,7 +304,7 @@ bool Controller::EventHandler::KeyEvent(Controller& controller, const Dali::KeyE
         // InputMethodContext is no longer handling key-events
         controller.mImpl->ClearPreEditFlag();
 
-        controller.InsertText(refinedKey, COMMIT);
+        TextUpdater::InsertText(controller, refinedKey, COMMIT);
 
         textChanged = true;
 
@@ -419,7 +421,7 @@ void Controller::EventHandler::TapEvent(Controller& controller, unsigned int tap
         if(controller.mImpl->IsShowingPlaceholderText() && !controller.mImpl->IsFocusedPlaceholderAvailable())
         {
           // Hide placeholder text
-          controller.ResetText();
+          TextUpdater::ResetText(controller);
         }
 
         if(EventData::INACTIVE == state)
@@ -598,18 +600,18 @@ void Controller::EventHandler::ProcessModifyEvents(Controller& controller)
       // A (single) replace event should come first, otherwise we wasted time processing NOOP events
       DALI_ASSERT_DEBUG(it == events.Begin() && "Unexpected TEXT_REPLACED event");
 
-      controller.TextReplacedEvent();
+      TextReplacedEvent(controller);
     }
     else if(ModifyEvent::TEXT_INSERTED == event.type)
     {
-      controller.TextInsertedEvent();
+      TextInsertedEvent(controller);
     }
     else if(ModifyEvent::TEXT_DELETED == event.type)
     {
       // Placeholder-text cannot be deleted
       if(!controller.mImpl->IsShowingPlaceholderText())
       {
-        controller.TextDeletedEvent();
+        TextDeletedEvent(controller);
       }
     }
   }
@@ -711,22 +713,18 @@ bool Controller::EventHandler::DeleteEvent(Controller& controller, int keyCode)
 
   if(EventData::SELECTING == controller.mImpl->mEventData->mState)
   {
-    removed = controller.RemoveSelectedText();
+    removed = TextUpdater::RemoveSelectedText(controller);
   }
   else if((controller.mImpl->mEventData->mPrimaryCursorPosition > 0) && (keyCode == Dali::DALI_KEY_BACKSPACE))
   {
     // Remove the character before the current cursor position
-    removed = controller.RemoveText(-1,
-                                    1,
-                                    UPDATE_INPUT_STYLE);
+    removed = TextUpdater::RemoveText(controller, -1, 1, UPDATE_INPUT_STYLE);
   }
   else if((controller.mImpl->mEventData->mPrimaryCursorPosition < controller.mImpl->mModel->mLogicalModel->mText.Count()) &&
           (keyCode == Dali::DevelKey::DALI_KEY_DELETE))
   {
     // Remove the character after the current cursor position
-    removed = controller.RemoveText(0,
-                                    1,
-                                    UPDATE_INPUT_STYLE);
+    removed = TextUpdater::RemoveText(controller, 0, 1, UPDATE_INPUT_STYLE);
   }
 
   if(removed)
@@ -738,7 +736,7 @@ bool Controller::EventHandler::DeleteEvent(Controller& controller, int keyCode)
     }
     else
     {
-      controller.ShowPlaceholderText();
+      PlaceholderHandler::ShowPlaceholderText(*controller.mImpl);
     }
     controller.mImpl->mEventData->mUpdateCursorPosition = true;
     controller.mImpl->mEventData->mScrollAfterDelete    = true;
@@ -760,23 +758,24 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
   {
     case InputMethodContext::COMMIT:
     {
-      controller.InsertText(inputMethodContextEvent.predictiveString, Text::Controller::COMMIT);
+      TextUpdater::InsertText(controller, inputMethodContextEvent.predictiveString, Text::Controller::COMMIT);
       requestRelayout = true;
       retrieveCursor  = true;
       break;
     }
     case InputMethodContext::PRE_EDIT:
     {
-      controller.InsertText(inputMethodContextEvent.predictiveString, Text::Controller::PRE_EDIT);
+      TextUpdater::InsertText(controller, inputMethodContextEvent.predictiveString, Text::Controller::PRE_EDIT);
       requestRelayout = true;
       retrieveCursor  = true;
       break;
     }
     case InputMethodContext::DELETE_SURROUNDING:
     {
-      const bool textDeleted = controller.RemoveText(inputMethodContextEvent.cursorOffset,
-                                                     inputMethodContextEvent.numberOfChars,
-                                                     DONT_UPDATE_INPUT_STYLE);
+      const bool textDeleted = TextUpdater::RemoveText(controller,
+                                                       inputMethodContextEvent.cursorOffset,
+                                                       inputMethodContextEvent.numberOfChars,
+                                                       DONT_UPDATE_INPUT_STYLE);
 
       if(textDeleted)
       {
@@ -787,7 +786,7 @@ InputMethodContext::CallbackData Controller::EventHandler::OnInputMethodContextE
         }
         else
         {
-          controller.ShowPlaceholderText();
+          PlaceholderHandler::ShowPlaceholderText(*controller.mImpl);
         }
         controller.mImpl->mEventData->mUpdateCursorPosition = true;
         controller.mImpl->mEventData->mScrollAfterDelete    = true;
@@ -882,7 +881,7 @@ void Controller::EventHandler::PasteClipboardItemEvent(Controller& controller)
   controller.mImpl->SetClipboardHideEnable(false);
 
   // Paste
-  controller.PasteText(stringToPaste);
+  TextUpdater::PasteText(controller, stringToPaste);
 
   controller.mImpl->SetClipboardHideEnable(true);
 }
@@ -972,14 +971,14 @@ void Controller::EventHandler::TextPopupButtonTouched(Controller& controller, Da
       if(controller.mImpl->mEventData->mSelectionEnabled)
       {
         // Creates a SELECT event.
-        controller.SelectEvent(currentCursorPosition.x, currentCursorPosition.y, SelectionType::INTERACTIVE);
+        SelectEvent(controller, currentCursorPosition.x, currentCursorPosition.y, SelectionType::INTERACTIVE);
       }
       break;
     }
     case Toolkit::TextSelectionPopup::SELECT_ALL:
     {
       // Creates a SELECT_ALL event
-      controller.SelectEvent(0.f, 0.f, SelectionType::ALL);
+      SelectEvent(controller, 0.f, 0.f, SelectionType::ALL);
       break;
     }
     case Toolkit::TextSelectionPopup::CLIPBOARD:

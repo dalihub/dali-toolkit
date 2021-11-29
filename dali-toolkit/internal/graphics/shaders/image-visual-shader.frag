@@ -233,19 +233,24 @@ void main()
   if(abs(vPosition.x) < vOptRectSize.x && abs(vPosition.y) < vOptRectSize.y)
   {
     OUT_COLOR = textureColor;
-    return;
   }
-  PreprocessPotential();
+  else
+  {
+    PreprocessPotential();
 #endif
 
 #if IS_REQUIRED_BORDERLINE
-  textureColor = convertBorderlineColor(textureColor);
+    textureColor = convertBorderlineColor(textureColor);
 #endif
-  OUT_COLOR = textureColor;
+    OUT_COLOR = textureColor;
 
 #if IS_REQUIRED_ROUNDED_CORNER
-  mediump float opacity = calculateCornerOpacity();
-  OUT_COLOR.a *= opacity;
-  OUT_COLOR.rgb *= mix(1.0, opacity, preMultipliedAlpha);
+    mediump float opacity = calculateCornerOpacity();
+    OUT_COLOR.a *= opacity;
+    OUT_COLOR.rgb *= mix(1.0, opacity, preMultipliedAlpha);
+#endif
+
+#if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
+  }
 #endif
 }

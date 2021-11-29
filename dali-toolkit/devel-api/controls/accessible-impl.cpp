@@ -36,7 +36,8 @@
 
 namespace Dali::Toolkit::DevelControl
 {
-
+namespace
+{
 static std::string GetLocaleText(std::string string, const char *domain = "dali-toolkit")
 {
 #ifdef DGETTEXT_ENABLED
@@ -47,6 +48,23 @@ static std::string GetLocaleText(std::string string, const char *domain = "dali-
     return string;
 #endif
 }
+
+static Dali::Actor CreateHighlightIndicatorActor()
+{
+  std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
+  focusBorderImagePath += "/keyboard_focus.9.png";
+
+  // Create the default if it hasn't been set and one that's shared by all the
+  // keyboard focusable actors
+  auto actor = Toolkit::ImageView::New(focusBorderImagePath);
+  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+
+  DevelControl::AppendAccessibilityAttribute(actor, "highlight", std::string());
+  actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
+
+  return actor;
+}
+} // unnamed namespace
 
 AccessibleImpl::AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal)
 : mSelf(self),
@@ -203,7 +221,7 @@ std::string AccessibleImpl::GetLocalizedRoleName()
 bool AccessibleImpl::IsShowing()
 {
   Dali::Actor self = Self();
-  if(self.GetProperty(Dali::DevelActor::Property::CULLED).Get<bool>() || !self.GetCurrentProperty<bool>(Actor::Property::VISIBLE))
+  if(!self.GetProperty<bool>(Actor::Property::VISIBLE) || self.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a == 0 || self.GetProperty<bool>(Dali::DevelActor::Property::CULLED))
   {
     return false;
   }
@@ -219,6 +237,10 @@ bool AccessibleImpl::IsShowing()
   while(parent)
   {
     auto control      = Dali::Toolkit::Control::DownCast(parent->Self());
+    if(!control.GetProperty<bool>(Actor::Property::VISIBLE))
+    {
+      return false;
+    }
     auto clipMode     = control.GetProperty(Actor::Property::CLIPPING_MODE).Get<bool>();
     auto parentExtent = parent->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
     if ((clipMode != ClippingMode::DISABLED) && !parentExtent.Intersects(childExtent))
@@ -250,7 +272,7 @@ Dali::Accessibility::States AccessibleImpl::CalculateStates()
   state[Dali::Accessibility::State::HIGHLIGHTED] = GetCurrentlyHighlightedActor() == self;
   state[Dali::Accessibility::State::ENABLED]     = true;
   state[Dali::Accessibility::State::SENSITIVE]   = true;
-  state[Dali::Accessibility::State::VISIBLE]     = true;
+  state[Dali::Accessibility::State::VISIBLE]     = self.GetProperty<bool>(Actor::Property::VISIBLE);
 
   if(mIsModal)
   {
@@ -333,22 +355,6 @@ double AccessibleImpl::GetAlpha()
 bool AccessibleImpl::GrabFocus()
 {
   return Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self());
-}
-
-static Dali::Actor CreateHighlightIndicatorActor()
-{
-  std::string focusBorderImagePath(AssetManager::GetDaliImagePath());
-  focusBorderImagePath += "/keyboard_focus.9.png";
-
-  // Create the default if it hasn't been set and one that's shared by all the
-  // keyboard focusable actors
-  auto actor = Toolkit::ImageView::New(focusBorderImagePath);
-  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-
-  DevelControl::AppendAccessibilityAttribute(actor, "highlight", std::string());
-  actor.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, false);
-
-  return actor;
 }
 
 void AccessibleImpl::ScrollToSelf()
@@ -530,12 +536,23 @@ std::vector<Dali::Accessibility::Relation> AccessibleImpl::GetRelationSet()
 
   std::vector<Dali::Accessibility::Relation> ret;
 
-  auto& relation = controlImpl.mAccessibilityRelations;
-  for(auto i = 0u; i < relation.size(); ++i)
+  auto& relations = controlImpl.mAccessibilityRelations;
+  for(auto i = 0u; i < relations.size(); ++i)
   {
-    if(relation[i].empty()) continue;
+    auto& relation = relations[i];
 
-    ret.emplace_back(Accessibility::Relation{static_cast<Accessibility::RelationType>(i), relation[i]});
+    if(relation.empty())
+    {
+      continue;
+    }
+
+    // Map every Accessible* to its Address
+    std::vector<Accessibility::Address> targets;
+    std::transform(relation.begin(), relation.end(), std::back_inserter(targets), [](auto* x) {
+      return x->GetAddress();
+    });
+
+    ret.emplace_back(Accessibility::Relation{static_cast<Accessibility::RelationType>(i), std::move(targets)});
   }
 
   return ret;

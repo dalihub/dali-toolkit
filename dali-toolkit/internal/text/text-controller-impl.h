@@ -356,8 +356,9 @@ struct Controller::Impl
     mTextFitMinSize(DEFAULT_TEXTFIT_MIN),
     mTextFitMaxSize(DEFAULT_TEXTFIT_MAX),
     mTextFitStepSize(DEFAULT_TEXTFIT_STEP),
-    mTextFitEnabled(false),
     mFontSizeScale(DEFAULT_FONT_SIZE_SCALE),
+    mTextFitEnabled(false),
+    mTextFitChanged(false),
     mIsLayoutDirectionChanged(false)
   {
     mModel = Model::New();
@@ -523,6 +524,13 @@ struct Controller::Impl
   Length GetNumberOfWhiteSpaces(CharacterIndex index) const;
 
   /**
+   * @brief Retrieve any text previously set.
+   *
+   * @param[out] text A string of UTF-8 characters.
+   */
+  void GetText(std::string& text) const;
+
+  /**
    * @brief Retrieve any text previously set starting from the given @p index.
    *
    * @param[in] index The character index from where to retrieve the text.
@@ -548,6 +556,12 @@ struct Controller::Impl
    * @copydoc Controller::GetLayoutDirection()
    */
   Dali::LayoutDirection::Type GetLayoutDirection(Dali::Actor& actor) const;
+
+  /**
+   * @brief Checks text direction.
+   * @return The text direction.
+   */
+  Toolkit::DevelText::TextDirection::Type GetTextDirection();
 
   /**
    * @brief Calculates the start character index of the first paragraph to be updated and
@@ -613,6 +627,21 @@ struct Controller::Impl
    * @copydoc Text::Controller::SetPrimaryCursorPosition()
    */
   bool SetPrimaryCursorPosition(CharacterIndex index, bool focused);
+
+  /**
+   * @copydoc Text::SelectableControlInterface::GetSelectedText()
+   */
+  string GetSelectedText();
+
+  /**
+   * @copydoc Text::EditableControlInterface::CopyText()
+   */
+  string CopyText();
+
+  /**
+   * @copydoc Text::EditableControlInterface::CutText()
+   */
+  string CutText();
 
   /**
    * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
@@ -755,13 +784,6 @@ struct Controller::Impl
   void ScrollTextToMatchCursor();
 
   /**
-   * @brief Create an actor that renders the text background color
-   *
-   * @return the created actor or an empty handle if no background color needs to be rendered.
-   */
-  Actor CreateBackgroundActor();
-
-  /**
    * @brief fill needed relayout parameters when line size is changed & request relayout.
    */
   void RelayoutForNewLineSize();
@@ -841,6 +863,49 @@ struct Controller::Impl
    */
   void ResetScrollPosition();
 
+  /**
+   * @brief Resets a provided vector with actors that marks the position of anchors in markup enabled text
+   *
+   * @param[out] anchorActors the vector of actor (empty collection if no anchors available).
+   */
+  void GetAnchorActors(std::vector<Toolkit::TextAnchor>& anchorActors);
+
+  /**
+   * @brief Return an index of first anchor in the anchor vector whose boundaries includes given character offset
+   *
+   * @param[in] characterOffset A position in text coords.
+   *
+   * @return the 0-based index in anchor vector (-1 if an anchor not found)
+   */
+  int32_t GetAnchorIndex(size_t characterOffset) const;
+
+  /**
+   * @brief Return the geometrical position of an anchor relative to the parent origin point.
+   *
+   * @param[in] anchor An anchor.
+   *
+   * @return The x, y, z coordinates of an anchor.
+   */
+  Vector3 GetAnchorPosition(Anchor anchor) const;
+
+  /**
+   * @brief Return the size of an anchor expresed as a vector containing anchor's width and height.
+   *
+   * @param[in] anchor An anchor.
+   *
+   * @return The width and height of an anchor.
+   */
+  Vector2 GetAnchorSize(Anchor anchor) const;
+
+  /**
+   * @brief Return the actor representing an anchor.
+   *
+   * @param[in] anchor An anchor.
+   *
+   * @return The actor representing an anchor.
+   */
+  Toolkit::TextAnchor CreateAnchorActor(Anchor anchor);
+
 public:
   /**
    * @brief Gets implementation from the controller handle.
@@ -910,9 +975,9 @@ public:
   float mTextFitMinSize;               ///< Minimum Font Size for text fit. Default 10
   float mTextFitMaxSize;               ///< Maximum Font Size for text fit. Default 100
   float mTextFitStepSize;              ///< Step Size for font intervalse. Default 1
-  bool  mTextFitEnabled : 1;           ///< Whether the text's fit is enabled.
-  float mTextFitChanged;               ///< Whether the text fit property has changed.
   float mFontSizeScale;                ///< Scale value for Font Size. Default 1.0
+  bool  mTextFitEnabled : 1;           ///< Whether the text's fit is enabled.
+  bool  mTextFitChanged : 1;           ///< Whether the text fit property has changed.
   bool  mIsLayoutDirectionChanged : 1; ///< Whether the layout has changed.
 
 private:

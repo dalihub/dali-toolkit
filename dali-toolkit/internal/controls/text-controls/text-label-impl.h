@@ -198,12 +198,15 @@ private:
    * @brief Emits TextFitChanged signal.
    */
   void EmitTextFitChangedSignal();
+  void OnAccessibilityStatusChanged();
 
 private: // Data
   Text::ControllerPtr   mController;
   Text::TextScrollerPtr mTextScroller;
 
   Toolkit::Visual::Base mVisual;
+
+  std::vector<Toolkit::TextAnchor> mAnchorActors;
 
   // Signals
   Toolkit::DevelTextLabel::AnchorClickedSignalType mAnchorClickedSignal;
@@ -217,7 +220,8 @@ protected:
    * @brief This structure is to connect TextLabel with Accessible functions.
    */
   struct AccessibleImpl : public DevelControl::AccessibleImpl,
-                          public virtual Dali::Accessibility::Text
+                          public virtual Dali::Accessibility::Text,
+                          public virtual Dali::Accessibility::Hypertext
   {
     using DevelControl::AccessibleImpl::AccessibleImpl;
 
@@ -270,6 +274,21 @@ protected:
      * @copydoc Dali::Accessibility::Text::GetNamePropertyIndex()
      */
     Property::Index GetNamePropertyIndex() override;
+
+    /**
+     * @copydoc Dali::Accessibility::Hypertext::GetLink()
+     */
+    Accessibility::Hyperlink* GetLink(int32_t linkIndex) const override;
+
+    /**
+     * @copydoc Dali::Accessibility::Hypertext::GetLinkIndex()
+     */
+    int32_t GetLinkIndex(int32_t characterOffset) const override;
+
+    /**
+     * @copydoc Dali::Accessibility::Hypertext::GetLinkCount()
+     */
+    int32_t GetLinkCount() const override;
   };
 };
 

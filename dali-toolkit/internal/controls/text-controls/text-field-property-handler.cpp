@@ -15,6 +15,7 @@
  */
 
 #include <dali-toolkit/internal/controls/text-controls/text-field-property-handler.h>
+#include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
 
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
@@ -408,6 +409,7 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p ENABLE_MARKUP %d\n", impl.mController.Get(), enableMarkup);
 
       impl.mController->SetMarkupProcessorEnabled(enableMarkup);
+      CommonTextUtils::SynchronizeTextAnchorsInParent(textField, impl.mController, impl.mAnchorActors);
       break;
     }
     case Toolkit::TextField::Property::INPUT_FONT_FAMILY:

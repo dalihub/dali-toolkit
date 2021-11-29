@@ -128,5 +128,16 @@ int UtcDaliAccessibilityCheckShowingState(void)
   states = q->GetStates();
   DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) false, TEST_LOCATION);
 
+  // Make SHOWING parent invisible
+  parentButton.SetProperty(Actor::Property::VISIBLE, false);
+
+  application.SendNotification();
+  application.Render(16);
+
+  q = Dali::Accessibility::Accessible::Get(buttonA);
+  DALI_TEST_CHECK(q);
+  states = q->GetStates();
+  DALI_TEST_EQUALS((int) states[Dali::Accessibility::State::SHOWING], (int) false, TEST_LOCATION);
+
   END_TEST;
 }

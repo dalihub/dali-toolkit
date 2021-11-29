@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
+#include <dali-toolkit/internal/text/text-controller-event-handler.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 
 namespace
@@ -94,7 +95,7 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
   // Store the actual control's size to restore later.
   const Size actualControlSize = visualModel->mControlSize;
 
-  DoRelayout(controller,
+  DoRelayout(impl,
              requestedControllerSize,
              static_cast<OperationsMask>(onlyOnceOperations |
                                          requestedOperationsMask),
@@ -125,7 +126,7 @@ Vector3 Controller::Relayouter::GetNaturalSize(Controller& controller)
   Vector3 naturalSizeVec3;
 
   // Make sure the model is up-to-date before layouting
-  controller.ProcessModifyEvents();
+  EventHandler::ProcessModifyEvents(controller);
 
   Controller::Impl& impl        = *controller.mImpl;
   ModelPtr&         model       = impl.mModel;
@@ -187,7 +188,7 @@ bool Controller::Relayouter::CheckForTextFit(Controller& controller, float point
   // Make sure the model is up-to-date before layouting
   impl.UpdateModel(onlyOnceOperations);
 
-  DoRelayout(controller,
+  DoRelayout(impl,
              Size(layoutSize.width, MAX_FLOAT),
              static_cast<OperationsMask>(onlyOnceOperations | LAYOUT),
              textSize);
@@ -271,7 +272,7 @@ float Controller::Relayouter::GetHeightForWidth(Controller& controller, float wi
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::GetHeightForWidth %p width %f\n", &controller, width);
 
   // Make sure the model is up-to-date before layouting
-  controller.ProcessModifyEvents();
+  EventHandler::ProcessModifyEvents(controller);
 
   Controller::Impl& impl           = *controller.mImpl;
   ModelPtr&         model          = impl.mModel;
@@ -407,12 +408,12 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
   }
 
   // Make sure the model is up-to-date before layouting.
-  controller.ProcessModifyEvents();
+  EventHandler::ProcessModifyEvents(controller);
   bool updated = impl.UpdateModel(operationsPending);
 
   // Layout the text.
   Size layoutSize;
-  updated = DoRelayout(controller, size, operationsPending, layoutSize) || updated;
+  updated = DoRelayout(impl, size, operationsPending, layoutSize) || updated;
 
   if(updated)
   {
@@ -436,7 +437,7 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
   if(!isEditable || !controller.IsMultiLineEnabled())
   {
     // After doing the text layout, the vertical offset to place the actor in the desired position can be calculated.
-    controller.CalculateVerticalOffset(size);
+    CalculateVerticalOffset(controller, size);
   }
 
   if(isEditable)
@@ -464,12 +465,10 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
   return updateTextType;
 }
 
-bool Controller::Relayouter::DoRelayout(Controller& controller, const Size& size, OperationsMask operationsRequired, Size& layoutSize)
+bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size, OperationsMask operationsRequired, Size& layoutSize)
 {
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::DoRelayout %p size %f,%f\n", &controller, size.width, size.height);
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "-->Controller::Relayouter::DoRelayout %p size %f,%f\n", &impl, size.width, size.height);
   bool viewUpdated(false);
-
-  Controller::Impl& impl = *controller.mImpl;
 
   // Calculate the operations to be done.
   const OperationsMask operations = static_cast<OperationsMask>(impl.mOperationsPending & operationsRequired);
@@ -505,7 +504,7 @@ bool Controller::Relayouter::DoRelayout(Controller& controller, const Size& size
        (lastIndex > charactersToGlyph.Count() && charactersToGlyph.Count() > 0u))
     {
       std::string currentText;
-      controller.GetText(currentText);
+      impl.GetText(currentText);
 
       DALI_LOG_ERROR("Controller::DoRelayout: Attempting to access invalid buffer\n");
       DALI_LOG_ERROR("Current text is: %s\n", currentText.c_str());
@@ -636,10 +635,10 @@ bool Controller::Relayouter::DoRelayout(Controller& controller, const Size& size
   }
 #if defined(DEBUG_ENABLED)
   std::string currentText;
-  controller.GetText(currentText);
-  DALI_LOG_INFO(gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mIsTextDirectionRTL[%s] [%s]\n", &controller, (impl.mIsTextDirectionRTL) ? "true" : "false", currentText.c_str());
+  impl.GetText(currentText);
+  DALI_LOG_INFO(gLogFilter, Debug::Concise, "Controller::Relayouter::DoRelayout [%p] mImpl->mIsTextDirectionRTL[%s] [%s]\n", &impl, (impl.mIsTextDirectionRTL) ? "true" : "false", currentText.c_str());
 #endif
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", (viewUpdated ? "true" : "false"));
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::Relayouter::DoRelayout, view updated %s\n", (viewUpdated ? "true" : "false"));
   return viewUpdated;
 }
 

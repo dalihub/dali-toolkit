@@ -21,18 +21,18 @@
 // EXTERNAL INCLUDES
 #include <cmath>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/actors/layer.h>
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller-impl-data-clearer.h>
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
 #include <dali-toolkit/internal/text/text-controller-impl-model-updater.h>
+#include <dali-toolkit/internal/text/text-controller-placeholder-handler.h>
+#include <dali-toolkit/internal/text/text-controller-relayouter.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
@@ -46,17 +46,9 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
-struct BackgroundVertex
-{
-  Vector2 mPosition; ///< Vertex posiiton
-  Vector4 mColor;    ///< Vertex color
-};
+constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
 
-struct BackgroundMesh
-{
-  Vector<BackgroundVertex> mVertices; ///< container of vertices
-  Vector<unsigned short>   mIndices;  ///< container of indices
-};
+const std::string EMPTY_STRING("");
 
 } // namespace
 
@@ -496,6 +488,19 @@ Length Controller::Impl::GetNumberOfWhiteSpaces(CharacterIndex index) const
   return numberOfWhiteSpaces;
 }
 
+void Controller::Impl::GetText(std::string& text) const
+{
+  if(!IsShowingPlaceholderText())
+  {
+    // Retrieves the text string.
+    GetText(0u, text);
+  }
+  else
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Controller::GetText %p empty (but showing placeholder)\n", this);
+  }
+}
+
 void Controller::Impl::GetText(CharacterIndex index, std::string& text) const
 {
   // Get the total number of characters.
@@ -519,6 +524,48 @@ Dali::LayoutDirection::Type Controller::Impl::GetLayoutDirection(Dali::Actor& ac
   {
     return static_cast<Dali::LayoutDirection::Type>(actor.GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
   }
+}
+
+Toolkit::DevelText::TextDirection::Type Controller::Impl::GetTextDirection()
+{
+  if(mUpdateTextDirection)
+  {
+    // Operations that can be done only once until the text changes.
+    const OperationsMask onlyOnceOperations = static_cast<OperationsMask>(CONVERT_TO_UTF32 |
+                                                                          GET_SCRIPTS |
+                                                                          VALIDATE_FONTS |
+                                                                          GET_LINE_BREAKS |
+                                                                          BIDI_INFO |
+                                                                          SHAPE_TEXT |
+                                                                          GET_GLYPH_METRICS);
+
+    // Set the update info to relayout the whole text.
+    mTextUpdateInfo.mParagraphCharacterIndex     = 0u;
+    mTextUpdateInfo.mRequestedNumberOfCharacters = mModel->mLogicalModel->mText.Count();
+
+    // Make sure the model is up-to-date before layouting
+    UpdateModel(onlyOnceOperations);
+
+    Vector3 naturalSize;
+    Relayouter::DoRelayout(*this,
+                           Size(MAX_FLOAT, MAX_FLOAT),
+                           static_cast<OperationsMask>(onlyOnceOperations |
+                                                       LAYOUT | REORDER | UPDATE_DIRECTION),
+                           naturalSize.GetVectorXY());
+
+    // Do not do again the only once operations.
+    mOperationsPending = static_cast<OperationsMask>(mOperationsPending & ~onlyOnceOperations);
+
+    // Clear the update info. This info will be set the next time the text is updated.
+    mTextUpdateInfo.Clear();
+
+    // FullRelayoutNeeded should be true because DoRelayout is MAX_FLOAT, MAX_FLOAT.
+    mTextUpdateInfo.mFullRelayoutNeeded = true;
+
+    mUpdateTextDirection = false;
+  }
+
+  return mIsTextDirectionRTL ? Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT : Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT;
 }
 
 void Controller::Impl::CalculateTextUpdateIndices(Length& numberOfCharacters)
@@ -664,6 +711,64 @@ bool Controller::Impl::SetDefaultLineSize(float lineSize)
     return true;
   }
   return false;
+}
+
+string Controller::Impl::GetSelectedText()
+{
+  string text;
+  if(EventData::SELECTING == mEventData->mState)
+  {
+    RetrieveSelection(text, false);
+  }
+  return text;
+}
+
+string Controller::Impl::CopyText()
+{
+  string text;
+  RetrieveSelection(text, false);
+  SendSelectionToClipboard(false); // Text not modified
+
+  mEventData->mUpdateCursorPosition = true;
+
+  RequestRelayout(); // Cursor, Handles, Selection Highlight, Popup
+
+  return text;
+}
+
+string Controller::Impl::CutText()
+{
+  string text;
+  RetrieveSelection(text, false);
+
+  if(!IsEditable())
+  {
+    return EMPTY_STRING;
+  }
+
+  SendSelectionToClipboard(true); // Synchronous call to modify text
+  mOperationsPending = ALL_OPERATIONS;
+
+  if((0u != mModel->mLogicalModel->mText.Count()) ||
+     !IsPlaceholderAvailable())
+  {
+    QueueModifyEvent(ModifyEvent::TEXT_DELETED);
+  }
+  else
+  {
+    PlaceholderHandler::ShowPlaceholderText(*this);
+  }
+
+  mEventData->mUpdateCursorPosition = true;
+  mEventData->mScrollAfterDelete    = true;
+
+  RequestRelayout();
+
+  if(nullptr != mEditableControlInterface)
+  {
+    mEditableControlInterface->TextChanged(true);
+  }
+  return text;
 }
 
 void Controller::Impl::SetTextSelectionRange(const uint32_t* pStart, const uint32_t* pEnd)
@@ -1357,188 +1462,6 @@ void Controller::Impl::RequestRelayout()
   }
 }
 
-Actor Controller::Impl::CreateBackgroundActor()
-{
-  // NOTE: Currently we only support background color for left-to-right text.
-
-  Actor actor;
-
-  Length numberOfGlyphs = mView.GetNumberOfGlyphs();
-  if(numberOfGlyphs > 0u)
-  {
-    Vector<GlyphInfo> glyphs;
-    glyphs.Resize(numberOfGlyphs);
-
-    Vector<Vector2> positions;
-    positions.Resize(numberOfGlyphs);
-
-    // Get the line where the glyphs are laid-out.
-    const LineRun* lineRun         = mModel->mVisualModel->mLines.Begin();
-    float          alignmentOffset = lineRun->alignmentOffset;
-    numberOfGlyphs                 = mView.GetGlyphs(glyphs.Begin(),
-                                     positions.Begin(),
-                                     alignmentOffset,
-                                     0u,
-                                     numberOfGlyphs);
-
-    glyphs.Resize(numberOfGlyphs);
-    positions.Resize(numberOfGlyphs);
-
-    const GlyphInfo* const glyphsBuffer    = glyphs.Begin();
-    const Vector2* const   positionsBuffer = positions.Begin();
-
-    BackgroundMesh mesh;
-    mesh.mVertices.Reserve(4u * glyphs.Size());
-    mesh.mIndices.Reserve(6u * glyphs.Size());
-
-    const Vector2 textSize = mView.GetLayoutSize();
-
-    const float offsetX = alignmentOffset + textSize.width * 0.5f;
-    const float offsetY = textSize.height * 0.5f;
-
-    const Vector4* const    backgroundColorsBuffer       = mView.GetBackgroundColors();
-    const ColorIndex* const backgroundColorIndicesBuffer = mView.GetBackgroundColorIndices();
-    const Vector4&          defaultBackgroundColor       = mModel->mVisualModel->IsBackgroundEnabled() ? mModel->mVisualModel->GetBackgroundColor() : Color::TRANSPARENT;
-
-    Vector4   quad;
-    uint32_t  numberOfQuads = 0u;
-    Length    yLineOffset   = 0;
-    Length    prevLineIndex = 0;
-    LineIndex lineIndex;
-    Length    numberOfLines;
-
-    for(uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i)
-    {
-      const GlyphInfo& glyph = *(glyphsBuffer + i);
-
-      // Get the background color of the character.
-      // The color index zero is reserved for the default background color (i.e. Color::TRANSPARENT)
-      const bool       isMarkupBackground       = mView.IsMarkupBackgroundColorSet();
-      const ColorIndex backgroundColorIndex     = isMarkupBackground ? *(backgroundColorIndicesBuffer + i) : 0u;
-      const bool       isDefaultBackgroundColor = (0u == backgroundColorIndex);
-      const Vector4&   backgroundColor          = isDefaultBackgroundColor ? defaultBackgroundColor : *(backgroundColorsBuffer + backgroundColorIndex - 1u);
-
-      mModel->mVisualModel->GetNumberOfLines(i, 1, lineIndex, numberOfLines);
-      Length lineHeight = lineRun[lineIndex].ascender + -(lineRun[lineIndex].descender) + lineRun[lineIndex].lineSpacing;
-
-      if(lineIndex != prevLineIndex)
-      {
-        yLineOffset += lineHeight;
-      }
-
-      // Only create quads for glyphs with a background color
-      if(backgroundColor != Color::TRANSPARENT)
-      {
-        const Vector2 position = *(positionsBuffer + i);
-
-        if(i == 0u && glyphSize == 1u) // Only one glyph in the whole text
-        {
-          quad.x = position.x;
-          quad.y = yLineOffset;
-          quad.z = quad.x + std::max(glyph.advance, glyph.xBearing + glyph.width);
-          quad.w = lineHeight;
-        }
-        else if((lineIndex != prevLineIndex) || (i == 0u)) // The first glyph in the line
-        {
-          quad.x = position.x;
-          quad.y = yLineOffset;
-          quad.z = quad.x - glyph.xBearing + glyph.advance;
-          quad.w = quad.y + lineHeight;
-        }
-        else if(i == glyphSize - 1u) // The last glyph in the whole text
-        {
-          quad.x = position.x - glyph.xBearing;
-          quad.y = yLineOffset;
-          quad.z = quad.x + std::max(glyph.advance, glyph.xBearing + glyph.width);
-          quad.w = quad.y + lineHeight;
-        }
-        else // The glyph in the middle of the text
-        {
-          quad.x = position.x - glyph.xBearing;
-          quad.y = yLineOffset;
-          quad.z = quad.x + glyph.advance;
-          quad.w = quad.y + lineHeight;
-        }
-
-        BackgroundVertex vertex;
-
-        // Top left
-        vertex.mPosition.x = quad.x - offsetX;
-        vertex.mPosition.y = quad.y - offsetY;
-        vertex.mColor      = backgroundColor;
-        mesh.mVertices.PushBack(vertex);
-
-        // Top right
-        vertex.mPosition.x = quad.z - offsetX;
-        vertex.mPosition.y = quad.y - offsetY;
-        vertex.mColor      = backgroundColor;
-        mesh.mVertices.PushBack(vertex);
-
-        // Bottom left
-        vertex.mPosition.x = quad.x - offsetX;
-        vertex.mPosition.y = quad.w - offsetY;
-        vertex.mColor      = backgroundColor;
-        mesh.mVertices.PushBack(vertex);
-
-        // Bottom right
-        vertex.mPosition.x = quad.z - offsetX;
-        vertex.mPosition.y = quad.w - offsetY;
-        vertex.mColor      = backgroundColor;
-        mesh.mVertices.PushBack(vertex);
-
-        // Six indices in counter clockwise winding
-        mesh.mIndices.PushBack(1u + 4 * numberOfQuads);
-        mesh.mIndices.PushBack(0u + 4 * numberOfQuads);
-        mesh.mIndices.PushBack(2u + 4 * numberOfQuads);
-        mesh.mIndices.PushBack(2u + 4 * numberOfQuads);
-        mesh.mIndices.PushBack(3u + 4 * numberOfQuads);
-        mesh.mIndices.PushBack(1u + 4 * numberOfQuads);
-
-        numberOfQuads++;
-      }
-
-      if(lineIndex != prevLineIndex)
-      {
-        prevLineIndex = lineIndex;
-      }
-    }
-
-    // Only create the background actor if there are glyphs with background color
-    if(mesh.mVertices.Count() > 0u)
-    {
-      Property::Map quadVertexFormat;
-      quadVertexFormat["aPosition"] = Property::VECTOR2;
-      quadVertexFormat["aColor"]    = Property::VECTOR4;
-
-      VertexBuffer quadVertices = VertexBuffer::New(quadVertexFormat);
-      quadVertices.SetData(&mesh.mVertices[0], mesh.mVertices.Size());
-
-      Geometry quadGeometry = Geometry::New();
-      quadGeometry.AddVertexBuffer(quadVertices);
-      quadGeometry.SetIndexBuffer(&mesh.mIndices[0], mesh.mIndices.Size());
-
-      if(!mShaderBackground)
-      {
-        mShaderBackground = Shader::New(SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_VERT, SHADER_TEXT_CONTROLLER_BACKGROUND_SHADER_FRAG);
-      }
-
-      Dali::Renderer renderer = Dali::Renderer::New(quadGeometry, mShaderBackground);
-      renderer.SetProperty(Dali::Renderer::Property::BLEND_MODE, BlendMode::ON);
-      renderer.SetProperty(Dali::Renderer::Property::DEPTH_INDEX, DepthIndex::CONTENT);
-
-      actor = Actor::New();
-      actor.SetProperty(Dali::Actor::Property::NAME, "TextBackgroundColorActor");
-      actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-      actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-      actor.SetProperty(Actor::Property::SIZE, textSize);
-      actor.SetProperty(Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR);
-      actor.AddRenderer(renderer);
-    }
-  }
-
-  return actor;
-}
-
 void Controller::Impl::RelayoutForNewLineSize()
 {
   // relayout all characters
@@ -1617,6 +1540,60 @@ float Controller::Impl::GetVerticalScrollPosition()
 {
   // Scroll values are negative internally so we convert them to positive numbers
   return mEventData ? -mModel->mScrollPosition.y : 0.0f;
+}
+
+Vector3 Controller::Impl::GetAnchorPosition(Anchor anchor) const
+{
+  //TODO
+  return Vector3(10.f, 10.f, 10.f);
+}
+
+Vector2 Controller::Impl::GetAnchorSize(Anchor anchor) const
+{
+  //TODO
+  return Vector2(10.f, 10.f);
+}
+
+Toolkit::TextAnchor Controller::Impl::CreateAnchorActor(Anchor anchor)
+{
+  auto actor = Toolkit::TextAnchor::New();
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  const Vector3 anchorPosition = GetAnchorPosition(anchor);
+  actor.SetProperty(Actor::Property::POSITION, anchorPosition);
+  const Vector2 anchorSize = GetAnchorSize(anchor);
+  actor.SetProperty(Actor::Property::SIZE, anchorSize);
+  std::string anchorText(mModel->mLogicalModel->mText.Begin() + anchor.startIndex, mModel->mLogicalModel->mText.Begin() + anchor.endIndex);
+  actor.SetProperty(Actor::Property::NAME, anchorText);
+  actor.SetProperty(Toolkit::TextAnchor::Property::URI, std::string(anchor.href));
+  actor.SetProperty(Toolkit::TextAnchor::Property::START_CHARACTER_INDEX, static_cast<int>(anchor.startIndex));
+  actor.SetProperty(Toolkit::TextAnchor::Property::END_CHARACTER_INDEX, static_cast<int>(anchor.endIndex));
+  return actor;
+}
+
+void Controller::Impl::GetAnchorActors(std::vector<Toolkit::TextAnchor>& anchorActors)
+{
+  /* TODO: Now actors are created/destroyed in every "RenderText" function call. Even when we add just 1 character,
+           we need to create and destroy potentially many actors. Some optimization can be considered here.
+           Maybe a "dirty" flag in mLogicalModel? */
+  anchorActors.clear();
+  for(auto& anchor : mModel->mLogicalModel->mAnchors)
+  {
+    auto actor = CreateAnchorActor(anchor);
+    anchorActors.push_back(actor);
+  }
+}
+
+int32_t Controller::Impl::GetAnchorIndex(size_t characterOffset) const
+{
+  Vector<Anchor>::Iterator it = mModel->mLogicalModel->mAnchors.Begin();
+
+  while(it != mModel->mLogicalModel->mAnchors.End() && (it->startIndex > characterOffset || it->endIndex <= characterOffset))
+  {
+    it++;
+  }
+
+  return it == mModel->mLogicalModel->mAnchors.End() ? -1 : it - mModel->mLogicalModel->mAnchors.Begin();
 }
 
 void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns)

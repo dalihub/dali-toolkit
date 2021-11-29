@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
+#include <dali-toolkit/internal/text/text-controller-placeholder-handler.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 namespace
@@ -141,7 +142,7 @@ void Controller::TextUpdater::SetText(Controller& controller, const std::string&
   }
   else
   {
-    controller.ShowPlaceholderText();
+    PlaceholderHandler::ShowPlaceholderText(impl);
   }
 
   unsigned int oldCursorPos = (nullptr != eventData ? eventData->mPrimaryCursorPosition : 0);
@@ -405,7 +406,7 @@ void Controller::TextUpdater::InsertText(Controller& controller, const std::stri
      impl.IsPlaceholderAvailable())
   {
     // Show place-holder if empty after removing the pre-edit text
-    controller.ShowPlaceholderText();
+    PlaceholderHandler::ShowPlaceholderText(impl);
     eventData->mUpdateCursorPosition = true;
     impl.ClearPreEditFlag();
   }
