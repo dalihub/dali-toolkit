@@ -116,13 +116,13 @@ VisualUrl::Type ResolveType(const std::string& url)
     } state                = SUFFIX;
     char         SVG[4]    = {'g', 'v', 's', '.'};
     char         GIF[4]    = {'f', 'i', 'g', '.'};
-    //char         WEBP[5]   = {'p', 'b', 'e', 'w', '.'};
+    char         WEBP[5]   = {'p', 'b', 'e', 'w', '.'};
     char         JSON[5]   = {'n', 'o', 's', 'j', '.'};
     char         TVG[4]    = {'g', 'v', 't', '.'};
     unsigned int svgScore  = 0;
     unsigned int tvgScore  = 0;
     unsigned int gifScore  = 0;
-    //unsigned int webpScore = 0;
+    unsigned int webpScore = 0;
     unsigned int jsonScore = 0;
     int          index     = count;
     while(--index >= 0)
@@ -153,14 +153,14 @@ VisualUrl::Type ResolveType(const std::string& url)
           return VisualUrl::GIF;
         }
       }
-      //if((offsetFromEnd < sizeof(WEBP)) && (currentChar == WEBP[offsetFromEnd]))
-      //{
-      //  // early out if WEBP as can't be used in N patch for now
-      //  if(++webpScore == sizeof(WEBP))
-      //  {
-      //    return VisualUrl::WEBP;
-      //  }
-      //}
+      if((offsetFromEnd < sizeof(WEBP)) && (currentChar == WEBP[offsetFromEnd]))
+      {
+        // early out if WEBP as can't be used in N patch for now
+        if(++webpScore == sizeof(WEBP))
+        {
+          return VisualUrl::WEBP;
+        }
+      }
       if((offsetFromEnd < sizeof(JSON)) && (currentChar == JSON[offsetFromEnd]))
       {
         // early out if JSON as can't be used in N patch for now
