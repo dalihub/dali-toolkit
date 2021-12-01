@@ -25,7 +25,10 @@ void main()
   mediump vec2 stretch  = floor( aPosition * 0.5 );
   mediump vec2 fixedTotal   = uFixed[ 2 ];
 
-  mediump vec4 gridPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );
+  // Scale down if fixedTotal is bigger than visualSize
+  mediump float fixedScaleDownRate = min(1.0, min(size.x / fixedTotal.x, size.y / fixedTotal.y));
+
+  mediump vec4 gridPosition = vec4( fixedFactor * fixedScaleDownRate + ( size - fixedTotal * fixedScaleDownRate ) * stretch, 0.0, 1.0 );
   mediump vec4 vertexPosition = gridPosition;
   vertexPosition.xy -= size * vec2( 0.5, 0.5 );
   vertexPosition.xy += anchorPoint*size + (visualOffset + origin)*uSize.xy;

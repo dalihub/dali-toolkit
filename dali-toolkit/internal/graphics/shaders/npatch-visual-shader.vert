@@ -25,7 +25,10 @@ void main()
   vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;
   vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);
 
-  mediump vec4 gridPosition = vec4( fixedFactor + ( visualSize.xy - fixedTotal ) * stretch / stretchTotal, 0.0, 1.0 );
+  // Scale down if fixedTotal is bigger than visualSize
+  mediump float fixedScaleDownRate = min(1.0, min(visualSize.x / fixedTotal.x, visualSize.y / fixedTotal.y));
+
+  mediump vec4 gridPosition = vec4( fixedFactor * fixedScaleDownRate + ( visualSize.xy - fixedTotal * fixedScaleDownRate ) * stretch / stretchTotal, 0.0, 1.0 );
   mediump vec4 vertexPosition = gridPosition;
   vertexPosition.xy -= visualSize.xy * vec2( 0.5, 0.5 );
   vertexPosition.xy += anchorPoint*visualSize + (visualOffset + origin)*uSize.xy;
