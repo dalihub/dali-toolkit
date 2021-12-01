@@ -80,6 +80,15 @@ namespace Accessibility
           gMoveOutedCalled = true;
           return wr->newReplyMessage(m);
       };
+
+      wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Window", "Activate", MethodType::Method}] =
+      [wr](const MessagePtr &m) -> MessagePtr {
+          return wr->newReplyMessage(m);
+      };
+      wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Window", "Deactivate", MethodType::Method}] =
+      [wr](const MessagePtr &m) -> MessagePtr {
+          return wr->newReplyMessage(m);
+      };
     }
     auto wr = static_cast<TestDBusWrapper*>(DBusWrapper::Installed());
     wr->fromTestChangeProperty("/org/a11y/bus", "org.a11y.Status", "ScreenReaderEnabled", b);

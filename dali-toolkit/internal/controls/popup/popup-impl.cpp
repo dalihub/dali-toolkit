@@ -726,25 +726,16 @@ void Popup::SetDisplayState(Toolkit::Popup::DisplayState displayState)
     return;
   }
 
-  auto* accessible = Dali::Accessibility::Accessible::Get(Self());
-  if(display)
-  {
-    Dali::Accessibility::Bridge::GetCurrentBridge()->AddPopup(accessible);
-    accessible->EmitStateChanged(Dali::Accessibility::State::SHOWING, 1, 0);
-  }
-  else
-  {
-    accessible->EmitStateChanged(Dali::Accessibility::State::SHOWING, 0, 0);
-    Dali::Accessibility::Bridge::GetCurrentBridge()->RemovePopup(accessible);
-  }
-
   // Convert the bool state to the actual display state to use.
-  mDisplayState = display ? Toolkit::Popup::SHOWING : Toolkit::Popup::HIDING;
+  mDisplayState    = display ? Toolkit::Popup::SHOWING : Toolkit::Popup::HIDING;
+  auto* accessible = Dali::Accessibility::Accessible::Get(Self());
 
   if(display)
   {
     // Update the state to indicate the current intent.
     mDisplayState = Toolkit::Popup::SHOWING;
+    Dali::Accessibility::Bridge::GetCurrentBridge()->RegisterDefaultLabel(accessible);
+    accessible->EmitShowing(true);
 
     // We want the popup to have key input focus when it is displayed
     SetKeyInputFocus();
@@ -798,8 +789,9 @@ void Popup::SetDisplayState(Toolkit::Popup::DisplayState displayState)
   else // Not visible.
   {
     mDisplayState = Toolkit::Popup::HIDING;
+    Dali::Accessibility::Bridge::GetCurrentBridge()->UnregisterDefaultLabel(accessible);
     ClearKeyInputFocus();
-
+    accessible->EmitShowing(false);
     // Restore the keyboard focus when popup is hidden.
     if(mPreviousFocusedActor && mPreviousFocusedActor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE))
     {
