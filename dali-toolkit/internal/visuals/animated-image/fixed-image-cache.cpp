@@ -20,6 +20,9 @@
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h> // For ImageAtlasManagerPtr
 
+// EXTERNAL HEADERS
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -28,33 +31,30 @@ namespace Internal
 {
 namespace
 {
-const bool ENABLE_ORIENTATION_CORRECTION(true);
+static constexpr bool ENABLE_ORIENTATION_CORRECTION(true);
+
+static constexpr uint32_t FIRST_FRAME_INDEX = 0u;
 } // namespace
 
 FixedImageCache::FixedImageCache(
-  TextureManager& textureManager, UrlList& urlList, ImageCache::FrameReadyObserver& observer, unsigned int batchSize)
-: ImageCache(textureManager, observer, batchSize),
+  TextureManager& textureManager, UrlList& urlList, ImageCache::FrameReadyObserver& observer, uint32_t batchSize, uint32_t interval)
+: ImageCache(textureManager, observer, batchSize, interval),
   mImageUrls(urlList),
-  mFront(0u)
+  mFront(FIRST_FRAME_INDEX)
 {
+  mLoadStates.assign(mImageUrls.size(), TextureManager::LoadState::NOT_STARTED);
   mReadyFlags.reserve(mImageUrls.size());
-  LoadBatch();
 }
 
 FixedImageCache::~FixedImageCache()
 {
-  if(mTextureManagerAlive)
-  {
-    for(std::size_t i = 0; i < mImageUrls.size(); ++i)
-    {
-      mTextureManager.Remove(mImageUrls[i].mTextureId, this);
-    }
-  }
+  ClearCache();
 }
 
 TextureSet FixedImageCache::Frame(uint32_t frameIndex)
 {
-  while(frameIndex > mFront)
+  while(frameIndex > mFront || mReadyFlags.empty() ||
+        (frameIndex == FIRST_FRAME_INDEX && mFront != FIRST_FRAME_INDEX))
   {
     ++mFront;
     if(mFront >= mImageUrls.size())
@@ -67,13 +67,9 @@ TextureSet FixedImageCache::Frame(uint32_t frameIndex)
   mFront = frameIndex;
 
   TextureSet textureSet;
-  if(IsFrontReady() == true)
+  if(IsFrontReady())
   {
     textureSet = GetFrontTextureSet();
-  }
-  else
-  {
-    mWaitingForReadyFrame = true;
   }
 
   return textureSet;
@@ -81,26 +77,14 @@ TextureSet FixedImageCache::Frame(uint32_t frameIndex)
 
 TextureSet FixedImageCache::FirstFrame()
 {
-  TextureSet textureSet = GetFrontTextureSet();
-
-  if(!textureSet)
-  {
-    mWaitingForReadyFrame = true;
-  }
-
-  return textureSet;
-}
-
-TextureSet FixedImageCache::NextFrame()
-{
-  TextureSet textureSet = Frame((mFront + 1) % mImageUrls.size());
+  TextureSet textureSet = Frame(FIRST_FRAME_INDEX);
 
   return textureSet;
 }
 
 uint32_t FixedImageCache::GetFrameInterval(uint32_t frameIndex) const
 {
-  return 0u;
+  return mInterval;
 }
 
 int32_t FixedImageCache::GetCurrentFrameIndex() const
@@ -113,6 +97,11 @@ int32_t FixedImageCache::GetTotalFrameCount() const
   return mImageUrls.size();
 }
 
+TextureManager::LoadState FixedImageCache::GetLoadState() const
+{
+  return mLoadStates[mFront];
+}
+
 bool FixedImageCache::IsFrontReady() const
 {
   return (mReadyFlags.size() > 0 && mReadyFlags[mFront] == true);
@@ -121,13 +110,11 @@ bool FixedImageCache::IsFrontReady() const
 void FixedImageCache::LoadBatch()
 {
   // Try and load up to mBatchSize images, until the cache is filled.
-  // Once the cache is filled, mUrlIndex exceeds mImageUrls size and
-  // no more images are loaded.
-  bool frontFrameReady = IsFrontReady();
-
-  for(unsigned int i = 0; i < mBatchSize && mUrlIndex < mImageUrls.size(); ++i)
+  // Once the cache is filled, no more images are loaded.
+  for(unsigned int i = 0; i < mBatchSize && mReadyFlags.size() < mImageUrls.size(); ++i)
   {
-    std::string& url = mImageUrls[mUrlIndex].mUrl;
+    uint32_t frameIndex = mReadyFlags.size();
+    std::string& url = mImageUrls[frameIndex].mUrl;
 
     mReadyFlags.push_back(false);
 
@@ -146,26 +133,44 @@ void FixedImageCache::LoadBatch()
     Dali::ImageDimensions              textureRectSize;
     auto                               preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
-    mTextureManager.LoadTexture(
-      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, maskInfo, synchronousLoading, mImageUrls[mUrlIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+    TextureSet textureSet = mTextureManager.LoadTexture(
+      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, maskInfo, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
 
-    if(loadingStatus == false) // not loading, means it's already ready.
+    // If textureSet is returned but loadingState is false than load state is LOAD_FINISHED. (Notification is not comming yet.)
+    // If textureSet is null and the request is synchronous, load state is LOAD_FAILED.
+    // If textureSet is null but the request is asynchronous, the frame is still loading so load state is LOADING.
+    mLoadStates[frameIndex] = TextureManager::LoadState::LOADING;
+    if(textureSet)
     {
-      SetImageFrameReady(mImageUrls[mUrlIndex].mTextureId);
+      if(!loadingStatus)
+      {
+        SetImageFrameReady(mImageUrls[frameIndex].mTextureId, true);
+      }
     }
-    mRequestingLoad = false;
-    ++mUrlIndex;
-  }
+    else if(synchronousLoading)
+    {
+      // Synchronous loading is failed
+      mLoadStates[frameIndex] = TextureManager::LoadState::LOAD_FAILED;
+    }
 
-  CheckFrontFrame(frontFrameReady);
+    mRequestingLoad = false;
+  }
 }
 
-void FixedImageCache::SetImageFrameReady(TextureManager::TextureId textureId)
+void FixedImageCache::SetImageFrameReady(TextureManager::TextureId textureId, bool loadSuccess)
 {
   for(std::size_t i = 0; i < mImageUrls.size(); ++i)
   {
     if(mImageUrls[i].mTextureId == textureId)
     {
+      if(loadSuccess)
+      {
+        mLoadStates[i] = TextureManager::LoadState::LOAD_FINISHED;
+      }
+      else
+      {
+        mLoadStates[i] = TextureManager::LoadState::LOAD_FAILED;
+      }
       mReadyFlags[i] = true;
       break;
     }
@@ -179,11 +184,24 @@ TextureSet FixedImageCache::GetFrontTextureSet() const
 
 void FixedImageCache::CheckFrontFrame(bool wasReady)
 {
-  if(mWaitingForReadyFrame && wasReady == false && IsFrontReady())
+  if(wasReady == false && IsFrontReady())
   {
-    mWaitingForReadyFrame = false;
-    mObserver.FrameReady(GetFrontTextureSet());
+    mObserver.FrameReady(GetFrontTextureSet(), mInterval);
   }
+}
+
+void FixedImageCache::ClearCache()
+{
+  if(mTextureManagerAlive)
+  {
+    for(std::size_t i = 0; i < mImageUrls.size(); ++i)
+    {
+      mTextureManager.Remove(mImageUrls[i].mTextureId, this);
+      mImageUrls[i].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+    }
+  }
+  mReadyFlags.clear();
+  mLoadStates.assign(mImageUrls.size(), TextureManager::LoadState::NOT_STARTED);
 }
 
 void FixedImageCache::UploadComplete(
@@ -195,31 +213,11 @@ void FixedImageCache::UploadComplete(
   bool           preMultiplied)
 {
   bool frontFrameReady = IsFrontReady();
-
+  SetImageFrameReady(textureId, loadSuccess);
   if(!mRequestingLoad)
   {
-    SetImageFrameReady(textureId);
-
     CheckFrontFrame(frontFrameReady);
   }
-  else
-  {
-    // UploadComplete has been called from within RequestLoad. TextureManager must
-    // therefore already have the texture cached, so make the texture ready.
-    // (Use the last texture, as the texture id hasn't been assigned yet)
-    mReadyFlags.back() = true;
-  }
-}
-
-void FixedImageCache::LoadComplete(
-  bool               loadSuccess,
-  Devel::PixelBuffer pixelBuffer,
-  const VisualUrl&   url,
-  bool               preMultiplied)
-{
-  // LoadComplete is called if this TextureUploadObserver requested to load
-  // an image that will be returned as a type of PixelBuffer by using a method
-  // TextureManager::LoadPixelBuffer.
 }
 
 } //namespace Internal

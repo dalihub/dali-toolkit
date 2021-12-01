@@ -37,10 +37,11 @@ public:
   {
   public:
     /**
-     * Informs observer when the next texture set is ready to display
+     * @brief Informs observer when the next texture set is ready to display
      * @param[in] textureSet The ready texture set
+     * @param[in] interval interval for the frame
      */
-    virtual void FrameReady(TextureSet textureSet) = 0;
+    virtual void FrameReady(TextureSet textureSet, uint32_t interval) = 0;
   };
 
   struct UrlStore
@@ -56,67 +57,93 @@ public:
 
 public:
   /**
-   * Constructor.
+   * @brief Constructor.
    * @param[in] textureManager The texture manager
    * @param[in] urlList List of urls to cache
    * @param[in] observer FrameReady observer
    * @param[in] batchSize The size of a batch to load
+   * @param[in] interval Time interval between each frame
    *
    * This will start loading textures immediately, according to the
    * batch and cache sizes. The cache is as large as the number of urls.
    */
   ImageCache(TextureManager&                 textureManager,
              ImageCache::FrameReadyObserver& observer,
-             unsigned int                    batchSize);
+             uint32_t                        batchSize,
+             uint32_t                        interval);
 
   virtual ~ImageCache();
 
   /**
-   * Get the first frame. If it's not ready, this will trigger the
+   * @brief Get the first frame. If it's not ready, this will trigger the
    * sending of FrameReady() when the image becomes ready.
+   *
+   * @return TextureSet of the first frame.
    */
   virtual TextureSet FirstFrame() = 0;
 
   /**
-   * Get the next frame. If it's not ready, this will trigger the
+   * @brief Get the Nth frame. If it's not ready, this will trigger the
    * sending of FrameReady() when the image becomes ready.
-   */
-  virtual TextureSet NextFrame() = 0;
-
-  /**
-   * Get the Nth frame. If it's not ready, this will trigger the
-   * sending of FrameReady() when the image becomes ready.
+   *
+   * @param[in] frameIndex required frame index to be returned.
+   * @return TextureSet of the frame index.
    */
   virtual TextureSet Frame(uint32_t frameIndex) = 0;
 
   /**
-   * Get the interval of Nth frame.
+   * @brief Get the interval of Nth frame.
+   *
+   * @param[in] frameIndex frame index to get frame interval.
+   * @return Time interval in millisecond between frames of frameIndex and frameIndex + 1.
    */
   virtual uint32_t GetFrameInterval(uint32_t frameIndex) const = 0;
 
   /**
-   * Get the current rendered frame index.
+   * @brief Get the current rendered frame index.
    * If there isn't any loaded frame, returns -1.
+   *
+   * @return Frame index of currently showing frame.
    */
   virtual int32_t GetCurrentFrameIndex() const = 0;
 
   /**
-   * Get total frame count of the animated image file.
+   * @brief Get total frame count of the animated image file.
+   *
+   * @return Total frame count of the animated image file.
    */
   virtual int32_t GetTotalFrameCount() const = 0;
 
+  /**
+   * @brief Get Loading state of the animated image file.
+   *
+   * @return LoadState of currently requested frame.
+   */
+  virtual TextureManager::LoadState GetLoadState() const = 0;
+
+  /**
+   * @brief Clears animated image cache and remove loaded textures.
+   */
+  virtual void ClearCache() = 0;
+
+  /**
+   * @brief Set default interval between each frame.
+   *
+   * @param[in] interval time interval in millisecond to be used as default interval.
+   */
+  virtual void SetInterval(uint32_t interval);
+
 private:
   /**
-   * Called before the texture manager is destroyed.
+   * @brief Called before the texture manager is destroyed.
    */
   void TextureManagerDestroyed() final;
 
 protected:
   TextureManager&     mTextureManager;
   FrameReadyObserver& mObserver;
-  unsigned int        mBatchSize;
-  unsigned int        mUrlIndex;
-  bool                mWaitingForReadyFrame : 1;
+  uint32_t            mBatchSize;
+  uint32_t            mInterval;
   bool                mRequestingLoad : 1;
   bool                mTextureManagerAlive : 1;
 };

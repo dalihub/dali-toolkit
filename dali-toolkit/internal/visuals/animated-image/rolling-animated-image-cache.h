@@ -40,10 +40,9 @@ class RollingAnimatedImageCache : public ImageCache, public TextureUploadObserve
 {
 public:
   /**
-   * Constructor.
+   * @brief Constructor.
    * @param[in] textureManager The texture manager
    * @param[in] animatedImageLoader The loaded animated image
-   * @param[in] frameCount The number of frames in the animated image
    * @param[in] observer FrameReady observer
    * @param[in] cacheSize The size of the cache
    * @param[in] batchSize The size of a batch to load
@@ -54,124 +53,124 @@ public:
    */
   RollingAnimatedImageCache(TextureManager&                 textureManager,
                             AnimatedImageLoading&           animatedImageLoader,
-                            uint32_t                        frameCount,
                             ImageCache::FrameReadyObserver& observer,
                             uint16_t                        cacheSize,
                             uint16_t                        batchSize,
                             bool                            isSynchronousLoading);
 
   /**
-   * Destructor
+   * @brief Destructor
    */
   ~RollingAnimatedImageCache() override;
 
   /**
-   * Get the Nth frame. If it's not ready, this will trigger the
-   * sending of FrameReady() when the image becomes ready.
+   * @copydoc Internal::ImageCache::Frame()
    */
   TextureSet Frame(uint32_t frameIndex) override;
 
   /**
-   * Get the first frame. If it's not ready, this will trigger the
-   * sending of FrameReady() when the image becomes ready.
+   * @copydoc Internal::ImageCache::FirstFrame()
    */
   TextureSet FirstFrame() override;
 
   /**
-   * Get the next frame. If it's not ready, this will trigger the
-   * sending of FrameReady() when the image becomes ready.
-   */
-  TextureSet NextFrame() override;
-
-  /**
-   * Get the interval of Nth frame.
+   * @copydoc Internal::ImageCache::GetFrameInterval()
    */
   uint32_t GetFrameInterval(uint32_t frameIndex) const override;
 
   /**
-   * Get the current rendered frame index.
-   * If there isn't any loaded frame, returns -1.
+   * @copydoc Internal::ImageCache::GetCurrentFrameIndex()
    */
   int32_t GetCurrentFrameIndex() const override;
 
   /**
-   * Get total frame count of the animated image file.
+   * @copydoc Internal::ImageCache::GetTotalFrameCount()
    */
   int32_t GetTotalFrameCount() const override;
 
+  /**
+   * @copydoc Internal::ImageCache::GetLoadState()
+   */
+  TextureManager::LoadState GetLoadState() const override;
+
+  /**
+   * @copydoc Internal::ImageCache::ClearCache()
+   */
+  void ClearCache() override;
+
 private:
   /**
+   * @brief Check whether the front frame is ready or not.
+   *
    * @return true if the front frame is ready
    */
   bool IsFrontReady() const;
 
   /**
-   * Request to Load a frame
+   * @brief Request to Load a frame
+   *
+   * @param[in] frameIndex          index of frame to be loaded.
+   * @param[in] useCache            true if this frame loading uses cache.
+   * @param[in] synchronousLoading  true if the frame should be loaded synchronously
    */
-  void RequestFrameLoading(uint32_t frameIndex);
+  TextureSet RequestFrameLoading(uint32_t frameIndex, bool useCache, bool synchronousLoading);
 
   /**
-   * Load the next batch of images
+   * @brief Load the next batch of images
+   *
+   * @param[in] frameIndex starting frame index of batch to be loaded.
    */
-  void LoadBatch();
+  void LoadBatch(uint32_t frameIndex);
 
   /**
-   * Find the matching image frame, and set it to ready
+   * @brief Find the matching image frame, and set it to ready
+   *
+   * @param[in] textureId texture id to be marked as ready.
    */
   void SetImageFrameReady(TextureManager::TextureId textureId);
 
   /**
-   * Get the texture set of the front frame.
-   * @return the texture set
+   * @brief Get the texture set of the front frame.
+   *
+   * @return the texture set of the front of Cache.
    */
   TextureSet GetFrontTextureSet() const;
 
   /**
-   * Get the texture id of the given index
+   * @brief Get the texture id of the given index
+   *
+   * @param[in] index index of the queue.
    */
   TextureManager::TextureId GetCachedTextureId(int index) const;
 
-  /**
-   * Check if the front frame has become ready - if so, inform observer
-   * @param[in] wasReady Readiness before call.
-   */
-  void CheckFrontFrame(bool wasReady);
-
 protected:
-  void UploadComplete(
-    bool           loadSuccess,
-    int32_t        textureId,
-    TextureSet     textureSet,
-    bool           useAtlasing,
-    const Vector4& atlasRect,
-    bool           preMultiplied) override;
 
-  void LoadComplete(
-    bool               loadSuccess,
-    Devel::PixelBuffer pixelBuffer,
-    const VisualUrl&   url,
-    bool               preMultiplied) override;
+  /**
+   * @copydoc Toolkit::TextureUploadObserver::AnimatedImageUploadComplete()
+   */
+  void AnimatedImageUploadComplete(bool loadSuccess, int32_t textureId, uint32_t frameCount, uint32_t interval) override;
 
 private:
+
   /**
    * Secondary class to hold readiness and index into url
    */
   struct ImageFrame
   {
-    unsigned int mFrameNumber = 0u;
-    bool         mReady       = false;
+    uint32_t mFrameNumber = 0u;
+    bool     mReady       = false;
   };
 
   Dali::AnimatedImageLoading mAnimatedImageLoading;
   uint32_t                   mFrameCount;
-  int                        mFrameIndex;
-  int                        mCacheSize;
+  uint32_t                   mFrameIndex;
+  uint32_t                   mCacheSize;
   std::vector<UrlStore>      mImageUrls;
   std::vector<int32_t>       mIntervals;
   std::vector<uint32_t>      mLoadWaitingQueue;
   CircularQueue<ImageFrame>  mQueue;
+  TextureManager::LoadState  mLoadState; ///< The texture loading state
   bool                       mIsSynchronousLoading;
-  bool                       mOnLoading;
 };
 
 } // namespace Internal

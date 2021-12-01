@@ -193,54 +193,57 @@ protected:
 
 private:
   /**
-   * Creates the renderer for the animated image
+   * @brief Creates the renderer for the animated image
    */
   void CreateRenderer();
 
   /**
-   * Starts the Load of the first batch of URLs
-   */
-  void LoadFirstBatch();
-
-  /**
-   * Adds the texture set to the renderer, and the renderer to the
+   * @brief Adds the texture set to the renderer, and the renderer to the
    * placement actor, and starts the frame timer
-   * @param[in] textureSet The texture set to apply
+   * @param[in] textureSet    The texture set to apply
+   * @param[in] firstInterval frame interval for the first frame.
    */
-  void StartFirstFrame(TextureSet& textureSet);
+  void StartFirstFrame(TextureSet& textureSet, uint32_t firstInterval);
 
   /**
-   * Prepares the texture set for displaying
+   * @brief Prepares the texture set for displaying
+   * @return Prepared texture set if it is loaded.
    */
   TextureSet PrepareTextureSet();
 
   /**
-   * Set the image size from the texture set
+   * @brief Set the image size from the texture set
    * @param[in] textureSet The texture set to get the size from
    */
   void SetImageSize(TextureSet& textureSet);
 
   /**
-   * Called when the next frame is ready.
+   * @brief Called when the next frame is ready.
    * @param[in] textureSet the texture set to apply
+   * @param[in] interval interval for the frame
    */
-  void FrameReady(TextureSet textureSet) override;
+  void FrameReady(TextureSet textureSet, uint32_t interval) override;
 
   /**
-   * Display the next frame. It is called when the mFrameDelayTimer ticks.
-   * Returns true to ensure the timer continues running.
+   * @brief Display the next frame. It is called when the mFrameDelayTimer ticks.
+   * @return true to ensure the timer continues running.
    */
   bool DisplayNextFrame();
 
   /**
-   * Initialize the animated image variables.
+   * @brief Initialize the animated image variables.
    * @param[in] imageUrl The url of the animated image
    */
   void InitializeAnimatedImage(const VisualUrl& imageUrl);
 
   /**
-   * Set the state of loading fail of an image or a frame.
-   * Returns TextureSet of broken image.
+   * @brief Create image cache for animated image or image array.
+   */
+  void CreateImageCache();
+
+  /**
+   * @brief Set the state of loading fail of an image or a frame.
+   * @return TextureSet of broken image.
    */
   TextureSet SetLoadingFailed();
 
@@ -260,6 +263,7 @@ private:
   VisualUrl                  mImageUrl;
   Dali::AnimatedImageLoading mAnimatedImageLoading; // Only needed for animated image
   uint32_t                   mFrameIndexForJumpTo;  // Frame index into textureRects
+  uint32_t                   mCurrentFrameIndex;
 
   // Variables for Multi-Image player
   ImageCache::UrlList* mImageUrls;
@@ -269,7 +273,10 @@ private:
   uint16_t             mFrameDelay;
   int16_t              mLoopCount;
   int16_t              mCurrentLoopIndex;
-  uint16_t             mUrlIndex;
+
+  // Variables for image visual policy.
+  Dali::Toolkit::ImageVisual::LoadPolicy::Type    mLoadPolicy;
+  Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
 
   // Shared variables
   uint32_t        mFrameCount; // Number of frames

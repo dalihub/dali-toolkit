@@ -24,12 +24,12 @@ namespace Internal
 {
 ImageCache::ImageCache(TextureManager&                 textureManager,
                        ImageCache::FrameReadyObserver& observer,
-                       unsigned int                    batchSize)
+                       uint32_t                        batchSize,
+                       uint32_t                        interval)
 : mTextureManager(textureManager),
   mObserver(observer),
   mBatchSize(batchSize),
-  mUrlIndex(0u),
-  mWaitingForReadyFrame(false),
+  mInterval(interval),
   mRequestingLoad(false),
   mTextureManagerAlive(true)
 {
@@ -47,6 +47,11 @@ ImageCache::~ImageCache()
 void ImageCache::TextureManagerDestroyed()
 {
   mTextureManagerAlive = false;
+}
+
+void ImageCache::SetInterval(uint32_t interval)
+{
+  mInterval = interval;
 }
 
 } //namespace Internal

@@ -165,26 +165,30 @@ public:
    * The parameters are used to specify how the animated image is loaded.
    * The observer has the LoadComplete method called when the load is ready.
    *
-   * @param[in] animatedImageLoading  The AnimatedImageLoading that contain the animated image information
-   * @param[in] frameIndex            The frame index to load.
-   * @param[in] samplingMode          The SamplingMode to use
-   * @param[in] synchronousLoading    true if the frame should be loaded synchronously
-   * @param[out] textureId            The textureId of the frame
-   * @param[in] wrapModeU             Horizontal Wrap mode
-   * @param[in] wrapModeV             Vertical Wrap mode
-   * @param[in] textureObserver       The client object should inherit from this and provide the "UploadCompleted" virtual.
-   *                                  This is called when an image load completes (or fails).
+   * @param[in]  animatedImageLoading  The AnimatedImageLoading that contain the animated image information
+   * @param[in]  frameIndex            The frame index to load.
+   * @param[out] loadingStatus         The loading status of the texture
+   * @param[out] textureId             The textureId of the frame
+   * @param[in]  samplingMode          The SamplingMode to use
+   * @param[in]  wrapModeU             Horizontal Wrap mode
+   * @param[in]  wrapModeV             Vertical Wrap mode
+   * @param[in]  synchronousLoading    true if the frame should be loaded synchronously
+   * @param[in]  useCache              true if this frame loading uses cache.
+   * @param[in]  textureObserver       The client object should inherit from this and provide the "UploadCompleted" virtual.
+   *                                   This is called when an image load completes (or fails).
    *
-   * @return                          The texture set containing the frame of animated image, or empty if still loading.
+   * @return                           The texture set containing the frame of animated image, or empty if still loading.
    */
 
   TextureSet LoadAnimatedImageTexture(Dali::AnimatedImageLoading animatedImageLoading,
                                       uint32_t                   frameIndex,
-                                      Dali::SamplingMode::Type   samplingMode,
-                                      bool                       synchronousLoading,
+                                      bool&                      loadingStatus,
                                       TextureManager::TextureId& textureId,
+                                      Dali::SamplingMode::Type   samplingMode,
                                       Dali::WrapMode::Type       wrapModeU,
                                       Dali::WrapMode::Type       wrapModeV,
+                                      bool                       synchronousLoading,
+                                      bool                       useCache,
                                       TextureUploadObserver*     textureObserver);
 
   /**
@@ -509,7 +513,8 @@ private:
     TextureManager::ReloadPolicy reloadPolicy,
     MultiplyOnLoad&              preMultiplyOnLoad,
     Dali::AnimatedImageLoading   animatedImageLoading,
-    uint32_t                     frameIndex);
+    uint32_t                     frameIndex,
+    bool useCache);
 
   /**
    * @brief Get the current state of a texture
@@ -558,6 +563,8 @@ private:
       storageType(StorageType::UPLOAD_TO_TEXTURE),
       animatedImageLoading(animatedImageLoading),
       frameIndex(frameIndex),
+      frameCount(0u),
+      frameInterval(0u),
       loadSynchronously(loadSynchronously),
       useAtlas(useAtlas),
       cropToMask(cropToMask),
@@ -565,6 +572,7 @@ private:
       preMultiplyOnLoad(preMultiplyOnLoad),
       preMultiplied(false)
     {
+      isAnimatedImageFormat = (animatedImageLoading) ? true : false;
     }
 
     /**
@@ -590,7 +598,9 @@ private:
     Dali::SamplingMode::Type    samplingMode : 3;      ///< The requested SamplingMode
     StorageType                 storageType;           ///< CPU storage / GPU upload;
     Dali::AnimatedImageLoading  animatedImageLoading;  ///< AnimatedImageLoading that contains animated image information.
-    uint32_t                    frameIndex;            ///< frame index that be loaded, in case of animated image
+    uint32_t                    frameIndex;            ///< Frame index that be loaded, in case of animated image
+    uint32_t                    frameCount;            ///< Total frame count of input animated image. If this variable is not 0, this textureInfo is for animated image file format.
+    uint32_t                    frameInterval;         ///< Time interval between this frame and next frame of animated image.
     bool                        loadSynchronously : 1; ///< True if synchronous loading was requested
     UseAtlas                    useAtlas : 2;          ///< USE_ATLAS if an atlas was requested.
                                                        ///< This is updated to false if atlas is not used
@@ -598,6 +608,7 @@ private:
     bool orientationCorrection : 1;                    ///< true if the image should be rotated to match exif orientation data
     bool preMultiplyOnLoad : 1;                        ///< true if the image's color should be multiplied by it's alpha
     bool preMultiplied : 1;                            ///< true if the image's color was multiplied by it's alpha
+    bool isAnimatedImageFormat : 1;                    ///< true if the image is requested from animated image visual.
   };
 
   /**
@@ -781,7 +792,8 @@ private:
    * @param[in] samplingMode      The SamplingMode to use
    * @param[in] useAtlas          True if atlased
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
-   * @param[in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
+   * @param[in] preMultiplyOnLoad If the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
+   * @param[in] isAnimatedImage   True if the texture is from animated image.
    * @return                      A TextureId of a cached Texture if found. Or INVALID_TEXTURE_ID if not found.
    */
   TextureManager::TextureId FindCachedTexture(
@@ -792,7 +804,8 @@ private:
     const Dali::SamplingMode::Type    samplingMode,
     const bool                        useAtlas,
     TextureId                         maskTextureId,
-    MultiplyOnLoad                    preMultiplyOnLoad);
+    MultiplyOnLoad                    preMultiplyOnLoad,
+    bool                              isAnimatedImage);
 
 private:
   /**

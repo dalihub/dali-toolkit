@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/signals/dali-signal.h>
+#include <dali/public-api/rendering/texture-set.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-url.h>
@@ -28,7 +29,6 @@
 
 namespace Dali
 {
-class TextureSet;
 
 namespace Toolkit
 {
@@ -54,7 +54,7 @@ public:
   virtual ~TextureUploadObserver();
 
   /**
-   * The action to be taken once the async load has finished and the upload to GPU is completed.
+   * @brief The action to be taken once the async load has finished and the upload to GPU is completed.
    * This should be overridden by the deriving class.
    *
    * @param[in] loadSuccess True if the texture load was successful (i.e. the resource is available). If false, then the resource failed to load. In future, this will automatically upload a "broken" image.
@@ -64,10 +64,25 @@ public:
    * @param[in] atlasRect   If using atlasing, this is the rectangle within the atlas to use.
    * @param[in] preMultiplied True if the image had pre-multiplied alpha applied
    */
-  virtual void UploadComplete(bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied) = 0;
+  virtual void UploadComplete(bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied)
+  {
+  }
 
   /**
-   * The action to be taken once the async load has finished.
+   * @brief The action to be taken once the async load of animated image has finished and the upload to GPU is completed.
+   * This should be overridden by the deriving class.
+   *
+   * @param[in] loadSuccess   True if the texture load was successful (i.e. the resource is available). If false, then the resource failed to load. In future, this will automatically upload a "broken" image.
+   * @param[in] textureId     The textureId of the loaded texture in the TextureManager
+   * @param[in] frameCount    The frameCount of the animated image
+   * @param[in] interval      Time interval between currently loaded frame and next frame.
+   */
+  virtual void AnimatedImageUploadComplete(bool loadSuccess, int32_t textureId, uint32_t frameCount, uint32_t interval)
+  {
+  }
+
+  /**
+   * @brief The action to be taken once the async load has finished.
    * This should be overridden by the deriving class.
    *
    * @param[in] loadSuccess   True if the image load was successful (i.e. the resource is available). If false, then the resource failed to load.
@@ -75,7 +90,9 @@ public:
    * @param[in] url           The url address of the loaded image.
    * @param[in] preMultiplied True if the image had pre-multiplied alpha applied
    */
-  virtual void LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const Internal::VisualUrl& url, bool preMultiplied) = 0;
+  virtual void LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const Internal::VisualUrl& url, bool preMultiplied)
+  {
+  }
 
   /**
    * @brief Returns the destruction signal.
