@@ -241,11 +241,11 @@ public:
   static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
 protected:
-  struct AccessibleImpl : public DevelControl::AccessibleImpl
+  struct AccessibleImpl : public DevelControl::ControlAccessible
   {
-    using DevelControl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::ControlAccessible::ControlAccessible;
 
-    std::string                 GetNameRaw() override;
+    std::string                 GetNameRaw() const override;
     Dali::Accessibility::States CalculateStates() override;
   };
 

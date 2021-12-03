@@ -504,32 +504,31 @@ protected:
   /**
    * @brief This structure is to connect TextField with Accessible functions.
    */
-  struct AccessibleImpl : public DevelControl::AccessibleImpl,
-                          public virtual Dali::Accessibility::Text,
+  struct AccessibleImpl : public DevelControl::ControlAccessible,
                           public virtual Dali::Accessibility::EditableText,
                           public virtual Dali::Accessibility::Hypertext
   {
-    using DevelControl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::ControlAccessible::ControlAccessible;
 
     /**
      * @copydoc Dali::Accessibility::Accessible::GetName()
      */
-    std::string GetName() override;
+    std::string GetName() const override;
 
     /**
      * @copydoc Dali::Accessibility::Text::GetText()
      */
-    std::string GetText(size_t startOffset, size_t endOffset) override;
+    std::string GetText(size_t startOffset, size_t endOffset) const override;
 
     /**
      * @copydoc Dali::Accessibility::Text::GetCharacterCount()
      */
-    size_t GetCharacterCount() override;
+    size_t GetCharacterCount() const override;
 
     /**
      * @copydoc Dali::Accessibility::Text::GetCursorOffset()
      */
-    size_t GetCursorOffset() override;
+    size_t GetCursorOffset() const override;
 
     /**
      * @copydoc Dali::Accessibility::Text::SetCursorOffset()
@@ -539,12 +538,12 @@ protected:
     /**
      * @copydoc Dali::Accessibility::Text::GetTextAtOffset()
      */
-    Accessibility::Range GetTextAtOffset(size_t offset, Accessibility::TextBoundary boundary) override;
+    Accessibility::Range GetTextAtOffset(size_t offset, Accessibility::TextBoundary boundary) const override;
 
     /**
      * @copydoc Dali::Accessibility::Text::GetRangeOfSelection()
      */
-    Accessibility::Range GetRangeOfSelection(size_t selectionIndex) override;
+    Accessibility::Range GetRangeOfSelection(size_t selectionIndex) const override;
 
     /**
      * @copydoc Dali::Accessibility::Text::RemoveSelection()

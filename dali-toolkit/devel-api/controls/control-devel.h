@@ -24,7 +24,7 @@
 #include <dali/public-api/animation/time-period.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/accessible-impl.h>
+#include <dali-toolkit/devel-api/controls/control-accessible.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
@@ -563,7 +563,7 @@ DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Dali::Actor control, Dali::
  * @code
  *   SetAccessibilityConstructor( []( Dali::Actor actor ) {
        return std::unique_ptr< Dali::Accessibility::Accessible >(
-       new AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
+       new ControlAccessible( actor, Dali::Accessibility::Role::DIALOG, true ) );
       } );
   * @endcode
   *

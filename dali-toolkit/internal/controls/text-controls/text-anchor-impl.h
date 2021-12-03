@@ -105,10 +105,10 @@ protected:
   /**
    * @brief This structure is to connect TextAnchor with Accessible functions.
    */
-  struct AccessibleImpl : public DevelControl::AccessibleImpl,
+  struct AccessibleImpl : public DevelControl::ControlAccessible,
                           public virtual Dali::Accessibility::Hyperlink
   {
-    using DevelControl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::ControlAccessible::ControlAccessible;
     /**
      * @copydoc Dali::Accessibility::Hyperlink::GetEndIndex()
      */

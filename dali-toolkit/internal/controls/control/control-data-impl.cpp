@@ -411,11 +411,11 @@ void SetVisualsOffScene(const RegisteredVisualContainer& container, Actor parent
   }
 }
 
-Dali::Rect<> GetShowingGeometry(Dali::Rect<> rect, Dali::Toolkit::DevelControl::AccessibleImpl* accessibleImpl)
+Dali::Rect<> GetShowingGeometry(Dali::Rect<> rect, Dali::Toolkit::DevelControl::ControlAccessible* accessible)
 {
   Rect<>  parentRect;
   Vector2 currentPosition;
-  auto    parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(accessibleImpl->GetParent());
+  auto    parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(accessible->GetParent());
 
   while(parent)
   {
@@ -434,7 +434,7 @@ Dali::Rect<> GetShowingGeometry(Dali::Rect<> rect, Dali::Toolkit::DevelControl::
       return rect;
     }
 
-    parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(parent->GetParent());
+    parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(parent->GetParent());
   }
 
   return rect;
@@ -513,7 +513,7 @@ Control::Impl::Impl(Control& controlImpl)
     });
 
   mAccessibilityConstructor = [](Dali::Actor actor) -> std::unique_ptr<Dali::Accessibility::Accessible> {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::UNKNOWN));
+    return std::unique_ptr<Dali::Accessibility::Accessible>(new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::UNKNOWN));
   };
 }
 
@@ -551,16 +551,16 @@ const Control::Impl& Control::Impl::Get(const Internal::Control& internalControl
 
 void Control::Impl::CheckHighlightedObjectGeometry()
 {
-  auto accessibleImpl = dynamic_cast<Dali::Toolkit::DevelControl::AccessibleImpl*>(mAccessibilityObject.get());
-  if(!accessibleImpl)
+  auto accessible = dynamic_cast<Dali::Toolkit::DevelControl::ControlAccessible*>(mAccessibilityObject.get());
+  if(!accessible)
   {
-    DALI_LOG_ERROR("accessibleImpl is not a pointer to a DevelControl::AccessibleImpl type");
+    DALI_LOG_ERROR("accessible is not a pointer to a DevelControl::ControlAccessible type");
     return;
   }
 
-  auto lastPosition   = accessibleImpl->GetLastPosition();
-  auto accessibleRect = accessibleImpl->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
-  auto rect = GetShowingGeometry(accessibleRect, accessibleImpl);
+  auto lastPosition   = accessible->GetLastPosition();
+  auto accessibleRect = accessible->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
+  auto rect = GetShowingGeometry(accessibleRect, accessible);
 
   switch(mAccessibilityLastScreenRelativeMoveType)
   {
@@ -608,7 +608,7 @@ void Control::Impl::CheckHighlightedObjectGeometry()
     }
   }
 
-  accessibleImpl->SetLastPosition(Vector2(accessibleRect.x, accessibleRect.y));
+  accessible->SetLastPosition(Vector2(accessibleRect.x, accessibleRect.y));
 }
 
 void Control::Impl::RegisterAccessibilityPositionPropertyNotification()

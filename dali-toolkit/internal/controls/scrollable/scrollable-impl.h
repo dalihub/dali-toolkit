@@ -117,11 +117,11 @@ public:
   virtual void SetOvershootSize(const Vector2& size) = 0;
 
 protected: // From Control
-  struct AccessibleImpl : public DevelControl::AccessibleImpl
+  struct AccessibleImpl : public DevelControl::ControlAccessible
   {
-    using DevelControl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::ControlAccessible::ControlAccessible;
 
-    bool IsScrollable() override;
+    bool IsScrollable() const override;
   };
 
   /**

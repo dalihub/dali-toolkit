@@ -158,7 +158,7 @@ protected:
     using Button::AccessibleImpl::AccessibleImpl;
 
     Dali::Accessibility::States CalculateStates() override;
-    std::string                 GetDescriptionRaw() override;
+    std::string                 GetDescriptionRaw() const override;
     Property::Index             GetDescriptionPropertyIndex() override;
   };
   void OnStateChange(State newState) override;

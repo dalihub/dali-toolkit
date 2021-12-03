@@ -861,21 +861,21 @@ Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
   return handle;
 }
 
-double ScrollBar::AccessibleImpl::GetMinimum()
+double ScrollBar::AccessibleImpl::GetMinimum() const
 {
   auto self = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(self).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(self).mPropertyMinScrollPosition) : 0.0f;
 }
 
-double ScrollBar::AccessibleImpl::GetCurrent()
+double ScrollBar::AccessibleImpl::GetCurrent() const
 {
   auto self = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(self).mScrollableObject.GetHandle();
   return scrollableHandle ? scrollableHandle.GetCurrentProperty<float>(GetImpl(self).mPropertyScrollPosition) : 0.0f;
 }
 
-double ScrollBar::AccessibleImpl::GetMaximum()
+double ScrollBar::AccessibleImpl::GetMaximum() const
 {
   auto self = Toolkit::ScrollBar::DownCast(Self());
   Handle scrollableHandle = GetImpl(self).mScrollableObject.GetHandle();
@@ -910,7 +910,7 @@ bool ScrollBar::AccessibleImpl::SetCurrent(double current)
   return true;
 }
 
-double ScrollBar::AccessibleImpl::GetMinimumIncrement()
+double ScrollBar::AccessibleImpl::GetMinimumIncrement() const
 {
   return 1.0;
 }

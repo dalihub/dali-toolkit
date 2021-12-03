@@ -676,18 +676,18 @@ void ProgressBar::OnSceneConnection(int depth)
   }
 }
 
-double ProgressBar::AccessibleImpl::GetMinimum()
+double ProgressBar::AccessibleImpl::GetMinimum() const
 {
   return DEFAULT_LOWER_BOUND;
 }
 
-double ProgressBar::AccessibleImpl::GetCurrent()
+double ProgressBar::AccessibleImpl::GetCurrent() const
 {
   auto self = Toolkit::ProgressBar::DownCast(Self());
   return self.GetProperty(Toolkit::ProgressBar::Property::PROGRESS_VALUE).Get<float>();
 }
 
-double ProgressBar::AccessibleImpl::GetMaximum()
+double ProgressBar::AccessibleImpl::GetMaximum() const
 {
   return DEFAULT_UPPER_BOUND;
 }
@@ -704,7 +704,7 @@ bool ProgressBar::AccessibleImpl::SetCurrent(double current)
   return true;
 }
 
-double ProgressBar::AccessibleImpl::GetMinimumIncrement()
+double ProgressBar::AccessibleImpl::GetMinimumIncrement() const
 {
   return 0.0;
 }

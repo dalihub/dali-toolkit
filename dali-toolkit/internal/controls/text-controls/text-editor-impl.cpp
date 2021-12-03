@@ -1289,13 +1289,13 @@ TextEditor::~TextEditor()
   }
 }
 
-std::string TextEditor::AccessibleImpl::GetName()
+std::string TextEditor::AccessibleImpl::GetName() const
 {
   auto self = Toolkit::TextEditor::DownCast(Self());
   return self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
 }
 
-std::string TextEditor::AccessibleImpl::GetText(size_t startOffset, size_t endOffset)
+std::string TextEditor::AccessibleImpl::GetText(size_t startOffset, size_t endOffset) const
 {
   if(endOffset <= startOffset)
   {
@@ -1313,7 +1313,7 @@ std::string TextEditor::AccessibleImpl::GetText(size_t startOffset, size_t endOf
   return text.substr(startOffset, endOffset - startOffset);
 }
 
-size_t TextEditor::AccessibleImpl::GetCharacterCount()
+size_t TextEditor::AccessibleImpl::GetCharacterCount() const
 {
   auto self = Toolkit::TextEditor::DownCast(Self());
   auto text = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
@@ -1321,7 +1321,7 @@ size_t TextEditor::AccessibleImpl::GetCharacterCount()
   return text.size();
 }
 
-size_t TextEditor::AccessibleImpl::GetCursorOffset()
+size_t TextEditor::AccessibleImpl::GetCursorOffset() const
 {
   auto slf = Toolkit::TextEditor::DownCast(Self());
   return Dali::Toolkit::GetImpl(slf).GetTextController()->GetCursorPosition();
@@ -1343,7 +1343,7 @@ bool TextEditor::AccessibleImpl::SetCursorOffset(size_t offset)
   return true;
 }
 
-Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary)
+Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary) const
 {
   auto self     = Toolkit::TextEditor::DownCast(Self());
   auto text     = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
@@ -1434,7 +1434,7 @@ Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t of
   return range;
 }
 
-Dali::Accessibility::Range TextEditor::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex)
+Dali::Accessibility::Range TextEditor::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex) const
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)
@@ -1526,12 +1526,12 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
 {
   using namespace Dali::Accessibility;
 
-  auto states              = DevelControl::AccessibleImpl::CalculateStates();
+  auto states              = DevelControl::ControlAccessible::CalculateStates();
   states[State::EDITABLE]  = true;
   states[State::FOCUSABLE] = true;
 
   Toolkit::Control focusControl = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
-  if(mSelf == focusControl)
+  if(Self() == focusControl)
   {
     states[State::FOCUSED] = true;
   }

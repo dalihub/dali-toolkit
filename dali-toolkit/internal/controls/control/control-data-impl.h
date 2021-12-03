@@ -71,7 +71,7 @@ typedef Dali::OwnerContainer<RegisteredVisual*> RegisteredVisualContainer;
  */
 class Control::Impl : public ConnectionTracker, public Visual::EventObserver
 {
-  friend class Toolkit::DevelControl::AccessibleImpl;
+  friend class Toolkit::DevelControl::ControlAccessible;
 
 public:
   /**

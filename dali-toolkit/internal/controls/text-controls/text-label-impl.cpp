@@ -1146,7 +1146,7 @@ Vector<Vector2> TextLabel::GetTextPosition(const uint32_t startIndex, const uint
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
-std::string TextLabel::AccessibleImpl::GetNameRaw()
+std::string TextLabel::AccessibleImpl::GetNameRaw() const
 {
   auto self = Toolkit::TextLabel::DownCast(Self());
   return self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
@@ -1157,7 +1157,7 @@ Property::Index TextLabel::AccessibleImpl::GetNamePropertyIndex()
   return Toolkit::TextLabel::Property::TEXT;
 }
 
-std::string TextLabel::AccessibleImpl::GetText(size_t startOffset, size_t endOffset)
+std::string TextLabel::AccessibleImpl::GetText(size_t startOffset, size_t endOffset) const
 {
   if(endOffset <= startOffset)
   {
@@ -1175,7 +1175,7 @@ std::string TextLabel::AccessibleImpl::GetText(size_t startOffset, size_t endOff
   return text.substr(startOffset, endOffset - startOffset);
 }
 
-size_t TextLabel::AccessibleImpl::GetCharacterCount()
+size_t TextLabel::AccessibleImpl::GetCharacterCount() const
 {
   auto self = Toolkit::TextLabel::DownCast(Self());
   auto text = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
@@ -1183,7 +1183,7 @@ size_t TextLabel::AccessibleImpl::GetCharacterCount()
   return text.size();
 }
 
-size_t TextLabel::AccessibleImpl::GetCursorOffset()
+size_t TextLabel::AccessibleImpl::GetCursorOffset() const
 {
   return {};
 }
@@ -1193,7 +1193,7 @@ bool TextLabel::AccessibleImpl::SetCursorOffset(size_t offset)
   return {};
 }
 
-Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary)
+Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary) const
 {
   auto self     = Toolkit::TextLabel::DownCast(Self());
   auto text     = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
@@ -1284,7 +1284,7 @@ Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t off
   return range;
 }
 
-Dali::Accessibility::Range TextLabel::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex)
+Dali::Accessibility::Range TextLabel::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex) const
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)

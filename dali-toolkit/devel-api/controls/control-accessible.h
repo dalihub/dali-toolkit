@@ -1,5 +1,6 @@
-#ifndef DALI_TOOLKIT_ACCESSIBLE_IMPL_H
-#define DALI_TOOLKIT_ACCESSIBLE_IMPL_H
+#ifndef DALI_TOOLKIT_CONTROL_ACCESSIBLE_H
+#define DALI_TOOLKIT_CONTROL_ACCESSIBLE_H
+
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
@@ -16,6 +17,7 @@
  * limitations under the License.
  *
  */
+
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
@@ -45,10 +47,10 @@ namespace Dali::Toolkit::DevelControl {
  * @see Dali::Accessibility::Text
  * @see Dali::Accessibility::EditableText
  */
-struct DALI_TOOLKIT_API AccessibleImpl : public virtual Dali::Accessibility::Accessible,
-                                         public virtual Dali::Accessibility::Component,
-                                         public virtual Dali::Accessibility::Collection,
-                                         public virtual Dali::Accessibility::Action
+struct DALI_TOOLKIT_API ControlAccessible : public virtual Dali::Accessibility::Accessible,
+                                            public virtual Dali::Accessibility::Component,
+                                            public virtual Dali::Accessibility::Collection,
+                                            public virtual Dali::Accessibility::Action
 {
 protected:
   Vector2                       mLastPosition{0.0f, 0.0f};
@@ -87,27 +89,27 @@ protected:
   bool IsShowing();
 
 public:
-  AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
+  ControlAccessible(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetName()
    */
-  std::string GetName() override;
+  std::string GetName() const override;
 
   /**
    * @brief Returns the actor's name in the absence of ACCESSIBILITY_NAME property
    */
-  virtual std::string GetNameRaw();
+  virtual std::string GetNameRaw() const;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetDescription()
    */
-  std::string GetDescription() override;
+  std::string GetDescription() const override;
 
   /**
    * @brief Returns the actor's description in the absence of ACCESSIBILITY_DESCRIPTION property
    */
-  virtual std::string GetDescriptionRaw();
+  virtual std::string GetDescriptionRaw() const;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetParent()
@@ -117,7 +119,7 @@ public:
   /**
    * @copydoc Dali::Accessibility::Accessible::GetChildCount()
    */
-  size_t GetChildCount() override;
+  size_t GetChildCount() const override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetChildAtIndex()
@@ -132,12 +134,12 @@ public:
   /**
    * @copydoc Dali::Accessibility::Accessible::GetRole()
    */
-  Dali::Accessibility::Role GetRole() override;
+  Dali::Accessibility::Role GetRole() const override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetLocalizedRoleName()
    */
-  std::string GetLocalizedRoleName() override;
+  std::string GetLocalizedRoleName() const override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetStates()
@@ -147,22 +149,22 @@ public:
   /**
    * @copydoc Dali::Accessibility::Accessible::GetAttributes()
    */
-  Dali::Accessibility::Attributes GetAttributes() override;
+  Dali::Accessibility::Attributes GetAttributes() const override;
 
   /**
    * @copydoc Dali::Accessibility::Component::GetExtents()
    */
-  Dali::Rect<> GetExtents(Accessibility::CoordinateType type) override;
+  Dali::Rect<> GetExtents(Accessibility::CoordinateType type) const override;
 
   /**
    * @copydoc Dali::Accessibility::Component::GetLayer()
    */
-  Dali::Accessibility::ComponentLayer GetLayer() override;
+  Dali::Accessibility::ComponentLayer GetLayer() const override;
 
   /**
    * @copydoc Dali::Accessibility::Component::GetMdiZOrder()
    */
-  int16_t GetMdiZOrder() override;
+  int16_t GetMdiZOrder() const override;
 
   /**
    * @copydoc Dali::Accessibility::Component::GrabFocus()
@@ -172,7 +174,7 @@ public:
   /**
    * @copydoc Dali::Accessibility::Component::GetAlpha()
    */
-  double GetAlpha() override;
+  double GetAlpha() const override;
 
   /**
    * @copydoc Dali::Accessibility::Component::GrabHighlight()
@@ -187,30 +189,30 @@ public:
   /**
    * @copydoc Dali::Accessibility::Action::GetActionName()
    */
-  std::string GetActionName(size_t index) override;
+  std::string GetActionName(size_t index) const override;
 
   /**
    * @copydoc Dali::Accessibility::Action::GetLocalizedActionName()
    */
-  std::string GetLocalizedActionName(size_t index) override;
+  std::string GetLocalizedActionName(size_t index) const override;
 
   /**
    * @copydoc Dali::Accessibility::Action::GetActionDescription()
    */
-  std::string GetActionDescription(size_t index) override;
+  std::string GetActionDescription(size_t index) const override;
 
   /**
    * @copydoc Dali::Accessibility::Action::GetActionCount()
    */
-  size_t GetActionCount() override;
+  size_t GetActionCount() const override;
 
   /**
    * @copydoc Dali::Accessibility::Action::GetActionKeyBinding()
    */
-  std::string GetActionKeyBinding(size_t index) override;
+  std::string GetActionKeyBinding(size_t index) const override;
 
   /**
-   * @copydoc Dali::Accessibility::Action::DoAction(size_t)
+   * @copydoc Dali::Accessibility::Action::DoAction(std::size_t)
    */
   bool DoAction(size_t index) override;
 
@@ -270,4 +272,4 @@ public:
 
 } // namespace Dali::Toolkit::DevelControl
 
-#endif // DALI_TOOLKIT_ACCESSIBLE_IMPL_H
+#endif // DALI_TOOLKIT_CONTROL_ACCESSIBLE_H

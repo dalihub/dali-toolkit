@@ -314,15 +314,16 @@ private:
   bool mIndicatorFirstShow : 1; ///< True if the indicator has never been shown
 
 protected:
-  struct AccessibleImpl : public DevelControl::AccessibleImpl,
+  struct AccessibleImpl : public DevelControl::ControlAccessible,
                           public virtual Dali::Accessibility::Value
   {
-    using DevelControl::AccessibleImpl::AccessibleImpl;
-    double GetMinimum() override;
-    double GetCurrent() override;
-    double GetMaximum() override;
+    using DevelControl::ControlAccessible::ControlAccessible;
+
+    double GetMinimum() const override;
+    double GetCurrent() const override;
+    double GetMaximum() const override;
     bool   SetCurrent(double) override;
-    double GetMinimumIncrement() override;
+    double GetMinimumIncrement() const override;
   };
 };
 

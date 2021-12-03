@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "accessible-impl.h"
+#include "control-accessible.h"
 
 // EXTERNAL INCLUDES
 #ifdef DGETTEXT_ENABLED
@@ -66,7 +66,7 @@ static Dali::Actor CreateHighlightIndicatorActor()
 }
 } // unnamed namespace
 
-AccessibleImpl::AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal)
+ControlAccessible::ControlAccessible(Dali::Actor self, Dali::Accessibility::Role role, bool modal)
 : mSelf(self),
   mIsModal(modal)
 {
@@ -103,7 +103,7 @@ AccessibleImpl::AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role,
   });
 }
 
-std::string AccessibleImpl::GetName()
+std::string ControlAccessible::GetName() const
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
@@ -136,12 +136,12 @@ std::string AccessibleImpl::GetName()
   return GetLocaleText(name);
 }
 
-std::string AccessibleImpl::GetNameRaw()
+std::string ControlAccessible::GetNameRaw() const
 {
   return {};
 }
 
-std::string AccessibleImpl::GetDescription()
+std::string ControlAccessible::GetDescription() const
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
@@ -169,27 +169,27 @@ std::string AccessibleImpl::GetDescription()
   return GetLocaleText(description);
 }
 
-std::string AccessibleImpl::GetDescriptionRaw()
+std::string ControlAccessible::GetDescriptionRaw() const
 {
   return {};
 }
 
-Dali::Accessibility::Accessible* AccessibleImpl::GetParent()
+Dali::Accessibility::Accessible* ControlAccessible::GetParent()
 {
   return Dali::Accessibility::Accessible::Get(Self().GetParent());
 }
 
-size_t AccessibleImpl::GetChildCount()
+size_t ControlAccessible::GetChildCount() const
 {
   return Self().GetChildCount();
 }
 
-Dali::Accessibility::Accessible* AccessibleImpl::GetChildAtIndex(size_t index)
+Dali::Accessibility::Accessible* ControlAccessible::GetChildAtIndex(size_t index)
 {
   return Dali::Accessibility::Accessible::Get(Self().GetChildAt(static_cast<unsigned int>(index)));
 }
 
-size_t AccessibleImpl::GetIndexInParent()
+size_t ControlAccessible::GetIndexInParent()
 {
   auto self = Self();
   auto parent = self.GetParent();
@@ -208,17 +208,17 @@ size_t AccessibleImpl::GetIndexInParent()
   return static_cast<size_t>(-1);
 }
 
-Dali::Accessibility::Role AccessibleImpl::GetRole()
+Dali::Accessibility::Role ControlAccessible::GetRole() const
 {
   return Self().GetProperty<Dali::Accessibility::Role>(Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE);
 }
 
-std::string AccessibleImpl::GetLocalizedRoleName()
+std::string ControlAccessible::GetLocalizedRoleName() const
 {
   return GetLocaleText(GetRoleName());
 }
 
-bool AccessibleImpl::IsShowing()
+bool ControlAccessible::IsShowing()
 {
   Dali::Actor self = Self();
   if(!self.GetProperty<bool>(Actor::Property::VISIBLE) || self.GetProperty<Vector4>(Actor::Property::WORLD_COLOR).a == 0 || self.GetProperty<bool>(Dali::DevelActor::Property::CULLED))
@@ -227,7 +227,7 @@ bool AccessibleImpl::IsShowing()
   }
 
   auto* child  = this;
-  auto* parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(child->GetParent());
+  auto* parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(child->GetParent());
   if(!parent)
   {
     return true;
@@ -247,13 +247,13 @@ bool AccessibleImpl::IsShowing()
     {
       return false;
     }
-    parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(parent->GetParent());
+    parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(parent->GetParent());
   }
 
   return true;
 }
 
-Dali::Accessibility::States AccessibleImpl::CalculateStates()
+Dali::Accessibility::States ControlAccessible::CalculateStates()
 {
   Dali::Actor self = Self();
   Dali::Accessibility::States state;
@@ -283,12 +283,12 @@ Dali::Accessibility::States AccessibleImpl::CalculateStates()
   return state;
 }
 
-Dali::Accessibility::States AccessibleImpl::GetStates()
+Dali::Accessibility::States ControlAccessible::GetStates()
 {
   return CalculateStates();
 }
 
-Dali::Accessibility::Attributes AccessibleImpl::GetAttributes()
+Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
 {
   std::unordered_map<std::string, std::string> attributeMap;
   auto control = Dali::Toolkit::Control::DownCast(Self());
@@ -316,12 +316,12 @@ Dali::Accessibility::Attributes AccessibleImpl::GetAttributes()
   return attributeMap;
 }
 
-Dali::Accessibility::ComponentLayer AccessibleImpl::GetLayer()
+Dali::Accessibility::ComponentLayer ControlAccessible::GetLayer() const
 {
   return Dali::Accessibility::ComponentLayer::WINDOW;
 }
 
-Dali::Rect<> AccessibleImpl::GetExtents(Dali::Accessibility::CoordinateType type)
+Dali::Rect<> ControlAccessible::GetExtents(Dali::Accessibility::CoordinateType type) const
 {
   Dali::Actor self = Self();
 
@@ -343,24 +343,25 @@ Dali::Rect<> AccessibleImpl::GetExtents(Dali::Accessibility::CoordinateType type
   }
 }
 
-int16_t AccessibleImpl::GetMdiZOrder()
-{
-  return 0;
-}
-double AccessibleImpl::GetAlpha()
+int16_t ControlAccessible::GetMdiZOrder() const
 {
   return 0;
 }
 
-bool AccessibleImpl::GrabFocus()
+double ControlAccessible::GetAlpha() const
+{
+  return 0;
+}
+
+bool ControlAccessible::GrabFocus()
 {
   return Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor(Self());
 }
 
-void AccessibleImpl::ScrollToSelf()
+void ControlAccessible::ScrollToSelf()
 {
   auto* child = this;
-  auto* parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(child->GetParent());
+  auto* parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(child->GetParent());
 
   while (parent)
   {
@@ -369,11 +370,11 @@ void AccessibleImpl::ScrollToSelf()
       parent->ScrollToChild(child->Self());
     }
 
-    parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(parent->GetParent());
+    parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(parent->GetParent());
   }
 }
 
-void AccessibleImpl::RegisterPositionPropertyNotification()
+void ControlAccessible::RegisterPositionPropertyNotification()
 {
   auto                     control         = Dali::Toolkit::Control::DownCast(Self());
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
@@ -381,7 +382,7 @@ void AccessibleImpl::RegisterPositionPropertyNotification()
   controlImpl.RegisterAccessibilityPositionPropertyNotification();
 }
 
-void AccessibleImpl::UnregisterPositionPropertyNotification()
+void ControlAccessible::UnregisterPositionPropertyNotification()
 {
   auto                     control         = Dali::Toolkit::Control::DownCast(Self());
   Internal::Control&       internalControl = Toolkit::Internal::GetImplementation(control);
@@ -389,7 +390,7 @@ void AccessibleImpl::UnregisterPositionPropertyNotification()
   controlImpl.UnregisterAccessibilityPositionPropertyNotification();
 }
 
-bool AccessibleImpl::GrabHighlight()
+bool ControlAccessible::GrabHighlight()
 {
   Dali::Actor self = Self();
   auto oldHighlightedActor = GetCurrentlyHighlightedActor();
@@ -426,8 +427,8 @@ bool AccessibleImpl::GrabHighlight()
   highlight.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
 
   // Need to set resize policy again, to update SIZE property which is set by
-  // AccessibleImpl_NUI. The highlight could move from AccessibleImpl_NUI to
-  // AccessibleImpl. In this case, highlight has incorrect size.
+  // NUIViewAccessible. The highlight could move from NUIViewAccessible to
+  // ControlAccessible. In this case, highlight has incorrect size.
   highlight.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Remember the highlight actor, so that when the default is changed with
@@ -442,7 +443,7 @@ bool AccessibleImpl::GrabHighlight()
   return true;
 }
 
-bool AccessibleImpl::ClearHighlight()
+bool ControlAccessible::ClearHighlight()
 {
   Dali::Actor self = Self();
 
@@ -463,7 +464,7 @@ bool AccessibleImpl::ClearHighlight()
   return false;
 }
 
-std::string AccessibleImpl::GetActionName(size_t index)
+std::string ControlAccessible::GetActionName(size_t index) const
 {
   if(index >= GetActionCount())
   {
@@ -476,17 +477,17 @@ std::string AccessibleImpl::GetActionName(size_t index)
   return type.GetActionName(index);
 }
 
-std::string AccessibleImpl::GetLocalizedActionName(size_t index)
+std::string ControlAccessible::GetLocalizedActionName(size_t index) const
 {
   return GetLocaleText(GetActionName(index));
 }
 
-std::string AccessibleImpl::GetActionDescription(size_t index)
+std::string ControlAccessible::GetActionDescription(size_t index) const
 {
   return {};
 }
 
-size_t AccessibleImpl::GetActionCount()
+size_t ControlAccessible::GetActionCount() const
 {
   Dali::TypeInfo type;
   Self().GetTypeInfo(type);
@@ -494,23 +495,23 @@ size_t AccessibleImpl::GetActionCount()
   return type.GetActionCount();
 }
 
-std::string AccessibleImpl::GetActionKeyBinding(size_t index)
+std::string ControlAccessible::GetActionKeyBinding(size_t index) const
 {
   return {};
 }
 
-bool AccessibleImpl::DoAction(size_t index)
+bool ControlAccessible::DoAction(size_t index)
 {
   std::string actionName = GetActionName(index);
   return Self().DoAction(actionName, {});
 }
 
-bool AccessibleImpl::DoAction(const std::string& name)
+bool ControlAccessible::DoAction(const std::string& name)
 {
   return Self().DoAction(name, {});
 }
 
-bool AccessibleImpl::DoGesture(const Dali::Accessibility::GestureInfo& gestureInfo)
+bool ControlAccessible::DoGesture(const Dali::Accessibility::GestureInfo& gestureInfo)
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
@@ -527,7 +528,7 @@ bool AccessibleImpl::DoGesture(const Dali::Accessibility::GestureInfo& gestureIn
   return false;
 }
 
-std::vector<Dali::Accessibility::Relation> AccessibleImpl::GetRelationSet()
+std::vector<Dali::Accessibility::Relation> ControlAccessible::GetRelationSet()
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
 
@@ -551,32 +552,32 @@ std::vector<Dali::Accessibility::Relation> AccessibleImpl::GetRelationSet()
   return ret;
 }
 
-Dali::Actor AccessibleImpl::GetInternalActor()
+Dali::Actor ControlAccessible::GetInternalActor()
 {
   return Dali::Actor{};
 }
 
-bool AccessibleImpl::ScrollToChild(Actor child)
+bool ControlAccessible::ScrollToChild(Actor child)
 {
   return false;
 }
 
-Dali::Property::Index AccessibleImpl::GetNamePropertyIndex()
+Dali::Property::Index ControlAccessible::GetNamePropertyIndex()
 {
   return Actor::Property::NAME;
 }
 
-Dali::Property::Index AccessibleImpl::GetDescriptionPropertyIndex()
+Dali::Property::Index ControlAccessible::GetDescriptionPropertyIndex()
 {
   return Dali::Property::INVALID_INDEX;
 }
 
-void AccessibleImpl::SetLastPosition(Vector2 position)
+void ControlAccessible::SetLastPosition(Vector2 position)
 {
   mLastPosition = position;
 }
 
-Vector2 AccessibleImpl::GetLastPosition() const
+Vector2 ControlAccessible::GetLastPosition() const
 {
   return mLastPosition;
 }

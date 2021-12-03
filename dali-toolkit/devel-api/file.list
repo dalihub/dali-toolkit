@@ -9,8 +9,8 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/builder/builder.cpp
   ${devel_api_src_dir}/builder/json-parser.cpp
   ${devel_api_src_dir}/builder/tree-node.cpp
-  ${devel_api_src_dir}/controls/accessible-impl.cpp
   ${devel_api_src_dir}/controls/canvas-view/canvas-view.cpp
+  ${devel_api_src_dir}/controls/control-accessible.cpp
   ${devel_api_src_dir}/controls/control-devel.cpp
   ${devel_api_src_dir}/controls/control-wrapper.cpp
   ${devel_api_src_dir}/controls/control-wrapper-impl.cpp
@@ -86,8 +86,8 @@ SET( devel_api_accessibility-manager_header_files
 )
 
 SET( devel_api_controls_header_files
-  ${devel_api_src_dir}/controls/accessible-impl.h
   ${devel_api_src_dir}/controls/canvas-view/canvas-view.h
+  ${devel_api_src_dir}/controls/control-accessible.h
   ${devel_api_src_dir}/controls/control-depth-index-ranges.h
   ${devel_api_src_dir}/controls/control-devel.h
   ${devel_api_src_dir}/controls/control-wrapper.h
