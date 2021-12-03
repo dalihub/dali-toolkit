@@ -155,7 +155,10 @@ void TextAnchor::OnInitialize()
 }
 
 TextAnchor::TextAnchor()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT))
+: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+  mStartCharacterIndex(0),
+  mEndCharacterIndex(0),
+  mUri()
 {
 }
 
