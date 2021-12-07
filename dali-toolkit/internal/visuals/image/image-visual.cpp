@@ -477,7 +477,7 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
     }
 
     auto textureSet = mImpl->mRenderer.GetTextures();
-    if(textureSet)
+    if(textureSet && textureSet.GetTextureCount())
     {
       auto texture = textureSet.GetTexture(0);
       if(texture)
