@@ -79,7 +79,13 @@ Size Controller::Relayouter::CalculateLayoutSizeOnRequiredControllerSize(Control
                                                                         GET_GLYPH_METRICS);
 
   // Set the update info to relayout the whole text.
-  TextUpdateInfo& textUpdateInfo              = impl.mTextUpdateInfo;
+  TextUpdateInfo& textUpdateInfo = impl.mTextUpdateInfo;
+  if((0 == textUpdateInfo.mNumberOfCharactersToAdd) &&
+     (0 == textUpdateInfo.mPreviousNumberOfCharacters) &&
+     ((visualModel->mControlSize.width < Math::MACHINE_EPSILON_1000) || (visualModel->mControlSize.height < Math::MACHINE_EPSILON_1000)))
+  {
+    textUpdateInfo.mNumberOfCharactersToAdd = model->mLogicalModel->mText.Count();
+  }
   textUpdateInfo.mParagraphCharacterIndex     = 0u;
   textUpdateInfo.mRequestedNumberOfCharacters = model->mLogicalModel->mText.Count();
 
@@ -213,10 +219,10 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
   {
     ModelPtr& model = impl.mModel;
 
-    bool  actualellipsis = model->mElideEnabled;
-    float minPointSize   = impl.mTextFitMinSize;
-    float maxPointSize   = impl.mTextFitMaxSize;
-    float pointInterval  = impl.mTextFitStepSize;
+    bool  actualellipsis      = model->mElideEnabled;
+    float minPointSize        = impl.mTextFitMinSize;
+    float maxPointSize        = impl.mTextFitMaxSize;
+    float pointInterval       = impl.mTextFitStepSize;
     float currentFitPointSize = impl.mFontDefaults->mFitPointSize;
 
     model->mElideEnabled = false;
@@ -256,7 +262,7 @@ void Controller::Relayouter::FitPointSizeforLayout(Controller& controller, const
       }
     }
 
-    model->mElideEnabled              = actualellipsis;
+    model->mElideEnabled = actualellipsis;
     if(currentFitPointSize != pointSizeArray[bestSizeIndex])
     {
       impl.mTextFitChanged = true;

@@ -183,17 +183,10 @@ void AppendAccessibilityRelation(Dali::Actor control, Actor destination, Dali::A
 {
   if(auto controlDataImpl = GetControlImplementation(control))
   {
-    auto index = static_cast<Dali::Property::Array::SizeType>(relation);
-    if(index >= controlDataImpl->mAccessibilityRelations.size())
-    {
-      DALI_LOG_ERROR("Relation index exceeds vector size.");
-      return;
-    }
-
     auto object = controlDataImpl->GetAccessibilityObject(destination);
     if(object)
     {
-      controlDataImpl->mAccessibilityRelations[index].push_back(object);
+      controlDataImpl->mAccessibilityRelations[relation].insert(object);
     }
   }
 }
@@ -202,27 +195,16 @@ void RemoveAccessibilityRelation(Dali::Actor control, Actor destination, Dali::A
 {
   if(auto controlDataImpl = GetControlImplementation(control))
   {
-    auto index = static_cast<Dali::Property::Array::SizeType>(relation);
-    if(index >= controlDataImpl->mAccessibilityRelations.size())
-    {
-      DALI_LOG_ERROR("Relation index exceeds vector size.");
-      return;
-    }
-
     auto object = controlDataImpl->GetAccessibilityObject(destination);
-    if(!object)
+    if(object)
     {
-      return;
-    }
+      auto& relations = controlDataImpl->mAccessibilityRelations;
 
-    auto& targets = controlDataImpl->mAccessibilityRelations[index];
-    for(auto i = 0u; i < targets.size(); ++i)
-    {
-      if(targets[i] == object)
+      relations[relation].erase(object);
+
+      if(relations[relation].empty())
       {
-        std::swap(targets[i], targets.back());
-        targets.pop_back();
-        --i;
+        relations.erase(relation);
       }
     }
   }
@@ -232,16 +214,15 @@ std::vector<std::vector<Accessibility::Address>> GetAccessibilityRelations(Dali:
 {
   if(auto controlDataImpl = GetControlImplementation(control))
   {
-    auto& relations = controlDataImpl->mAccessibilityRelations;
-
-    std::vector<std::vector<Accessibility::Address>> result(relations.size());
+    std::vector<std::vector<Accessibility::Address>> result(static_cast<std::size_t>(Accessibility::RelationType::MAX_COUNT));
 
     // Map every Accessible* to its Address
-    for(std::size_t i = 0; i < relations.size(); ++i)
+    for(auto& relation : controlDataImpl->mAccessibilityRelations)
     {
-      auto& relation = relations[i];
+      auto  index   = static_cast<std::size_t>(relation.first);
+      auto& targets = relation.second;
 
-      std::transform(relation.begin(), relation.end(), std::back_inserter(result[i]), [](auto* x) {
+      std::transform(targets.begin(), targets.end(), std::back_inserter(result[index]), [](auto* x) {
         return x->GetAddress();
       });
     }
@@ -256,10 +237,7 @@ void ClearAccessibilityRelations(Dali::Actor control)
 {
   if(auto controlDataImpl = GetControlImplementation(control))
   {
-    for(auto& it : controlDataImpl->mAccessibilityRelations)
-    {
-      it.clear();
-    }
+    controlDataImpl->mAccessibilityRelations.clear();
   }
 }
 

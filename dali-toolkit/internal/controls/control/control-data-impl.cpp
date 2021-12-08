@@ -515,13 +515,6 @@ Control::Impl::Impl(Control& controlImpl)
   mAccessibilityConstructor = [](Dali::Actor actor) -> std::unique_ptr<Dali::Accessibility::Accessible> {
     return std::unique_ptr<Dali::Accessibility::Accessible>(new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::UNKNOWN));
   };
-
-  size_t length = static_cast<size_t>(Dali::Accessibility::RelationType::MAX_COUNT);
-  mAccessibilityRelations.reserve(length);
-  for(auto i = 0u; i < length; ++i)
-  {
-    mAccessibilityRelations.push_back({});
-  }
 }
 
 Control::Impl::~Impl()

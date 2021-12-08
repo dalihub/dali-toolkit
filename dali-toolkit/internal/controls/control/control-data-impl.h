@@ -35,7 +35,9 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/integration-api/debug.h>
+#include <map>
 #include <memory>
+#include <set>
 
 namespace Dali
 {
@@ -546,9 +548,9 @@ public:
 
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 
-  std::vector<std::vector<Accessibility::Accessible*>>                   mAccessibilityRelations;
-  std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)> mAccessibilityConstructor;
-  std::unique_ptr<Dali::Accessibility::Accessible>                       mAccessibilityObject;
+  std::map<Dali::Accessibility::RelationType, std::set<Accessibility::Accessible*>> mAccessibilityRelations;
+  std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Actor)>            mAccessibilityConstructor;
+  std::unique_ptr<Dali::Accessibility::Accessible>                                  mAccessibilityObject;
 
   // Gesture Detection
   PinchGestureDetector     mPinchGestureDetector;
