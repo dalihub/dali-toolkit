@@ -168,6 +168,7 @@ void Visual::Base::SetCustomShader(const Property::Map& shaderMap)
 
 void Visual::Base::SetProperties(const Property::Map& propertyMap)
 {
+  bool needUpdateShader = false;
   for(size_t i = 0; i < propertyMap.Count(); ++i)
   {
     const KeyValuePair&    pair  = propertyMap.GetKeyValue(i);
@@ -300,6 +301,26 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         {
           mImpl->mRenderer.SetProperty(mImpl->mBorderlineWidthIndex, mImpl->mBorderlineWidth);
         }
+        else if(DALI_UNLIKELY(mImpl->mRenderer && IsBorderlineRequired()))
+        {
+          // Unusual case. SetProperty called after OnInitialize().
+          // Assume that DoAction call UPDATE_PROPERTY.
+          // We must regist properies into renderer, and update shader.
+
+          // Borderline added by this action. Regist property to renderer.
+          mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_WIDTH, BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
+          mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_COLOR, BORDERLINE_COLOR, mImpl->mBorderlineColor);
+          mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
+
+          // Make Blend mode ON_WITHOUT_CULL for transparent mix color.
+          mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
+
+          // Change the shader must not be occured many times. we always have to use borderline feature.
+          mImpl->mAlwaysUsingBorderline = true;
+
+          // Change shader
+          needUpdateShader = true;
+        }
         break;
       }
       case Toolkit::DevelVisual::Property::BORDERLINE_COLOR:
@@ -358,6 +379,28 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
         {
           mImpl->mRenderer.SetProperty(mImpl->mCornerRadiusIndex, mImpl->mCornerRadius);
         }
+        else if(DALI_UNLIKELY(mImpl->mRenderer && IsRoundedCornerRequired()))
+        {
+          // Unusual case. SetProperty called after OnInitialize().
+          // Assume that DoAction call UPDATE_PROPERTY.
+          // We must regist properies into renderer, and update shader.
+
+          // CornerRadius added by this action. Regist property to renderer.
+          mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
+          mImpl->mRenderer.RegisterProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
+
+          // Change the shader must not be occured many times. we always have to use corner radius feature.
+          mImpl->mAlwaysUsingCornerRadius = true;
+
+          if(!IsBorderlineRequired())
+          {
+            // If IsBorderlineRequired is true, BLEND_MODE is already BlendMode::ON_WITHOUT_CULL. So we don't overwrite it.
+            mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+          }
+
+          // Change shader
+          needUpdateShader = true;
+        }
         break;
       }
       case Toolkit::DevelVisual::Property::CORNER_RADIUS_POLICY:
@@ -371,6 +414,15 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
             case Toolkit::Visual::Transform::Policy::ABSOLUTE:
             {
               mImpl->mCornerRadiusPolicy = policy;
+              if(DALI_UNLIKELY(mImpl->mRenderer && mImpl->mCornerRadiusIndex != Property::INVALID_INDEX))
+              {
+                // Unusual case. SetProperty called after OnInitialize().
+                // Assume that DoAction call UPDATE_PROPERTY.
+                // We must update properies result into renderer
+                // Note : mImpl->mCornerRadiusIndex is not INVALID_INDEX.
+                // So CornerRadiusPolicy property is already registed.
+                mImpl->mRenderer.SetProperty(mImpl->mRenderer.GetPropertyIndex(CORNER_RADIUS_POLICY), mImpl->mCornerRadiusPolicy);
+              }
               break;
             }
             default:
@@ -386,6 +438,11 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
   }
 
   DoSetProperties(propertyMap);
+
+  if(DALI_UNLIKELY(needUpdateShader))
+  {
+    UpdateShader();
+  }
 }
 
 void Visual::Base::SetTransformAndSize(const Property::Map& transform, Size controlSize)

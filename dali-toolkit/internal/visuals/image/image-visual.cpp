@@ -795,11 +795,11 @@ void ImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
   }
 }
 
-void ImageVisual::OnDoAction(const Dali::Property::Index actionName, const Dali::Property::Value& attributes)
+void ImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes)
 {
   // Check if action is valid for this visual type and perform action if possible
 
-  switch(actionName)
+  switch(actionId)
   {
     case DevelImageVisual::Action::RELOAD:
     {

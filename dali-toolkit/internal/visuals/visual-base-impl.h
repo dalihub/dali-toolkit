@@ -92,12 +92,12 @@ public:
   void SetTransformAndSize(const Property::Map& transform, Size controlSize);
 
   /**
-   * @brief Performs an action on the visual with the given action name and attributes.
+   * @brief Performs an action on the visual with the given action id and attributes.
    *
-   * @param[in] actionName The name of the action to perform this API only takes an Index
+   * @param[in] actionId The id of the action to perform this API only takes an Index
    * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
    */
-  void DoAction(const Dali::Property::Index actionName, const Dali::Property::Value attributes);
+  void DoAction(const Dali::Property::Index actionId, const Dali::Property::Value attributes);
 
   /**
    * @copydoc Toolkit::Visual::Base::GetHeightForWidth

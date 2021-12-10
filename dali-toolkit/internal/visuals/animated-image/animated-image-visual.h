@@ -133,7 +133,7 @@ public: // from Visual
   /**
    * @copydoc Visual::Base::OnDoAction
    */
-  void OnDoAction(const Dali::Property::Index actionName, const Dali::Property::Value& attributes) override;
+  void OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes) override;
 
 protected:
   /**

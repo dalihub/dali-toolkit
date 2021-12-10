@@ -23,6 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -112,6 +113,27 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
     if(!blurRadiusValue->Get(mBlurRadius))
     {
       DALI_LOG_ERROR("ColorVisual:DoSetProperties:: BLUR_RADIUS property has incorrect type: %d\n", blurRadiusValue->GetType());
+    }
+
+    if(mBlurRadiusIndex != Property::INVALID_INDEX)
+    {
+      mImpl->mRenderer.SetProperty(mBlurRadiusIndex, mBlurRadius);
+    }
+    else if(DALI_UNLIKELY(mImpl->mRenderer && (!EqualsZero(mBlurRadius) || mAlwaysUsingBlurRadius)))
+    {
+      // Unusual case. SetProperty called after OnInitialize().
+      // Assume that DoAction call UPDATE_PROPERTY.
+      // We must regist properies into renderer, and update shader.
+
+      // BlurRadius added by this action. Regist property to renderer.
+      mBlurRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
+      mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
+
+      // Change the shader must not be occured many times. we always have to use blur feature.
+      mAlwaysUsingBlurRadius = true;
+
+      // Change shader
+      UpdateShader();
     }
   }
 }
