@@ -52,6 +52,15 @@ public:
   ImageAtlasManager();
 
   /**
+   * @brief Check whether the image of url could be Atlas or not.
+   *
+   * @param [in] url The URL of the resource image file to use.
+   * @param [in] size The width and height to fit the loaded image to.
+   * @return True if the image could be Atlas.
+   */
+  bool CheckAtlasAvailable(const VisualUrl& url, const ImageDimensions& size) const;
+
+  /**
    * @brief Add an image to the atlas.
    *
    * @note To make the atlasing efficient, an valid size should be provided.
