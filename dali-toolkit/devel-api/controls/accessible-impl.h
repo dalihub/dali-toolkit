@@ -17,8 +17,12 @@
  *
  */
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/devel-api/atspi-interfaces/accessible.h>
+#include <dali/devel-api/atspi-interfaces/action.h>
+#include <dali/devel-api/atspi-interfaces/collection.h>
+#include <dali/devel-api/atspi-interfaces/component.h>
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES

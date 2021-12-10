@@ -23,6 +23,8 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/devel-api/atspi-interfaces/accessible.h>
+#include <dali/devel-api/atspi-interfaces/text.h>
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
 

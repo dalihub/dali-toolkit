@@ -19,6 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/atspi-interfaces/hypertext.h>
+#include <dali/devel-api/atspi-interfaces/text.h>
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES

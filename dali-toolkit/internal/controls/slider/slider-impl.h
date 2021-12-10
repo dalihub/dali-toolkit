@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/atspi-interfaces/value.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>

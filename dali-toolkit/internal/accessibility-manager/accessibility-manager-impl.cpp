@@ -19,8 +19,8 @@
 #include "accessibility-manager-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
 #include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-devel.h>
