@@ -59,18 +59,19 @@ public:
   /**
    * @brief Constructor.
    * @param[in] textureManager The texture manager
-   * @param[in] urlList List of urls to cache
-   * @param[in] observer FrameReady observer
-   * @param[in] batchSize The size of a batch to load
-   * @param[in] interval Time interval between each frame
+   * @param[in] observer       FrameReady observer
+   * @param[in] maskingData    Masking data to be applied.
+   * @param[in] batchSize      The size of a batch to load
+   * @param[in] interval       Time interval between each frame
    *
    * This will start loading textures immediately, according to the
    * batch and cache sizes. The cache is as large as the number of urls.
    */
-  ImageCache(TextureManager&                 textureManager,
-             ImageCache::FrameReadyObserver& observer,
-             uint32_t                        batchSize,
-             uint32_t                        interval);
+  ImageCache(TextureManager&                     textureManager,
+             TextureManager::MaskingDataPointer& maskingData,
+             ImageCache::FrameReadyObserver&     observer,
+             uint32_t                            batchSize,
+             uint32_t                            interval);
 
   virtual ~ImageCache();
 
@@ -139,13 +140,16 @@ private:
    */
   void TextureManagerDestroyed() final;
 
+  void AllocateMaskData();
+
 protected:
-  TextureManager&     mTextureManager;
-  FrameReadyObserver& mObserver;
-  uint32_t            mBatchSize;
-  uint32_t            mInterval;
-  bool                mRequestingLoad : 1;
-  bool                mTextureManagerAlive : 1;
+  TextureManager&                     mTextureManager;
+  FrameReadyObserver&                 mObserver;
+  TextureManager::MaskingDataPointer& mMaskingData;
+  uint32_t                            mBatchSize;
+  uint32_t                            mInterval;
+  bool                                mRequestingLoad : 1;
+  bool                                mTextureManagerAlive : 1;
 };
 
 } //namespace Internal

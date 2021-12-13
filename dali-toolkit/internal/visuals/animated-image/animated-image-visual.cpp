@@ -174,7 +174,7 @@ void AnimatedImageVisual::CreateImageCache()
 
   if(mAnimatedImageLoading)
   {
-    mImageCache = new RollingAnimatedImageCache(textureManager, mAnimatedImageLoading, *this, mCacheSize, mBatchSize, IsSynchronousLoadingRequired());
+    mImageCache = new RollingAnimatedImageCache(textureManager, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, IsSynchronousLoadingRequired());
   }
   else if(mImageUrls)
   {
@@ -185,11 +185,11 @@ void AnimatedImageVisual::CreateImageCache()
     uint16_t cacheSize = std::max(std::min(std::max(batchSize, mCacheSize), numUrls), MINIMUM_CACHESIZE);
     if(cacheSize < numUrls)
     {
-      mImageCache = new RollingImageCache(textureManager, *mImageUrls, *this, cacheSize, batchSize, mFrameDelay);
+      mImageCache = new RollingImageCache(textureManager, *mImageUrls, mMaskingData, *this, cacheSize, batchSize, mFrameDelay);
     }
     else
     {
-      mImageCache = new FixedImageCache(textureManager, *mImageUrls, *this, batchSize, mFrameDelay);
+      mImageCache = new FixedImageCache(textureManager, *mImageUrls, mMaskingData, *this, batchSize, mFrameDelay);
     }
   }
 
@@ -218,6 +218,7 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mCurrentLoopIndex(FIRST_LOOP),
   mLoadPolicy(Toolkit::ImageVisual::LoadPolicy::ATTACHED),
   mReleasePolicy(Toolkit::ImageVisual::ReleasePolicy::DETACHED),
+  mMaskingData(),
   mFrameCount(0),
   mImageSize(),
   mActionStatus(DevelAnimatedImageVisual::Action::PLAY),
@@ -259,6 +260,18 @@ void AnimatedImageVisual::GetNaturalSize(Vector2& naturalSize)
     else if(mImageUrls && mImageUrls->size() > 0)
     {
       mImageSize = Dali::GetClosestImageSize((*mImageUrls)[0].mUrl);
+    }
+
+    if(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid() &&
+       mMaskingData->mCropToMask)
+    {
+      ImageDimensions dimensions = Dali::GetClosestImageSize(mMaskingData->mAlphaMaskUrl.GetUrl());
+      if(dimensions != ImageDimensions(0, 0))
+      {
+        naturalSize.x = dimensions.GetWidth();
+        naturalSize.y = dimensions.GetHeight();
+      }
+      return;
     }
   }
 
@@ -302,6 +315,13 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, (mImageCache) ? static_cast<int32_t>(mImageCache->GetTotalFrameCount()) : -1);
 
   map.Insert(Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mStopBehavior);
+
+  if(mMaskingData)
+  {
+    map.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mMaskingData->mAlphaMaskUrl.GetUrl());
+    map.Insert(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskingData->mContentScaleFactor);
+    map.Insert(Toolkit::ImageVisual::Property::CROP_TO_MASK, mMaskingData->mCropToMask);
+  }
 
   map.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, mLoadPolicy);
   map.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, mReleasePolicy);
@@ -417,6 +437,18 @@ void AnimatedImageVisual::DoSetProperties(const Property::Map& propertyMap)
       else if(keyValue.first == STOP_BEHAVIOR_NAME)
       {
         DoSetProperty(Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, keyValue.second);
+      }
+      else if(keyValue.first == ALPHA_MASK_URL)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, keyValue.second);
+      }
+      else if(keyValue.first == MASK_CONTENT_SCALE_NAME)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, keyValue.second);
+      }
+      else if(keyValue.first == CROP_TO_MASK_NAME)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::CROP_TO_MASK, keyValue.second);
       }
       else if(keyValue.first == LOAD_POLICY_NAME)
       {
@@ -555,6 +587,39 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       else
       {
         mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+      }
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::ALPHA_MASK_URL:
+    {
+      std::string alphaUrl = "";
+      if(value.Get(alphaUrl))
+      {
+        AllocateMaskData();
+        mMaskingData->mAlphaMaskUrl = alphaUrl;
+      }
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE:
+    {
+      float scale = 1.0f;
+      if(value.Get(scale))
+      {
+        AllocateMaskData();
+        mMaskingData->mContentScaleFactor = scale;
+      }
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::CROP_TO_MASK:
+    {
+      bool crop = false;
+      if(value.Get(crop))
+      {
+        AllocateMaskData();
+        mMaskingData->mCropToMask = crop;
       }
       break;
     }
@@ -868,6 +933,14 @@ Shader AnimatedImageVisual::GenerateShader() const
     .EnableBorderline(IsBorderlineRequired())
   );
   return shader;
+}
+
+void AnimatedImageVisual::AllocateMaskData()
+{
+  if(!mMaskingData)
+  {
+    mMaskingData.reset(new TextureManager::MaskingData());
+  }
 }
 
 } // namespace Internal

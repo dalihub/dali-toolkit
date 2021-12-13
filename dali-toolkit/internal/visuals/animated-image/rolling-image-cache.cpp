@@ -56,9 +56,14 @@ namespace Toolkit
 {
 namespace Internal
 {
-RollingImageCache::RollingImageCache(
-  TextureManager& textureManager, UrlList& urlList, ImageCache::FrameReadyObserver& observer, uint16_t cacheSize, uint16_t batchSize, uint32_t interval)
-: ImageCache(textureManager, observer, batchSize, interval),
+RollingImageCache::RollingImageCache(TextureManager&                     textureManager,
+                                     UrlList&                            urlList,
+                                     TextureManager::MaskingDataPointer& maskingData,
+                                     ImageCache::FrameReadyObserver&     observer,
+                                     uint16_t                            cacheSize,
+                                     uint16_t                            batchSize,
+                                     uint32_t                            interval)
+: ImageCache(textureManager, maskingData, observer, batchSize, interval),
   mImageUrls(urlList),
   mQueue(cacheSize)
 {
@@ -76,9 +81,7 @@ TextureSet RollingImageCache::Frame(uint32_t frameIndex)
   bool popExist = false;
   while(!mQueue.IsEmpty() && mQueue.Front().mUrlIndex != frameIndex)
   {
-    ImageFrame imageFrame = mQueue.PopFront();
-    mTextureManager.Remove(mImageUrls[imageFrame.mUrlIndex].mTextureId, this);
-    mImageUrls[imageFrame.mUrlIndex].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+    PopFrontCache();
     popExist                                    = true;
   }
   if(popExist || mQueue.IsEmpty())
@@ -159,7 +162,6 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
     bool                               synchronousLoading = false;
     bool                               atlasingStatus     = false;
     bool                               loadingStatus      = false;
-    TextureManager::MaskingDataPointer maskInfo           = nullptr;
     AtlasUploadObserver*               atlasObserver      = nullptr;
     ImageAtlasManagerPtr               imageAtlasManager  = nullptr;
     Vector4                            textureRect;
@@ -167,7 +169,7 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
     auto                               preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     TextureSet textureSet = mTextureManager.LoadTexture(
-      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, maskInfo, synchronousLoading, mImageUrls[imageFrame.mUrlIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, mImageUrls[imageFrame.mUrlIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
 
     // If textureSet is returned but loadingState is false than load state is LOAD_FINISHED. (Notification is not comming yet.)
     // If textureSet is null and the request is synchronous, load state is LOAD_FAILED.
@@ -232,13 +234,27 @@ void RollingImageCache::CheckFrontFrame(bool wasReady)
   }
 }
 
+void RollingImageCache::PopFrontCache()
+{
+  ImageFrame imageFrame = mQueue.PopFront();
+  mTextureManager.Remove(mImageUrls[imageFrame.mUrlIndex].mTextureId, this);
+  mImageUrls[imageFrame.mUrlIndex].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+
+  if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
+  {
+    mTextureManager.Remove(mMaskingData->mAlphaMaskId, this);
+    if(mQueue.IsEmpty())
+    {
+      mMaskingData->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
+    }
+  }
+}
+
 void RollingImageCache::ClearCache()
 {
   while(mTextureManagerAlive && !mQueue.IsEmpty())
   {
-    ImageFrame imageFrame = mQueue.PopFront();
-    mTextureManager.Remove(mImageUrls[imageFrame.mUrlIndex].mTextureId, this);
-    mImageUrls[imageFrame.mUrlIndex].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+    PopFrontCache();
   }
   mLoadStates.assign(mImageUrls.size(), TextureManager::LoadState::NOT_STARTED);
 }

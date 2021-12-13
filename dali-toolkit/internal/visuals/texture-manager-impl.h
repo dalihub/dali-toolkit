@@ -59,7 +59,7 @@ class TextureManager : public ConnectionTracker
 {
 public:
   typedef int32_t  TextureId;               ///< The TextureId type. This is used as a handle to refer to a particular Texture.
-  static const int INVALID_TEXTURE_ID = -1; ///< Used to represent a null TextureId or error
+  static constexpr int32_t INVALID_TEXTURE_ID = -1; ///< Used to represent a null TextureId or error
 
   /**
    * Whether the texture should be atlased or uploaded into it's own GPU texture
@@ -169,6 +169,7 @@ public:
    * @param[in]  frameIndex            The frame index to load.
    * @param[out] loadingStatus         The loading status of the texture
    * @param[out] textureId             The textureId of the frame
+   * @param[in, out] maskInfo          Mask info structure
    * @param[in]  samplingMode          The SamplingMode to use
    * @param[in]  wrapModeU             Horizontal Wrap mode
    * @param[in]  wrapModeV             Vertical Wrap mode
@@ -184,6 +185,7 @@ public:
                                       uint32_t                   frameIndex,
                                       bool&                      loadingStatus,
                                       TextureManager::TextureId& textureId,
+                                      MaskingDataPointer&        maskInfo,
                                       Dali::SamplingMode::Type   samplingMode,
                                       Dali::WrapMode::Type       wrapModeU,
                                       Dali::WrapMode::Type       wrapModeV,

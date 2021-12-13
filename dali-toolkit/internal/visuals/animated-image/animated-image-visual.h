@@ -247,6 +247,12 @@ private:
    */
   TextureSet SetLoadingFailed();
 
+  /**
+   * @brief Allocate mask data.
+   * This is allocated only once.
+   */
+  void AllocateMaskData();
+
   // Undefined
   AnimatedImageVisual(const AnimatedImageVisual& animatedImageVisual);
 
@@ -274,9 +280,10 @@ private:
   int16_t              mLoopCount;
   int16_t              mCurrentLoopIndex;
 
-  // Variables for image visual policy.
+  // Variables for image visual properties.
   Dali::Toolkit::ImageVisual::LoadPolicy::Type    mLoadPolicy;
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
+  TextureManager::MaskingDataPointer              mMaskingData;
 
   // Shared variables
   uint32_t        mFrameCount; // Number of frames

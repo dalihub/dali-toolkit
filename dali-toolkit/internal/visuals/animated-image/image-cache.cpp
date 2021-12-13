@@ -22,12 +22,14 @@ namespace Toolkit
 {
 namespace Internal
 {
-ImageCache::ImageCache(TextureManager&                 textureManager,
-                       ImageCache::FrameReadyObserver& observer,
-                       uint32_t                        batchSize,
-                       uint32_t                        interval)
+ImageCache::ImageCache(TextureManager&                     textureManager,
+                       TextureManager::MaskingDataPointer& maskingData,
+                       ImageCache::FrameReadyObserver&     observer,
+                       uint32_t                            batchSize,
+                       uint32_t                            interval)
 : mTextureManager(textureManager),
   mObserver(observer),
+  mMaskingData(maskingData),
   mBatchSize(batchSize),
   mInterval(interval),
   mRequestingLoad(false),

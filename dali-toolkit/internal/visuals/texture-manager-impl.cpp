@@ -146,6 +146,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(Dali::AnimatedImageLoading a
                                                     uint32_t                   frameIndex,
                                                     bool&                      loadingStatus,
                                                     TextureManager::TextureId& textureId,
+                                                    MaskingDataPointer&        maskInfo,
                                                     Dali::SamplingMode::Type   samplingMode,
                                                     Dali::WrapMode::Type       wrapModeU,
                                                     Dali::WrapMode::Type       wrapModeV,
@@ -168,6 +169,15 @@ TextureSet TextureManager::LoadAnimatedImageTexture(Dali::AnimatedImageLoading a
     }
     else
     {
+      if(maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
+      {
+        Devel::PixelBuffer maskPixelBuffer = LoadImageFromFile(maskInfo->mAlphaMaskUrl.GetUrl(), ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true);
+        if(maskPixelBuffer)
+        {
+          pixelBuffer.ApplyMask(maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
+        }
+      }
+
       PixelData pixelData = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
       if(!textureSet)
       {
@@ -180,9 +190,36 @@ TextureSet TextureManager::LoadAnimatedImageTexture(Dali::AnimatedImageLoading a
   }
   else
   {
-    loadingStatus = true;
-    auto preMultiply                    = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-    textureId                           = RequestLoadInternal(animatedImageLoading.GetUrl(), INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, TextureManager::NO_ATLAS, false, StorageType::UPLOAD_TO_TEXTURE, textureObserver, true, TextureManager::ReloadPolicy::CACHED, preMultiply, animatedImageLoading, frameIndex, useCache);
+    TextureId alphaMaskId        = INVALID_TEXTURE_ID;
+    float     contentScaleFactor = 1.0f;
+    bool      cropToMask         = false;
+    if(maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
+    {
+      maskInfo->mAlphaMaskId = RequestMaskLoad(maskInfo->mAlphaMaskUrl);
+      alphaMaskId            = maskInfo->mAlphaMaskId;
+      contentScaleFactor     = maskInfo->mContentScaleFactor;
+      cropToMask             = maskInfo->mCropToMask;
+    }
+
+    loadingStatus    = true;
+    auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+    textureId        = RequestLoadInternal(animatedImageLoading.GetUrl(),
+                                    alphaMaskId,
+                                    contentScaleFactor,
+                                    ImageDimensions(),
+                                    FittingMode::SCALE_TO_FILL,
+                                    SamplingMode::BOX_THEN_LINEAR,
+                                    TextureManager::NO_ATLAS,
+                                    cropToMask,
+                                    StorageType::UPLOAD_TO_TEXTURE,
+                                    textureObserver,
+                                    true,
+                                    TextureManager::ReloadPolicy::CACHED,
+                                    preMultiply,
+                                    animatedImageLoading,
+                                    frameIndex,
+                                    useCache);
+
     TextureManager::LoadState loadState = GetTextureStateInternal(textureId);
     if(loadState == TextureManager::LoadState::UPLOADED)
     {
@@ -244,8 +281,25 @@ Devel::PixelBuffer TextureManager::LoadPixelBuffer(
   return pixelBuffer;
 }
 
-TextureSet TextureManager::LoadTexture(
-  const VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode, MaskingDataPointer& maskInfo, bool synchronousLoading, TextureManager::TextureId& textureId, Vector4& textureRect, Dali::ImageDimensions& textureRectSize, bool& atlasingStatus, bool& loadingStatus, Dali::WrapMode::Type wrapModeU, Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver, AtlasUploadObserver* atlasObserver, ImageAtlasManagerPtr imageAtlasManager, bool orientationCorrection, TextureManager::ReloadPolicy reloadPolicy, TextureManager::MultiplyOnLoad& preMultiplyOnLoad)
+TextureSet TextureManager::LoadTexture(const VisualUrl&                url,
+                                       Dali::ImageDimensions           desiredSize,
+                                       Dali::FittingMode::Type         fittingMode,
+                                       Dali::SamplingMode::Type        samplingMode,
+                                       MaskingDataPointer&             maskInfo,
+                                       bool                            synchronousLoading,
+                                       TextureManager::TextureId&      textureId,
+                                       Vector4&                        textureRect,
+                                       Dali::ImageDimensions&          textureRectSize,
+                                       bool&                           atlasingStatus,
+                                       bool&                           loadingStatus,
+                                       Dali::WrapMode::Type            wrapModeU,
+                                       Dali::WrapMode::Type            wrapModeV,
+                                       TextureUploadObserver*          textureObserver,
+                                       AtlasUploadObserver*            atlasObserver,
+                                       ImageAtlasManagerPtr            imageAtlasManager,
+                                       bool                            orientationCorrection,
+                                       TextureManager::ReloadPolicy    reloadPolicy,
+                                       TextureManager::MultiplyOnLoad& preMultiplyOnLoad)
 {
   TextureSet textureSet;
 

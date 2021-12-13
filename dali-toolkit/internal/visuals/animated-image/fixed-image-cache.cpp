@@ -36,9 +36,13 @@ static constexpr bool ENABLE_ORIENTATION_CORRECTION(true);
 static constexpr uint32_t FIRST_FRAME_INDEX = 0u;
 } // namespace
 
-FixedImageCache::FixedImageCache(
-  TextureManager& textureManager, UrlList& urlList, ImageCache::FrameReadyObserver& observer, uint32_t batchSize, uint32_t interval)
-: ImageCache(textureManager, observer, batchSize, interval),
+FixedImageCache::FixedImageCache(TextureManager&                     textureManager,
+                                 UrlList&                            urlList,
+                                 TextureManager::MaskingDataPointer& maskingData,
+                                 ImageCache::FrameReadyObserver&     observer,
+                                 uint32_t                            batchSize,
+                                 uint32_t                            interval)
+: ImageCache(textureManager, maskingData, observer, batchSize, interval),
   mImageUrls(urlList),
   mFront(FIRST_FRAME_INDEX)
 {
@@ -126,7 +130,6 @@ void FixedImageCache::LoadBatch()
     bool                               synchronousLoading = false;
     bool                               atlasingStatus     = false;
     bool                               loadingStatus      = false;
-    TextureManager::MaskingDataPointer maskInfo           = nullptr;
     AtlasUploadObserver*               atlasObserver      = nullptr;
     ImageAtlasManagerPtr               imageAtlasManager  = nullptr;
     Vector4                            textureRect;
@@ -134,7 +137,7 @@ void FixedImageCache::LoadBatch()
     auto                               preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     TextureSet textureSet = mTextureManager.LoadTexture(
-      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, maskInfo, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
 
     // If textureSet is returned but loadingState is false than load state is LOAD_FINISHED. (Notification is not comming yet.)
     // If textureSet is null and the request is synchronous, load state is LOAD_FAILED.
@@ -198,10 +201,16 @@ void FixedImageCache::ClearCache()
     {
       mTextureManager.Remove(mImageUrls[i].mTextureId, this);
       mImageUrls[i].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+
+      if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
+      {
+        mTextureManager.Remove(mMaskingData->mAlphaMaskId, this);
+      }
     }
   }
   mReadyFlags.clear();
   mLoadStates.assign(mImageUrls.size(), TextureManager::LoadState::NOT_STARTED);
+  mMaskingData->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
 }
 
 void FixedImageCache::UploadComplete(
