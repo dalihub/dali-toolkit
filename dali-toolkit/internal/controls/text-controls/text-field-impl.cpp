@@ -204,8 +204,8 @@ Toolkit::TextField::InputStyle::Mask ConvertInputStyle(Text::InputStyle::Mask in
 bool IsHiddenInput(Toolkit::TextField textField)
 {
   Property::Map hiddenInputSettings = textField.GetProperty<Property::Map>(Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS);
-  auto mode  = hiddenInputSettings.Find(Toolkit::HiddenInput::Property::MODE);
-  if (mode && (mode->Get<int>() != Toolkit::HiddenInput::Mode::HIDE_NONE))
+  auto          mode                = hiddenInputSettings.Find(Toolkit::HiddenInput::Property::MODE);
+  if(mode && (mode->Get<int>() != Toolkit::HiddenInput::Mode::HIDE_NONE))
   {
     return true;
   }
@@ -215,8 +215,8 @@ bool IsHiddenInput(Toolkit::TextField textField)
 char GetSubstituteCharacter(Toolkit::TextField textField)
 {
   Property::Map hiddenInputSettings = textField.GetProperty<Property::Map>(Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS);
-  auto substChar = hiddenInputSettings.Find(Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER);
-  if (substChar)
+  auto          substChar           = hiddenInputSettings.Find(Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER);
+  if(substChar)
   {
     return static_cast<char>(substChar->Get<int>());
   }
@@ -1128,10 +1128,20 @@ TextField::~TextField()
   }
 }
 
+Vector<Vector2> TextField::GetTextSize(const uint32_t startIndex, const uint32_t endIndex) const
+{
+  return mController->GetTextSize(startIndex, endIndex);
+}
+
+Vector<Vector2> TextField::GetTextPosition(const uint32_t startIndex, const uint32_t endIndex) const
+{
+  return mController->GetTextPosition(startIndex, endIndex);
+}
+
 std::string TextField::AccessibleImpl::GetName()
 {
   auto self = Toolkit::TextField::DownCast(Self());
-  if (IsHiddenInput(self))
+  if(IsHiddenInput(self))
   {
     return {};
   }
@@ -1193,8 +1203,8 @@ bool TextField::AccessibleImpl::SetCursorOffset(size_t offset)
 Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
   size_t offset, Dali::Accessibility::TextBoundary boundary)
 {
-  auto self     = Toolkit::TextField::DownCast(Self());
-  auto range    = Dali::Accessibility::Range{};
+  auto self  = Toolkit::TextField::DownCast(Self());
+  auto range = Dali::Accessibility::Range{};
 
   if(IsHiddenInput(self))
   {
@@ -1297,14 +1307,14 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetRangeOfSelection(size_t
     return {};
   }
 
-  auto self = Toolkit::TextField::DownCast(Self());
+  auto self       = Toolkit::TextField::DownCast(Self());
   auto controller = Dali::Toolkit::GetImpl(self).GetTextController();
-  auto indices = controller->GetSelectionIndexes();
+  auto indices    = controller->GetSelectionIndexes();
 
   auto startOffset = static_cast<size_t>(indices.first);
-  auto endOffset = static_cast<size_t>(indices.second);
+  auto endOffset   = static_cast<size_t>(indices.second);
 
-  if (IsHiddenInput(self))
+  if(IsHiddenInput(self))
   {
     return {startOffset, endOffset, std::string(endOffset - startOffset, GetSubstituteCharacter(self))};
   }

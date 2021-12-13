@@ -37,6 +37,7 @@
 #include <dali-toolkit/internal/text/text-controller-relayouter.h>
 #include <dali-toolkit/internal/text/text-controller-text-updater.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
+#include <dali-toolkit/internal/text/text-geometry.h>
 
 namespace
 {
@@ -116,7 +117,6 @@ void UpdateCursorPosition(Dali::Toolkit::Text::EventData* eventData)
 
 namespace Dali::Toolkit::Text
 {
-
 void Controller::EnableTextInput(DecoratorPtr decorator, InputMethodContext& inputMethodContext)
 {
   if(!decorator)
@@ -1232,6 +1232,24 @@ Controller::UpdateTextType Controller::Relayout(const Size& size, Dali::LayoutDi
 void Controller::RequestRelayout()
 {
   mImpl->RequestRelayout();
+}
+
+Vector<Vector2> Controller::GetTextSize(CharacterIndex startIndex, CharacterIndex endIndex)
+{
+  Vector<Vector2> sizesList;
+  Vector<Vector2> positionsList;
+
+  GetTextGeometry(mImpl->mModel, startIndex, endIndex, sizesList, positionsList);
+  return sizesList;
+}
+
+Vector<Vector2> Controller::GetTextPosition(CharacterIndex startIndex, CharacterIndex endIndex)
+{
+  Vector<Vector2> sizesList;
+  Vector<Vector2> positionsList;
+
+  GetTextGeometry(mImpl->mModel, startIndex, endIndex, sizesList, positionsList);
+  return positionsList;
 }
 
 bool Controller::IsInputStyleChangedSignalsQueueEmpty()

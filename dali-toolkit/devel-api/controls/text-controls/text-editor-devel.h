@@ -451,6 +451,30 @@ DALI_TOOLKIT_API void SelectText(TextEditor textEditor, const uint32_t start, co
 DALI_TOOLKIT_API void ScrollBy(TextEditor textEditor, Vector2 scroll);
 
 /**
+ * @brief Get the rendered size of a specific text range.
+ * if the requested text is at multilines, multiple sizes will be returned for each text located in a separate line.
+ * if a line contains characters with different directions, multiple sizes will be returned for each block of contiguous characters with the same direction.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ * @param[in] startIndex start index of the text requested to calculate size for.
+ * @param[in] endIndex end index(included) of the text requested to calculate size for.
+ * @return list of sizes of the reuested text.
+ */
+DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextEditor textEditor, const uint32_t startIndex, const uint32_t endIndex);
+
+/**
+ * @brief Get the top/left rendered position of a specific text range.
+ * if the requested text is at multilines, multiple positions will be returned for each text located in a separate line.
+ * if a line contains characters with different directions, multiple positions will be returned for each block of contiguous characters with the same direction.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ * @param[in] startIndex start index of the text requested to get position to.
+ * @param[in] endIndex end index(included) of the text requested to get position to.
+ * @return list of positions of the requested text.
+ */
+DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextEditor textEditor, const uint32_t startIndex, const uint32_t endIndex);
+
+/**
  * @brief Copy and return the selected text of TextEditor.
  *
  * @param[in] textEditor The instance of TextEditor.

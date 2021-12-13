@@ -31,6 +31,7 @@
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include "toolkit-clipboard.h"
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include "test-text-geometry-utils.h"
 
 using namespace Dali;
 using namespace Toolkit;
@@ -4387,6 +4388,190 @@ int utcDaliTextFieldCursorPositionChangedSignal(void)
 
   DALI_TEST_CHECK(gCursorPositionChangedCallbackCalled);
   DALI_TEST_EQUALS(oldCursorPos, 5, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliTextFieldGeometryEllipsisStart(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldGeometryEllipsisStart");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  application.GetScene().Add( field );
+
+  field.SetProperty( TextField::Property::POINT_SIZE, 7.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 250.f, 50.f ) );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+  field.SetProperty( DevelTextField::Property::ELLIPSIS, true );
+  field.SetProperty( DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::START );
+  field.SetProperty( TextField::Property::TEXT, "Hello World" );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  unsigned int expectedCount = 1;
+  unsigned int startIndex = 0;
+  unsigned int endIndex = 10;
+
+  Vector<Vector2> positionsList = DevelTextField::GetTextPosition(field, startIndex, endIndex);
+  Vector<Vector2> sizeList = DevelTextField::GetTextSize(field, startIndex, endIndex);
+
+  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
+
+  Vector<Vector2> expectedSizes;
+  Vector<Vector2> expectedPositions;
+
+  expectedPositions.PushBack(Vector2(14, 0));
+  expectedSizes.PushBack(Vector2(106, 25));
+
+  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
+
+  END_TEST;
+}
+
+int utcDaliTextFieldGeometryEllipsisEnd(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldGeometryEllipsisEnd");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  application.GetScene().Add( field );
+
+  field.SetProperty( TextField::Property::POINT_SIZE, 7.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 250.f, 50.f ) );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+  field.SetProperty( DevelTextField::Property::ELLIPSIS, true );
+  field.SetProperty( DevelTextField::Property::ELLIPSIS_POSITION, DevelText::EllipsisPosition::END );
+  field.SetProperty( TextField::Property::TEXT, "Hello World" );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  unsigned int expectedCount = 1;
+  unsigned int startIndex = 0;
+  unsigned int endIndex = 10;
+
+  Vector<Vector2> positionsList = DevelTextField::GetTextPosition(field, startIndex, endIndex);
+  Vector<Vector2> sizeList = DevelTextField::GetTextSize(field, startIndex, endIndex);
+
+  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
+
+  Vector<Vector2> expectedSizes;
+  Vector<Vector2> expectedPositions;
+
+  expectedPositions.PushBack(Vector2(-2, 0));
+  expectedSizes.PushBack(Vector2(122, 25));
+
+  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
+
+  END_TEST;
+}
+
+int utcDaliTextFieldGeometryRTL(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldGeometryRTL");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  application.GetScene().Add( field );
+
+  field.SetProperty( TextField::Property::POINT_SIZE, 7.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 300.f, 50.f ) );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+  field.SetProperty( TextField::Property::TEXT, "السطر الاخير" );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  unsigned int expectedCount = 1;
+  unsigned int startIndex = 1;
+  unsigned int endIndex = 7;
+
+  Vector<Vector2> positionsList = DevelTextField::GetTextPosition(field, startIndex, endIndex);
+  Vector<Vector2> sizeList = DevelTextField::GetTextSize(field, startIndex, endIndex);
+
+  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
+
+  Vector<Vector2> expectedSizes;
+  Vector<Vector2> expectedPositions;
+
+  expectedPositions.PushBack(Vector2(38, 0));
+  expectedSizes.PushBack(Vector2(73, 25));
+
+  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
+
+  END_TEST;
+}
+
+int utcDaliTextFieldGeometryGlyphMiddle(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldGeometryGlyphMiddle");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  application.GetScene().Add( field );
+
+  field.SetProperty( TextField::Property::POINT_SIZE, 7.f );
+  field.SetProperty( Actor::Property::SIZE, Vector2( 150.f, 200.f ) );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+  field.SetProperty( TextField::Property::TEXT, "لا تحتوي على لا" );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  unsigned int expectedCount = 1;
+  unsigned int startIndex = 1;
+  unsigned int endIndex = 13;
+
+  Vector<Vector2> positionsList = DevelTextField::GetTextPosition(field, startIndex, endIndex);
+  Vector<Vector2> sizeList = DevelTextField::GetTextSize(field, startIndex, endIndex);
+
+  DALI_TEST_EQUALS(positionsList.Size(), expectedCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList.Size(), expectedCount, TEST_LOCATION);
+
+  Vector<Vector2> expectedSizes;
+  Vector<Vector2> expectedPositions;
+
+  expectedPositions.PushBack(Vector2(6, 0));
+  expectedSizes.PushBack(Vector2(124, 25));
+
+  TestTextGeometryUtils::CheckGeometryResult(positionsList, sizeList, expectedPositions, expectedSizes);
 
   END_TEST;
 }

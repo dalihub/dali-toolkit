@@ -325,6 +325,28 @@ public:
    */
   void AnchorClicked(const std::string& href) override;
 
+  /**
+   * @brief Get the rendered size of a specific text range.
+   * if the requested text is at multilines, multiple sizes will be returned for each text located in a separate line.
+   * if a line contains characters with different directions, multiple sizes will be returned for each block of contiguous characters with the same direction.
+   *
+   * @param[in] startIndex start index of the text requested to calculate size for.
+   * @param[in] endIndex end index(included) of the text requested to calculate size for.
+   * @return list of sizes of the reuested text.
+   */
+  Vector<Vector2> GetTextSize(const uint32_t startIndex, const uint32_t endIndex) const;
+
+  /**
+   * @brief Get the top/left rendered position of a specific text range.
+   * if the requested text is at multilines, multiple positions will be returned for each text located in a separate line.
+   * if a line contains characters with different directions, multiple positions will be returned for each block of contiguous characters with the same direction.
+   *
+   * @param[in] startIndex start index of the text requested to get position to.
+   * @param[in] endIndex end index(included) of the text requested to get position to.
+   * @return list of positions of the requested text.
+   */
+  Vector<Vector2> GetTextPosition(const uint32_t startIndex, const uint32_t endIndex) const;
+
 private: // Implementation
   /**
    * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)

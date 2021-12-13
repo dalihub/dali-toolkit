@@ -341,6 +341,16 @@ float TextEditor::GetVerticalScrollPosition()
   return 0;
 }
 
+Vector<Vector2> TextEditor::GetTextSize(const uint32_t startIndex, const uint32_t endIndex) const
+{
+  return mController->GetTextSize(startIndex, endIndex);
+}
+
+Vector<Vector2> TextEditor::GetTextPosition(const uint32_t startIndex, const uint32_t endIndex) const
+{
+  return mController->GetTextPosition(startIndex, endIndex);
+}
+
 string TextEditor::GetSelectedText() const
 {
   string selectedText = "";
