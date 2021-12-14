@@ -145,7 +145,16 @@ enum Type
    * @details Name "redrawInScalingDown", type Property::BOOLEAN.
    * @note It is used in the AnimatedVectorImageVisual. The default is true.
    */
-  REDRAW_IN_SCALING_DOWN
+  REDRAW_IN_SCALING_DOWN = ORIENTATION_CORRECTION + 11,
+
+  /**
+   * @brief Whether to apply mask in loading time or not.
+   * @details Name "preappliedMask", type Property::BOOLEAN.
+   * If it is true, mask image is applied on the texture in loading time with CPU.
+   * If it is false, mask image is applied in runtime in shader.
+   * @note It is used in the ImageVisual and AnimatedImageVisual. The default is true.
+   */
+  PREAPPLIED_MASK = ORIENTATION_CORRECTION + 12
 };
 
 } //namespace Property

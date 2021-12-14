@@ -77,6 +77,7 @@ public:
   {
     KEEP_PIXEL_BUFFER,
     RETURN_PIXEL_BUFFER,
+    KEEP_TEXTURE,
     UPLOAD_TO_TEXTURE
   };
 
@@ -133,6 +134,7 @@ public:
     TextureManager::TextureId mAlphaMaskId;
     float                     mContentScaleFactor;
     bool                      mCropToMask;
+    bool                      mPreappliedMasking;
   };
   using MaskingDataPointer = std::unique_ptr<MaskingData>;
 
@@ -360,7 +362,7 @@ public:
    * Requests a masking image to be loaded. This mask is not uploaded to GL,
    * instead, it is stored in CPU memory, and can be used for CPU blending.
    */
-  TextureId RequestMaskLoad(const VisualUrl& maskUrl);
+  TextureId RequestMaskLoad(const VisualUrl& maskUrl, StorageType storageType);
 
   /**
    * @brief Remove a Texture from the TextureManager.
@@ -480,14 +482,14 @@ private:
    * @param[in] maskTextureId         The texture id of an image to use as a mask. If no mask is required, then set
    *                                  to INVALID_TEXTURE_ID
    * @param[in] contentScale          The scaling factor to apply to the content when masking
+   * @param[in] cropToMask            Whether to crop the target after masking, or scale the mask to the image before
+   *                                  masking.
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
    * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still be
    *                                  loaded, and marked successful, but "useAtlasing" will be set to false in the
    *                                  "UploadCompleted" callback from the TextureManagerUploadObserver.
-   * @param[in] cropToMask            Whether to crop the target after masking, or scale the mask to the image before
-   *                                  masking.
    * @param[in] storageType,          Whether the pixel data is stored in the cache or uploaded to the GPU
    * @param[in] observer              The client object should inherit from this and provide the "UploadCompleted"
    *                                  virtual.
@@ -504,11 +506,11 @@ private:
     const VisualUrl&             url,
     TextureId                    maskTextureId,
     float                        contentScale,
+    bool                         cropToMask,
     const ImageDimensions        desiredSize,
     FittingMode::Type            fittingMode,
     Dali::SamplingMode::Type     samplingMode,
     UseAtlas                     useAtlas,
-    bool                         cropToMask,
     StorageType                  storageType,
     TextureUploadObserver*       observer,
     bool                         orientationCorrection,
@@ -516,7 +518,7 @@ private:
     MultiplyOnLoad&              preMultiplyOnLoad,
     Dali::AnimatedImageLoading   animatedImageLoading,
     uint32_t                     frameIndex,
-    bool useCache);
+    bool                         useCache);
 
   /**
    * @brief Get the current state of a texture
@@ -793,6 +795,7 @@ private:
    * @param[in] fittingMode       The FittingMode to use
    * @param[in] samplingMode      The SamplingMode to use
    * @param[in] useAtlas          True if atlased
+   * @param[in] storageType,      Whether the pixel data is stored in the cache or uploaded to the GPU
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
    * @param[in] preMultiplyOnLoad If the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    * @param[in] isAnimatedImage   True if the texture is from animated image.
@@ -805,6 +808,7 @@ private:
     const FittingMode::Type           fittingMode,
     const Dali::SamplingMode::Type    samplingMode,
     const bool                        useAtlas,
+    StorageType                       storageType,
     TextureId                         maskTextureId,
     MultiplyOnLoad                    preMultiplyOnLoad,
     bool                              isAnimatedImage);

@@ -81,6 +81,8 @@ static constexpr Vector4  FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 static constexpr auto     LOOP_FOREVER = -1;
 static constexpr auto     FIRST_LOOP   = 0u;
 
+const char* const MASK_TEXTURE_RATIO_NAME("maskTextureRatio");
+
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
 #endif
@@ -244,8 +246,38 @@ AnimatedImageVisual::~AnimatedImageVisual()
 
 void AnimatedImageVisual::GetNaturalSize(Vector2& naturalSize)
 {
+  naturalSize = Vector2::ZERO;
   if(mImageSize.GetWidth() == 0 && mImageSize.GetHeight() == 0)
   {
+    if(mImpl->mRenderer)
+    {
+      auto textureSet = mImpl->mRenderer.GetTextures();
+      if(textureSet)
+      {
+        auto texture = textureSet.GetTexture(0);
+        if(texture)
+        {
+          SetImageSize(textureSet);
+          naturalSize.x = texture.GetWidth();
+          naturalSize.y = texture.GetHeight();
+          return;
+        }
+      }
+    }
+
+    if(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid() &&
+       mMaskingData->mCropToMask)
+    {
+      ImageDimensions dimensions = Dali::GetClosestImageSize(mMaskingData->mAlphaMaskUrl.GetUrl());
+      if(dimensions != ImageDimensions(0, 0))
+      {
+        mImageSize = dimensions;
+        naturalSize.x = dimensions.GetWidth();
+        naturalSize.y = dimensions.GetHeight();
+      }
+      return;
+    }
+
     if(mImageUrl.IsValid())
     {
       if(mAnimatedImageLoading.HasLoadingSucceeded())
@@ -260,18 +292,6 @@ void AnimatedImageVisual::GetNaturalSize(Vector2& naturalSize)
     else if(mImageUrls && mImageUrls->size() > 0)
     {
       mImageSize = Dali::GetClosestImageSize((*mImageUrls)[0].mUrl);
-    }
-
-    if(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid() &&
-       mMaskingData->mCropToMask)
-    {
-      ImageDimensions dimensions = Dali::GetClosestImageSize(mMaskingData->mAlphaMaskUrl.GetUrl());
-      if(dimensions != ImageDimensions(0, 0))
-      {
-        naturalSize.x = dimensions.GetWidth();
-        naturalSize.y = dimensions.GetHeight();
-      }
-      return;
     }
   }
 
@@ -321,6 +341,7 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
     map.Insert(Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mMaskingData->mAlphaMaskUrl.GetUrl());
     map.Insert(Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskingData->mContentScaleFactor);
     map.Insert(Toolkit::ImageVisual::Property::CROP_TO_MASK, mMaskingData->mCropToMask);
+    map.Insert(Toolkit::DevelImageVisual::Property::PREAPPLIED_MASK, mMaskingData->mPreappliedMasking);
   }
 
   map.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, mLoadPolicy);
@@ -449,6 +470,10 @@ void AnimatedImageVisual::DoSetProperties(const Property::Map& propertyMap)
       else if(keyValue.first == CROP_TO_MASK_NAME)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::CROP_TO_MASK, keyValue.second);
+      }
+      else if(keyValue.first == PREAPPLIED_MASK_NAME)
+      {
+        DoSetProperty(Toolkit::DevelImageVisual::Property::PREAPPLIED_MASK, keyValue.second);
       }
       else if(keyValue.first == LOAD_POLICY_NAME)
       {
@@ -624,6 +649,17 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       break;
     }
 
+    case Toolkit::DevelImageVisual::Property::PREAPPLIED_MASK:
+    {
+      bool preappliedMask = true;
+      if(value.Get(preappliedMask))
+      {
+        AllocateMaskData();
+        mMaskingData->mPreappliedMasking = preappliedMask;
+      }
+      break;
+    }
+
     case Toolkit::ImageVisual::Property::RELEASE_POLICY:
     {
       int releasePolicy = 0;
@@ -730,6 +766,11 @@ void AnimatedImageVisual::OnInitialize()
   {
     mImpl->mRenderer.RegisterProperty(PIXEL_AREA_UNIFORM_NAME, mPixelArea);
   }
+
+  if(mMaskingData)
+  {
+    mImpl->mRenderer.RegisterProperty(CROP_TO_MASK_NAME, static_cast<float>(mMaskingData->mCropToMask));
+  }
 }
 
 void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t firstInterval)
@@ -791,6 +832,22 @@ void AnimatedImageVisual::SetImageSize(TextureSet& textureSet)
     {
       mImageSize.SetWidth(texture.GetWidth());
       mImageSize.SetHeight(texture.GetHeight());
+    }
+
+    if(textureSet.GetTextureCount() > 1u && mMaskingData && mMaskingData->mCropToMask)
+    {
+      Texture maskTexture = textureSet.GetTexture(1);
+      if(maskTexture)
+      {
+        mImageSize.SetWidth(std::min(static_cast<uint32_t>(mImageSize.GetWidth() * mMaskingData->mContentScaleFactor), maskTexture.GetWidth()));
+        mImageSize.SetHeight(std::min(static_cast<uint32_t>(mImageSize.GetHeight() * mMaskingData->mContentScaleFactor), maskTexture.GetHeight()));
+
+        float   textureWidth  = std::max(static_cast<float>(texture.GetWidth() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+        float   textureHeight = std::max(static_cast<float>(texture.GetHeight() * mMaskingData->mContentScaleFactor), Dali::Math::MACHINE_EPSILON_1);
+        Vector2 textureRatio(std::min(static_cast<float>(maskTexture.GetWidth()), textureWidth) / textureWidth,
+                             std::min(static_cast<float>(maskTexture.GetHeight()), textureHeight) / textureHeight);
+        mImpl->mRenderer.RegisterProperty(MASK_TEXTURE_RATIO_NAME, textureRatio);
+      }
     }
   }
 }
@@ -923,15 +980,16 @@ TextureSet AnimatedImageVisual::SetLoadingFailed()
 
 Shader AnimatedImageVisual::GenerateShader() const
 {
-  bool   defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
+  bool   defaultWrapMode      = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
+  bool   requiredAlphaMasking = (mMaskingData) ? !mMaskingData->mPreappliedMasking : false;
   Shader shader;
   shader = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
     ImageVisualShaderFeature::FeatureBuilder()
-    .ApplyDefaultTextureWrapMode(defaultWrapMode)
-    .EnableRoundedCorner(IsRoundedCornerRequired())
-    .EnableBorderline(IsBorderlineRequired())
-  );
+      .ApplyDefaultTextureWrapMode(defaultWrapMode)
+      .EnableRoundedCorner(IsRoundedCornerRequired())
+      .EnableBorderline(IsBorderlineRequired())
+      .EnableAlphaMasking(requiredAlphaMasking));
   return shader;
 }
 

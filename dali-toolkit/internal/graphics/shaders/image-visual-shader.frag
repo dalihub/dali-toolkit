@@ -4,6 +4,9 @@
 #ifndef IS_REQUIRED_BORDERLINE
 #define IS_REQUIRED_BORDERLINE 0
 #endif
+#ifndef IS_REQUIRED_ALPHA_MASKING
+#define IS_REQUIRED_ALPHA_MASKING 0
+#endif
 #ifndef ATLAS_DEFAULT_WARP
 #define ATLAS_DEFAULT_WARP 0
 #endif
@@ -22,6 +25,12 @@ INPUT mediump vec4 vCornerRadius;
 #endif
 
 uniform sampler2D sTexture;
+
+#if IS_REQUIRED_ALPHA_MASKING
+uniform sampler2D sMaskTexture;
+INPUT mediump vec2 vMaskTexCoord;
+#endif
+
 #if ATLAS_DEFAULT_WARP
 uniform mediump vec4 uAtlasRect;
 #elif ATLAS_CUSTOM_WARP
@@ -227,6 +236,12 @@ void main()
 #endif
 
   lowp vec4 textureColor = TEXTURE( sTexture, texCoord ) * vec4( mixColor, 1.0 ) * uColor;
+
+#if IS_REQUIRED_ALPHA_MASKING
+  mediump float maskAlpha = TEXTURE(sMaskTexture, vMaskTexCoord).a;
+  textureColor.a *= maskAlpha;
+  textureColor.rgb *= mix(1.0, maskAlpha, preMultipliedAlpha);
+#endif
 
 #if IS_REQUIRED_ROUNDED_CORNER || IS_REQUIRED_BORDERLINE
   // skip most potential calculate for performance
