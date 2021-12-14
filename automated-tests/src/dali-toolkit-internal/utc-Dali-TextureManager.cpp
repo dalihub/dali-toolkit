@@ -71,7 +71,8 @@ public:
   TestObserver()
   : mCompleteType( CompleteType::NOT_COMPLETED ),
     mLoaded(false),
-    mObserverCalled(false)
+    mObserverCalled(false),
+    mTextureSet()
   {
   }
 
@@ -81,6 +82,7 @@ public:
     mCompleteType = CompleteType::UPLOAD_COMPLETE;
     mLoaded = loadSuccess;
     mObserverCalled = true;
+    mTextureSet = textureSet;
   }
 
   virtual void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied ) override
@@ -93,6 +95,7 @@ public:
   CompleteType mCompleteType;
   bool mLoaded;
   bool mObserverCalled;
+  TextureSet mTextureSet;
 };
 
 
@@ -587,6 +590,308 @@ int UtcTextureManagerUseInvalidMask(void)
   DALI_TEST_EQUALS( observer.mLoaded, true, TEST_LOCATION );
   DALI_TEST_EQUALS( observer.mObserverCalled, true, TEST_LOCATION );
   DALI_TEST_EQUALS( observer.mCompleteType, TestObserver::CompleteType::UPLOAD_COMPLETE, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcTextureManagerSynchronousLoadingFail(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcTextureManagerSynchronousLoadingFail" );
+
+  TextureManager textureManager; // Create new texture manager
+
+  std::string maskname("");
+  TextureManager::MaskingDataPointer maskInfo = nullptr;
+  maskInfo.reset(new TextureManager::MaskingData());
+  maskInfo->mAlphaMaskUrl = maskname;
+  maskInfo->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
+  maskInfo->mCropToMask = true;
+  maskInfo->mContentScaleFactor = 1.0f;
+
+  std::string filename("dummy");
+  auto textureId( TextureManager::INVALID_TEXTURE_ID );
+  Vector4 atlasRect( 0.f, 0.f, 0.f, 0.f );
+  Dali::ImageDimensions atlasRectSize( 0,0 );
+  bool atlasingStatus(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  ImageAtlasManagerPtr atlasManager = nullptr;
+  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+
+  // load image synchronously.
+  TestObserver observer;
+  TextureSet textureSet = textureManager.LoadTexture(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    true, // synchronous loading.
+    textureId,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    WrapMode::DEFAULT,
+    WrapMode::DEFAULT,
+    &observer,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply
+  );
+
+  DALI_TEST_EQUALS(loadingStatus, false, TEST_LOCATION);
+  DALI_TEST_CHECK(!textureSet);  // texture loading fail.
+  DALI_TEST_CHECK(textureId == TextureManager::INVALID_TEXTURE_ID); // invalid texture id is returned.
+
+  END_TEST;
+}
+
+int UtcTextureManagerCachingSynchronousLoading(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcTextureManagerCachingSynchronousLoading" );
+
+  TextureManager textureManager; // Create new texture manager
+
+  std::string filename( TEST_IMAGE_FILE_NAME );
+
+  std::string maskname("");
+  TextureManager::MaskingDataPointer maskInfo = nullptr;
+  maskInfo.reset(new TextureManager::MaskingData());
+  maskInfo->mAlphaMaskUrl = maskname;
+  maskInfo->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
+  maskInfo->mCropToMask = true;
+  maskInfo->mContentScaleFactor = 1.0f;
+
+  Vector4 atlasRect( 0.f, 0.f, 0.f, 0.f );
+  Dali::ImageDimensions atlasRectSize( 0,0 );
+  bool atlasingStatus(false);
+  bool loadingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  ImageAtlasManagerPtr atlasManager = nullptr;
+  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+
+  // load image synchronously.
+  TestObserver observer;
+  auto textureId( TextureManager::INVALID_TEXTURE_ID );
+  TextureSet textureSet = textureManager.LoadTexture(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    true, // synchronous loading.
+    textureId,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    WrapMode::DEFAULT,
+    WrapMode::DEFAULT,
+    &observer,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply
+  );
+
+  DALI_TEST_EQUALS(loadingStatus, false, TEST_LOCATION);
+  DALI_TEST_CHECK(textureSet);  // texture is loaded.
+
+  // observer isn't called in synchronous loading.
+  DALI_TEST_EQUALS(observer.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(observer.mObserverCalled, false, TEST_LOCATION);
+
+
+  // load same image asynchronously.
+  TestObserver asyncObserver;
+  auto asyncTextureId( TextureManager::INVALID_TEXTURE_ID );
+  loadingStatus = false;
+  TextureSet asyncTextureSet = textureManager.LoadTexture(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    false, // asynchronous loading.
+    asyncTextureId,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    loadingStatus,
+    WrapMode::DEFAULT,
+    WrapMode::DEFAULT,
+    &asyncObserver,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply
+  );
+
+  DALI_TEST_EQUALS(asyncTextureId, textureId, TEST_LOCATION); // texture is loaded.
+  DALI_TEST_EQUALS(loadingStatus, false, TEST_LOCATION);
+  DALI_TEST_CHECK(asyncTextureSet);  // Cached texture.
+
+  // observer is directly called because textureSet is retrieved by cache.
+  DALI_TEST_EQUALS(asyncObserver.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(asyncObserver.mObserverCalled, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcTextureManagerAsyncSyncAsync(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcTextureManagerAsyncSyncAsync" );
+
+  TextureManager textureManager; // Create new texture manager
+
+  std::string filename( TEST_IMAGE_FILE_NAME );
+
+  std::string maskname("");
+  TextureManager::MaskingDataPointer maskInfo = nullptr;
+  maskInfo.reset(new TextureManager::MaskingData());
+  maskInfo->mAlphaMaskUrl = maskname;
+  maskInfo->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
+  maskInfo->mCropToMask = true;
+  maskInfo->mContentScaleFactor = 1.0f;
+
+  Vector4 atlasRect( 0.f, 0.f, 0.f, 0.f );
+  Dali::ImageDimensions atlasRectSize( 0,0 );
+  bool atlasingStatus(false);
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  ImageAtlasManagerPtr atlasManager = nullptr;
+  Toolkit::AtlasUploadObserver* atlasUploadObserver = nullptr;
+
+  // load image asynchronously.
+  TestObserver asyncObserver1;
+  auto asyncTextureId1( TextureManager::INVALID_TEXTURE_ID );
+  bool asyncLoadingStatus1 = false;
+  TextureSet asyncTextureSet1 = textureManager.LoadTexture(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    false, // asynchronous loading.
+    asyncTextureId1,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    asyncLoadingStatus1,
+    WrapMode::DEFAULT,
+    WrapMode::DEFAULT,
+    &asyncObserver1,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply
+  );
+
+  DALI_TEST_EQUALS(asyncLoadingStatus1, true, TEST_LOCATION); // texture is loading now.
+  DALI_TEST_CHECK(!asyncTextureSet1);  // texture is not loaded yet.
+
+  // observer is still not called.
+  DALI_TEST_EQUALS(asyncObserver1.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(asyncObserver1.mObserverCalled, false, TEST_LOCATION);
+
+
+  // load same image synchronously just after asynchronous loading.
+  TestObserver syncObserver;
+  auto textureId( TextureManager::INVALID_TEXTURE_ID );
+  bool syncLoadingStatus = false;
+  TextureSet syncTextureSet = textureManager.LoadTexture(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    true, // synchronous loading.
+    textureId,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    syncLoadingStatus,
+    WrapMode::DEFAULT,
+    WrapMode::DEFAULT,
+    &syncObserver,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply
+  );
+
+  DALI_TEST_EQUALS(asyncTextureId1, textureId, TEST_LOCATION); // texture is loaded.
+  DALI_TEST_EQUALS(syncLoadingStatus, false, TEST_LOCATION); // texture is loaded.
+  DALI_TEST_CHECK(syncTextureSet);  // texture is loaded.
+
+  // syncObserver isn't called in synchronous loading.
+  DALI_TEST_EQUALS(syncObserver.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(syncObserver.mObserverCalled, false, TEST_LOCATION);
+
+  // asyncObserver1 is still not called too.
+  DALI_TEST_EQUALS(asyncObserver1.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(asyncObserver1.mObserverCalled, false, TEST_LOCATION);
+
+
+
+  // load image asynchronously.
+  TestObserver asyncObserver2;
+  auto asyncTextureId2( TextureManager::INVALID_TEXTURE_ID );
+  bool asyncLoadingStatus2 = false;
+  TextureSet asyncTextureSet2 = textureManager.LoadTexture(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    maskInfo,
+    false, // asynchronous loading.
+    asyncTextureId2,
+    atlasRect,
+    atlasRectSize,
+    atlasingStatus,
+    asyncLoadingStatus2,
+    WrapMode::DEFAULT,
+    WrapMode::DEFAULT,
+    &asyncObserver2,
+    atlasUploadObserver,
+    atlasManager,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply
+  );
+
+  DALI_TEST_EQUALS(asyncLoadingStatus2, false, TEST_LOCATION); // texture is loaded by previous sync request
+  DALI_TEST_CHECK(asyncTextureSet2); // texture is loaded
+  DALI_TEST_CHECK(asyncTextureSet2 == syncTextureSet);  // check loaded two texture is same.
+
+  // observer is called synchronously because the texture is cached.
+  DALI_TEST_EQUALS(asyncObserver2.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(asyncObserver2.mObserverCalled, true, TEST_LOCATION);
+
+  asyncObserver2.mLoaded = false;
+  asyncObserver2.mObserverCalled = false;
+
+  application.SendNotification();
+  application.Render();
+
+  // Requested asynchronous loading at first is finished now and async observer is called now.
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS(asyncObserver1.mLoaded, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(asyncObserver1.mObserverCalled, true, TEST_LOCATION);
+  DALI_TEST_CHECK(asyncObserver1.mTextureSet == asyncTextureSet2);  // check loaded two texture is same.
+
+  // asyncObserver2 was already called so it isn't called here.
+  DALI_TEST_EQUALS(asyncObserver2.mLoaded, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(asyncObserver2.mObserverCalled, false, TEST_LOCATION);
 
   END_TEST;
 }

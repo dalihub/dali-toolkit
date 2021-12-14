@@ -336,6 +336,30 @@ using SelectionClearedSignalType = Signal<void(TextField)>;
 DALI_TOOLKIT_API SelectionClearedSignalType& SelectionClearedSignal(TextField textField);
 
 /**
+ * @brief Get the rendered size of a specific text range.
+ * if the requested text is at multilines, multiple sizes will be returned for each text located in a separate line.
+ * if a line contains characters with different directions, multiple sizes will be returned for each block of contiguous characters with the same direction.
+ *
+ * @param[in] textField The instance of TextField.
+ * @param[in] startIndex start index of the text requested to calculate size for.
+ * @param[in] endIndex end index(included) of the text requested to calculate size for.
+ * @return list of sizes of the reuested text.
+ */
+DALI_TOOLKIT_API Vector<Vector2> GetTextSize(TextField textField, const uint32_t startIndex, const uint32_t endIndex);
+
+/**
+ * @brief Get the top/left rendered position of a specific text range.
+ * if the requested text is at multilines, multiple positions will be returned for each text located in a separate line.
+ * if a line contains characters with different directions, multiple positions will be returned for each block of contiguous characters with the same direction.
+ *
+ * @param[in] textField The instance of TextField.
+ * @param[in] startIndex start index of the text requested to get position to.
+ * @param[in] endIndex end index(included) of the text requested to get position to.
+ * @return list of positions of the requested text.
+ */
+DALI_TOOLKIT_API Vector<Vector2> GetTextPosition(TextField textField, const uint32_t startIndex, const uint32_t endIndex);
+
+/**
  * @brief Select the whole text of TextField.
  *
  * @param[in] textField The instance of TextField.

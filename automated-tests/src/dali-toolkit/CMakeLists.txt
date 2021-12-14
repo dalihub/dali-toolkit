@@ -135,6 +135,7 @@ SET(TEST_HARNESS_SOURCES
   dali-toolkit-test-utils/test-render-controller.cpp
   dali-toolkit-test-utils/test-trace-call-stack.cpp
   dali-toolkit-test-utils/test-native-image.cpp
+  test-text-geometry-utils.cpp
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED

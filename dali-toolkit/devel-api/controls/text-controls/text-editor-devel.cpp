@@ -80,6 +80,16 @@ void ScrollBy(TextEditor textEditor, Vector2 scroll)
   GetImpl(textEditor).ScrollBy(scroll);
 }
 
+Vector<Vector2> GetTextSize(TextEditor textEditor, const uint32_t startIndex, const uint32_t endIndex)
+{
+  return GetImpl(textEditor).GetTextSize(startIndex, endIndex);
+}
+
+Vector<Vector2> GetTextPosition(TextEditor textEditor, const uint32_t startIndex, const uint32_t endIndex)
+{
+  return GetImpl(textEditor).GetTextPosition(startIndex, endIndex);
+}
+
 string CopyText(TextEditor textEditor)
 {
   return GetImpl(textEditor).CopyText();

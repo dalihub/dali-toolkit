@@ -35,6 +35,16 @@ TextFitChangedSignalType& TextFitChangedSignal(TextLabel textLabel)
   return GetImpl(textLabel).TextFitChangedSignal();
 }
 
+Vector<Vector2> GetTextSize(TextLabel textLabel, const uint32_t startIndex, const uint32_t endIndex)
+{
+  return GetImpl(textLabel).GetTextSize(startIndex, endIndex);
+}
+
+Vector<Vector2> GetTextPosition(TextLabel textLabel, const uint32_t startIndex, const uint32_t endIndex)
+{
+  return GetImpl(textLabel).GetTextPosition(startIndex, endIndex);
+}
+
 } // namespace DevelTextLabel
 
 } // namespace Toolkit

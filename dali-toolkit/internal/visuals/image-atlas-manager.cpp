@@ -46,6 +46,23 @@ ImageAtlasManager::~ImageAtlasManager()
 {
 }
 
+bool ImageAtlasManager::CheckAtlasAvailable(const VisualUrl& url, const ImageDimensions& size) const
+{
+  ImageDimensions dimensions = size;
+  ImageDimensions zero;
+  if(size == zero)
+  {
+    dimensions = Dali::GetClosestImageSize(url.GetUrl());
+  }
+
+  // big image, atlasing is not applied
+  if(static_cast<uint32_t>(dimensions.GetWidth()) * static_cast<uint32_t>(dimensions.GetHeight()) > MAX_ITEM_AREA || dimensions.GetWidth() > DEFAULT_ATLAS_SIZE || dimensions.GetHeight() > DEFAULT_ATLAS_SIZE)
+  {
+    return false;
+  }
+  return true;
+}
+
 TextureSet ImageAtlasManager::Add(Vector4&             textureRect,
                                   const VisualUrl&     url,
                                   ImageDimensions&     size,

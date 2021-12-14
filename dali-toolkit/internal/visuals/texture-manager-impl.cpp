@@ -122,8 +122,10 @@ TextureManager::MaskingData::MaskingData()
 }
 
 TextureManager::TextureManager()
-: mAsyncLocalLoaders(GetNumberOfLocalLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); }),
-  mAsyncRemoteLoaders(GetNumberOfRemoteLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); }),
+: mAsyncLocalLoaders(GetNumberOfLocalLoaderThreads(), [&]()
+                     { return AsyncLoadingHelper(*this); }),
+  mAsyncRemoteLoaders(GetNumberOfRemoteLoaderThreads(), [&]()
+                      { return AsyncLoadingHelper(*this); }),
   mExternalTextures(),
   mLifecycleObservers(),
   mLoadQueue(),
@@ -173,7 +175,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
   else
   {
     auto preMultiply                    = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-    textureId                           = RequestLoadInternal(animatedImageLoading.GetUrl(), INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, TextureManager::NO_ATLAS, false, StorageType::UPLOAD_TO_TEXTURE, textureObserver, true, TextureManager::ReloadPolicy::CACHED, preMultiply, animatedImageLoading, frameIndex);
+    textureId                           = RequestLoadInternal(animatedImageLoading.GetUrl(), INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, TextureManager::NO_ATLAS, false, StorageType::UPLOAD_TO_TEXTURE, textureObserver, true, TextureManager::ReloadPolicy::CACHED, preMultiply, animatedImageLoading, frameIndex, false);
     TextureManager::LoadState loadState = GetTextureStateInternal(textureId);
     if(loadState == TextureManager::LoadState::UPLOADED)
     {
@@ -220,7 +222,7 @@ Devel::PixelBuffer TextureManager::LoadPixelBuffer(
   }
   else
   {
-    RequestLoadInternal(url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, TextureManager::NO_ATLAS, false, StorageType::RETURN_PIXEL_BUFFER, textureObserver, orientationCorrection, TextureManager::ReloadPolicy::FORCED, preMultiplyOnLoad, Dali::AnimatedImageLoading(), 0u);
+    RequestLoadInternal(url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, TextureManager::NO_ATLAS, false, StorageType::RETURN_PIXEL_BUFFER, textureObserver, orientationCorrection, TextureManager::ReloadPolicy::FORCED, preMultiplyOnLoad, Dali::AnimatedImageLoading(), 0u, false);
   }
 
   return pixelBuffer;
@@ -251,113 +253,100 @@ TextureSet TextureManager::LoadTexture(
       }
     }
   }
-  else if(synchronousLoading)
+  else
   {
-    PixelData data;
-    if(url.IsValid())
+    // For Atlas
+    if(synchronousLoading && atlasingStatus && imageAtlasManager->CheckAtlasAvailable(url, desiredSize))
     {
-      Devel::PixelBuffer pixelBuffer;
-      if(url.IsBufferResource())
-      {
-        const EncodedImageBuffer& encodedImageBuffer = GetEncodedImageBuffer(url.GetUrl());
-        if(encodedImageBuffer)
-        {
-          pixelBuffer = LoadImageFromBuffer(encodedImageBuffer.GetRawBuffer(), desiredSize, fittingMode, samplingMode, orientationCorrection);
-        }
-      }
-      else
-      {
-        pixelBuffer = LoadImageFromFile(url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection);
-      }
+      Devel::PixelBuffer pixelBuffer = LoadImageSynchronously(url, desiredSize, fittingMode, samplingMode, orientationCorrection);
+
       if(maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
       {
-        Devel::PixelBuffer maskPixelBuffer = LoadImageFromFile(maskInfo->mAlphaMaskUrl.GetUrl(), ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true);
+        Devel::PixelBuffer maskPixelBuffer = LoadImageSynchronously(maskInfo->mAlphaMaskUrl.GetUrl(), ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true);
         if(maskPixelBuffer)
         {
           pixelBuffer.ApplyMask(maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask);
         }
       }
+
+      PixelData data;
       if(pixelBuffer)
       {
         PreMultiply(pixelBuffer, preMultiplyOnLoad);
         data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
+
+        if(data)
+        {
+          textureSet = imageAtlasManager->Add(textureRect, data);
+          if(textureSet)
+          {
+            textureRectSize.SetWidth(data.GetWidth());
+            textureRectSize.SetHeight(data.GetHeight());
+          }
+        }
+        else
+        {
+          DALI_LOG_ERROR("TextureManager::LoadTexture: Synchronous Texture loading with atlasing is failed.\n");
+        }
+      }
+      if(!textureSet)
+      {
+        atlasingStatus = false;
       }
     }
-    if(!data)
+
+    if(!textureSet)
     {
-      DALI_LOG_ERROR("TextureManager::LoadTexture: Synchronous loading is failed\n");
-    }
-    else
-    {
-      if(atlasingStatus) // attempt atlasing
+      loadingStatus = true;
+      if(atlasingStatus)
       {
-        textureSet = imageAtlasManager->Add(textureRect, data);
+        textureSet = imageAtlasManager->Add(textureRect, url.GetUrl(), desiredSize, fittingMode, true, atlasObserver);
       }
       if(!textureSet) // big image, no atlasing or atlasing failed
       {
-        atlasingStatus  = false;
-        Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
-        texture.Upload(data);
-        textureSet = TextureSet::New();
-        textureSet.SetTexture(0u, texture);
+        atlasingStatus = false;
+        if(!maskInfo || !maskInfo->mAlphaMaskUrl.IsValid())
+        {
+          textureId = RequestLoad(url, desiredSize, fittingMode, samplingMode, TextureManager::NO_ATLAS, textureObserver, orientationCorrection, reloadPolicy, preMultiplyOnLoad, synchronousLoading);
+        }
+        else
+        {
+          maskInfo->mAlphaMaskId = RequestMaskLoad(maskInfo->mAlphaMaskUrl, synchronousLoading);
+          textureId              = RequestLoad(url,
+                                  maskInfo->mAlphaMaskId,
+                                  maskInfo->mContentScaleFactor,
+                                  desiredSize,
+                                  fittingMode,
+                                  samplingMode,
+                                  TextureManager::NO_ATLAS,
+                                  maskInfo->mCropToMask,
+                                  textureObserver,
+                                  orientationCorrection,
+                                  reloadPolicy,
+                                  preMultiplyOnLoad,
+                                  synchronousLoading);
+        }
+
+        TextureManager::LoadState loadState = GetTextureStateInternal(textureId);
+        if(loadState == TextureManager::LoadState::UPLOADED)
+        {
+          // UploadComplete has already been called - keep the same texture set
+          textureSet = GetTextureSet(textureId);
+        }
+
+        // If we are loading the texture, or waiting for the ready signal handler to complete, inform
+        // caller that they need to wait.
+        loadingStatus = (loadState == TextureManager::LoadState::LOADING ||
+                         loadState == TextureManager::LoadState::WAITING_FOR_MASK ||
+                         loadState == TextureManager::LoadState::MASK_APPLYING ||
+                         loadState == TextureManager::LoadState::MASK_APPLIED ||
+                         loadState == TextureManager::LoadState::NOT_STARTED ||
+                         mQueueLoadFlag);
       }
       else
       {
-        textureRectSize.SetWidth(data.GetWidth());
-        textureRectSize.SetHeight(data.GetHeight());
+        textureRectSize = desiredSize;
       }
-    }
-  }
-  else
-  {
-    loadingStatus = true;
-    if(atlasingStatus)
-    {
-      textureSet = imageAtlasManager->Add(textureRect, url.GetUrl(), desiredSize, fittingMode, true, atlasObserver);
-    }
-    if(!textureSet) // big image, no atlasing or atlasing failed
-    {
-      atlasingStatus = false;
-      if(!maskInfo || !maskInfo->mAlphaMaskUrl.IsValid())
-      {
-        textureId = RequestLoad(url, desiredSize, fittingMode, samplingMode, TextureManager::NO_ATLAS, textureObserver, orientationCorrection, reloadPolicy, preMultiplyOnLoad);
-      }
-      else
-      {
-        maskInfo->mAlphaMaskId = RequestMaskLoad(maskInfo->mAlphaMaskUrl);
-        textureId              = RequestLoad(url,
-                                maskInfo->mAlphaMaskId,
-                                maskInfo->mContentScaleFactor,
-                                desiredSize,
-                                fittingMode,
-                                samplingMode,
-                                TextureManager::NO_ATLAS,
-                                maskInfo->mCropToMask,
-                                textureObserver,
-                                orientationCorrection,
-                                reloadPolicy,
-                                preMultiplyOnLoad);
-      }
-
-      TextureManager::LoadState loadState = GetTextureStateInternal(textureId);
-      if(loadState == TextureManager::LoadState::UPLOADED)
-      {
-        // UploadComplete has already been called - keep the same texture set
-        textureSet = GetTextureSet(textureId);
-      }
-
-      // If we are loading the texture, or waiting for the ready signal handler to complete, inform
-      // caller that they need to wait.
-      loadingStatus = (loadState == TextureManager::LoadState::LOADING ||
-                       loadState == TextureManager::LoadState::WAITING_FOR_MASK ||
-                       loadState == TextureManager::LoadState::MASK_APPLYING ||
-                       loadState == TextureManager::LoadState::MASK_APPLIED ||
-                       loadState == TextureManager::LoadState::NOT_STARTED ||
-                       mQueueLoadFlag);
-    }
-    else
-    {
-      textureRectSize = desiredSize;
     }
   }
 
@@ -366,6 +355,11 @@ TextureSet TextureManager::LoadTexture(
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(wrapModeU, wrapModeV);
     textureSet.SetSampler(0u, sampler);
+  }
+
+  if(synchronousLoading)
+  {
+    loadingStatus = false;
   }
 
   return textureSet;
@@ -380,9 +374,10 @@ TextureManager::TextureId TextureManager::RequestLoad(
   TextureUploadObserver*          observer,
   bool                            orientationCorrection,
   TextureManager::ReloadPolicy    reloadPolicy,
-  TextureManager::MultiplyOnLoad& preMultiplyOnLoad)
+  TextureManager::MultiplyOnLoad& preMultiplyOnLoad,
+  bool                            synchronousLoading)
 {
-  return RequestLoadInternal(url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, useAtlas, false, StorageType::UPLOAD_TO_TEXTURE, observer, orientationCorrection, reloadPolicy, preMultiplyOnLoad, Dali::AnimatedImageLoading(), 0u);
+  return RequestLoadInternal(url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, useAtlas, false, StorageType::UPLOAD_TO_TEXTURE, observer, orientationCorrection, reloadPolicy, preMultiplyOnLoad, Dali::AnimatedImageLoading(), 0u, synchronousLoading);
 }
 
 TextureManager::TextureId TextureManager::RequestLoad(
@@ -397,16 +392,17 @@ TextureManager::TextureId TextureManager::RequestLoad(
   TextureUploadObserver*          observer,
   bool                            orientationCorrection,
   TextureManager::ReloadPolicy    reloadPolicy,
-  TextureManager::MultiplyOnLoad& preMultiplyOnLoad)
+  TextureManager::MultiplyOnLoad& preMultiplyOnLoad,
+  bool                            synchronousLoading)
 {
-  return RequestLoadInternal(url, maskTextureId, contentScale, desiredSize, fittingMode, samplingMode, useAtlas, cropToMask, StorageType::UPLOAD_TO_TEXTURE, observer, orientationCorrection, reloadPolicy, preMultiplyOnLoad, Dali::AnimatedImageLoading(), 0u);
+  return RequestLoadInternal(url, maskTextureId, contentScale, desiredSize, fittingMode, samplingMode, useAtlas, cropToMask, StorageType::UPLOAD_TO_TEXTURE, observer, orientationCorrection, reloadPolicy, preMultiplyOnLoad, Dali::AnimatedImageLoading(), 0u, synchronousLoading);
 }
 
-TextureManager::TextureId TextureManager::RequestMaskLoad(const VisualUrl& maskUrl)
+TextureManager::TextureId TextureManager::RequestMaskLoad(const VisualUrl& maskUrl, bool synchronousLoading)
 {
   // Use the normal load procedure to get the alpha mask.
   auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-  return RequestLoadInternal(maskUrl, INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, false, StorageType::KEEP_PIXEL_BUFFER, NULL, true, TextureManager::ReloadPolicy::CACHED, preMultiply, Dali::AnimatedImageLoading(), 0u);
+  return RequestLoadInternal(maskUrl, INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, false, StorageType::KEEP_PIXEL_BUFFER, NULL, true, TextureManager::ReloadPolicy::CACHED, preMultiply, Dali::AnimatedImageLoading(), 0u, synchronousLoading);
 }
 
 TextureManager::TextureId TextureManager::RequestLoadInternal(
@@ -424,7 +420,8 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
   TextureManager::ReloadPolicy    reloadPolicy,
   TextureManager::MultiplyOnLoad& preMultiplyOnLoad,
   Dali::AnimatedImageLoading      animatedImageLoading,
-  uint32_t                        frameIndex)
+  uint32_t                        frameIndex,
+  bool                            synchronousLoading)
 {
   // First check if the requested Texture is cached.
   bool isAnimatedImage = (animatedImageLoading) ? true : false;
@@ -457,37 +454,30 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) Using cached texture id@%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId);
   }
 
-  // Check if the requested Texture exist in Encoded Buffer
-  // This mean, that buffer is not cached, and need to be decoded.
-  if(textureId == INVALID_TEXTURE_ID && VisualUrl::BUFFER == url.GetProtocolType())
-  {
-    std::string location = url.GetLocation();
-    if(location.size() > 0u)
-    {
-      TextureId                 targetId           = std::stoi(location);
-      const EncodedImageBuffer& encodedImageBuffer = GetEncodedImageBuffer(targetId);
-      if(encodedImageBuffer)
-      {
-        textureId = targetId;
-
-        // Increase EncodedImageBuffer reference during it contains mTextureInfoContainer.
-        UseExternalResource(url.GetUrl());
-
-        // Insert this buffer at mTextureInfoContainer.
-        // This buffer will decode at ImageLoaderThread.
-        bool preMultiply = (preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
-        mTextureInfoContainer.push_back(TextureInfo(textureId, maskTextureId, url, desiredSize, contentScale, fittingMode, samplingMode, false, cropToMask, useAtlas, textureHash, orientationCorrection, preMultiply, animatedImageLoading, frameIndex));
-        cacheIndex = mTextureInfoContainer.size() - 1u;
-
-        DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) New buffered texture, cacheIndex:%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId);
-      }
-    }
-  }
-
   if(textureId == INVALID_TEXTURE_ID) // There was no caching, or caching not required
   {
-    // We need a new Texture.
-    textureId        = GenerateUniqueTextureId();
+    if(VisualUrl::BUFFER == url.GetProtocolType())
+    {
+      std::string location = url.GetLocation();
+      if(location.size() > 0u)
+      {
+        TextureId                 targetId           = std::stoi(location);
+        const EncodedImageBuffer& encodedImageBuffer = GetEncodedImageBuffer(targetId);
+        if(encodedImageBuffer)
+        {
+          textureId = targetId;
+
+          // Increase EncodedImageBuffer reference during it contains mTextureInfoContainer.
+          UseExternalResource(url.GetUrl());
+        }
+      }
+    }
+
+    if(textureId == INVALID_TEXTURE_ID)
+    {
+      textureId = GenerateUniqueTextureId();
+    }
+
     bool preMultiply = (preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
     mTextureInfoContainer.push_back(TextureInfo(textureId, maskTextureId, url, desiredSize, contentScale, fittingMode, samplingMode, false, cropToMask, useAtlas, textureHash, orientationCorrection, preMultiply, animatedImageLoading, frameIndex));
     cacheIndex = mTextureInfoContainer.size() - 1u;
@@ -518,48 +508,101 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     textureInfo.loadState = TextureManager::LoadState::NOT_STARTED;
   }
 
-  // Check if we should add the observer.
-  // Only do this if we have not loaded yet and it will not have loaded by the end of this method.
-  switch(textureInfo.loadState)
+  if(!synchronousLoading)
   {
-    case TextureManager::LoadState::LOAD_FAILED: // Failed notifies observer which then stops observing.
-    case TextureManager::LoadState::NOT_STARTED:
+    // Check if we should add the observer.
+    // Only do this if we have not loaded yet and it will not have loaded by the end of this method.
+    switch(textureInfo.loadState)
     {
-      LoadOrQueueTexture(textureInfo, observer); // If called inside NotifyObservers, queues until afterwards
-      break;
-    }
-    case TextureManager::LoadState::LOADING:
-    case TextureManager::LoadState::WAITING_FOR_MASK:
-    case TextureManager::LoadState::MASK_APPLYING:
-    case TextureManager::LoadState::MASK_APPLIED:
-    {
-      ObserveTexture(textureInfo, observer);
-      break;
-    }
-    case TextureManager::LoadState::UPLOADED:
-    {
-      if(observer)
+      case TextureManager::LoadState::LOAD_FAILED: // Failed notifies observer which then stops observing.
+      case TextureManager::LoadState::NOT_STARTED:
       {
-        LoadOrQueueTexture(textureInfo, observer);
+        LoadOrQueueTexture(textureInfo, observer); // If called inside NotifyObservers, queues until afterwards
+        break;
       }
-      break;
-    }
-    case TextureManager::LoadState::CANCELLED:
-    {
-      // A cancelled texture hasn't finished loading yet. Treat as a loading texture
-      // (it's ref count has already been incremented, above)
-      textureInfo.loadState = TextureManager::LoadState::LOADING;
-      ObserveTexture(textureInfo, observer);
-      break;
-    }
-    case TextureManager::LoadState::LOAD_FINISHED:
-    {
-      // Loading has already completed.
-      if(observer && textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER)
+      case TextureManager::LoadState::LOADING:
+      case TextureManager::LoadState::WAITING_FOR_MASK:
+      case TextureManager::LoadState::MASK_APPLYING:
+      case TextureManager::LoadState::MASK_APPLIED:
       {
-        LoadOrQueueTexture(textureInfo, observer);
+        ObserveTexture(textureInfo, observer);
+        break;
       }
-      break;
+      case TextureManager::LoadState::UPLOADED:
+      {
+        if(observer)
+        {
+          LoadOrQueueTexture(textureInfo, observer);
+        }
+        break;
+      }
+      case TextureManager::LoadState::CANCELLED:
+      {
+        // A cancelled texture hasn't finished loading yet. Treat as a loading texture
+        // (it's ref count has already been incremented, above)
+        textureInfo.loadState = TextureManager::LoadState::LOADING;
+        ObserveTexture(textureInfo, observer);
+        break;
+      }
+      case TextureManager::LoadState::LOAD_FINISHED:
+      {
+        // Loading has already completed.
+        if(observer && textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER)
+        {
+          LoadOrQueueTexture(textureInfo, observer);
+        }
+        break;
+      }
+    }
+  }
+  else
+  {
+    // If the image is already finished to load, use cached texture.
+    // We don't need to consider Observer becaouse this is synchronous loading.
+    if(textureInfo.loadState == TextureManager::LoadState::UPLOADED ||
+       textureInfo.loadState == TextureManager::LoadState::LOAD_FINISHED)
+    {
+      return textureId;
+    }
+    else
+    {
+      Devel::PixelBuffer pixelBuffer = LoadImageSynchronously(url, desiredSize, fittingMode, samplingMode, orientationCorrection);;
+
+      if(!pixelBuffer)
+      {
+        // If pixelBuffer loading is failed in synchronously, call Remove() method.
+        Remove(textureId, nullptr);
+        return INVALID_TEXTURE_ID;
+      }
+
+      if(storageType == StorageType::KEEP_PIXEL_BUFFER) // For the mask image loading.
+      {
+        textureInfo.pixelBuffer = pixelBuffer; // Store the pixel data
+        textureInfo.loadState   = LoadState::LOAD_FINISHED;
+      }
+      else // For the image loading.
+      {
+        if(maskTextureId != INVALID_TEXTURE_ID)
+        {
+          int maskCacheIndex = GetCacheIndexFromId(maskTextureId);
+          if(maskCacheIndex != INVALID_CACHE_INDEX)
+          {
+            Devel::PixelBuffer maskPixelBuffer = mTextureInfoContainer[maskCacheIndex].pixelBuffer;
+            if(maskPixelBuffer)
+            {
+              pixelBuffer.ApplyMask(maskPixelBuffer, contentScale, cropToMask);
+            }
+          }
+          else
+          {
+            DALI_LOG_ERROR("Mask image is not stored in cache.\n");
+          }
+        }
+        PreMultiply(pixelBuffer, preMultiplyOnLoad);
+
+        // Upload texture
+        UploadTexture(pixelBuffer, textureInfo);
+      }
     }
   }
 
@@ -687,6 +730,28 @@ TextureManager::LoadState TextureManager::GetTextureStateInternal(TextureId text
   return loadState;
 }
 
+Devel::PixelBuffer TextureManager::LoadImageSynchronously(const VisualUrl&         url,
+                                                          const ImageDimensions    desiredSize,
+                                                          FittingMode::Type        fittingMode,
+                                                          Dali::SamplingMode::Type samplingMode,
+                                                          bool                     orientationCorrection)
+{
+  Devel::PixelBuffer pixelBuffer;
+  if(url.IsBufferResource())
+  {
+    const EncodedImageBuffer& encodedImageBuffer = GetEncodedImageBuffer(url.GetUrl());
+    if(encodedImageBuffer)
+    {
+      pixelBuffer = LoadImageFromBuffer(encodedImageBuffer.GetRawBuffer(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+    }
+  }
+  else
+  {
+    pixelBuffer = LoadImageFromFile(url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+  }
+  return pixelBuffer;
+}
+
 TextureSet TextureManager::GetTextureSet(TextureId textureId)
 {
   TextureSet textureSet; // empty handle
@@ -759,7 +824,7 @@ std::string TextureManager::AddExternalEncodedImageBuffer(const EncodedImageBuff
     {
       // If same buffer added, increase reference count and return.
       elem.referenceCount++;
-      return VisualUrl::CreateBufferUrl(std::to_string(elem.textureId));;
+      return VisualUrl::CreateBufferUrl(std::to_string(elem.textureId));
     }
   }
   TextureManager::EncodedBufferTextureInfo info(GenerateUniqueTextureId(), encodedImageBuffer);
@@ -807,7 +872,7 @@ EncodedImageBuffer TextureManager::RemoveExternalEncodedImageBuffer(const std::s
       std::string location = VisualUrl::GetLocation(url);
       if(location.size() > 0u)
       {
-        TextureId id = std::stoi(location);
+        TextureId  id  = std::stoi(location);
         const auto end = mEncodedBufferTextures.end();
         for(auto iter = mEncodedBufferTextures.begin(); iter != end; ++iter)
         {
@@ -1049,7 +1114,10 @@ void TextureManager::PostLoad(TextureInfo& textureInfo, Devel::PixelBuffer& pixe
       // If there is a mask texture ID associated with this texture, then apply the mask
       // if it's already loaded. If it hasn't, and the mask is still loading,
       // wait for the mask to finish loading.
-      if(textureInfo.maskTextureId != INVALID_TEXTURE_ID)
+      // note, If the texture is already uploaded synchronously during loading,
+      // we don't need to apply mask.
+      if(textureInfo.loadState != LoadState::UPLOADED &&
+         textureInfo.maskTextureId != INVALID_TEXTURE_ID)
       {
         if(textureInfo.loadState == LoadState::MASK_APPLYING)
         {
@@ -1153,7 +1221,7 @@ void TextureManager::ApplyMask(TextureInfo& textureInfo, TextureId maskTextureId
 
 void TextureManager::UploadTexture(Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo)
 {
-  if(textureInfo.useAtlas != USE_ATLAS)
+  if(textureInfo.loadState != LoadState::UPLOADED && textureInfo.useAtlas != USE_ATLAS)
   {
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "  TextureManager::UploadTexture() New Texture for textureId:%d\n", textureInfo.textureId);
 

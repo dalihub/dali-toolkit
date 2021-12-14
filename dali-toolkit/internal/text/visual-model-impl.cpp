@@ -204,6 +204,11 @@ void VisualModel::GetGlyphPositions(Vector2*   glyphPositions,
   memcpy(glyphPositions, mGlyphPositions.Begin() + glyphIndex, numberOfGlyphs * sizeof(Vector2));
 }
 
+Length VisualModel::GetTotalNumberOfLines() const
+{
+  return mLines.Size();
+}
+
 void VisualModel::GetNumberOfLines(GlyphIndex glyphIndex,
                                    Length     numberOfGlyphs,
                                    LineIndex& firstLine,

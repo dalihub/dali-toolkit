@@ -111,7 +111,7 @@ const Scripting::StringEnum ALIGNMENT_STRING_TABLE[] =
 
 const unsigned int ALIGNMENT_STRING_TABLE_COUNT = sizeof(ALIGNMENT_STRING_TABLE) / sizeof(ALIGNMENT_STRING_TABLE[0]);
 
-const Property::Index VISUAL_INDEX_FOR_STATE[][Button::STATE_COUNT] =
+const Property::Index VISUAL_INDEX_FOR_STATE[Button::STATE_COUNT][Button::VISUAL_STATE_COUNT] =
   {
     {Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::UNSELECTED_VISUAL},
     {Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::SELECTED_VISUAL},
