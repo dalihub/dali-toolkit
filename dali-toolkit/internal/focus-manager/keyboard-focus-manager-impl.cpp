@@ -522,7 +522,11 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
       else if(mEnableDefaultAlgorithm)
       {
         // We should find it among the actors nearby.
-        nextFocusableActor = Toolkit::FocusFinder::GetNearestFocusableActor(currentFocusActor, direction);
+        Integration::SceneHolder window = Integration::SceneHolder::Get(currentFocusActor);
+        if(window)
+        {
+          nextFocusableActor = Toolkit::FocusFinder::GetNearestFocusableActor(window.GetRootLayer(), currentFocusActor, direction);
+        }
       }
     }
 
