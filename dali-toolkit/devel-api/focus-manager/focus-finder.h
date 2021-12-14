@@ -27,13 +27,15 @@ namespace Toolkit
 {
 namespace FocusFinder
 {
+
 /**
  * Get the nearest focusable actor.
+ * @param [in] rootActor The root actor.
  * @param [in] focusedActor The current focused actor.
  * @param [in] direction The direction.
  * @return The nearest focusable actor, or an empty handle if none exists.
  */
-DALI_TOOLKIT_API Actor GetNearestFocusableActor(Actor focusedActor, Toolkit::Control::KeyboardFocus::Direction direction);
+DALI_TOOLKIT_API Actor GetNearestFocusableActor(Actor rootActor, Actor focusedActor, Toolkit::Control::KeyboardFocus::Direction direction);
 
 } // namespace FocusFinder
 
