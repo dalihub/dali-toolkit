@@ -110,12 +110,10 @@ struct Controller::Relayouter
   * @param[in] controller The controller to calcualte size on it.
   * @param[in] requestedControllerSize The requested size of controller to calcualte layout size on it.
   * @param[in] requestedOperationsMask The requested operations-mask to calcualte layout size according to it.
-  * @param[in] restoreLinesAndGlyphPositions whether to restore lines and glyph-positions to status before requesting calculation on size.
   *
   * @return The calculated layout-size.
   */
-  static Size CalculateLayoutSizeOnRequiredControllerSize(Controller& controller, const Size& requestedControllerSize, const OperationsMask& requestedOperationsMask, bool restoreLinesAndGlyphPositions);
-
+  static Size CalculateLayoutSizeOnRequiredControllerSize(Controller& controller, const Size& requestedControllerSize, const OperationsMask& requestedOperationsMask);
 };
 
 } // namespace Text

@@ -19,10 +19,10 @@
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cmath>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <cmath>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
@@ -54,10 +54,8 @@ const std::string EMPTY_STRING("");
 
 namespace Dali::Toolkit::Text
 {
-
 namespace
 {
-
 void SetDefaultInputStyle(InputStyle& inputStyle, const FontDefaults* const fontDefaults, const Vector4& textColor)
 {
   // Sets the default text's color.
@@ -342,7 +340,7 @@ void ChangeTextControllerState(Controller::Impl& impl, EventData::State newState
         decorator->StopCursorBlink();
         decorator->SetHandleActive(GRAB_HANDLE, false);
         if(eventData->mDecorator->IsHandleActive(LEFT_SELECTION_HANDLE) ||
-            decorator->IsHandleActive(RIGHT_SELECTION_HANDLE))
+           decorator->IsHandleActive(RIGHT_SELECTION_HANDLE))
         {
           decorator->SetHandleActive(LEFT_SELECTION_HANDLE, false);
           decorator->SetHandleActive(RIGHT_SELECTION_HANDLE, false);
@@ -692,7 +690,6 @@ bool Controller::Impl::SetDefaultLineSpacing(float lineSpacing)
   if(std::fabs(lineSpacing - mLayoutEngine.GetDefaultLineSpacing()) > Math::MACHINE_EPSILON_1000)
   {
     mLayoutEngine.SetDefaultLineSpacing(lineSpacing);
-    mRecalculateNaturalSize = true;
 
     RelayoutForNewLineSize();
     return true;
@@ -705,7 +702,6 @@ bool Controller::Impl::SetDefaultLineSize(float lineSize)
   if(std::fabs(lineSize - mLayoutEngine.GetDefaultLineSize()) > Math::MACHINE_EPSILON_1000)
   {
     mLayoutEngine.SetDefaultLineSize(lineSize);
-    mRecalculateNaturalSize = true;
 
     RelayoutForNewLineSize();
     return true;
@@ -1470,8 +1466,13 @@ void Controller::Impl::RelayoutForNewLineSize()
   mTextUpdateInfo.mNumberOfCharactersToAdd    = mModel->mLogicalModel->mText.Count();
   mOperationsPending                          = static_cast<OperationsMask>(mOperationsPending | LAYOUT);
 
+  mTextUpdateInfo.mFullRelayoutNeeded = true;
+
+  // Need to recalculate natural size
+  mRecalculateNaturalSize = true;
+
   //remove selection
-  if(mEventData && mEventData->mState == EventData::SELECTING)
+  if((mEventData != nullptr) && (mEventData->mState == EventData::SELECTING))
   {
     ChangeState(EventData::EDITING);
   }
@@ -1493,7 +1494,7 @@ void Controller::Impl::ProcessInputStyleChangedSignals()
       // Emit the input style changed signal for each mask
       std::for_each(mEventData->mInputStyleChangedQueue.begin(),
                     mEventData->mInputStyleChangedQueue.end(),
-                    [&](const auto mask) { mEditableControlInterface->InputStyleChanged(mask); } );
+                    [&](const auto mask) { mEditableControlInterface->InputStyleChanged(mask); });
     }
 
     mEventData->mInputStyleChangedQueue.Clear();
@@ -1724,7 +1725,7 @@ void Controller::Impl::SetVerticalAlignment(VerticalAlignment::Type alignment)
   {
     // Set the alignment.
     mModel->mVerticalAlignment = alignment;
-    mOperationsPending = static_cast<OperationsMask>(mOperationsPending | ALIGN);
+    mOperationsPending         = static_cast<OperationsMask>(mOperationsPending | ALIGN);
     RequestRelayout();
   }
 }
@@ -1803,7 +1804,6 @@ void Controller::Impl::ClearStyleData()
   mModel->mLogicalModel->mColorRuns.Clear();
   mModel->mLogicalModel->ClearFontDescriptionRuns();
 }
-
 
 void Controller::Impl::ResetScrollPosition()
 {

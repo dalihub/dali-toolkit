@@ -4745,7 +4745,7 @@ int utcDaliTextEditorSelectionClearedSignal(void)
   application.Render();
 
   // Move to second line of the text & Select some text in the right of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) ); 
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // remove selection
@@ -4971,6 +4971,214 @@ int utcDaliTextEditorSelectionChangedSignal(void)
   DALI_TEST_CHECK(gSelectionChangedCallbackCalled);
   DALI_TEST_EQUALS(oldSelectionStart, 0, TEST_LOCATION);
   DALI_TEST_EQUALS(oldSelectionEnd, 23, TEST_LOCATION);
+
+  END_TEST;
+}
+
+
+int utcDaliTextEditorInsertCharacterAfterInitWithResizePolicyNaturalSize(void)
+{
+
+  //This is to test a crash when used Resize Policy equals USE_NATURAL_SIZE
+  //DaliException on vector: "Iterator not inside vector"
+
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorInsertCharacterAfterInitWithResizePolicyNaturalSize");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  //Set multilines text
+  editor.SetProperty(Dali::Toolkit::TextEditor::Property::TEXT, "Hello \n World");
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  //Set ResizePolicy to NaturalSize
+  editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event to touch the text editor.
+  TestGenerateTap( application, 5.0f, 5.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set currsor and add character (in first line)
+  editor.SetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 5);
+  application.ProcessEvent( GenerateKey( "d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::DOWN, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::UP, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  //Check the changed text and cursor position
+  DALI_TEST_EQUALS( editor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "Hellod \n World", TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION ).Get<int>(), 6, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextEditorRemoveCharacterAfterInitWithResizePolicyNaturalSize(void)
+{
+
+  //This is to test a crash when used Resize Policy equals USE_NATURAL_SIZE
+  //DaliException on vector: "Iterator not inside vector"
+
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorRemoveCharacterAfterInitWithResizePolicyNaturalSize");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  //Set multilines text
+  editor.SetProperty(Dali::Toolkit::TextEditor::Property::TEXT, "Hello \n World");
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  //Set ResizePolicy to NaturalSize
+  editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
+
+  // Set currsor
+  editor.SetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 5);
+  application.SendNotification();
+  application.Render();
+
+  // Set focus and remove character
+  editor.SetKeyInputFocus();
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  //Check the changed text and cursor position
+  DALI_TEST_EQUALS( editor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "Hell \n World", TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION ).Get<int>(), 4, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextEditorCutSelectedTextAfterInitWithResizePolicyNaturalSize(void)
+{
+
+  //This is to test a crash when used Resize Policy equals USE_NATURAL_SIZE
+  //DaliException on vector: "Iterator not inside vector"
+
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorCutSelectedTextAfterInitWithResizePolicyNaturalSize");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  //Set multilines text
+  editor.SetProperty(Dali::Toolkit::TextEditor::Property::TEXT, "Hello \n World");
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  //Set ResizePolicy to NaturalSize
+  editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
+
+  //Select text at initialization (before the first render)
+  DevelTextEditor::SelectText( editor ,3, 5 );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  //Cut text
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "x", "x", "x", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::DOWN, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  //Check the changed text and cursor position
+  DALI_TEST_EQUALS( editor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "Hel \n World", TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION ).Get<int>(), 3, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+
+int utcDaliTextEditorDoubleEnterAfterInitWithResizePolicyNaturalSize(void)
+{
+
+  //This is to test a crash when used Resize Policy equals USE_NATURAL_SIZE
+  //DaliException on vector: "Iterator not inside vector"
+
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorDoubleEnterAfterInitWithResizePolicyNaturalSize");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  application.GetScene().Add( editor );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  //Set multilines text
+  editor.SetProperty(Dali::Toolkit::TextEditor::Property::TEXT, "Hello \n World");
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+
+  //Set ResizePolicy to NaturalSize
+  editor.SetProperty(Dali::Actor::Property::WIDTH_RESIZE_POLICY, ResizePolicy::USE_NATURAL_SIZE);
+
+  // Set currsor
+  editor.SetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION, 5);
+  application.SendNotification();
+  application.Render();
+
+  // Set focus and double enter (new line)
+  editor.SetKeyInputFocus();
+  application.ProcessEvent(GenerateKey("Enter", "", "\n", 13, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("Enter", "", "\n", 13, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  //Check the changed text and cursor position
+  DALI_TEST_EQUALS( editor.GetProperty( TextEditor::Property::TEXT ).Get<std::string>(), "Hello\n\n \n World", TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty( DevelTextEditor::Property::PRIMARY_CURSOR_POSITION ).Get<int>(), 7, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
