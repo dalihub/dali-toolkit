@@ -67,14 +67,8 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
   const CharacterIndex* const     glyphToCharacterBuffer         = visualModel->mGlyphsToCharacters.Begin();
   const CharacterDirection* const modelCharacterDirectionsBuffer = (0u != logicalModel->mCharacterDirections.Count()) ? logicalModel->mCharacterDirections.Begin() : NULL;
 
-  if((startIndex < 0 && endIndex < 0) || (startIndex >= logicalModel->mText.Count() && endIndex >= logicalModel->mText.Count()))
+  if(startIndex >= logicalModel->mText.Count() && endIndex >= logicalModel->mText.Count())
     return;
-
-  if(startIndex < 0)
-    startIndex = 0;
-
-  if(endIndex < 0)
-    endIndex = 0;
 
   if(startIndex >= logicalModel->mText.Count())
     startIndex = logicalModel->mText.Count() - 1;
