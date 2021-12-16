@@ -16,8 +16,8 @@
  */
 
 #include <iostream>
-
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
@@ -46,6 +46,8 @@ using namespace Text;
 
 namespace
 {
+  const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
+  const unsigned int DEFAULT_FONT_SIZE = 1152u;
 
 struct GetClosestLineData
 {
@@ -92,6 +94,15 @@ struct FindSelectionIndicesData
   CharacterIndex* noTextHitIndex;                 ///< The expected character index when there is no hit.
 };
 
+struct PrimaryCursorHeightData
+{
+  std::string     description;                    ///< Description of the test.
+  std::string     text;                           ///< Input text.
+  unsigned int    numberOfTests;                  ///< The number of tests.
+  CharacterIndex* logicalIndex;                   ///< The logical cursor index for each test.
+  float*          heights;                        ///< The expected primary cursor height for each test.
+};
+
 bool GetClosestLineTest( const GetClosestLineData& data )
 {
   std::cout << "  testing : " << data.description << std::endl;
@@ -114,7 +125,8 @@ bool GetClosestLineTest( const GetClosestLineData& data )
                    false,
                    LineWrap::WORD,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -163,7 +175,8 @@ bool GetClosestCursorIndexTest( const GetClosestCursorIndexData& data )
                    false,
                    LineWrap::WORD,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -216,7 +229,8 @@ bool GetCursorPositionTest( const GetCursorPositionData& data )
                    false,
                    LineWrap::WORD,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -233,6 +247,7 @@ bool GetCursorPositionTest( const GetCursorPositionData& data )
     parameters.logical = data.logicalIndex[index];
 
     GetCursorPosition( parameters,
+                       0.f,// Since this test case is not testing the primary cursor height, the default font line height can be set to 0.f.
                        cursorInfo );
 
     if( floor(cursorInfo.primaryPosition.x) != data.visualX[index] )
@@ -243,7 +258,7 @@ bool GetCursorPositionTest( const GetCursorPositionData& data )
     if( floor(cursorInfo.primaryPosition.y) != data.visualY[index] )
     {
       std::cout << "  test " << index << " failed. Different 'y' cursor position : " << cursorInfo.primaryPosition.y << ", expected : " << data.visualY[index] << std::endl;
-       return false;
+      return false;
     }
   }
 
@@ -272,7 +287,8 @@ bool FindSelectionIndicesTest( const FindSelectionIndicesData& data )
                    false,
                    LineWrap::WORD,
                    false,
-                   Toolkit::DevelText::EllipsisPosition::END );
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   0.f );
 
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
   VisualModelPtr visualModel = textModel->mVisualModel;
@@ -315,12 +331,102 @@ bool FindSelectionIndicesTest( const FindSelectionIndicesData& data )
   return true;
 }
 
+bool PrimaryCursorHeightTest( const PrimaryCursorHeightData& data )
+{
+  std::cout << "  testing : " << data.description << std::endl;
+
+  // 1) Create the model.
+  ModelPtr textModel;
+  MetricsPtr metrics;
+  Size textArea(400.f, 600.f);
+  Size layoutSize;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns;
+
+  const std::string fontFamily( "DejaVuSans" );
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun1;
+  fontDescriptionRun1.characterRun.characterIndex = 0u;
+  fontDescriptionRun1.characterRun.numberOfCharacters = 13u;
+  fontDescriptionRun1.familyLength = fontFamily.size();
+  fontDescriptionRun1.familyName = new char[fontDescriptionRun1.familyLength];
+  memcpy( fontDescriptionRun1.familyName, fontFamily.c_str(), fontDescriptionRun1.familyLength );
+  fontDescriptionRun1.familyDefined = true;
+  fontDescriptionRun1.weightDefined = false;
+  fontDescriptionRun1.widthDefined = false;
+  fontDescriptionRun1.slantDefined = false;
+  fontDescriptionRun1.sizeDefined = true;
+  fontDescriptionRun1.size = 768u;//Font size = 12.0f (768/64 = 12)
+
+  fontDescriptionRuns.PushBack( fontDescriptionRun1 );
+
+  LayoutOptions options;
+  CreateTextModel( data.text,
+                   textArea,
+                   fontDescriptionRuns,
+                   options,
+                   layoutSize,
+                   textModel,
+                   metrics,
+                   false,
+                   LineWrap::WORD,
+                   false,
+                   Toolkit::DevelText::EllipsisPosition::END,
+                   50.f );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
+
+  GetCursorPositionParameters parameters;
+  parameters.visualModel = visualModel;
+  parameters.logicalModel = logicalModel;
+  parameters.metrics = metrics;
+  parameters.isMultiline = true;
+
+  for( unsigned int index = 0; index < data.numberOfTests; ++index )
+  {
+    CursorInfo cursorInfo;
+    parameters.logical = data.logicalIndex[index];
+
+    // Load some fonts.
+    TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+    fontClient.SetDpi( 93u, 93u );
+
+    char* pathNamePtr = get_current_dir_name();
+    const std::string pathName( pathNamePtr );
+    free( pathNamePtr );
+
+    FontId fontID = fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/dejavu/DejaVuSans.ttf" );
+
+    Text::FontMetrics fontMetrics;
+    MetricsPtr mMetrics = Metrics::New(fontClient);
+    mMetrics->GetFontMetrics(fontID, fontMetrics);
+    float defaultFontLineHeight = (fontMetrics.ascender - fontMetrics.descender);
+
+    GetCursorPosition( parameters,
+                       defaultFontLineHeight,
+                       cursorInfo );
+
+    if( floor(cursorInfo.primaryCursorHeight) != data.heights[index] )
+    {
+      std::cout << "  test " << index << " failed. Different primaryCursorHeight : " << cursorInfo.primaryCursorHeight << ", expected : " << data.heights[index] << std::endl;
+      return false;
+    }
+  }
+
+  return true;
+}
+
 } // namespace
 
 //////////////////////////////////////////////////////////
 //
 // UtcDaliGetClosestLine
 // UtcDaliGetClosestCursorIndex
+// UtcDaliGetCursorPosition
+// UtcDaliFindSelectionIndices
+// UtcDaliPrimaryCursorHeight
 //
 //////////////////////////////////////////////////////////
 
@@ -797,6 +903,38 @@ int UtcDaliFindSelectionIndices(void)
   {
     ToolkitTestApplication application;
     if( !FindSelectionIndicesTest( data[index] ) )
+    {
+      tet_result(TET_FAIL);
+    }
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliPrimaryCursorHeight(void)
+{
+  tet_infoline(" UtcDaliPrimaryCursorHeight");
+
+  float heights[] = { 19.f };
+  CharacterIndex logicalIndex[] = { 1u };
+
+  struct PrimaryCursorHeightData data[] =
+  {
+    {
+      "Testing primary cursor height when line spacing is used.",
+      "Hello World",
+      1u,
+      logicalIndex,
+      heights,
+    }
+  };
+  const unsigned int numberOfTests = 1u;
+
+  for( unsigned int index = 0; index < numberOfTests; ++index )
+  {
+    ToolkitTestApplication application;
+    if( !PrimaryCursorHeightTest( data[index] ) )
     {
       tet_result(TET_FAIL);
     }

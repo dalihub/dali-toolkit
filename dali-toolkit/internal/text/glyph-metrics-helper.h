@@ -83,6 +83,28 @@ void GetGlyphsMetrics(GlyphIndex             glyphIndex,
                       const GlyphInfo* const glyphsBuffer,
                       MetricsPtr&            metrics);
 
+/**
+ * @brief Takes the character index, obtains the glyph index (and the number of Glyphs) from it and finally gets the glyph metrics.
+ *
+ * @param[in] index The character index.
+ * @param[in] glyphInfoBuffer The glyphs buffer.
+ * @param[in] charactersToGlyphBuffer A vector containing the glyph index for each character.
+ * @param[in] glyphsPerCharacterBuffer A vector containing the number of glyphs in each character.
+ * @param[in] metrics Used to access metrics from FontClient.
+ * @param[out] glyphMetrics Some glyph metrics (font height, advance, ascender and x bearing).
+ * @param[out] glyphIndex The glyph index obtained from the character index.
+ * @param[out] numberOfGlyphs The number of glyphs in the character of which the index was passed to the function.
+ *
+ */
+void GetGlyphMetricsFromCharacterIndex(CharacterIndex          index,
+                                       const GlyphInfo* const  glyphInfoBuffer,
+                                       const GlyphIndex* const charactersToGlyphBuffer,
+                                       const Length* const     glyphsPerCharacterBuffer,
+                                       MetricsPtr&             metrics,
+                                       GlyphMetrics&           glyphMetrics,
+                                       GlyphIndex&             glyphIndex,
+                                       Length&                 numberOfGlyphs);
+
 } // namespace Text
 
 } // namespace Toolkit
