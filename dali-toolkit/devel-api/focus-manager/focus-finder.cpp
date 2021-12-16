@@ -354,9 +354,9 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect,
   {
     // Recursively children
     const auto childCount = actor.GetChildCount();
-    for(auto i = 0u; i < childCount; ++i)
+    for(auto i = childCount; i > 0u; --i)
     {
-      Dali::Actor child = actor.GetChildAt(i);
+      Dali::Actor child = actor.GetChildAt(i-1);
       if(child && child != focusedActor && IsFocusable(child))
       {
         Rect<float> candidateRect = DevelActor::CalculateScreenExtents(child);
@@ -382,10 +382,10 @@ Actor FindNextFocus(Actor& actor, Actor& focusedActor, Rect<float>& focusedRect,
 
 } // unnamed namespace
 
-Actor GetNearestFocusableActor(Actor focusedActor, Toolkit::Control::KeyboardFocus::Direction direction)
+Actor GetNearestFocusableActor(Actor rootActor, Actor focusedActor, Toolkit::Control::KeyboardFocus::Direction direction)
 {
   Actor nearestActor;
-  if(!focusedActor)
+  if(!focusedActor || !rootActor)
   {
     return nearestActor;
   }
@@ -426,13 +426,7 @@ Actor GetNearestFocusableActor(Actor focusedActor, Toolkit::Control::KeyboardFoc
   ConvertCoordinate(bestCandidateRect);
 
   ConvertCoordinate(focusedRect);
-
-  Integration::SceneHolder window = Integration::SceneHolder::Get(focusedActor);
-  if(window)
-  {
-    Actor rootActor = window.GetRootLayer();
-    nearestActor    = FindNextFocus(rootActor, focusedActor, focusedRect, bestCandidateRect, direction);
-  }
+  nearestActor = FindNextFocus(rootActor, focusedActor, focusedRect, bestCandidateRect, direction);
   return nearestActor;
 }
 
