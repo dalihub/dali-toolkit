@@ -24,7 +24,9 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali/devel-api/adaptor-framework/accessibility.h>
-#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
+#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/devel-api/atspi-interfaces/accessible.h>
+#include <dali/devel-api/atspi-interfaces/value.h>
 
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
 
