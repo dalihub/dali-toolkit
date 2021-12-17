@@ -126,19 +126,7 @@ private:
   void CheckFrontFrame(bool wasReady);
 
 protected:
-  void UploadComplete(
-    bool           loadSuccess,
-    int32_t        textureId,
-    TextureSet     textureSet,
-    bool           useAtlasing,
-    const Vector4& atlasRect,
-    bool           preMultiplied) override;
-
-  void LoadComplete(
-    bool               loadSuccess,
-    Devel::PixelBuffer pixelBuffer,
-    const VisualUrl&   url,
-    bool               preMultiplied) override;
+  void LoadComplete(bool loadSuccess, TextureInformation textureInformation) override;
 
 private:
   /**

@@ -274,28 +274,22 @@ void RollingAnimatedImageCache::CheckFrontFrame(bool wasReady)
   }
 }
 
-void RollingAnimatedImageCache::UploadComplete(
-  bool           loadSuccess,
-  int32_t        textureId,
-  TextureSet     textureSet,
-  bool           useAtlasing,
-  const Vector4& atlasRect,
-  bool           preMultiplied)
+void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
-  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::UploadComplete(textureId:%d) start\n", textureId);
+  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::LoadComplete(textureId:%d) start\n", textureInformation.textureId);
   LOG_CACHE;
 
   bool frontFrameReady = IsFrontReady();
 
   if(!mRequestingLoad)
   {
-    SetImageFrameReady(textureId);
+    SetImageFrameReady(textureInformation.textureId);
 
     CheckFrontFrame(frontFrameReady);
   }
   else
   {
-    // UploadComplete has been called from within RequestLoad. TextureManager must
+    // LoadComplete has been called from within RequestLoad. TextureManager must
     // therefore already have the texture cached, so make the texture ready.
     // (Use the last texture, as the texture id hasn't been assigned yet)
     mQueue.Back().mReady = true;
@@ -314,17 +308,6 @@ void RollingAnimatedImageCache::UploadComplete(
   }
 
   LOG_CACHE;
-}
-
-void RollingAnimatedImageCache::LoadComplete(
-  bool               loadSuccess,
-  Devel::PixelBuffer pixelBuffer,
-  const VisualUrl&   url,
-  bool               preMultiplied)
-{
-  // LoadComplete is called if this TextureUploadObserver requested to load
-  // an image that will be returned as a type of PixelBuffer by using a method
-  // TextureManager::LoadPixelBuffer.
 }
 
 } //namespace Internal

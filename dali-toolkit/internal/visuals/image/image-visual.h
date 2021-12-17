@@ -248,24 +248,14 @@ public:
   void UploadCompleted() override;
 
   /**
-   * @copydoc TextureUploadObserver::UploadCompleted
+   * @copydoc TextureUploadObserver::LoadCompleted
    *
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  void UploadComplete(bool success, int32_t textureId, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle, bool preMultiplied) override;
+  void LoadComplete(bool success, TextureInformation textureInformation) override;
 
 private:
-  /**
-   * @copydoc TextureUploadObserver::LoadComplete
-   *
-   * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
-   * This callback is the place to add the renderer as it would be called once the PixelBuffer loading is finished.
-   */
-  void LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied) override
-  {
-  }
-
   /**
    * Allocate the mask data when a masking property is defined in the property map
    */

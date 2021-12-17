@@ -179,7 +179,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
     TextureManager::LoadState loadState = GetTextureStateInternal(textureId);
     if(loadState == TextureManager::LoadState::UPLOADED)
     {
-      // UploadComplete has already been called - keep the same texture set
+      // LoadComplete has already been called - keep the same texture set
       textureSet = GetTextureSet(textureId);
     }
   }
@@ -330,7 +330,7 @@ TextureSet TextureManager::LoadTexture(
         TextureManager::LoadState loadState = GetTextureStateInternal(textureId);
         if(loadState == TextureManager::LoadState::UPLOADED)
         {
-          // UploadComplete has already been called - keep the same texture set
+          // LoadComplete has already been called - keep the same texture set
           textureSet = GetTextureSet(textureId);
         }
 
@@ -978,7 +978,7 @@ void TextureManager::LoadOrQueueTexture(TextureInfo& textureInfo, TextureUploadO
       {
         // The Texture has already loaded. The other observers have already been notified.
         // We need to send a "late" loaded notification for this observer.
-        observer->UploadComplete(true, textureInfo.textureId, textureInfo.textureSet, textureInfo.useAtlas, textureInfo.atlasRect, textureInfo.preMultiplied);
+        observer->LoadComplete(true, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::TEXTURE, textureInfo.textureId, textureInfo.textureSet, textureInfo.useAtlas, textureInfo.atlasRect, textureInfo.preMultiplied));
       }
       break;
     }
@@ -1040,11 +1040,11 @@ void TextureManager::ProcessQueuedTextures()
       TextureInfo& textureInfo(mTextureInfoContainer[cacheIndex]);
       if(textureInfo.loadState == LoadState::UPLOADED)
       {
-        element.mObserver->UploadComplete(true, textureInfo.textureId, textureInfo.textureSet, textureInfo.useAtlas, textureInfo.atlasRect, textureInfo.preMultiplied);
+        element.mObserver->LoadComplete(true, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::TEXTURE, textureInfo.textureId, textureInfo.textureSet, textureInfo.useAtlas, textureInfo.atlasRect, textureInfo.preMultiplied));
       }
       else if(textureInfo.loadState == LoadState::LOAD_FINISHED && textureInfo.storageType == StorageType::RETURN_PIXEL_BUFFER)
       {
-        element.mObserver->LoadComplete(true, textureInfo.pixelBuffer, textureInfo.url, textureInfo.preMultiplied);
+        element.mObserver->LoadComplete(true, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::PIXEL_BUFFER, textureInfo.pixelBuffer, textureInfo.url.GetUrl(), textureInfo.preMultiplied));
       }
       else
       {
@@ -1266,7 +1266,7 @@ void TextureManager::NotifyObservers(TextureInfo& textureInfo, bool success)
   {
     TextureUploadObserver* observer = info->observerList[0];
 
-    // During UploadComplete() a Control ResourceReady() signal is emitted.
+    // During LoadComplete() a Control ResourceReady() signal is emitted.
     // During that signal the app may add remove /add Textures (e.g. via
     // ImageViews).
     // It is possible for observers to be removed from the observer list,
@@ -1284,11 +1284,11 @@ void TextureManager::NotifyObservers(TextureInfo& textureInfo, bool success)
 
     if(info->storageType == StorageType::RETURN_PIXEL_BUFFER)
     {
-      observer->LoadComplete(success, info->pixelBuffer, info->url, info->preMultiplied);
+      observer->LoadComplete(success, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::PIXEL_BUFFER, info->pixelBuffer, info->url.GetUrl(), info->preMultiplied));
     }
     else
     {
-      observer->UploadComplete(success, info->textureId, info->textureSet, info->useAtlas, info->atlasRect, info->preMultiplied);
+      observer->LoadComplete(success, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::TEXTURE, info->textureId, info->textureSet, info->useAtlas, info->atlasRect, info->preMultiplied));
     }
 
     // Get the textureInfo from the container again as it may have been invalidated.

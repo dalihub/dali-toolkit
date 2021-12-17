@@ -76,20 +76,19 @@ public:
   {
   }
 
-  virtual void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet,
-                               bool useAtlasing, const Vector4& atlasRect, bool preMultiplied ) override
+  virtual void LoadComplete( bool loadSuccess, TextureInformation textureInformation ) override
   {
-    mCompleteType = CompleteType::UPLOAD_COMPLETE;
+    if(textureInformation.returnType == TextureUploadObserver::ReturnType::TEXTURE)
+    {
+      mCompleteType = CompleteType::UPLOAD_COMPLETE;
+    }
+    else
+    {
+      mCompleteType = CompleteType::LOAD_COMPLETE;
+    }
     mLoaded = loadSuccess;
     mObserverCalled = true;
-    mTextureSet = textureSet;
-  }
-
-  virtual void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied ) override
-  {
-    mCompleteType = CompleteType::LOAD_COMPLETE;
-    mLoaded = loadSuccess;
-    mObserverCalled = true;
+    mTextureSet = textureInformation.textureSet;
   }
 
   CompleteType mCompleteType;
