@@ -21,7 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
-#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
+#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/devel-api/atspi-interfaces/accessible.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <toolkit-adaptor-impl.h>
 #include <toolkit-lifecycle-controller.h>

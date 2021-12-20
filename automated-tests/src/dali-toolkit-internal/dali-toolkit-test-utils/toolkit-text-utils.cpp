@@ -104,7 +104,8 @@ void CreateTextModel( const std::string& text,
                       bool markupProcessorEnabled,
                       LineWrap::Mode wrapMode,
                       bool ellipsisEnabled,
-                      DevelText::EllipsisPosition::Type ellipsisPosition)
+                      DevelText::EllipsisPosition::Type ellipsisPosition,
+                      float lineSpacing)
 {
   textModel = Model::New(); ///< Pointer to the text's model.
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
@@ -327,6 +328,7 @@ void CreateTextModel( const std::string& text,
   Layout::Engine layoutEngine;
   layoutEngine.SetMetrics( metrics );
   layoutEngine.SetLayout( Layout::Engine::MULTI_LINE_BOX );
+  layoutEngine.SetDefaultLineSpacing(lineSpacing);
 
   // Set the layout parameters.
   textModel->mHorizontalAlignment = Text::HorizontalAlignment::BEGIN;

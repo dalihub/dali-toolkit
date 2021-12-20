@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/atspi-interfaces/value.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/constraint.h>

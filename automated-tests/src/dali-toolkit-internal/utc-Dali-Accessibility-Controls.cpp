@@ -4,7 +4,13 @@
 
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/table-view/table-view.h>
-#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
+#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/devel-api/atspi-interfaces/accessible.h>
+#include <dali/devel-api/atspi-interfaces/action.h>
+#include <dali/devel-api/atspi-interfaces/editable-text.h>
+#include <dali/devel-api/atspi-interfaces/hyperlink.h>
+#include <dali/devel-api/atspi-interfaces/hypertext.h>
+#include <dali/devel-api/atspi-interfaces/text.h>
 
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/dbus-wrapper.h>
 

@@ -458,6 +458,7 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
 }
 
 void GetCursorPosition(GetCursorPositionParameters& parameters,
+                       float                        defaultFontLineHeight,
                        CursorInfo&                  cursorInfo)
 {
   const LineRun* const modelLines = parameters.visualModel->mLines.Begin();
@@ -479,6 +480,15 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
   const LineIndex lineIndex = parameters.visualModel->GetLineOfCharacter(characterOfLine);
   const LineRun&  line      = *(modelLines + lineIndex);
 
+  const GlyphIndex* const charactersToGlyphBuffer  = parameters.visualModel->mCharactersToGlyph.Begin();
+  const Length* const     glyphsPerCharacterBuffer = parameters.visualModel->mGlyphsPerCharacter.Begin();
+  const GlyphInfo* const  glyphInfoBuffer          = parameters.visualModel->mGlyphs.Begin();
+  CharacterIndex          index;
+  GlyphMetrics            glyphMetrics;
+  MetricsPtr&             metrics = parameters.metrics;
+  GlyphIndex glyphIndex = 0u;
+  Length numberOfGlyphs = 0u;
+
   if(isLastNewParagraph)
   {
     // The cursor is in a new line with no characters. Place the cursor in that line.
@@ -493,8 +503,14 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
 
     cursorInfo.lineHeight = GetLineHeight(newLine);
 
+    const Length totalNumberOfCharacters = parameters.logicalModel->mText.Count();
+    index                                = totalNumberOfCharacters - 1;
+
+    GetGlyphMetricsFromCharacterIndex(index, glyphInfoBuffer, charactersToGlyphBuffer, glyphsPerCharacterBuffer, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
+
     // Set the primary cursor's height.
-    cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
+    // The primary cursor height will take the font height of the last character and if there are no characters, it'll take the default font line height.
+    cursorInfo.primaryCursorHeight = (totalNumberOfCharacters > 0) ? (cursorInfo.isSecondaryCursor ? 0.5f * glyphMetrics.fontHeight : glyphMetrics.fontHeight) : defaultFontLineHeight;
 
     // Set the primary cursor's position.
     cursorInfo.primaryPosition.x = (LTR == line.direction) ? newLine.alignmentOffset : parameters.visualModel->mControlSize.width - newLine.alignmentOffset;
@@ -541,7 +557,7 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
 
     // Calculate the primary cursor.
 
-    CharacterIndex index = characterIndex;
+    index = characterIndex;
     if(cursorInfo.isSecondaryCursor)
     {
       // If there is a secondary position, the primary cursor may be in a different place than the logical index.
@@ -574,25 +590,13 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
       }
     }
 
-    const GlyphIndex* const     charactersToGlyphBuffer  = parameters.visualModel->mCharactersToGlyph.Begin();
-    const Length* const         glyphsPerCharacterBuffer = parameters.visualModel->mGlyphsPerCharacter.Begin();
     const Length* const         charactersPerGlyphBuffer = parameters.visualModel->mCharactersPerGlyph.Begin();
     const CharacterIndex* const glyphsToCharactersBuffer = parameters.visualModel->mGlyphsToCharacters.Begin();
     const Vector2* const        glyphPositionsBuffer     = parameters.visualModel->mGlyphPositions.Begin();
-    const GlyphInfo* const      glyphInfoBuffer          = parameters.visualModel->mGlyphs.Begin();
 
-    // Convert the cursor position into the glyph position.
-    const GlyphIndex primaryGlyphIndex         = *(charactersToGlyphBuffer + index);
-    const Length     primaryNumberOfGlyphs     = *(glyphsPerCharacterBuffer + index);
+    GetGlyphMetricsFromCharacterIndex(index, glyphInfoBuffer, charactersToGlyphBuffer, glyphsPerCharacterBuffer, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
+    const GlyphIndex primaryGlyphIndex         = glyphIndex;
     const Length     primaryNumberOfCharacters = *(charactersPerGlyphBuffer + primaryGlyphIndex);
-
-    // Get the metrics for the group of glyphs.
-    GlyphMetrics glyphMetrics;
-    GetGlyphsMetrics(primaryGlyphIndex,
-                     primaryNumberOfGlyphs,
-                     glyphMetrics,
-                     glyphInfoBuffer,
-                     parameters.metrics);
 
     // Whether to add the glyph's advance to the cursor position.
     // i.e if the paragraph is left to right and the logical cursor is zero, the position is the position of the first glyph and the advance is not added,
@@ -676,16 +680,9 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
         index = (isRightToLeftParagraph == isCurrentRightToLeft) ? nextCharacterIndex : characterIndex;
       }
 
-      const GlyphIndex secondaryGlyphIndex     = *(charactersToGlyphBuffer + index);
-      const Length     secondaryNumberOfGlyphs = *(glyphsPerCharacterBuffer + index);
-
-      const Vector2& secondaryPosition = *(glyphPositionsBuffer + secondaryGlyphIndex);
-
-      GetGlyphsMetrics(secondaryGlyphIndex,
-                       secondaryNumberOfGlyphs,
-                       glyphMetrics,
-                       glyphInfoBuffer,
-                       parameters.metrics);
+      GetGlyphMetricsFromCharacterIndex(index, glyphInfoBuffer, charactersToGlyphBuffer, glyphsPerCharacterBuffer, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
+      const GlyphIndex secondaryGlyphIndex = glyphIndex;
+      const Vector2&   secondaryPosition   = *(glyphPositionsBuffer + secondaryGlyphIndex);
 
       // Set the secondary cursor's position.
 

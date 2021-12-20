@@ -22,6 +22,7 @@
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/metrics.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 
 namespace Dali
 {
@@ -142,9 +143,11 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
  * if there is a valid alternative cursor, its position and height.
  *
  * @param[in] parameters Parameters used to calculate the cursor's position.
+ * @param[in] defaultFontLineHeight The default font line height.
  * @param[out] cursorInfo The line's height, the cursor's height, the cursor's position and whether there is an alternative cursor.
  */
 void GetCursorPosition(GetCursorPositionParameters& parameters,
+                       float                        defaultFontLineHeight,
                        CursorInfo&                  cursorInfo);
 
 /**

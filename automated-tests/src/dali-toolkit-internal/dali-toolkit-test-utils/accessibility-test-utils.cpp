@@ -1,7 +1,8 @@
 #include <automated-tests/src/dali-toolkit-internal/dali-toolkit-test-utils/accessibility-test-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/devel-api/common/stage.h>
-#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
+#include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
+#include <dali/devel-api/atspi-interfaces/accessible.h>
 #include "dbus-wrapper.h"
 
 namespace Dali
@@ -78,6 +79,15 @@ namespace Accessibility
       wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Object", "MoveOuted", MethodType::Method}] =
       [wr](const MessagePtr &m) -> MessagePtr {
           gMoveOutedCalled = true;
+          return wr->newReplyMessage(m);
+      };
+
+      wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Window", "Activate", MethodType::Method}] =
+      [wr](const MessagePtr &m) -> MessagePtr {
+          return wr->newReplyMessage(m);
+      };
+      wr->testMethods[std::tuple<std::string, std::string, std::string, MethodType>{"/org/a11y/atspi/accessible", "org.a11y.atspi.Event.Window", "Deactivate", MethodType::Method}] =
+      [wr](const MessagePtr &m) -> MessagePtr {
           return wr->newReplyMessage(m);
       };
     }

@@ -22,6 +22,9 @@
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
+#include <dali/devel-api/atspi-interfaces/editable-text.h>
+#include <dali/devel-api/atspi-interfaces/hypertext.h>
+#include <dali/devel-api/atspi-interfaces/text.h>
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
