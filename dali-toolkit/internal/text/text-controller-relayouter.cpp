@@ -395,8 +395,11 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
     textUpdateInfo.mCharacterIndex     = 0u;
   }
 
+  bool layoutDirectionChanged = false;
   if(impl.mLayoutDirection != layoutDirection)
   {
+    // Flag to indicate that the layout direction has changed.
+    layoutDirectionChanged = true;
     // Clear the update info. This info will be set the next time the text is updated.
     textUpdateInfo.mClearAll = true;
     // Apply modifications to the model
@@ -447,13 +450,25 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
 
   if(isEditable)
   {
-    if(newSize)
+    if(newSize || layoutDirectionChanged)
     {
-      // If there is a new size, the scroll position needs to be clamped.
+      // If there is a new size or layout direction is changed, the scroll position needs to be clamped.
       impl.ClampHorizontalScroll(layoutSize);
 
       // Update the decorator's positions is needed if there is a new size.
       impl.mEventData->mDecorator->UpdatePositions(model->mScrollPosition - offset);
+
+      // All decorator elements need to be updated.
+      if(EventData::IsEditingState(impl.mEventData->mState))
+      {
+        impl.mEventData->mScrollAfterUpdatePosition = true;
+        impl.mEventData->mUpdateCursorPosition = true;
+        impl.mEventData->mUpdateGrabHandlePosition = true;
+      }
+      else if(impl.mEventData->mState == EventData::SELECTING)
+      {
+        impl.mEventData->mUpdateHighlightBox = true;
+      }
     }
 
     // Move the cursor, grab handle etc.

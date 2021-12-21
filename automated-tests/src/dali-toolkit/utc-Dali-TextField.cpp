@@ -3564,6 +3564,12 @@ int UtcDaliTextFieldSelectWholeText(void)
   application.SendNotification();
   application.Render();
 
+  // Even if resize, selection should remain.
+  textField.SetProperty( Actor::Property::SIZE, Vector2( 150.f, 50.f ) );
+
+  application.SendNotification();
+  application.Render();
+
   // Should be 2 children, the stencil and the layer
   DALI_TEST_EQUALS( 2u, textField.GetChildCount(), TEST_LOCATION );
 
