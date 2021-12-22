@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/signals/dali-signal.h>
+#include <dali/public-api/rendering/texture-set.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-url.h>
@@ -28,14 +29,13 @@
 
 namespace Dali
 {
-class TextureSet;
 
 namespace Toolkit
 {
 /**
  * @brief Base class used to observe the upload status of a texture.
  *
- * Derived class must implement the UploadComplete method which is
+ * Derived class must implement the LoadComplete method which is
  * executed once the texture is ready to draw.
  */
 class TextureUploadObserver
@@ -43,6 +43,30 @@ class TextureUploadObserver
 public:
   typedef Signal<void(TextureUploadObserver*)> DestructionSignalType; ///< Signal prototype for the Destruction Signal.
 
+  enum class ReturnType
+  {
+    TEXTURE = 0,
+    PIXEL_BUFFER
+  };
+
+  struct TextureInformation
+  {
+    TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied);
+    TextureInformation(ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, bool preMultiplied);
+
+    TextureInformation();
+
+    ReturnType                 returnType;    ///< Returned Texture type.
+    int32_t                    textureId;     ///< The textureId of the loaded texture in the TextureManager
+    TextureSet                 textureSet;    ///< The TextureSet containing the Texture
+    bool                       useAtlasing;   ///< True if atlasing was used (note: this may be different to what was requested)
+    const Vector4&             atlasRect;     ///< If using atlasing, this is the rectangle within the atlas to use.
+    bool                       preMultiplied; ///< True if the image had pre-multiplied alpha applied
+    Devel::PixelBuffer         pixelBuffer;   ///< The PixelBuffer of the loaded image.
+    std::string_view           url;           ///< The url address of the loaded image.
+  };
+
+public:
   /**
    * @brief Constructor.
    */
@@ -54,28 +78,14 @@ public:
   virtual ~TextureUploadObserver();
 
   /**
-   * The action to be taken once the async load has finished and the upload to GPU is completed.
+   * The action to be taken once the async load has finished.
+   * And in case of texture loading, this method is called after uploading.
    * This should be overridden by the deriving class.
    *
    * @param[in] loadSuccess True if the texture load was successful (i.e. the resource is available). If false, then the resource failed to load. In future, this will automatically upload a "broken" image.
-   * @param[in] textureId   The textureId of the loaded texture in the TextureManager
-   * @param[in] textureSet  The TextureSet containing the Texture
-   * @param[in] useAtlasing True if atlasing was used (note: this may be different to what was requested)
-   * @param[in] atlasRect   If using atlasing, this is the rectangle within the atlas to use.
-   * @param[in] preMultiplied True if the image had pre-multiplied alpha applied
+   * @param[in] textureInformation Structure that contains loaded texture information.
    */
-  virtual void UploadComplete(bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied) = 0;
-
-  /**
-   * The action to be taken once the async load has finished.
-   * This should be overridden by the deriving class.
-   *
-   * @param[in] loadSuccess   True if the image load was successful (i.e. the resource is available). If false, then the resource failed to load.
-   * @param[in] pixelBuffer   The PixelBuffer of the loaded image.
-   * @param[in] url           The url address of the loaded image.
-   * @param[in] preMultiplied True if the image had pre-multiplied alpha applied
-   */
-  virtual void LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const Internal::VisualUrl& url, bool preMultiplied) = 0;
+  virtual void LoadComplete(bool loadSuccess, TextureInformation textureInformation) = 0;
 
   /**
    * @brief Returns the destruction signal.

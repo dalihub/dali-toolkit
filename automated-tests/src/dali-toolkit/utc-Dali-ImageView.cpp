@@ -3048,7 +3048,7 @@ void OnResourceReadySignal03( Control control )
   if(gResourceReadySignalCounter == 0)
   {
     // Queue loading
-    // 1. Use cached image, then UploadComplete will be called right after OnResourceReadySignal03.
+    // 1. Use cached image, then LoadComplete will be called right after OnResourceReadySignal03.
     gImageView2[ImageView::Property::IMAGE] = gImage_34_RGBA;
 
     // 2. Load a new image

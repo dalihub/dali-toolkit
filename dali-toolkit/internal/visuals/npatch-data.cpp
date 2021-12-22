@@ -224,11 +224,11 @@ void NPatchData::SetLoadedNPatchData(Devel::PixelBuffer& pixelBuffer, bool preMu
   mLoadingState = LoadingState::LOAD_COMPLETE;
 }
 
-void NPatchData::LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied)
+void NPatchData::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
   if(loadSuccess)
   {
-    SetLoadedNPatchData(pixelBuffer, preMultiplied);
+    SetLoadedNPatchData(textureInformation.pixelBuffer, textureInformation.preMultiplied);
   }
   else
   {
@@ -238,7 +238,7 @@ void NPatchData::LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, 
   for(uint32_t index = 0; index < mObserverList.Count(); ++index)
   {
     TextureUploadObserver* observer = mObserverList[index];
-    observer->UploadComplete(loadSuccess, TextureManager::INVALID_TEXTURE_ID, mTextureSet, false, Vector4(), preMultiplied);
+    observer->LoadComplete(loadSuccess, TextureUploadObserver::TextureInformation(TextureUploadObserver::ReturnType::TEXTURE, TextureManager::INVALID_TEXTURE_ID, mTextureSet, false, Vector4(), textureInformation.preMultiplied));
   }
 }
 

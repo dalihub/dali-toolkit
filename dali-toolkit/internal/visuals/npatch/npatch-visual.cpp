@@ -777,32 +777,34 @@ void NPatchVisual::SetResource()
   }
 }
 
-void NPatchVisual::UploadComplete(bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied)
+void NPatchVisual::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
-  EnablePreMultipliedAlpha(preMultiplied);
-  if(!loadSuccess)
+  if(textureInformation.returnType == TextureUploadObserver::ReturnType::TEXTURE)
   {
-    // Image loaded and ready to display
-    ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
-  }
+    EnablePreMultipliedAlpha(textureInformation.preMultiplied);
+    if(!loadSuccess)
+    {
+      // Image loaded and ready to display
+      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+    }
 
-  if(mAuxiliaryPixelBuffer || !mAuxiliaryUrl.IsValid())
-  {
-    SetResource();
+    if(mAuxiliaryPixelBuffer || !mAuxiliaryUrl.IsValid())
+    {
+      SetResource();
+    }
   }
-}
-
-void NPatchVisual::LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied)
-{
-  if(loadSuccess && url.GetUrl() == mAuxiliaryUrl.GetUrl())
+  else  // for the ReturnType::PIXEL_BUFFER
   {
-    mAuxiliaryPixelBuffer = pixelBuffer;
-    SetResource();
-  }
-  else
-  {
-    // Image loaded and ready to display
-    ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+    if(loadSuccess && textureInformation.url == mAuxiliaryUrl.GetUrl())
+    {
+      mAuxiliaryPixelBuffer = textureInformation.pixelBuffer;
+      SetResource();
+    }
+    else
+    {
+      // Image loaded and ready to display
+      ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
+    }
   }
 }
 
