@@ -364,6 +364,11 @@ void WebView::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEn
   Dali::Toolkit::GetImpl(*this).RegisterResponsePolicyDecidedCallback(callback);
 }
 
+void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
+{
+  Dali::Toolkit::GetImpl(*this).RegisterNavigationPolicyDecidedCallback(callback);
+}
+
 void WebView::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
 {
   Dali::Toolkit::GetImpl(*this).RegisterCertificateConfirmedCallback(callback);

@@ -716,6 +716,14 @@ void WebView::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEn
   }
 }
 
+void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterNavigationPolicyDecidedCallback(callback);
+  }
+}
+
 void WebView::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
 {
   if(mWebEngine)

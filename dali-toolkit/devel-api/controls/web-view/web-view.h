@@ -692,6 +692,13 @@ public:
   void RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback);
 
   /**
+   * @brief Callback to be called when navigation policy would be decided.
+   *
+   * @param[in] callback
+   */
+  void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
+
+  /**
    * @brief Callback to be called when certificate need be confirmed.
    *
    * @param[in] callback
