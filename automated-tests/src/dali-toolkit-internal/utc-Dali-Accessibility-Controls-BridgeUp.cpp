@@ -613,7 +613,7 @@ int UtcDaliAccessibilityParentChildren(void)
     child_1_accessible -> GetIndexInParent();
     DALI_ABORT("Object has parent, test abort");
   }
-  catch (Dali::DaliException &){}
+  catch (const std::domain_error&){}
 
   parent.Add(child_1);
   parent.Add(child_2);
@@ -1160,7 +1160,7 @@ int UtcDaliAccessibilityScrollToChildNonScrollable(void)
 
   DALI_TEST_EQUALS(accessible->IsScrollable(), false, TEST_LOCATION);
   DALI_TEST_EQUALS(accessible->ScrollToChild({}), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(accessible->GetInternalActor(), Dali::Actor{}, TEST_LOCATION);
+  DALI_TEST_EQUALS(accessible->GetInternalActor(), label, TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC( false );
   END_TEST;

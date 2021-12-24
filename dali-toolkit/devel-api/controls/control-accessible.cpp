@@ -67,7 +67,7 @@ static Dali::Actor CreateHighlightIndicatorActor()
 } // unnamed namespace
 
 ControlAccessible::ControlAccessible(Dali::Actor self, Dali::Accessibility::Role role, bool modal)
-: mSelf(self),
+: ActorAccessible(self),
   mIsModal(modal)
 {
   auto control = Dali::Toolkit::Control::DownCast(Self());
@@ -172,40 +172,6 @@ std::string ControlAccessible::GetDescription() const
 std::string ControlAccessible::GetDescriptionRaw() const
 {
   return {};
-}
-
-Dali::Accessibility::Accessible* ControlAccessible::GetParent()
-{
-  return Dali::Accessibility::Accessible::Get(Self().GetParent());
-}
-
-size_t ControlAccessible::GetChildCount() const
-{
-  return Self().GetChildCount();
-}
-
-Dali::Accessibility::Accessible* ControlAccessible::GetChildAtIndex(size_t index)
-{
-  return Dali::Accessibility::Accessible::Get(Self().GetChildAt(static_cast<unsigned int>(index)));
-}
-
-size_t ControlAccessible::GetIndexInParent()
-{
-  auto self = Self();
-  auto parent = self.GetParent();
-  DALI_ASSERT_ALWAYS(parent && "can't call GetIndexInParent on object without parent");
-
-  auto count = parent.GetChildCount();
-  for(auto i = 0u; i < count; ++i)
-  {
-    auto child = parent.GetChildAt(i);
-    if(child == self)
-    {
-      return i;
-    }
-  }
-  DALI_ASSERT_ALWAYS(false && "object isn't child of it's parent");
-  return static_cast<size_t>(-1);
 }
 
 Dali::Accessibility::Role ControlAccessible::GetRole() const
@@ -314,43 +280,6 @@ Dali::Accessibility::Attributes ControlAccessible::GetAttributes() const
   }
 
   return attributeMap;
-}
-
-Dali::Accessibility::ComponentLayer ControlAccessible::GetLayer() const
-{
-  return Dali::Accessibility::ComponentLayer::WINDOW;
-}
-
-Dali::Rect<> ControlAccessible::GetExtents(Dali::Accessibility::CoordinateType type) const
-{
-  Dali::Actor self = Self();
-
-  Vector2 screenPosition = self.GetProperty(Dali::DevelActor::Property::SCREEN_POSITION).Get<Vector2>();
-  auto size = self.GetCurrentProperty<Vector3>(Actor::Property::SIZE) * self.GetCurrentProperty<Vector3>(Actor::Property::WORLD_SCALE);
-  bool positionUsesAnchorPoint = self.GetProperty(Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT).Get<bool>();
-  Vector3 anchorPointOffSet = size * (positionUsesAnchorPoint ? self.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT) : AnchorPoint::TOP_LEFT);
-  Vector2 position = Vector2((screenPosition.x - anchorPointOffSet.x), (screenPosition.y - anchorPointOffSet.y));
-
-  if(type == Dali::Accessibility::CoordinateType::WINDOW)
-  {
-    return {position.x, position.y, size.x, size.y};
-  }
-  else // Dali::Accessibility::CoordinateType::SCREEN
-  {
-    auto window = Dali::DevelWindow::Get(self);
-    auto windowPosition = window.GetPosition();
-    return {position.x + windowPosition.GetX(), position.y + windowPosition.GetY(), size.x, size.y};
-  }
-}
-
-int16_t ControlAccessible::GetMdiZOrder() const
-{
-  return 0;
-}
-
-double ControlAccessible::GetAlpha() const
-{
-  return 0;
 }
 
 bool ControlAccessible::GrabFocus()
@@ -550,11 +479,6 @@ std::vector<Dali::Accessibility::Relation> ControlAccessible::GetRelationSet()
   }
 
   return ret;
-}
-
-Dali::Actor ControlAccessible::GetInternalActor()
-{
-  return Dali::Actor{};
 }
 
 bool ControlAccessible::ScrollToChild(Actor child)
