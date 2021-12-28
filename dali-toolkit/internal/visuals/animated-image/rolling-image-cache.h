@@ -38,6 +38,9 @@ public:
   /**
    * Constructor.
    * @param[in] textureManager The texture manager
+   * @param[in] size           The width and height to fit the loaded image to.
+   * @param[in] fittingMode    The FittingMode of the resource to load
+   * @param[in] samplingMode   The SamplingMode of the resource to load
    * @param[in] urlList        List of urls to cache
    * @param[in] maskingData    Masking data to be applied.
    * @param[in] observer       FrameReady observer
@@ -49,6 +52,9 @@ public:
    * batch and cache sizes.
    */
   RollingImageCache(TextureManager&                     textureManager,
+                    ImageDimensions                     size,
+                    Dali::FittingMode::Type             fittingMode,
+                    Dali::SamplingMode::Type            samplingMode,
                     UrlList&                            urlList,
                     TextureManager::MaskingDataPointer& maskingData,
                     ImageCache::FrameReadyObserver&     observer,
@@ -141,8 +147,8 @@ private:
     bool         mReady    = false;
   };
 
-  std::vector<UrlStore>&                 mImageUrls;
-  CircularQueue<ImageFrame>              mQueue;
+  std::vector<UrlStore>&    mImageUrls;
+  CircularQueue<ImageFrame> mQueue;
 };
 
 } // namespace Internal

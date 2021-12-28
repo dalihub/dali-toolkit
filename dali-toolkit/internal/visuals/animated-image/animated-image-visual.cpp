@@ -49,6 +49,26 @@ namespace
 {
 const int CUSTOM_PROPERTY_COUNT(5); // ltr, wrap, pixel area, crop to mask, mask texture ratio
 
+// fitting modes
+DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, SHRINK_TO_FIT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, SCALE_TO_FILL)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, FIT_WIDTH)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, FIT_HEIGHT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, DEFAULT)
+DALI_ENUM_TO_STRING_TABLE_END(FITTING_MODE)
+
+// sampling modes
+DALI_ENUM_TO_STRING_TABLE_BEGIN(SAMPLING_MODE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, NEAREST)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, LINEAR)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX_THEN_NEAREST)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX_THEN_LINEAR)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, NO_FILTER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, DONT_CARE)
+DALI_ENUM_TO_STRING_TABLE_END(SAMPLING_MODE)
+
 // stop behavior
 DALI_ENUM_TO_STRING_TABLE_BEGIN(STOP_BEHAVIOR)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelImageVisual::StopBehavior, CURRENT_FRAME)
@@ -124,7 +144,7 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
 
 AnimatedImageVisualPtr AnimatedImageVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties)
 {
-  AnimatedImageVisualPtr visual(new AnimatedImageVisual(factoryCache, shaderFactory));
+  AnimatedImageVisualPtr visual(new AnimatedImageVisual(factoryCache, shaderFactory, ImageDimensions()));
   visual->InitializeAnimatedImage(imageUrl);
   visual->SetProperties(properties);
 
@@ -135,7 +155,7 @@ AnimatedImageVisualPtr AnimatedImageVisual::New(VisualFactoryCache& factoryCache
 
 AnimatedImageVisualPtr AnimatedImageVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Property::Array& imageUrls, const Property::Map& properties)
 {
-  AnimatedImageVisualPtr visual(new AnimatedImageVisual(factoryCache, shaderFactory));
+  AnimatedImageVisualPtr visual(new AnimatedImageVisual(factoryCache, shaderFactory, ImageDimensions()));
   visual->mImageUrls = new ImageCache::UrlList();
   visual->mImageUrls->reserve(imageUrls.Count());
 
@@ -154,9 +174,9 @@ AnimatedImageVisualPtr AnimatedImageVisual::New(VisualFactoryCache& factoryCache
   return visual;
 }
 
-AnimatedImageVisualPtr AnimatedImageVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl)
+AnimatedImageVisualPtr AnimatedImageVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, ImageDimensions size)
 {
-  AnimatedImageVisualPtr visual(new AnimatedImageVisual(factoryCache, shaderFactory));
+  AnimatedImageVisualPtr visual(new AnimatedImageVisual(factoryCache, shaderFactory, size));
   visual->InitializeAnimatedImage(imageUrl);
 
   visual->Initialize();
@@ -178,7 +198,7 @@ void AnimatedImageVisual::CreateImageCache()
 
   if(mAnimatedImageLoading)
   {
-    mImageCache = new RollingAnimatedImageCache(textureManager, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize,  mWrapModeU, mWrapModeV, IsSynchronousLoadingRequired(), mFactoryCache.GetPreMultiplyOnLoad());
+    mImageCache = new RollingAnimatedImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, mWrapModeU, mWrapModeV, IsSynchronousLoadingRequired(), mFactoryCache.GetPreMultiplyOnLoad());
   }
   else if(mImageUrls)
   {
@@ -189,11 +209,11 @@ void AnimatedImageVisual::CreateImageCache()
     uint16_t cacheSize = std::max(std::min(std::max(batchSize, mCacheSize), numUrls), MINIMUM_CACHESIZE);
     if(cacheSize < numUrls)
     {
-      mImageCache = new RollingImageCache(textureManager, *mImageUrls, mMaskingData, *this, cacheSize, batchSize, mFrameDelay);
+      mImageCache = new RollingImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, *mImageUrls, mMaskingData, *this, cacheSize, batchSize, mFrameDelay);
     }
     else
     {
-      mImageCache = new FixedImageCache(textureManager, *mImageUrls, mMaskingData, *this, batchSize, mFrameDelay);
+      mImageCache = new FixedImageCache(textureManager, mDesiredSize, mFittingMode, mSamplingMode, *mImageUrls, mMaskingData, *this, batchSize, mFrameDelay);
     }
   }
 
@@ -203,7 +223,7 @@ void AnimatedImageVisual::CreateImageCache()
   }
 }
 
-AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory)
+AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, ImageDimensions desiredSize)
 : Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::ANIMATED_IMAGE),
   mFrameDelayTimer(),
   mPlacementActor(),
@@ -223,11 +243,14 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mLoadPolicy(Toolkit::ImageVisual::LoadPolicy::ATTACHED),
   mReleasePolicy(Toolkit::ImageVisual::ReleasePolicy::DETACHED),
   mMaskingData(),
+  mDesiredSize(desiredSize),
   mFrameCount(0),
   mImageSize(),
   mActionStatus(DevelAnimatedImageVisual::Action::PLAY),
   mWrapModeU(WrapMode::DEFAULT),
   mWrapModeV(WrapMode::DEFAULT),
+  mFittingMode(FittingMode::SCALE_TO_FILL),
+  mSamplingMode(SamplingMode::BOX_THEN_LINEAR),
   mStopBehavior(DevelImageVisual::StopBehavior::CURRENT_FRAME),
   mStartFirstFrame(false),
   mIsJumpTo(false)
@@ -249,6 +272,14 @@ AnimatedImageVisual::~AnimatedImageVisual()
 
 void AnimatedImageVisual::GetNaturalSize(Vector2& naturalSize)
 {
+  if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
+  {
+    naturalSize.x = mDesiredSize.GetWidth();
+    naturalSize.y = mDesiredSize.GetHeight();
+    return;
+  }
+
+  naturalSize = Vector2::ZERO;
   if(mImageSize.GetWidth() == 0 && mImageSize.GetHeight() == 0)
   {
     if(mMaskingData && mMaskingData->mAlphaMaskUrl.IsValid() &&
@@ -325,11 +356,21 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
 
   map.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, mLoadPolicy);
   map.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, mReleasePolicy);
+  map.Insert(Toolkit::ImageVisual::Property::FITTING_MODE, mFittingMode);
+  map.Insert(Toolkit::ImageVisual::Property::SAMPLING_MODE, mSamplingMode);
+  map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
+  map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
 }
 
 void AnimatedImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 {
-  // Do nothing
+  map.Clear();
+  map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::ANIMATED_IMAGE);
+  if(mImageUrl.IsValid())
+  {
+    map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
+    map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+  }
 }
 
 void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes)
@@ -465,6 +506,22 @@ void AnimatedImageVisual::DoSetProperties(const Property::Map& propertyMap)
       else if(keyValue.first == SYNCHRONOUS_LOADING)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second);
+      }
+      else if(keyValue.first == IMAGE_FITTING_MODE)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::FITTING_MODE, keyValue.second);
+      }
+      else if(keyValue.first == IMAGE_SAMPLING_MODE)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::SAMPLING_MODE, keyValue.second);
+      }
+      else if(keyValue.first == IMAGE_DESIRED_WIDTH)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_WIDTH, keyValue.second);
+      }
+      else if(keyValue.first == IMAGE_DESIRED_HEIGHT)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
       }
     }
   }
@@ -652,6 +709,50 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       int loadPolicy = 0;
       Scripting::GetEnumerationProperty(value, LOAD_POLICY_TABLE, LOAD_POLICY_TABLE_COUNT, loadPolicy);
       mLoadPolicy = Toolkit::ImageVisual::LoadPolicy::Type(loadPolicy);
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::FITTING_MODE:
+    {
+      int fittingMode = 0;
+      Scripting::GetEnumerationProperty(value, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, fittingMode);
+      mFittingMode = Dali::FittingMode::Type(fittingMode);
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::SAMPLING_MODE:
+    {
+      int samplingMode = 0;
+      Scripting::GetEnumerationProperty(value, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, samplingMode);
+      mSamplingMode = Dali::SamplingMode::Type(samplingMode);
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::DESIRED_WIDTH:
+    {
+      float desiredWidth = 0.0f;
+      if(value.Get(desiredWidth))
+      {
+        mDesiredSize.SetWidth(desiredWidth);
+      }
+      else
+      {
+        DALI_LOG_ERROR("AnimatedImageVisual: desiredWidth property has incorrect type\n");
+      }
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::DESIRED_HEIGHT:
+    {
+      float desiredHeight = 0.0f;
+      if(value.Get(desiredHeight))
+      {
+        mDesiredSize.SetHeight(desiredHeight);
+      }
+      else
+      {
+        DALI_LOG_ERROR("AnimatedImageVisual: desiredHeight property has incorrect type\n");
+      }
       break;
     }
   }

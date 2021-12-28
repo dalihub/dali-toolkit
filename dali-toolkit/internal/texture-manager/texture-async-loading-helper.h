@@ -31,7 +31,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 /**
  * @brief Helper class to keep the relation between AsyncImageLoader and corresponding LoadingInfo container
  */
@@ -49,11 +48,18 @@ public:
    * @param[in] textureId             TextureId to reference the texture that will be loaded
    * @param[in] animatedImageLoading  The AnimatedImageLoading to load animated image
    * @param[in] frameIndex            The frame index of a frame to be loaded frame
+   * @param[in] desiredSize           The size the image is likely to appear at.
+   *                                  This can be set to 0,0 for automatic
+   * @param[in] fittingMode           The FittingMode to use
+   * @param[in] samplingMode          The SamplingMode to use
    * @param[in] preMultiplyOnLoad     if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
    */
   void LoadAnimatedImage(const TextureManager::TextureId&                textureId,
                          Dali::AnimatedImageLoading                      animatedImageLoading,
                          const std::uint32_t&                            frameIndex,
+                         const Dali::ImageDimensions&                    desiredSize,
+                         const Dali::FittingMode::Type&                  fittingMode,
+                         const Dali::SamplingMode::Type&                 samplingMode,
                          const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad);
 
   /**

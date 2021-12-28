@@ -58,13 +58,16 @@ namespace Toolkit
 namespace Internal
 {
 RollingImageCache::RollingImageCache(TextureManager&                     textureManager,
+                                     ImageDimensions                     size,
+                                     Dali::FittingMode::Type             fittingMode,
+                                     Dali::SamplingMode::Type            samplingMode,
                                      UrlList&                            urlList,
                                      TextureManager::MaskingDataPointer& maskingData,
                                      ImageCache::FrameReadyObserver&     observer,
                                      uint16_t                            cacheSize,
                                      uint16_t                            batchSize,
                                      uint32_t                            interval)
-: ImageCache(textureManager, maskingData, observer, batchSize, interval),
+: ImageCache(textureManager, size, fittingMode, samplingMode, maskingData, observer, batchSize, interval),
   mImageUrls(urlList),
   mQueue(cacheSize)
 {
@@ -168,7 +171,7 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
 
     TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
     TextureSet                textureSet    = mTextureManager.LoadTexture(
-      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, loadTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+      url, mDesiredSize, mFittingMode, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
     mImageUrls[imageFrame.mUrlIndex].mTextureId = loadTextureId;
 
     mRequestingLoad = false;
@@ -180,8 +183,8 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
 
 TextureSet RollingImageCache::GetFrontTextureSet() const
 {
-  TextureManager::TextureId textureId = GetCachedTextureId(0);
-  TextureSet textureSet = mTextureManager.GetTextureSet(textureId);
+  TextureManager::TextureId textureId  = GetCachedTextureId(0);
+  TextureSet                textureSet = mTextureManager.GetTextureSet(textureId);
   if(textureSet)
   {
     Sampler sampler = Sampler::New();

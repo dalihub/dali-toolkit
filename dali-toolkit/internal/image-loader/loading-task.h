@@ -19,19 +19,19 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
+#include <dali-toolkit/internal/texture-manager/texture-manager-type.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
-#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
+#include <dali/public-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali-toolkit/internal/texture-manager/texture-manager-type.h>
 
 namespace Dali
 {
@@ -39,7 +39,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-
 class LoadingTask;
 using LoadingTaskPtr = IntrusivePtr<LoadingTask>;
 
@@ -60,6 +59,26 @@ public:
   LoadingTask(uint32_t                                 id,
               Dali::AnimatedImageLoading               animatedImageLoading,
               uint32_t                                 frameIndex,
+              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+              CallbackBase*                            callback);
+
+  /**
+   * Constructor.
+   * @param [in] id of the task
+   * @param [in] animatedImageLoading The AnimatedImageLoading to load animated image
+   * @param [in] frameIndex The frame index of a frame to be loaded frame
+   * @param [in] dimensions The width and height to fit the loaded image to
+   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
+   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
+   * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
+   * @param [in] callback The callback that is called when the operation is completed.
+   */
+  LoadingTask(uint32_t                                 id,
+              Dali::AnimatedImageLoading               animatedImageLoading,
+              uint32_t                                 frameIndex,
+              Dali::ImageDimensions                    dimensions,
+              Dali::FittingMode::Type                  fittingMode,
+              Dali::SamplingMode::Type                 samplingMode,
               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
               CallbackBase*                            callback);
 
@@ -188,7 +207,7 @@ public:
   bool isMaskTask : 1;            ///< whether this task is for mask or not
   bool cropToMask : 1;            ///< Whether to crop the content to the mask size
   bool loadPlanes : 1;            ///< Whether to load image planes
-  bool isReady    : 1;            ///< Whether this task ready to run
+  bool isReady : 1;               ///< Whether this task ready to run
 };
 
 } // namespace Internal

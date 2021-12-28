@@ -39,8 +39,9 @@ using namespace Toolkit;
 namespace
 {
 const char* TEST_VECTOR_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insta_camera.json";
+const char* TEST_GIF_FILE_NAME          = TEST_RESOURCE_DIR "/anim.gif";
 
-}
+} // namespace
 
 int UtcDaliVisualAction(void)
 {
@@ -181,6 +182,43 @@ int UtcDaliAnimatedVectorImageVisualCreateInstancePropertyMap(void)
 
   // check the property values from the returned map from a visual
   DALI_TEST_CHECK(resultMap.Empty()); // Now the map is empty
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualCreateInstancePropertyMap(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualCreateInstancePropertyMap");
+
+  Property::Map propertyMap;
+  propertyMap.Add(Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE)
+    .Add(ImageVisual::Property::URL, TEST_GIF_FILE_NAME)
+    .Add(ImageVisual::Property::DESIRED_WIDTH, 10)
+    .Add(ImageVisual::Property::DESIRED_HEIGHT, 12);
+
+  // request AnimatedVectorImageVisual with a property map
+  VisualFactory                    factory    = VisualFactory::Get();
+  Visual::Base                     visual     = factory.CreateVisual(propertyMap);
+  Toolkit::Internal::Visual::Base& visualImpl = GetImplementation(visual);
+
+  Property::Map resultMap;
+  visualImpl.CreateInstancePropertyMap(resultMap);
+
+  // check the property values from the returned map from a visual
+  DALI_TEST_EQUALS(resultMap.Count(), 3u, TEST_LOCATION);
+
+  Property::Value* value = resultMap.Find(Toolkit::Visual::Property::TYPE, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == Visual::ANIMATED_IMAGE);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::DESIRED_WIDTH, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == 10);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == 12);
 
   END_TEST;
 }

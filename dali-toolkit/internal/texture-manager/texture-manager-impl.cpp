@@ -33,7 +33,7 @@
 
 namespace
 {
-constexpr auto INITIAL_HASH_NUMBER                     = size_t{0u};
+constexpr auto INITIAL_HASH_NUMBER = size_t{0u};
 
 constexpr auto TEXTURE_INDEX      = 0u; ///< The Index for texture
 constexpr auto MASK_TEXTURE_INDEX = 1u; ///< The Index for mask texture
@@ -135,6 +135,8 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
   const uint32_t&                 frameIndex,
   TextureManager::TextureId&      textureId,
   MaskingDataPointer&             maskInfo,
+  const Dali::ImageDimensions&    desiredSize,
+  const Dali::FittingMode::Type&  fittingMode,
   const Dali::SamplingMode::Type& samplingMode,
   const bool&                     synchronousLoading,
   TextureUploadObserver*          textureObserver,
@@ -147,7 +149,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
     Devel::PixelBuffer pixelBuffer;
     if(animatedImageLoading)
     {
-      pixelBuffer = animatedImageLoading.LoadFrame(frameIndex);
+      pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, desiredSize, fittingMode, samplingMode);
     }
     if(!pixelBuffer)
     {
@@ -158,7 +160,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
       Texture maskTexture;
       if(maskInfo && maskInfo->mAlphaMaskUrl.IsValid())
       {
-        Devel::PixelBuffer maskPixelBuffer = LoadImageFromFile(maskInfo->mAlphaMaskUrl.GetUrl(), ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true);
+        Devel::PixelBuffer maskPixelBuffer = LoadImageFromFile(maskInfo->mAlphaMaskUrl.GetUrl(), desiredSize, fittingMode, samplingMode, true);
         if(maskPixelBuffer)
         {
           if(!maskInfo->mPreappliedMasking)
@@ -213,7 +215,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(
       }
     }
 
-    textureId = RequestLoadInternal(url, alphaMaskId, contentScaleFactor, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, UseAtlas::NO_ATLAS, cropToMask, StorageType::UPLOAD_TO_TEXTURE, textureObserver, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad, animatedImageLoading, frameIndex, false);
+    textureId = RequestLoadInternal(url, alphaMaskId, contentScaleFactor, desiredSize, fittingMode, samplingMode, UseAtlas::NO_ATLAS, cropToMask, StorageType::UPLOAD_TO_TEXTURE, textureObserver, true, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoad, animatedImageLoading, frameIndex, false);
 
     TextureManager::LoadState loadState = mTextureCacheManager.GetTextureStateInternal(textureId);
     if(loadState == TextureManager::LoadState::UPLOADED)
@@ -875,10 +877,10 @@ void TextureManager::LoadTexture(TextureManager::TextureInfo& textureInfo, Textu
   textureInfo.loadState = LoadState::LOADING;
   if(!textureInfo.loadSynchronously)
   {
-    auto  premultiplyOnLoad = (textureInfo.preMultiplyOnLoad && textureInfo.maskTextureId == INVALID_TEXTURE_ID) ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
+    auto premultiplyOnLoad = (textureInfo.preMultiplyOnLoad && textureInfo.maskTextureId == INVALID_TEXTURE_ID) ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
     if(textureInfo.animatedImageLoading)
     {
-      mAsyncLoader->LoadAnimatedImage(textureInfo.textureId, textureInfo.animatedImageLoading, textureInfo.frameIndex, premultiplyOnLoad);
+      mAsyncLoader->LoadAnimatedImage(textureInfo.textureId, textureInfo.animatedImageLoading, textureInfo.frameIndex, textureInfo.desiredSize, textureInfo.fittingMode, textureInfo.samplingMode, premultiplyOnLoad);
     }
     else
     {
@@ -1194,7 +1196,7 @@ void TextureManager::ApplyMask(TextureManager::TextureInfo& textureInfo, const T
 
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise, "TextureManager::ApplyMask(): url:%s sync:%s\n", textureInfo.url.GetUrl().c_str(), textureInfo.loadSynchronously ? "T" : "F");
 
-    textureInfo.loadState   = LoadState::MASK_APPLYING;
+    textureInfo.loadState  = LoadState::MASK_APPLYING;
     auto premultiplyOnLoad = textureInfo.preMultiplyOnLoad ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
     mAsyncLoader->ApplyMask(textureInfo.textureId, pixelBuffer, maskPixelBuffer, textureInfo.scaleFactor, textureInfo.cropToMask, premultiplyOnLoad);
   }

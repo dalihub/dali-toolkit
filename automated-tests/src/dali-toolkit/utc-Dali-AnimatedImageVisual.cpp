@@ -80,6 +80,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
       .Add(ImageVisual::Property::PIXEL_AREA, Vector4())
       .Add(ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT)
       .Add(ImageVisual::Property::WRAP_MODE_V, WrapMode::DEFAULT)
+      .Add(ImageVisual::Property::FITTING_MODE, FittingMode::FIT_WIDTH)
+      .Add(ImageVisual::Property::SAMPLING_MODE, SamplingMode::NEAREST)
+      .Add(ImageVisual::Property::DESIRED_WIDTH, 154)
+      .Add(ImageVisual::Property::DESIRED_HEIGHT, 79)
       .Add(ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME)
       .Add(ImageVisual::Property::MASK_CONTENT_SCALE, 1.6f)
       .Add(ImageVisual::Property::CROP_TO_MASK, true)
@@ -100,6 +104,30 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<std::string>() == TEST_GIF_FILE_NAME);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::WRAP_MODE_U, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == WrapMode::REPEAT);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::WRAP_MODE_V, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == WrapMode::DEFAULT);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::FITTING_MODE, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == FittingMode::FIT_WIDTH);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::SAMPLING_MODE, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == SamplingMode::NEAREST);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::DESIRED_WIDTH, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == 154);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER);
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == 79);
 
   value = resultMap.Find(DevelVisual::Property::CORNER_RADIUS, Property::VECTOR4);
   DALI_TEST_CHECK(value);
@@ -138,9 +166,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<int>() == DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
 
+  // Natural size getted as desired size
   Vector2 naturalSize;
   animatedImageVisual.GetNaturalSize(naturalSize);
-  DALI_TEST_EQUALS(naturalSize, Vector2(100, 100), TEST_LOCATION);
+  DALI_TEST_EQUALS(naturalSize, Vector2(154, 79), TEST_LOCATION);
 
   // request AnimatedImageVisual with an URL
   Visual::Base animatedImageVisual2 = factory.CreateVisual(TEST_GIF_FILE_NAME, ImageDimensions());
@@ -154,6 +183,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   value = resultMap.Find(ImageVisual::Property::URL, Property::STRING);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<std::string>() == TEST_GIF_FILE_NAME);
+
+  // Natural size getted as image size
+  animatedImageVisual2.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS(naturalSize, Vector2(50, 50), TEST_LOCATION);
 
   END_TEST;
 }
@@ -179,6 +212,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
       .Add("pixelArea", Vector4())
       .Add("wrapModeU", WrapMode::REPEAT)
       .Add("wrapModeV", WrapMode::DEFAULT)
+      .Add("fittingMode", FittingMode::FIT_WIDTH)
+      .Add("samplingMode", SamplingMode::NEAREST)
+      .Add("desiredWidth", 154)
+      .Add("desiredHeight", 79)
       .Add("alphaMaskUrl", TEST_MASK_IMAGE_FILE_NAME)
       .Add("maskContentScale", 1.6f)
       .Add("cropToMask", true)
@@ -221,6 +258,30 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   value = resultMap.Find(Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, "totalFrameNumber");
   DALI_TEST_CHECK(value);
   DALI_TEST_EQUALS(value->Get<int>(), 11, TEST_LOCATION);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::WRAP_MODE_U, "wrapModeU");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == WrapMode::REPEAT);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::WRAP_MODE_V, "wrapModeV");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == WrapMode::DEFAULT);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::FITTING_MODE, "fittingMode");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == FittingMode::FIT_WIDTH);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::SAMPLING_MODE, "samplingMode");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == SamplingMode::NEAREST);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::DESIRED_WIDTH, "desiredWidth");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == 154);
+
+  value = resultMap.Find(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, "desiredHeight");
+  DALI_TEST_CHECK(value);
+  DALI_TEST_CHECK(value->Get<int>() == 79);
 
   value = resultMap.Find(Toolkit::DevelVisual::Property::CORNER_RADIUS, "cornerRadius");
   DALI_TEST_CHECK(value);
@@ -358,6 +419,11 @@ int UtcDaliAnimatedImageVisualGetPropertyMap03(void)
   value = resultMap.Find(DevelImageVisual::Property::MASKING_TYPE, Property::INTEGER);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<bool>() == DevelImageVisual::MaskingType::MASKING_ON_RENDERING);
+
+  // Natural size getted as masked image size
+  Vector2 naturalSize;
+  animatedImageVisual.GetNaturalSize(naturalSize);
+  DALI_TEST_EQUALS(naturalSize, Vector2(100, 100), TEST_LOCATION);
 
   END_TEST;
 }
@@ -1792,7 +1858,7 @@ int UtcDaliAnimatedImageVisualWrapMode(void)
   // Test wrap mode in animated image visual.
   const int     width  = 950;
   const int     height = 1080;
-  const Vector4 pixelArea(0.0f, 0.0f, 950/ 40, 1.0f);
+  const Vector4 pixelArea(0.0f, 0.0f, 950 / 40, 1.0f);
 
   Property::Map propertyMap;
   propertyMap.Insert(Toolkit::Visual::Property::TYPE, Visual::IMAGE);
@@ -1845,6 +1911,75 @@ int UtcDaliAnimatedImageVisualWrapMode(void)
 
   actor.Unparent();
   DALI_TEST_CHECK(actor.GetRendererCount() == 0u);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualDesiredSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliAnimatedImageVisualDesiredSize");
+
+  TestGlAbstraction& gl           = application.GetGlAbstraction();
+  TraceCallStack&    textureTrace = gl.GetTextureTrace();
+
+  // Set desiredWidth < 37 and desiredHeight < 50, which is smaller than original image's size.
+  int desiredWidth  = 15;
+  int desiredHeight = 20;
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual(TEST_GIF_FILE_NAME, ImageDimensions(desiredWidth, desiredHeight));
+  DALI_TEST_CHECK(visual);
+
+  DummyControl      actor     = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(DummyControl::Property::TEST_VISUAL, visual);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - first frame and second frame.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  textureTrace.Enable(true);
+  textureTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render();
+
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
+    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  // Unparent to make next trigger
+  actor.Unparent();
+
+  application.SendNotification();
+  application.Render();
+
+  // Set visual size
+  actor.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Trigger count is 2 - first frame and second frame.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+
+  textureTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << desiredWidth << ", " << desiredHeight;
+    DALI_TEST_CHECK(textureTrace.FindMethodAndParams("TexImage2D", out.str().c_str())); // The size should not be changed
+  }
 
   END_TEST;
 }

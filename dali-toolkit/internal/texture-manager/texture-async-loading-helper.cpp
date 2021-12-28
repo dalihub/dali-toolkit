@@ -44,9 +44,12 @@ TextureAsyncLoadingHelper::TextureAsyncLoadingHelper(TextureManager& textureMana
 void TextureAsyncLoadingHelper::LoadAnimatedImage(const TextureManager::TextureId&                textureId,
                                                   Dali::AnimatedImageLoading                      animatedImageLoading,
                                                   const std::uint32_t&                            frameIndex,
+                                                  const Dali::ImageDimensions&                    desiredSize,
+                                                  const Dali::FittingMode::Type&                  fittingMode,
+                                                  const Dali::SamplingMode::Type&                 samplingMode,
                                                   const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, fittingMode, samplingMode, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   loadingTask->SetTextureId(textureId);
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }
@@ -81,7 +84,6 @@ void TextureAsyncLoadingHelper::ApplyMask(const TextureManager::TextureId&      
                                           const bool&                                     cropToMask,
                                           const DevelAsyncImageLoader::PreMultiplyOnLoad& preMultiplyOnLoad)
 {
-
   LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   loadingTask->SetTextureId(textureId);
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
