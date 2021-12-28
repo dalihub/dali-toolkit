@@ -23,6 +23,8 @@ namespace Toolkit
 namespace Internal
 {
 ImageCache::ImageCache(TextureManager&                     textureManager,
+                       ImageDimensions                     size,
+                       Dali::SamplingMode::Type            samplingMode,
                        TextureManager::MaskingDataPointer& maskingData,
                        ImageCache::FrameReadyObserver&     observer,
                        uint32_t                            batchSize,
@@ -30,6 +32,8 @@ ImageCache::ImageCache(TextureManager&                     textureManager,
 : mTextureManager(textureManager),
   mObserver(observer),
   mMaskingData(maskingData),
+  mDesiredSize(size),
+  mSamplingMode(samplingMode),
   mBatchSize(batchSize),
   mInterval(interval),
   mRequestingLoad(false),

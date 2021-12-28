@@ -60,13 +60,15 @@ static constexpr uint32_t FIRST_FRAME_INDEX  = 0u;
 } // namespace
 
 RollingAnimatedImageCache::RollingAnimatedImageCache(TextureManager&                     textureManager,
+                                                     ImageDimensions                     size,
+                                                     Dali::SamplingMode::Type            samplingMode,
                                                      AnimatedImageLoading&               animatedImageLoading,
                                                      TextureManager::MaskingDataPointer& maskingData,
                                                      ImageCache::FrameReadyObserver&     observer,
                                                      uint16_t                            cacheSize,
                                                      uint16_t                            batchSize,
                                                      bool                                isSynchronousLoading)
-: ImageCache(textureManager, maskingData, observer, batchSize, 0u),
+: ImageCache(textureManager, size, samplingMode, maskingData, observer, batchSize, 0u),
   mAnimatedImageLoading(animatedImageLoading),
   mFrameCount(SINGLE_IMAGE_COUNT),
   mFrameIndex(FIRST_FRAME_INDEX),
@@ -195,7 +197,8 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                    loadingStatus,
                                                                    mImageUrls[frameIndex].mTextureId,
                                                                    mMaskingData,
-                                                                   SamplingMode::BOX_THEN_LINEAR,
+                                                                   mDesiredSize,
+                                                                   mSamplingMode,
                                                                    Dali::WrapMode::Type::DEFAULT,
                                                                    Dali::WrapMode::Type::DEFAULT,
                                                                    synchronousLoading,

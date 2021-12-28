@@ -57,13 +57,15 @@ namespace Toolkit
 namespace Internal
 {
 RollingImageCache::RollingImageCache(TextureManager&                     textureManager,
+                                     ImageDimensions                     size,
+                                     Dali::SamplingMode::Type            samplingMode,
                                      UrlList&                            urlList,
                                      TextureManager::MaskingDataPointer& maskingData,
                                      ImageCache::FrameReadyObserver&     observer,
                                      uint16_t                            cacheSize,
                                      uint16_t                            batchSize,
                                      uint32_t                            interval)
-: ImageCache(textureManager, maskingData, observer, batchSize, interval),
+: ImageCache(textureManager, size, samplingMode, maskingData, observer, batchSize, interval),
   mImageUrls(urlList),
   mQueue(cacheSize)
 {
@@ -169,7 +171,25 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
     auto                               preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     TextureSet textureSet = mTextureManager.LoadTexture(
-      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, mImageUrls[imageFrame.mUrlIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+      url,
+      mDesiredSize,
+      FittingMode::SCALE_TO_FILL,
+      mSamplingMode,
+      mMaskingData,
+      synchronousLoading,
+      mImageUrls[imageFrame.mUrlIndex].mTextureId,
+      textureRect,
+      textureRectSize,
+      atlasingStatus,
+      loadingStatus,
+      Dali::WrapMode::Type::DEFAULT,
+      Dali::WrapMode::Type::DEFAULT,
+      this,
+      atlasObserver,
+      imageAtlasManager,
+      ENABLE_ORIENTATION_CORRECTION,
+      TextureManager::ReloadPolicy::CACHED,
+      preMultiply);
 
     // If textureSet is returned but loadingState is false than load state is LOAD_FINISHED. (Notification is not comming yet.)
     // If textureSet is null and the request is synchronous, load state is LOAD_FAILED.

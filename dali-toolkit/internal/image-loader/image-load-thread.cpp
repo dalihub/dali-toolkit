@@ -111,7 +111,7 @@ void LoadingTask::Load()
 {
   if(animatedImageLoading)
   {
-    pixelBuffer = animatedImageLoading.LoadFrame(frameIndex);
+    pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, dimensions, fittingMode, samplingMode);
   }
   else if(encodedImageBuffer)
   {

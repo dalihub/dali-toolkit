@@ -33,6 +33,8 @@ public:
   /**
    * Constructor.
    * @param[in] textureManager The texture manager
+   * @param[in] size           The width and height to fit the loaded image to.
+   * @param[in] samplingMode   The SamplingMode of the resource to load
    * @param[in] urlList        List of urls to cache
    * @param[in] maskingData    Masking data to be applied.
    * @param[in] observer       FrameReady observer
@@ -43,6 +45,8 @@ public:
    * batch and cache sizes. The cache is as large as the number of urls.
    */
   FixedImageCache(TextureManager&                     textureManager,
+                  ImageDimensions                     size,
+                  Dali::SamplingMode::Type            samplingMode,
                   UrlList&                            urlList,
                   TextureManager::MaskingDataPointer& maskingData,
                   ImageCache::FrameReadyObserver&     observer,

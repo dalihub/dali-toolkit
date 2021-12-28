@@ -42,7 +42,9 @@ public:
   /**
    * @brief Constructor.
    * @param[in] textureManager       The texture manager
-   * @param[in] animatedImageLoading  The loaded animated image
+   * @param[in] size                 The width and height to fit the loaded image to.
+   * @param[in] samplingMode         The SamplingMode of the resource to load
+   * @param[in] animatedImageLoading The loaded animated image
    * @param[in] maskingData          Masking data to be applied.
    * @param[in] observer             FrameReady observer
    * @param[in] cacheSize            The size of the cache
@@ -53,6 +55,8 @@ public:
    * batch and cache sizes.
    */
   RollingAnimatedImageCache(TextureManager&                     textureManager,
+                            ImageDimensions                     size,
+                            Dali::SamplingMode::Type            samplingMode,
                             AnimatedImageLoading&               animatedImageLoading,
                             TextureManager::MaskingDataPointer& maskingData,
                             ImageCache::FrameReadyObserver&     observer,

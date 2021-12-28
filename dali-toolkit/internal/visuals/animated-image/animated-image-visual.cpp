@@ -46,6 +46,18 @@ namespace Internal
 {
 namespace
 {
+
+// sampling modes
+DALI_ENUM_TO_STRING_TABLE_BEGIN(SAMPLING_MODE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, NEAREST)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, LINEAR)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX_THEN_NEAREST)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, BOX_THEN_LINEAR)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, NO_FILTER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::SamplingMode, DONT_CARE)
+DALI_ENUM_TO_STRING_TABLE_END(SAMPLING_MODE)
+
 // stop behavior
 DALI_ENUM_TO_STRING_TABLE_BEGIN(STOP_BEHAVIOR)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelImageVisual::StopBehavior, CURRENT_FRAME)
@@ -176,7 +188,7 @@ void AnimatedImageVisual::CreateImageCache()
 
   if(mAnimatedImageLoading)
   {
-    mImageCache = new RollingAnimatedImageCache(textureManager, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, IsSynchronousLoadingRequired());
+    mImageCache = new RollingAnimatedImageCache(textureManager, mDesiredSize, mSamplingMode, mAnimatedImageLoading, mMaskingData, *this, mCacheSize, mBatchSize, IsSynchronousLoadingRequired());
   }
   else if(mImageUrls)
   {
@@ -187,11 +199,11 @@ void AnimatedImageVisual::CreateImageCache()
     uint16_t cacheSize = std::max(std::min(std::max(batchSize, mCacheSize), numUrls), MINIMUM_CACHESIZE);
     if(cacheSize < numUrls)
     {
-      mImageCache = new RollingImageCache(textureManager, *mImageUrls, mMaskingData, *this, cacheSize, batchSize, mFrameDelay);
+      mImageCache = new RollingImageCache(textureManager, mDesiredSize, mSamplingMode, *mImageUrls, mMaskingData, *this, cacheSize, batchSize, mFrameDelay);
     }
     else
     {
-      mImageCache = new FixedImageCache(textureManager, *mImageUrls, mMaskingData, *this, batchSize, mFrameDelay);
+      mImageCache = new FixedImageCache(textureManager, mDesiredSize, mSamplingMode, *mImageUrls, mMaskingData, *this, batchSize, mFrameDelay);
     }
   }
 
@@ -221,6 +233,8 @@ AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, Image
   mLoadPolicy(Toolkit::ImageVisual::LoadPolicy::ATTACHED),
   mReleasePolicy(Toolkit::ImageVisual::ReleasePolicy::DETACHED),
   mMaskingData(),
+  mSamplingMode(SamplingMode::BOX_THEN_LINEAR),
+  mDesiredSize(),
   mFrameCount(0),
   mImageSize(),
   mActionStatus(DevelAnimatedImageVisual::Action::PLAY),
@@ -246,6 +260,13 @@ AnimatedImageVisual::~AnimatedImageVisual()
 
 void AnimatedImageVisual::GetNaturalSize(Vector2& naturalSize)
 {
+  if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)
+  {
+    naturalSize.x = mDesiredSize.GetWidth();
+    naturalSize.y = mDesiredSize.GetHeight();
+    return;
+  }
+
   naturalSize = Vector2::ZERO;
   if(mImageSize.GetWidth() == 0 && mImageSize.GetHeight() == 0)
   {
@@ -346,11 +367,20 @@ void AnimatedImageVisual::DoCreatePropertyMap(Property::Map& map) const
 
   map.Insert(Toolkit::ImageVisual::Property::LOAD_POLICY, mLoadPolicy);
   map.Insert(Toolkit::ImageVisual::Property::RELEASE_POLICY, mReleasePolicy);
+  map.Insert(Toolkit::ImageVisual::Property::SAMPLING_MODE, mSamplingMode);
+  map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
+  map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
 }
 
 void AnimatedImageVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 {
-  // Do nothing
+  map.Clear();
+  map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::ANIMATED_IMAGE);
+  if(mImageUrl.IsValid())
+  {
+    map.Insert(Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth());
+    map.Insert(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight());
+  }
 }
 
 void AnimatedImageVisual::OnDoAction(const Dali::Property::Index actionId, const Dali::Property::Value& attributes)
@@ -486,6 +516,18 @@ void AnimatedImageVisual::DoSetProperties(const Property::Map& propertyMap)
       else if(keyValue.first == SYNCHRONOUS_LOADING)
       {
         DoSetProperty(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second);
+      }
+      else if(keyValue.first == IMAGE_SAMPLING_MODE)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::SAMPLING_MODE, keyValue.second);
+      }
+      else if(keyValue.first == IMAGE_DESIRED_WIDTH)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_WIDTH, keyValue.second);
+      }
+      else if(keyValue.first == IMAGE_DESIRED_HEIGHT)
+      {
+        DoSetProperty(Toolkit::ImageVisual::Property::DESIRED_HEIGHT, keyValue.second);
       }
     }
   }
@@ -673,6 +715,42 @@ void AnimatedImageVisual::DoSetProperty(Property::Index        index,
       int loadPolicy = 0;
       Scripting::GetEnumerationProperty(value, LOAD_POLICY_TABLE, LOAD_POLICY_TABLE_COUNT, loadPolicy);
       mLoadPolicy = Toolkit::ImageVisual::LoadPolicy::Type(loadPolicy);
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::SAMPLING_MODE:
+    {
+      int samplingMode = 0;
+      Scripting::GetEnumerationProperty(value, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, samplingMode);
+      mSamplingMode = Dali::SamplingMode::Type(samplingMode);
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::DESIRED_WIDTH:
+    {
+      float desiredWidth = 0.0f;
+      if(value.Get(desiredWidth))
+      {
+        mDesiredSize.SetWidth(desiredWidth);
+      }
+      else
+      {
+        DALI_LOG_ERROR("AnimatedImageVisual: desiredWidth property has incorrect type\n");
+      }
+      break;
+    }
+
+    case Toolkit::ImageVisual::Property::DESIRED_HEIGHT:
+    {
+      float desiredHeight = 0.0f;
+      if(value.Get(desiredHeight))
+      {
+        mDesiredSize.SetHeight(desiredHeight);
+      }
+      else
+      {
+        DALI_LOG_ERROR("AnimatedImageVisual: desiredHeight property has incorrect type\n");
+      }
       break;
     }
   }

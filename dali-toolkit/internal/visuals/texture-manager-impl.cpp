@@ -148,6 +148,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(Dali::AnimatedImageLoading a
                                                     bool&                      loadingStatus,
                                                     TextureManager::TextureId& textureId,
                                                     MaskingDataPointer&        maskInfo,
+                                                    Dali::ImageDimensions      desiredSize,
                                                     Dali::SamplingMode::Type   samplingMode,
                                                     Dali::WrapMode::Type       wrapModeU,
                                                     Dali::WrapMode::Type       wrapModeV,
@@ -162,7 +163,7 @@ TextureSet TextureManager::LoadAnimatedImageTexture(Dali::AnimatedImageLoading a
     Devel::PixelBuffer pixelBuffer;
     if(animatedImageLoading)
     {
-      pixelBuffer = animatedImageLoading.LoadFrame(frameIndex);
+      pixelBuffer = animatedImageLoading.LoadFrame(frameIndex, desiredSize, FittingMode::SCALE_TO_FILL, samplingMode);
     }
     if(!pixelBuffer)
     {
@@ -222,9 +223,9 @@ TextureSet TextureManager::LoadAnimatedImageTexture(Dali::AnimatedImageLoading a
                                     alphaMaskId,
                                     contentScaleFactor,
                                     cropToMask,
-                                    ImageDimensions(),
+                                    desiredSize,
                                     FittingMode::SCALE_TO_FILL,
-                                    SamplingMode::BOX_THEN_LINEAR,
+                                    samplingMode,
                                     TextureManager::NO_ATLAS,
                                     StorageType::UPLOAD_TO_TEXTURE,
                                     textureObserver,

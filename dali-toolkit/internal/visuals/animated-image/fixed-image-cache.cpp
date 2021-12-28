@@ -37,12 +37,14 @@ static constexpr uint32_t FIRST_FRAME_INDEX = 0u;
 } // namespace
 
 FixedImageCache::FixedImageCache(TextureManager&                     textureManager,
+                                 ImageDimensions                     size,
+                                 Dali::SamplingMode::Type            samplingMode,
                                  UrlList&                            urlList,
                                  TextureManager::MaskingDataPointer& maskingData,
                                  ImageCache::FrameReadyObserver&     observer,
                                  uint32_t                            batchSize,
                                  uint32_t                            interval)
-: ImageCache(textureManager, maskingData, observer, batchSize, interval),
+: ImageCache(textureManager, size, samplingMode, maskingData, observer, batchSize, interval),
   mImageUrls(urlList),
   mFront(FIRST_FRAME_INDEX)
 {
@@ -137,7 +139,25 @@ void FixedImageCache::LoadBatch()
     auto                               preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     TextureSet textureSet = mTextureManager.LoadTexture(
-      url, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::BOX_THEN_LINEAR, mMaskingData, synchronousLoading, mImageUrls[frameIndex].mTextureId, textureRect, textureRectSize, atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT, Dali::WrapMode::Type::DEFAULT, this, atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply);
+      url,
+      mDesiredSize,
+      FittingMode::SCALE_TO_FILL,
+      mSamplingMode,
+      mMaskingData,
+      synchronousLoading,
+      mImageUrls[frameIndex].mTextureId,
+      textureRect,
+      textureRectSize,
+      atlasingStatus,
+      loadingStatus,
+      Dali::WrapMode::Type::DEFAULT,
+      Dali::WrapMode::Type::DEFAULT,
+      this,
+      atlasObserver,
+      imageAtlasManager,
+      ENABLE_ORIENTATION_CORRECTION,
+      TextureManager::ReloadPolicy::CACHED,
+      preMultiply);
 
     // If textureSet is returned but loadingState is false than load state is LOAD_FINISHED. (Notification is not comming yet.)
     // If textureSet is null and the request is synchronous, load state is LOAD_FAILED.

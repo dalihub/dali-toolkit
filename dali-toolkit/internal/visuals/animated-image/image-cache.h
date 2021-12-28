@@ -59,6 +59,8 @@ public:
   /**
    * @brief Constructor.
    * @param[in] textureManager The texture manager
+   * @param[in] size           The width and height to fit the loaded image to.
+   * @param[in] samplingMode   The SamplingMode of the resource to load
    * @param[in] observer       FrameReady observer
    * @param[in] maskingData    Masking data to be applied.
    * @param[in] batchSize      The size of a batch to load
@@ -68,6 +70,8 @@ public:
    * batch and cache sizes. The cache is as large as the number of urls.
    */
   ImageCache(TextureManager&                     textureManager,
+             ImageDimensions                     size,
+             Dali::SamplingMode::Type            samplingMode,
              TextureManager::MaskingDataPointer& maskingData,
              ImageCache::FrameReadyObserver&     observer,
              uint32_t                            batchSize,
@@ -146,6 +150,8 @@ protected:
   TextureManager&                     mTextureManager;
   FrameReadyObserver&                 mObserver;
   TextureManager::MaskingDataPointer& mMaskingData;
+  Dali::ImageDimensions               mDesiredSize;
+  Dali::SamplingMode::Type            mSamplingMode : 4;
   uint32_t                            mBatchSize;
   uint32_t                            mInterval;
   bool                                mRequestingLoad : 1;

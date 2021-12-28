@@ -172,6 +172,7 @@ public:
    * @param[out] loadingStatus         The loading status of the texture
    * @param[out] textureId             The textureId of the frame
    * @param[in, out] maskInfo          Mask info structure
+   * @param[in]  desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in]  samplingMode          The SamplingMode to use
    * @param[in]  wrapModeU             Horizontal Wrap mode
    * @param[in]  wrapModeV             Vertical Wrap mode
@@ -188,6 +189,7 @@ public:
                                       bool&                      loadingStatus,
                                       TextureManager::TextureId& textureId,
                                       MaskingDataPointer&        maskInfo,
+                                      Dali::ImageDimensions      desiredSize,
                                       Dali::SamplingMode::Type   samplingMode,
                                       Dali::WrapMode::Type       wrapModeU,
                                       Dali::WrapMode::Type       wrapModeV,

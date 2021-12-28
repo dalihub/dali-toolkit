@@ -284,6 +284,8 @@ private:
   Dali::Toolkit::ImageVisual::LoadPolicy::Type    mLoadPolicy;
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
   TextureManager::MaskingDataPointer              mMaskingData;
+  Dali::SamplingMode::Type                        mSamplingMode : 4;
+  Dali::ImageDimensions                           mDesiredSize;
 
   // Shared variables
   uint32_t        mFrameCount; // Number of frames
