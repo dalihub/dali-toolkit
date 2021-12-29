@@ -148,19 +148,26 @@ int utcDaliAccessibilityHidden(void)
 {
   ToolkitTestApplication application;
 
-  auto  control    = Toolkit::Control::New();
-  auto* accessible = Dali::Accessibility::Accessible::Get(control);
+  auto  parent            = Toolkit::Control::New();
+  auto* parentAccessible  = Accessibility::Accessible::Get(parent);
+  auto  control           = Toolkit::Control::New();
+  auto* controlAccessible = Accessibility::Accessible::Get(control);
+
+  parent.Add(control);
 
   // Check not hidden
-  DALI_TEST_CHECK(accessible);
-  DALI_TEST_CHECK(!accessible->IsHidden());
+  DALI_TEST_CHECK(parentAccessible && controlAccessible);
+  DALI_TEST_CHECK(!controlAccessible->IsHidden());
   DALI_TEST_CHECK(!control.GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN));
+  DALI_TEST_EQUALS(parentAccessible->GetChildCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parentAccessible->GetChildAtIndex(0), controlAccessible, TEST_LOCATION);
 
   control.SetProperty(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN, true);
 
   // Check hidden
-  DALI_TEST_CHECK(accessible->IsHidden());
+  DALI_TEST_CHECK(controlAccessible->IsHidden());
   DALI_TEST_CHECK(control.GetProperty<bool>(Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN));
+  DALI_TEST_EQUALS(parentAccessible->GetChildCount(), 0u, TEST_LOCATION);
 
   END_TEST;
 }
