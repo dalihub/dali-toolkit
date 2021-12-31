@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1168,6 +1168,35 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
   DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
+
+  // Set a URL in property map again
+  propertyMap[ImageVisual::Property::URL] = gImage_34_RGBA;
+  imageView.SetProperty( ImageView::Property::IMAGE, propertyMap );
+
+  application.SendNotification();
+  application.Render( 16 );
+
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( visual );             // Visual should be valid
+
+  // Set an empty property map
+  propertyMap.Clear();
+  imageView.SetProperty( ImageView::Property::IMAGE, propertyMap );
+
+  application.SendNotification();
+  application.Render( 16 );
+
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( map.Empty() );        // But PropertyMap should be empty
   DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   END_TEST;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -257,6 +257,57 @@ int UtcDaliDebugRenderingGetVisual2(void)
   END_TEST;
 }
 
+
+int UtcDaliDebugRenderingGetVisual3(void)
+{
+  EnvironmentVariable::SetTestingEnvironmentVariable( true );
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliDebugRenderingGetVisual3: Request visual with various parameters" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  // Test that image visual is replaced with debug visual
+  Dali::Property::Map map;
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::IMAGE;
+  map[ ImageVisual::Property::URL ] = TEST_IMAGE_FILE_NAME;
+  Visual::Base imageVisual = factory.CreateVisual( map );
+  DALI_TEST_CHECK( imageVisual );
+  TestDebugVisual( application.GetScene(),  imageVisual, Visual::IMAGE, Vector2(64.0f, 64.0f /* Broken Image Size */ ));
+
+  // Test that image visual with null string don't make visual
+  map.Clear();
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::IMAGE;
+  map[ ImageVisual::Property::URL ] = "";
+  Visual::Base emptyVisual = factory.CreateVisual( map );
+  DALI_TEST_CHECK( emptyVisual );
+  TestDebugVisual( application.GetScene(), emptyVisual, Visual::WIREFRAME, Vector2::ZERO);
+
+  tet_infoline( "Check that GetVisualObject returns the actual WireframeVisual" );
+  Toolkit::Internal::Visual::Base& visualImpl = GetImplementation( emptyVisual ).GetVisualObject();
+  DALI_TEST_CHECK( dynamic_cast< Toolkit::Internal::WireframeVisual* >( &visualImpl ) );
+
+  tet_infoline( "Compare the returned emptyVisual with the visual implementation, should be the same" );
+  DALI_TEST_CHECK( emptyVisual.GetObjectPtr() == &visualImpl );
+
+  // Test that image view with empty property map don't make visual even DebugRendering is enabled.
+  map.Clear();
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty(Control::Property::BACKGROUND, map);
+  imageView.SetProperty(ImageView::Property::IMAGE, map);
+
+  application.GetScene().Add(imageView);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetRendererCount(), 0u, TEST_LOCATION );
+
+  EnvironmentVariable::SetTestingEnvironmentVariable(false);
+  END_TEST;
+}
+
+
 int UtcDaliDebugRenderingGetVisualObject01(void)
 {
   EnvironmentVariable::SetTestingEnvironmentVariable( true );
@@ -281,6 +332,7 @@ int UtcDaliDebugRenderingGetVisualObject01(void)
   tet_infoline( "Compare the returned TextVisual with the visual implementation, should differ" );
   DALI_TEST_CHECK( textVisual.GetObjectPtr() != &visualImpl );
 
+  EnvironmentVariable::SetTestingEnvironmentVariable( false );
   END_TEST;
 }
 
