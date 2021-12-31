@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -890,7 +890,7 @@ int UtcDaliVisualGetPropertyMap5(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK(  value->Get<int>() == WrapMode::MIRRORED_REPEAT);
 
-  value = resultMap.Find( "synchronousLoading",   Property::BOOLEAN );
+  value = resultMap.Find( ImageVisual::Property::SYNCHRONOUS_LOADING, Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() == true );
 
