@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/internal/controls/text-controls/text-field-property-handler.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
+#include <dali-toolkit/internal/controls/text-controls/text-field-property-handler.h>
 
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
@@ -626,6 +626,15 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       }
       break;
     }
+    case Toolkit::DevelTextField::Property::ENABLE_FONT_SIZE_SCALE:
+    {
+      const bool enableFontSizeScale = value.Get<bool>();
+      if(!Equals(impl.mController->IsFontSizeScaleEnabled(), enableFontSizeScale))
+      {
+        impl.mController->SetFontSizeScaleEnabled(enableFontSizeScale);
+      }
+      break;
+    }
     case Toolkit::DevelTextField::Property::PRIMARY_CURSOR_POSITION:
     {
       uint32_t position = static_cast<uint32_t>(value.Get<int>());
@@ -1001,6 +1010,11 @@ Property::Value TextField::PropertyHandler::GetProperty(Toolkit::TextField textF
     case Toolkit::DevelTextField::Property::FONT_SIZE_SCALE:
     {
       value = impl.mController->GetFontSizeScale();
+      break;
+    }
+    case Toolkit::DevelTextField::Property::ENABLE_FONT_SIZE_SCALE:
+    {
+      value = impl.mController->IsFontSizeScaleEnabled();
       break;
     }
     case Toolkit::DevelTextField::Property::PRIMARY_CURSOR_POSITION:

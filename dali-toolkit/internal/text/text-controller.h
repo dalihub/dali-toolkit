@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -906,6 +906,20 @@ public: // Default style & Input style
    * @return The font size scale.
    */
   float GetFontSizeScale() const;
+
+  /**
+   * @brief Set the font size scale enabled flag.
+   *
+   * @param[in] enabled whether to enable the font size scale.
+   */
+  void SetFontSizeScaleEnabled(bool enabled);
+
+  /**
+   * @brief Returns whether the font size scale is enabled or not.
+   *
+   * @return @e true if the font size scale is enabled, otherwise returns @e false.
+   */
+  bool IsFontSizeScaleEnabled() const;
 
   /**
    * @brief Sets the Placeholder text font size.

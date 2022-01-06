@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -672,11 +672,11 @@ float Controller::Impl::GetDefaultFontLineHeight()
   if(nullptr == mFontDefaults)
   {
     TextAbstraction::FontDescription fontDescription;
-    defaultFontId = mFontClient.GetFontId(fontDescription, TextAbstraction::FontClient::DEFAULT_POINT_SIZE * mFontSizeScale);
+    defaultFontId = mFontClient.GetFontId(fontDescription, TextAbstraction::FontClient::DEFAULT_POINT_SIZE * GetFontSizeScale());
   }
   else
   {
-    defaultFontId = mFontDefaults->GetFontId(mFontClient, mFontDefaults->mDefaultPointSize * mFontSizeScale);
+    defaultFontId = mFontDefaults->GetFontId(mFontClient, mFontDefaults->mDefaultPointSize * GetFontSizeScale());
   }
 
   Text::FontMetrics fontMetrics;
