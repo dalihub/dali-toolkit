@@ -67,6 +67,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/transition-effects/cube-transition-fold-effect.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-wave-effect.cpp
   ${devel_api_src_dir}/utility/npatch-utilities.cpp
+  ${devel_api_src_dir}/utility/npatch-helper.cpp
   ${devel_api_src_dir}/visual-factory/transition-data.cpp
   ${devel_api_src_dir}/visual-factory/visual-factory.cpp
   ${devel_api_src_dir}/visual-factory/visual-base.cpp
@@ -271,6 +272,7 @@ SET( devel_api_drag_and_drop_detector_header_files
 
 SET( devel_api_utility_header_files
   ${devel_api_src_dir}/utility/npatch-utilities.h
+  ${devel_api_src_dir}/utility/npatch-helper.h
 )
 
 SET( SOURCES ${SOURCES}
