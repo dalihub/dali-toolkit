@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -213,7 +213,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
 
           if(lastGlyphIndexOfLine == index)
           {
-            penY += -line->descender;
+            penY += -line->descender + line->lineSpacing;
 
             // Get the next line.
             ++lineIndex;
@@ -225,7 +225,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
 
               lastGlyphIndexOfLine = (line->isSplitToTwoHalves ? line->glyphRunSecondHalf.glyphIndex + line->glyphRunSecondHalf.numberOfGlyphs : line->glyphRun.glyphIndex + line->glyphRun.numberOfGlyphs) - 1u;
 
-              penY += line->ascender + line->lineSpacing;
+              penY += line->ascender;
             }
           }
         }
