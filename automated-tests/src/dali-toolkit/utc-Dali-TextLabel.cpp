@@ -74,6 +74,7 @@ const char* const PROPERTY_NAME_PIXEL_SIZE = "pixelSize";
 const char* const PROPERTY_NAME_ELLIPSIS = "ellipsis";
 const char* const PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY = "autoScrollLoopDelay";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE = "fontSizeScale";
+const char* const PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE = "enableFontSizeScale";
 
 const char* const PROPERTY_NAME_ELLIPSIS_POSITION = "ellipsisPosition";
 
@@ -352,6 +353,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextLabel::Property::ELLIPSIS );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY ) == TextLabel::Property::AUTO_SCROLL_LOOP_DELAY );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_FONT_SIZE_SCALE ) == DevelTextLabel::Property::FONT_SIZE_SCALE );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE ) == DevelTextLabel::Property::ENABLE_FONT_SIZE_SCALE );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS_POSITION ) == DevelTextLabel::Property::ELLIPSIS_POSITION );
 
   END_TEST;
@@ -407,6 +409,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( DevelTextLabel::Property::FONT_SIZE_SCALE, 2.5f );
   DALI_TEST_EQUALS( label.GetProperty<float>( DevelTextLabel::Property::FONT_SIZE_SCALE ), 2.5f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   label.SetProperty( DevelTextLabel::Property::FONT_SIZE_SCALE, 1.0f );
+
+  label.SetProperty( DevelTextLabel::Property::ENABLE_FONT_SIZE_SCALE, false );
+  DALI_TEST_EQUALS( label.GetProperty<bool>( DevelTextLabel::Property::ENABLE_FONT_SIZE_SCALE ), false, TEST_LOCATION );
+  label.SetProperty( DevelTextLabel::Property::ENABLE_FONT_SIZE_SCALE, true );
 
   // Reset font style.
   fontStyleMapSet.Clear();

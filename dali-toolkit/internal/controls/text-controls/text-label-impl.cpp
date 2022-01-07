@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,6 +136,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "textFit",       
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "minLineSize",                  FLOAT,   MIN_LINE_SIZE                  )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "renderingBackend",             INTEGER, RENDERING_BACKEND              )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "fontSizeScale",                FLOAT,   FONT_SIZE_SCALE                )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "enableFontSizeScale",          BOOLEAN, ENABLE_FONT_SIZE_SCALE         )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "ellipsisPosition",             INTEGER, ELLIPSIS_POSITION              )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR   )
@@ -508,6 +509,15 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::ENABLE_FONT_SIZE_SCALE:
+      {
+        const bool enableFontSizeScale = value.Get<bool>();
+        if(!Equals(impl.mController->IsFontSizeScaleEnabled(), enableFontSizeScale))
+        {
+          impl.mController->SetFontSizeScaleEnabled(enableFontSizeScale);
+        }
+        break;
+      }
       case Toolkit::DevelTextLabel::Property::ELLIPSIS_POSITION:
       {
         DevelText::EllipsisPosition::Type ellipsisPositionType(static_cast<DevelText::EllipsisPosition::Type>(-1)); // Set to invalid value to ensure a valid mode does get set
@@ -754,6 +764,11 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       case Toolkit::DevelTextLabel::Property::FONT_SIZE_SCALE:
       {
         value = impl.mController->GetFontSizeScale();
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::ENABLE_FONT_SIZE_SCALE:
+      {
+        value = impl.mController->IsFontSizeScaleEnabled();
         break;
       }
       case Toolkit::DevelTextLabel::Property::ELLIPSIS_POSITION:

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -357,6 +357,7 @@ struct Controller::Impl
     mTextFitMaxSize(DEFAULT_TEXTFIT_MAX),
     mTextFitStepSize(DEFAULT_TEXTFIT_STEP),
     mFontSizeScale(DEFAULT_FONT_SIZE_SCALE),
+    mFontSizeScaleEnabled(true),
     mTextFitEnabled(false),
     mTextFitChanged(false),
     mIsLayoutDirectionChanged(false)
@@ -495,6 +496,11 @@ struct Controller::Impl
 
       ClearPreEditFlag();
     }
+  }
+
+  float GetFontSizeScale()
+  {
+    return mFontSizeScaleEnabled ? mFontSizeScale : 1.0f;
   }
 
   /**
@@ -976,6 +982,7 @@ public:
   float mTextFitMaxSize;               ///< Maximum Font Size for text fit. Default 100
   float mTextFitStepSize;              ///< Step Size for font intervalse. Default 1
   float mFontSizeScale;                ///< Scale value for Font Size. Default 1.0
+  bool  mFontSizeScaleEnabled : 1;     ///< Whether the font size scale is enabled.
   bool  mTextFitEnabled : 1;           ///< Whether the text's fit is enabled.
   bool  mTextFitChanged : 1;           ///< Whether the text fit property has changed.
   bool  mIsLayoutDirectionChanged : 1; ///< Whether the layout has changed.

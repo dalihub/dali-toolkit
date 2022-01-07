@@ -105,6 +105,7 @@ const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGr
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
 const char* const PROPERTY_NAME_MAX_LENGTH                           = "maxLength";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
+const char* const PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE               = "enableFontSizeScale";
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
 const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "inputMethodSettings";
@@ -554,6 +555,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == TextEditor::Property::ENABLE_SELECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextEditor::Property::PLACEHOLDER );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_FONT_SIZE_SCALE ) == DevelTextEditor::Property::FONT_SIZE_SCALE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE ) == DevelTextEditor::Property::ENABLE_FONT_SIZE_SCALE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == DevelTextEditor::Property::PLACEHOLDER_TEXT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextEditor::Property::ENABLE_SHIFT_SELECTION );
@@ -632,6 +634,10 @@ int UtcDaliTextEditorSetPropertyP(void)
   editor.SetProperty( DevelTextEditor::Property::FONT_SIZE_SCALE, 2.5f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::FONT_SIZE_SCALE ), 2.5f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   editor.SetProperty( DevelTextEditor::Property::FONT_SIZE_SCALE, 1.0f );
+
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_FONT_SIZE_SCALE, false );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_FONT_SIZE_SCALE ), false, TEST_LOCATION );
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_FONT_SIZE_SCALE, true );
 
   // Reset font style.
   fontStyleMapSet.Clear();

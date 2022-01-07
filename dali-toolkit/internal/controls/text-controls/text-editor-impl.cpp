@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,6 +146,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "verticalScrollP
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableEditing",                        BOOLEAN,   ENABLE_EDITING                      )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextEditor, "selectedText",                         STRING,    SELECTED_TEXT                       )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "fontSizeScale",                        FLOAT,     FONT_SIZE_SCALE                     )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableFontSizeScale",                  BOOLEAN,   ENABLE_FONT_SIZE_SCALE              )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "primaryCursorPosition",                INTEGER,   PRIMARY_CURSOR_POSITION             )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "grabHandleColor",                      VECTOR4,   GRAB_HANDLE_COLOR                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableGrabHandlePopup",                BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP            )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -667,6 +667,9 @@ void Controller::SetFontSizeScale(float scale)
 {
   mImpl->mFontSizeScale = scale;
 
+  // No relayout is required
+  if(!mImpl->mFontSizeScaleEnabled) return;
+
   // Update the cursor position if it's in editing mode
   UpdateCursorPosition(mImpl->mEventData);
 
@@ -679,6 +682,24 @@ void Controller::SetFontSizeScale(float scale)
 float Controller::GetFontSizeScale() const
 {
   return mImpl->mFontDefaults ? mImpl->mFontSizeScale : 1.0f;
+}
+
+void Controller::SetFontSizeScaleEnabled(bool enabled)
+{
+  mImpl->mFontSizeScaleEnabled = enabled;
+
+  // Update the cursor position if it's in editing mode
+  UpdateCursorPosition(mImpl->mEventData);
+
+  // Clear the font-specific data
+  mImpl->ClearFontData();
+
+  mImpl->RequestRelayout();
+}
+
+bool Controller::IsFontSizeScaleEnabled() const
+{
+  return mImpl->mFontSizeScaleEnabled;
 }
 
 void Controller::SetDefaultFontSize(float fontSize, FontSizeType type)

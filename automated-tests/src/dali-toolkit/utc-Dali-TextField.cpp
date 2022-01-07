@@ -107,6 +107,7 @@ const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSys
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
 const char* const PROPERTY_NAME_BACKGROUND                           = "textBackground";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
+const char* const PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE               = "enableFontSizeScale";
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
 const char* const PROPERTY_NAME_INPUT_FILTER                         = "inputFilter";
 
@@ -570,6 +571,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextField::Property::PLACEHOLDER );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextField::Property::ELLIPSIS );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_FONT_SIZE_SCALE ) == DevelTextField::Property::FONT_SIZE_SCALE );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE ) == DevelTextField::Property::ENABLE_FONT_SIZE_SCALE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextField::Property::ENABLE_SHIFT_SELECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextField::Property::ENABLE_GRAB_HANDLE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
@@ -651,6 +653,10 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty( DevelTextField::Property::FONT_SIZE_SCALE, 2.5f );
   DALI_TEST_EQUALS( field.GetProperty<float>( DevelTextField::Property::FONT_SIZE_SCALE ), 2.5f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   field.SetProperty( DevelTextField::Property::FONT_SIZE_SCALE, 1.0f );
+
+  field.SetProperty( DevelTextField::Property::ENABLE_FONT_SIZE_SCALE, false );
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_FONT_SIZE_SCALE ), false, TEST_LOCATION );
+  field.SetProperty( DevelTextField::Property::ENABLE_FONT_SIZE_SCALE, true );
 
   // Reset font style.
   fontStyleMapSet.Clear();

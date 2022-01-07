@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LABEL_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -154,6 +154,14 @@ enum Type
    *  - fontSize: 10pt, fontSizeScale: 1.5
    */
   FONT_SIZE_SCALE,
+
+  /**
+   * @brief True to enable the font size scale or false to disable.
+   * @details Name "enableFontSizeScale", type Property::BOOLEAN.
+   * @note The default value is true.
+   * If false, font size scale is not apppied.
+   */
+  ENABLE_FONT_SIZE_SCALE,
 
   /**
   * @brief The enumerations used to specify whether to position the ellipsis at the END, START or MIDDLE of the text.
