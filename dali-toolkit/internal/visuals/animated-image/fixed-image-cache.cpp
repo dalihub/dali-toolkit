@@ -230,7 +230,10 @@ void FixedImageCache::ClearCache()
   }
   mReadyFlags.clear();
   mLoadStates.assign(mImageUrls.size(), TextureManager::LoadState::NOT_STARTED);
-  mMaskingData->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
+  if(mMaskingData)
+  {
+    mMaskingData->mAlphaMaskId = TextureManager::INVALID_TEXTURE_ID;
+  }
 }
 
 void FixedImageCache::UploadComplete(
