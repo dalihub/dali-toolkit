@@ -197,6 +197,21 @@ public:
    */
   GlyphIndex GetSecondMiddleIndexOfElidedGlyphs() const override;
 
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetStrikethroughColor()
+   */
+  const Vector4& GetStrikethroughColor() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::IsStrikethroughEnabled()
+   */
+  bool IsStrikethroughEnabled() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetStrikethroughHeight()
+   */
+  float GetStrikethroughHeight() const override;
+
 private:
   // Undefined
   View(const View& handle);

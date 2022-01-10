@@ -659,6 +659,60 @@ public: // Configure the text controller.
    */
   void FontStyleSetByString(bool setByString);
 
+  /**
+   * @brief Query if Strikethrough settings were provided by string or map
+   * @return bool true if set by string
+   */
+  bool IsStrikethroughSetByString();
+
+  /**
+   * Set method Strikethrough setting were set by
+   * @param[in] bool, true if set by string
+   */
+  void StrikethroughSetByString(bool setByString);
+
+  /**
+   * @brief Set the override used for strikethrough height, 0 indicates height will be supplied by font metrics
+   *
+   * @param[in] height The height in pixels of the strikethrough
+   */
+  void SetStrikethroughHeight(float height);
+
+  /**
+   * @brief Retrieves the override height of an strikethrough, 0 indicates height is supplied by font metrics
+   *
+   * @return The height of the strikethrough, or 0 if height is not overrided.
+   */
+  float GetStrikethroughHeight() const;
+
+  /**
+   * @brief Set the strikethrough color.
+   *
+   * @param[in] color color of strikethrough.
+   */
+  void SetStrikethroughColor(const Vector4& color);
+
+  /**
+   * @brief Retrieve the strikethrough color.
+   *
+   * @return The strikethrough color.
+   */
+  const Vector4& GetStrikethroughColor() const;
+
+  /**
+   * @brief Set the strikethrough enabled flag.
+   *
+   * @param[in] enabled The strikethrough enabled flag.
+   */
+  void SetStrikethroughEnabled(bool enabled);
+
+  /**
+   * @brief Returns whether the text has a strikethrough or not.
+   *
+   * @return The strikethrough state.
+   */
+  bool IsStrikethroughEnabled() const;
+
 public: // Update.
   /**
    * @brief Replaces any text previously set.
@@ -1343,6 +1397,22 @@ public: // Default style & Input style
    * @return The outline's properties string.
    */
   const std::string& GetInputOutlineProperties() const;
+
+  /**
+   * @brief Sets the input strikethrough's properties string.
+   *
+   * @note The string is stored to be recovered.
+   *
+   * @param[in] strikethroughProperties The strikethrough's properties string.
+   */
+  void SetInputStrikethroughProperties(const std::string& strikethroughProperties);
+
+  /**
+   * @brief Retrieves the input strikethrough's properties string.
+   *
+   * @return The strikethrough's properties string.
+   */
+  const std::string& GetInputStrikethroughProperties() const;
 
   /**
    * @brief Set the control's interface.

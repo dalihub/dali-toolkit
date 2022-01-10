@@ -272,6 +272,12 @@ public:
    */
   void ElideGlyphs();
 
+  float GetStrikethroughHeight() const override;
+
+  const Vector4& GetStrikethroughColor() const override;
+
+  bool IsStrikethroughEnabled() const override;
+
 private:
   const ModelInterface* const mModel;                           ///< Pointer to the text's model.
   Vector<GlyphInfo>           mElidedGlyphs;                    ///< Stores the glyphs of the elided text.

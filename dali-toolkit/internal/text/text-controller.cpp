@@ -1113,6 +1113,65 @@ void Controller::FontStyleSetByString(bool setByString)
   mImpl->mFontStyleSetByString = setByString;
 }
 
+void Controller::SetStrikethroughHeight(float height)
+{
+  mImpl->mModel->mVisualModel->SetStrikethroughHeight(height);
+
+  mImpl->RequestRelayout();
+}
+
+float Controller::GetStrikethroughHeight() const
+{
+  return mImpl->mModel->mVisualModel->GetStrikethroughHeight();
+}
+
+void Controller::SetStrikethroughColor(const Vector4& color)
+{
+  mImpl->mModel->mVisualModel->SetStrikethroughColor(color);
+
+  mImpl->RequestRelayout();
+}
+
+const Vector4& Controller::GetStrikethroughColor() const
+{
+  return mImpl->mModel->mVisualModel->GetStrikethroughColor();
+}
+
+void Controller::SetStrikethroughEnabled(bool enabled)
+{
+  mImpl->mModel->mVisualModel->SetStrikethroughEnabled(enabled);
+
+  mImpl->RequestRelayout();
+}
+
+bool Controller::IsStrikethroughEnabled() const
+{
+  return mImpl->mModel->mVisualModel->IsStrikethroughEnabled();
+}
+
+void Controller::SetInputStrikethroughProperties(const std::string& strikethroughProperties)
+{
+  if(NULL != mImpl->mEventData)
+  {
+    mImpl->mEventData->mInputStyle.strikethroughProperties = strikethroughProperties;
+  }
+}
+
+const std::string& Controller::GetInputStrikethroughProperties() const
+{
+  return (NULL != mImpl->mEventData) ? mImpl->mEventData->mInputStyle.strikethroughProperties : EMPTY_STRING;
+}
+
+bool Controller::IsStrikethroughSetByString()
+{
+  return mImpl->mStrikethroughSetByString;
+}
+
+void Controller::StrikethroughSetByString(bool setByString)
+{
+  mImpl->mStrikethroughSetByString = setByString;
+}
+
 Layout::Engine& Controller::GetLayoutEngine()
 {
   return mImpl->mLayoutEngine;

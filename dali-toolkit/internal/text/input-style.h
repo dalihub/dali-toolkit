@@ -37,18 +37,19 @@ struct InputStyle
 {
   enum Mask
   {
-    NONE               = 0x0000,
-    INPUT_COLOR        = 0x0001,
-    INPUT_FONT_FAMILY  = 0x0002,
-    INPUT_POINT_SIZE   = 0x0004,
-    INPUT_FONT_WEIGHT  = 0x0008,
-    INPUT_FONT_WIDTH   = 0x0010,
-    INPUT_FONT_SLANT   = 0x0020,
-    INPUT_LINE_SPACING = 0x0040,
-    INPUT_UNDERLINE    = 0x0080,
-    INPUT_SHADOW       = 0x0100,
-    INPUT_EMBOSS       = 0x0200,
-    INPUT_OUTLINE      = 0x0400
+    NONE                = 0x0000,
+    INPUT_COLOR         = 0x0001,
+    INPUT_FONT_FAMILY   = 0x0002,
+    INPUT_POINT_SIZE    = 0x0004,
+    INPUT_FONT_WEIGHT   = 0x0008,
+    INPUT_FONT_WIDTH    = 0x0010,
+    INPUT_FONT_SLANT    = 0x0020,
+    INPUT_LINE_SPACING  = 0x0040,
+    INPUT_UNDERLINE     = 0x0080,
+    INPUT_SHADOW        = 0x0100,
+    INPUT_EMBOSS        = 0x0200,
+    INPUT_OUTLINE       = 0x0400,
+    INPUT_STRIKETHROUGH = 0x0800
   };
 
   InputStyle()
@@ -63,6 +64,7 @@ struct InputStyle
     shadowProperties(),
     embossProperties(),
     outlineProperties(),
+    strikethroughProperties(),
     isDefaultColor(true),
     isFamilyDefined(false),
     isWeightDefined(false),
@@ -73,7 +75,8 @@ struct InputStyle
     isUnderlineDefined(false),
     isShadowDefined(false),
     isEmbossDefined(false),
-    isOutlineDefined(false)
+    isOutlineDefined(false),
+    isStrikethroughDefined(false)
   {
   }
 
@@ -118,6 +121,9 @@ struct InputStyle
 
     isOutlineDefined  = inputStyle.isOutlineDefined;
     outlineProperties = inputStyle.outlineProperties;
+
+    isStrikethroughDefined  = inputStyle.isStrikethroughDefined;
+    strikethroughProperties = inputStyle.strikethroughProperties;
   }
 
   /**
@@ -148,7 +154,8 @@ struct InputStyle
        (underlineProperties != inputStyle.underlineProperties) ||
        (shadowProperties != inputStyle.shadowProperties) ||
        (embossProperties != inputStyle.embossProperties) ||
-       (outlineProperties != inputStyle.outlineProperties))
+       (outlineProperties != inputStyle.outlineProperties) ||
+       (isStrikethroughDefined != inputStyle.isStrikethroughDefined))
     {
       return false;
     }
@@ -204,6 +211,10 @@ struct InputStyle
     {
       mask = static_cast<Mask>(mask | INPUT_OUTLINE);
     }
+    if(strikethroughProperties != inputStyle.strikethroughProperties)
+    {
+      mask = static_cast<Mask>(mask | INPUT_STRIKETHROUGH);
+    }
 
     return mask;
   }
@@ -217,10 +228,11 @@ struct InputStyle
 
   float lineSpacing; ///< The line's spacing.
 
-  std::string underlineProperties; ///< The underline properties string.
-  std::string shadowProperties;    ///< The shadow properties string.
-  std::string embossProperties;    ///< The emboss properties string.
-  std::string outlineProperties;   ///< The outline properties string.
+  std::string underlineProperties;     ///< The underline properties string.
+  std::string shadowProperties;        ///< The shadow properties string.
+  std::string embossProperties;        ///< The emboss properties string.
+  std::string outlineProperties;       ///< The outline properties string.
+  std::string strikethroughProperties; ///< The strikethrough properties string.
 
   bool isDefaultColor : 1;  ///< Whether the text's color is the default.
   bool isFamilyDefined : 1; ///< Whether the font's family is defined.
@@ -229,11 +241,12 @@ struct InputStyle
   bool isSlantDefined : 1;  ///< Whether the font's slant is defined.
   bool isSizeDefined : 1;   ///< Whether the font's size is defined.
 
-  bool isLineSpacingDefined : 1; ///< Whether the line spacing is defined.
-  bool isUnderlineDefined : 1;   ///< Whether the underline parameters are defined.
-  bool isShadowDefined : 1;      ///< Whether the shadow parameters are defined.
-  bool isEmbossDefined : 1;      ///< Whether the emboss parameters are defined.
-  bool isOutlineDefined : 1;     ///< Whether the outline parameters are defined.
+  bool isLineSpacingDefined : 1;   ///< Whether the line spacing is defined.
+  bool isUnderlineDefined : 1;     ///< Whether the underline parameters are defined.
+  bool isShadowDefined : 1;        ///< Whether the shadow parameters are defined.
+  bool isEmbossDefined : 1;        ///< Whether the emboss parameters are defined.
+  bool isOutlineDefined : 1;       ///< Whether the outline parameters are defined.
+  bool isStrikethroughDefined : 1; ///< Whether the strikethrough parameters are defined.
 };
 
 } // namespace Text

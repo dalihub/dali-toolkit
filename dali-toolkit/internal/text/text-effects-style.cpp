@@ -226,6 +226,67 @@ bool ParseBackgroundProperties(const Property::Map& backgroundProperties,
   return 0u == numberOfItems;
 }
 
+bool ParseStrikethroughProperties(const Property::Map& strikethroughPropertiesMap,
+                                  bool&                enabled,
+                                  bool&                colorDefined,
+                                  Vector4&             color,
+                                  bool&                heightDefined,
+                                  float&               height)
+{
+  const unsigned int numberOfItems = strikethroughPropertiesMap.Count();
+
+  // Parses and applies the style.
+  for(unsigned int index = 0u; index < numberOfItems; ++index)
+  {
+    const KeyValuePair& valueGet = strikethroughPropertiesMap.GetKeyValue(index);
+
+    if((DevelText::Strikethrough::Property::ENABLE == valueGet.first.indexKey) || (ENABLE_KEY == valueGet.first.stringKey))
+    {
+      /// Enable key.
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string enableStr = valueGet.second.Get<std::string>();
+        enabled                     = Text::TokenComparison(TRUE_TOKEN, enableStr.c_str(), enableStr.size());
+      }
+      else
+      {
+        enabled = valueGet.second.Get<bool>();
+      }
+    }
+    else if((DevelText::Strikethrough::Property::COLOR == valueGet.first.indexKey) || (COLOR_KEY == valueGet.first.stringKey))
+    {
+      /// Color key.
+      colorDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string colorStr = valueGet.second.Get<std::string>();
+        Text::ColorStringToVector4(colorStr.c_str(), colorStr.size(), color);
+      }
+      else
+      {
+        color = valueGet.second.Get<Vector4>();
+      }
+    }
+    else if((DevelText::Strikethrough::Property::HEIGHT == valueGet.first.indexKey) || (HEIGHT_KEY == valueGet.first.stringKey))
+    {
+      /// Height key.
+      heightDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string heightStr = valueGet.second.Get<std::string>();
+        height                      = StringToFloat(heightStr.c_str());
+      }
+      else
+      {
+        height = valueGet.second.Get<float>();
+      }
+    }
+  }
+  return 0u == numberOfItems;
+}
+
 bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& value, EffectStyle::Type type)
 {
   bool update = false;
@@ -768,6 +829,153 @@ void GetBackgroundProperties(ControllerPtr controller, Property::Value& value, E
       case EffectStyle::INPUT:
       {
         // Text background is not supported while inputting yet
+        break;
+      }
+    }
+  }
+}
+
+bool SetStrikethroughProperties(ControllerPtr controller, const Property::Value& value, EffectStyle::Type type)
+{
+  bool update = false;
+
+  if(controller)
+  {
+    switch(type)
+    {
+      case EffectStyle::DEFAULT:
+      {
+        const Property::Map& propertiesMap = value.Get<Property::Map>();
+
+        bool    enabled      = false;
+        bool    colorDefined = false;
+        Vector4 color;
+        bool    heightDefined = false;
+        float   height        = 0.f;
+
+        bool empty = true;
+
+        if(propertiesMap.Empty())
+        {
+          // Map empty so check if a string provided
+          const std::string propertyString = value.Get<std::string>();
+
+          if(!propertyString.empty())
+          {
+            Property::Map parsedStringMap;
+            Text::ParsePropertyString(propertyString, parsedStringMap);
+
+            empty = ParseStrikethroughProperties(parsedStringMap,
+                                             enabled,
+                                             colorDefined,
+                                             color,
+                                             heightDefined,
+                                             height);
+
+            controller->StrikethroughSetByString(!empty);
+          }
+        }
+        else
+        {
+          empty = ParseStrikethroughProperties(propertiesMap,
+                                               enabled,
+                                               colorDefined,
+                                               color,
+                                               heightDefined,
+                                               height);
+
+          controller->StrikethroughSetByString(false);
+        }
+
+        if(!empty)
+        {
+          if(enabled != controller->IsStrikethroughEnabled())
+          {
+            controller->SetStrikethroughEnabled(enabled);
+            update = true;
+          }
+
+          // Sets the default strikethrough values.
+          if(colorDefined && (controller->GetStrikethroughColor() != color))
+          {
+            controller->SetStrikethroughColor(color);
+            update = true;
+          }
+          if(heightDefined && (fabsf(controller->GetStrikethroughHeight() - height) > Math::MACHINE_EPSILON_1000))
+          {
+            controller->SetStrikethroughHeight(height);
+            update = true;
+          }
+        }
+        else
+        {
+          // Disable strikethrough.
+          if(controller->IsStrikethroughEnabled())
+          {
+            controller->SetStrikethroughEnabled(false);
+            update = true;
+          }
+        }
+        break;
+      }
+      case EffectStyle::INPUT:
+      {
+        const std::string& strikethroughProperties = value.Get<std::string>();
+
+        controller->SetInputStrikethroughProperties(strikethroughProperties);
+        update = true;
+        break;
+      }
+    } // switch
+  }   // if( controller )
+
+  return update;
+}
+
+void GetStrikethroughProperties(ControllerPtr controller, Property::Value& value, EffectStyle::Type type)
+{
+  if(controller)
+  {
+    switch(type)
+    {
+      case EffectStyle::DEFAULT:
+      {
+        const bool     enabled = controller->IsStrikethroughEnabled();
+        const Vector4& color   = controller->GetStrikethroughColor();
+        const float    height  = controller->GetStrikethroughHeight();
+
+        if(controller->IsStrikethroughSetByString())
+        {
+          std::string       strikethroughProperties = "{\"enable\":";
+          const std::string enabledStr          = enabled ? "true" : "false";
+          strikethroughProperties += "\"" + enabledStr + "\",";
+
+          std::string colorStr;
+          Vector4ToColorString(color, colorStr);
+          strikethroughProperties += "\"color\":\"" + colorStr + "\",";
+
+          std::string heightStr;
+          FloatToString(height, heightStr);
+          strikethroughProperties += "\"height\":\"" + heightStr + "\"}";
+
+          value = strikethroughProperties;
+        }
+        else
+        {
+          Property::Map map;
+
+          map.Insert(ENABLE_KEY, enabled);
+          map.Insert(COLOR_KEY, color);
+          map.Insert(HEIGHT_KEY, height);
+
+          value = map;
+        }
+
+        break;
+      }
+      case EffectStyle::INPUT:
+      {
+        value = controller->GetInputStrikethroughProperties();
         break;
       }
     }

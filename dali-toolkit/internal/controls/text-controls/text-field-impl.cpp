@@ -142,6 +142,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "primaryCursorPos
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "grabHandleColor",                  VECTOR4,   GRAB_HANDLE_COLOR                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "inputFilter",                      MAP,       INPUT_FILTER                        )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "ellipsisPosition",                 INTEGER,   ELLIPSIS_POSITION                   )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "strikethrough",                    MAP,       STRIKETHROUGH                       )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "inputStrikethrough",               MAP,       INPUT_STRIKETHROUGH                 )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",      SIGNAL_MAX_LENGTH_REACHED     )

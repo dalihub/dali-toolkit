@@ -430,6 +430,21 @@ void VisualModel::SetSecondMiddleIndexOfElidedGlyphs(GlyphIndex secondMiddleInde
   mSecondMiddleIndexOfElidedGlyphs = secondMiddleIndexOfElidedGlyphs;
 }
 
+void VisualModel::SetStrikethroughColor(const Vector4& color)
+{
+  mStrikethroughColor = color;
+}
+
+void VisualModel::SetStrikethroughEnabled(bool enabled)
+{
+  mStrikethroughEnabled = enabled;
+}
+
+void VisualModel::SetStrikethroughHeight(float height)
+{
+  mStrikethroughHeight = height;
+}
+
 const Vector4& VisualModel::GetTextColor() const
 {
   return mTextColor;
@@ -525,6 +540,21 @@ Length VisualModel::GetNumberOfUnderlineRuns() const
   return mUnderlineRuns.Count();
 }
 
+const Vector4& VisualModel::GetStrikethroughColor() const
+{
+  return mStrikethroughColor;
+}
+
+bool VisualModel::IsStrikethroughEnabled() const
+{
+  return mStrikethroughEnabled;
+}
+
+float VisualModel::GetStrikethroughHeight() const
+{
+  return mStrikethroughHeight;
+}
+
 void VisualModel::ClearCaches()
 {
   mCachedLineIndex = 0u;
@@ -547,9 +577,11 @@ VisualModel::VisualModel()
   mUnderlineColor(Color::BLACK),
   mOutlineColor(Color::WHITE),
   mBackgroundColor(Color::TRANSPARENT),
+  mStrikethroughColor(Color::BLACK),
   mControlSize(),
   mShadowOffset(),
   mUnderlineHeight(0.0f),
+  mStrikethroughHeight(0.0f),
   mShadowBlurRadius(0.0f),
   mOutlineWidth(0u),
   mNaturalSize(),
@@ -564,7 +596,8 @@ VisualModel::VisualModel()
   mUnderlineEnabled(false),
   mUnderlineColorSet(false),
   mBackgroundEnabled(false),
-  mMarkupProcessorEnabled(false)
+  mMarkupProcessorEnabled(false),
+  mStrikethroughEnabled(false)
 
 {
 }

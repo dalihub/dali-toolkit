@@ -147,6 +147,38 @@ enum
 
 } // namespace Background
 
+namespace Strikethrough
+{
+namespace Property
+{
+enum
+{
+  /**
+   * @brief Whether the strikethrough is enabled.
+   * @details Name "enable", type Property::STRING or Property::BOOLEAN. i.e. "true", "false", true or false
+   * @note Optional. By default is disabled.
+   */
+  ENABLE,
+
+  /**
+   * @brief The color of the strikethrough.
+   * @details Name "color", type Property::STRING or Property::VECTOR4
+   * @note Optional. If not provided then the default color is black.
+   */
+  COLOR,
+
+  /**
+   * @brief The height in pixels of the strikethrough.
+   * @details Name "height", type Property::STRING or Property::FLOAT. i.e. "1.0" or 1.f
+   * @note Optional. If not provided then the default height is used (1 pixel).
+   */
+  HEIGHT
+};
+
+} // namespace Property
+
+} // namespace Strikethrough
+
 } // namespace DevelText
 
 /**

@@ -742,6 +742,21 @@ GlyphIndex View::GetSecondMiddleIndexOfElidedGlyphs() const
   return secondMiddleIndexOfElidedGlyphs;
 }
 
+const Vector4& View::GetStrikethroughColor() const
+{
+  return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetStrikethroughColor() : Vector4::ZERO;
+}
+
+bool View::IsStrikethroughEnabled() const
+{
+  return (mImpl->mVisualModel) ? mImpl->mVisualModel->IsStrikethroughEnabled() : false;
+}
+
+float View::GetStrikethroughHeight() const
+{
+  return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetStrikethroughHeight() : 0.0f;
+}
+
 } // namespace Text
 
 } // namespace Toolkit

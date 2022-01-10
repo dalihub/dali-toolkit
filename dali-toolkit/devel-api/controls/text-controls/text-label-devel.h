@@ -170,6 +170,21 @@ enum Type
   * @see DevelText::EllipsisPosition
   */
   ELLIPSIS_POSITION,
+
+  /**
+   * @brief The default strikethrough parameters.
+   * @details Name "strikethrough", type Property::MAP.
+   *
+   * The strikethrough map contains the following keys:
+   *
+   * | %Property Name       | Type     | Required | Description                                                                                                        |
+   * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
+   * | enable               | BOOLEAN  | No       | True to enable the strikethrough or false to disable (the default value is false)                                  |
+   * | color                | VECTOR4  | No       | The color of the strikethrough (the default value is Color::BLACK)                                                 |
+   * | height               | FLOAT    | No       | The height of the strikethrough (the default value is 0)                                                               |
+   *
+   */
+  STRIKETHROUGH,
 };
 
 } // namespace Property

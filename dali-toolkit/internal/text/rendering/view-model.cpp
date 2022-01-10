@@ -583,6 +583,21 @@ void ViewModel::ElideGlyphs()
   }
 }
 
+float ViewModel::GetStrikethroughHeight() const
+{
+  return mModel->GetStrikethroughHeight();
+}
+
+const Vector4& ViewModel::GetStrikethroughColor() const
+{
+  return mModel->GetStrikethroughColor();
+}
+
+bool ViewModel::IsStrikethroughEnabled() const
+{
+  return mModel->IsStrikethroughEnabled();
+}
+
 } // namespace Text
 
 } // namespace Toolkit

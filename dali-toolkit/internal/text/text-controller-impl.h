@@ -973,6 +973,7 @@ public:
   bool                  mShadowSetByString : 1;        ///< Set when shadow is set by string (legacy) instead of map
   bool                  mOutlineSetByString : 1;       ///< Set when outline is set by string (legacy) instead of map
   bool                  mFontStyleSetByString : 1;     ///< Set when font style is set by string (legacy) instead of map
+  bool                  mStrikethroughSetByString : 1; ///< Set when strikethrough is set by string (legacy) instead of map
   bool                  mShouldClearFocusOnEscape : 1; ///< Whether text control should clear key input focus
   LayoutDirection::Type mLayoutDirection;              ///< Current system language direction
 

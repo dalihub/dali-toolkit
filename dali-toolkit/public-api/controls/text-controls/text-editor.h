@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_EDITOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -449,16 +449,17 @@ public:
      */
     enum Mask
     {
-      NONE         = 0x0000, ///< @SINCE_1_2_2
-      COLOR        = 0x0001, ///< @SINCE_1_2_2
-      FONT_FAMILY  = 0x0002, ///< @SINCE_1_2_2
-      POINT_SIZE   = 0x0004, ///< @SINCE_1_2_2
-      FONT_STYLE   = 0x0008, ///< @SINCE_1_2_2
-      LINE_SPACING = 0x0010, ///< @SINCE_1_2_2
-      UNDERLINE    = 0x0020, ///< @SINCE_1_2_2
-      SHADOW       = 0x0040, ///< @SINCE_1_2_2
-      EMBOSS       = 0x0080, ///< @SINCE_1_2_2
-      OUTLINE      = 0x0100  ///< @SINCE_1_2_2
+      NONE          = 0x0000, ///< @SINCE_1_2_2
+      COLOR         = 0x0001, ///< @SINCE_1_2_2
+      FONT_FAMILY   = 0x0002, ///< @SINCE_1_2_2
+      POINT_SIZE    = 0x0004, ///< @SINCE_1_2_2
+      FONT_STYLE    = 0x0008, ///< @SINCE_1_2_2
+      LINE_SPACING  = 0x0010, ///< @SINCE_1_2_2
+      UNDERLINE     = 0x0020, ///< @SINCE_1_2_2
+      SHADOW        = 0x0040, ///< @SINCE_1_2_2
+      EMBOSS        = 0x0080, ///< @SINCE_1_2_2
+      OUTLINE       = 0x0100, ///< @SINCE_1_2_2
+      STRIKETHROUGH = 0x0200,
     };
   };
 

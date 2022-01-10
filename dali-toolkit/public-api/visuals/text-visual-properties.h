@@ -128,6 +128,12 @@ enum
    * @SINCE_1_2.60
    */
   UNDERLINE,
+
+  /**
+   * @brief The default strikethrough parameters.
+   * @details name "strikethrough", type Property::MAP.
+   */
+  STRIKETHROUGH,
 };
 
 } // namespace Property

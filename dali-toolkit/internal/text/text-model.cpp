@@ -241,6 +241,20 @@ Length Model::GetHyphensCount() const
 {
   return mVisualModel->mHyphen.glyph.Size();
 }
+const Vector4& Model::GetStrikethroughColor() const
+{
+  return mVisualModel->GetStrikethroughColor();
+}
+
+bool Model::IsStrikethroughEnabled() const
+{
+  return mVisualModel->IsStrikethroughEnabled();
+}
+
+float Model::GetStrikethroughHeight() const
+{
+  return mVisualModel->GetStrikethroughHeight();
+}
 
 Model::Model()
 : mLogicalModel(),

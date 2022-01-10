@@ -35,6 +35,7 @@ namespace Text
 {
 namespace
 {
+const float HALF(0.5f);
 /**
  * @brief Data struct used to set the buffer of the glyph's bitmap into the final bitmap's buffer.
  */
@@ -275,14 +276,17 @@ bool IsGlyphUnderlined(GlyphIndex              index,
 }
 
 /// Helper method to fetch the underline metrics for the specified font glyph
-void FetchFontUnderlineMetrics(
+void FetchFontDecorationlinesMetrics(
   TextAbstraction::FontClient& fontClient,
   const GlyphInfo* const       glyphInfo,
   float&                       currentUnderlinePosition,
   const float                  underlineHeight,
   float&                       currentUnderlineThickness,
   float&                       maxUnderlineThickness,
-  FontId&                      lastUnderlinedFontId)
+  FontId&                      lastlinedFontId,
+  const float                  strikethroughHeight,
+  float&                       currentStrikethroughThickness,
+  float&                       maxStrikethroughThickness)
 {
   FontMetrics fontMetrics;
   fontClient.GetFontMetrics(glyphInfo->fontId, fontMetrics);
@@ -304,10 +308,29 @@ void FetchFontUnderlineMetrics(
     }
   }
 
+  if(fabsf(strikethroughHeight) < Math::MACHINE_EPSILON_1000)
+  {
+    // Ensure strikethrough will be at least a pixel high
+    if(currentStrikethroughThickness < 1.0f)
+    {
+      currentStrikethroughThickness = 1.0f;
+    }
+    else
+    {
+      currentStrikethroughThickness = ceil(currentStrikethroughThickness);
+    }
+  }
+
   // The underline thickness should be the max underline thickness of all glyphs of the line.
   if(currentUnderlineThickness > maxUnderlineThickness)
   {
     maxUnderlineThickness = currentUnderlineThickness;
+  }
+
+  // The strikethrough thickness should be the max strikethrough thickness of all glyphs of the line.
+  if(currentStrikethroughThickness > maxStrikethroughThickness)
+  {
+    maxStrikethroughThickness = currentStrikethroughThickness;
   }
 
   // Clamp the underline position at the font descender and check for ( as EFL describes it ) a broken font
@@ -322,7 +345,7 @@ void FetchFontUnderlineMetrics(
     currentUnderlinePosition = 1.0f;
   }
 
-  lastUnderlinedFontId = glyphInfo->fontId;
+  lastlinedFontId = glyphInfo->fontId;
 }
 
 /// Draws the specified color to the pixel buffer
@@ -527,6 +550,42 @@ Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuff
   return glyphData.bitmapBuffer;
 }
 
+/// Draws the specified strikethrough color to the buffer
+void DrawStrikethrough(
+  const Vector4&     strikethroughColor,
+  const unsigned int bufferWidth,
+  const unsigned int bufferHeight,
+  GlyphData&         glyphData,
+  const float        baseline,
+  const LineRun&     line,
+  const float        maxStrikethroughThickness,
+  const float        lineExtentLeft,
+  const float        lineExtentRight,
+  float              strikethroughStartingYPosition)
+{
+  uint32_t* bitmapBuffer = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer());
+
+  for(unsigned int y = strikethroughStartingYPosition; y < strikethroughStartingYPosition + maxStrikethroughThickness; y++)
+  {
+    if(y > bufferHeight - 1)
+    {
+      // Do not write out of bounds.
+      break;
+    }
+
+    for(unsigned int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++)
+    {
+      if(x > bufferWidth - 1)
+      {
+        // Do not write out of bounds.
+        break;
+      }
+
+      WriteColorToPixelBuffer(glyphData, bitmapBuffer, strikethroughColor, x, y);
+    }
+  }
+}
+
 } // namespace
 
 TypesetterPtr Typesetter::New(const ModelInterface* const model)
@@ -659,7 +718,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
     // Generate the image buffer as an alpha mask for color glyphs.
     imageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_MASK, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
   }
-  else if(RENDER_NO_TEXT == behaviour)
+  else if(RENDER_NO_TEXT == behaviour || RENDER_OVERLAY_STYLE == behaviour)
   {
     // Generate an empty image buffer so that it can been combined with the image buffers for styles
     imageBuffer = Devel::PixelBuffer::New(bufferWidth, bufferHeight, Pixel::RGBA8888);
@@ -675,7 +734,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
   {
     // Generate the outline if enabled
     const uint16_t outlineWidth = mModel->GetOutlineWidth();
-    if(outlineWidth != 0u)
+    if(outlineWidth != 0u && RENDER_OVERLAY_STYLE != behaviour)
     {
       // Create the image buffer for outline
       Devel::PixelBuffer outlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
@@ -688,7 +747,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
 
     // Generate the shadow if enabled
     const Vector2& shadowOffset = mModel->GetShadowOffset();
-    if(fabsf(shadowOffset.x) > Math::MACHINE_EPSILON_1 || fabsf(shadowOffset.y) > Math::MACHINE_EPSILON_1)
+    if(RENDER_OVERLAY_STYLE != behaviour && (fabsf(shadowOffset.x) > Math::MACHINE_EPSILON_1 || fabsf(shadowOffset.y) > Math::MACHINE_EPSILON_1))
     {
       // Create the image buffer for shadow
       Devel::PixelBuffer shadowImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_SHADOW, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
@@ -707,7 +766,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
 
     // Generate the underline if enabled
     const bool underlineEnabled = mModel->IsUnderlineEnabled();
-    if(underlineEnabled)
+    if(underlineEnabled && RENDER_OVERLAY_STYLE == behaviour)
     {
       // Create the image buffer for underline
       Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
@@ -719,7 +778,7 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
     // Generate the background if enabled
     const bool backgroundEnabled   = mModel->IsBackgroundEnabled();
     const bool backgroundMarkupSet = mModel->IsMarkupBackgroundColorSet();
-    if(backgroundEnabled || backgroundMarkupSet)
+    if((backgroundEnabled || backgroundMarkupSet) && RENDER_OVERLAY_STYLE != behaviour)
     {
       Devel::PixelBuffer backgroundImageBuffer;
 
@@ -739,6 +798,17 @@ PixelData Typesetter::Render(const Vector2& size, Toolkit::DevelText::TextDirect
 
       // Combine the two buffers
       imageBuffer = CombineImageBuffer(imageBuffer, backgroundImageBuffer, bufferWidth, bufferHeight);
+    }
+
+    // Generate the strikethrough if enabled
+    const bool strikethroughEnabled = mModel->IsStrikethroughEnabled();
+    if(strikethroughEnabled && RENDER_OVERLAY_STYLE == behaviour)
+    {
+      // Create the image buffer for strikethrough
+      Devel::PixelBuffer strikethroughImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_STRIKETHROUGH, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, endIndexOfGlyphs);
+
+      // Combine the two buffers
+      imageBuffer = CombineImageBuffer(imageBuffer, strikethroughImageBuffer, bufferWidth, bufferHeight);
     }
 
     // Markup-Processor
@@ -834,6 +904,10 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     const Vector4& underlineColor   = mModel->GetUnderlineColor();
     const float    underlineHeight  = mModel->GetUnderlineHeight();
 
+    const bool     strikethroughEnabled = mModel->IsStrikethroughEnabled();
+    const Vector4& strikethroughColor   = mModel->GetStrikethroughColor();
+    const float    strikethroughHeight  = mModel->GetStrikethroughHeight();
+
     // Get the underline runs.
     const Length     numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
     Vector<GlyphRun> underlineRuns;
@@ -841,10 +915,14 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     mModel->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
 
     bool thereAreUnderlinedGlyphs = false;
+    bool strikethroughGlyphsExist = false;
 
-    float currentUnderlinePosition  = 0.0f;
-    float currentUnderlineThickness = underlineHeight;
-    float maxUnderlineThickness     = currentUnderlineThickness;
+    float currentUnderlinePosition       = 0.0f;
+    float currentUnderlineThickness      = underlineHeight;
+    float maxUnderlineThickness          = currentUnderlineThickness;
+    float currentStrikethroughThickness  = strikethroughHeight;
+    float maxStrikethroughThickness      = currentStrikethroughThickness;
+    float strikethroughStartingYPosition = 0.0f;
 
     FontId lastUnderlinedFontId = 0;
 
@@ -908,11 +986,13 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       const bool underlineGlyph = underlineEnabled || IsGlyphUnderlined(glyphIndex, underlineRuns);
       thereAreUnderlinedGlyphs  = thereAreUnderlinedGlyphs || underlineGlyph;
 
+      strikethroughGlyphsExist = strikethroughGlyphsExist || strikethroughEnabled;
+
       // Are we still using the same fontId as previous
-      if(underlineGlyph && (glyphInfo->fontId != lastUnderlinedFontId))
+      if((strikethroughEnabled || underlineGlyph) && (glyphInfo->fontId != lastUnderlinedFontId))
       {
         // We need to fetch fresh font underline metrics
-        FetchFontUnderlineMetrics(fontClient, glyphInfo, currentUnderlinePosition, underlineHeight, currentUnderlineThickness, maxUnderlineThickness, lastUnderlinedFontId);
+        FetchFontDecorationlinesMetrics(fontClient, glyphInfo, currentUnderlinePosition, underlineHeight, currentUnderlineThickness, maxUnderlineThickness, lastUnderlinedFontId, strikethroughHeight, currentStrikethroughThickness, maxStrikethroughThickness);
       } // underline
 
       // Retrieves the glyph's position.
@@ -974,7 +1054,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
         outlineWidth = 0.0f;
       }
 
-      if(style != Typesetter::STYLE_UNDERLINE)
+      if(style != Typesetter::STYLE_UNDERLINE && style != Typesetter::STYLE_STRIKETHROUGH)
       {
         fontClient.CreateBitmap(glyphInfo->fontId,
                                 glyphInfo->index,
@@ -1038,6 +1118,14 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     if(style == Typesetter::STYLE_BACKGROUND)
     {
       DrawBackgroundColor(mModel->GetBackgroundColor(), bufferWidth, bufferHeight, glyphData, baseline, line, lineExtentLeft, lineExtentRight);
+    }
+
+    // Draw the strikethrough from the leftmost glyph to the rightmost glyph
+    if(strikethroughGlyphsExist && style == Typesetter::STYLE_STRIKETHROUGH)
+    {
+      //TODO : The currently implemented strikethrough creates a strikethrough on the line level. We need to create different strikethroughs the case of glyphs with different sizes.
+      strikethroughStartingYPosition = (glyphData.verticalOffset + baseline + currentUnderlinePosition) - ((line.ascender) * HALF); // Since Free Type font doesn't contain the strikethrough-position property, strikethrough position will be calculated by moving the underline position upwards by half the value of the line height.
+      DrawStrikethrough(strikethroughColor, bufferWidth, bufferHeight, glyphData, baseline, line, maxStrikethroughThickness, lineExtentLeft, lineExtentRight, strikethroughStartingYPosition);
     }
 
     // Increases the vertical offset with the line's descender.

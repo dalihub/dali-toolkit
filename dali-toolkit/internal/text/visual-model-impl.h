@@ -467,6 +467,48 @@ public:
    */
   GlyphIndex GetSecondMiddleIndexOfElidedGlyphs() const;
 
+  /**
+   * @brief Sets the text's strikethrough color.
+   *
+   * @param[in] color The text's strikethrough color.
+   */
+  void SetStrikethroughColor(const Vector4& color);
+
+  /**
+   * @brief Retrieves the text's strikethrough color.
+   *
+   * @return The text's strikethrough color.
+   */
+  const Vector4& GetStrikethroughColor() const;
+
+  /**
+   * @brief Sets the text strikethrough flag.
+   *
+   * @param[in] enabled true if strikethrough.
+   */
+  void SetStrikethroughEnabled(bool enabled);
+
+  /**
+   * @brief Returns whether the text is strikethrough or not.
+   *
+   * @return strikethrough state.
+   */
+  bool IsStrikethroughEnabled() const;
+
+  /**
+   * @brief Set the override used for strikethrough height, 0 indicates height will be come from font metrics
+   *
+   * @param[in] height The height in pixels of the strikethrough
+   */
+  void SetStrikethroughHeight(float height);
+
+  /**
+   * @brief Retrieves the strikethrough height override
+   *
+   * @return Returns the override height for a strikethrough, 0 indicates that font metrics will determine the height
+   */
+  float GetStrikethroughHeight() const;
+
 protected:
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -499,16 +541,18 @@ public:
   Vector<Vector4>        mBackgroundColors;       ///< Background colors of the glyphs.
   Vector<ColorIndex>     mBackgroundColorIndices; ///< Indices to the vector of background colors for each glyphs.
 
-  Vector4  mTextColor;        ///< The text color
-  Vector4  mShadowColor;      ///< Color of drop shadow
-  Vector4  mUnderlineColor;   ///< Color of underline
-  Vector4  mOutlineColor;     ///< Color of outline
-  Vector4  mBackgroundColor;  ///< Color of text background
-  Size     mControlSize;      ///< The size of the UI control.
-  Vector2  mShadowOffset;     ///< Offset for drop shadow, 0 indicates no shadow
-  float    mUnderlineHeight;  ///< Fixed height for underline to override font metrics.
-  float    mShadowBlurRadius; ///< Blur radius of shadow, 0 indicates no blur.
-  uint16_t mOutlineWidth;     ///< Width of outline.
+  Vector4  mTextColor;           ///< The text color
+  Vector4  mShadowColor;         ///< Color of drop shadow
+  Vector4  mUnderlineColor;      ///< Color of underline
+  Vector4  mOutlineColor;        ///< Color of outline
+  Vector4  mBackgroundColor;     ///< Color of text background
+  Vector4  mStrikethroughColor;  ///< Color of text background
+  Size     mControlSize;         ///< The size of the UI control.
+  Vector2  mShadowOffset;        ///< Offset for drop shadow, 0 indicates no shadow
+  float    mUnderlineHeight;     ///< Fixed height for underline to override font metrics.
+  float    mStrikethroughHeight; ///< Fixed height for strikethrough to override font metrics.
+  float    mShadowBlurRadius;    ///< Blur radius of shadow, 0 indicates no blur.
+  uint16_t mOutlineWidth;        ///< Width of outline.
 
 private:
   Size mNaturalSize; ///< Size of the text with no line wrapping.
@@ -530,6 +574,7 @@ public:
   bool       mBackgroundEnabled : 1;      ///< Background enabled flag
   bool       mMarkupProcessorEnabled : 1; ///< Markup-processor enabled flag
   HyphenInfo mHyphen;                     ///< Contains hyphen glyph info & the character index to draw hyphen after.
+  bool       mStrikethroughEnabled : 1;   ///< Strikethrough enabled flag
 };
 
 } // namespace Text

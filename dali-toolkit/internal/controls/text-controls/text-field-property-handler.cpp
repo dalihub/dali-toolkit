@@ -674,6 +674,24 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       }
       break;
     }
+    case Toolkit::DevelTextField::Property::STRIKETHROUGH:
+    {
+      const bool update = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
+      if(update)
+      {
+        impl.mRenderer.Reset();
+      }
+      break;
+    }
+    case Toolkit::DevelTextField::Property::INPUT_STRIKETHROUGH:
+    {
+      const bool update = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::INPUT);
+      if(update)
+      {
+        impl.mRenderer.Reset();
+      }
+      break;
+    }
   }
 }
 
@@ -1037,6 +1055,16 @@ Property::Value TextField::PropertyHandler::GetProperty(Toolkit::TextField textF
     case Toolkit::DevelTextField::Property::ELLIPSIS_POSITION:
     {
       value = impl.mController->GetEllipsisPosition();
+      break;
+    }
+    case Toolkit::DevelTextField::Property::STRIKETHROUGH:
+    {
+      GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
+      break;
+    }
+    case Toolkit::DevelTextField::Property::INPUT_STRIKETHROUGH:
+    {
+      GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::INPUT);
       break;
     }
   } //switch
