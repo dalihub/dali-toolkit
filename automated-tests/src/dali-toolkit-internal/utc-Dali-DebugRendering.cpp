@@ -292,16 +292,32 @@ int UtcDaliDebugRenderingGetVisual3(void)
 
   // Test that image view with empty property map don't make visual even DebugRendering is enabled.
   map.Clear();
-  ImageView imageView = ImageView::New();
-  imageView.SetProperty(Control::Property::BACKGROUND, map);
-  imageView.SetProperty(ImageView::Property::IMAGE, map);
+  ImageView imageView1 = ImageView::New();
+  imageView1.SetProperty(Control::Property::BACKGROUND, map);
+  imageView1.SetProperty(ImageView::Property::IMAGE, map);
 
-  application.GetScene().Add(imageView);
+  // Test that image view with empty property value don't make visual even DebugRendering is enabled.
+  Property::Value emptyValue;
+  ImageView imageView2 = ImageView::New();
+  imageView2.SetProperty(Control::Property::BACKGROUND, emptyValue);
+  imageView2.SetProperty(ImageView::Property::IMAGE, emptyValue);
+
+  // Test that image view with invalid property value don't make visual even DebugRendering is enabled.
+  Property::Value invalidValue(static_cast<int>(3));
+  ImageView imageView3 = ImageView::New();
+  imageView3.SetProperty(Control::Property::BACKGROUND, invalidValue);
+  imageView3.SetProperty(ImageView::Property::IMAGE, invalidValue);
+
+  application.GetScene().Add(imageView1);
+  application.GetScene().Add(imageView2);
+  application.GetScene().Add(imageView3);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( imageView.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView1.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView2.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView3.GetRendererCount(), 0u, TEST_LOCATION );
 
   EnvironmentVariable::SetTestingEnvironmentVariable(false);
   END_TEST;

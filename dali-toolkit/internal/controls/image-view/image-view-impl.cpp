@@ -171,6 +171,19 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
   // Signal that a Relayout may be needed
 }
 
+void ImageView::ClearImageVisual()
+{
+  // Clear cached properties
+  mPropertyMap.Clear();
+  mUrl.clear();
+
+  // Unregister the exsiting visual
+  DevelControl::UnregisterVisual(*this, Toolkit::ImageView::Property::IMAGE);
+
+  // Trigger a size negotiation request that may be needed when unregistering a visual.
+  RelayoutRequest();
+}
+
 void ImageView::EnablePreMultipliedAlpha(bool preMultipled)
 {
   if(mVisual)
@@ -477,20 +490,12 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
         else
         {
           map = value.GetMap();
-          if(map)
+          if(DALI_LIKELY(map))
           {
             // the property map is emtpy map. Unregister visual.
             if(DALI_UNLIKELY(map->Count() == 0u))
             {
-              // Clear cached properties
-              impl.mPropertyMap.Clear();
-              impl.mUrl.clear();
-
-              // Unregister the exsiting visual
-              DevelControl::UnregisterVisual(impl, Toolkit::ImageView::Property::IMAGE);
-
-              // Trigger a size negotiation request that may be needed when unregistering a visual.
-              impl.RelayoutRequest();
+              impl.ClearImageVisual();
             }
             else
             {
@@ -519,6 +524,11 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
                 }
               }
             }
+          }
+          else
+          {
+            // invalid property value comes. Unregister visual.
+            impl.ClearImageVisual();
           }
         }
         break;
