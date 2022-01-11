@@ -363,6 +363,11 @@ public:
   void RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback);
 
   /**
+   * @copydoc Dali::Toolkit::WebView::RegisterNavigationPolicyDecidedCallback()
+   */
+  void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback);
+
+  /**
    * @copydoc Dali::Toolkit::WebView::RegisterCertificateConfirmedCallback()
    */
   void RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback);

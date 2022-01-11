@@ -80,6 +80,7 @@ static int gFrameRenderedCallbackCalled = 0;
 static int gConsoleMessageCallbackCalled = 0;
 static std::unique_ptr<Dali::WebEngineConsoleMessage> gConsoleMessageInstance = nullptr;
 static int gResponsePolicyDecidedCallbackCalled = 0;
+static int gNavigationPolicyDecidedCallbackCalled = 0;
 static std::unique_ptr<Dali::WebEnginePolicyDecision> gResponsePolicyDecisionInstance = nullptr;
 static int gCertificateConfirmCallbackCalled = 0;
 static std::unique_ptr<Dali::WebEngineCertificate> gCertificateConfirmInstance = nullptr;
@@ -142,6 +143,11 @@ static void OnResponsePolicyDecided(std::unique_ptr<Dali::WebEnginePolicyDecisio
 {
   gResponsePolicyDecidedCallbackCalled++;
   gResponsePolicyDecisionInstance = std::move(decision);
+}
+
+static void OnNavigationPolicyDecided(std::unique_ptr<Dali::WebEnginePolicyDecision> decision)
+{
+  gNavigationPolicyDecidedCallbackCalled++;
 }
 
 static void OnUrlChanged(const std::string& url)
@@ -1273,6 +1279,24 @@ int UtcDaliWebViewResponsePolicyDecisionRequest(void)
   DALI_TEST_CHECK(webFrame->IsMainFrame());
 
   gResponsePolicyDecisionInstance = nullptr;
+
+  END_TEST;
+}
+
+int UtcDaliWebViewNavigationPolicyDecisionRequest(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK(view);
+
+  // load url.
+  view.RegisterNavigationPolicyDecidedCallback(&OnNavigationPolicyDecided);
+  DALI_TEST_EQUALS(gNavigationPolicyDecidedCallbackCalled, 0, TEST_LOCATION);
+
+  view.LoadUrl(TEST_URL1);
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(gNavigationPolicyDecidedCallbackCalled, 1, TEST_LOCATION);
 
   END_TEST;
 }
