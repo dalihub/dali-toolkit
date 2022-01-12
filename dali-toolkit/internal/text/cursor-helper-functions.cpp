@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -485,9 +485,9 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
   const GlyphInfo* const  glyphInfoBuffer          = parameters.visualModel->mGlyphs.Begin();
   CharacterIndex          index;
   GlyphMetrics            glyphMetrics;
-  MetricsPtr&             metrics        = parameters.metrics;
-  GlyphIndex              glyphIndex     = 0u;
-  Length                  numberOfGlyphs = 0u;
+  MetricsPtr&             metrics = parameters.metrics;
+  GlyphIndex glyphIndex = 0u;
+  Length numberOfGlyphs = 0u;
 
   if(isLastNewParagraph)
   {
@@ -503,12 +503,8 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
 
     cursorInfo.lineHeight = GetLineHeight(newLine);
 
-    index                                = 0u;
     const Length totalNumberOfCharacters = parameters.logicalModel->mText.Count();
-    if(totalNumberOfCharacters > 0u)
-    {
-      index = totalNumberOfCharacters - 1u;
-    }
+    index                                = totalNumberOfCharacters - 1;
 
     GetGlyphMetricsFromCharacterIndex(index, glyphInfoBuffer, charactersToGlyphBuffer, glyphsPerCharacterBuffer, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
 
