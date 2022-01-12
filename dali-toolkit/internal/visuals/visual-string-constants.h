@@ -121,6 +121,7 @@ extern const char* const SHADOW_PROPERTY;
 extern const char* const UNDERLINE_PROPERTY;
 extern const char* const OUTLINE_PROPERTY;
 extern const char* const BACKGROUND_PROPERTY;
+extern const char* const STRIKETHROUGH_PROPERTY;
 
 //NPatch visual
 extern const char* const BORDER_ONLY;

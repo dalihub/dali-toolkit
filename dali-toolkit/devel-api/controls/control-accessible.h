@@ -1,5 +1,6 @@
-#ifndef DALI_TOOLKIT_ACCESSIBLE_IMPL_H
-#define DALI_TOOLKIT_ACCESSIBLE_IMPL_H
+#ifndef DALI_TOOLKIT_CONTROL_ACCESSIBLE_H
+#define DALI_TOOLKIT_CONTROL_ACCESSIBLE_H
+
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
@@ -16,13 +17,12 @@
  * limitations under the License.
  *
  */
+
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <dali/devel-api/adaptor-framework/accessibility-bridge.h>
-#include <dali/devel-api/atspi-interfaces/accessible.h>
+#include <dali/devel-api/adaptor-framework/actor-accessible.h>
 #include <dali/devel-api/atspi-interfaces/action.h>
-#include <dali/devel-api/atspi-interfaces/collection.h>
-#include <dali/devel-api/atspi-interfaces/component.h>
 #include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
@@ -45,28 +45,14 @@ namespace Dali::Toolkit::DevelControl {
  * @see Dali::Accessibility::Text
  * @see Dali::Accessibility::EditableText
  */
-struct DALI_TOOLKIT_API AccessibleImpl : public virtual Dali::Accessibility::Accessible,
-                                         public virtual Dali::Accessibility::Component,
-                                         public virtual Dali::Accessibility::Collection,
-                                         public virtual Dali::Accessibility::Action
+struct DALI_TOOLKIT_API ControlAccessible : public Dali::Accessibility::ActorAccessible,
+                                            public virtual Dali::Accessibility::Action
 {
 protected:
   Vector2                       mLastPosition{0.0f, 0.0f};
-  Dali::WeakHandle<Dali::Actor> mSelf;
   Dali::WeakHandle<Dali::Actor> mCurrentHighlightActor;
   bool mIsModal = false;
   bool mIsRoot = false;
-
-  Dali::Actor Self() const
-  {
-    auto handle = mSelf.GetHandle();
-
-    // Control::Impl holds a std::unique_ptr to the Accessible object,
-    // so that one does not outlive the other.
-    DALI_ASSERT_ALWAYS(handle);
-
-    return handle;
-  }
 
   void ScrollToSelf();
 
@@ -87,57 +73,37 @@ protected:
   bool IsShowing();
 
 public:
-  AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
+  ControlAccessible(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetName()
    */
-  std::string GetName() override;
+  std::string GetName() const override;
 
   /**
    * @brief Returns the actor's name in the absence of ACCESSIBILITY_NAME property
    */
-  virtual std::string GetNameRaw();
+  virtual std::string GetNameRaw() const;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetDescription()
    */
-  std::string GetDescription() override;
+  std::string GetDescription() const override;
 
   /**
    * @brief Returns the actor's description in the absence of ACCESSIBILITY_DESCRIPTION property
    */
-  virtual std::string GetDescriptionRaw();
-
-  /**
-   * @copydoc Dali::Accessibility::Accessible::GetParent()
-   */
-  Dali::Accessibility::Accessible* GetParent() override;
-
-  /**
-   * @copydoc Dali::Accessibility::Accessible::GetChildCount()
-   */
-  size_t GetChildCount() override;
-
-  /**
-   * @copydoc Dali::Accessibility::Accessible::GetChildAtIndex()
-   */
-  Dali::Accessibility::Accessible* GetChildAtIndex(size_t index) override;
-
-  /**
-   * @copydoc Dali::Accessibility::Accessible::GetIndexInParent()
-   */
-  size_t GetIndexInParent() override;
+  virtual std::string GetDescriptionRaw() const;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetRole()
    */
-  Dali::Accessibility::Role GetRole() override;
+  Dali::Accessibility::Role GetRole() const override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetLocalizedRoleName()
    */
-  std::string GetLocalizedRoleName() override;
+  std::string GetLocalizedRoleName() const override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetStates()
@@ -147,32 +113,17 @@ public:
   /**
    * @copydoc Dali::Accessibility::Accessible::GetAttributes()
    */
-  Dali::Accessibility::Attributes GetAttributes() override;
+  Dali::Accessibility::Attributes GetAttributes() const override;
 
   /**
-   * @copydoc Dali::Accessibility::Component::GetExtents()
+   * @copydoc Dali::Accessibility::Accessible::IsHidden()
    */
-  Dali::Rect<> GetExtents(Accessibility::CoordinateType type) override;
-
-  /**
-   * @copydoc Dali::Accessibility::Component::GetLayer()
-   */
-  Dali::Accessibility::ComponentLayer GetLayer() override;
-
-  /**
-   * @copydoc Dali::Accessibility::Component::GetMdiZOrder()
-   */
-  int16_t GetMdiZOrder() override;
+  bool IsHidden() const override;
 
   /**
    * @copydoc Dali::Accessibility::Component::GrabFocus()
    */
   bool GrabFocus() override;
-
-  /**
-   * @copydoc Dali::Accessibility::Component::GetAlpha()
-   */
-  double GetAlpha() override;
 
   /**
    * @copydoc Dali::Accessibility::Component::GrabHighlight()
@@ -187,30 +138,30 @@ public:
   /**
    * @copydoc Dali::Accessibility::Action::GetActionName()
    */
-  std::string GetActionName(size_t index) override;
+  std::string GetActionName(size_t index) const override;
 
   /**
    * @copydoc Dali::Accessibility::Action::GetLocalizedActionName()
    */
-  std::string GetLocalizedActionName(size_t index) override;
+  std::string GetLocalizedActionName(size_t index) const override;
 
   /**
    * @copydoc Dali::Accessibility::Action::GetActionDescription()
    */
-  std::string GetActionDescription(size_t index) override;
+  std::string GetActionDescription(size_t index) const override;
 
   /**
    * @copydoc Dali::Accessibility::Action::GetActionCount()
    */
-  size_t GetActionCount() override;
+  size_t GetActionCount() const override;
 
   /**
    * @copydoc Dali::Accessibility::Action::GetActionKeyBinding()
    */
-  std::string GetActionKeyBinding(size_t index) override;
+  std::string GetActionKeyBinding(size_t index) const override;
 
   /**
-   * @copydoc Dali::Accessibility::Action::DoAction(size_t)
+   * @copydoc Dali::Accessibility::Action::DoAction(std::size_t)
    */
   bool DoAction(size_t index) override;
 
@@ -228,11 +179,6 @@ public:
    * @copydoc Dali::Accessibility::Accessible::GetRelationSet()
    */
   std::vector<Dali::Accessibility::Relation> GetRelationSet() override;
-
-  /**
-   * @copydoc Dali::Accessibility::Accessible::GetInternalActor()
-   */
-  Dali::Actor GetInternalActor() override;
 
   /**
    * @copydoc Dali::Accessibility::Accessible::GetStates()
@@ -270,4 +216,4 @@ public:
 
 } // namespace Dali::Toolkit::DevelControl
 
-#endif // DALI_TOOLKIT_ACCESSIBLE_IMPL_H
+#endif // DALI_TOOLKIT_CONTROL_ACCESSIBLE_H

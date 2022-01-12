@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@
 
 namespace Dali::Toolkit::Text
 {
-
 namespace
 {
 #if defined(DEBUG_ENABLED)
@@ -90,7 +89,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
   // Check whether the indices for updating the text is valid
   if(numberOfCharacters > 0u &&
      (impl.mTextUpdateInfo.mParagraphCharacterIndex > numberOfCharacters ||
-         impl.mTextUpdateInfo.mRequestedNumberOfCharacters > numberOfCharacters))
+      impl.mTextUpdateInfo.mRequestedNumberOfCharacters > numberOfCharacters))
   {
     std::string currentText;
     Utf32ToUtf8(impl.mModel->mLogicalModel->mText.Begin(), numberOfCharacters, currentText);
@@ -146,7 +145,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
                      lineBreakInfo);
 
     if(impl.mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::HYPHENATION) ||
-        impl.mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::MIXED))
+       impl.mModel->mLineWrapMode == ((Text::LineWrap::Mode)DevelText::LineWrap::MIXED))
     {
       CharacterIndex end                 = startIndex + requestedNumberOfCharacters;
       LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
@@ -212,7 +211,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
       // Get the default font's description.
       TextAbstraction::FontDescription defaultFontDescription;
-      TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE * impl.mFontSizeScale;
+      TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE * impl.GetFontSizeScale();
 
       //Get the number of points per one unit of point-size
       uint32_t numberOfPointsPerOneUnitOfPointSize = impl.mFontClient.GetNumberOfPointsPerOneUnitOfPointSize();
@@ -223,7 +222,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
         defaultFontDescription = impl.mEventData->mPlaceholderFont->mFontDescription;
         if(impl.mEventData->mPlaceholderFont->sizeDefined)
         {
-          defaultPointSize = impl.mEventData->mPlaceholderFont->mDefaultPointSize * impl.mFontSizeScale * numberOfPointsPerOneUnitOfPointSize;
+          defaultPointSize = impl.mEventData->mPlaceholderFont->mDefaultPointSize * impl.GetFontSizeScale() * numberOfPointsPerOneUnitOfPointSize;
         }
       }
       else if(nullptr != impl.mFontDefaults)
@@ -237,7 +236,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
         }
         else
         {
-          defaultPointSize = impl.mFontDefaults->mDefaultPointSize * impl.mFontSizeScale * numberOfPointsPerOneUnitOfPointSize;
+          defaultPointSize = impl.mFontDefaults->mDefaultPointSize * impl.GetFontSizeScale() * numberOfPointsPerOneUnitOfPointSize;
         }
       }
 
@@ -352,7 +351,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
   }
 
   if((nullptr != impl.mEventData) &&
-      impl.mEventData->mPreEditFlag &&
+     impl.mEventData->mPreEditFlag &&
      (0u != impl.mModel->mVisualModel->mCharactersToGlyph.Count()))
   {
     Dali::InputMethodContext::PreEditAttributeDataContainer attrs;
@@ -565,7 +564,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
 
   if((Controller::NO_OPERATION != (Controller::SHAPE_TEXT & operations)) &&
      !((nullptr != impl.mEventData) &&
-         impl.mEventData->mPreEditFlag &&
+       impl.mEventData->mPreEditFlag &&
        (0u != impl.mModel->mVisualModel->mCharactersToGlyph.Count())))
   {
     //Mark-up processor case

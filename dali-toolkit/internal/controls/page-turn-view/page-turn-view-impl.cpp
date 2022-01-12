@@ -416,7 +416,7 @@ void PageTurnView::OnInitialize()
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::PAGE_TAB_LIST));
+      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::PAGE_TAB_LIST));
   });
 }
 

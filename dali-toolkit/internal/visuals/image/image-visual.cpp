@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -755,7 +755,7 @@ void ImageVisual::DoCreatePropertyMap(Property::Map& map) const
   map.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE);
 
   bool sync = IsSynchronousLoadingRequired();
-  map.Insert(SYNCHRONOUS_LOADING, sync);
+  map.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, sync);
   if(mImageUrl.IsValid())
   {
     map.Insert(Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl());
@@ -853,17 +853,17 @@ void ImageVisual::UploadCompleted()
 }
 
 // From Texture Manager
-void ImageVisual::UploadComplete(bool loadingSuccess, int32_t textureId, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle, bool preMultiplied)
+void ImageVisual::LoadComplete(bool loadingSuccess, TextureInformation textureInformation)
 {
   Toolkit::Visual::ResourceStatus resourceStatus;
   if(mImpl->mRenderer)
   {
-    if(usingAtlas)
+    if(textureInformation.useAtlasing)
     {
       mImpl->mRenderer.RegisterProperty(ATLAS_RECT_UNIFORM_NAME, mAtlasRect);
     }
 
-    EnablePreMultipliedAlpha(preMultiplied);
+    EnablePreMultipliedAlpha(textureInformation.preMultiplied);
 
     Actor actor = mPlacementActor.GetHandle();
     if(!loadingSuccess)
@@ -874,14 +874,14 @@ void ImageVisual::UploadComplete(bool loadingSuccess, int32_t textureId, Texture
         imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
       }
       mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-      textureSet = mImpl->mRenderer.GetTextures();
+      textureInformation.textureSet = mImpl->mRenderer.GetTextures();
     }
     else
     {
       Sampler sampler = Sampler::New();
       sampler.SetWrapMode(mWrapModeU, mWrapModeV);
-      textureSet.SetSampler(0u, sampler);
-      mImpl->mRenderer.SetTextures(textureSet);
+      textureInformation.textureSet.SetSampler(0u, sampler);
+      mImpl->mRenderer.SetTextures(textureInformation.textureSet);
     }
 
     if(actor)
@@ -895,7 +895,7 @@ void ImageVisual::UploadComplete(bool loadingSuccess, int32_t textureId, Texture
   // Storing TextureSet needed when renderer staged.
   if(!mImpl->mRenderer)
   {
-    mTextures = textureSet;
+    mTextures = textureInformation.textureSet;
   }
 
   // Image loaded, set status regardless of staged status.

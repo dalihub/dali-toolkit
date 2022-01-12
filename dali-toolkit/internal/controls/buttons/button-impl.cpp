@@ -1303,7 +1303,7 @@ Padding Button::GetForegroundPadding()
   return mForegroundPadding;
 }
 
-std::string Button::AccessibleImpl::GetNameRaw()
+std::string Button::AccessibleImpl::GetNameRaw() const
 {
   std::string   labelText;
   auto          slf      = Toolkit::Button::DownCast(Self());
@@ -1335,7 +1335,7 @@ Property::Index Button::AccessibleImpl::GetNamePropertyIndex()
 
 Dali::Accessibility::States Button::AccessibleImpl::CalculateStates()
 {
-  auto tmp                                    = DevelControl::AccessibleImpl::CalculateStates();
+  auto tmp                                    = DevelControl::ControlAccessible::CalculateStates();
   tmp[Dali::Accessibility::State::SELECTABLE] = true;
   auto slf                                    = Toolkit::Button::DownCast(Self());
   tmp[Dali::Accessibility::State::ENABLED]    = !slf.GetProperty<bool>(Toolkit::Button::Property::DISABLED);

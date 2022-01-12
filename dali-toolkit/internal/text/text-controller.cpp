@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -667,6 +667,9 @@ void Controller::SetFontSizeScale(float scale)
 {
   mImpl->mFontSizeScale = scale;
 
+  // No relayout is required
+  if(!mImpl->mFontSizeScaleEnabled) return;
+
   // Update the cursor position if it's in editing mode
   UpdateCursorPosition(mImpl->mEventData);
 
@@ -679,6 +682,24 @@ void Controller::SetFontSizeScale(float scale)
 float Controller::GetFontSizeScale() const
 {
   return mImpl->mFontDefaults ? mImpl->mFontSizeScale : 1.0f;
+}
+
+void Controller::SetFontSizeScaleEnabled(bool enabled)
+{
+  mImpl->mFontSizeScaleEnabled = enabled;
+
+  // Update the cursor position if it's in editing mode
+  UpdateCursorPosition(mImpl->mEventData);
+
+  // Clear the font-specific data
+  mImpl->ClearFontData();
+
+  mImpl->RequestRelayout();
+}
+
+bool Controller::IsFontSizeScaleEnabled() const
+{
+  return mImpl->mFontSizeScaleEnabled;
 }
 
 void Controller::SetDefaultFontSize(float fontSize, FontSizeType type)
@@ -1090,6 +1111,65 @@ bool Controller::IsFontStyleSetByString()
 void Controller::FontStyleSetByString(bool setByString)
 {
   mImpl->mFontStyleSetByString = setByString;
+}
+
+void Controller::SetStrikethroughHeight(float height)
+{
+  mImpl->mModel->mVisualModel->SetStrikethroughHeight(height);
+
+  mImpl->RequestRelayout();
+}
+
+float Controller::GetStrikethroughHeight() const
+{
+  return mImpl->mModel->mVisualModel->GetStrikethroughHeight();
+}
+
+void Controller::SetStrikethroughColor(const Vector4& color)
+{
+  mImpl->mModel->mVisualModel->SetStrikethroughColor(color);
+
+  mImpl->RequestRelayout();
+}
+
+const Vector4& Controller::GetStrikethroughColor() const
+{
+  return mImpl->mModel->mVisualModel->GetStrikethroughColor();
+}
+
+void Controller::SetStrikethroughEnabled(bool enabled)
+{
+  mImpl->mModel->mVisualModel->SetStrikethroughEnabled(enabled);
+
+  mImpl->RequestRelayout();
+}
+
+bool Controller::IsStrikethroughEnabled() const
+{
+  return mImpl->mModel->mVisualModel->IsStrikethroughEnabled();
+}
+
+void Controller::SetInputStrikethroughProperties(const std::string& strikethroughProperties)
+{
+  if(NULL != mImpl->mEventData)
+  {
+    mImpl->mEventData->mInputStyle.strikethroughProperties = strikethroughProperties;
+  }
+}
+
+const std::string& Controller::GetInputStrikethroughProperties() const
+{
+  return (NULL != mImpl->mEventData) ? mImpl->mEventData->mInputStyle.strikethroughProperties : EMPTY_STRING;
+}
+
+bool Controller::IsStrikethroughSetByString()
+{
+  return mImpl->mStrikethroughSetByString;
+}
+
+void Controller::StrikethroughSetByString(bool setByString)
+{
+  mImpl->mStrikethroughSetByString = setByString;
 }
 
 Layout::Engine& Controller::GetLayoutEngine()

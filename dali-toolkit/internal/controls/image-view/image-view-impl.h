@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,13 @@ public:
    * @copydoc Dali::Toolkit::SetImage
    */
   void SetImage(const std::string& imageUrl, ImageDimensions size);
+
+  /**
+   * @brief Unregister ImageView IMAGE visual
+   *
+   * ImageView will display nothing
+   */
+  void ClearImageVisual();
 
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required

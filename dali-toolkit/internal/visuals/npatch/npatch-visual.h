@@ -207,20 +207,12 @@ private:
 
 private:
   /**
-   * @copydoc TextureUploadObserver::UploadCompleted
+   * @copydoc TextureUploadObserver::LoadCompleted
    *
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  void UploadComplete(bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied) override;
-
-  /**
-   * @copydoc TextureUploadObserver::LoadComplete
-   *
-   * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
-   * This callback is the place to add the renderer as it would be called once the loading is finished.
-   */
-  void LoadComplete(bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied) override;
+  void LoadComplete(bool loadSuccess, TextureInformation textureInformation) override;
 
 private:
   WeakHandle<Actor>                         mPlacementActor; ///< Weakhandle to contain Actor during texture loading

@@ -97,6 +97,23 @@ bool ParseBackgroundProperties(const Property::Map& backgroundProperties,
                                Vector4&             color);
 
 /**
+ * @brief Parses the strikethrough properties.
+ *
+ * @param[in] strikethroughProperties The map with the strikethrough properties.
+ * @param[out] enabled Whether the strikethrough is enabled.
+ * @param[out] colorDefined Whether the strikethrough's color is defined.
+ * @param[out] color The strikethrough's color.
+ * @param[out] heightDefined Whether the strikethrough's height is defined.
+ * @param[out] height The strikethrough's height.
+ */
+bool ParseStrikethroughProperties(const Property::Map& strikethroughProperties,
+                              bool&                enabled,
+                              bool&                colorDefined,
+                              Vector4&             color,
+                              bool&                heightDefined,
+                              float&               height);
+
+/**
  * @brief Sets the underline properties.
  *
  * @param[in] controller The text's controller.
@@ -108,6 +125,17 @@ bool ParseBackgroundProperties(const Property::Map& backgroundProperties,
 bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& value, EffectStyle::Type type);
 
 /**
+ * @brief Sets the strikethrough properties.
+ *
+ * @param[in] controller The text's controller.
+ * @param[in] value The values of the strikethrough's properties.
+ * @param[in] type Whether the property is for the default strikethrough or the input strikethrough.
+ *
+ * @return Whether the strikethrough properties have been updated.
+ */
+bool SetStrikethroughProperties(ControllerPtr controller, const Property::Value& value, EffectStyle::Type type);
+
+/**
  * @brief Retrieves the underline's properties.
  *
  * @param[in] controller The text's controller.
@@ -115,6 +143,15 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
  * @param[in] type Whether the property is for the default underline or the input underline.
  */
 void GetUnderlineProperties(ControllerPtr controller, Property::Value& value, EffectStyle::Type type);
+
+/**
+ * @brief Retrieves the strikethrough's properties.
+ *
+ * @param[in] controller The text's controller.
+ * @param[out] value The value of the strikethrough's properties.
+ * @param[in] type Whether the property is for the default strikethrough or the input strikethrough.
+ */
+void GetStrikethroughProperties(ControllerPtr controller, Property::Value& value, EffectStyle::Type type);
 
 /**
  * @brief Sets the shadow properties.

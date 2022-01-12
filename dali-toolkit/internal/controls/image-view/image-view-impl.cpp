@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ void ImageView::OnInitialize()
 
   DevelControl::SetAccessibilityConstructor(Self(), [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::IMAGE));
+      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::IMAGE));
   });
 }
 
@@ -169,6 +169,19 @@ void ImageView::SetImage(const std::string& url, ImageDimensions size)
   }
 
   // Signal that a Relayout may be needed
+}
+
+void ImageView::ClearImageVisual()
+{
+  // Clear cached properties
+  mPropertyMap.Clear();
+  mUrl.clear();
+
+  // Unregister the exsiting visual
+  DevelControl::UnregisterVisual(*this, Toolkit::ImageView::Property::IMAGE);
+
+  // Trigger a size negotiation request that may be needed when unregistering a visual.
+  RelayoutRequest();
 }
 
 void ImageView::EnablePreMultipliedAlpha(bool preMultipled)
@@ -477,32 +490,45 @@ void ImageView::SetProperty(BaseObject* object, Property::Index index, const Pro
         else
         {
           map = value.GetMap();
-          if(map)
+          if(DALI_LIKELY(map))
           {
-            Property::Value* shaderValue = map->Find(Toolkit::Visual::Property::SHADER, CUSTOM_SHADER);
-            // set image only if property map contains image information other than custom shader
-            if(map->Count() > 1u || !shaderValue)
+            // the property map is emtpy map. Unregister visual.
+            if(DALI_UNLIKELY(map->Count() == 0u))
             {
-              impl.SetImage(*map);
+              impl.ClearImageVisual();
             }
-            // the property map contains only the custom shader
-            else if((map->Count() == 1u) && (shaderValue))
+            else
             {
-              Property::Map* shaderMap = shaderValue->GetMap();
-              if(shaderMap)
+              Property::Value* shaderValue = map->Find(Toolkit::Visual::Property::SHADER, CUSTOM_SHADER);
+              // set image only if property map contains image information other than custom shader
+              if(map->Count() > 1u || !shaderValue)
               {
-                impl.mShaderMap = *shaderMap;
+                impl.SetImage(*map);
+              }
+              // the property map contains only the custom shader
+              else if((map->Count() == 1u) && (shaderValue))
+              {
+                Property::Map* shaderMap = shaderValue->GetMap();
+                if(shaderMap)
+                {
+                  impl.mShaderMap = *shaderMap;
 
-                if(!impl.mUrl.empty())
-                {
-                  impl.SetImage(impl.mUrl, impl.mImageSize);
-                }
-                else if(!impl.mPropertyMap.Empty())
-                {
-                  impl.SetImage(impl.mPropertyMap);
+                  if(!impl.mUrl.empty())
+                  {
+                    impl.SetImage(impl.mUrl, impl.mImageSize);
+                  }
+                  else if(!impl.mPropertyMap.Empty())
+                  {
+                    impl.SetImage(impl.mPropertyMap);
+                  }
                 }
               }
             }
+          }
+          else
+          {
+            // invalid property value comes. Unregister visual.
+            impl.ClearImageVisual();
           }
         }
         break;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,7 +136,9 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "textFit",       
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "minLineSize",                  FLOAT,   MIN_LINE_SIZE                  )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "renderingBackend",             INTEGER, RENDERING_BACKEND              )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "fontSizeScale",                FLOAT,   FONT_SIZE_SCALE                )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "enableFontSizeScale",          BOOLEAN, ENABLE_FONT_SIZE_SCALE         )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "ellipsisPosition",             INTEGER, ELLIPSIS_POSITION              )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "strikethrough",                MAP,     STRIKETHROUGH                  )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR   )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0)
@@ -508,6 +510,15 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::ENABLE_FONT_SIZE_SCALE:
+      {
+        const bool enableFontSizeScale = value.Get<bool>();
+        if(!Equals(impl.mController->IsFontSizeScaleEnabled(), enableFontSizeScale))
+        {
+          impl.mController->SetFontSizeScaleEnabled(enableFontSizeScale);
+        }
+        break;
+      }
       case Toolkit::DevelTextLabel::Property::ELLIPSIS_POSITION:
       {
         DevelText::EllipsisPosition::Type ellipsisPositionType(static_cast<DevelText::EllipsisPosition::Type>(-1)); // Set to invalid value to ensure a valid mode does get set
@@ -516,6 +527,11 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
           DALI_LOG_INFO(gLogFilter, Debug::General, "TextLabel %p EllipsisPosition::Type %d\n", impl.mController.Get(), ellipsisPositionType);
           impl.mController->SetEllipsisPosition(ellipsisPositionType);
         }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::STRIKETHROUGH:
+      {
+        impl.mTextUpdateNeeded = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT) || impl.mTextUpdateNeeded;
         break;
       }
     }
@@ -756,9 +772,19 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
         value = impl.mController->GetFontSizeScale();
         break;
       }
+      case Toolkit::DevelTextLabel::Property::ENABLE_FONT_SIZE_SCALE:
+      {
+        value = impl.mController->IsFontSizeScaleEnabled();
+        break;
+      }
       case Toolkit::DevelTextLabel::Property::ELLIPSIS_POSITION:
       {
         value = impl.mController->GetEllipsisPosition();
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::STRIKETHROUGH:
+      {
+        GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
         break;
       }
     }
@@ -1146,7 +1172,7 @@ Vector<Vector2> TextLabel::GetTextPosition(const uint32_t startIndex, const uint
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
-std::string TextLabel::AccessibleImpl::GetNameRaw()
+std::string TextLabel::AccessibleImpl::GetNameRaw() const
 {
   auto self = Toolkit::TextLabel::DownCast(Self());
   return self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
@@ -1157,7 +1183,7 @@ Property::Index TextLabel::AccessibleImpl::GetNamePropertyIndex()
   return Toolkit::TextLabel::Property::TEXT;
 }
 
-std::string TextLabel::AccessibleImpl::GetText(size_t startOffset, size_t endOffset)
+std::string TextLabel::AccessibleImpl::GetText(size_t startOffset, size_t endOffset) const
 {
   if(endOffset <= startOffset)
   {
@@ -1175,7 +1201,7 @@ std::string TextLabel::AccessibleImpl::GetText(size_t startOffset, size_t endOff
   return text.substr(startOffset, endOffset - startOffset);
 }
 
-size_t TextLabel::AccessibleImpl::GetCharacterCount()
+size_t TextLabel::AccessibleImpl::GetCharacterCount() const
 {
   auto self = Toolkit::TextLabel::DownCast(Self());
   auto text = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
@@ -1183,7 +1209,7 @@ size_t TextLabel::AccessibleImpl::GetCharacterCount()
   return text.size();
 }
 
-size_t TextLabel::AccessibleImpl::GetCursorOffset()
+size_t TextLabel::AccessibleImpl::GetCursorOffset() const
 {
   return {};
 }
@@ -1193,7 +1219,7 @@ bool TextLabel::AccessibleImpl::SetCursorOffset(size_t offset)
   return {};
 }
 
-Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary)
+Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary) const
 {
   auto self     = Toolkit::TextLabel::DownCast(Self());
   auto text     = self.GetProperty(Toolkit::TextLabel::Property::TEXT).Get<std::string>();
@@ -1284,7 +1310,7 @@ Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(size_t off
   return range;
 }
 
-Dali::Accessibility::Range TextLabel::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex)
+Dali::Accessibility::Range TextLabel::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex) const
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)

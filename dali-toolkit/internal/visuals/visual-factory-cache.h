@@ -195,7 +195,7 @@ public:
    * @brief Set an image to be used when a visual has failed to correctly render
    * @param[in] brokenImageUrlList The broken image url list
    */
-  void SetBrokenImageUrl(const std::vector<std::string>& brokenImageUrlList);
+  void SetBrokenImageUrl(std::string& defaultBrokenUrl, const std::vector<std::string>& brokenImageUrlList);
 
   /**
    * @brief Update the broken image Renderer object
@@ -272,14 +272,6 @@ private:
   void ApplyTextureAndUniforms(Renderer& renderer, int index);
 
   /**
-   * @brief Creates a Npatch Geometry object
-   *
-   * @param[in] gridSize The gridSize for creating a geometry
-   * @return The Geometry for NPatch
-   */
-  Geometry CreateNPatchGeometry(Uint16Pair gridSize);
-
-  /**
    * @brief Gets a geometry for npatch image
    *
    * @param[in] index the index of broken image
@@ -294,16 +286,6 @@ private:
    * @return The Shader for NPatch
    */
   Shader GetNPatchShader(int index);
-
-  /**
-   * @brief Registers a properties for Stretch Ranges
-   *
-   * @param[in,out] renderer The renderer for broken image
-   * @param[in] uniformName The name of the uniform
-   * @param[in] stretchPixels The stretchable pixels in the cropped image space
-   * @param[in] imageExtent The imageExtent
-   */
-  void RegisterStretchProperties(Renderer& renderer, const char* uniformName, const NPatchUtility::StretchRanges& stretchPixels, uint16_t imageExtent);
 
   /**
    * @brief Returns a broken image type
@@ -349,6 +331,8 @@ private:
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;
   bool                                    mPreMultiplyOnLoad;
   std::vector<BrokenImageInfo>            mBrokenImageInfoContainer;
+  std::string                             mDefaultBrokenImageUrl;
+  bool                                    mUseDefaultBrokenImageOnly;
 };
 
 } // namespace Internal

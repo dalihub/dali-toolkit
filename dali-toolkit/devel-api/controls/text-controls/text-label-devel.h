@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LABEL_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,12 +156,35 @@ enum Type
   FONT_SIZE_SCALE,
 
   /**
+   * @brief True to enable the font size scale or false to disable.
+   * @details Name "enableFontSizeScale", type Property::BOOLEAN.
+   * @note The default value is true.
+   * If false, font size scale is not apppied.
+   */
+  ENABLE_FONT_SIZE_SCALE,
+
+  /**
   * @brief The enumerations used to specify whether to position the ellipsis at the END, START or MIDDLE of the text.
   * @details Name "EllipsisPosition", type [Type](@ref Dali::Toolkit::DevelText::EllipsisPosition::Type) (Property::INTEGER), or Property::STRING. Read/Write
   * @note Default is EllipsisPosition::END.
   * @see DevelText::EllipsisPosition
   */
   ELLIPSIS_POSITION,
+
+  /**
+   * @brief The default strikethrough parameters.
+   * @details Name "strikethrough", type Property::MAP.
+   *
+   * The strikethrough map contains the following keys:
+   *
+   * | %Property Name       | Type     | Required | Description                                                                                                        |
+   * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
+   * | enable               | BOOLEAN  | No       | True to enable the strikethrough or false to disable (the default value is false)                                  |
+   * | color                | VECTOR4  | No       | The color of the strikethrough (the default value is Color::BLACK)                                                 |
+   * | height               | FLOAT    | No       | The height of the strikethrough (the default value is 0)                                                               |
+   *
+   */
+  STRIKETHROUGH,
 };
 
 } // namespace Property

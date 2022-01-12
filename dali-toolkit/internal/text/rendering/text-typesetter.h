@@ -51,9 +51,10 @@ public:
   enum RenderBehaviour
   {
     RENDER_TEXT_AND_STYLES, ///< Render both the text and its styles
-    RENDER_NO_TEXT,         ///< Do not render the text itself
+    RENDER_NO_TEXT,         ///< Do not render the text itself but render the background styles such as outline and background.
     RENDER_NO_STYLES,       ///< Do not render any styles
-    RENDER_MASK             ///< Render an alpha mask (for color glyphs with no color animation, e.g. emoji)
+    RENDER_MASK,            ///< Render an alpha mask (for color glyphs with no color animation, e.g. emoji)
+    RENDER_OVERLAY_STYLE    ///< Do not render the text itself but render the style but overlay the style on the text (foreground styles such as strikethrough and underline)
   };
 
   /**
@@ -61,13 +62,14 @@ public:
    */
   enum Style
   {
-    STYLE_NONE,        ///< No style
-    STYLE_MASK,        ///< Alpha mask
-    STYLE_SHADOW,      ///< Hard shadow
-    STYLE_SOFT_SHADOW, ///< Soft shadow
-    STYLE_UNDERLINE,   ///< Underline
-    STYLE_OUTLINE,     ///< Outline
-    STYLE_BACKGROUND   ///< Text background
+    STYLE_NONE,         ///< No style
+    STYLE_MASK,         ///< Alpha mask
+    STYLE_SHADOW,       ///< Hard shadow
+    STYLE_SOFT_SHADOW,  ///< Soft shadow
+    STYLE_UNDERLINE,    ///< Underline
+    STYLE_OUTLINE,      ///< Outline
+    STYLE_BACKGROUND,   ///< Text background
+    STYLE_STRIKETHROUGH ///< Strikethrough
   };
 
 public: // Constructor.

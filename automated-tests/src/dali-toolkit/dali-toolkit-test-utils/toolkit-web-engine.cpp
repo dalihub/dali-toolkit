@@ -1544,6 +1544,11 @@ public:
     mResponsePolicyDecisionCallback = callback;
   }
 
+  void RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
+  {
+    mNavigationPolicyDecisionCallback = callback;
+  }
+
   void RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)
   {
     mCertificateConfirmCallback = callback;
@@ -1600,29 +1605,30 @@ public:
 
   std::vector<Dali::WebEnginePlugin::JavaScriptMessageHandlerCallback> mResultCallbacks;
 
-  Dali::WebEnginePlugin::WebEnginePageLoadCallback               mPageLoadStartedCallback;
-  Dali::WebEnginePlugin::WebEnginePageLoadCallback               mPageLoadInProgressCallback;
-  Dali::WebEnginePlugin::WebEnginePageLoadCallback               mPageLoadFinishedCallback;
-  Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback          mPageLoadErrorCallback;
-  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback      mScrollEdgeReachedCallback;
-  Dali::WebEnginePlugin::WebEngineUrlChangedCallback             mUrlChangedCallback;
-  Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback      mFormRepostDecidedCallback;
-  Dali::WebEnginePlugin::WebEngineFrameRenderedCallback          mFrameRenderedCallback;
-  Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback mConsoleMessageCallback;
-  Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback  mResponsePolicyDecisionCallback;
-  Dali::WebEnginePlugin::WebEngineCertificateCallback            mCertificateConfirmCallback;
-  Dali::WebEnginePlugin::WebEngineCertificateCallback            mSslCertificateChangedCallback;
-  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback        mHttpAuthHandlerCallback;
-  Dali::WebEnginePlugin::WebEngineContextMenuShownCallback       mContextMenuShownCallback;
-  Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback      mContextMenuHiddenCallback;
-  Dali::WebEnginePlugin::JavaScriptAlertCallback                 mJavaScriptAlertCallback;
-  Dali::WebEnginePlugin::JavaScriptConfirmCallback               mJavaScriptConfirmCallback;
-  Dali::WebEnginePlugin::JavaScriptPromptCallback                mJavaScriptPromptCallback;
-  Dali::WebEnginePlugin::ScreenshotCapturedCallback              mScreenshotCapturedCallback;
-  Dali::WebEnginePlugin::VideoPlayingCallback                    mVideoPlayingCallback;
-  Dali::WebEnginePlugin::GeolocationPermissionCallback           mGeolocationPermissionCallback;
-  Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback         mHitTestCreatedCallback;
-  Dali::WebEnginePlugin::PlainTextReceivedCallback               mPlainTextReceivedCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback                mPageLoadStartedCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback                mPageLoadInProgressCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadCallback                mPageLoadFinishedCallback;
+  Dali::WebEnginePlugin::WebEnginePageLoadErrorCallback           mPageLoadErrorCallback;
+  Dali::WebEnginePlugin::WebEngineScrollEdgeReachedCallback       mScrollEdgeReachedCallback;
+  Dali::WebEnginePlugin::WebEngineUrlChangedCallback              mUrlChangedCallback;
+  Dali::WebEnginePlugin::WebEngineFormRepostDecidedCallback       mFormRepostDecidedCallback;
+  Dali::WebEnginePlugin::WebEngineFrameRenderedCallback           mFrameRenderedCallback;
+  Dali::WebEnginePlugin::WebEngineConsoleMessageReceivedCallback  mConsoleMessageCallback;
+  Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback   mResponsePolicyDecisionCallback;
+  Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback mNavigationPolicyDecisionCallback;
+  Dali::WebEnginePlugin::WebEngineCertificateCallback             mCertificateConfirmCallback;
+  Dali::WebEnginePlugin::WebEngineCertificateCallback             mSslCertificateChangedCallback;
+  Dali::WebEnginePlugin::WebEngineHttpAuthHandlerCallback         mHttpAuthHandlerCallback;
+  Dali::WebEnginePlugin::WebEngineContextMenuShownCallback        mContextMenuShownCallback;
+  Dali::WebEnginePlugin::WebEngineContextMenuHiddenCallback       mContextMenuHiddenCallback;
+  Dali::WebEnginePlugin::JavaScriptAlertCallback                  mJavaScriptAlertCallback;
+  Dali::WebEnginePlugin::JavaScriptConfirmCallback                mJavaScriptConfirmCallback;
+  Dali::WebEnginePlugin::JavaScriptPromptCallback                 mJavaScriptPromptCallback;
+  Dali::WebEnginePlugin::ScreenshotCapturedCallback               mScreenshotCapturedCallback;
+  Dali::WebEnginePlugin::VideoPlayingCallback                     mVideoPlayingCallback;
+  Dali::WebEnginePlugin::GeolocationPermissionCallback            mGeolocationPermissionCallback;
+  Dali::WebEnginePlugin::WebEngineHitTestCreatedCallback          mHitTestCreatedCallback;
+  Dali::WebEnginePlugin::PlainTextReceivedCallback                mPlainTextReceivedCallback;
 };
 
 
@@ -1703,6 +1709,11 @@ bool OnLoadUrl()
     {
       std::unique_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
       gInstance->mResponsePolicyDecisionCallback(std::move(policyDecision));
+    }
+    if (gInstance->mNavigationPolicyDecisionCallback)
+    {
+      std::unique_ptr<Dali::WebEnginePolicyDecision> policyDecision(new MockWebEnginePolicyDecision());
+      gInstance->mNavigationPolicyDecisionCallback(std::move(policyDecision));
     }
     if (gInstance->mCertificateConfirmCallback)
     {
@@ -2422,6 +2433,11 @@ void WebEngine::RegisterConsoleMessageReceivedCallback(Dali::WebEnginePlugin::We
 void WebEngine::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineResponsePolicyDecidedCallback callback)
 {
   Internal::Adaptor::GetImplementation( *this ).RegisterResponsePolicyDecidedCallback(callback);
+}
+
+void WebEngine::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
+{
+  Internal::Adaptor::GetImplementation(*this).RegisterNavigationPolicyDecidedCallback(callback);
 }
 
 void WebEngine::RegisterCertificateConfirmedCallback(Dali::WebEnginePlugin::WebEngineCertificateCallback callback)

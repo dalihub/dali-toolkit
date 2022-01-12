@@ -1994,7 +1994,7 @@ void Popup::SetupTouch()
   }
 }
 
-std::string Popup::AccessibleImpl::GetNameRaw()
+std::string Popup::AccessibleImpl::GetNameRaw() const
 {
   auto        popup = Toolkit::Popup::DownCast(Self());
   std::string title;
@@ -2018,7 +2018,7 @@ std::string Popup::AccessibleImpl::GetNameRaw()
 
 Dali::Accessibility::States Popup::AccessibleImpl::CalculateStates()
 {
-  auto states       = DevelControl::AccessibleImpl::CalculateStates();
+  auto states       = DevelControl::ControlAccessible::CalculateStates();
   auto popup        = Toolkit::Popup::DownCast(Self());
   auto displayState = popup.GetProperty<std::string>(Toolkit::Popup::Property::DISPLAY_STATE);
 

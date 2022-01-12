@@ -183,6 +183,7 @@ void WebView::OnInitialize()
   Actor self = Self();
 
   self.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
+  self.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
   self.TouchedSignal().Connect(this, &WebView::OnTouchEvent);
   self.HoveredSignal().Connect(this, &WebView::OnHoverEvent);
   self.WheelEventSignal().Connect(this, &WebView::OnWheelEvent);
@@ -713,6 +714,14 @@ void WebView::RegisterResponsePolicyDecidedCallback(Dali::WebEnginePlugin::WebEn
   if(mWebEngine)
   {
     mWebEngine.RegisterResponsePolicyDecidedCallback(callback);
+  }
+}
+
+void WebView::RegisterNavigationPolicyDecidedCallback(Dali::WebEnginePlugin::WebEngineNavigationPolicyDecidedCallback callback)
+{
+  if(mWebEngine)
+  {
+    mWebEngine.RegisterNavigationPolicyDecidedCallback(callback);
   }
 }
 

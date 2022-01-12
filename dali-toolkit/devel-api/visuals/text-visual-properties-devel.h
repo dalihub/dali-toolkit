@@ -56,6 +56,11 @@ enum
    * @copydoc Dali::Toolkit::DevelTextLabel::Property::BACKGROUND
    */
   BACKGROUND = UNDERLINE + 2,
+
+  /**
+   * @copydoc Dali::Toolkit::DevelTextLabel::Property::STRIKETHROUGH
+   */
+  STRIKETHROUGH = UNDERLINE + 3,
 };
 
 } // namespace Property

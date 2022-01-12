@@ -411,11 +411,11 @@ void SetVisualsOffScene(const RegisteredVisualContainer& container, Actor parent
   }
 }
 
-Dali::Rect<> GetShowingGeometry(Dali::Rect<> rect, Dali::Toolkit::DevelControl::AccessibleImpl* accessibleImpl)
+Dali::Rect<> GetShowingGeometry(Dali::Rect<> rect, Dali::Toolkit::DevelControl::ControlAccessible* accessible)
 {
   Rect<>  parentRect;
   Vector2 currentPosition;
-  auto    parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(accessibleImpl->GetParent());
+  auto    parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(accessible->GetParent());
 
   while(parent)
   {
@@ -434,7 +434,7 @@ Dali::Rect<> GetShowingGeometry(Dali::Rect<> rect, Dali::Toolkit::DevelControl::
       return rect;
     }
 
-    parent = dynamic_cast<Toolkit::DevelControl::AccessibleImpl*>(parent->GetParent());
+    parent = dynamic_cast<Toolkit::DevelControl::ControlAccessible*>(parent->GetParent());
   }
 
   return rect;
@@ -468,7 +468,8 @@ const PropertyRegistration Control::Impl::PROPERTY_18(typeRegistration, "accessi
 const PropertyRegistration Control::Impl::PROPERTY_19(typeRegistration, "accessibilityRole",              Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE,               Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_20(typeRegistration, "accessibilityHighlightable",     Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE,      Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 const PropertyRegistration Control::Impl::PROPERTY_21(typeRegistration, "accessibilityAttributes",        Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES,         Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty);
-const PropertyRegistration Control::Impl::PROPERTY_22(typeRegistration, "dispatchKeyEvents",              Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS,               Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_22(typeRegistration, "dispatchKeyEvents",              Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS,              Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
+const PropertyRegistration Control::Impl::PROPERTY_23(typeRegistration, "accessibilityHidden",            Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN,             Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty);
 
 // clang-format on
 
@@ -513,7 +514,7 @@ Control::Impl::Impl(Control& controlImpl)
     });
 
   mAccessibilityConstructor = [](Dali::Actor actor) -> std::unique_ptr<Dali::Accessibility::Accessible> {
-    return std::unique_ptr<Dali::Accessibility::Accessible>(new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::UNKNOWN));
+    return std::unique_ptr<Dali::Accessibility::Accessible>(new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::UNKNOWN));
   };
 }
 
@@ -551,16 +552,16 @@ const Control::Impl& Control::Impl::Get(const Internal::Control& internalControl
 
 void Control::Impl::CheckHighlightedObjectGeometry()
 {
-  auto accessibleImpl = dynamic_cast<Dali::Toolkit::DevelControl::AccessibleImpl*>(mAccessibilityObject.get());
-  if(!accessibleImpl)
+  auto accessible = dynamic_cast<Dali::Toolkit::DevelControl::ControlAccessible*>(mAccessibilityObject.get());
+  if(!accessible)
   {
-    DALI_LOG_ERROR("accessibleImpl is not a pointer to a DevelControl::AccessibleImpl type");
+    DALI_LOG_ERROR("accessible is not a pointer to a DevelControl::ControlAccessible type");
     return;
   }
 
-  auto lastPosition   = accessibleImpl->GetLastPosition();
-  auto accessibleRect = accessibleImpl->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
-  auto rect = GetShowingGeometry(accessibleRect, accessibleImpl);
+  auto lastPosition   = accessible->GetLastPosition();
+  auto accessibleRect = accessible->GetExtents(Dali::Accessibility::CoordinateType::WINDOW);
+  auto rect = GetShowingGeometry(accessibleRect, accessible);
 
   switch(mAccessibilityLastScreenRelativeMoveType)
   {
@@ -608,7 +609,7 @@ void Control::Impl::CheckHighlightedObjectGeometry()
     }
   }
 
-  accessibleImpl->SetLastPosition(Vector2(accessibleRect.x, accessibleRect.y));
+  accessible->SetLastPosition(Vector2(accessibleRect.x, accessibleRect.y));
 }
 
 void Control::Impl::RegisterAccessibilityPositionPropertyNotification()
@@ -1369,6 +1370,16 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         }
         break;
       }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN:
+      {
+        bool hidden;
+        if(value.Get(hidden))
+        {
+          controlImpl.mImpl->mAccessibilityHidden = hidden;
+        }
+        break;
+      }
     }
   }
 }
@@ -1529,9 +1540,16 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
         value = controlImpl.mImpl->mAccessibilityAttributes;
         break;
       }
+
       case Toolkit::DevelControl::Property::DISPATCH_KEY_EVENTS:
       {
         value = controlImpl.mImpl->mDispatchKeyEvents;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::ACCESSIBILITY_HIDDEN:
+      {
+        value = controlImpl.mImpl->mAccessibilityHidden;
         break;
       }
     }

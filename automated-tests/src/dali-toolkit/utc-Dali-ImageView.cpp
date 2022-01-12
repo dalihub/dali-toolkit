@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1168,6 +1168,35 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
   DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
+
+  // Set a URL in property map again
+  propertyMap[ImageVisual::Property::URL] = gImage_34_RGBA;
+  imageView.SetProperty( ImageView::Property::IMAGE, propertyMap );
+
+  application.SendNotification();
+  application.Render( 16 );
+
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( visual );             // Visual should be valid
+
+  // Set an empty property map
+  propertyMap.Clear();
+  imageView.SetProperty( ImageView::Property::IMAGE, propertyMap );
+
+  application.SendNotification();
+  application.Render( 16 );
+
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( map.Empty() );        // But PropertyMap should be empty
   DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   END_TEST;
@@ -3001,6 +3030,59 @@ int UtcDaliImageViewImageLoadFailure03(void)
   END_TEST;
 }
 
+int UtcDaliImageViewImageLoadFailure04(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New("invalidUrl.png");
+  imageView.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  application.GetScene().Add( imageView );
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+
+  Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL, TEST_BROKEN_IMAGE_S);
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL, "invalidBroken.png");
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::LARGE, TEST_BROKEN_IMAGE_L);
+
+  ImageView imageView2 = ImageView::New("invalidUrl.png");
+  imageView2.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  application.GetScene().Add( imageView2 );
+
+  std::string brokenUrl;
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::SMALL);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_S, brokenUrl, TEST_LOCATION);
+
+  brokenUrl = DevelStyleManager::GetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::LARGE);
+  DALI_TEST_EQUALS( TEST_BROKEN_IMAGE_L, brokenUrl, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+
+  DevelStyleManager::SetBrokenImageUrl(styleManager, DevelStyleManager::BrokenImageType::NORMAL, "invalidBroken.9.png");
+
+  ImageView imageView3 = ImageView::New("invalidUrl.png");
+  imageView3.SetProperty( Actor::Property::SIZE, Vector2( 100.f, 100.f ) );
+  application.GetScene().Add( imageView3 );
+
+  application.SendNotification();
+  application.Render(16);
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
 namespace
 {
 
@@ -3048,7 +3130,7 @@ void OnResourceReadySignal03( Control control )
   if(gResourceReadySignalCounter == 0)
   {
     // Queue loading
-    // 1. Use cached image, then UploadComplete will be called right after OnResourceReadySignal03.
+    // 1. Use cached image, then LoadComplete will be called right after OnResourceReadySignal03.
     gImageView2[ImageView::Property::IMAGE] = gImage_34_RGBA;
 
     // 2. Load a new image

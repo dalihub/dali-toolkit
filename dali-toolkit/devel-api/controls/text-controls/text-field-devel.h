@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_FIELD_DEVEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,6 +163,14 @@ enum
   FONT_SIZE_SCALE,
 
   /**
+   * @brief True to enable the font size scale or false to disable.
+   * @details Name "enableFontSizeScale", type Property::BOOLEAN.
+   * @note The default value is true.
+   * If false, font size scale is not apppied.
+   */
+  ENABLE_FONT_SIZE_SCALE,
+
+  /**
    * @brief The position for primary cursor.
    * @details Name "primaryCursorPosition", type Property::INTEGER.
    */
@@ -213,6 +221,18 @@ enum
   * @see DevelText::EllipsisPosition
   */
   ELLIPSIS_POSITION,
+
+  /**
+   * @brief A horizontal line through the text center.
+   * @details Name "strikethrough", type Property::MAP.
+   */
+  STRIKETHROUGH,
+
+  /**
+   * @brief The strikethrough parameters of the new input text.
+   * @details Name "inputStrikethrough", type Property::MAP.
+   */
+  INPUT_STRIKETHROUGH,
 };
 
 } // namespace Property

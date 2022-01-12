@@ -383,7 +383,7 @@ Dali::Accessibility::States ToggleButton::AccessibleImpl::CalculateStates()
   return states;
 }
 
-std::string ToggleButton::AccessibleImpl::GetDescriptionRaw()
+std::string ToggleButton::AccessibleImpl::GetDescriptionRaw() const
 {
   auto button   = Toolkit::ToggleButton::DownCast(Self());
   auto index    = button.GetProperty<int>(Toolkit::ToggleButton::Property::CURRENT_STATE_INDEX);

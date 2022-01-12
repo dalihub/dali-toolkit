@@ -219,7 +219,7 @@ public:
    * @brief Requests an image load of the given URL.
    *
    * The parameters are used to specify how the image is loaded.
-   * The observer has the UploadComplete method called when the load is ready.
+   * The observer has the LoadComplete method called when the load is ready.
    *
    * When the client has finished with the Texture, Remove() should be called.
    *
@@ -276,7 +276,7 @@ public:
    * @brief Requests an image load of the given URL.
    *
    * The parameters are used to specify how the image is loaded.
-   * The observer has the UploadComplete method called when the load is ready.
+   * The observer has the LoadComplete method called when the load is ready.
    *
    * When the client has finished with the Texture, Remove() should be called.
    *
@@ -311,7 +311,7 @@ public:
    * the blended texture.
    *
    * The parameters are used to specify how the image is loaded.
-   * The observer has the UploadComplete method called when the load is ready.
+   * The observer has the LoadComplete method called when the load is ready.
    *
    * When the client has finished with the Texture, Remove() should be called.
    *
@@ -469,7 +469,7 @@ private:
    * CPU blend with the mask, and upload the blend texture.
    *
    * The parameters are used to specify how the image is loaded.
-   * The observer has the UploadComplete method called when the load is ready.
+   * The observer has the LoadComplete method called when the load is ready.
    *
    * When the client has finished with the Texture, Remove() should be called.
    *
@@ -750,12 +750,6 @@ private:
    * @param textureInfo
    */
   bool CreateTiledGeometry(const Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo);
-
-  /**
-   * Mark the texture as complete, and inform observers
-   * @param[in] textureInfo The struct associated with this Texture
-   */
-  void UploadComplete(TextureInfo& textureInfo);
 
   /**
    * Notify the current observers that the texture upload is complete,

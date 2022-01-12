@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,10 +137,13 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "selectedTextStar
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "selectedTextEnd",                  INTEGER,   SELECTED_TEXT_END                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "enableEditing",                    BOOLEAN,   ENABLE_EDITING                      )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "fontSizeScale",                    FLOAT,     FONT_SIZE_SCALE                     )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "enableFontSizeScale",              BOOLEAN,   ENABLE_FONT_SIZE_SCALE              )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "primaryCursorPosition",            INTEGER,   PRIMARY_CURSOR_POSITION             )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "grabHandleColor",                  VECTOR4,   GRAB_HANDLE_COLOR                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "inputFilter",                      MAP,       INPUT_FILTER                        )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "ellipsisPosition",                 INTEGER,   ELLIPSIS_POSITION                   )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "strikethrough",                    MAP,       STRIKETHROUGH                       )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "inputStrikethrough",               MAP,       INPUT_STRIKETHROUGH                 )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "maxLengthReached",      SIGNAL_MAX_LENGTH_REACHED     )
@@ -1138,7 +1141,7 @@ Vector<Vector2> TextField::GetTextPosition(const uint32_t startIndex, const uint
   return mController->GetTextPosition(startIndex, endIndex);
 }
 
-std::string TextField::AccessibleImpl::GetName()
+std::string TextField::AccessibleImpl::GetName() const
 {
   auto self = Toolkit::TextField::DownCast(Self());
   if(IsHiddenInput(self))
@@ -1149,7 +1152,7 @@ std::string TextField::AccessibleImpl::GetName()
   return self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
 }
 
-std::string TextField::AccessibleImpl::GetText(size_t startOffset, size_t endOffset)
+std::string TextField::AccessibleImpl::GetText(size_t startOffset, size_t endOffset) const
 {
   if(endOffset <= startOffset)
   {
@@ -1170,7 +1173,7 @@ std::string TextField::AccessibleImpl::GetText(size_t startOffset, size_t endOff
   return text.substr(startOffset, endOffset - startOffset);
 }
 
-size_t TextField::AccessibleImpl::GetCharacterCount()
+size_t TextField::AccessibleImpl::GetCharacterCount() const
 {
   auto self = Toolkit::TextField::DownCast(Self());
   auto text = self.GetProperty(Toolkit::TextField::Property::TEXT).Get<std::string>();
@@ -1178,7 +1181,7 @@ size_t TextField::AccessibleImpl::GetCharacterCount()
   return text.size();
 }
 
-size_t TextField::AccessibleImpl::GetCursorOffset()
+size_t TextField::AccessibleImpl::GetCursorOffset() const
 {
   auto self = Toolkit::TextField::DownCast(Self());
   return Dali::Toolkit::GetImpl(self).GetTextController()->GetCursorPosition();
@@ -1201,7 +1204,7 @@ bool TextField::AccessibleImpl::SetCursorOffset(size_t offset)
 }
 
 Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
-  size_t offset, Dali::Accessibility::TextBoundary boundary)
+  size_t offset, Dali::Accessibility::TextBoundary boundary) const
 {
   auto self  = Toolkit::TextField::DownCast(Self());
   auto range = Dali::Accessibility::Range{};
@@ -1299,7 +1302,7 @@ Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
   return range;
 }
 
-Dali::Accessibility::Range TextField::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex)
+Dali::Accessibility::Range TextField::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex) const
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)
@@ -1399,13 +1402,13 @@ Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
 {
   using namespace Dali::Accessibility;
 
-  auto states = DevelControl::AccessibleImpl::CalculateStates();
+  auto states = DevelControl::ControlAccessible::CalculateStates();
 
   states[State::EDITABLE]  = true;
   states[State::FOCUSABLE] = true;
 
   Toolkit::Control focusControl = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
-  if(mSelf == focusControl)
+  if(Self() == focusControl)
   {
     states[State::FOCUSED] = true;
   }

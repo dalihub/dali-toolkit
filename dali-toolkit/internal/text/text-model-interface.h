@@ -335,6 +335,27 @@ public:
    * @return number of hyphens.
    */
   virtual Length GetHyphensCount() const = 0;
+
+  /**
+   * @brief Retrieves the strikethrough color.
+   *
+   * @return The strikethrough color.
+   */
+  virtual const Vector4& GetStrikethroughColor() const = 0;
+
+  /**
+   * @brief Returns whether strikethrough is enabled or not.
+   *
+   * @return The strikethrough state.
+   */
+  virtual bool IsStrikethroughEnabled() const = 0;
+
+  /**
+   * @brief Retrieves the strikethrough height override
+   *
+   * @return Returns the override height for a strikethrough, 0 indicates that adaptor will determine the height
+   */
+  virtual float GetStrikethroughHeight() const = 0;
 };
 
 } // namespace Text

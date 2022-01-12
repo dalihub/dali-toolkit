@@ -92,7 +92,7 @@ Scrollable::~Scrollable()
 {
 }
 
-bool Scrollable::AccessibleImpl::IsScrollable()
+bool Scrollable::AccessibleImpl::IsScrollable() const
 {
   return true;
 }

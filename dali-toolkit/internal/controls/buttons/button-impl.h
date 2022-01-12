@@ -535,12 +535,12 @@ private:
   bool mClickActionPerforming; ///< Used to manage signal emissions during action
 
 protected:
-  struct AccessibleImpl : public DevelControl::AccessibleImpl
+  struct AccessibleImpl : public DevelControl::ControlAccessible
   {
-    using DevelControl::AccessibleImpl::AccessibleImpl;
+    using DevelControl::ControlAccessible::ControlAccessible;
 
     Dali::Accessibility::States CalculateStates() override;
-    std::string                 GetNameRaw() override;
+    std::string                 GetNameRaw() const override;
     Property::Index             GetNamePropertyIndex() override;
   };
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  *
  */
 
-#include <iostream>
 #include <stdlib.h>
+#include <iostream>
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 
-#include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/controls/text-controls/text-editor-impl.h>
-#include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
+#include <dali-toolkit/internal/text/text-controller.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -33,20 +33,20 @@ using namespace Text;
 int UtcDaliTextEditorSelectText(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliTextEditorSelectText" );
+  tet_infoline("UtcDaliTextEditorSelectText");
 
   // Create a text editor
   TextEditor textEditor = TextEditor::New();
-  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 400.f, 60.f ) );
-  textEditor.SetProperty( TextEditor::Property::TEXT, "Hello World" );
+  textEditor.SetProperty(Actor::Property::SIZE, Vector2(400.f, 60.f));
+  textEditor.SetProperty(TextEditor::Property::TEXT, "Hello World");
 
   // Add the text editor to the stage
-  application.GetScene().Add( textEditor );
+  application.GetScene().Add(textEditor);
 
   application.SendNotification();
   application.Render();
 
-  Toolkit::Internal::TextEditor& textEditorImpl = GetImpl( textEditor );
+  Toolkit::Internal::TextEditor& textEditorImpl = GetImpl(textEditor);
 
   application.SendNotification();
   application.Render();
@@ -58,7 +58,7 @@ int UtcDaliTextEditorSelectText(void)
   application.Render();
 
   std::string selectedText = textEditorImpl.GetSelectedText();
-  DALI_TEST_CHECK( selectedText == "Hello World" );
+  DALI_TEST_CHECK(selectedText == "Hello World");
 
   // Select None
   textEditorImpl.SelectNone();
@@ -67,7 +67,7 @@ int UtcDaliTextEditorSelectText(void)
   application.Render();
 
   selectedText = textEditorImpl.GetSelectedText();
-  DALI_TEST_CHECK( selectedText == "" );
+  DALI_TEST_CHECK(selectedText == "");
 
   END_TEST;
 }
@@ -79,33 +79,33 @@ int UtcDaliTextEditorMarkupUnderline(void)
 
   TextEditor textEditor = TextEditor::New();
 
-  application.GetScene().Add( textEditor );
+  application.GetScene().Add(textEditor);
 
-  textEditor.SetProperty( TextEditor::Property::TEXT, "<u>ABC</u>EF<u>GH</u>" );
-  textEditor.SetProperty( TextEditor ::Property::ENABLE_MARKUP,  true );
+  textEditor.SetProperty(TextEditor::Property::TEXT, "<u>ABC</u>EF<u>GH</u>");
+  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
 
   application.SendNotification();
   application.Render();
 
   uint32_t expectedNumberOfUnderlinedGlyphs = 5u;
 
-  Toolkit::Internal::TextEditor& textEditorImpl = GetImpl( textEditor );
-  const Text::Length numberOfUnderlineRuns = textEditorImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
+  Toolkit::Internal::TextEditor& textEditorImpl        = GetImpl(textEditor);
+  const Text::Length             numberOfUnderlineRuns = textEditorImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
 
-  DALI_TEST_EQUALS( numberOfUnderlineRuns, expectedNumberOfUnderlinedGlyphs, TEST_LOCATION );
+  DALI_TEST_EQUALS(numberOfUnderlineRuns, expectedNumberOfUnderlinedGlyphs, TEST_LOCATION);
 
   Vector<GlyphRun> underlineRuns;
   underlineRuns.Resize(numberOfUnderlineRuns);
   textEditorImpl.GetTextController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
 
   //ABC are underlined
-  DALI_TEST_EQUALS( underlineRuns[0u].glyphIndex, 0u, TEST_LOCATION);
-  DALI_TEST_EQUALS( underlineRuns[1u].glyphIndex, 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS( underlineRuns[2u].glyphIndex, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(underlineRuns[0u].glyphIndex, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(underlineRuns[1u].glyphIndex, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(underlineRuns[2u].glyphIndex, 2u, TEST_LOCATION);
 
   //GH are underlined
-  DALI_TEST_EQUALS( underlineRuns[3u].glyphIndex, 5u, TEST_LOCATION);
-  DALI_TEST_EQUALS( underlineRuns[4u].glyphIndex, 6u, TEST_LOCATION);
+  DALI_TEST_EQUALS(underlineRuns[3u].glyphIndex, 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(underlineRuns[4u].glyphIndex, 6u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -118,26 +118,25 @@ int UtcDaliTextEditorFontPointSizeLargerThanAtlas(void)
   // Create a text editor
   TextEditor textEditor = TextEditor::New();
   //Set size to avoid automatic eliding
-  textEditor.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  textEditor.SetProperty(Actor::Property::SIZE, Vector2(1025, 1025));
   //Set very large font-size using point-size
-  textEditor.SetProperty( TextEditor::Property::POINT_SIZE, 1000);
+  textEditor.SetProperty(TextEditor::Property::POINT_SIZE, 1000);
   //Specify font-family
-  textEditor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
+  textEditor.SetProperty(TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
   //Set text to check if appear or not
   textEditor.SetProperty(TextEditor::Property::TEXT, "A");
 
-  application.GetScene().Add( textEditor );
+  application.GetScene().Add(textEditor);
 
   application.SendNotification();
   application.Render();
 
   //Check if Glyph is added to AtlasGlyphManger or not
   int countAtlas = AtlasGlyphManager::Get().GetMetrics().mAtlasMetrics.mAtlasCount;
-  DALI_TEST_EQUALS( countAtlas, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS(countAtlas, 1, TEST_LOCATION);
 
   END_TEST;
 }
-
 
 int UtcDaliTextEditorFontPointSizeLargerThanAtlasPlaceholderCase(void)
 {
@@ -146,25 +145,25 @@ int UtcDaliTextEditorFontPointSizeLargerThanAtlasPlaceholderCase(void)
 
   //Set Map of placeholder: text, font-family and point-size
   Property::Map placeholderMapSet;
-  placeholderMapSet["text"] = "A";
+  placeholderMapSet["text"]       = "A";
   placeholderMapSet["fontFamily"] = "DejaVu Sans";
-  placeholderMapSet["pixelSize"] = 1000.0f;
+  placeholderMapSet["pixelSize"]  = 1000.0f;
 
   // Create a text editor
   TextEditor textEditor = TextEditor::New();
   //Set size to avoid automatic eliding
-  textEditor.SetProperty( Actor::Property::SIZE, Vector2(1025, 1025));
+  textEditor.SetProperty(Actor::Property::SIZE, Vector2(1025, 1025));
   //Set placeholder
-  textEditor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderMapSet) ;
+  textEditor.SetProperty(TextEditor::Property::PLACEHOLDER, placeholderMapSet);
 
-  application.GetScene().Add( textEditor );
+  application.GetScene().Add(textEditor);
 
   application.SendNotification();
   application.Render();
 
   //Check if Glyph is added to AtlasGlyphManger or not
   int countAtlas = AtlasGlyphManager::Get().GetMetrics().mAtlasMetrics.mAtlasCount;
-  DALI_TEST_EQUALS( countAtlas, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS(countAtlas, 1, TEST_LOCATION);
 
   END_TEST;
 }
@@ -175,27 +174,27 @@ int UtcDaliTextEditorBackgroundTag(void)
   tet_infoline("UtcDaliTextEditorBackgroundTag\n");
 
   TextEditor editor = TextEditor::New();
-  DALI_TEST_CHECK( editor );
+  DALI_TEST_CHECK(editor);
 
-  editor.SetProperty( TextEditor ::Property::ENABLE_MARKUP,  true );
-  editor.SetProperty( TextEditor::Property::TEXT, "H<background color='red'>e</background> Worl<background color='yellow'>d</background>" );
-  application.GetScene().Add( editor );
+  editor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+  editor.SetProperty(TextEditor::Property::TEXT, "H<background color='red'>e</background> Worl<background color='yellow'>d</background>");
+  application.GetScene().Add(editor);
   application.SendNotification();
   application.Render();
 
-  Toolkit::Internal::TextEditor& editorImpl = GetImpl( editor );
-  const ColorIndex* const backgroundColorIndicesBuffer = editorImpl.GetTextController()->GetTextModel()->GetBackgroundColorIndices();
+  Toolkit::Internal::TextEditor& editorImpl                   = GetImpl(editor);
+  const ColorIndex* const        backgroundColorIndicesBuffer = editorImpl.GetTextController()->GetTextModel()->GetBackgroundColorIndices();
 
-  DALI_TEST_CHECK( backgroundColorIndicesBuffer );
+  DALI_TEST_CHECK(backgroundColorIndicesBuffer);
 
   //default color
-  DALI_TEST_EQUALS( backgroundColorIndicesBuffer[0], 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[0], 0u, TEST_LOCATION);
 
   //red color
-  DALI_TEST_EQUALS( backgroundColorIndicesBuffer[1], 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[1], 1u, TEST_LOCATION);
 
   //yellow color
-  DALI_TEST_EQUALS( backgroundColorIndicesBuffer[7], 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(backgroundColorIndicesBuffer[7], 2u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -206,17 +205,17 @@ int UtcDaliTextEditorTextWithSpan(void)
   tet_infoline("UtcDaliTextEditorTextWithSpan\n");
 
   TextEditor editor = TextEditor::New();
-  DALI_TEST_CHECK( editor );
+  DALI_TEST_CHECK(editor);
 
-  editor.SetProperty( TextEditor ::Property::ENABLE_MARKUP,  true );
-  editor.SetProperty( TextEditor::Property::TEXT, "Hello Span" );
-  application.GetScene().Add( editor );
+  editor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+  editor.SetProperty(TextEditor::Property::TEXT, "Hello Span");
+  application.GetScene().Add(editor);
 
   application.SendNotification();
   application.Render();
 
   Vector3 originalSize = editor.GetNaturalSize();
-  editor.SetProperty( TextEditor::Property::TEXT, "H<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ello</span> Span" );
+  editor.SetProperty(TextEditor::Property::TEXT, "H<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ello</span> Span");
 
   application.SendNotification();
   application.Render();
@@ -225,41 +224,40 @@ int UtcDaliTextEditorTextWithSpan(void)
 
   DALI_TEST_GREATER(spanSize.width, originalSize.width, TEST_LOCATION);
 
-  Toolkit::Internal::TextEditor& editorImpl = GetImpl( editor );
-  const ColorIndex* const colorIndicesBuffer1 = editorImpl.GetTextController()->GetTextModel()->GetColorIndices();
+  Toolkit::Internal::TextEditor& editorImpl          = GetImpl(editor);
+  const ColorIndex* const        colorIndicesBuffer1 = editorImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
-  DALI_TEST_CHECK( colorIndicesBuffer1 );
+  DALI_TEST_CHECK(colorIndicesBuffer1);
 
   //default color
-  DALI_TEST_EQUALS( colorIndicesBuffer1[0], 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorIndicesBuffer1[0], 0u, TEST_LOCATION);
 
   //span color
-  DALI_TEST_EQUALS( colorIndicesBuffer1[1], 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorIndicesBuffer1[1], 1u, TEST_LOCATION);
 
   //default color
-  DALI_TEST_EQUALS( colorIndicesBuffer1[6], 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorIndicesBuffer1[6], 0u, TEST_LOCATION);
 
-
-  editor.SetProperty( TextEditor::Property::TEXT, "<span font-size='45'>H</span>ello <span text-color='red'>S</span>pan" );
+  editor.SetProperty(TextEditor::Property::TEXT, "<span font-size='45'>H</span>ello <span text-color='red'>S</span>pan");
 
   application.SendNotification();
   application.Render();
 
   const ColorIndex* const colorIndicesBuffer2 = editorImpl.GetTextController()->GetTextModel()->GetColorIndices();
 
-  DALI_TEST_CHECK( colorIndicesBuffer2 );
+  DALI_TEST_CHECK(colorIndicesBuffer2);
 
   //default color
-  DALI_TEST_EQUALS( colorIndicesBuffer2[0], 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorIndicesBuffer2[0], 0u, TEST_LOCATION);
 
   //default color
-  DALI_TEST_EQUALS( colorIndicesBuffer2[1], 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorIndicesBuffer2[1], 0u, TEST_LOCATION);
 
   //span color
-  DALI_TEST_EQUALS( colorIndicesBuffer2[6], 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorIndicesBuffer2[6], 1u, TEST_LOCATION);
 
   //default color
-  DALI_TEST_EQUALS( colorIndicesBuffer2[7], 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(colorIndicesBuffer2[7], 0u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -279,9 +277,9 @@ int UtcDaliTextEditorControlBackgroundColor(void)
   application.SendNotification();
   application.Render();
 
-  Toolkit::Internal::TextEditor& editorImpl = GetImpl(editor);
-  ControllerPtr controller = editorImpl.GetTextController();
-  Controller::Impl& controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
+  Toolkit::Internal::TextEditor& editorImpl     = GetImpl(editor);
+  ControllerPtr                  controller     = editorImpl.GetTextController();
+  Controller::Impl&              controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
 
   // Default color is transparent
   controllerImpl.mEditableControlInterface->GetControlBackgroundColor(backgroundColor);
@@ -295,6 +293,47 @@ int UtcDaliTextEditorControlBackgroundColor(void)
   // Should be red
   controllerImpl.mEditableControlInterface->GetControlBackgroundColor(backgroundColor);
   DALI_TEST_EQUALS(backgroundColor, Color::RED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorTextPositionWithMinLineAndBigFont(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorTextPositionWithMinLine ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, "<span font-size='45'>H</span>\ni");
+  textEditor.SetProperty(DevelTextEditor::Property::MIN_LINE_SIZE, 50);
+  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+
+  application.GetScene().Add(textEditor);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextEditor& textEditorImpl = GetImpl(textEditor);
+  Text::ViewInterface&           view           = textEditorImpl.GetTextController()->GetView();
+
+  Length numberOfGlyphs = view.GetNumberOfGlyphs();
+
+  DALI_TEST_EQUALS(numberOfGlyphs, 3u, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  Vector<GlyphInfo> glyphs;
+  glyphs.Resize(numberOfGlyphs);
+
+  Vector<Vector2> positions;
+  positions.Resize(numberOfGlyphs);
+
+  float alignmentOffset = 0u;
+  numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
+                                  positions.Begin(),
+                                  alignmentOffset,
+                                  0u,
+                                  numberOfGlyphs);
+
+  DALI_TEST_EQUALS(positions[2].y, 165.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
   END_TEST;
 }

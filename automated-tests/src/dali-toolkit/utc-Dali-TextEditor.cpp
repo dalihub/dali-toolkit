@@ -88,6 +88,8 @@ const char* const PROPERTY_NAME_EMBOSS                               = "emboss";
 const char* const PROPERTY_NAME_INPUT_EMBOSS                         = "inputEmboss";
 const char* const PROPERTY_NAME_OUTLINE                              = "outline";
 const char* const PROPERTY_NAME_INPUT_OUTLINE                        = "inputOutline";
+const char* const PROPERTY_NAME_STRIKETHROUGH                        = "strikethrough";
+const char* const PROPERTY_NAME_INPUT_STRIKETHROUGH                  = "inputStrikethrough";
 
 const char* const PROPERTY_NAME_SMOOTH_SCROLL                        = "smoothScroll";
 const char* const PROPERTY_NAME_SMOOTH_SCROLL_DURATION               = "smoothScrollDuration";
@@ -105,6 +107,7 @@ const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGr
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
 const char* const PROPERTY_NAME_MAX_LENGTH                           = "maxLength";
 const char* const PROPERTY_NAME_FONT_SIZE_SCALE                      = "fontSizeScale";
+const char* const PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE               = "enableFontSizeScale";
 const char* const PROPERTY_NAME_GRAB_HANDLE_COLOR                    = "grabHandleColor";
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
 const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "inputMethodSettings";
@@ -544,6 +547,8 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_EMBOSS ) == TextEditor::Property::INPUT_EMBOSS );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextEditor::Property::OUTLINE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_OUTLINE ) == TextEditor::Property::INPUT_OUTLINE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_STRIKETHROUGH ) == DevelTextEditor::Property::STRIKETHROUGH );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_STRIKETHROUGH ) == DevelTextEditor::Property::INPUT_STRIKETHROUGH );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SMOOTH_SCROLL ) == TextEditor::Property::SMOOTH_SCROLL );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SMOOTH_SCROLL_DURATION ) == TextEditor::Property::SMOOTH_SCROLL_DURATION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SCROLL_BAR ) == TextEditor::Property::ENABLE_SCROLL_BAR );
@@ -554,6 +559,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == TextEditor::Property::ENABLE_SELECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextEditor::Property::PLACEHOLDER );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_FONT_SIZE_SCALE ) == DevelTextEditor::Property::FONT_SIZE_SCALE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_FONT_SIZE_SCALE ) == DevelTextEditor::Property::ENABLE_FONT_SIZE_SCALE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == DevelTextEditor::Property::PLACEHOLDER_TEXT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextEditor::Property::ENABLE_SHIFT_SELECTION );
@@ -564,6 +570,8 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE_POPUP );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_METHOD_SETTINGS ) == DevelTextEditor::Property::INPUT_METHOD_SETTINGS );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_FILTER ) == DevelTextEditor::Property::INPUT_FILTER );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_STRIKETHROUGH ) == DevelTextEditor::Property::STRIKETHROUGH );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_STRIKETHROUGH ) == DevelTextEditor::Property::INPUT_STRIKETHROUGH );
 
   END_TEST;
 }
@@ -632,6 +640,10 @@ int UtcDaliTextEditorSetPropertyP(void)
   editor.SetProperty( DevelTextEditor::Property::FONT_SIZE_SCALE, 2.5f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::FONT_SIZE_SCALE ), 2.5f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   editor.SetProperty( DevelTextEditor::Property::FONT_SIZE_SCALE, 1.0f );
+
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_FONT_SIZE_SCALE, false );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_FONT_SIZE_SCALE ), false, TEST_LOCATION );
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_FONT_SIZE_SCALE, true );
 
   // Reset font style.
   fontStyleMapSet.Clear();
@@ -1032,6 +1044,36 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Clear
   inputFilterMapSet.Clear();
   editor.SetProperty(DevelTextEditor::Property::INPUT_FILTER, inputFilterMapSet);
+
+  // Check the strikethrough property
+
+  Property::Map strikethroughMapSet;
+  Property::Map strikethroughMapGet;
+
+  application.SendNotification();
+  application.Render();
+
+  // Check the input strikethrough property
+
+  strikethroughMapSet.Clear();
+  strikethroughMapGet.Clear();
+  strikethroughMapSet.Insert( "enable", true );
+  strikethroughMapSet.Insert( "color", Color::BLUE );
+  strikethroughMapSet.Insert( "height", 2.0f );
+
+  editor.SetProperty( DevelTextEditor::Property::STRIKETHROUGH, strikethroughMapSet );
+
+  application.SendNotification();
+  application.Render();
+
+  strikethroughMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::STRIKETHROUGH );
+
+  DALI_TEST_EQUALS( strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( strikethroughMapSet, strikethroughMapGet ), true,  TEST_LOCATION );
+
+  // Check the input strikethrough property
+  editor.SetProperty( DevelTextEditor::Property::INPUT_STRIKETHROUGH, "Strikethrough input properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( DevelTextEditor::Property::INPUT_STRIKETHROUGH ), std::string("Strikethrough input properties"), TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -1618,6 +1660,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   editor.SetProperty( TextEditor::Property::INPUT_SHADOW, "shadow" );
   editor.SetProperty( TextEditor::Property::INPUT_EMBOSS, "emboss" );
   editor.SetProperty( TextEditor::Property::INPUT_OUTLINE, "outline" );
+  editor.SetProperty( DevelTextEditor::Property::INPUT_STRIKETHROUGH, "strikethrough" );
 
   application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
@@ -2846,6 +2889,50 @@ int utcDaliTextEditorUnderPropertyStringP(void)
   value = editor.GetProperty( TextEditor::Property::UNDERLINE );
   value.Get(result);
   DALI_TEST_EQUALS( result , underlineSettings1, TEST_LOCATION  );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorStrikethroughPropertyStringP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorStrikethroughPropertyStringP");
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  std::string strikethroughSettings1( "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"2\"}" );
+
+  application.GetScene().Add( editor );
+
+  editor.SetProperty( DevelTextEditor::Property::STRIKETHROUGH, strikethroughSettings1 );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( DevelTextEditor::Property::STRIKETHROUGH ), strikethroughSettings1, TEST_LOCATION );
+
+  tet_infoline("Set strikethrough settings with a map");
+  // Check the input strikethrough property
+  Property::Map strikethroughMapSet;
+  Property::Map strikethroughMapGet;
+  strikethroughMapSet.Insert( "enable", true );
+  strikethroughMapSet.Insert( "color", Color::BLUE );
+  strikethroughMapSet.Insert( "height", 2.0f );
+
+  editor.SetProperty( DevelTextEditor::Property::STRIKETHROUGH, strikethroughMapSet );
+  strikethroughMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::STRIKETHROUGH );
+  DALI_TEST_EQUALS( strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( strikethroughMapSet, strikethroughMapGet ), true,  TEST_LOCATION );
+
+  tet_infoline("Set strikethrough settings with a string");
+  editor.SetProperty( DevelTextEditor::Property::STRIKETHROUGH, strikethroughSettings1 );
+  Property::Value value = editor.GetProperty( DevelTextEditor::Property::STRIKETHROUGH );
+  std::string result;
+  value.Get(result);
+  DALI_TEST_EQUALS( result , strikethroughSettings1, TEST_LOCATION  );
+
+  tet_infoline("Trying to set invalid strikethrough settings, should not update and stay at previous settings");
+  std::string strikethroughSettingsVoid( "{\"enable\":\"true\",\"coooolor\":\"blue\",\"height\":\"2\"}" );
+  editor.SetProperty( DevelTextEditor::Property::STRIKETHROUGH, strikethroughSettingsVoid );
+  value = editor.GetProperty( TextEditor::Property::UNDERLINE );
+  value.Get(result);
+  DALI_TEST_EQUALS( result , strikethroughSettings1, TEST_LOCATION  );
 
   END_TEST;
 }
@@ -5022,6 +5109,44 @@ int utcDaliTextEditorSelectionChangedSignal(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextEditorStrikethroughGeneration(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextEditorStrikethroughGeneration");
+
+  TextEditor textEditor = TextEditor::New();
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Test" );
+  textEditor.SetProperty( Actor::Property::SIZE, Vector2( 200.0f, 100.f ) );
+  textEditor.SetProperty( TextEditor::Property::POINT_SIZE, 10) ;
+  textEditor.SetProperty( TextEditor::Property::FONT_FAMILY, "DejaVu Sans");
+
+  application.GetScene().Add( textEditor );
+  application.SendNotification();
+  application.Render();
+
+  Property::Map strikethroughMapSet;
+  Property::Map strikethroughMapGet;
+
+  strikethroughMapSet.Insert( "enable", true );
+  strikethroughMapSet.Insert( "color", Color::RED );
+  strikethroughMapSet.Insert( "height", 2.0f );
+
+  // Check the strikethrough property
+  textEditor.SetProperty( DevelTextEditor::Property::STRIKETHROUGH, strikethroughMapSet );
+  strikethroughMapGet = textEditor.GetProperty<Property::Map>( DevelTextEditor::Property::STRIKETHROUGH );
+  textEditor.SetProperty( TextEditor::Property::TEXT, "Test1" );
+  DALI_TEST_EQUALS( strikethroughMapGet.Count(), strikethroughMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( strikethroughMapGet, strikethroughMapSet ), true, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  strikethroughMapSet.Clear();
+  strikethroughMapGet.Clear();
+
+  END_TEST;
+}
 
 int utcDaliTextEditorInsertCharacterAfterInitWithResizePolicyNaturalSize(void)
 {

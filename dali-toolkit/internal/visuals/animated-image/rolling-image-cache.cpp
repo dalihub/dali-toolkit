@@ -190,9 +190,9 @@ void RollingImageCache::LoadBatch()
 
     mQueue.PushBack(imageFrame);
 
-    // Note, if the image is already loaded, then UploadComplete will get called
+    // Note, if the image is already loaded, then LoadComplete will get called
     // from within this method. This means it won't yet have a texture id, so we
-    // need to account for this inside the UploadComplete method using mRequestingLoad.
+    // need to account for this inside the LoadComplete method using mRequestingLoad.
     mRequestingLoad = true;
 
     bool                               synchronousLoading = false;
@@ -246,45 +246,28 @@ void RollingImageCache::CheckFrontFrame(bool wasReady)
   }
 }
 
-void RollingImageCache::UploadComplete(
-  bool           loadSuccess,
-  int32_t        textureId,
-  TextureSet     textureSet,
-  bool           useAtlasing,
-  const Vector4& atlasRect,
-  bool           preMultiplied)
+void RollingImageCache::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
 {
-  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::UploadComplete(textureId:%d) start\n", textureId);
+  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::LoadComplete(textureId:%d) start\n", textureInformation.textureId);
   LOG_CACHE;
 
   bool frontFrameReady = IsFrontReady();
 
   if(!mRequestingLoad)
   {
-    SetImageFrameReady(textureId);
+    SetImageFrameReady(textureInformation.textureId);
 
     CheckFrontFrame(frontFrameReady);
   }
   else
   {
-    // UploadComplete has been called from within RequestLoad. TextureManager must
+    // LoadComplete has been called from within RequestLoad. TextureManager must
     // therefore already have the texture cached, so make the texture ready.
     // (Use the last texture, as the texture id hasn't been assigned yet)
     mQueue.Back().mReady = true;
   }
 
   LOG_CACHE;
-}
-
-void RollingImageCache::LoadComplete(
-  bool               loadSuccess,
-  Devel::PixelBuffer pixelBuffer,
-  const VisualUrl&   url,
-  bool               preMultiplied)
-{
-  // LoadComplete is called if this TextureUploadObserver requested to load
-  // an image that will be returned as a type of PixelBuffer by using a method
-  // TextureManager::LoadPixelBuffer.
 }
 
 } //namespace Internal

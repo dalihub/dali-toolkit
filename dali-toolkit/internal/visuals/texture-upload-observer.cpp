@@ -18,10 +18,37 @@
 // CLASS HEADER
 #include "texture-upload-observer.h"
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
+
 namespace Dali
 {
 namespace Toolkit
 {
+TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied)
+: returnType(returnType),
+  textureId(textureId),
+  textureSet(textureSet),
+  useAtlasing(useAtlasing),
+  atlasRect(atlasRect),
+  preMultiplied(preMultiplied),
+  pixelBuffer(),
+  url()
+{
+}
+
+TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, bool preMultiplied)
+: returnType(returnType),
+  textureId(Internal::TextureManager::INVALID_TEXTURE_ID),
+  textureSet(),
+  useAtlasing(false),
+  atlasRect(Vector4::ZERO),
+  preMultiplied(preMultiplied),
+  pixelBuffer(pixelBuffer),
+  url(url)
+{
+}
+
 TextureUploadObserver::TextureUploadObserver()
 {
 }

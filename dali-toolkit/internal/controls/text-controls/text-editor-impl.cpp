@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,6 +146,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "verticalScrollP
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableEditing",                        BOOLEAN,   ENABLE_EDITING                      )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextEditor, "selectedText",                         STRING,    SELECTED_TEXT                       )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "fontSizeScale",                        FLOAT,     FONT_SIZE_SCALE                     )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableFontSizeScale",                  BOOLEAN,   ENABLE_FONT_SIZE_SCALE              )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "primaryCursorPosition",                INTEGER,   PRIMARY_CURSOR_POSITION             )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "grabHandleColor",                      VECTOR4,   GRAB_HANDLE_COLOR                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableGrabHandlePopup",                BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP            )
@@ -154,6 +155,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputFilter",  
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsis",                             BOOLEAN,   ELLIPSIS                            )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsisPosition",                     INTEGER,   ELLIPSIS_POSITION                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "minLineSize",                          FLOAT,     MIN_LINE_SIZE                       )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "strikethrough",                        MAP,       STRIKETHROUGH                       )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputStrikethrough",                   MAP,       INPUT_STRIKETHROUGH                 )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )
@@ -215,6 +218,11 @@ Toolkit::TextEditor::InputStyle::Mask ConvertInputStyle(Text::InputStyle::Mask i
   {
     editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::OUTLINE);
   }
+  if(InputStyle::NONE != static_cast<InputStyle::Mask>(inputStyleMask & InputStyle::INPUT_STRIKETHROUGH))
+  {
+    editorInputStyleMask = static_cast<Toolkit::TextEditor::InputStyle::Mask>(editorInputStyleMask | Toolkit::TextEditor::InputStyle::STRIKETHROUGH);
+  }
+
   return editorInputStyleMask;
 }
 
@@ -1289,13 +1297,13 @@ TextEditor::~TextEditor()
   }
 }
 
-std::string TextEditor::AccessibleImpl::GetName()
+std::string TextEditor::AccessibleImpl::GetName() const
 {
   auto self = Toolkit::TextEditor::DownCast(Self());
   return self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
 }
 
-std::string TextEditor::AccessibleImpl::GetText(size_t startOffset, size_t endOffset)
+std::string TextEditor::AccessibleImpl::GetText(size_t startOffset, size_t endOffset) const
 {
   if(endOffset <= startOffset)
   {
@@ -1313,7 +1321,7 @@ std::string TextEditor::AccessibleImpl::GetText(size_t startOffset, size_t endOf
   return text.substr(startOffset, endOffset - startOffset);
 }
 
-size_t TextEditor::AccessibleImpl::GetCharacterCount()
+size_t TextEditor::AccessibleImpl::GetCharacterCount() const
 {
   auto self = Toolkit::TextEditor::DownCast(Self());
   auto text = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
@@ -1321,7 +1329,7 @@ size_t TextEditor::AccessibleImpl::GetCharacterCount()
   return text.size();
 }
 
-size_t TextEditor::AccessibleImpl::GetCursorOffset()
+size_t TextEditor::AccessibleImpl::GetCursorOffset() const
 {
   auto slf = Toolkit::TextEditor::DownCast(Self());
   return Dali::Toolkit::GetImpl(slf).GetTextController()->GetCursorPosition();
@@ -1343,7 +1351,7 @@ bool TextEditor::AccessibleImpl::SetCursorOffset(size_t offset)
   return true;
 }
 
-Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary)
+Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t offset, Dali::Accessibility::TextBoundary boundary) const
 {
   auto self     = Toolkit::TextEditor::DownCast(Self());
   auto text     = self.GetProperty(Toolkit::TextEditor::Property::TEXT).Get<std::string>();
@@ -1434,7 +1442,7 @@ Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(size_t of
   return range;
 }
 
-Dali::Accessibility::Range TextEditor::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex)
+Dali::Accessibility::Range TextEditor::AccessibleImpl::GetRangeOfSelection(size_t selectionIndex) const
 {
   // Since DALi supports only one selection indexes higher than 0 are ignored
   if(selectionIndex > 0)
@@ -1526,12 +1534,12 @@ Dali::Accessibility::States TextEditor::AccessibleImpl::CalculateStates()
 {
   using namespace Dali::Accessibility;
 
-  auto states              = DevelControl::AccessibleImpl::CalculateStates();
+  auto states              = DevelControl::ControlAccessible::CalculateStates();
   states[State::EDITABLE]  = true;
   states[State::FOCUSABLE] = true;
 
   Toolkit::Control focusControl = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
-  if(mSelf == focusControl)
+  if(Self() == focusControl)
   {
     states[State::FOCUSED] = true;
   }

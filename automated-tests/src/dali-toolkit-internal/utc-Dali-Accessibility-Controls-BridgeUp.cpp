@@ -613,7 +613,7 @@ int UtcDaliAccessibilityParentChildren(void)
     child_1_accessible -> GetIndexInParent();
     DALI_ABORT("Object has parent, test abort");
   }
-  catch (Dali::DaliException &){}
+  catch (const std::domain_error&){}
 
   parent.Add(child_1);
   parent.Add(child_2);
@@ -1077,11 +1077,11 @@ int UtcDaliAccessibilityScrollToChildScrollView(void)
 
   Wait(application);
 
-  auto* accessibleParent = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(scrollView));
+  auto* accessibleParent = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(scrollView));
   DALI_TEST_CHECK(accessibleParent);
-  auto* accessibleA = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(actorA));
+  auto* accessibleA = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(actorA));
   DALI_TEST_CHECK(accessibleA);
-  auto* accessibleB = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(actorB));
+  auto* accessibleB = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(actorB));
   DALI_TEST_CHECK(accessibleB);
 
   accessibleA->GrabHighlight(); // == scrollView.ScrollTo(actorA)
@@ -1132,11 +1132,11 @@ int UtcDaliAccessibilityScrollToChildItemView(void)
 
   Wait(application);
 
-  auto* accessibleParent = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(view));
+  auto* accessibleParent = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(view));
   DALI_TEST_CHECK(accessibleParent);
-  auto* accessibleA = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(view.GetItem(0)));
+  auto* accessibleA = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(view.GetItem(0)));
   DALI_TEST_CHECK(accessibleA);
-  auto* accessibleB = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(view.GetItem(1)));
+  auto* accessibleB = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(view.GetItem(1)));
   DALI_TEST_CHECK(accessibleB);
 
   accessibleA->GrabHighlight(); // == view.ScrollToItem(view.GetItemId(actorA))
@@ -1155,12 +1155,12 @@ int UtcDaliAccessibilityScrollToChildNonScrollable(void)
 
   TextLabel label = TextLabel::New("123");
 
-  auto* accessible = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(label));
+  auto* accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(label));
   DALI_TEST_CHECK(accessible);
 
   DALI_TEST_EQUALS(accessible->IsScrollable(), false, TEST_LOCATION);
   DALI_TEST_EQUALS(accessible->ScrollToChild({}), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(accessible->GetInternalActor(), Dali::Actor{}, TEST_LOCATION);
+  DALI_TEST_EQUALS(accessible->GetInternalActor(), label, TEST_LOCATION);
 
   Dali::Accessibility::TestEnableSC( false );
   END_TEST;
@@ -1197,7 +1197,7 @@ int UtcDaliAccessibilityCheckHighlight(void)
   Wait(application);
 
   // Set highlight to first child (A) to enable movement tracking
-  auto* accessible = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(buttonA));
+  auto* accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(buttonA));
   DALI_TEST_CHECK(accessible);
   accessible->GrabHighlight();
   Wait(application);
@@ -1223,7 +1223,7 @@ int UtcDaliAccessibilityCheckHighlight(void)
   Dali::Accessibility::TestResetMoveOutedCalled();
 
   // Set highlight to second child (B) to enable movement tracking
-  accessible = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(buttonB));
+  accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(buttonB));
   DALI_TEST_CHECK(accessible);
   accessible->GrabHighlight();
   Wait(application);
@@ -1261,7 +1261,7 @@ int UtcDaliAccessibilityCheckHighlight(void)
   Dali::Accessibility::TestResetMoveOutedCalled();
 
   // Disable movement tracking on B by giving highlight to A
-  accessible = dynamic_cast<DevelControl::AccessibleImpl*>(Dali::Accessibility::Accessible::Get(buttonA));
+  accessible = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(buttonA));
   DALI_TEST_CHECK(accessible);
   accessible->GrabHighlight();
   Wait(application);

@@ -120,7 +120,7 @@ void VideoView::OnInitialize()
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
-      new DevelControl::AccessibleImpl(actor, Dali::Accessibility::Role::VIDEO));
+      new DevelControl::ControlAccessible(actor, Dali::Accessibility::Role::VIDEO));
   });
 
   //Enable highightability

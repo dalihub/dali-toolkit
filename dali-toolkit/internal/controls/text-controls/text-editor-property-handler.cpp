@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/internal/controls/text-controls/text-editor-property-handler.h>
 #include <dali-toolkit/internal/controls/text-controls/common-text-utils.h>
+#include <dali-toolkit/internal/controls/text-controls/text-editor-property-handler.h>
 
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 
@@ -610,6 +610,15 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       }
       break;
     }
+    case Toolkit::DevelTextEditor::Property::ENABLE_FONT_SIZE_SCALE:
+    {
+      const bool enableFontSizeScale = value.Get<bool>();
+      if(!Equals(impl.mController->IsFontSizeScaleEnabled(), enableFontSizeScale))
+      {
+        impl.mController->SetFontSizeScaleEnabled(enableFontSizeScale);
+      }
+      break;
+    }
     case Toolkit::DevelTextEditor::Property::PRIMARY_CURSOR_POSITION:
     {
       uint32_t position = static_cast<uint32_t>(value.Get<int>());
@@ -687,6 +696,24 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
 
       impl.mController->SetDefaultLineSize(minLineSize);
       impl.mRenderer.Reset();
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::STRIKETHROUGH:
+    {
+      const bool update = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
+      if(update)
+      {
+        impl.mRenderer.Reset();
+      }
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::INPUT_STRIKETHROUGH:
+    {
+      const bool update = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::INPUT);
+      if(update)
+      {
+        impl.mRenderer.Reset();
+      }
       break;
     }
   }
@@ -975,6 +1002,16 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
       value = impl.mController->GetLineWrapMode();
       break;
     }
+    case Toolkit::DevelTextEditor::Property::STRIKETHROUGH:
+    {
+      GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::INPUT_STRIKETHROUGH:
+    {
+      GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::INPUT);
+      break;
+    }
     case Toolkit::DevelTextEditor::Property::ENABLE_SHIFT_SELECTION:
     {
       value = impl.mController->IsShiftSelectionEnabled();
@@ -1030,6 +1067,11 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     case Toolkit::DevelTextEditor::Property::FONT_SIZE_SCALE:
     {
       value = impl.mController->GetFontSizeScale();
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::ENABLE_FONT_SIZE_SCALE:
+    {
+      value = impl.mController->IsFontSizeScaleEnabled();
       break;
     }
     case Toolkit::DevelTextEditor::Property::PRIMARY_CURSOR_POSITION:
