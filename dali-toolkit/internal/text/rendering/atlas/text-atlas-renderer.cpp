@@ -46,6 +46,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT
 const float    ZERO(0.0f);
 const float    HALF(0.5f);
 const float    ONE(1.0f);
+const float    ONE_AND_A_HALF(1.5f);
 const uint32_t DOUBLE_PIXEL_PADDING = 4u; //Padding will be added twice to Atlas
 const uint16_t NO_OUTLINE           = 0u;
 } // namespace
@@ -426,22 +427,25 @@ struct AtlasRenderer::Impl
     Vector<Extent>          strikethroughExtents;
     mDepth = depth;
 
-    const Vector2&   textSize(view.GetLayoutSize());
-    const Vector2    halfTextSize(textSize * 0.5f);
-    const Vector2&   shadowOffset(view.GetShadowOffset());
-    const Vector4&   shadowColor(view.GetShadowColor());
-    const bool       underlineEnabled = view.IsUnderlineEnabled();
-    const Vector4&   underlineColor(view.GetUnderlineColor());
-    const float      underlineHeight = view.GetUnderlineHeight();
-    const uint16_t   outlineWidth    = view.GetOutlineWidth();
-    const Vector4&   outlineColor(view.GetOutlineColor());
-    const bool       isOutline            = 0u != outlineWidth;
-    const GlyphInfo* hyphens              = view.GetHyphens();
-    const Length*    hyphenIndices        = view.GetHyphenIndices();
-    const Length     hyphensCount         = view.GetHyphensCount();
-    const bool       strikethroughEnabled = view.IsStrikethroughEnabled();
-    const Vector4&   strikethroughColor(view.GetStrikethroughColor());
-    const float      strikethroughHeight = view.GetStrikethroughHeight();
+    const Vector2&              textSize(view.GetLayoutSize());
+    const Vector2               halfTextSize(textSize * 0.5f);
+    const Vector2&              shadowOffset(view.GetShadowOffset());
+    const Vector4&              shadowColor(view.GetShadowColor());
+    const bool                  underlineEnabled = view.IsUnderlineEnabled();
+    const Vector4&              underlineColor(view.GetUnderlineColor());
+    const float                 underlineHeight      = view.GetUnderlineHeight();
+    const Text::Underline::Type underlineType        = view.GetUnderlineType();
+    const float                 dashedUnderlineWidth = view.GetDashedUnderlineWidth();
+    const float                 dashedUnderlineGap   = view.GetDashedUnderlineGap();
+    const uint16_t              outlineWidth         = view.GetOutlineWidth();
+    const Vector4&              outlineColor(view.GetOutlineColor());
+    const bool                  isOutline            = 0u != outlineWidth;
+    const GlyphInfo*            hyphens              = view.GetHyphens();
+    const Length*               hyphenIndices        = view.GetHyphenIndices();
+    const Length                hyphensCount         = view.GetHyphensCount();
+    const bool                  strikethroughEnabled = view.IsStrikethroughEnabled();
+    const Vector4&              strikethroughColor(view.GetStrikethroughColor());
+    const float                 strikethroughHeight = view.GetStrikethroughHeight();
 
     // Elided text info. Indices according to elided text.
     const auto startIndexOfGlyphs              = view.GetStartIndexOfElidedGlyphs();
@@ -684,7 +688,7 @@ struct AtlasRenderer::Impl
     if(thereAreUnderlinedGlyphs)
     {
       // Check to see if any of the text needs an underline
-      GenerateUnderlines(meshContainer, extents, underlineColor);
+      GenerateUnderlines(meshContainer, extents, underlineColor, underlineType, dashedUnderlineWidth, dashedUnderlineGap);
     }
 
     if(strikethroughGlyphsExist)
@@ -984,9 +988,12 @@ struct AtlasRenderer::Impl
     }
   }
 
-  void GenerateUnderlines(std::vector<MeshRecord>& meshRecords,
-                          Vector<Extent>&          extents,
-                          const Vector4&           underlineColor)
+  void GenerateUnderlines(std::vector<MeshRecord>&     meshRecords,
+                          Vector<Extent>&              extents,
+                          const Vector4&               underlineColor,
+                          const Text::Underline::Type& underlineType,
+                          const float&                 dashedUnderlineWidth,
+                          const float&                 dashedUnderlineGap)
   {
     AtlasManager::Mesh2D newMesh;
     unsigned short       faceIndex = 0;
@@ -1000,49 +1007,157 @@ struct AtlasRenderer::Impl
       Vector2                uv    = mGlyphManager.GetAtlasSize(meshRecords[index].mAtlasId);
 
       // Make sure we don't hit texture edge for single pixel texture ( filled pixel is in top left of every atlas )
-      float u         = HALF / uv.x;
-      float v         = HALF / uv.y;
-      float thickness = eIt->mLineThickness;
-      float baseLine  = eIt->mBaseLine + eIt->mUnderlinePosition - (thickness * HALF);
-      float tlx       = eIt->mLeft;
-      float brx       = eIt->mRight;
+      float u           = HALF / uv.x;
+      float v           = HALF / uv.y;
+      float thickness   = eIt->mLineThickness;
+      float ShiftLineBy = (underlineType == Text::Underline::Type::DOUBLE) ? (thickness * ONE_AND_A_HALF) : (thickness * HALF);
+      float baseLine    = eIt->mBaseLine + eIt->mUnderlinePosition - ShiftLineBy;
+      float tlx         = eIt->mLeft;
+      float brx         = eIt->mRight;
 
-      vert.mPosition.x  = tlx;
-      vert.mPosition.y  = baseLine;
-      vert.mTexCoords.x = ZERO;
-      vert.mTexCoords.y = ZERO;
-      vert.mColor       = underlineColor;
-      newMesh.mVertices.PushBack(vert);
+      if(underlineType == Text::Underline::Type::DASHED)
+      {
+        float dashTlx = tlx;
+        float dashBrx = tlx;
+        faceIndex     = 0;
 
-      vert.mPosition.x  = brx;
-      vert.mPosition.y  = baseLine;
-      vert.mTexCoords.x = u;
-      vert.mColor       = underlineColor;
-      newMesh.mVertices.PushBack(vert);
+        AtlasManager::Mesh2D newMesh;
+        while((dashTlx >= tlx) && (dashTlx < brx) && ((dashTlx + dashedUnderlineWidth) <= brx))
+        {
+          dashBrx = dashTlx + dashedUnderlineWidth;
 
-      vert.mPosition.x  = tlx;
-      vert.mPosition.y  = baseLine + thickness;
-      vert.mTexCoords.x = ZERO;
-      vert.mTexCoords.y = v;
-      vert.mColor       = underlineColor;
-      newMesh.mVertices.PushBack(vert);
+          //The top left edge of the underline
+          vert.mPosition.x  = dashTlx;
+          vert.mPosition.y  = baseLine;
+          vert.mTexCoords.x = ZERO;
+          vert.mTexCoords.y = ZERO;
+          vert.mColor       = underlineColor;
+          newMesh.mVertices.PushBack(vert);
 
-      vert.mPosition.x  = brx;
-      vert.mPosition.y  = baseLine + thickness;
-      vert.mTexCoords.x = u;
-      vert.mColor       = underlineColor;
-      newMesh.mVertices.PushBack(vert);
+          //The top right edge of the underline
+          vert.mPosition.x  = dashBrx;
+          vert.mPosition.y  = baseLine;
+          vert.mTexCoords.x = u;
+          vert.mColor       = underlineColor;
+          newMesh.mVertices.PushBack(vert);
 
-      // Six indices in counter clockwise winding
-      newMesh.mIndices.PushBack(faceIndex + 1u);
-      newMesh.mIndices.PushBack(faceIndex);
-      newMesh.mIndices.PushBack(faceIndex + 2u);
-      newMesh.mIndices.PushBack(faceIndex + 2u);
-      newMesh.mIndices.PushBack(faceIndex + 3u);
-      newMesh.mIndices.PushBack(faceIndex + 1u);
-      faceIndex += 4;
+          //The bottom left edge of the underline
+          vert.mPosition.x  = dashTlx;
+          vert.mPosition.y  = baseLine + thickness;
+          vert.mTexCoords.x = ZERO;
+          vert.mTexCoords.y = v;
+          vert.mColor       = underlineColor;
+          newMesh.mVertices.PushBack(vert);
 
-      Toolkit::Internal::AtlasMeshFactory::AppendMesh(meshRecords[index].mMesh, newMesh);
+          //The bottom right edge of the underline
+          vert.mPosition.x  = dashBrx;
+          vert.mPosition.y  = baseLine + thickness;
+          vert.mTexCoords.x = u;
+          vert.mColor       = underlineColor;
+          newMesh.mVertices.PushBack(vert);
+
+          dashTlx = dashBrx + dashedUnderlineGap; // The next dash will start at the right of the current dash plus the gap
+
+          // Six indices in counter clockwise winding
+          newMesh.mIndices.PushBack(faceIndex + 1u);
+          newMesh.mIndices.PushBack(faceIndex);
+          newMesh.mIndices.PushBack(faceIndex + 2u);
+          newMesh.mIndices.PushBack(faceIndex + 2u);
+          newMesh.mIndices.PushBack(faceIndex + 3u);
+          newMesh.mIndices.PushBack(faceIndex + 1u);
+
+          faceIndex += 4;
+
+          Toolkit::Internal::AtlasMeshFactory::AppendMesh(meshRecords[index].mMesh, newMesh);
+        }
+      }
+      else
+      {
+        // It's either SOLID or DOUBLE so we need to generate the first solid underline anyway.
+        vert.mPosition.x  = tlx;
+        vert.mPosition.y  = baseLine;
+        vert.mTexCoords.x = ZERO;
+        vert.mTexCoords.y = ZERO;
+        vert.mColor       = underlineColor;
+        newMesh.mVertices.PushBack(vert);
+
+        vert.mPosition.x  = brx;
+        vert.mPosition.y  = baseLine;
+        vert.mTexCoords.x = u;
+        vert.mColor       = underlineColor;
+        newMesh.mVertices.PushBack(vert);
+
+        vert.mPosition.x  = tlx;
+        vert.mPosition.y  = baseLine + thickness;
+        vert.mTexCoords.x = ZERO;
+        vert.mTexCoords.y = v;
+        vert.mColor       = underlineColor;
+        newMesh.mVertices.PushBack(vert);
+
+        vert.mPosition.x  = brx;
+        vert.mPosition.y  = baseLine + thickness;
+        vert.mTexCoords.x = u;
+        vert.mColor       = underlineColor;
+        newMesh.mVertices.PushBack(vert);
+
+        // Six indices in counter clockwise winding
+        newMesh.mIndices.PushBack(faceIndex + 1u);
+        newMesh.mIndices.PushBack(faceIndex);
+        newMesh.mIndices.PushBack(faceIndex + 2u);
+        newMesh.mIndices.PushBack(faceIndex + 2u);
+        newMesh.mIndices.PushBack(faceIndex + 3u);
+        newMesh.mIndices.PushBack(faceIndex + 1u);
+        faceIndex += 4;
+
+        Toolkit::Internal::AtlasMeshFactory::AppendMesh(meshRecords[index].mMesh, newMesh);
+
+        if(underlineType == Text::Underline::Type::DOUBLE)
+        {
+          baseLine += 2 * thickness;
+
+          //The top left edge of the underline
+          vert.mPosition.x  = tlx;
+          vert.mPosition.y  = baseLine; // Vertical start of the second underline
+          vert.mTexCoords.x = ZERO;
+          vert.mTexCoords.y = ZERO;
+          vert.mColor       = underlineColor;
+          newMesh.mVertices.PushBack(vert);
+
+          //The top right edge of the underline
+          vert.mPosition.x  = brx;
+          vert.mPosition.y  = baseLine;
+          vert.mTexCoords.x = u;
+          vert.mColor       = underlineColor;
+          newMesh.mVertices.PushBack(vert);
+
+          //The bottom left edge of the underline
+          vert.mPosition.x  = tlx;
+          vert.mPosition.y  = baseLine + thickness; // Vertical End of the second underline
+          vert.mTexCoords.x = ZERO;
+          vert.mTexCoords.y = v;
+          vert.mColor       = underlineColor;
+          newMesh.mVertices.PushBack(vert);
+
+          //The bottom right edge of the underline
+          vert.mPosition.x  = brx;
+          vert.mPosition.y  = baseLine + thickness;
+          vert.mTexCoords.x = u;
+          vert.mColor       = underlineColor;
+          newMesh.mVertices.PushBack(vert);
+
+          // Six indices in counter clockwise winding
+          newMesh.mIndices.PushBack(faceIndex + 1u);
+          newMesh.mIndices.PushBack(faceIndex);
+          newMesh.mIndices.PushBack(faceIndex + 2u);
+          newMesh.mIndices.PushBack(faceIndex + 2u);
+          newMesh.mIndices.PushBack(faceIndex + 3u);
+          newMesh.mIndices.PushBack(faceIndex + 1u);
+
+          faceIndex += 4;
+
+          Toolkit::Internal::AtlasMeshFactory::AppendMesh(meshRecords[index].mMesh, newMesh);
+        }
+      }
     }
   }
 

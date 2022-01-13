@@ -372,15 +372,19 @@ void WriteColorToPixelBuffer(
 
 /// Draws the specified underline color to the buffer
 void DrawUnderline(
-  const Vector4&     underlineColor,
-  const unsigned int bufferWidth,
-  const unsigned int bufferHeight,
-  GlyphData&         glyphData,
-  const float        baseline,
-  const float        currentUnderlinePosition,
-  const float        maxUnderlineThickness,
-  const float        lineExtentLeft,
-  const float        lineExtentRight)
+  const Vector4&              underlineColor,
+  const unsigned int          bufferWidth,
+  const unsigned int          bufferHeight,
+  GlyphData&                  glyphData,
+  const float                 baseline,
+  const float                 currentUnderlinePosition,
+  const float                 maxUnderlineThickness,
+  const float                 lineExtentLeft,
+  const float                 lineExtentRight,
+  const Text::Underline::Type underlineType,
+  const float                 dashedUnderlineWidth,
+  const float                 dashedUnderlineGap,
+  const LineRun&              line)
 {
   int       underlineYOffset = glyphData.verticalOffset + baseline + currentUnderlinePosition;
   uint32_t* bitmapBuffer     = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer());
@@ -392,16 +396,67 @@ void DrawUnderline(
       // Do not write out of bounds.
       break;
     }
-
-    for(unsigned int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++)
+    if(underlineType == Text::Underline::DASHED)
     {
-      if(x > bufferWidth - 1)
+      float dashWidth = dashedUnderlineWidth;
+      float dashGap   = 0;
+
+      for(unsigned int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++)
+      {
+        if(x > bufferWidth - 1)
+        {
+          // Do not write out of bounds.
+          break;
+        }
+        if(dashGap == 0 && dashWidth > 0)
+        {
+          WriteColorToPixelBuffer(glyphData, bitmapBuffer, underlineColor, x, y);
+          dashWidth--;
+        }
+        else if(dashGap < dashedUnderlineGap)
+        {
+          dashGap++;
+        }
+        else
+        {
+          //reset
+          dashWidth = dashedUnderlineWidth;
+          dashGap   = 0;
+        }
+      }
+    }
+    else
+    {
+      for(unsigned int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++)
+      {
+        if(x > bufferWidth - 1)
+        {
+          // Do not write out of bounds.
+          break;
+        }
+        WriteColorToPixelBuffer(glyphData, bitmapBuffer, underlineColor, x, y);
+      }
+    }
+  }
+  if(underlineType == Text::Underline::DOUBLE)
+  {
+    int secondUnderlineYOffset = glyphData.verticalOffset - line.descender - maxUnderlineThickness;
+    for(unsigned int y = secondUnderlineYOffset; y < secondUnderlineYOffset + maxUnderlineThickness; y++)
+    {
+      if(y > bufferHeight - 1)
       {
         // Do not write out of bounds.
         break;
       }
-
-      WriteColorToPixelBuffer(glyphData, bitmapBuffer, underlineColor, x, y);
+      for(unsigned int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++)
+      {
+        if(x > bufferWidth - 1)
+        {
+          // Do not write out of bounds.
+          break;
+        }
+        WriteColorToPixelBuffer(glyphData, bitmapBuffer, underlineColor, x, y);
+      }
     }
   }
 }
@@ -900,9 +955,12 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       }
     }
 
-    const bool     underlineEnabled = mModel->IsUnderlineEnabled();
-    const Vector4& underlineColor   = mModel->GetUnderlineColor();
-    const float    underlineHeight  = mModel->GetUnderlineHeight();
+    const bool                  underlineEnabled     = mModel->IsUnderlineEnabled();
+    const Vector4&              underlineColor       = mModel->GetUnderlineColor();
+    const float                 underlineHeight      = mModel->GetUnderlineHeight();
+    const Text::Underline::Type underlineType        = mModel->GetUnderlineType();
+    const float                 dashedUnderlineWidth = mModel->GetDashedUnderlineWidth();
+    const float                 dashedUnderlineGap   = mModel->GetDashedUnderlineGap();
 
     const bool     strikethroughEnabled = mModel->IsStrikethroughEnabled();
     const Vector4& strikethroughColor   = mModel->GetStrikethroughColor();
@@ -1111,7 +1169,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     // Draw the underline from the leftmost glyph to the rightmost glyph
     if(thereAreUnderlinedGlyphs && style == Typesetter::STYLE_UNDERLINE)
     {
-      DrawUnderline(underlineColor, bufferWidth, bufferHeight, glyphData, baseline, currentUnderlinePosition, maxUnderlineThickness, lineExtentLeft, lineExtentRight);
+      DrawUnderline(underlineColor, bufferWidth, bufferHeight, glyphData, baseline, currentUnderlinePosition, maxUnderlineThickness, lineExtentLeft, lineExtentRight, underlineType, dashedUnderlineWidth, dashedUnderlineGap, line);
     }
 
     // Draw the background color from the leftmost glyph to the rightmost glyph

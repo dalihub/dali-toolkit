@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
 {
@@ -182,6 +183,15 @@ void StringToVector2(const char* const vectorStr, Length length, Vector2& vector
  * @param[out] vector2Str The string.
  */
 void Vector2ToString(const Vector2& value, std::string& vector2Str);
+
+/**
+ * @brief Converts a string into its value in the enum Text::Underline::Type.
+ *
+ * @param[in] typeStr The underline type value packed inside a string.
+ * @param[in] length The length of the string.
+ * @param[out] retType The Underline type.
+ */
+void UnderlineTypeStringToTypeValue(const char* const typeStr, Length length, Text::Underline::Type& retType);
 
 } // namespace Text
 

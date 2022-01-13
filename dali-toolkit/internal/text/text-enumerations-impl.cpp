@@ -55,6 +55,11 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(ELLIPSIS_POSITION_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelText::EllipsisPosition, MIDDLE)
 DALI_ENUM_TO_STRING_TABLE_END(ELLIPSIS_POSITION_TYPE)
 
+DALI_ENUM_TO_STRING_TABLE_BEGIN(UNDERLINE_TYPE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::Underline::Type, SOLID)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::Underline::Type, DASHED)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::Text::Underline::Type, DOUBLE)
+DALI_ENUM_TO_STRING_TABLE_END(UNDERLINE_TYPE)
 } // namespace
 
 bool GetHorizontalAlignmentEnumeration(const Property::Value& propertyValue, Toolkit::Text::HorizontalAlignment::Type& alignment)
@@ -89,6 +94,13 @@ const char* GetVerticalAlignmentString(const Toolkit::Text::VerticalAlignment::T
 bool GetEllipsisPositionTypeEnumeration(const Property::Value& propertyValue, Toolkit::DevelText::EllipsisPosition::Type& ellipsisPositionType)
 {
   return Scripting::GetEnumerationProperty(propertyValue, ELLIPSIS_POSITION_TYPE_TABLE, ELLIPSIS_POSITION_TYPE_TABLE_COUNT, ellipsisPositionType);
+}
+
+const char* GetUnderlineTypeToString(const Toolkit::Text::Underline::Type& type)
+{
+  return Scripting::GetLinearEnumerationName<Toolkit::Text::Underline::Type>(type,
+                                                                             UNDERLINE_TYPE_TABLE,
+                                                                             UNDERLINE_TYPE_TABLE_COUNT);
 }
 
 } // namespace Text
