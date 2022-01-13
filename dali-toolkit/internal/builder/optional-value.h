@@ -79,7 +79,6 @@ template<typename T>
 class OptionalValue
 {
 public:
-  typedef void (OptionalValue::*bool_type)() const;
   typedef typename OptionalTypes<T>::ReturnType ReturnType;
   typedef typename OptionalTypes<T>::ValueType  ValueType;
 
@@ -104,18 +103,14 @@ public:
     return OptionalTypes<T>::Get(mValue);
   }
 
-  // safe bool idiom
-  operator bool_type() const
+  explicit operator bool() const
   {
-    return mOk == true ? &OptionalValue::this_type_does_not_support_comparisons : 0;
+    return mOk;
   }
 
 private:
   bool      mOk;
   ValueType mValue;
-  void      this_type_does_not_support_comparisons() const
-  {
-  }
 };
 
 template<typename T, typename U>

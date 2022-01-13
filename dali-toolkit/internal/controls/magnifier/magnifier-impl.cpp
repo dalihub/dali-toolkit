@@ -250,7 +250,7 @@ void Magnifier::InitializeRenderTask()
 
 bool Magnifier::GetFrameVisibility() const
 {
-  return mFrame;
+  return static_cast<bool>(mFrame);
 }
 
 void Magnifier::SetFrameVisibility(bool visible)

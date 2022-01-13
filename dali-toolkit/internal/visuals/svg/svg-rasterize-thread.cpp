@@ -159,7 +159,7 @@ void SvgRasterizeThread::AddTask(RasterizingTaskPtr task)
     // Lock while adding task to the queue
     ConditionalWait::ScopedLock lock(mConditionalWait);
     wasEmpty = mRasterizeTasks.empty();
-    if(!wasEmpty && task != NULL)
+    if(!wasEmpty && task)
     {
       // Remove the tasks with the same renderer.
       // Older task which waiting to rasterize and apply the svg to the same renderer is expired.

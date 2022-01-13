@@ -1676,13 +1676,13 @@ int UtcDaliWebContextHttpRequestInterceptor(void)
   // load url.
   context->RegisterRequestInterceptedCallback(&OnRequestIntercepted);
   DALI_TEST_EQUALS(gRequestInterceptedCallbackCalled, 0, TEST_LOCATION);
-  DALI_TEST_CHECK(gRequestInterceptorInstance == 0);
+  DALI_TEST_CHECK(!gRequestInterceptorInstance);
 
   Test::EmitGlobalTimerSignal();
   DALI_TEST_EQUALS( gRequestInterceptedCallbackCalled, 1, TEST_LOCATION );
 
   // check request interceptor.
-  DALI_TEST_CHECK(gRequestInterceptorInstance != 0);
+  DALI_TEST_CHECK(gRequestInterceptorInstance);
   DALI_TEST_CHECK(gRequestInterceptorInstance->Ignore());
   DALI_TEST_CHECK(gRequestInterceptorInstance->SetResponseStatus(400, "error"));
   DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseHeader("key1", "value1"));
@@ -2352,4 +2352,3 @@ int UtcDaliWebViewGetPlainText(void)
 
   END_TEST;
 }
-
