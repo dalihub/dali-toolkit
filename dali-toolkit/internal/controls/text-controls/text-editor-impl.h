@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,11 @@ public:
    * @copydoc Dali::Toollkit::TextEditor::SelectionClearedSignal()
    */
   DevelTextEditor::SelectionClearedSignalType& SelectionClearedSignal();
+
+  /**
+   * @copydoc Dali::Toollkit::TextEditor::SelectionStartedSignal()
+   */
+  DevelTextEditor::SelectionStartedSignalType& SelectionStartedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -448,6 +453,11 @@ private: // Implementation
   void EmitSelectionClearedSignal();
 
   /**
+   * @brief Emits SelectionStarted signal.
+   */
+  void EmitSelectionStartedSignal();
+
+  /**
    * @brief set RenderActor's position with new scrollPosition
    *
    * Apply updated scroll position or start scroll animation if VerticalScrollAnimation is enabled
@@ -512,6 +522,7 @@ private: // Data
   Toolkit::DevelTextEditor::CursorPositionChangedSignalType mCursorPositionChangedSignal;
   Toolkit::DevelTextEditor::SelectionChangedSignalType      mSelectionChangedSignal;
   Toolkit::DevelTextEditor::SelectionClearedSignalType      mSelectionClearedSignal;
+  Toolkit::DevelTextEditor::SelectionStartedSignalType      mSelectionStartedSignal;
 
   InputMethodContext               mInputMethodContext;
   Text::ControllerPtr              mController;
@@ -550,6 +561,8 @@ private: // Data
   //args for selection changed event
   uint32_t mOldSelectionStart;
   uint32_t mOldSelectionEnd;
+
+  bool mSelectionStarted : 1; ///< If true, emits SelectionStartedSignal at the end of OnRelayout().
 
   struct PropertyHandler;
 

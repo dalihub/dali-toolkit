@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,11 @@ SelectionChangedSignalType& SelectionChangedSignal(TextField textField)
 SelectionClearedSignalType& SelectionClearedSignal(TextField textField)
 {
   return GetImpl(textField).SelectionClearedSignal();
+}
+
+SelectionStartedSignalType& SelectionStartedSignal(TextField textField)
+{
+  return GetImpl(textField).SelectionStartedSignal();
 }
 
 void SelectWholeText(TextField textField)
