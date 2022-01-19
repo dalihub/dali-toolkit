@@ -1689,9 +1689,9 @@ int UtcDaliWebContextHttpRequestInterceptor(void)
   Dali::Property::Map testHeaders;
   testHeaders.Insert("key2", "value2");
   DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseHeaders(testHeaders));
-  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseBody("test", 4));
-  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponse("key:value", "test", 4));
-  DALI_TEST_CHECK(gRequestInterceptorInstance->WriteResponseChunk("test", 4));
+  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponseBody((const int8_t*)"test", 4));
+  DALI_TEST_CHECK(gRequestInterceptorInstance->AddResponse("key:value", (const int8_t*)"test", 4));
+  DALI_TEST_CHECK(gRequestInterceptorInstance->WriteResponseChunk((const int8_t*)"test", 4));
   std::string testUrl("http://test.html");
   DALI_TEST_EQUALS(gRequestInterceptorInstance->GetUrl(), testUrl, TEST_LOCATION);
   std::string testMethod("GET");
