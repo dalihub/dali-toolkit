@@ -48,7 +48,7 @@ int UtcDaliSyncImageLoaderLoad(void)
 {
   PixelData pixelData = Toolkit::SyncImageLoader::Load( gImage_50_RGBA );
 
-  DALI_TEST_EQUALS<bool>( pixelData, true, TEST_LOCATION );
+  DALI_TEST_CHECK( pixelData );
 
   END_TEST;
 }
@@ -70,5 +70,3 @@ int UtcDaliSyncImageLoaderLoadWithAllOptions(void)
 
   END_TEST;
 }
-
-

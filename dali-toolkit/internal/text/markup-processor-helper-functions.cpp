@@ -51,6 +51,10 @@ const std::string YELLOW_COLOR("yellow");
 const std::string MAGENTA_COLOR("magenta");
 const std::string CYAN_COLOR("cyan");
 const std::string TRANSPARENT_COLOR("transparent");
+
+const std::string SOLID_UNDERLINE("solid");
+const std::string DASHED_UNDERLINE("dashed");
+const std::string DOUBLE_UNDERLINE("double");
 } // namespace
 
 bool TokenComparison(const std::string& string1, const char* const stringBuffer2, Length length)
@@ -293,6 +297,22 @@ void Vector2ToString(const Vector2& value, std::string& vector2Str)
   FloatToString(value.y, yStr);
 
   vector2Str += yStr;
+}
+
+void UnderlineTypeStringToTypeValue(const char* const typeStr, Length length, Text::Underline::Type& retType)
+{
+  if(TokenComparison(SOLID_UNDERLINE, typeStr, length))
+  {
+    retType = Text::Underline::SOLID;
+  }
+  else if(TokenComparison(DASHED_UNDERLINE, typeStr, length))
+  {
+    retType = Text::Underline::DASHED;
+  }
+  else if(TokenComparison(DOUBLE_UNDERLINE, typeStr, length))
+  {
+    retType = Text::Underline::DOUBLE;
+  }
 }
 
 } // namespace Text

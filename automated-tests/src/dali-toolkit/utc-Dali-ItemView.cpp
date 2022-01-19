@@ -362,7 +362,7 @@ int UtcDaliItemViewActivateLayoutAndGetActiveLayout(void)
   DALI_TEST_CHECK(view.GetLayoutCount() == 3);
 
   // Check there is no active layout at the moment
-  DALI_TEST_CHECK(view.GetActiveLayout() == NULL);
+  DALI_TEST_CHECK(!view.GetActiveLayout());
 
   // Activate the depth layout
   Vector3 stageSize(application.GetScene().GetSize());
@@ -399,7 +399,7 @@ int UtcDaliItemViewDeactivateCurrentLayout(void)
   view.AddLayout(*gridLayout);
 
   // Check there is no active layout at the moment
-  DALI_TEST_CHECK(view.GetActiveLayout() == NULL);
+  DALI_TEST_CHECK(!view.GetActiveLayout());
 
   // Activate the grid layout
   Vector3 stageSize(application.GetScene().GetSize());
@@ -412,7 +412,7 @@ int UtcDaliItemViewDeactivateCurrentLayout(void)
   view.DeactivateCurrentLayout();
 
   // Check there is no active layout at the moment
-  DALI_TEST_CHECK(view.GetActiveLayout() == NULL);
+  DALI_TEST_CHECK(!view.GetActiveLayout());
   END_TEST;
 }
 

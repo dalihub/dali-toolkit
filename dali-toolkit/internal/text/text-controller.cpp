@@ -826,6 +826,42 @@ float Controller::GetUnderlineHeight() const
   return mImpl->mModel->mVisualModel->GetUnderlineHeight();
 }
 
+void Controller::SetUnderlineType(Text::Underline::Type type)
+{
+  mImpl->mModel->mVisualModel->SetUnderlineType(type);
+
+  mImpl->RequestRelayout();
+}
+
+Text::Underline::Type Controller::GetUnderlineType() const
+{
+  return mImpl->mModel->mVisualModel->GetUnderlineType();
+}
+
+void Controller::SetDashedUnderlineWidth(float width)
+{
+  mImpl->mModel->mVisualModel->SetDashedUnderlineWidth(width);
+
+  mImpl->RequestRelayout();
+}
+
+float Controller::GetDashedUnderlineWidth() const
+{
+  return mImpl->mModel->mVisualModel->GetDashedUnderlineWidth();
+}
+
+void Controller::SetDashedUnderlineGap(float gap)
+{
+  mImpl->mModel->mVisualModel->SetDashedUnderlineGap(gap);
+
+  mImpl->RequestRelayout();
+}
+
+float Controller::GetDashedUnderlineGap() const
+{
+  return mImpl->mModel->mVisualModel->GetDashedUnderlineGap();
+}
+
 void Controller::SetOutlineColor(const Vector4& color)
 {
   mImpl->mModel->mVisualModel->SetOutlineColor(color);

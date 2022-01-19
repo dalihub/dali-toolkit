@@ -109,6 +109,24 @@ enum Mode
 
 } // namespace LineWrap
 
+/**
+ * @brief The available underline types for text.
+ * @SINCE_1_2.60
+ */
+namespace Underline
+{
+/**
+ * @brief Enumerations specifying the underline type.
+ */
+enum Type
+{
+  SOLID,
+  DASHED,
+  DOUBLE
+};
+
+} // namespace UnderlineType
+
 } // namespace Text
 
 /**

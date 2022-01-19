@@ -146,6 +146,21 @@ public:
   float GetUnderlineHeight() const override;
 
   /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineType()
+   */
+  Text::Underline::Type GetUnderlineType() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetDashedUnderlineWidth()
+   */
+  float GetDashedUnderlineWidth() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetDashedUnderlineGap()
+   */
+  float GetDashedUnderlineGap() const override;
+
+  /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetNumberOfUnderlineRuns()
    */
   Length GetNumberOfUnderlineRuns() const override;

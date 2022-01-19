@@ -22,6 +22,8 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-style-properties-devel.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
+#include <dali-toolkit/internal/text/text-enumerations-impl.h>
 
 namespace Dali
 {
@@ -37,6 +39,9 @@ const std::string BLUR_RADIUS_KEY("blurRadius");
 const std::string WIDTH_KEY("width");
 const std::string HEIGHT_KEY("height");
 const std::string ENABLE_KEY("enable");
+const std::string TYPE_KEY("type");
+const std::string DASH_WIDTH_KEY("dashWidth");
+const std::string DASH_GAP_KEY("dashGap");
 const std::string TRUE_TOKEN("true");
 const std::string FALSE_TOKEN("false");
 } // namespace
@@ -106,12 +111,18 @@ bool ParseShadowProperties(const Property::Map& shadowPropertiesMap,
   return 0u == numberOfItems;
 }
 
-bool ParseUnderlineProperties(const Property::Map& underlinePropertiesMap,
-                              bool&                enabled,
-                              bool&                colorDefined,
-                              Vector4&             color,
-                              bool&                heightDefined,
-                              float&               height)
+bool ParseUnderlineProperties(const Property::Map&   underlinePropertiesMap,
+                              bool&                  enabled,
+                              bool&                  colorDefined,
+                              Vector4&               color,
+                              bool&                  heightDefined,
+                              float&                 height,
+                              bool&                  typeDefined,
+                              Text::Underline::Type& type,
+                              bool&                  dashWidthDefined,
+                              float&                 dashWidth,
+                              bool&                  dashGapDefined,
+                              float&                 dashGap)
 {
   const unsigned int numberOfItems = underlinePropertiesMap.Count();
 
@@ -161,6 +172,51 @@ bool ParseUnderlineProperties(const Property::Map& underlinePropertiesMap,
       else
       {
         height = valueGet.second.Get<float>();
+      }
+    }
+    else if((DevelText::Underline::Property::TYPE == valueGet.first.indexKey) || (TYPE_KEY == valueGet.first.stringKey))
+    {
+      /// Underline Type key.
+      typeDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string typeStr = valueGet.second.Get<std::string>();
+        Text::UnderlineTypeStringToTypeValue(typeStr.c_str(), typeStr.size(), type);
+      }
+      else
+      {
+        type = valueGet.second.Get<Text::Underline::Type>();
+      }
+    }
+    else if((DevelText::Underline::Property::DASH_WIDTH == valueGet.first.indexKey) || (DASH_WIDTH_KEY == valueGet.first.stringKey))
+    {
+      /// Dashed Underline Width key.
+      dashWidthDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string dashWidthStr = valueGet.second.Get<std::string>();
+        dashWidth                      = StringToFloat(dashWidthStr.c_str());
+      }
+      else
+      {
+        dashWidth = valueGet.second.Get<float>();
+      }
+    }
+    else if((DevelText::Underline::Property::DASH_GAP == valueGet.first.indexKey) || (DASH_GAP_KEY == valueGet.first.stringKey))
+    {
+      /// Dashed Underline Gap key.
+      dashGapDefined = true;
+
+      if(valueGet.second.GetType() == Dali::Property::STRING)
+      {
+        const std::string dashGapStr = valueGet.second.Get<std::string>();
+        dashGap                      = StringToFloat(dashGapStr.c_str());
+      }
+      else
+      {
+        dashGap = valueGet.second.Get<float>();
       }
     }
   }
@@ -299,11 +355,17 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
       {
         const Property::Map& propertiesMap = value.Get<Property::Map>();
 
-        bool    enabled      = false;
-        bool    colorDefined = false;
-        Vector4 color;
-        bool    heightDefined = false;
-        float   height        = 0.f;
+        bool                  enabled       = false;
+        bool                  colorDefined  = false;
+        Vector4               color;
+        bool                  heightDefined = false;
+        float                 height        = 0.f;
+        bool                  typeDefined   = false;
+        Text::Underline::Type type;
+        bool                  dashWidthDefined = false;
+        float                 dashWidth        = 2.0f;
+        bool                  dashGapDefined   = false;
+        float                 dashGap          = 1.0f;
 
         bool empty = true;
 
@@ -322,7 +384,13 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
                                              colorDefined,
                                              color,
                                              heightDefined,
-                                             height);
+                                             height,
+                                             typeDefined,
+                                             type,
+                                             dashWidthDefined,
+                                             dashWidth,
+                                             dashGapDefined,
+                                             dashGap);
 
             controller->UnderlineSetByString(!empty);
           }
@@ -334,7 +402,13 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
                                            colorDefined,
                                            color,
                                            heightDefined,
-                                           height);
+                                           height,
+                                           typeDefined,
+                                           type,
+                                           dashWidthDefined,
+                                           dashWidth,
+                                           dashGapDefined,
+                                           dashGap);
 
           controller->UnderlineSetByString(false);
         }
@@ -357,6 +431,24 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
           if(heightDefined && (fabsf(controller->GetUnderlineHeight() - height) > Math::MACHINE_EPSILON_1000))
           {
             controller->SetUnderlineHeight(height);
+            update = true;
+          }
+
+          if(typeDefined && (controller->GetUnderlineType() != type))
+          {
+            controller->SetUnderlineType(type);
+            update = true;
+          }
+
+          if(dashWidthDefined && (fabsf(controller->GetDashedUnderlineWidth() - dashWidth) > Math::MACHINE_EPSILON_1000))
+          {
+            controller->SetDashedUnderlineWidth(dashWidth);
+            update = true;
+          }
+
+          if(dashGapDefined && (fabsf(controller->GetDashedUnderlineGap() - dashGap) > Math::MACHINE_EPSILON_1000))
+          {
+            controller->SetDashedUnderlineGap(dashGap);
             update = true;
           }
         }
@@ -392,9 +484,12 @@ void GetUnderlineProperties(ControllerPtr controller, Property::Value& value, Ef
     {
       case EffectStyle::DEFAULT:
       {
-        const bool     enabled = controller->IsUnderlineEnabled();
-        const Vector4& color   = controller->GetUnderlineColor();
-        const float    height  = controller->GetUnderlineHeight();
+        const bool                  enabled   = controller->IsUnderlineEnabled();
+        const Vector4&              color     = controller->GetUnderlineColor();
+        const float                 height    = controller->GetUnderlineHeight();
+        const Text::Underline::Type type      = controller->GetUnderlineType();
+        const float                 dashWidth = controller->GetDashedUnderlineWidth();
+        const float                 dashGap   = controller->GetDashedUnderlineGap();
 
         if(controller->IsUnderlineSetByString())
         {
@@ -408,7 +503,19 @@ void GetUnderlineProperties(ControllerPtr controller, Property::Value& value, Ef
 
           std::string heightStr;
           FloatToString(height, heightStr);
-          underlineProperties += "\"height\":\"" + heightStr + "\"}";
+          underlineProperties += "\"height\":\"" + heightStr + "\",";
+
+          std::string typeStr;
+          typeStr = GetUnderlineTypeToString(type);
+          underlineProperties += "\"type\":\"" + typeStr + "\",";
+
+          std::string dashWidthStr;
+          FloatToString(dashWidth, dashWidthStr);
+          underlineProperties += "\"dashWidth\":\"" + dashWidthStr + "\",";
+
+          std::string dashGapStr;
+          FloatToString(dashGap, dashGapStr);
+          underlineProperties += "\"dashGap\":\"" + dashGapStr + "\"}";
 
           value = underlineProperties;
         }
@@ -419,6 +526,9 @@ void GetUnderlineProperties(ControllerPtr controller, Property::Value& value, Ef
           map.Insert(ENABLE_KEY, enabled);
           map.Insert(COLOR_KEY, color);
           map.Insert(HEIGHT_KEY, height);
+          map.Insert(TYPE_KEY, type);
+          map.Insert(DASH_WIDTH_KEY, dashWidth);
+          map.Insert(DASH_GAP_KEY, dashGap);
 
           value = map;
         }

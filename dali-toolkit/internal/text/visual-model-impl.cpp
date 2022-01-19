@@ -380,6 +380,21 @@ void VisualModel::SetUnderlineHeight(float height)
   mUnderlineHeight = height;
 }
 
+void VisualModel::SetUnderlineType(Text::Underline::Type type)
+{
+  mUnderlineType = type;
+}
+
+void VisualModel::SetDashedUnderlineWidth(float width)
+{
+  mDashedUnderlineWidth = width;
+}
+
+void VisualModel::SetDashedUnderlineGap(float gap)
+{
+  mDashedUnderlineGap = gap;
+}
+
 void VisualModel::SetOutlineWidth(uint16_t width)
 {
   mOutlineWidth = width;
@@ -485,6 +500,21 @@ float VisualModel::GetUnderlineHeight() const
   return mUnderlineHeight;
 }
 
+Text::Underline::Type VisualModel::GetUnderlineType() const
+{
+  return mUnderlineType;
+}
+
+float VisualModel::GetDashedUnderlineWidth() const
+{
+  return mDashedUnderlineWidth;
+}
+
+float VisualModel::GetDashedUnderlineGap() const
+{
+  return mDashedUnderlineGap;
+}
+
 uint16_t VisualModel::GetOutlineWidth() const
 {
   return mOutlineWidth;
@@ -582,6 +612,9 @@ VisualModel::VisualModel()
   mShadowOffset(),
   mUnderlineHeight(0.0f),
   mStrikethroughHeight(0.0f),
+  mUnderlineType(Text::Underline::SOLID),
+  mDashedUnderlineWidth(2.0f),
+  mDashedUnderlineGap(1.0f),
   mShadowBlurRadius(0.0f),
   mOutlineWidth(0u),
   mNaturalSize(),

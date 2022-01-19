@@ -60,13 +60,22 @@ bool ParseShadowProperties(const Property::Map& shadowProperties,
  * @param[out] color The underline's color.
  * @param[out] heightDefined Whether the underline's height is defined.
  * @param[out] height The underline's height.
+ * @param[out] type The underline's type; DASHED, DOUBLE, etc. Default is a solid underline.
+ * @param[out] dashWidth The dashed underline's width.
+ * @param[out] dashGap The dashed underline's gap.
  */
-bool ParseUnderlineProperties(const Property::Map& underlineProperties,
-                              bool&                enabled,
-                              bool&                colorDefined,
-                              Vector4&             color,
-                              bool&                heightDefined,
-                              float&               height);
+bool ParseUnderlineProperties(const Property::Map&   underlineProperties,
+                              bool&                  enabled,
+                              bool&                  colorDefined,
+                              Vector4&               color,
+                              bool&                  heightDefined,
+                              float&                 height,
+                              bool&                  typeDefined,
+                              Text::Underline::Type& type,
+                              bool&                  widthDefined,
+                              float&                 dashWidth,
+                              bool&                  dashGapDefined,
+                              float&                 dashGap);
 
 /**
  * @brief Parses the outline properties.
