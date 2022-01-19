@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/paragraph-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
+#include <dali-toolkit/internal/text/strikethrough-character-run.h>
 #include <dali-toolkit/internal/text/underlined-character-run.h>
 
 namespace Dali
@@ -220,7 +221,8 @@ public:
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
   Vector<EmbeddedItem>                  mEmbeddedItems;
   Vector<Anchor>                        mAnchors;
-  Vector<UnderlinedCharacterRun>        mUnderlinedCharacterRuns; ///< The underlined character run from markup-processor
+  Vector<UnderlinedCharacterRun>        mUnderlinedCharacterRuns;    ///< The underlined character run from markup-processor
+  Vector<StrikethroughCharacterRun>     mStrikethroughCharacterRuns; ///< The strikethrough character run from markup-processor
 
   BidirectionalLineRunIndex mBidirectionalLineIndex; ///< The last fetched bidirectional line info.
 };

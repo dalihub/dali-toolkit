@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -269,6 +269,16 @@ bool Model::IsStrikethroughEnabled() const
 float Model::GetStrikethroughHeight() const
 {
   return mVisualModel->GetStrikethroughHeight();
+}
+
+Length Model::GetNumberOfStrikethroughRuns() const
+{
+  return mVisualModel->GetNumberOfStrikethroughRuns();
+}
+
+void Model::GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns, StrikethroughRunIndex index, Length numberOfRuns) const
+{
+  mVisualModel->GetStrikethroughRuns(strikethroughRuns, index, numberOfRuns);
 }
 
 Model::Model()

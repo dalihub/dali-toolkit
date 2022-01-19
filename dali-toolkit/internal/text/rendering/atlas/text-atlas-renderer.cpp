@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,8 @@ struct AtlasRenderer::Impl
       mLineThickness(0.0f),
       mMeshRecordIndex(0u),
       mUnderlineChunkId(0u),
-      mStrikethroughPosition(0.0f)
+      mStrikethroughPosition(0.0f),
+      mStrikethroughChunkId(0u)
     {
     }
 
@@ -96,6 +97,7 @@ struct AtlasRenderer::Impl
     uint32_t mMeshRecordIndex;
     uint32_t mUnderlineChunkId;
     float    mStrikethroughPosition;
+    uint32_t mStrikethroughChunkId;
   };
 
   struct MaxBlockSize
@@ -174,6 +176,30 @@ struct AtlasRenderer::Impl
     return false;
   }
 
+  bool doGlyphHaveStrikethrough(GlyphIndex                           index,
+                                const Vector<StrikethroughGlyphRun>& strikethroughRuns,
+                                Vector4&                             strikethroughColor)
+  {
+    for(Vector<StrikethroughGlyphRun>::ConstIterator it    = strikethroughRuns.Begin(),
+                                                     endIt = strikethroughRuns.End();
+        it != endIt;
+        ++it)
+    {
+      const StrikethroughGlyphRun& run = *it;
+
+      if((run.glyphRun.glyphIndex <= index) && (index < run.glyphRun.glyphIndex + run.glyphRun.numberOfGlyphs))
+      {
+        if(run.isColorSet)
+        {
+          strikethroughColor = run.color;
+        }
+
+        return true;
+      }
+    }
+
+    return false;
+  }
   void CacheGlyph(const GlyphInfo& glyph, FontId lastFontId, const AtlasGlyphManager::GlyphStyle& style, AtlasManager::AtlasSlot& slot)
   {
     const Size& defaultTextAtlasSize = mFontClient.GetDefaultTextAtlasSize(); //Retrieve default size of text-atlas-block from font-client.
@@ -293,7 +319,8 @@ struct AtlasRenderer::Impl
                     Vector<TextCacheEntry>&  newTextCache,
                     Vector<Extent>&          extents,
                     uint32_t                 underlineChunkId,
-                    bool                     isGlyphCached)
+                    bool                     isGlyphCached,
+                    uint32_t                 strikethroughChunkId)
   {
     // Generate mesh data for this quad, plugging in our supplied position
     AtlasManager::Mesh2D newMesh;
@@ -334,7 +361,8 @@ struct AtlasRenderer::Impl
                    currentlineThickness,
                    slot,
                    underlineChunkId,
-                   position.y + (glyph.height * HALF));
+                   position.y + (glyph.height * HALF),
+                   strikethroughChunkId);
   }
 
   void CreateActors(const std::vector<MeshRecord>& meshContainer,
@@ -446,6 +474,7 @@ struct AtlasRenderer::Impl
     const bool                  strikethroughEnabled = view.IsStrikethroughEnabled();
     const Vector4&              strikethroughColor(view.GetStrikethroughColor());
     const float                 strikethroughHeight = view.GetStrikethroughHeight();
+    Vector4                     currentStrikethroughColor;
 
     // Elided text info. Indices according to elided text.
     const auto startIndexOfGlyphs              = view.GetStartIndexOfElidedGlyphs();
@@ -461,6 +490,12 @@ struct AtlasRenderer::Impl
     view.GetUnderlineRuns(underlineRuns.Begin(),
                           0u,
                           numberOfUnderlineRuns);
+
+    // Get the strikethrough runs.
+    const Length                  numberOfStrikethroughRuns = view.GetNumberOfStrikethroughRuns();
+    Vector<StrikethroughGlyphRun> strikethroughRuns;
+    strikethroughRuns.Resize(numberOfStrikethroughRuns);
+    view.GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
 
     bool thereAreUnderlinedGlyphs = false;
     bool strikethroughGlyphsExist = false;
@@ -490,6 +525,9 @@ struct AtlasRenderer::Impl
     uint32_t underlineChunkId = 0u;    // give id for each chunk.
     bool     isPreUnderlined  = false; // status of underlined for previous glyph.
 
+    uint32_t strikethroughChunkId     = 0u;    // give id for each chunk.
+    bool     isPrevGlyphStrikethrough = false; // status of strikethrough for previous glyph.
+
     //Skip hyphenIndices less than startIndexOfGlyphs or between two middle of elided text
     if(hyphenIndices)
     {
@@ -516,13 +554,16 @@ struct AtlasRenderer::Impl
 
       const bool isGlyphUnderlined = underlineEnabled || IsGlyphUnderlined(i, underlineRuns);
       thereAreUnderlinedGlyphs     = thereAreUnderlinedGlyphs || isGlyphUnderlined;
-      strikethroughGlyphsExist     = strikethroughGlyphsExist || strikethroughEnabled;
+
+      currentStrikethroughColor       = strikethroughColor;
+      const bool isStrikethroughGlyph = strikethroughEnabled || doGlyphHaveStrikethrough(i, strikethroughRuns, currentStrikethroughColor);
+      strikethroughGlyphsExist        = strikethroughGlyphsExist || isStrikethroughGlyph;
 
       // No operation for white space
       if(glyph.width && glyph.height)
       {
         // Are we still using the same fontId as previous
-        if((isGlyphUnderlined || strikethroughGlyphsExist) && (glyph.fontId != lastUnderlinedFontId))
+        if((isGlyphUnderlined || isStrikethroughGlyph) && (glyph.fontId != lastUnderlinedFontId))
         {
           // We need to fetch fresh font underline metrics
           FontMetrics fontMetrics;
@@ -626,9 +667,10 @@ struct AtlasRenderer::Impl
                        newTextCache,
                        extents,
                        underlineChunkId,
-                       false);
+                       false,
+                       0u);
 
-          if(strikethroughGlyphsExist)
+          if(isStrikethroughGlyph)
           {
             GenerateMesh(glyph,
                          positionPlusOutlineOffset,
@@ -642,7 +684,8 @@ struct AtlasRenderer::Impl
                          newTextCache,
                          strikethroughExtents,
                          0u,
-                         true);
+                         true,
+                         strikethroughChunkId);
           }
 
           lastFontId = glyph.fontId; // Prevents searching for existing blocksizes when string of the same fontId.
@@ -662,7 +705,8 @@ struct AtlasRenderer::Impl
                        newTextCache,
                        extents,
                        0u,
-                       false);
+                       false,
+                       0u);
         }
 
         //The new underlined chunk. Add new id if they are not consecutive indices (this is for Markup case)
@@ -673,6 +717,13 @@ struct AtlasRenderer::Impl
         }
         //Keep status of underlined for previous glyph to check consecutive indices
         isPreUnderlined = isGlyphUnderlined;
+
+        if(isPrevGlyphStrikethrough && !isStrikethroughGlyph)
+        {
+          strikethroughChunkId++;
+        }
+
+        isPrevGlyphStrikethrough = isStrikethroughGlyph;
       }
 
       if(addHyphen)
@@ -694,7 +745,7 @@ struct AtlasRenderer::Impl
     if(strikethroughGlyphsExist)
     {
       // Check to see if any of the text needs a strikethrough
-      GenerateStrikethrough(meshContainer, strikethroughExtents, strikethroughColor);
+      GenerateStrikethrough(meshContainer, strikethroughExtents, currentStrikethroughColor);
     }
 
     // For each MeshData object, create a mesh actor and add to the renderable actor
@@ -836,7 +887,8 @@ struct AtlasRenderer::Impl
                       float                    lineThickness,
                       AtlasManager::AtlasSlot& slot,
                       uint32_t                 underlineChunkId,
-                      float                    strikethroughPosition)
+                      float                    strikethroughPosition,
+                      uint32_t                 strikethroughChunkId)
   {
     if(slot.mImageId)
     {
@@ -866,7 +918,8 @@ struct AtlasRenderer::Impl
                           underlinePosition,
                           lineThickness,
                           underlineChunkId,
-                          strikethroughPosition);
+                          strikethroughPosition,
+                          strikethroughChunkId);
           }
 
           return;
@@ -891,7 +944,8 @@ struct AtlasRenderer::Impl
                       underlinePosition,
                       lineThickness,
                       underlineChunkId,
-                      strikethroughPosition);
+                      strikethroughPosition,
+                      strikethroughChunkId);
       }
     }
   }
@@ -905,7 +959,8 @@ struct AtlasRenderer::Impl
                      float                    underlinePosition,
                      float                    lineThickness,
                      uint32_t                 underlineChunkId,
-                     float                    strikethroughPosition)
+                     float                    strikethroughPosition,
+                     uint32_t                 strikethroughChunkId)
   {
     bool foundExtent = false;
     for(Vector<Extent>::Iterator eIt    = extents.Begin(),
@@ -913,7 +968,7 @@ struct AtlasRenderer::Impl
         eIt != eEndIt;
         ++eIt)
     {
-      if(Equals(baseLine, eIt->mBaseLine) && underlineChunkId == eIt->mUnderlineChunkId)
+      if(Equals(baseLine, eIt->mBaseLine) && underlineChunkId == eIt->mUnderlineChunkId && strikethroughChunkId == eIt->mStrikethroughChunkId)
       {
         foundExtent = true;
         if(left < eIt->mLeft)
@@ -946,6 +1001,7 @@ struct AtlasRenderer::Impl
       extent.mUnderlineChunkId      = underlineChunkId;
       extent.mLineThickness         = lineThickness;
       extent.mStrikethroughPosition = strikethroughPosition;
+      extent.mStrikethroughChunkId  = strikethroughChunkId;
       extents.PushBack(extent);
     }
   }

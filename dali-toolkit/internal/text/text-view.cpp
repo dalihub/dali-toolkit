@@ -787,6 +787,28 @@ float View::GetStrikethroughHeight() const
   return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetStrikethroughHeight() : 0.0f;
 }
 
+Length View::GetNumberOfStrikethroughRuns() const
+{
+  if(mImpl->mVisualModel)
+  {
+    return mImpl->mVisualModel->GetNumberOfStrikethroughRuns();
+  }
+
+  return 0u;
+}
+
+void View::GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns,
+                                StrikethroughRunIndex  index,
+                                Length                 numberOfRuns) const
+{
+  if(mImpl->mVisualModel)
+  {
+    mImpl->mVisualModel->GetStrikethroughRuns(strikethroughRuns,
+                                              index,
+                                              numberOfRuns);
+  }
+}
+
 } // namespace Text
 
 } // namespace Toolkit

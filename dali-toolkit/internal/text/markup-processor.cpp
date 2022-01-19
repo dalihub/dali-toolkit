@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include <dali-toolkit/internal/text/markup-processor-font.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-processor-span.h>
+#include <dali-toolkit/internal/text/markup-processor-strikethrough.h>
 #include <dali-toolkit/internal/text/xhtml-entities.h>
 
 namespace Dali
@@ -57,6 +58,7 @@ const std::string XHTML_ITEM_TAG("item");
 const std::string XHTML_ANCHOR_TAG("a");
 const std::string XHTML_BACKGROUND_TAG("background");
 const std::string XHTML_SPAN_TAG("span");
+const std::string XHTML_STRIKETHROUGH_TAG("s");
 
 const char LESS_THAN      = '<';
 const char GREATER_THAN   = '>';
@@ -193,6 +195,18 @@ void Initialize(Span& span)
   span.isColorDefined = false;
   span.fontRunIndex   = 0u;
   span.isFontDefined  = false;
+}
+
+/**
+ * @brief Initializes a strikethrough character run to its defaults.
+ *
+ * @param[in,out] strikethroughCharacterRun The strikethrough character run to initialize.
+ */
+void Initialize(StrikethroughCharacterRun& strikethroughCharacterRun)
+{
+  strikethroughCharacterRun.characterRun.characterIndex     = 0u;
+  strikethroughCharacterRun.characterRun.numberOfCharacters = 0u;
+  strikethroughCharacterRun.isColorSet                      = false;
 }
 
 /**
@@ -875,10 +889,11 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   StyleStack<Span> spanStack;
 
   // Points the next free position in the vector of runs.
-  RunIndex colorRunIndex               = 0u;
-  RunIndex fontRunIndex                = 0u;
-  RunIndex underlinedCharacterRunIndex = 0u;
-  RunIndex backgroundRunIndex          = 0u;
+  RunIndex colorRunIndex                  = 0u;
+  RunIndex fontRunIndex                   = 0u;
+  RunIndex underlinedCharacterRunIndex    = 0u;
+  RunIndex backgroundRunIndex             = 0u;
+  RunIndex strikethroughCharacterRunIndex = 0u;
 
   // check tag reference
   int colorTagReference      = 0u;
@@ -888,6 +903,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   int uTagReference          = 0u;
   int backgroundTagReference = 0u;
   int spanTagReference       = 0u;
+  int sTagReference          = 0u;
 
   // Give an initial default value to the model's vectors.
   markupProcessData.colorRuns.Reserve(DEFAULT_VECTOR_SIZE);
@@ -979,7 +995,12 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       {
         ProcessSpanForRun(tag, spanStack, markupProcessData.colorRuns, markupProcessData.fontRuns, colorRunIndex, fontRunIndex, characterIndex, spanTagReference);
       }
-    } // end if( IsTag() )
+      else if(TokenComparison(XHTML_STRIKETHROUGH_TAG, tag.buffer, tag.length))
+      {
+        ProcessTagForRun<StrikethroughCharacterRun>(
+          markupProcessData.strikethroughCharacterRuns, styleStack, tag, characterIndex, strikethroughCharacterRunIndex, sTagReference, [](const Tag& tag, StrikethroughCharacterRun& run) { ProcessStrikethroughTag(tag, run); });
+      } // <s></s>
+    }   // end if( IsTag() )
     else if(markupStringBuffer < markupStringEndBuffer)
     {
       ProcessMarkupStringBuffer(markupProcessData, markupStringBuffer, markupStringEndBuffer, characterIndex);
