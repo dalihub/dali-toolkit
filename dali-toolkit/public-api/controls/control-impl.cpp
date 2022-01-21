@@ -484,7 +484,7 @@ void Control::EmitKeyInputFocusSignal(bool focusGained)
     auto parent = self->GetParent();
     if(parent && !self->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS])
     {
-      parent->EmitActiveDescendantChanged(parent, self);
+      parent->EmitActiveDescendantChanged(self);
     }
   }
 
