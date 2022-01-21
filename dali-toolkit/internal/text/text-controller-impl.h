@@ -351,6 +351,7 @@ struct Controller::Impl
     mShadowSetByString(false),
     mOutlineSetByString(false),
     mFontStyleSetByString(false),
+    mStrikethroughSetByString(false),
     mShouldClearFocusOnEscape(true),
     mLayoutDirection(LayoutDirection::LEFT_TO_RIGHT),
     mTextFitMinSize(DEFAULT_TEXTFIT_MIN),
