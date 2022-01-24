@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,9 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 #include <dali/integration-api/events/key-event-integ.h>
+
+// for Internal::StyleManager
+#include <dali-toolkit/internal/styling/style-manager-impl.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -1351,6 +1354,56 @@ int UtcDaliStyleManagerConfigSectionTest(void)
   application.ProcessEvent( Integration::KeyEvent( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerNewWithAdditionalBehavior(void)
+{
+  ToolkitTestApplication application;
+
+  Toolkit::StyleManager            styleManager     = StyleManager::Get();
+  Toolkit::Internal::StyleManager& styleManagerImpl = GetImpl(styleManager);
+
+  auto checkup = [&styleManagerImpl](int enableStyleChangeSignal, const Control& control){
+    DALI_TEST_EQUALS( enableStyleChangeSignal, styleManagerImpl.ControlStyleChangeSignal().GetConnectionCount(), TEST_LOCATION );
+  };
+
+  // Default New
+  tet_infoline( "Check whether ControlStyleChangeSignal connected in default New\n");
+  checkup(1, Control::New());
+  checkup(1, ImageView::New());
+  checkup(1, ImageView::New("url"));
+  checkup(1, ImageView::New("url", Dali::ImageDimensions(32u, 32u)));
+  checkup(1, TextLabel::New());
+  checkup(1, TextLabel::New("text"));
+
+  // New with additional behaviour, but enable style change signals
+  tet_infoline( "Check whether ControlStyleChangeSignal connected in non-disable style change signals\n");
+  checkup(1, Control::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT));
+  checkup(1, Control::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION));
+  checkup(1, Control::New(Toolkit::Control::ControlBehaviour::REQUIRES_KEYBOARD_NAVIGATION_SUPPORT));
+  checkup(1, ImageView::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT));
+  checkup(1, ImageView::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT, "url"));
+  checkup(1, ImageView::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT, "url", Dali::ImageDimensions(32u, 32u)));
+  checkup(1, ImageView::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION));
+  checkup(1, ImageView::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION, "url"));
+  checkup(1, ImageView::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION, "url", Dali::ImageDimensions(32u, 32u)));
+  checkup(1, TextLabel::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT));
+  checkup(1, TextLabel::New(Toolkit::Control::ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT, "text"));
+  checkup(1, TextLabel::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION));
+  checkup(1, TextLabel::New(Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION, "text"));
+
+  // New with additional behaviour, so disable style change signals
+  tet_infoline( "Check whether ControlStyleChangeSignal did not connected\n");
+  checkup(0, Control::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
+  checkup(0, Control::New(Toolkit::Control::ControlBehaviour(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS | Toolkit::Control::ControlBehaviour::DISABLE_SIZE_NEGOTIATION)));
+  checkup(0, ImageView::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
+  checkup(0, ImageView::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS, "url"));
+  checkup(0, ImageView::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS, "url", Dali::ImageDimensions(32u, 32u)));
+  checkup(0, TextLabel::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS));
+  checkup(0, TextLabel::New(Toolkit::Control::ControlBehaviour::DISABLE_STYLE_CHANGE_SIGNALS, "text"));
 
   END_TEST;
 }

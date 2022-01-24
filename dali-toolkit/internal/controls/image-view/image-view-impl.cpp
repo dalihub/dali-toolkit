@@ -61,8 +61,8 @@ DALI_TYPE_REGISTRATION_END()
 
 using namespace Dali;
 
-ImageView::ImageView()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+ImageView::ImageView(ControlBehaviour additionalBehaviour)
+: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour)),
   mImageSize(),
   mImageVisualPaddingSetByTransform(false),
   mImageViewPixelAreaSetByFittingMode(false)
@@ -73,9 +73,9 @@ ImageView::~ImageView()
 {
 }
 
-Toolkit::ImageView ImageView::New()
+Toolkit::ImageView ImageView::New(ControlBehaviour additionalBehaviour)
 {
-  ImageView* impl = new ImageView();
+  ImageView* impl = new ImageView(additionalBehaviour);
 
   Toolkit::ImageView handle = Toolkit::ImageView(*impl);
 

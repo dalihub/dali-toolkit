@@ -222,10 +222,10 @@ void ParseTextFitProperty(Text::ControllerPtr& controller, const Property::Map* 
 
 } // namespace
 
-Toolkit::TextLabel TextLabel::New()
+Toolkit::TextLabel TextLabel::New(ControlBehaviour additionalBehaviour)
 {
   // Create the implementation, temporarily owned by this handle on stack
-  IntrusivePtr<TextLabel> impl = new TextLabel();
+  IntrusivePtr<TextLabel> impl = new TextLabel(additionalBehaviour);
 
   // Pass ownership to CustomActor handle
   Toolkit::TextLabel handle(*impl);
@@ -1163,8 +1163,8 @@ void TextLabel::OnAccessibilityStatusChanged()
   CommonTextUtils::SynchronizeTextAnchorsInParent(Self(), mController, mAnchorActors);
 }
 
-TextLabel::TextLabel()
-: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT)),
+TextLabel::TextLabel(ControlBehaviour additionalBehavior)
+: Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehavior)),
   mRenderingBackend(DEFAULT_RENDERING_BACKEND),
   mTextUpdateNeeded(false)
 {

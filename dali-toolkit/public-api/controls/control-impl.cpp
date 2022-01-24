@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,8 +88,13 @@ void CreateClippingRenderer(Control& controlImpl)
 
 Toolkit::Control Control::New()
 {
+  return New(ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT);
+}
+
+Toolkit::Control Control::New(ControlBehaviour additionalBehaviour)
+{
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr<Control> controlImpl = new Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT));
+  IntrusivePtr<Control> controlImpl = new Control(ControlBehaviour(CONTROL_BEHAVIOUR_DEFAULT | additionalBehaviour));
 
   // Pass ownership to handle
   Toolkit::Control handle(*controlImpl);

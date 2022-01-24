@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,9 @@ class TextLabel : public Control, public Text::ControlInterface, public Text::Sc
 public:
   /**
    * @copydoc Dali::Toollkit::TextLabel::New()
+   * @param[in] additionalBehaviour custom behavior flags for this TextLabel. Default is CONTROL_BEHAVIOUR_DEFAULT
    */
-  static Toolkit::TextLabel New();
+  static Toolkit::TextLabel New(ControlBehaviour additionalBehaviour = ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT);
 
   // Properties
 
@@ -180,8 +181,10 @@ public: // From AnchorControlInterface
 private: // Implementation
   /**
    * Construct a new TextLabel.
+   *
+   * @param[in] additionalBehaviour additional behaviour flags for this TextLabel
    */
-  TextLabel();
+  TextLabel(ControlBehaviour additionalBehaviour);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
