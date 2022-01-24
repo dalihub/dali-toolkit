@@ -580,13 +580,6 @@ DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Dali::Actor control, Dali::
   */
 DALI_TOOLKIT_API void SetAccessibilityConstructor(Dali::Actor control, std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Dali::Actor)> constructor);
 
-/**
- * Returns accessibility object bound to actor, if any
- *
- * This method won't bound new accessibility object. Use Dali::Accessibility::Accessible::Get in that case.
- */
-DALI_TOOLKIT_API Dali::Accessibility::Accessible* GetBoundAccessibilityObject(Dali::Actor control);
-
 } // namespace DevelControl
 
 } // namespace Toolkit
