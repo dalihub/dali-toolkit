@@ -614,7 +614,7 @@ void TextVisual::CreateTextureSet(TilingInfo& info, Renderer& renderer, Sampler&
     ++textureSetIndex;
   }
 
-  if(styleEnabled && isOverlayStyle)
+  if(styleEnabled && isOverlayStyle && info.styleBuffer)
   {
     PixelData overlayStyleData = ConvertToPixelData(info.styleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888);
     AddTexture(textureSet, overlayStyleData, sampler, textureSetIndex);
