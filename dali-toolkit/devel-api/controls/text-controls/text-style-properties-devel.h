@@ -103,7 +103,7 @@ enum
   /**
    * @brief The width in pixels of the dashes of the dashed underline. Only valid when "DASHED" underline type is used.
    * @details Name "dashWidth", type Property::STRING or Property::FLOAT. e.g. "1.0" or 1.f
-   * @note Optional. If not provided then the default width is used (1 pixel).
+   * @note Optional. If not provided then the default width is used (2 pixel).
    */
   DASH_WIDTH,
 
