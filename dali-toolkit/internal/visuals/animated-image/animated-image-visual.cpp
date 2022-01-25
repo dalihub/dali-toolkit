@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,8 @@ namespace Internal
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(8); // 5 transform properties + ltr, wrap, pixel area,
+
 // stop behavior
 DALI_ENUM_TO_STRING_TABLE_BEGIN(STOP_BEHAVIOR)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::Toolkit::DevelImageVisual::StopBehavior, CURRENT_FRAME)
@@ -552,6 +554,7 @@ void AnimatedImageVisual::OnInitialize()
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
   mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   // Register transform properties
   mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
@@ -807,7 +810,7 @@ TextureSet AnimatedImageVisual::SetLoadingFailed()
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "ResourceReady(ResourceStatus::FAILED)\n");
   ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
 
-  Actor actor = mPlacementActor.GetHandle();
+  Actor   actor     = mPlacementActor.GetHandle();
   Vector2 imageSize = Vector2::ZERO;
   if(actor)
   {
@@ -834,10 +837,9 @@ Shader AnimatedImageVisual::GenerateShader() const
   shader = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
     ImageVisualShaderFeature::FeatureBuilder()
-    .ApplyDefaultTextureWrapMode(defaultWrapMode)
-    .EnableRoundedCorner(IsRoundedCornerRequired())
-    .EnableBorderline(IsBorderlineRequired())
-  );
+      .ApplyDefaultTextureWrapMode(defaultWrapMode)
+      .EnableRoundedCorner(IsRoundedCornerRequired())
+      .EnableBorderline(IsBorderlineRequired()));
   return shader;
 }
 

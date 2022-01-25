@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
-#include <dali/devel-api/common/stage.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/utility/npatch-helper.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
-#include <dali-toolkit/devel-api/utility/npatch-helper.h>
 #include <dali-toolkit/internal/visuals/rendering-addon.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -44,6 +44,10 @@ namespace Toolkit
 {
 namespace Internal
 {
+namespace
+{
+const int CUSTOM_PROPERTY_COUNT(10); // 5 transform properties + fixed(3),stretch,aux
+}
 
 /////////////////NPatchVisual////////////////
 
@@ -294,10 +298,10 @@ void NPatchVisual::OnInitialize()
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
   Shader   shader   = mImageVisualShaderFactory.GetShader(
     mFactoryCache,
-    ImageVisualShaderFeature::FeatureBuilder()
-  );
+    ImageVisualShaderFeature::FeatureBuilder());
 
   mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   //Register transform properties
   mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
@@ -337,12 +341,12 @@ Geometry NPatchVisual::CreateGeometry()
       Uint16Pair gridSize(2 * data->GetStretchPixelsX().Size() + 1, 2 * data->GetStretchPixelsY().Size() + 1);
       if(!data->GetRenderingMap())
       {
-        geometry = !mBorderOnly ?  NPatchHelper::CreateGridGeometry(gridSize) :  NPatchHelper::CreateBorderGeometry(gridSize);
+        geometry = !mBorderOnly ? NPatchHelper::CreateGridGeometry(gridSize) : NPatchHelper::CreateBorderGeometry(gridSize);
       }
       else
       {
         uint32_t elementCount[2];
-        geometry = !mBorderOnly ? RenderingAddOn::Get().CreateGeometryGrid(data->GetRenderingMap(), gridSize, elementCount) :  NPatchHelper::CreateBorderGeometry(gridSize);
+        geometry = !mBorderOnly ? RenderingAddOn::Get().CreateGeometryGrid(data->GetRenderingMap(), gridSize, elementCount) : NPatchHelper::CreateBorderGeometry(gridSize);
         if(mImpl->mRenderer)
         {
           RenderingAddOn::Get().SubmitRenderTask(mImpl->mRenderer, data->GetRenderingMap());
@@ -369,8 +373,8 @@ Shader NPatchVisual::CreateShader()
 
   auto fragmentShader = mAuxiliaryPixelBuffer ? SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG
                                               : SHADER_NPATCH_VISUAL_SHADER_FRAG;
-  auto shaderType     = mAuxiliaryPixelBuffer ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
-                                              : VisualFactoryCache::NINE_PATCH_SHADER;
+  auto shaderType = mAuxiliaryPixelBuffer ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
+                                          : VisualFactoryCache::NINE_PATCH_SHADER;
 
   // ask loader for the regions
   if(mLoader.GetNPatchData(mId, data))
@@ -453,7 +457,7 @@ void NPatchVisual::ApplyTextureAndUniforms()
     DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.GetUrl().c_str());
     textureSet = TextureSet::New();
 
-    Actor actor = mPlacementActor.GetHandle();
+    Actor   actor     = mPlacementActor.GetHandle();
     Vector2 imageSize = Vector2::ZERO;
     if(actor)
     {
@@ -556,7 +560,7 @@ void NPatchVisual::LoadComplete(bool loadSuccess, TextureInformation textureInfo
       SetResource();
     }
   }
-  else  // for the ReturnType::PIXEL_BUFFER
+  else // for the ReturnType::PIXEL_BUFFER
   {
     if(loadSuccess && textureInformation.url == mAuxiliaryUrl.GetUrl())
     {

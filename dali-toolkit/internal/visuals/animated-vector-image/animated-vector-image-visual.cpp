@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-signals-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-manager.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
@@ -44,6 +44,8 @@ namespace Internal
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(6); // 5 transform properties + pixel area,
+
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 // stop behavior
@@ -289,6 +291,7 @@ void AnimatedVectorImageVisual::OnInitialize(void)
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
 
   mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   TextureSet textureSet = TextureSet::New();
   mImpl->mRenderer.SetTextures(textureSet);
@@ -307,7 +310,7 @@ void AnimatedVectorImageVisual::DoSetOnScene(Actor& actor)
   if(mLoadFailed)
   {
     Vector2 imageSize = Vector2::ZERO;
-    imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+    imageSize         = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
     mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
     actor.AddRenderer(mImpl->mRenderer);
     ResourceReady(Toolkit::Visual::ResourceStatus::FAILED);
@@ -627,13 +630,11 @@ Shader AnimatedVectorImageVisual::GenerateShader() const
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
       ImageVisualShaderFeature::FeatureBuilder()
-      .EnableRoundedCorner(IsRoundedCornerRequired())
-      .EnableBorderline(IsBorderlineRequired())
-    );
+        .EnableRoundedCorner(IsRoundedCornerRequired())
+        .EnableBorderline(IsBorderlineRequired()));
   }
   return shader;
 }
-
 
 } // namespace Internal
 

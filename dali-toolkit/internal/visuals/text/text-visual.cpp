@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ namespace Internal
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(10); // 5 transform properties + anim,premul,size,offset,multicol
+
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 /**
@@ -257,6 +259,7 @@ void TextVisual::OnInitialize()
   Shader   shader   = GetTextShader(mFactoryCache, TextType::SINGLE_COLOR_TEXT, TextType::NO_EMOJI, TextType::NO_STYLES);
 
   mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 }
 
 void TextVisual::DoSetProperties(const Property::Map& propertyMap)
@@ -555,7 +558,7 @@ void TextVisual::UpdateRenderer()
       const bool markupProcessorEnabled = mController->IsMarkupProcessorEnabled();
       const bool strikethroughEnabled   = mController->GetTextModel()->IsStrikethroughEnabled();
 
-      const bool styleEnabled = (shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled || strikethroughEnabled);
+      const bool styleEnabled   = (shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled || markupProcessorEnabled || strikethroughEnabled);
       const bool isOverlayStyle = underlineEnabled || strikethroughEnabled;
 
       AddRenderer(control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled, isOverlayStyle);
