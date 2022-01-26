@@ -356,6 +356,23 @@ using SelectionClearedSignalType = Signal<void(TextField)>;
 DALI_TOOLKIT_API SelectionClearedSignalType& SelectionClearedSignal(TextField textField);
 
 /**
+ * @brief selection start signal type.
+ */
+using SelectionStartedSignalType = Signal<void(TextField)>;
+
+/**
+ * @brief This signal is emitted when the selection start.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( TextField textField);
+ * @endcode
+ * @param[in] textField The instance of TextField.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API SelectionStartedSignalType& SelectionStartedSignal(TextField textField);
+
+/**
  * @brief Get the rendered size of a specific text range.
  * if the requested text is at multilines, multiple sizes will be returned for each text located in a separate line.
  * if a line contains characters with different directions, multiple sizes will be returned for each block of contiguous characters with the same direction.

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,6 +138,11 @@ public:
    * @copydoc TextField::SelectionClearedSignal()
    */
   DevelTextField::SelectionClearedSignalType& SelectionClearedSignal();
+
+  /**
+   * @copydoc TextField::SelectionStartedSignal()
+   */
+  DevelTextField::SelectionStartedSignalType& SelectionStartedSignal();
 
 private: // From Control
   /**
@@ -418,6 +423,11 @@ private: // Implementation
   void EmitSelectionClearedSignal();
 
   /**
+   * @brief Emits SelectionStarted signal.
+   */
+  void EmitSelectionStartedSignal();
+
+  /**
    * @brief Callback function for when the layout is changed.
    * @param[in] actor The actor whose layoutDirection is changed.
    * @param[in] type  The layoutDirection.
@@ -467,6 +477,7 @@ private: // Data
   Toolkit::DevelTextField::CursorPositionChangedSignalType mCursorPositionChangedSignal;
   Toolkit::DevelTextField::SelectionChangedSignalType      mSelectionChangedSignal;
   Toolkit::DevelTextField::SelectionClearedSignalType      mSelectionClearedSignal;
+  Toolkit::DevelTextField::SelectionStartedSignalType      mSelectionStartedSignal;
 
   InputMethodContext               mInputMethodContext;
   Text::ControllerPtr              mController;
@@ -497,6 +508,8 @@ private: // Data
   //args for selection changed event
   uint32_t mOldSelectionStart;
   uint32_t mOldSelectionEnd;
+
+  bool mSelectionStarted : 1; ///< If true, emits SelectionStartedSignal at the end of OnRelayout().
 
 protected:
   struct PropertyHandler;

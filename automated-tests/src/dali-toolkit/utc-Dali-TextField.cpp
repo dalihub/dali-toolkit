@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,6 +131,7 @@ static bool                                       gSelectionChangedCallbackCalle
 static uint32_t                                   oldSelectionStart;
 static uint32_t                                   oldSelectionEnd;
 static bool                                       gSelectionClearedCallbackCalled;
+static bool                                       gSelectionStartedCallbackCalled;
 static bool                                       gAnchorClickedCallBackCalled;
 static bool                                       gAnchorClickedCallBackNotCalled;
 static bool                                       gTextChangedCallBackCalled;
@@ -227,6 +228,13 @@ static void TestSelectionClearedCallback(TextField control)
   tet_infoline(" TestSelectionClearedCallback");
 
   gSelectionClearedCallbackCalled = true;
+}
+
+static void TestSelectionStartedCallback(TextField control)
+{
+  tet_infoline(" TestSelectionStartedCallback");
+
+  gSelectionStartedCallbackCalled = true;
 }
 
 static void TestSelectionChangedCallback(TextField control, uint32_t oldStart, uint32_t oldEnd)
@@ -4778,6 +4786,72 @@ int utcDaliTextFieldSelectionClearedSignal(void)
   application.Render();
 
   DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
+
+  END_TEST;
+}
+
+int utcDaliTextFieldSelectionStartedSignal(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldSelectionStartedSignal");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK(field);
+
+  application.GetScene().Add(field);
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextField::SelectionStartedSignal(field).Connect(&TestSelectionStartedCallback);
+  bool selectionStartedSignal = false;
+  field.ConnectSignal(testTracker, "selectionStarted", CallbackFunctor(&selectionStartedSignal));
+
+  field.SetProperty(TextField::Property::TEXT, "Hello\nworld\nHello world");
+  field.SetProperty(TextField::Property::POINT_SIZE, 10.f);
+  field.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  field.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  field.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text field
+  TestGenerateTap(application, 3.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text & Select some text in the right of the current cursor position
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionStartedCallbackCalled);
+
+  // remove selection
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  gSelectionStartedCallbackCalled = false;
+
+  DevelTextField::SelectText(field, 1, 3);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionStartedCallbackCalled);
 
   END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,6 +140,7 @@ static bool                                        gSelectionChangedCallbackCall
 static uint32_t                                    oldSelectionStart;
 static uint32_t                                    oldSelectionEnd;
 static bool                                        gSelectionClearedCallbackCalled;
+static bool                                        gSelectionStartedCallbackCalled;
 static bool                                        gAnchorClickedCallBackCalled;
 static bool                                        gAnchorClickedCallBackNotCalled;
 static bool                                        gTextChangedCallBackCalled;
@@ -164,6 +165,13 @@ struct CallbackFunctor
   }
   bool* mCallbackFlag;
 };
+
+static void TestSelectionStartedCallback(TextEditor control)
+{
+  tet_infoline(" TestSelectionStartedCallback");
+
+  gSelectionStartedCallbackCalled = true;
+}
 
 static void TestSelectionClearedCallback(TextEditor control)
 {
@@ -5018,6 +5026,72 @@ int utcDaliTextEditorSelectionClearedSignal(void)
   application.Render();
 
   DALI_TEST_CHECK(gSelectionClearedCallbackCalled);
+
+  END_TEST;
+}
+
+int utcDaliTextEditorSelectionStartedSignal(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorSelectionStartedSignal");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK(editor);
+
+  application.GetScene().Add(editor);
+
+  // connect to the selection changed signal.
+  ConnectionTracker* testTracker = new ConnectionTracker();
+  DevelTextEditor::SelectionStartedSignal(editor).Connect(&TestSelectionStartedCallback);
+  bool selectionStartedSignal = false;
+  editor.ConnectSignal(testTracker, "selectionStarted", CallbackFunctor(&selectionStartedSignal));
+
+  editor.SetProperty(TextEditor::Property::TEXT, "Hello\nworld\nHello world");
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
+  editor.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  TestGenerateTap(application, 3.0f, 25.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text & Select some text in the right of the current cursor position
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::DOWN, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionStartedCallbackCalled);
+
+  // remove selection
+  application.ProcessEvent(GenerateKey("", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::UP, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE));
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  gSelectionStartedCallbackCalled = false;
+
+  DevelTextEditor::SelectText(editor, 1, 3);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(gSelectionStartedCallbackCalled);
 
   END_TEST;
 }
