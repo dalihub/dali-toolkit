@@ -351,6 +351,7 @@ struct Controller::Impl
     mShadowSetByString(false),
     mOutlineSetByString(false),
     mFontStyleSetByString(false),
+    mStrikethroughSetByString(false),
     mShouldClearFocusOnEscape(true),
     mLayoutDirection(LayoutDirection::LEFT_TO_RIGHT),
     mTextFitMinSize(DEFAULT_TEXTFIT_MIN),
@@ -935,6 +936,12 @@ private:
    * @param shouldClearPreUnderlineRuns Whether should clear the existing Underlined-Glyph-Runs in Visual-Model
    */
   void CopyUnderlinedFromLogicalToVisualModels(bool shouldClearPreUnderlineRuns);
+
+  /**
+   * @brief Copy strikethrough-Character-Runs from Logical-Model to strikethrough-Glyph-Runs in Visual-Model
+   *
+   */
+  void CopyStrikethroughFromLogicalToVisualModels();
 
 public:
   ControlInterface*            mControlInterface;           ///< Reference to the text controller.

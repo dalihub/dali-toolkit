@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MODEL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -277,6 +277,16 @@ public:
   const Vector4& GetStrikethroughColor() const override;
 
   bool IsStrikethroughEnabled() const override;
+
+  /**
+   * @copydoc ModelInterface::GetNumberOfStrikethroughRuns()
+   */
+  Length GetNumberOfStrikethroughRuns() const override;
+
+  /**
+   * @copydoc ModelInterface::GetStrikethroughRuns()
+   */
+  void GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns, StrikethroughRunIndex index, Length numberOfRuns) const override;
 
 private: // Private contructors & copy operator.
   /**

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,9 +96,14 @@ struct Base::Impl
     void UpdatePropertyMap(const Property::Map& map);
 
     /**
-     * Register or set the uniform properties onto the renderer
+     * Register the uniform properties onto the renderer
      */
     void RegisterUniforms(Renderer renderer, Toolkit::Direction::Type direction);
+
+    /**
+     * Set the uniform properties onto the renderer
+     */
+    void SetUniforms(Renderer renderer, Toolkit::Direction::Type direction);
 
     /**
      * Convert the control size and the transform attributes into the actual
@@ -112,8 +117,8 @@ struct Base::Impl
     Vector4              mOffsetSizeMode;
     Toolkit::Align::Type mOrigin;
     Toolkit::Align::Type mAnchorPoint;
-    Property::Index      mOffsetIndex;
-    Property::Index      mSizeIndex;
+    Property::Index      mOffsetIndex{Property::INVALID_INDEX};
+    Property::Index      mSizeIndex{Property::INVALID_INDEX};
   };
 
   Renderer                        mRenderer;

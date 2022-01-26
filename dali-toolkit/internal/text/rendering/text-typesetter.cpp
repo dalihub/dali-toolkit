@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,6 +268,31 @@ bool IsGlyphUnderlined(GlyphIndex              index,
 
     if((run.glyphIndex <= index) && (index < run.glyphIndex + run.numberOfGlyphs))
     {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool doGlyphHaveStrikethrough(GlyphIndex                           index,
+                              const Vector<StrikethroughGlyphRun>& strikethroughRuns,
+                              Vector4&                             strikethroughColor)
+{
+  for(Vector<StrikethroughGlyphRun>::ConstIterator it    = strikethroughRuns.Begin(),
+                                                   endIt = strikethroughRuns.End();
+      it != endIt;
+      ++it)
+  {
+    const StrikethroughGlyphRun& run = *it;
+
+    if((run.glyphRun.glyphIndex <= index) && (index < run.glyphRun.glyphIndex + run.glyphRun.numberOfGlyphs))
+    {
+      if(run.isColorSet)
+      {
+        strikethroughColor = run.color;
+      }
+
       return true;
     }
   }
@@ -900,6 +925,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
   // Whether to use the default color.
   const bool     useDefaultColor = (NULL == colorsBuffer);
   const Vector4& defaultColor    = mModel->GetDefaultColor();
+  Vector4        currentStrikethroughColor;
 
   // Create and initialize the pixel buffer.
   GlyphData glyphData;
@@ -971,6 +997,12 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     Vector<GlyphRun> underlineRuns;
     underlineRuns.Resize(numberOfUnderlineRuns);
     mModel->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+
+    // Get the strikethrough runs.
+    const Length                  numberOfStrikethroughRuns = mModel->GetNumberOfStrikethroughRuns();
+    Vector<StrikethroughGlyphRun> strikethroughRuns;
+    strikethroughRuns.Resize(numberOfStrikethroughRuns);
+    mModel->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
 
     bool thereAreUnderlinedGlyphs = false;
     bool strikethroughGlyphsExist = false;
@@ -1044,10 +1076,12 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       const bool underlineGlyph = underlineEnabled || IsGlyphUnderlined(glyphIndex, underlineRuns);
       thereAreUnderlinedGlyphs  = thereAreUnderlinedGlyphs || underlineGlyph;
 
-      strikethroughGlyphsExist = strikethroughGlyphsExist || strikethroughEnabled;
+      currentStrikethroughColor     = strikethroughColor;
+      const bool strikethroughGlyph = strikethroughEnabled || doGlyphHaveStrikethrough(glyphIndex, strikethroughRuns, currentStrikethroughColor);
+      strikethroughGlyphsExist      = strikethroughGlyphsExist || strikethroughGlyph;
 
       // Are we still using the same fontId as previous
-      if((strikethroughEnabled || underlineGlyph) && (glyphInfo->fontId != lastUnderlinedFontId))
+      if((strikethroughGlyph || underlineGlyph) && (glyphInfo->fontId != lastUnderlinedFontId))
       {
         // We need to fetch fresh font underline metrics
         FetchFontDecorationlinesMetrics(fontClient, glyphInfo, currentUnderlinePosition, underlineHeight, currentUnderlineThickness, maxUnderlineThickness, lastUnderlinedFontId, strikethroughHeight, currentStrikethroughThickness, maxStrikethroughThickness);
@@ -1255,43 +1289,83 @@ Devel::PixelBuffer Typesetter::CombineImageBuffer(Devel::PixelBuffer topPixelBuf
   return combinedPixelBuffer;
 }
 
+Devel::PixelBuffer Typesetter::ApplyUnderlineMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset)
+{
+  // Underline-tags (this is for Markup case)
+  // Get the underline runs.
+  const Length     numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
+  Vector<GlyphRun> underlineRuns;
+  underlineRuns.Resize(numberOfUnderlineRuns);
+  mModel->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+
+  // Iterate on the consecutive underlined glyph run and connect them into one chunk of underlined characters.
+  Vector<GlyphRun>::ConstIterator itGlyphRun    = underlineRuns.Begin();
+  Vector<GlyphRun>::ConstIterator endItGlyphRun = underlineRuns.End();
+  GlyphIndex                      startGlyphIndex, endGlyphIndex;
+
+  //The outer loop to iterate on the separated chunks of underlined glyph runs
+  while(itGlyphRun != endItGlyphRun)
+  {
+    startGlyphIndex = itGlyphRun->glyphIndex;
+    endGlyphIndex   = startGlyphIndex;
+    //The inner loop to make a connected underline for the consecutive characters
+    do
+    {
+      endGlyphIndex += itGlyphRun->numberOfGlyphs;
+      itGlyphRun++;
+    } while(itGlyphRun != endItGlyphRun && itGlyphRun->glyphIndex == endGlyphIndex);
+
+    endGlyphIndex--;
+
+    // Create the image buffer for underline
+    Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset, startGlyphIndex, endGlyphIndex);
+    // Combine the two buffers
+    topPixelBuffer = CombineImageBuffer(topPixelBuffer, underlineImageBuffer, bufferWidth, bufferHeight);
+  }
+
+  return topPixelBuffer;
+}
+
+Devel::PixelBuffer Typesetter::ApplyStrikethroughMarkupImageBuffer(Devel::PixelBuffer topPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset)
+{
+  // strikethrough-tags (this is for Markup case)
+  // Get the strikethrough runs.
+  const Length                  numberOfStrikethroughRuns = mModel->GetNumberOfStrikethroughRuns();
+  Vector<StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+  mModel->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  // Iterate on the consecutive strikethrough glyph run and connect them into one chunk of strikethrough characters.
+  Vector<StrikethroughGlyphRun>::ConstIterator itGlyphRun    = strikethroughRuns.Begin();
+  Vector<StrikethroughGlyphRun>::ConstIterator endItGlyphRun = strikethroughRuns.End();
+  GlyphIndex                                   startGlyphIndex, endGlyphIndex;
+
+  //The outer loop to iterate on the separated chunks of strikethrough glyph runs
+  while(itGlyphRun != endItGlyphRun)
+  {
+    startGlyphIndex = itGlyphRun->glyphRun.glyphIndex;
+    endGlyphIndex   = startGlyphIndex + itGlyphRun->glyphRun.numberOfGlyphs - 1;
+
+    // Create the image buffer for strikethrough
+    Devel::PixelBuffer strikethroughImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_STRIKETHROUGH, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset, startGlyphIndex, endGlyphIndex);
+    // Combine the two buffers
+    topPixelBuffer = CombineImageBuffer(strikethroughImageBuffer, topPixelBuffer, bufferWidth, bufferHeight);
+
+    itGlyphRun++;
+  }
+
+  return topPixelBuffer;
+}
+
 Devel::PixelBuffer Typesetter::ApplyMarkupProcessorOnPixelBuffer(Devel::PixelBuffer topPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset)
 {
   // Apply the markup-Processor if enabled
   const bool markupProcessorEnabled = mModel->IsMarkupProcessorEnabled();
   if(markupProcessorEnabled)
   {
-    // Underline-tags (this is for Markup case)
-    // Get the underline runs.
-    const Length     numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
-    Vector<GlyphRun> underlineRuns;
-    underlineRuns.Resize(numberOfUnderlineRuns);
-    mModel->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+    topPixelBuffer = ApplyUnderlineMarkupImageBuffer(topPixelBuffer, bufferWidth, bufferHeight, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset);
 
-    // Iterate on the consecutive underlined glyph run and connect them into one chunk of underlined characters.
-    Vector<GlyphRun>::ConstIterator itGlyphRun    = underlineRuns.Begin();
-    Vector<GlyphRun>::ConstIterator endItGlyphRun = underlineRuns.End();
-    GlyphIndex                      startGlyphIndex, endGlyphIndex;
-
-    //The outer loop to iterate on the separated chunks of underlined glyph runs
-    while(itGlyphRun != endItGlyphRun)
-    {
-      startGlyphIndex = itGlyphRun->glyphIndex;
-      endGlyphIndex   = startGlyphIndex;
-      //The inner loop to make a connected underline for the consecutive characters
-      do
-      {
-        endGlyphIndex += itGlyphRun->numberOfGlyphs;
-        itGlyphRun++;
-      } while(itGlyphRun != endItGlyphRun && itGlyphRun->glyphIndex == endGlyphIndex);
-
-      endGlyphIndex--;
-
-      // Create the image buffer for underline
-      Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset, startGlyphIndex, endGlyphIndex);
-      // Combine the two buffers
-      topPixelBuffer = CombineImageBuffer(topPixelBuffer, underlineImageBuffer, bufferWidth, bufferHeight);
-    }
+    topPixelBuffer = ApplyStrikethroughMarkupImageBuffer(topPixelBuffer, bufferWidth, bufferHeight, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset);
   }
 
   return topPixelBuffer;

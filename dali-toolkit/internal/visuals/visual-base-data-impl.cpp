@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -385,12 +385,32 @@ void Internal::Visual::Base::Impl::Transform::GetPropertyMap(Property::Map& map)
 
 void Internal::Visual::Base::Impl::Transform::RegisterUniforms(Dali::Renderer renderer, Toolkit::Direction::Type direction)
 {
-  mSizeIndex   = renderer.RegisterProperty(SIZE, mSize);
-  mOffsetIndex = renderer.RegisterProperty(OFFSET, direction == Toolkit::Direction::LEFT_TO_RIGHT ? mOffset : mOffset * Vector2(-1.0f, 1.0f));
-  renderer.RegisterProperty(OFFSET_SIZE_MODE, mOffsetSizeMode);
-  renderer.RegisterProperty(ORIGIN, PointToVector2(mOrigin, direction) - Vector2(0.5, 0.5));
-  renderer.RegisterProperty(ANCHOR_POINT, Vector2(0.5, 0.5) - PointToVector2(mAnchorPoint, direction));
-  renderer.RegisterProperty(EXTRA_SIZE, mExtraSize);
+  // have to test if one of these properties has already been registered on the renderer; as some visuals use more than one renderer, so can't use stored property index.
+  //
+  if(Property::INVALID_INDEX == renderer.GetPropertyIndex(SIZE))
+  {
+    mSizeIndex   = renderer.RegisterUniqueProperty(SIZE, mSize);
+    mOffsetIndex = renderer.RegisterUniqueProperty(OFFSET, direction == Toolkit::Direction::LEFT_TO_RIGHT ? mOffset : mOffset * Vector2(-1.0f, 1.0f));
+    renderer.RegisterUniqueProperty(OFFSET_SIZE_MODE, mOffsetSizeMode);
+    renderer.RegisterUniqueProperty(ORIGIN, PointToVector2(mOrigin, direction) - Vector2(0.5, 0.5));
+    renderer.RegisterUniqueProperty(ANCHOR_POINT, Vector2(0.5, 0.5) - PointToVector2(mAnchorPoint, direction));
+    renderer.RegisterUniqueProperty(EXTRA_SIZE, mExtraSize);
+  }
+  else
+  {
+    SetUniforms(renderer, direction);
+  }
+}
+
+void Internal::Visual::Base::Impl::Transform::SetUniforms(Dali::Renderer renderer, Toolkit::Direction::Type direction)
+{
+  renderer.SetProperty(mSizeIndex, mSize);
+  renderer.SetProperty(mOffsetIndex, direction == Toolkit::Direction::LEFT_TO_RIGHT ? mOffset : mOffset * Vector2(-1.0f, 1.0f));
+
+  renderer.SetProperty(renderer.GetPropertyIndex(OFFSET_SIZE_MODE), mOffsetSizeMode);
+  renderer.SetProperty(renderer.GetPropertyIndex(ORIGIN), PointToVector2(mOrigin, direction) - Vector2(0.5, 0.5));
+  renderer.SetProperty(renderer.GetPropertyIndex(ANCHOR_POINT), Vector2(0.5, 0.5) - PointToVector2(mAnchorPoint, direction));
+  renderer.SetProperty(renderer.GetPropertyIndex(EXTRA_SIZE), mExtraSize);
 }
 
 Vector2 Internal::Visual::Base::Impl::Transform::GetVisualSize(const Vector2& controlSize)

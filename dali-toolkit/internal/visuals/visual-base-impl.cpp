@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,16 +135,16 @@ void Visual::Base::Initialize()
 
     if(IsRoundedCornerRequired())
     {
-      mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
-      mImpl->mRenderer.RegisterProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
+      mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
+      mImpl->mRenderer.RegisterUniqueProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
 
       mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
     }
     if(IsBorderlineRequired())
     {
-      mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_WIDTH,  BORDERLINE_WIDTH,  mImpl->mBorderlineWidth);
-      mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_COLOR,  BORDERLINE_COLOR,  mImpl->mBorderlineColor);
-      mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
+      mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::BORDERLINE_WIDTH, BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
+      mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::BORDERLINE_COLOR, BORDERLINE_COLOR, mImpl->mBorderlineColor);
+      mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
 
       mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
     }
@@ -307,10 +307,10 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           // Assume that DoAction call UPDATE_PROPERTY.
           // We must regist properies into renderer, and update shader.
 
-          // Borderline added by this action. Regist property to renderer.
-          mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_WIDTH, BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
-          mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_COLOR, BORDERLINE_COLOR, mImpl->mBorderlineColor);
-          mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
+          // Borderline added by this action. Register property to renderer.
+          mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::BORDERLINE_WIDTH, BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
+          mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::BORDERLINE_COLOR, BORDERLINE_COLOR, mImpl->mBorderlineColor);
+          mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
 
           // Make Blend mode ON_WITHOUT_CULL for transparent mix color.
           mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
@@ -386,8 +386,8 @@ void Visual::Base::SetProperties(const Property::Map& propertyMap)
           // We must regist properies into renderer, and update shader.
 
           // CornerRadius added by this action. Regist property to renderer.
-          mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
-          mImpl->mRenderer.RegisterProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
+          mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
+          mImpl->mRenderer.RegisterUniqueProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
 
           // Change the shader must not be occured many times. we always have to use corner radius feature.
           mImpl->mAlwaysUsingCornerRadius = true;
@@ -706,7 +706,7 @@ void Visual::Base::RegisterMixColor()
   // (Color and Primitive visuals will register their own and save to this index)
   if(mImpl->mMixColorIndex == Property::INVALID_INDEX)
   {
-    mImpl->mMixColorIndex = mImpl->mRenderer.RegisterProperty(
+    mImpl->mMixColorIndex = mImpl->mRenderer.RegisterUniqueProperty(
       Toolkit::Visual::Property::MIX_COLOR,
       MIX_COLOR,
       Vector3(mImpl->mMixColor));
@@ -1050,16 +1050,16 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
   if(index == Property::INVALID_INDEX)
   {
     if(IsTypeAvailableForBorderline(mImpl->mType) &&
-       ((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_WIDTH)  || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_WIDTH) ||
-        (key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_COLOR)  || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_COLOR) ||
+       ((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_WIDTH) || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_WIDTH) ||
+        (key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_COLOR) || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_COLOR) ||
         (key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::BORDERLINE_OFFSET) || (key.type == Property::Key::STRING && key.stringKey == BORDERLINE_OFFSET)))
     {
       mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON_WITHOUT_CULL);
 
       // Register borderline properties
-      mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_WIDTH, BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
-      mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_COLOR, BORDERLINE_COLOR, mImpl->mBorderlineColor);
-      mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
+      mImpl->mBorderlineWidthIndex  = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::BORDERLINE_WIDTH, BORDERLINE_WIDTH, mImpl->mBorderlineWidth);
+      mImpl->mBorderlineColorIndex  = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::BORDERLINE_COLOR, BORDERLINE_COLOR, mImpl->mBorderlineColor);
+      mImpl->mBorderlineOffsetIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::BORDERLINE_OFFSET, BORDERLINE_OFFSET, mImpl->mBorderlineOffset);
 
       // Borderline is animated now. we always have to use borderline feature.
       mImpl->mAlwaysUsingBorderline = true;
@@ -1072,10 +1072,10 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
     else if(IsTypeAvailableForCornerRadius(mImpl->mType) && ((key.type == Property::Key::INDEX && key.indexKey == DevelVisual::Property::CORNER_RADIUS) || (key.type == Property::Key::STRING && key.stringKey == CORNER_RADIUS)))
     {
       // Register CORNER_RADIUS property
-      mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
-      mImpl->mRenderer.RegisterProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
+      mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelVisual::Property::CORNER_RADIUS, CORNER_RADIUS, mImpl->mCornerRadius);
+      mImpl->mRenderer.RegisterUniqueProperty(CORNER_RADIUS_POLICY, mImpl->mCornerRadiusPolicy);
 
-      // ConerRadius is animated now. we always have to use corner radius feature.
+      // CornerRadius is animated now. we always have to use corner radius feature.
       mImpl->mAlwaysUsingCornerRadius = true;
 
       if(!IsBorderlineRequired())

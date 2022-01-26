@@ -337,3 +337,42 @@ int UtcDaliTextEditorTextPositionWithMinLineAndBigFont(void)
 
   END_TEST;
 }
+
+int UtcDaliTextEditorMarkupStrikethrough(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMarkupStrikethrough ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add(textEditor);
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, "<s>ABC</s>EF<s color='red'>GH</s>");
+  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t expectedNumberOfStrikethroughGlyphs = 2u;
+
+  Toolkit::Internal::TextEditor& textEditorImpl            = GetImpl(textEditor);
+  const Text::Length             numberOfStrikethroughRuns = textEditorImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughGlyphs, TEST_LOCATION);
+
+  Vector<StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+  textEditorImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  //ABC have strikethrough
+  DALI_TEST_EQUALS(strikethroughRuns[0u].glyphRun.glyphIndex, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(strikethroughRuns[0u].glyphRun.numberOfGlyphs, 3u, TEST_LOCATION);
+  DALI_TEST_CHECK(!strikethroughRuns[0u].isColorSet);
+
+  //GH have strikethrough
+  DALI_TEST_EQUALS(strikethroughRuns[1u].glyphRun.glyphIndex, 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(strikethroughRuns[1u].glyphRun.numberOfGlyphs, 2u, TEST_LOCATION);
+  DALI_TEST_CHECK(strikethroughRuns[1u].isColorSet);
+
+  END_TEST;
+}

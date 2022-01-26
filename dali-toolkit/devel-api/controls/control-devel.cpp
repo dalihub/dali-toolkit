@@ -337,11 +337,6 @@ void NotifyAccessibilityStateChange(Dali::Actor control, Dali::Accessibility::St
   }
 }
 
-Dali::Accessibility::Accessible* GetBoundAccessibilityObject(Dali::Actor control)
-{
-  return Dali::Accessibility::Accessible::Get(control);
-}
-
 } // namespace DevelControl
 
 } // namespace Toolkit

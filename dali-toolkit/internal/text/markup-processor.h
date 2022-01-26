@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/embedded-item.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
+#include <dali-toolkit/internal/text/strikethrough-character-run.h>
 #include <dali-toolkit/internal/text/underlined-character-run.h>
 
 namespace Dali
@@ -40,29 +41,32 @@ namespace Text
  */
 struct MarkupProcessData
 {
-  MarkupProcessData(Vector<ColorRun>&               colorRuns,
-                    Vector<FontDescriptionRun>&     fontRuns,
-                    Vector<EmbeddedItem>&           items,
-                    Vector<Anchor>&                 anchors,
-                    Vector<UnderlinedCharacterRun>& underlinedCharacterRuns,
-                    Vector<ColorRun>&               backgroundColorRuns)
+  MarkupProcessData(Vector<ColorRun>&                  colorRuns,
+                    Vector<FontDescriptionRun>&        fontRuns,
+                    Vector<EmbeddedItem>&              items,
+                    Vector<Anchor>&                    anchors,
+                    Vector<UnderlinedCharacterRun>&    underlinedCharacterRuns,
+                    Vector<ColorRun>&                  backgroundColorRuns,
+                    Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns)
   : colorRuns(colorRuns),
     fontRuns(fontRuns),
     items(items),
     anchors(anchors),
     underlinedCharacterRuns(underlinedCharacterRuns),
     backgroundColorRuns(backgroundColorRuns),
+    strikethroughCharacterRuns(strikethroughCharacterRuns),
     markupProcessedText()
   {
   }
 
-  Vector<ColorRun>&               colorRuns;               ///< The color runs.
-  Vector<FontDescriptionRun>&     fontRuns;                ///< The font description runs.
-  Vector<EmbeddedItem>&           items;                   ///< The embedded items.
-  Vector<Anchor>&                 anchors;                 ///< The anchors.
-  Vector<UnderlinedCharacterRun>& underlinedCharacterRuns; ///< The underlined character runs.
-  Vector<ColorRun>&               backgroundColorRuns;     ///< The background color runs.
-  std::string                     markupProcessedText;     ///< The mark-up string.
+  Vector<ColorRun>&                  colorRuns;                  ///< The color runs.
+  Vector<FontDescriptionRun>&        fontRuns;                   ///< The font description runs.
+  Vector<EmbeddedItem>&              items;                      ///< The embedded items.
+  Vector<Anchor>&                    anchors;                    ///< The anchors.
+  Vector<UnderlinedCharacterRun>&    underlinedCharacterRuns;    ///< The underlined character runs.
+  Vector<ColorRun>&                  backgroundColorRuns;        ///< The background color runs.
+  Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns; ///< The strikethrough character runs.
+  std::string                        markupProcessedText;        ///< The mark-up string.
 };
 
 /**

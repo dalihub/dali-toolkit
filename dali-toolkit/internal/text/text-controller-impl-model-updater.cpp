@@ -571,6 +571,7 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
     if(impl.mModel->mVisualModel->IsMarkupProcessorEnabled())
     {
       impl.CopyUnderlinedFromLogicalToVisualModels(true);
+      impl.CopyStrikethroughFromLogicalToVisualModels();
     }
 
     updated = true;

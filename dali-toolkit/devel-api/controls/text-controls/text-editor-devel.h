@@ -434,6 +434,23 @@ using SelectionClearedSignalType = Signal<void(TextEditor)>;
 DALI_TOOLKIT_API SelectionClearedSignalType& SelectionClearedSignal(TextEditor textEditor);
 
 /**
+ * @brief selection start signal type.
+ */
+using SelectionStartedSignalType = Signal<void(TextEditor)>;
+
+/**
+ * @brief This signal is emitted when the selection start.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( TextEditor textEditor);
+ * @endcode
+ * @param[in] textEditor The instance of TextEditor.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API SelectionStartedSignalType& SelectionStartedSignal(TextEditor textEditor);
+
+/**
  * @brief Select the whole text of TextEditor.
  *
  * @param[in] textEditor The instance of TextEditor.

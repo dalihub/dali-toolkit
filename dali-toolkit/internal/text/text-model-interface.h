@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MODEL_INTERFACE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
+#include <dali-toolkit/internal/text/strikethrough-glyph-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
@@ -377,6 +378,22 @@ public:
    * @return Returns the override height for a strikethrough, 0 indicates that adaptor will determine the height
    */
   virtual float GetStrikethroughHeight() const = 0;
+
+  /**
+   * @brief Retrieves the number of strikethrough runs.
+   *
+   * @return The number of strikethrough runs.
+   */
+  virtual Length GetNumberOfStrikethroughRuns() const = 0;
+
+  /**
+   * @brief Retrieves the strikethrough runs.
+   *
+   * @param[out] strikethroughRuns Pointer to a buffer where the strikethrough runs are copied.
+   * @param[in] index Index of the first strikethrough run to be copied.
+   * @param[in] numberOfRuns Number of strikethrough runs to be copied.
+   */
+  virtual void GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns, StrikethroughRunIndex index, Length numberOfRuns) const = 0;
 };
 
 } // namespace Text
