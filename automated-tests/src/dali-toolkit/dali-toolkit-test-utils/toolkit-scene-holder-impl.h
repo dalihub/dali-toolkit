@@ -119,6 +119,8 @@ public:
 
   Dali::Integration::SceneHolder::WheelEventSignalType& WheelEventSignal();
 
+  Dali::Integration::SceneHolder::WheelEventGeneratedSignalType& WheelEventGeneratedSignal();
+
   Integration::Scene GetScene();
 
   Dali::RenderSurfaceInterface& GetRenderSurface();

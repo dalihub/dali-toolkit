@@ -272,6 +272,11 @@ WheelEventSignalType& WheelEventSignal( Window window )
   return GetImplementation( window ).WheelEventSignal();
 }
 
+WheelEventGeneratedSignalType& WheelEventGeneratedSignal( Window window )
+{
+  return GetImplementation( window ).WheelEventGeneratedSignal();
+}
+
 VisibilityChangedSignalType& VisibilityChangedSignal( Window window )
 {
   return GetImplementation( window ).mVisibilityChangedSignal;

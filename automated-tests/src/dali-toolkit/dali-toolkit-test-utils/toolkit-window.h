@@ -95,6 +95,7 @@ namespace DevelWindow
 typedef Signal< void () > EventProcessingFinishedSignalType;
 typedef Signal< bool (const KeyEvent&) > KeyEventGeneratedSignalType;
 typedef Signal< void (const WheelEvent&) > WheelEventSignalType;
+typedef Signal< bool (const WheelEvent&) > WheelEventGeneratedSignalType;
 typedef Signal< void ( Window, bool ) > VisibilityChangedSignalType;
 
 Dali::Window Get( Actor actor );
@@ -107,6 +108,7 @@ void AddFramePresentedCallback( Window window, std::unique_ptr< CallbackBase > c
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window );
 KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Dali::Window window );
 WheelEventSignalType& WheelEventSignal( Window window );
+WheelEventGeneratedSignalType& WheelEventGeneratedSignal( Dali::Window window );
 VisibilityChangedSignalType& VisibilityChangedSignal( Window window );
 }
 

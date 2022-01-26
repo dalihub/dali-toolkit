@@ -115,6 +115,11 @@ Dali::Integration::SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSig
   return mScene.WheelEventSignal();
 }
 
+Dali::Integration::SceneHolder::WheelEventGeneratedSignalType& SceneHolder::WheelEventGeneratedSignal()
+{
+  return mScene.WheelEventGeneratedSignal();
+}
+
 Integration::Scene SceneHolder::GetScene()
 {
   return mScene;
@@ -233,6 +238,11 @@ SceneHolder::TouchEventSignalType& SceneHolder::TouchedSignal()
 SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
 {
   return GetImplementation( *this ).WheelEventSignal();
+}
+
+SceneHolder::WheelEventGeneratedSignalType& SceneHolder::WheelEventGeneratedSignal()
+{
+  return GetImplementation( *this ).WheelEventGeneratedSignal();
 }
 
 } // Integration

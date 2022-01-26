@@ -292,6 +292,12 @@ private:
   void OnTouch(const TouchEvent& touch);
 
   /**
+   * Callback for the wheel event when the custom wheel event occurs.
+   * @param[in] wheel The WheelEvent information
+   */
+  bool OnWheelEvent(const WheelEvent& wheel);
+
+  /**
    * Called when the window focus is changed.
    * @param[in] window The window whose focus is changed
    * @param[in] focusIn Whether the focus is in/out
@@ -302,6 +308,14 @@ private:
    * Get the focus Actor from current window
    */
   Actor GetFocusActorFromCurrentWindow();
+
+  /**
+   * Recursively deliver events to the control and its parents, until the event is consumed or the stage is reached.
+   * @param[in]  actor  The actor got WheelEvent.
+   * @param[in]  event  The WheelEvent.
+   * @return True if WheelEvent is consumed.
+   */
+  bool EmitWheelSignals(Actor actor, const WheelEvent& event);
 
 private:
   // Undefined
