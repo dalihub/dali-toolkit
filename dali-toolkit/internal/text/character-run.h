@@ -46,6 +46,21 @@ struct CharacterRun
 
   CharacterIndex characterIndex;     ///< Index to the first character.
   Length         numberOfCharacters; ///< Number of characters in the run.
+
+  //Methods
+
+  /**
+  * @brief Calculate the end index in run.
+  * @return the end character index in run.
+  */
+  CharacterIndex GetEndCharacterIndex() const
+  {
+    DALI_ASSERT_DEBUG(!((0u == numberOfCharacters) && (characterIndex > 0u)) &&
+                      "Toolkit::Text::CharacterRun. NumberOfCharacters should be greater than zero");
+
+    // Note: Length is uint32. Extra validation to avoid a potential defects.
+    return (numberOfCharacters == 0u ? 0u : (characterIndex + numberOfCharacters - 1u));
+  }
 };
 
 } // namespace Text

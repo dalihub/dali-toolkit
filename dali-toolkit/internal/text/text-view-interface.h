@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali-toolkit/internal/text/bounded-paragraph-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 #include <dali-toolkit/internal/text/underlined-glyph-run.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
@@ -321,6 +322,20 @@ public:
    * @return The number of strikethrough runs.
    */
   virtual Length GetNumberOfStrikethroughRuns() const = 0;
+
+  /**
+   * @brief Retrieves the number of bounded paragraph runs.
+   *
+   * @return The number of bounded paragraph runs.
+   */
+  virtual Length GetNumberOfBoundedParagraphRuns() const = 0;
+
+  /**
+   * @brief Retrieves the reference for bounded paragraph runs.
+   *
+   * @return The reference for bounded paragraph runs.
+   */
+  virtual const Vector<BoundedParagraphRun>& GetBoundedParagraphRuns() const = 0;
 
   /**
    * @brief Retrieves the strikethrough runs.

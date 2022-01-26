@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/text/anchor.h>
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
 #include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
+#include <dali-toolkit/internal/text/bounded-paragraph-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/embedded-item.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
@@ -182,6 +183,20 @@ public:
                       Length                     numberOfCharacters,
                       Vector<ParagraphRunIndex>& paragraphs);
 
+  /**
+   * @brief Retrieves the number of bounded paragraph runs.
+   *
+   * @return The number of bounded paragraph runs.
+   */
+  Length GetNumberOfBoundedParagraphRuns() const;
+
+  /**
+   * @brief Retrieves the reference for bounded paragraph runs.
+   *
+   * @return The reference for bounded paragraph runs.
+   */
+  const Vector<BoundedParagraphRun>& GetBoundedParagraphRuns() const;
+
   // Embedded images
 
   /**
@@ -228,6 +243,7 @@ public:
   Vector<Anchor>                        mAnchors;
   Vector<UnderlinedCharacterRun>        mUnderlinedCharacterRuns;    ///< The underlined character run from markup-processor
   Vector<StrikethroughCharacterRun>     mStrikethroughCharacterRuns; ///< The strikethrough character run from markup-processor
+  Vector<BoundedParagraphRun>           mBoundedParagraphRuns;       ///< The bounded paragraph is used to handle a paragraph mark-up tag and it's attributes. Like TextAlign, TextDirection, TextIndent, LineHeight, etc.
 
   BidirectionalLineRunIndex mBidirectionalLineIndex; ///< The last fetched bidirectional line info.
 };

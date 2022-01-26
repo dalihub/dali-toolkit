@@ -2654,3 +2654,46 @@ int UtcDaliTextLabelCharacterSpacing(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextlabelParagraphTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelParagraphTag");
+  TextLabel labelNewlineSeparator = TextLabel::New();
+  TextLabel labelParagraphTag     = TextLabel::New();
+  DALI_TEST_CHECK(labelNewlineSeparator);
+  DALI_TEST_CHECK(labelParagraphTag);
+
+  application.GetScene().Add(labelNewlineSeparator);
+  application.GetScene().Add(labelParagraphTag);
+
+  //Same utterance uses new-line to split paragraphs should give similar results for paragraph tag.
+  labelNewlineSeparator.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  labelNewlineSeparator.SetProperty(TextLabel::Property::ELLIPSIS, false);
+  labelNewlineSeparator.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  labelNewlineSeparator.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  labelNewlineSeparator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  labelNewlineSeparator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  labelNewlineSeparator.SetProperty(TextLabel::Property::TEXT, "test paragraph tag \ntest paragraph tag \ntest paragraph tag ");
+
+  labelParagraphTag.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  labelParagraphTag.SetProperty(TextLabel::Property::ELLIPSIS, false);
+  labelParagraphTag.SetProperty(TextLabel::Property::ENABLE_MARKUP, true);
+  labelParagraphTag.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  labelParagraphTag.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  labelParagraphTag.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  labelParagraphTag.SetProperty(TextLabel::Property::TEXT, "test paragraph tag <p>test paragraph tag </p>test paragraph tag ");
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 textNaturalSizeNewlineSeparator = labelNewlineSeparator.GetNaturalSize();
+  Vector3 textNaturalSizeParagraphTag     = labelParagraphTag.GetNaturalSize();
+
+  DALI_TEST_EQUALS(textNaturalSizeNewlineSeparator, textNaturalSizeParagraphTag, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}

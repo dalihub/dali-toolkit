@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/bounded-paragraph-run.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-view-interface.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
@@ -246,6 +247,16 @@ public:
   void GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns,
                             StrikethroughRunIndex  index,
                             Length                 numberOfRuns) const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetNumberOfBoundedParagraphRuns()
+   */
+  virtual Length GetNumberOfBoundedParagraphRuns() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetBoundedParagraphRuns()
+   */
+  virtual const Vector<BoundedParagraphRun>& GetBoundedParagraphRuns() const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetCharacterSpacing()

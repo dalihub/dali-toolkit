@@ -5748,3 +5748,42 @@ int UtcDaliTextEditorCharacterSpacing(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTexteditorParagraphTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTexteditorParagraphTag");
+  TextEditor editorNewlineSeparator = TextEditor::New();
+  TextEditor editorParagraphTag     = TextEditor::New();
+  DALI_TEST_CHECK(editorNewlineSeparator);
+  DALI_TEST_CHECK(editorParagraphTag);
+
+  application.GetScene().Add(editorNewlineSeparator);
+  application.GetScene().Add(editorParagraphTag);
+
+  //Same utterance uses new-line to split paragraphs should give similar results for paragraph tag.
+  editorNewlineSeparator.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  editorNewlineSeparator.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  editorNewlineSeparator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editorNewlineSeparator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editorNewlineSeparator.SetProperty(TextEditor::Property::TEXT, "test paragraph tag \ntest paragraph tag \ntest paragraph tag ");
+
+  editorParagraphTag.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  editorParagraphTag.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  editorParagraphTag.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editorParagraphTag.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editorParagraphTag.SetProperty(TextEditor::Property::TEXT, "test paragraph tag <p>test paragraph tag </p>test paragraph tag ");
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 textNaturalSizeNewlineSeparator = editorNewlineSeparator.GetNaturalSize();
+  Vector3 textNaturalSizeParagraphTag     = editorParagraphTag.GetNaturalSize();
+
+  DALI_TEST_EQUALS(textNaturalSizeNewlineSeparator, textNaturalSizeParagraphTag, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}

@@ -136,6 +136,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/image-loader/image-url-impl.cpp
    ${toolkit_src_dir}/styling/style-manager-impl.cpp
    ${toolkit_src_dir}/text/bidirectional-support.cpp
+   ${toolkit_src_dir}/text/bounded-paragraph-helper-functions.cpp
    ${toolkit_src_dir}/text/character-set-conversion.cpp
    ${toolkit_src_dir}/text/color-segmentation.cpp
    ${toolkit_src_dir}/text/cursor-helper-functions.cpp
