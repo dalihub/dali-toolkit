@@ -145,6 +145,7 @@ void KeyboardFocusManager::OnAdaptorInit()
     {
       (*iter).KeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
       (*iter).TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
+      (*iter).WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
       Dali::Window window = DevelWindow::DownCast(*iter);
       if(window)
       {
@@ -161,6 +162,7 @@ void KeyboardFocusManager::OnSceneHolderCreated(Dali::Integration::SceneHolder& 
 {
   sceneHolder.KeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
   sceneHolder.TouchedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnTouch);
+  sceneHolder.WheelEventGeneratedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnWheelEvent);
   Dali::Window window = DevelWindow::DownCast(sceneHolder);
   if(window)
   {
@@ -1006,6 +1008,49 @@ void KeyboardFocusManager::OnTouch(const TouchEvent& touch)
       SetCurrentFocusActor(hitActor);
     }
   }
+}
+
+bool KeyboardFocusManager::OnWheelEvent(const WheelEvent& event)
+{
+  bool consumed = false;
+  Actor actor = GetCurrentFocusActor();
+  if(actor)
+  {
+    // Notify the actor about the wheel event
+    consumed = EmitWheelSignals(actor, event);
+  }
+  return consumed;
+}
+
+bool KeyboardFocusManager::EmitWheelSignals(Actor actor, const WheelEvent& event)
+{
+  bool consumed = false;
+
+  if(actor)
+  {
+    Dali::Actor oldParent(actor.GetParent());
+
+    // Only do the conversion and emit the signal if the actor's wheel signal has connections.
+    if(!actor.WheelEventSignal().Empty())
+    {
+      // Emit the signal to the parent
+      consumed = actor.WheelEventSignal().Emit(actor, event);
+    }
+    // if actor doesn't consume WheelEvent, give WheelEvent to its parent.
+    if(!consumed)
+    {
+      // The actor may have been removed/reparented during the signal callbacks.
+      Dali::Actor parent = actor.GetParent();
+
+      if(parent &&
+         (parent == oldParent))
+      {
+        consumed = EmitWheelSignals(parent, event);
+      }
+    }
+  }
+
+  return consumed;
 }
 
 void KeyboardFocusManager::OnWindowFocusChanged(Window window, bool focusIn)
