@@ -519,7 +519,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
         nextFocusableActor = mPreFocusChangeSignal.Emit( currentFocusActor, Actor(), direction );
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
-      else if(mEnableDefaultAlgorithm)
+      else if(mEnableDefaultAlgorithm && currentFocusActor)
       {
         // We should find it among the actors nearby.
         Integration::SceneHolder window = Integration::SceneHolder::Get(currentFocusActor);
