@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_BACKGROUND_ACTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
 
 namespace Dali::Toolkit::Text
@@ -32,9 +33,14 @@ class View;
 /**
  * @brief Create an actor that renders the text background color
  *
+ * @param[in] textView The text view.
+ * @param[in] textVisualModel The text visual model.
+ * @param[in] textLogicalModel The text logical model.
+ * @param[in] textShaderBackground The text shader for background.
+ *
  * @return the created actor or an empty handle if no background color needs to be rendered.
  */
-Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr& textVisualModel, Shader& textShaderBackground);
+Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr& textVisualModel, const LogicalModelPtr& textLogicalModel, Shader& textShaderBackground);
 
 } // namespace Dali::Toolkit::Text
 

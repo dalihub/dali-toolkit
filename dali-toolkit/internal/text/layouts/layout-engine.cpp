@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/layouts/layout-engine-helper-functions.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 
 namespace Dali
@@ -42,6 +43,7 @@ float GetLineHeight(const LineRun lineRun)
   // However, the line descender has a negative value, hence the subtraction.
   return lineRun.ascender - lineRun.descender + lineRun.lineSpacing;
 }
+
 namespace Layout
 {
 namespace
@@ -250,9 +252,12 @@ struct Engine::Impl
 
     const float      outlineWidth                = static_cast<float>(parameters.textModel->GetOutlineWidth());
     const GlyphIndex lastGlyphOfParagraphPlusOne = parameters.startGlyphIndex + parameters.numberOfGlyphs;
+    const float      characterSpacing            = parameters.textModel->mVisualModel->GetCharacterSpacing();
 
     CharacterIndex characterLogicalIndex = 0u;
     CharacterIndex characterVisualIndex  = 0u;
+
+    float calculatedAdvance = 0.f;
 
     // If there are characters in the second half of Line then the first visual index mapped from visualToLogicalMapSecondHalf
     // Otherwise maps the first visual index from visualToLogicalMap.
@@ -278,7 +283,8 @@ struct Engine::Impl
         {
           const GlyphInfo& glyphInfo = *(glyphsBuffer + *(charactersToGlyphsBuffer + characterVisualIndex));
 
-          whiteSpaceLengthEndOfLine += glyphInfo.advance;
+          calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, glyphInfo.advance);
+          whiteSpaceLengthEndOfLine += calculatedAdvance;
 
           ++characterLogicalIndex;
           characterVisualIndex = bidirectionalLineInfo.characterRunForSecondHalfLine.characterIndex + *(bidirectionalLineInfo.visualToLogicalMapSecondHalf + characterLogicalIndex);
@@ -299,7 +305,8 @@ struct Engine::Impl
         {
           const GlyphInfo& glyphInfo = *(glyphsBuffer + *(charactersToGlyphsBuffer + characterVisualIndex));
 
-          whiteSpaceLengthEndOfLine += glyphInfo.advance;
+          calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, glyphInfo.advance);
+          whiteSpaceLengthEndOfLine += calculatedAdvance;
 
           ++characterLogicalIndex;
           characterVisualIndex = bidirectionalLineInfo.characterRun.characterIndex + *(bidirectionalLineInfo.visualToLogicalMap + characterLogicalIndex);
@@ -316,11 +323,13 @@ struct Engine::Impl
                                                                   charactersPerGlyphBuffer);
 
     GlyphMetrics glyphMetrics;
+    calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
     GetGlyphsMetrics(glyphIndex,
                      numberOfGLyphsInGroup,
                      glyphMetrics,
                      glyphsBuffer,
-                     mMetrics);
+                     mMetrics,
+                     calculatedAdvance);
 
     float penX = -glyphMetrics.xBearing + mCursorWidth + outlineWidth;
 
@@ -345,11 +354,13 @@ struct Engine::Impl
         characterLogicalIndex += *(charactersPerGlyphBuffer + glyphIndex + numberOfGLyphsInGroup - 1u);
 
         GlyphMetrics glyphMetrics;
+        calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
         GetGlyphsMetrics(glyphIndex,
                          numberOfGLyphsInGroup,
                          glyphMetrics,
                          glyphsBuffer,
-                         mMetrics);
+                         mMetrics,
+                         calculatedAdvance);
 
         if(isWhiteSpace)
         {
@@ -405,11 +416,13 @@ struct Engine::Impl
       characterLogicalIndex += *(charactersPerGlyphBuffer + glyphIndex + numberOfGLyphsInGroup - 1u);
 
       GlyphMetrics glyphMetrics;
+      calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
       GetGlyphsMetrics(glyphIndex,
                        numberOfGLyphsInGroup,
                        glyphMetrics,
                        glyphsBuffer,
-                       mMetrics);
+                       mMetrics,
+                       calculatedAdvance);
 
       if(isWhiteSpace)
       {
@@ -639,13 +652,20 @@ struct Engine::Impl
     float widthFirstHalf = ((ellipsisPosition != DevelText::EllipsisPosition::MIDDLE) ? targetWidth : targetWidth - std::floor(targetWidth / 2));
 
     bool isSecondHalf = false;
+    // Character Spacing
+    const float             characterSpacing          = parameters.textModel->mVisualModel->GetCharacterSpacing();
+    float                   calculatedAdvance         = 0.f;
+    Vector<CharacterIndex>& glyphToCharacterMap       = parameters.textModel->mVisualModel->mGlyphsToCharacters;
+    const CharacterIndex*   glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
 
     GlyphMetrics glyphMetrics;
+    calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + lineLayout.glyphIndex))), characterSpacing, (*(glyphsBuffer + lineLayout.glyphIndex)).advance);
     GetGlyphsMetrics(lineLayout.glyphIndex,
                      numberOfGLyphsInGroup,
                      glyphMetrics,
                      glyphsBuffer,
-                     mMetrics);
+                     mMetrics,
+                     calculatedAdvance);
 
     // Set the direction of the first character of the line.
     lineLayout.characterIndex = *(glyphsToCharactersBuffer + lineLayout.glyphIndex);
@@ -680,11 +700,13 @@ struct Engine::Impl
                                                                     charactersPerGlyphBuffer);
 
       GlyphMetrics glyphMetrics;
+      calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + glyphIndex))), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
       GetGlyphsMetrics(glyphIndex,
                        numberOfGLyphsInGroup,
                        glyphMetrics,
                        glyphsBuffer,
-                       mMetrics);
+                       mMetrics,
+                       calculatedAdvance);
 
       const bool isLastGlyph = glyphIndex + numberOfGLyphsInGroup == totalNumberOfGlyphs;
 
@@ -739,7 +761,8 @@ struct Engine::Impl
       if(isWhiteSpace)
       {
         // Add the length to the length of white spaces at the end of the line.
-        tmpLineLayout.whiteSpaceLengthEndOfLine += glyphMetrics.advance; // The advance is used as the width is always zero for the white spaces.
+        tmpLineLayout.whiteSpaceLengthEndOfLine += glyphMetrics.advance;
+        // The advance is used as the width is always zero for the white spaces.
       }
       else
       {
@@ -777,11 +800,13 @@ struct Engine::Impl
         while(tmpLineLayout.length + tmpLineLayout.whiteSpaceLengthEndOfLine > targetWidth && glyphIndexToRemove < glyphIndex)
         {
           GlyphMetrics glyphMetrics;
+          calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + glyphIndexToRemove))), characterSpacing, (*(glyphsBuffer + glyphIndexToRemove)).advance);
           GetGlyphsMetrics(glyphIndexToRemove,
                            numberOfGLyphsInGroup,
                            glyphMetrics,
                            glyphsBuffer,
-                           mMetrics);
+                           mMetrics,
+                           calculatedAdvance);
 
           const Length numberOfGLyphsInGroup = GetNumberOfGlyphsOfGroup(glyphIndexToRemove,
                                                                         lastGlyphOfParagraphPlusOne,
@@ -1008,16 +1033,14 @@ struct Engine::Impl
     const GlyphInfo& glyph = *(glyphsBuffer + startIndexForGlyph);
     float            penX  = -glyph.xBearing + mCursorWidth + outlineWidth; //
 
-    for(GlyphIndex i = 0u; i < numberOfGlyphs; ++i)
-    {
-      const GlyphInfo& glyph    = *(glyphsBuffer + startIndexForGlyph + i);
-      Vector2&         position = *(glyphPositionsBuffer + startIndexForGlyphPositions + i);
-
-      position.x = penX + glyph.xBearing;
-      position.y = -glyph.yBearing;
-
-      penX += (glyph.advance + interGlyphExtraAdvance);
-    }
+    CalculateGlyphPositionsLTR(layoutParameters.textModel->mVisualModel,
+                               layoutParameters.textModel->mLogicalModel,
+                               interGlyphExtraAdvance,
+                               numberOfGlyphs,
+                               startIndexForGlyph, // startIndexForGlyph is the index of the first glyph in the line
+                               startIndexForGlyphPositions,
+                               glyphPositionsBuffer,
+                               penX);
 
     if(layout.isSplitToTwoHalves)
     {
@@ -1025,16 +1048,14 @@ struct Engine::Impl
       const Length     numberOfGlyphsInSecondHalfLine         = layout.numberOfGlyphsInSecondHalfLine;
       const GlyphIndex startIndexForGlyphPositionsnSecondHalf = layout.glyphIndexInSecondHalfLine - layoutParameters.startGlyphIndex;
 
-      for(GlyphIndex i = 0u; i < numberOfGlyphsInSecondHalfLine; ++i)
-      {
-        const GlyphInfo& glyph    = *(glyphsBuffer + startIndexForGlyphInSecondHalf + i);
-        Vector2&         position = *(glyphPositionsBuffer + startIndexForGlyphPositionsnSecondHalf + i);
-
-        position.x = penX + glyph.xBearing;
-        position.y = -glyph.yBearing;
-
-        penX += (glyph.advance + interGlyphExtraAdvance);
-      }
+      CalculateGlyphPositionsLTR(layoutParameters.textModel->mVisualModel,
+                                 layoutParameters.textModel->mLogicalModel,
+                                 interGlyphExtraAdvance,
+                                 numberOfGlyphsInSecondHalfLine,
+                                 startIndexForGlyphInSecondHalf, // startIndexForGlyph is the index of the first glyph in the line
+                                 startIndexForGlyphPositionsnSecondHalf,
+                                 glyphPositionsBuffer,
+                                 penX);
     }
   }
 
@@ -1043,11 +1064,9 @@ struct Engine::Impl
                          LayoutBidiParameters& layoutBidiParameters,
                          const LineLayout&     layout)
   {
-    const Character* const          textBuffer               = layoutParameters.textModel->mLogicalModel->mText.Begin();
     const BidirectionalLineInfoRun& bidiLine                 = layoutParameters.textModel->mLogicalModel->mBidirectionalLineInfo[layoutBidiParameters.bidiLineIndex];
     const GlyphInfo* const          glyphsBuffer             = layoutParameters.textModel->mVisualModel->mGlyphs.Begin();
     const GlyphIndex* const         charactersToGlyphsBuffer = layoutParameters.textModel->mVisualModel->mCharactersToGlyph.Begin();
-    const Length* const             glyphsPerCharacterBuffer = layoutParameters.textModel->mVisualModel->mGlyphsPerCharacter.Begin();
 
     CharacterIndex characterLogicalIndex = 0u;
     CharacterIndex characterVisualIndex  = bidiLine.characterRunForSecondHalfLine.characterIndex + *(bidiLine.visualToLogicalMapSecondHalf + characterLogicalIndex);
@@ -1057,20 +1076,14 @@ struct Engine::Impl
 
     if(layout.isSplitToTwoHalves)
     {
-      while(TextAbstraction::IsWhiteSpace(*(textBuffer + characterVisualIndex)))
-      {
-        const GlyphIndex glyphIndex = *(charactersToGlyphsBuffer + characterVisualIndex);
-        const GlyphInfo& glyph      = *(glyphsBuffer + glyphIndex);
-
-        Vector2& position = *(glyphPositionsBuffer + glyphIndex - layoutParameters.startGlyphIndex);
-        position.x        = penX;
-        position.y        = -glyph.yBearing;
-
-        penX += glyph.advance;
-
-        ++characterLogicalIndex;
-        characterVisualIndex = bidiLine.characterRun.characterIndex + *(bidiLine.visualToLogicalMap + characterLogicalIndex);
-      }
+      CalculateGlyphPositionsRTL(layoutParameters.textModel->mVisualModel,
+                                 layoutParameters.textModel->mLogicalModel,
+                                 layoutBidiParameters.bidiLineIndex,
+                                 layoutParameters.startGlyphIndex,
+                                 glyphPositionsBuffer,
+                                 characterVisualIndex,
+                                 characterLogicalIndex,
+                                 penX);
     }
 
     if(characterLogicalIndex == bidiLine.characterRunForSecondHalfLine.numberOfCharacters)
@@ -1079,20 +1092,14 @@ struct Engine::Impl
       characterLogicalIndex = 0u;
       characterVisualIndex  = bidiLine.characterRun.characterIndex + *(bidiLine.visualToLogicalMap + characterLogicalIndex);
 
-      while(TextAbstraction::IsWhiteSpace(*(textBuffer + characterVisualIndex)))
-      {
-        const GlyphIndex glyphIndex = *(charactersToGlyphsBuffer + characterVisualIndex);
-        const GlyphInfo& glyph      = *(glyphsBuffer + glyphIndex);
-
-        Vector2& position = *(glyphPositionsBuffer + glyphIndex - layoutParameters.startGlyphIndex);
-        position.x        = penX;
-        position.y        = -glyph.yBearing;
-
-        penX += glyph.advance;
-
-        ++characterLogicalIndex;
-        characterVisualIndex = bidiLine.characterRun.characterIndex + *(bidiLine.visualToLogicalMap + characterLogicalIndex);
-      }
+      CalculateGlyphPositionsRTL(layoutParameters.textModel->mVisualModel,
+                                 layoutParameters.textModel->mLogicalModel,
+                                 layoutBidiParameters.bidiLineIndex,
+                                 layoutParameters.startGlyphIndex,
+                                 glyphPositionsBuffer,
+                                 characterVisualIndex,
+                                 characterLogicalIndex,
+                                 penX);
     }
 
     const GlyphIndex glyphIndex = *(charactersToGlyphsBuffer + characterVisualIndex);
@@ -1103,59 +1110,28 @@ struct Engine::Impl
     // Traverses the characters of the right to left paragraph.
     if(layout.isSplitToTwoHalves && !extendedToSecondHalf)
     {
-      for(; characterLogicalIndex < bidiLine.characterRunForSecondHalfLine.numberOfCharacters;
-          ++characterLogicalIndex)
-      {
-        // Convert the character in the logical order into the character in the visual order.
-        const CharacterIndex characterVisualIndex = bidiLine.characterRunForSecondHalfLine.characterIndex + *(bidiLine.visualToLogicalMapSecondHalf + characterLogicalIndex);
-
-        // Get the number of glyphs of the character.
-        const Length numberOfGlyphs = *(glyphsPerCharacterBuffer + characterVisualIndex);
-
-        for(GlyphIndex index = 0u; index < numberOfGlyphs; ++index)
-        {
-          // Convert the character in the visual order into the glyph in the visual order.
-          const GlyphIndex glyphIndex = *(charactersToGlyphsBuffer + characterVisualIndex) + index;
-
-          DALI_ASSERT_DEBUG(glyphIndex < layoutParameters.textModel->mVisualModel->mGlyphs.Count());
-
-          const GlyphInfo& glyph    = *(glyphsBuffer + glyphIndex);
-          Vector2&         position = *(glyphPositionsBuffer + glyphIndex - layoutParameters.startGlyphIndex);
-
-          position.x = penX + glyph.xBearing;
-          position.y = -glyph.yBearing;
-
-          penX += (glyph.advance + layoutParameters.interGlyphExtraAdvance);
-        }
-      }
+      TraversesCharactersForGlyphPositionsRTL(layoutParameters.textModel->mVisualModel,
+                                              layoutParameters.textModel->mLogicalModel->mText.Begin(),
+                                              layoutParameters.startGlyphIndex,
+                                              layoutParameters.interGlyphExtraAdvance,
+                                              bidiLine.characterRunForSecondHalfLine,
+                                              bidiLine.visualToLogicalMapSecondHalf,
+                                              glyphPositionsBuffer,
+                                              characterLogicalIndex,
+                                              penX);
     }
 
     characterLogicalIndex = extendedToSecondHalf ? characterLogicalIndex : 0u;
-    for(; characterLogicalIndex < bidiLine.characterRun.numberOfCharacters;
-        ++characterLogicalIndex)
-    {
-      // Convert the character in the logical order into the character in the visual order.
-      const CharacterIndex characterVisualIndex = bidiLine.characterRun.characterIndex + *(bidiLine.visualToLogicalMap + characterLogicalIndex);
 
-      // Get the number of glyphs of the character.
-      const Length numberOfGlyphs = *(glyphsPerCharacterBuffer + characterVisualIndex);
-
-      for(GlyphIndex index = 0u; index < numberOfGlyphs; ++index)
-      {
-        // Convert the character in the visual order into the glyph in the visual order.
-        const GlyphIndex glyphIndex = *(charactersToGlyphsBuffer + characterVisualIndex) + index;
-
-        DALI_ASSERT_DEBUG(glyphIndex < layoutParameters.textModel->mVisualModel->mGlyphs.Count());
-
-        const GlyphInfo& glyph    = *(glyphsBuffer + glyphIndex);
-        Vector2&         position = *(glyphPositionsBuffer + glyphIndex - layoutParameters.startGlyphIndex);
-
-        position.x = penX + glyph.xBearing;
-        position.y = -glyph.yBearing;
-
-        penX += (glyph.advance + layoutParameters.interGlyphExtraAdvance);
-      }
-    }
+    TraversesCharactersForGlyphPositionsRTL(layoutParameters.textModel->mVisualModel,
+                                            layoutParameters.textModel->mLogicalModel->mText.Begin(),
+                                            layoutParameters.startGlyphIndex,
+                                            layoutParameters.interGlyphExtraAdvance,
+                                            bidiLine.characterRun,
+                                            bidiLine.visualToLogicalMap,
+                                            glyphPositionsBuffer,
+                                            characterLogicalIndex,
+                                            penX);
   }
 
   /**

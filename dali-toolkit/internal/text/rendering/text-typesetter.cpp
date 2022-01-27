@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
 
 namespace Dali
@@ -939,6 +940,11 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
   TextAbstraction::FontClient fontClient  = TextAbstraction::FontClient::Get();
   Length                      hyphenIndex = 0;
 
+  const Character*              textBuffer                = mModel->GetTextBuffer();
+  float                         calculatedAdvance         = 0.f;
+  const Vector<CharacterIndex>& glyphToCharacterMap       = mModel->GetGlyphsToCharacters();
+  const CharacterIndex*         glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
+
   // Traverses the lines of the text.
   for(LineIndex lineIndex = 0u; lineIndex < modelNumberOfLines; ++lineIndex)
   {
@@ -987,10 +993,10 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     const Text::Underline::Type underlineType        = mModel->GetUnderlineType();
     const float                 dashedUnderlineWidth = mModel->GetDashedUnderlineWidth();
     const float                 dashedUnderlineGap   = mModel->GetDashedUnderlineGap();
-
-    const bool     strikethroughEnabled = mModel->IsStrikethroughEnabled();
-    const Vector4& strikethroughColor   = mModel->GetStrikethroughColor();
-    const float    strikethroughHeight  = mModel->GetStrikethroughHeight();
+    const bool                  strikethroughEnabled = mModel->IsStrikethroughEnabled();
+    const Vector4&              strikethroughColor   = mModel->GetStrikethroughColor();
+    const float                 strikethroughHeight  = mModel->GetStrikethroughHeight();
+    const float                 characterSpacing     = mModel->GetCharacterSpacing();
 
     // Get the underline runs.
     const Length     numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
@@ -1093,7 +1099,8 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       if(addHyphen)
       {
         GlyphInfo tempInfo = *(glyphsBuffer + elidedGlyphIndex);
-        position.x         = position.x + tempInfo.advance - tempInfo.xBearing + glyphInfo->xBearing;
+        calculatedAdvance  = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + elidedGlyphIndex))), characterSpacing, tempInfo.advance);
+        position.x         = position.x + calculatedAdvance - tempInfo.xBearing + glyphInfo->xBearing;
         position.y         = -glyphInfo->yBearing;
       }
 

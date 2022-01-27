@@ -212,6 +212,7 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
   {
     return logicalIndex;
   }
+  const float characterSpacing = visualModel->GetCharacterSpacing();
 
   // Whether there is a hit on a line.
   bool matchedLine = false;
@@ -262,8 +263,11 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
   bool isBeforeFirstGlyph = false;
 
   // Traverses glyphs in visual order. To do that use the visual to logical conversion table.
-  CharacterIndex visualIndex              = startCharacter;
-  Length         numberOfVisualCharacters = 0;
+  CharacterIndex          visualIndex               = startCharacter;
+  Length                  numberOfVisualCharacters  = 0;
+  float                   calculatedAdvance         = 0.f;
+  Vector<CharacterIndex>& glyphToCharacterMap       = visualModel->mGlyphsToCharacters;
+  const CharacterIndex*   glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
   for(; visualIndex < endCharacter; ++visualIndex)
   {
     // The character in logical order.
@@ -283,11 +287,13 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
 
       // Get the metrics for the group of glyphs.
       GlyphMetrics glyphMetrics;
+      calculatedAdvance = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + firstLogicalGlyphIndex))), characterSpacing, (*(visualModel->mGlyphs.Begin() + firstLogicalGlyphIndex)).advance);
       GetGlyphsMetrics(firstLogicalGlyphIndex,
                        numberOfGlyphs,
                        glyphMetrics,
                        glyphInfoBuffer,
-                       metrics);
+                       metrics,
+                       calculatedAdvance);
 
       // Get the position of the first glyph.
       const Vector2& position = *(positionsBuffer + firstLogicalGlyphIndex);
@@ -480,14 +486,11 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
   const LineIndex lineIndex = parameters.visualModel->GetLineOfCharacter(characterOfLine);
   const LineRun&  line      = *(modelLines + lineIndex);
 
-  const GlyphIndex* const charactersToGlyphBuffer  = parameters.visualModel->mCharactersToGlyph.Begin();
-  const Length* const     glyphsPerCharacterBuffer = parameters.visualModel->mGlyphsPerCharacter.Begin();
-  const GlyphInfo* const  glyphInfoBuffer          = parameters.visualModel->mGlyphs.Begin();
-  CharacterIndex          index;
-  GlyphMetrics            glyphMetrics;
-  MetricsPtr&             metrics        = parameters.metrics;
-  GlyphIndex              glyphIndex     = 0u;
-  Length                  numberOfGlyphs = 0u;
+  CharacterIndex index;
+  GlyphMetrics   glyphMetrics;
+  MetricsPtr&    metrics        = parameters.metrics;
+  GlyphIndex     glyphIndex     = 0u;
+  Length         numberOfGlyphs = 0u;
 
   if(isLastNewParagraph)
   {
@@ -510,7 +513,7 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
       index = totalNumberOfCharacters - 1u;
     }
 
-    GetGlyphMetricsFromCharacterIndex(index, glyphInfoBuffer, charactersToGlyphBuffer, glyphsPerCharacterBuffer, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
+    GetGlyphMetricsFromCharacterIndex(index, parameters.visualModel, parameters.logicalModel, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
 
     // Set the primary cursor's height.
     // The primary cursor height will take the font height of the last character and if there are no characters, it'll take the default font line height.
@@ -597,8 +600,12 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
     const Length* const         charactersPerGlyphBuffer = parameters.visualModel->mCharactersPerGlyph.Begin();
     const CharacterIndex* const glyphsToCharactersBuffer = parameters.visualModel->mGlyphsToCharacters.Begin();
     const Vector2* const        glyphPositionsBuffer     = parameters.visualModel->mGlyphPositions.Begin();
+    const float                 characterSpacing         = parameters.visualModel->GetCharacterSpacing();
 
-    GetGlyphMetricsFromCharacterIndex(index, glyphInfoBuffer, charactersToGlyphBuffer, glyphsPerCharacterBuffer, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
+    // Get the metrics for the group of glyphs.
+    GetGlyphMetricsFromCharacterIndex(index, parameters.visualModel, parameters.logicalModel, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
+
+    // Convert the cursor position into the glyph position.
     const GlyphIndex primaryGlyphIndex         = glyphIndex;
     const Length     primaryNumberOfCharacters = *(charactersPerGlyphBuffer + primaryGlyphIndex);
 
@@ -636,7 +643,7 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
                                   (isFirstPositionOfLine && isRightToLeftParagraph) ||
                                   (!isFirstPositionOfLine && !isLastPosition && !isCurrentRightToLeft));
 
-    float glyphAdvance = addGlyphAdvance ? glyphMetrics.advance : 0.f;
+    float glyphAdvance = addGlyphAdvance ? (glyphMetrics.advance) : 0.f;
 
     if(!isLastPositionOfLine &&
        (primaryNumberOfCharacters > 1u))
@@ -655,7 +662,7 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
         numberOfGlyphAdvance = primaryNumberOfCharacters - numberOfGlyphAdvance;
       }
 
-      glyphAdvance = static_cast<float>(numberOfGlyphAdvance) * glyphMetrics.advance / static_cast<float>(primaryNumberOfCharacters);
+      glyphAdvance = static_cast<float>(numberOfGlyphAdvance) * (glyphMetrics.advance) / static_cast<float>(primaryNumberOfCharacters);
     }
 
     // Get the glyph position and x bearing (in the line's coords).
@@ -684,7 +691,8 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
         index = (isRightToLeftParagraph == isCurrentRightToLeft) ? nextCharacterIndex : characterIndex;
       }
 
-      GetGlyphMetricsFromCharacterIndex(index, glyphInfoBuffer, charactersToGlyphBuffer, glyphsPerCharacterBuffer, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
+      GetGlyphMetricsFromCharacterIndex(index, parameters.visualModel, parameters.logicalModel, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
+
       const GlyphIndex secondaryGlyphIndex = glyphIndex;
       const Vector2&   secondaryPosition   = *(glyphPositionsBuffer + secondaryGlyphIndex);
 
@@ -709,7 +717,7 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
       const bool addGlyphAdvance = ((!isFirstPositionOfLine && !isCurrentRightToLeft) ||
                                     (isFirstPositionOfLine && !isRightToLeftParagraph));
 
-      cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + (addGlyphAdvance ? glyphMetrics.advance : 0.f);
+      cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + (addGlyphAdvance ? (glyphMetrics.advance + characterSpacing) : 0.f);
       cursorInfo.secondaryPosition.y = cursorInfo.lineOffset + cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight;
 
       // Transform the cursor info from line's coords to text's coords.

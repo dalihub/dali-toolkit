@@ -1340,6 +1340,19 @@ void Controller::SetEllipsisPosition(Toolkit::DevelText::EllipsisPosition::Type 
   mImpl->mModel->mVisualModel->SetEllipsisPosition(ellipsisPosition);
 }
 
+void Controller::SetCharacterSpacing(float characterSpacing)
+{
+  mImpl->mModel->mVisualModel->SetCharacterSpacing(characterSpacing);
+
+  mImpl->RelayoutAllCharacters();
+  mImpl->RequestRelayout();
+}
+
+const float Controller::GetCharacterSpacing() const
+{
+  return mImpl->mModel->mVisualModel->GetCharacterSpacing();
+}
+
 Controller::UpdateTextType Controller::Relayout(const Size& size, Dali::LayoutDirection::Type layoutDirection)
 {
   return Relayouter::Relayout(*this, size, layoutDirection);
@@ -1597,7 +1610,7 @@ bool Controller::ShouldClearFocusOnEscape() const
 
 Actor Controller::CreateBackgroundActor()
 {
-  return CreateControllerBackgroundActor(mImpl->mView, mImpl->mModel->mVisualModel, mImpl->mShaderBackground);
+  return CreateControllerBackgroundActor(mImpl->mView, mImpl->mModel->mVisualModel, mImpl->mModel->mLogicalModel, mImpl->mShaderBackground);
 }
 
 void Controller::GetAnchorActors(std::vector<Toolkit::TextAnchor>& anchorActors)

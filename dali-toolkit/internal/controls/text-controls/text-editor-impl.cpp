@@ -157,6 +157,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "ellipsisPositio
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "minLineSize",                          FLOAT,     MIN_LINE_SIZE                       )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "strikethrough",                        MAP,       STRIKETHROUGH                       )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "inputStrikethrough",                   MAP,       INPUT_STRIKETHROUGH                 )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "characterSpacing",                     FLOAT,     CHARACTER_SPACING                   )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )

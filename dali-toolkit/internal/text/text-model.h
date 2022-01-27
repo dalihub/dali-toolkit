@@ -277,6 +277,20 @@ public:
   const Vector4& GetStrikethroughColor() const override;
 
   bool IsStrikethroughEnabled() const override;
+  /**
+   * @copydoc ModelInterface::GetCharacterSpacing()
+   */
+  const float GetCharacterSpacing() const override;
+
+  /**
+   * @copydoc ModelInterface::GetTextBuffer()
+   */
+  const Character* GetTextBuffer() const override;
+
+  /**
+   * @copydoc ModelInterface::GetGlyphsToCharacters()
+   */
+  const Vector<CharacterIndex>& GetGlyphsToCharacters() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfStrikethroughRuns()

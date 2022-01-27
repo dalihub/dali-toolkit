@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/text-view.h>
 
 namespace Dali::Toolkit::Text
 {
-
 namespace
 {
 struct BackgroundVertex
@@ -44,7 +44,7 @@ struct BackgroundMesh
 };
 } // unnamed namespace
 
-Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr& textVisualModel, Shader& textShaderBackground)
+Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr& textVisualModel, const LogicalModelPtr& textLogicalModel, Shader& textShaderBackground)
 {
   // NOTE: Currently we only support background color for left-to-right text.
 
@@ -63,10 +63,10 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
     const LineRun* lineRun         = textVisualModel->mLines.Begin();
     float          alignmentOffset = lineRun->alignmentOffset;
     numberOfGlyphs                 = textView.GetGlyphs(glyphs.Begin(),
-                                                     positions.Begin(),
-                                                     alignmentOffset,
-                                                     0u,
-                                                     numberOfGlyphs);
+                                        positions.Begin(),
+                                        alignmentOffset,
+                                        0u,
+                                        numberOfGlyphs);
 
     glyphs.Resize(numberOfGlyphs);
     positions.Resize(numberOfGlyphs);
@@ -86,6 +86,10 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
     const Vector4* const    backgroundColorsBuffer       = textView.GetBackgroundColors();
     const ColorIndex* const backgroundColorIndicesBuffer = textView.GetBackgroundColorIndices();
     const Vector4&          defaultBackgroundColor       = textVisualModel->IsBackgroundEnabled() ? textVisualModel->GetBackgroundColor() : Color::TRANSPARENT;
+    const float             characterSpacing             = textVisualModel->GetCharacterSpacing();
+    Vector<CharacterIndex>& glyphToCharacterMap          = textVisualModel->mGlyphsToCharacters;
+    const CharacterIndex*   glyphToCharacterMapBuffer    = glyphToCharacterMap.Begin();
+    float                   calculatedAdvance            = 0.f;
 
     Vector4   quad;
     uint32_t  numberOfQuads = 0u;
@@ -117,33 +121,34 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
       if(backgroundColor != Color::TRANSPARENT)
       {
         const Vector2 position = *(positionsBuffer + i);
+        calculatedAdvance      = GetCalculatedAdvance(*(textLogicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + i))), characterSpacing, glyph.advance);
 
         if(i == 0u && glyphSize == 1u) // Only one glyph in the whole text
         {
           quad.x = position.x;
           quad.y = yLineOffset;
-          quad.z = quad.x + std::max(glyph.advance, glyph.xBearing + glyph.width);
+          quad.z = quad.x + std::max(calculatedAdvance, glyph.xBearing + glyph.width);
           quad.w = lineHeight;
         }
         else if((lineIndex != prevLineIndex) || (i == 0u)) // The first glyph in the line
         {
           quad.x = position.x;
           quad.y = yLineOffset;
-          quad.z = quad.x - glyph.xBearing + glyph.advance;
+          quad.z = quad.x - glyph.xBearing + calculatedAdvance;
           quad.w = quad.y + lineHeight;
         }
         else if(i == glyphSize - 1u) // The last glyph in the whole text
         {
           quad.x = position.x - glyph.xBearing;
           quad.y = yLineOffset;
-          quad.z = quad.x + std::max(glyph.advance, glyph.xBearing + glyph.width);
+          quad.z = quad.x + std::max(calculatedAdvance, glyph.xBearing + glyph.width);
           quad.w = quad.y + lineHeight;
         }
         else // The glyph in the middle of the text
         {
           quad.x = position.x - glyph.xBearing;
           quad.y = yLineOffset;
-          quad.z = quad.x + glyph.advance;
+          quad.z = quad.x + calculatedAdvance;
           quad.w = quad.y + lineHeight;
         }
 

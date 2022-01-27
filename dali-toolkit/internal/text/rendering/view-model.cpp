@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/line-run.h>
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 
 namespace Dali
 {
@@ -314,13 +315,33 @@ Length ViewModel::GetHyphensCount() const
   return mModel->GetHyphensCount();
 }
 
+const float ViewModel::GetCharacterSpacing() const
+{
+  return mModel->GetCharacterSpacing();
+}
+
+const Character* ViewModel::GetTextBuffer() const
+{
+  return mModel->GetTextBuffer();
+}
+
+const Vector<CharacterIndex>& ViewModel::GetGlyphsToCharacters() const
+{
+  return mModel->GetGlyphsToCharacters();
+}
+
 void ViewModel::ElideGlyphs()
 {
   mIsTextElided             = false;
   mStartIndexOfElidedGlyphs = mFirstMiddleIndexOfElidedGlyphs = mSecondMiddleIndexOfElidedGlyphs = 0;
   mEndIndexOfElidedGlyphs                                                                        = mModel->GetNumberOfGlyphs() - 1u;
 
-  auto ellipsisPosition = GetEllipsisPosition();
+  auto                          ellipsisPosition          = GetEllipsisPosition();
+  auto                          characterSpacing          = GetCharacterSpacing();
+  const Character*              textBuffer                = GetTextBuffer();
+  const Vector<CharacterIndex>& glyphToCharacterMap       = GetGlyphsToCharacters();
+  const CharacterIndex*         glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
+  float                         calculatedAdvance         = 0.f;
 
   if(IsTextElideEnabled())
   {
@@ -484,7 +505,8 @@ void ViewModel::ElideGlyphs()
                 firstPenSet = true;
               }
 
-              removedGlypsWidth += std::min(glyphToRemove.advance, (glyphToRemove.xBearing + glyphToRemove.width));
+              calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + indexOfEllipsis))), characterSpacing, glyphToRemove.advance);
+              removedGlypsWidth += std::min(calculatedAdvance, (glyphToRemove.xBearing + glyphToRemove.width));
 
               // Calculate the width of the ellipsis glyph and check if it fits.
               const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;

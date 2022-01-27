@@ -22,11 +22,13 @@
 #include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <cmath>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller-impl-data-clearer.h>
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
@@ -691,7 +693,7 @@ bool Controller::Impl::SetDefaultLineSpacing(float lineSpacing)
   {
     mLayoutEngine.SetDefaultLineSpacing(lineSpacing);
 
-    RelayoutForNewLineSize();
+    RelayoutAllCharacters();
     return true;
   }
   return false;
@@ -703,7 +705,7 @@ bool Controller::Impl::SetDefaultLineSize(float lineSize)
   {
     mLayoutEngine.SetDefaultLineSize(lineSize);
 
-    RelayoutForNewLineSize();
+    RelayoutAllCharacters();
     return true;
   }
   return false;
@@ -1461,7 +1463,7 @@ void Controller::Impl::RequestRelayout()
   }
 }
 
-void Controller::Impl::RelayoutForNewLineSize()
+void Controller::Impl::RelayoutAllCharacters()
 {
   // relayout all characters
   mTextUpdateInfo.mCharacterIndex             = 0;

@@ -692,6 +692,14 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       }
       break;
     }
+    case Toolkit::DevelTextField::Property::CHARACTER_SPACING:
+    {
+      const float characterSpacing = value.Get<float>();
+      DALI_LOG_INFO(gTextFieldLogFilter, Debug::General, "TextField %p CHARACTER_SPACING %d\n", impl.mController.Get(), characterSpacing);
+
+      impl.mController->SetCharacterSpacing(characterSpacing);
+      break;
+    }
   }
 }
 
@@ -1065,6 +1073,11 @@ Property::Value TextField::PropertyHandler::GetProperty(Toolkit::TextField textF
     case Toolkit::DevelTextField::Property::INPUT_STRIKETHROUGH:
     {
       GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::INPUT);
+      break;
+    }
+    case Toolkit::DevelTextField::Property::CHARACTER_SPACING:
+    {
+      value = impl.mController->GetCharacterSpacing();
       break;
     }
   } //switch

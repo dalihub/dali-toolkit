@@ -139,6 +139,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "fontSizeScale", 
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "enableFontSizeScale",          BOOLEAN, ENABLE_FONT_SIZE_SCALE         )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "ellipsisPosition",             INTEGER, ELLIPSIS_POSITION              )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "strikethrough",                MAP,     STRIKETHROUGH                  )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "characterSpacing",             FLOAT,   CHARACTER_SPACING              )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR   )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0)
@@ -534,6 +535,12 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         impl.mTextUpdateNeeded = SetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT) || impl.mTextUpdateNeeded;
         break;
       }
+      case Toolkit::DevelTextLabel::Property::CHARACTER_SPACING:
+      {
+        const float characterSpacing = value.Get<float>();
+        impl.mController->SetCharacterSpacing(characterSpacing);
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -785,6 +792,11 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       case Toolkit::DevelTextLabel::Property::STRIKETHROUGH:
       {
         GetStrikethroughProperties(impl.mController, value, Text::EffectStyle::DEFAULT);
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::CHARACTER_SPACING:
+      {
+        value = impl.mController->GetCharacterSpacing();
         break;
       }
     }

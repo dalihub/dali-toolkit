@@ -394,6 +394,29 @@ public:
    * @param[in] numberOfRuns Number of strikethrough runs to be copied.
    */
   virtual void GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns, StrikethroughRunIndex index, Length numberOfRuns) const = 0;
+
+  /**
+   * @brief Retrieves the character spacing.
+   *
+   * @note A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+   *
+   * @return The character spacing.
+   */
+  virtual const float GetCharacterSpacing() const = 0;
+
+  /**
+   * @brief Retrieves the text buffer.
+   *
+   * @return The text buffer.
+   */
+  virtual const Character* GetTextBuffer() const = 0;
+
+  /**
+   * @brief Retrieves the Glyphs to Characters Array.
+   *
+   * @return The GlyphsToCharacters.
+   */
+  virtual const Vector<CharacterIndex>& GetGlyphsToCharacters() const = 0;
 };
 
 } // namespace Text

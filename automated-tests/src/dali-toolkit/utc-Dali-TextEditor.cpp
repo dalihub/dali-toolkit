@@ -5719,6 +5719,30 @@ int UtcDaliToolkitTextEditorUnderlineTypesGeneration3(void)
   DALI_TEST_EQUALS(DaliTestCheckMaps(underlineMapGet1, underlineMapSet1), true, TEST_LOCATION);
 
   application.GetScene().Add(textEditor1);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorCharacterSpacing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorCharacterSpacing ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  textEditor.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 300.f));
+
+  application.GetScene().Add(textEditor);
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, "Hi Experiment");
+  textEditor.SetProperty(DevelTextEditor::Property::CHARACTER_SPACING, 10.f);
+  DALI_TEST_EQUALS(textEditor.GetProperty<float>(DevelTextEditor::Property::CHARACTER_SPACING), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
   application.SendNotification();
   application.Render();
 
