@@ -257,7 +257,7 @@ private: // From Control
   /**
    * @copydoc Text::EditableControlInterface::AddDecoration()
    */
-  void AddDecoration(Actor& actor, bool needsClipping) override;
+  void AddDecoration(Actor& actor, Toolkit::Text::DecorationType type, bool needsClipping) override;
 
   /**
    * @copydoc Text::EditableControlInterface::InputFiltered()
@@ -271,6 +271,7 @@ private: // From Control
 
   // From SelectableControlInterface
 public:
+
   /**
    * @copydoc Text::SelectableControlInterface::SetTextSelectionRange()
    */
@@ -435,6 +436,13 @@ private: // Implementation
   void OnLayoutDirectionChanged(Actor actor, LayoutDirection::Type type);
 
   /**
+  * @brief Add a layer for active or cursor.
+  * @param[in] layer The actor in which to store the layer.
+  * @param[in] actor The new layer to add.
+  */
+  void AddLayer(Actor& layer, Actor& actor);
+
+  /**
    * Construct a new TextField.
    */
   TextField();
@@ -490,6 +498,7 @@ private: // Data
 
   Actor         mRenderableActor;
   Actor         mActiveLayer;
+  Actor         mCursorLayer;
   Actor         mBackgroundActor;
   CallbackBase* mIdleCallback;
 

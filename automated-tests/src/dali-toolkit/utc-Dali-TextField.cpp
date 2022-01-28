@@ -2372,7 +2372,7 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Actor layer = field.GetChildAt(1u);
+  Actor layer = field.GetChildAt(2u);
   DALI_TEST_EQUALS(layer.GetChildCount(), 1u, TEST_LOCATION); // The cursor.
   DALI_TEST_EQUALS(stencil.GetChildCount(), 0u, TEST_LOCATION);
 
@@ -2386,7 +2386,7 @@ int utcDaliTextFieldEvent02(void)
 
   // Checks the cursor and the renderer have been created.
   DALI_TEST_EQUALS(layer.GetChildCount(), 1u, TEST_LOCATION);   // The cursor.
-  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION); // The renderer
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 2u, TEST_LOCATION); // The renderer, clipped cursor
 
   Control cursor = Control::DownCast(layer.GetChildAt(0u));
   DALI_TEST_CHECK(cursor);
@@ -2468,8 +2468,8 @@ int utcDaliTextFieldEvent02(void)
 
   DALI_TEST_EQUALS(position4, position7, TEST_LOCATION); // Should be in the same position2.
 
-  // Should not be a renderer.
-  DALI_TEST_EQUALS(stencil.GetChildCount(), 0u, TEST_LOCATION);
+  // Should not be a renderer, there is only a clipped cursor.
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION);
 
   // Chanege exceed policy (EXCEED_POLICY_ORIGINAL doesn't use stencil )
   field.SetProperty(TextField::Property::TEXT, "This is a long text for the size of the text-field.");

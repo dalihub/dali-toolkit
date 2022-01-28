@@ -88,9 +88,10 @@ public:
    * @brief Add a decoration.
    *
    * @param[in] decoration The actor displaying a decoration.
+   * @param[in] type Whether this decoration is a layer or not, which layer it is.
    * @param[in] needsClipping Whether the actor needs clipping.
    */
-  virtual void AddDecoration(Actor& actor, bool needsClipping) = 0;
+  virtual void AddDecoration(Actor& actor, DecorationType type, bool needsClipping) = 0;
 
   /**
    * @brief Gets the color of the control.
