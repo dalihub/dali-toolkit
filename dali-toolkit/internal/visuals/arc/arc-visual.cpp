@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ namespace Internal
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(9); // 5 transform properties + thickness,start,sweep,radius
+
 // cap
 DALI_ENUM_TO_STRING_TABLE_BEGIN(CAP)
   DALI_ENUM_TO_STRING_WITH_SCOPE(DevelArcVisual::Cap, BUTT)
@@ -212,6 +214,7 @@ void ArcVisual::OnInitialize()
   }
 
   mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   mThicknessIndex  = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::THICKNESS, THICKNESS_NAME, mThickness);
   mStartAngleIndex = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::START_ANGLE, START_ANGLE_NAME, mStartAngle);

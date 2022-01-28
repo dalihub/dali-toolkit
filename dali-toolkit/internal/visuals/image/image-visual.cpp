@@ -51,6 +51,8 @@ namespace Internal
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(14); // 5 transform properties + wrap, pixel area, atlas, pixalign, + border/corner
+
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::FittingMode, SHRINK_TO_FIT)
@@ -513,7 +515,7 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
       }
       else
       {
-        Actor actor = mPlacementActor.GetHandle();
+        Actor   actor     = mPlacementActor.GetHandle();
         Vector2 imageSize = Vector2::ZERO;
         if(actor)
         {
@@ -521,8 +523,8 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
         }
         mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
         Texture brokenImage = mImpl->mRenderer.GetTextures().GetTexture(0);
-        naturalSize.x = brokenImage.GetWidth();
-        naturalSize.y = brokenImage.GetWidth();
+        naturalSize.x       = brokenImage.GetWidth();
+        naturalSize.y       = brokenImage.GetWidth();
       }
       return;
     }
@@ -566,6 +568,7 @@ void ImageVisual::OnInitialize()
 
   // Create the renderer
   mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   //Register transform properties
   mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
@@ -974,9 +977,9 @@ Shader ImageVisual::GenerateShader() const
 {
   Shader shader;
 
-  bool             usesWholeTexture  = true;
-  const bool       useStandardShader = !mImpl->mCustomShader;
-  const bool       useNativeImage    = (mTextures && DevelTexture::IsNative(mTextures.GetTexture(0)));
+  bool       usesWholeTexture  = true;
+  const bool useStandardShader = !mImpl->mCustomShader;
+  const bool useNativeImage    = (mTextures && DevelTexture::IsNative(mTextures.GetTexture(0)));
 
   if(useStandardShader)
   {
@@ -984,12 +987,11 @@ Shader ImageVisual::GenerateShader() const
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
       ImageVisualShaderFeature::FeatureBuilder()
-      .EnableTextureAtlas(mImpl->mFlags & Impl::IS_ATLASING_APPLIED && !useNativeImage)
-      .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
-      .EnableRoundedCorner(IsRoundedCornerRequired())
-      .EnableBorderline(IsBorderlineRequired())
-      .SetTextureForFragmentShaderCheck(useNativeImage ? mTextures.GetTexture(0) : Dali::Texture())
-    );
+        .EnableTextureAtlas(mImpl->mFlags & Impl::IS_ATLASING_APPLIED && !useNativeImage)
+        .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
+        .EnableRoundedCorner(IsRoundedCornerRequired())
+        .EnableBorderline(IsBorderlineRequired())
+        .SetTextureForFragmentShaderCheck(useNativeImage ? mTextures.GetTexture(0) : Dali::Texture()));
   }
   else
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ namespace Internal
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(6); // 5 transform properties+mix
+
 // shapes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(SHAPE_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::PrimitiveVisual::Shape, SPHERE)
@@ -380,6 +382,7 @@ void PrimitiveVisual::OnInitialize()
   }
 
   mImpl->mRenderer = Renderer::New(mGeometry, mShader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
   mImpl->mRenderer.SetProperty(Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::BACK);
 
   // Register transform properties

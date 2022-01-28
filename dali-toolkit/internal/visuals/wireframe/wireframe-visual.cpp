@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ namespace Internal
 {
 namespace
 {
+const int         CUSTOM_PROPERTY_COUNT(5);
 const char* const POSITION_ATTRIBUTE_NAME("aPosition");
 const char* const INDEX_NAME("indices");
 } // namespace
@@ -156,6 +157,7 @@ void WireframeVisual::OnInitialize()
 
   //Create the renderer
   mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   //Register transform properties
   mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
