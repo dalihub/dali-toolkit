@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_LOAD_THREAD_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
 namespace Dali
 {
@@ -68,7 +68,8 @@ struct LoadingTask
               FittingMode::Type                        fittingMode,
               SamplingMode::Type                       samplingMode,
               bool                                     orientationCorrection,
-              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
+              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+              bool                                     loadYuvPlanes);
 
   /**
    * Constructor.
@@ -144,6 +145,9 @@ public:
   bool                       cropToMask;      ///< Whether to crop the content to the mask size
   Dali::AnimatedImageLoading animatedImageLoading;
   uint32_t                   frameIndex;
+  bool                       loadYuvPlanes{false};
+
+  std::vector<Devel::PixelBuffer> pixelBuffers{};
 };
 
 /**

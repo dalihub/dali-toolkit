@@ -153,8 +153,8 @@ public:
       DOWN,      ///< Move keyboard focus towards the down direction @SINCE_1_0.0
       PAGE_UP,   ///< Move keyboard focus towards the previous page direction @SINCE_1_2.14
       PAGE_DOWN, ///< Move keyboard focus towards the next page direction @SINCE_1_2.14
-      FORWARD,   ///< Move keyboard focus towards the forward direction @SINCE_2_1.10
-      BACKWARD,  ///< Move keyboard focus towards the backward direction @SINCE_2_1.10
+      FORWARD,   ///< Move keyboard focus towards the forward direction
+      BACKWARD,  ///< Move keyboard focus towards the backward direction
     };
   };
 

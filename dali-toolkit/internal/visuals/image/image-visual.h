@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -343,6 +343,7 @@ private:
   TextureManager::LoadState                       mLoadState;             ///< The texture loading state
   bool                                            mAttemptAtlasing;       ///< If true will attempt atlasing, otherwise create unique texture
   bool                                            mOrientationCorrection; ///< true if the image will have it's orientation corrected.
+  bool                                            mNeedYuvToRgb{false};   ///< true if we need to convert yuv to rgb.
 };
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,24 +46,23 @@ const int NATIVE_SHADER_TYPE_OFFSET = VisualFactoryCache::ShaderType::NATIVE_IMA
 // enum of required list when we select shader
 enum class ImageVisualRequireFlag : uint32_t
 {
-  DEFAULT         = 0,
-  ROUNDED_CORNER  = 1 << 0,
-  BORDERLINE      = 1 << 1,
-  ALPHA_MASKING = 1 << 2,
+  DEFAULT        = 0,
+  ROUNDED_CORNER = 1 << 0,
+  BORDERLINE     = 1 << 1,
+  ALPHA_MASKING  = 1 << 2,
 };
 
-static constexpr auto SHADER_TYPE_COUNT = 8u;
+static constexpr auto          SHADER_TYPE_COUNT = 8u;
 VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[SHADER_TYPE_COUNT] =
-{
-  VisualFactoryCache::IMAGE_SHADER,
-  VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
-  VisualFactoryCache::IMAGE_SHADER_BORDERLINE,
-  VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE,
-  VisualFactoryCache::IMAGE_SHADER_MASKING,
-  VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_MASKING,
-  VisualFactoryCache::IMAGE_SHADER_BORDERLINE_MASKING,
-  VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING
-};
+  {
+    VisualFactoryCache::IMAGE_SHADER,
+    VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER,
+    VisualFactoryCache::IMAGE_SHADER_BORDERLINE,
+    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE,
+    VisualFactoryCache::IMAGE_SHADER_MASKING,
+    VisualFactoryCache::IMAGE_SHADER_ROUNDED_CORNER_MASKING,
+    VisualFactoryCache::IMAGE_SHADER_BORDERLINE_MASKING,
+    VisualFactoryCache::IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING};
 
 } // unnamed namespace
 
@@ -74,29 +73,40 @@ FeatureBuilder& FeatureBuilder::EnableTextureAtlas(bool enableAtlas)
   mTextureAtlas = (enableAtlas ? TextureAtlas::ENABLED : TextureAtlas::DISABLED);
   return *this;
 }
+
 FeatureBuilder& FeatureBuilder::ApplyDefaultTextureWrapMode(bool applyDefaultTextureWrapMode)
 {
   mDefaultTextureWrapMode = (applyDefaultTextureWrapMode ? DefaultTextureWrapMode::APPLY : DefaultTextureWrapMode::DO_NOT_APPLY);
   return *this;
 }
+
 FeatureBuilder& FeatureBuilder::EnableRoundedCorner(bool enableRoundedCorner)
 {
   mRoundedCorner = (enableRoundedCorner ? RoundedCorner::ENABLED : RoundedCorner::DISABLED);
   return *this;
 }
+
 FeatureBuilder& FeatureBuilder::EnableBorderline(bool enableBorderline)
 {
   mBorderline = (enableBorderline ? Borderline::ENABLED : Borderline::DISABLED);
   return *this;
 }
+
 FeatureBuilder& FeatureBuilder::SetTextureForFragmentShaderCheck(const Dali::Texture& texture)
 {
   mTexture = texture;
   return *this;
 }
+
 FeatureBuilder& FeatureBuilder::EnableAlphaMasking(bool enableAlphaMasking)
 {
   mAlphaMasking = (enableAlphaMasking ? AlphaMasking::ENABLED : AlphaMasking::DISABLED);
+  return *this;
+}
+
+FeatureBuilder& FeatureBuilder::EnableYuvToRgb(bool enableYuvToRgb)
+{
+  mColorConversion = (enableYuvToRgb ? ColorConversion::YUV_TO_RGB : ColorConversion::DONT_NEED);
   return *this;
 }
 } // namespace ImageVisualShaderFeature
@@ -112,7 +122,7 @@ ImageVisualShaderFactory::~ImageVisualShaderFactory()
 
 Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, const ImageVisualShaderFeature::FeatureBuilder& featureBuilder)
 {
-  Shader shader;
+  Shader                         shader;
   VisualFactoryCache::ShaderType shaderType = VisualFactoryCache::IMAGE_SHADER;
 
   const auto& atlasing               = featureBuilder.mTextureAtlas;
@@ -120,6 +130,7 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
   const auto& roundedCorner          = featureBuilder.mRoundedCorner;
   const auto& borderline             = featureBuilder.mBorderline;
   const auto& alphaMasking           = featureBuilder.mAlphaMasking;
+  const auto& colorConversion        = featureBuilder.mColorConversion;
   const auto& changeFragmentShader   = (featureBuilder.mTexture && DevelTexture::IsNative(featureBuilder.mTexture))
                                          ? ImageVisualShaderFeature::ChangeFragmentShader::NEED_CHANGE
                                          : ImageVisualShaderFeature::ChangeFragmentShader::DONT_CHANGE;
@@ -160,42 +171,56 @@ Shader ImageVisualShaderFactory::GetShader(VisualFactoryCache& factoryCache, con
     shaderType = static_cast<VisualFactoryCache::ShaderType>(static_cast<int>(shaderType) + NATIVE_SHADER_TYPE_OFFSET);
   }
 
+  if(colorConversion == ImageVisualShaderFeature::ColorConversion::YUV_TO_RGB)
+  {
+    shaderType = VisualFactoryCache::IMAGE_SHADER_YUV_TO_RGB;
+  }
+
   shader = factoryCache.GetShader(shaderType);
   if(!shader)
   {
     std::string vertexShaderPrefixList;
     std::string fragmentShaderPrefixList;
-    if(atlasing == ImageVisualShaderFeature::TextureAtlas::ENABLED)
+
+    // We don't support other properties in case of yuv format for now.
+    if(colorConversion == ImageVisualShaderFeature::ColorConversion::YUV_TO_RGB)
     {
-      if(defaultTextureWrapping == ImageVisualShaderFeature::DefaultTextureWrapMode::APPLY)
-      {
-        fragmentShaderPrefixList += "#define ATLAS_DEFAULT_WARP 1\n";
-      }
-      else
-      {
-        fragmentShaderPrefixList += "#define ATLAS_CUSTOM_WARP 1\n";
-      }
+      fragmentShaderPrefixList += "#define IS_REQUIRED_YUV_TO_RGB 1\n";
     }
     else
     {
-      if(roundedCorner == ImageVisualShaderFeature::RoundedCorner::ENABLED)
+      if(atlasing == ImageVisualShaderFeature::TextureAtlas::ENABLED)
       {
-        vertexShaderPrefixList   += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
-        fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+        if(defaultTextureWrapping == ImageVisualShaderFeature::DefaultTextureWrapMode::APPLY)
+        {
+          fragmentShaderPrefixList += "#define ATLAS_DEFAULT_WARP 1\n";
+        }
+        else
+        {
+          fragmentShaderPrefixList += "#define ATLAS_CUSTOM_WARP 1\n";
+        }
       }
-      if(borderline == ImageVisualShaderFeature::Borderline::ENABLED)
+      else
       {
-        vertexShaderPrefixList   += "#define IS_REQUIRED_BORDERLINE 1\n";
-        fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
-      }
-      if(alphaMasking == ImageVisualShaderFeature::AlphaMasking::ENABLED)
-      {
-        vertexShaderPrefixList   += "#define IS_REQUIRED_ALPHA_MASKING 1\n";
-        fragmentShaderPrefixList += "#define IS_REQUIRED_ALPHA_MASKING 1\n";
+        if(roundedCorner == ImageVisualShaderFeature::RoundedCorner::ENABLED)
+        {
+          vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+          fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+        }
+        if(borderline == ImageVisualShaderFeature::Borderline::ENABLED)
+        {
+          vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
+          fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
+        }
+        if(alphaMasking == ImageVisualShaderFeature::AlphaMasking::ENABLED)
+        {
+          vertexShaderPrefixList += "#define IS_REQUIRED_ALPHA_MASKING 1\n";
+          fragmentShaderPrefixList += "#define IS_REQUIRED_ALPHA_MASKING 1\n";
+        }
       }
     }
 
-    std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix()   + vertexShaderPrefixList   + SHADER_IMAGE_VISUAL_SHADER_VERT.data());
+    std::string vertexShader   = std::string(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_IMAGE_VISUAL_SHADER_VERT.data());
     std::string fragmentShader = std::string(Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_IMAGE_VISUAL_SHADER_FRAG.data());
 
     if(changeFragmentShader == ImageVisualShaderFeature::ChangeFragmentShader::NEED_CHANGE)

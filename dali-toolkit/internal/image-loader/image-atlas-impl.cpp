@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,7 +162,7 @@ bool ImageAtlas::Upload(Vector4&             textureRect,
   unsigned int packPositionY = 0;
   if(mPacker.Pack(dimensions.GetWidth(), dimensions.GetHeight(), packPositionX, packPositionY))
   {
-    unsigned short loadId = GetImplementation(mAsyncLoader).Load(url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF);
+    unsigned short loadId = GetImplementation(mAsyncLoader).Load(url, size, fittingMode, SamplingMode::BOX_THEN_LINEAR, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, false);
     mLoadingTaskInfoContainer.PushBack(new LoadingTaskInfo(loadId, packPositionX, packPositionY, dimensions.GetWidth(), dimensions.GetHeight(), atlasUploadObserver));
     // apply the half pixel correction
     textureRect.x = (static_cast<float>(packPositionX) + 0.5f) / mWidth;                      // left

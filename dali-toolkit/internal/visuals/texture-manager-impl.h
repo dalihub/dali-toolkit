@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_MANAGER_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
 class TextureManager : public ConnectionTracker
 {
 public:
-  typedef int32_t  TextureId;               ///< The TextureId type. This is used as a handle to refer to a particular Texture.
+  typedef int32_t          TextureId;               ///< The TextureId type. This is used as a handle to refer to a particular Texture.
   static constexpr int32_t INVALID_TEXTURE_ID = -1; ///< Used to represent a null TextureId or error
 
   /**
@@ -520,7 +520,8 @@ private:
     MultiplyOnLoad&              preMultiplyOnLoad,
     Dali::AnimatedImageLoading   animatedImageLoading,
     uint32_t                     frameIndex,
-    bool                         useCache);
+    bool                         useCache,
+    bool                         loadYuvPlanes);
 
   /**
    * @brief Get the current state of a texture
@@ -553,7 +554,8 @@ private:
                 bool                        orientationCorrection,
                 bool                        preMultiplyOnLoad,
                 Dali::AnimatedImageLoading  animatedImageLoading,
-                uint32_t                    frameIndex)
+                uint32_t                    frameIndex,
+                bool                        loadYuvPlanes)
     : url(url),
       desiredSize(desiredSize),
       useSize(desiredSize),
@@ -576,7 +578,8 @@ private:
       cropToMask(cropToMask),
       orientationCorrection(true),
       preMultiplyOnLoad(preMultiplyOnLoad),
-      preMultiplied(false)
+      preMultiplied(false),
+      loadYuvPlanes(loadYuvPlanes)
     {
       isAnimatedImageFormat = (animatedImageLoading) ? true : false;
     }
@@ -615,6 +618,7 @@ private:
     bool preMultiplyOnLoad : 1;                        ///< true if the image's color should be multiplied by it's alpha
     bool preMultiplied : 1;                            ///< true if the image's color was multiplied by it's alpha
     bool isAnimatedImageFormat : 1;                    ///< true if the image is requested from animated image visual.
+    bool loadYuvPlanes : 1;                            ///< true if the image should be loaded as yuv planes
   };
 
   /**
@@ -706,7 +710,7 @@ private:
    * @param[in] id        This is the async image loaders Id
    * @param[in] pixelBuffer The loaded image data
    */
-  void AsyncLoadComplete(AsyncLoadingInfoContainerType& container, uint32_t id, Devel::PixelBuffer pixelBuffer);
+  void AsyncLoadComplete(AsyncLoadingInfoContainerType& container, uint32_t id, std::vector<Devel::PixelBuffer>& pixelBuffer);
 
   /**
    * @brief Performs Post-Load steps including atlasing.
@@ -714,7 +718,7 @@ private:
    * @param[in] pixelBuffer The image pixelBuffer
    * @return    True if successful
    */
-  void PostLoad(TextureManager::TextureInfo& textureInfo, Devel::PixelBuffer& pixelBuffer);
+  void PostLoad(TextureManager::TextureInfo& textureInfo, std::vector<Devel::PixelBuffer>& pixelBuffer);
 
   /**
    * Check if there is a texture waiting to be masked. If there
@@ -737,6 +741,14 @@ private:
    * store the data to.
    */
   void UploadTexture(Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo);
+
+  /**
+   * Upload the texture specified in pixelBuffer to the appropriate location
+   * @param[in] pixelBuffer The image data to upload
+   * @param[in] textureInfo The texture info containing the location to
+   * store the data to.
+   */
+  void UploadTextures(std::vector<Devel::PixelBuffer>& pixelBuffers, TextureInfo& textureInfo);
 
   /**
    * Creates tiled geometry of for the texture which separates fully-opaque
@@ -856,7 +868,8 @@ private:
               FittingMode::Type                        fittingMode,
               SamplingMode::Type                       samplingMode,
               bool                                     orientationCorrection,
-              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
+              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+              bool                                     loadYuvPlanes);
 
     /**
      * @brief Apply mask
@@ -894,7 +907,7 @@ private:
      * @param[in] id          Loader id
      * @param[in] pixelBuffer Image data
      */
-    void AsyncLoadComplete(uint32_t id, Devel::PixelBuffer pixelBuffer);
+    void AsyncLoadComplete(uint32_t id, std::vector<Devel::PixelBuffer>& pixelBuffers);
 
   private:
     Toolkit::AsyncImageLoader     mLoader;

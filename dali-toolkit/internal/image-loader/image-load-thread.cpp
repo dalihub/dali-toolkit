@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 #include "image-load-thread.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 
 namespace Dali
 {
@@ -50,7 +50,7 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
+LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadYuvPlanes)
 : pixelBuffer(),
   url(url),
   encodedImageBuffer(),
@@ -65,7 +65,8 @@ LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dime
   contentScale(1.0f),
   cropToMask(false),
   animatedImageLoading(),
-  frameIndex(0u)
+  frameIndex(0u),
+  loadYuvPlanes(loadYuvPlanes)
 {
 }
 
@@ -119,7 +120,18 @@ void LoadingTask::Load()
   }
   else if(url.IsValid() && url.IsLocalResource())
   {
-    pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
+    if(!loadYuvPlanes)
+    {
+      pixelBuffer = Dali::LoadImageFromFile(url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection);
+    }
+    else
+    {
+      Dali::LoadImagePlanesFromFile(url.GetUrl(), pixelBuffers, dimensions, fittingMode, samplingMode, orientationCorrection);
+      if(!pixelBuffers.empty())
+      {
+        pixelBuffer = pixelBuffers.front();
+      }
+    }
   }
   else if(url.IsValid())
   {
@@ -283,6 +295,11 @@ void ImageLoadThread::AddCompletedTask(LoadingTask* task)
   // Lock while adding task to the queue
   Mutex::ScopedLock lock(mMutex);
   mCompleteQueue.PushBack(task);
+
+  if(task->pixelBuffers.empty() && task->pixelBuffer)
+  {
+    task->pixelBuffers.push_back(task->pixelBuffer);
+  }
 
   // wake up the main thread
   mTrigger->Trigger();

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_CACHE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,7 @@ public:
     IMAGE_SHADER_ROUNDED_BORDERLINE_MASKING,
     IMAGE_SHADER_ATLAS_DEFAULT_WRAP,
     IMAGE_SHADER_ATLAS_CUSTOM_WRAP,
+    IMAGE_SHADER_YUV_TO_RGB,
     NATIVE_IMAGE_SHADER,
     NATIVE_IMAGE_SHADER_ROUNDED_CORNER,
     NATIVE_IMAGE_SHADER_BORDERLINE,
@@ -324,12 +325,12 @@ private:
   struct BrokenImageInfo
   {
     BrokenImageInfo()
-    :visualType(),
-     url(""),
-     npatchId(NPatchData::INVALID_NPATCH_DATA_ID),
-     texture(),
-     width(0),
-     height(0)
+    : visualType(),
+      url(""),
+      npatchId(NPatchData::INVALID_NPATCH_DATA_ID),
+      texture(),
+      width(0),
+      height(0)
     {
     }
 
@@ -338,20 +339,20 @@ private:
     }
 
     // Data
-    VisualUrl::Type                         visualType;
-    std::string                             url;
-    NPatchData::NPatchDataId                npatchId;
-    Texture                                 texture;
-    uint32_t                                width;
-    uint32_t                                height;
+    VisualUrl::Type          visualType;
+    std::string              url;
+    NPatchData::NPatchDataId npatchId;
+    Texture                  texture;
+    uint32_t                 width;
+    uint32_t                 height;
   };
 
   Geometry mGeometry[GEOMETRY_TYPE_MAX + 1];
   Shader   mShader[SHADER_TYPE_MAX + 1];
 
-  ImageAtlasManagerPtr                    mAtlasManager;
-  TextureManager                          mTextureManager;
-  NPatchLoader                            mNPatchLoader;
+  ImageAtlasManagerPtr mAtlasManager;
+  TextureManager       mTextureManager;
+  NPatchLoader         mNPatchLoader;
 
   SvgRasterizeThread*                     mSvgRasterizeThread;
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;

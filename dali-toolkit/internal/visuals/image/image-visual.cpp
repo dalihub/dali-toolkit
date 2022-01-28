@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -477,7 +477,7 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
     }
 
     auto textureSet = mImpl->mRenderer.GetTextures();
-    if(textureSet)
+    if(textureSet && textureSet.GetTextureCount())
     {
       auto texture = textureSet.GetTexture(0);
       if(texture)
@@ -513,7 +513,7 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
       }
       else
       {
-        Actor actor = mPlacementActor.GetHandle();
+        Actor   actor     = mPlacementActor.GetHandle();
         Vector2 imageSize = Vector2::ZERO;
         if(actor)
         {
@@ -521,8 +521,8 @@ void ImageVisual::GetNaturalSize(Vector2& naturalSize)
         }
         mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
         Texture brokenImage = mImpl->mRenderer.GetTextures().GetTexture(0);
-        naturalSize.x = brokenImage.GetWidth();
-        naturalSize.y = brokenImage.GetWidth();
+        naturalSize.x       = brokenImage.GetWidth();
+        naturalSize.y       = brokenImage.GetWidth();
       }
       return;
     }
@@ -658,10 +658,19 @@ void ImageVisual::InitializeRenderer()
   if(mTextures)
   {
     mImpl->mRenderer.SetTextures(mTextures);
-    if(DevelTexture::IsNative(mTextures.GetTexture(0)))
+
+    bool needToUpdateShader = DevelTexture::IsNative(mTextures.GetTexture(0));
+    if(mTextures.GetTextureCount() > 1)
+    {
+      mNeedYuvToRgb      = true;
+      needToUpdateShader = true;
+    }
+
+    if(needToUpdateShader)
     {
       UpdateShader();
     }
+
     mTextures.Reset(); // Visual should not keep a handle to the texture after this point.
   }
 
@@ -882,6 +891,13 @@ void ImageVisual::UploadComplete(bool loadingSuccess, int32_t textureId, Texture
       sampler.SetWrapMode(mWrapModeU, mWrapModeV);
       textureSet.SetSampler(0u, sampler);
       mImpl->mRenderer.SetTextures(textureSet);
+
+      if(textureSet.GetTextureCount() > 1)
+      {
+        mNeedYuvToRgb = true;
+
+        UpdateShader();
+      }
     }
 
     if(actor)
@@ -974,9 +990,9 @@ Shader ImageVisual::GenerateShader() const
 {
   Shader shader;
 
-  bool             usesWholeTexture  = true;
-  const bool       useStandardShader = !mImpl->mCustomShader;
-  const bool       useNativeImage    = (mTextures && DevelTexture::IsNative(mTextures.GetTexture(0)));
+  bool       usesWholeTexture  = true;
+  const bool useStandardShader = !mImpl->mCustomShader;
+  const bool useNativeImage    = (mTextures && DevelTexture::IsNative(mTextures.GetTexture(0)));
 
   if(useStandardShader)
   {
@@ -984,12 +1000,12 @@ Shader ImageVisual::GenerateShader() const
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
       ImageVisualShaderFeature::FeatureBuilder()
-      .EnableTextureAtlas(mImpl->mFlags & Impl::IS_ATLASING_APPLIED && !useNativeImage)
-      .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
-      .EnableRoundedCorner(IsRoundedCornerRequired())
-      .EnableBorderline(IsBorderlineRequired())
-      .SetTextureForFragmentShaderCheck(useNativeImage ? mTextures.GetTexture(0) : Dali::Texture())
-    );
+        .EnableTextureAtlas(mImpl->mFlags & Impl::IS_ATLASING_APPLIED && !useNativeImage)
+        .ApplyDefaultTextureWrapMode(mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE)
+        .EnableRoundedCorner(IsRoundedCornerRequired())
+        .EnableBorderline(IsBorderlineRequired())
+        .SetTextureForFragmentShaderCheck(useNativeImage ? mTextures.GetTexture(0) : Dali::Texture())
+        .EnableYuvToRgb(mNeedYuvToRgb));
   }
   else
   {
