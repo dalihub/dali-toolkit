@@ -1224,7 +1224,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     {
       //TODO : The currently implemented strikethrough creates a strikethrough on the line level. We need to create different strikethroughs the case of glyphs with different sizes.
       strikethroughStartingYPosition = (glyphData.verticalOffset + baseline + currentUnderlinePosition) - ((line.ascender) * HALF); // Since Free Type font doesn't contain the strikethrough-position property, strikethrough position will be calculated by moving the underline position upwards by half the value of the line height.
-      DrawStrikethrough(strikethroughColor, bufferWidth, bufferHeight, glyphData, baseline, line, maxStrikethroughThickness, lineExtentLeft, lineExtentRight, strikethroughStartingYPosition);
+      DrawStrikethrough(currentStrikethroughColor, bufferWidth, bufferHeight, glyphData, baseline, line, maxStrikethroughThickness, lineExtentLeft, lineExtentRight, strikethroughStartingYPosition);
     }
 
     // Increases the vertical offset with the line's descender.
