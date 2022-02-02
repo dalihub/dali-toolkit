@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/markup-processor-embedded-item.h>
 #include <dali-toolkit/internal/text/markup-processor-font.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-processor-paragraph.h>
 #include <dali-toolkit/internal/text/markup-processor-span.h>
 #include <dali-toolkit/internal/text/markup-processor-strikethrough.h>
 #include <dali-toolkit/internal/text/markup-processor-underline.h>
@@ -1052,7 +1053,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       {
         ProcessParagraphTag(markupProcessData, tag, (markupStringBuffer == markupStringEndBuffer), characterIndex);
         ProcessTagForRun<BoundedParagraphRun>(
-          markupProcessData.boundedParagraphRuns, styleStack, tag, characterIndex, boundedParagraphRunIndex, pTagReference, [](const Tag& tag, BoundedParagraphRun& run) {});
+          markupProcessData.boundedParagraphRuns, styleStack, tag, characterIndex, boundedParagraphRunIndex, pTagReference, [](const Tag& tag, BoundedParagraphRun& run) { ProcessAttributesOfParagraphTag(tag, run); });
       } // <p></p>
     }   // end if( IsTag() )
     else if(markupStringBuffer < markupStringEndBuffer)

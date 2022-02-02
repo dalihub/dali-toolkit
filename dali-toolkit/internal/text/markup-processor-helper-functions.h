@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_HELPER_FUNCTIONS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,6 +201,17 @@ void UnderlineTypeStringToTypeValue(const char* const typeStr, Length length, Te
  * @return The float value.
  */
 float StringToFloat(const char* const floatStr);
+
+/**
+ * @brief Converts a string into its value in the enum Text::HorizontalAlignment::Type.
+ *
+ * @param[in] typeStr The horizontal-alignment type value packed inside a string.
+ * @param[in] length The length of the string.
+ * @param[out] retType The HorizontalAlignment type.
+ *
+ * @return Whether the value parsed or not.
+ */
+bool HorizontalAlignmentTypeStringToTypeValue(const char* const typeStr, Length length, Text::HorizontalAlignment::Type& retType);
 
 } // namespace Text
 
