@@ -654,17 +654,17 @@ public:
     return true;
   }
 
-  bool AddResponseBody(const std::string& body, uint32_t length) override
+  bool AddResponseBody(const int8_t* body, uint32_t length) override
   {
     return true;
   }
 
-  bool AddResponse(const std::string& headers, const std::string& body, uint32_t length) override
+  bool AddResponse(const std::string& headers, const int8_t* body, uint32_t length) override
   {
     return true;
   }
 
-  bool WriteResponseChunk(const std::string& chunk, uint32_t length) override
+  bool WriteResponseChunk(const int8_t* chunk, uint32_t length) override
   {
     return true;
   }
