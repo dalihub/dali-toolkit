@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,6 @@ public:
   class Extension; ///< Forward declare future extension interface
 
   // Creation & Destruction
-
   /**
    * @brief Creates a new ControlImpl instance that does not require touch by default.
    *
@@ -382,8 +381,7 @@ protected: // From CustomActorImpl
    */
   void OnLayoutNegotiated(float size, Dimension::Type dimension) override;
 
-protected: // Helpers for deriving classes
-  // Construction
+public: // Helpers for deriving classes
 
   /**
    * @brief Flags for the constructor.
@@ -400,6 +398,19 @@ protected: // Helpers for deriving classes
   };
 
   static const int CONTROL_BEHAVIOUR_FLAG_COUNT = Log<LAST_CONTROL_BEHAVIOUR_FLAG - 1>::value + 1; ///< Total count of flags
+
+  /**
+   * @brief Creates a new ControlImpl instance that does not require touch by default.
+   *
+   * If touch is required, then the user can connect to this class' touch signal.
+   * @SINCE_2_1.8
+   * @param[in] additionalBehaviour Additional control behaviour.
+   * @return A handle to the ControlImpl instance
+   */
+  static Toolkit::Control New(ControlBehaviour additionalBehaviour);
+
+protected:
+  // Construction
 
   /**
    * @brief Control constructor.

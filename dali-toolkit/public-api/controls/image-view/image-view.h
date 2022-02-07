@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VIEW_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,6 +171,49 @@ public:
    *       The content of the area not covered by the actual image is undefined and will not be cleared.
    */
   static ImageView New(const std::string& url, ImageDimensions size);
+
+  /**
+   * @brief Create an initialized ImageView with additional behaviour.
+   *
+   * @SINCE_2_1.8
+   * @param[in] additionalBehaviour Additional control behaviour
+   * @return A handle to a newly allocated Dali ImageView
+   *
+   * @note ImageView will not display anything.
+   */
+  static ImageView New(ControlBehaviour additionalBehaviour);
+
+  /**
+   * @brief Creates an initialized ImageView from an URL to an image resource with additional behaviour.
+   *
+   * If the string is empty, ImageView will not display anything.
+   *
+   * @SINCE_2_1.8
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
+   * @param[in] additionalBehaviour Additional control behaviour
+   * @param[in] url The url of the image resource to display
+   * @return A handle to a newly allocated ImageView
+   */
+  static ImageView New(ControlBehaviour additionalBehaviour, const std::string& url);
+
+  /**
+   * @brief Creates an initialized ImageView from a URL to an image resource with additional behaviour.
+   *
+   * If the string is empty, ImageView will not display anything.
+   *
+   * @SINCE_2_1.8
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
+   * @param[in] additionalBehaviour Additional control behaviour
+   * @param[in] url The url of the image resource to display
+   * @param[in] size The width and height to which to fit the loaded image
+   * @return A handle to a newly allocated ImageView
+   * @note A valid size is preferable for efficiency.
+   *       However, do not set a size that is bigger than the actual image size, as up-scaling is not available.
+   *       The content of the area not covered by the actual image is undefined and will not be cleared.
+   */
+  static ImageView New(ControlBehaviour additionalBehaviour, const std::string& url, ImageDimensions size);
 
   /**
    * @brief Destructor.

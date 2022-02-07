@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ namespace Dali
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(5); // 5 transform properties
+
 /**
    * @brief Loads a texture from a file
    * @param[in] imageUrl The url of the file
@@ -301,6 +303,7 @@ void MeshVisual::OnInitialize()
   }
 
   mImpl->mRenderer = Renderer::New(mGeometry, mShader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
   mImpl->mRenderer.SetTextures(mTextureSet);
   mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::ON);
   mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON);

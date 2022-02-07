@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_TEXT_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,11 @@ enum
    * @copydoc Dali::Toolkit::DevelTextLabel::Property::STRIKETHROUGH
    */
   STRIKETHROUGH = UNDERLINE + 3,
+
+  /**
+   * @copydoc Dali::Toolkit::DevelTextLabel::Property::CHARACTER_SPACING
+   */
+  CHARACTER_SPACING = UNDERLINE + 4,
 };
 
 } // namespace Property

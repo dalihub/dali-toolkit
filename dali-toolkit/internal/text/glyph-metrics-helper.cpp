@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,8 @@ void GetGlyphsMetrics(GlyphIndex             glyphIndex,
                       Length                 numberOfGlyphs,
                       GlyphMetrics&          glyphMetrics,
                       const GlyphInfo* const glyphsBuffer,
-                      MetricsPtr&            metrics)
+                      MetricsPtr&            metrics,
+                      float                  calculatedAdvance)
 {
   const GlyphInfo& firstGlyph = *(glyphsBuffer + glyphIndex);
 
@@ -72,7 +73,7 @@ void GetGlyphsMetrics(GlyphIndex             glyphIndex,
   glyphMetrics.fontId     = firstGlyph.fontId;
   glyphMetrics.fontHeight = fontMetrics.height;
   glyphMetrics.width      = firstGlyph.width;
-  glyphMetrics.advance    = firstGlyph.advance;
+  glyphMetrics.advance    = calculatedAdvance;
   glyphMetrics.ascender   = fontMetrics.ascender;
   glyphMetrics.xBearing   = firstGlyph.xBearing;
 
@@ -91,7 +92,7 @@ void GetGlyphsMetrics(GlyphIndex             glyphIndex,
       const float currentMaxGlyphWidthEdge = glyphMetrics.advance + glyphInfo.xBearing + glyphInfo.width;
       maxWidthEdge                         = std::max(maxWidthEdge, currentMaxGlyphWidthEdge);
 
-      glyphMetrics.advance += glyphInfo.advance;
+      glyphMetrics.advance += (glyphInfo.advance);
     }
 
     glyphMetrics.width = maxWidthEdge - glyphMetrics.xBearing;
@@ -100,18 +101,47 @@ void GetGlyphsMetrics(GlyphIndex             glyphIndex,
   glyphMetrics.width += (firstGlyph.isItalicRequired && !isItalicFont) ? TextAbstraction::FontClient::DEFAULT_ITALIC_ANGLE * firstGlyph.height : 0.f;
 }
 
-void GetGlyphMetricsFromCharacterIndex(CharacterIndex index, const GlyphInfo* const glyphInfoBuffer, const GlyphIndex* const charactersToGlyphBuffer, const Length* const glyphsPerCharacterBuffer, MetricsPtr& metrics, GlyphMetrics& glyphMetrics, GlyphIndex& glyphIndex, Length& numberOfGlyphs)
+void GetGlyphMetricsFromCharacterIndex(CharacterIndex         index,
+                                       const VisualModelPtr&  visualModel,
+                                       const LogicalModelPtr& logicalModel,
+                                       MetricsPtr&            metrics,
+                                       GlyphMetrics&          glyphMetrics,
+                                       GlyphIndex&            glyphIndex,
+                                       Length&                numberOfGlyphs)
 {
+  const GlyphIndex* const charactersToGlyphBuffer   = visualModel->mCharactersToGlyph.Begin();
+  const Length* const     glyphsPerCharacterBuffer  = visualModel->mGlyphsPerCharacter.Begin();
+  const GlyphInfo* const  glyphInfoBuffer           = visualModel->mGlyphs.Begin();
+  Vector<CharacterIndex>& glyphToCharacterMap       = visualModel->mGlyphsToCharacters;
+  const CharacterIndex*   glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
+  const float             characterSpacing          = visualModel->GetCharacterSpacing();
+
   //Takes the character index, obtains the glyph index (and the number of Glyphs) from it and finally gets the glyph metrics.
   glyphIndex     = *(charactersToGlyphBuffer + index);
   numberOfGlyphs = *(glyphsPerCharacterBuffer + index);
+
+  float calculatedAdvance = 0.f;
+
+  calculatedAdvance = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + glyphIndex))), characterSpacing, (*(visualModel->mGlyphs.Begin() + glyphIndex)).advance);
 
   // Get the metrics for the group of glyphs.
   GetGlyphsMetrics(glyphIndex,
                    numberOfGlyphs,
                    glyphMetrics,
                    glyphInfoBuffer,
-                   metrics);
+                   metrics,
+                   calculatedAdvance);
+}
+
+float GetCalculatedAdvance(unsigned int character, float characterSpacing, float advance)
+{
+  //Gets the final advance value by adding the CharacterSpacing value to it
+  //In some cases the CharacterSpacing should not be added. Ex: when the glyph is a ZWSP (Zero Width Space)
+  return (TextAbstraction::IsZeroWidthNonJoiner(character) || TextAbstraction::IsZeroWidthJoiner(character) ||
+          TextAbstraction::IsZeroWidthSpace(character) || TextAbstraction::IsNewParagraph(character) ||
+          TextAbstraction::IsLeftToRightMark(character) || TextAbstraction::IsRightToLeftMark(character))
+           ? advance
+           : advance + characterSpacing;
 }
 
 } // namespace Text

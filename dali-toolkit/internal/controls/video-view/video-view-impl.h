@@ -304,16 +304,6 @@ private: // From Control
    */
   Vector3 GetNaturalSize() override;
 
-  /**
-   * @copydoc Toolkit::Control::GetHeightForWidth()
-   */
-  float GetHeightForWidth(float width) override;
-
-  /**
-   * @copydoc Toolkit::Control::GetWidthForHeight()
-   */
-  float GetWidthForHeight(float height) override;
-
 private:
   /**
    * @brief Construct a new VideoView.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@
 #include <dali/integration-api/debug.h>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-actions-devel.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -41,14 +41,16 @@ namespace Internal
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(12); // 5 transform properties + Blur Radius + Mix Color + border/corner
+
 VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[6] =
-{
-  VisualFactoryCache::COLOR_SHADER,
-  VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER,
-  VisualFactoryCache::COLOR_SHADER_BORDERLINE,
-  VisualFactoryCache::COLOR_SHADER_ROUNDED_BORDERLINE,
-  VisualFactoryCache::COLOR_SHADER_BLUR_EDGE,
-  VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE,
+  {
+    VisualFactoryCache::COLOR_SHADER,
+    VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER,
+    VisualFactoryCache::COLOR_SHADER_BORDERLINE,
+    VisualFactoryCache::COLOR_SHADER_ROUNDED_BORDERLINE,
+    VisualFactoryCache::COLOR_SHADER_BLUR_EDGE,
+    VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER_BLUR_EDGE,
 };
 
 // enum of required list when we select shader
@@ -198,6 +200,7 @@ void ColorVisual::OnInitialize()
   Shader shader = GenerateShader();
 
   mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   // ColorVisual has it's own index key for mix color - use this instead
   // of using the new base index to avoid changing existing applications
@@ -216,13 +219,13 @@ void ColorVisual::OnInitialize()
 
 Shader ColorVisual::GenerateShader() const
 {
-  Shader shader;
+  Shader                         shader;
   VisualFactoryCache::ShaderType shaderType;
 
-  bool roundedCorner = IsRoundedCornerRequired();
-  bool borderline    = IsBorderlineRequired();
-  bool blur          = !EqualsZero(mBlurRadius) || mAlwaysUsingBlurRadius;
-  int shaderTypeFlag = ColorVisualRequireFlag::DEFAULT;
+  bool roundedCorner  = IsRoundedCornerRequired();
+  bool borderline     = IsBorderlineRequired();
+  bool blur           = !EqualsZero(mBlurRadius) || mAlwaysUsingBlurRadius;
+  int  shaderTypeFlag = ColorVisualRequireFlag::DEFAULT;
 
   if(roundedCorner)
   {
@@ -240,27 +243,27 @@ Shader ColorVisual::GenerateShader() const
   }
 
   shaderType = SHADER_TYPE_TABLE[shaderTypeFlag];
-  shader = mFactoryCache.GetShader(shaderType);
+  shader     = mFactoryCache.GetShader(shaderType);
   if(!shader)
   {
     std::string vertexShaderPrefixList;
     std::string fragmentShaderPrefixList;
     if(roundedCorner)
     {
-      vertexShaderPrefixList   += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
       fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
     }
     if(blur)
     {
-      vertexShaderPrefixList   += "#define IS_REQUIRED_BLUR 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_BLUR 1\n";
       fragmentShaderPrefixList += "#define IS_REQUIRED_BLUR 1\n";
     }
     if(borderline)
     {
-      vertexShaderPrefixList   += "#define IS_REQUIRED_BORDERLINE 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
       fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
     }
-    shader = Shader::New(Dali::Shader::GetVertexShaderPrefix()   + vertexShaderPrefixList   + SHADER_COLOR_VISUAL_SHADER_VERT.data(),
+    shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_VERT.data(),
                          Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_COLOR_VISUAL_SHADER_FRAG.data());
     mFactoryCache.SaveShader(shaderType, shader);
   }

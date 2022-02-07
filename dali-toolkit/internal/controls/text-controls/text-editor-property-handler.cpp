@@ -716,6 +716,13 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       }
       break;
     }
+    case Toolkit::DevelTextEditor::Property::CHARACTER_SPACING:
+    {
+      const float characterSpacing = value.Get<float>();
+      impl.mController->SetCharacterSpacing(characterSpacing);
+      impl.mRenderer.Reset();
+      break;
+    }
   }
 }
 
@@ -1116,6 +1123,11 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     case Toolkit::DevelTextEditor::Property::MIN_LINE_SIZE:
     {
       value = impl.mController->GetDefaultLineSize();
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::CHARACTER_SPACING:
+    {
+      value = impl.mController->GetCharacterSpacing();
       break;
     }
   } //switch

@@ -608,30 +608,6 @@ Vector3 VideoView::GetNaturalSize()
   }
 }
 
-float VideoView::GetHeightForWidth(float width)
-{
-  if(mVideoSize.GetWidth() > 0 && mVideoSize.GetHeight() > 0)
-  {
-    return GetHeightForWidthBase(width);
-  }
-  else
-  {
-    return Control::GetHeightForWidthBase(width);
-  }
-}
-
-float VideoView::GetWidthForHeight(float height)
-{
-  if(mVideoSize.GetWidth() > 0 && mVideoSize.GetHeight() > 0)
-  {
-    return GetWidthForHeightBase(height);
-  }
-  else
-  {
-    return Control::GetWidthForHeightBase(height);
-  }
-}
-
 void VideoView::SetWindowSurfaceTarget()
 {
   Actor self = Self();

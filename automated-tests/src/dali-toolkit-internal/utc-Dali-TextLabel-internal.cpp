@@ -227,7 +227,7 @@ int UtcDaliTextLabelMarkupStrikethrough(void)
 
   application.GetScene().Add(textLabel);
 
-  textLabel.SetProperty(TextLabel::Property::TEXT, "<s>ABC</s>EF<s color='red'>GH</s>");
+  textLabel.SetProperty(TextLabel::Property::TEXT, "<s color='red'>ABC</s>EF<s color='green'>GH</s>");
   textLabel.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
 
   application.SendNotification();
@@ -247,12 +247,18 @@ int UtcDaliTextLabelMarkupStrikethrough(void)
   //ABC have strikethrough
   DALI_TEST_EQUALS(strikethroughRuns[0u].glyphRun.glyphIndex, 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(strikethroughRuns[0u].glyphRun.numberOfGlyphs, 3u, TEST_LOCATION);
-  DALI_TEST_CHECK(!strikethroughRuns[0u].isColorSet);
+  DALI_TEST_CHECK(strikethroughRuns[0u].isColorSet);
+  DALI_TEST_EQUALS(strikethroughRuns[0u].color.r, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(strikethroughRuns[0u].color.g, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(strikethroughRuns[0u].color.b, 0u, TEST_LOCATION);
 
   //GH have strikethrough
   DALI_TEST_EQUALS(strikethroughRuns[1u].glyphRun.glyphIndex, 5u, TEST_LOCATION);
   DALI_TEST_EQUALS(strikethroughRuns[1u].glyphRun.numberOfGlyphs, 2u, TEST_LOCATION);
   DALI_TEST_CHECK(strikethroughRuns[1u].isColorSet);
+  DALI_TEST_EQUALS(strikethroughRuns[1u].color.r, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(strikethroughRuns[1u].color.g, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(strikethroughRuns[1u].color.b, 0u, TEST_LOCATION);
 
   END_TEST;
 }

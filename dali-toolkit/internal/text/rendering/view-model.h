@@ -276,6 +276,21 @@ public:
   Length GetHyphensCount() const override;
 
   /**
+  * @copydoc ModelInterface::GetCharacterSpacing()
+  */
+  const float GetCharacterSpacing() const override;
+
+  /**
+  * @copydoc ModelInterface::GetTextBuffer()
+  */
+  const Character* GetTextBuffer() const override;
+
+  /**
+  * @copydoc ModelInterface::GetGlyphsToCharacters()
+  */
+  const Vector<CharacterIndex>& GetGlyphsToCharacters() const override;
+
+  /**
    * @brief Does the text elide at the end, start or middle of text according to ellipsis position
    *
    * It stores a copy of the visible glyphs and removes as many glyphs as needed

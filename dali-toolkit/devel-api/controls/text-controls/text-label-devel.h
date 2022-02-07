@@ -185,6 +185,15 @@ enum Type
    *
    */
   STRIKETHROUGH,
+
+  /**
+  * @brief The spaces between characters in Pixels.
+  * @details Name "characterSpacing", type Property::FLOAT.
+  * @note
+  *   A positive value will make the characters far apart (expanded) and a negative value will bring them closer (condensed).
+  *   The default value is 0.f which does nothing.
+  */
+  CHARACTER_SPACING,
 };
 
 } // namespace Property

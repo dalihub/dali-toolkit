@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,6 +168,21 @@ public:
   typedef Signal<void(Control)> ResourceReadySignalType;
 
 public: // Creation & Destruction
+
+  /**
+   * @brief Additional control behaviour flags for the control constructor.
+   * @note TODO : Currunt code is hard-coded. We Should sync type values as
+   * CustomActorImpl::ActorFlag and Internal::Control::ControlBehaviour in future.
+   * @SINCE_2_1.8
+   */
+  enum ControlBehaviour
+  {
+    CONTROL_BEHAVIOUR_DEFAULT            = 0,            ///< Default behaviour: Size negotiation is enabled & listens to Style Change signal, but doesn't receive event callbacks. @SINCE_1_2_10
+    DISABLE_SIZE_NEGOTIATION             = 1 << (0 + 0), ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm @SINCE_1_0.0
+    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << (4 + 1), ///< True if needs to support keyboard navigation @SINCE_1_0.0
+    DISABLE_STYLE_CHANGE_SIGNALS         = 1 << (4 + 2), ///< True if control should not monitor style change signals @SINCE_1_2_10
+  };
+
   /**
    * @brief Creates a new instance of a Control.
    *
@@ -175,6 +190,15 @@ public: // Creation & Destruction
    * @return A handle to a new Control
    */
   static Control New();
+
+  /**
+   * @brief Creates a new instance of a Control with additional behaviour.
+   *
+   * @SINCE_2_1.8
+   * @param[in] additionalBehaviour Additional control behaviour
+   * @return A handle to a new Control
+   */
+  static Control New(ControlBehaviour additionalBehaviour);
 
   /**
    * @brief Creates an uninitialized Control handle.

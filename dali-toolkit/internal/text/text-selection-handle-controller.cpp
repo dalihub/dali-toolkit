@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
 
 using namespace Dali;
@@ -103,10 +104,13 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
   }
 
   // Get the indices to the first and last selected glyphs.
-  const CharacterIndex selectionEndMinusOne = selectionEnd - 1u;
-  const GlyphIndex     glyphStart           = *(charactersToGlyphBuffer + selectionStart);
-  const Length         numberOfGlyphs       = *(glyphsPerCharacterBuffer + selectionEndMinusOne);
-  const GlyphIndex     glyphEnd             = *(charactersToGlyphBuffer + selectionEndMinusOne) + ((numberOfGlyphs > 0) ? numberOfGlyphs - 1u : 0u);
+  const CharacterIndex    selectionEndMinusOne      = selectionEnd - 1u;
+  const GlyphIndex        glyphStart                = *(charactersToGlyphBuffer + selectionStart);
+  const Length            numberOfGlyphs            = *(glyphsPerCharacterBuffer + selectionEndMinusOne);
+  const GlyphIndex        glyphEnd                  = *(charactersToGlyphBuffer + selectionEndMinusOne) + ((numberOfGlyphs > 0) ? numberOfGlyphs - 1u : 0u);
+  const float             characterSpacing          = visualModel->GetCharacterSpacing();
+  Vector<CharacterIndex>& glyphToCharacterMap       = visualModel->mGlyphsToCharacters;
+  const CharacterIndex*   glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
 
   // Get the lines where the glyphs are laid-out.
   const LineRun* lineRun = visualModel->mLines.Begin();
@@ -163,18 +167,20 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
   // Count the actual number of quads.
   unsigned int actualNumberOfQuads = 0u;
   Vector4      quad;
+  float        calculatedAdvance = 0.f;
 
   // Traverse the glyphs.
   for(GlyphIndex index = glyphStart; index <= glyphEnd; ++index)
   {
     const GlyphInfo& glyph    = *(glyphsBuffer + index);
     const Vector2&   position = *(positionsBuffer + index);
+    calculatedAdvance         = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + index))), characterSpacing, glyph.advance);
 
     if(splitStartGlyph)
     {
       // If the first glyph is a ligature that must be broken it may be needed to add only part of the glyph to the highlight box.
 
-      const float          glyphAdvance    = glyph.advance / static_cast<float>(numberOfCharactersStart);
+      const float          glyphAdvance    = calculatedAdvance / static_cast<float>(numberOfCharactersStart);
       const CharacterIndex interGlyphIndex = selectionStart - *(glyphToCharacterBuffer + glyphStart);
       // Get the direction of the character.
       CharacterDirection isCurrentRightToLeft = false;
@@ -207,7 +213,7 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
     {
       // Equally, if the last glyph is a ligature that must be broken it may be needed to add only part of the glyph to the highlight box.
 
-      const float          glyphAdvance    = glyph.advance / static_cast<float>(numberOfCharactersEnd);
+      const float          glyphAdvance    = calculatedAdvance / static_cast<float>(numberOfCharactersEnd);
       const CharacterIndex interGlyphIndex = selectionEnd - *(glyphToCharacterBuffer + glyphEnd);
       // Get the direction of the character.
       CharacterDirection isCurrentRightToLeft = false;
@@ -237,7 +243,7 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
 
     quad.x = lineRun->alignmentOffset + position.x - glyph.xBearing + model->mScrollPosition.x;
     quad.y = selectionBoxInfo->lineOffset;
-    quad.z = quad.x + glyph.advance;
+    quad.z = quad.x + calculatedAdvance;
     quad.w = quad.y + selectionBoxInfo->lineHeight;
 
     // Store the min and max 'x' for each line.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,8 @@ namespace Internal
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(11); // 5 transform properties + alignment + corner/border
+
 DALI_ENUM_TO_STRING_TABLE_BEGIN(UNITS)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::GradientVisual::Units, OBJECT_BOUNDING_BOX)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::GradientVisual::Units, USER_SPACE)
@@ -65,23 +67,23 @@ const unsigned int DEFAULT_OFFSET_MINIMUM = 0.0f;
 const unsigned int DEFAULT_OFFSET_MAXIMUM = 1.0f;
 
 VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[16] =
-{
-  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX,
-  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_CORNER,
-  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_BORDERLINE,
-  VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_BORDERLINE,
-  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE,
-  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_CORNER,
-  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_BORDERLINE,
-  VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_BORDERLINE,
-  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX,
-  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_CORNER,
-  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_BORDERLINE,
-  VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_BORDERLINE,
-  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE,
-  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_CORNER,
-  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_BORDERLINE,
-  VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_BORDERLINE,
+  {
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX,
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_CORNER,
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_BORDERLINE,
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_BORDERLINE,
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE,
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_CORNER,
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_BORDERLINE,
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_BORDERLINE,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_CORNER,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_BORDERLINE,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_BORDERLINE,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_CORNER,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_BORDERLINE,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_BORDERLINE,
 };
 
 // enum of required list when we select shader
@@ -251,6 +253,7 @@ void GradientVisual::OnInitialize()
   textureSet.SetSampler(0u, sampler);
 
   mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
   mImpl->mRenderer.SetTextures(textureSet);
 
   // If opaque and then no need to have blending
@@ -352,7 +355,7 @@ Shader GradientVisual::GenerateShader() const
   bool borderline     = IsBorderlineRequired();
   bool radialGradient = (mGradientType == Type::RADIAL);
 
-  int  shaderTypeFlag = GradientVisualRequireFlag::DEFAULT;
+  int shaderTypeFlag = GradientVisualRequireFlag::DEFAULT;
   if(roundedCorner)
   {
     shaderTypeFlag |= GradientVisualRequireFlag::ROUNDED_CORNER;
@@ -379,12 +382,12 @@ Shader GradientVisual::GenerateShader() const
 
     if(roundedCorner)
     {
-      vertexShaderPrefixList   += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
       fragmentShaderPrefixList += "#define IS_REQUIRED_ROUNDED_CORNER 1\n";
     }
     if(borderline)
     {
-      vertexShaderPrefixList   += "#define IS_REQUIRED_BORDERLINE 1\n";
+      vertexShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
       fragmentShaderPrefixList += "#define IS_REQUIRED_BORDERLINE 1\n";
     }
     if(radialGradient)
@@ -393,10 +396,10 @@ Shader GradientVisual::GenerateShader() const
     }
     if(userspaceUnit)
     {
-      vertexShaderPrefixList   += "#define USER_SPACE 1\n";
+      vertexShaderPrefixList += "#define USER_SPACE 1\n";
     }
 
-    shader = Shader::New(Dali::Shader::GetVertexShaderPrefix()   + vertexShaderPrefixList   + SHADER_GRADIENT_VISUAL_SHADER_VERT.data(),
+    shader = Shader::New(Dali::Shader::GetVertexShaderPrefix() + vertexShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_VERT.data(),
                          Dali::Shader::GetFragmentShaderPrefix() + fragmentShaderPrefixList + SHADER_GRADIENT_VISUAL_SHADER_FRAG.data());
     mFactoryCache.SaveShader(shaderType, shader);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@ namespace Internal
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(12); // 5 transform properties + Start point/color, end point/color, rotate center/angle, offset
+
 DALI_ENUM_TO_STRING_TABLE_BEGIN(GRADIENT_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelAnimatedGradientVisual::GradientType, LINEAR)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::DevelAnimatedGradientVisual::GradientType, RADIAL)
@@ -663,6 +665,7 @@ void AnimatedGradientVisual::OnInitialize()
   }
 
   mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   mImpl->mRenderer.RegisterProperty(UNIFORM_START_POINT_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::START_POSITION, START_POSITION_NAME));
   mImpl->mRenderer.RegisterProperty(UNIFORM_START_COLOR_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::START_COLOR, START_COLOR_NAME));

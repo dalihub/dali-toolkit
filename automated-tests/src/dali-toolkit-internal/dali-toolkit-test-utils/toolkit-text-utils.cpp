@@ -102,7 +102,8 @@ void CreateTextModel(const std::string&                text,
                      LineWrap::Mode                    wrapMode,
                      bool                              ellipsisEnabled,
                      DevelText::EllipsisPosition::Type ellipsisPosition,
-                     float                             lineSpacing)
+                     float                             lineSpacing,
+                     float                             characterSpacing)
 {
   textModel                    = Model::New(); ///< Pointer to the text's model.
   LogicalModelPtr logicalModel = textModel->mLogicalModel;
@@ -298,6 +299,8 @@ void CreateTextModel(const std::string&                text,
   // Create the 'number of glyphs' per character and the glyph to character conversion tables.
   visualModel->CreateGlyphsPerCharacterTable(0u, 0u, characterCount);
   visualModel->CreateCharacterToGlyphTable(0u, 0u, characterCount);
+
+  visualModel->SetCharacterSpacing(characterSpacing);
 
   const Length numberOfGlyphs = glyphs.Count();
 

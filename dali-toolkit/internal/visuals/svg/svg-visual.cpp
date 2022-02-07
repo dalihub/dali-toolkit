@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ namespace Internal
 {
 namespace
 {
+const int CUSTOM_PROPERTY_COUNT(11); // 5 transform properties + atlas + corner/border
+
 // property name
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
@@ -84,9 +86,10 @@ SvgVisual::~SvgVisual()
 
 void SvgVisual::OnInitialize()
 {
-  Shader shader = GenerateShader();
+  Shader   shader   = GenerateShader();
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
   mImpl->mRenderer  = Renderer::New(geometry, shader);
+  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 }
 
 void SvgVisual::DoSetProperties(const Property::Map& propertyMap)
@@ -158,7 +161,7 @@ void SvgVisual::DoSetOnScene(Actor& actor)
   if(mLoadFailed)
   {
     Vector2 imageSize = Vector2::ZERO;
-    imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+    imageSize         = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
     mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
     actor.AddRenderer(mImpl->mRenderer);
 
@@ -328,7 +331,7 @@ void SvgVisual::ApplyRasterizedImage(VectorImageRenderer vectorRenderer, PixelDa
     if(actor)
     {
       Vector2 imageSize = Vector2::ZERO;
-      imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
+      imageSize         = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
       mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
       actor.AddRenderer(mImpl->mRenderer);
     }
@@ -379,10 +382,9 @@ Shader SvgVisual::GenerateShader() const
     shader = mImageVisualShaderFactory.GetShader(
       mFactoryCache,
       ImageVisualShaderFeature::FeatureBuilder()
-      .EnableTextureAtlas(mAttemptAtlasing)
-      .EnableRoundedCorner(IsRoundedCornerRequired())
-      .EnableBorderline(IsBorderlineRequired())
-    );
+        .EnableTextureAtlas(mAttemptAtlasing)
+        .EnableRoundedCorner(IsRoundedCornerRequired())
+        .EnableBorderline(IsBorderlineRequired()));
   }
   else
   {

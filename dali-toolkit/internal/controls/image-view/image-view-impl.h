@@ -39,8 +39,10 @@ class ImageView : public Control
 protected:
   /**
    * Construct a new ImageView.
+   *
+   * @param[in] additionalBehaviour additional behaviour flags for this ImageView
    */
-  ImageView();
+  ImageView(ControlBehaviour additionalBehaviour);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -50,9 +52,11 @@ protected:
 public:
   /**
    * Create a new ImageView.
+   *
+   * @param[in] additionalBehaviour custom behavior flags for this ImageView. Default is CONTROL_BEHAVIOUR_DEFAULT
    * @return A smart-pointer to the newly allocated ImageView.
    */
-  static Toolkit::ImageView New();
+  static Toolkit::ImageView New(ControlBehaviour additionalBehaviour = ControlBehaviour::CONTROL_BEHAVIOUR_DEFAULT);
 
   /**
    * @brief Sets this ImageView from an Dali::Property::Map

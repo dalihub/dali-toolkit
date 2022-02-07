@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-view-interface.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
 
@@ -50,6 +51,13 @@ public:
    * @param[in] visualModel The visual model used by the View.
    */
   void SetVisualModel(VisualModelPtr visualModel);
+
+  /**
+   * @brief Set the logical model.
+   *
+   * @param[in] logicalModel The logical model used by the View.
+   */
+  void SetLogicalModel(LogicalModelPtr logicalModel);
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetControlSize()
@@ -238,6 +246,21 @@ public:
   void GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns,
                             StrikethroughRunIndex  index,
                             Length                 numberOfRuns) const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetCharacterSpacing()
+   */
+  const float GetCharacterSpacing() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetTextBuffer()
+   */
+  const Character* GetTextBuffer() const override;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetGlyphsToCharacters()
+   */
+  const Vector<CharacterIndex>& GetGlyphsToCharacters() const override;
 
 private:
   // Undefined
