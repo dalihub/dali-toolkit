@@ -153,6 +153,11 @@ public:
    */
   void ClearFontDescriptionRuns();
 
+  /**
+   * @brief Clears the strikethrough runs.
+   */
+  void ClearStrikethroughRuns();
+
   // Paragraphs
 
   /**

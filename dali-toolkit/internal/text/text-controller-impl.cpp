@@ -1639,8 +1639,14 @@ void Controller::Impl::CopyStrikethroughFromLogicalToVisualModels()
 
   for(Vector<StrikethroughCharacterRun>::ConstIterator it = strikethroughCharacterRuns.Begin(), endIt = strikethroughCharacterRuns.End(); it != endIt; ++it)
   {
-    CharacterIndex        characterIndex     = it->characterRun.characterIndex;
-    Length                numberOfCharacters = it->characterRun.numberOfCharacters;
+    CharacterIndex characterIndex     = it->characterRun.characterIndex;
+    Length         numberOfCharacters = it->characterRun.numberOfCharacters;
+
+    if(numberOfCharacters == 0)
+    {
+      continue;
+    }
+
     StrikethroughGlyphRun strikethroughGlyphRun;
     strikethroughGlyphRun.color                   = it->color;
     strikethroughGlyphRun.isColorSet              = it->isColorSet;
@@ -1836,6 +1842,7 @@ void Controller::Impl::ClearStyleData()
 {
   mModel->mLogicalModel->mColorRuns.Clear();
   mModel->mLogicalModel->ClearFontDescriptionRuns();
+  mModel->mLogicalModel->ClearStrikethroughRuns();
 }
 
 void Controller::Impl::ResetScrollPosition()
