@@ -193,6 +193,15 @@ void Vector2ToString(const Vector2& value, std::string& vector2Str);
  */
 void UnderlineTypeStringToTypeValue(const char* const typeStr, Length length, Text::Underline::Type& retType);
 
+/**
+ * @brief Converts a string into a float value.
+ *
+ * @param[in] floatStr A float packed inside a string.
+ *
+ * @return The float value.
+ */
+float StringToFloat(const char* const floatStr);
+
 } // namespace Text
 
 } // namespace Toolkit

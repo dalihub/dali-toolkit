@@ -150,6 +150,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/markup-processor-span.cpp
    ${toolkit_src_dir}/text/markup-processor-strikethrough.cpp
    ${toolkit_src_dir}/text/markup-processor-helper-functions.cpp
+   ${toolkit_src_dir}/text/markup-processor-attribute-helper-functions.cpp
    ${toolkit_src_dir}/text/multi-language-support.cpp
    ${toolkit_src_dir}/text/hidden-text.cpp
    ${toolkit_src_dir}/text/input-filter.cpp
