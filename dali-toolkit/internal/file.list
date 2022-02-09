@@ -149,6 +149,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/markup-processor-background.cpp
    ${toolkit_src_dir}/text/markup-processor-span.cpp
    ${toolkit_src_dir}/text/markup-processor-strikethrough.cpp
+   ${toolkit_src_dir}/text/markup-processor-underline.cpp
    ${toolkit_src_dir}/text/markup-processor-helper-functions.cpp
    ${toolkit_src_dir}/text/markup-processor-attribute-helper-functions.cpp
    ${toolkit_src_dir}/text/multi-language-support.cpp
@@ -197,6 +198,8 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/text/rendering/text-backend-impl.cpp
    ${toolkit_src_dir}/text/rendering/text-typesetter.cpp
    ${toolkit_src_dir}/text/rendering/view-model.cpp
+   ${toolkit_src_dir}/text/rendering/styles/underline-helper-functions.cpp
+   ${toolkit_src_dir}/text/rendering/styles/strikethrough-helper-functions
    ${toolkit_src_dir}/transition/fade-transition-impl.cpp
    ${toolkit_src_dir}/transition/slide-transition-impl.cpp
    ${toolkit_src_dir}/transition/scale-transition-impl.cpp

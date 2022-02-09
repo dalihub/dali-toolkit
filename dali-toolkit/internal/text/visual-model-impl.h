@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/strikethrough-glyph-run.h>
+#include <dali-toolkit/internal/text/underlined-glyph-run.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 // DEVEL INCLUDES
@@ -172,9 +173,9 @@ public:
    * @param[in] index Index of the first underline run to be copied.
    * @param[in] numberOfRuns Number of underline runs to be copied.
    */
-  void GetUnderlineRuns(GlyphRun*         underlineRuns,
-                        UnderlineRunIndex index,
-                        Length            numberOfRuns) const;
+  void GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns,
+                        UnderlineRunIndex   index,
+                        Length              numberOfRuns) const;
 
   // Size interface
 
@@ -621,7 +622,7 @@ public:
   Vector<Length>                mGlyphsPerCharacter;     ///< For each character, the number of glyphs that are shaped.
   Vector<Vector2>               mGlyphPositions;         ///< For each glyph, the position.
   Vector<LineRun>               mLines;                  ///< The laid out lines.
-  Vector<GlyphRun>              mUnderlineRuns;          ///< Runs of glyphs that are underlined.
+  Vector<UnderlinedGlyphRun>    mUnderlineRuns;          ///< Runs of glyphs that are underlined.
   Vector<Vector4>               mColors;                 ///< Colors of the glyphs.
   Vector<ColorIndex>            mColorIndices;           ///< Indices to the vector of colors for each glyphs.
   Vector<Vector4>               mBackgroundColors;       ///< Background colors of the glyphs.

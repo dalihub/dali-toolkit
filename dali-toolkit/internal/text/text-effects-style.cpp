@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-style-properties-devel.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
-#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 
 namespace Dali
@@ -355,8 +354,8 @@ bool SetUnderlineProperties(ControllerPtr controller, const Property::Value& val
       {
         const Property::Map& propertiesMap = value.Get<Property::Map>();
 
-        bool                  enabled       = false;
-        bool                  colorDefined  = false;
+        bool                  enabled      = false;
+        bool                  colorDefined = false;
         Vector4               color;
         bool                  heightDefined = false;
         float                 height        = 0.f;
@@ -976,11 +975,11 @@ bool SetStrikethroughProperties(ControllerPtr controller, const Property::Value&
             Text::ParsePropertyString(propertyString, parsedStringMap);
 
             empty = ParseStrikethroughProperties(parsedStringMap,
-                                             enabled,
-                                             colorDefined,
-                                             color,
-                                             heightDefined,
-                                             height);
+                                                 enabled,
+                                                 colorDefined,
+                                                 color,
+                                                 heightDefined,
+                                                 height);
 
             controller->StrikethroughSetByString(!empty);
           }
@@ -1057,7 +1056,7 @@ void GetStrikethroughProperties(ControllerPtr controller, Property::Value& value
         if(controller->IsStrikethroughSetByString())
         {
           std::string       strikethroughProperties = "{\"enable\":";
-          const std::string enabledStr          = enabled ? "true" : "false";
+          const std::string enabledStr              = enabled ? "true" : "false";
           strikethroughProperties += "\"" + enabledStr + "\",";
 
           std::string colorStr;
@@ -1090,6 +1089,17 @@ void GetStrikethroughProperties(ControllerPtr controller, Property::Value& value
       }
     }
   }
+}
+
+Underline::Type StringToUnderlineType(const char* const underlineTypeStr)
+{
+  Underline::Type underlineType = Text::Underline::SOLID;
+  Scripting::GetEnumeration<Underline::Type>(underlineTypeStr,
+                                             UNDERLINE_TYPE_STRING_TABLE,
+                                             UNDERLINE_TYPE_STRING_TABLE_COUNT,
+                                             underlineType);
+
+  return underlineType;
 }
 
 } // namespace Text

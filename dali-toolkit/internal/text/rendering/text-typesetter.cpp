@@ -26,6 +26,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/rendering/styles/strikethrough-helper-functions.h>
+#include <dali-toolkit/internal/text/rendering/styles/underline-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
 
 namespace Dali
@@ -37,6 +39,7 @@ namespace Text
 namespace
 {
 const float HALF(0.5f);
+const float ONE_AND_A_HALF(1.5f);
 /**
  * @brief Data struct used to set the buffer of the glyph's bitmap into the final bitmap's buffer.
  */
@@ -257,25 +260,6 @@ void TypesetGlyph(GlyphData&           data,
   }
 }
 
-bool IsGlyphUnderlined(GlyphIndex              index,
-                       const Vector<GlyphRun>& underlineRuns)
-{
-  for(Vector<GlyphRun>::ConstIterator it    = underlineRuns.Begin(),
-                                      endIt = underlineRuns.End();
-      it != endIt;
-      ++it)
-  {
-    const GlyphRun& run = *it;
-
-    if((run.glyphIndex <= index) && (index < run.glyphIndex + run.numberOfGlyphs))
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
 bool doGlyphHaveStrikethrough(GlyphIndex                           index,
                               const Vector<StrikethroughGlyphRun>& strikethroughRuns,
                               Vector4&                             strikethroughColor)
@@ -299,79 +283,6 @@ bool doGlyphHaveStrikethrough(GlyphIndex                           index,
   }
 
   return false;
-}
-
-/// Helper method to fetch the underline metrics for the specified font glyph
-void FetchFontDecorationlinesMetrics(
-  TextAbstraction::FontClient& fontClient,
-  const GlyphInfo* const       glyphInfo,
-  float&                       currentUnderlinePosition,
-  const float                  underlineHeight,
-  float&                       currentUnderlineThickness,
-  float&                       maxUnderlineThickness,
-  FontId&                      lastlinedFontId,
-  const float                  strikethroughHeight,
-  float&                       currentStrikethroughThickness,
-  float&                       maxStrikethroughThickness)
-{
-  FontMetrics fontMetrics;
-  fontClient.GetFontMetrics(glyphInfo->fontId, fontMetrics);
-  currentUnderlinePosition = ceil(fabsf(fontMetrics.underlinePosition));
-  const float descender    = ceil(fabsf(fontMetrics.descender));
-
-  if(fabsf(underlineHeight) < Math::MACHINE_EPSILON_1000)
-  {
-    currentUnderlineThickness = fontMetrics.underlineThickness;
-
-    // Ensure underline will be at least a pixel high
-    if(currentUnderlineThickness < 1.0f)
-    {
-      currentUnderlineThickness = 1.0f;
-    }
-    else
-    {
-      currentUnderlineThickness = ceil(currentUnderlineThickness);
-    }
-  }
-
-  if(fabsf(strikethroughHeight) < Math::MACHINE_EPSILON_1000)
-  {
-    // Ensure strikethrough will be at least a pixel high
-    if(currentStrikethroughThickness < 1.0f)
-    {
-      currentStrikethroughThickness = 1.0f;
-    }
-    else
-    {
-      currentStrikethroughThickness = ceil(currentStrikethroughThickness);
-    }
-  }
-
-  // The underline thickness should be the max underline thickness of all glyphs of the line.
-  if(currentUnderlineThickness > maxUnderlineThickness)
-  {
-    maxUnderlineThickness = currentUnderlineThickness;
-  }
-
-  // The strikethrough thickness should be the max strikethrough thickness of all glyphs of the line.
-  if(currentStrikethroughThickness > maxStrikethroughThickness)
-  {
-    maxStrikethroughThickness = currentStrikethroughThickness;
-  }
-
-  // Clamp the underline position at the font descender and check for ( as EFL describes it ) a broken font
-  if(currentUnderlinePosition > descender)
-  {
-    currentUnderlinePosition = descender;
-  }
-
-  if(fabsf(currentUnderlinePosition) < Math::MACHINE_EPSILON_1000)
-  {
-    // Move offset down by one ( EFL behavior )
-    currentUnderlinePosition = 1.0f;
-  }
-
-  lastlinedFontId = glyphInfo->fontId;
 }
 
 /// Draws the specified color to the pixel buffer
@@ -398,24 +309,27 @@ void WriteColorToPixelBuffer(
 
 /// Draws the specified underline color to the buffer
 void DrawUnderline(
-  const Vector4&              underlineColor,
-  const unsigned int          bufferWidth,
-  const unsigned int          bufferHeight,
-  GlyphData&                  glyphData,
-  const float                 baseline,
-  const float                 currentUnderlinePosition,
-  const float                 maxUnderlineThickness,
-  const float                 lineExtentLeft,
-  const float                 lineExtentRight,
-  const Text::Underline::Type underlineType,
-  const float                 dashedUnderlineWidth,
-  const float                 dashedUnderlineGap,
-  const LineRun&              line)
+  const unsigned int              bufferWidth,
+  const unsigned int              bufferHeight,
+  GlyphData&                      glyphData,
+  const float                     baseline,
+  const float                     currentUnderlinePosition,
+  const float                     maxUnderlineHeight,
+  const float                     lineExtentLeft,
+  const float                     lineExtentRight,
+  const UnderlineStyleProperties& commonUnderlineProperties,
+  const UnderlineStyleProperties& currentUnderlineProperties,
+  const LineRun&                  line)
 {
+  const Vector4&              underlineColor       = currentUnderlineProperties.colorDefined ? currentUnderlineProperties.color : commonUnderlineProperties.color;
+  const Text::Underline::Type underlineType        = currentUnderlineProperties.typeDefined ? currentUnderlineProperties.type : commonUnderlineProperties.type;
+  const float                 dashedUnderlineWidth = currentUnderlineProperties.dashWidthDefined ? currentUnderlineProperties.dashWidth : commonUnderlineProperties.dashWidth;
+  const float                 dashedUnderlineGap   = currentUnderlineProperties.dashGapDefined ? currentUnderlineProperties.dashGap : commonUnderlineProperties.dashGap;
+
   int       underlineYOffset = glyphData.verticalOffset + baseline + currentUnderlinePosition;
   uint32_t* bitmapBuffer     = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer());
 
-  for(unsigned int y = underlineYOffset; y < underlineYOffset + maxUnderlineThickness; y++)
+  for(unsigned int y = underlineYOffset; y < underlineYOffset + maxUnderlineHeight; y++)
   {
     if(y > bufferHeight - 1)
     {
@@ -466,8 +380,8 @@ void DrawUnderline(
   }
   if(underlineType == Text::Underline::DOUBLE)
   {
-    int secondUnderlineYOffset = glyphData.verticalOffset - line.descender - maxUnderlineThickness;
-    for(unsigned int y = secondUnderlineYOffset; y < secondUnderlineYOffset + maxUnderlineThickness; y++)
+    int secondUnderlineYOffset = underlineYOffset - ONE_AND_A_HALF * maxUnderlineHeight;
+    for(unsigned int y = secondUnderlineYOffset; y < secondUnderlineYOffset + maxUnderlineHeight; y++)
     {
       if(y > bufferHeight - 1)
       {
@@ -639,14 +553,14 @@ void DrawStrikethrough(
   GlyphData&         glyphData,
   const float        baseline,
   const LineRun&     line,
-  const float        maxStrikethroughThickness,
+  const float        maxStrikethroughHeight,
   const float        lineExtentLeft,
   const float        lineExtentRight,
   float              strikethroughStartingYPosition)
 {
   uint32_t* bitmapBuffer = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer());
 
-  for(unsigned int y = strikethroughStartingYPosition; y < strikethroughStartingYPosition + maxStrikethroughThickness; y++)
+  for(unsigned int y = strikethroughStartingYPosition; y < strikethroughStartingYPosition + maxStrikethroughHeight; y++)
   {
     if(y > bufferHeight - 1)
     {
@@ -987,20 +901,27 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       }
     }
 
-    const bool                  underlineEnabled     = mModel->IsUnderlineEnabled();
-    const Vector4&              underlineColor       = mModel->GetUnderlineColor();
-    const float                 underlineHeight      = mModel->GetUnderlineHeight();
-    const Text::Underline::Type underlineType        = mModel->GetUnderlineType();
-    const float                 dashedUnderlineWidth = mModel->GetDashedUnderlineWidth();
-    const float                 dashedUnderlineGap   = mModel->GetDashedUnderlineGap();
-    const bool                  strikethroughEnabled = mModel->IsStrikethroughEnabled();
-    const Vector4&              strikethroughColor   = mModel->GetStrikethroughColor();
-    const float                 strikethroughHeight  = mModel->GetStrikethroughHeight();
-    const float                 characterSpacing     = mModel->GetCharacterSpacing();
+    const bool     underlineEnabled     = mModel->IsUnderlineEnabled();
+    const bool     strikethroughEnabled = mModel->IsStrikethroughEnabled();
+    const Vector4& strikethroughColor   = mModel->GetStrikethroughColor();
+    const float    strikethroughHeight  = mModel->GetStrikethroughHeight();
+    const float    characterSpacing     = mModel->GetCharacterSpacing();
+
+    // Aggregate underline-style-properties from mModel
+    const UnderlineStyleProperties modelUnderlineProperties{mModel->GetUnderlineType(),
+                                                            mModel->GetUnderlineColor(),
+                                                            mModel->GetUnderlineHeight(),
+                                                            mModel->GetDashedUnderlineGap(),
+                                                            mModel->GetDashedUnderlineWidth(),
+                                                            true,
+                                                            true,
+                                                            true,
+                                                            true,
+                                                            true};
 
     // Get the underline runs.
-    const Length     numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
-    Vector<GlyphRun> underlineRuns;
+    const Length               numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
+    Vector<UnderlinedGlyphRun> underlineRuns;
     underlineRuns.Resize(numberOfUnderlineRuns);
     mModel->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
 
@@ -1013,14 +934,16 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     bool thereAreUnderlinedGlyphs = false;
     bool strikethroughGlyphsExist = false;
 
-    float currentUnderlinePosition       = 0.0f;
-    float currentUnderlineThickness      = underlineHeight;
-    float maxUnderlineThickness          = currentUnderlineThickness;
-    float currentStrikethroughThickness  = strikethroughHeight;
-    float maxStrikethroughThickness      = currentStrikethroughThickness;
+    float currentUnderlinePosition   = 0.0f;
+    float currentUnderlineHeight     = modelUnderlineProperties.height;
+    float maxUnderlineHeight         = currentUnderlineHeight;
+    auto  currentUnderlineProperties = modelUnderlineProperties;
+
+    float currentStrikethroughHeight     = strikethroughHeight;
+    float maxStrikethroughHeight         = currentStrikethroughHeight;
     float strikethroughStartingYPosition = 0.0f;
 
-    FontId lastUnderlinedFontId = 0;
+    FontId lastFontId = 0;
 
     float lineExtentLeft  = bufferWidth;
     float lineExtentRight = 0.0f;
@@ -1079,19 +1002,39 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
         continue;
       }
 
-      const bool underlineGlyph = underlineEnabled || IsGlyphUnderlined(glyphIndex, underlineRuns);
-      thereAreUnderlinedGlyphs  = thereAreUnderlinedGlyphs || underlineGlyph;
+      Vector<UnderlinedGlyphRun>::ConstIterator currentUnderlinedGlyphRunIt = underlineRuns.End();
+      const bool                                underlineGlyph              = underlineEnabled || IsGlyphUnderlined(glyphIndex, underlineRuns, currentUnderlinedGlyphRunIt);
+      currentUnderlineProperties                                            = GetCurrentUnderlineProperties(underlineGlyph, underlineRuns, currentUnderlinedGlyphRunIt, modelUnderlineProperties);
+      currentUnderlineHeight                                                = GetCurrentUnderlineHeight(underlineRuns, currentUnderlinedGlyphRunIt, modelUnderlineProperties.height);
+      thereAreUnderlinedGlyphs                                              = thereAreUnderlinedGlyphs || underlineGlyph;
 
       currentStrikethroughColor     = strikethroughColor;
       const bool strikethroughGlyph = strikethroughEnabled || doGlyphHaveStrikethrough(glyphIndex, strikethroughRuns, currentStrikethroughColor);
       strikethroughGlyphsExist      = strikethroughGlyphsExist || strikethroughGlyph;
 
       // Are we still using the same fontId as previous
-      if((strikethroughGlyph || underlineGlyph) && (glyphInfo->fontId != lastUnderlinedFontId))
+      if((glyphInfo->fontId != lastFontId) && (strikethroughGlyph || underlineGlyph))
       {
         // We need to fetch fresh font underline metrics
-        FetchFontDecorationlinesMetrics(fontClient, glyphInfo, currentUnderlinePosition, underlineHeight, currentUnderlineThickness, maxUnderlineThickness, lastUnderlinedFontId, strikethroughHeight, currentStrikethroughThickness, maxStrikethroughThickness);
-      } // underline
+        FontMetrics fontMetrics;
+        fontClient.GetFontMetrics(glyphInfo->fontId, fontMetrics);
+
+        //The currentUnderlinePosition will be used for both Underline and/or Strikethrough
+        currentUnderlinePosition = FetchUnderlinePositionFromFontMetrics(fontMetrics);
+
+        if(underlineGlyph)
+        {
+          CalcualteUnderlineHeight(fontMetrics, currentUnderlineHeight, maxUnderlineHeight);
+        }
+
+        if(strikethroughGlyph)
+        {
+          CalcualteStrikethroughHeight(currentStrikethroughHeight, maxStrikethroughHeight);
+        }
+
+        // Update lastFontId because fontId is changed
+        lastFontId = glyphInfo->fontId; // Prevents searching for existing blocksizes when string of the same fontId.
+      }
 
       // Retrieves the glyph's position.
       Vector2 position = *(positionBuffer + elidedGlyphIndex);
@@ -1210,7 +1153,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     // Draw the underline from the leftmost glyph to the rightmost glyph
     if(thereAreUnderlinedGlyphs && style == Typesetter::STYLE_UNDERLINE)
     {
-      DrawUnderline(underlineColor, bufferWidth, bufferHeight, glyphData, baseline, currentUnderlinePosition, maxUnderlineThickness, lineExtentLeft, lineExtentRight, underlineType, dashedUnderlineWidth, dashedUnderlineGap, line);
+      DrawUnderline(bufferWidth, bufferHeight, glyphData, baseline, currentUnderlinePosition, maxUnderlineHeight, lineExtentLeft, lineExtentRight, modelUnderlineProperties, currentUnderlineProperties, line);
     }
 
     // Draw the background color from the leftmost glyph to the rightmost glyph
@@ -1224,7 +1167,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     {
       //TODO : The currently implemented strikethrough creates a strikethrough on the line level. We need to create different strikethroughs the case of glyphs with different sizes.
       strikethroughStartingYPosition = (glyphData.verticalOffset + baseline + currentUnderlinePosition) - ((line.ascender) * HALF); // Since Free Type font doesn't contain the strikethrough-position property, strikethrough position will be calculated by moving the underline position upwards by half the value of the line height.
-      DrawStrikethrough(currentStrikethroughColor, bufferWidth, bufferHeight, glyphData, baseline, line, maxStrikethroughThickness, lineExtentLeft, lineExtentRight, strikethroughStartingYPosition);
+      DrawStrikethrough(currentStrikethroughColor, bufferWidth, bufferHeight, glyphData, baseline, line, maxStrikethroughHeight, lineExtentLeft, lineExtentRight, strikethroughStartingYPosition);
     }
 
     // Increases the vertical offset with the line's descender.
@@ -1300,27 +1243,30 @@ Devel::PixelBuffer Typesetter::ApplyUnderlineMarkupImageBuffer(Devel::PixelBuffe
 {
   // Underline-tags (this is for Markup case)
   // Get the underline runs.
-  const Length     numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
-  Vector<GlyphRun> underlineRuns;
+  const Length               numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
+  Vector<UnderlinedGlyphRun> underlineRuns;
   underlineRuns.Resize(numberOfUnderlineRuns);
   mModel->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
 
   // Iterate on the consecutive underlined glyph run and connect them into one chunk of underlined characters.
-  Vector<GlyphRun>::ConstIterator itGlyphRun    = underlineRuns.Begin();
-  Vector<GlyphRun>::ConstIterator endItGlyphRun = underlineRuns.End();
-  GlyphIndex                      startGlyphIndex, endGlyphIndex;
+  Vector<UnderlinedGlyphRun>::ConstIterator itGlyphRun    = underlineRuns.Begin();
+  Vector<UnderlinedGlyphRun>::ConstIterator endItGlyphRun = underlineRuns.End();
+  GlyphIndex                                startGlyphIndex, endGlyphIndex;
 
   //The outer loop to iterate on the separated chunks of underlined glyph runs
   while(itGlyphRun != endItGlyphRun)
   {
-    startGlyphIndex = itGlyphRun->glyphIndex;
+    const UnderlineStyleProperties& firstUnderlineStyleProperties = itGlyphRun->properties;
+
+    startGlyphIndex = itGlyphRun->glyphRun.glyphIndex;
     endGlyphIndex   = startGlyphIndex;
     //The inner loop to make a connected underline for the consecutive characters
     do
     {
-      endGlyphIndex += itGlyphRun->numberOfGlyphs;
+      endGlyphIndex += itGlyphRun->glyphRun.numberOfGlyphs;
       itGlyphRun++;
-    } while(itGlyphRun != endItGlyphRun && itGlyphRun->glyphIndex == endGlyphIndex);
+    } while(itGlyphRun != endItGlyphRun && itGlyphRun->glyphRun.glyphIndex == endGlyphIndex &&
+            (firstUnderlineStyleProperties == itGlyphRun->properties));
 
     endGlyphIndex--;
 

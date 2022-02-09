@@ -24,6 +24,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <map>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -32,6 +33,8 @@
 #include <dali-toolkit/internal/text/glyph-run.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-mesh-factory.h>
+#include <dali-toolkit/internal/text/rendering/styles/strikethrough-helper-functions.h>
+#include <dali-toolkit/internal/text/rendering/styles/underline-helper-functions.h>
 #include <dali-toolkit/internal/text/text-view.h>
 
 using namespace Dali;
@@ -158,28 +161,10 @@ struct AtlasRenderer::Impl
     mQuadVertexFormat["aColor"]    = Property::VECTOR4;
   }
 
-  bool IsGlyphUnderlined(GlyphIndex              index,
-                         const Vector<GlyphRun>& underlineRuns)
-  {
-    for(Vector<GlyphRun>::ConstIterator it    = underlineRuns.Begin(),
-                                        endIt = underlineRuns.End();
-        it != endIt;
-        ++it)
-    {
-      const GlyphRun& run = *it;
-
-      if((run.glyphIndex <= index) && (index < run.glyphIndex + run.numberOfGlyphs))
-      {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  bool doGlyphHaveStrikethrough(GlyphIndex                           index,
-                                const Vector<StrikethroughGlyphRun>& strikethroughRuns,
-                                Vector4&                             strikethroughColor)
+  bool
+  doGlyphHaveStrikethrough(GlyphIndex                           index,
+                           const Vector<StrikethroughGlyphRun>& strikethroughRuns,
+                           Vector4&                             strikethroughColor)
   {
     for(Vector<StrikethroughGlyphRun>::ConstIterator it    = strikethroughRuns.Begin(),
                                                      endIt = strikethroughRuns.End();
@@ -456,27 +441,22 @@ struct AtlasRenderer::Impl
     Vector<Extent>          strikethroughExtents;
     mDepth = depth;
 
-    const Vector2&              textSize(view.GetLayoutSize());
-    const Vector2               halfTextSize(textSize * 0.5f);
-    const Vector2&              shadowOffset(view.GetShadowOffset());
-    const Vector4&              shadowColor(view.GetShadowColor());
-    const bool                  underlineEnabled = view.IsUnderlineEnabled();
-    const Vector4&              underlineColor(view.GetUnderlineColor());
-    const float                 underlineHeight      = view.GetUnderlineHeight();
-    const Text::Underline::Type underlineType        = view.GetUnderlineType();
-    const float                 dashedUnderlineWidth = view.GetDashedUnderlineWidth();
-    const float                 dashedUnderlineGap   = view.GetDashedUnderlineGap();
-    const uint16_t              outlineWidth         = view.GetOutlineWidth();
-    const Vector4&              outlineColor(view.GetOutlineColor());
-    const bool                  isOutline            = 0u != outlineWidth;
-    const GlyphInfo*            hyphens              = view.GetHyphens();
-    const Length*               hyphenIndices        = view.GetHyphenIndices();
-    const Length                hyphensCount         = view.GetHyphensCount();
-    const bool                  strikethroughEnabled = view.IsStrikethroughEnabled();
-    const Vector4&              strikethroughColor(view.GetStrikethroughColor());
-    const float                 strikethroughHeight = view.GetStrikethroughHeight();
-    Vector4                     currentStrikethroughColor;
-    const float                 characterSpacing(view.GetCharacterSpacing());
+    const Vector2&   textSize(view.GetLayoutSize());
+    const Vector2    halfTextSize(textSize * 0.5f);
+    const Vector2&   shadowOffset(view.GetShadowOffset());
+    const Vector4&   shadowColor(view.GetShadowColor());
+    const bool       underlineEnabled = view.IsUnderlineEnabled();
+    const uint16_t   outlineWidth     = view.GetOutlineWidth();
+    const Vector4&   outlineColor(view.GetOutlineColor());
+    const bool       isOutline            = 0u != outlineWidth;
+    const GlyphInfo* hyphens              = view.GetHyphens();
+    const Length*    hyphenIndices        = view.GetHyphenIndices();
+    const Length     hyphensCount         = view.GetHyphensCount();
+    const bool       strikethroughEnabled = view.IsStrikethroughEnabled();
+    const Vector4&   strikethroughColor(view.GetStrikethroughColor());
+    const float      strikethroughHeight = view.GetStrikethroughHeight();
+    Vector4          currentStrikethroughColor;
+    const float      characterSpacing(view.GetCharacterSpacing());
 
     // Elided text info. Indices according to elided text.
     const auto startIndexOfGlyphs              = view.GetStartIndexOfElidedGlyphs();
@@ -485,13 +465,30 @@ struct AtlasRenderer::Impl
 
     const bool useDefaultColor = (NULL == colorsBuffer);
 
+    // Get a handle of the font client. Used to retrieve the bitmaps of the glyphs.
+    TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+
     // Get the underline runs.
-    const Length     numberOfUnderlineRuns = view.GetNumberOfUnderlineRuns();
-    Vector<GlyphRun> underlineRuns;
+    const Length               numberOfUnderlineRuns = view.GetNumberOfUnderlineRuns();
+    Vector<UnderlinedGlyphRun> underlineRuns;
     underlineRuns.Resize(numberOfUnderlineRuns);
     view.GetUnderlineRuns(underlineRuns.Begin(),
                           0u,
                           numberOfUnderlineRuns);
+
+    // Aggregate underline-style-properties from view
+    const UnderlineStyleProperties viewUnderlineProperties{view.GetUnderlineType(),
+                                                           view.GetUnderlineColor(),
+                                                           view.GetUnderlineHeight(),
+                                                           view.GetDashedUnderlineGap(),
+                                                           view.GetDashedUnderlineWidth(),
+                                                           true,
+                                                           true,
+                                                           true,
+                                                           true,
+                                                           true};
+
+    float maxUnderlineHeight = viewUnderlineProperties.height;
 
     // Get the strikethrough runs.
     const Length                  numberOfStrikethroughRuns = view.GetNumberOfStrikethroughRuns();
@@ -502,12 +499,11 @@ struct AtlasRenderer::Impl
     bool thereAreUnderlinedGlyphs = false;
     bool strikethroughGlyphsExist = false;
 
-    float  currentUnderlinePosition      = ZERO;
-    float  currentUnderlineThickness     = underlineHeight;
-    float  currentStrikethroughThickness = strikethroughHeight;
-    FontId lastFontId                    = 0;
-    FontId lastUnderlinedFontId          = 0;
-    Style  style                         = STYLE_NORMAL;
+    float  currentUnderlinePosition   = ZERO;
+    float  currentStrikethroughHeight = strikethroughHeight;
+    float  maxStrikethroughHeight     = currentStrikethroughHeight;
+    FontId lastFontId                 = 0;
+    Style  style                      = STYLE_NORMAL;
 
     if(fabsf(shadowOffset.x) > Math::MACHINE_EPSILON_1 || fabsf(shadowOffset.y) > Math::MACHINE_EPSILON_1)
     {
@@ -524,8 +520,10 @@ struct AtlasRenderer::Impl
     uint32_t               hyphenIndex = 0;
 
     //For septated underlined chunks. (this is for Markup case)
-    uint32_t underlineChunkId = 0u;    // give id for each chunk.
-    bool     isPreUnderlined  = false; // status of underlined for previous glyph.
+    uint32_t                                     underlineChunkId = 0u;                            // give id for each chunk.
+    bool                                         isPreUnderlined  = false;                         // status of underlined for previous glyph.
+    std::map<uint32_t, UnderlineStyleProperties> mapUnderlineChunkIdWithProperties;                // mapping underlineChunkId with UnderlineStyleProperties to get properties of underlined chunk
+    UnderlineStyleProperties                     preUnderlineProperties = viewUnderlineProperties; // the previous UnderlineStyleProperties
 
     uint32_t                      strikethroughChunkId      = 0u;    // give id for each chunk.
     bool                          isPrevGlyphStrikethrough  = false; // status of strikethrough for previous glyph.
@@ -544,6 +542,12 @@ struct AtlasRenderer::Impl
       }
     }
 
+    //To keep the last fontMetrics of lastDecorativeLinesFontId
+    FontId      lastDecorativeLinesFontId = 0; // DecorativeLines like Undeline and Strikethrough
+    FontMetrics lastDecorativeLinesFontMetrics;
+    fontClient.GetFontMetrics(lastDecorativeLinesFontId, lastDecorativeLinesFontMetrics);
+
+    // Iteration on glyphs
     for(uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i)
     {
       GlyphInfo glyph;
@@ -558,8 +562,11 @@ struct AtlasRenderer::Impl
         glyph = *(glyphsBuffer + i);
       }
 
-      const bool isGlyphUnderlined = underlineEnabled || IsGlyphUnderlined(i, underlineRuns);
-      thereAreUnderlinedGlyphs     = thereAreUnderlinedGlyphs || isGlyphUnderlined;
+      Vector<UnderlinedGlyphRun>::ConstIterator currentUnderlinedGlyphRunIt = underlineRuns.End();
+      const bool                                isGlyphUnderlined           = underlineEnabled || IsGlyphUnderlined(i, underlineRuns, currentUnderlinedGlyphRunIt);
+      const UnderlineStyleProperties            currentUnderlineProperties  = GetCurrentUnderlineProperties(isGlyphUnderlined, underlineRuns, currentUnderlinedGlyphRunIt, viewUnderlineProperties);
+      float                                     currentUnderlineHeight      = GetCurrentUnderlineHeight(underlineRuns, currentUnderlinedGlyphRunIt, viewUnderlineProperties.height);
+      thereAreUnderlinedGlyphs                                              = thereAreUnderlinedGlyphs || isGlyphUnderlined;
 
       currentStrikethroughColor       = strikethroughColor;
       const bool isStrikethroughGlyph = strikethroughEnabled || doGlyphHaveStrikethrough(i, strikethroughRuns, currentStrikethroughColor);
@@ -568,58 +575,42 @@ struct AtlasRenderer::Impl
       // No operation for white space
       if(glyph.width && glyph.height)
       {
-        // Are we still using the same fontId as previous
-        if((isGlyphUnderlined || isStrikethroughGlyph) && (glyph.fontId != lastUnderlinedFontId))
+        // Check and update decorative-lines informations
+        if((isGlyphUnderlined || isStrikethroughGlyph) &&
+           ((glyph.fontId != lastDecorativeLinesFontId) || !(currentUnderlineProperties.IsHeightEqualTo(preUnderlineProperties))))
         {
-          // We need to fetch fresh font underline metrics
-          FontMetrics fontMetrics;
-          mFontClient.GetFontMetrics(glyph.fontId, fontMetrics);
-          currentUnderlinePosition = ceil(fabsf(fontMetrics.underlinePosition));
-          const float descender    = ceil(fabsf(fontMetrics.descender));
-
-          if(fabsf(underlineHeight) < Math::MACHINE_EPSILON_1000)
+          bool isDecorativeLinesFontIdUpdated = false;
+          // Are we still using the same fontId as previous
+          if(glyph.fontId != lastDecorativeLinesFontId)
           {
-            currentUnderlineThickness = fontMetrics.underlineThickness;
+            // We need to fetch fresh font metrics
+            lastDecorativeLinesFontId      = glyph.fontId;
+            isDecorativeLinesFontIdUpdated = true;
+            fontClient.GetFontMetrics(lastDecorativeLinesFontId, lastDecorativeLinesFontMetrics);
 
-            // Ensure underline will be at least a pixel high
-            if(currentUnderlineThickness < ONE)
+            if(isStrikethroughGlyph || isGlyphUnderlined)
             {
-              currentUnderlineThickness = ONE;
-            }
-            else
-            {
-              currentUnderlineThickness = ceil(currentUnderlineThickness);
+              //The currentUnderlinePosition will be used for both Underline and/or Strikethrough
+              currentUnderlinePosition = FetchUnderlinePositionFromFontMetrics(lastDecorativeLinesFontMetrics);
             }
           }
 
-          if(fabsf(strikethroughHeight) < Math::MACHINE_EPSILON_1000)
+          if(isGlyphUnderlined && (isDecorativeLinesFontIdUpdated || !(currentUnderlineProperties.IsHeightEqualTo(preUnderlineProperties))))
           {
-            // Ensure strikethrough will be at least a pixel high
-            if(currentStrikethroughThickness < ONE)
+            //If the Underline Height is changed then we need to recalculate height.
+            if(!(currentUnderlineProperties.IsHeightEqualTo(preUnderlineProperties)))
             {
-              currentStrikethroughThickness = ONE;
+              maxUnderlineHeight = currentUnderlineHeight;
             }
-            else
-            {
-              currentStrikethroughThickness = ceil(currentStrikethroughThickness);
-            }
+
+            CalcualteUnderlineHeight(lastDecorativeLinesFontMetrics, currentUnderlineHeight, maxUnderlineHeight);
           }
 
-          // Clamp the underline position at the font descender and check for ( as EFL describes it ) a broken font
-          if(currentUnderlinePosition > descender)
+          if(isDecorativeLinesFontIdUpdated && isStrikethroughGlyph)
           {
-            currentUnderlinePosition = descender;
+            CalcualteStrikethroughHeight(currentStrikethroughHeight, maxStrikethroughHeight);
           }
-
-          if(fabsf(currentUnderlinePosition) < Math::MACHINE_EPSILON_1000)
-          {
-            // Move offset down by one ( EFL behavior )
-            currentUnderlinePosition = ONE;
-          }
-
-          lastUnderlinedFontId = glyph.fontId;
-
-        } // underline
+        } // decorative-lines
 
         AtlasGlyphManager::GlyphStyle style;
         style.isItalic = glyph.isItalicRequired;
@@ -662,6 +653,18 @@ struct AtlasRenderer::Impl
           const ColorIndex colorIndex = useDefaultColor ? 0u : *(colorIndicesBuffer + i);
           const Vector4&   color      = (useDefaultColor || (0u == colorIndex)) ? defaultColor : *(colorsBuffer + colorIndex - 1u);
 
+          //The new underlined chunk. Add new id if they are not consecutive indices (this is for Markup case)
+          // Examples: "Hello <u>World</u> Hello <u>World</u>", "<u>World</u> Hello <u>World</u>", "<u>   World</u> Hello <u>World</u>"
+          if(isPreUnderlined && (!isGlyphUnderlined || (preUnderlineProperties != currentUnderlineProperties)))
+          {
+            mapUnderlineChunkIdWithProperties.insert(std::pair<uint32_t, UnderlineStyleProperties>(underlineChunkId, preUnderlineProperties));
+            underlineChunkId++;
+          }
+
+          //Keep status of underlined for previous glyph to check consecutive indices
+          isPreUnderlined        = isGlyphUnderlined;
+          preUnderlineProperties = currentUnderlineProperties;
+
           GenerateMesh(glyph,
                        positionPlusOutlineOffset,
                        color,
@@ -669,7 +672,7 @@ struct AtlasRenderer::Impl
                        slot,
                        isGlyphUnderlined,
                        currentUnderlinePosition,
-                       currentUnderlineThickness,
+                       maxUnderlineHeight,
                        meshContainer,
                        newTextCache,
                        extents,
@@ -686,7 +689,7 @@ struct AtlasRenderer::Impl
                          slot,
                          strikethroughGlyphsExist,
                          0.0f,
-                         currentStrikethroughThickness,
+                         maxStrikethroughHeight,
                          meshContainer,
                          newTextCache,
                          strikethroughExtents,
@@ -707,7 +710,7 @@ struct AtlasRenderer::Impl
                        slotOutline,
                        false,
                        currentUnderlinePosition,
-                       currentUnderlineThickness,
+                       maxUnderlineHeight,
                        meshContainerOutline,
                        newTextCache,
                        extents,
@@ -715,15 +718,6 @@ struct AtlasRenderer::Impl
                        false,
                        0u);
         }
-
-        //The new underlined chunk. Add new id if they are not consecutive indices (this is for Markup case)
-        // Examples: "Hello <u>World</u> Hello <u>World</u>", "<u>World</u> Hello <u>World</u>", "<u>   World</u> Hello <u>World</u>"
-        if(isPreUnderlined && (isPreUnderlined != isGlyphUnderlined))
-        {
-          underlineChunkId++;
-        }
-        //Keep status of underlined for previous glyph to check consecutive indices
-        isPreUnderlined = isGlyphUnderlined;
 
         if(isPrevGlyphStrikethrough && !isStrikethroughGlyph)
         {
@@ -746,7 +740,7 @@ struct AtlasRenderer::Impl
     if(thereAreUnderlinedGlyphs)
     {
       // Check to see if any of the text needs an underline
-      GenerateUnderlines(meshContainer, extents, underlineColor, underlineType, dashedUnderlineWidth, dashedUnderlineGap);
+      GenerateUnderlines(meshContainer, extents, viewUnderlineProperties, mapUnderlineChunkIdWithProperties);
     }
 
     if(strikethroughGlyphsExist)
@@ -1051,15 +1045,14 @@ struct AtlasRenderer::Impl
     }
   }
 
-  void GenerateUnderlines(std::vector<MeshRecord>&     meshRecords,
-                          Vector<Extent>&              extents,
-                          const Vector4&               underlineColor,
-                          const Text::Underline::Type& underlineType,
-                          const float&                 dashedUnderlineWidth,
-                          const float&                 dashedUnderlineGap)
+  void GenerateUnderlines(std::vector<MeshRecord>&                            meshRecords,
+                          Vector<Extent>&                                     extents,
+                          const UnderlineStyleProperties&                     viewUnderlineProperties,
+                          const std::map<uint32_t, UnderlineStyleProperties>& mapUnderlineChunkIdWithProperties)
   {
     AtlasManager::Mesh2D newMesh;
     unsigned short       faceIndex = 0;
+
     for(Vector<Extent>::ConstIterator eIt    = extents.Begin(),
                                       eEndIt = extents.End();
         eIt != eEndIt;
@@ -1068,6 +1061,17 @@ struct AtlasRenderer::Impl
       AtlasManager::Vertex2D vert;
       uint32_t               index = eIt->mMeshRecordIndex;
       Vector2                uv    = mGlyphManager.GetAtlasSize(meshRecords[index].mAtlasId);
+
+      auto pairUnderlineChunkIdWithProperties = mapUnderlineChunkIdWithProperties.find(eIt->mUnderlineChunkId);
+
+      const UnderlineStyleProperties underlineProperties = (pairUnderlineChunkIdWithProperties == mapUnderlineChunkIdWithProperties.end())
+                                                             ? viewUnderlineProperties
+                                                             : pairUnderlineChunkIdWithProperties->second;
+
+      const Vector4&               underlineColor       = underlineProperties.colorDefined ? underlineProperties.color : viewUnderlineProperties.color;
+      const Text::Underline::Type& underlineType        = underlineProperties.typeDefined ? underlineProperties.type : viewUnderlineProperties.type;
+      const float&                 dashedUnderlineGap   = underlineProperties.dashGapDefined ? underlineProperties.dashGap : viewUnderlineProperties.dashGap;
+      const float&                 dashedUnderlineWidth = underlineProperties.dashWidthDefined ? underlineProperties.dashWidth : viewUnderlineProperties.dashWidth;
 
       // Make sure we don't hit texture edge for single pixel texture ( filled pixel is in top left of every atlas )
       float u           = HALF / uv.x;
@@ -1082,9 +1086,7 @@ struct AtlasRenderer::Impl
       {
         float dashTlx = tlx;
         float dashBrx = tlx;
-        faceIndex     = 0;
 
-        AtlasManager::Mesh2D newMesh;
         while((dashTlx >= tlx) && (dashTlx < brx) && ((dashTlx + dashedUnderlineWidth) <= brx))
         {
           dashBrx = dashTlx + dashedUnderlineWidth;

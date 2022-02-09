@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/internal/text/underlined-glyph-run.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
@@ -233,9 +234,9 @@ public:
    * @param[in] index Index of the first underline run to be copied.
    * @param[in] numberOfRuns Number of underline runs to be copied.
    */
-  virtual void GetUnderlineRuns(GlyphRun*         underlineRuns,
-                                UnderlineRunIndex index,
-                                Length            numberOfRuns) const = 0;
+  virtual void GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns,
+                                UnderlineRunIndex   index,
+                                Length              numberOfRuns) const = 0;
 
   /**
    * @brief Retrieve the outline color.

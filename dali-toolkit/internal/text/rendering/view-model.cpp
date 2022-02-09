@@ -23,8 +23,8 @@
 #include <memory.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/line-run.h>
 
 namespace Dali
 {
@@ -270,7 +270,7 @@ Length ViewModel::GetNumberOfUnderlineRuns() const
   return mModel->GetNumberOfUnderlineRuns();
 }
 
-void ViewModel::GetUnderlineRuns(GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const
+void ViewModel::GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const
 {
   mModel->GetUnderlineRuns(underlineRuns, index, numberOfRuns);
 }

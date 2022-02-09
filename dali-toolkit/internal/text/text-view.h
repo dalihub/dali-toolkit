@@ -176,9 +176,9 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineRuns()
    */
-  virtual void GetUnderlineRuns(GlyphRun*         underlineRuns,
-                                UnderlineRunIndex index,
-                                Length            numberOfRuns) const;
+  virtual void GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns,
+                                UnderlineRunIndex   index,
+                                Length              numberOfRuns) const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetOutlineColor()

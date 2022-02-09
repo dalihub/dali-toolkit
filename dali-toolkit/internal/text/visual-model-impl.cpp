@@ -305,13 +305,13 @@ LineIndex VisualModel::GetLineOfCharacter(CharacterIndex characterIndex)
   return index;
 }
 
-void VisualModel::GetUnderlineRuns(GlyphRun*         underlineRuns,
-                                   UnderlineRunIndex index,
-                                   Length            numberOfRuns) const
+void VisualModel::GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns,
+                                   UnderlineRunIndex   index,
+                                   Length              numberOfRuns) const
 {
   memcpy(underlineRuns,
          mUnderlineRuns.Begin() + index,
-         numberOfRuns * sizeof(GlyphRun));
+         numberOfRuns * sizeof(UnderlinedGlyphRun));
 }
 
 void VisualModel::SetNaturalSize(const Vector2& size)

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_EFFECTS_STYLE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
+#include <dali/devel-api/scripting/scripting.h>
 
 namespace Dali
 {
@@ -27,6 +29,12 @@ namespace Toolkit
 {
 namespace Text
 {
+const Scripting::StringEnum UNDERLINE_TYPE_STRING_TABLE[] =
+  {
+    {"solid", Text::Underline::SOLID},
+    {"dashed", Text::Underline::DASHED},
+    {"double", Text::Underline::DOUBLE}};
+const unsigned int UNDERLINE_TYPE_STRING_TABLE_COUNT = sizeof(UNDERLINE_TYPE_STRING_TABLE) / sizeof(UNDERLINE_TYPE_STRING_TABLE[0]);
 namespace EffectStyle
 {
 enum Type
@@ -116,11 +124,11 @@ bool ParseBackgroundProperties(const Property::Map& backgroundProperties,
  * @param[out] height The strikethrough's height.
  */
 bool ParseStrikethroughProperties(const Property::Map& strikethroughProperties,
-                              bool&                enabled,
-                              bool&                colorDefined,
-                              Vector4&             color,
-                              bool&                heightDefined,
-                              float&               height);
+                                  bool&                enabled,
+                                  bool&                colorDefined,
+                                  Vector4&             color,
+                                  bool&                heightDefined,
+                                  float&               height);
 
 /**
  * @brief Sets the underline properties.
@@ -241,6 +249,15 @@ bool SetBackgroundProperties(ControllerPtr controller, const Property::Value& va
  * @param[in] type Whether the property is for the default background or the input background.
  */
 void GetBackgroundProperties(ControllerPtr controller, Property::Value& value, EffectStyle::Type type);
+
+/**
+ * @brief Converts a underline type string into @e Underline::Type
+ *
+ * @param[in] underlineTypeStr The underline type string. Must end with '\0'.
+ *
+ * @return The @e Underline::Type value corresponding to the string.
+ */
+Underline::Type StringToUnderlineType(const char* const underlineTypeStr);
 
 } // namespace Text
 

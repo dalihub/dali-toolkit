@@ -212,7 +212,7 @@ Length Model::GetNumberOfUnderlineRuns() const
   return mVisualModel->GetNumberOfUnderlineRuns();
 }
 
-void Model::GetUnderlineRuns(GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const
+void Model::GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const
 {
   mVisualModel->GetUnderlineRuns(underlineRuns, index, numberOfRuns);
 }

@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_TEXT_UNDERLINED_CHARACTER_RUN_H
-#define DALI_TOOLKIT_TEXT_UNDERLINED_CHARACTER_RUN_H
+#ifndef DALI_TOOLKIT_TEXT_UNDERLINED_GLYPH_RUN_H
+#define DALI_TOOLKIT_TEXT_UNDERLINED_GLYPH_RUN_H
 
 /*
  * Copyright (c) 2022 Samsung Electronics Co., Ltd.
@@ -22,7 +22,7 @@
 #include <dali/public-api/math/vector4.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/character-run.h>
+#include <dali-toolkit/internal/text/glyph-run.h>
 #include <dali-toolkit/internal/text/underline-style-properties.h>
 
 namespace Dali
@@ -32,21 +32,21 @@ namespace Toolkit
 namespace Text
 {
 /**
- * @brief Run of underlined characters with same properties.
+ * @brief Run of underlined glyphs with same properties.
  */
-struct UnderlinedCharacterRun
+struct UnderlinedGlyphRun
 {
   /**
    * Default constructor to set the default values of bitfields
    */
-  UnderlinedCharacterRun()
-  : characterRun{},
+  UnderlinedGlyphRun()
+  : glyphRun{},
     properties{}
   {
   }
 
-  CharacterRun             characterRun; ///< The initial character index and the number of characters of the run.
-  UnderlineStyleProperties properties;   /// The properties of underline style
+  GlyphRun                 glyphRun;   ///< The initial glyph index and the number of glyphs in the run.
+  UnderlineStyleProperties properties; /// The properties of underline style
 };
 
 } // namespace Text
@@ -55,4 +55,4 @@ struct UnderlinedCharacterRun
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_TEXT_UNDERLINED_CHARACTER_RUN_H
+#endif // DALI_TOOLKIT_TEXT_UNDERLINED_GLYPH_RUN_H

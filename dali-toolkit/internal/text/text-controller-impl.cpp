@@ -39,6 +39,7 @@
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 #include <dali-toolkit/internal/text/text-selection-handle-controller.h>
+#include <dali-toolkit/internal/text/underlined-glyph-run.h>
 
 using namespace Dali;
 
@@ -1620,9 +1621,22 @@ void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearP
     Length         numberOfCharacters = it->characterRun.numberOfCharacters;
     for(Length index = 0u; index < numberOfCharacters; index++)
     {
-      GlyphRun underlineGlyphRun;
-      underlineGlyphRun.glyphIndex     = charactersToGlyph[characterIndex + index];
-      underlineGlyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex + index];
+      UnderlinedGlyphRun underlineGlyphRun;
+      underlineGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex + index];
+      underlineGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex + index];
+
+      //Copy properties (attributes)
+      underlineGlyphRun.properties.type             = it->properties.type;
+      underlineGlyphRun.properties.color            = it->properties.color;
+      underlineGlyphRun.properties.height           = it->properties.height;
+      underlineGlyphRun.properties.dashGap          = it->properties.dashGap;
+      underlineGlyphRun.properties.dashWidth        = it->properties.dashWidth;
+      underlineGlyphRun.properties.typeDefined      = it->properties.typeDefined;
+      underlineGlyphRun.properties.colorDefined     = it->properties.colorDefined;
+      underlineGlyphRun.properties.heightDefined    = it->properties.heightDefined;
+      underlineGlyphRun.properties.dashGapDefined   = it->properties.dashGapDefined;
+      underlineGlyphRun.properties.dashWidthDefined = it->properties.dashWidthDefined;
+
       mModel->mVisualModel->mUnderlineRuns.PushBack(underlineGlyphRun);
     }
   }
