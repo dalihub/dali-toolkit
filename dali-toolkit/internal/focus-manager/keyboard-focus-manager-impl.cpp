@@ -901,12 +901,8 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         // "Shift-Tab" key changes it in the backward direction.
         if(!DoMoveFocusToNextFocusGroup(!event.IsShiftModifier()))
         {
-          // If the focus group is not changed, Move the focus towards right, "Shift-Tap" key moves the focus towards left.
-          if(!MoveFocus(event.IsShiftModifier() ? Toolkit::Control::KeyboardFocus::LEFT : Toolkit::Control::KeyboardFocus::RIGHT))
-          {
-            // If the focus is not moved, Move the focus towards down, "Shift-Tap" key moves the focus towards up.
-            MoveFocus(event.IsShiftModifier() ? Toolkit::Control::KeyboardFocus::UP : Toolkit::Control::KeyboardFocus::DOWN);
-          }
+          // If the focus group is not changed, Move the focus towards forward, "Shift-Tap" key moves the focus towards backward.
+          MoveFocus(event.IsShiftModifier() ? Toolkit::Control::KeyboardFocus::BACKWARD : Toolkit::Control::KeyboardFocus::FORWARD);
         }
       }
 
