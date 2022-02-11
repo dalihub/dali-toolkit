@@ -147,7 +147,7 @@ void SuperBlurView::OnInitialize()
 {
   Actor self(Self());
 
-  mBlurStrengthPropertyIndex = self.RegisterProperty("blurStrength", 0.f);
+  mBlurStrengthPropertyIndex = self.RegisterUniqueProperty("blurStrength", 0.f);
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(
@@ -307,7 +307,7 @@ void SuperBlurView::OnSceneConnection(int depth)
     if(i > 0)
     {
       Renderer        renderer   = mRenderers[i];
-      Property::Index index      = renderer.RegisterProperty(ALPHA_UNIFORM_NAME, 0.f);
+      Property::Index index      = renderer.RegisterUniqueProperty(ALPHA_UNIFORM_NAME, 0.f);
       Constraint      constraint = Constraint::New<float>(renderer, index, ActorOpacityConstraint(mBlurLevels, i - 1));
       constraint.AddSource(Source(self, mBlurStrengthPropertyIndex));
       constraint.Apply();

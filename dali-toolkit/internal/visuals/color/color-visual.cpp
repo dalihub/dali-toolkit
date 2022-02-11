@@ -128,7 +128,7 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
       // We must regist properies into renderer, and update shader.
 
       // BlurRadius added by this action. Regist property to renderer.
-      mBlurRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
+      mBlurRadiusIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
       mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
 
       // Change the shader must not be occured many times. we always have to use blur feature.
@@ -209,7 +209,7 @@ void ColorVisual::OnInitialize()
 
   if(!EqualsZero(mBlurRadius))
   {
-    mBlurRadiusIndex = mImpl->mRenderer.RegisterProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
+    mBlurRadiusIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME, mBlurRadius);
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
   }
 
