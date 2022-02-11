@@ -42,7 +42,7 @@ ImageUrl::ImageUrl(const EncodedImageBuffer& encodedImageBuffer)
   if(visualFactory)
   {
     auto& textureManager = GetImplementation(visualFactory).GetTextureManager();
-    mUrl                 = textureManager.AddExternalEncodedImageBuffer(encodedImageBuffer);
+    mUrl                 = textureManager.AddEncodedImageBuffer(encodedImageBuffer);
   }
 }
 
@@ -60,7 +60,7 @@ ImageUrl::~ImageUrl()
       }
       else if(VisualUrl::BUFFER == VisualUrl::GetProtocolType(mUrl))
       {
-        textureManager.RemoveExternalEncodedImageBuffer(mUrl);
+        textureManager.RemoveEncodedImageBuffer(mUrl);
       }
     }
   }

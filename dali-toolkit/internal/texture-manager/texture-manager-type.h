@@ -38,18 +38,123 @@ namespace Internal
  */
 namespace TextureManagerType
 {
+// Enum!
+
+enum TextureCacheIndexType
+{
+  TEXTURE_CACHE_INDEX_FREE_LIST  = 0, ///< Only for FreeList. We should not use this for TextureCacheIndex.
+  TEXTURE_CACHE_INDEX_TYPE_LOCAL = 1,
+  TEXTURE_CACHE_INDEX_TYPE_TEXTURE,
+  TEXTURE_CACHE_INDEX_TYPE_BUFFER,
+  TEXTURE_CACHE_INDEX_TYPE_MASKING, ///< Not implemented yet.
+  TEXTURE_CACHE_INDEX_TYPE_MAX = 7, ///< Maximum number of cache type we can use.
+};
+
+// Union!
+
+/**
+ * @brief standard union type of texture index.
+ * Due to the FreeList can only use for uint32_t and we need to seperate
+ * each index per container type, we can only hold maximum 2^28 textures
+ * at the same time.
+ *      0 ~   2^28 - 1 : index of FreeList. TextureCacheManager will not use it.
+ *   2^28 ~ 2*2^28 - 1 : index of mTextureInfoContainer, the main texture container.
+ * 2*2^28 ~ 3*2^28 - 1 : index of mExternalTextures.
+ * 3*2^28 ~ 4*2^28 - 1 : index of mEncodedBufferTextures.
+ */
+union TextureCacheIndexData
+{
+  TextureCacheIndexData() = default;
+  constexpr TextureCacheIndexData(const std::uint32_t& index)
+  : indexValue(index)
+  {
+  }
+  constexpr explicit TextureCacheIndexData(const std::int32_t& index)
+  : indexValue(static_cast<std::uint32_t>(index))
+  {
+  }
+  constexpr TextureCacheIndexData(const TextureCacheIndexType& type, const std::uint32_t& index)
+  : detailValue{index, type}
+  {
+  }
+  constexpr TextureCacheIndexData(const TextureCacheIndexData& indexData)
+  : indexValue(indexData.indexValue)
+  {
+  }
+  constexpr TextureCacheIndexData(TextureCacheIndexData&& indexData)
+  : indexValue(indexData.indexValue)
+  {
+  }
+
+  TextureCacheIndexData& operator=(const std::uint32_t& index)
+  {
+    indexValue = index;
+    return *this;
+  }
+  TextureCacheIndexData& operator=(const TextureCacheIndexData& rhs)
+  {
+    indexValue = rhs.indexValue;
+    return *this;
+  }
+  TextureCacheIndexData& operator=(TextureCacheIndexData&& rhs)
+  {
+    indexValue = rhs.indexValue;
+    return *this;
+  }
+
+  constexpr operator std::uint32_t() const
+  {
+    return indexValue;
+  }
+  constexpr operator std::uint32_t()
+  {
+    return indexValue;
+  }
+  constexpr explicit operator std::int32_t() const
+  {
+    return static_cast<std::int32_t>(indexValue);
+  }
+  constexpr explicit operator std::int32_t()
+  {
+    return static_cast<std::int32_t>(indexValue);
+  }
+
+  // Return detailValue.index. - the real index of datailValue.type container
+  constexpr inline std::uint32_t GetIndex() const
+  {
+    return detailValue.index;
+  }
+
+  inline constexpr bool operator==(const TextureCacheIndexData& rhs)
+  {
+    return indexValue == rhs.indexValue;
+  }
+  inline constexpr bool operator<(const TextureCacheIndexData& rhs)
+  {
+    return indexValue < rhs.indexValue;
+  }
+
+  // Data area
+  std::uint32_t indexValue;
+  struct
+  {
+    unsigned int          index : 28;
+    TextureCacheIndexType type : 4;
+  } detailValue;
+};
+
 // Typedef:
 
-typedef std::int32_t TextureId;         ///< The TextureId type. This is used as a handle to refer to a particular Texture.
-typedef std::int32_t TextureCacheIndex; ///< The TextureCacheIndex type. This is used as a handles to refer to a particular Texture in TextureCacheManager.
-                                        ///  Note : For the same Texture, TextureId will not be changed. But TextureCacheIndex can be chaged when TextureCacheManager
-                                        ///  Internal container informations changed by Append or Remove.
-typedef std::size_t TextureHash;        ///< The type used to store the hash used for Texture caching.
+typedef std::int32_t          TextureId;         ///< The TextureId type. This is used as a handle to refer to a particular Texture.
+typedef TextureCacheIndexData TextureCacheIndex; ///< The TextureCacheIndex type. This is used as a handles to refer to a particular Texture in TextureCacheManager.
+                                                 ///  Note : For the same Texture, TextureId will not be changed. But TextureCacheIndex can be chaged when TextureCacheManager
+                                                 ///  Internal container informations changed by Append or Remove.
+typedef std::size_t TextureHash;                 ///< The type used to store the hash used for Texture caching.
 
 // Constant values:
 
 static constexpr TextureId         INVALID_TEXTURE_ID  = -1; ///< Used to represent a null TextureId or error
-static constexpr TextureCacheIndex INVALID_CACHE_INDEX = -1; ///< Used to represent a null TextureCacheIndex or error
+static constexpr TextureCacheIndex INVALID_CACHE_INDEX = 0;  ///< Used to represent a null TextureCacheIndex or error
 
 // Enum classes:
 

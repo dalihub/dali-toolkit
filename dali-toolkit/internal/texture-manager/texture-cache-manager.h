@@ -18,7 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/free-list.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
+#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-type.h>
@@ -38,11 +40,29 @@ namespace Internal
  * You can Convert TextureId into TextureCacheIndex by this class.
  *
  * Also, You can store external TextureSet or EncodedImageBuffer here.
+ *
+ * There are 3 type of CachedContainer in this manager
+ *  - mTextureInfoContainer : Cache all kind of textures that need some load/upload jobs.
+ *                            All kind of images that visual using (not vector image) will be stored here.
+ *                            This container will use TEXTURE_CACHE_INDEX_TYPE_LOCAL
+ *
+ *  - mExternalTextures : External appended TextureSet cache container.
+ *                        External TextureSet can be Something like NativeImageSource, FrameBuffer and PixelData.
+ *                        This container will use TEXTURE_CACHE_INDEX_TYPE_TEXTURE
+ *                        The textureId will be used for VisualUrl. ex) dali://1
+ *
+ *  - mEncodedImageBuffers : External appended EncodedImageBuffer cache container.
+ *                           This container will use TEXTURE_CACHE_INDEX_TYPE_BUFFER
+ *                           The bufferId will be used for VisualUrl. ex) enbuf://1
+ *                           Note that this bufferId is not equal with textureId in mTextureInfoContainer.
  */
 class TextureCacheManager
 {
 public:
   // Copy enum and types and const values that TextureCacheManager will use.
+  using TextureCacheIndexType = TextureManagerType::TextureCacheIndexType;
+  using TextureCacheIndexData = TextureManagerType::TextureCacheIndexData;
+
   using TextureId         = TextureManagerType::TextureId;
   using TextureCacheIndex = TextureManagerType::TextureCacheIndex;
   using TextureHash       = TextureManagerType::TextureHash;
@@ -81,6 +101,7 @@ public:
 
   /**
    * @brief Get the current state of a texture
+   * @note This API doesn't consider encodedimagebuffer.
    * @param[in] textureId The texture id to query
    * @return The loading state if the texture is valid, or NOT_STARTED if the textureId
    * is not valid.
@@ -89,6 +110,7 @@ public:
 
   /**
    * @brief Get the current state of a texture
+   * @note This API doesn't consider external & encodedimagebuffer.
    * @param[in] textureId The texture id to query
    * @return The loading state if the texture is valid, or NOT_STARTED if the textureId
    * is not valid.
@@ -111,17 +133,17 @@ public:
 
   /**
    * @brief Get the encoded image buffer
-   * @param[in] textureId The textureId to look up
-   * @return the encoded image buffer, or an empty handle if textureId is not valid
+   * @param[in] bufferId The bufferId to look up
+   * @return the encoded image buffer, or an empty handle if bufferId is not valid
    */
-  EncodedImageBuffer GetEncodedImageBuffer(const TextureCacheManager::TextureId& textureId);
+  EncodedImageBuffer GetEncodedImageBuffer(const TextureCacheManager::TextureId& bufferId);
 
   /**
    * @brief Get the encoded image buffer by VisualUrl
    * @param[in] url The url to look up
    * @return the encoded image buffer, or an empty handle if url is not buffer resource or buffer is not valid
    */
-  EncodedImageBuffer GetEncodedImageBuffer(const std::string& url);
+  EncodedImageBuffer GetEncodedImageBuffer(const VisualUrl& url);
 
   /**
    * Adds an external texture to the texture manager
@@ -131,28 +153,28 @@ public:
   std::string AddExternalTexture(const TextureSet& texture);
 
   /**
-   * Adds an external encoded image buffer to the texture manager
+   * Adds an encoded image buffer to the texture manager
    * @param[in] encodedImageBuffer The image buffer to add
    * @return string containing the URL for the texture
    */
-  std::string AddExternalEncodedImageBuffer(const EncodedImageBuffer& encodedImageBuffer);
+  std::string AddEncodedImageBuffer(const EncodedImageBuffer& encodedImageBuffer);
 
   /**
    * Removes an external texture from texture manager
    * @param[in] url The string containing the texture to remove
    * @return handle to the texture
    */
-  TextureSet RemoveExternalTexture(const std::string& url);
+  TextureSet RemoveExternalTexture(const VisualUrl& url);
 
   /**
    * Removes an external encoded image buffer from texture manager
    * @param[in] url The string containing the encoded image buffer to remove
    * @return handle to the encoded image buffer
    */
-  EncodedImageBuffer RemoveExternalEncodedImageBuffer(const std::string& url);
+  EncodedImageBuffer RemoveEncodedImageBuffer(const VisualUrl& url);
 
   /**
-   * @brief Notify that external textures or external encoded image buffers are used.
+   * @brief Notify that external textures or encoded image buffers are used.
    * @param[in] url The URL of the texture to use.
    */
   void UseExternalResource(const VisualUrl& url);
@@ -161,10 +183,11 @@ public:
   // To Generate / Get / Remove TextureId.
 
   /**
-   * @brief Generates a new, unique TextureId
-   * @return A unique TextureId
+   * @brief Generates a new valid TextureId.
+   * @param[in] textureCacheIndex the index of the cache container. If we don't setup this value, default is INVALID_CACHE_INDEX
+   * @return A TextureId
    */
-  TextureCacheManager::TextureId GenerateUniqueTextureId();
+  TextureCacheManager::TextureId GenerateTextureId(const TextureCacheIndex& textureCacheIndex = INVALID_CACHE_INDEX);
 
   /**
    * @brief Used to lookup an index into the TextureInfoContainer from a TextureId
@@ -188,7 +211,7 @@ public:
    * @return                     A hash of the provided data for caching.
    */
   TextureCacheManager::TextureHash GenerateHash(
-    const std::string&                    url,
+    const VisualUrl&                      url,
     const Dali::ImageDimensions&          size,
     const Dali::FittingMode::Type&        fittingMode,
     const Dali::SamplingMode::Type&       samplingMode,
@@ -206,26 +229,27 @@ public:
    * @param[in] samplingMode      The SamplingMode to use
    * @param[in] useAtlas          True if atlased
    * @param[in] maskTextureId     Optional texture ID to use to mask this image
-   * @param[in] preMultiplyOnLoad If the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
+   * @param[in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    * @param[in] isAnimatedImage   True if the texture is from animated image.
    * @param[in] cropToMask        True if crop to mask
-   * @return                      A TextureCacheId of a cached Texture if found. Or INVALID_CACHE_INDEX if not found.
+   * @return                      A TextureCacheIndex of a cached Texture if found. Or INVALID_CACHE_INDEX if not found.
    */
   TextureCacheManager::TextureCacheIndex FindCachedTexture(
     const TextureCacheManager::TextureHash&    hash,
-    const std::string&                         url,
+    const VisualUrl&                           url,
     const Dali::ImageDimensions&               size,
     const Dali::FittingMode::Type&             fittingMode,
     const Dali::SamplingMode::Type&            samplingMode,
     const TextureCacheManager::UseAtlas&       useAtlas,
     const TextureCacheManager::TextureId&      maskTextureId,
+    const bool&                                cropToMask,
     const TextureCacheManager::MultiplyOnLoad& preMultiplyOnLoad,
-    bool                                       isAnimatedImage,
-    const bool&                                cropToMask);
+    const bool&                                isAnimatedImage);
 
   /**
    * @brief Append a Texture to the TextureCacheManager.
    * @note This API doesn't check duplication of TextureId.
+   * @note This API doesn't consider external & encodedimagebuffer.
    *
    * @param[in] textureInfo TextureInfo that want to cache in container.
    * @return Index of newly appended texture info.
@@ -234,6 +258,7 @@ public:
 
   /**
    * @brief Remove a Texture from the TextureCacheManager.
+   * @note This API doesn't consider external & encodedimagebuffer.
    *
    * Textures are cached and therefore only the removal of the last
    * occurrence of a Texture will cause its removal internally.
@@ -251,7 +276,7 @@ public:
    */
   inline TextureCacheManager::TextureInfo& operator[](const TextureCacheManager::TextureCacheIndex& textureCacheIndex) noexcept
   {
-    return mTextureInfoContainer[textureCacheIndex];
+    return mTextureInfoContainer[textureCacheIndex.GetIndex()];
   }
 
   /**
@@ -267,6 +292,9 @@ public:
 private:
   // Private defined structs.
 
+  /**
+   * @brief This struct is used to manage the life-cycle of ExternalTexture url.
+   */
   struct ExternalTextureInfo
   {
     ExternalTextureInfo(const TextureCacheManager::TextureId& textureId,
@@ -281,23 +309,77 @@ private:
     std::int16_t                   referenceCount;
   };
 
-  struct EncodedBufferTextureInfo
+  /**
+   * @brief This struct is used to manage the life-cycle of EncodedImageBuffer url.
+   */
+  struct EncodedImageBufferInfo
   {
-    EncodedBufferTextureInfo(const TextureCacheManager::TextureId& textureId,
-                             const EncodedImageBuffer&             encodedImageBuffer)
-    : textureId(textureId),
+    EncodedImageBufferInfo(const TextureCacheManager::TextureId&   bufferId,
+                           const TextureCacheManager::TextureHash& bufferHash,
+                           const EncodedImageBuffer&               encodedImageBuffer)
+    : bufferId(bufferId),
+      bufferHash(bufferHash),
       encodedImageBuffer(encodedImageBuffer),
       referenceCount(1u)
     {
     }
-    TextureCacheManager::TextureId textureId;
-    EncodedImageBuffer             encodedImageBuffer;
-    std::int16_t                   referenceCount;
+    TextureCacheManager::TextureId   bufferId;
+    TextureCacheManager::TextureHash bufferHash;
+    EncodedImageBuffer               encodedImageBuffer;
+    std::int16_t                     referenceCount;
   };
 
-  typedef std::vector<TextureCacheManager::TextureInfo>              TextureInfoContainerType;              ///< The container type used to manage the life-cycle and caching of Textures
-  typedef std::vector<TextureCacheManager::ExternalTextureInfo>      ExternalTextureInfoContainerType;      ///< The container type used to manage the life-cycle and caching of Textures
-  typedef std::vector<TextureCacheManager::EncodedBufferTextureInfo> EncodedBufferTextureInfoContainerType; ///< The container type used to manage the life-cycle and caching of Textures
+  typedef Dali::FreeList TextureIdConverterType; ///< The converter type from TextureId to index of TextureInfoContainer.
+
+  typedef std::unordered_map<TextureCacheManager::TextureHash, std::vector<TextureCacheManager::TextureId>> TextureHashContainerType;            ///< The container type used to fast-find the TextureId by TextureHash.
+  typedef std::vector<TextureCacheManager::TextureInfo>                                                     TextureInfoContainerType;            ///< The container type used to manage the life-cycle and caching of Textures
+  typedef std::vector<TextureCacheManager::ExternalTextureInfo>                                             ExternalTextureInfoContainerType;    ///< The container type used to manage the life-cycle and caching of ExternalTexture url
+  typedef std::vector<TextureCacheManager::EncodedImageBufferInfo>                                          EncodedImageBufferInfoContainerType; ///< The container type used to manage the life-cycle and caching of EncodedImageBuffer url
+
+private:
+  // Private API: only used internally
+
+  /**
+   * @brief Used to lookup an index into the ExternalTextureInfoContainer from a textureId
+   * @param[in] textureId The TextureId to look up
+   * @return              The cache index
+   */
+  TextureCacheManager::TextureCacheIndex GetCacheIndexFromExternalTextureId(const TextureCacheManager::TextureId& textureId);
+
+  /**
+   * @brief Used to lookup an index into the EncodedImageBufferInfoContainer from a bufferId
+   * @param[in] bufferId The bufferId to look up
+   * @return             The cache index
+   */
+  TextureCacheManager::TextureCacheIndex GetCacheIndexFromEncodedImageBufferId(const TextureCacheManager::TextureId& bufferId);
+
+  /**
+   * @brief Looks up a cached encoded image buffer cached by its hash.
+   * If found, the given parameters are used to check there is no hash-collision.
+   * @param[in] hash               The hash to look up
+   * @param[in] encodedImageBuffer The image buffer to load
+   * @return                       A TextureCacheIndex of a cached Texture if found. Or INVALID_CACHE_INDEX if not found.
+   */
+  TextureCacheManager::TextureCacheIndex FindCachedEncodedImageBuffer(const TextureCacheManager::TextureHash& hash, const EncodedImageBuffer& encodedImageBuffer);
+
+  /**
+   * @brief Remove id in HashContainer.
+   * @param[in] hash The hash of the texture/buffer to be delete
+   * @param[in] id   The texture/buffer id to be deleted.
+   */
+  void RemoveHashId(const TextureCacheManager::TextureHash& hash, const TextureCacheManager::TextureId& id);
+
+  /**
+   * @brief Remove data from container by the TextureCacheIndex.
+   * It also valiate the TextureIdConverter internally.
+   * We will assume that only valid TextureCacheIndex will come.
+   *
+   * @tparam ContainerType The type of container. It will automatically defined
+   * @param[in] cacheContainer The container that will remove texture info.
+   * @param[in] removeContainerIndex The index of texture info that will remove.
+   */
+  template<class ContainerType>
+  void RemoveTextureInfoByIndex(ContainerType& cacheContainer, const TextureCacheManager::TextureCacheIndex& removeContainerIndex);
 
 private:
   /**
@@ -310,11 +392,13 @@ private:
    */
   TextureCacheManager& operator=(const TextureCacheManager& rhs) = delete;
 
-private:                                                          // Member Variables:
-  TextureInfoContainerType              mTextureInfoContainer{};  ///< Used to manage the life-cycle and caching of Textures
-  ExternalTextureInfoContainerType      mExternalTextures{};      ///< Externally provided textures
-  EncodedBufferTextureInfoContainerType mEncodedBufferTextures{}; ///< Externally encoded buffer textures
-  TextureCacheManager::TextureId        mCurrentTextureId;        ///< The current value used for the unique Texture Id generation
+private:                                            // Member Variables:
+  TextureIdConverterType   mTextureIdConverter{};   ///< Convert TextureId into various container's index.
+  TextureHashContainerType mTextureHashContainer{}; ///< Used to manage the life-cycle and caching of Textures + EncodedImageBuffer by TextureHash
+
+  TextureInfoContainerType            mTextureInfoContainer{}; ///< Used to manage the life-cycle and caching of Textures
+  ExternalTextureInfoContainerType    mExternalTextures{};     ///< Externally provided textures
+  EncodedImageBufferInfoContainerType mEncodedImageBuffers{};  ///< Externally encoded image buffer
 };
 
 } // namespace Internal

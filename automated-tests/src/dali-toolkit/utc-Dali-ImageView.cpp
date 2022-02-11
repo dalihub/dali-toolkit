@@ -59,6 +59,7 @@ namespace
 const char* TEST_IMAGE_FILE_NAME  = "gallery_image_01.jpg";
 const char* TEST_IMAGE_FILE_NAME2 = "gallery_image_02.jpg";
 
+// resolution: 1024*1024
 const char* TEST_IMAGE_1 = TEST_RESOURCE_DIR "/TB-gloss.png";
 const char* TEST_IMAGE_2 = TEST_RESOURCE_DIR "/tb-norm.png";
 
@@ -3105,6 +3106,7 @@ void OnResourceReadySignal02(Control control)
 ImageView gImageView1;
 ImageView gImageView2;
 ImageView gImageView3;
+ImageView gImageView4;
 
 void OnResourceReadySignal03(Control control)
 {
@@ -3134,6 +3136,66 @@ void OnSimpleResourceReadySignal(Control control)
 {
   // simply increate counter
   gResourceReadySignalCounter++;
+}
+
+int gResourceReadySignal04ComesOrder = 0;
+
+void OnResourceReadySignal04(Control control)
+{
+  gResourceReadySignalCounter++;
+  tet_printf("rc %d\n", gResourceReadySignalCounter);
+  if(gResourceReadySignalCounter == 1)
+  {
+    auto scene = gImageView1.GetParent();
+
+    // Request load something
+    // We hope this request result is return later than gImageView2.
+    gImageView3 = ImageView::New(TEST_IMAGE_1);
+    gImageView3.ResourceReadySignal().Connect(&OnResourceReadySignal04);
+    scene.Add(gImageView3);
+    gImageView4 = ImageView::New(TEST_IMAGE_2);
+    gImageView4.ResourceReadySignal().Connect(&OnResourceReadySignal04);
+    scene.Add(gImageView4);
+
+    if(control == gImageView1)
+    {
+      gResourceReadySignal04ComesOrder = 1;
+    }
+    else
+    {
+      gResourceReadySignal04ComesOrder = 2;
+    }
+  }
+  if(gResourceReadySignalCounter == 2)
+  {
+    if(gResourceReadySignal04ComesOrder == 1 && control == gImageView2)
+    {
+      // Scene off first one.
+      gImageView1.Unparent();
+
+      // Scene off second one.
+      gImageView2.Unparent();
+    }
+    else if(gResourceReadySignal04ComesOrder == 2 && control == gImageView1)
+    {
+      // Scene off first one.
+      gImageView2.Unparent();
+
+      // Scene off second one.
+      gImageView1.Unparent();
+    }
+    else
+    {
+      // We can't check that this utc fail case. just pass always when we come here.
+      gResourceReadySignal04ComesOrder = -1;
+    }
+
+    // If we don't seperate index of FreeList area
+    // and if we don't queue remove during obversing,
+    // cache index become something invalid data.
+    // In this case, some strange observer can be called.
+    // For example, gImageView4.LoadComplete will be called.
+  }
 }
 
 } // namespace
@@ -3465,6 +3527,62 @@ int UtcDaliImageViewCheckVariousCaseSendOnResourceReadySignal(void)
   TestAuxiliaryResourceReadyUrl(1, 0, "invalid.9.png", "invalid.png", TEST_LOCATION);
   TestAuxiliaryResourceReadyUrl(1, 1, TEST_BROKEN_IMAGE_L, "invalid.png", TEST_LOCATION);
   TestAuxiliaryResourceReadyUrl(1, 0, "invalid.9.png", gImage_34_RGBA, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliImageViewSetImageOnResourceReadySignal04(void)
+{
+  tet_infoline("Test texturemanager's remove queue works well within signal handler.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter      = 0;
+  gResourceReadySignal04ComesOrder = 0;
+
+  gImageView1 = ImageView::New("invalid.jpg"); // request invalid image, to make loading failed fast.
+  gImageView1.ResourceReadySignal().Connect(&OnResourceReadySignal04);
+  application.GetScene().Add(gImageView1);
+
+  gImageView2 = ImageView::New("invalid.png"); // request invalid image, to make loading failed fast.
+  gImageView2.ResourceReadySignal().Connect(&OnResourceReadySignal04);
+  application.GetScene().Add(gImageView2);
+
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Try to load 2 invalid image");
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gResourceReadySignalCounter, 2, TEST_LOCATION);
+
+  tet_infoline("load done");
+
+  // We can test this UTC only if gImageView1 and gImageView2 loaded done.
+  if(gResourceReadySignal04ComesOrder == -1)
+  {
+    tet_infoline("Bad news.. gImageView3 or gImageView4 loaded faster than others. just skip this UTC");
+  }
+  else
+  {
+    // gImageView3 and gImageView4 load must not be successed yet.
+    DALI_TEST_EQUALS(gImageView3.GetRendererCount(), 0u, TEST_LOCATION);
+    DALI_TEST_EQUALS(gImageView4.GetRendererCount(), 0u, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render();
+
+    tet_infoline("Try to load 2 valid image");
+
+    DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(2), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(gResourceReadySignalCounter, 4, TEST_LOCATION);
+
+    tet_infoline("load done");
+
+    // gImageView3 and gImageView4 load must be successed now.
+    DALI_TEST_EQUALS(gImageView3.GetRendererAt(0).GetTextures().GetTextureCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(gImageView4.GetRendererAt(0).GetTextures().GetTextureCount(), 1u, TEST_LOCATION);
+  }
 
   END_TEST;
 }

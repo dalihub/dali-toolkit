@@ -283,11 +283,11 @@ public:
   }
 
   /**
-   * @copydoc TextureCacheManager::RemoveExternalEncodedImageBuffer
+   * @copydoc TextureCacheManager::RemoveEncodedImageBuffer
    */
-  inline EncodedImageBuffer RemoveExternalEncodedImageBuffer(const std::string& url)
+  inline EncodedImageBuffer RemoveEncodedImageBuffer(const std::string& url)
   {
-    return mTextureCacheManager.RemoveExternalEncodedImageBuffer(url);
+    return mTextureCacheManager.RemoveEncodedImageBuffer(url);
   }
 
   /**
@@ -315,11 +315,11 @@ public:
   }
 
   /**
-   * @copydoc TextureCacheManager::AddExternalEncodedImageBuffer
+   * @copydoc TextureCacheManager::AddEncodedImageBuffer
    */
-  inline std::string AddExternalEncodedImageBuffer(const EncodedImageBuffer& encodedImageBuffer)
+  inline std::string AddEncodedImageBuffer(const EncodedImageBuffer& encodedImageBuffer)
   {
-    return mTextureCacheManager.AddExternalEncodedImageBuffer(encodedImageBuffer);
+    return mTextureCacheManager.AddEncodedImageBuffer(encodedImageBuffer);
   }
 
 public: // Load Request API
@@ -536,7 +536,12 @@ private:
   /**
    * @brief Initiate load of textures queued whilst NotifyObservers invoking callbacks.
    */
-  void ProcessQueuedTextures();
+  void ProcessLoadQueue();
+
+  /**
+   * @brief Initiate remove of texture queued whilst NotifyObservers invoking callbacks.
+   */
+  void ProcessRemoveQueue();
 
   /**
    * Add the observer to the observer list
@@ -624,9 +629,10 @@ private:                                    // Member Variables:
   RoundRobinContainerView<TextureAsyncLoadingHelper> mAsyncLocalLoaders;  ///< The Asynchronous image loaders used to provide all local async loads
   RoundRobinContainerView<TextureAsyncLoadingHelper> mAsyncRemoteLoaders; ///< The Asynchronous image loaders used to provide all remote async loads
 
-  Dali::Vector<LifecycleObserver*> mLifecycleObservers; ///< Lifecycle observers of texture manager
-  Dali::Vector<LoadQueueElement>   mLoadQueue;          ///< Queue of textures to load after NotifyObservers
-  bool                             mQueueLoadFlag;      ///< Flag that causes Load Textures to be queued.
+  Dali::Vector<LifecycleObserver*>        mLifecycleObservers; ///< Lifecycle observers of texture manager
+  Dali::Vector<LoadQueueElement>          mLoadQueue;          ///< Queue of textures to load after NotifyObservers
+  Dali::Vector<TextureManager::TextureId> mRemoveQueue;        ///< Queue of textures to remove after NotifyObservers
+  bool                                    mQueueLoadFlag;      ///< Flag that causes Load Textures to be queued.
 };
 
 } // namespace Internal
