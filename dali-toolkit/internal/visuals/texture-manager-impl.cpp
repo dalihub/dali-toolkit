@@ -523,10 +523,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
   int         cacheIndex  = INVALID_CACHE_INDEX;
   if(storageType != StorageType::RETURN_PIXEL_BUFFER && useCache)
   {
-    textureHash = GenerateHash(url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId);
+    textureHash = GenerateHash(url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId, cropToMask);
 
     // Look up the texture by hash. Note: The extra parameters are used in case of a hash collision.
-    cacheIndex = FindCachedTexture(textureHash, url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, storageType, maskTextureId, preMultiplyOnLoad, (animatedImageLoading) ? true : false);
+    cacheIndex = FindCachedTexture(textureHash, url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, storageType, maskTextureId, preMultiplyOnLoad, (animatedImageLoading) ? true : false, cropToMask);
   }
 
   TextureManager::TextureId textureId = INVALID_TEXTURE_ID;
@@ -1494,7 +1494,8 @@ TextureManager::TextureHash TextureManager::GenerateHash(
   const FittingMode::Type        fittingMode,
   const Dali::SamplingMode::Type samplingMode,
   const UseAtlas                 useAtlas,
-  TextureId                      maskTextureId)
+  TextureId                      maskTextureId,
+  bool                           cropToMask)
 {
   std::string    hashTarget(url);
   const size_t   urlLength = hashTarget.length();
@@ -1542,7 +1543,7 @@ TextureManager::TextureHash TextureManager::GenerateHash(
   if(maskTextureId != INVALID_TEXTURE_ID)
   {
     auto textureIdIndex = hashTarget.length();
-    hashTarget.resize(hashTarget.length() + sizeof(TextureId));
+    hashTarget.resize(hashTarget.length() + sizeof(TextureId) + 1u);
     unsigned char* hashTargetPtr = reinterpret_cast<unsigned char*>(&(hashTarget[textureIdIndex]));
 
     // Append the texture id to the end of the URL byte by byte:
@@ -1552,6 +1553,7 @@ TextureManager::TextureHash TextureManager::GenerateHash(
       *hashTargetPtr++ = maskTextureId & 0xff;
       maskTextureId >>= 8u;
     }
+    *hashTargetPtr++ = (cropToMask ? 'C' : 'M');
   }
 
   return Dali::CalculateHash(hashTarget);
@@ -1567,7 +1569,8 @@ int TextureManager::FindCachedTexture(
   StorageType                       storageType,
   TextureId                         maskTextureId,
   TextureManager::MultiplyOnLoad    preMultiplyOnLoad,
-  bool                              isAnimatedImage)
+  bool                              isAnimatedImage,
+  bool                              cropToMask)
 {
   // Default to an invalid ID, in case we do not find a match.
   int cacheIndex = INVALID_CACHE_INDEX;
@@ -1584,6 +1587,7 @@ int TextureManager::FindCachedTexture(
       if((url == textureInfo.url.GetUrl()) &&
          (useAtlas == textureInfo.useAtlas) &&
          (maskTextureId == textureInfo.maskTextureId) &&
+         (cropToMask == textureInfo.cropToMask) &&
          (size == textureInfo.desiredSize) &&
          (isAnimatedImage == textureInfo.isAnimatedImageFormat) &&
          (storageType == textureInfo.storageType) &&
