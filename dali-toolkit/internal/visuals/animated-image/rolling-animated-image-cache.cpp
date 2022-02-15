@@ -140,7 +140,6 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
       textureSet = GetFrontTextureSet();
     }
   }
-
   return textureSet;
 }
 
@@ -220,6 +219,18 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
   {
     // Synchronous loading is failed
     mLoadState = TextureManager::LoadState::LOAD_FAILED;
+    return textureSet;
+  }
+
+  if(synchronousLoading)
+  {
+    if(DALI_UNLIKELY(mFrameCount != mAnimatedImageLoading.GetImageCount()))
+    {
+      mFrameCount = mAnimatedImageLoading.GetImageCount();
+      mImageUrls.resize(mFrameCount);
+      mIntervals.assign(mFrameCount, 0);
+    }
+    mIntervals[mQueue.Back().mFrameNumber] = mAnimatedImageLoading.GetFrameInterval(frameIndex);
   }
 
   return textureSet;

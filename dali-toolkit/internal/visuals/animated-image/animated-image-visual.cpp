@@ -854,6 +854,7 @@ void AnimatedImageVisual::OnInitialize()
 void AnimatedImageVisual::StartFirstFrame(TextureSet& textureSet, uint32_t firstInterval)
 {
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::StartFirstFrame()\n");
+  mFrameCount = mImageCache->GetTotalFrameCount();
 
   mStartFirstFrame = false;
   if(mImpl->mRenderer)
@@ -897,7 +898,6 @@ TextureSet AnimatedImageVisual::PrepareTextureSet()
   {
     SetImageSize(textureSet);
   }
-
   return textureSet;
 }
 
@@ -941,7 +941,6 @@ void AnimatedImageVisual::FrameReady(TextureSet textureSet, uint32_t interval)
 
   if(mStartFirstFrame)
   {
-    mFrameCount = mImageCache->GetTotalFrameCount();
     StartFirstFrame(textureSet, interval);
   }
   else
