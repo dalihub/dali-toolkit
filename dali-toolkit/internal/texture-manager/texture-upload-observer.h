@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXTURE_UPLOAD_OBSERVER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
-#include <dali/public-api/signals/dali-signal.h>
 #include <dali/public-api/rendering/texture-set.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-url.h>
@@ -29,7 +29,6 @@
 
 namespace Dali
 {
-
 namespace Toolkit
 {
 /**
@@ -56,14 +55,14 @@ public:
 
     TextureInformation();
 
-    ReturnType                 returnType;    ///< Returned Texture type.
-    int32_t                    textureId;     ///< The textureId of the loaded texture in the TextureManager
-    TextureSet                 textureSet;    ///< The TextureSet containing the Texture
-    bool                       useAtlasing;   ///< True if atlasing was used (note: this may be different to what was requested)
-    const Vector4&             atlasRect;     ///< If using atlasing, this is the rectangle within the atlas to use.
-    bool                       preMultiplied; ///< True if the image had pre-multiplied alpha applied
-    Devel::PixelBuffer         pixelBuffer;   ///< The PixelBuffer of the loaded image.
-    std::string_view           url;           ///< The url address of the loaded image.
+    ReturnType         returnType;    ///< Returned Texture type.
+    int32_t            textureId;     ///< The textureId of the loaded texture in the TextureManager
+    TextureSet         textureSet;    ///< The TextureSet containing the Texture
+    bool               useAtlasing;   ///< True if atlasing was used (note: this may be different to what was requested)
+    const Vector4&     atlasRect;     ///< If using atlasing, this is the rectangle within the atlas to use.
+    bool               preMultiplied; ///< True if the image had pre-multiplied alpha applied
+    Devel::PixelBuffer pixelBuffer;   ///< The PixelBuffer of the loaded image.
+    std::string_view   url;           ///< The url address of the loaded image.
   };
 
 public:

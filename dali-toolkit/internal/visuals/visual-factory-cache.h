@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_CACHE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@
 #include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
-#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 
 namespace Dali
@@ -298,12 +298,12 @@ private:
   struct BrokenImageInfo
   {
     BrokenImageInfo()
-    :visualType(),
-     url(""),
-     npatchId(NPatchData::INVALID_NPATCH_DATA_ID),
-     texture(),
-     width(0),
-     height(0)
+    : visualType(),
+      url(""),
+      npatchId(NPatchData::INVALID_NPATCH_DATA_ID),
+      texture(),
+      width(0),
+      height(0)
     {
     }
 
@@ -312,20 +312,20 @@ private:
     }
 
     // Data
-    VisualUrl::Type                         visualType;
-    std::string                             url;
-    NPatchData::NPatchDataId                npatchId;
-    Texture                                 texture;
-    uint32_t                                width;
-    uint32_t                                height;
+    VisualUrl::Type          visualType;
+    std::string              url;
+    NPatchData::NPatchDataId npatchId;
+    Texture                  texture;
+    uint32_t                 width;
+    uint32_t                 height;
   };
 
   Geometry mGeometry[GEOMETRY_TYPE_MAX + 1];
   Shader   mShader[SHADER_TYPE_MAX + 1];
 
-  ImageAtlasManagerPtr                    mAtlasManager;
-  TextureManager                          mTextureManager;
-  NPatchLoader                            mNPatchLoader;
+  ImageAtlasManagerPtr mAtlasManager;
+  TextureManager       mTextureManager;
+  NPatchLoader         mNPatchLoader;
 
   SvgRasterizeThread*                     mSvgRasterizeThread;
   std::unique_ptr<VectorAnimationManager> mVectorAnimationManager;

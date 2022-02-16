@@ -31,9 +31,9 @@
 
 // INTERNAL HEADERS
 #include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
+#include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
-#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>

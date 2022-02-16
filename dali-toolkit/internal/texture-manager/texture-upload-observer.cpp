@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include "texture-upload-observer.h"
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
+#include <dali-toolkit/internal/texture-manager/texture-manager-type.h> // for INVALUD_TEXTURE_ID
 
 namespace Dali
 {
@@ -39,7 +39,7 @@ TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnT
 
 TextureUploadObserver::TextureInformation::TextureInformation(ReturnType returnType, Devel::PixelBuffer pixelBuffer, const std::string& url, bool preMultiplied)
 : returnType(returnType),
-  textureId(Internal::TextureManager::INVALID_TEXTURE_ID),
+  textureId(Internal::TextureManagerType::INVALID_TEXTURE_ID),
   textureSet(),
   useAtlasing(false),
   atlasRect(Vector4::ZERO),
