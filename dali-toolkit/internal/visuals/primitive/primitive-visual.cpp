@@ -39,8 +39,6 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(6); // 5 transform properties+mix
-
 // shapes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(SHAPE_TYPE)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::PrimitiveVisual::Shape, SPHERE)
@@ -365,7 +363,7 @@ void PrimitiveVisual::OnSetTransform()
 {
   if(mImpl->mRenderer)
   {
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 
@@ -381,14 +379,10 @@ void PrimitiveVisual::OnInitialize()
     CreateShader();
   }
 
-  mImpl->mRenderer = Renderer::New(mGeometry, mShader);
-  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
+  mImpl->mRenderer = VisualRenderer::New(mGeometry, mShader);
   mImpl->mRenderer.SetProperty(Renderer::Property::FACE_CULLING_MODE, FaceCullingMode::BACK);
-
-  // Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
-
-  mImpl->mMixColorIndex = mImpl->mRenderer.RegisterProperty(Toolkit::PrimitiveVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor));
+  mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, Vector3(mImpl->mMixColor));
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 void PrimitiveVisual::UpdateShaderUniforms()

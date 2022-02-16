@@ -237,7 +237,7 @@ void MeshVisual::OnSetTransform()
 {
   if(mImpl->mRenderer)
   {
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 
@@ -302,21 +302,20 @@ void MeshVisual::OnInitialize()
     return;
   }
 
-  mImpl->mRenderer = Renderer::New(mGeometry, mShader);
-  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
+  mImpl->mRenderer = VisualRenderer::New(mGeometry, mShader);
   mImpl->mRenderer.SetTextures(mTextureSet);
   mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::ON);
   mImpl->mRenderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON);
 
   //Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 void MeshVisual::SupplyEmptyGeometry()
 {
   mGeometry        = Geometry::New();
   mShader          = Shader::New(SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT, SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG);
-  mImpl->mRenderer = Renderer::New(mGeometry, mShader);
+  mImpl->mRenderer = VisualRenderer::New(mGeometry, mShader);
 
   DALI_LOG_ERROR("Initialisation error in mesh visual.\n");
 }

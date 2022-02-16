@@ -39,7 +39,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(11); // 5 transform properties + atlas + corner/border
+const int CUSTOM_PROPERTY_COUNT(6); // atlas + corner/border
 
 // property name
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
@@ -88,7 +88,7 @@ void SvgVisual::OnInitialize()
 {
   Shader   shader   = GenerateShader();
   Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
-  mImpl->mRenderer  = Renderer::New(geometry, shader);
+  mImpl->mRenderer  = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 }
 
@@ -151,7 +151,7 @@ void SvgVisual::DoSetOnScene(Actor& actor)
   mImpl->mRenderer.SetTextures(textureSet);
 
   // Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 
   // Defer the rasterisation task until we get given a size (by Size Negotiation algorithm)
 
@@ -355,7 +355,7 @@ void SvgVisual::OnSetTransform()
 
   if(mImpl->mRenderer)
   {
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 

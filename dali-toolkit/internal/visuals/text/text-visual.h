@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_VISUAL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
+#include <dali/public-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
@@ -271,7 +272,7 @@ private:
    * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
    * @param[in] isOverlayStyle Whether the style needs to overlay on the text (e.g. strikethrough, underline, etc.).
    */
-  void CreateTextureSet(TilingInfo& info, Renderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle);
+  void CreateTextureSet(TilingInfo& info, VisualRenderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled, bool isOverlayStyle);
 
   /**
    * Create renderer of the text for rendering.

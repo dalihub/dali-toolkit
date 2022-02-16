@@ -37,7 +37,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(9); // 5 transform properties + thickness,start,sweep,radius
+const int CUSTOM_PROPERTY_COUNT(4); // thickness,start,sweep,radius
 
 // cap
 DALI_ENUM_TO_STRING_TABLE_BEGIN(CAP)
@@ -213,7 +213,7 @@ void ArcVisual::OnInitialize()
     }
   }
 
-  mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   mThicknessIndex  = mImpl->mRenderer.RegisterUniqueProperty(DevelArcVisual::Property::THICKNESS, THICKNESS_NAME, mThickness);
@@ -225,7 +225,7 @@ void ArcVisual::OnInitialize()
   mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
 
   // Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 } // namespace Internal

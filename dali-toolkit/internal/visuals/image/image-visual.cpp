@@ -51,7 +51,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(14); // 5 transform properties + wrap, pixel area, atlas, pixalign, + border/corner
+const int CUSTOM_PROPERTY_COUNT(9); // wrap, pixel area, atlas, pixalign, + border/corner
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN(FITTING_MODE)
@@ -567,11 +567,11 @@ void ImageVisual::OnInitialize()
   Shader shader = GenerateShader();
 
   // Create the renderer
-  mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   //Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 
   EnablePreMultipliedAlpha(IsPreMultipliedAlphaEnabled());
 }
@@ -817,7 +817,7 @@ void ImageVisual::OnSetTransform()
 {
   if(mImpl->mRenderer)
   {
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 
