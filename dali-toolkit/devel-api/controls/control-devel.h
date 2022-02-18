@@ -462,7 +462,7 @@ DALI_TOOLKIT_API AccessibilityDoGestureSignalType& AccessibilityDoGestureSignal(
  * @param destination Actor object
  * @param relation    enumerated value describing relation
  */
-DALI_TOOLKIT_API void AppendAccessibilityRelation(Dali::Actor control, Actor destination, Dali::Accessibility::RelationType relation);
+DALI_TOOLKIT_API void AppendAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation);
 
 /**
  * @brief The method allows removing relation
@@ -471,7 +471,7 @@ DALI_TOOLKIT_API void AppendAccessibilityRelation(Dali::Actor control, Actor des
  * @param destination Actor object
  * @param relation    enumerated value describing relation
  */
-DALI_TOOLKIT_API void RemoveAccessibilityRelation(Dali::Actor control, Actor destination, Dali::Accessibility::RelationType relation);
+DALI_TOOLKIT_API void RemoveAccessibilityRelation(Toolkit::Control control, Dali::Actor destination, Dali::Accessibility::RelationType relation);
 
 /**
  * @brief The method returns collection accessibility addresses representing objects connected with current object
@@ -479,14 +479,14 @@ DALI_TOOLKIT_API void RemoveAccessibilityRelation(Dali::Actor control, Actor des
  * @param control object to append attribute to
  * @return std::vector, where index is casted value of Accessibility::RelationType and value is std::vector of type Accessibility::Address
  */
-DALI_TOOLKIT_API std::vector<std::vector<Accessibility::Address>> GetAccessibilityRelations(Dali::Actor control);
+DALI_TOOLKIT_API std::vector<std::vector<Accessibility::Address>> GetAccessibilityRelations(Toolkit::Control control);
 
 /**
  * @brief The method removes all previously appended relations
  *
  * @param control object to append attribute to
  */
-DALI_TOOLKIT_API void ClearAccessibilityRelations(Dali::Actor control);
+DALI_TOOLKIT_API void ClearAccessibilityRelations(Toolkit::Control control);
 
 /**
  * @brief The method allows to add or modify value matched with given key.
@@ -496,21 +496,21 @@ DALI_TOOLKIT_API void ClearAccessibilityRelations(Dali::Actor control);
  * @param key   std::string value
  * @param value std::string value
  */
-DALI_TOOLKIT_API void AppendAccessibilityAttribute(Dali::Actor control, const std::string& key, const std::string value);
+DALI_TOOLKIT_API void AppendAccessibilityAttribute(Toolkit::Control control, const std::string& key, const std::string& value);
 
 /**
  * @brief The method erases key with its value from accessibility attributes
  * @param control object to append attribute to
  * @param key std::string value
  */
-DALI_TOOLKIT_API void RemoveAccessibilityAttribute(Dali::Actor control, const std::string& key);
+DALI_TOOLKIT_API void RemoveAccessibilityAttribute(Toolkit::Control control, const std::string& key);
 
 /**
  * @brief The method clears accessibility attributes
  *
  * @param control object to append attribute to
  */
-DALI_TOOLKIT_API void ClearAccessibilityAttributes(Dali::Actor control);
+DALI_TOOLKIT_API void ClearAccessibilityAttributes(Toolkit::Control control);
 
 /**
  * @brief The method inserts reading information of an accessible object into attributes
@@ -518,7 +518,7 @@ DALI_TOOLKIT_API void ClearAccessibilityAttributes(Dali::Actor control);
  * @param control object to append attribute to
  * @param types Reading information types
  */
-DALI_TOOLKIT_API void SetAccessibilityReadingInfoType(Dali::Actor control, const Dali::Accessibility::ReadingInfoTypes types);
+DALI_TOOLKIT_API void SetAccessibilityReadingInfoType(Toolkit::Control control, const Dali::Accessibility::ReadingInfoTypes types);
 
 /**
  * @brief The method returns reading information of an accessible object
@@ -526,7 +526,7 @@ DALI_TOOLKIT_API void SetAccessibilityReadingInfoType(Dali::Actor control, const
  * @param control object to append attribute to
  * @return Reading information types
  */
-DALI_TOOLKIT_API Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Dali::Actor control);
+DALI_TOOLKIT_API Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType(Toolkit::Control control);
 
 /**
  * @brief The method erases highlight.
@@ -534,7 +534,7 @@ DALI_TOOLKIT_API Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingIn
  * @param control object to append attribute to
  * @return bool value, false when it is not possible or something went wrong, at the other way true.
  */
-DALI_TOOLKIT_API bool ClearAccessibilityHighlight(Dali::Actor control);
+DALI_TOOLKIT_API bool ClearAccessibilityHighlight(Toolkit::Control control);
 
 /**
  * @brief The method grabs highlight.
@@ -542,7 +542,7 @@ DALI_TOOLKIT_API bool ClearAccessibilityHighlight(Dali::Actor control);
  * @param control object to append attribute to
  * @return bool value, false when it is not possible or something went wrong, at the other way true.
  */
-DALI_TOOLKIT_API bool GrabAccessibilityHighlight(Dali::Actor control);
+DALI_TOOLKIT_API bool GrabAccessibilityHighlight(Toolkit::Control control);
 
 /**
  * @brief The metod presents bitset of control's states.
@@ -550,16 +550,16 @@ DALI_TOOLKIT_API bool GrabAccessibilityHighlight(Dali::Actor control);
  * @param control object to append attribute to
  * @return Dali::Accessibility::States is vector of enumerated State.
  */
-DALI_TOOLKIT_API Dali::Accessibility::States GetAccessibilityStates(Dali::Actor control);
+DALI_TOOLKIT_API Dali::Accessibility::States GetAccessibilityStates(Toolkit::Control control);
 
 /**
  * @brief The method force sending notifications about current states to accessibility clients
  *
  * @param control object to append attribute to
- * @param states      mask with states expected to broadcast
- * @param isRecursive flag pointing if notifications of children's state would be sent
+ * @param states  mask with states expected to broadcast
+ * @param recurse flag pointing if notifications of children's state would be sent
  */
-DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Dali::Actor control, Dali::Accessibility::States states, bool isRecursive);
+DALI_TOOLKIT_API void NotifyAccessibilityStateChange(Toolkit::Control control, Dali::Accessibility::States states, bool recurse);
 
 /**
  * The method allows to set specific constructor for creating accessibility structure

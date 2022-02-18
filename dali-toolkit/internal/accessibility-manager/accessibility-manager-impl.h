@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/accessibility-manager/accessibility-manager.h>
+#include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
 {
@@ -406,7 +407,7 @@ private:
   AccessibilityManager& operator=(const AccessibilityManager& rhs);
 
 private:
-  std::vector<Actor> mFocusOrder;
+  std::vector<Toolkit::Control> mFocusOrder;
 
   Toolkit::AccessibilityManager::FocusChangedSignalType          mFocusChangedSignal;          ///< The signal to notify the focus change
   Toolkit::AccessibilityManager::FocusOvershotSignalType         mFocusOvershotSignal;         ///< The signal to notify the focus overshooted

@@ -80,27 +80,37 @@ std::string AccessibilityManager::GetAccessibilityAttribute(Actor actor, Toolkit
 
 void AccessibilityManager::SetFocusOrder(Actor actor, const unsigned int order)
 {
-  if(order == 0)
+  auto control = Toolkit::Control::DownCast(actor);
+
+  if(!control || order == 0)
+  {
     return;
+  }
 
   if(order >= mFocusOrder.size())
+  {
     mFocusOrder.resize(order + 1);
+  }
 
   auto it = mFocusOrder.begin() + order;
-  mFocusOrder.insert(it, actor);
+  mFocusOrder.insert(it, control);
 
   if(order > 0)
   {
-    Actor prev = mFocusOrder[order - 1];
-    DevelControl::AppendAccessibilityRelation(prev, actor, Accessibility::RelationType::FLOWS_TO);
-    DevelControl::AppendAccessibilityRelation(actor, prev, Accessibility::RelationType::FLOWS_FROM);
+    if(auto prev = mFocusOrder[order - 1])
+    {
+      DevelControl::AppendAccessibilityRelation(prev, control, Accessibility::RelationType::FLOWS_TO);
+      DevelControl::AppendAccessibilityRelation(control, prev, Accessibility::RelationType::FLOWS_FROM);
+    }
   }
 
   if(order + 1 < mFocusOrder.size())
   {
-    Actor next = mFocusOrder[order + 1];
-    DevelControl::AppendAccessibilityRelation(actor, next, Accessibility::RelationType::FLOWS_TO);
-    DevelControl::AppendAccessibilityRelation(next, actor, Accessibility::RelationType::FLOWS_FROM);
+    if(auto next = mFocusOrder[order + 1])
+    {
+      DevelControl::AppendAccessibilityRelation(control, next, Accessibility::RelationType::FLOWS_TO);
+      DevelControl::AppendAccessibilityRelation(next, control, Accessibility::RelationType::FLOWS_FROM);
+    }
   }
 }
 
@@ -132,7 +142,13 @@ Actor AccessibilityManager::GetActorByFocusOrder(const unsigned int order)
 
 bool AccessibilityManager::SetCurrentFocusActor(Actor actor)
 {
-  return Toolkit::DevelControl::GrabAccessibilityHighlight(actor);
+  auto control = Toolkit::Control::DownCast(actor);
+  if(!control)
+  {
+    return false;
+  }
+
+  return Toolkit::DevelControl::GrabAccessibilityHighlight(control);
 }
 
 Actor AccessibilityManager::GetCurrentFocusActor()
@@ -178,8 +194,13 @@ bool AccessibilityManager::MoveFocusBackward()
 
 void AccessibilityManager::ClearFocus()
 {
-  auto actor = GetCurrentFocusActor();
-  Toolkit::DevelControl::ClearAccessibilityHighlight(actor);
+  auto control = Toolkit::Control::DownCast(GetCurrentFocusActor());
+  if(!control)
+  {
+    return;
+  }
+
+  Toolkit::DevelControl::ClearAccessibilityHighlight(control);
 }
 
 void AccessibilityManager::Reset()
@@ -188,11 +209,14 @@ void AccessibilityManager::Reset()
 
   for(std::size_t i = 2; i < mFocusOrder.size(); ++i)
   {
-    Actor prev = mFocusOrder[i - 1];
-    Actor next = mFocusOrder[i];
+    auto prev = mFocusOrder[i - 1];
+    auto next = mFocusOrder[i];
 
-    DevelControl::RemoveAccessibilityRelation(prev, next, Accessibility::RelationType::FLOWS_TO);
-    DevelControl::RemoveAccessibilityRelation(next, prev, Accessibility::RelationType::FLOWS_FROM);
+    if(prev && next)
+    {
+      DevelControl::RemoveAccessibilityRelation(prev, next, Accessibility::RelationType::FLOWS_TO);
+      DevelControl::RemoveAccessibilityRelation(next, prev, Accessibility::RelationType::FLOWS_FROM);
+    }
   }
 
   mFocusOrder.clear();

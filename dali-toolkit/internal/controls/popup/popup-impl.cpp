@@ -343,7 +343,7 @@ void Popup::OnInitialize()
 
   SetupTouch();
 
-  DevelControl::AppendAccessibilityAttribute(self, "sub-role", "Alert");
+  DevelControl::AppendAccessibilityAttribute(Toolkit::Control::DownCast(self), "sub-role", "Alert");
 
   DevelControl::SetAccessibilityConstructor(self, [](Dali::Actor actor) {
     return std::unique_ptr<Dali::Accessibility::Accessible>(new AccessibleImpl(actor, Dali::Accessibility::Role::DIALOG, true));

@@ -432,7 +432,7 @@ void Control::Initialize()
   if(type)
   {
     auto typeName = type.GetName();
-    DevelControl::AppendAccessibilityAttribute(Self(), "class", typeName);
+    DevelControl::AppendAccessibilityAttribute(Toolkit::Control::DownCast(Self()), "class", typeName);
   }
 }
 
