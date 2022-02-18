@@ -1286,45 +1286,30 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         std::string name;
         if(value.Get(name))
         {
-          controlImpl.mImpl->mAccessibilityName    = name;
-          controlImpl.mImpl->mAccessibilityNameSet = true;
+          controlImpl.mImpl->mAccessibilityName = name;
         }
-        else
-        {
-          controlImpl.mImpl->mAccessibilityNameSet = false;
-        }
+        break;
       }
-      break;
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
       {
         std::string text;
         if(value.Get(text))
         {
-          controlImpl.mImpl->mAccessibilityDescription    = text;
-          controlImpl.mImpl->mAccessibilityDescriptionSet = true;
+          controlImpl.mImpl->mAccessibilityDescription = text;
         }
-        else
-        {
-          controlImpl.mImpl->mAccessibilityDescriptionSet = false;
-        }
+        break;
       }
-      break;
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN:
       {
         std::string text;
         if(value.Get(text))
         {
-          controlImpl.mImpl->mAccessibilityTranslationDomain    = text;
-          controlImpl.mImpl->mAccessibilityTranslationDomainSet = true;
+          controlImpl.mImpl->mAccessibilityTranslationDomain = text;
         }
-        else
-        {
-          controlImpl.mImpl->mAccessibilityTranslationDomainSet = false;
-        }
+        break;
       }
-      break;
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
       {
@@ -1333,23 +1318,18 @@ void Control::Impl::SetProperty(BaseObject* object, Property::Index index, const
         {
           controlImpl.mImpl->mAccessibilityRole = role;
         }
+        break;
       }
-      break;
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
       {
         bool highlightable;
         if(value.Get(highlightable))
         {
-          controlImpl.mImpl->mAccessibilityHighlightable    = highlightable;
-          controlImpl.mImpl->mAccessibilityHighlightableSet = true;
+          controlImpl.mImpl->mAccessibilityHighlightable = highlightable;
         }
-        else
-        {
-          controlImpl.mImpl->mAccessibilityHighlightableSet = false;
-        }
+        break;
       }
-      break;
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_ATTRIBUTES:
       {
@@ -1502,28 +1482,19 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
       {
-        if(controlImpl.mImpl->mAccessibilityNameSet)
-        {
-          value = controlImpl.mImpl->mAccessibilityName;
-        }
+        value = controlImpl.mImpl->mAccessibilityName;
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTION:
       {
-        if(controlImpl.mImpl->mAccessibilityDescriptionSet)
-        {
-          value = controlImpl.mImpl->mAccessibilityDescription;
-        }
+        value = controlImpl.mImpl->mAccessibilityDescription;
         break;
       }
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN:
       {
-        if(controlImpl.mImpl->mAccessibilityTranslationDomainSet)
-        {
-          value = controlImpl.mImpl->mAccessibilityTranslationDomain;
-        }
+        value = controlImpl.mImpl->mAccessibilityTranslationDomain;
         break;
       }
 
@@ -1535,10 +1506,7 @@ Property::Value Control::Impl::GetProperty(BaseObject* object, Property::Index i
 
       case Toolkit::DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE:
       {
-        if(controlImpl.mImpl->mAccessibilityHighlightableSet)
-        {
-          value = controlImpl.mImpl->mAccessibilityHighlightable;
-        }
+        value = controlImpl.mImpl->mAccessibilityHighlightable;
         break;
       }
 

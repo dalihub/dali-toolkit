@@ -267,13 +267,13 @@ int UtcDaliControlAccessibilityHighlightable(void)
   ToolkitTestApplication application;
   auto control = Control::New();
 
-  auto noneset = control.GetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE );
-  DALI_TEST_EQUALS( Property::NONE, noneset.GetType(), TEST_LOCATION );
+  auto highlightable = control.GetProperty<bool>(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE);
+  DALI_TEST_EQUALS(highlightable, false, TEST_LOCATION);
 
    // negative testcase - trying to set unconvertible value
-  control.SetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, "deadbeef" );
-  noneset = control.GetProperty( DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE );
-  DALI_TEST_EQUALS( Property::NONE, noneset.GetType(), TEST_LOCATION );
+  control.SetProperty(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE, "deadbeef");
+  highlightable = control.GetProperty<bool>(DevelControl::Property::ACCESSIBILITY_HIGHLIGHTABLE);
+  DALI_TEST_EQUALS(highlightable, false, TEST_LOCATION);
 
   auto q = Dali::Accessibility::Accessible::Get( control );
 

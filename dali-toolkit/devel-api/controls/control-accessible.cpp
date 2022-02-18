@@ -85,7 +85,7 @@ ControlAccessible::ControlAccessible(Dali::Actor self, Dali::Accessibility::Role
       return;
     }
 
-    if(index == DevelControl::Property::ACCESSIBILITY_NAME || (index == GetNamePropertyIndex() && !controlImpl.mAccessibilityNameSet))
+    if(index == DevelControl::Property::ACCESSIBILITY_NAME || (index == GetNamePropertyIndex() && controlImpl.mAccessibilityName.empty()))
     {
       if(controlImpl.mAccessibilityGetNameSignal.Empty())
       {
@@ -93,7 +93,7 @@ ControlAccessible::ControlAccessible(Dali::Actor self, Dali::Accessibility::Role
       }
     }
 
-    if(index == DevelControl::Property::ACCESSIBILITY_DESCRIPTION || (index == GetDescriptionPropertyIndex() && !controlImpl.mAccessibilityDescriptionSet))
+    if(index == DevelControl::Property::ACCESSIBILITY_DESCRIPTION || (index == GetDescriptionPropertyIndex() && controlImpl.mAccessibilityDescription.empty()))
     {
       if(controlImpl.mAccessibilityGetDescriptionSignal.Empty())
       {
@@ -115,7 +115,7 @@ std::string ControlAccessible::GetName() const
   {
     controlImpl.mAccessibilityGetNameSignal.Emit(name);
   }
-  else if(controlImpl.mAccessibilityNameSet)
+  else if(!controlImpl.mAccessibilityName.empty())
   {
     name = controlImpl.mAccessibilityName;
   }
@@ -128,7 +128,7 @@ std::string ControlAccessible::GetName() const
     name = Self().GetProperty<std::string>(Actor::Property::NAME);
   }
 
-  if(controlImpl.mAccessibilityTranslationDomainSet)
+  if(!controlImpl.mAccessibilityTranslationDomain.empty())
   {
     return GetLocaleText(name, controlImpl.mAccessibilityTranslationDomain.c_str());
   }
@@ -153,7 +153,7 @@ std::string ControlAccessible::GetDescription() const
   {
     controlImpl.mAccessibilityGetDescriptionSignal.Emit(description);
   }
-  else if(controlImpl.mAccessibilityDescriptionSet)
+  else if(!controlImpl.mAccessibilityDescription.empty())
   {
     description = controlImpl.mAccessibilityDescription;
   }
@@ -161,7 +161,8 @@ std::string ControlAccessible::GetDescription() const
   {
     description = GetDescriptionRaw();
   }
-  if(controlImpl.mAccessibilityTranslationDomainSet)
+
+  if(!controlImpl.mAccessibilityTranslationDomain.empty())
   {
     return GetLocaleText(description, controlImpl.mAccessibilityTranslationDomain.c_str());
   }
