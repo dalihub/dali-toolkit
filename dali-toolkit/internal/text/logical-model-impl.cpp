@@ -471,6 +471,11 @@ void LogicalModel::ClearFontDescriptionRuns()
   FreeFontFamilyNames(mFontDescriptionRuns);
 }
 
+void LogicalModel::ClearStrikethroughRuns()
+{
+  mStrikethroughCharacterRuns.Clear();
+}
+
 void LogicalModel::CreateParagraphInfo(CharacterIndex startIndex,
                                        Length         numberOfCharacters)
 {

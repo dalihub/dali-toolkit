@@ -450,3 +450,28 @@ int UtcDaliTextFieldMarkupStrikethrough(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldMarkupStrikethroughNoEndTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldMarkupStrikethroughNoEndTag ");
+
+  TextField textField = TextField::New();
+
+  application.GetScene().Add(textField);
+
+  textField.SetProperty(TextField::Property::TEXT, "<s>ABC");
+  textField.SetProperty(TextField ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t expectedNumberOfStrikethroughGlyphs = 0u;
+
+  Toolkit::Internal::TextField& textFieldImpl             = GetImpl(textField);
+  Text::Length                  numberOfStrikethroughRuns = textFieldImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughGlyphs, TEST_LOCATION);
+
+  END_TEST;
+}

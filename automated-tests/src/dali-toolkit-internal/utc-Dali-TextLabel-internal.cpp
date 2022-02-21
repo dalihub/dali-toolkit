@@ -262,3 +262,28 @@ int UtcDaliTextLabelMarkupStrikethrough(void)
 
   END_TEST;
 }
+
+int UtcDaliTextLabelMarkupStrikethroughNoEndTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelMarkupStrikethroughNoEndTag ");
+
+  TextLabel textLabel = TextLabel::New();
+
+  application.GetScene().Add(textLabel);
+
+  textLabel.SetProperty(TextLabel::Property::TEXT, "<s>ABC");
+  textLabel.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t expectedNumberOfStrikethroughGlyphs = 0u;
+
+  Toolkit::Internal::TextLabel& textLabelImpl             = GetImpl(textLabel);
+  Text::Length                  numberOfStrikethroughRuns = textLabelImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughGlyphs, TEST_LOCATION);
+
+  END_TEST;
+}
