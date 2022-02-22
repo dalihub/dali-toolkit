@@ -966,7 +966,13 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
             run.color = Color::BLUE;
             ProcessColorTag(tag, run);
           });
-        /* TODO - underline */
+        /* Underline */
+        ProcessTagForRun<UnderlinedCharacterRun>(
+          markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& tag, UnderlinedCharacterRun& run) {
+            run.properties.color = Color::BLUE;
+            run.properties.colorDefined = true;
+            ProcessUnderlineTag(tag, run);
+          });
       } // <a href=https://www.tizen.org>tizen</a>
       else if(TokenComparison(XHTML_SHADOW_TAG, tag.buffer, tag.length))
       {
