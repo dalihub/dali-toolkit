@@ -374,9 +374,9 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
         case Dali::InputMethodContext::PreeditStyle::UNDERLINE:
         {
           // Add the underline for the pre-edit text.
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = numberOfIndices;
+          UnderlinedGlyphRun underlineRun;
+          underlineRun.glyphRun.glyphIndex     = attrData.startIndex + numberOfCommit;
+          underlineRun.glyphRun.numberOfGlyphs = numberOfIndices;
           impl.mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
 
           //Mark-up processor case
@@ -451,9 +451,9 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           backgroundColorRun.color                           = BACKGROUND_SUB4;
           impl.mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
 
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = numberOfIndices;
+          UnderlinedGlyphRun underlineRun;
+          underlineRun.glyphRun.glyphIndex     = attrData.startIndex + numberOfCommit;
+          underlineRun.glyphRun.numberOfGlyphs = numberOfIndices;
           impl.mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
 
           //Mark-up processor case
@@ -472,9 +472,9 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           backgroundColorRun.color                           = BACKGROUND_SUB5;
           impl.mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
 
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = numberOfIndices;
+          UnderlinedGlyphRun underlineRun;
+          underlineRun.glyphRun.glyphIndex     = attrData.startIndex + numberOfCommit;
+          underlineRun.glyphRun.numberOfGlyphs = numberOfIndices;
           impl.mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
 
           //Mark-up processor case
@@ -493,9 +493,9 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           backgroundColorRun.color                           = BACKGROUND_SUB6;
           impl.mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
 
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = numberOfIndices;
+          UnderlinedGlyphRun underlineRun;
+          underlineRun.glyphRun.glyphIndex     = attrData.startIndex + numberOfCommit;
+          underlineRun.glyphRun.numberOfGlyphs = numberOfIndices;
           impl.mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
 
           //Mark-up processor case
@@ -514,9 +514,9 @@ bool ControllerImplModelUpdater::Update(Controller::Impl& impl, OperationsMask o
           backgroundColorRun.color                           = BACKGROUND_SUB7;
           impl.mModel->mLogicalModel->mBackgroundColorRuns.PushBack(backgroundColorRun);
 
-          GlyphRun underlineRun;
-          underlineRun.glyphIndex     = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = numberOfIndices;
+          UnderlinedGlyphRun underlineRun;
+          underlineRun.glyphRun.glyphIndex     = attrData.startIndex + numberOfCommit;
+          underlineRun.glyphRun.numberOfGlyphs = numberOfIndices;
           impl.mModel->mVisualModel->mUnderlineRuns.PushBack(underlineRun);
 
           //Mark-up processor case

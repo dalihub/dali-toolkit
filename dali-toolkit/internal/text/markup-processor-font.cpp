@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/font-description-run.h>
+#include <dali-toolkit/internal/text/markup-processor-attribute-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 
@@ -68,35 +69,23 @@ void ProcessFontFamily(const Attribute& attribute, FontDescriptionRun& fontRun)
 void ProcessFontSize(const Attribute& attribute, FontDescriptionRun& fontRun)
 {
   // 64.f is used to convert from point size to 26.6 pixel format.
-  fontRun.size        = static_cast<PointSize26Dot6>(StringToFloat(attribute.valueBuffer) * PIXEL_FORMAT_64_FACTOR);
+  fontRun.size        = static_cast<PointSize26Dot6>(ProcessFloatAttribute(attribute) * PIXEL_FORMAT_64_FACTOR);
   fontRun.sizeDefined = true;
 }
 
 void ProcessFontWeight(const Attribute& attribute, FontDescriptionRun& fontRun)
 {
-  char value[MAX_FONT_ATTRIBUTE_SIZE + 1u];
-  processFontAttributeValue(value, attribute);
-
-  fontRun.weight        = StringToWeight(value);
-  fontRun.weightDefined = true;
+  fontRun.weightDefined = ProcessEnumerationAttribute<FontWeight>(attribute, MAX_FONT_ATTRIBUTE_SIZE, &StringToWeight, fontRun.weight);
 }
 
 void ProcessFontWidth(const Attribute& attribute, FontDescriptionRun& fontRun)
 {
-  char value[MAX_FONT_ATTRIBUTE_SIZE + 1u];
-  processFontAttributeValue(value, attribute);
-
-  fontRun.width        = StringToWidth(value);
-  fontRun.widthDefined = true;
+  fontRun.widthDefined = ProcessEnumerationAttribute<FontWidth>(attribute, MAX_FONT_ATTRIBUTE_SIZE, &StringToWidth, fontRun.width);
 }
 
 void ProcessFontSlant(const Attribute& attribute, FontDescriptionRun& fontRun)
 {
-  char value[MAX_FONT_ATTRIBUTE_SIZE + 1u];
-  processFontAttributeValue(value, attribute);
-
-  fontRun.slant        = StringToSlant(value);
-  fontRun.slantDefined = true;
+  fontRun.slantDefined = ProcessEnumerationAttribute<FontSlant>(attribute, MAX_FONT_ATTRIBUTE_SIZE, &StringToSlant, fontRun.slant);
 }
 
 void ProcessFontTag(const Tag& tag, FontDescriptionRun& fontRun)

@@ -680,9 +680,9 @@ Length View::GetNumberOfUnderlineRuns() const
   return 0u;
 }
 
-void View::GetUnderlineRuns(GlyphRun*         underlineRuns,
-                            UnderlineRunIndex index,
-                            Length            numberOfRuns) const
+void View::GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns,
+                            UnderlineRunIndex   index,
+                            Length              numberOfRuns) const
 {
   if(mImpl->mVisualModel)
   {

@@ -233,7 +233,7 @@ public:
   /**
    * @copydoc ModelInterface::GetUnderlineRuns()
    */
-  void GetUnderlineRuns(GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const override;
+  void GetUnderlineRuns(UnderlinedGlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns) const override;
 
   /**
    * @copydoc ModelInterface::GetOutlineColor()

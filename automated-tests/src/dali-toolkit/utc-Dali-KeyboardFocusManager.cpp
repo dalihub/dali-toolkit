@@ -23,6 +23,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
@@ -239,6 +240,34 @@ public:
   }
 
   void Callback( const KeyEvent& keyEvent )
+  {
+    mIsCalled = true;
+  }
+
+  bool mConsumed;
+  bool mIsCalled;
+};
+
+class WheelEventCallback : public Dali::ConnectionTracker
+{
+public:
+  /**
+   * Constructor
+   * @param[in]  returnValue  Set return value of WheelEvent callback.
+   * */
+  WheelEventCallback( bool consumed )
+  : mConsumed( consumed ),
+    mIsCalled( false )
+  {
+  }
+
+  bool Callback( Actor actor, const WheelEvent& wheelEvent )
+  {
+    mIsCalled = true;
+    return mConsumed;
+  }
+
+  void Callback( const WheelEvent& wheelEvent )
   {
     mIsCalled = true;
   }
@@ -2034,6 +2063,48 @@ int UtcDaliKeyboardFocusManagerWithKeyboardFocusableChildren(void)
   // Check that the focus is set on the second actor
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+
+  END_TEST;
+}
+
+int UtcDaliKeyboardFocusManagerCheckWheelEvent(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliKeyboardFocusManagerCheckWheelEvent" );
+  Dali::Integration::Scene scene = application.GetScene();
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK( ! manager.GetCurrentFocusActor() );
+
+  // Create the first actor and add it to the stage
+  Actor parent = Actor::New();
+  parent.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
+
+  Actor child = Actor::New();
+  child.SetProperty( Actor::Property::KEYBOARD_FOCUSABLE,true);
+
+  parent.Add(child);
+  scene.Add(parent);
+
+  WheelEventCallback childCallback( false );
+  child.WheelEventSignal().Connect( &childCallback, &WheelEventCallback::Callback );
+
+  WheelEventCallback parentCallback( true );
+  parent.WheelEventSignal().Connect( &parentCallback, &WheelEventCallback::Callback );
+
+  WheelEventCallback sceneCallback( false );
+  scene.WheelEventSignal().Connect( &sceneCallback, &WheelEventCallback::Callback );
+
+  manager.SetCurrentFocusActor( child );
+
+  // Emit custom wheel event is comming to KeyboardFocusManager
+  Integration::WheelEvent event(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  application.ProcessEvent(event);
+
+  DALI_TEST_CHECK( childCallback.mIsCalled );
+  DALI_TEST_CHECK( parentCallback.mIsCalled );
+  DALI_TEST_CHECK( !sceneCallback.mIsCalled );
 
   END_TEST;
 }

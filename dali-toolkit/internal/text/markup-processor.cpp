@@ -33,6 +33,7 @@
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-processor-span.h>
 #include <dali-toolkit/internal/text/markup-processor-strikethrough.h>
+#include <dali-toolkit/internal/text/markup-processor-underline.h>
 #include <dali-toolkit/internal/text/xhtml-entities.h>
 
 namespace Dali
@@ -940,7 +941,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       else if(TokenComparison(XHTML_U_TAG, tag.buffer, tag.length))
       {
         ProcessTagForRun<UnderlinedCharacterRun>(
-          markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& tag, UnderlinedCharacterRun& run) {});
+          markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& tag, UnderlinedCharacterRun& run) { ProcessUnderlineTag(tag, run); });
       } // <u></u>
       else if(TokenComparison(XHTML_B_TAG, tag.buffer, tag.length))
       {
