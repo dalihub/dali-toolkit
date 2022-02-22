@@ -201,7 +201,7 @@ void AnimatedImageVisual::CreateImageCache()
 }
 
 AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory)
-: Visual::Base(factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO, Toolkit::Visual::ANIMATED_IMAGE),
+: Visual::Base(factoryCache, Visual::FittingMode::FILL, Toolkit::Visual::ANIMATED_IMAGE),
   mFrameDelayTimer(),
   mPlacementActor(),
   mImageVisualShaderFactory(shaderFactory),
