@@ -11,6 +11,7 @@
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
+#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/stage.h>
 #include <cstdlib>
@@ -1075,6 +1076,17 @@ int UtcDaliAccessibilityScrollToChildScrollView(void)
   actorB.SetProperty( Dali::Actor::Property::POSITION, positionB );
   scrollView.Add(actorB);
 
+  TableView tableView = TableView::New( 2, 2 ); // 2 by 2 grid.
+  tableView.SetProperty( Actor::Property::SIZE, Vector2(100.0f, 100.0f) );
+  scrollView.Add(tableView);
+
+  PushButton actorC = PushButton::New();
+  actorC.SetProperty( Actor::Property::SIZE, Vector2(50.0f, 50.0f) );
+  tableView.AddChild( actorC, TableView::CellPosition( 0, 0 ) );
+
+  PushButton actorD = PushButton::New();
+  application.GetScene().Add( actorD );
+
   Wait(application);
 
   auto* accessibleParent = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(scrollView));
@@ -1083,11 +1095,21 @@ int UtcDaliAccessibilityScrollToChildScrollView(void)
   DALI_TEST_CHECK(accessibleA);
   auto* accessibleB = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(actorB));
   DALI_TEST_CHECK(accessibleB);
+  auto* accessibleC = dynamic_cast<DevelControl::ControlAccessible*>(Dali::Accessibility::Accessible::Get(actorC));
+  DALI_TEST_CHECK(accessibleC);
 
   accessibleA->GrabHighlight(); // == scrollView.ScrollTo(actorA)
   Wait(application);
   accessibleB->GrabHighlight(); // == scrollView.ScrollTo(actorB)
   Wait(application);
+
+  // scrollView is ancestor of actorC
+  // This should work without a crash
+  accessibleC->GrabHighlight(); // == scrollView.ScrollTo(actorC)
+  Wait(application);
+
+  // negative testcase calling ScrollToChild using non-child actor
+  accessibleParent->ScrollToChild(actorD);
 
   Dali::Accessibility::TestEnableSC( false );
   END_TEST;
