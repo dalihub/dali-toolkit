@@ -667,13 +667,13 @@ void AnimatedGradientVisual::OnInitialize()
   mImpl->mRenderer = Renderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
-  mImpl->mRenderer.RegisterProperty(UNIFORM_START_POINT_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::START_POSITION, START_POSITION_NAME));
-  mImpl->mRenderer.RegisterProperty(UNIFORM_START_COLOR_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::START_COLOR, START_COLOR_NAME));
-  mImpl->mRenderer.RegisterProperty(UNIFORM_END_POINT_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::END_POSITION, END_POSITION_NAME));
-  mImpl->mRenderer.RegisterProperty(UNIFORM_END_COLOR_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::END_COLOR, END_COLOR_NAME));
-  mImpl->mRenderer.RegisterProperty(UNIFORM_ROTATE_CENTER_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::ROTATE_CENTER, ROTATE_CENTER_NAME));
-  mImpl->mRenderer.RegisterProperty(UNIFORM_ROTATE_ANGLE_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::ROTATE_AMOUNT, ROTATE_AMOUNT_NAME));
-  mImpl->mRenderer.RegisterProperty(UNIFORM_OFFSET_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::OFFSET, OFFSET_NAME));
+  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_START_POINT_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::START_POSITION, START_POSITION_NAME));
+  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_START_COLOR_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::START_COLOR, START_COLOR_NAME));
+  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_END_POINT_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::END_POSITION, END_POSITION_NAME));
+  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_END_COLOR_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::END_COLOR, END_COLOR_NAME));
+  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_ROTATE_CENTER_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::ROTATE_CENTER, ROTATE_CENTER_NAME));
+  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_ROTATE_ANGLE_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::ROTATE_AMOUNT, ROTATE_AMOUNT_NAME));
+  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_OFFSET_NAME, GetStartValue(mValueMap, Toolkit::DevelAnimatedGradientVisual::Property::OFFSET, OFFSET_NAME));
 
   //Register transform properties
   mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);

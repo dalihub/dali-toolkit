@@ -300,7 +300,7 @@ void TextVisual::DoSetOnScene(Actor& actor)
   const Vector4& defaultColor = mController->GetTextModel()->GetDefaultColor();
   if(mTextColorAnimatableIndex == Property::INVALID_INDEX)
   {
-    mTextColorAnimatableIndex = mImpl->mRenderer.RegisterProperty("uTextColorAnimatable", defaultColor);
+    mTextColorAnimatableIndex = mImpl->mRenderer.RegisterUniqueProperty("uTextColorAnimatable", defaultColor);
   }
   else
   {

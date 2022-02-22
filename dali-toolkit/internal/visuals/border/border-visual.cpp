@@ -129,12 +129,18 @@ void BorderVisual::DoSetProperty(Dali::Property::Index        index,
 
 void BorderVisual::DoSetOnScene(Actor& actor)
 {
-  mBorderColorIndex = mImpl->mRenderer.RegisterProperty(Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor);
+  if(mBorderColorIndex == Property::INVALID_INDEX)
+  {
+    mBorderColorIndex = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor);
+  }
   if(mBorderColor.a < 1.f || mAntiAliasing)
   {
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
   }
-  mBorderSizeIndex = mImpl->mRenderer.RegisterProperty(Toolkit::BorderVisual::Property::SIZE, SIZE_NAME, mBorderSize);
+  if(mBorderSizeIndex == Property::INVALID_INDEX)
+  {
+    mBorderSizeIndex = mImpl->mRenderer.RegisterUniqueProperty(Toolkit::BorderVisual::Property::SIZE, SIZE_NAME, mBorderSize);
+  }
 
   actor.AddRenderer(mImpl->mRenderer);
 

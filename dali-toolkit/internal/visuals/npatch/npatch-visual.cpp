@@ -464,12 +464,6 @@ void NPatchVisual::ApplyTextureAndUniforms()
       imageSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector2>();
     }
     mFactoryCache.UpdateBrokenImageRenderer(mImpl->mRenderer, imageSize);
-    Texture croppedImage = mImpl->mRenderer.GetTextures().GetTexture(0);
-    textureSet.SetTexture(0u, croppedImage);
-    mImpl->mRenderer.RegisterProperty("uFixed[0]", Vector2::ZERO);
-    mImpl->mRenderer.RegisterProperty("uFixed[1]", Vector2::ZERO);
-    mImpl->mRenderer.RegisterProperty("uFixed[2]", Vector2::ZERO);
-    mImpl->mRenderer.RegisterProperty("uStretchTotal", Vector2(croppedImage.GetWidth(), croppedImage.GetHeight()));
   }
 
   if(mAuxiliaryPixelBuffer)
