@@ -148,7 +148,9 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
 
   lineRun += firstLineIndex;
 
-  selectionBoxInfo->lineHeight = GetLineHeight(*lineRun);
+  // The line height is the addition of the line ascender and the line descender.
+  // However, the line descender has a negative value, hence the subtraction also line spacing should not be included in selection height.
+  selectionBoxInfo->lineHeight = lineRun->ascender - lineRun->descender;
 
   GlyphIndex lastGlyphOfLine = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
 
@@ -260,6 +262,8 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
       ++lineIndex;
       if(lineIndex < firstLineIndex + numberOfLines)
       {
+        float currentLineSpacing = lineRun->lineSpacing;
+
         // Retrieve the next line.
         ++lineRun;
 
@@ -279,7 +283,19 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
         // Update the line's vertical offset.
         selectionBoxInfo->lineOffset = currentLineOffset + currentLineHeight;
 
-        selectionBoxInfo->lineHeight = GetLineHeight(*lineRun);
+        if(currentLineSpacing < 0)
+        {
+          selectionBoxInfo->lineOffset += currentLineSpacing;
+        }
+
+        // The line height is the addition of the line ascender and the line descender.
+        // However, the line descender has a negative value, hence the subtraction also line spacing should not be included in selection height.
+        selectionBoxInfo->lineHeight = lineRun->ascender - lineRun->descender;
+
+        if(lineRun->lineSpacing > 0)
+        {
+          selectionBoxInfo->lineHeight += lineRun->lineSpacing;
+        }
       }
     }
   }
