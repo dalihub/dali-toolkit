@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,12 +97,12 @@ TextureSet RollingAnimatedImageCache::Frame(uint32_t frameIndex)
   }
 
   TextureSet textureSet;
-  uint32_t batchFrameIndex = frameIndex;
+  uint32_t   batchFrameIndex = frameIndex;
   // If we need to load new frame that are not stored in queue.
   // Load the frame synchronously.
   if(mIsSynchronousLoading && mQueue.IsEmpty())
   {
-    textureSet  = RequestFrameLoading(frameIndex, frameIndex == FIRST_FRAME_INDEX, true);
+    textureSet      = RequestFrameLoading(frameIndex, frameIndex == FIRST_FRAME_INDEX, true);
     batchFrameIndex = (frameIndex + 1) % mFrameCount;
   }
 
@@ -306,6 +306,18 @@ void RollingAnimatedImageCache::AnimatedImageUploadComplete(bool loadSuccess, in
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::UploadComplete(textureId:%d) start\n", textureId);
   LOG_CACHE;
 
+  if(loadSuccess)
+  {
+    mLoadState = TextureManager::LoadState::LOAD_FINISHED;
+  }
+  else
+  {
+    mLoadState = TextureManager::LoadState::LOAD_FAILED;
+    // If load failed, send empty TextureSet handle so observer can notify that frame load failed.
+    mObserver.FrameReady(TextureSet(), 0u);
+    return;
+  }
+
   // Reset size of Queue according to the real frame count.
   if(mFrameCount != frameCount)
   {
@@ -314,19 +326,10 @@ void RollingAnimatedImageCache::AnimatedImageUploadComplete(bool loadSuccess, in
     mIntervals.assign(mFrameCount, 0u);
   }
 
-  if(loadSuccess)
-  {
-    mLoadState = TextureManager::LoadState::LOAD_FINISHED;
-  }
-  else
-  {
-    mLoadState = TextureManager::LoadState::LOAD_FAILED;
-  }
-
   bool frontFrameReady = IsFrontReady();
   // Because only one frame is on loading and the others are in mLoadWaitingQueue,
   // mQueue.Back() is always the frame currently loaded.
-  mQueue.Back().mReady = true;
+  mQueue.Back().mReady                   = true;
   mIntervals[mQueue.Back().mFrameNumber] = interval;
   // Check whether currently loaded frame is front of queue or not.
   // If it is, notify frame ready to observer.
