@@ -328,17 +328,17 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
   const TextureCacheManager::UseAtlas&  useAtlas,
   const TextureCacheManager::TextureId& maskTextureId)
 {
-  std::string    hashTarget(url);
-  const size_t   urlLength = hashTarget.length();
-  const uint16_t width     = size.GetWidth();
-  const uint16_t height    = size.GetWidth();
+  std::vector<std::uint8_t> hashTarget(url.begin(), url.end());
+  const size_t              urlLength = url.length();
+  const uint16_t            width     = size.GetWidth();
+  const uint16_t            height    = size.GetWidth();
 
   // If either the width or height has been specified, include the resizing options in the hash
   if(width != 0 || height != 0)
   {
     // We are appending 5 bytes to the URL to form the hash input.
     hashTarget.resize(urlLength + 5u);
-    char* hashTargetPtr = &(hashTarget[urlLength]);
+    std::uint8_t* hashTargetPtr = &(hashTarget[urlLength]);
 
     // Pack the width and height (4 bytes total).
     *hashTargetPtr++ = size.GetWidth() & 0xff;
@@ -373,9 +373,9 @@ TextureCacheManager::TextureHash TextureCacheManager::GenerateHash(
 
   if(maskTextureId != INVALID_TEXTURE_ID)
   {
-    auto textureIdIndex = hashTarget.length();
-    hashTarget.resize(hashTarget.length() + sizeof(TextureId));
-    unsigned char* hashTargetPtr = reinterpret_cast<unsigned char*>(&(hashTarget[textureIdIndex]));
+    auto textureIdIndex = hashTarget.size();
+    hashTarget.resize(hashTarget.size() + sizeof(TextureId));
+    std::uint8_t* hashTargetPtr = reinterpret_cast<std::uint8_t*>(&(hashTarget[textureIdIndex]));
 
     // Append the texture id to the end of the URL byte by byte:
     // (to avoid SIGBUS / alignment issues)
