@@ -13,6 +13,10 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/builder/style.cpp
    ${toolkit_src_dir}/builder/tree-node-manipulator.cpp
    ${toolkit_src_dir}/builder/replacement.cpp
+   ${toolkit_src_dir}/texture-manager/texture-async-loading-helper.cpp
+   ${toolkit_src_dir}/texture-manager/texture-cache-manager.cpp
+   ${toolkit_src_dir}/texture-manager/texture-manager-impl.cpp
+   ${toolkit_src_dir}/texture-manager/texture-upload-observer.cpp
    ${toolkit_src_dir}/visuals/animated-image/animated-image-visual.cpp
    ${toolkit_src_dir}/visuals/animated-image/image-cache.cpp
    ${toolkit_src_dir}/visuals/animated-image/fixed-image-cache.cpp
@@ -42,8 +46,6 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/svg/svg-visual.cpp
    ${toolkit_src_dir}/visuals/text/text-visual.cpp
    ${toolkit_src_dir}/visuals/transition-data-impl.cpp
-   ${toolkit_src_dir}/visuals/texture-manager-impl.cpp
-   ${toolkit_src_dir}/visuals/texture-upload-observer.cpp
    ${toolkit_src_dir}/visuals/image-visual-shader-factory.cpp
    ${toolkit_src_dir}/visuals/visual-base-data-impl.cpp
    ${toolkit_src_dir}/visuals/visual-base-impl.cpp
