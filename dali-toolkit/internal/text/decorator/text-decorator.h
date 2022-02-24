@@ -83,6 +83,14 @@ enum HandleType
   HANDLE_TYPE_COUNT
 };
 
+// Types of decoration.
+enum DecorationType
+{
+  NONE_LAYER,
+  ACTIVE_LAYER,
+  CURSOR_LAYER
+};
+
 /**
  * @brief A Text Decorator is used to display cursors, handles, selection highlights and pop-ups.
  *
@@ -122,9 +130,11 @@ public:
     /**
      * @brief Add a decoration to the parent UI control.
      *
-     * @param[in] decoration The actor displaying a decoration.
+     * @param[in] actor The actor displaying a decoration.
+     * @param[in] type Whether this decoration is a layer or not, which layer it is.
+     * @param[in] needsClipping Whether the actor needs clipping.
      */
-    virtual void AddDecoration(Actor& actor, bool needsClipping) = 0;
+    virtual void AddDecoration(Actor& actor, DecorationType type, bool needsClipping) = 0;
 
     /**
      * @brief An input event from one of the handles.

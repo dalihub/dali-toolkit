@@ -700,6 +700,11 @@ void TextEditor::OnRelayout(const Vector2& size, RelayoutContainer& container)
     mActiveLayer.SetProperty(Actor::Property::POSITION, Vector2(padding.start, padding.top));
     ResizeActor(mActiveLayer, contentSize);
   }
+  if(mCursorLayer)
+  {
+    mCursorLayer.SetProperty(Actor::Property::POSITION, Vector2(padding.start, padding.top));
+    ResizeActor(mCursorLayer, contentSize);
+  }
 
   // If there is text changed, callback is called.
   if(mTextChanged)
@@ -1032,7 +1037,7 @@ void TextEditor::SelectionChanged(uint32_t oldStart, uint32_t oldEnd, uint32_t n
   }
 }
 
-void TextEditor::AddDecoration(Actor& actor, bool needsClipping)
+void TextEditor::AddDecoration(Actor& actor, DecorationType type, bool needsClipping)
 {
   if(actor)
   {
@@ -1040,14 +1045,25 @@ void TextEditor::AddDecoration(Actor& actor, bool needsClipping)
     {
       mClippingDecorationActors.push_back(actor);
     }
-    else
+
+    // If the actor is a layer type, add it.
+    if(type == DecorationType::ACTIVE_LAYER)
     {
-      actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-      actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-      Self().Add(actor);
-      mActiveLayer = actor;
+      AddLayer(mActiveLayer, actor);
+    }
+    else if(type == DecorationType::CURSOR_LAYER)
+    {
+      AddLayer(mCursorLayer, actor);
     }
   }
+}
+
+void TextEditor::AddLayer(Actor& layer, Actor& actor)
+{
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  Self().Add(actor);
+  layer = actor;
 }
 
 void TextEditor::SetTextSelectionRange(const uint32_t* start, const uint32_t* end)

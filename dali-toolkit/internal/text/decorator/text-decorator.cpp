@@ -256,7 +256,8 @@ struct Decorator::Impl : public ConnectionTracker
     mControlSize = size;
 
     // TODO - Remove this if nothing is active
-    CreateActiveLayer();
+    CreateLayer(mActiveLayer, DecorationType::ACTIVE_LAYER);
+    CreateLayer(mCursorLayer, DecorationType::CURSOR_LAYER);
 
     // Show or hide the cursors
     CreateCursors();
@@ -266,8 +267,8 @@ struct Decorator::Impl : public ConnectionTracker
       const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
       mPrimaryCursorVisible    = (!mHidePrimaryCursorAndGrabHandle) && ((mControlSize.width - (cursor.position.x + mCursorWidth) > -Math::MACHINE_EPSILON_1000) &&
                                                                      (cursor.position.x > -Math::MACHINE_EPSILON_1000) &&
-                                                                     (mControlSize.height - (cursor.position.y + cursor.cursorHeight) > -Math::MACHINE_EPSILON_1000) &&
-                                                                     (cursor.position.y > -Math::MACHINE_EPSILON_1000));
+                                                                     (mControlSize.height - cursor.position.y > -Math::MACHINE_EPSILON_1000) &&
+                                                                     (cursor.position.y + cursor.cursorHeight > -Math::MACHINE_EPSILON_1000));
       if(mPrimaryCursorVisible)
       {
         mPrimaryCursor.SetProperty(Actor::Property::POSITION, Vector2(cursor.position.x, cursor.position.y));
@@ -280,8 +281,8 @@ struct Decorator::Impl : public ConnectionTracker
       const CursorImpl& cursor = mCursor[SECONDARY_CURSOR];
       mSecondaryCursorVisible  = ((mControlSize.width - (cursor.position.x + mCursorWidth) > -Math::MACHINE_EPSILON_1000) &&
                                  (cursor.position.x > -Math::MACHINE_EPSILON_1000) &&
-                                 (mControlSize.height - (cursor.position.y + cursor.cursorHeight) > -Math::MACHINE_EPSILON_1000) &&
-                                 (cursor.position.y > -Math::MACHINE_EPSILON_1000));
+                                 (mControlSize.height - cursor.position.y > -Math::MACHINE_EPSILON_1000) &&
+                                 (cursor.position.y + cursor.cursorHeight > -Math::MACHINE_EPSILON_1000));
       if(mSecondaryCursorVisible)
       {
         mSecondaryCursor.SetProperty(Actor::Property::POSITION, Vector2(cursor.position.x, cursor.position.y));
@@ -299,8 +300,8 @@ struct Decorator::Impl : public ConnectionTracker
     {
       grabHandle.horizontallyVisible = ((mControlSize.width - (grabHandle.position.x + floor(0.5f * mCursorWidth)) > -Math::MACHINE_EPSILON_1000) &&
                                         (grabHandle.position.x > -Math::MACHINE_EPSILON_1000));
-      grabHandle.verticallyVisible   = (((mControlSize.height - grabHandle.lineHeight) - grabHandle.position.y > -Math::MACHINE_EPSILON_1000) &&
-                                      (grabHandle.position.y > -Math::MACHINE_EPSILON_1000));
+      grabHandle.verticallyVisible   = ((fabsf(mControlSize.height - grabHandle.lineHeight) - grabHandle.position.y > -Math::MACHINE_EPSILON_1000) &&
+                                        (grabHandle.position.y + grabHandle.lineHeight > -Math::MACHINE_EPSILON_1000));
 
       const bool isVisible = grabHandle.horizontallyVisible && grabHandle.verticallyVisible && (!mHidePrimaryCursorAndGrabHandle);
       if(isVisible)
@@ -334,11 +335,11 @@ struct Decorator::Impl : public ConnectionTracker
 
     primary.horizontallyVisible   = ((mControlSize.width - primary.position.x > -Math::MACHINE_EPSILON_1000) &&
                                    (primary.position.x > -Math::MACHINE_EPSILON_1000));
-    primary.verticallyVisible     = (((mControlSize.height - primary.lineHeight) - primary.position.y > -Math::MACHINE_EPSILON_1000) &&
+    primary.verticallyVisible     = ((fabsf(mControlSize.height - primary.lineHeight) - primary.position.y > -Math::MACHINE_EPSILON_1000) &&
                                  (primary.position.y + (primary.verticallyFlipped ? 0.f : primary.lineHeight) > -Math::MACHINE_EPSILON_1000));
     secondary.horizontallyVisible = ((mControlSize.width - secondary.position.x > -Math::MACHINE_EPSILON_1000) &&
                                      (secondary.position.x > -Math::MACHINE_EPSILON_1000));
-    secondary.verticallyVisible   = (((mControlSize.height - secondary.lineHeight) - secondary.position.y > -Math::MACHINE_EPSILON_1000) &&
+    secondary.verticallyVisible   = ((fabsf(mControlSize.height - secondary.lineHeight) - secondary.position.y > -Math::MACHINE_EPSILON_1000) &&
                                    (secondary.position.y + (secondary.verticallyFlipped ? 0.f : secondary.lineHeight) > -Math::MACHINE_EPSILON_1000));
 
     const bool primaryVisible   = primary.horizontallyVisible && primary.verticallyVisible;
@@ -665,7 +666,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         if(!mPrimaryCursor.GetParent())
         {
-          mActiveLayer.Add(mPrimaryCursor);
+          mCursorLayer.Add(mPrimaryCursor);
         }
       }
 
@@ -681,7 +682,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         if(!mSecondaryCursor.GetParent())
         {
-          mActiveLayer.Add(mSecondaryCursor);
+          mCursorLayer.Add(mSecondaryCursor);
         }
       }
       else
@@ -735,23 +736,34 @@ struct Decorator::Impl : public ConnectionTracker
     mPanDetector.DetectedSignal().Connect(this, &Decorator::Impl::OnPan);
   }
 
-  void CreateActiveLayer()
+  void CreateLayer(Actor& layer, DecorationType type)
   {
-    if(!mActiveLayer)
+    if(!layer)
     {
-      mActiveLayer = Actor::New();
+      layer = Actor::New();
 #ifdef DECORATOR_DEBUG
-      mActiveLayer.SetProperty(Actor::Property::NAME, "ActiveLayerActor");
+      if(type == DecorationType::ACTIVE_LAYER)
+      {
+        layer.SetProperty(Actor::Property::NAME, "ActiveLayerActor");
+      }
+      else if(type == DecorationType::CURSOR_LAYER)
+      {
+        layer.SetProperty(Actor::Property::NAME, "CursorLayerActor");
+      }
 #endif
+      bool needsClipping = false;
+      if(type == DecorationType::CURSOR_LAYER)
+      {
+        needsClipping = true;
+      }
 
-      mActiveLayer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-      mActiveLayer.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+      layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+      layer.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-      // Add the active layer telling the controller it doesn't need clipping.
-      mController.AddDecoration(mActiveLayer, false);
+      mController.AddDecoration(layer, type, needsClipping);
     }
 
-    mActiveLayer.RaiseToTop();
+    layer.RaiseToTop();
   }
 
   void SetSelectionHandleMarkerSize(HandleImpl& handle)
@@ -1160,7 +1172,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
 
     // Add the highlight box telling the controller it needs clipping.
-    mController.AddDecoration(mHighlightActor, true);
+    mController.AddDecoration(mHighlightActor, DecorationType::NONE_LAYER, true);
   }
 
   void UpdateHighlight()
@@ -1881,6 +1893,7 @@ struct Decorator::Impl : public ConnectionTracker
   Timer mScrollTimer;      ///< Timer used to scroll the text when the grab handle is moved close to the edges.
 
   Actor                mActiveLayer;                             ///< Actor for active handles and alike that ensures they are above all else.
+  Actor                mCursorLayer;                             ///< Actor for cursor layer. this is for cursor clipping.
   PropertyNotification mHandleVerticalLessThanNotification;      ///< Notifies when the 'y' coord of the active layer is less than a given value.
   PropertyNotification mHandleVerticalGreaterThanNotification;   ///< Notifies when the 'y' coord of the active layer is grater than a given value.
   PropertyNotification mHandleHorizontalLessThanNotification;    ///< Notifies when the 'x' coord of the active layer is less than a given value.

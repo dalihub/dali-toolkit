@@ -101,8 +101,8 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   application.SendNotification();
   application.Render();
 
-  // Now the offscreen root actor should have three children: the renderable, the highlight, and the background.
-  DALI_TEST_CHECK(stencil.GetChildCount() == 3u);
+  // Now the offscreen root actor should have four children: the renderable, the clipped cursor, the highlight, and the background.
+  DALI_TEST_CHECK(stencil.GetChildCount() == 4u);
   // The renderable actor should have one child only: the text
   DALI_TEST_CHECK(renderableActor.GetChildCount() == 1u);
 

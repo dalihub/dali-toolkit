@@ -1521,11 +1521,11 @@ void Controller::GetTargetSize(Vector2& targetSize)
   targetSize = mImpl->mModel->mVisualModel->mControlSize;
 }
 
-void Controller::AddDecoration(Actor& actor, bool needsClipping)
+void Controller::AddDecoration(Actor& actor, DecorationType type, bool needsClipping)
 {
   if(mImpl->mEditableControlInterface)
   {
-    mImpl->mEditableControlInterface->AddDecoration(actor, needsClipping);
+    mImpl->mEditableControlInterface->AddDecoration(actor, type, needsClipping);
   }
 }
 
