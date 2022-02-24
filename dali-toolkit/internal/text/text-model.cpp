@@ -276,6 +276,16 @@ Length Model::GetNumberOfStrikethroughRuns() const
   return mVisualModel->GetNumberOfStrikethroughRuns();
 }
 
+Length Model::GetNumberOfBoundedParagraphRuns() const
+{
+  return mLogicalModel->GetNumberOfBoundedParagraphRuns();
+}
+
+const Vector<BoundedParagraphRun>& Model::GetBoundedParagraphRuns() const
+{
+  return mLogicalModel->GetBoundedParagraphRuns();
+}
+
 void Model::GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns, StrikethroughRunIndex index, Length numberOfRuns) const
 {
   mVisualModel->GetStrikethroughRuns(strikethroughRuns, index, numberOfRuns);

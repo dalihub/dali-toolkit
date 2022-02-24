@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/bounded-paragraph-helper-functions.h>
 #include <dali-toolkit/internal/text/input-style.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
 
@@ -331,6 +332,19 @@ void LogicalModel::UpdateTextStyleRuns(CharacterIndex index, int numberOfCharact
 
   // Free memory allocated for the font family name.
   FreeFontFamilyNames(removedFontDescriptionRuns);
+
+  // Process the bounded paragraph runs
+  MergeBoundedParagraphRunsWhenRemoveCharacters(mText,
+                                                index,
+                                                numberOfCharacters,
+                                                mBoundedParagraphRuns);
+
+  Vector<BoundedParagraphRun> removedBoundedParagraphRuns;
+  UpdateCharacterRuns<BoundedParagraphRun>(index,
+                                           numberOfCharacters,
+                                           totalNumberOfCharacters,
+                                           mBoundedParagraphRuns,
+                                           removedBoundedParagraphRuns);
 }
 
 void LogicalModel::RetrieveStyle(CharacterIndex index, InputStyle& style)
@@ -598,6 +612,16 @@ void LogicalModel::FindParagraphs(CharacterIndex             index,
       paragraphs.PushBack(paragraphIndex);
     }
   }
+}
+
+Length LogicalModel::GetNumberOfBoundedParagraphRuns() const
+{
+  return mBoundedParagraphRuns.Count();
+}
+
+const Vector<BoundedParagraphRun>& LogicalModel::GetBoundedParagraphRuns() const
+{
+  return mBoundedParagraphRuns;
 }
 
 void LogicalModel::ClearEmbeddedImages()

@@ -524,3 +524,39 @@ int UtcDaliTextLabelMarkupStrikethroughNoEndTag(void)
 
   END_TEST;
 }
+
+int UtcDaliTextLabelMarkupParagraphTag(void)
+
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliTextLabelMarkupParagraphTag ");
+  TextLabel textLabel = TextLabel::New();
+
+  application.GetScene().Add(textLabel);
+
+  textLabel.SetProperty(TextLabel::Property::TEXT, "text one <p>Paragraph two</p> text three <p>Paragraph four</p> text five");
+  textLabel.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+  textLabel.SetProperty(TextLabel::Property::MULTI_LINE, true);
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t expectedNumberOfBoundedParagraphRuns = 2u;
+
+  Toolkit::Internal::TextLabel& textLabelImpl                = GetImpl(textLabel);
+  const Text::Length            numberOfBoundedParagraphRuns = textLabelImpl.GetTextController()->GetTextModel()->GetNumberOfBoundedParagraphRuns();
+  DALI_TEST_EQUALS(numberOfBoundedParagraphRuns, expectedNumberOfBoundedParagraphRuns, TEST_LOCATION);
+
+  const Vector<BoundedParagraphRun>& boundedParagraphRuns = textLabelImpl.GetTextController()->GetTextModel()->GetBoundedParagraphRuns();
+
+  //<p>Paragraph two</p>
+  DALI_TEST_EQUALS(boundedParagraphRuns[0u].characterRun.characterIndex, 10u, TEST_LOCATION);
+  DALI_TEST_EQUALS(boundedParagraphRuns[0u].characterRun.numberOfCharacters, 14u, TEST_LOCATION);
+
+  //<p>Paragraph four</p>
+  DALI_TEST_EQUALS(boundedParagraphRuns[1u].characterRun.characterIndex, 37u, TEST_LOCATION);
+  DALI_TEST_EQUALS(boundedParagraphRuns[1u].characterRun.numberOfCharacters, 15u, TEST_LOCATION);
+
+  END_TEST;
+}

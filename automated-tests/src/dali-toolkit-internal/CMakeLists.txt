@@ -9,6 +9,7 @@ SET(CAPI_LIB "dali-toolkit-internal")
 SET(TC_SOURCES
  utc-Dali-AddOns.cpp
  utc-Dali-BidirectionalSupport.cpp
+ utc-Dali-BoundedParagraph-Functions.cpp
  utc-Dali-ColorConversion.cpp
  utc-Dali-Control-internal.cpp
  utc-Dali-DebugRendering.cpp

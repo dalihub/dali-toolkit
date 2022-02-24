@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/anchor.h>
+#include <dali-toolkit/internal/text/bounded-paragraph-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/embedded-item.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
@@ -47,7 +48,8 @@ struct MarkupProcessData
                     Vector<Anchor>&                    anchors,
                     Vector<UnderlinedCharacterRun>&    underlinedCharacterRuns,
                     Vector<ColorRun>&                  backgroundColorRuns,
-                    Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns)
+                    Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns,
+                    Vector<BoundedParagraphRun>&       boundedParagraphRuns)
   : colorRuns(colorRuns),
     fontRuns(fontRuns),
     items(items),
@@ -55,6 +57,7 @@ struct MarkupProcessData
     underlinedCharacterRuns(underlinedCharacterRuns),
     backgroundColorRuns(backgroundColorRuns),
     strikethroughCharacterRuns(strikethroughCharacterRuns),
+    boundedParagraphRuns(boundedParagraphRuns),
     markupProcessedText()
   {
   }
@@ -66,6 +69,7 @@ struct MarkupProcessData
   Vector<UnderlinedCharacterRun>&    underlinedCharacterRuns;    ///< The underlined character runs.
   Vector<ColorRun>&                  backgroundColorRuns;        ///< The background color runs.
   Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns; ///< The strikethrough character runs.
+  Vector<BoundedParagraphRun>&       boundedParagraphRuns;       ///< The bounded paragraph runs
   std::string                        markupProcessedText;        ///< The mark-up string.
 };
 

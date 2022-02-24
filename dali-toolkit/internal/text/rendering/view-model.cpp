@@ -645,6 +645,16 @@ void ViewModel::GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns, S
   mModel->GetStrikethroughRuns(strikethroughRuns, index, numberOfRuns);
 }
 
+Length ViewModel::GetNumberOfBoundedParagraphRuns() const
+{
+  return mModel->GetNumberOfBoundedParagraphRuns();
+}
+
+const Vector<BoundedParagraphRun>& ViewModel::GetBoundedParagraphRuns() const
+{
+  return mModel->GetBoundedParagraphRuns();
+}
+
 } // namespace Text
 
 } // namespace Toolkit

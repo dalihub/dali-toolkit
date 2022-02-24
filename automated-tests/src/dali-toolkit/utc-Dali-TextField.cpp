@@ -5281,3 +5281,42 @@ int UtcDaliToolkitTextFieldUnderlineTypesGeneration3(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextfieldParagraphTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextfieldParagraphTag");
+  TextField fieldNewlineSeparator = TextField::New();
+  TextField fieldParagraphTag     = TextField::New();
+  DALI_TEST_CHECK(fieldNewlineSeparator);
+  DALI_TEST_CHECK(fieldParagraphTag);
+
+  application.GetScene().Add(fieldNewlineSeparator);
+  application.GetScene().Add(fieldParagraphTag);
+
+  //Same utterance uses new-line to split paragraphs should give similar results for paragraph tag.
+  fieldNewlineSeparator.SetProperty(TextField::Property::ENABLE_MARKUP, true);
+  fieldNewlineSeparator.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  fieldNewlineSeparator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  fieldNewlineSeparator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  fieldNewlineSeparator.SetProperty(TextField::Property::TEXT, "test paragraph tag \ntest paragraph tag \ntest paragraph tag ");
+
+  fieldParagraphTag.SetProperty(TextField::Property::ENABLE_MARKUP, true);
+  fieldParagraphTag.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  fieldParagraphTag.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  fieldParagraphTag.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  fieldParagraphTag.SetProperty(TextField::Property::TEXT, "test paragraph tag <p>test paragraph tag </p>test paragraph tag ");
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 textNaturalSizeNewlineSeparator = fieldNewlineSeparator.GetNaturalSize();
+  Vector3 textNaturalSizeParagraphTag     = fieldParagraphTag.GetNaturalSize();
+
+  DALI_TEST_EQUALS(textNaturalSizeNewlineSeparator, textNaturalSizeParagraphTag, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
