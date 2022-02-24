@@ -83,7 +83,7 @@ const char NEW_LINE    = 0x0A; // ASCII value of the newline.
 // Range 3 0x10000u < XHTML_DECIMAL_ENTITY_RANGE <= 0x10FFFFu
 const unsigned long XHTML_DECIMAL_ENTITY_RANGE[] = {0x0u, 0xD7FFu, 0xE000u, 0xFFFDu, 0x10000u, 0x10FFFFu};
 
-const unsigned int MAX_NUM_OF_ATTRIBUTES = 5u;  ///< The font tag has the 'family', 'size' 'weight', 'width' and 'slant' attrubutes.
+const unsigned int MAX_NUM_OF_ATTRIBUTES = 11u; ///< The span tag has the 'font-family', 'font-size' 'font-weight', 'font-width', 'font-slant','text-color', 'u-color', 'u-height','u-type','u-dash-gap'and 'u-dash-width' attrubutes.
 const unsigned int DEFAULT_VECTOR_SIZE   = 16u; ///< Default size of run vectors.
 
 #if defined(DEBUG_ENABLED)
@@ -140,8 +140,10 @@ struct Span
 {
   RunIndex colorRunIndex;
   RunIndex fontRunIndex;
+  RunIndex underlinedCharacterRunIndex;
   bool     isColorDefined;
   bool     isFontDefined;
+  bool     isUnderlinedCharacterDefined;
 };
 
 /**
@@ -195,10 +197,12 @@ void Initialize(UnderlinedCharacterRun& underlinedCharacterRun)
  */
 void Initialize(Span& span)
 {
-  span.colorRunIndex  = 0u;
-  span.isColorDefined = false;
-  span.fontRunIndex   = 0u;
-  span.isFontDefined  = false;
+  span.colorRunIndex                = 0u;
+  span.isColorDefined               = false;
+  span.fontRunIndex                 = 0u;
+  span.isFontDefined                = false;
+  span.underlinedCharacterRunIndex  = 0u;
+  span.isUnderlinedCharacterDefined = false;
 }
 
 /**
@@ -719,14 +723,16 @@ void ProcessAnchorTag(
  * @param[in] tagReference The tagReference we should increment/decrement
  */
 void ProcessSpanForRun(
-  const Tag&                  spanTag,
-  StyleStack<Span>&           spanStack,
-  Vector<ColorRun>&           colorRuns,
-  Vector<FontDescriptionRun>& fontRuns,
-  RunIndex&                   colorRunIndex,
-  RunIndex&                   fontRunIndex,
-  const CharacterIndex        characterIndex,
-  int&                        tagReference)
+  const Tag&                      spanTag,
+  StyleStack<Span>&               spanStack,
+  Vector<ColorRun>&               colorRuns,
+  Vector<FontDescriptionRun>&     fontRuns,
+  Vector<UnderlinedCharacterRun>& underlinedCharacterRuns,
+  RunIndex&                       colorRunIndex,
+  RunIndex&                       fontRunIndex,
+  RunIndex&                       underlinedCharacterRunIndex,
+  const CharacterIndex            characterIndex,
+  int&                            tagReference)
 {
   if(!spanTag.isEndTag)
   {
@@ -737,17 +743,22 @@ void ProcessSpanForRun(
     FontDescriptionRun fontRun;
     Initialize(fontRun);
 
+    UnderlinedCharacterRun underlinedCharacterRun;
+    Initialize(underlinedCharacterRun);
+
     Span span;
     Initialize(span);
 
     // Fill the run with the parameters.
-    colorRun.characterRun.characterIndex = characterIndex;
-    fontRun.characterRun.characterIndex  = characterIndex;
+    colorRun.characterRun.characterIndex               = characterIndex;
+    fontRun.characterRun.characterIndex                = characterIndex;
+    underlinedCharacterRun.characterRun.characterIndex = characterIndex;
 
-    span.colorRunIndex = colorRunIndex;
-    span.fontRunIndex  = fontRunIndex;
+    span.colorRunIndex               = colorRunIndex;
+    span.fontRunIndex                = fontRunIndex;
+    span.underlinedCharacterRunIndex = underlinedCharacterRunIndex;
 
-    ProcessSpanTag(spanTag, colorRun, fontRun, span.isColorDefined, span.isFontDefined);
+    ProcessSpanTag(spanTag, colorRun, fontRun, underlinedCharacterRun, span.isColorDefined, span.isFontDefined, span.isUnderlinedCharacterDefined);
 
     // Push the span into the stack.
     spanStack.Push(span);
@@ -765,6 +776,13 @@ void ProcessSpanForRun(
       // Push the run in the logical model.
       fontRuns.PushBack(fontRun);
       ++fontRunIndex;
+    }
+
+    if(span.isUnderlinedCharacterDefined)
+    {
+      // Push the run in the logical model.
+      underlinedCharacterRuns.PushBack(underlinedCharacterRun);
+      ++underlinedCharacterRunIndex;
     }
 
     // Increase reference
@@ -787,6 +805,12 @@ void ProcessSpanForRun(
       {
         FontDescriptionRun& fontRun             = *(fontRuns.Begin() + span.fontRunIndex);
         fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
+      }
+
+      if(span.isUnderlinedCharacterDefined)
+      {
+        UnderlinedCharacterRun& underlinedCharacterRun         = *(underlinedCharacterRuns.Begin() + span.underlinedCharacterRunIndex);
+        underlinedCharacterRun.characterRun.numberOfCharacters = characterIndex - underlinedCharacterRun.characterRun.characterIndex;
       }
 
       --tagReference;
@@ -1017,7 +1041,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
         /* Underline */
         ProcessTagForRun<UnderlinedCharacterRun>(
           markupProcessData.underlinedCharacterRuns, styleStack, tag, characterIndex, underlinedCharacterRunIndex, uTagReference, [](const Tag& tag, UnderlinedCharacterRun& run) {
-            run.properties.color = Color::BLUE;
+            run.properties.color        = Color::BLUE;
             run.properties.colorDefined = true;
             ProcessUnderlineTag(tag, run);
           });
@@ -1048,7 +1072,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       }
       else if(TokenComparison(XHTML_SPAN_TAG, tag.buffer, tag.length))
       {
-        ProcessSpanForRun(tag, spanStack, markupProcessData.colorRuns, markupProcessData.fontRuns, colorRunIndex, fontRunIndex, characterIndex, spanTagReference);
+        ProcessSpanForRun(tag, spanStack, markupProcessData.colorRuns, markupProcessData.fontRuns, markupProcessData.underlinedCharacterRuns, colorRunIndex, fontRunIndex, underlinedCharacterRunIndex, characterIndex, spanTagReference);
       }
       else if(TokenComparison(XHTML_STRIKETHROUGH_TAG, tag.buffer, tag.length))
       {

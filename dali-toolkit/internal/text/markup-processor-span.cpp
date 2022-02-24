@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/font-description-run.h>
 #include <dali-toolkit/internal/text/markup-processor-font.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-processor-underline.h>
 
 namespace Dali
 {
@@ -42,9 +43,22 @@ const std::string XHTML_WIDTH_ATTRIBUTE("font-width");
 const std::string XHTML_SLANT_ATTRIBUTE("font-slant");
 
 const std::string XHTML_COLOR_ATTRIBUTE("text-color");
+
+//the underlined character's attributes
+const std::string XHTML_UNDERLINE_COLOR_ATTRIBUTE("u-color");
+const std::string XHTML_UNDERLINE_HEIGHT_ATTRIBUTE("u-height");
+const std::string XHTML_UNDERLINE_TYPE_ATTRIBUTE("u-type");
+const std::string XHTML_UNDERLINE_DASH_GAP_ATTRIBUTE("u-dash-gap");
+const std::string XHTML_UNDERLINE_DASH_WIDTH_ATTRIBUTE("u-dash-width");
 } // namespace
 
-void ProcessSpanTag(const Tag& tag, ColorRun& colorRun, FontDescriptionRun& fontRun, bool& isColorDefined, bool& isFontDefined)
+void ProcessSpanTag(const Tag&              tag,
+                    ColorRun&               colorRun,
+                    FontDescriptionRun&     fontRun,
+                    UnderlinedCharacterRun& underlinedCharacterRun,
+                    bool&                   isColorDefined,
+                    bool&                   isFontDefined,
+                    bool&                   isUnderlinedCharacterDefined)
 {
   for(Vector<Attribute>::ConstIterator it    = tag.attributes.Begin(),
                                        endIt = tag.attributes.End();
@@ -82,6 +96,31 @@ void ProcessSpanTag(const Tag& tag, ColorRun& colorRun, FontDescriptionRun& font
     {
       isFontDefined = true;
       ProcessFontSlant(attribute, fontRun);
+    }
+    else if(TokenComparison(XHTML_UNDERLINE_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      isUnderlinedCharacterDefined = true;
+      ProcessColorAttribute(attribute, underlinedCharacterRun);
+    }
+    else if(TokenComparison(XHTML_UNDERLINE_HEIGHT_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      isUnderlinedCharacterDefined = true;
+      ProcessHeightAttribute(attribute, underlinedCharacterRun);
+    }
+    else if(TokenComparison(XHTML_UNDERLINE_TYPE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      isUnderlinedCharacterDefined = true;
+      ProcessTypeAttribute(attribute, underlinedCharacterRun);
+    }
+    else if(TokenComparison(XHTML_UNDERLINE_DASH_GAP_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      isUnderlinedCharacterDefined = true;
+      ProcessDashGapAttribute(attribute, underlinedCharacterRun);
+    }
+    else if(TokenComparison(XHTML_UNDERLINE_DASH_WIDTH_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      isUnderlinedCharacterDefined = true;
+      ProcessDashWidthAttribute(attribute, underlinedCharacterRun);
     }
   }
 }
