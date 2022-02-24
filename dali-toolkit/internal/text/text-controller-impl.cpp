@@ -712,6 +712,23 @@ bool Controller::Impl::SetDefaultLineSize(float lineSize)
   return false;
 }
 
+bool Controller::Impl::SetRelativeLineSize(float relativeLineSize)
+{
+  if(std::fabs(relativeLineSize - GetRelativeLineSize()) > Math::MACHINE_EPSILON_1000)
+  {
+    mLayoutEngine.SetRelativeLineSize(relativeLineSize);
+
+    RelayoutAllCharacters();
+    return true;
+  }
+  return false;
+}
+
+float Controller::Impl::GetRelativeLineSize()
+{
+  return mLayoutEngine.GetRelativeLineSize();
+}
+
 string Controller::Impl::GetSelectedText()
 {
   string text;

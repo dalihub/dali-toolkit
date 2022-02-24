@@ -1262,6 +1262,22 @@ public: // Default style & Input style
   float GetDefaultLineSize() const;
 
   /**
+   * @brief Sets the relative line size to the original line size.
+   *
+   * @param[in] relativeLineSize The relativeline size.
+   *
+   * @return True if relativeLineSize has been updated, false otherwise
+   */
+  bool SetRelativeLineSize(float lineSize);
+
+  /**
+   * @brief Retrieves the relative line size.
+   *
+   * @return The relative line size.
+   */
+  float GetRelativeLineSize() const;
+
+  /**
    * @brief Sets the input text's color.
    *
    * @param[in] color The input text's color.

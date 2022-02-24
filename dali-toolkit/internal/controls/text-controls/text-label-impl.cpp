@@ -140,6 +140,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "enableFontSizeSc
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "ellipsisPosition",             INTEGER, ELLIPSIS_POSITION              )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "strikethrough",                MAP,     STRIKETHROUGH                  )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "characterSpacing",             FLOAT,   CHARACTER_SPACING              )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "relativeLineSize",             FLOAT,   RELATIVE_LINE_SIZE             )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR   )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0)
@@ -541,6 +542,14 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
         impl.mController->SetCharacterSpacing(characterSpacing);
         break;
       }
+      case Toolkit::DevelTextLabel::Property::RELATIVE_LINE_SIZE:
+      {
+        const float relativeLineSize = value.Get<float>();
+        DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextLabel %p RELATIVE_LINE_SIZE %f\n", impl.mController.Get(), relativeLineSize);
+
+        impl.mController->SetRelativeLineSize(relativeLineSize);
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -797,6 +806,11 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       case Toolkit::DevelTextLabel::Property::CHARACTER_SPACING:
       {
         value = impl.mController->GetCharacterSpacing();
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::RELATIVE_LINE_SIZE:
+      {
+        value = impl.mController->GetRelativeLineSize();
         break;
       }
     }

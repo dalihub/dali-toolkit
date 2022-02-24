@@ -52,12 +52,13 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_LAYOUT");
 #endif
 
-const float              MAX_FLOAT      = std::numeric_limits<float>::max();
-const CharacterDirection LTR            = false;
-const CharacterDirection RTL            = !LTR;
-const float              LINE_SPACING   = 0.f;
-const float              MIN_LINE_SIZE  = 0.f;
-const Character          HYPHEN_UNICODE = 0x002D;
+const float              MAX_FLOAT          = std::numeric_limits<float>::max();
+const CharacterDirection LTR                = false;
+const CharacterDirection RTL                = !LTR;
+const float              LINE_SPACING       = 0.f;
+const float              MIN_LINE_SIZE      = 0.f;
+const Character          HYPHEN_UNICODE     = 0x002D;
+const float              RELATIVE_LINE_SIZE = 1.f;
 
 inline bool isEmptyLineAtLast(const Vector<LineRun>& lines, const Vector<LineRun>::Iterator& line)
 {
@@ -155,8 +156,52 @@ struct Engine::Impl
   : mLayout{Layout::Engine::SINGLE_LINE_BOX},
     mCursorWidth{0.f},
     mDefaultLineSpacing{LINE_SPACING},
-    mDefaultLineSize{MIN_LINE_SIZE}
+    mDefaultLineSize{MIN_LINE_SIZE},
+    mRelativeLineSize{RELATIVE_LINE_SIZE}
   {
+  }
+
+  /**
+   * @brief get the line spacing.
+   *
+   * @param[in] textSize The text size.
+   * @return the line spacing value.
+   */
+  float GetLineSpacing(float textSize)
+  {
+    float lineSpacing;
+    float relTextSize;
+
+    // Sets the line size
+    lineSpacing = mDefaultLineSize - textSize;
+    lineSpacing = lineSpacing < 0.f ? 0.f : lineSpacing;
+
+    // Add the line spacing
+    lineSpacing += mDefaultLineSpacing;
+
+    //subtract line spcaing if relativeLineSize < 1 & larger than min height
+    relTextSize = textSize * mRelativeLineSize;
+    if(relTextSize > mDefaultLineSize)
+    {
+      if(mRelativeLineSize < 1)
+      {
+        //subtract the difference (always will be positive)
+        lineSpacing -= (textSize - relTextSize);
+      }
+      else
+      {
+        //reverse the addition in the top.
+        if(mDefaultLineSize > textSize)
+        {
+          lineSpacing -= mDefaultLineSize - textSize;
+        }
+
+        //add difference instead
+        lineSpacing += relTextSize - textSize;
+      }
+    }
+
+    return lineSpacing;
   }
 
   /**
@@ -187,12 +232,7 @@ struct Engine::Impl
     // Sets the minimum descender.
     lineLayout.descender = std::min(lineLayout.descender, fontMetrics.descender);
 
-    // Sets the line size
-    lineLayout.lineSpacing = mDefaultLineSize - (lineLayout.ascender + -lineLayout.descender);
-    lineLayout.lineSpacing = lineLayout.lineSpacing < 0.f ? 0.f : lineLayout.lineSpacing;
-
-    // Add the line spacing
-    lineLayout.lineSpacing += mDefaultLineSpacing;
+    lineLayout.lineSpacing = GetLineSpacing(lineLayout.ascender + -lineLayout.descender);
   }
 
   /**
@@ -1353,10 +1393,7 @@ struct Engine::Impl
     lineRun.direction = layout.direction;
     lineRun.ellipsis  = false;
 
-    lineRun.lineSpacing = mDefaultLineSize - (lineRun.ascender + -lineRun.descender);
-    lineRun.lineSpacing = lineRun.lineSpacing < 0.f ? 0.f : lineRun.lineSpacing;
-
-    lineRun.lineSpacing += mDefaultLineSpacing;
+    lineRun.lineSpacing = GetLineSpacing(lineRun.ascender + -lineRun.descender);
 
     // Update the actual size.
     if(lineRun.width > layoutSize.width)
@@ -1410,10 +1447,7 @@ struct Engine::Impl
     lineRun.direction                       = LTR;
     lineRun.ellipsis                        = false;
 
-    lineRun.lineSpacing = mDefaultLineSize - (lineRun.ascender + -lineRun.descender);
-    lineRun.lineSpacing = lineRun.lineSpacing < 0.f ? 0.f : lineRun.lineSpacing;
-
-    lineRun.lineSpacing += mDefaultLineSpacing;
+    lineRun.lineSpacing = GetLineSpacing(lineRun.ascender + -lineRun.descender);
 
     layoutSize.height += GetLineHeight(lineRun);
   }
@@ -1811,14 +1845,7 @@ struct Engine::Impl
         }
 
         // Updates the vertical pen's position.
-        penY += -layout.descender + layout.lineSpacing + mDefaultLineSpacing;
-        // If there is a defaultLineSize, updates the pen's position.
-        if(mDefaultLineSize > 0.f)
-        {
-          float lineSpacing = mDefaultLineSize - (layout.ascender + -layout.descender);
-          lineSpacing       = lineSpacing < 0.f ? 0.f : lineSpacing;
-          penY += lineSpacing;
-        }
+        penY += -layout.descender + layout.lineSpacing + GetLineSpacing(layout.ascender + -layout.descender);
 
         // Increase the glyph index.
         index = nextIndex;
@@ -2077,6 +2104,7 @@ struct Engine::Impl
   float mDefaultLineSize;
 
   IntrusivePtr<Metrics> mMetrics;
+  float                 mRelativeLineSize;
 };
 
 Engine::Engine()
@@ -2166,6 +2194,16 @@ void Engine::SetDefaultLineSize(float lineSize)
 float Engine::GetDefaultLineSize() const
 {
   return mImpl->mDefaultLineSize;
+}
+
+void Engine::SetRelativeLineSize(float relativeLineSize)
+{
+  mImpl->mRelativeLineSize = relativeLineSize;
+}
+
+float Engine::GetRelativeLineSize() const
+{
+  return mImpl->mRelativeLineSize;
 }
 
 } // namespace Layout

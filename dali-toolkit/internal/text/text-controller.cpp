@@ -948,6 +948,16 @@ float Controller::GetDefaultLineSize() const
   return mImpl->mLayoutEngine.GetDefaultLineSize();
 }
 
+bool Controller::SetRelativeLineSize(float relativeLineSize)
+{
+  return mImpl->SetRelativeLineSize(relativeLineSize);
+}
+
+float Controller::GetRelativeLineSize() const
+{
+  return mImpl->GetRelativeLineSize();
+}
+
 void Controller::SetInputColor(const Vector4& color)
 {
   InputProperties::SetInputColor(*this, color);

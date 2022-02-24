@@ -5765,6 +5765,42 @@ int UtcDaliToolkitTextEditorUnderlineTypesGeneration3(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextEditorRelativeLineHeight(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextEditorRelativeLineHeight");
+
+  TextEditor editor = TextEditor::New();
+  editor.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10);
+  editor.SetProperty(TextEditor::Property::TEXT, "Hello\nWorld");
+
+  application.GetScene().Add(editor);
+  application.SendNotification();
+  application.Render();
+
+  Vector3 naturalSize = editor.GetNaturalSize();
+
+  editor.SetProperty(DevelTextEditor::Property::RELATIVE_LINE_SIZE, 0.5f);
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 relativeNaturalSize = editor.GetNaturalSize();
+
+  DALI_TEST_EQUALS(naturalSize.y, relativeNaturalSize.y * 2, TEST_LOCATION);
+
+  editor.SetProperty(DevelTextEditor::Property::RELATIVE_LINE_SIZE, 2.0f);
+
+  application.SendNotification();
+  application.Render();
+
+  relativeNaturalSize = editor.GetNaturalSize();
+
+  DALI_TEST_EQUALS(naturalSize.y * 2, relativeNaturalSize.y, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliTextEditorCharacterSpacing(void)
 {
   ToolkitTestApplication application;

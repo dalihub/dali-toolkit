@@ -2632,6 +2632,42 @@ int UtcDaliToolkitTextLabelStrikethroughGeneration(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextLabelRelativeLineHeight(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelRelativeLineHeight");
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 300.f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 10);
+  label.SetProperty(TextLabel::Property::TEXT, "Hello\nWorld");
+
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  Vector3 naturalSize = label.GetNaturalSize();
+
+  label.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 0.5f);
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 relativeNaturalSize = label.GetNaturalSize();
+
+  DALI_TEST_EQUALS(naturalSize.y, relativeNaturalSize.y * 2, TEST_LOCATION);
+
+  label.SetProperty(DevelTextLabel::Property::RELATIVE_LINE_SIZE, 2.0f);
+
+  application.SendNotification();
+  application.Render();
+
+  relativeNaturalSize = label.GetNaturalSize();
+
+  DALI_TEST_EQUALS(naturalSize.y * 2, relativeNaturalSize.y, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliTextLabelCharacterSpacing(void)
 {
   ToolkitTestApplication application;
