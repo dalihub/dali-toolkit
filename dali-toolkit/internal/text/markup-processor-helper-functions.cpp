@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,11 @@ const std::string TRANSPARENT_COLOR("transparent");
 const std::string SOLID_UNDERLINE("solid");
 const std::string DASHED_UNDERLINE("dashed");
 const std::string DOUBLE_UNDERLINE("double");
+
+const std::string BEGIN_HORIZONTAL_ALIGNMENT("begin");
+const std::string CENTER_HORIZONTAL_ALIGNMENT("center");
+const std::string END_HORIZONTAL_ALIGNMENT("end");
+
 } // namespace
 
 bool TokenComparison(const std::string& string1, const char* const stringBuffer2, Length length)
@@ -315,6 +320,29 @@ void UnderlineTypeStringToTypeValue(const char* const typeStr, Length length, Te
   {
     retType = Text::Underline::DOUBLE;
   }
+}
+
+bool HorizontalAlignmentTypeStringToTypeValue(const char* const typeStr, Length length, Text::HorizontalAlignment::Type& retType)
+{
+  // The string is valid value for HorizontalAlignment
+  bool valid = false;
+  if(TokenComparison(BEGIN_HORIZONTAL_ALIGNMENT, typeStr, length))
+  {
+    retType = Text::HorizontalAlignment::BEGIN;
+    valid   = true;
+  }
+  else if(TokenComparison(CENTER_HORIZONTAL_ALIGNMENT, typeStr, length))
+  {
+    retType = Text::HorizontalAlignment::CENTER;
+    valid   = true;
+  }
+  else if(TokenComparison(END_HORIZONTAL_ALIGNMENT, typeStr, length))
+  {
+    retType = Text::HorizontalAlignment::END;
+    valid   = true;
+  }
+
+  return valid;
 }
 
 } // namespace Text

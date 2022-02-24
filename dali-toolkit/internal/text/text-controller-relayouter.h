@@ -114,6 +114,18 @@ struct Controller::Relayouter
   * @return The calculated layout-size.
   */
   static Size CalculateLayoutSizeOnRequiredControllerSize(Controller& controller, const Size& requestedControllerSize, const OperationsMask& requestedOperationsMask);
+
+private:
+  /**
+   * @brief Called by the DoRelayout to do HorizontalAlignment operation when relayouting.
+   *
+   * @param[in] impl A reference to the controller impl class
+   * @param[in] size The size to set
+   * @param[in] startIndex The start index for relayouting
+   * @param[in] requestedNumberOfCharacters The number Of characters for relayouting
+   */
+
+  static void DoRelayoutHorizontalAlignment(Controller::Impl& impl, const Size& size, const CharacterIndex startIndex, const Length requestedNumberOfCharacters);
 };
 
 } // namespace Text

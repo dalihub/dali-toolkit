@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-run.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
 {
@@ -41,7 +42,19 @@ namespace Text
  */
 struct BoundedParagraphRun
 {
-  CharacterRun characterRun; ///< The initial character index within the whole text and the number of characters of the run.
+  /**
+   * Default constructor to set the default values of bitfields
+   */
+  BoundedParagraphRun()
+  : characterRun{},
+    horizontalAlignment(Text::HorizontalAlignment::BEGIN),
+    horizontalAlignmentDefined{false}
+  {
+  }
+
+  CharacterRun                    characterRun;                   ///< The initial character index within the whole text and the number of characters of the run.
+  Text::HorizontalAlignment::Type horizontalAlignment;            ///< The paragraph horizontal alignment. Values "BEGIN" "CENTER" "END".
+  bool                            horizontalAlignmentDefined : 1; ///< Whether the horizontal alignment is defined.
 };
 
 } // namespace Text
