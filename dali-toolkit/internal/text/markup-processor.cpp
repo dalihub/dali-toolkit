@@ -1094,6 +1094,9 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
 
   // Resize the model's vectors.
   ResizeModelVectors(markupProcessData, fontRunIndex, colorRunIndex, underlinedCharacterRunIndex, backgroundRunIndex, boundedParagraphRunIndex);
+
+  // Handle the nested tags
+  OverrideNestedUnderlinedCharacterRuns(markupProcessData.underlinedCharacterRuns);
 }
 
 } // namespace Text

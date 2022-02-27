@@ -45,27 +45,34 @@ bool IsGlyphUnderlined(GlyphIndex                                 index,
   return false;
 }
 
-float GetCurrentUnderlineHeight(const Vector<UnderlinedGlyphRun>&         underlineRuns,
-                                Vector<UnderlinedGlyphRun>::ConstIterator currentUnderlinedGlyphRunIt,
-                                const float                               underlineHeight)
+UnderlineStyleProperties GetCurrentUnderlineProperties(GlyphIndex                                 index,
+                                                       const bool&                                isGlyphUnderlined,
+                                                       const Vector<UnderlinedGlyphRun>&          underlineRuns,
+                                                       Vector<UnderlinedGlyphRun>::ConstIterator& currentUnderlinedGlyphRunIt,
+                                                       const UnderlineStyleProperties&            commonUnderlineProperties)
 {
-  if(currentUnderlinedGlyphRunIt == underlineRuns.End())
+  UnderlineStyleProperties currentUnderlineStyleProperties = commonUnderlineProperties;
+
+  if(isGlyphUnderlined && (currentUnderlinedGlyphRunIt != underlineRuns.End()))
   {
-    return underlineHeight;
+    // Retrieve the latest run to handle the nested case.
+    for(Vector<UnderlinedGlyphRun>::ConstIterator it    = currentUnderlinedGlyphRunIt + 1,
+                                                  endIt = underlineRuns.End();
+        it != endIt;
+        ++it)
+    {
+      const UnderlinedGlyphRun& run = *it;
+
+      if((run.glyphRun.glyphIndex <= index) && (index < (run.glyphRun.glyphIndex + run.glyphRun.numberOfGlyphs)))
+      {
+        currentUnderlinedGlyphRunIt = it;
+      }
+    }
+
+    currentUnderlineStyleProperties.OverrideByDefinedProperties(currentUnderlinedGlyphRunIt->properties);
   }
 
-  const UnderlinedGlyphRun& underlinedGlyphRun = *currentUnderlinedGlyphRunIt;
-  return (underlinedGlyphRun.properties.heightDefined ? underlinedGlyphRun.properties.height : underlineHeight);
-}
-
-UnderlineStyleProperties GetCurrentUnderlineProperties(const bool&                               isGlyphUnderlined,
-                                                       const Vector<UnderlinedGlyphRun>&         underlineRuns,
-                                                       Vector<UnderlinedGlyphRun>::ConstIterator currentUnderlinedGlyphRunIt,
-                                                       const UnderlineStyleProperties&           commonUnderlineProperties)
-{
-  return (isGlyphUnderlined && (currentUnderlinedGlyphRunIt != underlineRuns.End()))
-           ? currentUnderlinedGlyphRunIt->properties
-           : commonUnderlineProperties;
+  return currentUnderlineStyleProperties;
 }
 
 float FetchUnderlinePositionFromFontMetrics(const FontMetrics& fontMetrics)

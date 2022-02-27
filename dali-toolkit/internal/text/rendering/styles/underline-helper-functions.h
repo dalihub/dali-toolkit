@@ -46,21 +46,9 @@ bool IsGlyphUnderlined(GlyphIndex                                 index,
                        Vector<UnderlinedGlyphRun>::ConstIterator& currentUnderlinedGlyphRunIt);
 
 /**
- * @brief Check the current underlined glyph run iterator if not empty and its height is defined then return ts height. Otherwise return the common underline height.
- *
- * @param[in] underlineRuns the underline runs.
- * @param[in] currentUnderlinedGlyphRunIt the iterator of current underlined glyph run.
- * @param[in] underlineHeight the common underline height.
- *
- * @return the determined underline height
- */
-float GetCurrentUnderlineHeight(const Vector<UnderlinedGlyphRun>&         underlineRuns,
-                                Vector<UnderlinedGlyphRun>::ConstIterator currentUnderlinedGlyphRunIt,
-                                const float                               underlineHeight);
-
-/**
  * @brief Check the current underlined glyph run iterator if not empty and isGlyphUnderlined is true then return its UnderlineProperties. Otherwise return the common underline properties.
  *
+ * @param[in] index the index of glyph.
  * @param[in] isGlyphUnderlined whether the glyph is underlined.
  * @param[in] underlineRuns the underline runs.
  * @param[in] currentUnderlinedGlyphRunIt the iterator of current underlined glyph run.
@@ -68,10 +56,11 @@ float GetCurrentUnderlineHeight(const Vector<UnderlinedGlyphRun>&         underl
  *
  * @return the determined underline properties
  */
-UnderlineStyleProperties GetCurrentUnderlineProperties(const bool&                               isGlyphUnderlined,
-                                                       const Vector<UnderlinedGlyphRun>&         underlineRuns,
-                                                       Vector<UnderlinedGlyphRun>::ConstIterator currentUnderlinedGlyphRunIt,
-                                                       const UnderlineStyleProperties&           commonUnderlineProperties);
+UnderlineStyleProperties GetCurrentUnderlineProperties(GlyphIndex                                 index,
+                                                       const bool&                                isGlyphUnderlined,
+                                                       const Vector<UnderlinedGlyphRun>&          underlineRuns,
+                                                       Vector<UnderlinedGlyphRun>::ConstIterator& currentUnderlinedGlyphRunIt,
+                                                       const UnderlineStyleProperties&            commonUnderlineProperties);
 
 /**
  * @brief Fetch and calculate underline Position using font-metrics
