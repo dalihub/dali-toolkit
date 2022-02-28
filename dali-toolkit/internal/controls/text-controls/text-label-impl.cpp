@@ -1379,6 +1379,24 @@ bool TextLabel::AccessibleImpl::SetRangeOfSelection(size_t selectionIndex, size_
   return true;
 }
 
+Rect<> TextLabel::AccessibleImpl::GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type)
+{
+  if (endOffset <= startOffset || endOffset <= 0)
+  {
+    return {0, 0, 0, 0};
+  }
+
+  auto self = Toolkit::TextLabel::DownCast(Self());
+  auto rect = Dali::Toolkit::GetImpl(self).GetTextController()->GetTextBoundingRectangle(startOffset, endOffset - 1);
+
+  auto componentExtents = this->GetExtents(type);
+
+  rect.x += componentExtents.x;
+  rect.y += componentExtents.y;
+
+  return rect;
+}
+
 int32_t TextLabel::AccessibleImpl::GetLinkCount() const
 {
   auto self = Toolkit::TextLabel::DownCast(Self());

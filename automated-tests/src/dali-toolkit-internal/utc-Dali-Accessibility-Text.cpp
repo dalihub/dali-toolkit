@@ -199,6 +199,59 @@ int utcDaliAccessibilityTextEditorRemoveSelection(void)
   END_TEST;
 }
 
+int utcDaliAccessibilityTextEditorGetRangeExtents(void)
+{
+  ToolkitTestApplication application;
+
+  auto editor = Dali::Toolkit::TextEditor::New();
+  auto q     = Dali::Accessibility::Accessible::Get( editor );
+  auto x     = dynamic_cast< Dali::Accessibility::Text* >( q );
+  DALI_TEST_CHECK( x );
+
+  if( x )
+  {
+    auto rangeExtents = x->GetRangeExtents( 0, 0, Dali::Accessibility::CoordinateType::WINDOW );
+    DALI_TEST_EQUALS( (int)rangeExtents.x, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( (int)rangeExtents.y, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( (int)rangeExtents.width, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( (int)rangeExtents.height, 0, TEST_LOCATION );
+
+    application.GetScene().Add( editor );
+
+    editor.SetProperty( Toolkit::TextEditor::Property::POINT_SIZE, 7.f );
+    editor.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
+    editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+    editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+    editor.SetProperty( Toolkit::TextEditor::Property::TEXT, "text editor test sentence" );
+
+    // Avoid a crash when core load gl resources.
+    application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+    // Render and notify
+    application.SendNotification();
+    application.Render();
+
+    auto characterCount = x->GetCharacterCount();
+    rangeExtents        = x->GetRangeExtents( 0, characterCount, Dali::Accessibility::CoordinateType::WINDOW );
+
+    Vector<Vector2> positionList = Toolkit::DevelTextEditor::GetTextPosition(editor, 0, characterCount);
+    Vector<Vector2> sizeList     = Toolkit::DevelTextEditor::GetTextSize(editor, 0, characterCount);
+
+    DALI_TEST_EQUALS(positionList.Size() == sizeList.Size(), true, TEST_LOCATION);
+
+    unsigned int sizeListSize = sizeList.Size();
+    for(unsigned int i = 0; i < sizeListSize; i++)
+    {
+      DALI_TEST_EQUALS((int)positionList[i].x >= rangeExtents.x, true, TEST_LOCATION);
+      DALI_TEST_EQUALS((int)positionList[i].y >= rangeExtents.y, true, TEST_LOCATION);
+      DALI_TEST_EQUALS((int)sizeList[i].x <= rangeExtents.width, true, TEST_LOCATION);
+      DALI_TEST_EQUALS((int)sizeList[i].y <= rangeExtents.height, true, TEST_LOCATION);
+    }
+  }
+
+  END_TEST;
+}
+
 int utcDaliAccessibilityTextFieldGetName(void)
 {
   ToolkitTestApplication application;
@@ -390,6 +443,59 @@ int utcDaliAccessibilityTextFieldRemoveSelection(void)
   END_TEST;
 }
 
+int utcDaliAccessibilityTextFieldGetRangeExtents(void)
+{
+  ToolkitTestApplication application;
+
+  auto field = Dali::Toolkit::TextField::New();
+  auto q     = Dali::Accessibility::Accessible::Get( field );
+  auto x     = dynamic_cast< Dali::Accessibility::Text* >( q );
+  DALI_TEST_CHECK( x );
+
+  if( x )
+  {
+    auto rangeExtents = x->GetRangeExtents( 0, 0, Dali::Accessibility::CoordinateType::WINDOW );
+    DALI_TEST_EQUALS( (int)rangeExtents.x, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( (int)rangeExtents.y, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( (int)rangeExtents.width, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( (int)rangeExtents.height, 0, TEST_LOCATION );
+
+    application.GetScene().Add( field );
+
+    field.SetProperty( Toolkit::TextField::Property::POINT_SIZE, 7.f );
+    field.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
+    field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+    field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+    field.SetProperty( Toolkit::TextField::Property::TEXT, "text field test sentence" );
+
+    // Avoid a crash when core load gl resources.
+    application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+    // Render and notify
+    application.SendNotification();
+    application.Render();
+
+    auto characterCount = x->GetCharacterCount();
+    rangeExtents        = x->GetRangeExtents( 0, characterCount, Dali::Accessibility::CoordinateType::WINDOW );
+
+    Vector<Vector2> positionList = Toolkit::DevelTextField::GetTextPosition(field, 0, characterCount);
+    Vector<Vector2> sizeList     = Toolkit::DevelTextField::GetTextSize(field, 0, characterCount);
+
+    DALI_TEST_EQUALS(positionList.Size() == sizeList.Size(), true, TEST_LOCATION);
+
+    unsigned int sizeListSize = sizeList.Size();
+    for(unsigned int i = 0; i < sizeListSize; i++)
+    {
+      DALI_TEST_EQUALS((int)positionList[i].x >= rangeExtents.x, true, TEST_LOCATION);
+      DALI_TEST_EQUALS((int)positionList[i].y >= rangeExtents.y, true, TEST_LOCATION);
+      DALI_TEST_EQUALS((int)sizeList[i].x <= rangeExtents.width, true, TEST_LOCATION);
+      DALI_TEST_EQUALS((int)sizeList[i].y <= rangeExtents.height, true, TEST_LOCATION);
+    }
+  }
+
+  END_TEST;
+}
+
 int utcDaliAccessibilityTextLabelGetName(void)
 {
   ToolkitTestApplication application;
@@ -516,6 +622,60 @@ int utcDaliAccessibilityTextLabelRemoveSelection( void )
     range = x->GetRangeOfSelection( 0 );
     DALI_TEST_EQUALS( range.startOffset, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( range.endOffset, 0, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int utcDaliAccessibilityTextLabelGetRangeExtents(void)
+{
+  ToolkitTestApplication application;
+
+  auto label = Dali::Toolkit::TextLabel::New();
+  auto q     = Dali::Accessibility::Accessible::Get( label );
+  auto x     = dynamic_cast< Dali::Accessibility::Text* >( q );
+  DALI_TEST_CHECK( x );
+
+  if( x )
+  {
+    auto rangeExtents = x->GetRangeExtents( 0, 0, Dali::Accessibility::CoordinateType::WINDOW );
+    DALI_TEST_EQUALS( (int)rangeExtents.x, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( (int)rangeExtents.y, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( (int)rangeExtents.width, 0, TEST_LOCATION );
+    DALI_TEST_EQUALS( (int)rangeExtents.height, 0, TEST_LOCATION );
+
+    application.GetScene().Add( label );
+
+    label.SetProperty( Toolkit::TextLabel::Property::POINT_SIZE, 7.f );
+    label.SetProperty( Toolkit::TextLabel::Property::MULTI_LINE, true );
+    label.SetProperty( Actor::Property::SIZE, Vector2(200.f, 200.f) );
+    label.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+    label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+    label.SetProperty( Toolkit::TextLabel::Property::TEXT, "text label\n test sentence" );
+
+    // Avoid a crash when core load gl resources.
+    application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE);
+
+    // Render and notify
+    application.SendNotification();
+    application.Render();
+
+    auto characterCount = x->GetCharacterCount();
+    rangeExtents        = x->GetRangeExtents( 0, characterCount, Dali::Accessibility::CoordinateType::WINDOW );
+
+    Vector<Vector2> positionList = Toolkit::DevelTextLabel::GetTextPosition(label, 0, characterCount);
+    Vector<Vector2> sizeList     = Toolkit::DevelTextLabel::GetTextSize(label, 0, characterCount);
+
+    DALI_TEST_EQUALS(positionList.Size() == sizeList.Size(), true, TEST_LOCATION);
+
+    unsigned int sizeListSize = sizeList.Size();
+    for(unsigned int i = 0; i < sizeListSize; i++)
+    {
+      DALI_TEST_EQUALS((int)positionList[i].x >= rangeExtents.x, true, TEST_LOCATION);
+      DALI_TEST_EQUALS((int)positionList[i].y >= rangeExtents.y, true, TEST_LOCATION);
+      DALI_TEST_EQUALS((int)sizeList[i].x <= rangeExtents.width, true, TEST_LOCATION);
+      DALI_TEST_EQUALS((int)sizeList[i].y <= rangeExtents.height, true, TEST_LOCATION);
+    }
   }
 
   END_TEST;
