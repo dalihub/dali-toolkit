@@ -37,11 +37,18 @@ namespace Toolkit
 {
 namespace Text
 {
-float GetLineHeight(const LineRun lineRun)
+float GetLineHeight(const LineRun lineRun, bool isLastLine)
 {
   // The line height is the addition of the line ascender, the line descender and the line spacing.
   // However, the line descender has a negative value, hence the subtraction.
-  return lineRun.ascender - lineRun.descender + lineRun.lineSpacing;
+  // In case this is the only/last line then line spacing should be ignored.
+  float lineHeight = lineRun.ascender - lineRun.descender;
+
+  if(!isLastLine || lineRun.lineSpacing > 0)
+  {
+    lineHeight += lineRun.lineSpacing;
+  }
+  return lineHeight;
 }
 
 namespace Layout
@@ -1257,7 +1264,7 @@ struct Engine::Impl
       layoutSize.width = layoutParameters.boundingBox.width;
       if(layoutSize.height < Math::MACHINE_EPSILON_1000)
       {
-        layoutSize.height += GetLineHeight(*lineRun);
+        layoutSize.height += GetLineHeight(*lineRun, true);
       }
 
       const Vector<BidirectionalLineInfoRun>& bidirectionalLinesInfo = layoutParameters.textModel->mLogicalModel->mBidirectionalLineInfo;
@@ -1364,7 +1371,7 @@ struct Engine::Impl
       layoutSize.width = lineRun.width;
     }
 
-    layoutSize.height += GetLineHeight(lineRun);
+    layoutSize.height += GetLineHeight(lineRun, isLastLine);
   }
 
   /**
@@ -1415,7 +1422,7 @@ struct Engine::Impl
 
     lineRun.lineSpacing += mDefaultLineSpacing;
 
-    layoutSize.height += GetLineHeight(lineRun);
+    layoutSize.height += GetLineHeight(lineRun, true);
   }
 
   /**
@@ -1432,14 +1439,15 @@ struct Engine::Impl
         it != endIt;
         ++it)
     {
-      const LineRun& line = *it;
+      const LineRun& line       = *it;
+      bool           isLastLine = (it + 1 == endIt);
 
       if(line.width > layoutSize.width)
       {
         layoutSize.width = line.width;
       }
 
-      layoutSize.height += GetLineHeight(line);
+      layoutSize.height += GetLineHeight(line, isLastLine);
     }
   }
 

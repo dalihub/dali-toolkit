@@ -279,7 +279,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
           const LineRun& elidedLine = *ellipsisLine;
 
           if((1u == numberOfLines) &&
-             (GetLineHeight(elidedLine) > mImpl->mVisualModel->mControlSize.height))
+             (GetLineHeight(elidedLine, true) > mImpl->mVisualModel->mControlSize.height))
           {
             // Replace the first glyph with ellipsis glyph
             auto indexOfFirstGlyph = (ellipsisPosition == DevelText::EllipsisPosition::START) ? startIndexOfEllipsis : 0u;

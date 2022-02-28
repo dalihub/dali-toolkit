@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/color-segmentation.h>
+#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
@@ -40,7 +41,6 @@
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-model.h>
-#include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 
 namespace Dali
 {
@@ -835,7 +835,7 @@ void Ellipsis(const RendererParameters& textParameters, TextAbstraction::TextRen
     {
       Length finalNumberOfGlyphs = 0u;
 
-      if((GetLineHeight(line)) > textLayoutArea.height)
+      if((GetLineHeight(line, (lines.Size() == 1))) > textLayoutArea.height)
       {
         // The height of the line is bigger than the height of the text area.
         // Show the ellipsis glyph even if it doesn't fit in the text area.
@@ -1528,12 +1528,14 @@ Dali::Property::Array RenderForLastIndex(RendererParameters& textParameters)
   float            penY               = 0.f;
   float            lineSize           = internalData.layoutEngine.GetDefaultLineSize();
   float            lineOffset         = 0.f;
+  bool             isLastLine;
   for(unsigned int index = 0u; index < numberOfLines; ++index)
   {
     const LineRun& line = *(lines.Begin() + index);
     numberOfCharacters += line.characterRun.numberOfCharacters;
+    isLastLine = (index == numberOfLines - 1);
 
-    lineOffset = lineSize > 0.f ? lineSize : GetLineHeight(line);
+    lineOffset = lineSize > 0.f ? lineSize : GetLineHeight(line, isLastLine);
     penY += lineOffset;
     if((penY + lineOffset) > boundingBox)
     {
