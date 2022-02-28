@@ -25,6 +25,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
+#include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 #include <dali-toolkit/internal/text/text-view.h>
 
 namespace Dali::Toolkit::Text
@@ -98,10 +99,13 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
     const Vector4* const    backgroundColorsBuffer       = textView.GetBackgroundColors();
     const ColorIndex* const backgroundColorIndicesBuffer = textView.GetBackgroundColorIndices();
     const Vector4&          defaultBackgroundColor       = textVisualModel->IsBackgroundEnabled() ? textVisualModel->GetBackgroundColor() : Color::TRANSPARENT;
-    const float             characterSpacing             = textVisualModel->GetCharacterSpacing();
+    const float             modelCharacterSpacing        = textVisualModel->GetCharacterSpacing();
     Vector<CharacterIndex>& glyphToCharacterMap          = textVisualModel->mGlyphsToCharacters;
     const CharacterIndex*   glyphToCharacterMapBuffer    = glyphToCharacterMap.Begin();
     float                   calculatedAdvance            = 0.f;
+
+    // Get the character-spacing runs.
+    const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = textVisualModel->GetCharacterSpacingGlyphRuns();
 
     Vector4   quad;
     uint32_t  numberOfQuads = 0u;
@@ -137,6 +141,8 @@ Actor CreateControllerBackgroundActor(const View& textView, const VisualModelPtr
       // Only create quads for glyphs with a background color
       if(backgroundColor != Color::TRANSPARENT)
       {
+        const float characterSpacing = GetGlyphCharacterSpacing(i, characterSpacingGlyphRuns, modelCharacterSpacing);
+
         const Vector2 position = *(positionsBuffer + i);
         calculatedAdvance      = GetCalculatedAdvance(*(textLogicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + i))), characterSpacing, glyph.advance);
 

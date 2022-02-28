@@ -329,6 +329,16 @@ public:
    */
   void GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns, StrikethroughRunIndex index, Length numberOfRuns) const override;
 
+  /**
+   * @copydoc ModelInterface::GetNumberOfCharacterSpacingGlyphRuns()
+   */
+  Length GetNumberOfCharacterSpacingGlyphRuns() const override;
+
+  /**
+   * @copydoc ModelInterface::GetCharacterSpacingGlyphRuns()
+   */
+  const Vector<CharacterSpacingGlyphRun>& GetCharacterSpacingGlyphRuns() const override;
+
 private:
   const ModelInterface* const mModel;                           ///< Pointer to the text's model.
   Vector<GlyphInfo>           mElidedGlyphs;                    ///< Stores the glyphs of the elided text.

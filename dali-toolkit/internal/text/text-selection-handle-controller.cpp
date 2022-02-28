@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 #include <dali-toolkit/internal/text/text-controller-impl-event-handler.h>
 
 using namespace Dali;
@@ -108,9 +109,12 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
   const GlyphIndex        glyphStart                = *(charactersToGlyphBuffer + selectionStart);
   const Length            numberOfGlyphs            = *(glyphsPerCharacterBuffer + selectionEndMinusOne);
   const GlyphIndex        glyphEnd                  = *(charactersToGlyphBuffer + selectionEndMinusOne) + ((numberOfGlyphs > 0) ? numberOfGlyphs - 1u : 0u);
-  const float             characterSpacing          = visualModel->GetCharacterSpacing();
+  const float             modelCharacterSpacing     = visualModel->GetCharacterSpacing();
   Vector<CharacterIndex>& glyphToCharacterMap       = visualModel->mGlyphsToCharacters;
   const CharacterIndex*   glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
+
+  // Get the character-spacing runs.
+  const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = visualModel->GetCharacterSpacingGlyphRuns();
 
   // Get the lines where the glyphs are laid-out.
   const LineRun* lineRun = visualModel->mLines.Begin();
@@ -174,9 +178,10 @@ void SelectionHandleController::Reposition(Controller::Impl& impl)
   // Traverse the glyphs.
   for(GlyphIndex index = glyphStart; index <= glyphEnd; ++index)
   {
-    const GlyphInfo& glyph    = *(glyphsBuffer + index);
-    const Vector2&   position = *(positionsBuffer + index);
-    calculatedAdvance         = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + index))), characterSpacing, glyph.advance);
+    const float      characterSpacing = GetGlyphCharacterSpacing(index, characterSpacingGlyphRuns, modelCharacterSpacing);
+    const GlyphInfo& glyph            = *(glyphsBuffer + index);
+    const Vector2&   position         = *(positionsBuffer + index);
+    calculatedAdvance                 = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + index))), characterSpacing, glyph.advance);
 
     if(splitStartGlyph)
     {

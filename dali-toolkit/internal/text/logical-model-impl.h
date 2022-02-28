@@ -28,6 +28,7 @@
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
 #include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
 #include <dali-toolkit/internal/text/bounded-paragraph-run.h>
+#include <dali-toolkit/internal/text/character-spacing-character-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/embedded-item.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
@@ -197,6 +198,20 @@ public:
    */
   const Vector<BoundedParagraphRun>& GetBoundedParagraphRuns() const;
 
+  /**
+   * @brief Retrieves the number of character-spacing runs.
+   *
+   * @return The number of character-spacing runs.
+   */
+  Length GetNumberOfCharacterSpacingCharacterRuns() const;
+
+  /**
+   * @brief Retrieves the reference for character-spacing runs.
+   *
+   * @return The reference for character-spacing runs.
+   */
+  const Vector<CharacterSpacingCharacterRun>& GetCharacterSpacingCharacterRuns() const;
+
   // Embedded images
 
   /**
@@ -241,9 +256,10 @@ public:
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
   Vector<EmbeddedItem>                  mEmbeddedItems;
   Vector<Anchor>                        mAnchors;
-  Vector<UnderlinedCharacterRun>        mUnderlinedCharacterRuns;    ///< The underlined character run from markup-processor
-  Vector<StrikethroughCharacterRun>     mStrikethroughCharacterRuns; ///< The strikethrough character run from markup-processor
-  Vector<BoundedParagraphRun>           mBoundedParagraphRuns;       ///< The bounded paragraph is used to handle a paragraph mark-up tag and it's attributes. Like TextAlign, TextDirection, TextIndent, LineHeight, etc.
+  Vector<UnderlinedCharacterRun>        mUnderlinedCharacterRuns;       ///< The underlined character run from markup-processor
+  Vector<StrikethroughCharacterRun>     mStrikethroughCharacterRuns;    ///< The strikethrough character run from markup-processor
+  Vector<BoundedParagraphRun>           mBoundedParagraphRuns;          ///< The bounded paragraph is used to handle a paragraph mark-up tag and it's attributes. Like TextAlign, TextDirection, TextIndent, LineHeight, etc.
+  Vector<CharacterSpacingCharacterRun>  mCharacterSpacingCharacterRuns; ///< The character-spacing character run from markup-processor.
 
   BidirectionalLineRunIndex mBidirectionalLineIndex; ///< The last fetched bidirectional line info.
 };

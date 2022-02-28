@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 
 namespace
 {
@@ -214,7 +215,10 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
   {
     return logicalIndex;
   }
-  const float characterSpacing = visualModel->GetCharacterSpacing();
+
+  // Get the character-spacing runs.
+  const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = visualModel->GetCharacterSpacingGlyphRuns();
+  const float                             modelCharacterSpacing     = visualModel->GetCharacterSpacing();
 
   // Whether there is a hit on a line.
   bool matchedLine = false;
@@ -289,7 +293,8 @@ CharacterIndex GetClosestCursorIndex(VisualModelPtr         visualModel,
 
       // Get the metrics for the group of glyphs.
       GlyphMetrics glyphMetrics;
-      calculatedAdvance = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + firstLogicalGlyphIndex))), characterSpacing, (*(visualModel->mGlyphs.Begin() + firstLogicalGlyphIndex)).advance);
+      const float  characterSpacing = GetGlyphCharacterSpacing(firstLogicalGlyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+      calculatedAdvance             = GetCalculatedAdvance(*(logicalModel->mText.Begin() + (*(glyphToCharacterMapBuffer + firstLogicalGlyphIndex))), characterSpacing, (*(visualModel->mGlyphs.Begin() + firstLogicalGlyphIndex)).advance);
       GetGlyphsMetrics(firstLogicalGlyphIndex,
                        numberOfGlyphs,
                        glyphMetrics,
@@ -606,7 +611,9 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
     const Length* const         charactersPerGlyphBuffer = parameters.visualModel->mCharactersPerGlyph.Begin();
     const CharacterIndex* const glyphsToCharactersBuffer = parameters.visualModel->mGlyphsToCharacters.Begin();
     const Vector2* const        glyphPositionsBuffer     = parameters.visualModel->mGlyphPositions.Begin();
-    const float                 characterSpacing         = parameters.visualModel->GetCharacterSpacing();
+    const float                 modelCharacterSpacing    = parameters.visualModel->GetCharacterSpacing();
+
+    const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = parameters.visualModel->GetCharacterSpacingGlyphRuns();
 
     // Get the metrics for the group of glyphs.
     GetGlyphMetricsFromCharacterIndex(index, parameters.visualModel, parameters.logicalModel, metrics, glyphMetrics, glyphIndex, numberOfGlyphs);
@@ -723,6 +730,7 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
       const bool addGlyphAdvance = ((!isFirstPositionOfLine && !isCurrentRightToLeft) ||
                                     (isFirstPositionOfLine && !isRightToLeftParagraph));
 
+      const float characterSpacing   = GetGlyphCharacterSpacing(secondaryGlyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
       cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + (addGlyphAdvance ? (glyphMetrics.advance + characterSpacing) : 0.f);
       cursorInfo.secondaryPosition.y = cursorInfo.lineOffset + cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight;
 

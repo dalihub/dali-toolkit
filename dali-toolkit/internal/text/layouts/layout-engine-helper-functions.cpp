@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDE
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 
 namespace Dali
 {
@@ -38,12 +39,15 @@ void CalculateGlyphPositionsLTR(const VisualModelPtr&  visualModel,
                                 Vector2*               glyphPositionsBuffer,
                                 float&                 penX)
 {
-  const GlyphInfo* const glyphsBuffer     = visualModel->mGlyphs.Begin();
-  const float            characterSpacing = visualModel->GetCharacterSpacing();
-  const Character* const textBuffer       = logicalModel->mText.Begin();
+  const GlyphInfo* const glyphsBuffer          = visualModel->mGlyphs.Begin();
+  const float            modelCharacterSpacing = visualModel->GetCharacterSpacing();
+  const Character* const textBuffer            = logicalModel->mText.Begin();
 
   Vector<CharacterIndex>& glyphToCharacterMap       = visualModel->mGlyphsToCharacters;
   const CharacterIndex*   glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
+
+  // Get the character-spacing runs.
+  const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = visualModel->GetCharacterSpacingGlyphRuns();
 
   float calculatedAdvance = 0.f;
 
@@ -55,7 +59,8 @@ void CalculateGlyphPositionsLTR(const VisualModelPtr&  visualModel,
     position.x = penX + glyph.xBearing;
     position.y = -glyph.yBearing;
 
-    calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + (startIndexForGlyph + i)))), characterSpacing, glyph.advance);
+    const float characterSpacing = GetGlyphCharacterSpacing((startIndexForGlyph + i), characterSpacingGlyphRuns, modelCharacterSpacing);
+    calculatedAdvance            = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + (startIndexForGlyph + i)))), characterSpacing, glyph.advance);
     penX += (calculatedAdvance + interGlyphExtraAdvance);
   }
 }
@@ -73,7 +78,10 @@ void CalculateGlyphPositionsRTL(const VisualModelPtr&            visualModel,
   const BidirectionalLineInfoRun& bidiLine                 = logicalModel->mBidirectionalLineInfo[bidiLineIndex];
   const GlyphInfo* const          glyphsBuffer             = visualModel->mGlyphs.Begin();
   const GlyphIndex* const         charactersToGlyphsBuffer = visualModel->mCharactersToGlyph.Begin();
-  const float                     characterSpacing         = visualModel->GetCharacterSpacing();
+  const float                     modelCharacterSpacing    = visualModel->GetCharacterSpacing();
+
+  // Get the character-spacing runs.
+  const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = visualModel->GetCharacterSpacingGlyphRuns();
 
   float calculatedAdvance = 0.f;
 
@@ -86,7 +94,8 @@ void CalculateGlyphPositionsRTL(const VisualModelPtr&            visualModel,
     position.x        = penX;
     position.y        = -glyph.yBearing;
 
-    calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, glyph.advance);
+    const float characterSpacing = GetGlyphCharacterSpacing(glyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+    calculatedAdvance            = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, glyph.advance);
     penX += calculatedAdvance;
 
     ++characterLogicalIndex;
@@ -106,8 +115,11 @@ void TraversesCharactersForGlyphPositionsRTL(const VisualModelPtr&  visualModel,
 {
   const GlyphInfo* const  glyphsBuffer             = visualModel->mGlyphs.Begin();
   const GlyphIndex* const charactersToGlyphsBuffer = visualModel->mCharactersToGlyph.Begin();
-  const float             characterSpacing         = visualModel->GetCharacterSpacing();
+  const float             modelCharacterSpacing    = visualModel->GetCharacterSpacing();
   const Length* const     glyphsPerCharacterBuffer = visualModel->mGlyphsPerCharacter.Begin();
+
+  // Get the character-spacing runs.
+  const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = visualModel->GetCharacterSpacingGlyphRuns();
 
   float calculatedAdvance = 0.f;
 
@@ -133,7 +145,8 @@ void TraversesCharactersForGlyphPositionsRTL(const VisualModelPtr&  visualModel,
       position.x = penX + glyph.xBearing;
       position.y = -glyph.yBearing;
 
-      calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, glyph.advance);
+      const float characterSpacing = GetGlyphCharacterSpacing(glyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+      calculatedAdvance            = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, glyph.advance);
       penX += (calculatedAdvance + interGlyphExtraAdvance);
     }
   }

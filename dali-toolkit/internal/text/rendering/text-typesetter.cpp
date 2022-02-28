@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
+#include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/styles/strikethrough-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/styles/underline-helper-functions.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
@@ -877,9 +878,12 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       }
     }
 
-    const bool  underlineEnabled     = mModel->IsUnderlineEnabled();
-    const bool  strikethroughEnabled = mModel->IsStrikethroughEnabled();
-    const float characterSpacing     = mModel->GetCharacterSpacing();
+    const bool  underlineEnabled      = mModel->IsUnderlineEnabled();
+    const bool  strikethroughEnabled  = mModel->IsStrikethroughEnabled();
+    const float modelCharacterSpacing = mModel->GetCharacterSpacing();
+
+    // Get the character-spacing runs.
+    const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = mModel->GetCharacterSpacingGlyphRuns();
 
     // Aggregate underline-style-properties from mModel
     const UnderlineStyleProperties modelUnderlineProperties{mModel->GetUnderlineType(),
@@ -1024,10 +1028,11 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
 
       if(addHyphen)
       {
-        GlyphInfo tempInfo = *(glyphsBuffer + elidedGlyphIndex);
-        calculatedAdvance  = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + elidedGlyphIndex))), characterSpacing, tempInfo.advance);
-        position.x         = position.x + calculatedAdvance - tempInfo.xBearing + glyphInfo->xBearing;
-        position.y         = -glyphInfo->yBearing;
+        GlyphInfo   tempInfo         = *(glyphsBuffer + elidedGlyphIndex);
+        const float characterSpacing = GetGlyphCharacterSpacing(glyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+        calculatedAdvance            = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + elidedGlyphIndex))), characterSpacing, tempInfo.advance);
+        position.x                   = position.x + calculatedAdvance - tempInfo.xBearing + glyphInfo->xBearing;
+        position.y                   = -glyphInfo->yBearing;
       }
 
       if(baseline < position.y + glyphInfo->yBearing)

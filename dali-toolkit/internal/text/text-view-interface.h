@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/bounded-paragraph-run.h>
+#include <dali-toolkit/internal/text/character-spacing-glyph-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 #include <dali-toolkit/internal/text/underlined-glyph-run.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
@@ -336,6 +337,20 @@ public:
    * @return The reference for bounded paragraph runs.
    */
   virtual const Vector<BoundedParagraphRun>& GetBoundedParagraphRuns() const = 0;
+
+  /**
+   * @brief Retrieves the number of character-spacing glyph runs.
+   *
+   * @return The number of character-spacing glyph runs.
+   */
+  virtual Length GetNumberOfCharacterSpacingGlyphRuns() const = 0;
+
+  /**
+   * @brief Retrieves the reference for character-spacing glyph runs.
+   *
+   * @return The reference for character-spacing glyph runs.
+   */
+  virtual const Vector<CharacterSpacingGlyphRun>& GetCharacterSpacingGlyphRuns() const = 0;
 
   /**
    * @brief Retrieves the strikethrough runs.

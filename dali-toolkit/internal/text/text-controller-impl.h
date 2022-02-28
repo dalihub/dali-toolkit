@@ -961,6 +961,12 @@ private:
    */
   void CopyStrikethroughFromLogicalToVisualModels();
 
+  /**
+   * @brief Copy CharacterSpacing-Character-Runs from Logical-Model to CharacterSpacing-Glyph-Runs in Visual-Model
+   *
+   */
+  void CopyCharacterSpacingFromLogicalToVisualModels();
+
 public:
   ControlInterface*            mControlInterface;           ///< Reference to the text controller.
   EditableControlInterface*    mEditableControlInterface;   ///< Reference to the editable text controller.

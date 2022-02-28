@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/markup-processor-anchor.h>
 #include <dali-toolkit/internal/text/markup-processor-background.h>
+#include <dali-toolkit/internal/text/markup-processor-character-spacing.h>
 #include <dali-toolkit/internal/text/markup-processor-color.h>
 #include <dali-toolkit/internal/text/markup-processor-embedded-item.h>
 #include <dali-toolkit/internal/text/markup-processor-font.h>
@@ -62,6 +63,7 @@ const std::string XHTML_BACKGROUND_TAG("background");
 const std::string XHTML_SPAN_TAG("span");
 const std::string XHTML_STRIKETHROUGH_TAG("s");
 const std::string XHTML_PARAGRAPH_TAG("p");
+const std::string XHTML_CHARACTER_SPACING_TAG("char-spacing");
 
 const char LESS_THAN      = '<';
 const char GREATER_THAN   = '>';
@@ -237,6 +239,18 @@ void Initialize(BoundedParagraphRun& boundedParagraphRun)
 {
   boundedParagraphRun.characterRun.characterIndex     = 0u;
   boundedParagraphRun.characterRun.numberOfCharacters = 0u;
+}
+
+/**
+ * @brief Initializes a character-spacing run to its defaults.
+ *
+ * @param[in,out] characterSpacingCharacterRun The character-spacing run to initialize.
+ */
+void Initialize(CharacterSpacingCharacterRun& characterSpacingCharacterRun)
+{
+  characterSpacingCharacterRun.characterRun.characterIndex     = 0u;
+  characterSpacingCharacterRun.characterRun.numberOfCharacters = 0u;
+  characterSpacingCharacterRun.value                           = 0.0f;
 }
 
 /**
@@ -893,6 +907,7 @@ void ProcessSpanForRun(
  * @param[in] strikethroughCharacterRunIndex The strikethroughed character run index
  * @param[in] backgroundRunIndex The background run index
  * @param[in] boundedParagraphRunIndex The bounded paragraph run index
+ * @param[in] characterSpacingCharacterRunIndex The character-spacing character run index
  *
  */
 void ResizeModelVectors(MarkupProcessData& markupProcessData,
@@ -901,7 +916,8 @@ void ResizeModelVectors(MarkupProcessData& markupProcessData,
                         const RunIndex     underlinedCharacterRunIndex,
                         const RunIndex     strikethroughCharacterRunIndex,
                         const RunIndex     backgroundRunIndex,
-                        const RunIndex     boundedParagraphRunIndex)
+                        const RunIndex     boundedParagraphRunIndex,
+                        const RunIndex     characterSpacingCharacterRunIndex)
 {
   markupProcessData.fontRuns.Resize(fontRunIndex);
   markupProcessData.colorRuns.Resize(colorRunIndex);
@@ -909,6 +925,7 @@ void ResizeModelVectors(MarkupProcessData& markupProcessData,
   markupProcessData.strikethroughCharacterRuns.Resize(strikethroughCharacterRunIndex);
   markupProcessData.backgroundColorRuns.Resize(backgroundRunIndex);
   markupProcessData.boundedParagraphRuns.Resize(boundedParagraphRunIndex);
+  markupProcessData.characterSpacingCharacterRuns.Resize(characterSpacingCharacterRunIndex);
 
 #ifdef DEBUG_ENABLED
   for(unsigned int i = 0; i < colorRunIndex; ++i)
@@ -1028,23 +1045,25 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   StyleStack<Span> spanStack;
 
   // Points the next free position in the vector of runs.
-  RunIndex colorRunIndex                  = 0u;
-  RunIndex fontRunIndex                   = 0u;
-  RunIndex underlinedCharacterRunIndex    = 0u;
-  RunIndex backgroundRunIndex             = 0u;
-  RunIndex strikethroughCharacterRunIndex = 0u;
-  RunIndex boundedParagraphRunIndex       = 0u;
+  RunIndex colorRunIndex                     = 0u;
+  RunIndex fontRunIndex                      = 0u;
+  RunIndex underlinedCharacterRunIndex       = 0u;
+  RunIndex backgroundRunIndex                = 0u;
+  RunIndex strikethroughCharacterRunIndex    = 0u;
+  RunIndex boundedParagraphRunIndex          = 0u;
+  RunIndex characterSpacingCharacterRunIndex = 0u;
 
   // check tag reference
-  int colorTagReference      = 0u;
-  int fontTagReference       = 0u;
-  int iTagReference          = 0u;
-  int bTagReference          = 0u;
-  int uTagReference          = 0u;
-  int backgroundTagReference = 0u;
-  int spanTagReference       = 0u;
-  int sTagReference          = 0u;
-  int pTagReference          = 0u;
+  int colorTagReference            = 0u;
+  int fontTagReference             = 0u;
+  int iTagReference                = 0u;
+  int bTagReference                = 0u;
+  int uTagReference                = 0u;
+  int backgroundTagReference       = 0u;
+  int spanTagReference             = 0u;
+  int sTagReference                = 0u;
+  int pTagReference                = 0u;
+  int characterSpacingTagReference = 0u;
 
   // Give an initial default value to the model's vectors.
   markupProcessData.colorRuns.Reserve(DEFAULT_VECTOR_SIZE);
@@ -1052,6 +1071,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   markupProcessData.underlinedCharacterRuns.Reserve(DEFAULT_VECTOR_SIZE);
   markupProcessData.backgroundColorRuns.Reserve(DEFAULT_VECTOR_SIZE);
   markupProcessData.strikethroughCharacterRuns.Reserve(DEFAULT_VECTOR_SIZE);
+  markupProcessData.characterSpacingCharacterRuns.Reserve(DEFAULT_VECTOR_SIZE);
 
   // Get the mark-up string buffer.
   const char*       markupStringBuffer    = markupString.c_str();
@@ -1167,6 +1187,11 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
         ProcessTagForRun<BoundedParagraphRun>(
           markupProcessData.boundedParagraphRuns, styleStack, tag, characterIndex, boundedParagraphRunIndex, pTagReference, [](const Tag& tag, BoundedParagraphRun& run) { ProcessAttributesOfParagraphTag(tag, run); });
       } // <p></p>
+      else if(TokenComparison(XHTML_CHARACTER_SPACING_TAG, tag.buffer, tag.length))
+      {
+        ProcessTagForRun<CharacterSpacingCharacterRun>(
+          markupProcessData.characterSpacingCharacterRuns, styleStack, tag, characterIndex, characterSpacingCharacterRunIndex, characterSpacingTagReference, [](const Tag& tag, CharacterSpacingCharacterRun& run) { ProcessCharacterSpacingTag(tag, run); });
+      } // <char-spacing></char-spacing>
     }   // end if( IsTag() )
     else if(markupStringBuffer < markupStringEndBuffer)
     {
@@ -1175,7 +1200,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   }
 
   // Resize the model's vectors.
-  ResizeModelVectors(markupProcessData, fontRunIndex, colorRunIndex, underlinedCharacterRunIndex, strikethroughCharacterRunIndex, backgroundRunIndex, boundedParagraphRunIndex);
+  ResizeModelVectors(markupProcessData, fontRunIndex, colorRunIndex, underlinedCharacterRunIndex, strikethroughCharacterRunIndex, backgroundRunIndex, boundedParagraphRunIndex, characterSpacingCharacterRunIndex);
 
   // Handle the nested tags
   OverrideNestedUnderlinedCharacterRuns(markupProcessData.underlinedCharacterRuns);

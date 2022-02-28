@@ -30,6 +30,7 @@
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine-helper-functions.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
+#include <dali-toolkit/internal/text/rendering/styles/character-spacing-helper-functions.h>
 
 namespace Dali
 {
@@ -299,7 +300,10 @@ struct Engine::Impl
 
     const float      outlineWidth                = static_cast<float>(parameters.textModel->GetOutlineWidth());
     const GlyphIndex lastGlyphOfParagraphPlusOne = parameters.startGlyphIndex + parameters.numberOfGlyphs;
-    const float      characterSpacing            = parameters.textModel->mVisualModel->GetCharacterSpacing();
+    const float      modelCharacterSpacing       = parameters.textModel->mVisualModel->GetCharacterSpacing();
+
+    // Get the character-spacing runs.
+    const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = parameters.textModel->mVisualModel->GetCharacterSpacingGlyphRuns();
 
     CharacterIndex characterLogicalIndex = 0u;
     CharacterIndex characterVisualIndex  = 0u;
@@ -330,7 +334,8 @@ struct Engine::Impl
         {
           const GlyphInfo& glyphInfo = *(glyphsBuffer + *(charactersToGlyphsBuffer + characterVisualIndex));
 
-          calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, glyphInfo.advance);
+          const float characterSpacing = GetGlyphCharacterSpacing(characterVisualIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+          calculatedAdvance            = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, glyphInfo.advance);
           whiteSpaceLengthEndOfLine += calculatedAdvance;
 
           ++characterLogicalIndex;
@@ -352,7 +357,8 @@ struct Engine::Impl
         {
           const GlyphInfo& glyphInfo = *(glyphsBuffer + *(charactersToGlyphsBuffer + characterVisualIndex));
 
-          calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, glyphInfo.advance);
+          const float characterSpacing = GetGlyphCharacterSpacing(characterVisualIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+          calculatedAdvance            = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, glyphInfo.advance);
           whiteSpaceLengthEndOfLine += calculatedAdvance;
 
           ++characterLogicalIndex;
@@ -370,7 +376,8 @@ struct Engine::Impl
                                                                   charactersPerGlyphBuffer);
 
     GlyphMetrics glyphMetrics;
-    calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
+    const float  characterSpacing = GetGlyphCharacterSpacing(glyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+    calculatedAdvance             = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
     GetGlyphsMetrics(glyphIndex,
                      numberOfGLyphsInGroup,
                      glyphMetrics,
@@ -401,7 +408,8 @@ struct Engine::Impl
         characterLogicalIndex += *(charactersPerGlyphBuffer + glyphIndex + numberOfGLyphsInGroup - 1u);
 
         GlyphMetrics glyphMetrics;
-        calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
+        const float  characterSpacing = GetGlyphCharacterSpacing(glyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+        calculatedAdvance             = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
         GetGlyphsMetrics(glyphIndex,
                          numberOfGLyphsInGroup,
                          glyphMetrics,
@@ -463,7 +471,8 @@ struct Engine::Impl
       characterLogicalIndex += *(charactersPerGlyphBuffer + glyphIndex + numberOfGLyphsInGroup - 1u);
 
       GlyphMetrics glyphMetrics;
-      calculatedAdvance = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
+      const float  characterSpacing = GetGlyphCharacterSpacing(glyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+      calculatedAdvance             = GetCalculatedAdvance(*(textBuffer + characterVisualIndex), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
       GetGlyphsMetrics(glyphIndex,
                        numberOfGLyphsInGroup,
                        glyphMetrics,
@@ -700,13 +709,17 @@ struct Engine::Impl
 
     bool isSecondHalf = false;
     // Character Spacing
-    const float             characterSpacing          = parameters.textModel->mVisualModel->GetCharacterSpacing();
+    const float             modelCharacterSpacing     = parameters.textModel->mVisualModel->GetCharacterSpacing();
     float                   calculatedAdvance         = 0.f;
     Vector<CharacterIndex>& glyphToCharacterMap       = parameters.textModel->mVisualModel->mGlyphsToCharacters;
     const CharacterIndex*   glyphToCharacterMapBuffer = glyphToCharacterMap.Begin();
 
+    // Get the character-spacing runs.
+    const Vector<CharacterSpacingGlyphRun>& characterSpacingGlyphRuns = parameters.textModel->mVisualModel->GetCharacterSpacingGlyphRuns();
+
     GlyphMetrics glyphMetrics;
-    calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + lineLayout.glyphIndex))), characterSpacing, (*(glyphsBuffer + lineLayout.glyphIndex)).advance);
+    const float  characterSpacing = GetGlyphCharacterSpacing(lineLayout.glyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+    calculatedAdvance             = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + lineLayout.glyphIndex))), characterSpacing, (*(glyphsBuffer + lineLayout.glyphIndex)).advance);
     GetGlyphsMetrics(lineLayout.glyphIndex,
                      numberOfGLyphsInGroup,
                      glyphMetrics,
@@ -747,7 +760,8 @@ struct Engine::Impl
                                                                     charactersPerGlyphBuffer);
 
       GlyphMetrics glyphMetrics;
-      calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + glyphIndex))), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
+      const float  characterSpacing = GetGlyphCharacterSpacing(glyphIndex, characterSpacingGlyphRuns, modelCharacterSpacing);
+      calculatedAdvance             = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + glyphIndex))), characterSpacing, (*(glyphsBuffer + glyphIndex)).advance);
       GetGlyphsMetrics(glyphIndex,
                        numberOfGLyphsInGroup,
                        glyphMetrics,
@@ -847,7 +861,8 @@ struct Engine::Impl
         while(tmpLineLayout.length + tmpLineLayout.whiteSpaceLengthEndOfLine > targetWidth && glyphIndexToRemove < glyphIndex)
         {
           GlyphMetrics glyphMetrics;
-          calculatedAdvance = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + glyphIndexToRemove))), characterSpacing, (*(glyphsBuffer + glyphIndexToRemove)).advance);
+          const float  characterSpacing = GetGlyphCharacterSpacing(glyphIndexToRemove, characterSpacingGlyphRuns, modelCharacterSpacing);
+          calculatedAdvance             = GetCalculatedAdvance(*(textBuffer + (*(glyphToCharacterMapBuffer + glyphIndexToRemove))), characterSpacing, (*(glyphsBuffer + glyphIndexToRemove)).advance);
           GetGlyphsMetrics(glyphIndexToRemove,
                            numberOfGLyphsInGroup,
                            glyphMetrics,

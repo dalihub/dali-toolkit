@@ -345,6 +345,13 @@ void LogicalModel::UpdateTextStyleRuns(CharacterIndex index, int numberOfCharact
                                            totalNumberOfCharacters,
                                            mBoundedParagraphRuns,
                                            removedBoundedParagraphRuns);
+
+  Vector<CharacterSpacingCharacterRun> removedCharacterSpacingCharacterRuns;
+  UpdateCharacterRuns<CharacterSpacingCharacterRun>(index,
+                                                    numberOfCharacters,
+                                                    totalNumberOfCharacters,
+                                                    mCharacterSpacingCharacterRuns,
+                                                    removedCharacterSpacingCharacterRuns);
 }
 
 void LogicalModel::RetrieveStyle(CharacterIndex index, InputStyle& style)
@@ -622,6 +629,16 @@ Length LogicalModel::GetNumberOfBoundedParagraphRuns() const
 const Vector<BoundedParagraphRun>& LogicalModel::GetBoundedParagraphRuns() const
 {
   return mBoundedParagraphRuns;
+}
+
+Length LogicalModel::GetNumberOfCharacterSpacingCharacterRuns() const
+{
+  return mCharacterSpacingCharacterRuns.Count();
+}
+
+const Vector<CharacterSpacingCharacterRun>& LogicalModel::GetCharacterSpacingCharacterRuns() const
+{
+  return mCharacterSpacingCharacterRuns;
 }
 
 void LogicalModel::ClearEmbeddedImages()

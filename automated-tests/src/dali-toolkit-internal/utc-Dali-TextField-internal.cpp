@@ -1236,3 +1236,58 @@ int UtcDaliTextFieldMarkupStrikethroughNoEndTag(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldMarkupCharacterSpacingTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldMarkupCharacterSpacingTag ");
+
+  const Length EXPECTED_NUMBER_OF_GLYPHS = 21u;
+
+  const float expandedCharSpacing  = 10.0f;
+  const float condensedCharSpacing = -5.0f;
+
+  TextField textField = TextField::New();
+
+  textField.SetProperty(TextField::Property::TEXT, "ABC EF\n<char-spacing value='-5.0f'>ABC EF\n</char-spacing><char-spacing value='10.0f'>ABC EF\n</char-spacing>");
+  textField.SetProperty(TextField ::Property::ENABLE_MARKUP, true);
+
+  application.GetScene().Add(textField);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextField& textFieldImpl = GetImpl(textField);
+  Text::ViewInterface&          view          = textFieldImpl.GetTextController()->GetView();
+
+  Length numberOfGlyphs = view.GetNumberOfGlyphs();
+
+  DALI_TEST_EQUALS(numberOfGlyphs, EXPECTED_NUMBER_OF_GLYPHS, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  Vector<GlyphInfo> glyphs;
+  glyphs.Resize(numberOfGlyphs);
+
+  Vector<Vector2> positions;
+  positions.Resize(numberOfGlyphs);
+
+  float alignmentOffset = 0u;
+  numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
+                                  positions.Begin(),
+                                  alignmentOffset,
+                                  0u,
+                                  numberOfGlyphs);
+
+  const Length numberOfGlyphsOneLine = 7u;
+  for(Length i = 0; i < numberOfGlyphsOneLine - 1u; i++)
+  {
+    float diffLineNoCharSpacing = positions[i + 1].x - positions[i].x;
+
+    float diffLineCondensedCharSpacing = positions[numberOfGlyphsOneLine + i + 1].x - positions[numberOfGlyphsOneLine + i].x;
+    DALI_TEST_EQUALS(diffLineCondensedCharSpacing, diffLineNoCharSpacing + condensedCharSpacing, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+    float diffLineExpandedCharSpacing = positions[2u * numberOfGlyphsOneLine + i + 1].x - positions[2u * numberOfGlyphsOneLine + i].x;
+    DALI_TEST_EQUALS(diffLineExpandedCharSpacing, diffLineNoCharSpacing + expandedCharSpacing, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
