@@ -824,6 +824,21 @@ void View::GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns,
   }
 }
 
+Length View::GetNumberOfBoundedParagraphRuns() const
+{
+  if(mImpl->mLogicalModel)
+  {
+    return mImpl->mLogicalModel->GetNumberOfBoundedParagraphRuns();
+  }
+
+  return 0u;
+}
+
+const Vector<BoundedParagraphRun>& View::GetBoundedParagraphRuns() const
+{
+  return mImpl->mLogicalModel->GetBoundedParagraphRuns();
+}
+
 const float View::GetCharacterSpacing() const
 {
   return (mImpl->mVisualModel) ? mImpl->mVisualModel->GetCharacterSpacing() : 0.f;

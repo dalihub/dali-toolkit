@@ -262,7 +262,7 @@ void GradientVisual::OnInitialize()
     mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
   }
 
-  mImpl->mRenderer.RegisterProperty(UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform);
+  mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform);
 
   //Register transform properties
   mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);

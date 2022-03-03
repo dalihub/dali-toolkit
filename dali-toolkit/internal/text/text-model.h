@@ -22,6 +22,7 @@
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/bounded-paragraph-run.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
@@ -301,6 +302,16 @@ public:
    * @copydoc ModelInterface::GetStrikethroughRuns()
    */
   void GetStrikethroughRuns(StrikethroughGlyphRun* strikethroughRuns, StrikethroughRunIndex index, Length numberOfRuns) const override;
+
+  /**
+   * @copydoc ModelInterface::GetNumberOfBoundedParagraphRuns()
+   */
+  virtual Length GetNumberOfBoundedParagraphRuns() const override;
+
+  /**
+   * @copydoc ModelInterface::GetBoundedParagraphRuns()
+   */
+  virtual const Vector<BoundedParagraphRun>& GetBoundedParagraphRuns() const override;
 
 private: // Private contructors & copy operator.
   /**

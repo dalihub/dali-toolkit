@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -464,8 +464,8 @@ Controller::UpdateTextType Controller::Relayouter::Relayout(Controller& controll
       if(EventData::IsEditingState(impl.mEventData->mState))
       {
         impl.mEventData->mScrollAfterUpdatePosition = true;
-        impl.mEventData->mUpdateCursorPosition = true;
-        impl.mEventData->mUpdateGrabHandlePosition = true;
+        impl.mEventData->mUpdateCursorPosition      = true;
+        impl.mEventData->mUpdateGrabHandlePosition  = true;
       }
       else if(impl.mEventData->mState == EventData::SELECTING)
       {
@@ -627,21 +627,51 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
 
   if(NO_OPERATION != (ALIGN & operations))
   {
-    // The laid-out lines.
-    Vector<LineRun>& lines = visualModel->mLines;
+    DoRelayoutHorizontalAlignment(impl, size, startIndex, requestedNumberOfCharacters);
+    viewUpdated = true;
+  }
+#if defined(DEBUG_ENABLED)
+  std::string currentText;
+  impl.GetText(currentText);
+  DALI_LOG_INFO(gLogFilter, Debug::Concise, "Controller::Relayouter::DoRelayout [%p] mImpl->mIsTextDirectionRTL[%s] [%s]\n", &impl, (impl.mIsTextDirectionRTL) ? "true" : "false", currentText.c_str());
+#endif
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::Relayouter::DoRelayout, view updated %s\n", (viewUpdated ? "true" : "false"));
+  return viewUpdated;
+}
 
-    CharacterIndex alignStartIndex                  = startIndex;
-    Length         alignRequestedNumberOfCharacters = requestedNumberOfCharacters;
+void Controller::Relayouter::DoRelayoutHorizontalAlignment(Controller::Impl&    impl,
+                                                           const Size&          size,
+                                                           const CharacterIndex startIndex,
+                                                           const Length         requestedNumberOfCharacters)
+{
+  // The visualModel
+  VisualModelPtr& visualModel = impl.mModel->mVisualModel;
 
-    // the whole text needs to be full aligned.
-    // If you do not do a full aligned, only the last line of the multiline input is aligned.
-    if(impl.mEventData && impl.mEventData->mUpdateAlignment)
-    {
-      alignStartIndex                   = 0u;
-      alignRequestedNumberOfCharacters  = impl.mModel->mLogicalModel->mText.Count();
-      impl.mEventData->mUpdateAlignment = false;
-    }
+  // The laid-out lines.
+  Vector<LineRun>& lines = visualModel->mLines;
 
+  CharacterIndex alignStartIndex                  = startIndex;
+  Length         alignRequestedNumberOfCharacters = requestedNumberOfCharacters;
+
+  // the whole text needs to be full aligned.
+  // If you do not do a full aligned, only the last line of the multiline input is aligned.
+  if(impl.mEventData && impl.mEventData->mUpdateAlignment)
+  {
+    alignStartIndex                   = 0u;
+    alignRequestedNumberOfCharacters  = impl.mModel->mLogicalModel->mText.Count();
+    impl.mEventData->mUpdateAlignment = false;
+  }
+
+  // If there is no BoundedParagraphRuns then apply the alignment of controller.
+  // Check whether the layout is single line. It's needed to apply one alignment for single-line.
+  // In single-line layout case we need to check whether to follow the alignment of controller or the first BoundedParagraph.
+  // Apply BoundedParagraph's alignment if and only if there is one BoundedParagraph contains all characters. Otherwise follow controller's alignment.
+  const bool isFollowControllerAlignment = ((impl.mModel->GetNumberOfBoundedParagraphRuns() == 0u) ||
+                                            ((Layout::Engine::SINGLE_LINE_BOX == impl.mLayoutEngine.GetLayout()) &&
+                                             (impl.mModel->GetBoundedParagraphRuns()[0].characterRun.numberOfCharacters != impl.mModel->mLogicalModel->mText.Count())));
+
+  if(isFollowControllerAlignment)
+  {
     // Need to align with the control's size as the text may contain lines
     // starting either with left to right text or right to left.
     impl.mLayoutEngine.Align(size,
@@ -652,16 +682,91 @@ bool Controller::Relayouter::DoRelayout(Controller::Impl& impl, const Size& size
                              impl.mModel->mAlignmentOffset,
                              impl.mLayoutDirection,
                              (impl.mModel->mMatchLayoutDirection != DevelText::MatchLayoutDirection::CONTENTS));
-
-    viewUpdated = true;
   }
-#if defined(DEBUG_ENABLED)
-  std::string currentText;
-  impl.GetText(currentText);
-  DALI_LOG_INFO(gLogFilter, Debug::Concise, "Controller::Relayouter::DoRelayout [%p] mImpl->mIsTextDirectionRTL[%s] [%s]\n", &impl, (impl.mIsTextDirectionRTL) ? "true" : "false", currentText.c_str());
-#endif
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "<--Controller::Relayouter::DoRelayout, view updated %s\n", (viewUpdated ? "true" : "false"));
-  return viewUpdated;
+  else
+  {
+    //Override the controller horizontal-alignment by horizontal-alignment of bounded paragraph.
+    const Length&                      numberOfBoundedParagraphRuns = impl.mModel->GetNumberOfBoundedParagraphRuns();
+    const Vector<BoundedParagraphRun>& boundedParagraphRuns         = impl.mModel->GetBoundedParagraphRuns();
+    const CharacterIndex               alignEndIndex                = alignStartIndex + alignRequestedNumberOfCharacters - 1u;
+
+    Length alignIndex               = alignStartIndex;
+    Length boundedParagraphRunIndex = 0u;
+
+    while(alignIndex <= alignEndIndex && boundedParagraphRunIndex < numberOfBoundedParagraphRuns)
+    {
+      //BP: BoundedParagraph
+      const BoundedParagraphRun& boundedParagraphRun   = boundedParagraphRuns[boundedParagraphRunIndex];
+      const CharacterIndex&      characterStartIndexBP = boundedParagraphRun.characterRun.characterIndex;
+      const Length&              numberOfCharactersBP  = boundedParagraphRun.characterRun.numberOfCharacters;
+      const CharacterIndex       characterEndIndexBP   = characterStartIndexBP + numberOfCharactersBP - 1u;
+
+      CharacterIndex                  decidedAlignStartIndex         = alignIndex;
+      Length                          decidedAlignNumberOfCharacters = alignEndIndex - alignIndex + 1u;
+      Text::HorizontalAlignment::Type decidedHorizontalAlignment     = impl.mModel->mHorizontalAlignment;
+
+      /*
+         * Shortcuts to explain indexes cases:
+         *
+         * AS: Alignment Start Index
+         * AE: Alignment End Index
+         * PS: Paragraph Start Index
+         * PE: Paragraph End Index
+         * B: BoundedParagraph Alignment
+         * M: Model Alignment
+         *
+         */
+
+      if(alignIndex < characterStartIndexBP && characterStartIndexBP <= alignEndIndex) /// AS.MMMMMM.PS--------AE
+      {
+        // Alignment from "Alignment Start Index" to index before "Paragraph Start Index" according to "Model Alignment"
+        decidedAlignStartIndex         = alignIndex;
+        decidedAlignNumberOfCharacters = characterStartIndexBP - alignIndex;
+        decidedHorizontalAlignment     = impl.mModel->mHorizontalAlignment;
+
+        // Need to re-heck the case of current bounded paragraph
+        alignIndex = characterStartIndexBP; // Shift AS to be PS
+      }
+      else if((characterStartIndexBP <= alignIndex && alignIndex <= characterEndIndexBP) ||     /// ---PS.BBBBBBB.AS.BBBBBBB.PE---
+              (characterStartIndexBP <= alignEndIndex && alignEndIndex <= characterEndIndexBP)) /// ---PS.BBBBBB.AE.BBBBBBB.PE---
+      {
+        // Alignment from "Paragraph Start Index" to "Paragraph End Index" according to "BoundedParagraph Alignment"
+        decidedAlignStartIndex         = characterStartIndexBP;
+        decidedAlignNumberOfCharacters = numberOfCharactersBP;
+        decidedHorizontalAlignment     = boundedParagraphRun.horizontalAlignmentDefined ? boundedParagraphRun.horizontalAlignment : impl.mModel->mHorizontalAlignment;
+
+        alignIndex = characterEndIndexBP + 1u; // Shift AS to be after PE direct
+        boundedParagraphRunIndex++;            // Align then check the case of next bounded paragraph
+      }
+      else
+      {
+        boundedParagraphRunIndex++; // Check the case of next bounded paragraph
+        continue;
+      }
+
+      impl.mLayoutEngine.Align(size,
+                               decidedAlignStartIndex,
+                               decidedAlignNumberOfCharacters,
+                               decidedHorizontalAlignment,
+                               lines,
+                               impl.mModel->mAlignmentOffset,
+                               impl.mLayoutDirection,
+                               (impl.mModel->mMatchLayoutDirection != DevelText::MatchLayoutDirection::CONTENTS));
+    }
+
+    //Align the remaining that is not aligned
+    if(alignIndex <= alignEndIndex)
+    {
+      impl.mLayoutEngine.Align(size,
+                               alignIndex,
+                               (alignEndIndex - alignIndex + 1u),
+                               impl.mModel->mHorizontalAlignment,
+                               lines,
+                               impl.mModel->mAlignmentOffset,
+                               impl.mLayoutDirection,
+                               (impl.mModel->mMatchLayoutDirection != DevelText::MatchLayoutDirection::CONTENTS));
+    }
+  }
 }
 
 void Controller::Relayouter::CalculateVerticalOffset(Controller& controller, const Size& controlSize)

@@ -177,7 +177,8 @@ void ShapeTextPreprocess(const RendererParameters& textParameters, TextAbstracti
                                       textModel->mLogicalModel->mAnchors,
                                       textModel->mLogicalModel->mUnderlinedCharacterRuns,
                                       textModel->mLogicalModel->mBackgroundColorRuns,
-                                      textModel->mLogicalModel->mStrikethroughCharacterRuns);
+                                      textModel->mLogicalModel->mStrikethroughCharacterRuns,
+                                      textModel->mLogicalModel->mBoundedParagraphRuns);
 
   if(textParameters.markupEnabled)
   {

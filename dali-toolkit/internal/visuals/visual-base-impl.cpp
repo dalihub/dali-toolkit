@@ -830,7 +830,9 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key)
         // Leave keyIndex as INVALID_KEY - it can still be registered against the string key.
       }
       Property::Value value = shader.GetProperty(index);
-      index                 = mImpl->mRenderer.RegisterProperty(keyIndex, keyName, value);
+
+      // We already know that mRenderer didn't have property. So we can assume that it is unique.
+      index = mImpl->mRenderer.RegisterUniqueProperty(keyIndex, keyName, value);
     }
   }
   return index;

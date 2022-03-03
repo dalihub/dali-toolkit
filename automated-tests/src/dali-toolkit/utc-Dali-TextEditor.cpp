@@ -1920,7 +1920,7 @@ int utcDaliTextEditorEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Actor layer = editor.GetChildAt(1u);
+  Actor layer = editor.GetChildAt(2u);
   DALI_TEST_EQUALS(layer.GetChildCount(), 1u, TEST_LOCATION); // The cursor.
   DALI_TEST_EQUALS(stencil.GetChildCount(), 0u, TEST_LOCATION);
 
@@ -1934,7 +1934,7 @@ int utcDaliTextEditorEvent02(void)
 
   // Checks the cursor and the renderer have been created.
   DALI_TEST_EQUALS(layer.GetChildCount(), 1u, TEST_LOCATION);   // The cursor.
-  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION); // The renderer
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 2u, TEST_LOCATION); // The renderer, clipped cursor
 
   Control cursor = Control::DownCast(layer.GetChildAt(0u));
   DALI_TEST_CHECK(cursor);
@@ -2011,8 +2011,8 @@ int utcDaliTextEditorEvent02(void)
 
   DALI_TEST_EQUALS(position2, position6, TEST_LOCATION); // Should be in the same position2.
 
-  // Should not be a renderer.
-  DALI_TEST_EQUALS(stencil.GetChildCount(), 0u, TEST_LOCATION);
+  // Should not be a renderer, there is only a clipped cursor.
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2830,7 +2830,7 @@ int utcDaliTextEditorHandles(void)
   Actor activeLayer = editor.GetChildAt(1u);
 
   // Get the handle's actor.
-  Actor handle = activeLayer.GetChildAt(1u);
+  Actor handle = activeLayer.GetChildAt(0u);
   handle.SetProperty(Actor::Property::SIZE, Vector2(100.f, 100.f));
 
   // Render and notify
@@ -5742,6 +5742,45 @@ int UtcDaliTextEditorCharacterSpacing(void)
   textEditor.SetProperty(TextEditor::Property::TEXT, "Hi Experiment");
   textEditor.SetProperty(DevelTextEditor::Property::CHARACTER_SPACING, 10.f);
   DALI_TEST_EQUALS(textEditor.GetProperty<float>(DevelTextEditor::Property::CHARACTER_SPACING), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTexteditorParagraphTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTexteditorParagraphTag");
+  TextEditor editorNewlineSeparator = TextEditor::New();
+  TextEditor editorParagraphTag     = TextEditor::New();
+  DALI_TEST_CHECK(editorNewlineSeparator);
+  DALI_TEST_CHECK(editorParagraphTag);
+
+  application.GetScene().Add(editorNewlineSeparator);
+  application.GetScene().Add(editorParagraphTag);
+
+  //Same utterance uses new-line to split paragraphs should give similar results for paragraph tag.
+  editorNewlineSeparator.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  editorNewlineSeparator.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  editorNewlineSeparator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editorNewlineSeparator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editorNewlineSeparator.SetProperty(TextEditor::Property::TEXT, "test paragraph tag \ntest paragraph tag \ntest paragraph tag ");
+
+  editorParagraphTag.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
+  editorParagraphTag.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  editorParagraphTag.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  editorParagraphTag.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  editorParagraphTag.SetProperty(TextEditor::Property::TEXT, "test paragraph tag <p>test paragraph tag </p>test paragraph tag ");
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 textNaturalSizeNewlineSeparator = editorNewlineSeparator.GetNaturalSize();
+  Vector3 textNaturalSizeParagraphTag     = editorParagraphTag.GetNaturalSize();
+
+  DALI_TEST_EQUALS(textNaturalSizeNewlineSeparator, textNaturalSizeParagraphTag, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();

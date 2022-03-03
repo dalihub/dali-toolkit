@@ -15,7 +15,6 @@
  *
  */
 
-#include <bits/stdint-uintn.h>
 #include <stdlib.h>
 #include <iostream>
 
@@ -522,6 +521,179 @@ int UtcDaliTextLabelMarkupStrikethroughNoEndTag(void)
   Text::Length                  numberOfStrikethroughRuns = textLabelImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
 
   DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughGlyphs, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextLabelMarkupParagraphTag(void)
+
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliTextLabelMarkupParagraphTag ");
+  TextLabel textLabel = TextLabel::New();
+
+  application.GetScene().Add(textLabel);
+
+  textLabel.SetProperty(TextLabel::Property::TEXT, "text one <p>Paragraph two</p> text three <p>Paragraph four</p> text five");
+  textLabel.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+  textLabel.SetProperty(TextLabel::Property::MULTI_LINE, true);
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t expectedNumberOfBoundedParagraphRuns = 2u;
+
+  Toolkit::Internal::TextLabel& textLabelImpl                = GetImpl(textLabel);
+  const Text::Length            numberOfBoundedParagraphRuns = textLabelImpl.GetTextController()->GetTextModel()->GetNumberOfBoundedParagraphRuns();
+  DALI_TEST_EQUALS(numberOfBoundedParagraphRuns, expectedNumberOfBoundedParagraphRuns, TEST_LOCATION);
+
+  const Vector<BoundedParagraphRun>& boundedParagraphRuns = textLabelImpl.GetTextController()->GetTextModel()->GetBoundedParagraphRuns();
+
+  //<p>Paragraph two</p>
+  DALI_TEST_EQUALS(boundedParagraphRuns[0u].characterRun.characterIndex, 10u, TEST_LOCATION);
+  DALI_TEST_EQUALS(boundedParagraphRuns[0u].characterRun.numberOfCharacters, 14u, TEST_LOCATION);
+
+  //<p>Paragraph four</p>
+  DALI_TEST_EQUALS(boundedParagraphRuns[1u].characterRun.characterIndex, 37u, TEST_LOCATION);
+  DALI_TEST_EQUALS(boundedParagraphRuns[1u].characterRun.numberOfCharacters, 15u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextLabelMarkupParagraphTagAlignAttribute(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelMarkupParagraphTagAlignAttribute ");
+
+  // Apply alignment for each type on property level on three paragraphs and in-between text.
+  // Apply align in markup on the three paragraphs (each one a type).
+  // Using the same text to gain similar results from both the property level and the markup.
+  // Compare line alignment between the property level and the markup.
+
+  std::string textAlignOnPropertyLevel = "text outside<p>Paragraph end</p>text outside<p>Paragraph center</p>text outside<p>Paragraph begin</p><p>Paragraph property alignment</p>";
+  std::string textAlignInMarkup        = "text outside<p align='end'>Paragraph end</p>text outside<p align='center'>Paragraph center</p>text outside<p align='begin' >Paragraph begin</p><p>Paragraph property alignment</p>";
+
+  //Set size to avoid automatic eliding
+  Vector2 controllerSize = Vector2(1025, 1025);
+
+  TextLabel textLabelBeginAlign  = TextLabel::New();
+  TextLabel textLabelCenterAlign = TextLabel::New();
+  TextLabel textLabelEndAlign    = TextLabel::New();
+  TextLabel textLabelMultiAlign  = TextLabel::New();
+
+  application.GetScene().Add(textLabelBeginAlign);
+  application.GetScene().Add(textLabelCenterAlign);
+  application.GetScene().Add(textLabelEndAlign);
+  application.GetScene().Add(textLabelMultiAlign);
+
+  textLabelBeginAlign.SetProperty(TextLabel::Property::TEXT, textAlignOnPropertyLevel);
+  textLabelBeginAlign.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+  textLabelBeginAlign.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  textLabelBeginAlign.SetProperty(TextLabel::Property::ELLIPSIS, false);
+  textLabelBeginAlign.SetProperty(TextLabel::Property::HORIZONTAL_ALIGNMENT, Dali::Toolkit::Text::HorizontalAlignment::BEGIN);
+  textLabelBeginAlign.SetProperty(Actor::Property::SIZE, controllerSize);
+
+  textLabelCenterAlign.SetProperty(TextLabel::Property::TEXT, textAlignOnPropertyLevel);
+  textLabelCenterAlign.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+  textLabelCenterAlign.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  textLabelCenterAlign.SetProperty(TextLabel::Property::ELLIPSIS, false);
+  textLabelCenterAlign.SetProperty(TextLabel::Property::HORIZONTAL_ALIGNMENT, Dali::Toolkit::Text::HorizontalAlignment::CENTER);
+  textLabelCenterAlign.SetProperty(Actor::Property::SIZE, controllerSize);
+
+  textLabelEndAlign.SetProperty(TextLabel::Property::TEXT, textAlignOnPropertyLevel);
+  textLabelEndAlign.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+  textLabelEndAlign.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  textLabelEndAlign.SetProperty(TextLabel::Property::ELLIPSIS, false);
+  textLabelEndAlign.SetProperty(TextLabel::Property::HORIZONTAL_ALIGNMENT, Dali::Toolkit::Text::HorizontalAlignment::END);
+  textLabelEndAlign.SetProperty(Actor::Property::SIZE, controllerSize);
+
+  textLabelMultiAlign.SetProperty(TextLabel::Property::TEXT, textAlignInMarkup);
+  textLabelMultiAlign.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+  textLabelMultiAlign.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  textLabelMultiAlign.SetProperty(TextLabel::Property::ELLIPSIS, false);
+  textLabelMultiAlign.SetProperty(TextLabel::Property::HORIZONTAL_ALIGNMENT, Dali::Toolkit::Text::HorizontalAlignment::CENTER);
+  textLabelMultiAlign.SetProperty(Actor::Property::SIZE, controllerSize);
+
+  application.SendNotification();
+  application.Render();
+
+  uint32_t expectedNumberOfBoundedParagraphRuns = 4u;
+  uint32_t expectedNumberOfLines                = 7u;
+
+  Toolkit::Internal::TextLabel& textLabelMultiAlignImpl  = GetImpl(textLabelMultiAlign);
+  Toolkit::Internal::TextLabel& textLabelBeginAlignImpl  = GetImpl(textLabelBeginAlign);
+  Toolkit::Internal::TextLabel& textLabelCenterAlignImpl = GetImpl(textLabelCenterAlign);
+  Toolkit::Internal::TextLabel& textLabelEndAlignImpl    = GetImpl(textLabelEndAlign);
+
+  const Text::Length numberOfBoundedParagraphRuns = textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetNumberOfBoundedParagraphRuns();
+  DALI_TEST_EQUALS(numberOfBoundedParagraphRuns, expectedNumberOfBoundedParagraphRuns, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetNumberOfLines(), expectedNumberOfLines, TEST_LOCATION);
+  DALI_TEST_CHECK(textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetLines());
+
+  DALI_TEST_EQUALS(textLabelBeginAlignImpl.GetTextController()->GetTextModel()->GetNumberOfLines(), expectedNumberOfLines, TEST_LOCATION);
+  DALI_TEST_CHECK(textLabelBeginAlignImpl.GetTextController()->GetTextModel()->GetLines());
+
+  DALI_TEST_EQUALS(textLabelCenterAlignImpl.GetTextController()->GetTextModel()->GetNumberOfLines(), expectedNumberOfLines, TEST_LOCATION);
+  DALI_TEST_CHECK(textLabelCenterAlignImpl.GetTextController()->GetTextModel()->GetLines());
+
+  DALI_TEST_EQUALS(textLabelEndAlignImpl.GetTextController()->GetTextModel()->GetNumberOfLines(), expectedNumberOfLines, TEST_LOCATION);
+  DALI_TEST_CHECK(textLabelEndAlignImpl.GetTextController()->GetTextModel()->GetLines());
+
+  const uint32_t LINE_INDEX_ALIGN_END    = 1u;
+  const uint32_t LINE_INDEX_ALIGN_CENTER = 3u;
+  const uint32_t LINE_INDEX_ALIGN_BEGIN  = 5u;
+  const uint32_t LINE_INDEX_OUTSIDE_1    = 0u;
+  const uint32_t LINE_INDEX_OUTSIDE_2    = 2u;
+  const uint32_t LINE_INDEX_OUTSIDE_3    = 4u;
+  const uint32_t LINE_INDEX_PARAGRAPH    = 6u;
+
+  //<p align='end'>Paragraph end</p>
+  const LineRun& lineEndFromMultiAlign = *(textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_ALIGN_END);
+  const LineRun& lineEndFromEndAlign   = *(textLabelEndAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_ALIGN_END);
+  tet_infoline(" UtcDaliTextLabelMarkupParagraphTagAlignAttribute - <p align='end'>Paragraph end</p>");
+  DALI_TEST_EQUALS(lineEndFromMultiAlign.alignmentOffset, lineEndFromEndAlign.alignmentOffset, TEST_LOCATION);
+  DALI_TEST_EQUALS(lineEndFromMultiAlign.width, lineEndFromEndAlign.width, TEST_LOCATION);
+
+  //<p align='center'>Paragraph center</p>
+  const LineRun& lineCenterFromMultiAlign = *(textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_ALIGN_CENTER);
+  const LineRun& lineEndFromCenterAlign   = *(textLabelCenterAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_ALIGN_CENTER);
+  tet_infoline(" UtcDaliTextLabelMarkupParagraphTagAlignAttribute - <p align='center'>Paragraph center</p>");
+  DALI_TEST_EQUALS(lineCenterFromMultiAlign.alignmentOffset, lineEndFromCenterAlign.alignmentOffset, TEST_LOCATION);
+  DALI_TEST_EQUALS(lineCenterFromMultiAlign.width, lineEndFromCenterAlign.width, TEST_LOCATION);
+
+  //<p align='begin' >Paragraph begin</p>
+  const LineRun& lineBeginFromMultiAlign = *(textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_ALIGN_BEGIN);
+  const LineRun& lineEndFromBeginAlign   = *(textLabelBeginAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_ALIGN_BEGIN);
+  tet_infoline(" UtcDaliTextLabelMarkupParagraphTagAlignAttribute - <p align='begin' >Paragraph begin</p>");
+  DALI_TEST_EQUALS(lineBeginFromMultiAlign.alignmentOffset, lineEndFromBeginAlign.alignmentOffset, TEST_LOCATION);
+  DALI_TEST_EQUALS(lineBeginFromMultiAlign.width, lineEndFromBeginAlign.width, TEST_LOCATION);
+
+  //text outside
+  const LineRun& lineOutsideOneFromMultiAlign  = *(textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_OUTSIDE_1);
+  const LineRun& lineOutsideOneFromCenterAlign = *(textLabelCenterAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_OUTSIDE_1);
+  tet_infoline(" UtcDaliTextLabelMarkupParagraphTagAlignAttribute - text outside one");
+  DALI_TEST_EQUALS(lineOutsideOneFromMultiAlign.alignmentOffset, lineOutsideOneFromCenterAlign.alignmentOffset, TEST_LOCATION);
+  DALI_TEST_EQUALS(lineOutsideOneFromMultiAlign.width, lineOutsideOneFromCenterAlign.width, TEST_LOCATION);
+
+  const LineRun& lineOutsideTwoFromMultiAlign  = *(textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_OUTSIDE_2);
+  const LineRun& lineOutsideTwoFromCenterAlign = *(textLabelCenterAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_OUTSIDE_2);
+  tet_infoline(" UtcDaliTextLabelMarkupParagraphTagAlignAttribute - text outside two");
+  DALI_TEST_EQUALS(lineOutsideTwoFromMultiAlign.alignmentOffset, lineOutsideTwoFromCenterAlign.alignmentOffset, TEST_LOCATION);
+  DALI_TEST_EQUALS(lineOutsideTwoFromMultiAlign.width, lineOutsideTwoFromCenterAlign.width, TEST_LOCATION);
+
+  const LineRun& lineOutsideThreeFromMultiAlign  = *(textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_OUTSIDE_3);
+  const LineRun& lineOutsideThreeFromCenterAlign = *(textLabelCenterAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_OUTSIDE_3);
+  tet_infoline(" UtcDaliTextLabelMarkupParagraphTagAlignAttribute - text outside three");
+  DALI_TEST_EQUALS(lineOutsideThreeFromMultiAlign.alignmentOffset, lineOutsideThreeFromCenterAlign.alignmentOffset, TEST_LOCATION);
+  DALI_TEST_EQUALS(lineOutsideThreeFromMultiAlign.width, lineOutsideThreeFromCenterAlign.width, TEST_LOCATION);
+
+  const LineRun& lineParagraphFromMultiAlign  = *(textLabelMultiAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_PARAGRAPH);
+  const LineRun& lineParagraphFromCenterAlign = *(textLabelCenterAlignImpl.GetTextController()->GetTextModel()->GetLines() + LINE_INDEX_PARAGRAPH);
+  tet_infoline(" UtcDaliTextLabelMarkupParagraphTagAlignAttribute - <p>Paragraph property alignment</p>");
+  DALI_TEST_EQUALS(lineParagraphFromMultiAlign.alignmentOffset, lineParagraphFromCenterAlign.alignmentOffset, TEST_LOCATION);
+  DALI_TEST_EQUALS(lineParagraphFromMultiAlign.width, lineParagraphFromCenterAlign.width, TEST_LOCATION);
 
   END_TEST;
 }

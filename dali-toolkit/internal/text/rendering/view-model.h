@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali-toolkit/internal/text/bounded-paragraph-run.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
@@ -312,6 +313,16 @@ public:
    * @copydoc ModelInterface::GetNumberOfStrikethroughRuns()
    */
   Length GetNumberOfStrikethroughRuns() const override;
+
+  /**
+   * @copydoc ModelInterface::GetNumberOfBoundedParagraphRuns()
+   */
+  virtual Length GetNumberOfBoundedParagraphRuns() const override;
+
+  /**
+   * @copydoc ModelInterface::GetBoundedParagraphRuns()
+   */
+  virtual const Vector<BoundedParagraphRun>& GetBoundedParagraphRuns() const override;
 
   /**
    * @copydoc ModelInterface::GetStrikethroughRuns()

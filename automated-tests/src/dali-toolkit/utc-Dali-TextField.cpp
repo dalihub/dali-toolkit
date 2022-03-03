@@ -2372,7 +2372,7 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Actor layer = field.GetChildAt(1u);
+  Actor layer = field.GetChildAt(2u);
   DALI_TEST_EQUALS(layer.GetChildCount(), 1u, TEST_LOCATION); // The cursor.
   DALI_TEST_EQUALS(stencil.GetChildCount(), 0u, TEST_LOCATION);
 
@@ -2386,7 +2386,7 @@ int utcDaliTextFieldEvent02(void)
 
   // Checks the cursor and the renderer have been created.
   DALI_TEST_EQUALS(layer.GetChildCount(), 1u, TEST_LOCATION);   // The cursor.
-  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION); // The renderer
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 2u, TEST_LOCATION); // The renderer, clipped cursor
 
   Control cursor = Control::DownCast(layer.GetChildAt(0u));
   DALI_TEST_CHECK(cursor);
@@ -2468,8 +2468,8 @@ int utcDaliTextFieldEvent02(void)
 
   DALI_TEST_EQUALS(position4, position7, TEST_LOCATION); // Should be in the same position2.
 
-  // Should not be a renderer.
-  DALI_TEST_EQUALS(stencil.GetChildCount(), 0u, TEST_LOCATION);
+  // Should not be a renderer, there is only a clipped cursor.
+  DALI_TEST_EQUALS(stencil.GetChildCount(), 1u, TEST_LOCATION);
 
   // Chanege exceed policy (EXCEED_POLICY_ORIGINAL doesn't use stencil )
   field.SetProperty(TextField::Property::TEXT, "This is a long text for the size of the text-field.");
@@ -5276,6 +5276,45 @@ int UtcDaliToolkitTextFieldUnderlineTypesGeneration3(void)
   DALI_TEST_EQUALS(DaliTestCheckMaps(underlineMapGet1, underlineMapSet1), true, TEST_LOCATION);
 
   application.GetScene().Add(field1);
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextfieldParagraphTag(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextfieldParagraphTag");
+  TextField fieldNewlineSeparator = TextField::New();
+  TextField fieldParagraphTag     = TextField::New();
+  DALI_TEST_CHECK(fieldNewlineSeparator);
+  DALI_TEST_CHECK(fieldParagraphTag);
+
+  application.GetScene().Add(fieldNewlineSeparator);
+  application.GetScene().Add(fieldParagraphTag);
+
+  //Same utterance uses new-line to split paragraphs should give similar results for paragraph tag.
+  fieldNewlineSeparator.SetProperty(TextField::Property::ENABLE_MARKUP, true);
+  fieldNewlineSeparator.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  fieldNewlineSeparator.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  fieldNewlineSeparator.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  fieldNewlineSeparator.SetProperty(TextField::Property::TEXT, "test paragraph tag \ntest paragraph tag \ntest paragraph tag ");
+
+  fieldParagraphTag.SetProperty(TextField::Property::ENABLE_MARKUP, true);
+  fieldParagraphTag.SetProperty(Actor::Property::SIZE, Vector2(100.f, 50.f));
+  fieldParagraphTag.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  fieldParagraphTag.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  fieldParagraphTag.SetProperty(TextField::Property::TEXT, "test paragraph tag <p>test paragraph tag </p>test paragraph tag ");
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 textNaturalSizeNewlineSeparator = fieldNewlineSeparator.GetNaturalSize();
+  Vector3 textNaturalSizeParagraphTag     = fieldParagraphTag.GetNaturalSize();
+
+  DALI_TEST_EQUALS(textNaturalSizeNewlineSeparator, textNaturalSizeParagraphTag, TEST_LOCATION);
+
   application.SendNotification();
   application.Render();
 

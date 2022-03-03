@@ -216,9 +216,9 @@ void ArcVisual::OnInitialize()
   mImpl->mRenderer = Renderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
-  mThicknessIndex  = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::THICKNESS, THICKNESS_NAME, mThickness);
-  mStartAngleIndex = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::START_ANGLE, START_ANGLE_NAME, mStartAngle);
-  mSweepAngleIndex = mImpl->mRenderer.RegisterProperty(DevelArcVisual::Property::SWEEP_ANGLE, SWEEP_ANGLE_NAME, mSweepAngle);
+  mThicknessIndex  = mImpl->mRenderer.RegisterUniqueProperty(DevelArcVisual::Property::THICKNESS, THICKNESS_NAME, mThickness);
+  mStartAngleIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelArcVisual::Property::START_ANGLE, START_ANGLE_NAME, mStartAngle);
+  mSweepAngleIndex = mImpl->mRenderer.RegisterUniqueProperty(DevelArcVisual::Property::SWEEP_ANGLE, SWEEP_ANGLE_NAME, mSweepAngle);
 
   mRadiusIndex = mImpl->mRenderer.RegisterProperty(RADIUS_NAME, mRadius);
 

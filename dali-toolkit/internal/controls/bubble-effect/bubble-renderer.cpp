@@ -53,25 +53,25 @@ void BubbleRenderer::Initialize(unsigned int numberOfBubble, const Vector2& move
   mRenderer.SetTextures(textureSet);
 
   // register uniforms
-  mIndexGravity      = mRenderer.RegisterProperty("uGravity", 50.f);
-  mIndexDynamicScale = mRenderer.RegisterProperty("uDynamicScale", 1.f);
+  mIndexGravity      = mRenderer.RegisterUniqueProperty("uGravity", 50.f);
+  mIndexDynamicScale = mRenderer.RegisterUniqueProperty("uDynamicScale", 1.f);
 
-  mIndexInvertedMovementArea = mRenderer.RegisterProperty("uInvertedMovementArea", Vector2(1.f, 1.f) / movementArea);
+  mIndexInvertedMovementArea = mRenderer.RegisterUniqueProperty("uInvertedMovementArea", Vector2(1.f, 1.f) / movementArea);
 
   mIndicesOffset.resize(9);
   int offset = movementArea.Length() / 10.f;
 
   unsigned int seed = time(NULL);
 
-  mIndicesOffset[0] = mRenderer.RegisterProperty("uOffset[0]", Vector2(0.f, 0.f));
-  mIndicesOffset[1] = mRenderer.RegisterProperty("uOffset[1]", Vector2(rand_r(&seed) % offset, rand_r(&seed) % offset));
-  mIndicesOffset[2] = mRenderer.RegisterProperty("uOffset[2]", Vector2(rand_r(&seed) % offset, -rand_r(&seed) % offset));
-  mIndicesOffset[3] = mRenderer.RegisterProperty("uOffset[3]", Vector2(-rand_r(&seed) % offset, rand_r(&seed) % offset));
-  mIndicesOffset[4] = mRenderer.RegisterProperty("uOffset[4]", Vector2(-rand_r(&seed) % offset, -rand_r(&seed) % offset));
-  mIndicesOffset[5] = mRenderer.RegisterProperty("uOffset[5]", Vector2(rand_r(&seed) % offset, 0.f));
-  mIndicesOffset[6] = mRenderer.RegisterProperty("uOffset[6]", Vector2(-rand_r(&seed) % offset, 0.f));
-  mIndicesOffset[7] = mRenderer.RegisterProperty("uOffset[7]", Vector2(0.f, rand_r(&seed) % offset));
-  mIndicesOffset[8] = mRenderer.RegisterProperty("uOffset[8]", Vector2(0.f, -rand_r(&seed) % offset));
+  mIndicesOffset[0] = mRenderer.RegisterUniqueProperty("uOffset[0]", Vector2(0.f, 0.f));
+  mIndicesOffset[1] = mRenderer.RegisterUniqueProperty("uOffset[1]", Vector2(rand_r(&seed) % offset, rand_r(&seed) % offset));
+  mIndicesOffset[2] = mRenderer.RegisterUniqueProperty("uOffset[2]", Vector2(rand_r(&seed) % offset, -rand_r(&seed) % offset));
+  mIndicesOffset[3] = mRenderer.RegisterUniqueProperty("uOffset[3]", Vector2(-rand_r(&seed) % offset, rand_r(&seed) % offset));
+  mIndicesOffset[4] = mRenderer.RegisterUniqueProperty("uOffset[4]", Vector2(-rand_r(&seed) % offset, -rand_r(&seed) % offset));
+  mIndicesOffset[5] = mRenderer.RegisterUniqueProperty("uOffset[5]", Vector2(rand_r(&seed) % offset, 0.f));
+  mIndicesOffset[6] = mRenderer.RegisterUniqueProperty("uOffset[6]", Vector2(-rand_r(&seed) % offset, 0.f));
+  mIndicesOffset[7] = mRenderer.RegisterUniqueProperty("uOffset[7]", Vector2(0.f, rand_r(&seed) % offset));
+  mIndicesOffset[8] = mRenderer.RegisterUniqueProperty("uOffset[8]", Vector2(0.f, -rand_r(&seed) % offset));
 
   Vector4 zeroVector;
   mIndiceStartEndPos.resize(numberOfBubble);
@@ -80,11 +80,11 @@ void BubbleRenderer::Initialize(unsigned int numberOfBubble, const Vector2& move
   {
     std::ostringstream ossProperty;
     ossProperty << "uStartEndPosition[" << i << "]";
-    mIndiceStartEndPos[i] = mRenderer.RegisterProperty(ossProperty.str(), zeroVector);
+    mIndiceStartEndPos[i] = mRenderer.RegisterUniqueProperty(ossProperty.str(), zeroVector);
 
     ossProperty.str("");
     ossProperty << "uPercentage[" << i << "]";
-    mIndicesPercentage[i] = mRenderer.RegisterProperty(ossProperty.str(), 0.f);
+    mIndicesPercentage[i] = mRenderer.RegisterUniqueProperty(ossProperty.str(), 0.f);
   }
 }
 

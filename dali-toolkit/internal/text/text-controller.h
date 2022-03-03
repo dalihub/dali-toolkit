@@ -1935,7 +1935,7 @@ protected: // Inherit from Text::Decorator::ControllerInterface.
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::AddDecoration()
    */
-  void AddDecoration(Actor& actor, bool needsClipping) override;
+  void AddDecoration(Actor& actor, DecorationType type, bool needsClipping) override;
 
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::DecorationEvent()
