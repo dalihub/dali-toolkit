@@ -4516,6 +4516,45 @@ int UtcDaliTextEditorLineSpacing(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorSelectionWithLineSpacing(void)
+{
+  //Only for test coverage
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorSelectionWithLineSpacing ");
+
+  TextEditor textEditor = TextEditor::New();
+  textEditor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.f));
+  application.GetScene().Add(textEditor);
+  application.SendNotification();
+  application.Render();
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, "Line #1\nLine #2\nLine #3");
+  textEditor.SetProperty(DevelTextEditor::Property::LINE_SPACING, -20);
+
+  application.SendNotification();
+  application.Render();
+
+  DevelTextEditor::SelectWholeText(textEditor);
+
+  application.SendNotification();
+  application.Render();
+
+  DevelTextEditor::SelectNone(textEditor);
+  textEditor.SetProperty(DevelTextEditor::Property::LINE_SPACING, 20);
+
+  application.SendNotification();
+  application.Render();
+
+  DevelTextEditor::SelectWholeText(textEditor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(textEditor.GetProperty<float>(DevelTextEditor::Property::LINE_SPACING), 20.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliTextEditorMinLineSize(void)
 {
   ToolkitTestApplication application;

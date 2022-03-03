@@ -504,7 +504,9 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
     cursorInfo.lineOffset = CalculateLineOffset(parameters.visualModel->mLines,
                                                 newLineIndex);
 
-    cursorInfo.lineHeight = GetLineHeight(newLine);
+    // The line height is the addition of the line ascender and the line descender.
+    // However, the line descender has a negative value, hence the subtraction also line spacing should not be included in cursor height.
+    cursorInfo.lineHeight = newLine.ascender - newLine.descender;
 
     index                                = 0u;
     const Length totalNumberOfCharacters = parameters.logicalModel->mText.Count();
@@ -560,7 +562,9 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
     cursorInfo.lineOffset = CalculateLineOffset(parameters.visualModel->mLines,
                                                 lineIndex);
 
-    cursorInfo.lineHeight = GetLineHeight(line);
+    // The line height is the addition of the line ascender and the line descender.
+    // However, the line descender has a negative value, hence the subtraction also line spacing should not be included in cursor height.
+    cursorInfo.lineHeight = line.ascender - line.descender;
 
     // Calculate the primary cursor.
 
