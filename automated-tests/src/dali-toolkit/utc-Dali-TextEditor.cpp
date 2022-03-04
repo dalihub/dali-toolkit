@@ -5788,7 +5788,7 @@ int UtcDaliToolkitTextEditorRelativeLineHeight(void)
 
   Vector3 relativeNaturalSize = editor.GetNaturalSize();
 
-  DALI_TEST_EQUALS(naturalSize.y, relativeNaturalSize.y * 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(naturalSize.y, relativeNaturalSize.y, TEST_LOCATION);
 
   editor.SetProperty(DevelTextEditor::Property::RELATIVE_LINE_SIZE, 2.0f);
 
