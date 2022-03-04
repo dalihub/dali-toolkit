@@ -153,9 +153,10 @@ LineIndex GetClosestLine(VisualModelPtr visualModel,
       it != endIt;
       ++it, ++lineIndex)
   {
-    const LineRun& lineRun = *it;
+    const LineRun& lineRun    = *it;
+    bool           isLastLine = (it + 1 == endIt);
 
-    totalHeight += GetLineHeight(lineRun);
+    totalHeight += GetLineHeight(lineRun, isLastLine);
 
     if(visualY < totalHeight)
     {
@@ -182,9 +183,10 @@ float CalculateLineOffset(const Vector<LineRun>& lines,
       it != endIt;
       ++it)
   {
-    const LineRun& lineRun = *it;
+    const LineRun& lineRun    = *it;
+    bool           isLastLine = (it + 1 == lines.End());
 
-    offset += GetLineHeight(lineRun);
+    offset += GetLineHeight(lineRun, isLastLine);
   }
 
   return offset;

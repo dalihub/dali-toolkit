@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -334,6 +334,8 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
 
     const LineIndex lineIndex         = visualModel->GetLineOfCharacter(characterIndex);
     const LineIndex previousLineIndex = (lineIndex > 0 ? lineIndex - 1u : lineIndex);
+    const LineIndex lastLineIndex     = (visualModel->mLines.Size() > 0 ? visualModel->mLines.Size() - 1u : 0);
+    const bool      isLastLine        = (previousLineIndex == lastLineIndex);
 
     // Retrieve the cursor position info.
     CursorInfo cursorInfo;
@@ -344,7 +346,7 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
     const LineRun& line = *(visualModel->mLines.Begin() + previousLineIndex);
 
     // Get the next hit 'y' point.
-    const float hitPointY = cursorInfo.lineOffset - 0.5f * GetLineHeight(line);
+    const float hitPointY = cursorInfo.lineOffset - 0.5f * GetLineHeight(line, isLastLine);
 
     // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
     bool matchedCharacter = false;
@@ -379,8 +381,12 @@ void ControllerImplEventHandler::OnCursorKeyEvent(Controller::Impl& impl, const 
       // Get the line below.
       const LineRun& line = *(visualModel->mLines.Begin() + lineIndex + 1u);
 
+      // Get last line index
+      const LineIndex lastLineIndex = (visualModel->mLines.Size() > 0 ? visualModel->mLines.Size() - 1u : 0);
+      const bool      isLastLine    = (lineIndex + 1u == lastLineIndex);
+
       // Get the next hit 'y' point.
-      const float hitPointY = cursorInfo.lineOffset + cursorInfo.lineHeight + 0.5f * GetLineHeight(line);
+      const float hitPointY = cursorInfo.lineOffset + cursorInfo.lineHeight + 0.5f * GetLineHeight(line, isLastLine);
 
       // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
       bool matchedCharacter = false;

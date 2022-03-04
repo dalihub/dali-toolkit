@@ -5824,6 +5824,39 @@ int UtcDaliTextEditorCharacterSpacing(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorTextSizeNegativeLineSpacing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorTextSizeNegativeLineSpacing");
+
+  TextEditor editor = TextEditor::New();
+
+  float lineSpacing = -20.f;
+
+  editor.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
+  editor.SetProperty(TextEditor::Property::POINT_SIZE, 10.f);
+  editor.SetProperty(DevelTextEditor::Property::LINE_SPACING, lineSpacing);
+  editor.SetProperty(TextEditor::Property::TEXT, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+
+  application.GetScene().Add(editor);
+  application.SendNotification();
+  application.Render();
+
+  Vector<Vector2> positionsList = DevelTextEditor::GetTextPosition(editor, 0, 123);
+  Vector<Vector2> sizeList      = DevelTextEditor::GetTextSize(editor, 0, 123);
+
+  Vector2 lastLinePos  = positionsList[positionsList.Size() - 1];
+  Vector2 lastLineSize = sizeList[sizeList.Size() - 1];
+
+  DALI_TEST_EQUALS(sizeList[0].y * (sizeList.Size() - 1), lastLinePos.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList[0].y - lineSpacing, lastLineSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTexteditorParagraphTag(void)
 {
   ToolkitTestApplication application;

@@ -2691,6 +2691,40 @@ int UtcDaliTextLabelCharacterSpacing(void)
   END_TEST;
 }
 
+int UtcDaliTextTextLabelSizeNegativeLineSpacing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextTextLabelSizeNegativeLineSpacing");
+
+  TextLabel label = TextLabel::New();
+
+  float lineSpacing = -20.f;
+
+  label.SetProperty(Actor::Property::SIZE, Vector2(450.0f, 300.f));
+  label.SetProperty(TextLabel::Property::POINT_SIZE, 10.f);
+  label.SetProperty(DevelTextLabel::Property::LINE_SPACING, lineSpacing);
+  label.SetProperty(TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(TextLabel::Property::TEXT, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+
+  Vector<Vector2> positionsList = DevelTextLabel::GetTextPosition(label, 0, 123);
+  Vector<Vector2> sizeList      = DevelTextLabel::GetTextSize(label, 0, 123);
+
+  Vector2 lastLinePos  = positionsList[positionsList.Size() - 1];
+  Vector2 lastLineSize = sizeList[sizeList.Size() - 1];
+
+  DALI_TEST_EQUALS(sizeList[0].y * (sizeList.Size() - 1), lastLinePos.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  DALI_TEST_EQUALS(sizeList[0].y - lineSpacing, lastLineSize.y, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelParagraphTag(void)
 {
   ToolkitTestApplication application;
