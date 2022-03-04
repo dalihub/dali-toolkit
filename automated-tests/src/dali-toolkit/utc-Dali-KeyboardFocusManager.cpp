@@ -55,11 +55,12 @@ public:
   : mInterfaceVerified(interfaceVerified),
     mCurrentFocusedActor(),
     mProposedActorToFocus(),
-    mDirection(Control::KeyboardFocus::LEFT)
+    mDirection(Control::KeyboardFocus::LEFT),
+    mDeviceName("")
   {
   }
 
-  Actor GetNextFocusableActor(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocus::Direction direction)
+  Actor GetNextFocusableActor(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocus::Direction direction, const std::string& deviceName)
   {
     tet_infoline("Verifying CustomAlgorithm()");
 
@@ -68,6 +69,7 @@ public:
     mCurrentFocusedActor  = currentFocusedActor;
     mProposedActorToFocus = proposedActorToFocus;
     mDirection            = direction;
+    mDeviceName           = deviceName;
 
     return mProposedActorToFocus;
   }
@@ -78,12 +80,14 @@ public:
     mCurrentFocusedActor  = Actor();
     mProposedActorToFocus = Actor();
     mDirection            = Control::KeyboardFocus::LEFT;
+    mDeviceName           = "";
   }
 
   bool&                             mInterfaceVerified;
   Actor                             mCurrentFocusedActor;
   Actor                             mProposedActorToFocus;
   Control::KeyboardFocus::Direction mDirection;
+  std::string mDeviceName;
 };
 
 // Functors to test whether PreFocusChange signal is emitted when the keyboard focus is about to change
@@ -578,17 +582,19 @@ int UtcDaliKeyboardFocusManagerCustomAlgorithmMoveFocus(void)
   preFocusChangeCallback.Reset();
 
   bool            customAlgorithmInterfaceVerified = false;
+  std::string     deviceName                       = "deviceName";
   CustomAlgorithm customAlgorithm(customAlgorithmInterfaceVerified);
   Toolkit::DevelKeyboardFocusManager::SetCustomAlgorithm(manager, customAlgorithm);
 
   // Move the focus towards right
-  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == false);
+  DALI_TEST_CHECK(Toolkit::DevelKeyboardFocusManager::MoveFocus(manager, Control::KeyboardFocus::RIGHT, deviceName) == false);
 
   // Because no layout control in the stage and the first actor is focused, it should invoke CustomAlgorithm
   DALI_TEST_CHECK(customAlgorithm.mInterfaceVerified);
   DALI_TEST_CHECK(customAlgorithm.mCurrentFocusedActor == Actor());
   DALI_TEST_CHECK(customAlgorithm.mProposedActorToFocus == Actor());
   DALI_TEST_CHECK(customAlgorithm.mDirection == Control::KeyboardFocus::RIGHT);
+  DALI_TEST_EQUALS(customAlgorithm.mDeviceName, deviceName, TEST_LOCATION );
   customAlgorithm.Reset();
 
   // Check that the focus is set on the first actor
@@ -600,13 +606,14 @@ int UtcDaliKeyboardFocusManagerCustomAlgorithmMoveFocus(void)
   focusChangedCallback.Reset();
 
   // Move the focus towards right
-  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == false);
+  DALI_TEST_CHECK(Toolkit::DevelKeyboardFocusManager::MoveFocus(manager, Control::KeyboardFocus::RIGHT, deviceName) == false);
 
   // Because no layout control in the stage and the first actor is focused, it should invoke CustomAlgorithm
   DALI_TEST_CHECK(customAlgorithm.mInterfaceVerified);
   DALI_TEST_CHECK(customAlgorithm.mCurrentFocusedActor == first);
   DALI_TEST_CHECK(customAlgorithm.mProposedActorToFocus == Actor());
   DALI_TEST_CHECK(customAlgorithm.mDirection == Control::KeyboardFocus::RIGHT);
+  DALI_TEST_EQUALS(customAlgorithm.mDeviceName, deviceName, TEST_LOCATION );
   customAlgorithm.Reset();
 
   // Check that the focus is set on the second actor
@@ -618,13 +625,14 @@ int UtcDaliKeyboardFocusManagerCustomAlgorithmMoveFocus(void)
   focusChangedCallback.Reset();
 
   // Move the focus towards up
-  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::UP) == false);
+  DALI_TEST_CHECK(Toolkit::DevelKeyboardFocusManager::MoveFocus(manager, Control::KeyboardFocus::UP, deviceName) == false);
 
   // Because no layout control in the stage and no actor is focused, it should invoke CustomAlgorithm
   DALI_TEST_CHECK(customAlgorithm.mInterfaceVerified);
   DALI_TEST_CHECK(customAlgorithm.mCurrentFocusedActor == second);
   DALI_TEST_CHECK(customAlgorithm.mProposedActorToFocus == Actor());
   DALI_TEST_CHECK(customAlgorithm.mDirection == Control::KeyboardFocus::UP);
+  DALI_TEST_EQUALS(customAlgorithm.mDeviceName, deviceName, TEST_LOCATION );
   customAlgorithm.Reset();
   DALI_TEST_CHECK(!focusChangedCallback.mSignalVerified);
 

@@ -54,9 +54,11 @@ public:
    * @param[in] current The current focused actor
    * @param[in] proposed The proposed focused actor
    * @param[in] direction The direction of focus movement
+   * @param[in] deviceName The name of the device where the key event occurred.
    * @return A handle to the next focusable actor
    */
-  virtual Actor GetNextFocusableActor(Actor current, Actor proposed, Control::KeyboardFocus::Direction direction) = 0;
+  virtual Actor GetNextFocusableActor(Actor current, Actor proposed, Control::KeyboardFocus::Direction direction, const std::string& deviceName = "") = 0;
+
 };
 
 /**
@@ -99,6 +101,20 @@ DALI_TOOLKIT_API void EnableDefaultAlgorithm(KeyboardFocusManager keyboardFocusM
  * @return True when default focus algorithm is enabled
  */
 DALI_TOOLKIT_API bool IsDefaultAlgorithmEnabled(KeyboardFocusManager keyboardFocusManager);
+
+/**
+ * @brief Moves the focus to the next focusable actor in the focus
+ * chain in the given direction (according to the focus traversal
+ * order).
+ *
+ * @param[in] keyboardFocusManager The instance of KeyboardFocusManager
+ * @param direction The direction of focus movement
+ * @param deviceName The device name
+ * @return true if the movement was successful
+ * @pre The KeyboardFocusManager has been initialized.
+ */
+DALI_TOOLKIT_API bool MoveFocus(KeyboardFocusManager keyboardFocusManager, Control::KeyboardFocus::Direction direction, const std::string& deviceName);
+
 
 } // namespace DevelKeyboardFocusManager
 
