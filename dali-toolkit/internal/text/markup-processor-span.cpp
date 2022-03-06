@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/color-run.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
+#include <dali-toolkit/internal/text/markup-processor-character-spacing.h>
 #include <dali-toolkit/internal/text/markup-processor-font.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/markup-processor-strikethrough.h>
@@ -57,20 +58,26 @@ const std::string XHTML_UNDERLINE_DASH_WIDTH_ATTRIBUTE("u-dash-width");
 const std::string XHTML_STRIKETHROUGH_COLOR_ATTRIBUTE("s-color");
 const std::string XHTML_STRIKETHROUGH_HEIGHT_ATTRIBUTE("s-height");
 
+//the character-spacing character's attributes
+const std::string XHTML_CHARACTER_SPACING_VALUE_ATTRIBUTE("char-space-value");
+
+//NOTE: the MAX_NUM_OF_ATTRIBUTES in "markup-processor.cpp" should be updated when add a new attribute for span tag.
+
 } // namespace
 
-void ProcessSpanTag(const Tag&                 tag,
-                    ColorRun&                  colorRun,
-                    FontDescriptionRun&        fontRun,
-                    UnderlinedCharacterRun&    underlinedCharacterRun,
-                    ColorRun&                  backgroundColorRun,
-                    StrikethroughCharacterRun& strikethroughRun,
-                    bool&                      isColorDefined,
-                    bool&                      isFontDefined,
-                    bool&                      isUnderlinedCharacterDefined,
-                    bool&                      isBackgroundColorDefined,
-                    bool&                      isStrikethroughDefined)
-
+void ProcessSpanTag(const Tag&                    tag,
+                    ColorRun&                     colorRun,
+                    FontDescriptionRun&           fontRun,
+                    UnderlinedCharacterRun&       underlinedCharacterRun,
+                    ColorRun&                     backgroundColorRun,
+                    StrikethroughCharacterRun&    strikethroughRun,
+                    CharacterSpacingCharacterRun& characterSpacingCharacterRun,
+                    bool&                         isColorDefined,
+                    bool&                         isFontDefined,
+                    bool&                         isUnderlinedCharacterDefined,
+                    bool&                         isBackgroundColorDefined,
+                    bool&                         isStrikethroughDefined,
+                    bool&                         isCharacterSpacingDefined)
 {
   for(Vector<Attribute>::ConstIterator it    = tag.attributes.Begin(),
                                        endIt = tag.attributes.End();
@@ -148,6 +155,11 @@ void ProcessSpanTag(const Tag&                 tag,
     {
       isStrikethroughDefined = true;
       ProcessHeightAttribute(attribute, strikethroughRun);
+    }
+    else if(TokenComparison(XHTML_CHARACTER_SPACING_VALUE_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      isCharacterSpacingDefined = true;
+      ProcessValueAttribute(attribute, characterSpacingCharacterRun);
     }
   }
 }

@@ -1291,3 +1291,63 @@ int UtcDaliTextFieldMarkupCharacterSpacingTag(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldMarkupSpanCharacterSpacing(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldMarkupSpanCharacterSpacing ");
+
+  const Length EXPECTED_NUMBER_OF_GLYPHS = 21u;
+
+  const float expandedCharSpacing  = 10.0f;
+  const float condensedCharSpacing = -5.0f;
+
+  std::string testText =
+    "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='blue' >ABC EF\n</span>"
+    "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' char-space-value='-5.0f'>ABC EF\n</span>"
+    "<span font-size='20' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='green' char-space-value='10.0f'>ABC EF\n</span>";
+
+  TextField textField = TextField::New();
+
+  textField.SetProperty(TextField::Property::TEXT, testText);
+  textField.SetProperty(TextField ::Property::ENABLE_MARKUP, true);
+
+  application.GetScene().Add(textField);
+
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Internal::TextField& textFieldImpl = GetImpl(textField);
+  Text::ViewInterface&          view          = textFieldImpl.GetTextController()->GetView();
+
+  Length numberOfGlyphs = view.GetNumberOfGlyphs();
+
+  DALI_TEST_EQUALS(numberOfGlyphs, EXPECTED_NUMBER_OF_GLYPHS, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+  Vector<GlyphInfo> glyphs;
+  glyphs.Resize(numberOfGlyphs);
+
+  Vector<Vector2> positions;
+  positions.Resize(numberOfGlyphs);
+
+  float alignmentOffset = 0u;
+  numberOfGlyphs        = view.GetGlyphs(glyphs.Begin(),
+                                  positions.Begin(),
+                                  alignmentOffset,
+                                  0u,
+                                  numberOfGlyphs);
+
+  const Length numberOfGlyphsOneLine = 7u;
+  for(Length i = 0; i < numberOfGlyphsOneLine - 1u; i++)
+  {
+    float diffLineNoCharSpacing = positions[i + 1].x - positions[i].x;
+
+    float diffLineCondensedCharSpacing = positions[numberOfGlyphsOneLine + i + 1].x - positions[numberOfGlyphsOneLine + i].x;
+    DALI_TEST_EQUALS(diffLineCondensedCharSpacing, diffLineNoCharSpacing + condensedCharSpacing, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+
+    float diffLineExpandedCharSpacing = positions[2u * numberOfGlyphsOneLine + i + 1].x - positions[2u * numberOfGlyphsOneLine + i].x;
+    DALI_TEST_EQUALS(diffLineExpandedCharSpacing, diffLineNoCharSpacing + expandedCharSpacing, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
