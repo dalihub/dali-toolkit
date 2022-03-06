@@ -561,6 +561,76 @@ int UtcDaliTextLabelMarkupNestedUnderlineTags(void)
   END_TEST;
 }
 
+int UtcDaliTextLabelMarkupSpanStrikethrough(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelMarkupSpanStrikethrough ");
+
+  TextLabel textLabel = TextLabel::New();
+
+  application.GetScene().Add(textLabel);
+
+  std::string testText =
+    "start<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ABC1</span>then"
+    "<span s-color='blue'>ABC2</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' s-color='green'>ABC3</span>end";
+
+  textLabel.SetProperty(TextLabel::Property::TEXT, testText);
+  textLabel.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t expectedNumberOfStrikethroughRuns = 2u;
+
+  Toolkit::Internal::TextLabel& textLabelImpl             = GetImpl(textLabel);
+  const Text::Length            numberOfStrikethroughRuns = textLabelImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughRuns, TEST_LOCATION);
+
+  Vector<StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+  textLabelImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  struct DataOfCase
+  {
+    std::string                  title;
+    GlyphIndex                   glyphIndex;
+    Length                       numberOfGlyphs;
+    StrikethroughStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+
+      {"<span s-color='blue'>ABC2</span>then",
+       13u,
+       4u,
+       {Color::BLUE,
+        0u,
+        true,
+        false}},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' s-color='green'>ABC3</span>",
+       21u,
+       4u,
+       {Color::GREEN,
+        0u,
+        true,
+        false}},
+
+    };
+
+  for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliTextLabelBackgroundTag(void)
 {
   ToolkitTestApplication application;

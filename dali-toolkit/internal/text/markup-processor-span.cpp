@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/font-description-run.h>
 #include <dali-toolkit/internal/text/markup-processor-font.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/markup-processor-strikethrough.h>
 #include <dali-toolkit/internal/text/markup-processor-underline.h>
 
 namespace Dali
@@ -51,17 +52,24 @@ const std::string XHTML_UNDERLINE_HEIGHT_ATTRIBUTE("u-height");
 const std::string XHTML_UNDERLINE_TYPE_ATTRIBUTE("u-type");
 const std::string XHTML_UNDERLINE_DASH_GAP_ATTRIBUTE("u-dash-gap");
 const std::string XHTML_UNDERLINE_DASH_WIDTH_ATTRIBUTE("u-dash-width");
+
+//the strikethroughed character's attributes
+const std::string XHTML_STRIKETHROUGH_COLOR_ATTRIBUTE("s-color");
+
 } // namespace
 
-void ProcessSpanTag(const Tag&              tag,
-                    ColorRun&               colorRun,
-                    FontDescriptionRun&     fontRun,
-                    UnderlinedCharacterRun& underlinedCharacterRun,
-                    ColorRun&               backgroundColorRun,
-                    bool&                   isColorDefined,
-                    bool&                   isFontDefined,
-                    bool&                   isUnderlinedCharacterDefined,
-                    bool&                   isBackgroundColorDefined)
+void ProcessSpanTag(const Tag&                 tag,
+                    ColorRun&                  colorRun,
+                    FontDescriptionRun&        fontRun,
+                    UnderlinedCharacterRun&    underlinedCharacterRun,
+                    ColorRun&                  backgroundColorRun,
+                    StrikethroughCharacterRun& strikethroughRun,
+                    bool&                      isColorDefined,
+                    bool&                      isFontDefined,
+                    bool&                      isUnderlinedCharacterDefined,
+                    bool&                      isBackgroundColorDefined,
+                    bool&                      isStrikethroughDefined)
+
 {
   for(Vector<Attribute>::ConstIterator it    = tag.attributes.Begin(),
                                        endIt = tag.attributes.End();
@@ -129,6 +137,11 @@ void ProcessSpanTag(const Tag&              tag,
     {
       isUnderlinedCharacterDefined = true;
       ProcessDashWidthAttribute(attribute, underlinedCharacterRun);
+    }
+    else if(TokenComparison(XHTML_STRIKETHROUGH_COLOR_ATTRIBUTE, attribute.nameBuffer, attribute.nameLength))
+    {
+      isStrikethroughDefined = true;
+      ProcessColorAttribute(attribute, strikethroughRun);
     }
   }
 }

@@ -600,6 +600,76 @@ int UtcDaliTextEditorMarkupNestedUnderlineTags(void)
   END_TEST;
 }
 
+int UtcDaliTextEditorMarkupSpanStrikethrough(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorMarkupSpanStrikethrough ");
+
+  TextEditor textEditor = TextEditor::New();
+
+  application.GetScene().Add(textEditor);
+
+  std::string testText =
+    "start<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ABC1</span>then"
+    "<span s-color='blue'>ABC2</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' s-color='green'>ABC3</span>end";
+
+  textEditor.SetProperty(TextEditor::Property::TEXT, testText);
+  textEditor.SetProperty(TextEditor ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t expectedNumberOfStrikethroughRuns = 2u;
+
+  Toolkit::Internal::TextEditor& textEditorImpl            = GetImpl(textEditor);
+  const Text::Length             numberOfStrikethroughRuns = textEditorImpl.GetTextController()->GetTextModel()->GetNumberOfStrikethroughRuns();
+
+  DALI_TEST_EQUALS(numberOfStrikethroughRuns, expectedNumberOfStrikethroughRuns, TEST_LOCATION);
+
+  Vector<StrikethroughGlyphRun> strikethroughRuns;
+  strikethroughRuns.Resize(numberOfStrikethroughRuns);
+  textEditorImpl.GetTextController()->GetTextModel()->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
+
+  struct DataOfCase
+  {
+    std::string                  title;
+    GlyphIndex                   glyphIndex;
+    Length                       numberOfGlyphs;
+    StrikethroughStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+
+      {"<span s-color='blue'>ABC2</span>then",
+       13u,
+       4u,
+       {Color::BLUE,
+        0u,
+        true,
+        false}},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' s-color='green'>ABC3</span>",
+       21u,
+       4u,
+       {Color::GREEN,
+        0u,
+        true,
+        false}},
+
+    };
+
+  for(uint32_t i = 0; i < expectedNumberOfStrikethroughRuns; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(strikethroughRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == strikethroughRuns[i].properties);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliTextEditorFontPointSizeLargerThanAtlas(void)
 {
   ToolkitTestApplication application;

@@ -83,7 +83,7 @@ const char NEW_LINE    = 0x0A; // ASCII value of the newline.
 // Range 3 0x10000u < XHTML_DECIMAL_ENTITY_RANGE <= 0x10FFFFu
 const unsigned long XHTML_DECIMAL_ENTITY_RANGE[] = {0x0u, 0xD7FFu, 0xE000u, 0xFFFDu, 0x10000u, 0x10FFFFu};
 
-const unsigned int MAX_NUM_OF_ATTRIBUTES = 11u; ///< The span tag has the 'font-family', 'font-size' 'font-weight', 'font-width', 'font-slant','text-color', 'u-color', 'u-height','u-type','u-dash-gap'and 'u-dash-width' attrubutes.
+const unsigned int MAX_NUM_OF_ATTRIBUTES = 12u; ///< The span tag has the 'font-family', 'font-size' 'font-weight', 'font-width', 'font-slant','text-color', 'u-color', 'u-height','u-type','u-dash-gap', 'u-dash-width' and 's-color' attrubutes.
 const unsigned int DEFAULT_VECTOR_SIZE   = 16u; ///< Default size of run vectors.
 
 #if defined(DEBUG_ENABLED)
@@ -142,10 +142,13 @@ struct Span
   RunIndex fontRunIndex;
   RunIndex underlinedCharacterRunIndex;
   RunIndex backgroundColorRunIndex;
-  bool     isColorDefined;
-  bool     isFontDefined;
-  bool     isUnderlinedCharacterDefined;
-  bool     isBackgroundColorDefined;
+  RunIndex strikethroughCharacterRunIndex;
+
+  bool isColorDefined;
+  bool isFontDefined;
+  bool isUnderlinedCharacterDefined;
+  bool isBackgroundColorDefined;
+  bool isStrikethroughDefined;
 };
 
 /**
@@ -207,6 +210,10 @@ void Initialize(Span& span)
   span.isUnderlinedCharacterDefined = false;
   span.backgroundColorRunIndex      = 0u;
   span.isBackgroundColorDefined     = false;
+
+  //strikethrough
+  span.strikethroughCharacterRunIndex = 0u;
+  span.isStrikethroughDefined         = false;
 }
 
 /**
@@ -718,27 +725,33 @@ void ProcessAnchorTag(
  * @brief Processes span tag for the color-run & font-run.
  *
  * @param[in] spanTag The tag we are currently processing
- * @param[in/out] spanStack The spans stack
- * @param[int/out] colorRuns The container containing all the color runs
- * @param[int/out] fontRuns The container containing all the font description runs
- * @param[in/out] colorRunIndex The color run index
- * @param[in/out] fontRunIndex The font run index
+ * @param[inout] spanStack The spans stack
+ * @param[inout] colorRuns The container containing all the color runs
+ * @param[inout] fontRuns The container containing all the font description runs
+ * @param[inout] underlinedCharacterRuns The container containing all the underlined character runs
+ * @param[inout] strikethroughCharacterRuns The container containing all the strikethroughed character runs
+ * @param[inout] colorRunIndex The color run index
+ * @param[inout] fontRunIndex The font run index
+ * @param[inout] underlinedCharacterRunIndex The underlined character run index
+ * @param[inout] strikethroughCharacterRunIndex The strikethroughed character run index
  * @param[in] characterIndex The current character index
  * @param[in] tagReference The tagReference we should increment/decrement
  */
 void ProcessSpanForRun(
-  const Tag&                      spanTag,
-  StyleStack<Span>&               spanStack,
-  Vector<ColorRun>&               colorRuns,
-  Vector<FontDescriptionRun>&     fontRuns,
-  Vector<UnderlinedCharacterRun>& underlinedCharacterRuns,
-  Vector<ColorRun>&               backgroundColorRuns,
-  RunIndex&                       colorRunIndex,
-  RunIndex&                       fontRunIndex,
-  RunIndex&                       underlinedCharacterRunIndex,
-  RunIndex&                       backgroundColorRunIndex,
-  const CharacterIndex            characterIndex,
-  int&                            tagReference)
+  const Tag&                         spanTag,
+  StyleStack<Span>&                  spanStack,
+  Vector<ColorRun>&                  colorRuns,
+  Vector<FontDescriptionRun>&        fontRuns,
+  Vector<UnderlinedCharacterRun>&    underlinedCharacterRuns,
+  Vector<ColorRun>&                  backgroundColorRuns,
+  Vector<StrikethroughCharacterRun>& strikethroughCharacterRuns,
+  RunIndex&                          colorRunIndex,
+  RunIndex&                          fontRunIndex,
+  RunIndex&                          underlinedCharacterRunIndex,
+  RunIndex&                          backgroundColorRunIndex,
+  RunIndex&                          strikethroughCharacterRunIndex,
+  const CharacterIndex               characterIndex,
+  int&                               tagReference)
 {
   if(!spanTag.isEndTag)
   {
@@ -755,21 +768,36 @@ void ProcessSpanForRun(
     ColorRun backgroundColorRun;
     Initialize(backgroundColorRun);
 
+    StrikethroughCharacterRun strikethroughCharacterRun;
+    Initialize(strikethroughCharacterRun);
+
     Span span;
     Initialize(span);
 
     // Fill the run with the parameters.
-    colorRun.characterRun.characterIndex               = characterIndex;
-    fontRun.characterRun.characterIndex                = characterIndex;
-    underlinedCharacterRun.characterRun.characterIndex = characterIndex;
-    backgroundColorRun.characterRun.characterIndex     = characterIndex;
+    colorRun.characterRun.characterIndex                  = characterIndex;
+    fontRun.characterRun.characterIndex                   = characterIndex;
+    underlinedCharacterRun.characterRun.characterIndex    = characterIndex;
+    backgroundColorRun.characterRun.characterIndex        = characterIndex;
+    strikethroughCharacterRun.characterRun.characterIndex = characterIndex;
 
-    span.colorRunIndex               = colorRunIndex;
-    span.fontRunIndex                = fontRunIndex;
-    span.underlinedCharacterRunIndex = underlinedCharacterRunIndex;
-    span.backgroundColorRunIndex     = backgroundColorRunIndex;
+    span.colorRunIndex                  = colorRunIndex;
+    span.fontRunIndex                   = fontRunIndex;
+    span.underlinedCharacterRunIndex    = underlinedCharacterRunIndex;
+    span.backgroundColorRunIndex        = backgroundColorRunIndex;
+    span.strikethroughCharacterRunIndex = strikethroughCharacterRunIndex;
 
-    ProcessSpanTag(spanTag, colorRun, fontRun, underlinedCharacterRun, backgroundColorRun, span.isColorDefined, span.isFontDefined, span.isUnderlinedCharacterDefined, span.isBackgroundColorDefined);
+    ProcessSpanTag(spanTag,
+                   colorRun,
+                   fontRun,
+                   underlinedCharacterRun,
+                   backgroundColorRun,
+                   strikethroughCharacterRun,
+                   span.isColorDefined,
+                   span.isFontDefined,
+                   span.isUnderlinedCharacterDefined,
+                   span.isBackgroundColorDefined,
+                   span.isStrikethroughDefined);
 
     // Push the span into the stack.
     spanStack.Push(span);
@@ -801,6 +829,13 @@ void ProcessSpanForRun(
       // Push the run in the logical model.
       backgroundColorRuns.PushBack(backgroundColorRun);
       ++backgroundColorRunIndex;
+    }
+
+    if(span.isStrikethroughDefined)
+    {
+      // Push the run in the logical model.
+      strikethroughCharacterRuns.PushBack(strikethroughCharacterRun);
+      ++strikethroughCharacterRunIndex;
     }
 
     // Increase reference
@@ -837,6 +872,12 @@ void ProcessSpanForRun(
         backgroundColorRun.characterRun.numberOfCharacters = characterIndex - backgroundColorRun.characterRun.characterIndex;
       }
 
+      if(span.isStrikethroughDefined)
+      {
+        StrikethroughCharacterRun& strikethroughCharacterRun      = *(strikethroughCharacterRuns.Begin() + span.strikethroughCharacterRunIndex);
+        strikethroughCharacterRun.characterRun.numberOfCharacters = characterIndex - strikethroughCharacterRun.characterRun.characterIndex;
+      }
+
       --tagReference;
     }
   }
@@ -845,10 +886,11 @@ void ProcessSpanForRun(
 /**
  * @brief Resizes the model's vectors
  *
- * @param[in/out] markupProcessData The markup process data
+ * @param[inout] markupProcessData The markup process data
  * @param[in] fontRunIndex The font run index
  * @param[in] colorRunIndex The color run index
  * @param[in] underlinedCharacterRunIndex The underlined character run index
+ * @param[in] strikethroughCharacterRunIndex The strikethroughed character run index
  * @param[in] backgroundRunIndex The background run index
  * @param[in] boundedParagraphRunIndex The bounded paragraph run index
  *
@@ -857,12 +899,14 @@ void ResizeModelVectors(MarkupProcessData& markupProcessData,
                         const RunIndex     fontRunIndex,
                         const RunIndex     colorRunIndex,
                         const RunIndex     underlinedCharacterRunIndex,
+                        const RunIndex     strikethroughCharacterRunIndex,
                         const RunIndex     backgroundRunIndex,
                         const RunIndex     boundedParagraphRunIndex)
 {
   markupProcessData.fontRuns.Resize(fontRunIndex);
   markupProcessData.colorRuns.Resize(colorRunIndex);
   markupProcessData.underlinedCharacterRuns.Resize(underlinedCharacterRunIndex);
+  markupProcessData.strikethroughCharacterRuns.Resize(strikethroughCharacterRunIndex);
   markupProcessData.backgroundColorRuns.Resize(backgroundRunIndex);
   markupProcessData.boundedParagraphRuns.Resize(boundedParagraphRunIndex);
 
@@ -1007,6 +1051,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   markupProcessData.fontRuns.Reserve(DEFAULT_VECTOR_SIZE);
   markupProcessData.underlinedCharacterRuns.Reserve(DEFAULT_VECTOR_SIZE);
   markupProcessData.backgroundColorRuns.Reserve(DEFAULT_VECTOR_SIZE);
+  markupProcessData.strikethroughCharacterRuns.Reserve(DEFAULT_VECTOR_SIZE);
 
   // Get the mark-up string buffer.
   const char*       markupStringBuffer    = markupString.c_str();
@@ -1096,7 +1141,20 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
       }
       else if(TokenComparison(XHTML_SPAN_TAG, tag.buffer, tag.length))
       {
-        ProcessSpanForRun(tag, spanStack, markupProcessData.colorRuns, markupProcessData.fontRuns, markupProcessData.underlinedCharacterRuns, markupProcessData.backgroundColorRuns, colorRunIndex, fontRunIndex, underlinedCharacterRunIndex, backgroundRunIndex, characterIndex, spanTagReference);
+        ProcessSpanForRun(tag,
+                          spanStack,
+                          markupProcessData.colorRuns,
+                          markupProcessData.fontRuns,
+                          markupProcessData.underlinedCharacterRuns,
+                          markupProcessData.backgroundColorRuns,
+                          markupProcessData.strikethroughCharacterRuns,
+                          colorRunIndex,
+                          fontRunIndex,
+                          underlinedCharacterRunIndex,
+                          backgroundRunIndex,
+                          strikethroughCharacterRunIndex,
+                          characterIndex,
+                          spanTagReference);
       }
       else if(TokenComparison(XHTML_STRIKETHROUGH_TAG, tag.buffer, tag.length))
       {
@@ -1117,7 +1175,7 @@ void ProcessMarkupString(const std::string& markupString, MarkupProcessData& mar
   }
 
   // Resize the model's vectors.
-  ResizeModelVectors(markupProcessData, fontRunIndex, colorRunIndex, underlinedCharacterRunIndex, backgroundRunIndex, boundedParagraphRunIndex);
+  ResizeModelVectors(markupProcessData, fontRunIndex, colorRunIndex, underlinedCharacterRunIndex, strikethroughCharacterRunIndex, backgroundRunIndex, boundedParagraphRunIndex);
 
   // Handle the nested tags
   OverrideNestedUnderlinedCharacterRuns(markupProcessData.underlinedCharacterRuns);
