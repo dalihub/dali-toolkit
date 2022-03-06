@@ -25,7 +25,16 @@ namespace Toolkit
 namespace Text
 {
 struct Tag;
+struct Attribute;
 struct StrikethroughCharacterRun;
+
+/**
+ * @brief Fill the strikethrough character run with the color attribute value.
+ *
+ * @param[in] attribute the color attribute.
+ * @param[out] strikethroughCharacterRun The strikethrough character run
+ */
+void ProcessColorAttribute(const Attribute& attribute, StrikethroughCharacterRun& strikethroughCharacterRun);
 
 /**
  * @brief Retrieves the strikethrough run info from the tag and sets it to the strikethrough run.

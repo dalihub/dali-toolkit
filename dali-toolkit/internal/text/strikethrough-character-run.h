@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-run.h>
+#include <dali-toolkit/internal/text/strikethrough-style-properties.h>
 
 namespace Dali
 {
@@ -35,9 +36,17 @@ namespace Text
  */
 struct StrikethroughCharacterRun
 {
-  CharacterRun characterRun; ///< The initial character index and the number of characters of the run.
-  Vector4      color;        ///< The color of strikethrough.
-  bool         isColorSet;   ///< If the color of strikethrough is set.
+  /**
+   * Default constructor to set the default values of bitfields
+   */
+  StrikethroughCharacterRun()
+  : characterRun{},
+    properties{}
+  {
+  }
+
+  CharacterRun                 characterRun; ///< The initial character index and the number of characters of the run.
+  StrikethroughStyleProperties properties;   /// The properties of strikethrough style
 };
 
 } // namespace Text

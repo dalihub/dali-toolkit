@@ -260,31 +260,6 @@ void TypesetGlyph(GlyphData&           data,
   }
 }
 
-bool doGlyphHaveStrikethrough(GlyphIndex                           index,
-                              const Vector<StrikethroughGlyphRun>& strikethroughRuns,
-                              Vector4&                             strikethroughColor)
-{
-  for(Vector<StrikethroughGlyphRun>::ConstIterator it    = strikethroughRuns.Begin(),
-                                                   endIt = strikethroughRuns.End();
-      it != endIt;
-      ++it)
-  {
-    const StrikethroughGlyphRun& run = *it;
-
-    if((run.glyphRun.glyphIndex <= index) && (index < run.glyphRun.glyphIndex + run.glyphRun.numberOfGlyphs))
-    {
-      if(run.isColorSet)
-      {
-        strikethroughColor = run.color;
-      }
-
-      return true;
-    }
-  }
-
-  return false;
-}
-
 /// Draws the specified color to the pixel buffer
 void WriteColorToPixelBuffer(
   GlyphData&         glyphData,
@@ -546,18 +521,20 @@ Devel::PixelBuffer DrawGlyphsBackground(const ViewModel* model, Devel::PixelBuff
 }
 
 /// Draws the specified strikethrough color to the buffer
-void DrawStrikethrough(
-  const Vector4&     strikethroughColor,
-  const unsigned int bufferWidth,
-  const unsigned int bufferHeight,
-  GlyphData&         glyphData,
-  const float        baseline,
-  const LineRun&     line,
-  const float        maxStrikethroughHeight,
-  const float        lineExtentLeft,
-  const float        lineExtentRight,
-  float              strikethroughStartingYPosition)
+void DrawStrikethrough(const unsigned int                  bufferWidth,
+                       const unsigned int                  bufferHeight,
+                       GlyphData&                          glyphData,
+                       const float                         baseline,
+                       const float                         strikethroughStartingYPosition,
+                       const float                         maxStrikethroughHeight,
+                       const float                         lineExtentLeft,
+                       const float                         lineExtentRight,
+                       const StrikethroughStyleProperties& commonStrikethroughProperties,
+                       const StrikethroughStyleProperties& currentStrikethroughProperties,
+                       const LineRun&                      line)
 {
+  const Vector4& strikethroughColor = currentStrikethroughProperties.colorDefined ? currentStrikethroughProperties.color : commonStrikethroughProperties.color;
+
   uint32_t* bitmapBuffer = reinterpret_cast<uint32_t*>(glyphData.bitmapBuffer.GetBuffer());
 
   for(unsigned int y = strikethroughStartingYPosition; y < strikethroughStartingYPosition + maxStrikethroughHeight; y++)
@@ -840,7 +817,6 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
   // Whether to use the default color.
   const bool     useDefaultColor = (NULL == colorsBuffer);
   const Vector4& defaultColor    = mModel->GetDefaultColor();
-  Vector4        currentStrikethroughColor;
 
   // Create and initialize the pixel buffer.
   GlyphData glyphData;
@@ -901,11 +877,9 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       }
     }
 
-    const bool     underlineEnabled     = mModel->IsUnderlineEnabled();
-    const bool     strikethroughEnabled = mModel->IsStrikethroughEnabled();
-    const Vector4& strikethroughColor   = mModel->GetStrikethroughColor();
-    const float    strikethroughHeight  = mModel->GetStrikethroughHeight();
-    const float    characterSpacing     = mModel->GetCharacterSpacing();
+    const bool  underlineEnabled     = mModel->IsUnderlineEnabled();
+    const bool  strikethroughEnabled = mModel->IsStrikethroughEnabled();
+    const float characterSpacing     = mModel->GetCharacterSpacing();
 
     // Aggregate underline-style-properties from mModel
     const UnderlineStyleProperties modelUnderlineProperties{mModel->GetUnderlineType(),
@@ -919,6 +893,12 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
                                                             true,
                                                             true};
 
+    // Aggregate strikethrough-style-properties from mModel
+    const StrikethroughStyleProperties modelStrikethroughProperties{mModel->GetStrikethroughColor(),
+                                                                    mModel->GetStrikethroughHeight(),
+                                                                    true,
+                                                                    true};
+
     // Get the underline runs.
     const Length               numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
     Vector<UnderlinedGlyphRun> underlineRuns;
@@ -931,16 +911,17 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     strikethroughRuns.Resize(numberOfStrikethroughRuns);
     mModel->GetStrikethroughRuns(strikethroughRuns.Begin(), 0u, numberOfStrikethroughRuns);
 
-    bool thereAreUnderlinedGlyphs = false;
-    bool strikethroughGlyphsExist = false;
+    bool thereAreUnderlinedGlyphs    = false;
+    bool thereAreStrikethroughGlyphs = false;
 
     float currentUnderlinePosition   = 0.0f;
     float currentUnderlineHeight     = modelUnderlineProperties.height;
     float maxUnderlineHeight         = currentUnderlineHeight;
     auto  currentUnderlineProperties = modelUnderlineProperties;
 
-    float currentStrikethroughHeight     = strikethroughHeight;
+    float currentStrikethroughHeight     = modelStrikethroughProperties.height;
     float maxStrikethroughHeight         = currentStrikethroughHeight;
+    auto  currentStrikethroughProperties = modelStrikethroughProperties;
     float strikethroughStartingYPosition = 0.0f;
 
     FontId lastFontId = 0;
@@ -1008,9 +989,11 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
       currentUnderlineHeight                                                = currentUnderlineProperties.height;
       thereAreUnderlinedGlyphs                                              = thereAreUnderlinedGlyphs || underlineGlyph;
 
-      currentStrikethroughColor     = strikethroughColor;
-      const bool strikethroughGlyph = strikethroughEnabled || doGlyphHaveStrikethrough(glyphIndex, strikethroughRuns, currentStrikethroughColor);
-      strikethroughGlyphsExist      = strikethroughGlyphsExist || strikethroughGlyph;
+      Vector<StrikethroughGlyphRun>::ConstIterator currentStrikethroughGlyphRunIt = strikethroughRuns.End();
+      const bool                                   strikethroughGlyph             = strikethroughEnabled || IsGlyphStrikethrough(glyphIndex, strikethroughRuns, currentStrikethroughGlyphRunIt);
+      currentStrikethroughProperties                                              = GetCurrentStrikethroughProperties(strikethroughGlyph, strikethroughRuns, currentStrikethroughGlyphRunIt, modelStrikethroughProperties);
+      currentStrikethroughHeight                                                  = GetCurrentStrikethroughHeight(strikethroughRuns, currentStrikethroughGlyphRunIt, modelStrikethroughProperties.height);
+      thereAreStrikethroughGlyphs                                                 = thereAreStrikethroughGlyphs || strikethroughGlyph;
 
       // Are we still using the same fontId as previous
       if((glyphInfo->fontId != lastFontId) && (strikethroughGlyph || underlineGlyph))
@@ -1163,11 +1146,11 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
     }
 
     // Draw the strikethrough from the leftmost glyph to the rightmost glyph
-    if(strikethroughGlyphsExist && style == Typesetter::STYLE_STRIKETHROUGH)
+    if(thereAreStrikethroughGlyphs && style == Typesetter::STYLE_STRIKETHROUGH)
     {
       //TODO : The currently implemented strikethrough creates a strikethrough on the line level. We need to create different strikethroughs the case of glyphs with different sizes.
       strikethroughStartingYPosition = (glyphData.verticalOffset + baseline + currentUnderlinePosition) - ((line.ascender) * HALF); // Since Free Type font doesn't contain the strikethrough-position property, strikethrough position will be calculated by moving the underline position upwards by half the value of the line height.
-      DrawStrikethrough(currentStrikethroughColor, bufferWidth, bufferHeight, glyphData, baseline, line, maxStrikethroughHeight, lineExtentLeft, lineExtentRight, strikethroughStartingYPosition);
+      DrawStrikethrough(bufferWidth, bufferHeight, glyphData, baseline, strikethroughStartingYPosition, maxStrikethroughHeight, lineExtentLeft, lineExtentRight, modelStrikethroughProperties, currentStrikethroughProperties, line);
     }
 
     // Increases the vertical offset with the line's descender.

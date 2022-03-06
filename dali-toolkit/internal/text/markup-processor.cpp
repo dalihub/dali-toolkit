@@ -214,7 +214,7 @@ void Initialize(StrikethroughCharacterRun& strikethroughCharacterRun)
 {
   strikethroughCharacterRun.characterRun.characterIndex     = 0u;
   strikethroughCharacterRun.characterRun.numberOfCharacters = 0u;
-  strikethroughCharacterRun.isColorSet                      = false;
+  strikethroughCharacterRun.properties.colorDefined         = false;
 }
 
 /**
