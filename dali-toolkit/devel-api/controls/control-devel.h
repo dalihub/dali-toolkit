@@ -201,6 +201,20 @@ enum
    * @note The representative Accessible object will not appear in the AT-SPI tree.
    */
   ACCESSIBILITY_HIDDEN,
+
+  /**
+   * @brief The actor ID of the clockwise focusable control.
+   * @details Name "clockwiseFocusableActorId", type Property::INTEGER.
+   *
+   */
+  CLOCKWISE_FOCUSABLE_ACTOR_ID,
+
+  /**
+   * @brief The actor ID of the conter-clockwise focusable control.
+   * @details Name "counterClockwiseFocusableActorId", type Property::INTEGER.
+   *
+   */
+  COUNTER_CLOCKWISE_FOCUSABLE_ACTOR_ID,
 };
 
 } // namespace Property

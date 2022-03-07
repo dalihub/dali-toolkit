@@ -295,7 +295,13 @@ private:
    * Callback for the wheel event when the custom wheel event occurs.
    * @param[in] wheel The WheelEvent information
    */
-  bool OnWheelEvent(const WheelEvent& wheel);
+  bool OnCustomWheelEvent(const WheelEvent& wheel);
+
+  /**
+   * Callback for the wheel event when the wheel event occurs.
+   * @param[in] wheel The WheelEvent information
+   */
+  void OnWheelEvent(const WheelEvent& wheel);
 
   /**
    * Called when the window focus is changed.
@@ -315,7 +321,7 @@ private:
    * @param[in]  event  The WheelEvent.
    * @return True if WheelEvent is consumed.
    */
-  bool EmitWheelSignals(Actor actor, const WheelEvent& event);
+  bool EmitCustomWheelSignals(Actor actor, const WheelEvent& event);
 
 private:
   // Undefined
