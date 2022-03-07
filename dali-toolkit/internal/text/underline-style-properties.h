@@ -100,6 +100,80 @@ struct UnderlineStyleProperties
     return ((!heightDefined && !other.heightDefined) || ((heightDefined && other.heightDefined) && (height == other.height)));
   }
 
+  UnderlineStyleProperties& CopyIfNotDefined(const UnderlineStyleProperties& other)
+  {
+    //Copy only the defined properties in other and not defined in this from other to this
+    if(!typeDefined && other.typeDefined)
+    {
+      type        = other.type;
+      typeDefined = true;
+    }
+
+    if(!heightDefined && other.heightDefined)
+    {
+      height        = other.height;
+      heightDefined = true;
+    }
+
+    if(!colorDefined && other.colorDefined)
+    {
+      color        = other.color;
+      colorDefined = true;
+    }
+
+    if(!dashGapDefined && other.dashGapDefined)
+    {
+      dashGap        = other.dashGap;
+      dashGapDefined = true;
+    }
+
+    if(!dashWidthDefined && other.dashWidthDefined)
+    {
+      dashWidth        = other.dashWidth;
+      dashWidthDefined = true;
+    }
+
+    // to chain this method
+    return *this;
+  }
+
+  UnderlineStyleProperties& OverrideByDefinedProperties(const UnderlineStyleProperties& other)
+  {
+    //Copy only the defined properties in other from other to this
+    if(other.typeDefined)
+    {
+      type        = other.type;
+      typeDefined = true;
+    }
+
+    if(other.heightDefined)
+    {
+      height        = other.height;
+      heightDefined = true;
+    }
+
+    if(other.colorDefined)
+    {
+      color        = other.color;
+      colorDefined = true;
+    }
+
+    if(other.dashGapDefined)
+    {
+      dashGap        = other.dashGap;
+      dashGapDefined = true;
+    }
+
+    if(other.dashWidthDefined)
+    {
+      dashWidth        = other.dashWidth;
+      dashWidthDefined = true;
+    }
+
+    // to chain this method
+    return *this;
+  }
+
   //Attributes
   Text::Underline::Type type;      ///< The type of underline.
   Vector4               color;     ///< The color of underline.

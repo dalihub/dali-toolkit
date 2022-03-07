@@ -1004,8 +1004,8 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer(const unsigned int bufferWidth,
 
       Vector<UnderlinedGlyphRun>::ConstIterator currentUnderlinedGlyphRunIt = underlineRuns.End();
       const bool                                underlineGlyph              = underlineEnabled || IsGlyphUnderlined(glyphIndex, underlineRuns, currentUnderlinedGlyphRunIt);
-      currentUnderlineProperties                                            = GetCurrentUnderlineProperties(underlineGlyph, underlineRuns, currentUnderlinedGlyphRunIt, modelUnderlineProperties);
-      currentUnderlineHeight                                                = GetCurrentUnderlineHeight(underlineRuns, currentUnderlinedGlyphRunIt, modelUnderlineProperties.height);
+      currentUnderlineProperties                                            = GetCurrentUnderlineProperties(glyphIndex, underlineGlyph, underlineRuns, currentUnderlinedGlyphRunIt, modelUnderlineProperties);
+      currentUnderlineHeight                                                = currentUnderlineProperties.height;
       thereAreUnderlinedGlyphs                                              = thereAreUnderlinedGlyphs || underlineGlyph;
 
       currentStrikethroughColor     = strikethroughColor;
@@ -1256,24 +1256,15 @@ Devel::PixelBuffer Typesetter::ApplyUnderlineMarkupImageBuffer(Devel::PixelBuffe
   //The outer loop to iterate on the separated chunks of underlined glyph runs
   while(itGlyphRun != endItGlyphRun)
   {
-    const UnderlineStyleProperties& firstUnderlineStyleProperties = itGlyphRun->properties;
-
     startGlyphIndex = itGlyphRun->glyphRun.glyphIndex;
-    endGlyphIndex   = startGlyphIndex;
-    //The inner loop to make a connected underline for the consecutive characters
-    do
-    {
-      endGlyphIndex += itGlyphRun->glyphRun.numberOfGlyphs;
-      itGlyphRun++;
-    } while(itGlyphRun != endItGlyphRun && itGlyphRun->glyphRun.glyphIndex == endGlyphIndex &&
-            (firstUnderlineStyleProperties == itGlyphRun->properties));
-
-    endGlyphIndex--;
+    endGlyphIndex   = startGlyphIndex + itGlyphRun->glyphRun.numberOfGlyphs - 1;
 
     // Create the image buffer for underline
     Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, horizontalOffset, verticalOffset, startGlyphIndex, endGlyphIndex);
     // Combine the two buffers
-    topPixelBuffer = CombineImageBuffer(topPixelBuffer, underlineImageBuffer, bufferWidth, bufferHeight);
+    topPixelBuffer = CombineImageBuffer(underlineImageBuffer, topPixelBuffer, bufferWidth, bufferHeight);
+
+    itGlyphRun++;
   }
 
   return topPixelBuffer;

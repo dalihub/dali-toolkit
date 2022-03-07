@@ -18,6 +18,12 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/underlined-character-run.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -26,7 +32,6 @@ namespace Text
 {
 struct Tag;
 struct Attribute;
-struct UnderlinedCharacterRun;
 
 /**
  * @brief Fill the underlined character run with the type attribute value.
@@ -75,6 +80,13 @@ void ProcessColorAttribute(const Attribute& attribute, UnderlinedCharacterRun& u
  * @param[in,out] underlinedCharacterRun The underlined character run
  */
 void ProcessUnderlineTag(const Tag& tag, UnderlinedCharacterRun& underlinedCharacterRun);
+
+/**
+ * @brief Override the run's attributes which contained in the previous run. This is to handle the nested tags.
+ *
+ * @param[in,out] underlinedCharacterRuns The list of underlined character run
+ */
+void OverrideNestedUnderlinedCharacterRuns(Vector<UnderlinedCharacterRun>& underlinedCharacterRuns);
 
 } // namespace Text
 

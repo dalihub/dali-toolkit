@@ -108,6 +108,44 @@ void ProcessUnderlineTag(const Tag& tag, UnderlinedCharacterRun& underlinedChara
   }
 }
 
+void OverrideNestedUnderlinedCharacterRuns(Vector<UnderlinedCharacterRun>& underlinedCharacterRuns)
+{
+  // Handle nested tags
+  // The inner tag inherit the attributes of the outer tag and override them when defined in the inner tag.
+  // Example:
+  // <u height='5.0f' color='blue'> outer tag before  <u color='green'> inner tag </u> outer tag after </u>
+  // "outer tag before" and  "outer tag after" have height = 5.0f and color = 'blue'
+  // "inner tag" has height = 5.0f and color = 'green'
+
+  if(underlinedCharacterRuns.Count() > 0u)
+  {
+    Vector<UnderlinedCharacterRun>::ConstIterator preIt = underlinedCharacterRuns.Begin();
+
+    Vector<UnderlinedCharacterRun>::Iterator      it    = underlinedCharacterRuns.Begin() + 1;
+    Vector<UnderlinedCharacterRun>::ConstIterator endIt = underlinedCharacterRuns.End();
+
+    while(it != endIt)
+    {
+      const UnderlinedCharacterRun& run                = *it;
+      const CharacterIndex&         characterIndex     = run.characterRun.characterIndex;
+      const Length&                 numberOfCharacters = run.characterRun.numberOfCharacters;
+
+      const UnderlinedCharacterRun& preRun                = *preIt;
+      const CharacterIndex&         preCharacterIndex     = preRun.characterRun.characterIndex;
+      const Length&                 preNumberOfCharacters = preRun.characterRun.numberOfCharacters;
+
+      if((preCharacterIndex <= characterIndex) &&
+         ((characterIndex + numberOfCharacters) <= (preCharacterIndex + preNumberOfCharacters)))
+      {
+        it->properties.CopyIfNotDefined(preIt->properties);
+      }
+
+      it++;
+      preIt++;
+    }
+  }
+}
+
 } // namespace Text
 
 } // namespace Toolkit

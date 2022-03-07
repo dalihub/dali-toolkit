@@ -564,8 +564,8 @@ struct AtlasRenderer::Impl
 
       Vector<UnderlinedGlyphRun>::ConstIterator currentUnderlinedGlyphRunIt = underlineRuns.End();
       const bool                                isGlyphUnderlined           = underlineEnabled || IsGlyphUnderlined(i, underlineRuns, currentUnderlinedGlyphRunIt);
-      const UnderlineStyleProperties            currentUnderlineProperties  = GetCurrentUnderlineProperties(isGlyphUnderlined, underlineRuns, currentUnderlinedGlyphRunIt, viewUnderlineProperties);
-      float                                     currentUnderlineHeight      = GetCurrentUnderlineHeight(underlineRuns, currentUnderlinedGlyphRunIt, viewUnderlineProperties.height);
+      const UnderlineStyleProperties            currentUnderlineProperties  = GetCurrentUnderlineProperties(i, isGlyphUnderlined, underlineRuns, currentUnderlinedGlyphRunIt, viewUnderlineProperties);
+      float                                     currentUnderlineHeight      = currentUnderlineProperties.height;
       thereAreUnderlinedGlyphs                                              = thereAreUnderlinedGlyphs || isGlyphUnderlined;
 
       currentStrikethroughColor       = strikethroughColor;
@@ -655,10 +655,10 @@ struct AtlasRenderer::Impl
 
           //The new underlined chunk. Add new id if they are not consecutive indices (this is for Markup case)
           // Examples: "Hello <u>World</u> Hello <u>World</u>", "<u>World</u> Hello <u>World</u>", "<u>   World</u> Hello <u>World</u>"
-          if(isPreUnderlined && (!isGlyphUnderlined || (preUnderlineProperties != currentUnderlineProperties)))
+          if((!isPreUnderlined && isGlyphUnderlined) || (isGlyphUnderlined && (preUnderlineProperties != currentUnderlineProperties)))
           {
-            mapUnderlineChunkIdWithProperties.insert(std::pair<uint32_t, UnderlineStyleProperties>(underlineChunkId, preUnderlineProperties));
             underlineChunkId++;
+            mapUnderlineChunkIdWithProperties.insert(std::pair<uint32_t, UnderlineStyleProperties>(underlineChunkId, currentUnderlineProperties));
           }
 
           //Keep status of underlined for previous glyph to check consecutive indices
