@@ -306,6 +306,217 @@ int UtcDaliTextLabelMarkupUnderlineAttributes(void)
   END_TEST;
 }
 
+int UtcDaliTextLabelMarkupSpanUnderline(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLabelMarkupSpanUnderline ");
+
+  TextLabel textLabel = TextLabel::New();
+
+  application.GetScene().Add(textLabel);
+
+  std::string testText =
+    "start<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ABC1</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='solid'>ABC2</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed'>ABC3</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='double'>ABC4</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-color='green'>ABC5</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-height='5.0f'>ABC6</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed' u-dash-gap='3.0f'>ABC7</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed' u-dash-width='4.0f'>ABC8</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-color='blue' u-type='dashed' u-height='4.0f' u-dash-gap='2.0f' u-dash-width='3.0f'>ABC9</span>end"
+
+    ;
+
+  textLabel.SetProperty(TextLabel::Property::TEXT, testText);
+  textLabel.SetProperty(TextLabel ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t NUMBER_OF_CASES                  = 8u;
+  uint32_t       expectedNumberOfUnderlinedGlyphs = 32u;
+
+  Toolkit::Internal::TextLabel& textLabelImpl         = GetImpl(textLabel);
+  const Text::Length            numberOfUnderlineRuns = textLabelImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
+
+  DALI_TEST_EQUALS(numberOfUnderlineRuns, expectedNumberOfUnderlinedGlyphs, TEST_LOCATION);
+
+  Vector<UnderlinedGlyphRun> underlineRuns;
+  underlineRuns.Resize(numberOfUnderlineRuns);
+  textLabelImpl.GetTextController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+
+  struct DataOfCase
+  {
+    std::string              title;
+    uint32_t                 startIndex;
+    uint32_t                 endIndex;
+    GlyphIndex               startGlyphIndex;
+    GlyphIndex               endGlyphIndex;
+    UnderlineStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='solid'>ABC2</span>",
+       0u,
+       3u,
+       13u,
+       16u,
+       {
+         Text::Underline::SOLID,
+         Color::BLACK,
+         0u,
+         1u,
+         2u,
+         true,
+         false,
+         false,
+         false,
+         false,
+       }},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed'>ABC3</span>",
+       4u,
+       7u,
+       21u,
+       24u,
+       {
+         Text::Underline::DASHED,
+         Color::BLACK,
+         0u,
+         1u,
+         2u,
+         true,
+         false,
+         false,
+         false,
+         false,
+       }},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='double'>ABC4</span>",
+       8u,
+       11u,
+       29u,
+       32u,
+       {
+         Text::Underline::DOUBLE,
+         Color::BLACK,
+         0u,
+         1u,
+         2u,
+         true,
+         false,
+         false,
+         false,
+         false,
+       }},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-color='green'>ABC5</span>",
+       12u,
+       15u,
+       37u,
+       40u,
+       {
+         Text::Underline::SOLID,
+         Color::GREEN,
+         0u,
+         1u,
+         2u,
+         false,
+         true,
+         false,
+         false,
+         false,
+       }},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-height='5.0f'>ABC6</span>",
+       16u,
+       19u,
+       45u,
+       48u,
+       {
+         Text::Underline::SOLID,
+         Color::BLACK,
+         5u,
+         1u,
+         2u,
+         false,
+         false,
+         true,
+         false,
+         false,
+       }},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed' u-dash-gap='3.0f'>ABC7</span>",
+       20u,
+       23u,
+       53u,
+       56u,
+       {
+         Text::Underline::DASHED,
+         Color::BLACK,
+         0u,
+         3u,
+         2u,
+         true,
+         false,
+         false,
+         true,
+         false,
+       }},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed' u-dash-width='4.0f'>ABC8</span>",
+       24u,
+       27u,
+       61u,
+       64u,
+       {
+         Text::Underline::DASHED,
+         Color::BLACK,
+         0u,
+         1u,
+         4u,
+         true,
+         false,
+         false,
+         false,
+         true,
+       }},
+
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-color='blue' u-type='dashed' u-height='4.0f' u-dash-gap='2.0f' u-dash-width='3.0f'>ABC9</span>",
+       28u,
+       31u,
+       69u,
+       72u,
+       {
+         Text::Underline::DASHED,
+         Color::BLUE,
+         4u,
+         2u,
+         3u,
+         true,
+         true,
+         true,
+         true,
+         true,
+       }},
+
+    };
+
+  for(uint32_t i = 0; i < NUMBER_OF_CASES; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(underlineRuns[data[i].startIndex].glyphRun.glyphIndex, data[i].startGlyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(underlineRuns[data[i].endIndex].glyphRun.glyphIndex, data[i].endGlyphIndex, TEST_LOCATION);
+
+    DALI_TEST_CHECK(data[i].properties == underlineRuns[data[i].startIndex].properties);
+    DALI_TEST_CHECK(data[i].properties == underlineRuns[data[i].endIndex].properties);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliTextLabelBackgroundTag(void)
 {
   ToolkitTestApplication application;

@@ -19,10 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/vector4.h>
 
 // INTERNAL INCLUDES
-
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 
 namespace Dali
