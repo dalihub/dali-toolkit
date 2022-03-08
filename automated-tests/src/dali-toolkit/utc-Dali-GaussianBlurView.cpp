@@ -192,7 +192,6 @@ int UtcDaliGaussianBlurActivateDeactivate(void)
 // Positive test case for a method
 int UtcDaliGaussianBlurActivateDeactivateRepeat(void)
 {
-#ifdef OLD_GRAPHICS_TEST // NEeds framebuffers implementing
   ToolkitTestApplication application;
   TestGlAbstraction&     gl           = application.GetGlAbstraction();
   TraceCallStack&        textureTrace = gl.GetTextureTrace();
@@ -226,9 +225,6 @@ int UtcDaliGaussianBlurActivateDeactivateRepeat(void)
   application.Render(20);
 
   DALI_TEST_EQUALS(gl.GetLastGenTextureId(), 6, TEST_LOCATION);
-#else
-  tet_result(TET_PASS);
-#endif
   END_TEST;
 }
 
@@ -299,7 +295,6 @@ int UtcDaliGaussianBlurViewActivateOnce1(void)
 // Positive test case for a method
 int UtcDaliGaussianBlurActivateOnce2(void)
 {
-#ifdef OLD_GRAPHICS_TEST // requires framebuffers to be implemented
   ToolkitTestApplication application;
   TestGlAbstraction&     gl           = application.GetGlAbstraction();
   TraceCallStack&        textureTrace = gl.GetTextureTrace();
@@ -326,10 +321,6 @@ int UtcDaliGaussianBlurActivateOnce2(void)
   application.Render(20);
 
   DALI_TEST_CHECK(gl.GetLastGenTextureId() == 6);
-
-#else
-  tet_result(TET_PASS);
-#endif
 
   END_TEST;
 }

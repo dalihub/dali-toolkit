@@ -318,14 +318,13 @@ int UtcDaliBubbleEmitterEmitBubble(void)
 
 int UtcDaliBubbleEmitterRestore(void)
 {
-#ifdef OLD_GRAPHICS_TEST
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliBubbleEmitterRestore ");
 
   static std::vector<UniformData> customUniforms =
     {
-      UniformData("uPercentage[0]", Property::Type::FLOAT),
-      UniformData("uStartEndPosition[0]", Property::Type::VECTOR4),
+      UniformData("uPercentage[90]", Property::Type::FLOAT),
+      UniformData("uStartEndPosition[90]", Property::Type::VECTOR4),
     };
 
   TestGraphicsController& graphics = application.GetGraphicsController();
@@ -380,9 +379,6 @@ int UtcDaliBubbleEmitterRestore(void)
 
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uStartEndPosition[0]", startEndPosValue));
   DALI_TEST_EQUALS(startEndPosValue, Vector4::ZERO, TEST_LOCATION);
-#else
-  tet_result(TET_PASS);
-#endif
 
   END_TEST;
 }

@@ -32,8 +32,8 @@
 #include <dali-toolkit/public-api/image-loader/image-url.h>
 #include <dali-toolkit/public-api/image-loader/image.h>
 
-#include <test-encoded-image-buffer.h>
 #include "dummy-control.h"
+#include "test-encoded-image-buffer.h"
 #include "test-native-image-source.h"
 
 using namespace Dali;
@@ -726,14 +726,10 @@ int UtcDaliImageVisualTextureReuse1(void)
 
   DALI_TEST_EQUALS(actor2.GetRendererCount(), 1u, TEST_LOCATION);
 
-  tet_infoline(
-    "Test that 2 draw calls occur with no new texture gens/binds, i.e. both\n"
-    "draw calls use the same texture as the previous draw call\n");
-
+  // Testing for texture re-use in gl side is not relevant - we are not using actual graphics
+  // backend here, but test graphics backend.
   DALI_TEST_EQUALS(textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION);
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawArrays"), 2, TEST_LOCATION);
-  // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
-  //  DALI_TEST_EQUALS( textureTrace.CountMethod("BindTexture"), 0, TEST_LOCATION );
 
   tet_infoline("Test that removing 1 actor doesn't delete the texture\n");
 
@@ -1101,10 +1097,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(1.0f, 1.0f, 1.0f, 0.5f)), true, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(TARGET_MIX_COLOR)), true, TEST_LOCATION);
 
-  // GL_BLEND should not be changed: Keep enabled
-  // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
-  //  DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
-  DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Disable", blendStr.str()));
+  // (Don't test for caching of capabilities, toolkit uses Test graphics backend, not actual backend)
 
   TestMixColor(visual, Visual::Property::MIX_COLOR, TARGET_MIX_COLOR);
 
@@ -1180,8 +1173,7 @@ int UtcDaliImageVisualAnimateOpacity(void)
     DALI_TEST_CHECK(application.GetGlAbstraction().GetUniformValue<Vector4>("uColor", color));
     DALI_TEST_EQUALS(color.a, 1.0f, TEST_LOCATION);
 
-    // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
-    //    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+    // (Don't test for caching of capabilities, toolkit uses Test graphics backend, not actual backend)
     DALI_TEST_CHECK(glEnableStack.FindMethodAndParams("Disable", blendStr.str()));
   }
 
@@ -1221,10 +1213,7 @@ int UtcDaliImageVisualAnimateOpacity(void)
     DALI_TEST_CHECK(application.GetGlAbstraction().GetUniformValue<Vector4>("uColor", color));
     DALI_TEST_EQUALS(color.a, 0.1f, TEST_LOCATION);
 
-    // GL_BLEND should not be changed: Keep enabled
-    // @todo
-    // TODO: Temporarily commented out the line below when caching is disabled. Will need to add it back.
-    //    DALI_TEST_CHECK( !glEnableStack.FindMethodAndParams( "Enable", blendStr.str() ) );
+    // (Don't test for caching of capabilities, toolkit uses Test graphics backend, not actual backend)
     DALI_TEST_CHECK(!glEnableStack.FindMethodAndParams("Disable", blendStr.str()));
   }
 
