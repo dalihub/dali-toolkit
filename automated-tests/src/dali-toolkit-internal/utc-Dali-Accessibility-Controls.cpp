@@ -36,7 +36,7 @@ int UtcDaliControlPropertyAccessibilityTranslationDomain(void)
   auto control = Control::New();
 
   auto accessibility_translation_domain = DevelControl::Property::ACCESSIBILITY_TRANSLATION_DOMAIN;
-  DALI_TEST_EQUALS( Property::NONE , control.GetProperty( accessibility_translation_domain ).GetType(), TEST_LOCATION );
+  DALI_TEST_EQUALS("", control.GetProperty<std::string>(accessibility_translation_domain), TEST_LOCATION);
 
   control.SetProperty( accessibility_translation_domain, "translation_domain_test_1" );
   DALI_TEST_EQUALS( "translation_domain_test_1" , control.GetProperty( accessibility_translation_domain ).Get<  std::string  >(), TEST_LOCATION );

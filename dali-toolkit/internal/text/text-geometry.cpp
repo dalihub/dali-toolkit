@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,14 @@ namespace Toolkit
 {
 namespace Text
 {
-bool GetNextLine(GlyphIndex index, LineIndex& lineIndex, LineRun*& lineRun, GlyphIndex& lastGlyphOfLine, Length numberOfLines)
+bool GetNextLine(GlyphIndex index, LineIndex& lineIndex, LineRun*& lineRun, GlyphIndex& lastGlyphOfLine, Length numberOfLines, bool& isLastLine)
 {
   if(index == lastGlyphOfLine)
   {
     ++lineIndex;
     if(lineIndex < numberOfLines)
     {
+      isLastLine = (lineIndex + 1 == numberOfLines);
       ++lineRun;
       return true;
     }
@@ -47,11 +48,11 @@ bool GetNextLine(GlyphIndex index, LineIndex& lineIndex, LineRun*& lineRun, Glyp
   return false;
 }
 
-void UpdateLineInfo(const LineRun* lineRun, float& currentLineOffset, float& currentLineHeight, GlyphIndex& lastGlyphOfLine)
+void UpdateLineInfo(const LineRun* lineRun, float& currentLineOffset, float& currentLineHeight, GlyphIndex& lastGlyphOfLine, bool isLastLine)
 {
   lastGlyphOfLine   = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
   currentLineOffset = currentLineOffset + currentLineHeight;
-  currentLineHeight = GetLineHeight(*lineRun);
+  currentLineHeight = GetLineHeight(*lineRun, isLastLine);
 }
 
 void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterIndex endIndex, Vector<Vector2>& sizesList, Vector<Vector2>& positionsList)
@@ -100,6 +101,7 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
   GlyphIndex   glyphEnd       = *(charactersToGlyphBuffer + endIndex) + ((numberOfGlyphs > 0) ? numberOfGlyphs - 1u : 0u);
   LineIndex    lineIndex      = visualModel->GetLineOfCharacter(startIndex);
   Length       numberOfLines  = visualModel->GetTotalNumberOfLines();
+  bool         isLastLine     = lineIndex + 1 == numberOfLines;
 
   LineIndex firstLineIndex = lineIndex;
   Size      textInLineSize;
@@ -109,7 +111,7 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
 
   //get the first line and its vertical offset
   float      currentLineOffset = CalculateLineOffset(visualModel->mLines, firstLineIndex);
-  float      currentLineHeight = GetLineHeight(*lineRun);
+  float      currentLineHeight = GetLineHeight(*lineRun, isLastLine);
   GlyphIndex lastGlyphOfLine   = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1;
 
   // Check if the first/last glyph is a ligature that needs be splitted like English fi or Arabic ﻻ.
@@ -148,9 +150,9 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
             positionsList.PushBack(blockPos);
           }
 
-          if(GetNextLine(index, lineIndex, lineRun, lastGlyphOfLine, numberOfLines))
+          if(GetNextLine(index, lineIndex, lineRun, lastGlyphOfLine, numberOfLines, isLastLine))
           {
-            UpdateLineInfo(lineRun, currentLineOffset, currentLineHeight, lastGlyphOfLine);
+            UpdateLineInfo(lineRun, currentLineOffset, currentLineHeight, lastGlyphOfLine, isLastLine);
           }
           // Ignore any glyph that was removed
           continue;
@@ -165,9 +167,9 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
         }
         else if((ellipsisPosition == DevelText::EllipsisPosition::START) && (index <= startIndexOfGlyphs))
         {
-          if(GetNextLine(index, lineIndex, lineRun, lastGlyphOfLine, numberOfLines))
+          if(GetNextLine(index, lineIndex, lineRun, lastGlyphOfLine, numberOfLines, isLastLine))
           {
-            UpdateLineInfo(lineRun, currentLineOffset, currentLineHeight, lastGlyphOfLine);
+            UpdateLineInfo(lineRun, currentLineOffset, currentLineHeight, lastGlyphOfLine, isLastLine);
           }
 
           continue;
@@ -214,9 +216,9 @@ void GetTextGeometry(ModelPtr textModel, CharacterIndex startIndex, CharacterInd
       currentSize.y     = currentLineHeight;
 
       // if there is next line to retrieve.
-      if(GetNextLine(index, lineIndex, lineRun, lastGlyphOfLine, numberOfLines))
+      if(GetNextLine(index, lineIndex, lineRun, lastGlyphOfLine, numberOfLines, isLastLine))
       {
-        UpdateLineInfo(lineRun, currentLineOffset, currentLineHeight, lastGlyphOfLine);
+        UpdateLineInfo(lineRun, currentLineOffset, currentLineHeight, lastGlyphOfLine, isLastLine);
       }
     }
 

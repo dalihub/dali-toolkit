@@ -194,6 +194,13 @@ enum Type
   *   The default value is 0.f which does nothing.
   */
   CHARACTER_SPACING,
+
+  /**
+   * @brief the relative height of the line (a factor that will be multiplied by text height).
+   * @details Name "relativeLineSize", type Property::FLOAT.
+   * @note If the value is less than 1, the lines could to be overlapped.
+   */
+  RELATIVE_LINE_SIZE,
 };
 
 } // namespace Property

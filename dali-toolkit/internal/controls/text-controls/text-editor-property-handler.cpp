@@ -723,6 +723,15 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       impl.mRenderer.Reset();
       break;
     }
+    case Toolkit::DevelTextEditor::Property::RELATIVE_LINE_SIZE:
+    {
+      const float relativeLineSize = value.Get<float>();
+      DALI_LOG_INFO(gTextEditorLogFilter, Debug::Verbose, "TextEditor %p RELATIVE_LINE_SIZE %f\n", impl.mController.Get(), relativeLineSize);
+
+      impl.mController->SetRelativeLineSize(relativeLineSize);
+      impl.mRenderer.Reset();
+      break;
+    }
   }
 }
 
@@ -1128,6 +1137,11 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     case Toolkit::DevelTextEditor::Property::CHARACTER_SPACING:
     {
       value = impl.mController->GetCharacterSpacing();
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::RELATIVE_LINE_SIZE:
+    {
+      value = impl.mController->GetRelativeLineSize();
       break;
     }
   } //switch

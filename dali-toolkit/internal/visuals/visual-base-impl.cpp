@@ -1098,6 +1098,21 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key)
       return OnGetPropertyObject(key);
     }
   }
+  else
+  {
+    if(index == mImpl->mBorderlineWidthIndex ||
+       index == mImpl->mBorderlineColorIndex ||
+       index == mImpl->mBorderlineOffsetIndex)
+    {
+      // Borderline is animated now. we always have to use borderline feature.
+      mImpl->mAlwaysUsingBorderline = true;
+    }
+    if(index == mImpl->mCornerRadiusIndex)
+    {
+      // CornerRadius is animated now. we always have to use corner radius feature.
+      mImpl->mAlwaysUsingCornerRadius = true;
+    }
+  }
 
   return Dali::Property(mImpl->mRenderer, index);
 }

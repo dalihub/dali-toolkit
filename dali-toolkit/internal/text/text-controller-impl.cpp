@@ -712,6 +712,23 @@ bool Controller::Impl::SetDefaultLineSize(float lineSize)
   return false;
 }
 
+bool Controller::Impl::SetRelativeLineSize(float relativeLineSize)
+{
+  if(std::fabs(relativeLineSize - GetRelativeLineSize()) > Math::MACHINE_EPSILON_1000)
+  {
+    mLayoutEngine.SetRelativeLineSize(relativeLineSize);
+
+    RelayoutAllCharacters();
+    return true;
+  }
+  return false;
+}
+
+float Controller::Impl::GetRelativeLineSize()
+{
+  return mLayoutEngine.GetRelativeLineSize();
+}
+
 string Controller::Impl::GetSelectedText()
 {
   string text;
@@ -1619,26 +1636,26 @@ void Controller::Impl::CopyUnderlinedFromLogicalToVisualModels(bool shouldClearP
   {
     CharacterIndex characterIndex     = it->characterRun.characterIndex;
     Length         numberOfCharacters = it->characterRun.numberOfCharacters;
-    for(Length index = 0u; index < numberOfCharacters; index++)
+
+    if(numberOfCharacters == 0)
     {
-      UnderlinedGlyphRun underlineGlyphRun;
-      underlineGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex + index];
-      underlineGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex + index];
-
-      //Copy properties (attributes)
-      underlineGlyphRun.properties.type             = it->properties.type;
-      underlineGlyphRun.properties.color            = it->properties.color;
-      underlineGlyphRun.properties.height           = it->properties.height;
-      underlineGlyphRun.properties.dashGap          = it->properties.dashGap;
-      underlineGlyphRun.properties.dashWidth        = it->properties.dashWidth;
-      underlineGlyphRun.properties.typeDefined      = it->properties.typeDefined;
-      underlineGlyphRun.properties.colorDefined     = it->properties.colorDefined;
-      underlineGlyphRun.properties.heightDefined    = it->properties.heightDefined;
-      underlineGlyphRun.properties.dashGapDefined   = it->properties.dashGapDefined;
-      underlineGlyphRun.properties.dashWidthDefined = it->properties.dashWidthDefined;
-
-      mModel->mVisualModel->mUnderlineRuns.PushBack(underlineGlyphRun);
+      continue;
     }
+
+    // Create one run for all glyphs of all run's characters that has same properties
+    // This enhance performance and reduce the needed memory to store glyphs-runs
+    UnderlinedGlyphRun underlineGlyphRun;
+    underlineGlyphRun.glyphRun.glyphIndex     = charactersToGlyph[characterIndex];
+    underlineGlyphRun.glyphRun.numberOfGlyphs = glyphsPerCharacter[characterIndex];
+    //Copy properties (attributes)
+    underlineGlyphRun.properties = it->properties;
+
+    for(Length index = 1u; index < numberOfCharacters; index++)
+    {
+      underlineGlyphRun.glyphRun.numberOfGlyphs += glyphsPerCharacter[characterIndex + index];
+    }
+
+    mModel->mVisualModel->mUnderlineRuns.PushBack(underlineGlyphRun);
   }
 }
 

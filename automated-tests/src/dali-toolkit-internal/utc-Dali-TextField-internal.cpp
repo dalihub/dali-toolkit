@@ -169,12 +169,12 @@ int UtcDaliTextFieldMarkupUnderline(void)
   application.SendNotification();
   application.Render();
 
-  uint32_t expectedNumberOfUnderlinedGlyphs = 5u;
+  uint32_t expectedNumberOfUnderlineRuns = 2u;
 
   Toolkit::Internal::TextField& textFieldImpl         = GetImpl(textField);
   const Text::Length            numberOfUnderlineRuns = textFieldImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
 
-  DALI_TEST_EQUALS(numberOfUnderlineRuns, expectedNumberOfUnderlinedGlyphs, TEST_LOCATION);
+  DALI_TEST_EQUALS(numberOfUnderlineRuns, expectedNumberOfUnderlineRuns, TEST_LOCATION);
 
   Vector<UnderlinedGlyphRun> underlineRuns;
   underlineRuns.Resize(numberOfUnderlineRuns);
@@ -182,12 +182,11 @@ int UtcDaliTextFieldMarkupUnderline(void)
 
   //ABC are underlined
   DALI_TEST_EQUALS(underlineRuns[0u].glyphRun.glyphIndex, 0u, TEST_LOCATION);
-  DALI_TEST_EQUALS(underlineRuns[1u].glyphRun.glyphIndex, 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(underlineRuns[2u].glyphRun.glyphIndex, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(underlineRuns[0u].glyphRun.numberOfGlyphs, 3u, TEST_LOCATION);
 
   //GH are underlined
-  DALI_TEST_EQUALS(underlineRuns[3u].glyphRun.glyphIndex, 5u, TEST_LOCATION);
-  DALI_TEST_EQUALS(underlineRuns[4u].glyphRun.glyphIndex, 6u, TEST_LOCATION);
+  DALI_TEST_EQUALS(underlineRuns[1u].glyphRun.glyphIndex, 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(underlineRuns[1u].glyphRun.numberOfGlyphs, 2u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -220,13 +219,12 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
   application.SendNotification();
   application.Render();
 
-  const uint32_t NUMBER_OF_CASES                  = 9u;
-  uint32_t       expectedNumberOfUnderlinedGlyphs = 36u;
+  const uint32_t expectedNumberOfUnderlineRuns = 9u;
 
   Toolkit::Internal::TextField& textFieldImpl         = GetImpl(textField);
   const Text::Length            numberOfUnderlineRuns = textFieldImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
 
-  DALI_TEST_EQUALS(numberOfUnderlineRuns, expectedNumberOfUnderlinedGlyphs, TEST_LOCATION);
+  DALI_TEST_EQUALS(numberOfUnderlineRuns, expectedNumberOfUnderlineRuns, TEST_LOCATION);
 
   Vector<UnderlinedGlyphRun> underlineRuns;
   underlineRuns.Resize(numberOfUnderlineRuns);
@@ -235,20 +233,16 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
   struct DataOfCase
   {
     std::string              title;
-    uint32_t                 startIndex;
-    uint32_t                 endIndex;
-    GlyphIndex               startGlyphIndex;
-    GlyphIndex               endGlyphIndex;
+    GlyphIndex               glyphIndex;
+    Length                   numberOfGlyphs;
     UnderlineStyleProperties properties;
   };
   DataOfCase data[] =
     {
       //<u>ABC1</u>
       {"<u>ABC1</u>",
-       0u,
-       3u,
        5u,
-       8u,
+       4u,
        {
          Text::Underline::SOLID,
          Color::BLACK,
@@ -264,10 +258,8 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
       //<u type='solid'>ABC2</u>
       {"<u type='solid'>ABC2</u>",
-       4u,
-       7u,
        13u,
-       16u,
+       4u,
        {
          Text::Underline::SOLID,
          Color::BLACK,
@@ -283,10 +275,8 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
       //<u type='dashed'>ABC3</u>
       {"<u type='dashed'>ABC3</u>",
-       8u,
-       11u,
        21u,
-       24u,
+       4u,
        {
          Text::Underline::DASHED,
          Color::BLACK,
@@ -302,10 +292,8 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
       //<u type='double'>ABC4</u>
       {"<u type='double'>ABC4</u>",
-       12u,
-       15u,
        29u,
-       32u,
+       4u,
        {
          Text::Underline::DOUBLE,
          Color::BLACK,
@@ -321,10 +309,8 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
       //<u color='green'>ABC5</u>
       {"<u color='green'>ABC5</u>",
-       16u,
-       19u,
        37u,
-       40u,
+       4u,
        {
          Text::Underline::SOLID,
          Color::GREEN,
@@ -340,10 +326,8 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
       //<u height='5.0f'>ABC6</u>
       {"<u height='5.0f'>ABC6</u>",
-       20u,
-       23u,
        45u,
-       48u,
+       4u,
        {
          Text::Underline::SOLID,
          Color::BLACK,
@@ -359,10 +343,8 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
       //<u type='dashed' dash-gap='3.0f'>ABC7</u>
       {"<u type='dashed' dash-gap='3.0f'>ABC7</u>",
-       24u,
-       27u,
        53u,
-       56u,
+       4u,
        {
          Text::Underline::DASHED,
          Color::BLACK,
@@ -378,10 +360,8 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
       //<u type='dashed' dash-width='4.0f'>ABC8</u>
       {"<u type='dashed' dash-width='4.0f'>ABC8</u>",
-       28u,
-       31u,
        61u,
-       64u,
+       4u,
        {
          Text::Underline::DASHED,
          Color::BLACK,
@@ -397,10 +377,8 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
       //<u color='blue' type='dashed' height='4.0f' dash-gap='2.0f' dash-width='3.0f'>
       {"<u color='blue' type='dashed' height='4.0f' dash-gap='2.0f' dash-width='3.0f'>",
-       32u,
-       35u,
        69u,
-       72u,
+       4u,
        {
          Text::Underline::DASHED,
          Color::BLUE,
@@ -416,14 +394,291 @@ int UtcDaliTextFieldMarkupUnderlineAttributes(void)
 
     };
 
-  for(uint32_t i = 0; i < NUMBER_OF_CASES; i++)
+  for(uint32_t i = 0; i < expectedNumberOfUnderlineRuns; i++)
   {
     tet_infoline(data[i].title.c_str());
-    DALI_TEST_EQUALS(underlineRuns[data[i].startIndex].glyphRun.glyphIndex, data[i].startGlyphIndex, TEST_LOCATION);
-    DALI_TEST_EQUALS(underlineRuns[data[i].endIndex].glyphRun.glyphIndex, data[i].endGlyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(underlineRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(underlineRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == underlineRuns[i].properties);
+  }
 
-    DALI_TEST_CHECK(data[i].properties == underlineRuns[data[i].startIndex].properties);
-    DALI_TEST_CHECK(data[i].properties == underlineRuns[data[i].endIndex].properties);
+  END_TEST;
+}
+
+int UtcDaliTextFieldMarkupSpanUnderline(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldMarkupSpanUnderline ");
+
+  TextField textField = TextField::New();
+
+  application.GetScene().Add(textField);
+
+  std::string testText =
+    "start<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red'>ABC1</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='solid'>ABC2</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed'>ABC3</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='double'>ABC4</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-color='green'>ABC5</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-height='5.0f'>ABC6</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed' u-dash-gap='3.0f'>ABC7</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed' u-dash-width='4.0f'>ABC8</span>then"
+    "<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-color='blue' u-type='dashed' u-height='4.0f' u-dash-gap='2.0f' u-dash-width='3.0f'>ABC9</span>end";
+
+  textField.SetProperty(TextField::Property::TEXT, testText);
+  textField.SetProperty(TextField ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t expectedNumberOfUnderlineRuns = 8u;
+
+  Toolkit::Internal::TextField& textFieldImpl         = GetImpl(textField);
+  const Text::Length            numberOfUnderlineRuns = textFieldImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
+
+  DALI_TEST_EQUALS(numberOfUnderlineRuns, expectedNumberOfUnderlineRuns, TEST_LOCATION);
+
+  Vector<UnderlinedGlyphRun> underlineRuns;
+  underlineRuns.Resize(numberOfUnderlineRuns);
+  textFieldImpl.GetTextController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+
+  struct DataOfCase
+  {
+    std::string              title;
+    GlyphIndex               glyphIndex;
+    Length                   numberOfGlyphs;
+    UnderlineStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+      //<u type='solid'>ABC2</u>
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='solid'>ABC2</span>",
+       13u,
+       4u,
+       {
+         Text::Underline::SOLID,
+         Color::BLACK,
+         0u,
+         1u,
+         2u,
+         true,
+         false,
+         false,
+         false,
+         false,
+       }},
+
+      //<u type='dashed'>ABC3</u>
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed'>ABC3</span>",
+       21u,
+       4u,
+       {
+         Text::Underline::DASHED,
+         Color::BLACK,
+         0u,
+         1u,
+         2u,
+         true,
+         false,
+         false,
+         false,
+         false,
+       }},
+
+      //<u type='double'>ABC4</u>
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='double'>ABC4</span>",
+       29u,
+       4u,
+       {
+         Text::Underline::DOUBLE,
+         Color::BLACK,
+         0u,
+         1u,
+         2u,
+         true,
+         false,
+         false,
+         false,
+         false,
+       }},
+
+      //<u color='green'>ABC5</u>
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-color='green'>ABC5</span>",
+       37u,
+       4u,
+       {
+         Text::Underline::SOLID,
+         Color::GREEN,
+         0u,
+         1u,
+         2u,
+         false,
+         true,
+         false,
+         false,
+         false,
+       }},
+
+      //<u height='5.0f'>ABC6</u>
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-height='5.0f'>ABC6</span>",
+       45u,
+       4u,
+       {
+         Text::Underline::SOLID,
+         Color::BLACK,
+         5u,
+         1u,
+         2u,
+         false,
+         false,
+         true,
+         false,
+         false,
+       }},
+
+      //<u type='dashed' dash-gap='3.0f'>ABC7</u>
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed' u-dash-gap='3.0f'>ABC7</span>",
+       53u,
+       4u,
+       {
+         Text::Underline::DASHED,
+         Color::BLACK,
+         0u,
+         3u,
+         2u,
+         true,
+         false,
+         false,
+         true,
+         false,
+       }},
+
+      //<u type='dashed' dash-width='4.0f'>ABC8</u>
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-type='dashed' u-dash-width='4.0f'>ABC8</span>",
+       61u,
+       4u,
+       {
+         Text::Underline::DASHED,
+         Color::BLACK,
+         0u,
+         1u,
+         4u,
+         true,
+         false,
+         false,
+         false,
+         true,
+       }},
+
+      //<u color='blue' type='dashed' height='4.0f' dash-gap='2.0f' dash-width='3.0f'>
+      {"<span font-size='45' font-family='DejaVu Sans' font-width='condensed' font-slant='italic' text-color='red' u-color='blue' u-type='dashed' u-height='4.0f' u-dash-gap='2.0f' u-dash-width='3.0f'>ABC9</span>",
+       69u,
+       4u,
+       {
+         Text::Underline::DASHED,
+         Color::BLUE,
+         4u,
+         2u,
+         3u,
+         true,
+         true,
+         true,
+         true,
+         true,
+       }},
+
+    };
+
+  for(uint32_t i = 0; i < expectedNumberOfUnderlineRuns; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(underlineRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(underlineRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == underlineRuns[i].properties);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldMarkupNestedUnderlineTags(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldMarkupNestedUnderlineTags ");
+
+  TextField textField = TextField::New();
+
+  application.GetScene().Add(textField);
+
+  std::string testText = "start<u height='5.0f' color='green' >AB<u color='blue' >XYZ</u>CDE</u>end";
+
+  textField.SetProperty(TextField::Property::TEXT, testText);
+  textField.SetProperty(TextField ::Property::ENABLE_MARKUP, true);
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t expectedNumberOfUnderlineRuns = 2u;
+
+  Toolkit::Internal::TextField& textFieldImpl         = GetImpl(textField);
+  const Text::Length            numberOfUnderlineRuns = textFieldImpl.GetTextController()->GetTextModel()->GetNumberOfUnderlineRuns();
+
+  DALI_TEST_EQUALS(numberOfUnderlineRuns, expectedNumberOfUnderlineRuns, TEST_LOCATION);
+
+  Vector<UnderlinedGlyphRun> underlineRuns;
+  underlineRuns.Resize(numberOfUnderlineRuns);
+  textFieldImpl.GetTextController()->GetTextModel()->GetUnderlineRuns(underlineRuns.Begin(), 0u, numberOfUnderlineRuns);
+
+  struct DataOfCase
+  {
+    std::string              title;
+    GlyphIndex               glyphIndex;
+    Length                   numberOfGlyphs;
+    UnderlineStyleProperties properties;
+  };
+  DataOfCase data[] =
+    {
+      //Outter
+      {"<u height='5.0f' color='green' >AB<u color='blue' >XYZ</u>CDE</u>",
+       5u,
+       8u,
+       {
+         Text::Underline::SOLID,
+         Color::GREEN,
+         5u,
+         1u,
+         2u,
+         false,
+         true,
+         true,
+         false,
+         false,
+       }},
+
+      //Inner
+      {"<u color='blue' >XYZ</u>",
+       7u,
+       3u,
+       {
+         Text::Underline::SOLID,
+         Color::BLUE,
+         5u,
+         1u,
+         2u,
+         false,
+         true,
+         true,
+         false,
+         false,
+       }},
+
+    };
+
+  for(uint32_t i = 0; i < expectedNumberOfUnderlineRuns; i++)
+  {
+    tet_infoline(data[i].title.c_str());
+    DALI_TEST_EQUALS(underlineRuns[i].glyphRun.glyphIndex, data[i].glyphIndex, TEST_LOCATION);
+    DALI_TEST_EQUALS(underlineRuns[i].glyphRun.numberOfGlyphs, data[i].numberOfGlyphs, TEST_LOCATION);
+    DALI_TEST_CHECK(data[i].properties == underlineRuns[i].properties);
   }
 
   END_TEST;

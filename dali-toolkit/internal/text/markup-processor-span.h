@@ -33,10 +33,18 @@ struct MarkupProcessData;
  * @param[in] tag The span tag and its attributes.
  * @param[out] colorRun the color run to be filled.
  * @param[out] fontRun the font run to be filled.
+ * @param[out] underlinedCharacterRun the underlined character run to be filled.
  * @param[out] isColorDefined if the span has color defined.
  * @param[out] isFontDefined if the span has font defined.
+ * @param[out] isUnderlinedCharacterDefined if the span has underlined-character defined.
  */
-void ProcessSpanTag(const Tag& tag, ColorRun& colorRun, FontDescriptionRun& fontRun, bool& isColorDefined, bool& isFontDefined);
+void ProcessSpanTag(const Tag&              tag,
+                    ColorRun&               colorRun,
+                    FontDescriptionRun&     fontRun,
+                    UnderlinedCharacterRun& underlinedCharacterRun,
+                    bool&                   isColorDefined,
+                    bool&                   isFontDefined,
+                    bool&                   isUnderlinedCharacterDefined);
 
 } // namespace Text
 

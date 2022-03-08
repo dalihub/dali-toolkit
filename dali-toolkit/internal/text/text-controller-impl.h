@@ -627,6 +627,16 @@ struct Controller::Impl
   bool SetDefaultLineSize(float lineSize);
 
   /**
+   * @copydoc Controller::SetRelativeLineSize
+   */
+  bool SetRelativeLineSize(float relativeLineSize);
+
+  /**
+   * @copydoc Controller::GetRelativeLineSize
+   */
+  float GetRelativeLineSize();
+
+  /**
    * @copydoc Text::Controller::GetPrimaryCursorPosition()
    */
   CharacterIndex GetPrimaryCursorPosition() const;

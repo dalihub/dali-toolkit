@@ -539,14 +539,9 @@ public:
   std::string mAccessibilityName;
   std::string mAccessibilityDescription;
   std::string mAccessibilityTranslationDomain;
-  bool        mAccessibilityNameSet              = false;
-  bool        mAccessibilityDescriptionSet       = false;
-  bool        mAccessibilityTranslationDomainSet = false;
 
-  bool mAccessibilityHighlightable    = false;
-  bool mAccessibilityHighlightableSet = false;
-
-  bool mAccessibilityHidden = false;
+  bool mAccessibilityHighlightable = false;
+  bool mAccessibilityHidden        = false;
 
   Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
 

@@ -153,9 +153,10 @@ LineIndex GetClosestLine(VisualModelPtr visualModel,
       it != endIt;
       ++it, ++lineIndex)
   {
-    const LineRun& lineRun = *it;
+    const LineRun& lineRun    = *it;
+    bool           isLastLine = (it + 1 == endIt);
 
-    totalHeight += GetLineHeight(lineRun);
+    totalHeight += GetLineHeight(lineRun, isLastLine);
 
     if(visualY < totalHeight)
     {
@@ -182,9 +183,10 @@ float CalculateLineOffset(const Vector<LineRun>& lines,
       it != endIt;
       ++it)
   {
-    const LineRun& lineRun = *it;
+    const LineRun& lineRun    = *it;
+    bool           isLastLine = (it + 1 == lines.End());
 
-    offset += GetLineHeight(lineRun);
+    offset += GetLineHeight(lineRun, isLastLine);
   }
 
   return offset;
@@ -504,7 +506,9 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
     cursorInfo.lineOffset = CalculateLineOffset(parameters.visualModel->mLines,
                                                 newLineIndex);
 
-    cursorInfo.lineHeight = GetLineHeight(newLine);
+    // The line height is the addition of the line ascender and the line descender.
+    // However, the line descender has a negative value, hence the subtraction also line spacing should not be included in cursor height.
+    cursorInfo.lineHeight = newLine.ascender - newLine.descender;
 
     index                                = 0u;
     const Length totalNumberOfCharacters = parameters.logicalModel->mText.Count();
@@ -560,7 +564,9 @@ void GetCursorPosition(GetCursorPositionParameters& parameters,
     cursorInfo.lineOffset = CalculateLineOffset(parameters.visualModel->mLines,
                                                 lineIndex);
 
-    cursorInfo.lineHeight = GetLineHeight(line);
+    // The line height is the addition of the line ascender and the line descender.
+    // However, the line descender has a negative value, hence the subtraction also line spacing should not be included in cursor height.
+    cursorInfo.lineHeight = line.ascender - line.descender;
 
     // Calculate the primary cursor.
 

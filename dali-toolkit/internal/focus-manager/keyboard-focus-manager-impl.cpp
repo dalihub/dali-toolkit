@@ -784,20 +784,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
   {
     if(keyName == "Left")
     {
-      if(!mIsFocusIndicatorShown)
+      if(mIsFocusIndicatorShown == HIDE)
       {
-        if(mIsFocusIndicatorShown == HIDE)
-        {
-          // Show focus indicator
-          mIsFocusIndicatorShown = SHOW;
-        }
-        else
-        {
-          // Move the focus towards left
-          MoveFocus(Toolkit::Control::KeyboardFocus::LEFT);
-        }
-
-        isFocusStartableKey = true;
+        // Show focus indicator
+        mIsFocusIndicatorShown = SHOW;
       }
       else
       {
@@ -809,18 +799,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if(keyName == "Right")
     {
-      if(!mIsFocusIndicatorShown)
+      if(mIsFocusIndicatorShown == HIDE)
       {
-        if(mIsFocusIndicatorShown == HIDE)
-        {
-          // Show focus indicator
-          mIsFocusIndicatorShown = SHOW;
-        }
-        else
-        {
-          // Move the focus towards right
-          MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT);
-        }
+        // Show focus indicator
+        mIsFocusIndicatorShown = SHOW;
       }
       else
       {
