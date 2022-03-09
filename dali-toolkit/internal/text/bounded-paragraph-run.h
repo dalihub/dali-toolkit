@@ -48,13 +48,17 @@ struct BoundedParagraphRun
   BoundedParagraphRun()
   : characterRun{},
     horizontalAlignment(Text::HorizontalAlignment::BEGIN),
-    horizontalAlignmentDefined{false}
+    relativeLineSize(1),
+    horizontalAlignmentDefined{false},
+    relativeLineSizeDefined(false)
   {
   }
 
   CharacterRun                    characterRun;                   ///< The initial character index within the whole text and the number of characters of the run.
   Text::HorizontalAlignment::Type horizontalAlignment;            ///< The paragraph horizontal alignment. Values "BEGIN" "CENTER" "END".
+  float                           relativeLineSize;               ///< The relative line height to be used for this paragaraph.
   bool                            horizontalAlignmentDefined : 1; ///< Whether the horizontal alignment is defined.
+  bool                            relativeLineSizeDefined : 1;    ///< Whether the relative line height is defined for this paragraph.
 };
 
 } // namespace Text

@@ -96,7 +96,8 @@ struct LineLayout
     glyphIndexInSecondHalfLine{0u},
     characterIndexInSecondHalfLine{0u},
     numberOfGlyphsInSecondHalfLine{0u},
-    numberOfCharactersInSecondHalfLine{0u}
+    numberOfCharactersInSecondHalfLine{0u},
+    relativeLineSize{1.0f}
 
   {
   }
@@ -119,6 +120,7 @@ struct LineLayout
     characterIndexInSecondHalfLine     = 0u;
     numberOfGlyphsInSecondHalfLine     = 0u;
     numberOfCharactersInSecondHalfLine = 0u;
+    relativeLineSize                   = 1.0f;
   }
 
   GlyphIndex         glyphIndex;                ///< Index of the first glyph to be laid-out.
@@ -139,6 +141,8 @@ struct LineLayout
   CharacterIndex characterIndexInSecondHalfLine;     ///< Index of the first character to be laid-out for the second half of line.
   Length         numberOfGlyphsInSecondHalfLine;     ///< The number of glyph which fit in one line for the second half of line.
   Length         numberOfCharactersInSecondHalfLine; ///< The number of characters which fit in one line for the second half of line.
+
+  float relativeLineSize; ///< The relative line size to be applied for this line.
 };
 
 struct LayoutBidiParameters
@@ -172,9 +176,10 @@ struct Engine::Impl
    * @brief get the line spacing.
    *
    * @param[in] textSize The text size.
+   * @param[in] relativeLineSize The relative line size to be applied.
    * @return the line spacing value.
    */
-  float GetLineSpacing(float textSize)
+  float GetLineSpacing(float textSize, float relativeLineSize)
   {
     float lineSpacing;
     float relTextSize;
@@ -187,10 +192,10 @@ struct Engine::Impl
     lineSpacing += mDefaultLineSpacing;
 
     //subtract line spcaing if relativeLineSize < 1 & larger than min height
-    relTextSize = textSize * mRelativeLineSize;
+    relTextSize = textSize * relativeLineSize;
     if(relTextSize > mDefaultLineSize)
     {
-      if(mRelativeLineSize < 1)
+      if(relativeLineSize < 1)
       {
         //subtract the difference (always will be positive)
         lineSpacing -= (textSize - relTextSize);
@@ -239,7 +244,7 @@ struct Engine::Impl
     // Sets the minimum descender.
     lineLayout.descender = std::min(lineLayout.descender, fontMetrics.descender);
 
-    lineLayout.lineSpacing = GetLineSpacing(lineLayout.ascender + -lineLayout.descender);
+    lineLayout.lineSpacing = GetLineSpacing(lineLayout.ascender + -lineLayout.descender, lineLayout.relativeLineSize);
   }
 
   /**
@@ -726,6 +731,8 @@ struct Engine::Impl
     // i.e. if the bearing of the first glyph is negative it may exceed the boundaries of the text area.
     // It needs to add as well space for the cursor if the text is in edit mode and extra space in case the text is outlined.
     tmpLineLayout.penX = -glyphMetrics.xBearing + mCursorWidth + outlineWidth;
+
+    tmpLineLayout.relativeLineSize = lineLayout.relativeLineSize;
 
     // Calculate the line height if there is no characters.
     FontId lastFontId = glyphMetrics.fontId;
@@ -1253,6 +1260,9 @@ struct Engine::Impl
 
       LineRun*   lineRun = nullptr;
       LineLayout ellipsisLayout;
+
+      ellipsisLayout.relativeLineSize = layout.relativeLineSize;
+
       if(0u != numberOfLines)
       {
         // Get the last line and layout it again with the 'completelyFill' flag to true.
@@ -1409,7 +1419,7 @@ struct Engine::Impl
     lineRun.direction = layout.direction;
     lineRun.ellipsis  = false;
 
-    lineRun.lineSpacing = GetLineSpacing(lineRun.ascender + -lineRun.descender);
+    lineRun.lineSpacing = GetLineSpacing(lineRun.ascender + -lineRun.descender, layout.relativeLineSize);
 
     // Update the actual size.
     if(lineRun.width > layoutSize.width)
@@ -1463,7 +1473,11 @@ struct Engine::Impl
     lineRun.direction                       = LTR;
     lineRun.ellipsis                        = false;
 
-    lineRun.lineSpacing = GetLineSpacing(lineRun.ascender + -lineRun.descender);
+    BoundedParagraphRun currentParagraphRun;
+    LineLayout          tempLineLayout;
+    (GetBoundedParagraph(layoutParameters.textModel->GetBoundedParagraphRuns(), characterIndex, currentParagraphRun) ? SetRelativeLineSize(&currentParagraphRun, tempLineLayout) : SetRelativeLineSize(nullptr, tempLineLayout));
+
+    lineRun.lineSpacing = GetLineSpacing(lineRun.ascender + -lineRun.descender, tempLineLayout.relativeLineSize);
 
     layoutSize.height += GetLineHeight(lineRun, true);
   }
@@ -1523,6 +1537,51 @@ struct Engine::Impl
     }
   }
 
+  /**
+   * @brief Sets the relative line size for the LineLayout
+   *
+   * @param[in] currentParagraphRun Contains the bounded paragraph for this line layout.
+   * @param[in,out] lineLayout The line layout to be updated.
+   */
+  void SetRelativeLineSize(BoundedParagraphRun* currentParagraphRun, LineLayout& lineLayout)
+  {
+    lineLayout.relativeLineSize = mRelativeLineSize;
+
+    if(currentParagraphRun != nullptr && currentParagraphRun->relativeLineSizeDefined)
+    {
+      lineLayout.relativeLineSize = currentParagraphRun->relativeLineSize;
+    }
+  }
+
+  /**
+   * @brief Get the bounded paragraph for the characterIndex if exists.
+   *
+   * @param[in] boundedParagraphRuns The bounded paragraph list to search in.
+   * @param[in] characterIndex The character index to get bounded paragraph for.
+   * @param[out] currentParagraphRun Contains the bounded paragraph if found for the characterIndex.
+   *
+   * @return returns true if a bounded paragraph was found.
+   */
+  bool GetBoundedParagraph(const Vector<BoundedParagraphRun> boundedParagraphRuns, CharacterIndex characterIndex, BoundedParagraphRun& currentParagraphRun)
+  {
+    for(Vector<BoundedParagraphRun>::Iterator it    = boundedParagraphRuns.Begin(),
+                                              endIt = boundedParagraphRuns.End();
+        it != endIt;
+        ++it)
+    {
+      BoundedParagraphRun& tempParagraphRun = *it;
+
+      if(characterIndex >= tempParagraphRun.characterRun.characterIndex &&
+         characterIndex < (tempParagraphRun.characterRun.characterIndex + tempParagraphRun.characterRun.numberOfCharacters))
+      {
+        currentParagraphRun = tempParagraphRun;
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   bool LayoutText(Parameters&                       layoutParameters,
                   Size&                             layoutSize,
                   bool                              elideTextEnabled,
@@ -1541,7 +1600,8 @@ struct Engine::Impl
     layoutParameters.textModel->mVisualModel->SetFirstMiddleIndexOfElidedGlyphs(0u);
     layoutParameters.textModel->mVisualModel->SetSecondMiddleIndexOfElidedGlyphs(0u);
 
-    Vector<LineRun>& lines = layoutParameters.textModel->mVisualModel->mLines;
+    Vector<LineRun>&                   lines                = layoutParameters.textModel->mVisualModel->mLines;
+    const Vector<BoundedParagraphRun>& boundedParagraphRuns = layoutParameters.textModel->GetBoundedParagraphRuns();
 
     if(0u == layoutParameters.numberOfGlyphs)
     {
@@ -1601,7 +1661,7 @@ struct Engine::Impl
     // Retrieve BiDi info.
     const bool hasBidiParagraphs = !layoutParameters.textModel->mLogicalModel->mBidirectionalParagraphInfo.Empty();
 
-    const CharacterIndex* const                  glyphsToCharactersBuffer    = hasBidiParagraphs ? layoutParameters.textModel->mVisualModel->mGlyphsToCharacters.Begin() : nullptr;
+    const CharacterIndex* const                  glyphsToCharactersBuffer    = layoutParameters.textModel->mVisualModel->mGlyphsToCharacters.Begin();
     const Vector<BidirectionalParagraphInfoRun>& bidirectionalParagraphsInfo = layoutParameters.textModel->mLogicalModel->mBidirectionalParagraphInfo;
     const Vector<BidirectionalLineInfoRun>&      bidirectionalLinesInfo      = layoutParameters.textModel->mLogicalModel->mBidirectionalLineInfo;
 
@@ -1705,6 +1765,10 @@ struct Engine::Impl
       LineLayout layout;
       layout.direction  = layoutBidiParameters.paragraphDirection;
       layout.glyphIndex = index;
+
+      BoundedParagraphRun currentParagraphRun;
+      (GetBoundedParagraph(boundedParagraphRuns, *(glyphsToCharactersBuffer + index), currentParagraphRun) ? SetRelativeLineSize(&currentParagraphRun, layout) : SetRelativeLineSize(nullptr, layout));
+
       GetLineLayoutForBox(layoutParameters,
                           layoutBidiParameters,
                           layout,
@@ -1718,6 +1782,14 @@ struct Engine::Impl
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "      number of glyphs %d\n", layout.numberOfGlyphs);
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "  number of characters %d\n", layout.numberOfCharacters);
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "                length %f\n", layout.length);
+
+      CharacterIndex lastCharacterInParagraph = currentParagraphRun.characterRun.characterIndex + currentParagraphRun.characterRun.numberOfCharacters - 1;
+
+      //check if this is the last line in paragraph, if false we should use the default relative line size (the one set using the property)
+      if(lastCharacterInParagraph >= layout.characterIndex && lastCharacterInParagraph < layout.characterIndex+layout.numberOfCharacters)
+      {
+        layout.relativeLineSize = mRelativeLineSize;
+      }
 
       if(0u == layout.numberOfGlyphs + layout.numberOfGlyphsInSecondHalfLine)
       {
@@ -1862,7 +1934,7 @@ struct Engine::Impl
         }
 
         // Updates the vertical pen's position.
-        penY += -layout.descender + layout.lineSpacing + GetLineSpacing(layout.ascender + -layout.descender);
+        penY += -layout.descender + layout.lineSpacing + GetLineSpacing(layout.ascender + -layout.descender, layout.relativeLineSize);
 
         // Increase the glyph index.
         index = nextIndex;

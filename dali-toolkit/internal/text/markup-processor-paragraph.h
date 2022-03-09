@@ -44,6 +44,14 @@ void ProcessHorizontalAlignment(const Attribute& attribute, BoundedParagraphRun&
  */
 void ProcessAttributesOfParagraphTag(const Tag& tag, BoundedParagraphRun& boundedParagraphRun);
 
+/**
+ * @brief Retrieves the relative line height value from the paragraph tag and sets it to the bounded paragraph run.
+ *
+ * @param[in] attribute the relative line height attribute.
+ * @param[in,out] boundedParagraphRun The bounded paragraph run.
+ */
+void ProcessRelativeLineHeight(const Attribute& attribute, BoundedParagraphRun& boundedParagraphRun);
+
 } // namespace Text
 
 } // namespace Toolkit
