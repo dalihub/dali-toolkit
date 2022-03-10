@@ -293,6 +293,11 @@ protected:
     bool SetRangeOfSelection(size_t selectionIndex, size_t startOffset, size_t endOffset) override;
 
     /**
+     * @copydoc Dali::Accessibility::Text::GetRangeExtents()
+     */
+    Rect<> GetRangeExtents(size_t startOffset, size_t endOffset, Accessibility::CoordinateType type) override;
+
+    /**
      * @copydoc Dali::Accessibility::Text::GetNameRaw()
      */
     std::string GetNameRaw() const override;
