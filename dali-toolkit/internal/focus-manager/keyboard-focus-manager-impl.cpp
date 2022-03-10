@@ -516,13 +516,27 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
         nextFocusableActor                  = mPreFocusChangeSignal.Emit(currentFocusActor, Actor(), direction);
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
-      else if(mEnableDefaultAlgorithm && currentFocusActor)
+      else if (mEnableDefaultAlgorithm)
       {
-        // We should find it among the actors nearby.
-        Integration::SceneHolder window = Integration::SceneHolder::Get(currentFocusActor);
-        if(window)
+        Layer rootLayer;
+        if (currentFocusActor)
         {
-          nextFocusableActor = Toolkit::FocusFinder::GetNearestFocusableActor(window.GetRootLayer(), currentFocusActor, direction);
+          // Find the window of the focused actor.
+          Integration::SceneHolder window = Integration::SceneHolder::Get(currentFocusActor);
+          if (window)
+          {
+            rootLayer = window.GetRootLayer();
+          }
+        }
+        else
+        {
+          // Searches from the currently focused window.
+          rootLayer = mCurrentFocusedWindow.GetHandle();
+        }
+        if (rootLayer)
+        {
+          // We should find it among the actors nearby.
+          nextFocusableActor = Toolkit::FocusFinder::GetNearestFocusableActor(rootLayer, currentFocusActor, direction);
         }
       }
     }
