@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  *
  */
 
-#include <iostream>
-#include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali/devel-api/actors/actor-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/public-api/transition/transition-set.h>
-#include <dali-toolkit/public-api/transition/transition-base.h>
 #include <dali-toolkit/public-api/transition/scale-transition.h>
+#include <dali-toolkit/public-api/transition/transition-base.h>
+#include <dali-toolkit/public-api/transition/transition-set.h>
+#include <dali/devel-api/actors/actor-devel.h>
+#include <stdlib.h>
+#include <iostream>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -88,7 +88,6 @@ int UtcDaliScaleTransitionSetGetProperty(void)
   DALI_TEST_EQUALS(0.5f, scaleFactor.x, TEST_LOCATION);
   DALI_TEST_EQUALS(0.5f, scaleFactor.y, TEST_LOCATION);
 
-
   scale.SetScaleFactor(Vector2(1.5f, 1.2f));
   scaleFactor = scale.GetScaleFactor();
   DALI_TEST_EQUALS(1.5f, scaleFactor.x, TEST_LOCATION);
@@ -124,7 +123,7 @@ int UtcDaliScaleTransitionWithOffScene(void)
   transitionSet.AddTransition(scale);
   transitionSet.Play();
 
-  bool signalReceived(false);
+  bool                  signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
   transitionSet.FinishedSignal().Connect(&application, finishCheck);
 
@@ -187,7 +186,7 @@ int UtcDaliScaleTransitionDisappearing(void)
   transitionSet.AddTransition(scale);
   transitionSet.Play();
 
-  bool signalReceived(false);
+  bool                  signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
   transitionSet.FinishedSignal().Connect(&application, finishCheck);
 
@@ -250,7 +249,7 @@ int UtcDaliScaleTransitionAppearing(void)
   transitionSet.AddTransition(scale);
   transitionSet.Play();
 
-  bool signalReceived(false);
+  bool                  signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
   transitionSet.FinishedSignal().Connect(&application, finishCheck);
 

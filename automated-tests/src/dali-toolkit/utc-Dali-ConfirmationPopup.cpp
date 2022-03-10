@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/popup/confirmation-popup.h>
 
@@ -38,7 +39,6 @@ void utc_dali_toolkit_confirmation_popup_cleanup(void)
 
 namespace
 {
-
 static bool gObjectCreatedCallBackCalled;
 
 static void TestCallback(BaseHandle handle)
@@ -88,131 +88,130 @@ struct ConfirmationPopupCancelTestFunctor
 
 } // unnamed namespace.
 
-
-int UtcDaliConfirmationPopupNewP( void )
+int UtcDaliConfirmationPopupNewP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( " UtcDaliConfirmationPopupNewP" );
+  tet_infoline(" UtcDaliConfirmationPopupNewP");
 
   // Create the ConfirmationPopup.
   ConfirmationPopup popup;
 
-  DALI_TEST_CHECK( !popup );
+  DALI_TEST_CHECK(!popup);
 
   popup = ConfirmationPopup::New();
 
-  DALI_TEST_CHECK( popup );
+  DALI_TEST_CHECK(popup);
 
-  ConfirmationPopup popup2( popup );
+  ConfirmationPopup popup2(popup);
 
-  DALI_TEST_CHECK( popup2 == popup );
+  DALI_TEST_CHECK(popup2 == popup);
 
   // Additional check to ensure object is created by checking if it's registered.
   ObjectRegistry registry = application.GetCore().GetObjectRegistry();
-  DALI_TEST_CHECK( registry );
+  DALI_TEST_CHECK(registry);
 
   gObjectCreatedCallBackCalled = false;
-  registry.ObjectCreatedSignal().Connect( &TestCallback );
+  registry.ObjectCreatedSignal().Connect(&TestCallback);
   {
     ConfirmationPopup popup = ConfirmationPopup::New();
   }
-  DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
+  DALI_TEST_CHECK(gObjectCreatedCallBackCalled);
   END_TEST;
 }
 
-int UtcDaliConfirmationPopupDestructorP( void )
+int UtcDaliConfirmationPopupDestructorP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( " UtcDaliConfirmationPopupDestructorP" );
+  tet_infoline(" UtcDaliConfirmationPopupDestructorP");
 
   ConfirmationPopup* popup = new ConfirmationPopup();
   delete popup;
 
-  DALI_TEST_CHECK( true );
+  DALI_TEST_CHECK(true);
   END_TEST;
 }
 
 int UtcDaliConfirmationPopupDownCastP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( " UtcDaliConfirmationPopupDownCastP" );
+  tet_infoline(" UtcDaliConfirmationPopupDownCastP");
 
   Handle handle = ConfirmationPopup::New();
 
-  ConfirmationPopup popup = ConfirmationPopup::DownCast( handle );
+  ConfirmationPopup popup = ConfirmationPopup::DownCast(handle);
 
-  DALI_TEST_CHECK( popup == handle );
+  DALI_TEST_CHECK(popup == handle);
   END_TEST;
 }
 
 int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( " UtcDaliConfirmationPopupDynamicSignalGenerationP" );
+  tet_infoline(" UtcDaliConfirmationPopupDynamicSignalGenerationP");
 
   ConfirmationPopup popup = ConfirmationPopup::New();
 
-  TextLabel titleActor = TextLabel::New( "Title" );
-  popup.SetTitle( titleActor );
+  TextLabel titleActor = TextLabel::New("Title");
+  popup.SetTitle(titleActor);
 
-  TextLabel contentActor = TextLabel::New( "Content" );
-  popup.SetContent( contentActor );
+  TextLabel contentActor = TextLabel::New("Content");
+  popup.SetContent(contentActor);
 
   Actor footerActor = Actor::New();
 
   // The confirmation popup can use any control type for the ok or cancel buttons.
   // It requires that the name is "controlOk" to provide the "controlSignalOk" signal.
   PushButton buttonOK = PushButton::New();
-  buttonOK.SetProperty( Dali::Actor::Property::NAME, "controlOk" );
-  footerActor.Add( buttonOK );
+  buttonOK.SetProperty(Dali::Actor::Property::NAME, "controlOk");
+  footerActor.Add(buttonOK);
 
   PushButton buttonCancel = PushButton::New();
-  buttonCancel.SetProperty( Dali::Actor::Property::NAME, "controlCancel" );
-  footerActor.Add( buttonCancel );
+  buttonCancel.SetProperty(Dali::Actor::Property::NAME, "controlCancel");
+  footerActor.Add(buttonCancel);
 
-  popup.SetFooter( footerActor );
+  popup.SetFooter(footerActor);
 
   // Tell the confirmation popup to connect to the signal in our button called "onScene".
-  popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "onScene" );
+  popup.SetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "onScene");
   std::string resultProperty;
-  DALI_TEST_CHECK( popup.GetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED ).Get( resultProperty ) );
-  DALI_TEST_EQUALS( resultProperty, "onScene",  TEST_LOCATION );
+  DALI_TEST_CHECK(popup.GetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED).Get(resultProperty));
+  DALI_TEST_EQUALS(resultProperty, "onScene", TEST_LOCATION);
 
   // Connect to the confirmation popup's OK signal. This signal is dynamically created upon connection.
-  gSignalReceivedOK = false;
-  gSignalReceivedCancel = false;
+  gSignalReceivedOK                        = false;
+  gSignalReceivedCancel                    = false;
   TestConnectionTrackerObject* testTracker = new TestConnectionTrackerObject();
-  popup.ConnectSignal( testTracker, "controlSignalOk",   ConfirmationPopupOKTestFunctor() );
+  popup.ConnectSignal(testTracker, "controlSignalOk", ConfirmationPopupOKTestFunctor());
 
   // Check no signal has occurred yet.
-  DALI_TEST_CHECK( !gSignalReceivedOK );
-  DALI_TEST_CHECK( !gSignalReceivedCancel );
+  DALI_TEST_CHECK(!gSignalReceivedOK);
+  DALI_TEST_CHECK(!gSignalReceivedCancel);
 
   // Provoke the signal.
-  application.GetScene().Add( popup );
+  application.GetScene().Add(popup);
 
   // Check the signal has occurred.
-  DALI_TEST_CHECK( gSignalReceivedOK );
-  DALI_TEST_CHECK( !gSignalReceivedCancel );
+  DALI_TEST_CHECK(gSignalReceivedOK);
+  DALI_TEST_CHECK(!gSignalReceivedCancel);
 
   // Remove the popup from the stage, and connect the cancel signal.
   popup.Unparent();
-  popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED, "onScene" );
-  DALI_TEST_CHECK( popup.GetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED ).Get( resultProperty ) );
-  DALI_TEST_EQUALS( resultProperty, "onScene",  TEST_LOCATION );
+  popup.SetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED, "onScene");
+  DALI_TEST_CHECK(popup.GetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED).Get(resultProperty));
+  DALI_TEST_EQUALS(resultProperty, "onScene", TEST_LOCATION);
 
-  popup.ConnectSignal( testTracker, "controlSignalCancel",   ConfirmationPopupCancelTestFunctor() );
+  popup.ConnectSignal(testTracker, "controlSignalCancel", ConfirmationPopupCancelTestFunctor());
 
   // Check the cancel signal has not occurred yet.
-  DALI_TEST_CHECK( gSignalReceivedOK );
-  DALI_TEST_CHECK( !gSignalReceivedCancel );
+  DALI_TEST_CHECK(gSignalReceivedOK);
+  DALI_TEST_CHECK(!gSignalReceivedCancel);
 
   // Provoke the signal.
-  application.GetScene().Add( popup );
+  application.GetScene().Add(popup);
 
   // Check the cancel signal has occurred.
-  DALI_TEST_CHECK( gSignalReceivedOK );
-  DALI_TEST_CHECK( gSignalReceivedCancel );
+  DALI_TEST_CHECK(gSignalReceivedOK);
+  DALI_TEST_CHECK(gSignalReceivedCancel);
 
   END_TEST;
 }
@@ -220,69 +219,66 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
 int UtcDaliConfirmationPopupDynamicSignalGenerationN(void)
 {
   ToolkitTestApplication application;
-   tet_infoline( " UtcDaliConfirmationPopupDynamicSignalGenerationN" );
+  tet_infoline(" UtcDaliConfirmationPopupDynamicSignalGenerationN");
 
-   ConfirmationPopup popup = ConfirmationPopup::New();
+  ConfirmationPopup popup = ConfirmationPopup::New();
 
-   TextLabel titleActor = TextLabel::New( "Title" );
-   popup.SetTitle( titleActor );
+  TextLabel titleActor = TextLabel::New("Title");
+  popup.SetTitle(titleActor);
 
-   TextLabel contentActor = TextLabel::New( "Content" );
-   popup.SetContent( contentActor );
+  TextLabel contentActor = TextLabel::New("Content");
+  popup.SetContent(contentActor);
 
-   Actor footerActor = Actor::New();
+  Actor footerActor = Actor::New();
 
-   PushButton buttonOK = PushButton::New();
-   buttonOK.SetProperty( Dali::Actor::Property::NAME, "controlOkMisnamed" );
-   popup.SetFooter( buttonOK );
+  PushButton buttonOK = PushButton::New();
+  buttonOK.SetProperty(Dali::Actor::Property::NAME, "controlOkMisnamed");
+  popup.SetFooter(buttonOK);
 
-   // Tell the confirmation popup to connect to the signal in our button called "onScene".
-   popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "onScene" );
+  // Tell the confirmation popup to connect to the signal in our button called "onScene".
+  popup.SetProperty(Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "onScene");
 
-   // Connect to the confirmation popup's OK signal.
-   gSignalReceivedOK = false;
+  // Connect to the confirmation popup's OK signal.
+  gSignalReceivedOK = false;
 
-   // The connection will fail at this point as no actor with the name "controlOk" will be located.
-   TestConnectionTrackerObject* testTracker = new TestConnectionTrackerObject();
-   popup.ConnectSignal( testTracker, "controlSignalOk",   ConfirmationPopupOKTestFunctor() );
+  // The connection will fail at this point as no actor with the name "controlOk" will be located.
+  TestConnectionTrackerObject* testTracker = new TestConnectionTrackerObject();
+  popup.ConnectSignal(testTracker, "controlSignalOk", ConfirmationPopupOKTestFunctor());
 
-   // Check no signal has occurred yet.
-   DALI_TEST_CHECK( !gSignalReceivedOK );
+  // Check no signal has occurred yet.
+  DALI_TEST_CHECK(!gSignalReceivedOK);
 
-   // Provoke the signal.
-   application.GetScene().Add( popup );
+  // Provoke the signal.
+  application.GetScene().Add(popup);
 
-   // Check the signal has still not occurred, as our button was incorrectly named.
-   DALI_TEST_CHECK( !gSignalReceivedOK );
+  // Check the signal has still not occurred, as our button was incorrectly named.
+  DALI_TEST_CHECK(!gSignalReceivedOK);
 
-   END_TEST;
+  END_TEST;
 }
 
 int UtcDaliConfirmationPopupTypeRegistryCreation(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( " UtcDaliConfirmationPopupTypeRegistryCreation" );
+  tet_infoline(" UtcDaliConfirmationPopupTypeRegistryCreation");
 
-  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( "ConfirmationPopup" );
-  DALI_TEST_CHECK( typeInfo )
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo("ConfirmationPopup");
+  DALI_TEST_CHECK(typeInfo)
 
   BaseHandle baseHandle = typeInfo.CreateInstance();
-  DALI_TEST_CHECK( baseHandle )
+  DALI_TEST_CHECK(baseHandle)
 
-  Toolkit::Popup popup = Toolkit::Popup::DownCast( baseHandle );
-  popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
+  Toolkit::Popup popup = Toolkit::Popup::DownCast(baseHandle);
+  popup.SetProperty(Popup::Property::ANIMATION_DURATION, 0.0f);
 
-  application.GetScene().Add( popup );
-  popup.SetDisplayState( Toolkit::Popup::SHOWN );
+  application.GetScene().Add(popup);
+  popup.SetDisplayState(Toolkit::Popup::SHOWN);
 
   application.SendNotification();
   application.Render();
 
   // Check the popup is shown.
-  DALI_TEST_EQUALS( popup.GetDisplayState(), Popup::SHOWN, TEST_LOCATION );
+  DALI_TEST_EQUALS(popup.GetDisplayState(), Popup::SHOWN, TEST_LOCATION);
 
   END_TEST;
 }
-
-
-

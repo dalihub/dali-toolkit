@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  *
  */
 
-#include <iostream>
 #include <stdlib.h>
+#include <iostream>
 
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
 
-#include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 
 using namespace Dali;
@@ -41,8 +41,7 @@ void utc_dali_toolkit_scroll_view_effect_cleanup(void)
 
 namespace
 {
-
-const int RENDER_FRAME_INTERVAL = 16;                           ///< Duration of each frame in ms. (at approx 60FPS)
+const int RENDER_FRAME_INTERVAL = 16; ///< Duration of each frame in ms. (at approx 60FPS)
 
 /*
  * Simulate time passed by.
@@ -57,7 +56,7 @@ int Wait(ToolkitTestApplication& application, int duration = 0)
 {
   int time = 0;
 
-  for(int i = 0; i <= ( duration / RENDER_FRAME_INTERVAL); i++)
+  for(int i = 0; i <= (duration / RENDER_FRAME_INTERVAL); i++)
   {
     application.SendNotification();
     application.Render(RENDER_FRAME_INTERVAL);
@@ -80,25 +79,25 @@ RulerPtr CreateRuler(float gridSize = 0.0f)
 {
   if(gridSize <= Math::MACHINE_EPSILON_0)
   {
-      return new DefaultRuler();
+    return new DefaultRuler();
   }
   return new FixedRuler(gridSize);
 }
 
 // Callback probes.
 
-static bool gOnScrollStartCalled;                       ///< Whether the OnScrollStart signal was invoked.
-static bool gOnScrollUpdateCalled;                      ///< Whether the OnScrollUpdate signal was invoked.
-static bool gOnScrollCompleteCalled;                    ///< Whether the OnScrollComplete signal was invoked.
-static Vector3 gConstraintResult;                       ///< Result from constraint.
+static bool    gOnScrollStartCalled;    ///< Whether the OnScrollStart signal was invoked.
+static bool    gOnScrollUpdateCalled;   ///< Whether the OnScrollUpdate signal was invoked.
+static bool    gOnScrollCompleteCalled; ///< Whether the OnScrollComplete signal was invoked.
+static Vector3 gConstraintResult;       ///< Result from constraint.
 
-static std::vector< Actor > gPages;                                ///< Keeps track of all the pages for applying effects.
-typedef std::vector< Actor >::iterator ActorIter;
+static std::vector<Actor>            gPages; ///< Keeps track of all the pages for applying effects.
+typedef std::vector<Actor>::iterator ActorIter;
 
 static void ResetScrollCallbackResults()
 {
-  gOnScrollStartCalled = false;
-  gOnScrollUpdateCalled = false;
+  gOnScrollStartCalled    = false;
+  gOnScrollUpdateCalled   = false;
   gOnScrollCompleteCalled = false;
 }
 
@@ -107,7 +106,7 @@ static void ResetScrollCallbackResults()
  *
  * @param[in] position The current scroll position.
  */
-static void OnScrollStart( const Vector2& position )
+static void OnScrollStart(const Vector2& position)
 {
   gOnScrollStartCalled = true;
 }
@@ -117,7 +116,7 @@ static void OnScrollStart( const Vector2& position )
  *
  * @param[in] position The current scroll position.
  */
-static void OnScrollUpdate( const Vector2& position )
+static void OnScrollUpdate(const Vector2& position)
 {
   gOnScrollUpdateCalled = true;
 }
@@ -127,7 +126,7 @@ static void OnScrollUpdate( const Vector2& position )
  *
  * @param[in] position The current scroll position.
  */
-static void OnScrollComplete( const Vector2& position )
+static void OnScrollComplete(const Vector2& position)
 {
   gOnScrollCompleteCalled = true;
 }
@@ -137,19 +136,19 @@ ScrollView SetupTestScrollView(Integration::Scene scene, int rows, int columns, 
   Constraint constraint;
 
   ScrollView scrollView = ScrollView::New();
-  scrollView.SetProperty( Actor::Property::SIZE, size);
-  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
-  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+  scrollView.SetProperty(Actor::Property::SIZE, size);
+  scrollView.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  scrollView.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  constraint = Constraint::New<Dali::Vector3>( scrollView, Dali::Actor::Property::SIZE, Dali::EqualToConstraint() );
-  constraint.AddSource( Dali::ParentSource( Dali::Actor::Property::SIZE ) );
+  constraint = Constraint::New<Dali::Vector3>(scrollView, Dali::Actor::Property::SIZE, Dali::EqualToConstraint());
+  constraint.AddSource(Dali::ParentSource(Dali::Actor::Property::SIZE));
   constraint.Apply();
 
   scrollView.SetWrapMode(false);
-  scrollView.ScrollStartedSignal().Connect( &OnScrollStart );
-  scrollView.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
-  scrollView.ScrollCompletedSignal().Connect( &OnScrollComplete );
-  scene.Add( scrollView );
+  scrollView.ScrollStartedSignal().Connect(&OnScrollStart);
+  scrollView.ScrollUpdatedSignal().Connect(&OnScrollUpdate);
+  scrollView.ScrollCompletedSignal().Connect(&OnScrollComplete);
+  scene.Add(scrollView);
   RulerPtr rulerX = CreateRuler(size.width);
   RulerPtr rulerY = CreateRuler(size.height);
   if(columns > 1)
@@ -169,33 +168,33 @@ ScrollView SetupTestScrollView(Integration::Scene scene, int rows, int columns, 
     rulerY->Disable();
   }
 
-  scrollView.SetRulerX( rulerX );
-  scrollView.SetRulerY( rulerY );
-  scene.Add( scrollView );
+  scrollView.SetRulerX(rulerX);
+  scrollView.SetRulerY(rulerY);
+  scene.Add(scrollView);
 
   Actor container = Actor::New();
-  container.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
-  container.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
-  container.SetProperty( Actor::Property::SIZE, size );
-  scrollView.Add( container );
+  container.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  container.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  container.SetProperty(Actor::Property::SIZE, size);
+  scrollView.Add(container);
 
-  constraint = Constraint::New<Vector3>( container, Actor::Property::SIZE, EqualToConstraint() );
-  constraint.AddSource( Dali::ParentSource( Dali::Actor::Property::SIZE ) );
+  constraint = Constraint::New<Vector3>(container, Actor::Property::SIZE, EqualToConstraint());
+  constraint.AddSource(Dali::ParentSource(Dali::Actor::Property::SIZE));
   constraint.Apply();
 
   gPages.clear();
-  for(int row = 0;row<rows;row++)
+  for(int row = 0; row < rows; row++)
   {
-    for(int column = 0;column<columns;column++)
+    for(int column = 0; column < columns; column++)
     {
       Actor page = Actor::New();
 
-      constraint = Constraint::New<Vector3>( page, Actor::Property::SIZE, EqualToConstraint() );
-      constraint.AddSource( Dali::ParentSource( Dali::Actor::Property::SIZE ) );
+      constraint = Constraint::New<Vector3>(page, Actor::Property::SIZE, EqualToConstraint());
+      constraint.AddSource(Dali::ParentSource(Dali::Actor::Property::SIZE));
       constraint.Apply();
-      page.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
-      page.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
-      page.SetProperty( Actor::Property::POSITION, Vector2( column * size.x, row * size.y ));
+      page.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+      page.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+      page.SetProperty(Actor::Property::POSITION, Vector2(column * size.x, row * size.y));
       container.Add(page);
 
       gPages.push_back(page);
@@ -221,15 +220,15 @@ int UtcDaliScrollViewPagePathEffectSetup(void)
 
   ScrollViewPagePathEffect effect;
 
-  DALI_TEST_CHECK( !effect );
+  DALI_TEST_CHECK(!effect);
 
-  BaseHandle handle = ScrollViewPagePathEffect::New(Dali::Path::New(), Vector3::ZERO,Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3::ZERO,0);
+  BaseHandle handle = ScrollViewPagePathEffect::New(Dali::Path::New(), Vector3::ZERO, Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3::ZERO, 0);
 
-  DALI_TEST_CHECK( handle );
+  DALI_TEST_CHECK(handle);
 
   effect = ScrollViewPagePathEffect::DownCast(handle);
 
-  DALI_TEST_CHECK( effect );
+  DALI_TEST_CHECK(effect);
   END_TEST;
 }
 
@@ -241,32 +240,32 @@ int UtcDaliScrollViewPagePathEffectTest(void)
   Vector2 size = application.GetScene().GetSize();
 
   ScrollView scrollView = SetupTestScrollView(application.GetScene(), 1, 3, size);
-  Actor testPage = gPages[2];
+  Actor      testPage   = gPages[2];
   Wait(application, 500);
 
   //Create path
-  float xHalfSize( size.x * 0.5f);
+  float xHalfSize(size.x * 0.5f);
 
-  Dali::Path path = Dali::Path::New();
+  Dali::Path            path = Dali::Path::New();
   Dali::Property::Array points;
   points.Resize(3);
-  points[0] = Vector3( xHalfSize, 0.0f,  -xHalfSize);
-  points[1] = Vector3( 0.0f, 0.0f, 0.0f );
-  points[2] = Vector3( -xHalfSize, 0.0f,  -xHalfSize);
-  path.SetProperty( Path::Property::POINTS, points );
+  points[0] = Vector3(xHalfSize, 0.0f, -xHalfSize);
+  points[1] = Vector3(0.0f, 0.0f, 0.0f);
+  points[2] = Vector3(-xHalfSize, 0.0f, -xHalfSize);
+  path.SetProperty(Path::Property::POINTS, points);
 
   Dali::Property::Array controlPoints;
   controlPoints.Resize(4);
-  controlPoints[0] = Vector3( xHalfSize, 0.0f, 0.0f );
-  controlPoints[1] = Vector3( xHalfSize, 0.0f, 0.0f );
-  controlPoints[2] = Vector3(-xHalfSize, 0.0f, 0.0f );
-  controlPoints[3] = Vector3(-xHalfSize, 0.0f, 0.0f );
-  path.SetProperty( Path::Property::CONTROL_POINTS, controlPoints );
+  controlPoints[0] = Vector3(xHalfSize, 0.0f, 0.0f);
+  controlPoints[1] = Vector3(xHalfSize, 0.0f, 0.0f);
+  controlPoints[2] = Vector3(-xHalfSize, 0.0f, 0.0f);
+  controlPoints[3] = Vector3(-xHalfSize, 0.0f, 0.0f);
+  path.SetProperty(Path::Property::CONTROL_POINTS, controlPoints);
 
   ScrollViewPagePathEffect effect = ScrollViewPagePathEffect::New(path,
                                                                   Vector3::ZERO,
                                                                   Toolkit::ScrollView::Property::SCROLL_FINAL_X,
-                                                                  Vector3(size.x,size.y,0.0f),
+                                                                  Vector3(size.x, size.y, 0.0f),
                                                                   3);
   scrollView.ApplyEffect(effect);
 
@@ -275,8 +274,8 @@ int UtcDaliScrollViewPagePathEffectTest(void)
   {
     Actor page = *pageIter;
     page.RemoveConstraints();
-    Constraint constraint = Constraint::New<Vector3>( page, Actor::Property::SIZE, EqualToConstraint() );
-    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+    Constraint constraint = Constraint::New<Vector3>(page, Actor::Property::SIZE, EqualToConstraint());
+    constraint.AddSource(ParentSource(Actor::Property::SIZE));
     constraint.Apply();
     effect.ApplyToPage(page, pageCounter++);
   }
@@ -289,7 +288,7 @@ int UtcDaliScrollViewPagePathEffectTest(void)
   }
 
   // test that the test page has reached centre of screen
-  Vector3 pagePos = testPage.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
+  Vector3 pagePos = testPage.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
   DALI_TEST_EQUALS(pagePos, Vector3::ZERO, Math::MACHINE_EPSILON_0, TEST_LOCATION);
 
   CleanupTest();

@@ -15,10 +15,10 @@
  *
  */
 
-#include <iostream>
-#include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <stdlib.h>
+#include <iostream>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -41,10 +41,10 @@ int UtcToolkitIsVertical(void)
 
   tet_infoline(" UtcToolkitIsVertical");
   bRet = IsVertical(ControlOrientation::Up);
-  DALI_TEST_EQUALS( bRet, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(bRet, true, TEST_LOCATION);
 
   bRet = IsVertical(ControlOrientation::Down);
-  DALI_TEST_EQUALS( bRet, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(bRet, true, TEST_LOCATION);
 
   END_TEST;
 }
@@ -57,11 +57,10 @@ int UtcToolkitIsHorizontal(void)
 
   tet_infoline(" UtcToolkitIsHorizontal");
   bRet = IsHorizontal(ControlOrientation::Left);
-  DALI_TEST_EQUALS( bRet, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(bRet, true, TEST_LOCATION);
 
   bRet = IsHorizontal(ControlOrientation::Right);
-  DALI_TEST_EQUALS( bRet, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(bRet, true, TEST_LOCATION);
 
   END_TEST;
 }
-

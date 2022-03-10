@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  *
  */
 
-#include <iostream>
-#include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali/devel-api/actors/actor-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/public-api/transition/transition-set.h>
-#include <dali-toolkit/public-api/transition/transition-base.h>
 #include <dali-toolkit/public-api/transition/slide-transition.h>
+#include <dali-toolkit/public-api/transition/transition-base.h>
+#include <dali-toolkit/public-api/transition/transition-set.h>
+#include <dali/devel-api/actors/actor-devel.h>
+#include <stdlib.h>
+#include <iostream>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -121,7 +121,7 @@ int UtcDaliSlideTransitionWithOffScene(void)
   transitionSet.AddTransition(slide);
   transitionSet.Play();
 
-  bool signalReceived(false);
+  bool                  signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
   transitionSet.FinishedSignal().Connect(&application, finishCheck);
 
@@ -171,15 +171,15 @@ int UtcDaliSlideTransitionOut(void)
 
   DALI_TEST_EQUALS(Vector2(0, 0), control.GetCurrentProperty<Vector2>(Actor::Property::POSITION), TEST_LOCATION);
 
-  Vector2 windowSize = application.GetScene().GetSize();
-  SlideTransition slide = SlideTransition::New(control, Dali::Toolkit::SlideTransitionDirection::BOTTOM, TimePeriod(0.5f));
+  Vector2         windowSize = application.GetScene().GetSize();
+  SlideTransition slide      = SlideTransition::New(control, Dali::Toolkit::SlideTransitionDirection::BOTTOM, TimePeriod(0.5f));
   slide.SetAppearingTransition(false);
 
   TransitionSet transitionSet = TransitionSet::New();
   transitionSet.AddTransition(slide);
   transitionSet.Play();
 
-  bool signalReceived(false);
+  bool                  signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
   transitionSet.FinishedSignal().Connect(&application, finishCheck);
 
@@ -240,7 +240,7 @@ int UtcDaliSlideTransitionIn(void)
   transitionSet.AddTransition(slide);
   transitionSet.Play();
 
-  bool signalReceived(false);
+  bool                  signalReceived(false);
   TransitionFinishCheck finishCheck(signalReceived);
   transitionSet.FinishedSignal().Connect(&application, finishCheck);
 

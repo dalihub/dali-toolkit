@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  *
  */
 
-#include <iostream>
-#include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/builder/json-parser.h>
+#include <stdlib.h>
+#include <iostream>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -36,8 +36,7 @@ void utc_json_parser_cleanup(void)
 
 namespace
 {
-
-std::string ReplaceQuotes(const std::string &in_s)
+std::string ReplaceQuotes(const std::string& in_s)
 {
   std::string s(in_s);
   // wrong as no embedded quote but had regex link problems
@@ -47,47 +46,48 @@ std::string ReplaceQuotes(const std::string &in_s)
 
 void CompareTrees(const TreeNode& a, const TreeNode& b)
 {
-  DALI_TEST_CHECK( a.GetType() == b.GetType() );
+  DALI_TEST_CHECK(a.GetType() == b.GetType());
 
-  DALI_TEST_CHECK( a.Size() == b.Size() );
+  DALI_TEST_CHECK(a.Size() == b.Size());
 
-  if( a.GetName() )
+  if(a.GetName())
   {
-    DALI_TEST_CHECK( std::string( a.GetName() ) == std::string( b.GetName() ) );
+    DALI_TEST_CHECK(std::string(a.GetName()) == std::string(b.GetName()));
   }
 
-  DALI_TEST_CHECK( a.HasSubstitution() == b.HasSubstitution() );
+  DALI_TEST_CHECK(a.HasSubstitution() == b.HasSubstitution());
 
-  switch( a.GetType() )
+  switch(a.GetType())
   {
     case TreeNode::OBJECT:
     case TreeNode::ARRAY:
     {
-      for( TreeNode::ConstIterator aiter = a.CBegin(), biter = b.CBegin();
-           aiter != a.CEnd() && biter != b.CEnd(); ++aiter, ++biter )
+      for(TreeNode::ConstIterator aiter = a.CBegin(), biter = b.CBegin();
+          aiter != a.CEnd() && biter != b.CEnd();
+          ++aiter, ++biter)
       {
-        CompareTrees( (*aiter).second, (*biter).second );
+        CompareTrees((*aiter).second, (*biter).second);
       }
       break;
     }
     case TreeNode::STRING:
     {
-      DALI_TEST_CHECK( std::string( a.GetString() ) == std::string( b.GetString() ) );
+      DALI_TEST_CHECK(std::string(a.GetString()) == std::string(b.GetString()));
       break;
     }
     case TreeNode::FLOAT:
     {
-      DALI_TEST_CHECK( a.GetFloat() == b.GetFloat() );
+      DALI_TEST_CHECK(a.GetFloat() == b.GetFloat());
       break;
     }
     case TreeNode::INTEGER:
     {
-      DALI_TEST_CHECK( a.GetInteger() == b.GetInteger());
+      DALI_TEST_CHECK(a.GetInteger() == b.GetInteger());
       break;
     }
     case TreeNode::BOOLEAN:
     {
-      DALI_TEST_CHECK( a.GetBoolean() == b.GetBoolean() );
+      DALI_TEST_CHECK(a.GetBoolean() == b.GetBoolean());
       break;
     }
     default:
@@ -97,9 +97,7 @@ void CompareTrees(const TreeNode& a, const TreeNode& b)
   }
 }
 
-
-}
-
+} // namespace
 
 int UtcDaliJsonParserMethod01(void)
 {
@@ -107,8 +105,8 @@ int UtcDaliJsonParserMethod01(void)
 
   tet_infoline("JSON basic test");
 
-  std::string s1( ReplaceQuotes(
-"{ \
+  std::string s1(ReplaceQuotes(
+    "{ \
   'string':'value2', \
   'integer':2, \
   'float':2.0, \
@@ -120,7 +118,7 @@ int UtcDaliJsonParserMethod01(void)
 
   JsonParser parser = JsonParser::New();
 
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
   if(parser.ParseError())
   {
@@ -187,21 +185,21 @@ int UtcDaliJsonParserMethod01(void)
   TreeNode::ConstIterator iterArray = node->CBegin();
 
   DALI_TEST_CHECK(iterArray != node->CEnd());
-  DALI_TEST_CHECK( ((*iterArray).second).GetType() == TreeNode::INTEGER);
-  DALI_TEST_CHECK( (*iterArray).first == NULL );
-  DALI_TEST_CHECK( ((*iterArray).second).GetInteger() == 1);
+  DALI_TEST_CHECK(((*iterArray).second).GetType() == TreeNode::INTEGER);
+  DALI_TEST_CHECK((*iterArray).first == NULL);
+  DALI_TEST_CHECK(((*iterArray).second).GetInteger() == 1);
 
   ++iterArray;
   DALI_TEST_CHECK(iterArray != node->CEnd());
-  DALI_TEST_CHECK( ((*iterArray).second).GetType() == TreeNode::INTEGER);
-  DALI_TEST_CHECK( (*iterArray).first == NULL );
-  DALI_TEST_CHECK( ((*iterArray).second).GetInteger() == 2);
+  DALI_TEST_CHECK(((*iterArray).second).GetType() == TreeNode::INTEGER);
+  DALI_TEST_CHECK((*iterArray).first == NULL);
+  DALI_TEST_CHECK(((*iterArray).second).GetInteger() == 2);
 
   ++iterArray;
   DALI_TEST_CHECK(iterArray != node->CEnd());
-  DALI_TEST_CHECK( ((*iterArray).second).GetType() == TreeNode::INTEGER);
-  DALI_TEST_CHECK( (*iterArray).first == NULL );
-  DALI_TEST_CHECK( ((*iterArray).second).GetInteger() == 3);
+  DALI_TEST_CHECK(((*iterArray).second).GetType() == TreeNode::INTEGER);
+  DALI_TEST_CHECK((*iterArray).first == NULL);
+  DALI_TEST_CHECK(((*iterArray).second).GetInteger() == 3);
 
   ++iter;
   DALI_TEST_CHECK(iter != root->CEnd());
@@ -212,12 +210,12 @@ int UtcDaliJsonParserMethod01(void)
 
   TreeNode::ConstIterator iterObject = node->CBegin();
   DALI_TEST_CHECK(iterObject != node->CEnd());
-  DALI_TEST_CHECK( ((*iterObject).second).GetType() == TreeNode::STRING);
-  DALI_TEST_CHECK( std::string((*iterObject).first) == std::string("key" ));
-  DALI_TEST_CHECK( std::string(((*iterObject).second).GetString()) == std::string("value"));
+  DALI_TEST_CHECK(((*iterObject).second).GetType() == TreeNode::STRING);
+  DALI_TEST_CHECK(std::string((*iterObject).first) == std::string("key"));
+  DALI_TEST_CHECK(std::string(((*iterObject).second).GetString()) == std::string("value"));
 
   ++iter;
-  DALI_TEST_CHECK(!( iter != root->CEnd() ));
+  DALI_TEST_CHECK(!(iter != root->CEnd()));
 
   ++iter; // Go past the end
 
@@ -233,7 +231,8 @@ int UtcDaliJsonParserMethod02(void)
 
   tet_infoline("JSON Comments");
 
-  std::string s1( ReplaceQuotes("         \
+  std::string s1(ReplaceQuotes(
+    "         \
 // some comments with empty line above  \n\
 {                                         \
   // inline comments                    \n\
@@ -245,7 +244,7 @@ int UtcDaliJsonParserMethod02(void)
 
   JsonParser parser = JsonParser::New();
 
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
   if(parser.ParseError())
   {
@@ -273,27 +272,25 @@ int UtcDaliJsonParserMethod02(void)
   END_TEST;
 }
 
-
 int UtcDaliJsonParserMethod03(void)
 {
   ToolkitTestApplication application;
 
   tet_infoline("JSON Empty line comment");
 
-  std::string s1( ReplaceQuotes(
-"/*\n" \
-"c comment\n" \
-"*/"\
-"// next empty line comment\n"\
-"//\n"\
-"{\n"\
-"  'key':'value'\n"\
-"}\n"\
-));
+  std::string s1(ReplaceQuotes(
+    "/*\n"
+    "c comment\n"
+    "*/"
+    "// next empty line comment\n"
+    "//\n"
+    "{\n"
+    "  'key':'value'\n"
+    "}\n"));
 
   JsonParser parser = JsonParser::New();
 
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
   if(parser.ParseError())
   {
@@ -327,7 +324,8 @@ int UtcDaliJsonParserMethod04(void)
 
   tet_infoline("JSON Merge");
 
-  std::string s1( ReplaceQuotes("                                       \
+  std::string s1(ReplaceQuotes(
+    "                                       \
 {                                                                       \
   'animations':                                                         \
   {                                                                     \
@@ -348,7 +346,8 @@ int UtcDaliJsonParserMethod04(void)
 }                                                                       \
 "));
 
-  std::string s2( ReplaceQuotes("                                       \
+  std::string s2(ReplaceQuotes(
+    "                                       \
 {                                                                       \
   'animations':                                                         \
   {                                                                     \
@@ -364,7 +363,7 @@ int UtcDaliJsonParserMethod04(void)
 
   JsonParser parser = JsonParser::New();
 
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
   if(parser.ParseError())
   {
@@ -373,7 +372,7 @@ int UtcDaliJsonParserMethod04(void)
   }
   DALI_TEST_CHECK(!parser.ParseError());
 
-  parser.Parse( s2 );
+  parser.Parse(s2);
 
   if(parser.ParseError())
   {
@@ -386,15 +385,14 @@ int UtcDaliJsonParserMethod04(void)
   const TreeNode* root = parser.GetRoot();
   DALI_TEST_CHECK(root);
 
-  const TreeNode *node = root->Find("bump");
+  const TreeNode* node = root->Find("bump");
   DALI_TEST_CHECK(node);
 
   DALI_TEST_CHECK(static_cast<int>(node->Size()) == 4);
 
-  DALI_TEST_CHECK( node->GetChild("duration") );
-  DALI_TEST_CHECK( node->GetChild("loop") );
-  DALI_TEST_CHECK( node->GetChild("properties") );
-
+  DALI_TEST_CHECK(node->GetChild("duration"));
+  DALI_TEST_CHECK(node->GetChild("loop"));
+  DALI_TEST_CHECK(node->GetChild("properties"));
 
   tet_result(TET_PASS);
   END_TEST;
@@ -406,7 +404,8 @@ int UtcDaliJsonParserMethod05(void)
 
   tet_infoline("JSON Pack & Write");
 
-  std::string s1( ReplaceQuotes("                                       \
+  std::string s1(ReplaceQuotes(
+    "                                       \
 {                                                                       \
   'animations':                                                         \
   {                                                                     \
@@ -429,7 +428,7 @@ int UtcDaliJsonParserMethod05(void)
 
   JsonParser parser = JsonParser::New();
 
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
   if(parser.ParseError())
   {
@@ -446,7 +445,7 @@ int UtcDaliJsonParserMethod05(void)
   std::stringstream b;
   parser.Write(b, 2);
 
-  DALI_TEST_CHECK( a.str() == b.str() );
+  DALI_TEST_CHECK(a.str() == b.str());
 
   tet_result(TET_PASS);
   END_TEST;
@@ -454,9 +453,8 @@ int UtcDaliJsonParserMethod05(void)
 
 namespace
 {
-
-static const int NUMBER_OK_TESTS = 36;
-const char *TEST_OK[NUMBER_OK_TESTS] = {
+static const int NUMBER_OK_TESTS          = 36;
+const char*      TEST_OK[NUMBER_OK_TESTS] = {
   "{ 'hex': '\u0123\u4567\u89AB\uCDEF\uabcd\uef4A' }",
   "{ 'special': '`1~!@#$%^&*()_+-={:[,]}|;.</>?' }",
   "{ 'slash': '/ & \' }",
@@ -494,8 +492,7 @@ const char *TEST_OK[NUMBER_OK_TESTS] = {
   "{'JSON Test Pattern pass3': { 'The outermost value': 'must be an object or array.', 'In this test': 'It is an object.' } }",
   "[[[[[[[[[[[[[[[[[[['Not too deep']]]]]]]]]]]]]]]]]]]",
 };
-}
-
+} // namespace
 
 int UtcDaliJsonParserMethod06(void)
 {
@@ -509,7 +506,7 @@ int UtcDaliJsonParserMethod06(void)
   {
     parser = JsonParser::New();
 
-    parser.Parse( ReplaceQuotes(TEST_OK[i]) );
+    parser.Parse(ReplaceQuotes(TEST_OK[i]));
 
     if(parser.ParseError())
     {
@@ -528,9 +525,8 @@ int UtcDaliJsonParserMethod06(void)
 
 namespace
 {
-
 static const int NUMBER_FAIL_TESTS = 34;
-const char *TEST_FAIL[] = {
+const char*      TEST_FAIL[]       = {
   "[' tab\t   character  \t in\t string   ']",
   "['Extra close']]",
   "['Colon instead of comma': false]",
@@ -566,7 +562,7 @@ const char *TEST_FAIL[] = {
   "[{'no comma':1} {'b:2}]",
   "{'extra comma':1,}",
 };
-}
+} // namespace
 
 int UtcDaliJsonParserMethod07(void)
 {
@@ -580,23 +576,21 @@ int UtcDaliJsonParserMethod07(void)
   {
     parser = JsonParser::New();
 
-    parser.Parse( ReplaceQuotes(TEST_FAIL[i]) );
+    parser.Parse(ReplaceQuotes(TEST_FAIL[i]));
 
     if(!parser.ParseError())
     {
       tet_printf("Invalid JSON parse test %d Failed", i);
       tet_printf("%s", ReplaceQuotes(TEST_FAIL[i]).c_str());
-      tet_printf("JSON Error %d:%d %s (%s)", parser.GetErrorLineNumber(), parser.GetErrorColumn(),
-                 parser.GetErrorDescription().c_str(), parser.GetErrorPosition());
+      tet_printf("JSON Error %d:%d %s (%s)", parser.GetErrorLineNumber(), parser.GetErrorColumn(), parser.GetErrorDescription().c_str(), parser.GetErrorPosition());
     }
 
     DALI_TEST_CHECK(parser.ParseError());
   }
 
-
   parser = JsonParser::New();
 
-  parser.Parse( "['single quote']" );
+  parser.Parse("['single quote']");
 
   if(!parser.ParseError())
   {
@@ -615,7 +609,8 @@ int UtcDaliJsonParserMethod08(void)
 
   tet_infoline("JSON error reporting");
 
-  std::string s1( ReplaceQuotes("\
+  std::string s1(ReplaceQuotes(
+    "\
 {                                         \n\
   'float':,],                             \n\
 }                                         \n\
@@ -623,11 +618,11 @@ int UtcDaliJsonParserMethod08(void)
 
   JsonParser parser = JsonParser::New();
 
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
   DALI_TEST_CHECK(parser.ParseError());
 
-  DALI_TEST_CHECK(1  == parser.GetErrorLineNumber());
+  DALI_TEST_CHECK(1 == parser.GetErrorLineNumber());
   DALI_TEST_CHECK(53 == parser.GetErrorPosition());
   DALI_TEST_CHECK(11 == parser.GetErrorColumn());
   DALI_TEST_CHECK("Missing Value" == parser.GetErrorDescription());
@@ -642,7 +637,8 @@ int UtcDaliJsonParserMethod09(void)
 
   tet_infoline("JSON Pack()");
 
-  std::string s1( ReplaceQuotes("\
+  std::string s1(ReplaceQuotes(
+    "\
 {                                         \
   'string':'value2',                      \
   'integer':2,                            \
@@ -656,7 +652,7 @@ int UtcDaliJsonParserMethod09(void)
 
   JsonParser parser = JsonParser::New();
 
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
   std::stringstream ss1;
   parser.Write(ss1, 2);
@@ -678,11 +674,11 @@ int UtcDaliJsonParserMethod10(void)
 
   tet_infoline("JSON empty data");
 
-  std::string s1( "" );
+  std::string s1("");
 
   JsonParser parser = JsonParser::New();
 
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
   DALI_TEST_CHECK(parser.ParseError());
 
@@ -695,7 +691,8 @@ int UtcDaliJsonParserMethod11(void)
   ToolkitTestApplication application;
   tet_infoline("JSON tree copy");
 
-  std::string s1( ReplaceQuotes("                                       \
+  std::string s1(ReplaceQuotes(
+    "                                       \
 {                                                                       \
   'animations':                                                         \
   {                                                                     \
@@ -718,26 +715,26 @@ int UtcDaliJsonParserMethod11(void)
 
   JsonParser parser = JsonParser::New();
 
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
   JsonParser parser2 = JsonParser::New(*parser.GetRoot());
 
   DALI_TEST_CHECK(parser.GetRoot());
   DALI_TEST_CHECK(parser2.GetRoot());
 
-  CompareTrees( *parser.GetRoot(), *parser2.GetRoot() );
+  CompareTrees(*parser.GetRoot(), *parser2.GetRoot());
 
   tet_result(TET_PASS);
   END_TEST;
 }
-
 
 int UtcDaliJsonParserMerge1(void)
 {
   ToolkitTestApplication application;
   tet_infoline("JSON tree merge");
 
-  std::string s1( ReplaceQuotes("                                       \
+  std::string s1(ReplaceQuotes(
+    "                                       \
 {                                                                       \
   'styles':                                                             \
   {                                                                     \
@@ -750,17 +747,17 @@ int UtcDaliJsonParserMerge1(void)
 }                                                                       \
 "));
 
-  JsonParser parser = JsonParser::New();
+  JsonParser parser     = JsonParser::New();
   JsonParser testParser = JsonParser::New();
 
-  testParser.Parse( s1 );
+  testParser.Parse(s1);
 
-  parser.Parse( s1 );
-  parser.Parse( s1 ); // Merge the tree into itself. The value array should not grow.
+  parser.Parse(s1);
+  parser.Parse(s1); // Merge the tree into itself. The value array should not grow.
 
   DALI_TEST_CHECK(parser.GetRoot());
 
-  CompareTrees( *parser.GetRoot(), *testParser.GetRoot() );
+  CompareTrees(*parser.GetRoot(), *testParser.GetRoot());
 
   END_TEST;
 }
@@ -768,14 +765,15 @@ int UtcDaliJsonParserMerge1(void)
 int UtcDaliJsonParserDownCast(void)
 {
   BaseHandle handle = JsonParser::New();
-  JsonParser parser = JsonParser::DownCast( handle );
-  DALI_TEST_CHECK( parser );
+  JsonParser parser = JsonParser::DownCast(handle);
+  DALI_TEST_CHECK(parser);
   END_TEST;
 }
 
 int UtcDaliJsonParserTreeNodeCount(void)
 {
-  std::string s1( ReplaceQuotes("                                       \
+  std::string s1(ReplaceQuotes(
+    "                                       \
 {                                                                       \
   'styles':                                                             \
   {                                                                     \
@@ -789,18 +787,19 @@ int UtcDaliJsonParserTreeNodeCount(void)
 "));
 
   JsonParser parser = JsonParser::New();
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
   const TreeNode* treeNode = parser.GetRoot();
-  DALI_TEST_EQUALS(1, treeNode->Count("styles"), TEST_LOCATION );
-  DALI_TEST_EQUALS(0, treeNode->Count("random"), TEST_LOCATION );
+  DALI_TEST_EQUALS(1, treeNode->Count("styles"), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, treeNode->Count("random"), TEST_LOCATION);
 
   END_TEST;
 }
 
 int UtcDaliJsonParserTreeNodeFind(void)
 {
-  std::string s1( ReplaceQuotes("\
+  std::string s1(ReplaceQuotes(
+    "\
 {                                         \
   'string':'value2',                      \
   'integer':2,                            \
@@ -813,13 +812,13 @@ int UtcDaliJsonParserTreeNodeFind(void)
 "));
 
   JsonParser parser = JsonParser::New();
-  parser.Parse( s1 );
+  parser.Parse(s1);
 
-  const TreeNode* treeNode = parser.GetRoot();
+  const TreeNode* treeNode  = parser.GetRoot();
   const TreeNode* childNode = treeNode->Find("string");
-  DALI_TEST_CHECK( childNode );
+  DALI_TEST_CHECK(childNode);
   const TreeNode* sameNode = childNode->Find("string");
-  DALI_TEST_EQUALS( sameNode, childNode, TEST_LOCATION );
+  DALI_TEST_EQUALS(sameNode, childNode, TEST_LOCATION);
 
   END_TEST;
 }

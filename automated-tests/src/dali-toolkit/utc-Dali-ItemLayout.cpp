@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,28 @@
  *
  */
 
-#include <iostream>
 #include <stdlib.h>
+#include <iostream>
 
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
 
-#include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali.h>
 
 using namespace Dali;
 using namespace Toolkit;
 
 namespace
 {
-const unsigned int TOTAL_ITEM_NUMBER = 200;
-const char* TEST_IMAGE_FILE_NAME = "gallery_image_01.jpg";
-
+const unsigned int TOTAL_ITEM_NUMBER    = 200;
+const char*        TEST_IMAGE_FILE_NAME = "gallery_image_01.jpg";
 
 // Implementation of ItemFactory for providing actors to ItemView
 class TestItemFactory : public ItemFactory
 {
 public:
-
   /**
    * Constructor
    * @param application class, stored as reference
@@ -55,7 +53,6 @@ public:
   }
 
 public: // From ItemFactory
-
   /**
    * Query the number of items available from the factory.
    * The maximum available item has an ID of GetNumberOfItems() - 1.
@@ -73,7 +70,7 @@ public: // From ItemFactory
   virtual Actor NewItem(unsigned int itemId)
   {
     // Create a renderable actor for this item
-    return ImageView::New( TEST_IMAGE_FILE_NAME );
+    return ImageView::New(TEST_IMAGE_FILE_NAME);
   }
 };
 
@@ -85,7 +82,6 @@ typedef IntrusivePtr<TestItemLayout> TestItemLayoutPtr;
 class TestItemLayout : public ItemLayout
 {
 public:
-
   /**
    * Constructor
    */
@@ -109,7 +105,6 @@ public:
   }
 
 public: // From ItemLayout
-
   /**
    * Query the minimum valid layout position; this is a negative value.
    *
@@ -178,7 +173,7 @@ public: // From ItemLayout
    * @param[in] layoutSize The layout size
    * @param[out] itemSize The target size of an item.
    */
-  virtual void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const
+  virtual void GetDefaultItemSize(unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize) const
   {
   }
 
@@ -188,7 +183,7 @@ public: // From ItemLayout
    */
   virtual Degree GetScrollDirection() const
   {
-    return Degree( 0.0f );
+    return Degree(0.0f);
   }
 
   /**
@@ -226,7 +221,7 @@ public: // From ItemLayout
    * @param[in] layoutSize the current size of the item view instance.
    * @param[in] itemViewActor The item view instance which requests the application of constraints.
    */
-  virtual void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor )
+  virtual void ApplyConstraints(Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor)
   {
   }
 
@@ -252,10 +247,10 @@ int UtcDaliItemLayoutSetAndGetOrientation(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
   view.AddLayout(*gridLayout);
 
   // Set the orientation of the layout to be horizontal from left to right
@@ -289,21 +284,21 @@ int UtcDaliItemLayoutSetAndGetOrientation(void)
   DALI_TEST_CHECK(flickSpeedFactor != 0.0f);
 
   // White box test here: -( itemId / NoOfItemsPerRow(default 4) ) * NoOfItemsPerRow
-  DALI_TEST_EQUALS( -1.0f, gridLayout->GetItemScrollToPosition( 1 ), TEST_LOCATION );
+  DALI_TEST_EQUALS(-1.0f, gridLayout->GetItemScrollToPosition(1), TEST_LOCATION);
 
-  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New(DefaultItemLayout::DEPTH);
   view.AddLayout(*depthLayout);
 
   layout = view.GetLayout(1);
   DALI_TEST_CHECK(depthLayout == layout);
 
-  ItemLayoutPtr listLayout = DefaultItemLayout::New( DefaultItemLayout::LIST );
+  ItemLayoutPtr listLayout = DefaultItemLayout::New(DefaultItemLayout::LIST);
   view.AddLayout(*listLayout);
 
   layout = view.GetLayout(2);
   DALI_TEST_CHECK(listLayout == layout);
 
-  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New(DefaultItemLayout::SPIRAL);
   view.AddLayout(*spiralLayout);
 
   layout = view.GetLayout(3);
@@ -315,9 +310,9 @@ int UtcDaliItemLayoutGetExtension(void)
 {
   ToolkitTestApplication application;
 
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
-  DALI_TEST_CHECK( gridLayout );
-  DALI_TEST_CHECK( !gridLayout->GetExtension() );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
+  DALI_TEST_CHECK(gridLayout);
+  DALI_TEST_CHECK(!gridLayout->GetExtension());
 
   END_TEST;
 }
@@ -327,9 +322,9 @@ int UtcDaliItemLayoutGetClosestOnScreenLayoutPosition(void)
   ToolkitTestApplication application;
 
   TestItemLayoutPtr layout = TestItemLayout::New();
-  DALI_TEST_CHECK( layout );
-  DALI_TEST_EQUALS(layout->GetClosestOnScreenLayoutPosition(0, 0.0f, Vector3::ZERO), 0.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS(layout->GetClosestOnScreenLayoutPosition(0, 0.0f, Vector3(-800.0f, -1200.0f, 0.0f)), 0.0f, TEST_LOCATION );
+  DALI_TEST_CHECK(layout);
+  DALI_TEST_EQUALS(layout->GetClosestOnScreenLayoutPosition(0, 0.0f, Vector3::ZERO), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(layout->GetClosestOnScreenLayoutPosition(0, 0.0f, Vector3(-800.0f, -1200.0f, 0.0f)), 0.0f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -339,9 +334,9 @@ int UtcDaliItemLayoutGetNextFocusItemID(void)
   ToolkitTestApplication application;
 
   TestItemLayoutPtr layout = TestItemLayout::New();
-  DALI_TEST_CHECK( layout );
-  DALI_TEST_EQUALS(layout->GetNextFocusItemID(0, 100, Control::KeyboardFocus::LEFT, true), 99, TEST_LOCATION );
-  DALI_TEST_EQUALS(layout->GetNextFocusItemID(110, 100, Control::KeyboardFocus::RIGHT, true), 0, TEST_LOCATION );
+  DALI_TEST_CHECK(layout);
+  DALI_TEST_EQUALS(layout->GetNextFocusItemID(0, 100, Control::KeyboardFocus::LEFT, true), 99, TEST_LOCATION);
+  DALI_TEST_EQUALS(layout->GetNextFocusItemID(110, 100, Control::KeyboardFocus::RIGHT, true), 0, TEST_LOCATION);
 
   END_TEST;
 }
@@ -352,25 +347,25 @@ int UtcDaliItemLayoutSetAndGetLayoutProperties(void)
 
   // Create the ItemView actor
   TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
+  ItemView        view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New(DefaultItemLayout::GRID);
 
   // Set the property of the grid layout
   Property::Map gridLayoutProperty;
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::GRID) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::ITEM_SIZE, Dali::Property::Value(Vector3(200, 200,50)) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_ROW_SPACING, Dali::Property::Value(50.0f) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_COLUMN_NUMBER, Dali::Property::Value(4) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_COLUMN_SPACING, Dali::Property::Value(50.0f) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_TOP_MARGIN, Dali::Property::Value(95.0f) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_BOTTOM_MARGIN, Dali::Property::Value(20.0f) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_SIDE_MARGIN, Dali::Property::Value(20.0f) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_SCROLL_SPEED_FACTOR, Dali::Property::Value(0.03f) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_ITEM_FLICK_ANIMATION_DURATION, Dali::Property::Value(0.015f) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::GRID_MAXIMUM_SWIPE_SPEED, Dali::Property::Value(100.0f) );
-  gridLayoutProperty.Insert( DefaultItemLayoutProperty::ORIENTATION, Dali::Property::Value((int)ControlOrientation::Up) );
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::GRID));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::ITEM_SIZE, Dali::Property::Value(Vector3(200, 200, 50)));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_ROW_SPACING, Dali::Property::Value(50.0f));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_COLUMN_NUMBER, Dali::Property::Value(4));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_COLUMN_SPACING, Dali::Property::Value(50.0f));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_TOP_MARGIN, Dali::Property::Value(95.0f));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_BOTTOM_MARGIN, Dali::Property::Value(20.0f));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_SIDE_MARGIN, Dali::Property::Value(20.0f));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_SCROLL_SPEED_FACTOR, Dali::Property::Value(0.03f));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_ITEM_FLICK_ANIMATION_DURATION, Dali::Property::Value(0.015f));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::GRID_MAXIMUM_SWIPE_SPEED, Dali::Property::Value(100.0f));
+  gridLayoutProperty.Insert(DefaultItemLayoutProperty::ORIENTATION, Dali::Property::Value((int)ControlOrientation::Up));
   gridLayout->SetLayoutProperties(gridLayoutProperty);
 
   view.AddLayout(*gridLayout);
@@ -379,81 +374,81 @@ int UtcDaliItemLayoutSetAndGetLayoutProperties(void)
   Property::Map firstLayout = gridLayout->GetLayoutProperties();
 
   //Check all the properties of grid layout
-  DALI_TEST_EQUALS( gridLayoutProperty.Count(), firstLayout.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS(gridLayoutProperty.Count(), firstLayout.Count(), TEST_LOCATION);
 
-  for( unsigned int mapIdx = 0, mapCount = firstLayout.Count(); mapIdx < mapCount; ++mapIdx )
+  for(unsigned int mapIdx = 0, mapCount = firstLayout.Count(); mapIdx < mapCount; ++mapIdx)
   {
-    KeyValuePair propertyPair( firstLayout.GetKeyValue( mapIdx ) );
+    KeyValuePair propertyPair(firstLayout.GetKeyValue(mapIdx));
     if(propertyPair.first == DefaultItemLayoutProperty::TYPE)
     {
       int layoutType = propertyPair.second.Get<int>();
-      DALI_TEST_EQUALS( layoutType, (int)DefaultItemLayout::GRID, TEST_LOCATION );
+      DALI_TEST_EQUALS(layoutType, (int)DefaultItemLayout::GRID, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::ITEM_SIZE)
     {
       Vector3 size = propertyPair.second.Get<Vector3>();
-      DALI_TEST_EQUALS( size, Vector3(200, 200,50), TEST_LOCATION );
+      DALI_TEST_EQUALS(size, Vector3(200, 200, 50), TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_ROW_SPACING)
     {
       float rowSpacing = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS( rowSpacing, 50.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(rowSpacing, 50.0f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_COLUMN_NUMBER)
     {
       int number = propertyPair.second.Get<int>();
-      DALI_TEST_EQUALS(number, 4, TEST_LOCATION );
+      DALI_TEST_EQUALS(number, 4, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_COLUMN_SPACING)
     {
       float columnSpacing = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(columnSpacing, 50.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(columnSpacing, 50.0f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_TOP_MARGIN)
     {
       float topMargin = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(topMargin, 95.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(topMargin, 95.0f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_BOTTOM_MARGIN)
     {
       float bottomMargin = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(bottomMargin, 20.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(bottomMargin, 20.0f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_SIDE_MARGIN)
     {
       float sideMargin = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(sideMargin, 20.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(sideMargin, 20.0f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_SCROLL_SPEED_FACTOR)
     {
       float scrollSpeedFactor = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(scrollSpeedFactor, 0.03f, TEST_LOCATION );
+      DALI_TEST_EQUALS(scrollSpeedFactor, 0.03f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_ITEM_FLICK_ANIMATION_DURATION)
     {
       float animationDuration = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(animationDuration, 0.015f, TEST_LOCATION );
+      DALI_TEST_EQUALS(animationDuration, 0.015f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::GRID_MAXIMUM_SWIPE_SPEED)
     {
       float swipSpeed = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(swipSpeed, 100.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(swipSpeed, 100.0f, TEST_LOCATION);
     }
   }
-  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New(DefaultItemLayout::DEPTH);
 
   // Set the property of the depth layout
   Property::Map depthLayoutProperty;
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::DEPTH) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_COLUMN_NUMBER, Dali::Property::Value(3) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_ROW_NUMBER, Dali::Property::Value(26.0f) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_ROW_SPACING, Dali::Property::Value(55.0f) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_TILT_ANGLE, Dali::Property::Value(Math::PI*0.15f) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_ITEM_TILT_ANGLE, Dali::Property::Value(-Math::PI*0.025f ) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_SCROLL_SPEED_FACTOR, Dali::Property::Value(0.02f) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_ITEM_FLICK_ANIMATION_DURATION, Dali::Property::Value(0.03f) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::DEPTH_MAXIMUM_SWIPE_SPEED, Dali::Property::Value(50.0f) );
-  depthLayoutProperty.Insert( DefaultItemLayoutProperty::ORIENTATION, Dali::Property::Value((int)ControlOrientation::Up) );
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::DEPTH));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::DEPTH_COLUMN_NUMBER, Dali::Property::Value(3));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::DEPTH_ROW_NUMBER, Dali::Property::Value(26.0f));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::DEPTH_ROW_SPACING, Dali::Property::Value(55.0f));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::DEPTH_TILT_ANGLE, Dali::Property::Value(Math::PI * 0.15f));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::DEPTH_ITEM_TILT_ANGLE, Dali::Property::Value(-Math::PI * 0.025f));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::DEPTH_SCROLL_SPEED_FACTOR, Dali::Property::Value(0.02f));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::DEPTH_ITEM_FLICK_ANIMATION_DURATION, Dali::Property::Value(0.03f));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::DEPTH_MAXIMUM_SWIPE_SPEED, Dali::Property::Value(50.0f));
+  depthLayoutProperty.Insert(DefaultItemLayoutProperty::ORIENTATION, Dali::Property::Value((int)ControlOrientation::Up));
   depthLayout->SetLayoutProperties(depthLayoutProperty);
 
   view.AddLayout(*depthLayout);
@@ -463,79 +458,79 @@ int UtcDaliItemLayoutSetAndGetLayoutProperties(void)
   Property::Map secondLayout = depthLayout->GetLayoutProperties();
 
   //Check all the properties of grid layout
-  DALI_TEST_EQUALS( depthLayoutProperty.Count(), secondLayout.Count(), TEST_LOCATION );
-  for( unsigned int mapIdx = 0, mapCount = secondLayout.Count(); mapIdx < mapCount; ++mapIdx )
+  DALI_TEST_EQUALS(depthLayoutProperty.Count(), secondLayout.Count(), TEST_LOCATION);
+  for(unsigned int mapIdx = 0, mapCount = secondLayout.Count(); mapIdx < mapCount; ++mapIdx)
   {
-    KeyValuePair propertyPair( secondLayout.GetKeyValue( mapIdx ) );
+    KeyValuePair propertyPair(secondLayout.GetKeyValue(mapIdx));
     if(propertyPair.first == DefaultItemLayoutProperty::TYPE)
     {
       int layoutType = propertyPair.second.Get<int>();
-      DALI_TEST_EQUALS( layoutType, (int)DefaultItemLayout::DEPTH, TEST_LOCATION );
+      DALI_TEST_EQUALS(layoutType, (int)DefaultItemLayout::DEPTH, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::ORIENTATION)
     {
       int orientation = propertyPair.second.Get<int>();
-      DALI_TEST_EQUALS(orientation, (int)ControlOrientation::Up, TEST_LOCATION );
+      DALI_TEST_EQUALS(orientation, (int)ControlOrientation::Up, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::ITEM_SIZE)
     {
       Vector3 size = propertyPair.second.Get<Vector3>();
-      DALI_TEST_EQUALS( size, Vector3(200, 200,50), TEST_LOCATION );
+      DALI_TEST_EQUALS(size, Vector3(200, 200, 50), TEST_LOCATION);
     }
 
     else if(propertyPair.first == DefaultItemLayoutProperty::DEPTH_COLUMN_NUMBER)
     {
       int columnNumber = propertyPair.second.Get<int>();
-      DALI_TEST_EQUALS( columnNumber, 3, TEST_LOCATION );
+      DALI_TEST_EQUALS(columnNumber, 3, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::DEPTH_ROW_NUMBER)
     {
       float rowNumber = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(rowNumber, 26.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(rowNumber, 26.0f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::DEPTH_ROW_SPACING)
     {
       float rowSpacing = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(rowSpacing, 55.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(rowSpacing, 55.0f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::DEPTH_TILT_ANGLE)
     {
       float tiltAngle = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(tiltAngle, Math::PI*0.15f, TEST_LOCATION );
+      DALI_TEST_EQUALS(tiltAngle, Math::PI * 0.15f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::DEPTH_ITEM_TILT_ANGLE)
     {
       float itemTiltAngle = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(itemTiltAngle, -Math::PI*0.025f, TEST_LOCATION );
+      DALI_TEST_EQUALS(itemTiltAngle, -Math::PI * 0.025f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::DEPTH_SCROLL_SPEED_FACTOR)
     {
       float scrollSpeedFactor = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(scrollSpeedFactor, 0.02f, TEST_LOCATION );
+      DALI_TEST_EQUALS(scrollSpeedFactor, 0.02f, TEST_LOCATION);
     }
 
     else if(propertyPair.first == DefaultItemLayoutProperty::DEPTH_ITEM_FLICK_ANIMATION_DURATION)
     {
       float animationDuration = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(animationDuration, 0.03f, TEST_LOCATION );
+      DALI_TEST_EQUALS(animationDuration, 0.03f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::DEPTH_MAXIMUM_SWIPE_SPEED)
     {
       float swipSpeed = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(swipSpeed, 50.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(swipSpeed, 50.0f, TEST_LOCATION);
     }
   }
-  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New(DefaultItemLayout::SPIRAL);
 
   // Set the property of the spiral layout
   Property::Map spiralLayoutPrperty;
-  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::SPIRAL) );
-  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::SPIRAL_ITEM_SPACING, Dali::Property::Value((Math::PI*2.0f)/9.5f) );
-  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::SPIRAL_TOP_ITEM_ALIGNMENT, Dali::Property::Value(-0.125f) );
-  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::SPIRAL_REVOLUTION_DISTANCE, Dali::Property::Value(190.0f) );
-  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::SPIRAL_SCROLL_SPEED_FACTOR, Dali::Property::Value(0.01f) );
-  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::SPIRAL_ITEM_FLICK_ANIMATION_DURATION, Dali::Property::Value(0.1f) );
-  spiralLayoutPrperty.Insert( DefaultItemLayoutProperty::SPIRAL_MAXIMUM_SWIPE_SPEED, Dali::Property::Value(30.0f) );
+  spiralLayoutPrperty.Insert(DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::SPIRAL));
+  spiralLayoutPrperty.Insert(DefaultItemLayoutProperty::SPIRAL_ITEM_SPACING, Dali::Property::Value((Math::PI * 2.0f) / 9.5f));
+  spiralLayoutPrperty.Insert(DefaultItemLayoutProperty::SPIRAL_TOP_ITEM_ALIGNMENT, Dali::Property::Value(-0.125f));
+  spiralLayoutPrperty.Insert(DefaultItemLayoutProperty::SPIRAL_REVOLUTION_DISTANCE, Dali::Property::Value(190.0f));
+  spiralLayoutPrperty.Insert(DefaultItemLayoutProperty::SPIRAL_SCROLL_SPEED_FACTOR, Dali::Property::Value(0.01f));
+  spiralLayoutPrperty.Insert(DefaultItemLayoutProperty::SPIRAL_ITEM_FLICK_ANIMATION_DURATION, Dali::Property::Value(0.1f));
+  spiralLayoutPrperty.Insert(DefaultItemLayoutProperty::SPIRAL_MAXIMUM_SWIPE_SPEED, Dali::Property::Value(30.0f));
   spiralLayout->SetLayoutProperties(spiralLayoutPrperty);
 
   view.AddLayout(*spiralLayout);
@@ -545,55 +540,54 @@ int UtcDaliItemLayoutSetAndGetLayoutProperties(void)
   Property::Map thridLayout = spiralLayout->GetLayoutProperties();
 
   //Check all the properties of grid layout
-  DALI_TEST_EQUALS( spiralLayoutPrperty.Count(), thridLayout.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS(spiralLayoutPrperty.Count(), thridLayout.Count(), TEST_LOCATION);
 
-  for( unsigned int mapIdx = 0, mapCount = thridLayout.Count(); mapIdx < mapCount; ++mapIdx )
+  for(unsigned int mapIdx = 0, mapCount = thridLayout.Count(); mapIdx < mapCount; ++mapIdx)
   {
-    KeyValuePair propertyPair( thridLayout.GetKeyValue( mapIdx ) );
+    KeyValuePair propertyPair(thridLayout.GetKeyValue(mapIdx));
     if(propertyPair.first == DefaultItemLayoutProperty::TYPE)
     {
       int layoutType = propertyPair.second.Get<int>();
-      DALI_TEST_EQUALS( layoutType, (int)DefaultItemLayout::SPIRAL, TEST_LOCATION );
+      DALI_TEST_EQUALS(layoutType, (int)DefaultItemLayout::SPIRAL, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::SPIRAL_ITEM_SPACING)
     {
       float columnNumber = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS( columnNumber, (Math::PI*2.0f)/9.5f, TEST_LOCATION );
+      DALI_TEST_EQUALS(columnNumber, (Math::PI * 2.0f) / 9.5f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::SPIRAL_TOP_ITEM_ALIGNMENT)
     {
       float rowNumber = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(rowNumber, -0.125f, TEST_LOCATION );
+      DALI_TEST_EQUALS(rowNumber, -0.125f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::SPIRAL_REVOLUTION_DISTANCE)
     {
       float rowSpacing = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(rowSpacing, 190.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(rowSpacing, 190.0f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::SPIRAL_SCROLL_SPEED_FACTOR)
     {
       float scrollSpeedFactor = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(scrollSpeedFactor, 0.01f, TEST_LOCATION );
+      DALI_TEST_EQUALS(scrollSpeedFactor, 0.01f, TEST_LOCATION);
     }
 
     else if(propertyPair.first == DefaultItemLayoutProperty::SPIRAL_ITEM_FLICK_ANIMATION_DURATION)
     {
       float animationDuration = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(animationDuration, 0.1f, TEST_LOCATION );
+      DALI_TEST_EQUALS(animationDuration, 0.1f, TEST_LOCATION);
     }
     else if(propertyPair.first == DefaultItemLayoutProperty::SPIRAL_MAXIMUM_SWIPE_SPEED)
     {
       float swipSpeed = propertyPair.second.Get<float>();
-      DALI_TEST_EQUALS(swipSpeed, 30.0f, TEST_LOCATION );
+      DALI_TEST_EQUALS(swipSpeed, 30.0f, TEST_LOCATION);
     }
   }
   Dali::Integration::Scene scene = application.GetScene();
-  Vector3 sceneSize(scene.GetSize());
+  Vector3                  sceneSize(scene.GetSize());
   view.ActivateLayout(0, sceneSize, 0.5f);
   view.ActivateLayout(1, sceneSize, 0.5f);
   view.ActivateLayout(2, sceneSize, 0.5f);
   END_TEST;
-
 }
 
 int UtcDaliItemRangeIntersection(void)
@@ -602,18 +596,18 @@ int UtcDaliItemRangeIntersection(void)
 
   unsigned int uBeginItemFirst = 100u, uEndItemFirst = 300u;
   unsigned int uBeginItemSecond = 290u, uEndItemSecond = 400;
-  unsigned int uInterBeginCheck=290u , uInterEndCheck=301u;
-  bool bIsInThisRange = false, bOutOfThisRange = false;
+  unsigned int uInterBeginCheck = 290u, uInterEndCheck = 301u;
+  bool         bIsInThisRange = false, bOutOfThisRange = false;
 
   Toolkit::ItemRange objItemRangeFirst(uBeginItemFirst, uEndItemFirst);
   Toolkit::ItemRange objItemRangeSecond(uBeginItemSecond, uEndItemSecond);
-  ItemRange itmInterSect = objItemRangeFirst.Intersection(objItemRangeSecond);
+  ItemRange          itmInterSect = objItemRangeFirst.Intersection(objItemRangeSecond);
 
   bIsInThisRange = itmInterSect.Within(uInterBeginCheck);
-  DALI_TEST_EQUALS(bIsInThisRange, true, TEST_LOCATION );
+  DALI_TEST_EQUALS(bIsInThisRange, true, TEST_LOCATION);
 
   bOutOfThisRange = itmInterSect.Within(uInterEndCheck);
-  DALI_TEST_EQUALS(bOutOfThisRange, false, TEST_LOCATION );
+  DALI_TEST_EQUALS(bOutOfThisRange, false, TEST_LOCATION);
 
   END_TEST;
 }
