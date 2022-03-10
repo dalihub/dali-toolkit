@@ -73,6 +73,7 @@ Dali::Vector2 PointToVector2(Toolkit::Align::Type point, Toolkit::Direction::Typ
                                          0.0f,1.0f,
                                          0.5f,1.0f,
                                          1.0f,1.0f};
+
   // clang-format on
 
   Vector2 result(&pointToVector2[point * 2]);
@@ -125,7 +126,6 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode, Toolkit::Visual::Typ
   mCornerRadius(Vector4::ZERO),
   mCornerRadiusPolicy(1.0f),
   mDepthIndex(0.0f),
-  mMixColorIndex(Property::INVALID_INDEX),
   mBorderlineWidthIndex(Property::INVALID_INDEX),
   mBorderlineColorIndex(Property::INVALID_INDEX),
   mBorderlineOffsetIndex(Property::INVALID_INDEX),
@@ -252,9 +252,7 @@ Internal::Visual::Base::Impl::Transform::Transform()
   mExtraSize(0.0f, 0.0f),
   mOffsetSizeMode(0.0f, 0.0f, 0.0f, 0.0f),
   mOrigin(Toolkit::Align::TOP_BEGIN),
-  mAnchorPoint(Toolkit::Align::TOP_BEGIN),
-  mOffsetIndex(Property::INVALID_INDEX),
-  mSizeIndex(Property::INVALID_INDEX)
+  mAnchorPoint(Toolkit::Align::TOP_BEGIN)
 {
 }
 
@@ -276,76 +274,29 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap(const Property::
   for(Property::Map::SizeType i(0); i < map.Count(); ++i)
   {
     KeyValuePair keyValue = map.GetKeyValue(i);
-    if(keyValue.first.type == Property::Key::INDEX)
+    switch(Visual::Base::GetIntKey(keyValue.first))
     {
-      switch(keyValue.first.indexKey)
-      {
-        case Toolkit::Visual::Transform::Property::OFFSET:
-        {
-          keyValue.second.Get(mOffset);
-          break;
-        }
-        case Toolkit::Visual::Transform::Property::SIZE:
-        {
-          keyValue.second.Get(mSize);
-          break;
-        }
-        case Toolkit::Visual::Transform::Property::ORIGIN:
-        {
-          Scripting::GetEnumerationProperty<Toolkit::Align::Type>(keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mOrigin);
-          break;
-        }
-        case Toolkit::Visual::Transform::Property::ANCHOR_POINT:
-        {
-          Scripting::GetEnumerationProperty<Toolkit::Align::Type>(keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mAnchorPoint);
-          break;
-        }
-        case Toolkit::Visual::Transform::Property::OFFSET_POLICY:
-        {
-          Vector2 policy;
-          if(GetPolicyFromValue(keyValue.second, policy))
-          {
-            mOffsetSizeMode.x = policy.x;
-            mOffsetSizeMode.y = policy.y;
-          }
-          break;
-        }
-        case Toolkit::Visual::Transform::Property::SIZE_POLICY:
-        {
-          Vector2 policy;
-          if(GetPolicyFromValue(keyValue.second, policy))
-          {
-            mOffsetSizeMode.z = policy.x;
-            mOffsetSizeMode.w = policy.y;
-          }
-          break;
-        }
-        case Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE:
-        {
-          keyValue.second.Get(mExtraSize);
-          break;
-        }
-      }
-    }
-    else // Key type is STRING
-    {
-      if(keyValue.first == "offset")
+      case Toolkit::Visual::Transform::Property::OFFSET:
       {
         keyValue.second.Get(mOffset);
+        break;
       }
-      else if(keyValue.first == "size")
+      case Toolkit::Visual::Transform::Property::SIZE:
       {
         keyValue.second.Get(mSize);
+        break;
       }
-      else if(keyValue.first == "origin")
+      case Toolkit::Visual::Transform::Property::ORIGIN:
       {
         Scripting::GetEnumerationProperty<Toolkit::Align::Type>(keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mOrigin);
+        break;
       }
-      else if(keyValue.first == "anchorPoint")
+      case Toolkit::Visual::Transform::Property::ANCHOR_POINT:
       {
         Scripting::GetEnumerationProperty<Toolkit::Align::Type>(keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mAnchorPoint);
+        break;
       }
-      else if(keyValue.first == "offsetPolicy")
+      case Toolkit::Visual::Transform::Property::OFFSET_POLICY:
       {
         Vector2 policy;
         if(GetPolicyFromValue(keyValue.second, policy))
@@ -353,8 +304,9 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap(const Property::
           mOffsetSizeMode.x = policy.x;
           mOffsetSizeMode.y = policy.y;
         }
+        break;
       }
-      else if(keyValue.first == "sizePolicy")
+      case Toolkit::Visual::Transform::Property::SIZE_POLICY:
       {
         Vector2 policy;
         if(GetPolicyFromValue(keyValue.second, policy))
@@ -362,10 +314,12 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap(const Property::
           mOffsetSizeMode.z = policy.x;
           mOffsetSizeMode.w = policy.y;
         }
+        break;
       }
-      else if(keyValue.first == "extraSize")
+      case Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE:
       {
         keyValue.second.Get(mExtraSize);
+        break;
       }
     }
   }
@@ -374,7 +328,8 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap(const Property::
 void Internal::Visual::Base::Impl::Transform::GetPropertyMap(Property::Map& map) const
 {
   map.Clear();
-  map.Add(Toolkit::Visual::Transform::Property::OFFSET, mOffset)
+  map
+    .Add(Toolkit::Visual::Transform::Property::OFFSET, mOffset)
     .Add(Toolkit::Visual::Transform::Property::SIZE, mSize)
     .Add(Toolkit::Visual::Transform::Property::ORIGIN, mOrigin)
     .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, mAnchorPoint)
@@ -383,34 +338,16 @@ void Internal::Visual::Base::Impl::Transform::GetPropertyMap(Property::Map& map)
     .Add(Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE, mExtraSize);
 }
 
-void Internal::Visual::Base::Impl::Transform::RegisterUniforms(Dali::Renderer renderer, Toolkit::Direction::Type direction)
+void Internal::Visual::Base::Impl::Transform::SetUniforms(Dali::VisualRenderer renderer, Toolkit::Direction::Type direction)
 {
-  // have to test if one of these properties has already been registered on the renderer; as some visuals use more than one renderer, so can't use stored property index.
-  //
-  if(Property::INVALID_INDEX == renderer.GetPropertyIndex(SIZE))
-  {
-    mSizeIndex   = renderer.RegisterUniqueProperty(SIZE, mSize);
-    mOffsetIndex = renderer.RegisterUniqueProperty(OFFSET, direction == Toolkit::Direction::LEFT_TO_RIGHT ? mOffset : mOffset * Vector2(-1.0f, 1.0f));
-    renderer.RegisterUniqueProperty(OFFSET_SIZE_MODE, mOffsetSizeMode);
-    renderer.RegisterUniqueProperty(ORIGIN, PointToVector2(mOrigin, direction) - Vector2(0.5, 0.5));
-    renderer.RegisterUniqueProperty(ANCHOR_POINT, Vector2(0.5, 0.5) - PointToVector2(mAnchorPoint, direction));
-    renderer.RegisterUniqueProperty(EXTRA_SIZE, mExtraSize);
-  }
-  else
-  {
-    SetUniforms(renderer, direction);
-  }
-}
-
-void Internal::Visual::Base::Impl::Transform::SetUniforms(Dali::Renderer renderer, Toolkit::Direction::Type direction)
-{
-  renderer.SetProperty(mSizeIndex, mSize);
-  renderer.SetProperty(mOffsetIndex, direction == Toolkit::Direction::LEFT_TO_RIGHT ? mOffset : mOffset * Vector2(-1.0f, 1.0f));
-
-  renderer.SetProperty(renderer.GetPropertyIndex(OFFSET_SIZE_MODE), mOffsetSizeMode);
-  renderer.SetProperty(renderer.GetPropertyIndex(ORIGIN), PointToVector2(mOrigin, direction) - Vector2(0.5, 0.5));
-  renderer.SetProperty(renderer.GetPropertyIndex(ANCHOR_POINT), Vector2(0.5, 0.5) - PointToVector2(mAnchorPoint, direction));
-  renderer.SetProperty(renderer.GetPropertyIndex(EXTRA_SIZE), mExtraSize);
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, mSize);
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET,
+                       direction == Toolkit::Direction::LEFT_TO_RIGHT ? mOffset : mOffset * Vector2(-1.0f, 1.0f));
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE, mOffsetSizeMode);
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_ORIGIN, PointToVector2(mOrigin, direction) - Vector2(0.5, 0.5));
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT,
+                       Vector2(0.5, 0.5) - PointToVector2(mAnchorPoint, direction));
+  renderer.SetProperty(VisualRenderer::Property::EXTRA_SIZE, mExtraSize);
 }
 
 Vector2 Internal::Visual::Base::Impl::Transform::GetVisualSize(const Vector2& controlSize)

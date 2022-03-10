@@ -46,7 +46,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(11); // 5 transform properties + alignment + corner/border
+const int CUSTOM_PROPERTY_COUNT(6); // alignment + corner/border
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(UNITS)
   DALI_ENUM_TO_STRING_WITH_SCOPE(Toolkit::GradientVisual::Units, OBJECT_BOUNDING_BOX)
@@ -169,7 +169,7 @@ void GradientVisual::OnSetTransform()
 {
   if(mImpl->mRenderer)
   {
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 
@@ -252,7 +252,7 @@ void GradientVisual::OnInitialize()
   sampler.SetWrapMode(wrap, wrap);
   textureSet.SetSampler(0u, sampler);
 
-  mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
   mImpl->mRenderer.SetTextures(textureSet);
 
@@ -265,7 +265,7 @@ void GradientVisual::OnInitialize()
   mImpl->mRenderer.RegisterUniqueProperty(UNIFORM_ALIGNMENT_MATRIX_NAME, mGradientTransform);
 
   //Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propertyMap)

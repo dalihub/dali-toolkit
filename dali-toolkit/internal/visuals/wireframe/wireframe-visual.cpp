@@ -34,7 +34,6 @@ namespace Internal
 {
 namespace
 {
-const int         CUSTOM_PROPERTY_COUNT(5);
 const char* const POSITION_ATTRIBUTE_NAME("aPosition");
 const char* const INDEX_NAME("indices");
 } // namespace
@@ -156,11 +155,10 @@ void WireframeVisual::OnInitialize()
   }
 
   //Create the renderer
-  mImpl->mRenderer = Renderer::New(geometry, shader);
-  mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
+  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
 
   //Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 Geometry WireframeVisual::CreateQuadWireframeGeometry()
@@ -200,7 +198,7 @@ void WireframeVisual::OnSetTransform()
   if(mImpl->mRenderer)
   {
     //Register transform properties
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 

@@ -39,7 +39,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(7); // 5 transform properties + color,size
+const int CUSTOM_PROPERTY_COUNT(2); // color,size
 
 const char* const POSITION_ATTRIBUTE_NAME("aPosition");
 const char* const DRIFT_ATTRIBUTE_NAME("aDrift");
@@ -166,7 +166,7 @@ void BorderVisual::OnSetTransform()
 {
   if(mImpl->mRenderer)
   {
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 
@@ -180,11 +180,11 @@ void BorderVisual::OnInitialize()
   }
 
   Shader shader    = GetBorderShader();
-  mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
   //Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 Shader BorderVisual::GetBorderShader()

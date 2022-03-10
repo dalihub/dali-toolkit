@@ -41,7 +41,7 @@ namespace Internal
 {
 namespace
 {
-const int CUSTOM_PROPERTY_COUNT(12); // 5 transform properties + Blur Radius + Mix Color + border/corner
+const int CUSTOM_PROPERTY_COUNT(6); // Blur Radius + border/corner
 
 VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[6] =
   {
@@ -180,7 +180,7 @@ void ColorVisual::OnSetTransform()
 {
   if(mImpl->mRenderer)
   {
-    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+    mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 
@@ -199,13 +199,10 @@ void ColorVisual::OnInitialize()
 
   Shader shader = GenerateShader();
 
-  mImpl->mRenderer = Renderer::New(geometry, shader);
+  mImpl->mRenderer = VisualRenderer::New(geometry, shader);
   mImpl->mRenderer.ReserveCustomProperties(CUSTOM_PROPERTY_COUNT);
 
-  // ColorVisual has it's own index key for mix color - use this instead
-  // of using the new base index to avoid changing existing applications
-  // String keys will get to this property.
-  mImpl->mMixColorIndex = mImpl->mRenderer.RegisterProperty(Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor));
+  mImpl->mRenderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, Vector3(mImpl->mMixColor));
 
   if(!EqualsZero(mBlurRadius))
   {
@@ -214,7 +211,7 @@ void ColorVisual::OnInitialize()
   }
 
   // Register transform properties
-  mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  mImpl->mTransform.SetUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
 }
 
 Shader ColorVisual::GenerateShader() const
