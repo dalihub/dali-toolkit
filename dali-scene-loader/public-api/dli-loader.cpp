@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1626,14 +1626,13 @@ void DliLoader::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadParams& 
           if(tnValue)
           {
             animProp.mValue.reset(new AnimatedProperty::Value{ReadPropertyValue(*tnValue)});
+            ReadBool(tnProperty.GetChild("relative"), animProp.mValue->mIsRelative);
           }
           else
           {
             mOnError(FormatString("Property '%s' fails to define target value.",
                                   animProp.mPropertyName.c_str()));
           }
-
-          ReadBool(tnProperty.GetChild("relative"), animProp.mValue->mIsRelative);
         }
 
         animDef.mProperties.push_back(std::move(animProp));
